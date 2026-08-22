@@ -1,0 +1,44 @@
+import Link from "next/link";
+import { Container } from "@/components/ui/Container";
+import { NAV_ITEMS } from "@/lib/nav";
+
+export function Footer() {
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className="border-t border-border">
+      <Container className="flex flex-col gap-8 py-12 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-sm">
+          <div className="flex items-center gap-2 text-base font-semibold tracking-tight text-foreground">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-foreground">
+              Q
+            </span>
+            QuantumLearn
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            An interactive platform for learning quantum computing — built for
+            advanced high-school and early-college students.
+          </p>
+        </div>
+
+        <nav className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm sm:flex sm:gap-6">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </Container>
+
+      <Container className="border-t border-border py-6">
+        <p className="text-xs text-muted-foreground">
+          © {year} QuantumLearn. All rights reserved.
+        </p>
+      </Container>
+    </footer>
+  );
+}
