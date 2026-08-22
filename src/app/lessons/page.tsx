@@ -1,63 +1,34 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { PlaceholderCard } from "@/components/ui/PlaceholderCard";
+import { CourseList } from "@/components/curriculum/CourseList";
+import { PILLARS, getCoursesByPillar } from "@/lib/content/curriculum";
+import { getAllLessonsMeta } from "@/lib/content/lessons";
 
 export const metadata: Metadata = {
   title: "Lessons",
-  description: "The full QuantumLearn lesson library, organized by topic and difficulty.",
+  description: "The full QuantumLearn lesson catalog, across every course and every track.",
 };
 
-const LESSON_TOPICS = [
-  {
-    title: "Complex numbers & vector spaces",
-    description: "The mathematical toolkit underlying every quantum state.",
-    tag: "Foundations",
-  },
-  {
-    title: "The qubit",
-    description: "Superposition, the Bloch sphere, and measurement.",
-    tag: "Foundations",
-  },
-  {
-    title: "Single-qubit gates",
-    description: "Pauli, Hadamard, and phase gates, and how they act on state vectors.",
-    tag: "Core",
-  },
-  {
-    title: "Entanglement",
-    description: "Multi-qubit states, Bell pairs, and why entanglement isn't just correlation.",
-    tag: "Core",
-  },
-  {
-    title: "Quantum circuits",
-    description: "Reading and building circuit diagrams from gates and qubits.",
-    tag: "Core",
-  },
-  {
-    title: "Grover's algorithm",
-    description: "Amplitude amplification and quadratic speedups for search.",
-    tag: "Algorithms",
-  },
-];
+export default async function LessonsPage() {
+  const lessons = await getAllLessonsMeta();
 
-export default function LessonsPage() {
   return (
     <Container className="py-16">
       <PageHeader
         eyebrow="Lessons"
-        title="Lesson library"
-        description="Browse lessons by topic. Content is still being written — this is a preview of what's coming."
+        title="Lesson catalog"
+        description="Every course across all four tracks, in one place. Most lessons are still being written — this is the full map of what's coming."
       />
 
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {LESSON_TOPICS.map((lesson) => (
-          <PlaceholderCard
-            key={lesson.title}
-            title={lesson.title}
-            description={lesson.description}
-            tag={lesson.tag}
-          />
+      <div className="mt-14 space-y-16">
+        {PILLARS.map((pillar) => (
+          <section key={pillar.slug}>
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">{pillar.title}</h2>
+            <div className="mt-4">
+              <CourseList courses={getCoursesByPillar(pillar.slug)} lessons={lessons} />
+            </div>
+          </section>
         ))}
       </div>
     </Container>

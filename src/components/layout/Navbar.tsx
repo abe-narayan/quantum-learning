@@ -31,13 +31,13 @@ export function Navbar() {
           QuantumLearn
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                "rounded-full px-2.5 py-2 text-sm font-medium transition-colors",
                 isActive(pathname, item.href)
                   ? "bg-surface-muted text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -48,7 +48,7 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <Button href="/learn" size="sm">
             Start learning
           </Button>
@@ -56,7 +56,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-surface-muted md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-surface-muted lg:hidden"
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((open) => !open)}
@@ -79,7 +79,7 @@ export function Navbar() {
       </Container>
 
       {isMenuOpen ? (
-        <div className="border-t border-border md:hidden">
+        <div className="border-t border-border lg:hidden">
           <Container className="flex flex-col gap-1 py-3">
             {NAV_ITEMS.map((item) => (
               <Link

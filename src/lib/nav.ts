@@ -31,6 +31,16 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Practice problems and quizzes to check your understanding.",
   },
   {
+    label: "Hardware",
+    href: "/hardware",
+    description: "How qubits are physically built, controlled, and scaled.",
+  },
+  {
+    label: "Software",
+    href: "/software",
+    description: "The simulators, compilers, and SDKs behind quantum programs.",
+  },
+  {
     label: "About",
     href: "/about",
     description: "Who QuantumLearn is for, and what we're building.",

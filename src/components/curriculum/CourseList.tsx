@@ -1,0 +1,69 @@
+import Link from "next/link";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
+import type { Course, Difficulty, LessonMetaWithSlug } from "@/lib/content/types";
+
+const DIFFICULTY_LABEL: Record<Difficulty, string> = {
+  foundational: "Foundational",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+};
+
+export function CourseList({
+  courses,
+  lessons,
+}: {
+  courses: Course[];
+  lessons: LessonMetaWithSlug[];
+}) {
+  return (
+    <div className="space-y-6">
+      {courses.map((course) => {
+        const lessonByModule = new Map(
+          lessons.filter((lesson) => lesson.course === course.slug).map((lesson) => [lesson.module, lesson])
+        );
+
+        return (
+          <Card key={course.slug}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">{course.title}</h3>
+                <p className="mt-1 max-w-xl text-sm text-muted-foreground">{course.description}</p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <Badge tone="brand">{DIFFICULTY_LABEL[course.difficulty]}</Badge>
+                <Badge>{course.estimatedHours}h</Badge>
+              </div>
+            </div>
+
+            <ol className="mt-4 grid gap-2 sm:grid-cols-2">
+              {course.modules.map((module) => {
+                const lesson = lessonByModule.get(module.slug);
+                return (
+                  <li
+                    key={module.slug}
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm"
+                  >
+                    <span className={lesson ? "text-foreground" : "text-muted-foreground"}>
+                      {module.title}
+                    </span>
+                    {lesson ? (
+                      <Link
+                        href={`/lessons/${lesson.slug}`}
+                        className="shrink-0 text-xs font-medium text-brand hover:underline"
+                      >
+                        View →
+                      </Link>
+                    ) : (
+                      <Badge>Coming soon</Badge>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
