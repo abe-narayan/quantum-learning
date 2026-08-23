@@ -1,0 +1,225 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/bra-ket-formalism"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Bra-Ket Formalism",
+  description:
+    "Dirac's notation for general vector spaces — kets, bras, outer products as operators, the completeness relation, and operator matrix elements — the notation every remaining lesson in this course is written in.",
+  course: "mathematical-foundations",
+  module: "bra-ket-formalism",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"],
+  objectives: [
+    "Translate between column-vector and bra-ket notation for vectors, inner products, and outer products",
+    "Derive and apply the completeness relation for an orthonormal basis",
+    "Compute operator matrix elements using bra-ket sandwiches",
+  ],
+};
+
+<Callout type="note">
+If you've completed the Quantum Computing track, you've already met kets,
+bras, and the inner product applied specifically to qubits, in that
+track's Dirac Notation lesson. This lesson develops the same notation for
+a general vector space, and goes further — into outer products and the
+completeness relation — which the rest of this course needs.
+</Callout>
+
+## Motivation
+
+Every result from the last two lessons — inner products, norms,
+orthogonality — can be written in ordinary vector and matrix notation. But
+quantum mechanics almost never is written that way, because Paul Dirac
+invented a notation compact enough to make the extra structure (operators,
+in particular) far easier to write and reason about. It's worth learning
+properly now, once, rather than reconstructing it piecemeal every time a
+new lesson introduces another piece of it.
+
+## Intuition
+
+A **ket** $|v\rangle$ is just a name for a vector — nothing new yet, only
+notation. The payoff comes from its partner, the **bra** $\langle v|$,
+because a bra and a ket combine into $\langle u|v\rangle$ — read
+left-to-right it looks like "bra-c-ket," which is where the names come
+from — and that combination is exactly the inner product from the last
+lesson.
+
+## Mathematical Development
+
+### Ket, bra, and the inner product
+
+$|v\rangle$ denotes a vector — concretely, for $\mathbb{C}^n$, a column
+vector. The bra $\langle v|$ is its **conjugate transpose**: lay the
+column on its side and conjugate every entry.
+
+$$
+|v\rangle = \begin{pmatrix}v_1\\\vdots\\v_n\end{pmatrix} \quad\Longrightarrow\quad \langle v| = \begin{pmatrix}v_1^* & \cdots & v_n^*\end{pmatrix}
+$$
+
+A bra times a ket is ordinary matrix multiplication of a row by a column —
+a single number, and exactly the standard inner product:
+
+$$
+\langle u|v\rangle = \begin{pmatrix}u_1^*&\cdots&u_n^*\end{pmatrix}\begin{pmatrix}v_1\\\vdots\\v_n\end{pmatrix} = \sum_i u_i^*v_i
+$$
+
+The conjugate-symmetry and linearity axioms from the last lesson carry
+over unchanged: $\langle u|v\rangle=\langle v|u\rangle^*$, and
+$\langle u|v\rangle$ is linear in $|v\rangle$, conjugate-linear in
+$\langle u|$.
+
+### More abstractly: bras as linear functionals
+
+More generally (beyond concrete column vectors), a bra is a **linear
+functional** — a linear map from $V$ to $\mathbb{C}$ — defined by how it
+acts on kets: $\langle v|$ acts on $|w\rangle$ to produce the number
+$\langle v,w\rangle$. Every inner product space has exactly one such
+functional for each vector $|v\rangle$; the concrete conjugate-transpose
+recipe above is what that functional looks like once you write vectors as
+columns. This lesson mostly works with the concrete picture, but it's
+worth knowing the more abstract statement exists, since it's what lets
+bra-ket notation extend cleanly to infinite-dimensional spaces (like
+wavefunctions) later in the Quantum Mechanics pillar.
+
+### The outer product
+
+Reversing the order, $|u\rangle\langle v|$ — a ket times a bra — is a
+column times a row, which produces a **matrix**, not a number:
+
+$$
+|u\rangle\langle v| = \begin{pmatrix}u_1\\u_2\end{pmatrix}\begin{pmatrix}v_1^*&v_2^*\end{pmatrix} = \begin{pmatrix}u_1v_1^* & u_1v_2^*\\u_2v_1^*&u_2v_2^*\end{pmatrix}
+$$
+
+This **outer product** is an operator: applied to a ket $|w\rangle$, it
+gives $|u\rangle\langle v|w\rangle = \langle v|w\rangle\,|u\rangle$ — the
+number $\langle v|w\rangle$ times the vector $|u\rangle$. A concrete and
+important example: $|0\rangle\langle0|$ for the standard basis of
+$\mathbb{C}^2$ is
+
+$$
+|0\rangle\langle0| = \begin{pmatrix}1\\0\end{pmatrix}\begin{pmatrix}1&0\end{pmatrix} = \begin{pmatrix}1&0\\0&0\end{pmatrix}
+$$
+
+which sends $|0\rangle\mapsto|0\rangle$ and $|1\rangle\mapsto0$ — it
+**projects** onto $|0\rangle$. Projectors built from outer products are
+central to how measurement is described mathematically, developed in the
+Probability and Quantum States lesson.
+
+### The completeness relation
+
+For an orthonormal basis $\{|e_i\rangle\}$, the sum of every basis
+vector's projector equals the **identity operator**:
+
+$$
+\sum_i |e_i\rangle\langle e_i| = I
+$$
+
+This deserves a derivation, not just acceptance — it's one of the most
+useful identities in all of quantum mechanics. Apply the left side to an
+arbitrary $|\psi\rangle$, expanded in this basis as
+$|\psi\rangle=\sum_j c_j|e_j\rangle$:
+
+$$
+\left(\sum_i|e_i\rangle\langle e_i|\right)|\psi\rangle = \sum_i|e_i\rangle\langle e_i|\psi\rangle = \sum_i \langle e_i|\psi\rangle\,|e_i\rangle
+$$
+
+Since $\{e_i\}$ is orthonormal, $\langle e_i|\psi\rangle = \langle
+e_i|\sum_j c_j e_j\rangle = \sum_j c_j\langle e_i|e_j\rangle = c_i$ (every
+term but $j=i$ vanishes). So the sum becomes $\sum_i c_i|e_i\rangle$,
+which is exactly $|\psi\rangle$ by how it was expanded in the first place.
+The completeness relation acts as the identity on *every* vector, so it
+equals the identity operator.
+
+### Operator matrix elements
+
+For an operator $A$, the number $\langle i|A|j\rangle$ (a bra, then $A$,
+then a ket — read as $\langle i|$ acting on the vector $A|j\rangle$) is
+called a **matrix element**, and it's literally the $(i,j)$ entry of $A$'s
+matrix in the basis $\{|i\rangle\}$. The Linear Operators lesson develops
+this fully; for a preview, take $A$ to be the Pauli-$X$ matrix
+$\begin{pmatrix}0&1\\1&0\end{pmatrix}$ (the quantum NOT gate, if you've
+seen quantum computing): $X|1\rangle = |0\rangle$, so
+
+$$
+\langle0|X|1\rangle = \langle0|0\rangle = 1
+$$
+
+matching the top-right entry of $X$'s matrix directly.
+
+### The adjoint (dagger) notation
+
+The bra $\langle v|$ is called the **adjoint** or **dagger** of the ket
+$|v\rangle$, written $|v\rangle^\dagger=\langle v|$. The same dagger
+notation extends to matrices: for any matrix $M$, $M^\dagger$ is its
+conjugate transpose, $(M^\dagger)_{ij}=M_{ji}^*$. This single symbol will
+carry the entire Hermitian Operators lesson.
+
+## Physical Interpretation
+
+The completeness relation is the formal version of "any state can be
+decomposed into basis states, and the decomposition is unique" — the same
+fact from the Vector Spaces lesson about coordinates, now written as an
+operator identity rather than a sentence. Projectors like
+$|e_i\rangle\langle e_i|$ are the mathematical objects that represent
+"asking whether the system is in state $|e_i\rangle$."
+
+## Worked Example
+
+**Verify the completeness relation for $\mathbb{C}^2$'s standard basis by
+computing $|0\rangle\langle0|+|1\rangle\langle1|$ directly.**
+
+$$
+|0\rangle\langle0| + |1\rangle\langle1| = \begin{pmatrix}1&0\\0&0\end{pmatrix} + \begin{pmatrix}0&0\\0&1\end{pmatrix} = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I
+$$
+
+Matches the identity matrix exactly, confirming the general derivation
+above for this specific case.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing $|u\rangle\langle v|$ with $\langle u|v\rangle$.** The first is
+an operator (a matrix); the second is a number. Getting the order of bra
+and ket backwards changes what kind of object you even have.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the bra's conjugation when computing a matrix element.**
+$\langle i|A|j\rangle$ conjugates the entries of $\langle i|$, not $A$
+itself.
+</Callout>
+
+## Practice Questions
+
+1. Compute the outer product $|1\rangle\langle0|$ as a $2\times2$ matrix.
+2. Using $|+\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$ and
+   $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$, verify that
+   $|+\rangle\langle+|+|-\rangle\langle-|=I$ as well (a *different*
+   orthonormal basis satisfying the same completeness relation).
+3. Compute $\langle1|X|0\rangle$ for the Pauli-$X$ matrix above.
+4. Explain in one sentence why $(|u\rangle\langle v|)^\dagger = |v\rangle\langle u|$.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $|v\rangle$ is a ket (column vector); $\langle v|=|v\rangle^\dagger$ is
+  its bra (conjugate-transpose row vector).
+- $\langle u|v\rangle$ is a number (the inner product); $|u\rangle\langle
+  v|$ is an operator (the outer product).
+- Completeness relation: $\sum_i|e_i\rangle\langle e_i|=I$ for any
+  orthonormal basis — derived by checking it acts as the identity on an
+  arbitrary vector.
+- $\langle i|A|j\rangle$ is $A$'s $(i,j)$ matrix element in the basis
+  $\{|i\rangle\}$.
+
+## Further Exploration
+
+Next: **Linear Operators**, which develops matrix representation and
+composition fully — including a derivation of matrix multiplication
+*from* the completeness relation just built here.

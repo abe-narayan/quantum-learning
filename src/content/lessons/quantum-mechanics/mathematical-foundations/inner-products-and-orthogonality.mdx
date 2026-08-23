@@ -1,0 +1,219 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Inner Products and Orthogonality",
+  description:
+    "Adding geometry to a vector space — the conjugate-linear inner product, norm and normalization, orthogonality, and a full derivation of the Cauchy-Schwarz inequality.",
+  course: "mathematical-foundations",
+  module: "inner-products-and-orthogonality",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/vector-spaces"],
+  objectives: [
+    "State the inner product axioms for a complex vector space and explain why conjugation is required",
+    "Compute norms, check orthogonality, and normalize vectors",
+    "Derive and apply the Cauchy-Schwarz inequality",
+  ],
+};
+
+## Motivation
+
+A vector space, as built in the last lesson, has no notion of length or
+angle — you can add and scale vectors, but nothing yet says how "big" one
+is or whether two of them are perpendicular. Physics needs both: the
+length of a quantum state vector will turn out to be tied to total
+probability, and "perpendicular" states will turn out to be the ones a
+single measurement can perfectly tell apart. The extra structure that
+supplies length and angle is called an **inner product**.
+
+## Intuition
+
+For ordinary real vectors, the dot product $u\cdot v = \sum u_iv_i$ already
+does this job: $u\cdot u$ gives squared length, and $u\cdot v=0$ means
+perpendicular. The complex case needs one modification — conjugation —
+and once you see why, the whole structure falls out naturally rather than
+looking like an arbitrary rule.
+
+## Mathematical Development
+
+### Why conjugation is required
+
+Try defining an inner product on $\mathbb{C}^n$ the naive way, without
+conjugating: $\langle v,v\rangle \overset{?}{=} \sum v_i^2$. Take
+$v=(i,0)$: $\sum v_i^2 = i^2 = -1$ — negative. A notion of "squared
+length" that can be negative is useless. Conjugating one side fixes this
+immediately, because $v_i^*v_i=|v_i|^2\ge0$ always (this is exactly the
+$zz^*\ge0$ fact from the Complex Numbers lesson).
+
+### The axioms
+
+An **inner product** on a complex vector space $V$ is a function
+$\langle\cdot,\cdot\rangle:V\times V\to\mathbb{C}$ satisfying, for all
+$u,v,w\in V$ and $a\in\mathbb{C}$:
+
+1. **Conjugate symmetry**: $\langle u,v\rangle = \langle v,u\rangle^*$.
+2. **Linearity in the second argument**:
+   $\langle u,av+bw\rangle = a\langle u,v\rangle+b\langle u,w\rangle$.
+3. **Positive-definiteness**: $\langle v,v\rangle\ge0$, with equality iff
+   $v=0$.
+
+(This lesson uses the physics convention — linear in the *second* slot.
+Some math texts put linearity in the first slot instead; both are used in
+the literature, so always check a text's convention before combining
+formulas from different sources.) Conjugate-linearity in the *first*
+argument follows from axioms 1 and 2, rather than needing to be assumed
+separately:
+
+$$
+\langle au+bw, v\rangle = \langle v, au+bw\rangle^* = (a\langle v,u\rangle+b\langle v,w\rangle)^* = a^*\langle v,u\rangle^*+b^*\langle v,w\rangle^* = a^*\langle u,v\rangle+b^*\langle w,v\rangle
+$$
+
+The **standard inner product** on $\mathbb{C}^n$ is
+$\langle u,v\rangle = \sum_i u_i^*v_i$; you can check directly that it
+satisfies all three axioms.
+
+### Norm and normalization
+
+The **norm** is $\|v\| = \sqrt{\langle v,v\rangle}$ — real and
+non-negative by positive-definiteness. A vector is **normalized** if
+$\|v\|=1$; any nonzero $v$ can be normalized by scaling:
+$v/\|v\|$ always has norm exactly $1$ (check:
+$\|v/\|v\|\|^2 = \langle v/\|v\|, v/\|v\|\rangle = \langle v,v\rangle/\|v\|^2 = 1$).
+
+### Orthogonality
+
+Two vectors are **orthogonal** if $\langle u,v\rangle=0$. A set of
+pairwise-orthogonal, individually-normalized vectors is an
+**orthonormal set** — the natural generalization of "perpendicular unit
+vectors." An orthonormal *basis* is the best-behaved kind of basis to
+work with, for a reason the Bra-Ket Formalism lesson makes precise
+(coordinates relative to an orthonormal basis are just inner products).
+
+### The Cauchy-Schwarz inequality
+
+For any $u,v\in V$:
+
+$$
+|\langle u,v\rangle| \le \|u\|\,\|v\|
+$$
+
+This deserves a real derivation. Assume $v\ne0$ (the inequality is trivial
+if $v=0$), and define $c = \langle v,u\rangle/\langle v,v\rangle$ — this
+is the coefficient that makes $w = u - cv$ orthogonal to $v$:
+
+$$
+\langle v,w\rangle = \langle v,u\rangle - c\langle v,v\rangle = \langle v,u\rangle - \langle v,u\rangle = 0
+$$
+
+By positive-definiteness, $\langle w,w\rangle\ge0$. Expand it out, using
+$\langle v,u\rangle=\langle u,v\rangle^*$ and the fact that $\langle
+v,v\rangle$ is real:
+
+$$
+0 \le \langle w,w\rangle = \langle u,u\rangle - c\langle u,v\rangle - c^*\langle v,u\rangle + c^*c\langle v,v\rangle = \langle u,u\rangle - \frac{|\langle v,u\rangle|^2}{\langle v,v\rangle}
+$$
+
+(all three of the last terms reduce to $|\langle v,u\rangle|^2/\langle
+v,v\rangle$, and two of them subtract while one adds, leaving exactly one
+copy — working through the algebra term by term is a good self-check).
+Rearranging:
+
+$$
+|\langle v,u\rangle|^2 \le \langle u,u\rangle\langle v,v\rangle = \|u\|^2\|v\|^2
+$$
+
+Taking square roots, and using $|\langle v,u\rangle|=|\langle u,v\rangle|$
+(conjugating doesn't change modulus), gives Cauchy-Schwarz.
+
+### Geometric interpretation and Gram-Schmidt
+
+For real vectors, $u\cdot v = \|u\|\|v\|\cos\theta$, so Cauchy-Schwarz is
+just $|\cos\theta|\le1$. Complex vectors don't have a literal angle in the
+same sense, but the ratio $|\langle u,v\rangle|/(\|u\|\|v\|)\in[0,1]$
+still measures how much $u$ and $v$ "overlap" — the same word used for
+$\langle\phi|\psi\rangle$ once bra-ket notation is introduced. The vector
+$w=u-cv$ built during the Cauchy-Schwarz proof is exactly the first step
+of **Gram-Schmidt orthogonalization**: subtracting off the component along
+$v$ leaves a piece orthogonal to it, which is how an arbitrary basis gets
+converted into an orthonormal one, one vector at a time.
+
+## Physical Interpretation
+
+Two quantum states with $\langle\phi|\psi\rangle=0$ are the states a
+single measurement can distinguish with certainty — orthogonality is not
+just a geometric nicety here, it's the mathematical condition for
+"perfectly distinguishable." $\|\psi\|=1$ will turn out to be exactly the
+normalization condition that makes total measurement probability equal
+$1$, developed fully in the Probability and Quantum States lesson.
+
+## Worked Example
+
+**Are $u=(1,i)$ and $v=(i,1)$ orthogonal? If not, find the angle-like
+overlap ratio.**
+
+$$
+\langle u,v\rangle = 1^*\cdot i + i^*\cdot 1 = i + (-i)(1) = i - i = 0
+$$
+
+They're orthogonal. (Quick sanity check on why this is unsurprising: $v$
+is $i$ times the vector $(1,-i)$, and $(1,-i)$ turns out to be exactly
+orthogonal to $(1,i)$ under this inner product — an overall phase factor
+like this $i$ never changes orthogonality, since $|\langle u, cv\rangle| =
+|c|\,|\langle u,v\rangle|$ for any scalar $c$.)
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting to conjugate.** $\langle u,v\rangle=\sum u_i^*v_i$, not $\sum
+u_iv_i$ — skipping the conjugate breaks positive-definiteness, as shown
+above.
+</Callout>
+
+<Callout type="mistake">
+**Assuming $\langle u,v\rangle=\langle v,u\rangle$.** They're complex
+conjugates of each other, equal only when both happen to be real.
+</Callout>
+
+<Callout type="warning">
+**Different textbooks conjugate different slots.** This lesson conjugates
+the first argument (physics convention, matching bra-ket notation). Watch
+for the opposite convention when reading other sources.
+</Callout>
+
+## Practice Questions
+
+1. Compute $\langle u,v\rangle$ for $u=(1,0)$ and $v=(1,1)/\sqrt2$. Is
+   Cauchy-Schwarz satisfied (check $|\langle u,v\rangle|\le\|u\|\|v\|$
+   numerically)?
+2. Normalize $v=(3,4i)$.
+3. Find a vector orthogonal to $(1,1)$ in $\mathbb{C}^2$, using the
+   Gram-Schmidt idea from this lesson.
+4. Explain, using positive-definiteness, why $\langle v,v\rangle=0$ forces
+   $v$ to be the zero vector — not just "small."
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- An inner product is conjugate-symmetric, linear in the second argument,
+  and positive-definite; conjugation is what makes $\langle v,v\rangle$
+  real and non-negative for complex vectors.
+- Norm: $\|v\|=\sqrt{\langle v,v\rangle}$; normalization scales any
+  nonzero vector to norm $1$.
+- Orthogonality: $\langle u,v\rangle=0$; an orthonormal set has no
+  redundancy and no "overlap" between distinct members.
+- Cauchy-Schwarz, $|\langle u,v\rangle|\le\|u\|\|v\|$, follows by
+  projecting out the component along one vector and using
+  positive-definiteness on what's left.
+
+## Further Exploration
+
+Next: **The Bra-Ket Formalism**, which gives this exact inner-product
+structure a compact, standard notation — bras, kets, outer products, and
+the completeness relation — used throughout the rest of quantum mechanics.

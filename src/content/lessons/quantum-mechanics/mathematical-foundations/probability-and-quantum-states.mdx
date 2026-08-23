@@ -1,0 +1,226 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/probability-and-quantum-states"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Probability and Quantum States",
+  description:
+    "The postulates that connect all of this course's linear algebra to physical predictions — states as unit vectors, observables as Hermitian operators, the Born rule, and expectation values, with every consistency check derived rather than assumed.",
+  course: "mathematical-foundations",
+  module: "probability-and-quantum-states",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/tensor-products-and-composite-systems"],
+  objectives: [
+    "State the postulates connecting quantum states, observables, and measurement outcomes",
+    "Compute measurement probabilities and expectation values from a state and a Hermitian observable, and verify they agree with the direct sandwich formula",
+    "Explain why an overall phase never affects any measurement prediction",
+  ],
+};
+
+## Motivation
+
+Nine lessons of linear algebra have built unit vectors, inner products,
+Hermitian and unitary operators, eigenvalues, and tensor products. None of
+that, by itself, is physics — it's mathematics that happens to be useful
+for physics. This lesson supplies the missing piece: the specific
+postulates that connect the mathematics to actual, checkable predictions
+about what an experiment will show.
+
+## Intuition
+
+Every earlier lesson in this course quietly built toward one destination:
+a state is a unit vector; an observable is a Hermitian operator; a
+measurement outcome is one of that operator's eigenvalues; and the
+*probability* of getting a particular outcome comes from how much the
+state "overlaps" with the corresponding eigenvector. Every piece of that
+sentence is a lesson you've already done the work for.
+
+## Mathematical Development
+
+### Postulate 1: states are unit vectors
+
+A quantum system's state is a vector $|\psi\rangle$ with $\|\psi\rangle\|=1$,
+in a complex vector space equipped with an inner product (a **Hilbert
+space** — the name for exactly the structure built across this course).
+Two states are the same if they differ only by an overall phase:
+$|\psi\rangle$ and $e^{i\alpha}|\psi\rangle$ represent the identical
+physical situation, for any real $\alpha$ — a fact this lesson will
+justify below rather than just assert.
+
+### Postulate 2: observables are Hermitian operators
+
+A measurable physical quantity corresponds to a Hermitian operator $A$.
+Its possible outcomes are exactly its eigenvalues — guaranteed real by the
+Hermitian Operators lesson, exactly matching the physical requirement that
+measurement outcomes are real numbers.
+
+### Postulate 3 (the Born rule): outcome probabilities
+
+Write $A$'s spectral decomposition $A = \sum_i\lambda_i|e_i\rangle\langle
+e_i|$ (Hermitian Operators lesson). If the system is in state
+$|\psi\rangle$, the probability of measuring outcome $\lambda_i$ is:
+
+$$
+P(\lambda_i) = |\langle e_i|\psi\rangle|^2
+$$
+
+This is a genuine postulate of quantum mechanics — not something derived
+from more basic principles in this course, or anywhere else in physics —
+but it isn't arbitrary either: it's the *unique* rule consistent with
+everything already built. Expand $|\psi\rangle=\sum_i c_i|e_i\rangle$
+where $c_i=\langle e_i|\psi\rangle$ (the completeness relation, Bra-Ket
+Formalism lesson). Total probability had better sum to $1$; check it does:
+
+$$
+\sum_i P(\lambda_i) = \sum_i |c_i|^2 = \sum_i \langle\psi|e_i\rangle\langle e_i|\psi\rangle = \langle\psi|\Big(\sum_i|e_i\rangle\langle e_i|\Big)|\psi\rangle = \langle\psi|I|\psi\rangle = \langle\psi|\psi\rangle = 1
+$$
+
+using the completeness relation again in the second-to-last step, and
+$\|\psi\|=1$ (Postulate 1) in the last. Normalization, orthonormal
+eigenbases, and the completeness relation all conspire to make this
+come out exactly right — a real consistency check, not a coincidence.
+
+### Expectation value, and why it matches $\langle\psi|A|\psi\rangle$
+
+The **expectation value** — the average outcome over many repeated
+measurements — is $\langle A\rangle = \sum_i \lambda_i P(\lambda_i)$ by
+definition of "average." Substitute the Born rule and simplify using the
+spectral decomposition:
+
+$$
+\langle A\rangle = \sum_i \lambda_i|\langle e_i|\psi\rangle|^2 = \sum_i\lambda_i\langle\psi|e_i\rangle\langle e_i|\psi\rangle = \langle\psi|\Big(\sum_i\lambda_i|e_i\rangle\langle e_i|\Big)|\psi\rangle = \langle\psi|A|\psi\rangle
+$$
+
+This recovers exactly the "sandwich" formula stated without proof back in
+the Hermitian Operators lesson — now derived as a consequence of the Born
+rule, closing the loop between that lesson and this one.
+
+### Why global phase is unobservable
+
+Replace $|\psi\rangle$ with $e^{i\alpha}|\psi\rangle$ and recompute every
+outcome probability: $\langle e_i|e^{i\alpha}\psi\rangle =
+e^{i\alpha}\langle e_i|\psi\rangle$, so
+$P(\lambda_i) = |e^{i\alpha}\langle e_i|\psi\rangle|^2 =
+|e^{i\alpha}|^2\,|\langle e_i|\psi\rangle|^2 = |\langle
+e_i|\psi\rangle|^2$ — completely unchanged, because $|e^{i\alpha}|=1$
+(Complex Numbers lesson). Every prediction this framework makes depends
+only on $|\psi\rangle$ up to an overall phase, which is exactly Postulate
+1's claim, now justified rather than just stated.
+
+### Measurement and collapse
+
+After a measurement yields outcome $\lambda_i$, the state becomes
+$|e_i\rangle$ — the corresponding eigenvector. A repeated, immediate
+re-measurement of the same observable then gives $\lambda_i$ again with
+certainty ($P(\lambda_i)=|\langle e_i|e_i\rangle|^2=1$), matching the
+operational meaning of "the system now definitely has that value."
+
+### Composite systems
+
+For two systems combined via the tensor product (last lesson), a joint
+state lives in $H_1\otimes H_2$; product states describe independent
+systems, and non-factorizable (entangled) states describe systems whose
+measurement outcomes are correlated in a way no product state can
+reproduce.
+
+## Physical Interpretation
+
+Collect the four postulates together, each now tied to a specific earlier
+lesson: **state** = unit vector (Vector Spaces, Inner Products); **
+observable** = Hermitian operator (Hermitian Operators); **outcome** =
+eigenvalue (Eigenvalues and Eigenvectors); **probability** = Born rule via
+the spectral decomposition (this lesson, built on the Bra-Ket Formalism's
+completeness relation). Unitary operators (not directly a postulate here,
+but essential) describe how a state evolves *between* measurements. This
+short list is the mathematical skeleton of every calculation the rest of
+quantum mechanics will ask you to do.
+
+## Worked Example
+
+**A Hermitian observable has eigenvalues $+1,-1$ with eigenvectors
+$|e_+\rangle,|e_-\rangle$. A system is in state $|\psi\rangle$ with
+$\langle e_+|\psi\rangle=0.6$ and $\langle e_-|\psi\rangle=0.8$ (both
+real). Find $P(+1)$, $P(-1)$, and $\langle A\rangle$, and check the two
+ways of computing $\langle A\rangle$ agree.**
+
+$$
+P(+1) = |0.6|^2 = 0.36, \qquad P(-1)=|0.8|^2=0.64
+$$
+
+(Check: $0.36+0.64=1$ ✓, consistent with normalization as required.)
+
+$$
+\langle A\rangle = (+1)(0.36) + (-1)(0.64) = -0.28
+$$
+
+Via the sandwich formula, with $A=\lambda_+|e_+\rangle\langle e_+| +
+\lambda_-|e_-\rangle\langle e_-|$ and $|\psi\rangle = 0.6|e_+\rangle +
+0.8|e_-\rangle$ (real coefficients, so this expansion is literally
+$c_+=\langle e_+|\psi\rangle=0.6$, $c_-=0.8$):
+
+$$
+\langle\psi|A|\psi\rangle = (0.6)^2(+1) + (0.8)^2(-1) = 0.36-0.64=-0.28
+$$
+
+Both routes agree, as the general derivation above guarantees they must.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Using the amplitude directly instead of its squared modulus.**
+$P(\lambda_i)=|\langle e_i|\psi\rangle|^2$, not $\langle
+e_i|\psi\rangle$ itself — the single most common error in this entire
+course, worth flagging one last time at the point where it matters most.
+</Callout>
+
+<Callout type="mistake">
+**Believing global phase is physically meaningful.** $|\psi\rangle$ and
+$e^{i\alpha}|\psi\rangle$ predict identically for *every* observable, as
+derived above — only the *relative* phase between terms in a
+superposition, not an overall phase on the whole state, is observable.
+</Callout>
+
+## Practice Questions
+
+1. Using the worked example's setup, verify $P(+1)+P(-1)=1$ directly
+   (already shown above — restate the calculation in your own words).
+2. A state has $\langle e_1|\psi\rangle = \frac{1}{\sqrt3}$ and two other
+   eigenvectors with equal overlap. If probabilities must sum to $1$ and
+   are all equal, what is $|\langle e_2|\psi\rangle|^2$?
+3. Explain, using the derivation above, why multiplying $|\psi\rangle$ by
+   $-1$ (a special case of a global phase, $\alpha=\pi$) changes no
+   prediction at all.
+4. For the observable $A=$ Pauli-$Z$ and state $|\psi\rangle=|+\rangle$
+   (eigenvector of Pauli-$X$, not $Z$), use $Z$'s eigenvectors
+   $|0\rangle,|1\rangle$ to find $P(+1)$ and $P(-1)$ for a $Z$
+   measurement, and $\langle Z\rangle$.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- State = unit vector; observable = Hermitian operator; outcome =
+  eigenvalue; probability = Born rule, $P(\lambda_i)=|\langle
+  e_i|\psi\rangle|^2$ — a postulate, verified consistent with
+  normalization via the completeness relation.
+- $\langle A\rangle=\langle\psi|A|\psi\rangle$ is derived from the Born
+  rule and the spectral decomposition, not assumed independently.
+- Global phase is provably unobservable: every probability depends only
+  on $|\langle e_i|\psi\rangle|^2$, which an overall phase factor never
+  changes.
+- Composite systems combine via the tensor product; entangled states
+  describe correlations no product state can reproduce.
+
+## Further Exploration
+
+This closes the course's core development. Next: **Mathematical
+Foundations Challenge**, a synthesis lesson connecting every tool built
+here across multiple lessons at once, before the Quantum Mechanics pillar
+continues into **From Classical to Quantum** — the historical and
+experimental motivation for why physics needed this framework in the
+first place.

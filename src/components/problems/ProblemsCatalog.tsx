@@ -12,6 +12,7 @@ type DifficultyFilter = "all" | ProblemDifficulty;
 
 const PILLAR_OPTIONS: { id: PillarFilter; label: string }[] = [
   { id: "all", label: "All" },
+  { id: "quantum-mechanics", label: "Quantum Mechanics" },
   { id: "quantum-computing", label: "Quantum Computing" },
 ];
 

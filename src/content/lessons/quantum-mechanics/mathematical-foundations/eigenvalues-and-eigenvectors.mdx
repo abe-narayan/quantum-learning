@@ -1,0 +1,189 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Eigenvalues and Eigenvectors",
+  description:
+    "The vectors an operator only rescales, not rotates — the characteristic equation, worked eigenvalue problems for the Pauli matrices, and the trace/determinant shortcuts.",
+  course: "mathematical-foundations",
+  module: "eigenvalues-and-eigenvectors",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/linear-operators"],
+  objectives: [
+    "Derive and use the characteristic equation to find eigenvalues",
+    "Find eigenvectors for a given eigenvalue and verify $Av=\\lambda v$ directly",
+    "Use the trace/determinant shortcut to check eigenvalue calculations",
+  ],
+};
+
+## Motivation
+
+Most vectors, hit with an operator, come out pointing in some new
+direction. A special few come out pointing the *same* direction — only
+stretched or shrunk. Those are an operator's **eigenvectors**, and they
+matter enormously in physics: for the operators representing physical
+observables, eigenvectors turn out to be exactly the states with a
+definite, predictable value of that observable.
+
+## Intuition
+
+Picture an operator as a transformation of the plane — most directions get
+tilted somewhere else, but there's usually a couple of special axes that
+just get stretched along themselves. Those axes are the eigenvectors; the
+stretch factor along each is its eigenvalue.
+
+## Mathematical Development
+
+### Definition
+
+$|v\rangle\ne0$ is an **eigenvector** of $A$ with **eigenvalue** $\lambda$
+if:
+
+$$
+A|v\rangle = \lambda|v\rangle
+$$
+
+The requirement $v\ne0$ matters — $A\cdot0=\lambda\cdot0$ is true for
+*every* $\lambda$ and tells you nothing.
+
+### The characteristic equation
+
+Rewrite the eigenvalue equation as $(A-\lambda I)|v\rangle = 0$. A linear
+system $Mv=0$ has a *nonzero* solution exactly when $M$ is not invertible
+(an invertible $M$ has only the trivial solution $v=M^{-1}0=0$), and a
+matrix fails to be invertible exactly when its determinant is zero. So:
+
+$$
+\det(A-\lambda I) = 0
+$$
+
+This is the **characteristic equation** — a polynomial in $\lambda$ whose
+roots are exactly $A$'s eigenvalues.
+
+### The $2\times2$ case, worked in general
+
+For $A=\begin{pmatrix}a&b\\c&d\end{pmatrix}$:
+
+$$
+\det(A-\lambda I) = \det\begin{pmatrix}a-\lambda&b\\c&d-\lambda\end{pmatrix} = (a-\lambda)(d-\lambda)-bc = \lambda^2 - (a+d)\lambda + (ad-bc)
+$$
+
+Two useful facts fall out immediately: $a+d = \operatorname{tr}(A)$ (the
+**trace**, sum of diagonal entries) and $ad-bc=\det(A)$. So for any
+$2\times2$ matrix:
+
+$$
+\lambda^2 - \operatorname{tr}(A)\,\lambda + \det(A) = 0
+$$
+
+By Vieta's formulas for a quadratic, this immediately gives two useful
+shortcuts without solving for the eigenvalues individually: **the sum of
+the eigenvalues equals the trace, and their product equals the
+determinant.**
+
+### Worked: Pauli-$X$
+
+For $X=\begin{pmatrix}0&1\\1&0\end{pmatrix}$: $\operatorname{tr}(X)=0$,
+$\det(X)=0\cdot0-1\cdot1=-1$, so $\lambda^2-1=0 \Rightarrow
+\lambda=\pm1$.
+
+**Eigenvector for $\lambda=1$:** solve $(X-I)v=0$:
+$\begin{pmatrix}-1&1\\1&-1\end{pmatrix}\begin{pmatrix}v_1\\v_2\end{pmatrix}=0
+\Rightarrow v_1=v_2$. Normalizing, $v = \frac{1}{\sqrt2}(1,1)$ — this is
+$|+\rangle$ from the Quantum Computing track, if you've seen it.
+
+**Eigenvector for $\lambda=-1$:** solve $(X+I)v=0 \Rightarrow v_1=-v_2$,
+giving $v=\frac{1}{\sqrt2}(1,-1) = |-\rangle$.
+
+You can check both directly: $X|+\rangle =
+\frac{1}{\sqrt2}(X|0\rangle+X|1\rangle) = \frac{1}{\sqrt2}(|1\rangle+|0\rangle)
+= |+\rangle$ (eigenvalue $+1$, confirmed), and $X|-\rangle =
+\frac{1}{\sqrt2}(|1\rangle-|0\rangle) = -|-\rangle$ (eigenvalue $-1$,
+confirmed).
+
+### Diagonalization
+
+If $A$ has a full basis of eigenvectors $\{|v_i\rangle\}$ with eigenvalues
+$\{\lambda_i\}$, then in that basis $A$'s matrix is diagonal — the
+off-diagonal entries $\langle v_i|A|v_j\rangle$ for $i\ne j$ vanish,
+because $A|v_j\rangle=\lambda_j|v_j\rangle$ is proportional to
+$|v_j\rangle$, which is orthogonal to $\langle v_i|$ when the eigenbasis
+happens to be orthonormal. Not every operator has enough eigenvectors to
+diagonalize this way; the Hermitian Operators lesson shows that an
+important class always does.
+
+## Physical Interpretation
+
+For an operator representing a physical observable, eigenvalues are the
+only values that observable can ever be measured to have, and its
+eigenvectors are the states in which the outcome is certain rather than
+probabilistic. The full justification for this (and why eigenvalues of
+*physical* observables always come out real) is the Hermitian Operators
+lesson; this lesson builds the pure linear-algebra machinery first.
+
+## Worked Example
+
+**Find the eigenvalues and eigenvectors of $A=\begin{pmatrix}2&1\\1&2\end{pmatrix}$.**
+
+$\operatorname{tr}(A)=4$, $\det(A)=4-1=3$, so
+$\lambda^2-4\lambda+3=0 \Rightarrow (\lambda-1)(\lambda-3)=0 \Rightarrow
+\lambda=1,3$.
+
+For $\lambda=1$: $(A-I)v=0 \Rightarrow
+\begin{pmatrix}1&1\\1&1\end{pmatrix}v=0 \Rightarrow v_1=-v_2$, giving
+$\frac{1}{\sqrt2}(1,-1)$.
+
+For $\lambda=3$: $(A-3I)v=0 \Rightarrow
+\begin{pmatrix}-1&1\\1&-1\end{pmatrix}v=0 \Rightarrow v_1=v_2$, giving
+$\frac{1}{\sqrt2}(1,1)$.
+
+Check: eigenvalues sum to $1+3=4=\operatorname{tr}(A)$ ✓, and multiply to
+$1\cdot3=3=\det(A)$ ✓.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Accepting $v=0$ as an eigenvector.** The eigenvalue equation is trivially
+true for the zero vector regardless of $\lambda$; it carries no
+information and is excluded by definition.
+</Callout>
+
+<Callout type="mistake">
+**Sign errors in the characteristic polynomial.** Double-check with the
+trace/determinant shortcut: if your two eigenvalues don't sum to the
+trace, you've made an arithmetic error somewhere.
+</Callout>
+
+## Practice Questions
+
+1. Find the eigenvalues of Pauli-$Y=\begin{pmatrix}0&-i\\i&0\end{pmatrix}$
+   using the trace/determinant shortcut.
+2. Find an eigenvector of $Y$ for its eigenvalue $+1$.
+3. Find the eigenvalues of $\begin{pmatrix}3&0\\0&5\end{pmatrix}$ without
+   any calculation — explain why a diagonal matrix's eigenvalues are
+   immediate.
+4. A $2\times2$ matrix has trace $6$ and one eigenvalue is $2$. What is
+   the other?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $A|v\rangle=\lambda|v\rangle$, $v\ne0$; eigenvalues are the roots of the
+  characteristic equation $\det(A-\lambda I)=0$.
+- For a $2\times2$ matrix, $\lambda^2-\operatorname{tr}(A)\lambda+\det(A)=0$
+  — eigenvalues sum to the trace and multiply to the determinant.
+- Pauli-$X$ has eigenvalues $\pm1$ with eigenvectors $|+\rangle,|-\rangle$.
+- A full eigenbasis diagonalizes an operator's matrix.
+
+## Further Exploration
+
+Next: **Hermitian Operators**, which proves eigenvalues are always real
+and eigenvectors from different eigenvalues are always orthogonal — for
+the specific class of operators representing physical observables.

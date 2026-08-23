@@ -1,0 +1,209 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/tensor-products-and-composite-systems"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Tensor Products and Composite Systems",
+  description:
+    "How the state space of two systems combines into one — the construction for general (not just equal) dimensions, and a dimension-counting argument for why entanglement is the generic case.",
+  course: "mathematical-foundations",
+  module: "tensor-products-and-composite-systems",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/unitary-operators"],
+  objectives: [
+    "Construct the tensor product of two vectors of any dimensions and state the resulting space's dimension",
+    "Explain, via dimension counting, why not every vector in a composite space is a simple product",
+    "Represent an operator acting on only one subsystem as a tensor product with the identity",
+  ],
+};
+
+<Callout type="note">
+If you've completed the Quantum Computing track, you've already met tensor
+products applied specifically to qubits, in that track's Tensor Products
+lesson. This lesson develops the same construction for vector spaces of
+any dimension, and adds a general argument for why entanglement is
+unavoidable rather than a special feature of two-qubit systems.
+</Callout>
+
+## Motivation
+
+Two separate physical systems — two electrons, two qubits, a particle and
+a measuring device — need to be describable *together*, as one combined
+system, without losing the ability to describe superpositions across
+them. Simply pairing up states the way a Cartesian product would (treat
+"system A in state $i$, system B in state $j$" as one of $nm$ classical
+combinations) throws away exactly the linear structure — the ability to
+superpose — that makes the theory quantum. The construction that keeps
+that structure is the **tensor product**.
+
+## Intuition
+
+Classically, two systems with $n$ and $m$ possible states have $nm$
+possible joint states, full stop — nothing more to say. Quantum
+mechanically, that count of $nm$ becomes the *dimension of a vector
+space*, not the number of allowed outcomes — and a vector space of
+dimension $nm$ contains vastly more than just $nm$ basis combinations, it
+contains every superposition of them too. That extra room is where
+entanglement lives.
+
+## Mathematical Development
+
+### Construction and dimension
+
+Given vector spaces $V$ (dimension $n$, basis $\{|e_i\rangle\}$) and $W$
+(dimension $m$, basis $\{|f_j\rangle\}$), their **tensor product**
+$V\otimes W$ is the vector space with basis $\{|e_i\rangle\otimes
+|f_j\rangle\}$ — one basis vector for every pair $(i,j)$, so
+$\dim(V\otimes W) = nm$. Two vector spaces of dimension $3$ and $4$
+combine into one of dimension $12$ — nothing here is specific to qubits or
+to equal dimensions.
+
+### Bilinearity
+
+The tensor product of two general vectors $|u\rangle=\sum_i u_i|e_i\rangle$
+and $|v\rangle=\sum_j v_j|f_j\rangle$ is defined by requiring
+**bilinearity** — linearity in each argument separately:
+
+$$
+(a|u_1\rangle+b|u_2\rangle)\otimes|v\rangle = a(|u_1\rangle\otimes|v\rangle) + b(|u_2\rangle\otimes|v\rangle)
+$$
+
+and similarly in the second slot. Applying this to the basis expansions
+gives the concrete formula:
+
+$$
+|u\rangle\otimes|v\rangle = \sum_{i,j} u_iv_j\, |e_i\rangle\otimes|f_j\rangle
+$$
+
+For coordinate vectors, this is the **Kronecker product**: list every
+product $u_iv_j$, in the order that runs through all of $j$ for each fixed
+$i$ before moving to the next $i$. Concretely, for $u=(1,2)\in\mathbb{C}^2$
+and $v=(0,1,-1)\in\mathbb{C}^3$:
+
+$$
+u\otimes v = (1\cdot0,\ 1\cdot1,\ 1\cdot(-1),\ 2\cdot0,\ 2\cdot1,\ 2\cdot(-1)) = (0,1,-1,0,2,-2) \in \mathbb{C}^6
+$$
+
+matching $\dim(\mathbb{C}^2\otimes\mathbb{C}^3)=2\cdot3=6$ exactly. This
+construction doesn't care that $u$ and $v$ have different dimensions, or
+that neither is $2$ — the qubit case ($\mathbb{C}^2\otimes\mathbb{C}^2$)
+is the smallest, most familiar example, not the general rule.
+
+### The inner product on a tensor product space
+
+Inner products combine multiplicatively on simple tensors:
+
+$$
+\langle u\otimes v,\ u'\otimes v'\rangle = \langle u,u'\rangle\langle v,v'\rangle
+$$
+
+In particular, if both $\{e_i\}$ and $\{f_j\}$ are orthonormal, then
+$\{e_i\otimes f_j\}$ is orthonormal too:
+$\langle e_i\otimes f_j,\ e_k\otimes f_l\rangle = \langle
+e_i,e_k\rangle\langle f_j,f_l\rangle = \delta_{ik}\delta_{jl}$ — nonzero,
+and equal to $1$, only when both indices match.
+
+### Operators on one subsystem
+
+An operator acting on subsystem $A$ alone, leaving subsystem $B$
+untouched, is represented as $A\otimes I$, defined on simple tensors by
+$(A\otimes I)(|u\rangle\otimes|v\rangle) = (A|u\rangle)\otimes|v\rangle$
+and extended linearly to the rest of the space. This is exactly what
+"apply a gate to qubit 0 only, leaving qubit 1 alone" means, if you've
+seen quantum circuits — $A\otimes I$ acting on the whole two-qubit space.
+
+### Why not every vector is a simple product — a dimension count
+
+Here is the central fact this lesson has been building toward. A simple
+tensor $|u\rangle\otimes|v\rangle$ is specified by choosing a direction
+for $|u\rangle$ (up to scale, $n-1$ free complex parameters) and a
+direction for $|v\rangle$ ($m-1$ free parameters) and one overall scale —
+a family with roughly $n+m-1$ free parameters. But $V\otimes W$ has
+dimension $nm$. For $n,m\ge2$, $nm$ grows far faster than $n+m-1$ — for
+two qubits, $nm=4$ against $n+m-1=3$; for two 3-level systems, $nm=9$
+against $n+m-1=5$ — so **the simple tensors form only a small slice of
+the whole space**, and a generic vector in $V\otimes W$ *cannot* be
+written as $|u\rangle\otimes|v\rangle$ for any single choice of $u,v$.
+That failure to factor is exactly what **entanglement** is: not a strange
+exception, but the mathematically generic situation, with product states
+as the special, measure-zero case. If you've seen the Bell state
+$\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ proven non-factorizable by
+direct contradiction in the Quantum Computing track, this dimension count
+is the structural reason that kind of proof was always going to succeed:
+there simply isn't enough room in the space of simple products to reach
+every vector.
+
+## Physical Interpretation
+
+Composite quantum systems are described by the tensor product of their
+parts' state spaces — this is itself a postulate of quantum mechanics
+(confirmed by every experiment ever run on multi-particle systems), not a
+consequence of anything more basic. Once accepted, entanglement stops
+being a special or exotic addition to the theory — it's simply what
+"most" states in a large enough composite space look like.
+
+## Worked Example
+
+**Is $\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ a simple tensor
+$|u\rangle\otimes|v\rangle$ for some $u,v\in\mathbb{C}^2$?**
+
+Suppose it were, with $u=(u_0,u_1)$, $v=(v_0,v_1)$. Then $u\otimes v =
+(u_0v_0,\ u_0v_1,\ u_1v_0,\ u_1v_1)$, and matching against
+$\frac{1}{\sqrt2}(1,0,0,1)$ requires $u_0v_0=\tfrac1{\sqrt2}$,
+$u_0v_1=0$, $u_1v_0=0$, $u_1v_1=\tfrac1{\sqrt2}$. From $u_0v_1=0$: either
+$u_0=0$ (then $u_0v_0=0\ne\tfrac1{\sqrt2}$, contradiction) or $v_1=0$
+(then $u_1v_1=0\ne\tfrac1{\sqrt2}$, also a contradiction). No $u,v$ work —
+confirming, by direct computation this time rather than dimension
+counting alone, that this state is entangled.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming every vector in a tensor product space is automatically a
+simple product.** As just shown, most aren't — that's the entire content
+of entanglement.
+</Callout>
+
+<Callout type="mistake">
+**Getting the Kronecker ordering backwards.** This course (matching the
+Quantum Computing track's convention) always lists the first system's
+index as the more significant one — all of the first system's
+combinations with the second system's index $0$, then all of the second
+system's index $1$, and so on.
+</Callout>
+
+## Practice Questions
+
+1. What is $\dim(V\otimes W)$ if $V$ has dimension $5$ and $W$ has
+   dimension $2$?
+2. Compute $u\otimes v$ for $u=(1,0,-1)\in\mathbb{C}^3$ and
+   $v=(2,1)\in\mathbb{C}^2$.
+3. Is $\frac{1}{\sqrt2}(|00\rangle-|01\rangle)$ a simple tensor? If so,
+   find $u,v$; if not, explain why.
+4. Explain in your own words why a composite system of two 10-dimensional
+   subsystems has "more room" for entangled states than a composite of
+   two 2-dimensional ones.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\dim(V\otimes W) = \dim(V)\cdot\dim(W)$, for spaces of any dimension —
+  not just equal ones, and not just qubits.
+- The tensor product is bilinear; on coordinates it's the Kronecker
+  product, and inner products multiply on simple tensors.
+- $A\otimes I$ represents an operator acting on one subsystem only.
+- Dimension counting shows simple tensors are a small slice of $V\otimes
+  W$ in general — entanglement is the generic case, not a special one.
+
+## Further Exploration
+
+Next: **Probability and Quantum States**, which assembles every tool from
+this course — unit vectors, Hermitian observables, eigenvalues, the
+bra-ket formalism — into the actual postulates connecting the mathematics
+to physical predictions.

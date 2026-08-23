@@ -1,0 +1,155 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Mathematical Foundations Challenge",
+  description:
+    "A synthesis capstone — no new mathematics, just problems and worked examples that require combining tools from more than one earlier lesson, and a recap map of how everything connects.",
+  course: "mathematical-foundations",
+  module: "mathematical-foundations-challenge",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 40,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/probability-and-quantum-states"],
+  objectives: [
+    "Combine results from at least two earlier lessons to solve a single problem",
+    "Recall which lesson each core tool (trace/determinant, Hermiticity, unitarity, the Born rule) came from and why",
+    "Identify what mathematics this course deliberately left for later courses",
+  ],
+};
+
+## Motivation
+
+This lesson introduces no new mathematics. Ten lessons have built a
+genuine toolkit — complex numbers, vector spaces, inner products, bra-ket
+notation, operators, eigenvalues, Hermiticity, unitarity, tensor products,
+and the postulates connecting all of it to physical prediction. The point
+of a challenge lesson is to prove, to yourself, that the pieces actually
+fit together — with problems that don't announce which single lesson they
+come from, the way most of the practice questions so far have.
+
+## Recap: What Each Lesson Contributed
+
+| Lesson | Core result | Used again in |
+|---|---|---|
+| Complex Numbers for Physics | $e^{i\theta}=\cos\theta+i\sin\theta$, $\lvert e^{i\theta}\rvert=1$ | Unitary eigenvalues, global phase |
+| Vector Spaces | Basis, dimension, $\dim_{\mathbb C}$ vs. $\dim_{\mathbb R}$ | Tensor-product dimension counting |
+| Inner Products and Orthogonality | Cauchy-Schwarz; conjugation required for positive-definiteness | Bra-ket, expectation values |
+| The Bra-Ket Formalism | Completeness relation $\sum_i\lvert e_i\rangle\langle e_i\rvert=I$ | Matrix multiplication, spectral decomposition, Born rule |
+| Linear Operators | Matrix multiplication *derived* from completeness | Every later operator computation |
+| Eigenvalues and Eigenvectors | Characteristic equation; trace/det shortcuts | Hermitian & unitary eigenvalue theorems |
+| Hermitian Operators | Real eigenvalues; orthogonal eigenvectors; spectral theorem | The Born rule |
+| Unitary Operators | Norm preservation; eigenvalues have modulus $1$ | Quantum gates, time evolution (later courses) |
+| Tensor Products | $\dim(V\otimes W)=\dim(V)\dim(W)$; entanglement is generic | Composite-system states |
+| Probability and Quantum States | Born rule; $\langle A\rangle=\langle\psi\lvert A\rvert\psi\rangle$ derived, not assumed | All of quantum mechanics from here on |
+
+## Worked Synthesis Examples
+
+**1. A real, symmetric $2\times2$ matrix $M$ satisfies $M^2=I$. Is $M$
+necessarily unitary?**
+
+Real and symmetric means $M^\dagger = M^T = M$ (conjugation does nothing
+to a real matrix) — so $M$ is Hermitian. Check $M^\dagger M$: since
+$M^\dagger=M$, $M^\dagger M = M^2 = I$ directly from the given condition.
+So $M^\dagger M=I$, which is exactly the unitarity condition — **yes**,
+necessarily. (Pauli-$X$ is the standard example: real, symmetric, and
+$X^2=I$.) This combines the Hermitian Operators lesson's adjoint
+definition with the Unitary Operators lesson's defining condition —
+neither lesson alone states this fact.
+
+**2. A $2\times2$ Hermitian matrix has trace $5$ and determinant $6$. What
+are its eigenvalues, and are its eigenvectors necessarily orthogonal?**
+
+From the Eigenvalues lesson's $2\times2$ shortcut,
+$\lambda^2-5\lambda+6=0 \Rightarrow (\lambda-2)(\lambda-3)=0 \Rightarrow
+\lambda=2,3$ — two *different* eigenvalues. From the Hermitian Operators
+lesson's second theorem, eigenvectors of a Hermitian operator with
+different eigenvalues are automatically orthogonal — so **yes**, without
+any further calculation.
+
+**3. Two qubits are each individually normalized. Is their combined
+two-qubit state via the tensor product automatically normalized too?**
+
+Let $|u\rangle,|v\rangle$ each have norm $1$. Using the tensor-product
+inner-product rule from the Tensor Products lesson,
+$\langle u\otimes v, u\otimes v\rangle = \langle u,u\rangle\langle
+v,v\rangle = 1\cdot1=1$ — **yes**, automatically, with no separate
+renormalization step needed. This combines the Inner Products lesson's
+norm definition with the Tensor Products lesson's multiplicative rule for
+inner products on simple tensors.
+
+## Common Mistakes, Revisited
+
+<Callout type="mistake">
+**The single most common error across this entire course: using an
+amplitude directly instead of its squared modulus.** It shows up as early
+as Complex Numbers and as late as the Born rule — always the same fix,
+square the modulus first.
+</Callout>
+
+<Callout type="mistake">
+**Treating Hermitian and unitary as synonyms, or assuming one implies the
+other.** They're independent conditions; some operators (the Paulis) are
+special enough to be both, but that's not the general case.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting *which* slot an inner product convention conjugates.** This
+course conjugated the first argument throughout, matching bra-ket
+notation; always check a source's convention before mixing formulas.
+</Callout>
+
+## Practice Questions
+
+1. A $2\times2$ unitary matrix has real entries. Show that it must be a
+   rotation matrix $\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}$
+   or a reflection (same form with an overall sign flip on one column) —
+   using the fact that its columns must form an orthonormal set.
+2. A Hermitian operator has eigenvalues $1, 1, 4$ (one repeated). Is a
+   generic pair of eigenvectors from the repeated eigenvalue $1$
+   guaranteed orthogonal to each other? Contrast with the eigenvector for
+   eigenvalue $4$.
+3. Two systems have dimensions $2$ and $3$. What is the dimension of their
+   combined state space, and what is the largest possible number of
+   linearly independent product states you could list (compare this to
+   the full dimension, and connect the gap to entanglement)?
+4. A state $|\psi\rangle$ is measured with a Hermitian observable whose
+   spectral decomposition is $A = 2|e_1\rangle\langle e_1| +
+   5|e_2\rangle\langle e_2|$. If $\langle A\rangle = 3.5$ and there are
+   only two possible outcomes, find $P(2)$ and $P(5)$.
+5. Explain why the characteristic equation, completeness relation, and
+   Born rule are each, in their own way, consequences of requiring
+   *consistency* (probabilities summing to $1$, matrix elements
+   determining an operator fully) rather than being independent
+   assumptions bolted onto the theory.
+6. Looking back across all eleven lessons: which single result would you
+   consider the most important prerequisite for everything that comes
+   after it in this course? Defend your choice in two or three sentences.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- No new mathematics — this lesson exercises the ten lessons before it in
+  combination.
+- The recap table above is worth returning to as a reference throughout
+  the rest of the Quantum Mechanics pillar.
+- The recurring theme across every derivation in this course:
+  consistency requirements (norms staying $1$, matrix elements
+  determining an operator, probabilities summing to $1$) are what force
+  the structure — nothing here was arbitrary.
+
+## Further Exploration
+
+This completes **Mathematical Foundations for Quantum Mechanics**. The
+Quantum Mechanics pillar continues with **From Classical to Quantum** —
+the experiments (blackbody radiation, the photoelectric effect,
+wave-particle duality) that forced physics to adopt exactly the framework
+this course just built. If you haven't already, the **Quantum Computing**
+pillar's courses apply this same linear algebra to qubits, gates, and
+circuits — everything from state vectors to entanglement to measurement
+in that track is a direct application of a lesson in this one.

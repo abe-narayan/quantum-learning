@@ -1,0 +1,233 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/vector-spaces"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Vector Spaces",
+  description:
+    "Vectors as anything you can add and scale — axioms, span, linear independence, basis, dimension, change of basis, and the complex vector spaces quantum mechanics actually uses.",
+  course: "mathematical-foundations",
+  module: "vector-spaces",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"],
+  objectives: [
+    "State the vector space axioms and check whether a given set with given operations satisfies them",
+    "Determine whether a set of vectors is linearly independent, and find a basis and dimension",
+    "Explain why the complex dimension of a space and its real dimension can differ",
+  ],
+};
+
+## Motivation
+
+An arrow in 3D space is a vector. So is a list of stock prices, a
+polynomial, a musical chord, and — the case this course cares about — a
+quantum state. These don't look alike, but they share exactly two
+operations that matter: you can add two of them, and you can scale one by
+a number. **Vector space** is the name for any set equipped with those two
+operations, obeying a short list of sensible rules. Once you accept that
+definition, every theorem proved about "vectors" in the abstract applies
+equally to arrows, polynomials, and quantum states — you never have to
+re-derive linear algebra separately for each new kind of object physics
+throws at you.
+
+## Intuition
+
+Forget arrows for a moment. The only things you actually *do* with a
+vector are: add two of them to get a third, and stretch/shrink one by a
+number. If a collection of objects supports those two operations and they
+behave the way you'd expect (addition doesn't care about order, scaling by
+$1$ does nothing, and so on), it's a vector space — full stop, regardless
+of whether "vector" conjures an arrow in your head or not.
+
+## Mathematical Development
+
+### The axioms
+
+A **vector space** over a field of scalars $F$ (for us, $F=\mathbb{R}$ or
+$F=\mathbb{C}$) is a set $V$ with an addition $+$ and a scalar
+multiplication, satisfying, for all $u,v,w\in V$ and $a,b\in F$:
+
+1. **Closure**: $u+v\in V$ and $av \in V$.
+2. **Commutativity**: $u+v=v+u$.
+3. **Associativity of addition**: $(u+v)+w=u+(v+w)$.
+4. **Zero vector**: there is a $0\in V$ with $v+0=v$ for all $v$.
+5. **Additive inverse**: for every $v$ there is $-v$ with $v+(-v)=0$.
+6. **Scalar identity**: $1v=v$.
+7. **Distributivity**: $a(u+v)=au+av$ and $(a+b)v=av+bv$.
+8. **Associativity of scaling**: $a(bv)=(ab)v$.
+
+This is a checklist, not a proof burden — to show something *is* a vector
+space, verify the operations satisfy all eight; to show it *isn't*, find
+one axiom that fails. $\mathbb{R}^n$ and $\mathbb{C}^n$ (tuples of $n$
+real or complex numbers, added and scaled entrywise) are the working
+examples this course uses, but the definition doesn't care that the
+"vectors" are tuples: the set of all polynomials of degree $\le 3$, or the
+set of all functions $f:\mathbb{R}\to\mathbb{R}$, are vector spaces too,
+under ordinary addition and scaling.
+
+### Linear combinations and span
+
+A **linear combination** of vectors $v_1,\ldots,v_k$ is
+$a_1v_1+\cdots+a_kv_k$ for scalars $a_i$. The **span** of a set of vectors
+is the set of *all* linear combinations of them — everything reachable by
+adding and scaling just those vectors.
+
+### Linear independence
+
+A set $\{v_1,\ldots,v_k\}$ is **linearly independent** if the only
+combination equal to the zero vector is the trivial one:
+
+$$
+a_1v_1+\cdots+a_kv_k = 0 \quad\Longrightarrow\quad a_1=\cdots=a_k=0
+$$
+
+Equivalently: no vector in the set is a combination of the others — each
+one genuinely adds a new direction the others couldn't reach.
+Independence depends on *which scalars you're allowed to use*. Over
+$\mathbb{C}$, the vectors $(1,0)$ and $(i,0)$ are **dependent** —
+$(i,0)=i\cdot(1,0)$ — even though they look like "different" vectors; a
+complex scalar is exactly what's needed to turn one into the other.
+
+### Basis and dimension
+
+A **basis** is a linearly independent set that spans $V$. Two facts (both
+real theorems, stated here rather than proved in full): every vector space
+with a finite basis has a basis, and every basis of a given $V$ has the
+same number of vectors — that number is the **dimension**, $\dim V$.
+
+### Coordinates
+
+Fix a basis $\{e_1,\ldots,e_n\}$. Because it spans $V$, every $v\in V$
+can be written $v=c_1e_1+\cdots+c_ne_n$; because the basis is
+independent, that expression is **unique** — if $v$ also equalled
+$c_1'e_1+\cdots+c_n'e_n$, subtracting gives
+$(c_1-c_1')e_1+\cdots+(c_n-c_n')e_n=0$, which by independence forces every
+$c_i=c_i'$. The numbers $(c_1,\ldots,c_n)$ are $v$'s **coordinates**
+relative to this basis. This is exactly what a column vector like
+$\begin{pmatrix}\alpha\\\beta\end{pmatrix}$ already was in every earlier
+piece of quantum notation you may have seen — coordinates relative to the
+standard basis $\{(1,0),(0,1)\}$, nothing more.
+
+### Change of basis
+
+Coordinates depend on which basis you chose. Consider $\mathbb{R}^2$ with
+the standard basis $e_1=(1,0), e_2=(0,1)$, and a second basis rotated by
+angle $\theta$: $e_1'=(\cos\theta,\sin\theta)$,
+$e_2'=(-\sin\theta,\cos\theta)$. A vector with standard coordinates
+$(x,y)$ has new coordinates $(x',y')$ found by solving
+$x e_1+y e_2 = x'e_1'+y'e_2'$ for $x',y'$, which works out to:
+
+$$
+\begin{pmatrix}x'\\y'\end{pmatrix} = \begin{pmatrix}\cos\theta&\sin\theta\\-\sin\theta&\cos\theta\end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix}
+$$
+
+The vector itself hasn't moved — only its *description* changed, because
+you changed the ruler you're measuring it against. This distinction —
+physical object versus its coordinates in a chosen basis — matters a great
+deal once operators enter the picture: a matrix representation always
+depends on a choice of basis, even though the underlying operator doesn't.
+
+### Complex vector spaces, and a subtlety about dimension
+
+Everything above works verbatim with $F=\mathbb{C}$: $\mathbb{C}^n$ is a
+vector space over $\mathbb{C}$, of complex dimension $n$ (the standard
+basis $\{(1,0,\ldots),(0,1,0,\ldots),\ldots\}$ has $n$ vectors). Here is
+the subtlety: you can also view $\mathbb{C}^n$ as a vector space over
+$\mathbb{R}$ — restrict scalars to real numbers only — and by that
+measure its dimension **doubles**, because each complex coordinate needs
+two independent real numbers (its real and imaginary parts) to pin down.
+So $\dim_{\mathbb{C}}(\mathbb{C}^n) = n$ but
+$\dim_{\mathbb{R}}(\mathbb{C}^n) = 2n$. This is not pedantry: it's exactly
+why a single qubit's state space $\mathbb{C}^2$ is called
+"2-dimensional" in quantum computing (complex dimension) while its
+geometric picture — the Bloch sphere, an ordinary 2-dimensional *surface*
+sitting in 3 real dimensions — comes from a different counting entirely
+(4 real dimensions in $\mathbb{C}^2$, minus 1 for the normalization
+constraint, minus 1 more because overall phase carries no physical
+information, leaves 2). If you've seen the Bloch sphere in the Quantum
+Computing track, this is the dimension-counting behind why it's a
+2-dimensional surface rather than some higher-dimensional object.
+
+## Physical Interpretation
+
+Physics gets to choose, for each system, what plays the role of "vector."
+For a qubit it's a pair of complex amplitudes; for a particle's spatial
+wavefunction it's an entire complex-valued function. The payoff of the
+abstract axioms is that *the same linear algebra* — span, independence,
+basis, and everything built on top of it later in this course — applies
+to both without modification.
+
+## Worked Example
+
+**Is $\{(1,1,0), (0,1,1), (1,0,1)\}$ a basis for $\mathbb{C}^3$?**
+
+Three vectors in a 3-dimensional space form a basis exactly when they're
+linearly independent (independence plus the right count automatically
+gives spanning). Set $a(1,1,0)+b(0,1,1)+c(1,0,1)=(0,0,0)$:
+
+$$
+a+c=0, \qquad a+b=0, \qquad b+c=0
+$$
+
+From the first two, $c=-a$ and $b=-a$. Substituting into the third:
+$-a+(-a)=0 \Rightarrow -2a=0 \Rightarrow a=0$, forcing $b=c=0$ too. Only
+the trivial combination gives zero, so the set is independent — and with
+exactly $3=\dim\mathbb{C}^3$ vectors, it's a basis.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing "spans the space" with "is a basis."** A spanning set can have
+*extra*, redundant vectors; a basis is the special case where there's no
+redundancy left to remove.
+</Callout>
+
+<Callout type="mistake">
+**Checking independence over the wrong field.** $(1,0)$ and $(i,0)$ are
+dependent over $\mathbb{C}$ but would be treated as unrelated if you
+carelessly reasoned about them the way you would two real vectors that
+merely "look different."
+</Callout>
+
+<Callout type="warning">
+**"Complex dimension" and "real dimension" are not the same number.**
+$\dim_{\mathbb{R}}(\mathbb{C}^n)=2n$, not $n$. Always know which one a
+problem is asking for.
+</Callout>
+
+## Practice Questions
+
+1. Is $\{(1,2),(2,4)\}$ linearly independent in $\mathbb{C}^2$? Justify
+   your answer.
+2. Find the coordinates of $v=(3,5)$ relative to the basis
+   $e_1'=(1,1), e_2'=(1,-1)$ of $\mathbb{R}^2$.
+3. What is $\dim_{\mathbb{C}}(\mathbb{C}^4)$? What is
+   $\dim_{\mathbb{R}}(\mathbb{C}^4)$?
+4. Is the set of all $2\times2$ complex matrices a vector space under
+   matrix addition and scalar multiplication? If so, propose a basis and
+   state its dimension.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A vector space is any set with addition and scalar multiplication
+  obeying eight axioms — "vector" doesn't have to mean "arrow."
+- Linear independence, span, basis, and dimension are defined
+  independently of what the vectors "are."
+- Coordinates are a vector's description relative to a chosen basis;
+  changing the basis changes the coordinates, not the vector.
+- $\dim_{\mathbb{C}}(\mathbb{C}^n)=n$, but
+  $\dim_{\mathbb{R}}(\mathbb{C}^n)=2n$ — a distinction that directly
+  explains the Bloch sphere's dimension count.
+
+## Further Exploration
+
+Next: **Inner Products and Orthogonality**, which adds the missing
+geometric structure — length and angle — that a bare vector space doesn't
+have on its own.

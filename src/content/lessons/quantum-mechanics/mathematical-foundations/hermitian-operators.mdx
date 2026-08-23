@@ -1,0 +1,214 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/mathematical-foundations/hermitian-operators"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Hermitian Operators",
+  description:
+    "Why physical observables are represented by self-adjoint operators — full derivations that their eigenvalues are real and their eigenvectors orthogonal, plus expectation values.",
+  course: "mathematical-foundations",
+  module: "hermitian-operators",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors"],
+  objectives: [
+    "Compute the adjoint of an operator and determine whether it is Hermitian",
+    "Derive that Hermitian operators have real eigenvalues and orthogonal eigenvectors for distinct eigenvalues",
+    "Compute expectation values and connect them to the spectral decomposition",
+  ],
+};
+
+## Motivation
+
+A measurement outcome — the energy of an atom, the spin of an electron —
+is always a real number; nobody has ever measured $3+2i$ volts. If
+physical observables are represented by operators, and eigenvalues are the
+possible outcomes (previewed last lesson), those operators had better be
+restricted to ones whose eigenvalues are guaranteed real. That restriction
+has a name — **Hermitian** — and it turns out to be exactly the right one,
+provably.
+
+## Intuition
+
+A real number equals its own conjugate. **Hermitian** operators are the
+matrix generalization of that idea: an operator that, in a precise sense,
+equals its own conjugate transpose. The theorems below show this
+algebraic condition is exactly strong enough to force real eigenvalues —
+not a coincidence, a genuine "if and only if"-flavored connection between
+an algebraic property and a physical requirement.
+
+## Mathematical Development
+
+### The adjoint
+
+The **adjoint** $A^\dagger$ of an operator $A$ is defined by requiring
+$\langle u|Av\rangle = \langle A^\dagger u|v\rangle$ for all $u,v$.
+Concretely, for a matrix, $A^\dagger$ is the conjugate transpose:
+$(A^\dagger)_{ij} = A_{ji}^*$ — the same dagger notation introduced for
+kets in the Bra-Ket Formalism lesson, now applied to operators.
+
+### Definition
+
+$A$ is **Hermitian** (or self-adjoint) if $A = A^\dagger$.
+
+### Theorem: Hermitian operators have real eigenvalues
+
+Let $A|v\rangle=\lambda|v\rangle$, $v\ne0$, $A$ Hermitian. Consider
+$\langle v|Av\rangle$. Using the adjoint definition with $u=v$:
+
+$$
+\langle v|Av\rangle = \langle A^\dagger v|v\rangle = \langle Av|v\rangle
+$$
+
+(the middle step uses $A^\dagger=A$). But $\langle Av|v\rangle = \langle
+v|Av\rangle^*$ by conjugate symmetry of the inner product. So $\langle
+v|Av\rangle = \langle v|Av\rangle^*$ — a complex number equal to its own
+conjugate, which forces it to be **real**. Now compute
+$\langle v|Av\rangle$ directly using the eigenvalue equation:
+
+$$
+\langle v|Av\rangle = \langle v|\lambda v\rangle = \lambda\langle v|v\rangle = \lambda\|v\|^2
+$$
+
+Since $\langle v|Av\rangle$ is real and $\|v\|^2$ is real and strictly
+positive ($v\ne0$), $\lambda = \langle v|Av\rangle / \|v\|^2$ must be
+real.
+
+### Theorem: eigenvectors of different eigenvalues are orthogonal
+
+Let $A|u\rangle=\lambda_1|u\rangle$, $A|v\rangle=\lambda_2|v\rangle$, $A$
+Hermitian, $\lambda_1\ne\lambda_2$ (both real, by the theorem just
+proved). Compute $\langle u|Av\rangle$ two ways. Directly:
+
+$$
+\langle u|Av\rangle = \lambda_2\langle u|v\rangle
+$$
+
+Via the adjoint (using $A^\dagger=A$ and $\lambda_1$ real, so
+$\lambda_1^*=\lambda_1$):
+
+$$
+\langle u|Av\rangle = \langle Au|v\rangle = \langle\lambda_1 u|v\rangle = \lambda_1^*\langle u|v\rangle = \lambda_1\langle u|v\rangle
+$$
+
+Equating the two: $\lambda_2\langle u|v\rangle = \lambda_1\langle
+u|v\rangle$, so $(\lambda_2-\lambda_1)\langle u|v\rangle=0$. Since
+$\lambda_1\ne\lambda_2$, $\langle u|v\rangle=0$ — orthogonal.
+
+(Eigenvectors that happen to *share* an eigenvalue are not automatically
+orthogonal to each other, but they can always be chosen to be, via the
+Gram-Schmidt process from the Inner Products lesson — there's no
+obstruction, just a choice that needs to be made explicitly.)
+
+### The spectral theorem
+
+Putting the last two theorems together: a Hermitian operator on a
+finite-dimensional space has an orthonormal basis entirely of
+eigenvectors, and can be written as a weighted completeness relation —
+the **spectral decomposition**:
+
+$$
+A = \sum_i \lambda_i |e_i\rangle\langle e_i|
+$$
+
+(This lesson states the theorem rather than proving the full existence
+argument, but verifies it concretely below.) This is the completeness
+relation from the Bra-Ket Formalism lesson, now weighted by each basis
+vector's eigenvalue — the natural generalization of "a diagonal matrix is
+built from its diagonal entries and the standard basis."
+
+### Expectation value
+
+For a normalized state $|\psi\rangle$ and Hermitian observable $A$, the
+**expectation value** is defined as $\langle A\rangle = \langle\psi|A|\psi\rangle$
+— the "sandwich" you'll see everywhere in quantum mechanics. It's
+guaranteed real by the same argument as the eigenvalue theorem above
+(with $|\psi\rangle$ not necessarily an eigenvector this time): physically
+it represents the average result if the same measurement were repeated
+many times on identically-prepared systems, made precise in the
+Probability and Quantum States lesson.
+
+## Physical Interpretation
+
+Hermiticity is not an arbitrary mathematical restriction — it's exactly
+the algebraic condition equivalent to "every possible measurement outcome
+is a real number, and states with different definite outcomes are
+perfectly distinguishable." That's why every observable in quantum
+mechanics — position, momentum, energy, spin — is represented by a
+Hermitian operator, without exception.
+
+## Worked Example
+
+**Verify the spectral decomposition of Pauli-$Z=\begin{pmatrix}1&0\\0&-1\end{pmatrix}$,
+and check whether $S=\begin{pmatrix}1&0\\0&i\end{pmatrix}$ is Hermitian.**
+
+$Z$'s eigenvalues are $\pm1$ with eigenvectors $|0\rangle,|1\rangle$
+(diagonal already, so this is immediate). The spectral decomposition
+claims $Z = (+1)|0\rangle\langle0| + (-1)|1\rangle\langle1|$:
+
+$$
+1\cdot\begin{pmatrix}1&0\\0&0\end{pmatrix} + (-1)\cdot\begin{pmatrix}0&0\\0&1\end{pmatrix} = \begin{pmatrix}1&0\\0&-1\end{pmatrix} = Z \checkmark
+$$
+
+For $S$: $S^\dagger = \begin{pmatrix}1&0\\0&-i\end{pmatrix} \ne S$. **Not
+Hermitian** — a Hermitian matrix must have real entries on its diagonal
+(the $(i,i)$ entry has to equal its own conjugate), and $S$'s bottom-right
+entry, $i$, isn't real.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing "Hermitian" with "real."** A Hermitian matrix can have complex
+off-diagonal entries (Pauli-$Y$ is a standard example) — the requirement
+is $A=A^\dagger$, not that every entry is real.
+</Callout>
+
+<Callout type="mistake">
+**Assuming every operator has real eigenvalues.** This is a special
+property of Hermitian operators, not a general fact — plenty of
+non-Hermitian matrices have complex eigenvalues.
+</Callout>
+
+<Callout type="warning">
+**A Hermitian matrix's diagonal entries must be real.** Check this first —
+it's the fastest way to rule out a candidate.
+</Callout>
+
+## Practice Questions
+
+1. Is $\begin{pmatrix}1&i\\-i&1\end{pmatrix}$ Hermitian? Justify using the
+   adjoint definition.
+2. Is $\begin{pmatrix}0&1\\-1&0\end{pmatrix}$ Hermitian? (This one is real
+   — don't assume that settles it.)
+3. For $A=$ Pauli-$Z$ and $|\psi\rangle = (\sqrt{0.6},\sqrt{0.4})$ (both
+   entries real and positive), compute $\langle\psi|Z|\psi\rangle$.
+4. Explain why the theorem "eigenvectors of different eigenvalues are
+   orthogonal" required $A$ to be Hermitian — where exactly would the
+   proof break down for a non-Hermitian $A$?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $A^\dagger$ is defined by $\langle u|Av\rangle=\langle A^\dagger
+  u|v\rangle$; concretely, conjugate transpose. $A$ is Hermitian if
+  $A=A^\dagger$.
+- Hermitian operators have real eigenvalues — derived from $\langle
+  v|Av\rangle$ being simultaneously real (by Hermiticity) and equal to
+  $\lambda\|v\|^2$.
+- Eigenvectors of a Hermitian operator with different eigenvalues are
+  automatically orthogonal — derived by computing $\langle u|Av\rangle$
+  two ways.
+- Spectral decomposition: $A=\sum_i\lambda_i|e_i\rangle\langle e_i|$.
+- Expectation value $\langle A\rangle=\langle\psi|A|\psi\rangle$ is always
+  real for Hermitian $A$.
+
+## Further Exploration
+
+Next: **Unitary Operators**, the other essential class — the ones that
+preserve norms, representing how quantum states evolve and transform
+between bases without losing probability.

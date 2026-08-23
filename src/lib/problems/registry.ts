@@ -4,6 +4,30 @@ import { tensorProductBasisLabel } from "@/content/problems/quantum-computing/qu
 import { bellStateSeparability } from "@/content/problems/quantum-computing/quantum-gates-and-circuits/bell-state-separability";
 import { bellStateOutcomeProbability } from "@/content/problems/quantum-computing/quantum-gates-and-circuits/bell-state-outcome-probability";
 import { hThenCnotResult } from "@/content/problems/quantum-computing/quantum-gates-and-circuits/h-then-cnot-result";
+import { complexModulus } from "@/content/problems/quantum-mechanics/mathematical-foundations/complex-modulus";
+import { eulersIdentity } from "@/content/problems/quantum-mechanics/mathematical-foundations/eulers-identity";
+import { linearIndependenceCheck } from "@/content/problems/quantum-mechanics/mathematical-foundations/linear-independence-check";
+import { realDimensionOfComplexSpace } from "@/content/problems/quantum-mechanics/mathematical-foundations/real-dimension-of-complex-space";
+import { plusMinusOrthogonality } from "@/content/problems/quantum-mechanics/mathematical-foundations/plus-minus-orthogonality";
+import { cauchySchwarzCheck } from "@/content/problems/quantum-mechanics/mathematical-foundations/cauchy-schwarz-check";
+import { outerProductType } from "@/content/problems/quantum-mechanics/mathematical-foundations/outer-product-type";
+import { completenessRelationSandwich } from "@/content/problems/quantum-mechanics/mathematical-foundations/completeness-relation-sandwich";
+import { matrixProductEntry } from "@/content/problems/quantum-mechanics/mathematical-foundations/matrix-product-entry";
+import { nonInvertibleMatrix } from "@/content/problems/quantum-mechanics/mathematical-foundations/non-invertible-matrix";
+import { pauliXEigenvalueSum } from "@/content/problems/quantum-mechanics/mathematical-foundations/pauli-x-eigenvalue-sum";
+import { pauliZEigenvalueProduct } from "@/content/problems/quantum-mechanics/mathematical-foundations/pauli-z-eigenvalue-product";
+import { identifyHermitianMatrix } from "@/content/problems/quantum-mechanics/mathematical-foundations/identify-hermitian-matrix";
+import { expectationValueCalculation } from "@/content/problems/quantum-mechanics/mathematical-foundations/expectation-value-calculation";
+import { unitaryDefiningProperty } from "@/content/problems/quantum-mechanics/mathematical-foundations/unitary-defining-property";
+import { unitaryEigenvalueModulus } from "@/content/problems/quantum-mechanics/mathematical-foundations/unitary-eigenvalue-modulus";
+import { compositeSystemDimension } from "@/content/problems/quantum-mechanics/mathematical-foundations/composite-system-dimension";
+import { whyEntanglementIsGeneric } from "@/content/problems/quantum-mechanics/mathematical-foundations/why-entanglement-is-generic";
+import { bornRuleProbability } from "@/content/problems/quantum-mechanics/mathematical-foundations/born-rule-probability";
+import { expectationValueFromProbabilities } from "@/content/problems/quantum-mechanics/mathematical-foundations/expectation-value-from-probabilities";
+import { globalPhaseInvariance } from "@/content/problems/quantum-mechanics/mathematical-foundations/global-phase-invariance";
+import { synthesisEigenvalueFromTraceDet } from "@/content/problems/quantum-mechanics/mathematical-foundations/synthesis-eigenvalue-from-trace-det";
+import { synthesisHermitianAndUnitary } from "@/content/problems/quantum-mechanics/mathematical-foundations/synthesis-hermitian-and-unitary";
+import { synthesisMeasurementPostulates } from "@/content/problems/quantum-mechanics/mathematical-foundations/synthesis-measurement-postulates";
 
 /**
  * Problems are plain, statically-imported TypeScript objects rather than
@@ -22,6 +46,30 @@ export const PROBLEMS: Problem[] = [
   bellStateSeparability,
   bellStateOutcomeProbability,
   hThenCnotResult,
+  complexModulus,
+  eulersIdentity,
+  linearIndependenceCheck,
+  realDimensionOfComplexSpace,
+  plusMinusOrthogonality,
+  cauchySchwarzCheck,
+  outerProductType,
+  completenessRelationSandwich,
+  matrixProductEntry,
+  nonInvertibleMatrix,
+  pauliXEigenvalueSum,
+  pauliZEigenvalueProduct,
+  identifyHermitianMatrix,
+  expectationValueCalculation,
+  unitaryDefiningProperty,
+  unitaryEigenvalueModulus,
+  compositeSystemDimension,
+  whyEntanglementIsGeneric,
+  bornRuleProbability,
+  expectationValueFromProbabilities,
+  globalPhaseInvariance,
+  synthesisEigenvalueFromTraceDet,
+  synthesisHermitianAndUnitary,
+  synthesisMeasurementPostulates,
 ];
 
 export function getAllProblems(): Problem[] {
