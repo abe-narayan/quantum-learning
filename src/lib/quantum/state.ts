@@ -53,6 +53,11 @@ export class StateVector {
     return new StateVector(this.amplitudes.map((amplitude) => amplitude.scale(1 / n)));
   }
 
+  /** Whether this state is normalized (norm 1) to within `epsilon`. */
+  isNormalized(epsilon = 1e-9): boolean {
+    return Math.abs(this.norm() - 1) < epsilon;
+  }
+
   /** ⟨this|other⟩ */
   innerProduct(other: StateVector): Complex {
     if (this.dimension !== other.dimension) {
@@ -90,4 +95,10 @@ export class StateVector {
       .map((amplitude, i) => `(${amplitude.toString()})|${this.basisLabel(i)}⟩`)
       .join(" + ");
   }
+}
+
+/** Tensors together any number of states, left to right: s1 ⊗ s2 ⊗ s3 ⊗ ... */
+export function tensorStates(states: StateVector[]): StateVector {
+  if (states.length === 0) throw new Error("tensorStates requires at least one state.");
+  return states.reduce((acc, s) => acc.tensor(s));
 }

@@ -1,54 +1,26 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { PlaceholderCard } from "@/components/ui/PlaceholderCard";
+import { ProblemsCatalog } from "@/components/problems/ProblemsCatalog";
+import { getAllProblemMeta } from "@/lib/problems/registry";
 
 export const metadata: Metadata = {
   title: "Problems & Quizzes",
-  description: "Practice problems and quizzes for checking your understanding of quantum computing.",
+  description: "Practice problems for checking your understanding of quantum computing, graded exactly against the real quantum engine.",
 };
 
-const PROBLEM_SETS = [
-  {
-    title: "Foundations check",
-    description: "Complex numbers, vector spaces, and inner products.",
-    tag: "Quiz",
-  },
-  {
-    title: "Single-qubit gates",
-    description: "Predict the resulting state after applying a sequence of gates.",
-    tag: "Practice set",
-  },
-  {
-    title: "Entanglement & measurement",
-    description: "Work through Bell states and conditional measurement outcomes.",
-    tag: "Practice set",
-  },
-  {
-    title: "Algorithm design",
-    description: "Trace through Deutsch–Jozsa and Grover's algorithm by hand.",
-    tag: "Challenge",
-  },
-];
-
 export default function ProblemsPage() {
+  const problems = getAllProblemMeta();
+
   return (
     <Container className="py-16">
       <PageHeader
-        eyebrow="Problems & Quizzes"
+        eyebrow="Problems"
         title="Practice what you've learned"
-        description="Problem sets and quizzes for each stage of the learning path. Content is still being written."
+        description="Real practice problems, tied to real lessons. Each is graded exactly, with progressive hints and a worked solution if you get stuck."
       />
-
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {PROBLEM_SETS.map((set) => (
-          <PlaceholderCard
-            key={set.title}
-            title={set.title}
-            description={set.description}
-            tag={set.tag}
-          />
-        ))}
+      <div className="mt-12">
+        <ProblemsCatalog problems={problems} />
       </div>
     </Container>
   );

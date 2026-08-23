@@ -1,0 +1,174 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, HADAMARD, PAULI_Z } from "@/lib/quantum/gates";
+
+export const lessonMeta = {
+  title: "Interference in Quantum Circuits",
+  description:
+    "Extending single-qubit interference to multiple qubits — how a uniform superposition collapses onto one outcome through pure phase manipulation.",
+  course: "quantum-gates-and-circuits",
+  module: "interference-in-quantum-circuits",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/quantum-teleportation"],
+  objectives: [
+    "Explain how a multi-qubit circuit can concentrate amplitude onto a single outcome using only interference",
+    "Distinguish interference that requires entanglement from interference that doesn't",
+    "State the general principle behind why quantum algorithms use interference",
+  ],
+};
+
+export const start = StateVector.zero(2);
+export const afterFirstH = applySingleQubitGate(applySingleQubitGate(start, HADAMARD, 0), HADAMARD, 1);
+export const afterPhase = applySingleQubitGate(afterFirstH, PAULI_Z, 1);
+export const afterSecondH = applySingleQubitGate(applySingleQubitGate(afterPhase, HADAMARD, 0), HADAMARD, 1);
+
+## Motivation
+
+Back in the first course, $H|+\rangle=|0\rangle$ was a small, striking
+fact: two amplitudes that individually gave 50/50 probabilities combined,
+through a second $H$, into a completely definite outcome. That was
+interference on a single qubit. This lesson asks whether the same trick
+scales up — and shows, with a fully worked circuit, that it does: uniform
+randomness across *four* outcomes can be turned into one certain outcome,
+using nothing but Hadamards and a phase gate.
+
+## Intuition
+
+Interference needs two things: multiple paths (amplitudes) contributing
+to the same final outcome, and the freedom to arrange their phases so
+they add constructively where you want a result and cancel where you
+don't. A single qubit only has two paths to play with. Multiple qubits
+give you exponentially more — and every quantum algorithm you'll
+encounter in later courses is, at its core, an elaborate arrangement of
+phases designed to make wrong answers cancel and the right answer
+reinforce.
+
+## Mathematical Development
+
+### A uniform superposition
+
+Apply $H$ to both qubits of $|00\rangle$:
+
+<QuantumStateDisplay state={afterFirstH} label="H ⊗ H applied to |00⟩" />
+
+$$
+(H\otimes H)|00\rangle = |+\rangle\otimes|+\rangle = \frac12(|00\rangle+|01\rangle+|10\rangle+|11\rangle)
+$$
+
+All four outcomes equally likely — and notably, this state is a plain
+product state, $|+\rangle\otimes|+\rangle$, not entangled at all. Every
+qubit here is doing its own independent single-qubit thing.
+
+### Introduce a relative phase
+
+Apply $Z$ to qubit 1 only. $Z$ leaves $|0\rangle$ alone and flips the
+sign on $|1\rangle$ — applied to qubit 1's $|+\rangle$ factor, this turns
+it into $|-\rangle$:
+
+<QuantumStateDisplay state={afterPhase} label="Z on qubit 1: |+⟩ ⊗ |−⟩" />
+
+$$
+|+\rangle\otimes|-\rangle = \frac12(|00\rangle-|01\rangle+|10\rangle-|11\rangle)
+$$
+
+Still a product state, still uniform *probabilities* — but the phases are
+no longer all the same.
+
+### Undo the superposition — and watch the phases collide
+
+Apply $H\otimes H$ again:
+
+<QuantumStateDisplay state={afterSecondH} label="H ⊗ H again: exactly |01⟩" />
+
+$$
+(H\otimes H)(|+\rangle\otimes|-\rangle) = (H|+\rangle)\otimes(H|-\rangle) = |0\rangle\otimes|1\rangle = |01\rangle
+$$
+
+using the single-qubit facts $H|+\rangle=|0\rangle$ and $H|-\rangle=|1\rangle$
+from the last course, applied independently to each factor since this is
+still a plain product state throughout. **All the probability that was
+spread uniformly across four outcomes has concentrated onto exactly
+one**, with certainty — not because any measurement narrowed things down,
+but purely because the phases introduced by that single $Z$ gate caused
+constructive interference on $|01\rangle$ and destructive interference
+(exact cancellation) everywhere else.
+
+### This didn't require entanglement — but interference can also act on entangled states
+
+Notice every state in this derivation was a product state — interference
+here is really just two independent copies of the single-qubit story
+running in parallel. Interference on genuinely *entangled* states is also
+possible and was already in front of you: the Bell-states lesson's
+calculation $(H\otimes H)|\Phi^+\rangle=|\Phi^+\rangle$ is exactly this —
+phases rearranging inside an entangled state, reproducing the same
+correlated pattern rather than concentrating onto one outcome. Both are
+"interference"; they differ in what structure the state has going in.
+
+## Physical Interpretation
+
+A circuit that ends in a superposition carries no information until it's
+measured — the *only* way a circuit's design can influence what you're
+likely to observe is by shaping which amplitudes reinforce and which
+cancel before that final measurement. This is the single mechanism behind
+every quantum algorithm's speedup: not "trying all answers at once and
+picking the right one" (a common but misleading way to describe
+superposition), but arranging the entire computation so that wrong
+answers' amplitudes cancel and the right answer's amplitude survives.
+
+## Worked Example
+
+**What does $H\otimes H$, $Z$ on qubit 0 (instead of qubit 1), $H\otimes H$
+produce, starting from $|00\rangle$?**
+
+By the same reasoning with the roles of the two qubits swapped: $Z$ on
+qubit 0 turns $|+\rangle\otimes|+\rangle$ into $|-\rangle\otimes|+\rangle$,
+and the second $H\otimes H$ gives $H|-\rangle\otimes H|+\rangle=|1\rangle\otimes|0\rangle=|10\rangle$.
+Concentration still happens, on a different outcome, because the phase
+was introduced on a different qubit.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming interference requires entanglement.** The main derivation in
+this lesson is a product state from start to finish — full interference,
+zero entanglement. They're independent concepts that can occur together
+or separately.
+</Callout>
+
+<Callout type="mistake">
+**Measuring partway through and expecting the same result.** If you
+measured either qubit right after the $Z$ gate in the derivation above,
+you'd destroy the superposition needed for the second $H\otimes H$ to
+produce interference — you'd get a random definite outcome instead of the
+guaranteed $|01\rangle$. Interference requires the amplitudes to stay
+*unmeasured* until they've had a chance to combine.
+</Callout>
+
+## Practice Questions
+
+1. Starting from $|00\rangle$, predict the result of: $H\otimes H$, then
+   $Z$ on *both* qubits, then $H\otimes H$ again.
+2. Explain why applying $Z$ to qubit 1 in the main derivation, rather
+   than doing nothing, is what causes concentration onto $|01\rangle$
+   specifically rather than back onto $|00\rangle$.
+3. Is $|+\rangle\otimes|+\rangle$, on its own, "interfering"? Why or why
+   not — what has to happen for interference to actually occur?
+
+## Summary
+
+- $H\otimes H$, a $Z$ on one qubit, $H\otimes H$ again takes a uniform
+  4-way superposition to a single definite outcome, purely through phase
+  interference.
+- This particular example needs no entanglement — it's two parallel
+  copies of single-qubit interference.
+- Interference is the general mechanism: circuits are designed so unwanted
+  outcomes' amplitudes cancel and the desired outcome's amplitude survives
+  until measurement.
+
+## Further Exploration
+
+Next: **Building Quantum Circuits**, the capstone for this course — every
+tool from tensor products through interference, combined to construct and
+analyze a genuine multi-qubit entangled state from scratch.

@@ -1,0 +1,174 @@
+export const lessonMeta = {
+  title: "The No-Cloning Theorem",
+  description:
+    "A complete proof by contradiction: no unitary can copy an arbitrary, unknown qubit state — derived, not asserted.",
+  course: "quantum-gates-and-circuits",
+  module: "the-no-cloning-theorem",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement"],
+  objectives: [
+    "State the no-cloning theorem precisely",
+    "Reproduce the proof by contradiction using linearity",
+    "Explain why copying a known basis state is not a counterexample",
+  ],
+};
+
+## Motivation
+
+Copying data is the most ordinary operation in classical computing — you
+do it constantly, without thinking about it. It's worth asking directly:
+can a quantum computer copy an unknown qubit's state onto a second,
+blank qubit? The answer is a flat no, and the proof is short enough to
+walk through completely, using nothing more than linearity — a property
+every quantum gate has been guaranteed to have since the moment you
+learned gates are matrices.
+
+## Intuition
+
+A "cloning machine" would need to be a single, fixed device that works
+for *any* input state, since the whole point is you don't know the state
+in advance (if you already knew it, you could just prepare a second copy
+yourself with no machine needed). But a fixed quantum device is a fixed
+unitary matrix — and matrices are linear. Linear operations are
+extremely constrained: what they do to a superposition is *completely
+determined* by what they do to the pieces of that superposition
+separately. That single fact is enough to break cloning.
+
+## Mathematical Development
+
+### Setting up the claim
+
+Suppose a cloning unitary $U$ existed: for *any* single-qubit state
+$|\psi\rangle$, acting on $|\psi\rangle$ together with a fixed "blank"
+qubit $|0\rangle$ produces two copies:
+
+$$
+U(|\psi\rangle\otimes|0\rangle) = |\psi\rangle\otimes|\psi\rangle \qquad \text{for every } |\psi\rangle
+$$
+
+This has to hold for *every* single-qubit state, since $U$ is one fixed
+device with no way to know in advance which $|\psi\rangle$ it's been
+handed.
+
+### Testing it on two specific inputs
+
+Apply the assumption to $|0\rangle$ and to $|1\rangle$ individually:
+
+$$
+U(|0\rangle\otimes|0\rangle) = |0\rangle\otimes|0\rangle, \qquad U(|1\rangle\otimes|0\rangle) = |1\rangle\otimes|1\rangle
+$$
+
+Nothing wrong yet — a device that measures the input in the computational
+basis and prepares a matching copy could achieve exactly this much.
+
+### The contradiction: apply it to a superposition
+
+Now apply the *same* assumption to $|+\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$.
+If cloning works for every state, it must work for this one too, giving
+$U(|+\rangle\otimes|0\rangle)=|+\rangle\otimes|+\rangle$. But $U$ is
+linear, and $|+\rangle\otimes|0\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)\otimes|0\rangle=\frac{1}{\sqrt2}(|00\rangle+|10\rangle)$,
+so linearity forces:
+
+$$
+U(|+\rangle\otimes|0\rangle) = \frac{1}{\sqrt2}\Big(U(|0\rangle\otimes|0\rangle)+U(|1\rangle\otimes|0\rangle)\Big) = \frac{1}{\sqrt2}(|00\rangle+|11\rangle)
+$$
+
+That's the Bell state $|\Phi^+\rangle$ from two lessons ago. Compare it to
+what cloning was supposed to produce:
+
+$$
+|+\rangle\otimes|+\rangle = \frac12(|00\rangle+|01\rangle+|10\rangle+|11\rangle)
+$$
+
+These are not the same state — $|\Phi^+\rangle$ has zero amplitude on
+$|01\rangle$ and $|10\rangle$; $|+\rangle\otimes|+\rangle$ doesn't.
+**Contradiction.** A $U$ that correctly clones $|0\rangle$ and $|1\rangle$
+individually is *forced by linearity* to fail at cloning $|+\rangle$.
+Since $U$ was assumed to work for every state, no such $U$ can exist.
+
+## Physical Interpretation
+
+This isn't a technological limitation waiting on better engineering — the
+proof only used linearity, a property that holds for *every* possible
+quantum gate, so no future device of any kind can evade it. No-cloning is
+also not an arbitrary restriction bolted onto the theory: if cloning were
+possible, you could make unlimited copies of one unknown qubit and
+measure each copy in a different basis, reconstructing the full state
+exactly — directly violating the measurement-disturbs-the-state structure
+this course has built lesson by lesson. Worse, a device that clones one
+half of an entangled pair many times over would let its holder detect,
+instantaneously, which basis someone light-years away chose to measure
+their half in — a faster-than-light signal. No-cloning isn't a
+restriction on quantum mechanics; it's a requirement for quantum
+mechanics to be a consistent theory at all.
+
+## Worked Example
+
+**Someone claims their device correctly clones $|0\rangle$, $|1\rangle$,
+*and* $|+\rangle$. Show this is still impossible using the same method.**
+
+If the device clones all three, it must also (by the same linearity
+argument, since $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$ is
+another superposition of $|0\rangle$ and $|1\rangle$) satisfy:
+
+$$
+U(|-\rangle\otimes|0\rangle) = \frac{1}{\sqrt2}\Big(U(|0\rangle\otimes|0\rangle)-U(|1\rangle\otimes|0\rangle)\Big) = \frac{1}{\sqrt2}(|00\rangle-|11\rangle) = |\Phi^-\rangle
+$$
+
+But correct cloning of $|-\rangle$ requires
+$U(|-\rangle\otimes|0\rangle)=|-\rangle\otimes|-\rangle=\frac12(|00\rangle-|01\rangle-|10\rangle+|11\rangle)$
+— again not equal to $|\Phi^-\rangle$. Cloning $|0\rangle$, $|1\rangle$,
+and $|+\rangle$ correctly already forces incorrect behavior on
+$|-\rangle$; you can't patch the theorem by cloning "just a few more"
+states without breaking somewhere else.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**"CNOT copies bits, so cloning must be possible."** $\text{CNOT}(|b\rangle\otimes|0\rangle)=|b\rangle\otimes|b\rangle$
+for $b=0$ or $1$ individually — but apply linearity to a superposition
+input, exactly as the proof above does, and CNOT produces the Bell state,
+not two copies of the superposition. CNOT copies *known classical
+basis states*; it does not clone unknown quantum states.
+</Callout>
+
+<Callout type="mistake">
+**Thinking no-cloning forbids preparing many copies of a *known* state.**
+If you know $|\psi\rangle$ in advance, you can prepare as many copies as
+you like using ordinary gates — the theorem only forbids a single fixed
+device correctly copying an *arbitrary, unknown* input.
+</Callout>
+
+## Practice Questions
+
+1. Where exactly in the proof does linearity get used? What would go
+   wrong with the argument if quantum gates weren't linear operations?
+2. A device is claimed to clone $|0\rangle$ and $|-\rangle$ correctly.
+   Using the same method as the worked example, find the state it must
+   produce for $|1\rangle$'s input, and show it can't equal
+   $|1\rangle\otimes|1\rangle$.
+3. Explain, in a sentence or two, the connection between no-cloning and
+   the measurement postulate: why would perfect cloning let you learn an
+   unknown state's exact amplitudes, something a single measurement
+   cannot do?
+
+## Summary
+
+- No fixed unitary can map $|\psi\rangle\otimes|0\rangle\to|\psi\rangle\otimes|\psi\rangle$
+  for *every* single-qubit $|\psi\rangle$.
+- The proof: assume it works for $|0\rangle$ and $|1\rangle$, apply
+  linearity to $|+\rangle$, and show the required output disagrees with
+  actual cloning of $|+\rangle$.
+- Copying *known* classical states (via CNOT) is unaffected — the theorem
+  is specifically about arbitrary, unknown quantum states.
+- No-cloning is required for the theory's consistency, not an incidental
+  restriction.
+
+## Further Exploration
+
+Next: **Quantum Teleportation** — you can't copy an unknown state, but
+you *can* move it, destroying the original in the process. The full
+protocol uses entanglement, CNOT, and partial measurement, all from this
+course, plus the fact you just proved.

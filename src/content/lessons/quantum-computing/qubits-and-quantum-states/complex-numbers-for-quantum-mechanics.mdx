@@ -1,0 +1,230 @@
+export const lessonMeta = {
+  title: "Complex Numbers for Quantum Mechanics",
+  description:
+    "The arithmetic and geometry of complex numbers — the language every quantum amplitude is written in.",
+  course: "qubits-and-quantum-states",
+  module: "complex-numbers-for-quantum-mechanics",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/classical-bit-vs-qubit"],
+  objectives: [
+    "Add, multiply, and conjugate complex numbers confidently",
+    "Convert between rectangular and polar form using Euler's formula",
+    "Explain why multiplying complex numbers adds their phases",
+  ],
+};
+
+## Motivation
+
+In the last lesson, $\alpha$ and $\beta$ showed up as "complex numbers" and
+we mostly left it at that — every example used real values like
+$\tfrac{1}{\sqrt2}$. That was deliberately gentle. It's about to stop being
+gentle: the Bloch sphere's phase factor $e^{i\varphi}$, the difference
+between a $Z$ gate and an $S$ gate, and the reason quantum interference
+exists at all — all of it comes down to genuinely complex amplitudes,
+not just real ones with a sign.
+
+So before going further, we need the actual toolkit: how to add, multiply,
+and geometrically picture complex numbers. If you've seen this before,
+treat this lesson as a fast, quantum-flavored refresher — the polar form
+and Euler's formula sections are the parts that matter most going forward.
+
+## Intuition
+
+A real number lives on a line. A complex number lives on a **plane**: one
+axis for its real part, one for its imaginary part. That's really it — a
+complex number is just an ordered pair $(a, b)$, written $a + bi$, plotted
+as a point (or an arrow from the origin) in this plane.
+
+The "imaginary" unit $i$ is defined by one property: $i^2 = -1$. That's the
+entire rulebook. Everything else — every identity in this lesson — follows
+from treating $i$ like any other algebraic symbol, except that whenever
+$i^2$ shows up, you replace it with $-1$.
+
+## Mathematical Development
+
+### Rectangular form: addition and multiplication
+
+A complex number $z = a + bi$ has **real part** $\operatorname{Re}(z) = a$
+and **imaginary part** $\operatorname{Im}(z) = b$ (both $a$ and $b$ are
+ordinary real numbers).
+
+Addition is component-wise:
+
+$$
+(a + bi) + (c + di) = (a + c) + (b + d)i
+$$
+
+Multiplication follows from distributing and applying $i^2 = -1$:
+
+$$
+(a+bi)(c+di) = ac + adi + bci + bdi^2 = (ac - bd) + (ad + bc)i
+$$
+
+### Conjugate and modulus
+
+The **complex conjugate** of $z = a+bi$ flips the sign of the imaginary
+part: $z^* = a - bi$. Multiplying a number by its own conjugate always
+produces a non-negative real number:
+
+$$
+z z^* = (a+bi)(a-bi) = a^2 - abi + abi - b^2i^2 = a^2 + b^2
+$$
+
+That quantity — always real, always $\geq 0$ — defines the **modulus**
+(length) of $z$:
+
+$$
+|z| = \sqrt{z z^*} = \sqrt{a^2+b^2}
+$$
+
+This is exactly the reason $|\alpha|^2$ and $|\beta|^2$ from the last lesson
+are guaranteed to be real, non-negative numbers suitable for probabilities,
+no matter how complex $\alpha$ and $\beta$ get: $|\alpha|^2 = \alpha\alpha^*$
+by construction.
+
+### Polar form and Euler's formula
+
+Rectangular form $(a, b)$ is one way to locate a point in the plane; polar
+coordinates — a distance $r$ and an angle $\theta$ from the positive real
+axis — are another. They're related by $a = r\cos\theta$,
+$b = r\sin\theta$, so:
+
+$$
+z = a + bi = r(\cos\theta + i \sin\theta)
+$$
+
+Remarkably, $\cos\theta + i\sin\theta$ can be written as a single
+exponential, $e^{i\theta}$. This is **Euler's formula**, and it's worth
+seeing where it comes from rather than just accepting it. The Taylor series
+for $e^x$ works for complex inputs too, so substitute $x = i\theta$:
+
+$$
+e^{i\theta} = 1 + i\theta + \frac{(i\theta)^2}{2!} + \frac{(i\theta)^3}{3!} + \frac{(i\theta)^4}{4!} + \cdots
+$$
+
+Using $i^2=-1, i^3=-i, i^4=1$ and regrouping into real and imaginary terms:
+
+$$
+e^{i\theta} = \underbrace{\left(1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \cdots\right)}_{\cos\theta} \; + \; i\underbrace{\left(\theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \cdots\right)}_{\sin\theta}
+$$
+
+which is exactly $\cos\theta + i\sin\theta$. So:
+
+$$
+e^{i\theta} = \cos\theta + i\sin\theta \qquad \Longrightarrow \qquad z = re^{i\theta}
+$$
+
+A number written this way has modulus $r$ and **phase** (or **argument**)
+$\theta$. Every complex number has both a rectangular form and a polar
+form — they're the same information, viewed two ways.
+
+### Why polar form matters: multiplication adds phases
+
+Multiply two numbers in polar form, $z_1 = r_1 e^{i\theta_1}$ and
+$z_2 = r_2e^{i\theta_2}$, using ordinary exponent rules:
+
+$$
+z_1 z_2 = r_1 e^{i\theta_1} \cdot r_2 e^{i\theta_2} = r_1 r_2\, e^{i(\theta_1+\theta_2)}
+$$
+
+**Magnitudes multiply; phases add.** This one fact is the entire reason
+quantum computing cares about phase at all: applying a phase gate to a
+qubit multiplies an amplitude by $e^{i\theta}$ for some $\theta$, and this
+identity is exactly what tells you the *new* phase is the old phase plus
+$\theta$ — nothing about the probability (which depends on $r$) changes.
+
+Conjugation is simple in polar form too: $z^* = re^{-i\theta}$ — same
+modulus, negated phase. You can check this matches
+$\cos(-\theta)+i\sin(-\theta) = \cos\theta - i\sin\theta$.
+
+## Physical Interpretation
+
+In quantum mechanics, an amplitude's **modulus** will always turn out to
+control a probability (through $|\alpha|^2$), while its **phase** carries
+information that never shows up in a probability by itself — only in how
+one amplitude compares to another. That split — "how much" vs. "in what
+phase" — is precisely $r$ and $\theta$ in $z = re^{i\theta}$. You'll see
+this made completely explicit when we reach the Bloch sphere: the
+$e^{i\varphi}$ you'll write there is not a decoration, it's literally this
+lesson's polar form.
+
+## Worked Example
+
+**Multiply $(3+4i)(1-2i)$ directly, and find its modulus.**
+
+$$
+(3+4i)(1-2i) = 3(1) + 3(-2i) + 4i(1) + 4i(-2i) = 3 - 6i + 4i - 8i^2
+$$
+
+Since $i^2 = -1$, the last term is $+8$:
+
+$$
+= (3+8) + (-6+4)i = 11 - 2i
+$$
+
+Modulus: $|11-2i| = \sqrt{11^2 + (-2)^2} = \sqrt{125} = 5\sqrt5$.
+
+**Check it against polar form.** $|3+4i| = \sqrt{9+16}=5$ and
+$|1-2i|=\sqrt{1+4}=\sqrt5$. Since magnitudes multiply, we should get
+$5 \cdot \sqrt5 = 5\sqrt5$ — matches, without needing to expand anything.
+
+**Verify Euler's formula at $\theta = \pi/2$:**
+
+$$
+e^{i\pi/2} = \cos\!\left(\frac{\pi}{2}\right) + i\sin\!\left(\frac{\pi}{2}\right) = 0 + i(1) = i
+$$
+
+So $e^{i\pi/2} = i$ exactly — a fact you'll meet again the moment we define
+the $S$ gate.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Writing $i^2 = +1$.** This is the single most common slip, and it
+silently breaks every calculation downstream. $i^2 = -1$, always.
+</Callout>
+
+<Callout type="mistake">
+**Confusing $|z|$ with $z$ itself.** $|z|$ is always a non-negative real
+number — a distance. It has thrown away the phase entirely. Two very
+different complex numbers can have the same modulus (e.g. $1$ and $i$ both
+have modulus $1$), so knowing $|z|$ alone never tells you $z$.
+</Callout>
+
+<Callout type="mistake">
+**Assuming $(a+bi)^* = a + bi$.** Conjugation *only* flips the sign of the
+imaginary part, not the real part: $(a+bi)^* = a - bi$, not $-a - bi$ or
+$-a+bi$.
+</Callout>
+
+## Practice Questions
+
+1. Compute $(2-i) + (−3+5i)$ and $(2-i)(-3+5i)$.
+2. Find the modulus and phase (in radians) of $z = -1 + i$.
+3. Using Euler's formula, show that $e^{i\pi} = -1$. (This is the
+   famous identity connecting $e$, $i$, and $\pi$ in one equation.)
+4. If $z_1$ has phase $\pi/6$ and $z_2$ has phase $\pi/3$, what is the
+   phase of $z_1 z_2$? What if you multiply $z_1$ by $z_1^*$ instead?
+5. A complex number has modulus $1$. What does its rectangular form
+   $(a, b)$ satisfy geometrically? (Hint: revisit the definition of
+   modulus.)
+
+## Summary
+
+- A complex number $a+bi$ is a point in the plane; $i^2=-1$ is the only new
+  rule needed to do arithmetic with it.
+- The conjugate $z^*=a-bi$ makes $zz^*=a^2+b^2$ real and non-negative,
+  defining the modulus $|z|=\sqrt{zz^*}$.
+- Polar form $z=re^{i\theta}=r(\cos\theta+i\sin\theta)$ (Euler's formula)
+  separates a complex number into a magnitude $r$ and a phase $\theta$.
+- Multiplying complex numbers multiplies their magnitudes and **adds**
+  their phases — the reason phase gates compose the way they do.
+
+## Further Exploration
+
+Next: **Dirac Notation**, which packages complex-valued vectors like
+$\alpha|0\rangle+\beta|1\rangle$ into a compact algebra with its own
+built-in notion of "multiplication" — the inner product — built directly
+on the conjugate you just learned.

@@ -1,0 +1,194 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { StateVector } from "@/lib/quantum/state";
+import { applyCNOT, applySwap } from "@/lib/quantum/gates";
+
+export const lessonMeta = {
+  title: "Controlled Gates and CNOT",
+  description:
+    "The general controlled-U operation, worked out completely for CNOT — matrix, truth table, and why SWAP is three CNOTs.",
+  course: "quantum-gates-and-circuits",
+  module: "controlled-gates-and-cnot",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/quantum-circuit-notation"],
+  objectives: [
+    "Derive the CNOT matrix from the general controlled-U construction",
+    "Predict CNOT's action on any computational basis state",
+    "Explain why SWAP decomposes into three CNOTs",
+  ],
+};
+
+export const cnotOnAllBasisStates = [0b00, 0b01, 0b10, 0b11].map((i) =>
+  applyCNOT(StateVector.basis(2, i), 0, 1)
+);
+
+export const swapDemo = [0, 1, 2, 3].map((step) => {
+  let s = StateVector.basis(2, 0b10);
+  if (step >= 1) s = applyCNOT(s, 0, 1);
+  if (step >= 2) s = applyCNOT(s, 1, 0);
+  if (step >= 3) s = applyCNOT(s, 0, 1);
+  return s;
+});
+
+## Motivation
+
+Tensor products build multi-qubit states; the last lesson's circuit
+notation showed how to draw operations on them. But every gate mentioned
+so far still acts on one qubit independently of the others — nothing yet
+lets one qubit's value affect what happens to another. **Controlled
+gates** are that missing ingredient, and CNOT — controlled-NOT — is the
+single most important one in this course.
+
+## Intuition
+
+A controlled-$U$ gate is a conditional: "if the control qubit is
+$|1\rangle$, apply $U$ to the target; if the control is $|0\rangle$, do
+nothing." For a classical bit this would be an ordinary `if` statement.
+For a qubit, the control can be in *superposition* — and then the gate
+does something no classical conditional can: it applies $U$ and
+not-$U$ simultaneously, in proportion to the control's amplitudes,
+producing correlation between the two qubits that wasn't there before.
+
+## Mathematical Development
+
+### The general controlled-U construction
+
+Write the projectors onto $|0\rangle$ and $|1\rangle$ as
+$|0\rangle\langle0|$ and $|1\rangle\langle1|$ (outer products — a ket
+times a bra, not a bra times a ket — producing a matrix, not a number).
+As matrices:
+
+$$
+|0\rangle\langle0| = \begin{pmatrix}1&0\\0&0\end{pmatrix}, \qquad |1\rangle\langle1| = \begin{pmatrix}0&0\\0&1\end{pmatrix}
+$$
+
+A controlled-$U$ gate (control = qubit 0, target = qubit 1) is:
+
+$$
+\text{C-}U = |0\rangle\langle0|\otimes I + |1\rangle\langle1|\otimes U
+$$
+
+Read this as: "if the control projects onto $|0\rangle$, apply identity
+to the target; if it projects onto $|1\rangle$, apply $U$ instead" — both
+terms are always present in the sum, and whichever piece of the control's
+amplitude occupies each branch gets the corresponding target operation
+applied to it.
+
+### CNOT, derived explicitly
+
+Set $U=X$. Using $I=\begin{pmatrix}1&0\\0&1\end{pmatrix}$ and
+$X=\begin{pmatrix}0&1\\1&0\end{pmatrix}$, expand each tensor product:
+
+$$
+|0\rangle\langle0|\otimes I = \begin{pmatrix}1&0&0&0\\0&1&0&0\\0&0&0&0\\0&0&0&0\end{pmatrix}, \qquad |1\rangle\langle1|\otimes X = \begin{pmatrix}0&0&0&0\\0&0&0&0\\0&0&0&1\\0&0&1&0\end{pmatrix}
+$$
+
+Adding them:
+
+$$
+\text{CNOT} = \begin{pmatrix}1&0&0&0\\0&1&0&0\\0&0&0&1\\0&0&1&0\end{pmatrix}
+$$
+
+This is the standard CNOT matrix, derived rather than just handed to you.
+Reading off its action on each basis state (in the
+$|00\rangle,|01\rangle,|10\rangle,|11\rangle$ order):
+
+<div className="not-prose my-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+  {cnotOnAllBasisStates.map((state, i) => (
+    <QuantumStateDisplay
+      key={i}
+      state={state}
+      label={`CNOT|${[0b00, 0b01, 0b10, 0b11][i].toString(2).padStart(2, "0")}⟩`}
+      showProbabilities={false}
+    />
+  ))}
+</div>
+
+Qubit 0 (the control) is always left alone; qubit 1 (the target) flips
+exactly when qubit 0 is 1. This truth table — $00\to00$, $01\to01$,
+$10\to11$, $11\to10$ — is CNOT's complete classical-looking behavior on
+basis states. Its genuinely quantum behavior only shows up once the
+control is in superposition, which is the subject of the next lesson.
+
+### CNOT is its own inverse
+
+$\text{CNOT}^2 = I$: applying the same conditional flip twice always
+undoes it, since flipping the target bit twice returns it to where it
+started, regardless of the control. This makes CNOT — like $X$, $Z$, $H$
+before it — reversible, exactly as every quantum gate must be.
+
+## Physical Interpretation
+
+CNOT is the standard building block for creating correlation between
+qubits *deliberately*. Applied to a control that's already in
+superposition, it doesn't produce a definite outcome for the target — it
+produces a target whose value is now tied to the control's, in whatever
+proportion the control's amplitudes dictate. That's entanglement, built
+on demand, and it's exactly the next lesson's subject.
+
+## Worked Example: SWAP from three CNOTs
+
+The **SWAP** gate exchanges two qubits' values entirely:
+$\text{SWAP}|ab\rangle = |ba\rangle$. Remarkably, it can be built from
+three CNOTs alone, alternating which qubit is the control:
+
+$$
+\text{SWAP} = \text{CNOT}(0,1)\cdot\text{CNOT}(1,0)\cdot\text{CNOT}(0,1)
+$$
+
+Track $|10\rangle$ through all three steps:
+
+<div className="not-prose my-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+  <QuantumStateDisplay state={swapDemo[0]} label="Start: |10⟩" showProbabilities={false} />
+  <QuantumStateDisplay state={swapDemo[1]} label="After CNOT(0,1)" showProbabilities={false} />
+  <QuantumStateDisplay state={swapDemo[2]} label="After CNOT(1,0)" showProbabilities={false} />
+  <QuantumStateDisplay state={swapDemo[3]} label="After CNOT(0,1) again" showProbabilities={false} />
+</div>
+
+$|10\rangle \to |11\rangle \to |01\rangle \to |01\rangle$ — the qubits end
+up swapped, $|10\rangle\to|01\rangle$, exactly as claimed, using nothing
+but the CNOT you just derived, three times in a row.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming CNOT always entangles its inputs.** Applied to $|10\rangle$
+above, the output $|11\rangle$ is still a plain product state — no
+entanglement at all. CNOT only *creates* entanglement when its control
+qubit starts in superposition. The next lesson makes this precise.
+</Callout>
+
+<Callout type="mistake">
+**Confusing control and target.** $\text{CNOT}(0,1)$ (control=qubit 0)
+and $\text{CNOT}(1,0)$ (control=qubit 1) are different gates with
+different matrices — swapping which qubit is which changes the result, as
+the SWAP derivation above relies on directly.
+</Callout>
+
+## Practice Questions
+
+1. Derive the matrix for controlled-$Z$ (control=qubit 0, target=qubit 1)
+   using the same $|0\rangle\langle0|\otimes I + |1\rangle\langle1|\otimes Z$
+   construction.
+2. What does $\text{CNOT}(0,1)$ do to $|11\rangle$? To $|01\rangle$?
+3. Confirm $\text{CNOT}^2=I$ by multiplying the CNOT matrix derived above
+   by itself.
+4. Why does the SWAP construction need to *alternate* which qubit is the
+   control (0,1 then 1,0 then 0,1), rather than using the same control
+   three times?
+
+## Summary
+
+- $\text{C-}U = |0\rangle\langle0|\otimes I + |1\rangle\langle1|\otimes U$
+  is the general controlled-gate construction; setting $U=X$ gives CNOT.
+- CNOT's matrix, derived directly, matches its truth table: the target
+  flips exactly when the control is 1.
+- CNOT is its own inverse, and three alternating CNOTs implement SWAP.
+- CNOT on a basis state never entangles anything by itself — superposition
+  on the control is required, which is where the next lesson begins.
+
+## Further Exploration
+
+Next: **Bell States and Entanglement** — put a control qubit into
+superposition *before* the CNOT, and watch what comes out.

@@ -86,9 +86,20 @@ parallel** with Quantum Mechanics: `Qubits & Quantum States` only requires
 sequence. This matches how quantum computing is actually taught — you don't
 need the Schrödinger equation to understand a Bloch sphere.
 
-`Qubits & Quantum States → Quantum Gates & Circuits → Measurement,
-Superposition & Entanglement → Quantum Algorithms I: Foundations → Quantum
+`Qubits & Quantum States → Quantum Gates & Circuits → Entanglement, Mixed
+States & Bell Tests → Quantum Algorithms I: Foundations → Quantum
 Algorithms II: Advanced → Quantum Error Correction & Fault Tolerance`
+
+The first two are fully authored (10 lessons each); the third was
+originally scoped as "Measurement, Superposition & Entanglement" with
+placeholder modules (`bell-states`, `the-no-cloning-theorem`,
+`quantum-teleportation`) that turned out to duplicate what Quantum Gates &
+Circuits ended up teaching in depth once it was actually written — a
+placeholder module list is a guess made before the adjacent course exists,
+and guesses need revisiting once reality catches up. It was renamed and
+rescoped (still a placeholder) to build *past* single-pair entanglement —
+multipartite states, mixed states, Bell inequalities — rather than repeat
+it. See the changelog at the end of this document.
 
 **Modules are intentionally lean** (`{ slug, title }` only, no per-module
 description) — at ~100 modules across 22 courses, module-level prose would
@@ -156,8 +167,7 @@ fields requested: `title`, `description`, `course`, `module`, `order`,
 from the file's path by the loader, so there's no way for a lesson's
 metadata and its actual URL to disagree.
 
-**Loading (`src/lib/content/lessons.ts`)** — two functions, both
-server-only:
+**Loading (`src/lib/content/lessons.ts`)** — server-only:
 
 - `getAllLessonSlugs()` — walks `src/content/lessons/` at request/build
   time (`node:fs`) and returns every authored slug. This is what
@@ -168,6 +178,34 @@ server-only:
   Next's own docs recommend for slug-driven MDX content outside `app/`, and
   it means content isn't bundled into every page's JS — each lesson is its
   own chunk, loaded only when its route is hit.
+- `getAllLessonsMeta()` — loads every lesson's metadata plus its slug
+  (`LessonMetaWithSlug`), used for catalog pages and for resolving
+  prerequisites (next paragraph).
+
+**Lesson identity and cross-course prerequisites.** A lesson's *identity*
+is its file-path-derived slug — there is no separate ID field. This is a
+deliberate "smallest clean" choice: introducing a decoupled ID (and an
+alias/redirect map for renames) is a real future improvement once lesson
+URLs are live and stable, but would have been premature architecture for
+content that's still being authored. `LessonMeta.prerequisites` is an
+array of these slugs, and — critically — they are **not** scoped to the
+current course: a Quantum Gates & Circuits lesson can (and does) list a
+Qubits & Quantum States lesson as a prerequisite, with no special-casing
+anywhere in the loader or the curriculum registry.
+
+The route (`app/lessons/[...slug]/page.tsx`) fetches `getAllLessonsMeta()`
+**once** and passes the full list into `LessonLayout` as `allLessons`.
+`LessonLayout` then does two different things with the same list:
+prerequisites resolve by scanning *all* of `allLessons` (so cross-course
+links just work), while previous/next navigation and the "Lesson X of Y"
+progress indicator filter that same list down to the current lesson's own
+course before computing position (so course-local nav stays course-local).
+One fetch, one array, two different scopes derived from it — this is the
+fix for what was previously a bug: an earlier version fetched only the
+current course's lessons, so a cross-course prerequisite would silently
+fail to resolve into a link. If a prerequisite slug doesn't resolve to any
+authored lesson (typo, or the target hasn't been written yet), it's
+silently dropped from the display rather than crashing the page.
 
 Catalog pages (`/learn`, `/lessons`, `/hardware`, `/software`) call
 `getAllLessonsMeta()` once, and cross-reference the result against
@@ -204,9 +242,56 @@ top of, so the math is written and verified exactly once.
 |---|---|
 | `complex.ts` | Immutable `Complex` number class — arithmetic, polar form, magnitude, phase |
 | `matrix.ts` | Immutable complex `Matrix` — add, scale, multiply, Kronecker/tensor product, conjugate transpose, apply-to-vector |
-| `state.ts` | `StateVector` — an n-qubit pure state, normalization, measurement probabilities, inner product, tensor composition |
+| `state.ts` | `StateVector` — an n-qubit pure state, normalization (`isNormalized`), measurement probabilities, inner product, tensor composition (`.tensor()`, plus the module-level `tensorStates()` for combining more than two at once) |
 | `gates.ts` | Standard gate matrices (`I, X, Y, Z, H, S, T`, parametrized `Rx/Ry/Rz`, `phase(θ)`) plus `applySingleQubitGate` / `applyControlledGate` / `applyCNOT` / `applyCZ` / `applySwap`, which apply a gate to specific qubit(s) within a larger register |
-| `measurement.ts` | `measurementDistribution` (Born-rule probabilities) and `measure` (samples an outcome and returns the collapsed state) |
+| `measurement.ts` | `measurementDistribution` / `measure` (full-register Born-rule probabilities and collapse) plus `qubitMeasurementProbabilities` / `measureQubit` (partial measurement of one qubit within a multi-qubit state, added for Quantum Gates & Circuits — see below) |
+| `twoQubit.ts` | `testSeparability` and `twoQubitJointProbabilities` — the two genuinely 2-qubit-specific math functions (see below); deliberately its own file rather than folded into `state.ts`, since the separability test doesn't generalize past 2 qubits the way everything else in the engine does |
+| `format.ts` | `formatAmplitudeLatex` — the one formatting helper shared between the Bloch sphere simulator and lesson-embedded state displays, kept here (not under `components/`) since multiple, otherwise-unrelated UI pieces consume it |
+
+### Qubit ordering convention
+
+**Qubit 0 is the most significant (leftmost) bit of a multi-qubit basis
+label**, everywhere: a 3-qubit state's basis states are written
+$|q_0q_1q_2\rangle$, so `StateVector.basis(3, 0b100)` is $|100\rangle$ —
+qubit 0 equal to 1, the others 0. This was already implicit in
+`applySingleQubitGate`'s bitmask (`1 << (n - 1 - target)`) from the
+Bloch-sphere-simulator pass, and is now used and *tested* explicitly (see
+§Testing below) since Quantum Gates & Circuits is the first content that
+actually has more than one qubit to get the order wrong on. Every lesson,
+test, and the `QuantumStateDisplay` component all rely on this same
+convention — there is exactly one place it's decided
+(`gates.ts`'s bitmask math) and everything else is downstream of it.
+
+### Multi-qubit support: mostly already there
+
+The single-qubit-era engine turned out to already be qubit-count-agnostic
+in almost every function that mattered: `applySingleQubitGate`,
+`applyControlledGate`, `applyCNOT`, `applyCZ`, `applySwap`, and
+`StateVector.tensor()` all operate correctly on a state of any
+`numQubits` — they were written generally the first time, not
+single-qubit-only. Building Quantum Gates & Circuits confirmed this by
+using every one of them unchanged.
+
+The one genuine gap was **partial measurement** — collapsing *one* qubit
+within a multi-qubit state while leaving the others alone (needed for
+"measure one half of a Bell pair" and for quantum teleportation, which
+measures 2 of its 3 qubits). `measurement.ts` gained two functions for
+this: `qubitMeasurementProbabilities(state, qubit)` sums $|c_i|^2$ over
+every basis index consistent with each outcome, and `measureQubit(state,
+qubit, random?)` samples an outcome and returns the correctly
+renormalized collapsed state — zeroing every amplitude inconsistent with
+the observed outcome and dividing survivors by $\sqrt{P(\text{outcome})}$.
+Both are straightforward generalizations of the existing full-register
+`measure`, not a new measurement model.
+
+**Verified, not just written:** every new engine addition (partial
+measurement, and the full teleportation protocol built from existing
+primitives) has a corresponding Vitest test in
+`src/lib/quantum/__tests__/multiQubit.test.ts` *before* the corresponding
+lesson was written, including the teleportation protocol checked against
+all 4 measurement outcomes for 4 different message states (16 exact-state
+assertions) — the lesson's derivation was written to match what the
+engine actually computes, not the other way around.
 
 Two design choices worth calling out:
 
@@ -228,21 +313,99 @@ full Bell-state construction, SWAP, complex arithmetic, and measurement
 collapse) via a throwaway script — all seven passed. That script wasn't
 kept (see §9's testing recommendation for the durable version of this).
 
-**Rendering stays fully separate.** `BlochSpherePreview` (today, a static
-SVG under `src/components/simulators/bloch-sphere/`) has zero dependency on
-`lib/quantum/` — it's decorative. When it becomes real, it will read a
-`StateVector` and render the corresponding point on the sphere; the gate
-math, circuit state, and UI will not be entangled with each other. The
-convention going forward: `src/components/simulators/<name>/` for
-rendering, `src/lib/quantum/` for math, never mixed in one file.
+**Rendering stays fully separate.** `src/components/simulators/bloch-sphere/`
+holds two things deliberately: `BlochSpherePreview` (a static, decorative
+SVG used only on the homepage hero — no `lib/quantum/` dependency at all)
+and `BlochSphereExplorer` (the real interactive simulator, which reads and
+writes `StateVector`s via `lib/quantum/` and renders the corresponding
+point on the sphere). Neither the gate math nor the circuit state is ever
+mixed into a rendering file. The convention going forward:
+`src/components/simulators/<name>/` for rendering,
+`src/lib/quantum/` for math, never mixed in one file.
 
 **What's deliberately not built yet:** density matrices, partial trace,
 von Neumann entropy, and Hamiltonian time evolution. Those are real
-requirements (entanglement visualizer, error-correction simulator, noise
-simulation, wavefunction time evolution all need them eventually) but
-aren't needed for the first simulators (Bloch sphere, circuit builder,
-measurement) and would have roughly doubled the size of this pass. Next
-addition to this library, when a simulator needs it.
+requirements (a future multipartite-entanglement course, an
+error-correction simulator, noise simulation, wavefunction time evolution
+all need them eventually) but weren't needed to teach pure-state
+entanglement, measurement, no-cloning, or teleportation — all of which
+are expressible with pure `StateVector`s and partial measurement alone —
+and would have meaningfully expanded this pass's scope. Next addition to
+this library, when a simulator or lesson actually needs it (the
+multipartite-entanglement course that replaced the old duplicate-content
+"Bell States" course, see the changelog below, is the most likely
+trigger).
+
+---
+
+## 6b. Interactive Visualization Architecture
+
+The 2-qubit explorer (`TwoQubitExplorer`, `src/components/simulators/two-qubit-explorer/`)
+is the first simulator built with an explicit five-layer separation, meant
+to be the pattern every future visualization (circuit diagrams, density
+matrices, wavefunctions, algorithm animations) follows rather than
+reinvents:
+
+1. **Quantum mathematics** — `src/lib/quantum/`. Zero React, zero DOM.
+   `testSeparability` is the only genuinely new math this simulator needed;
+   every gate/measurement operation it uses already existed.
+2. **Simulation state** — owned entirely by the top-level orchestrator
+   (`TwoQubitExplorer.tsx`) as a single `StateVector` plus small pieces of
+   UI state (narration text, which preset is active, which qubit is the
+   current gate target). No other component in the tree holds quantum
+   state; they all receive it as props and call back up through handlers.
+3. **Visualization** — `StatePanel` (ket + amplitude/probability table +
+   entanglement badge) and `CorrelationView` (the Q0/Q1 joint-probability
+   grid). Pure presentational components: given a `StateVector`, render it.
+   Neither imports a gate function or touches `useState`.
+4. **Controls** — `OperationControls` (init / gates / CNOT / SWAP /
+   guided-preset buttons) and `MeasurementPanel` (measure / reset).
+   Presentational too, except for the target-qubit toggle's own tiny local
+   state; every action is a callback prop, not a direct engine call.
+5. **Lesson integration** — `LazyTwoQubitExplorer.tsx`, the same
+   `dynamic(..., { ssr: false })` pattern as the Bloch sphere, so an MDX
+   lesson embeds the whole thing as `<LazyTwoQubitExplorer />` and pays
+   its bundle cost only on routes that use it.
+
+The reason this split matters beyond tidiness: the *next* visualization
+(a circuit diagram, say) can reuse layers 1 and — if it also needs
+per-basis-state probabilities or a separability check — parts of layer 3,
+without reusing anything from layers 2 or 4, which are legitimately
+different for a circuit builder. Nothing here is a shared abstract base
+class or a plugin framework; it's a convention (these five concerns live
+in separate files, math never appears in a `.tsx` file) that the next
+simulator either follows or has a documented reason not to.
+
+**Entanglement detection, done rigorously.** `testSeparability` is an
+*exact* test, not a heuristic or a name-based lookup: a 2-qubit state
+$a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$ is separable iff
+$ad-bc=0$ (the determinant of the amplitudes arranged as a 2×2 matrix,
+which is zero exactly when that matrix has rank ≤ 1, i.e. is an outer
+product of two vectors — necessary and sufficient, proven in the code
+comment, not just asserted). The explorer computes this on every state
+change and shows "Product state" or "Entangled" accordingly — a state is
+never labeled entangled because it happens to be *called* a Bell state.
+Tested directly against all four Bell states, several plain product
+states (including ones that don't "look" simple), and a numerical-tolerance
+boundary case in `src/lib/quantum/__tests__/twoQubit.test.ts`.
+
+**Guided presets run through the same code path as manual clicks.**
+`presets.ts` describes each guided walkthrough as a list of steps (reset /
+apply a named gate to a qubit / CNOT / measure a qubit); the orchestrator's
+`runPreset` sequences through them with a short delay between steps,
+calling the exact same `applySingleQubitGate` / `applyCNOT` / `measureQubit`
+functions a manual button click would. There is no separate "preset
+engine" — presets are just pre-written scripts for the same actions.
+
+**Animation is deliberately simple.** Unlike the Bloch sphere (which
+needed a `requestAnimationFrame` loop to interpolate a 3D rotation path),
+the 2-qubit explorer's state is tabular — probability bars and a
+correlation grid — so ordinary CSS `transition-[width]` on value changes
+is sufficient, with `motion-reduce:transition-none` handling reduced-motion
+per element. No JS animation loop, no extra hook. Measurement is narrated
+explicitly as a discrete event ("the state has collapsed — this was an
+instantaneous event, not a smooth transition") rather than animated as if
+it were continuous physical evolution.
 
 ---
 
@@ -258,22 +421,139 @@ plus a few new, purpose-built pieces:
   `/software`. One component, four call sites, one visual language for
   "here is a curriculum" anywhere on the site.
 - **`components/lessons/LessonLayout`** — the chrome around every lesson:
-  breadcrumb (`Learn / <Pillar> / <Course>`), difficulty + time badges, the
-  "by the end of this lesson" objectives box, then the MDX body inside a
-  `prose` wrapper. Every future lesson gets this for free just by having
-  correct `lessonMeta`.
+  breadcrumb (`Learn / <Pillar> / <Course>`), a course-position indicator
+  ("Lesson 5 of 10") with a progress bar, difficulty + time badges, a
+  resolved prerequisites line (annotated with the source course's title
+  when a prerequisite lives outside the current course), the "by the end
+  of this lesson" objectives box, the MDX body inside a `prose` wrapper,
+  and a previous/next footer nav. Every future lesson gets all of this for
+  free just by having correct `lessonMeta` and being registered as a module
+  in `curriculum.ts`.
 - **`components/mdx/Callout`** — the one content-authoring primitive
   content needs today (see §5).
+- **`components/quantum/QuantumStateDisplay`** — added for Quantum Gates &
+  Circuits. Renders a computational-basis ket expression plus a
+  probability bar per basis state, from a real `StateVector` a lesson
+  computed via the actual engine (not hand-typed numbers) — so the
+  rendered math can never drift from what the engine computes. It's a
+  **pure Server Component**: `katex.renderToString` runs at build time
+  (the same call `rehype-katex` itself makes internally), so this ships
+  zero client-side JavaScript. Lessons compose several of these in a row
+  to narrate a gate-by-gate sequence (a Bell-state or teleportation
+  derivation) without needing a dedicated "stepper" component — deliberately
+  choosing repetition of one small component over building a bigger one.
 
-This is intentionally minimal. A "Problems/Quiz" UI system (question types,
-scoring, review state) and a "Simulator chrome" system (controls, playback,
-reset) are real, separate design problems — building them now, with zero
-real quizzes or simulators to design against, would mean guessing. They're
-first in the roadmap below.
+This is intentionally minimal. A "Simulator chrome" system (controls,
+playback, reset) is a real, separate design problem — building it now, with
+only two simulators to design against, would mean guessing; it's in the
+roadmap below. A full circuit-diagram visualizer is a similar case: Quantum
+Gates & Circuits teaches circuit notation and composition entirely through
+prose, LaTeX, and `QuantumStateDisplay` step sequences, deliberately without
+one — building a genuine circuit builder is its own project, not a
+byproduct of writing lessons. The "Problems/Quiz" UI system, previously
+listed here as future work, was designed and built this session — see §7b.
 
 ---
 
-## 8. Changes Made to the Existing Architecture
+## 7b. Problems System Architecture
+
+The problems system is the platform's first real content type that isn't
+prose-plus-math (a lesson) or a hand-built interactive widget (a
+simulator) — it's structured, gradeable exercise data. It follows the same
+"math / state / UI" separation §6b established for simulators, adapted to
+a system that also needs persistence and content authoring:
+
+**Content format: TypeScript data files, not MDX.** A lesson is
+long-form prose with embedded interactive components — MDX is the right
+tool because most of a lesson *is* markdown. A problem is the opposite
+shape: a handful of short, strictly-typed fields (a prompt, a few hints,
+a multi-step solution, one canonical answer) with no free-form prose
+structure to speak of. Authoring problems as plain `Problem` object
+literals in `src/content/problems/<pillar>/<course>/<slug>.ts` gets full
+compile-time checking of every field against the discriminated-union
+schema in `lib/problems/types.ts` — an MDX file only gets that for its
+`export const` values, not for its content shape — with zero MDX
+compilation cost. Every demonstration problem computes its own canonical
+answer by calling the real quantum engine at module load (the same
+pattern lessons use for `QuantumStateDisplay` inputs), so an answer can
+never silently drift from what the engine actually computes; the
+multiple-choice `h-then-cnot-result` problem goes further and renders its
+correct option's ket through the exact same `formatAmplitudeLatex` helper
+`QuantumStateDisplay` uses, so it looks identical to what a student saw
+in the lesson.
+
+**Data model** (`lib/problems/types.ts`) keeps five concerns in separate
+fields rather than one blob, per the brief's explicit requirement:
+`meta` (slug, course, lesson, difficulty, tags — everything a catalog or
+filter needs, with no question content in it), `question` (the prompt and
+input shape — *no* correctness information), `answer` (the canonical
+correct value plus validation parameters — tolerance, required concept
+groups — kept entirely separate from `question` so a client can never
+receive the answer alongside the question), `hints` (an ordered array,
+revealed progressively by the UI, not the content), and
+`solution`/`explanation` (a worked derivation plus why-correct/why-wrong
+prose, not just the bare answer). `Problem` is a discriminated union over
+`problemType`, so authoring a `numeric` problem with a `multiple-choice`
+answer shape is a compile error, not a runtime surprise —
+`registry.test.ts` additionally asserts this invariant holds for every
+authored problem, since validator dispatch relies on it.
+
+**Validators** (`lib/problems/validators/`) are one small pure function
+per problem type — `validateMultipleChoice`, `validateNumeric`,
+`validateConceptual` — dispatched by `validateAnswer(problem, rawAnswer)`.
+Every submission reaches a validator as a plain `string`; no submission is
+ever evaluated as code. Numeric answers are parsed with `Number(...)` and
+compared with configurable absolute or relative tolerance (never a bare
+`===`). Conceptual answers use case-insensitive substring matching against
+author-supplied keyword groups — deliberately simple and fully
+deterministic, not natural-language understanding; a correct answer
+phrased with none of the listed synonyms will be marked incomplete, and
+this is a documented Phase 1 limitation, not a stand-in for `eval`. The
+abstraction (`Problem -> ValidationResult`) is what makes adding a fourth
+validator later (symbolic, quantum-state-vector-with-global-phase,
+circuit-structure) a matter of adding one file and one `case`, not
+touching the UI.
+
+**Progress persistence** (`lib/problems/progress/`) is a `ProgressStore`
+interface — `getProblemProgress`, `recordAttempt`, `revealHint`,
+`revealSolution` — with one implementation today
+(`LocalStorageProgressStore`, plus a same-shaped in-memory fallback used
+during SSR, where `window` doesn't exist). No component calls
+`localStorage` directly. `useProblemProgress(slug)` — built on
+`useSyncExternalStore`, not a `useEffect`-plus-`setState` hydration dance
+— is the one hook `ProblemView` uses to both read and mutate progress;
+swapping in an authenticated, server-backed store later means writing one
+new class against the same interface, not touching `ProblemView`. (This
+mattered in practice, not just in theory: an earlier version read
+progress via `useEffect` + `setState` on mount, and a separate bug in the
+localStorage read path — returning a freshly-parsed object on every call
+instead of a cached one — combined with `useSyncExternalStore`'s
+stable-snapshot requirement to produce a genuine infinite render loop,
+caught by browser-testing the feature rather than by type-checking or unit
+tests. See the Session 6 changelog entry and
+`progress/__tests__/progressStore.test.ts`.)
+
+**UI components** (`components/problems/`) split along the same lines as
+§6b's simulator layering: `ProblemLayout` (server — breadcrumb, badges,
+title, prompt, prerequisites, related-lesson link) wraps `ProblemView`
+(client — the only part that needs state), which composes `AnswerInput`
+(dispatches by question type), `Feedback`, `HintPanel`, and
+`SolutionPanel`. The catalog (`/problems`) is `ProblemsCatalog` (client,
+owns filter state) rendering `ProblemFilters` and `ProblemCard`.
+`PracticeLinks` is the lesson-embed primitive — deliberately smaller and
+plainer than a full `ProblemCard`, so a lesson's practice section reads as
+part of the lesson rather than an inserted widget.
+
+**Quiz** (`Quiz` type in `lib/problems/types.ts`, plus `getAllQuizzes` /
+`getQuiz` in the registry) is architecture only this phase — the data
+model and lookup functions exist, `QUIZZES` is an empty array, and there
+is no quiz-taking UI. See §9.
+
+---
+
+## 8. Changelog
+
+### Session 1 — Foundation
 
 - **Navigation** (`src/lib/nav.ts`, `Navbar.tsx`) — added Hardware and
   Software; the desktop nav breakpoint moved from `md` to `lg` because 8
@@ -287,58 +567,202 @@ first in the roadmap below.
   since it can't serialize JS plugin functions).
 - **`globals.css`** — added the KaTeX stylesheet import and the
   `@tailwindcss/typography` plugin.
-- **Nothing was removed or restructured** — `/simulators`, `/problems`,
-  `/about`, and the entire homepage are untouched.
+
+### Session 2 — Bloch sphere simulator
+
+- Built `BlochSphereExplorer` (real, interactive) alongside the existing
+  static `BlochSpherePreview`; added `lib/quantum/bloch.ts`
+  (`StateVector` ⇄ Bloch angle/vector conversions) and
+  `rotationAboutAxis` to `gates.ts`.
+- Set up Vitest; wrote the first real test suite for `lib/quantum/`.
+- Authored `what-is-a-qubit.mdx`, the first real lesson.
+
+### Session 3 — Qubits & Quantum States (Course 1, complete)
+
+- Authored the remaining 9 lessons of `qubits-and-quantum-states`.
+- `LessonLayout` gained course progress, prerequisites, and prev/next nav
+  (course-local only, at this point — see Session 4).
+
+### Session 4 — Quantum Gates & Circuits (Course 2, complete)
+
+- **Cross-course prerequisites fixed.** `LessonLayout` previously resolved
+  `meta.prerequisites` only against the current course's lessons, so a
+  prerequisite pointing at a different course silently failed to render as
+  a link — Course 2 needed this on its very first lesson (its prerequisite
+  is Course 1's capstone). Fixed by fetching `getAllLessonsMeta()` once in
+  the route and passing the full list into `LessonLayout` as `allLessons`;
+  prerequisites resolve against all of it, while prev/next and the
+  progress indicator filter it down to the current course. See §5.
+- **`lib/quantum/measurement.ts`** gained `qubitMeasurementProbabilities`
+  and `measureQubit` — partial measurement of one qubit within a
+  multi-qubit state, the one genuine gap in an engine that was otherwise
+  already multi-qubit-capable. See §6.
+- **`lib/quantum/state.ts`** gained `isNormalized()` and the module-level
+  `tensorStates()`.
+- **`lib/quantum/format.ts`** (new) — `formatAmplitudeLatex` promoted out
+  of the Bloch-sphere-specific `format.ts` so both the simulator and the
+  new `QuantumStateDisplay` component share one implementation;
+  `bloch-sphere/format.ts` now just re-exports it alongside its own
+  Bloch-specific helpers.
+- **`components/quantum/QuantumStateDisplay`** (new) — see §7.
+- **`src/lib/quantum/__tests__/multiQubit.test.ts`** (new) — 32 tests:
+  qubit ordering, tensor products, two-qubit gates, Bell-state derivation
+  and its entanglement proof, partial measurement (including on an
+  entangled vs. an unentangled state), the full teleportation protocol
+  (4 message states × 4 measurement branches, exact state equality), and
+  a GHZ-state / multi-qubit-interference pair used as the capstone
+  lesson's worked examples.
+- **`curriculum.ts`** — replaced Quantum Gates & Circuits' 5 placeholder
+  modules with the real 10-lesson sequence (bumped its difficulty to
+  `intermediate`, hours to 8); moved `multi-qubit-states-and-tensor-products`
+  out of it into the (still-placeholder) next course, since Course 2 is
+  now scoped as "everything about a single qubit → many." Also **renamed
+  and rescoped** `entanglement-and-measurement` (still all-placeholder) —
+  its original modules (`bell-states`, `the-no-cloning-theorem`,
+  `quantum-teleportation`) duplicated what Course 2 ended up teaching in
+  depth; it now targets multipartite entanglement, mixed states, and Bell
+  tests instead. See §2 & 3.
+- **`package.json`** — added a `typecheck` script (`tsc --noEmit`).
+- Nothing was removed from or restructured in the homepage,
+  `/simulators`, `/problems`, `/about`, or Course 1's content.
+
+### Session 5 — 2-Qubit State Explorer
+
+- **`lib/quantum/twoQubit.ts`** (new) — `testSeparability` (the exact
+  $ad-bc$ rank-≤1 test for 2-qubit separability) and
+  `twoQubitJointProbabilities`. The only new math this simulator needed;
+  every gate/measurement operation it uses already existed in the engine
+  from Session 4. See §6b.
+- **`src/lib/quantum/__tests__/twoQubit.test.ts`** (new) — 11 tests
+  covering all four Bell states, several product states, a numerical-
+  tolerance boundary case, and invalid-dimension guards. Total suite: 77
+  tests (66 prior + 11 new), all passing.
+- **`components/simulators/two-qubit-explorer/`** (new) — the explorer
+  itself: `TwoQubitExplorer.tsx` (orchestrator), `StatePanel.tsx`,
+  `CorrelationView.tsx` (presentational), `OperationControls.tsx`,
+  `MeasurementPanel.tsx` (controls), `gateDefinitions.ts`, `presets.ts`
+  (data), and `LazyTwoQubitExplorer.tsx` (lesson-embed wrapper, mirrors
+  `LazyBlochSphereExplorer`). Built around an explicit five-layer split —
+  math / simulation state / visualization / controls / lesson integration
+  — documented in full in §6b, intended as the pattern future
+  visualizations (circuit diagrams, density matrices, ...) follow.
+- **Lesson integration** — embedded via `<LazyTwoQubitExplorer />` in
+  `tensor-products.mdx`, `bell-states-and-entanglement.mdx`, and
+  `multi-qubit-measurement.mdx`, each with lesson-specific "try it
+  yourself" framing pointing at the exact interaction the surrounding math
+  just derived (not inserted into every lesson in the course).
+- **No new dependencies.** Everything is built on the existing engine, the
+  existing `Button`/`Badge`/`KatexMath` UI primitives, and plain CSS
+  transitions.
+- Nothing was removed from or restructured in Course 1, Course 2's lesson
+  prose, the homepage, `/simulators`, `/problems`, or `/about`.
+
+### Session 6 — Problems System (Phase 1)
+
+- **`lib/problems/`** (new) — the whole problems architecture: `types.ts`
+  (the `Problem`/`Question`/`Answer`/`Hint`/`Solution`/`Explanation`/`Quiz`
+  data model), `registry.ts` (statically-imported problem list plus
+  lookups by slug/lesson/course), `validators/` (`multipleChoice.ts`,
+  `numeric.ts`, `conceptual.ts`, dispatched by `validateAnswer`),
+  `progress/` (`ProgressStore` interface, `LocalStorageProgressStore` +
+  an in-memory SSR fallback, `useProblemProgress` built on
+  `useSyncExternalStore`), and `hints.ts` (the pure hint-reveal-progression
+  function). See §7b for the full design rationale.
+- **`src/content/problems/quantum-computing/{qubits-and-quantum-states,quantum-gates-and-circuits}/`**
+  (new) — 5 demonstration problems, each computing its canonical answer
+  via the real engine at module load: `plus-state-measurement-probability`
+  (numeric), `tensor-product-basis-label` (multiple-choice),
+  `bell-state-separability` (conceptual), `bell-state-outcome-probability`
+  (numeric), `h-then-cnot-result` (multiple-choice, whose correct option
+  text is generated through the same `formatAmplitudeLatex` helper
+  `QuantumStateDisplay` uses).
+- **`components/problems/`** (new) — `ProblemLayout` (server),
+  `ProblemView` (client orchestrator), `AnswerInput`, `Feedback`,
+  `HintPanel`, `SolutionPanel`, `ProblemCard`, `ProblemFilters`,
+  `ProblemsCatalog`, `PracticeLinks`. See §7b.
+- **`components/ui/MathText.tsx`** (new) — renders plain text containing
+  inline `$...$` LaTeX segments, for problem prompts/hints/solutions that
+  are short structured strings rather than full MDX documents. A pure,
+  hook-free function component, so — like `QuantumStateDisplay` — it works
+  unmodified from both a Server Component (`ProblemLayout`) and a Client
+  Component (`ProblemView`'s children).
+- **`/problems`** rewritten from a 4-item hardcoded placeholder list to a
+  real, filterable catalog of the 5 authored problems (topic + difficulty
+  chip filters; an honest, live problem count — never a fabricated one).
+  **`/problems/[slug]`** (new route) — statically generated, same
+  `generateStaticParams` + `dynamicParams = false` pattern as
+  `/lessons/[...slug]`.
+- **Lesson integration** — `<PracticeLinks problems={...} />` added to
+  `what-is-a-qubit.mdx`, `tensor-products.mdx`,
+  `bell-states-and-entanglement.mdx`, and `multi-qubit-measurement.mdx`,
+  each pulling its own lesson's problems via `getProblemsForLesson(slug)`
+  computed at module load — the same "compute from real data, don't
+  hand-type it" discipline as everything else these lessons import.
+- **A real bug, caught by browser-testing rather than by type-checking or
+  the unit suite:** the first working version of `useProblemProgress`
+  hydrated progress via `useEffect` + `setState` on mount; separately,
+  `LocalStorageProgressStore.getProblemProgress` returned a freshly
+  `JSON.parse`'d object on every call. Switching the hook to
+  `useSyncExternalStore` (the React-recommended primitive for an
+  SSR-unsafe external store, and the fix for the `useEffect` pattern's own
+  `react-hooks/set-state-in-effect` lint error) exposed the second bug:
+  `useSyncExternalStore` requires `getSnapshot` to return a referentially
+  *stable* value when nothing changed, and a fresh object every call
+  doesn't satisfy that — React saw a "new" snapshot on every render and
+  re-rendered forever (React error #185, a real crash reproduced in a
+  live browser tab, not a lint warning). Fixed by caching reads in
+  `localStorageStore.ts` until the next write. Pinned by
+  `progressStore.test.ts`'s stable-reference assertions, added specifically
+  because this class of bug is invisible to both `tsc` and a validator
+  unit test — it only shows up when something actually calls the hook
+  inside React's render loop.
+- **`vitest.config.mts`** gained a `resolve.alias` for `"@/*"` (mirroring
+  `tsconfig.json`), needed once problem content files started importing
+  the engine and each other via `@/...` — no prior test file had used the
+  alias. **Test suite: 115 tests, up from 77** (38 new: validators, hint
+  progression, registry integrity, demonstration-problem answers checked
+  against the engine, and the progress-store regression test above).
+- **No new dependencies.**
+- Nothing was removed from or restructured in Course 1 or Course 2's
+  lesson prose (beyond the added `<PracticeLinks />` sections), the
+  homepage, `/simulators`, or `/about`.
 
 ---
 
 ## 9. Implementation Roadmap
 
-**Stage 0 — Foundation (this pass).** Curriculum data model, MDX content
-pipeline, quantum math engine, IA/nav update, one real reference lesson.
+**Done:** foundation (data model, MDX pipeline, quantum engine, IA/nav);
+the Bloch sphere simulator; Vitest infrastructure; both
+`Qubits & Quantum States` and `Quantum Gates & Circuits` fully authored
+(20 lessons total); cross-course prerequisites; the 2-qubit state explorer
+(entanglement detection, partial/full measurement, correlation view,
+guided presets) embedded in three Course 2 lessons; the Problems system
+(data model, 3 validator types, `localStorage`-backed progress behind a
+swappable interface, catalog + detail UI) with 5 demonstration problems
+embedded across 4 lessons.
 
-**Stage 1 — Prove the simulator pattern.** Build one real, interactive
-simulator end to end — the Bloch sphere is the natural first choice, since
-its static preview and the exact lesson that should embed it already exist.
-This is the first simulator built on `lib/quantum/`, and it'll surface
-whatever the `StateVector` → rendering interface actually needs to look
-like before more simulators copy the pattern.
+**Next — scale the problems system's content, not its architecture.**
+The Phase 1 slice (5 problems) exists to prove the loop end-to-end, not to
+cover the curriculum. The natural next step is authoring more problems
+against the existing model — no new abstractions needed until a problem
+type Phase 1 didn't build (symbolic math, a real quantum-state/global-phase
+comparator, circuit-structure comparison) actually comes up in a lesson.
 
-**Stage 2 — Write real lesson content.** With the pipeline proven by one
-lesson, author the rest of `Qubits & Quantum States` (the first course) for
-real, at full depth (all 10 sections, no shortening). Doing one full course
-before moving on tests whether the data model and `LessonLayout` hold up
-across lessons with real variety (worked examples, multiple callouts,
-multiple visualizations), not just one example.
+**Then — the quiz-taking UI.** The `Quiz` data model and registry lookups
+already exist (§7b) with zero authored quizzes; building the actual
+navigation/scoring/review UI is real, separate design work best done
+against a handful of real quizzes, the same reasoning that kept the
+Problems UI itself out of scope until Course 2 existed to design against.
 
-**Stage 3 — Problems/Quiz system design.** A real content and UI model for
-practice questions and quizzes — question types, an answer/grading
-representation, and how a lesson's "Practice Questions" section relates to
-the standalone `/problems` catalog. Needs its own design pass; not
-speculatively built now.
+**Then — expand the math engine.** Density matrices, partial trace, von
+Neumann entropy, basic Hamiltonian time evolution — needed once the
+renamed `entanglement-and-measurement` course (multipartite entanglement,
+mixed states, Bell tests) gets written for real, or once any simulator
+needs to show a reduced/mixed state.
 
-**Stage 4 — Progress & personalization groundwork.** Still no auth/database
-per the brief, but the *shape* of progress data (completed lessons,
-bookmarks, recently viewed) should be designed as a typed interface now,
-backed by `localStorage` initially, so swapping in real accounts later is a
-storage-layer change, not a rewrite. Also the point to revisit the
-"IA tension" flagged in §1 if the nav has grown further by then.
-
-**Stage 5 — Testing infrastructure.** Add Vitest (small, fast, zero-config
-with TS) specifically for `lib/quantum/` — the seven checks run manually
-this pass should become permanent, committed tests, and grow alongside the
-math engine (density matrices, partial trace, etc. in Stage 6 should ship
-with tests, not after).
-
-**Stage 6 — Expand the math engine.** Density matrices, partial trace, von
-Neumann entropy, basic Hamiltonian time evolution — driven by whichever
-simulator needs them first (entanglement visualizer is the likely trigger).
-
-**Stage 7 — Hardware & Software content.** Lowest priority pillars content-
-wise; their architecture is already identical to Mechanics/Computing, so
-this is purely a content-writing stage, not an engineering one.
-
-Recommended immediate next step: **Stage 1**, the real Bloch sphere
-simulator — it's small, it's already anchored to real content, and
-building it now (rather than writing more lessons first) will validate or
-correct the `lib/quantum/` API before a dozen lessons come to depend on it.
+**Also pending:** progress & personalization *beyond* single-problem
+state (lesson completion, cross-problem streak-free progress summaries —
+still no auth/database, same `ProgressStore`-interface discipline `lib/problems/progress`
+already established); revisiting the 8-item flat navbar if it grows
+further; Hardware & Software pillar content (architecture-complete,
+purely a writing task).

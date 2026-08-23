@@ -1,4 +1,10 @@
-import { BlochSpherePreview } from "@/components/simulators/bloch-sphere/BlochSpherePreview";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/qubits-and-quantum-states/what-is-a-qubit"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "What Is a Qubit?",
@@ -73,11 +79,11 @@ be *probabilities* — and probabilities have to add up to 1.
 ## Physical Interpretation
 
 The connection between the math and what you can actually observe is the
-**Born rule**: if you measure a qubit in state $|\psi\rangle = \alpha|0\rangle
-+ \beta|1\rangle$, you get outcome 0 with probability $|\alpha|^2$ and
-outcome 1 with probability $|\beta|^2$. Measurement is the one place where
-the smooth, continuous evolution of $\alpha$ and $\beta$ gives way to a
-single, random, classical outcome — the superposition **collapses**.
+**Born rule**: if you measure a qubit in state $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$,
+you get outcome 0 with probability $|\alpha|^2$ and outcome 1 with
+probability $|\beta|^2$. Measurement is the one place where the smooth,
+continuous evolution of $\alpha$ and $\beta$ gives way to a single, random,
+classical outcome — the superposition **collapses**.
 
 This is why normalization matters physically, not just mathematically: it's
 exactly the statement that "probability of 0" plus "probability of 1" must
@@ -87,14 +93,14 @@ equal 1.
 
 Every qubit state can be pictured as a point on the surface of a sphere — the
 **Bloch sphere** — where the north pole is $|0\rangle$, the south pole is
-$|1\rangle$, and every other point is some superposition of the two. The
-vector below is one such example state.
+$|1\rangle$, and every other point is some superposition of the two.
 
-<BlochSpherePreview />
+Try it yourself: apply a gate below and watch $\alpha$, $\beta$, and the
+measurement probabilities update as the vector moves. Then hit **Measure** a
+few times from the same state and notice the outcomes are random, but always
+land on 0 or 1 with exactly the probabilities shown.
 
-This is a static illustration for now. A full interactive version — where
-you can drag the vector and watch the amplitudes update live — is one of the
-first simulators planned for this platform.
+<LazyBlochSphereExplorer />
 
 ## Worked Example
 
@@ -145,6 +151,8 @@ and a 64% chance of measuring 1.
    amplitudes $(\alpha, \beta)$ consistent with this.
 3. Why can't a qubit's amplitudes both be negative real numbers close to $-1$?
 
+<PracticeLinks problems={practiceProblems} />
+
 ## Summary
 
 - A classical bit is always 0 or 1; a qubit's state is a complex linear
@@ -157,6 +165,9 @@ and a 64% chance of measuring 1.
 
 ## Further Exploration
 
-Next in this course: **Dirac Notation**, which generalizes the notation used
-here, followed by **The Bloch Sphere**, which derives the geometric picture
-above from the algebra. Both are coming soon.
+We've been using $\alpha$ and $\beta$ as complex numbers without really using
+their complex structure yet — every example above could have used real
+numbers. That changes fast. Next in this course: **Complex Numbers for
+Quantum Mechanics**, which builds the machinery (polar form, Euler's
+formula) that phases like $e^{i\varphi}$ on the Bloch sphere actually need —
+followed by **Dirac Notation**, which makes the bra-ket formalism precise.

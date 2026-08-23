@@ -1,0 +1,60 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { ProblemFilters } from "./ProblemFilters";
+import { ProblemCard } from "./ProblemCard";
+import { getCourse } from "@/lib/content/curriculum";
+import type { Pillar } from "@/lib/content/types";
+import type { ProblemDifficulty, ProblemMeta } from "@/lib/problems/types";
+
+type PillarFilter = "all" | Pillar;
+type DifficultyFilter = "all" | ProblemDifficulty;
+
+const PILLAR_OPTIONS: { id: PillarFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "quantum-computing", label: "Quantum Computing" },
+];
+
+const DIFFICULTY_OPTIONS: { id: DifficultyFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "beginner", label: "Beginner" },
+  { id: "intermediate", label: "Intermediate" },
+  { id: "advanced", label: "Advanced" },
+];
+
+export function ProblemsCatalog({ problems }: { problems: ProblemMeta[] }) {
+  const [pillar, setPillar] = useState<PillarFilter>("all");
+  const [difficulty, setDifficulty] = useState<DifficultyFilter>("all");
+
+  const filtered = useMemo(() => {
+    return problems.filter((problem) => {
+      const course = getCourse(problem.course);
+      const matchesPillar = pillar === "all" || course?.pillar === pillar;
+      const matchesDifficulty = difficulty === "all" || problem.difficulty === difficulty;
+      return matchesPillar && matchesDifficulty;
+    });
+  }, [problems, pillar, difficulty]);
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-x-8 gap-y-4">
+        <ProblemFilters label="Topic" options={PILLAR_OPTIONS} selected={pillar} onChange={setPillar} />
+        <ProblemFilters label="Difficulty" options={DIFFICULTY_OPTIONS} selected={difficulty} onChange={setDifficulty} />
+      </div>
+
+      <p className="mt-6 text-sm text-muted-foreground">
+        {filtered.length} problem{filtered.length === 1 ? "" : "s"}
+      </p>
+
+      {filtered.length > 0 ? (
+        <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((problem) => (
+            <ProblemCard key={problem.slug} problem={problem} />
+          ))}
+        </div>
+      ) : (
+        <p className="mt-8 text-sm text-muted-foreground">No problems match these filters yet.</p>
+      )}
+    </div>
+  );
+}

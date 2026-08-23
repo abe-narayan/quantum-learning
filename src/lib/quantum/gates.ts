@@ -45,29 +45,41 @@ export function phaseGate(theta: number): Matrix {
   ]);
 }
 
-export function rotationX(theta: number): Matrix {
+export type Axis3 = { x: number; y: number; z: number };
+
+/**
+ * The general single-qubit rotation R_n(θ) = cos(θ/2) I − i sin(θ/2) (n·σ),
+ * a rotation by θ about an arbitrary axis `n` on the Bloch sphere. `Rx`,
+ * `Ry`, `Rz` below are the special cases where `n` is a coordinate axis;
+ * every fixed gate (X, Y, Z, H, S, T) is also some R_n(θ) up to an
+ * unobservable global phase, which is what lets a Bloch-sphere animation
+ * treat every gate as a genuine rotation rather than an ad hoc tween.
+ */
+export function rotationAboutAxis(axis: Axis3, theta: number): Matrix {
+  const norm = Math.hypot(axis.x, axis.y, axis.z);
+  if (norm === 0) throw new Error("Rotation axis must be nonzero.");
+  const nx = axis.x / norm;
+  const ny = axis.y / norm;
+  const nz = axis.z / norm;
   const cos = Math.cos(theta / 2);
   const sin = Math.sin(theta / 2);
+
   return new Matrix([
-    [c(cos), c(0, -sin)],
-    [c(0, -sin), c(cos)],
+    [c(cos, -nz * sin), c(-ny * sin, -nx * sin)],
+    [c(ny * sin, -nx * sin), c(cos, nz * sin)],
   ]);
+}
+
+export function rotationX(theta: number): Matrix {
+  return rotationAboutAxis({ x: 1, y: 0, z: 0 }, theta);
 }
 
 export function rotationY(theta: number): Matrix {
-  const cos = Math.cos(theta / 2);
-  const sin = Math.sin(theta / 2);
-  return new Matrix([
-    [c(cos), c(-sin)],
-    [c(sin), c(cos)],
-  ]);
+  return rotationAboutAxis({ x: 0, y: 1, z: 0 }, theta);
 }
 
 export function rotationZ(theta: number): Matrix {
-  return new Matrix([
-    [Complex.fromPolar(1, -theta / 2), c(0)],
-    [c(0), Complex.fromPolar(1, theta / 2)],
-  ]);
+  return rotationAboutAxis({ x: 0, y: 0, z: 1 }, theta);
 }
 
 // --- Applying gates to a multi-qubit state ---------------------------------

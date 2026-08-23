@@ -1,0 +1,170 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
+import { measureQubit } from "@/lib/quantum/measurement";
+
+export const lessonMeta = {
+  title: "Building Quantum Circuits",
+  description:
+    "The capstone for this course: composing every tool so far into a real 3-qubit entangled circuit, built and analyzed from scratch.",
+  course: "quantum-gates-and-circuits",
+  module: "building-quantum-circuits",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: [
+    "quantum-computing/quantum-gates-and-circuits/interference-in-quantum-circuits",
+    "quantum-computing/qubits-and-quantum-states/building-qubit-circuits",
+  ],
+  objectives: [
+    "Design a circuit that prepares a specified 3-qubit entangled state",
+    "Verify a multi-qubit circuit identity by tracking a state through it step by step",
+    "Predict multi-qubit measurement statistics for a circuit you designed yourself",
+  ],
+};
+
+export const ghzStep0 = StateVector.zero(3);
+export const ghzStep1 = applySingleQubitGate(ghzStep0, HADAMARD, 0);
+export const ghzStep2 = applyCNOT(ghzStep1, 0, 1);
+export const ghzStep3 = applyCNOT(ghzStep2, 0, 2);
+
+export const ghzMeasured = measureQubit(ghzStep3, 0, 0.9); // outcome 1
+
+## Motivation
+
+Nine lessons have built a genuine toolkit: tensor products, entanglement,
+CNOT, partial measurement, no-cloning, teleportation, interference. This
+lesson doesn't introduce new mathematics — it uses everything at once, on
+a circuit you haven't seen yet, extending the two-qubit Bell state to
+three qubits for the first time.
+
+## A circuit identity, revisited
+
+Before building something new, one more circuit-equivalence check —
+useful in its own right, and good practice for verifying that two
+differently-drawn circuits compute the same thing. **Controlled Gates and
+CNOT** showed $\text{SWAP}=\text{CNOT}(0,1)\cdot\text{CNOT}(1,0)\cdot\text{CNOT}(0,1)$
+by tracking $|10\rangle$ through all three steps. That same
+step-by-step-tracking technique — apply one gate, note the new state,
+apply the next — is the general method for verifying *any* circuit
+identity, and it's exactly what the rest of this lesson does for a
+brand-new circuit.
+
+## Building a three-qubit entangled state
+
+### The circuit
+
+Extend the Bell-state recipe by one qubit: $H$ on qubit 0, then
+$\text{CNOT}(0,1)$, then $\text{CNOT}(0,2)$.
+
+<QuantumStateDisplay state={ghzStep0} label="Start: |000⟩" />
+<QuantumStateDisplay state={ghzStep1} label="After H on qubit 0" />
+<QuantumStateDisplay state={ghzStep2} label="After CNOT(0, 1)" />
+<QuantumStateDisplay state={ghzStep3} label="After CNOT(0, 2) — done" />
+
+$$
+|000\rangle \xrightarrow{H} \frac{|000\rangle+|100\rangle}{\sqrt2} \xrightarrow{\text{CNOT}(0,1)} \frac{|000\rangle+|110\rangle}{\sqrt2} \xrightarrow{\text{CNOT}(0,2)} \frac{|000\rangle+|111\rangle}{\sqrt2}
+$$
+
+This is a **GHZ state** (named for Greenberger, Horne, and Zeilinger) —
+the natural three-party generalization of a Bell pair. Qubit 0's
+superposition, via two CNOTs instead of one, has been copied onto *both*
+of the other qubits' correlation structure — not their amplitudes
+(no-cloning still holds; nothing here clones an unknown state, since
+$|0\rangle$ is a known state and this whole circuit is fixed and public),
+but their entanglement with qubit 0.
+
+### Analyzing it
+
+**Is it entangled?** By the same style of argument as the Bell-state
+proof: if $\frac{1}{\sqrt2}(|000\rangle+|111\rangle)$ factored as
+$|a\rangle\otimes|b\rangle\otimes|c\rangle$, every one of the six
+"mixed" basis terms ($|001\rangle,|010\rangle,|011\rangle,|100\rangle,|101\rangle,|110\rangle$)
+would need zero amplitude — forcing at least one of $|a\rangle,|b\rangle,|c\rangle$
+to have a zero component, which then also zeroes out one of the surviving
+terms ($|000\rangle$ or $|111\rangle$). Genuinely entangled, same
+technique, one qubit more.
+
+**What happens on measurement?** Measure qubit 0:
+
+<QuantumStateDisplay state={ghzMeasured.collapsed} label={`Qubit 0 measured → outcome ${ghzMeasured.outcome}`} />
+
+All three qubits become exactly determined and equal — measuring *any
+one* of the three tells you, with certainty, what the other two are.
+Three-party correlation, from the same H-plus-CNOTs pattern that built a
+two-party one, extended by exactly one more CNOT.
+
+## Common Mistakes, Revisited
+
+<Callout type="mistake">
+**Operator order.** Still the most common error across this entire
+course: a circuit's diagram reads left to right; its operator product
+reads right to left. Every derivation in this course has depended on
+getting this right.
+</Callout>
+
+<Callout type="mistake">
+**Confusing "many CNOTs from one qubit" with cloning.** The GHZ circuit
+uses qubit 0 as the control for two separate CNOTs — this spreads
+*correlation*, not the qubit's unknown amplitude information. If qubit 0
+had started in an arbitrary unknown state instead of $|0\rangle$, the
+same circuit would still work exactly as derived (try it: replace
+$|000\rangle$ with $|\psi\rangle\otimes|00\rangle$ and redo the algebra) —
+and it still wouldn't violate no-cloning, because the result is one
+*entangled* 3-qubit state, not three independent copies of $|\psi\rangle$.
+</Callout>
+
+## Practice: The Course Challenge
+
+Work through this multi-step problem in full — it draws on nearly every
+lesson in this course.
+
+**1.** Starting from $|00\rangle$, design a circuit (a sequence of gates)
+that prepares $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$.
+(Hint: start from the H-then-CNOT recipe, and figure out what
+single-qubit gate(s), applied before or after, produce the extra minus
+sign and the swapped basis labels.)
+
+**2.** Prove your circuit's output is entangled, using the
+coefficient-matching contradiction method from the Bell-states lesson.
+
+**3.** Compute the measurement statistics: if you measure qubit 0 of your
+prepared state, what are $P(0)$ and $P(1)$, and what does qubit 1 become
+in each case?
+
+**4.** Extend your circuit by one qubit, using the same
+"one more CNOT from the same control" pattern as the GHZ derivation
+above, to build a 3-qubit state with the same "flavor" of correlation as
+$|\Psi^-\rangle$. Predict what measuring any one qubit tells you about
+the other two.
+
+**5.** Explain, in your own words, why none of the circuits you just
+built could be used to send a message faster than light — even though
+measuring one qubit instantly tells you something about qubits that
+might be far away.
+
+## Summary
+
+- Every technique from this course — tensor products, CNOT, entanglement
+  proofs, partial measurement, interference — composes directly: circuits
+  are built the same way regardless of how many qubits are involved.
+- The GHZ state, $\frac{1}{\sqrt2}(|000\rangle+|111\rangle)$, extends a
+  Bell pair to three parties using one extra CNOT from the same control
+  qubit, with a matching extension to the entanglement and correlation
+  arguments.
+- Analyzing any circuit — is it entangled, what does measurement do —
+  reuses the exact same techniques regardless of circuit size.
+
+## Further Exploration
+
+This completes **Quantum Gates & Circuits**. You now have the complete
+toolkit for multi-qubit systems: tensor products, circuit notation,
+controlled gates, entanglement, multi-qubit measurement, no-cloning,
+teleportation, and interference. The next course in this pillar,
+**Entanglement, Mixed States & Bell Tests**, pushes entanglement further
+— beyond pairs to arbitrary multipartite states, and beyond pure states
+to the mixed-state formalism needed once a qubit is entangled with
+something you can't observe. After that, **Quantum Algorithms I:
+Foundations** is where interference — the mechanism from two lessons ago
+— stops being a standalone curiosity and becomes the engine behind
+algorithms that outperform anything classical.

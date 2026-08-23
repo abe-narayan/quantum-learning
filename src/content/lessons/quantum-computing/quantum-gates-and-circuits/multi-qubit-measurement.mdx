@@ -1,0 +1,198 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
+import { measureQubit } from "@/lib/quantum/measurement";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Multi-Qubit Measurement",
+  description:
+    "Measuring one qubit of an entangled pair while leaving the others alone — the exact mechanism behind Bell-state correlation.",
+  course: "quantum-gates-and-circuits",
+  module: "multi-qubit-measurement",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement"],
+  objectives: [
+    "State the projective measurement rule for one qubit within a multi-qubit state",
+    "Compute the exact post-measurement state after measuring part of an entangled system",
+    "Contrast measuring an entangled qubit with measuring an unentangled one",
+  ],
+};
+
+export const bellState = applyCNOT(applySingleQubitGate(StateVector.zero(2), HADAMARD, 0), 0, 1);
+export const bellAfterZero = measureQubit(bellState, 0, 0.1).collapsed;
+export const bellAfterOne = measureQubit(bellState, 0, 0.9).collapsed;
+
+export const plusZero = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]).tensor(
+  StateVector.zero(1)
+);
+export const plusZeroAfterMeasuringQubit1 = measureQubit(plusZero, 1, 0.5).collapsed;
+
+## Motivation
+
+The last lesson showed that measuring either qubit of a Bell state always
+matches its partner. That claim was stated in terms of probabilities;
+this lesson derives it from the measurement postulate directly, and
+along the way builds the tool — measuring *part* of a multi-qubit state
+— that quantum teleportation is built entirely out of two lessons from
+now.
+
+## Intuition
+
+Measuring a single-qubit state collapses it to a definite basis state,
+full stop. Measuring one qubit *within* a multi-qubit state has to do
+something more careful: the other qubits are still there, still possibly
+in superposition, and the measurement can't simply erase them. What it
+does is throw away every possibility inconsistent with the outcome you
+got, and rescale what's left so it's still a valid, normalized state.
+
+## Mathematical Development
+
+### The rule
+
+To measure qubit $k$ of an $n$-qubit state $|\psi\rangle$: the
+probability of outcome $b\in\{0,1\}$ is the sum of $|\text{amplitude}|^2$
+over every computational basis term whose qubit-$k$ bit equals $b$:
+
+$$
+P(\text{qubit } k = b) = \sum_{\substack{i:\, \text{bit } k \text{ of } i \,=\, b}} |c_i|^2
+$$
+
+If outcome $b$ occurs, the post-measurement state is obtained by zeroing
+out every amplitude inconsistent with qubit $k=b$, then renormalizing the
+survivors by dividing by $\sqrt{P(\text{qubit }k=b)}$:
+
+$$
+|\psi'\rangle = \frac{1}{\sqrt{P(b)}}\sum_{\substack{i:\, \text{bit } k \text{ of } i \,=\, b}} c_i |i\rangle
+$$
+
+This is the general single-qubit computational-basis Born rule from the
+last course, applied one qubit at a time instead of to the whole
+register at once — the "collapse to a definite basis state" you already
+know is exactly the special case where the state being measured has only
+one qubit to begin with.
+
+### Applied to the Bell state
+
+$|\Phi^+\rangle=\frac{1}{\sqrt2}|00\rangle+\frac{1}{\sqrt2}|11\rangle$
+has exactly one term with qubit 0 equal to 0 (the $|00\rangle$ term) and
+one with qubit 0 equal to 1 (the $|11\rangle$ term), each with
+$|c_i|^2=\frac12$. So $P(\text{qubit }0{=}0)=P(\text{qubit }0{=}1)=\frac12$
+— confirming the 50/50 claim. Now the post-measurement state: if the
+outcome is 0, only the $|00\rangle$ term survives, and dividing by
+$\sqrt{1/2}$ gives amplitude exactly 1 on $|00\rangle$:
+
+<QuantumStateDisplay state={bellAfterZero} label="Bell state, after measuring qubit 0 → outcome 0" />
+<QuantumStateDisplay state={bellAfterOne} label="Bell state, after measuring qubit 0 → outcome 1" />
+
+Qubit 1 doesn't merely "tend to agree" with qubit 0 — after the
+measurement, its value is **exactly determined**, with certainty. This is
+the full mechanism behind the correlation from the last lesson, not an
+approximation of it.
+
+### Not every partial measurement does this
+
+Contrast with an unentangled example: $|+\rangle\otimes|0\rangle$, where
+qubit 1 is definitely $|0\rangle$ and qubit 0 is independently in
+superposition. Measure qubit 1:
+
+<QuantumStateDisplay state={plusZero} label="|+⟩ ⊗ |0⟩, before any measurement" />
+<QuantumStateDisplay state={plusZeroAfterMeasuringQubit1} label="After measuring qubit 1 (always outcome 0)" />
+
+Qubit 1's outcome is certain (it was already definite), and — crucially —
+qubit 0's superposition survives completely untouched. Measuring one
+qubit of a product state never disturbs the other; measuring one qubit of
+an entangled state generally does. Entanglement is precisely what makes
+that difference possible.
+
+## Physical Interpretation
+
+Partial measurement is genuinely local: only the measured qubit's degree
+of freedom is projected. But when the qubits are entangled, "only the
+measured qubit" and "the whole state" aren't separable questions —
+collapsing part of an indivisible state collapses the whole description
+at once, which is why the untouched qubit's outcome becomes definite even
+though nothing was done to it directly.
+
+## Interactive Experiment
+
+Try it yourself, using the exact **Measure q0** / **Measure q1** buttons
+this lesson's math describes. Run the **Create a Bell state** walkthrough,
+then measure q0 — the state panel shows the collapse this lesson derived,
+exactly. Reset, prepare **|++⟩** instead, and measure q1: notice q0's row
+in the state table still shows a 50/50 split afterward — the unentangled
+contrast from the previous section, live.
+
+<LazyTwoQubitExplorer />
+
+## Worked Example
+
+**A 2-qubit state is $\frac{1}{2}|00\rangle+\frac{\sqrt3}{2}|01\rangle$.
+Find $P(\text{qubit }0{=}0)$ and the post-measurement state if that
+outcome occurs.**
+
+Both nonzero terms ($|00\rangle$ and $|01\rangle$) have qubit 0 equal to
+0, so $P(\text{qubit }0{=}0) = \left(\frac12\right)^2+\left(\frac{\sqrt3}{2}\right)^2 = \frac14+\frac34=1$
+— certain, as it should be, since qubit 0 never appears as 1 anywhere in
+this state to begin with. The post-measurement state is unchanged:
+$\frac{1}{2}|00\rangle+\frac{\sqrt3}{2}|01\rangle$ — qubit 1 keeps
+whatever superposition it already had.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming partial measurement always collapses the other qubits too.**
+Only entangled qubits get disturbed this way — the worked example and the
+$|+\rangle\otimes|0\rangle$ case above are both counterexamples.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting to renormalize after zeroing out inconsistent amplitudes.**
+The surviving amplitudes must be divided by $\sqrt{P(b)}$, not left as
+they were in the original state — otherwise the result isn't a valid,
+normalized quantum state.
+</Callout>
+
+## Practice Questions
+
+1. For $|\Psi^+\rangle=\frac{1}{\sqrt2}(|01\rangle+|10\rangle)$, find
+   $P(\text{qubit }0{=}0)$ and the resulting state if that outcome
+   occurs. What does qubit 1 become?
+2. For the same $|\Psi^+\rangle$, what happens if you measure qubit 1
+   first instead of qubit 0? Should the final joint state depend on which
+   qubit you measure first?
+3. A 3-qubit entangled state is
+   $\frac{1}{\sqrt2}(|000\rangle+|111\rangle)$. Find the post-measurement
+   state after measuring qubit 0 and getting outcome 1. What are qubits 1
+   and 2 now?
+4. Explain why "measuring an entangled qubit always destroys
+   superposition everywhere" is an overstatement — construct or recall a
+   3-qubit example where measuring one qubit leaves some superposition
+   intact among the rest.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Measuring qubit $k$ sums $|c_i|^2$ over basis terms consistent with each
+  outcome, then collapses to the surviving, renormalized amplitudes.
+- Applied to a Bell state, this shows the partner qubit becomes exactly
+  determined — not just statistically likely to match.
+- Applied to a product state, the untouched qubit's superposition survives
+  completely.
+
+## Further Exploration
+
+Next: **The No-Cloning Theorem** — a genuinely surprising consequence of
+the measurement and linearity rules from this course: no device can copy
+an unknown qubit state, and the proof follows directly from tools you
+already have.

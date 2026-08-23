@@ -1,0 +1,201 @@
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+
+export const lessonMeta = {
+  title: "Global Phase vs. Relative Phase",
+  description:
+    "A precise proof of which phases are physically real and which aren't — probably the single most common confusion in quantum computing.",
+  course: "qubits-and-quantum-states",
+  module: "global-and-relative-phase",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/single-qubit-rotations"],
+  objectives: [
+    "Prove that a global phase changes no measurement probability in any basis",
+    "Prove that a relative phase does change some measurement probabilities",
+    "Identify whether two given states differ by global phase, relative phase, or neither",
+  ],
+};
+
+## Motivation
+
+Two lessons ago, $Y|0\rangle=i|1\rangle$ landed on exactly the same Bloch
+point as $X|0\rangle=|1\rangle$. Last lesson, $R_z(2\pi)=-I$ turned out to
+do nothing physically despite the matrix having an unmistakable overall
+minus sign. Both facts have been used without being proven. This is where
+they finally get proven — and where the difference between "phase that
+doesn't matter" and "phase that matters enormously" gets made completely
+precise.
+
+## Intuition
+
+**Global phase** multiplies an entire state by the same factor:
+$|\psi\rangle \to e^{i\gamma}|\psi\rangle$. Every amplitude gets rotated by
+the same angle in the complex plane, together, all at once — like
+rotating a photograph; the picture doesn't change, only your description
+of "which way is up" does.
+
+**Relative phase** changes the phase of one amplitude *relative to* the
+other: $\alpha|0\rangle+\beta|1\rangle \to \alpha|0\rangle+e^{i\delta}\beta|1\rangle$.
+This is not a re-labeling — it genuinely rotates the state to a different
+point on the Bloch sphere (a different $\varphi$), and it is very much
+measurable.
+
+## Mathematical Development
+
+### Global phase is unobservable
+
+**Claim:** for any orthonormal basis $\{|e_0\rangle,|e_1\rangle\}$ and any
+real $\gamma$, measuring $e^{i\gamma}|\psi\rangle$ gives the exact same
+probabilities as measuring $|\psi\rangle$.
+
+**Proof.** By the measurement postulate,
+
+$$
+P(e_i) = |\langle e_i|(e^{i\gamma}|\psi\rangle)|^2 = |e^{i\gamma}|^2|\langle e_i|\psi\rangle|^2 = |\langle e_i|\psi\rangle|^2
+$$
+
+using $|e^{i\gamma}|=1$ for any real $\gamma$ — a phase factor never
+changes a modulus. The right-hand side is exactly the probability computed
+from $|\psi\rangle$ alone, with no $\gamma$ in it anywhere. Since this
+holds for *every* basis, not just the computational one, global phase is
+unobservable by any measurement whatsoever — not "hard to detect," but
+provably, permanently invisible.
+
+The same fact shows up geometrically: the Bloch-vector formulas
+$x=2\operatorname{Re}(\alpha^*\beta)$, $y=2\operatorname{Im}(\alpha^*\beta)$,
+$z=|\alpha|^2-|\beta|^2$ depend on $\alpha,\beta$ only through
+$\alpha^*\beta$, $|\alpha|^2$, $|\beta|^2$ — and substituting
+$\alpha\to e^{i\gamma}\alpha$, $\beta\to e^{i\gamma}\beta$ leaves every one
+of those combinations unchanged, since $(e^{i\gamma}\alpha)^*(e^{i\gamma}\beta)=e^{-i\gamma}e^{i\gamma}\alpha^*\beta=\alpha^*\beta$.
+Global phase moves nothing on the sphere. This is *why* the simulator you've
+been using has no "global phase" control — there is nothing for such a
+control to do.
+
+### Relative phase is observable
+
+Now instead multiply *only* $\beta$: $\beta \to e^{i\delta}\beta$. In the
+computational basis, this changes nothing —
+$|e^{i\delta}\beta|^2=|\beta|^2$ — which is exactly why relative phase was
+invisible for the first several lessons of this course, where every
+measurement was implicitly in the computational basis. But recall the
+X-basis result from the Measurement lesson:
+
+$$
+P(+) = \frac{1+2\operatorname{Re}(\alpha^*\beta)}{2}
+$$
+
+Replace $\beta$ with $e^{i\delta}\beta$:
+
+$$
+P(+)_{\text{new}} = \frac{1+2\operatorname{Re}(e^{i\delta}\alpha^*\beta)}{2}
+$$
+
+This genuinely depends on $\delta$ (take $\alpha=\beta=\tfrac{1}{\sqrt2}$:
+$P(+)$ ranges from $1$ at $\delta=0$ down to $0$ at $\delta=\pi$, as
+$\operatorname{Re}(e^{i\delta})$ sweeps from $1$ to $-1$). Relative phase
+is measurable — just not in the computational basis. This is precisely
+the $\varphi$ coordinate on the Bloch sphere, and precisely what $S$, $T$,
+and $R_z$ manipulate.
+
+### Resolving the two open threads
+
+**$Y|0\rangle=i|1\rangle$ vs. $X|0\rangle=|1\rangle$:** here $\alpha=0$ for
+both, so there is no second amplitude for a phase to be "relative" to —
+the factor of $i$ is necessarily a *global* phase on the single nonzero
+term, hence physically invisible. That's why both land at the same Bloch
+point.
+
+**$R_z(2\pi)=-I$:** multiplies both $\alpha$ and $\beta$ by $-1$ equally —
+a global phase ($\gamma=\pi$) applied to the whole state, not a relative
+one. Unobservable, exactly as the simulator showed.
+
+## Physical Interpretation
+
+Global phase is a redundancy in the mathematical description — the same
+physical state can be written infinitely many ways, differing by
+$e^{i\gamma}$, and no experiment can prefer one writing over another.
+Relative phase is the opposite: it is exactly the information interference
+depends on, and it's what every phase gate in this course was built to
+manipulate. Conflating the two — dismissing *any* phase as "just a
+global phase, ignore it" — is probably the single most common conceptual
+error in quantum computing, and everything in this lesson exists to make
+sure you can always tell them apart with a calculation, not a guess.
+
+## Interactive Experiment
+
+<LazyBlochSphereExplorer />
+
+- Prepare $|1\rangle$, then apply $S$. The amplitudes shown numerically
+  change (as computed in the Quantum Gates lesson, $\beta \to i\beta$),
+  but the Bloch vector and both probabilities stay frozen — global phase,
+  caught in the act of doing nothing physical.
+- Now prepare $|+\rangle$ and apply $S$. This time the vector visibly
+  sweeps to $|{+i}\rangle$ — the *same* gate, but now acting as a
+  relative-phase change, because this time there are two nonzero
+  amplitudes for the phase to be relative between.
+
+## Worked Example
+
+**Do $|\psi_1\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$ and
+$|\psi_2\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$ differ by a global
+phase, a relative phase, or neither?**
+
+If they differed by global phase, $|\psi_2\rangle = e^{i\gamma}|\psi_1\rangle$
+for some $\gamma$ would require *both* coefficients to pick up the same
+factor $e^{i\gamma}$. But $|\psi_1\rangle$'s coefficients are $(1,1)/\sqrt2$
+and $|\psi_2\rangle$'s are $(1,-1)/\sqrt2$ — going from the first pair to
+the second multiplies only the *second* entry by $-1$, not both entries
+by a common factor. That's a relative phase ($\delta=\pi$, since
+$e^{i\pi}=-1$), not a global one — consistent with $|\psi_1\rangle=|+\rangle$
+and $|\psi_2\rangle=|-\rangle$ sitting at opposite, physically distinct
+points on the equator.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**"It's just a phase, so it doesn't matter."** Half-true, dangerously so.
+*Global* phase never matters. *Relative* phase can matter enormously.
+Always identify which kind you're looking at before dismissing it.
+</Callout>
+
+<Callout type="mistake">
+**Judging global vs. relative by whether a $-1$ or $i$ "looks small."**
+The size or simplicity of a phase factor has nothing to do with whether
+it's global or relative — only whether it multiplies *every* amplitude
+equally (global) or only *some* of them (relative) determines that.
+</Callout>
+
+## Practice Questions
+
+1. $|\psi_1\rangle=\frac{3}{5}|0\rangle+\frac{4}{5}|1\rangle$ and
+   $|\psi_2\rangle=-\frac{3}{5}|0\rangle-\frac{4}{5}|1\rangle$. Global
+   phase, relative phase, or neither? Justify with a calculation.
+2. $|\psi_1\rangle=\frac{3}{5}|0\rangle+\frac{4}{5}|1\rangle$ and
+   $|\psi_3\rangle=\frac{3}{5}|0\rangle-\frac{4}{5}|1\rangle$. Same
+   question.
+3. Explain why a state with $\alpha=0$ (i.e. proportional to $|1\rangle$)
+   can never exhibit a *relative*-phase effect from any gate, no matter
+   what phase that gate introduces.
+4. Two experimentalists prepare what they both call "$|+\rangle$," but one
+   of them has an extra $\pi$ global phase in their equipment's
+   convention they don't know about. Would any experiment they run be
+   able to tell their two preparations apart? Why or why not?
+
+## Summary
+
+- Global phase, $|\psi\rangle \to e^{i\gamma}|\psi\rangle$, is
+  unobservable in *any* measurement basis — proven directly from the Born
+  rule, not just asserted.
+- Relative phase, changing one amplitude's phase relative to the other,
+  moves the state's Bloch point and is measurable (just not always in the
+  computational basis).
+- This resolves both $Y|0\rangle$ vs. $X|0\rangle$ and $R_z(2\pi)=-I$: both
+  are global-phase effects, hence invisible.
+
+## Further Exploration
+
+Next: **Putting It Together**, the capstone lesson for this course, where
+states, gates, rotations, measurement, and phase all combine to analyze
+multi-gate sequences — including one genuinely useful identity you'll
+verify yourself in the simulator.

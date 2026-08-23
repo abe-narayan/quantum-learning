@@ -1,0 +1,189 @@
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+
+export const lessonMeta = {
+  title: "Measurement and Probability",
+  description:
+    "The measurement postulate stated precisely, and what it means to measure a qubit in a basis other than {|0⟩, |1⟩}.",
+  course: "qubits-and-quantum-states",
+  module: "measurement-and-probability",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/the-bloch-sphere"],
+  objectives: [
+    "State the projective measurement postulate using inner products",
+    "Compute measurement probabilities in bases other than the computational basis",
+    "Explain why a single measurement can't reveal a state's amplitudes",
+  ],
+};
+
+## Motivation
+
+The Born rule — $P(0)=|\alpha|^2$, $P(1)=|\beta|^2$ — has been used
+informally since Lesson 1. What hasn't been asked yet: what if you wanted
+to measure something other than "is this 0 or 1"? A qubit lives on an
+entire sphere of possible states; the computational basis is just one
+choice of two special points on it. This lesson makes the measurement
+postulate general enough to answer that, and along the way, gives a much
+sharper picture of what a "measurement" actually is.
+
+## Intuition
+
+Measuring is like asking a question with a fixed menu of possible answers.
+"Is this 0 or 1?" is one question — the menu is $\{|0\rangle,|1\rangle\}$.
+But "is this $|+\rangle$ or $|-\rangle$?" is an equally legitimate
+question, with a different menu. Which question you ask is a choice you
+make (by choosing what to measure); which answer you get, for a fixed
+question, is genuinely random — weighted by how much your prepared state
+overlaps with each possible answer.
+
+## Mathematical Development
+
+### The measurement postulate
+
+Choose any **orthonormal basis** $\{|e_0\rangle, |e_1\rangle\}$ — any pair
+of states with $\langle e_0|e_0\rangle=\langle e_1|e_1\rangle=1$ and
+$\langle e_0|e_1\rangle=0$, exactly the orthonormality property Dirac
+notation gave us. Measuring $|\psi\rangle$ "in this basis" means:
+
+$$
+P(e_i) = |\langle e_i|\psi\rangle|^2
+$$
+
+and afterward, the state has collapsed to exactly $|e_i\rangle$ — every
+trace of the original superposition is gone. This is the general Born
+rule; the computational-basis version from Lesson 1 is the special case
+$\{|e_0\rangle,|e_1\rangle\}=\{|0\rangle,|1\rangle\}$:
+
+$$
+P(0) = |\langle0|\psi\rangle|^2 = |\alpha|^2, \qquad P(1) = |\langle1|\psi\rangle|^2 = |\beta|^2
+$$
+
+using $\langle0|\psi\rangle=\langle0|(\alpha|0\rangle+\beta|1\rangle)=\alpha$
+by orthonormality — the amplitude $\alpha$ *is* the inner product with
+$|0\rangle$, not just notation that happens to look like one.
+
+### Measuring in the X-basis
+
+Take $\{|+\rangle,|-\rangle\}$ instead, with
+$|\pm\rangle=\frac{1}{\sqrt2}(|0\rangle\pm|1\rangle)$. For a general
+$|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$:
+
+$$
+\langle+|\psi\rangle = \frac{1}{\sqrt2}(\langle0|+\langle1|)(\alpha|0\rangle+\beta|1\rangle) = \frac{\alpha+\beta}{\sqrt2}
+$$
+
+$$
+P(+) = \left|\frac{\alpha+\beta}{\sqrt2}\right|^2 = \frac{|\alpha+\beta|^2}{2}
+$$
+
+This is genuinely different behavior from the computational-basis case.
+Expand $|\alpha+\beta|^2 = |\alpha|^2+|\beta|^2+2\operatorname{Re}(\alpha^*\beta) = 1 + 2\operatorname{Re}(\alpha^*\beta)$
+— so $P(+)$ depends on the *relative phase* between $\alpha$ and $\beta$
+(through $\operatorname{Re}(\alpha^*\beta)$), not just their individual
+sizes. Two states with identical $P(0),P(1)$ can have completely different
+$P(+),P(-)$. This is interference showing up in a measurement probability,
+concretely, for the first time in this course.
+
+### Why one measurement isn't enough
+
+A single measurement returns one classical bit of information — 0 or 1,
+$+$ or $-$, whatever the chosen basis's outcomes are called. It does
+**not** return $\theta$, $\varphi$, or any amplitude. Learning
+$P(0)\approx0.73$, say, to any useful precision requires repeating the
+*entire experiment* — prepare the same state, measure, record the
+outcome, discard the (now-collapsed) state, repeat — many times, and
+computing the fraction of 0s. This is a hard physical constraint, not a
+technological limitation: once you measure, the superposition is gone, so
+you cannot "measure again more carefully."
+
+## Physical Interpretation
+
+Choosing a measurement basis is choosing which physical property to
+observe (for a real qubit, e.g. photon polarization, this might mean
+literally orienting a polarizing filter one way vs. another). The
+outcome's randomness isn't error or noise to be engineered away — the
+measurement postulate says it's a fundamental feature of the theory.
+
+## Interactive Experiment
+
+<LazyBlochSphereExplorer />
+
+- Prepare $|+\rangle$ using the preset, then click **Measure** several
+  times in a row (using Reset or the preset button to re-prepare $|+\rangle$
+  between clicks, since each measurement collapses the state). You should
+  see roughly even 0s and 1s.
+- The simulator's Measure button always measures in the computational
+  (Z) basis — but you can measure in the X-basis with the tools you
+  already have: apply **H**, *then* Measure. Try it from $|+\rangle$:
+  `H` sends $|+\rangle$ to $|0\rangle$ exactly (the next lesson derives
+  why), so measuring afterward is deterministic — a clean way to see that
+  "measure in the X basis" and "rotate then measure in Z" are the same
+  operation.
+
+## Worked Example
+
+**Compute $P(+)$ and $P(-)$ for $|\psi\rangle = |{+i}\rangle = \frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$.**
+
+Here $\alpha=\frac{1}{\sqrt2}$, $\beta=\frac{i}{\sqrt2}$, so
+$\alpha^*\beta = \frac{1}{\sqrt2}\cdot\frac{i}{\sqrt2} = \frac{i}{2}$, which
+is purely imaginary: $\operatorname{Re}(\alpha^*\beta)=0$.
+
+$$
+P(+) = \frac{1+2\operatorname{Re}(\alpha^*\beta)}{2} = \frac{1+0}{2} = \frac12
+$$
+
+and by the same logic $P(-)=\frac12$ too. Even though $|{+i}\rangle$ sits
+on the equator just like $|+\rangle$, measuring it in the X-basis is
+completely random — makes sense geometrically, since $|{+i}\rangle$ is
+$90°$ of longitude away from $|+\rangle$, as far from it as possible while
+staying on the equator.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Believing a measurement "reveals" $\theta$ or $\varphi$.** A single
+measurement gives one bit (which outcome occurred), full stop. Only
+statistics over *many* identical preparations approximate a probability,
+and even then you only recover $\theta$-like information from one basis
+and $\varphi$-like information from a different basis — never both from
+one series of measurements in one basis.
+</Callout>
+
+<Callout type="mistake">
+**Applying the computational-basis Born rule to a different basis by
+habit.** $P(0)=|\alpha|^2$ is specific to measuring in
+$\{|0\rangle,|1\rangle\}$. For any other basis, go back to
+$P(e_i)=|\langle e_i|\psi\rangle|^2$ and compute the inner product
+directly.
+</Callout>
+
+## Practice Questions
+
+1. Compute $P(0)$ and $P(1)$ for $|\psi\rangle=\frac{1}{2}|0\rangle+\frac{\sqrt3}{2}|1\rangle$,
+   then compute $P(+)$ and $P(-)$ for the same state.
+2. For which states is $P(+)=1$ exactly? Name the state and justify it
+   using the formula for $P(+)$ above.
+3. A friend claims they measured a single qubit once and determined
+   $\theta=47°$. Explain what's wrong with this claim.
+4. Two states have the same $\theta$ and differ only in $\varphi$. Under
+   what condition on $\varphi$ do they have *identical* $P(+)$ and $P(-)$,
+   even though they're different states?
+
+## Summary
+
+- Measuring in an orthonormal basis $\{|e_0\rangle,|e_1\rangle\}$ gives
+  outcome $e_i$ with probability $|\langle e_i|\psi\rangle|^2$, collapsing
+  the state to $|e_i\rangle$.
+- The familiar $P(0)=|\alpha|^2$ is the special case of the computational
+  basis.
+- X-basis probabilities depend on the *relative phase* between $\alpha$
+  and $\beta$ — a direct, measurable consequence of interference.
+- A single measurement yields one classical bit; probabilities require
+  many repeated preparations and measurements.
+
+## Further Exploration
+
+Next: **Quantum Gates**, where we finally define the $X,Y,Z,H,S,T$
+operators precisely, and connect each one to a specific rotation of the
+Bloch vector.

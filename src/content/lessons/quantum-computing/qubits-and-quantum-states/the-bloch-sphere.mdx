@@ -1,0 +1,229 @@
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+
+export const lessonMeta = {
+  title: "The Bloch Sphere",
+  description:
+    "Deriving the geometric picture of a qubit — where θ and φ come from, and what the sphere's surface actually represents.",
+  course: "qubits-and-quantum-states",
+  module: "the-bloch-sphere",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors"],
+  objectives: [
+    "Derive the canonical form |ψ⟩ = cos(θ/2)|0⟩ + e^{iφ}sin(θ/2)|1⟩",
+    "Convert between amplitudes (α, β) and Bloch coordinates (θ, φ) and (x, y, z)",
+    "Read the geometric meaning of a state directly off its position on the sphere",
+  ],
+};
+
+## Motivation
+
+The last lesson ended with a claim: a qubit's physical state has exactly
+two real degrees of freedom. Two real numbers are exactly what you need to
+locate a point on a sphere. This lesson makes that connection precise —
+not by analogy, but by direct derivation from
+$\alpha|0\rangle+\beta|1\rangle$.
+
+## Intuition
+
+Picture a globe. Latitude tells you how far from the equator you are;
+longitude tells you which way you're facing around the vertical axis. The
+Bloch sphere reuses exactly this idea: the "latitude" angle $\theta$ will
+turn out to control *how much* $|0\rangle$ versus $|1\rangle$ — i.e. the
+measurement probabilities — while the "longitude" angle $\varphi$ carries
+the *relative phase*, information invisible to a measurement in the
+computational basis but very much physically real, as you'll see in a
+later lesson.
+
+## Mathematical Development
+
+### Removing the redundant parameters
+
+Start from the general state, $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$,
+$|\alpha|^2+|\beta|^2=1$.
+
+**Step 1 — kill the global phase.** Write $\alpha$ in polar form,
+$\alpha = |\alpha|e^{i\gamma}$. Multiply the *entire state* by $e^{-i\gamma}$:
+
+$$
+e^{-i\gamma}|\psi\rangle = |\alpha|\,|0\rangle + \beta e^{-i\gamma}|1\rangle
+$$
+
+The new coefficient of $|0\rangle$, $|\alpha|$, is now real and
+non-negative. (We're allowed to do this because — as the next-lesson
+preview noted, and as we'll prove properly soon — multiplying a state by an
+overall phase changes nothing physical.) Relabel the new coefficients
+$\alpha' = |\alpha| \geq 0$ and $\beta' = \beta e^{-i\gamma}$, so
+$|\psi\rangle$'s *physics* is fully captured by $\alpha'|0\rangle+\beta'|1\rangle$
+with $\alpha'$ real.
+
+**Step 2 — parametrize the remaining freedom.** Since $\alpha'$ is real
+and $0 \le \alpha' \le 1$ (from normalization), we can always write
+$\alpha' = \cos(\theta/2)$ for a unique $\theta \in [0,\pi]$ — cosine is a
+bijection from $[0,\pi/2]$ onto $[0,1]$ for the half-angle $\theta/2$.
+Normalization $(\alpha')^2+|\beta'|^2=1$ then forces
+$|\beta'| = \sin(\theta/2)$ automatically, since
+$\cos^2(\theta/2)+\sin^2(\theta/2)=1$ is guaranteed regardless of $\theta$.
+Writing $\beta'$'s remaining phase as $\varphi$:
+
+$$
+\boxed{|\psi\rangle = \cos\!\left(\frac{\theta}{2}\right)|0\rangle + e^{i\varphi}\sin\!\left(\frac{\theta}{2}\right)|1\rangle}
+$$
+
+This is the **canonical Bloch form**. Every normalized single-qubit state
+(up to the global phase we removed in Step 1) corresponds to exactly one
+pair $(\theta,\varphi)$ with $\theta\in[0,\pi]$, $\varphi\in[0,2\pi)$ — and
+every such pair corresponds to exactly one physical state. That's the
+"two real parameters" from the previous lesson, made concrete.
+
+<Callout type="mistake">
+The **halved** angle $\theta/2$ inside the amplitudes is the single most
+common source of factor-of-two errors in this entire subject. The state
+rotates through angle $\theta$ on the *Bloch sphere*, but the amplitude
+formula uses $\theta/2$. Keep the two angles — the sphere's $\theta$ and
+the amplitude's $\theta/2$ — mentally separate.
+</Callout>
+
+### From amplitudes to a point in space
+
+The pair $(\theta,\varphi)$ are spherical coordinates for a point
+$(x,y,z)$ on a unit sphere, via the standard conversion
+$x=\sin\theta\cos\varphi$, $y=\sin\theta\sin\varphi$, $z=\cos\theta$. It's
+worth confirming this is exactly what falls out of the amplitudes
+directly, using the inner-product machinery from two lessons ago. Define:
+
+$$
+x = \langle\psi|X|\psi\rangle, \quad y = \langle\psi|Y|\psi\rangle, \quad z = \langle\psi|Z|\psi\rangle
+$$
+
+using the Pauli matrices you'll meet properly in the Quantum Gates lesson.
+Working out $z$ for $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$: since
+$Z|0\rangle=|0\rangle$ and $Z|1\rangle=-|1\rangle$,
+
+$$
+\langle\psi|Z|\psi\rangle = \alpha^*\alpha\langle0|0\rangle - \beta^*\beta\langle1|1\rangle = |\alpha|^2 - |\beta|^2
+$$
+
+Substituting the canonical form, $|\alpha|^2-|\beta|^2 = \cos^2(\theta/2) - \sin^2(\theta/2) = \cos\theta$
+— exactly $z=\cos\theta$, as promised, via the double-angle identity. The
+$x$ and $y$ computations follow the same pattern and give
+$x=\sin\theta\cos\varphi$, $y=\sin\theta\sin\varphi$. All three:
+
+$$
+x = 2\operatorname{Re}(\alpha^*\beta), \qquad y = 2\operatorname{Im}(\alpha^*\beta), \qquad z = |\alpha|^2-|\beta|^2
+$$
+
+work directly from *any* $\alpha,\beta$ — you never actually need to remove
+the global phase by hand first, because (as you can check) these three
+formulas don't change if you multiply $\alpha,\beta$ by a common phase.
+That cancellation is not an accident; it's the content of the next lesson.
+
+### Reading the sphere
+
+- **North pole** ($\theta=0$): $|\psi\rangle=|0\rangle$, regardless of $\varphi$
+  ($\varphi$ is meaningless when $\sin(\theta/2)=0$ — there's no $|1\rangle$
+  component to have a phase relative to).
+- **South pole** ($\theta=\pi$): $|\psi\rangle=|1\rangle$ (up to an
+  unobservable overall phase $e^{i\varphi}$).
+- **Equator** ($\theta=\pi/2$): equal-probability superpositions,
+  $\frac{1}{\sqrt2}(|0\rangle+e^{i\varphi}|1\rangle)$ — $|+\rangle$,
+  $|-\rangle$, $|{+i}\rangle$, $|{-i}\rangle$ all live here, at
+  $\varphi = 0, \pi, \pi/2, 3\pi/2$ respectively.
+
+## Physical Interpretation
+
+$\theta$ alone determines the measurement statistics
+($P(0)=\cos^2(\theta/2)$, $P(1)=\sin^2(\theta/2)$ — you'll derive this
+properly next lesson). $\varphi$ determines *nothing* about a
+computational-basis measurement by itself, yet it is not discardable
+information: it's what makes $|+\rangle$ and $|-\rangle$ — same $\theta$,
+different $\varphi$ — behave completely differently once gates get
+involved. Geometrically, latitude is "how much," longitude is "in what
+phase."
+
+## Interactive Experiment
+
+Try each of these directly in the simulator below, and check the numbers
+against what you just derived.
+
+<LazyBlochSphereExplorer />
+
+- Click through the six presets and read off $\theta$ and $\varphi$ for
+  each — confirm they match the values listed in "Reading the sphere"
+  above.
+- Drag the $\theta$ slider from $0$ to $\pi$ with $\varphi$ fixed at $0$.
+  Watch $P(0)$ and $P(1)$ trade off smoothly, and notice the vector stays
+  in a single vertical half-plane the whole time.
+- Now fix $\theta$ at $90°$ and sweep $\varphi$ through a full turn.
+  Notice $P(0)$ and $P(1)$ **never change** — the vector just sweeps
+  around the equator at constant latitude, exactly as the formulas
+  predict.
+
+## Worked Example
+
+**Find the state and Bloch point for $\theta=\pi/3$, $\varphi=\pi/2$.**
+
+$$
+\alpha = \cos\!\left(\frac{\pi}{6}\right) = \frac{\sqrt3}{2}, \qquad \beta = e^{i\pi/2}\sin\!\left(\frac{\pi}{6}\right) = i\cdot\frac12 = \frac{i}{2}
+$$
+
+$$
+x = \sin\!\left(\frac{\pi}{3}\right)\cos\!\left(\frac{\pi}{2}\right) = \frac{\sqrt3}{2}\cdot0 = 0
+$$
+
+$$
+y = \sin\!\left(\frac{\pi}{3}\right)\sin\!\left(\frac{\pi}{2}\right) = \frac{\sqrt3}{2}\cdot1 = \frac{\sqrt3}{2}, \qquad z = \cos\!\left(\frac{\pi}{3}\right) = \frac12
+$$
+
+Set $\theta$ and $\varphi$ to these values in the simulator above (in
+degrees: $\theta=60°$, $\varphi=90°$) and confirm $\alpha \approx 0.87$,
+$\beta \approx 0.50i$, matching $\frac{\sqrt3}{2}\approx0.87$ and
+$\frac12=0.50$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing the Bloch angle $\theta$ with a phase.** $\theta$ is a
+*probability* parameter (latitude), not a phase. Only $\varphi$ is a
+phase (longitude). Mixing these up is easy since both are angles measured
+in radians or degrees.
+</Callout>
+
+<Callout type="mistake">
+**Expecting $\varphi$ to mean something at the poles.** At $\theta=0$ or
+$\theta=\pi$, the state is $|0\rangle$ or $|1\rangle$ exactly, and
+$\varphi$ has no effect — there's no second component for it to be a
+phase *relative to*.
+</Callout>
+
+## Practice Questions
+
+1. Find $(\theta,\varphi)$ for the state $|\psi\rangle = \frac{1}{2}|0\rangle + \frac{\sqrt3}{2}|1\rangle$
+   (assume both coefficients are real and positive).
+2. Two states have the same $\theta$ but $\varphi$ differing by $\pi$.
+   Where do they sit relative to each other on the sphere?
+3. A state sits at Bloch point $(x,y,z) = (0, 0, -1)$. Write down
+   $|\psi\rangle$ in terms of $|0\rangle$ and $|1\rangle$.
+4. Explain, using the canonical form, why the north and south poles are
+   the *only* points on the sphere where $\varphi$ has no physical effect.
+
+## Summary
+
+- Removing global phase and reparametrizing gives the canonical form
+  $|\psi\rangle=\cos(\theta/2)|0\rangle+e^{i\varphi}\sin(\theta/2)|1\rangle$.
+- $(\theta,\varphi)$ map to Bloch coordinates
+  $x=\sin\theta\cos\varphi$, $y=\sin\theta\sin\varphi$, $z=\cos\theta$ —
+  equivalently $x=2\operatorname{Re}(\alpha^*\beta)$,
+  $y=2\operatorname{Im}(\alpha^*\beta)$, $z=|\alpha|^2-|\beta|^2$.
+- $\theta$ (latitude) controls measurement probability; $\varphi$
+  (longitude) is the relative phase.
+- The poles are $|0\rangle$ and $|1\rangle$; the equator is the set of
+  equal-probability superpositions, distinguished only by phase.
+
+## Further Exploration
+
+Next: **Measurement and Probability**, where $P(0)=\cos^2(\theta/2)$ and
+$P(1)=\sin^2(\theta/2)$ get derived properly from the measurement
+postulate — and where measuring in a basis *other* than $\{|0\rangle,|1\rangle\}$
+turns out to be just as natural.

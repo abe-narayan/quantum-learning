@@ -1,0 +1,158 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
+
+export const lessonMeta = {
+  title: "Quantum Circuit Notation",
+  description:
+    "How to read and write multi-qubit circuit diagrams, and how they correspond exactly to the operator products from the last course.",
+  course: "quantum-gates-and-circuits",
+  module: "quantum-circuit-notation",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors"],
+  objectives: [
+    "Read a multi-qubit circuit diagram: wires, gate boxes, controls, and meters",
+    "Translate a circuit diagram into the corresponding operator expression",
+    "Explain the relationship between a circuit's left-to-right layout and its right-to-left operator product",
+  ],
+};
+
+export const afterH = applySingleQubitGate(StateVector.zero(2), HADAMARD, 0);
+export const afterCnot = applyCNOT(afterH, 0, 1);
+
+## Motivation
+
+Every multi-qubit operation so far has been described in prose and
+equations. Real circuits — the ones you'll see in papers, textbooks, and
+every quantum SDK — are drawn as diagrams. Learning to read one fluently
+is a small, mechanical skill; getting the *ordering convention* backwards
+is the single most common way people misread a circuit, so this lesson
+spends real time on that specifically.
+
+## Intuition
+
+A circuit diagram is a small piece of sheet music: one horizontal line
+per qubit ("wire"), time flowing left to right, and symbols placed on the
+wires telling you what happens to that qubit at that moment. Reading a
+circuit is reading a story of the state evolving, one column at a time.
+
+## Mathematical Development
+
+### The conventions
+
+- **Wires**, read top to bottom, are qubits 0, 1, 2, ... — matching this
+  platform's ordering convention exactly, so the topmost wire is always
+  qubit 0.
+- **Boxes** on a wire (labeled $H$, $X$, $S$, etc.) are single-qubit
+  gates, identical to the ones from the last course.
+- **A filled dot** connected by a vertical line to a $\oplus$ symbol (or
+  to another gate box) is a **controlled operation**: the dot marks the
+  control qubit, the connected symbol marks the target and what happens
+  to it. The next lesson covers this in full.
+- **A meter symbol** (⏱-like gauge icon, conventionally) marks a
+  measurement of that wire at that point in time.
+- **A blank wire** at a given time step means: nothing happens to that
+  qubit there — which is not "no operation," it's *implicitly the
+  identity gate*, tensored in with whatever the other wires are doing.
+
+### From diagram to operator expression
+
+A circuit is read left to right, but the corresponding operator product —
+exactly as established in the last course's circuit lesson — is written
+and multiplied **right to left**: the leftmost box in the diagram is the
+rightmost (first-applied) operator in the product. If qubit 0 gets an $H$
+while qubit 1 does nothing, that single column is the operator
+$H\otimes I$ (not $I\otimes H$ — order in the tensor product matches
+wire order, qubit 0 first). A second column applying $\text{CNOT}$ across
+both wires, written as its own two-qubit operator, composes on the left:
+
+$$
+\text{full circuit} = \text{CNOT} \cdot (H\otimes I)
+$$
+
+This is exactly the same right-to-left composition rule from the last
+course's capstone lesson — nothing new about *how* operators combine, only
+new about *reading a picture* instead of a written expression.
+
+### Following a circuit step by step
+
+The two-column circuit above — $H$ on qubit 0, then $\text{CNOT}$ with
+qubit 0 as control and qubit 1 as target — applied to $|00\rangle$, one
+column at a time:
+
+<QuantumStateDisplay state={afterH} label="After column 1: H on qubit 0" />
+<QuantumStateDisplay state={afterCnot} label="After column 2: CNOT(0, 1)" />
+
+(If this final state looks familiar, it should — you'll meet it formally,
+by name, in two lessons.)
+
+## Physical Interpretation
+
+A circuit diagram is a complete recipe: given it and an input state,
+there's exactly one predicted output state, obtained by working through
+the columns left to right and multiplying operators right to left. Two
+circuits that look different on paper but reduce to the same operator
+product are physically identical — this is the basis for "circuit
+identities," used later in this course to simplify or rewrite circuits
+without changing what they compute.
+
+## Worked Example
+
+**A circuit has $X$ on qubit 1 in the first column, then $\text{CNOT}$
+with qubit 1 as control and qubit 0 as target in the second column.
+Predict the output starting from $|00\rangle$.**
+
+Column 1: $X$ on qubit 1 turns $|00\rangle$ into $|01\rangle$ (qubit 0
+untouched, qubit 1 flips). Column 2: $\text{CNOT}$ with control = qubit 1
+(which is now 1) flips the target, qubit 0: $|01\rangle \to |11\rangle$.
+Final state: $|11\rangle$, with certainty (no superposition was ever
+introduced, so this circuit is really just doing classical bit-flip logic
+here).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Reading the operator product in diagram order.** The diagram reads left
+to right; the operator product, when you write it out, reads right to
+left. Confusing these flips which gate you think acted first.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the implicit identity on untouched wires.** A blank space on
+a wire during a column that has gates elsewhere is not "nothing" in the
+operator expression — it's an explicit $I$ factor in that column's tensor
+product, needed to keep the dimensions consistent.
+</Callout>
+
+## Practice Questions
+
+1. A circuit has $H$ on qubit 0 and $H$ on qubit 1 in the same column.
+   Write the operator for that column as a tensor product.
+2. Write the full operator expression (as a product of tensor products)
+   for a 3-column circuit: column 1 is $H$ on qubit 0 only; column 2 is
+   $X$ on qubit 1 only; column 3 is $\text{CNOT}$(0,1).
+3. Two circuits are proposed for the same task; one has 2 columns, the
+   other has 3, but a friend claims they're equivalent. What would you
+   need to check to confirm or refute this?
+4. Starting from $|10\rangle$, predict the output of: $H$ on qubit 0, then
+   $\text{CNOT}$(0, 1). Work it out by hand, then compare to the "Bell
+   state" derivation in the next lesson once you get there.
+
+## Summary
+
+- Wires are qubits (qubit 0 on top); time flows left to right; boxes are
+  gates; a dot-to-$\oplus$ connection is a controlled operation; blank
+  space means an implicit identity.
+- A circuit's diagram order (left to right) and its operator-product order
+  (right to left) are inverses of each other — the same rule from the
+  last course, just applied to pictures.
+- Each column of simultaneous single-qubit gates is a tensor product of
+  those gates (with identity filling in untouched wires).
+
+## Further Exploration
+
+Next: **Controlled Gates and CNOT** — the dot-and-$\oplus$ notation
+introduced here, worked out completely: the matrix, the truth table, and
+why it's the standard building block for entangling circuits.

@@ -1,0 +1,175 @@
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+
+export const lessonMeta = {
+  title: "Putting It Together: Building and Analyzing Qubit Circuits",
+  description:
+    "Composing gates into sequences, and the capstone identity HZH = X, derived on paper and verified in the simulator.",
+  course: "qubits-and-quantum-states",
+  module: "building-qubit-circuits",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: [
+    "quantum-computing/qubits-and-quantum-states/global-and-relative-phase",
+    "quantum-computing/qubits-and-quantum-states/quantum-gates",
+  ],
+  objectives: [
+    "Compute the net effect of a sequence of single-qubit gates",
+    "Prove the identity HZH = X and explain what it means geometrically",
+    "Predict measurement statistics after a multi-gate sequence",
+  ],
+};
+
+## Motivation
+
+Nine lessons have built, piece by piece, everything needed to describe a
+single qubit and everything that can happen to it. This lesson doesn't
+introduce anything new — it's where those pieces get used together,
+analyzing sequences of gates the way you'll do constantly once circuits
+with many qubits enter the picture in the next course.
+
+## Intuition
+
+A **circuit** is just a sequence of gates applied one after another. If
+$U_1$ is applied first, then $U_2$, the combined operation is written
+$U_2U_1$ — matrix multiplication, and read **right to left**: the gate
+closest to the state acts first. This convention trips up nearly everyone
+at least once, so it's worth stating as plainly as possible before going
+further: in $U_2U_1|\psi\rangle$, $U_1$ happens first.
+
+## Mathematical Development
+
+### Composing gates
+
+A two-gate circuit, $U_1$ then $U_2$, produces the single combined
+operator $U_2U_1$ (also unitary, since a product of unitary matrices is
+always unitary — worth confirming: $(U_2U_1)^\dagger(U_2U_1) = U_1^\dagger U_2^\dagger U_2 U_1 = U_1^\dagger I U_1 = I$).
+Composition doesn't generally commute — applying $U_1$ then $U_2$ is not
+the same as $U_2$ then $U_1$ — because matrix multiplication itself isn't
+commutative in general. Order is part of the circuit's meaning, not an
+implementation detail.
+
+### The identity $HZH = X$
+
+Take $H$, then $Z$, then $H$ again — written as the operator
+$HZH$ (rightmost $H$ acts first). Compute $ZH$ first:
+
+$$
+ZH = \begin{pmatrix}1&0\\0&-1\end{pmatrix}\cdot\frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\-1&1\end{pmatrix}
+$$
+
+then left-multiply by $H$:
+
+$$
+H(ZH) = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\cdot\frac{1}{\sqrt2}\begin{pmatrix}1&1\\-1&1\end{pmatrix} = \frac12\begin{pmatrix}1-1 & 1+1\\1+1&1-1\end{pmatrix} = \begin{pmatrix}0&1\\1&0\end{pmatrix} = X
+$$
+
+$$
+\boxed{HZH = X}
+$$
+
+This is a genuine, checkable fact about these three matrices — not a
+coincidence of notation. Geometrically it says: a $\pi$ rotation about
+the diagonal $H$-axis, sandwiching a $\pi$ rotation about $z$, nets out to
+exactly a $\pi$ rotation about $x$. Composing rotations about different
+axes can produce a rotation about a third axis entirely — the same fact
+that (in the next course) makes it possible to build *any* gate from just
+a small, fixed set of "universal" ones.
+
+### Predicting outcomes through a circuit
+
+To find what a circuit does to a specific input, apply gates one at a
+time, right to left, tracking the state (or its Bloch coordinates) at
+each step — exactly like narrating a path across the sphere. For
+$HZH|0\rangle$: first $H|0\rangle=|+\rangle$; then $Z|+\rangle=|-\rangle$
+(check: $Z$ flips the sign of the $|1\rangle$ coefficient, turning
+$\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$ into
+$\frac{1}{\sqrt2}(|0\rangle-|1\rangle)=|-\rangle$); then $H|-\rangle=|1\rangle$
+(the Quantum Gates lesson noted $H|1\rangle=|-\rangle$, and $H$ is its own
+inverse, so $H|-\rangle=|1\rangle$). Total: $|0\rangle \to |1\rangle$ —
+exactly what $X|0\rangle$ gives directly, confirming $HZH=X$ a second way,
+state by state instead of matrix by matrix.
+
+## Physical Interpretation
+
+A circuit is a single net rotation of the Bloch sphere, built by composing
+several simpler ones — nothing more exotic than that. Reading a circuit
+diagram left-to-right (the usual convention for the *diagram*, even
+though the *operator product* is written right-to-left) is really reading
+off a sequence of instructions: "rotate this way, then that way, then
+measure."
+
+## Interactive Experiment
+
+<LazyBlochSphereExplorer />
+
+Reproduce $HZH$ yourself: starting from $|0\rangle$, apply **H**, then
+**Z**, then **H**. Confirm the state panel shows exactly $|1\rangle$
+(that is, $\alpha=0$, $\beta=1$) — matching the direct application of
+**X** to $|0\rangle$, without resetting in between to compare. Then try
+predicting, on paper, the result of a different three-gate sequence of
+your choosing before running it.
+
+## Worked Example
+
+**Predict the measurement statistics of $H$ applied to $|1\rangle$, then
+measured in the computational basis.**
+
+$H|1\rangle = |-\rangle = \frac{1}{\sqrt2}(|0\rangle-|1\rangle)$.
+$P(0)=\left|\frac{1}{\sqrt2}\right|^2=\frac12$,
+$P(1)=\left|{-\frac{1}{\sqrt2}}\right|^2=\frac12$ — an even coin flip,
+despite starting from a completely definite state. (Compare: $H|+\rangle$
+gives $|0\rangle$ exactly, $P(0)=1$ — the *same* gate can turn certainty
+into randomness or randomness into certainty, entirely depending on what
+it's applied to.)
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Applying gates left to right instead of right to left in the operator
+product.** $U_2U_1|\psi\rangle$ means $U_1$ acts first. If your final
+state doesn't match hand-simulating the circuit step by step, this is the
+first thing to check.
+</Callout>
+
+<Callout type="mistake">
+**Assuming gate sequences commute.** $HZ \neq ZH$ in general (check: you
+derived $HZH=X$ above; by contrast $ZHZ$ works out to a different matrix
+entirely — a good exercise). Order is meaningful.
+</Callout>
+
+## Practice Questions
+
+1. Compute $XZ|0\rangle$ and $ZX|0\rangle$ separately. Are they equal?
+2. Predict, without the simulator, the final Bloch coordinates of
+   $|0\rangle$ after $H$, then $S$, then $H$. Then verify.
+3. Show that $HXH = Z$ (the same style of identity as $HZH=X$, with the
+   roles of $X$ and $Z$ swapped).
+4. A friend built a circuit $H, S, S, S, S, H$ (four $S$ gates in a row,
+   sandwiched by $H$s) and claims it does nothing at all to any input
+   state. Is this correct? Justify using a fact from an earlier lesson in
+   this course.
+5. Starting from $|+\rangle$, find a two-gate sequence (using only gates
+   from this course) that returns the state to $|+\rangle$ but is not
+   simply "do nothing."
+
+## Summary
+
+- A circuit's net effect is the operator product of its gates, applied
+  right to left: $U_1$ first, $U_2$ second, written $U_2U_1$.
+- $HZH=X$, proven both by direct matrix multiplication and by tracking a
+  specific state step by step — the same rotation, reached two different
+  ways.
+- Predicting a circuit's output means composing known single-gate effects
+  in the correct order; predicting its measurement statistics means
+  applying the Born rule to whatever state comes out the other end.
+
+## Further Exploration
+
+This completes **Qubits & Quantum States** — everything about a single
+qubit: what it is, how to describe it precisely, where it sits
+geometrically, how measurement works, and how to manipulate and compose
+gates acting on it. The next course, **Quantum Gates & Circuits**, extends
+all of this to *multiple* qubits at once — starting with the tensor
+product needed to describe two qubits together, and building toward
+phenomena a single qubit can never exhibit on its own, like entanglement.

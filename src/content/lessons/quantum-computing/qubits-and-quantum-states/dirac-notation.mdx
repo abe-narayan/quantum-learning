@@ -1,0 +1,186 @@
+export const lessonMeta = {
+  title: "Dirac Notation",
+  description:
+    "Kets, bras, and the inner product — the compact algebra behind every quantum expression you'll write.",
+  course: "qubits-and-quantum-states",
+  module: "dirac-notation",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics"],
+  objectives: [
+    "Explain what a bra is and how it relates to a ket",
+    "Compute inner products between qubit states",
+    "Use orthonormality to simplify bra-ket expressions",
+  ],
+};
+
+## Motivation
+
+We've been writing $|0\rangle$, $|1\rangle$, and
+$|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$ since the first lesson without
+ever asking what the $|\cdot\rangle$ symbol actually *means* as notation, or
+what rules it follows. It's time to make that precise — not because the
+notation itself is deep, but because it makes everything after this lesson
+faster to write and harder to get wrong.
+
+## Intuition
+
+$|\psi\rangle$ is called a **ket**, and it's just a name for "the vector
+$\psi$." Physicists write vectors this way instead of with an arrow
+($\vec{\psi}$) or bold type ($\mathbf{\psi}$) mostly by convention — but the
+notation earns its keep the moment you introduce its partner, the **bra**
+$\langle\psi|$, because a bra and a ket combine to form
+$\langle\phi|\psi\rangle$ — read left-to-right, it looks like a
+"bra-c-ket," which is exactly where the names come from. That combined
+object is a single number (in general, complex), and it plays the role
+ordinary dot products play for real vectors.
+
+## Mathematical Development
+
+### From column vectors to kets
+
+Recall the computational basis states as column vectors:
+
+$$
+|0\rangle = \begin{pmatrix}1\\0\end{pmatrix}, \qquad |1\rangle = \begin{pmatrix}0\\1\end{pmatrix}
+$$
+
+A general ket is a linear combination, $|\psi\rangle = \alpha|0\rangle+\beta|1\rangle = \begin{pmatrix}\alpha\\\beta\end{pmatrix}$.
+Nothing new yet — $|\psi\rangle$ is just notation for this column vector.
+
+### The bra as a conjugated row vector
+
+The bra $\langle\psi|$ is defined as the **conjugate transpose** of the
+ket: take the column vector, lay it on its side, and conjugate every
+entry.
+
+$$
+|\psi\rangle = \begin{pmatrix}\alpha\\\beta\end{pmatrix} \quad\Longrightarrow\quad \langle\psi| = \begin{pmatrix}\alpha^* & \beta^*\end{pmatrix}
+$$
+
+The conjugation isn't optional decoration — it's exactly what makes the
+next step work.
+
+### The inner product
+
+A bra times a ket is ordinary matrix multiplication of a row vector by a
+column vector, which produces a single number:
+
+$$
+\langle\phi|\psi\rangle = \begin{pmatrix}\phi_0^* & \phi_1^*\end{pmatrix}\begin{pmatrix}\psi_0\\\psi_1\end{pmatrix} = \phi_0^*\psi_0 + \phi_1^*\psi_1
+$$
+
+Apply this to the basis states themselves. Since $|0\rangle=(1,0)$ and
+$|1\rangle=(0,1)$:
+
+$$
+\langle0|0\rangle = 1, \quad \langle1|1\rangle = 1, \quad \langle0|1\rangle = 0, \quad \langle1|0\rangle = 0
+$$
+
+This is **orthonormality**: each basis state has unit overlap with itself
+and zero overlap with the other. It's the reason $|0\rangle$ and
+$|1\rangle$ are a sensible basis in the first place, and it lets you
+compute any inner product without matrix multiplication at all — just
+distribute and cancel:
+
+$$
+\langle\phi|\psi\rangle = (\phi_0^*\langle0| + \phi_1^*\langle1|)(\psi_0|0\rangle+\psi_1|1\rangle) = \phi_0^*\psi_0\langle0|0\rangle + \phi_0^*\psi_1\langle0|1\rangle + \phi_1^*\psi_0\langle1|0\rangle + \phi_1^*\psi_1\langle1|1\rangle
+$$
+
+The two cross terms vanish by orthonormality, leaving exactly
+$\phi_0^*\psi_0+\phi_1^*\psi_1$ — the same formula, derived rather than
+just stated.
+
+### Norm, revisited
+
+Set $\langle\phi|=\langle\psi|$ (i.e. take the inner product of
+$|\psi\rangle$ with itself):
+
+$$
+\langle\psi|\psi\rangle = \alpha^*\alpha + \beta^*\beta = |\alpha|^2+|\beta|^2
+$$
+
+The normalization condition from Lesson 1, $|\alpha|^2+|\beta|^2=1$, is now
+just $\langle\psi|\psi\rangle=1$ — one clean statement, in one notation,
+that will hold for quantum states of any size, not just single qubits.
+
+One important asymmetry: $\langle\phi|\psi\rangle$ and
+$\langle\psi|\phi\rangle$ are **not** generally equal — they're complex
+conjugates of each other, $\langle\psi|\phi\rangle = \langle\phi|\psi\rangle^*$.
+Order matters.
+
+## Physical Interpretation
+
+$\langle\phi|\psi\rangle$ measures how much $|\psi\rangle$ "overlaps" with
+$|\phi\rangle$ — geometrically, something like a (complex-valued) cosine of
+the angle between them. When we get to measurement in a few lessons, this
+overlap will turn out to be exactly the probability amplitude for finding
+a system prepared in state $|\psi\rangle$ to instead look like $|\phi\rangle$
+once measured. For now, treat orthonormality as the algebraic fact that
+makes every other calculation in this course tractable: whenever a term
+like $\langle0|1\rangle$ appears, it's zero, and whenever $\langle0|0\rangle$
+appears, it's one.
+
+## Worked Example
+
+**Compute $\langle+|0\rangle$, where $|+\rangle = \frac{1}{\sqrt2}(|0\rangle+|1\rangle)$.**
+
+$$
+\langle+| = \frac{1}{\sqrt2}(\langle0|+\langle1|)
+$$
+
+(coefficients here are real, so conjugation doesn't change them)
+
+$$
+\langle+|0\rangle = \frac{1}{\sqrt2}(\langle0|0\rangle + \langle1|0\rangle) = \frac{1}{\sqrt2}(1 + 0) = \frac{1}{\sqrt2}
+$$
+
+This number — $\tfrac{1}{\sqrt2}$ — will resurface directly in the
+Measurement lesson: it's the probability *amplitude* for measuring $|+\rangle$
+and finding "0," and squaring it gives the actual probability, $\tfrac12$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting to conjugate the bra's coefficients.** If $|\phi\rangle$ has a
+complex coefficient like $i$, the bra's corresponding entry is $-i$, not
+$i$. Skipping this silently flips signs in the imaginary part of your
+answer.
+</Callout>
+
+<Callout type="mistake">
+**Assuming $\langle\phi|\psi\rangle=\langle\psi|\phi\rangle$.** They're
+complex conjugates of each other. They're only equal when the inner
+product happens to be real.
+</Callout>
+
+## Practice Questions
+
+1. Compute $\langle-|1\rangle$, where $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$.
+2. Let $|\psi\rangle = \frac{3}{5}|0\rangle + \frac{4i}{5}|1\rangle$. Verify
+   $\langle\psi|\psi\rangle=1$ directly from the inner-product formula.
+3. Show that $\langle+i|-i\rangle = 0$, where
+   $|{+i}\rangle=\frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$ and
+   $|{-i}\rangle=\frac{1}{\sqrt2}(|0\rangle-i|1\rangle)$. (These two states
+   are orthogonal, just like $|0\rangle$ and $|1\rangle$ — there's more than
+   one orthonormal basis for a qubit.)
+4. If $\langle\phi|\psi\rangle = 3-4i$, what is $\langle\psi|\phi\rangle$?
+
+## Summary
+
+- $|\psi\rangle$ is a ket (column vector); $\langle\psi|$ is its bra
+  (conjugate-transpose row vector).
+- The inner product $\langle\phi|\psi\rangle=\phi_0^*\psi_0+\phi_1^*\psi_1$
+  is a single complex number measuring overlap.
+- $\langle0|0\rangle=\langle1|1\rangle=1$ and $\langle0|1\rangle=\langle1|0\rangle=0$:
+  the computational basis is orthonormal.
+- $\langle\psi|\psi\rangle=1$ is the normalization condition, restated.
+- $\langle\phi|\psi\rangle=\langle\psi|\phi\rangle^*$ — order matters.
+
+## Further Exploration
+
+Next: **Quantum States and State Vectors**, where we use this notation to
+state the actual postulates governing which vectors count as physical
+qubit states, and derive exactly how many real numbers it takes to
+describe one.

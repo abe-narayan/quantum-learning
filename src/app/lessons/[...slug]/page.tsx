@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllLessonSlugs, loadLesson } from "@/lib/content/lessons";
+import { getAllLessonSlugs, getAllLessonsMeta, loadLesson } from "@/lib/content/lessons";
 import { getCourse } from "@/lib/content/curriculum";
 import { LessonLayout } from "@/components/lessons/LessonLayout";
 
@@ -27,15 +27,20 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
-  const { slug } = await params;
-  const lesson = await loadLesson(slug.join("/"));
+  const { slug: slugParts } = await params;
+  const slug = slugParts.join("/");
+  const lesson = await loadLesson(slug);
   if (!lesson) notFound();
 
   const course = getCourse(lesson.lessonMeta.course);
+  // Fetched globally (not per-course) so prerequisites can resolve across
+  // course boundaries — see LessonLayout for how course-local nav is
+  // derived from this same list.
+  const allLessons = await getAllLessonsMeta();
   const LessonBody = lesson.default;
 
   return (
-    <LessonLayout meta={lesson.lessonMeta} course={course}>
+    <LessonLayout meta={lesson.lessonMeta} slug={slug} course={course} allLessons={allLessons}>
       <LessonBody />
     </LessonLayout>
   );

@@ -59,3 +59,9 @@ export async function getAllLessonsMeta(): Promise<LessonMetaWithSlug[]> {
 
   return lessons.filter((lesson): lesson is LessonMetaWithSlug => lesson !== null);
 }
+
+/** Every authored lesson belonging to a given course slug. */
+export async function getLessonsForCourse(courseSlug: string): Promise<LessonMetaWithSlug[]> {
+  const all = await getAllLessonsMeta();
+  return all.filter((lesson) => lesson.course === courseSlug);
+}

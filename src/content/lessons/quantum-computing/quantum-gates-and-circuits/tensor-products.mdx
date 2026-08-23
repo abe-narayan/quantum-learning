@@ -1,0 +1,227 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { StateVector } from "@/lib/quantum/state";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/tensor-products"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Tensor Products: Combining Qubits",
+  description:
+    "How two qubits become a single four-amplitude system — the tensor product, derived rather than just defined.",
+  course: "quantum-gates-and-circuits",
+  module: "tensor-products",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/building-qubit-circuits"],
+  objectives: [
+    "Compute the tensor product of two qubit states from their amplitudes",
+    "Explain why an n-qubit system needs 2^n amplitudes, not 2n",
+    "State and use the qubit-ordering convention this platform follows",
+  ],
+};
+
+export const ketZeroOne = StateVector.zero(1).tensor(StateVector.basis(1, 1));
+export const ketOneZero = StateVector.basis(1, 1).tensor(StateVector.zero(1));
+
+## Motivation
+
+Everything in the last course lived on one qubit's Bloch sphere. Real
+computation needs more than one qubit working together — but "more than
+one qubit" is not simply "do the single-qubit thing twice." A classical
+2-bit register needs 2 bits to describe: which one of $\{00,01,10,11\}$ it's
+in. A quantum 2-qubit register needs to describe a *superposition* over
+all four of those possibilities simultaneously — which turns out to
+require exactly 4 complex amplitudes, not 2. This lesson derives where
+that "4" comes from, and it won't stop at 4: by the end, you'll see why
+$n$ qubits need $2^n$ amplitudes — the single fact that makes quantum
+computers exponentially hard to simulate classically, and (later courses)
+part of why they can be exponentially powerful.
+
+## Intuition
+
+Think of two independent qubits as two independent Bloch spheres. Fully
+describing "where qubit A is" takes its own $(\theta,\varphi)$, and
+"where qubit B is" takes another, independent, pair. Combining them
+shouldn't lose any of that information — whatever mathematical operation
+combines two qubit states needs to preserve both spheres' worth of detail
+*and* leave room for something classical bits could never do: correlation
+between them that isn't just "A's state" plus "B's state" separately. The
+**tensor product**, written $\otimes$, is that operation.
+
+## Mathematical Development
+
+### Defining the tensor product
+
+For two single-qubit kets $|a\rangle = a_0|0\rangle + a_1|1\rangle$ and
+$|b\rangle = b_0|0\rangle+b_1|1\rangle$, their tensor product is the
+4-component vector:
+
+$$
+|a\rangle \otimes |b\rangle = \begin{pmatrix}a_0\\a_1\end{pmatrix} \otimes \begin{pmatrix}b_0\\b_1\end{pmatrix} = \begin{pmatrix}a_0 b_0\\a_0 b_1\\a_1 b_0\\a_1 b_1\end{pmatrix}
+$$
+
+Every entry of the first vector multiplies every entry of the second —
+this is exactly what makes the result 4-dimensional from two
+2-dimensional inputs ($2\times2=4$), rather than 4-dimensional from
+"stacking" them ($2+2=4$ would give the wrong structure entirely; stacking
+loses the ability to represent correlations).
+
+### Basis states tensor by concatenating labels
+
+Apply the definition to $|0\rangle=(1,0)$ and $|1\rangle=(0,1)$:
+
+$$
+|0\rangle \otimes |1\rangle = \begin{pmatrix}1\\0\end{pmatrix}\otimes\begin{pmatrix}0\\1\end{pmatrix} = \begin{pmatrix}1\cdot0\\1\cdot1\\0\cdot0\\0\cdot1\end{pmatrix} = \begin{pmatrix}0\\1\\0\\0\end{pmatrix} = |01\rangle
+$$
+
+The result is exactly the computational basis state whose label is the
+two input labels written side by side. This is a genuinely useful
+shorthand: $|i\rangle\otimes|j\rangle = |ij\rangle$, and you rarely need
+to write out the column-vector arithmetic by hand once you trust this
+rule.
+
+<QuantumStateDisplay state={ketZeroOne} label="|0⟩ ⊗ |1⟩" />
+<QuantumStateDisplay state={ketOneZero} label="|1⟩ ⊗ |0⟩" />
+
+Notice these are different states — **order matters**. $|0\rangle\otimes|1\rangle$
+and $|1\rangle\otimes|0\rangle$ are as distinct as the classical strings
+"01" and "10".
+
+### Combining superpositions: cross terms
+
+The tensor product is *bilinear* — it distributes over addition in each
+argument — so combining two states that are each already superpositions
+produces every pairwise cross term:
+
+$$
+(\alpha|0\rangle+\beta|1\rangle)\otimes(\gamma|0\rangle+\delta|1\rangle) = \alpha\gamma|00\rangle + \alpha\delta|01\rangle + \beta\gamma|10\rangle + \beta\delta|11\rangle
+$$
+
+All four terms are generally nonzero even if you started with two
+"simple" single-qubit superpositions — this is the mechanism, not yet the
+full story, behind why multi-qubit states can look complicated fast.
+
+### Normalization survives tensoring
+
+If $|a\rangle$ and $|b\rangle$ are each normalized
+($\langle a|a\rangle=\langle b|b\rangle=1$), is $|a\rangle\otimes|b\rangle$
+automatically normalized too? Compute its norm using the inner product
+from Dirac Notation:
+
+$$
+\langle a\otimes b|a\otimes b\rangle = \sum_{i,j}|a_ib_j|^2 = \left(\sum_i|a_i|^2\right)\left(\sum_j|b_j|^2\right) = \langle a|a\rangle\langle b|b\rangle = 1\cdot1 = 1
+$$
+
+Yes — tensoring two normalized states always gives a normalized state, so
+you never need a separate renormalization step just because you combined
+two qubits.
+
+### Dimension growth and the qubit-ordering convention
+
+Tensoring $n$ single qubits together gives a $2^n$-dimensional state
+vector — each additional qubit *doubles* the dimension rather than adding
+a fixed amount to it. Three qubits need 8 amplitudes; ten qubits need
+1024; fifty qubits need more amplitudes than there are atoms on Earth to
+store classically. This exponential growth is the whole reason
+"simulating a quantum computer on a classical one" gets hard fast, and
+it's the raw resource multi-qubit algorithms will eventually try to
+exploit.
+
+One convention needs to be fixed and used consistently everywhere from
+here on: **qubit 0 is the leftmost (most significant) label in a
+multi-qubit ket.** For three qubits, $|q_0q_1q_2\rangle$ — so
+$|100\rangle$ has qubit 0 equal to 1 and qubits 1, 2 equal to 0. This
+matches how the simulator engine indexes qubits, and it's the convention
+every lesson, test, and future circuit diagram on this platform will use.
+
+## Physical Interpretation
+
+That composite systems are described by the tensor product of their
+parts' state spaces is itself a postulate of quantum mechanics — not
+something derivable from the single-qubit postulates you already know.
+It's an experimentally confirmed fact about how nature composes systems,
+and everything about multi-qubit computing follows from taking it
+seriously, including a consequence the next lesson is built entirely
+around: **not every vector in this combined space can be written as a
+tensor product of two single-qubit states.**
+
+## Interactive Experiment
+
+Try it yourself. Use **Initialize** to jump straight to $|01\rangle$ and
+$|10\rangle$ and confirm they're different states with different
+probability rows. Then use **Apply a gate** to build a superposition on
+each qubit independently (H on q0, then H on q1) and watch all four
+cross terms from this lesson's bilinear expansion appear in the state
+table at once.
+
+<LazyTwoQubitExplorer />
+
+## Worked Example
+
+**Compute $|+\rangle \otimes |-\rangle$**, where
+$|\pm\rangle=\frac{1}{\sqrt2}(|0\rangle\pm|1\rangle)$.
+
+Using the bilinear expansion with $\alpha=\beta=\gamma=\frac{1}{\sqrt2}$,
+$\delta=-\frac{1}{\sqrt2}$:
+
+$$
+|+\rangle\otimes|-\rangle = \frac12|00\rangle - \frac12|01\rangle + \frac12|10\rangle - \frac12|11\rangle
+$$
+
+Each coefficient has magnitude $\frac12$, so every one of the four
+outcomes is equally likely if measured — makes sense, since $|+\rangle$
+and $|-\rangle$ are each individually 50/50 in the computational basis,
+and the qubits here are completely independent (no correlation has been
+introduced yet).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Multiplying probabilities instead of amplitudes.** It's tempting to
+combine "50% this, 50% that" intuitively and skip the amplitude algebra —
+but relative *phases* between terms only show up correctly if you
+multiply amplitudes first and take $|\cdot|^2$ afterward, not the other
+way around. This matters enormously once gates introduce phases.
+</Callout>
+
+<Callout type="mistake">
+**Getting the factor order backwards.** $|0\rangle\otimes|1\rangle=|01\rangle$
+is not the same state as $|1\rangle\otimes|0\rangle=|10\rangle$. Always
+track which ket is qubit 0.
+</Callout>
+
+## Practice Questions
+
+1. Compute $|1\rangle\otimes|+\rangle$ explicitly as a 4-component vector.
+2. Compute $|{+i}\rangle\otimes|0\rangle$, where
+   $|{+i}\rangle=\frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$.
+3. How many amplitudes does a 5-qubit state vector have? A 20-qubit one?
+4. Verify by direct calculation that
+   $\langle 01|(|0\rangle\otimes|1\rangle) = 1$ and
+   $\langle 00|(|0\rangle\otimes|1\rangle) = 0$, using the inner product
+   from Dirac Notation.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $|a\rangle\otimes|b\rangle$ multiplies every amplitude of $|a\rangle$ by
+  every amplitude of $|b\rangle$; basis states tensor by concatenating
+  labels, $|i\rangle\otimes|j\rangle=|ij\rangle$.
+- Tensoring two normalized states always yields a normalized state.
+- $n$ qubits need $2^n$ amplitudes — exponential growth is structural, not
+  incidental.
+- Qubit 0 is the leftmost label in a multi-qubit ket, everywhere on this
+  platform.
+
+## Further Exploration
+
+Next: **Multi-Qubit State Vectors**, where we ask the sharper question
+this lesson set up — is every valid multi-qubit state actually *reachable*
+as a tensor product of single-qubit states? The answer is no, and the
+states that aren't are the entangled ones.
