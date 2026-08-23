@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { swapOverheadForLinearChain } from "@/lib/quantum/transpilation";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation"
@@ -66,6 +67,15 @@ Circuits), so this overhead compounds directly into Noise, Decoherence &
 Scaling's per-gate compounding-error problem: every inserted SWAP is
 several more real gates that can fail.
 
+<BarChart
+  ariaLabel="SWAP gate overhead versus control-target distance on a linear chain, for distances 1 through 5"
+  bars={[1, 2, 3, 4, 5].map((d) => ({ label: `d=${d}`, value: swapOverheadForLinearChain(0, d), highlight: d === 5 }))}
+/>
+
+Distance 1 (already-adjacent qubits) needs zero SWAPs, exactly what the
+formula predicts; the highlighted bar at $d=5$ is the Worked Example
+below.
+
 ## Physical Interpretation
 
 Transpilation is not a cosmetic renaming step. It can substantially
@@ -90,6 +100,32 @@ execute what was logically a single two-qubit gate. This concretely
 shows why algorithms designed with connectivity in mind (grouping
 interacting qubits close together) can run substantially more
 efficiently than ones that ignore it.
+
+This is the exact gate sequence `cnotOnLinearChain` walks through
+internally for control=0, target=5: four SWAPs carrying qubit 0's data
+forward to sit next to qubit 5, the real CNOT, then four SWAPs undoing
+the walk to restore the original ordering.
+
+<StaticCircuitDiagram
+  ariaLabel="SWAP-network implementation of CNOT(0,5) on a 6-qubit linear chain: four SWAPs forward, one CNOT, four SWAPs back"
+  numQubits={6}
+  instructions={[
+    { gate: "SWAP", targets: [0, 1] },
+    { gate: "SWAP", targets: [1, 2] },
+    { gate: "SWAP", targets: [2, 3] },
+    { gate: "SWAP", targets: [3, 4] },
+    { gate: "CNOT", targets: [4, 5] },
+    { gate: "SWAP", targets: [3, 4] },
+    { gate: "SWAP", targets: [2, 3] },
+    { gate: "SWAP", targets: [1, 2] },
+    { gate: "SWAP", targets: [0, 1] }
+  ]}
+  highlightColumn={4}
+/>
+
+The highlighted column is the one gate that actually does the requested
+work; every other column is pure overhead the connectivity constraint
+forced onto the circuit.
 
 ## Common Mistakes
 

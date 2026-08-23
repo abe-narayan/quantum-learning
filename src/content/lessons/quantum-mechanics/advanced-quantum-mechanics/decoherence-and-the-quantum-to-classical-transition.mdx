@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"
@@ -63,6 +64,10 @@ after full decoherence is a state that looks exactly like a classical
 50/50 probabilistic mixture, mathematically indistinguishable from "the
 system was secretly in $|0\rangle$ or $|1\rangle$ all along, we just
 didn't know which."
+
+<InteractiveSection description="Set channel to dephasing, start from |+⟩, step forward. Watch purity crawl from 1.0 toward 0.5 while P(0),P(1) never move; only phase is being destroyed. Compare against amplitude damping from the same starting state and see how differently it behaves.">
+  <LazyNoiseExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 

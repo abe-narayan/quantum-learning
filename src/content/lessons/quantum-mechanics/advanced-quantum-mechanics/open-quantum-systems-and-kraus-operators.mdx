@@ -74,12 +74,16 @@ outright) to confirm the check actually discriminates valid from invalid
 channels, rather than trivially returning `true`.
 
 Watch the trace-preservation condition play out physically, not just
-algebraically: pick amplitude damping below, start from $|+\rangle$, and
-step forward. Every intermediate step is a genuine, valid quantum state
-(total probability exactly 1, Bloch vector never leaving the sphere's
-interior), even though it's visibly losing purity along the way.
+algebraically. Every intermediate step below is a genuine, valid quantum
+state (total probability exactly 1, Bloch vector never leaving the
+sphere's interior), even though it's visibly losing purity along the way.
 
-<LazyNoiseExplorer />
+<InteractiveSection
+  title="Try it yourself"
+  description="Pick amplitude damping, start from |+⟩, and step forward. Watch the Bloch vector shrink toward |0⟩ while never leaving the sphere. That's the trace-preservation condition holding exactly even as purity drops."
+>
+  <LazyNoiseExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 

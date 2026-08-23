@@ -61,7 +61,18 @@ measurement counts over many shots (Qubit Readout Techniques), not a
 single exact answer. Framework differences are mostly about ergonomics,
 target audience (research vs. production), and which hardware
 ecosystem each is most tightly integrated with, not about
-fundamentally different computational capability.
+fundamentally different computational capability. Laid out as a
+pipeline, Qiskit, Cirq, and PennyLane are three different skins over
+the exact same three boxes:
+
+<PipelineDiagram
+  ariaLabel="Shared quantum SDK structure: build, backend, results"
+  steps={[
+    { label: "Build", detail: "construct the circuit" },
+    { label: "Backend", detail: "choose simulator or hardware" },
+    { label: "Results", detail: "get counts or state back" },
+  ]}
+/>
 
 ### What a backend abstracts over
 

@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"
@@ -94,6 +95,10 @@ $Z_1Z_2$ (also has $Z$ on qubit 1) contain a $Z$ on qubit 1, so $X_1$
 anticommutes with *both*, flipping both syndrome bits to $1$:
 $(1,1)$, exactly matching the decode table's qubit-1 entry from Lesson
 2, now derived from the operators' structure rather than just quoted.
+
+<InteractiveSection description="Inject an X error on qubit 1. Watch which stabilizer's sign flips: the (1,1) syndrome you see is Z0Z1 AND Z1Z2 both anticommuting with X1, exactly as derived above, not a coincidence.">
+  <LazySyndromeExplorer mode="bit-flip" />
+</InteractiveSection>
 
 ## Common Mistakes
 

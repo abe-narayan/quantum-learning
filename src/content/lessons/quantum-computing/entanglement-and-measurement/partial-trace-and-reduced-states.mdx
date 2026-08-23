@@ -3,6 +3,8 @@ import { StateVector } from "@/lib/quantum/state";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
+import { reducedDensityMatrixQubit0 } from "@/lib/quantum/partialTrace";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/partial-trace-and-reduced-states"
@@ -26,6 +28,9 @@ export const lessonMeta = {
 };
 
 export const plusZeroState = new StateVector([new Complex(Math.SQRT1_2), Complex.ZERO, new Complex(Math.SQRT1_2), Complex.ZERO]);
+
+export const psiThetaState = (theta) => new StateVector([new Complex(Math.cos(theta)), Complex.ZERO, Complex.ZERO, new Complex(Math.sin(theta))]);
+export const rhoADiagonal = (theta) => reducedDensityMatrixQubit0(pureStateDensityMatrix(psiThetaState(theta)));
 
 ## Motivation
 
@@ -125,6 +130,21 @@ cross-terms vanish since $Z\otimes I$ maps each basis term to $\pm$
 itself, and $\langle00|11\rangle=0$). And directly from $\rho_A(\theta)$:
 $\text{Tr}(\rho_A(\theta)Z)=\cos^2\theta-\sin^2\theta=\cos2\theta$:
 identical, for every $\theta$, exactly as the derivation guarantees.
+
+<InteractiveSection description="Before looking, predict: as θ sweeps from 0 to π/2, do the off-diagonal entries of ρ_A(θ) ever become nonzero? The curve below plots only the two diagonal entries, computed by calling the real reducedDensityMatrixQubit0 on the actual entangled state at each θ, not from the closed-form formula directly.">
+  <ParametricCurve
+    frames={[
+      {
+        paramLabel: "ρ_A(θ) diagonal entries",
+        series: [
+          { label: "⟨0|ρ_A|0⟩ = cos²θ", color: "brand", points: Array.from({ length: 41 }, (_, i) => ({ x: (i / 40) * (Math.PI / 2), y: rhoADiagonal((i / 40) * (Math.PI / 2)).get(0, 0).re })) },
+          { label: "⟨1|ρ_A|1⟩ = sin²θ", color: "accent", points: Array.from({ length: 41 }, (_, i) => ({ x: (i / 40) * (Math.PI / 2), y: rhoADiagonal((i / 40) * (Math.PI / 2)).get(1, 1).re })) }
+        ]
+      }
+    ]}
+    ariaLabel="Diagonal entries of the reduced density matrix rho_A as a function of theta, showing cos squared theta and sin squared theta crossing at theta = pi/4"
+  />
+</InteractiveSection>
 
 At $\theta=\pi/4$ (a Bell state), $\rho_A=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$.
 The reduced state of one qubit of a maximally entangled pair is

@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code"
@@ -74,6 +75,10 @@ involving that qubit flip:
 the indicated qubit (or nothing, for $(0,0)$) restores the original
 encoded state exactly, verified directly for every one of the four
 cases, on an arbitrary $\alpha,\beta$, not just checked once.
+
+<InteractiveSection description="Inject an X error on qubit 1. Watch both syndrome bits light up as (1,1). Confirm the decode table points at qubit 1, then check the recovered state's amplitude table matches the original exactly.">
+  <LazySyndromeExplorer mode="bit-flip" />
+</InteractiveSection>
 
 ### Why this doesn't collapse the logical information
 

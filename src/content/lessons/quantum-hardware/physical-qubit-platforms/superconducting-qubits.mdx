@@ -40,12 +40,49 @@ hardware), and a harmonic oscillator's evenly-spaced levels make a
 
 A **Josephson junction**, a thin insulating barrier between two
 superconductors, replaces the plain inductor with a genuinely
-*nonlinear* circuit element. This nonlinearity makes the energy levels
+*nonlinear* circuit element. Physically, the qubit is this whole
+circuit, capacitor and junction together, on a chip:
+
+<HardwarePlatformSchematic variant="superconducting" ariaLabel="Superconducting transmon qubit: an LC circuit with a Josephson junction replacing the inductor" />
+
+This nonlinearity makes the energy levels
 *unevenly* spaced (anharmonic), so a microwave pulse tuned to the
 0→1 gap no longer resonantly drives 1→2 as well. This is precisely
 what makes an artificial "atom" out of a circuit, isolating a clean
 two-level qubit ($|0\rangle,|1\rangle$) from what would otherwise be an
-infinite oscillator ladder.
+infinite oscillator ladder. The two ladders side by side make the
+difference visible directly, not just in words:
+
+<div className="not-prose grid gap-4 sm:grid-cols-2">
+
+<EnergyLevelDiagram
+  ariaLabel="A plain LC circuit's evenly-spaced harmonic levels"
+  levels={[
+    { label: "n=0", energy: 0 },
+    { label: "n=1", energy: 1 },
+    { label: "n=2", energy: 2 },
+    { label: "n=3", energy: 3 },
+  ]}
+/>
+
+<EnergyLevelDiagram
+  ariaLabel="A transmon's anharmonic levels, with the 0-1 and 1-2 gaps no longer equal"
+  levels={[
+    { label: "n=0", energy: 0, highlight: true },
+    { label: "n=1", energy: 1, highlight: true },
+    { label: "n=2", energy: 1.95 },
+    { label: "n=3", energy: 2.85 },
+  ]}
+/>
+
+</div>
+
+(Illustrative spacing, chosen to show the *pattern* of shrinking gaps at
+higher $n$, not a measured device's specific anharmonicity.) In the
+plain harmonic case, every gap is identical, so a drive resonant with
+0→1 is equally resonant with 1→2. In the transmon case, the 0→1 gap
+(highlighted) is measurably different from 1→2, which is exactly what
+lets a microwave pulse address only the qubit subspace.
 
 ### Coherence time and gate speed
 

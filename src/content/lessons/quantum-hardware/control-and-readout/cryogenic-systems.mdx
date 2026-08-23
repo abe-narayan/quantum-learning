@@ -1,9 +1,16 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { thermalPhotonOccupation } from "@/lib/quantum/thermalPhysics";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/control-and-readout/cryogenic-systems"
 ).map((problem) => problem.meta);
+
+export const QUBIT_FREQUENCY_HZ = 5e9;
+export const T_MIN_K = 0.01;
+export const T_MAX_K = 5;
+export const logTAt = (i) => Math.log10(T_MIN_K) + (i / 59) * (Math.log10(T_MAX_K) - Math.log10(T_MIN_K));
+export const occupationYAt = (i) => Math.log10(thermalPhotonOccupation(QUBIT_FREQUENCY_HZ, 10 ** logTAt(i)));
 
 export const lessonMeta = {
   title: "Cryogenic Systems",
@@ -68,6 +75,41 @@ near cold enough** ($\bar n\approx16$, over an order of magnitude too
 warm). This is exactly why dilution refrigerators push further, to the
 $10$-$20$ mK range, rather than stopping at the comparatively easy-to-reach
 4 K stage.
+
+The table samples four points; the underlying curve (computed the same
+way, `thermalPhotonOccupation` swept continuously over temperature) shows
+the crossover isn't a cliff, it's a smooth exponential, with the horizontal
+axis plotted as $\log_{10}(T/\text{K})$ and the vertical axis as
+$\log_{10}(\bar n)$ so both the $10^{-7}$ and $10^3$ ends stay visible on
+the same plot:
+
+<InteractiveSection description="Drag the temperature slider from 15 mK toward 4 K. Watch the accent marker cross the dashed n̄=1 line well before it reaches 4 K. That crossing is the same ≈350 mK estimate the Worked Example below derives by hand.">
+  <ParametricCurve
+    frames={[0.015, 0.05, 0.1, 0.35, 1, 2, 4].map((temperatureK) => ({
+      paramLabel:
+        (temperatureK >= 1 ? `T = ${temperatureK.toFixed(0)} K` : `T = ${(temperatureK * 1000).toFixed(0)} mK`) +
+        ` (n̄ ≈ ${
+          thermalPhotonOccupation(QUBIT_FREQUENCY_HZ, temperatureK) >= 0.01
+            ? thermalPhotonOccupation(QUBIT_FREQUENCY_HZ, temperatureK).toFixed(2)
+            : thermalPhotonOccupation(QUBIT_FREQUENCY_HZ, temperatureK).toExponential(1)
+        })`,
+      series: [
+        { label: "n̄(T)", color: "brand", points: Array.from({ length: 60 }, (_, i) => ({ x: logTAt(i), y: occupationYAt(i) })) },
+        {
+          label: "current T",
+          color: "accent",
+          points: [
+            { x: Math.log10(temperatureK), y: Math.min(...Array.from({ length: 60 }, (_, i) => occupationYAt(i))) },
+            { x: Math.log10(temperatureK), y: Math.max(...Array.from({ length: 60 }, (_, i) => occupationYAt(i))) }
+          ]
+        }
+      ]
+    }))}
+    sliderLabel="Temperature"
+    referenceLines={[{ y: 0, label: "n̄ = 1" }]}
+    ariaLabel="Log-log plot of thermal photon occupation versus temperature for a 5 GHz qubit, with a movable temperature marker"
+  />
+</InteractiveSection>
 
 ### Staged cooling
 

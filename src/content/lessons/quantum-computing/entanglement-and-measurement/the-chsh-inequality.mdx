@@ -1,5 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
+import { pureStateDensityMatrix, convexCombination, maximallyMixedState } from "@/lib/quantum/densityMatrix";
+import { chshValue, spinObservableInXZPlane } from "@/lib/quantum/chsh";
+
+export const bellPlus = applyCNOT(applySingleQubitGate(StateVector.zero(2), HADAMARD, 0), 0, 1);
+export const bellPlusRho = pureStateDensityMatrix(bellPlus);
+export const maximallyMixedTwoQubit = maximallyMixedState(4);
+
+
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/the-chsh-inequality"
@@ -141,6 +151,36 @@ of $\eta$ beyond that point (mixing in noise reduces both purity and the
 kind of quantitative connection this course's entropy and concurrence
 lessons were building toward). All five values above are computed
 directly from `chshValue` and `convexCombination`, not estimated.
+
+The table only samples five points; the full curve, and how differently
+it behaves for the standard angles versus the worked example's swapped
+setting, is worth seeing continuously:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "Standard angles",
+      series: [{ label: "S(η)", color: "brand", points: Array.from({ length: 13 }, (_, i) => ({ x: (i / 12) * 0.6, y: chshValue(convexCombination([{ probability: 1 - (i / 12) * 0.6, density: bellPlusRho }, { probability: (i / 12) * 0.6, density: maximallyMixedTwoQubit }]), { a: spinObservableInXZPlane(0), aPrime: spinObservableInXZPlane(Math.PI / 2), b: spinObservableInXZPlane(Math.PI / 4), bPrime: spinObservableInXZPlane(-Math.PI / 4) }) })) }]
+    },
+    {
+      paramLabel: "Swapped Bob's angles",
+      series: [{ label: "S(η)", color: "accent", points: Array.from({ length: 13 }, (_, i) => ({ x: (i / 12) * 0.6, y: chshValue(convexCombination([{ probability: 1 - (i / 12) * 0.6, density: bellPlusRho }, { probability: (i / 12) * 0.6, density: maximallyMixedTwoQubit }]), { a: spinObservableInXZPlane(0), aPrime: spinObservableInXZPlane(Math.PI / 2), b: spinObservableInXZPlane(-Math.PI / 4), bPrime: spinObservableInXZPlane(Math.PI / 4) }) })) }]
+    }
+  ]}
+  sliderLabel="Measurement configuration"
+  referenceLines={[
+    { y: 2, label: "classical bound" },
+    { y: 2.828, label: "Tsirelson bound (2√2)" },
+  ]}
+  ariaLabel="S as a function of noise eta, for the standard and swapped-Bob measurement configurations"
+/>
+
+At the standard angles, $S$ starts at $2\sqrt2$ and decays smoothly,
+crossing the classical bound between $\eta=0.2$ and $0.3$, exactly the
+table above. Switch to the swapped-Bob configuration and the curve is
+flat at 0 for every $\eta$: a bad choice of angles can't be rescued by
+adding more or less noise, because it never violated the bound in the
+first place.
 
 ## Physical Interpretation
 

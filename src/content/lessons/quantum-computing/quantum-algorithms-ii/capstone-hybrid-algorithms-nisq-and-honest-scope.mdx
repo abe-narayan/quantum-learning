@@ -5,6 +5,7 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope"
 ).map((problem) => problem.meta);
 
+
 export const lessonMeta = {
   title: "Capstone: Hybrid Algorithms, NISQ, and Honest Scope",
   description:
@@ -105,7 +106,21 @@ circuit (Hadamards, many controlled modular multiplications, a QFT) that
 must produce a *single* usable measurement. An error partway through
 directly corrupts that one shot, with no built-in mechanism to average it
 away. This structural difference, not just historical accident, is why
-VQE is considered NISQ-friendly and Shor's algorithm is not.
+VQE is considered NISQ-friendly and Shor's algorithm is not. The contrast
+in how many independent chances each algorithm gets is real, drawn
+directly from this course's own worked examples, not illustrative:
+
+<BarChart
+  bars={[
+    { label: "Shor's: usable measurements needed", value: 1, highlight: false },
+    { label: "VQE: circuit executions across one optimization run", value: 80, highlight: true }
+  ]}
+  ariaLabel="Number of circuit executions each algorithm needs or uses: Shor's single required measurement versus VQE's 80 optimizer iterations"
+/>
+
+Shor's gets exactly one shot at the whole answer; VQE's toy example got
+80, each one a fresh opportunity for the classical loop to route around
+whatever the previous shot's noise or imperfection left behind.
 
 ## Common Mistakes
 

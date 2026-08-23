@@ -84,8 +84,8 @@ explicitly rather than assuming away.
 
 **A circuit is run 1000 times on hardware with 97% readout fidelity (and
 otherwise-perfect gates and no decoherence, for this idealized
-example). Roughly how many of the 1000 reported outcomes are expected to
-be readout errors?**
+example). Before computing it, guess roughly how many of the 1000
+reported outcomes will be readout errors. Then check the number below.**
 
 $$
 1000 \times (1-0.97) = 1000\times0.03 = 30
@@ -96,6 +96,14 @@ from readout error, even though the underlying quantum state and gates
 were assumed perfect in this idealized example. This is exactly why real
 experiments report statistics over many shots rather than trusting a
 single run.
+
+<BarChart
+  bars={[
+    { label: "Correct", value: 970, caption: "970 shots" },
+    { label: "Readout error", value: 30, caption: "30 shots", highlight: true },
+  ]}
+  ariaLabel="Out of 1000 shots at 97% readout fidelity, 970 report the correct bit and 30 report a readout error"
+/>
 
 ## Common Mistakes
 

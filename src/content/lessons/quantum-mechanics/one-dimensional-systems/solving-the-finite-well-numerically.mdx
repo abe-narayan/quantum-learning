@@ -5,6 +5,11 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/one-dimensional-systems/solving-the-finite-well-numerically"
 ).map((problem) => problem.meta);
 
+export const wellHalfWidth = 1;
+export const tangentCap = 6;
+export const finiteWellKUpper = (v0) => Math.min(1.55, Math.sqrt(2 * v0) * 0.999);
+export const finiteWellKAt = (v0, i) => 0.02 + (i / 80) * (finiteWellKUpper(v0) - 0.02);
+
 export const lessonMeta = {
   title: "Solving the Finite Well Numerically",
   description:
@@ -37,10 +42,43 @@ well parameters). The left side is a repeating, diverging tangent
 curve; the right side, $\kappa=\sqrt{2V_0-k^2}$, is a single quarter-circle
 arc from $(0,\sqrt{2V_0})$ down to $(\sqrt{2V_0},0)$. Wherever the two
 curves cross is a valid bound-state wavenumber, the classic **graphical
-solution** every introductory course shows a picture of. Bisection is
-just that same idea, automated: repeatedly halve a bracket known to
-contain a sign change in $k\tan(ka)-\kappa$, converging on the crossing
-point.
+solution** every introductory course shows a picture of.
+
+<ParametricCurve
+  frames={[1, 2, 3, 5, 8, 12].map((v0) => ({
+    paramLabel: `V0 = ${v0}`,
+    series: [
+      {
+        label: "k·tan(ka)",
+        color: "brand",
+        points: Array.from({ length: 81 }, (_, i) => ({
+          x: finiteWellKAt(v0, i),
+          y: Math.min(finiteWellKAt(v0, i) * Math.tan(finiteWellKAt(v0, i) * wellHalfWidth), tangentCap)
+        }))
+      },
+      {
+        label: "κ(k) = √(2V0−k²)",
+        color: "accent",
+        points: Array.from({ length: 81 }, (_, i) => ({
+          x: finiteWellKAt(v0, i),
+          y: Math.sqrt(Math.max(0, 2 * v0 - finiteWellKAt(v0, i) ** 2))
+        }))
+      }
+    ]
+  }))}
+  sliderLabel="Well depth V0 (half-width a=1 fixed)"
+  ariaLabel="Graphical bisection solver: k tan(ka) versus kappa(k), crossing point marks the bound-state wavenumber, for varying well depth V0"
+/>
+
+Drag the slider and watch the quarter-circle grow with $V_0$ while the
+tangent branch stays fixed (it depends only on $a$, not $V_0$): the
+crossing point moves to larger $k$, a deeper well pulling the bound
+state to a larger wavenumber. At $V_0=1$ the quarter-circle may not even
+reach the first tangent branch, meaning no bound state exists yet at
+that depth; by $V_0=5$ (this lesson's own worked example below) the
+crossing is clearly visible. Bisection is just that same graphical idea,
+automated: repeatedly halve a bracket known to contain a sign change in
+$k\tan(ka)-\kappa$, converging on the crossing point.
 
 ## Mathematical Development
 

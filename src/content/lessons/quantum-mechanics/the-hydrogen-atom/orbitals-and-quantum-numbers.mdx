@@ -1,9 +1,25 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { radial1s, radial2s, radial2p } from "@/lib/quantum/hydrogenAtom";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers"
 ).map((problem) => problem.meta);
+
+export const R_MAX = 15;
+export const R_STEPS = 120;
+export const rGrid = Array(R_STEPS + 1).fill(0).map((_, i) => (i / R_STEPS) * R_MAX);
+
+export const orbitalRadialDensities = [
+  ["1s", "r²|R₁ₛ(r)|²", radial1s],
+  ["2s", "r²|R₂ₛ(r)|²", radial2s],
+  ["2p", "r²|R₂ₚ(r)|²", radial2p],
+];
+
+export const radialDensityFrames = orbitalRadialDensities.map(([name, label, R]) => ({
+  paramLabel: name,
+  series: [{ label: label, color: "brand", points: rGrid.map((r) => ({ x: r, y: r * r * R(r) * R(r) })) }]
+}));
 
 export const lessonMeta = {
   title: "Orbitals & Quantum Numbers",
@@ -77,6 +93,23 @@ exactly the Bohr model's ground-state radius, though arrived at by a
 completely different route (probability-density maximization, not a
 classical circular-orbit assumption).
 
+The three radial functions look genuinely different once plotted, not
+just algebraically different:
+
+<ParametricCurve
+  frames={radialDensityFrames}
+  sliderLabel="Orbital"
+  ariaLabel="Radial probability distribution r-squared times R(r)-squared, for 1s, 2s, and 2p"
+/>
+
+Compare 1s and 2p's radial profiles directly: 1s peaks once, close to
+the origin (at $r=1$, computed above); 2p peaks once too, but farther
+out and shorter, since its $r^2$ dependence at small $r$ (visible in
+`radial2p`'s explicit $r\,e^{-r/2}$ factor) suppresses it near the
+nucleus entirely, unlike 1s. 2s shows something neither does: a genuine
+**node**, a radius where the distribution touches zero before rising
+again, from the $(2-r)$ factor in `radial2s` changing sign.
+
 ## Physical Interpretation
 
 The 1s and 2s orbitals ($l=0$) are spherically symmetric: $Y_0^0$ is a
@@ -84,7 +117,11 @@ constant, so all angular dependence vanishes, and the "shape" is purely
 radial. The 2p orbitals ($l=1$) are genuinely directional, following
 $Y_1^{-1},Y_1^0,Y_1^1$'s angular dependence; this directionality is
 exactly what determines molecular bond geometry in chemistry (though
-that application is well beyond this course's scope).
+that application is well beyond this course's scope). The angular part
+alone, independent of which radial function it's paired with, looks like
+this:
+
+<OrbitalShapePlot ariaLabel="Orbital angular shape |Y_l^m|^2" />
 
 ## Worked Example
 

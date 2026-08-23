@@ -1,5 +1,56 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+
+export const sequentialTree = {
+  label: "start",
+  children: [
+    {
+      label: "z: ↑",
+      probability: 0.5,
+      children: [
+        {
+          label: "x: +",
+          probability: 0.5,
+          children: [
+            { label: "z: ↑", probability: 0.5 },
+            { label: "z: ↓", probability: 0.5 },
+          ],
+        },
+        {
+          label: "x: −",
+          probability: 0.5,
+          children: [
+            { label: "z: ↑", probability: 0.5 },
+            { label: "z: ↓", probability: 0.5 },
+          ],
+        },
+      ],
+    },
+    {
+      label: "z: ↓",
+      probability: 0.5,
+      children: [
+        {
+          label: "x: +",
+          probability: 0.5,
+          children: [
+            { label: "z: ↑", probability: 0.5 },
+            { label: "z: ↓", probability: 0.5 },
+          ],
+        },
+        {
+          label: "x: −",
+          probability: 0.5,
+          children: [
+            { label: "z: ↑", probability: 0.5 },
+            { label: "z: ↓", probability: 0.5 },
+          ],
+        },
+      ],
+    },
+  ],
+};
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"
@@ -98,6 +149,18 @@ since the second measurement erased the correlation with the first). Net
 joint probability: $\tfrac12\times\tfrac12\times\tfrac12=\tfrac18$. Each
 stage is genuinely independent of the one before it, once an intervening
 incompatible measurement has occurred.
+
+The full branching structure makes this concrete: every path through the
+tree below carries probability $\tfrac12\times\tfrac12\times\tfrac12=\tfrac18$,
+including the "↑,+,↑" path just computed and its seven siblings.
+
+<MeasurementTree root={sequentialTree} ariaLabel="Sequential Stern-Gerlach measurement tree: z, then x, then z again" />
+
+Try the same sequence yourself, one measurement at a time:
+
+<InteractiveSection description="Measure along Z, then X, then Z again. Watch the point re-randomize after the X measurement. The third Z outcome carries no memory of the first, exactly like every path in the tree above splitting 50/50 regardless of which branch you took to get there.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ## Common Mistakes
 

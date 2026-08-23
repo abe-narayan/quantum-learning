@@ -1,9 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { quantumFourierTransform } from "@/lib/quantum/qft";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform"
 ).map((problem) => problem.meta);
+
+export const qftOfOne = quantumFourierTransform(StateVector.basis(2, 1));
 
 export const lessonMeta = {
   title: "The Quantum Fourier Transform",
@@ -105,7 +109,26 @@ $$
 
 using $e^{0}=1,\ e^{i\pi/2}=i,\ e^{i\pi}=-1,\ e^{i3\pi/2}=-i$. The engine's
 output for `quantumFourierTransform(StateVector.basis(2, 1))` is
-$(0.5,\ 0.5i,\ -0.5,\ -0.5i)$, the identical four amplitudes.
+$(0.5,\ 0.5i,\ -0.5,\ -0.5i)$, the identical four amplitudes. Splitting
+those four amplitudes into real and imaginary parts shows the "equal
+magnitude, evenly-spaced phase" fan directly: every bar has the same
+height, $0.5$, but which axis (real or imaginary, positive or negative)
+it lands on cycles through all four possibilities exactly once:
+
+<BarChart
+  bars={qftOfOne.amplitudes.map((amp, i) => ({ label: `|${qftOfOne.basisLabel(i)}⟩`, value: amp.re }))}
+  ariaLabel="Real part of each output amplitude of QFT applied to |01⟩"
+/>
+
+<BarChart
+  bars={qftOfOne.amplitudes.map((amp, i) => ({ label: `|${qftOfOne.basisLabel(i)}⟩`, value: amp.im }))}
+  ariaLabel="Imaginary part of each output amplitude of QFT applied to |01⟩"
+/>
+
+Every amplitude has magnitude exactly $0.5$ (so $|{\pm0.5}|=|{\pm0.5i}|=0.5$
+in every one of the eight bars above, only four of which are nonzero at a
+time), but the phase steps by exactly $90°$ from one basis state to the
+next, precisely $e^{2\pi i(1)k/4}$ for $k=0,1,2,3$.
 
 ## Common Mistakes
 

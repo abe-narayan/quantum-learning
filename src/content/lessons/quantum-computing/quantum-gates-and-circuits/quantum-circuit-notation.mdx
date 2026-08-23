@@ -84,9 +84,22 @@ new about *reading a picture* instead of a written expression.
 
 ### Following a circuit step by step
 
-The two-column circuit above ($H$ on qubit 0, then $\text{CNOT}$ with
-qubit 0 as control and qubit 1 as target) applied to $|00\rangle$, one
-column at a time:
+Here's what that circuit actually looks like, drawn the way every SDK
+and paper draws it: qubit 0's wire on top, time flowing left to right.
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+  ]}
+  ariaLabel="A two-qubit circuit: H on qubit 0, then CNOT with qubit 0 as control and qubit 1 as target"
+/>
+
+Column 1 is the $H\otimes I$ operator this section just derived; column 2
+is the two-qubit $\text{CNOT}$. Applying that same two-column circuit
+($H$ on qubit 0, then $\text{CNOT}$ with qubit 0 as control and qubit 1
+as target) to $|00\rangle$, one column at a time:
 
 <QuantumStateDisplay state={afterH} label="After column 1: H on qubit 0" />
 <QuantumStateDisplay state={afterCnot} label="After column 2: CNOT(0, 1)" />

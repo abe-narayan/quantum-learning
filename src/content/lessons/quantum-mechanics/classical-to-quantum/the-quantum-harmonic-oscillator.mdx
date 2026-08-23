@@ -1,5 +1,8 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { harmonicOscillatorEnergyLevels } from "@/lib/quantum/harmonicOscillator";
+
+export const oscillatorLevels = harmonicOscillatorEnergyLevels(6, 1);
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
@@ -121,6 +124,18 @@ $\hbar\omega$, and the ground state ($n=0$) has energy $E_0=\hbar\omega/2$,
 **not zero**. This is the famous **zero-point energy**: even in its
 lowest possible state, a quantum harmonic oscillator is never
 perfectly at rest.
+
+<EnergyLevelDiagram
+  levels={oscillatorLevels.map((energy, n) => ({ label: `n=${n}`, energy, highlight: n === 0 }))}
+  ariaLabel="Harmonic oscillator energy levels, equally spaced by ħω"
+  unit="ħω"
+/>
+
+Every rung is the same distance from the one below it, exactly $\hbar\omega$
+apart, all the way up. Compare this to the hydrogen atom's spectrum later
+in the curriculum, where the gaps between levels shrink as $n$ grows: even
+spacing is a special feature of the harmonic oscillator, not a general
+rule for quantum energy ladders.
 
 ### A finite matrix representation
 

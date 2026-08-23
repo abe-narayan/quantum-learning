@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { infiniteSquareWellEnergyLevel } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/the-infinite-square-well"
@@ -85,7 +86,16 @@ exactly `infiniteSquareWellEnergyLevel(n, L, mass)`'s formula (natural
 units drop the $\hbar^2$). Unlike the harmonic oscillator's *equally
 spaced* ladder from the last course, these levels spread apart
 quadratically ($E_n\propto n^2$), a genuinely different spectrum, from a
-genuinely different confining mechanism.
+genuinely different confining mechanism. The unevenness is easier to see
+than to read off an equation:
+
+<EnergyLevelDiagram
+  levels={[1, 2, 3, 4, 5].map((n) => ({ label: `n=${n}`, energy: infiniteSquareWellEnergyLevel(n, 10) }))}
+  ariaLabel="Infinite square well energy levels for L=10, showing quadratically increasing spacing"
+/>
+
+The gaps between rungs widen sharply as $n$ grows ($E_2-E_1\ne E_3-E_2$),
+the visual signature of the $n^2$ scaling this section just derived.
 
 ### Normalized eigenstates
 

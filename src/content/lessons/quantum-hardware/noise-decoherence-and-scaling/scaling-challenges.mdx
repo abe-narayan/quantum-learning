@@ -5,6 +5,9 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/scaling-challenges"
 ).map((problem) => problem.meta);
 
+export const FIDELITIES = [0.95, 0.99, 0.999, 0.9999];
+export const MAX_GATES = 1200;
+
 export const lessonMeta = {
   title: "Scaling Challenges",
   description:
@@ -51,6 +54,25 @@ barely better than a coin flip's worth of confidence in the final
 answer. This single table is the quantitative core of why "quantum
 supremacy"-scale algorithms need either extremely low error rates or
 active error correction, not just "more qubits."
+
+The table samples three values of $N$; the full curve makes the decay's
+shape, and how differently each fidelity ages, visible directly:
+
+<InteractiveSection description="Step through the fidelity values from 95% up to 99.99%. At each one, watch how far along the x-axis the curve survives before collapsing toward zero. The gap between 99% and 99.9% is enormous, even though both round to 'about 99%.'">
+  <ParametricCurve
+    frames={FIDELITIES.map((fidelity) => ({
+      paramLabel: `p = ${(fidelity * 100).toFixed(2)}%`,
+      series: [{
+        label: `p^N, p=${fidelity}`,
+        color: "brand",
+        points: Array.from({ length: 61 }, (_, i) => ({ x: Math.round((i / 60) * MAX_GATES), y: fidelity ** Math.round((i / 60) * MAX_GATES) }))
+      }]
+    }))}
+    sliderLabel="Per-gate fidelity p"
+    referenceLines={[{ y: 0.5, label: "50% success" }]}
+    ariaLabel="Success probability p^N versus number of sequential gates N, for several per-gate fidelities"
+  />
+</InteractiveSection>
 
 ### Qubit count is an incomplete metric
 

@@ -3,6 +3,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/from-state-vectors-to-density-matrices"
@@ -76,6 +77,13 @@ $$
 
 Both match `pureStateDensityMatrix`'s output exactly, checked directly
 in this module's regression tests.
+
+Watching $\rho$ get built live makes the outer-product mechanics
+concrete before the algebra below generalizes it:
+
+<InteractiveSection description="Set the mixing weight to 1 so only one component contributes: that's exactly ρ=|ψ⟩⟨ψ⟩ for whichever single Bloch point you pick, not a mixture yet. Try |0⟩, then |+⟩, then an arbitrary angle, and watch ρ change with it. The point stays exactly on the sphere's surface every time, matching Tr(ρ²)=1.">
+  <LazyDensityMatrixExplorer />
+</InteractiveSection>
 
 ### ρ is Hermitian with trace 1: proven, not assumed
 

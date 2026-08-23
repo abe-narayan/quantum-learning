@@ -1,10 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { createGrid } from "@/lib/quantum/wavefunction";
+import { barrierPotential } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier"
 ).map((problem) => problem.meta);
+
+export const barrierGrid = createGrid(256, 0.1);
+export const barrierShape = barrierPotential(barrierGrid, 0, 1, 5);
 
 export const lessonMeta = {
   title: "Tunneling and the Finite Barrier",
@@ -89,6 +94,22 @@ second-order differential equation: continuity of $\psi$ and $\psi'$
 across the barrier's edges (required for $\psi''$ to stay well-defined)
 forces some amplitude to always be present in and past the barrier,
 however small.
+
+Before running the simulator, it helps to see the shape being described:
+a flat-bottomed rectangular bump, height $V_0$, sitting in an otherwise
+empty landscape.
+
+<PotentialDiagram
+  xValues={[...barrierGrid.x]}
+  potential={barrierShape}
+  ariaLabel="A rectangular potential barrier of height 5 and half-width 1, centered at the origin"
+/>
+
+Everywhere outside the shaded bump, $V=0$ and the earlier lessons'
+oscillatory solutions apply; inside it, $V=V_0$ and this section's
+exponential solution takes over. The wavefunction has to be continuous
+across both edges, which is exactly the matching condition that lets a
+sliver of amplitude survive to the far side.
 
 ## Interactive Experiment
 

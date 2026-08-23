@@ -5,6 +5,12 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier"
 ).map((problem) => problem.meta);
 
+export const resonanceEnergy = 5;
+export const resonanceBarrierHeight = 2;
+export const resonanceK2 = Math.sqrt(2 * (resonanceEnergy - resonanceBarrierHeight));
+export const transmissionAt = (L) =>
+  1 / (1 + (resonanceBarrierHeight ** 2 * Math.sin(resonanceK2 * L) ** 2) / (4 * resonanceEnergy * (resonanceEnergy - resonanceBarrierHeight)));
+
 export const lessonMeta = {
   title: "Resonant Transmission Through a Barrier",
   description:
@@ -76,7 +82,21 @@ $$
 
 At these special energies, the barrier is **perfectly transparent**:
 every incident particle transmits, none reflects, despite the barrier
-being, in every other sense, a genuine obstacle.
+being, in every other sense, a genuine obstacle. Sweeping barrier width
+$L$ at fixed $E=5,V_0=2$ makes the oscillation, and the resonance peaks
+hitting exactly $T=1$, directly visible:
+
+<ParametricCurve
+  frames={[
+    { paramLabel: `E=${resonanceEnergy}, V0=${resonanceBarrierHeight}`, series: [{ label: "T(L)", color: "brand", points: Array.from({ length: 200 }, (_, i) => ({ x: 0.05 + (i / 199) * (4 - 0.05), y: transmissionAt(0.05 + (i / 199) * (4 - 0.05)) })) }] }
+  ]}
+  sliderLabel="Barrier width"
+  ariaLabel="Transmission probability T versus barrier width L for E=5, V0=2, showing oscillation between resonance peaks at T=1"
+/>
+
+Every peak touches exactly $1$, never overshooting, and the peaks repeat
+with spacing $\pi/k_2$ in $L$, exactly the periodicity $\sin^2(k_2L)=0$
+predicts.
 
 ## Physical Interpretation
 

@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/stationary-states"
@@ -79,6 +80,13 @@ independent of $t$. This is why $|n\rangle$ is called a **stationary
 state**: not because the state *vector* is unchanging (it visibly isn't,
 it accrues phase continuously) but because every physically measurable
 prediction built from it is exactly constant in time.
+
+On the Bloch sphere, "accrues phase but stays stationary" versus "genuinely
+precesses" is a difference you can watch, not just derive:
+
+<InteractiveSection description="Prepare |0⟩ and apply a Z-axis rotation gate repeatedly. Watch the point stay fixed at the pole, even though it's picking up phase with each application. Then prepare |+⟩ and repeat. This time the point visibly sweeps around the equator, because |+⟩ is a superposition of two different Z-eigenstates, not a single stationary one.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ### Energy is exactly conserved, for any state
 

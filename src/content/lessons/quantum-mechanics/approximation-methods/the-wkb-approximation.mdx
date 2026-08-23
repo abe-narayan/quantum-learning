@@ -1,9 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { createGrid } from "@/lib/quantum/wavefunction";
+import { harmonicOscillatorPotential } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/approximation-methods/the-wkb-approximation"
 ).map((problem) => problem.meta);
+
+export const wkbGrid = createGrid(256, 0.025);
+export const wkbEnergy = 1.5; // n=1: E=(n+1/2)ħω
+export const wkbTurningPoint = Math.sqrt(2 * wkbEnergy); // E = x^2/2 => x = sqrt(2E)
 
 export const lessonMeta = {
   title: "The WKB Approximation",
@@ -40,6 +46,24 @@ wherever $E>V(x)$ (a classical particle with that energy could physically
 be there); its boundary points (where $E=V(x)$) are the **turning
 points**, $x_1<x_2$. The local classical momentum is
 $p(x)=\sqrt{2m(E-V(x))}$, real and positive only inside this region.
+
+For the harmonic oscillator's $n=1$ level ($E=1.5$), the turning points
+sit at $x=\pm\sqrt{2E}\approx\pm1.732$, found by solving $E=V(x)=x^2/2$
+directly:
+
+<PotentialDiagram
+  xValues={wkbGrid.x}
+  potential={harmonicOscillatorPotential(wkbGrid, 1, 1)}
+  energyLine={wkbEnergy}
+  markers={[{ x: -wkbTurningPoint, label: "x₁" }, { x: wkbTurningPoint, label: "x₂" }]}
+  shadedRegion={{ from: -wkbTurningPoint, to: wkbTurningPoint }}
+  ariaLabel="Harmonic oscillator potential with the n=1 energy line and classically allowed region shaded"
+/>
+
+The shaded band is exactly where $E>V(x)$, the region the action
+integral $\int_{x_1}^{x_2}p(x)dx$ sums over; outside it, $p(x)$ would be
+imaginary, which is precisely why the integral stops at the turning
+points rather than running over all $x$.
 
 ### The quantization condition
 

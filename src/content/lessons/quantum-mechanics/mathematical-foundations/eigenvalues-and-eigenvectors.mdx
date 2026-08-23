@@ -5,6 +5,8 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors"
 ).map((problem) => problem.meta);
 
+export const eigenDemoA = (x, y) => ({ x: 2 * x + y, y: x + 2 * y });
+
 export const lessonMeta = {
   title: "Eigenvalues and Eigenvectors",
   description:
@@ -37,6 +39,26 @@ Picture an operator as a transformation of the plane. Most directions get
 tilted somewhere else, but there's usually a couple of special axes that
 just get stretched along themselves. Those axes are the eigenvectors; the
 stretch factor along each is its eigenvalue.
+
+Using the matrix $A=\begin{pmatrix}2&1\\1&2\end{pmatrix}$ from this
+lesson's own Worked Example below: the ordinary vector $e_1=(1,0)$ comes
+out tilted, landing at $(2,1)$, pointing in a genuinely different
+direction. But $v=(1,1)$ comes out at $(3,3)$, exactly $3v$, still on the
+same line through the origin, just three times as long.
+
+<VectorDiagram
+  vectors={[
+    { label: "e₁", x: 1, y: 0, color: "muted" },
+    { label: "Ae₁", x: eigenDemoA(1, 0).x, y: eigenDemoA(1, 0).y, color: "brand" },
+    { label: "v", x: 1, y: 1, color: "accent" },
+    { label: "Av = 3v", x: eigenDemoA(1, 1).x, y: eigenDemoA(1, 1).y, color: "accent", dashed: true }
+  ]}
+  ariaLabel="Vector diagram showing an ordinary vector e1 tilted by the operator A, versus the eigenvector v which only stretches to 3v along the same line"
+/>
+
+$e_1$'s image points somewhere new; $v$'s image stays on $v$'s own line.
+That's the whole picture: eigenvectors are the directions an operator
+treats as an axis of pure scaling, nothing else.
 
 ## Mathematical Development
 

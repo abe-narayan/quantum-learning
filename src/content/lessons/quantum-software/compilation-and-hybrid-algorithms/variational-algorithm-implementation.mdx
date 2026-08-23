@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { QuantumCircuit, runCircuit } from "@/lib/quantum/circuitBuilder";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation"
@@ -66,7 +67,34 @@ already used) finds the minimum at exactly $\theta=\pi$, with
 $\langle Z\rangle=-1$, matching `exactGroundStateEnergy(PAULI_Z)=-1`
 EXACTLY, confirming the `QuantumCircuit`-based implementation reproduces
 Quantum Algorithms II's matrix-based result precisely, despite being
-built through a completely different (software-first) code path.
+built through a completely different (software-first) code path. This
+page's own grid search, run live over all 41 points, traces out the
+full cost landscape the optimizer is searching:
+
+<ParametricCurve
+  ariaLabel="Cost landscape: expectation value of Z vs theta, grid search over one full period"
+  frames={[
+    {
+      paramLabel: "grid search over θ ∈ [0, 2π]",
+      series: [
+        {
+          label: "⟨Z⟩(θ)",
+          color: "brand",
+          points: Array.from({ length: 41 }, (_, i) => ({
+            x: (i / 40) * 2 * Math.PI,
+            y: runCircuit(new QuantumCircuit(1).ry(0, (i / 40) * 2 * Math.PI)).probabilities()[0] - runCircuit(new QuantumCircuit(1).ry(0, (i / 40) * 2 * Math.PI)).probabilities()[1]
+          }))
+        }
+      ]
+    }
+  ]}
+  referenceLines={[{ y: -1, label: "exact ground energy" }]}
+/>
+
+Watch the curve dip to $-1$ exactly at $\theta=\pi$, touching the
+dashed reference line precisely there and nowhere else in the full
+period, exactly what "grid search finds the exact minimum" means as a
+picture rather than a single reported number.
 
 ### Extending to a nontrivial Hamiltonian
 

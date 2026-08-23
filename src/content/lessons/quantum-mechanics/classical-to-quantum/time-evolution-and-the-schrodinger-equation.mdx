@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"
@@ -155,6 +156,13 @@ probability is $\cos^2(\omega t/2)$: the state precesses around the
 Bloch sphere's equator at angular frequency $\omega$, returning to
 $|+\rangle$ exactly (probability $1$) at $t=0, \tfrac{2\pi}{\omega},
 \tfrac{4\pi}{\omega},\ldots$
+
+The rotation formula above is exactly what the Bloch Sphere Explorer's
+gate buttons already compute, one discrete step at a time:
+
+<InteractiveSection description="Prepare |+⟩ and apply a Z-axis rotation gate repeatedly. Watch the vector sweep around the equator at a constant rate. This is U(t) for this Hamiltonian, discretized into steps you control, not a separate animation.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ## Common Mistakes
 

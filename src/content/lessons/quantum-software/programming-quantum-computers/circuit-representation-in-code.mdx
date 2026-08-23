@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/programming-quantum-computers/circuit-representation-in-code"
@@ -96,6 +97,14 @@ exactly `[0, 1]`. The circuit-as-data representation reproduces the
 matrix identity $HZH=X$ exactly, since underneath, `runCircuit` is doing
 nothing more than applying $H$, then $Z$, then $H$ in sequence, exactly
 as Quantum Gates & Circuits' direct approach would.
+
+Build the same three-instruction list yourself below and step through
+it, watching the state land on $|1\rangle$ after the final $H$ rather
+than reading it as a claim about someone else's code:
+
+<InteractiveSection description="Build H, Z, H on qubit 0 yourself. Step through each gate. Confirm the final state lands on |1⟩, exactly matching X|0⟩.">
+  <LazyCircuitBuilder />
+</InteractiveSection>
 
 ## Common Mistakes
 

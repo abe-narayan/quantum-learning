@@ -1,9 +1,16 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/qubits-and-quantum-states/dirac-notation"
 ).map((problem) => problem.meta);
+
+export const zeroState = new StateVector([Complex.ONE, Complex.ZERO]);
+export const oneState = new StateVector([Complex.ZERO, Complex.ONE]);
+export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+export const plusZeroOverlap = plusState.innerProduct(zeroState).re;
 
 export const lessonMeta = {
   title: "Dirac Notation",
@@ -86,10 +93,27 @@ $$
 $$
 
 This is **orthonormality**: each basis state has unit overlap with itself
-and zero overlap with the other. It's the reason $|0\rangle$ and
-$|1\rangle$ are a sensible basis in the first place, and it lets you
-compute any inner product without matrix multiplication at all, just
-distribute and cancel:
+and zero overlap with the other. Plotting a few real inner products side
+by side makes the pattern easy to spot: full overlap with yourself, zero
+overlap with your orthogonal partner, and something in between for a
+state that's a genuine mix of both.
+
+<BarChart
+  bars={[
+    { label: "⟨0|0⟩", value: 1 },
+    { label: "⟨1|1⟩", value: 1 },
+    { label: "⟨0|1⟩", value: 0 },
+    { label: "⟨+|0⟩", value: plusZeroOverlap, highlight: true }
+  ]}
+  ariaLabel="Inner products: basis states give 1 or 0, while a superposition state like plus gives a value in between"
+/>
+
+The highlighted bar is $\langle+|0\rangle$, worked out explicitly below:
+neither 0 nor 1, because $|+\rangle$ is a genuine mix of both basis
+states, not aligned with or orthogonal to either one. It's the reason
+$|0\rangle$ and $|1\rangle$ are a sensible basis in the first place, and
+it lets you compute any inner product without matrix multiplication at
+all, just distribute and cancel:
 
 $$
 \langle\phi|\psi\rangle = (\phi_0^*\langle0| + \phi_1^*\langle1|)(\psi_0|0\rangle+\psi_1|1\rangle) = \phi_0^*\psi_0\langle0|0\rangle + \phi_0^*\psi_1\langle0|1\rangle + \phi_1^*\psi_0\langle1|0\rangle + \phi_1^*\psi_1\langle1|1\rangle

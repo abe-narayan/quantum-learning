@@ -234,7 +234,7 @@ export const COURSES: Course[] = [
     estimatedHours: 7,
     prerequisites: ["mathematical-foundations"],
     modules: [
-      { slug: "classical-bit-vs-qubit", title: "What Is a Qubit?" },
+      { slug: "what-is-a-qubit", title: "What Is a Qubit?" },
       { slug: "complex-numbers-for-quantum-mechanics", title: "Complex Numbers for Quantum Mechanics" },
       { slug: "dirac-notation", title: "Dirac Notation" },
       { slug: "quantum-states-and-state-vectors", title: "Quantum States and State Vectors" },

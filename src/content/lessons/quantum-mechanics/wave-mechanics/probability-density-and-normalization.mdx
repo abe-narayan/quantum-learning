@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/probability-density-and-normalization"
@@ -86,6 +87,10 @@ position space or via a unitary Fourier transform), so the simulator's
 `Norm ‖ψ‖` readout staying at $1.0000$ for as long as you let it run isn't
 a coincidence or good luck. It's this unitarity theorem, holding to
 floating-point precision.
+
+<InteractiveSection description="Run any preset and watch the Norm readout as the packet evolves and spreads. Does it ever drift from 1?">
+  <LazyWavefunctionExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 

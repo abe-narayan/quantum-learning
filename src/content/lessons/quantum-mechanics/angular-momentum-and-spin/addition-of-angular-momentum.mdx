@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum"
@@ -88,6 +89,13 @@ built for atomic physics are, mathematically, the exact same state, not
 an analogy: the identical vector, verified via the identical
 $\vec J^{\,2}=0$ eigenstate computation. (The triplet's $m=0$ state,
 $|1,0\rangle$, is likewise identical to $|\Psi^+\rangle$.)
+
+Checking this yourself in the same explorer used to build $|\Psi^-\rangle$
+in the first place makes the identity concrete rather than just asserted:
+
+<InteractiveSection description="Prepare |Ψ−⟩ in the explorer and check its correlation table. This is the exact same vector as the spin-0 singlet above, not an analogy: the same amplitudes, the same perfect anti-correlation in every basis.">
+  <LazyTwoQubitExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 

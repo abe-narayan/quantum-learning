@@ -43,6 +43,27 @@ decision-making happens in practice.
 tradeoff space, not precise specifications of any particular device;
 real numbers vary by generation, vendor, and continue to improve.)
 
+The table's coherence-time column, read as a relative ordering rather
+than exact numbers (bar height is ordinal; the caption under each bar
+is the table's own qualitative entry, not a precise measurement):
+
+<BarChart
+  ariaLabel="Relative coherence-time ordering across the five platforms, from the table above"
+  bars={[
+    { label: "Super-conducting", value: 1, caption: "~μs" },
+    { label: "Spin qubits", value: 2, caption: "intermediate" },
+    { label: "Trapped ions", value: 3, caption: "~s" },
+    { label: "Neutral atoms", value: 3, caption: "~s" },
+    { label: "Photonic", value: 4, highlight: true, caption: "no decoherence" },
+  ]}
+/>
+
+Photonic's bar is highlighted because it isn't really on the same
+scale as the others at all: "no decoherence in flight" is a
+qualitatively different statement from a long-but-finite coherence
+time, which is exactly the nuance a single ranked bar can't fully
+capture and the table's loss-limited caveat spells out.
+
 ### The general pattern: no free lunch
 
 Every platform trades something for something else: superconducting

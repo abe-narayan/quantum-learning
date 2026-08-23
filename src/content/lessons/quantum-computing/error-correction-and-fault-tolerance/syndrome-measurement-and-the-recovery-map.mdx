@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Syndrome Measurement and the Recovery Map",
   description:
-    "The general recovery procedure, measure every stabilizer, look up the syndrome, apply the matching correction, stated for any stabilizer code, plus the [[n,k,d]] parameters that describe a code's size, logical qubit count, and error-correcting power.",
+    "The general recovery procedure, measure every stabilizer, look up the syndrome, apply the matching correction, stated for any stabilizer code, plus the (n,k,d) parameters that describe a code's size, logical qubit count, and error-correcting power.",
   course: "error-correction-and-fault-tolerance",
   module: "syndrome-measurement-and-the-recovery-map",
   order: 1,
@@ -17,7 +17,7 @@ export const lessonMeta = {
   prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"],
   objectives: [
     "State the general recovery procedure for any stabilizer code",
-    "Define the [[n,k,d]] code parameters and give the 3-qubit codes' own parameters",
+    "Define the (n,k,d) code parameters and give the 3-qubit codes' own parameters",
     "Explain the relationship between code distance and how many errors a code can correct",
   ],
 };
@@ -65,6 +65,17 @@ $Z_0Z_1$ and $Z_1Z_2$ syndromes at $(0,0)$; no weight-1 or weight-2
 error does this). The Shor code is $[[9,1,3]]$, the same distance, at
 $9\times$ the physical qubit cost, since its distance-3 protection covers
 *both* error types ($X$ and $Z$), not just one.
+
+<BarChart
+  bars={[
+    { label: "n=3, bit-flip", value: 3, caption: "3 physical qubits" },
+    { label: "n=9, Shor", value: 9, caption: "9 physical qubits", highlight: true }
+  ]}
+  ariaLabel="Physical qubit count for the 3,1,3 bit-flip code versus the 9,1,3 Shor code, same distance"
+/>
+
+Same distance, $3\times$ the qubits: $n$ is a cost paid for broader
+error coverage, not a benefit that scales with the number itself.
 
 ### Distance and correctable error count
 

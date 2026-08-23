@@ -100,6 +100,25 @@ are individually nonzero (destructive interference). This gap between
 "add probabilities" and "add amplitudes" is where every advantage quantum
 algorithms will eventually exploit comes from.
 
+A concrete case makes the gap impossible to miss: two amplitudes,
+$\alpha_1=\frac{1}{\sqrt2}$ and $\alpha_2=-\frac{1}{\sqrt2}$, each on
+their own would give probability $\frac12$.
+
+<BarChart
+  bars={[
+    { label: "|α₁|²", value: 0.5 },
+    { label: "|α₂|²", value: 0.5 },
+    { label: "sum of separate P's", value: 1 },
+    { label: "|α₁+α₂|² (actual)", value: 0, highlight: true }
+  ]}
+  ariaLabel="Classical probability addition would predict 1; the real quantum amplitude sum gives exactly 0"
+/>
+
+Classical probability-addition would predict a combined probability of 1.
+The actual quantum answer, squaring the *summed amplitude*
+$\alpha_1+\alpha_2=0$ first, is exactly 0: complete destructive
+interference. Nothing like this has a classical-probability analogue.
+
 ## Physical Interpretation
 
 Treating $\mathbb{C}^2$ as the state space is a physical claim, not just a

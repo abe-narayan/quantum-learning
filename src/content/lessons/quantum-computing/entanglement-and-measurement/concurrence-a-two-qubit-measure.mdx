@@ -1,6 +1,8 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
+export const shannonTerm = (x) => (x >= 1e-12 ? -x * Math.log2(x) : 0);
+
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure"
 ).map((problem) => problem.meta);
@@ -92,7 +94,36 @@ from $\cos^2\theta,\sin^2\theta$ through $-p\log_2p$ terms. They agree on
 *which* states are entangled, and on the direction of "more" vs. "less,"
 without being numerically equal at intermediate $\theta$: two
 independent, cross-checking measures rather than duplicates of each
-other.
+other. Plotted together, the gap between them is visible directly, not
+just asserted:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        {
+          label: "Concurrence C(θ) = |sin 2θ|",
+          color: "brand",
+          points: Array.from({ length: 41 }, (_, i) => ({ x: (i / 40) * (Math.PI / 2), y: Math.abs(Math.sin(2 * (i / 40) * (Math.PI / 2))) }))
+        },
+        {
+          label: "Entanglement entropy E(θ)",
+          color: "accent",
+          points: Array.from({ length: 41 }, (_, i) => ({ x: (i / 40) * (Math.PI / 2), y: shannonTerm(Math.cos((i / 40) * (Math.PI / 2)) ** 2) + shannonTerm(Math.sin((i / 40) * (Math.PI / 2)) ** 2) }))
+        }
+      ]
+    }
+  ]}
+  ariaLabel="Concurrence and entanglement entropy plotted together as functions of theta from 0 to pi/2"
+/>
+
+Both curves start at 0, both reach their maximum at $\theta=\pi/4$, and
+both are 0 only at $\theta=0$, exactly the agreement claimed above, but
+$E(\theta)$ (built from a logarithm) rises faster near the endpoints than
+$C(\theta)$ (built from a sine) does: two genuinely different functions
+that happen to agree on the two things that matter for this course, zero
+vs. nonzero, and which of two states is more entangled.
 
 ### Scope: pure two-qubit states only
 

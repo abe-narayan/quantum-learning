@@ -5,6 +5,9 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead"
 ).map((problem) => problem.meta);
 
+export const toyCombinations = (n, k) => Array.from({ length: k }, (_, i) => (n - i) / (i + 1)).reduce((acc, term) => acc * term, 1);
+export const toyFailureProbability = (d, p) => Array.from({ length: d - Math.ceil(d / 2) }, (_, i) => Math.ceil(d / 2) + 1 + i).reduce((sum, k) => sum + toyCombinations(d, k) * p ** k * (1 - p) ** (d - k), 0);
+
 export const lessonMeta = {
   title: "Capstone: Fault-Tolerant Thresholds and Resource Overhead",
   description:
@@ -49,6 +52,31 @@ toward zero. This only works while $p$ is below some critical value, the
 **threshold** $p_{\text{th}}$: above it, more physical qubits mean *more*
 opportunities for errors to combine, and increasing $d$ makes the logical
 error rate *worse*, not better.
+
+The shape of this crossover, not the real surface-code threshold value,
+is what a simple toy model can show honestly: treat $d$ physical qubits
+as failing independently with probability $p$ each, majority-vote style,
+and the code fails once more than $d/2$ of them fail. This is a genuine
+binomial-tail computation, real classical probability math, deliberately
+using a toy threshold ($p=0.5$ for independent majority voting) far
+above the real, literature-cited surface-code figure below, purely to
+make the qualitative crossover visible without claiming a realistic
+number:
+
+<InteractiveSection description="Compare the two curves: at p=0.2 (below this toy model's own p=0.5 crossover), failure probability drops as distance grows, more redundancy helps. At p=0.7 (above it), failure probability grows instead, exactly the 'more error correction makes it worse' case Common Mistakes warns about below.">
+  <ParametricCurve
+    frames={[
+      {
+        paramLabel: "Toy majority-vote failure probability vs. distance",
+        series: [
+          { label: "p = 0.2 (below toy threshold)", color: "brand", points: [1, 3, 5, 7, 9, 11].map((d) => ({ x: d, y: toyFailureProbability(d, 0.2) })) },
+          { label: "p = 0.7 (above toy threshold)", color: "accent", points: [1, 3, 5, 7, 9, 11].map((d) => ({ x: d, y: toyFailureProbability(d, 0.7) })) }
+        ]
+      }
+    ]}
+    ariaLabel="Toy binomial majority-vote failure probability versus code distance, for a below-threshold error rate (decreasing) and an above-threshold error rate (increasing)"
+  />
+</InteractiveSection>
 
 ### Why this platform doesn't derive p_th's actual value
 

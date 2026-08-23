@@ -89,7 +89,26 @@ one random $x$ and its one value $f(x)$**, with probability $1/2^n$ each,
 exactly like measuring any other uniform superposition. You learn $f$ at one
 point, chosen randomly, having spent the same one query a classical computer
 would have spent to learn one point. No speedup has been extracted yet:
-superposition alone gives you a single random sample, dressed up.
+superposition alone gives you a single random sample, dressed up. For the
+$n=2$ case above, measurement collapses the four-branch superposition to
+exactly one of them, each equally likely:
+
+<MeasurementTree
+  root={{
+    label: "H⊗H|00⟩",
+    children: [
+      { label: "|00⟩, f(00)", probability: 0.25 },
+      { label: "|01⟩, f(01)", probability: 0.25 },
+      { label: "|10⟩, f(10)", probability: 0.25 },
+      { label: "|11⟩, f(11)", probability: 0.25 }
+    ]
+  }}
+  ariaLabel="Measurement tree showing the uniform superposition over 4 inputs collapsing to exactly one random branch, each with probability 25%"
+/>
+
+Only one of these four branches survives measurement. The other three
+values of $f$, still sitting in the pre-measurement superposition a moment
+earlier, are gone the instant you look.
 
 The entire content of Deutsch-Jozsa, phase estimation, and Grover's algorithm
 is a specific way to make the *interference* between these $2^n$ branches

@@ -3,6 +3,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD, PAULI_Z } from "@/lib/quantum/gates";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/interference-in-quantum-circuits"
@@ -100,6 +101,10 @@ one**, with certainty, not because any measurement narrowed things down,
 but purely because the phases introduced by that single $Z$ gate caused
 constructive interference on $|01\rangle$ and destructive interference
 (exact cancellation) everywhere else.
+
+<InteractiveSection description="Apply H to both qubits, then Z to qubit 1 only, then H to both again, the exact sequence just derived above. Watch all four probabilities collapse onto exactly one outcome, purely from interference, with no measurement and no entanglement involved anywhere in the sequence.">
+  <LazyTwoQubitExplorer />
+</InteractiveSection>
 
 ### This didn't require entanglement, but interference can also act on entangled states
 

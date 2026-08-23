@@ -50,7 +50,20 @@ Every variational algorithm follows the same repeated pattern:
 This is exactly what `runVqe` and `runQaoa` (Quantum Algorithms II)
 already implement, just described here as a general software pattern
 rather than a physics algorithm, the SAME structure Quantum SDKs
-Overview named as PennyLane's specific area of strength.
+Overview named as PennyLane's specific area of strength. As a loop
+rather than a list, the classical-quantum handoff (and where it repeats
+from) is easier to see at a glance:
+
+<PipelineDiagram
+  ariaLabel="The hybrid quantum-classical optimization loop"
+  loop
+  steps={[
+    { label: "Propose θ", detail: "classical" },
+    { label: "Run ansatz circuit", detail: "quantum" },
+    { label: "Compute cost", detail: "classical" },
+    { label: "Update θ", detail: "classical optimizer", highlight: true },
+  ]}
+/>
 
 ### Why compilation overhead compounds here
 

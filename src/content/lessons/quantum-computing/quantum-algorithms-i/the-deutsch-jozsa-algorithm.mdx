@@ -1,9 +1,29 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
+import { applyBitOracle, constantFunction, balancedFunction } from "@/lib/quantum/oracles";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"
 ).map((problem) => problem.meta);
+
+export const deutschJozsaP00 = (f) =>
+  [
+    (s) => applySingleQubitGate(s, HADAMARD, 0),
+    (s) => applySingleQubitGate(s, HADAMARD, 1),
+    (s) => applySingleQubitGate(s, HADAMARD, 2),
+    (s) => applyBitOracle(s, f),
+    (s) => applySingleQubitGate(s, HADAMARD, 0),
+    (s) => applySingleQubitGate(s, HADAMARD, 1),
+  ]
+    .reduce((s, step) => step(s), StateVector.basis(3, 1))
+    .probabilities()
+    .slice(0, 2)
+    .reduce((a, b) => a + b, 0); // input register = 00, ancilla marginalized out
+
+export const p00Constant = deutschJozsaP00(constantFunction(1));
+export const p00Balanced = deutschJozsaP00(balancedFunction(3)); // parity of both bits = x1 XOR x2 (3 = 0b11)
 
 export const lessonMeta = {
   title: "The Deutsch-Jozsa Algorithm",
@@ -84,6 +104,19 @@ Both cases are verified directly against the engine (`applyBitOracle` +
 `HADAMARD` composed exactly as derived above): a balanced function built
 from `balancedFunction` gives $P(0^n)=0$ exactly; either constant function
 gives $P(0^n)=1$ exactly, not approximately, to floating-point precision.
+Running the full circuit for real, for both cases, makes the "no middle
+ground" claim visible rather than just asserted:
+
+<BarChart
+  bars={[
+    { label: "constant f", value: p00Constant, highlight: true },
+    { label: "balanced f", value: p00Balanced },
+  ]}
+  ariaLabel="Probability of measuring the all-zeros outcome, for a constant function versus a balanced function"
+/>
+
+One bar sits at exactly 1, the other at exactly 0, nothing in between,
+for the same reason the algebra above gives exactly $\pm1$ or exactly $0$.
 
 ## Physical Interpretation
 

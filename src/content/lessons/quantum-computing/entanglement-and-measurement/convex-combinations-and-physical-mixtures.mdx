@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/convex-combinations-and-physical-mixtures"
@@ -122,6 +123,10 @@ Unlike the earlier examples, this one is *not* $I/2$: a nonuniform
 mixture of non-mutually-orthogonal states has no reason to collapse to
 the maximally mixed state, and it doesn't here (verified directly
 against `convexCombination`'s output).
+
+<InteractiveSection description="The density matrix explorer only mixes two components, so build the pieces of the worked example one pair at a time. First load the 'mix-0-1' preset (50/50, orthogonal) and note the point sits exactly at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this is non-orthogonal, off-center, and behaves nothing like the orthogonal case. That's the same reason the three-component worked example above lands away from I/2 too.">
+  <LazyDensityMatrixExplorer />
+</InteractiveSection>
 
 ## Common Mistakes
 

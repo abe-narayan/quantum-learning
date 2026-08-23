@@ -29,13 +29,15 @@ export const cnotOnAllBasisStates = [0b00, 0b01, 0b10, 0b11].map((i) =>
   applyCNOT(StateVector.basis(2, i), 0, 1)
 );
 
-export const swapDemo = [0, 1, 2, 3].map((step) => {
-  let s = StateVector.basis(2, 0b10);
-  if (step >= 1) s = applyCNOT(s, 0, 1);
-  if (step >= 2) s = applyCNOT(s, 1, 0);
-  if (step >= 3) s = applyCNOT(s, 0, 1);
-  return s;
-});
+export const swapDemo = [0, 1, 2, 3].map((step) =>
+  step === 0
+    ? StateVector.basis(2, 0b10)
+    : step === 1
+      ? applyCNOT(StateVector.basis(2, 0b10), 0, 1)
+      : step === 2
+        ? applyCNOT(applyCNOT(StateVector.basis(2, 0b10), 0, 1), 1, 0)
+        : applyCNOT(applyCNOT(applyCNOT(StateVector.basis(2, 0b10), 0, 1), 1, 0), 0, 1)
+);
 
 ## Motivation
 
@@ -97,6 +99,16 @@ $$
 $$
 
 This is the standard CNOT matrix, derived rather than just handed to you.
+Drawn as a circuit, this is the standard dot-and-$\oplus$ symbol you'll
+see everywhere from here on: a filled dot on the control wire, connected
+to a $\oplus$ circle on the target wire.
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[{ gate: "CNOT", targets: [0, 1] }]}
+  ariaLabel="CNOT gate: qubit 0 as control (dot), qubit 1 as target (circled plus)"
+/>
+
 Reading off its action on each basis state (in the
 $|00\rangle,|01\rangle,|10\rangle,|11\rangle$ order):
 
@@ -142,6 +154,19 @@ three CNOTs alone, alternating which qubit is the control:
 $$
 \text{SWAP} = \text{CNOT}(0,1)\cdot\text{CNOT}(1,0)\cdot\text{CNOT}(0,1)
 $$
+
+Drawn out, the alternating control is visible at a glance in a way the
+algebra alone doesn't show as directly:
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "CNOT", targets: [1, 0] },
+    { gate: "CNOT", targets: [0, 1] },
+  ]}
+  ariaLabel="Three CNOTs implementing SWAP: control alternates between qubit 0 and qubit 1"
+/>
 
 Track $|10\rangle$ through all three steps:
 

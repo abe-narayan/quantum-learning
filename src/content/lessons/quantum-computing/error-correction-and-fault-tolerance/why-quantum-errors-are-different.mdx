@@ -62,6 +62,24 @@ mathematical fact that makes quantum error correction possible at all, and
 exactly why this course builds a bit-flip ($X$) code and a phase-flip
 ($Z$) code separately, then combines them.
 
+<MeasurementTree
+  ariaLabel="An arbitrary single-qubit error decomposes into I, X, Y, Z components; correcting X and Z automatically corrects Y as well"
+  root={{
+    label: "Arbitrary error",
+    children: [
+      { label: "I (no error)" },
+      { label: "X (bit flip)" },
+      { label: "Z (phase flip)" },
+      { label: "Y = iXZ", highlight: true },
+    ],
+  }}
+/>
+
+Correcting the $X$ and $Z$ branches directly also corrects the $Y$
+branch, since $Y$ is nothing but their combination (up to the
+unobservable global phase $i$), confirmed algebraically in the Worked
+Example below.
+
 ### Obstacle 3: measurement collapses superposition
 
 Classically, checking a stored bit's value is harmless. Reading a $0$

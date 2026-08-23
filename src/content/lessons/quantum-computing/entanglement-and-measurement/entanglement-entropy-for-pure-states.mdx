@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states"
@@ -69,6 +70,10 @@ $\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$ directly. This
 is a genuine graded measure, not a binary "entangled or not" flag, and
 it increases monotonically as $\theta$ moves from $0$ toward $\pi/4$
 (verified directly in `entanglement.test.ts`).
+
+<InteractiveSection description="Dial the mixing weight away from 1 toward 0.5, moving the point from the sphere's surface toward its center. Watch the entropy readout climb from 0 bits (pure, weight 1) toward 1 bit (maximally mixed, weight 0.5), the same climb this family's E(θ) makes as θ moves from 0 toward π/4.">
+  <LazyDensityMatrixExplorer />
+</InteractiveSection>
 
 ### Why "pure" cannot be dropped: a counterexample
 

@@ -1,9 +1,31 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { euclideanFreePropagator } from "@/lib/quantum/pathIntegral";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/the-path-integral-formulation"
 ).map((problem) => problem.meta);
+
+export const xF = 3;
+export const xI = -1;
+export const halfTau = 1; // tau/2, with tau=2
+export const x1Values = Array(100).fill(0).map((_, i) => -8 + (i / 99) * 16);
+
+export const pathIntegrandFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "K_E(x_f,x_1;τ/2)·K_E(x_1,x_i;τ/2)",
+        color: "brand",
+        points: x1Values.map((x1) => ({
+          x: x1,
+          y: euclideanFreePropagator(xF, x1, halfTau) * euclideanFreePropagator(x1, xI, halfTau),
+        })),
+      },
+    ],
+  },
+];
 
 export const lessonMeta = {
   title: "The Path Integral Formulation (Introduction)",
@@ -118,6 +140,25 @@ integrating $x_1$ over $[-30,30]$ with 12000 steps):
 $\approx0.0051667$, matching to a relative difference of
 $\sim1.3\times10^{-15}$, confirmed directly by this platform's test
 suite.
+
+The integrand being summed over, plotted directly against $x_1$ (the
+real product of the two Gaussian propagators, not an illustrative
+sketch), shows exactly where that sum's weight actually comes from:
+
+<ParametricCurve
+  frames={pathIntegrandFrames}
+  sliderLabel=""
+  ariaLabel="The path-integral integrand K_E(x_f,x_1)K_E(x_1,x_i) as a function of the intermediate position x_1"
+/>
+
+The integrand peaks right around $x_1=1$, the straight-line midpoint
+between $x_i=-1$ and $x_f=3$, the classical intermediate position, and
+falls off fast on either side. This is the concrete,
+computed version of the Physical Interpretation section's claim: nearby
+paths (intermediate positions close to the classical one) contribute the
+overwhelming share of the total sum, while distant ones contribute
+almost nothing, even though the sum genuinely runs over every $x_1$, not
+just the classical one.
 
 ## Common Mistakes
 

@@ -118,6 +118,27 @@ both match the intuitive answer (measuring a "totally random" qubit in
 the computational basis gives 0 or 1 with 50/50 odds, and afterward you
 know exactly which one you got).
 
+Laid out as two short pipelines, evolution and measurement are each a
+handful of steps, not a wall of algebra to re-derive every time:
+
+<PipelineDiagram
+  steps={[
+    { label: "ρ" },
+    { label: "apply U", detail: "ρ → UρU†" },
+    { label: "ρ′" },
+  ]}
+  ariaLabel="Unitary evolution pipeline: rho, apply U, rho prime"
+/>
+
+<PipelineDiagram
+  steps={[
+    { label: "ρ" },
+    { label: "measure P", detail: "p = Tr(Pρ)" },
+    { label: "collapse", detail: "ρ_after = PρP / p", highlight: true },
+  ]}
+  ariaLabel="Measurement pipeline: rho, measure P, collapse to PρP over p"
+/>
+
 ## Physical Interpretation
 
 Gates and measurement extend to density matrices with no new physical

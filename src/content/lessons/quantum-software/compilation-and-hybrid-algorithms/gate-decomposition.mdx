@@ -53,7 +53,29 @@ $$
 The first three are trivial (a single native rotation each); $H$ and
 $X$ genuinely need a composition of two native gates, real,
 non-obvious identities, each confirmed to machine precision
-($\text{maxDiff}<10^{-15}$) rather than simply asserted.
+($\text{maxDiff}<10^{-15}$) rather than simply asserted. Drawn as an
+actual circuit (application order, left to right, which reads opposite
+to the matrix product above, since the matrix product $H=R_y(\pi/2)R_z(\pi)$
+applies $R_z$ first, so it's drawn first here), the two-rotation
+decompositions look like this:
+
+<StaticCircuitDiagram
+  ariaLabel="H decomposed into Rz(pi) then Ry(pi/2)"
+  numQubits={1}
+  instructions={[
+    { gate: "RZ", targets: [0], param: Math.PI },
+    { gate: "RY", targets: [0], param: Math.PI / 2 }
+  ]}
+/>
+
+<StaticCircuitDiagram
+  ariaLabel="X decomposed into Ry(pi) then Rz(pi)"
+  numQubits={1}
+  instructions={[
+    { gate: "RY", targets: [0], param: Math.PI },
+    { gate: "RZ", targets: [0], param: Math.PI }
+  ]}
+/>
 
 ### Why "up to global phase" is the right check
 

@@ -1436,6 +1436,69 @@ evaluated the way it looks like it should be) — worth restating here
 because it surfaces only at `next build` time, which is why that build is
 a mandatory step, not an optional extra check.
 
+**A related but distinct MDX/acorn module-scope hazard, discovered in the
+visual-transformation session (Session 13) and worth its own entry
+because it is silent at every check *except* `next build`'s prerender
+step, and even then reports the wrong symptom (a `ReferenceError` on
+some *later* line, not a parse error at the real fault site).** The
+complete rule, found only after inspecting compiled Turbopack SSR chunks
+directly (`.next/server/chunks/ssr/*.js` under `next dev`, or
+`.next/server/chunks/ssr/*.js` after a `next build`) to see exactly how a
+broken statement had been tokenized:
+
+- **Every top-level statement in an `.mdx` file's JS frontmatter must be
+  an `import` or `export` statement — nothing else.** `@next/mdx`'s
+  parser groups module-scope code into contiguous blocks (any run of
+  non-blank lines), and a block is only recognized as executable code if
+  it is *entirely* import/export syntax. A block containing so much as a
+  bare `//` comment line, or a bare expression statement
+  (`someObject.method(x);`), or a plain (non-`export`) `const`/`let`, gets
+  silently reparsed as markdown *prose* instead of JavaScript — the
+  broken statement literally becomes the text content of a compiled `<p>`
+  element (confirmed by grepping the compiled chunk for the swallowed
+  variable name). This produces no error at parse time; it only surfaces
+  as `ReferenceError: X is not defined` at prerender time, and only on
+  whichever *later* line first references the swallowed name — which can
+  be far from, and look unrelated to, the actual broken block.
+- Concretely, all of the following must be avoided in `.mdx` frontmatter,
+  each independently sufficient to trigger the swallow: (1) a plain
+  `const`/`let` not marked `export`; (2) a `//` comment line adjacent (no
+  blank-line separation) to a following `const`/`export const`, which
+  drags the whole contiguous block — comment and code together — into the
+  same misparsed prose run; (3) any bare expression statement, e.g.
+  `circuit.h(0).cnot(0,1);` on its own line after `const circuit = ...` —
+  fix by folding the whole chain into one expression
+  (`new QuantumCircuit(3).h(0).cnot(0,1)`) assigned directly, since MDX
+  literally only accepts import/export at this level, not "declare then
+  mutate."
+- Separately (a real, independently-necessary hazard, not the same
+  mechanism): a **braced function/arrow body** (`(x) => { ...; return
+  y; }`) anywhere in the frontmatter — including nested inside an
+  otherwise-fine JSX prop expression, e.g.
+  `frames={values.map((v) => { const y = f(v); return {...}; })}` inside
+  a component tag — breaks the same pipeline, regardless of nesting depth
+  or brace-body length. The fix is always the same: rewrite as an
+  implicit-return arrow (`values.map((v) => ({ ... }))`), pulling any
+  multi-step computation out into module-scope, brace-free
+  `export const helper = (x) => expression;` functions called from
+  inside the implicit-return expression instead of computed inline with
+  intermediate `const`s.
+- **The practical rule that avoids every variant above:** in `.mdx`
+  frontmatter, mark every declaration `export const` (never plain
+  `const`/`let`), never leave a bare `//` comment adjacent to code (delete
+  it or separate it with a blank line so it forms its own inert
+  single-line block), never write a bare expression statement (fold it
+  into the preceding declaration), and never use a braced function body
+  anywhere, including inside JSX — implicit-return arrows only, with
+  named `export const` helpers for anything needing more than one step.
+  None of this is caught by `tsc`, `lint`, or `vitest`; only a clean
+  (`rm -rf .next`) `next build` exercises every static route and will
+  surface it, and Turbopack's parallel static-generation workers stop at
+  the *first* failure they hit, which can misleadingly suggest a fix
+  worked when a different, still-broken file simply hadn't been reached
+  yet by that particular build run — always re-run a full clean build
+  after any such fix, not just spot-check the one file that errored.
+
 **Content-quality corrections found during writing, before publishing:**
 the 3-qubit bit-flip code's weight-2 error case was initially described
 as "detected but miscorrected to the wrong qubit"; direct engine

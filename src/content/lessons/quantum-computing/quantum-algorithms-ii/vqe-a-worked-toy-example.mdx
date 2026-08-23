@@ -1,9 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
+import { runVqe, exactGroundStateEnergy } from "@/lib/quantum/vqe";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example"
 ).map((problem) => problem.meta);
+
+export const toyHamiltonian = PAULI_Z.scale(0.6).add(PAULI_X.scale(0.8));
+export const toyVqeResult = runVqe(toyHamiltonian, 80);
+export const toyGroundEnergy = exactGroundStateEnergy(toyHamiltonian);
 
 export const lessonMeta = {
   title: "VQE: A Worked Toy Example",
@@ -52,7 +58,30 @@ monotonically (proven structurally: the optimizer only ever accepts a
 strictly better candidate, checked directly in this course's tests) and
 converges to an energy within $10^{-12}$ of $-1$, far tighter than
 needed for any practical purpose, since the pattern search keeps halving
-its step size until it's negligibly small.
+its step size until it's negligibly small. This is the actual history
+array `runVqe` returned for this exact Hamiltonian, not a smoothed
+illustration:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        {
+          label: "cost (⟨ψ(θ,φ)|H|ψ(θ,φ)⟩)",
+          color: "brand",
+          points: toyVqeResult.history.map((cost, iteration) => ({ x: iteration, y: cost }))
+        }
+      ]
+    }
+  ]}
+  referenceLines={[{ y: toyGroundEnergy, label: "E₀" }]}
+  ariaLabel="VQE cost function versus iteration, converging to the exact ground energy"
+/>
+
+Every step either strictly improves the cost or shrinks the search step;
+the curve never dips below the dashed $E_0$ line, exactly what the
+variational principle from the last lesson guarantees.
 
 ### Reading the convergence
 

@@ -68,6 +68,38 @@ alone.
 - **Crosstalk**: unwanted coupling between supposedly-independent
   qubits (next lesson's dedicated topic).
 
+The catalog sorts cleanly into the two categories, and each branch
+points to a genuinely different fix:
+
+<MeasurementTree
+  root={{
+    label: "Noise source",
+    children: [
+      {
+        label: "Coherent (systematic)",
+        children: [
+          { label: "Miscalibration drift" },
+          { label: "Fix: recalibration", highlight: true },
+        ],
+      },
+      {
+        label: "Incoherent (environmental)",
+        children: [
+          { label: "Amplitude damping" },
+          { label: "Dephasing" },
+          { label: "Thermal photon population" },
+          { label: "Fix: isolation or error correction", highlight: true },
+        ],
+      },
+    ],
+  }}
+  ariaLabel="Noise sources split into coherent errors (fixed by recalibration) and incoherent errors (mitigated by isolation or error correction)"
+/>
+
+Control line noise and crosstalk aren't shown above since, as the
+catalog notes, which branch they fall into depends on their specific
+origin rather than being fixed in advance.
+
 ### Why the classification matters for mitigation
 
 A coherent miscalibration error is fixed by better/more frequent

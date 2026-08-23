@@ -5,6 +5,9 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics"
 ).map((problem) => problem.meta);
 
+export const workedExamplePPlus = Math.cos(Math.PI / 6) ** 2;
+export const workedExamplePMinus = Math.sin(Math.PI / 6) ** 2;
+
 export const lessonMeta = {
   title: "The Postulates of Quantum Mechanics",
   description:
@@ -137,6 +140,17 @@ and $P(-1)=|\sin(\pi/6)|^2=(\tfrac12)^2=\tfrac14$. Check:
 $\tfrac34+\tfrac14=1$ ✓, consistent with $|\psi\rangle$ being normalized
 (Postulate 1). Expectation value:
 $\langle A\rangle = (+1)(\tfrac34)+(-1)(\tfrac14)=\tfrac12$.
+
+<BarChart
+  bars={[
+    { label: "P(+1)", value: workedExamplePPlus, highlight: true },
+    { label: "P(-1)", value: workedExamplePMinus },
+  ]}
+  ariaLabel="Bar chart of P(+1) and P(-1) for the two-level worked example"
+/>
+
+A $3:1$ split, visible at a glance, exactly matching the $\cos^2(\pi/6):\sin^2(\pi/6)$
+ratio the algebra above predicts.
 
 ## Common Mistakes
 

@@ -49,6 +49,29 @@ is a Hamiltonian whose eigenvalue on $|z\rangle$ is exactly the number of
 edges cut by that particular 2-coloring. Maximizing $\langle C\rangle$ is
 literally Max-Cut.
 
+For a 3-vertex triangle graph (every pair connected, 3 edges total), the
+coloring $z=100$ (vertex 0 in one group, vertices 1 and 2 in the other)
+cuts exactly 2 of the 3 edges:
+
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.5, y: 0.1, group: 0 },
+    { id: "1", x: 0.15, y: 0.9, group: 1 },
+    { id: "2", x: 0.85, y: 0.9, group: 1 }
+  ]}
+  edges={[
+    { from: "0", to: "1", cut: true },
+    { from: "0", to: "2", cut: true },
+    { from: "1", to: "2", cut: false }
+  ]}
+  ariaLabel="Triangle graph with vertex 0 in one group and vertices 1,2 in the other, showing 2 of 3 edges cut"
+/>
+
+Edges 0-1 and 0-2 cross between groups (dashed, cut); edge 1-2 sits
+entirely inside one group (solid, not cut). $\langle z|C|z\rangle=2$ for
+this particular coloring, read directly off the picture by counting
+dashed edges.
+
 ### The cost unitary is a pure phase
 
 $C$ is diagonal in the computational basis (built entirely from $Z$

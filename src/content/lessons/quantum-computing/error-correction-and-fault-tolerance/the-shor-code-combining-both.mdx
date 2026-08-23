@@ -42,6 +42,19 @@ $|111\rangle\to|---\rangle$). Then bit-flip-encode **each of those three
 qubits individually** into its own group of 3 physical qubits: $9$
 physical qubits total, in $3$ groups of $3$.
 
+<PipelineDiagram
+  steps={[
+    { label: "Group 1", detail: "qubits 0-2, bit-flip protected" },
+    { label: "Group 2", detail: "qubits 3-5, bit-flip protected" },
+    { label: "Group 3", detail: "qubits 6-8, bit-flip protected" },
+  ]}
+  ariaLabel="The Shor code's three groups of three qubits, each inner-protected against bit-flip errors"
+/>
+
+All three groups are, in turn, phase-flip protected as a single outer
+block (the $\alpha|+++\rangle+\beta|---\rangle$ structure spans all
+three groups together), the nesting the rest of this lesson explains.
+
 ### Why this catches every single-qubit error
 
 An $X$ error on one physical qubit is caught by that qubit's own

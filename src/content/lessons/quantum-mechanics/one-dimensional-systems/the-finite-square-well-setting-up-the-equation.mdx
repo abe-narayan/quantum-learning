@@ -1,9 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { createGrid } from "@/lib/quantum/wavefunction";
+import { finiteSquareWellPotential } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/one-dimensional-systems/the-finite-square-well-setting-up-the-equation"
 ).map((problem) => problem.meta);
+
+export const finiteWellGrid = createGrid(256, 0.1);
+export const finiteWellShape = finiteSquareWellPotential(finiteWellGrid, 2, 4);
 
 export const lessonMeta = {
   title: "The Finite Square Well: Setting Up the Equation",
@@ -50,8 +55,18 @@ forced to exactly zero at $x=\pm a$, just small.
 ### Three regions, two kinds of solution
 
 Take the well as $V(x)=-V_0$ for $|x|<a$, $V(x)=0$ for $|x|>a$ (matching
-this platform's `finiteSquareWellPotential` convention exactly). A bound
-state has $-V_0<E<0$. Define
+this platform's `finiteSquareWellPotential` convention exactly). Concretely,
+for $a=2$, $V_0=4$:
+
+<PotentialDiagram
+  xValues={[...finiteWellGrid.x]}
+  potential={finiteWellShape}
+  ariaLabel="A finite square well of depth 4 and half-width 2, flat at V=0 outside and V=-4 inside"
+/>
+
+Unlike the infinite well's vertical walls, this dip has finite depth,
+which is exactly what makes the outside region merely *unlikely*, not
+strictly forbidden. A bound state has $-V_0<E<0$. Define
 
 $$
 k \equiv \sqrt{2(E+V_0)} \quad(\text{inside, oscillatory}), \qquad \kappa \equiv \sqrt{-2E} \quad(\text{outside, decaying})

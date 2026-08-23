@@ -5,6 +5,12 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/the-radial-equation"
 ).map((problem) => problem.meta);
 
+export const rGridEff = Array(160).fill(0).map((_, i) => 0.05 + (i / 159) * 7.95);
+export const effectivePotential = (l) => rGridEff.map((r) => -1 / r + (l * (l + 1)) / (2 * r * r));
+export const vEffL0 = effectivePotential(0);
+export const vEffL1 = effectivePotential(1);
+export const vEffL2 = effectivePotential(2);
+
 export const lessonMeta = {
   title: "The Radial Equation",
   description:
@@ -103,6 +109,23 @@ effective repulsive barrier, consistent with $l=1$ states (unlike
 $l=0$) having zero probability density exactly at the nucleus, previewed
 here and confirmed directly in the next lesson's explicit radial
 wavefunctions.
+
+Plotting $V_\text{eff}(r)$ for each $l$ makes the growing barrier
+directly visible (atomic units, $V(r)=-1/r$):
+
+<PotentialDiagram xValues={rGridEff} potential={vEffL0} ariaLabel="Effective potential for l=0: no centrifugal barrier" />
+
+$l=0$: no centrifugal term at all, so $V_\text{eff}=V(r)$ falls straight
+into the origin, unbounded below, exactly the bare Coulomb attraction.
+
+<PotentialDiagram xValues={rGridEff} potential={vEffL1} ariaLabel="Effective potential for l=1: a mild centrifugal barrier" />
+
+<PotentialDiagram xValues={rGridEff} potential={vEffL2} ariaLabel="Effective potential for l=2: a stronger centrifugal barrier" />
+
+$l=1$ and $l=2$: the curve now turns sharply *upward* near $r=0$ instead
+of falling to $-\infty$, and the turn gets steeper as $l$ grows, exactly
+the repulsive barrier keeping higher-$l$ electrons away from the
+nucleus.
 
 ## Common Mistakes
 

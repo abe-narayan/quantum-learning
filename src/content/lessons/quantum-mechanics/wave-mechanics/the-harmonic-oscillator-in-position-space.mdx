@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { harmonicOscillatorEnergyLevel } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/the-harmonic-oscillator-in-position-space"
@@ -101,6 +102,19 @@ derivations (raising/lowering operators on an abstract Hilbert space;
 direct substitution into a differential equation) landing on the exact
 same spectrum is not a coincidence. It's the same physical system,
 correctly described in two different mathematical languages.
+
+Set next to the infinite well's ladder from the last lesson, the contrast
+is immediate:
+
+<EnergyLevelDiagram
+  levels={[0, 1, 2, 3, 4].map((n) => ({ label: `n=${n}`, energy: harmonicOscillatorEnergyLevel(n, 2) }))}
+  ariaLabel="Harmonic oscillator energy levels for omega=2, showing perfectly even spacing"
+/>
+
+Every rung here sits exactly $\omega$ above the last, unlike the well's
+widening gaps. Same diagram component, genuinely different physics: a
+quadratic confining potential produces an evenly-spaced spectrum, a hard
+box does not.
 
 ## Physical Interpretation
 

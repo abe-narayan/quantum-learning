@@ -5,6 +5,11 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/one-dimensional-systems/scattering-off-a-step-potential"
 ).map((problem) => problem.meta);
 
+export const stepHeight = 4;
+export const stepK1 = (ratio) => Math.sqrt(2 * ratio * stepHeight);
+export const stepK2 = (ratio) => Math.sqrt(2 * (ratio * stepHeight - stepHeight));
+export const stepReflection = (ratio) => ((stepK1(ratio) - stepK2(ratio)) / (stepK1(ratio) + stepK2(ratio))) ** 2;
+
 export const lessonMeta = {
   title: "Scattering Off a Step Potential",
   description:
@@ -105,6 +110,34 @@ $$
 
 using $(k_1-k_2)^2+4k_1k_2=k_1^2-2k_1k_2+k_2^2+4k_1k_2=k_1^2+2k_1k_2+k_2^2=(k_1+k_2)^2$,
 a genuine algebraic identity, not an assumption.
+
+Plotted against the energy ratio $E/V_0$, the shape of this falloff is
+worth seeing directly:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: `V0 = ${stepHeight}`,
+      series: [
+        {
+          label: "R = r²",
+          color: "brand",
+          points: Array.from({ length: 100 }, (_, i) => ({
+            x: 1.05 + (i / 99) * (6 - 1.05),
+            y: stepReflection(1.05 + (i / 99) * (6 - 1.05))
+          }))
+        }
+      ]
+    }
+  ]}
+  sliderLabel="Step height"
+  ariaLabel="Reflection probability R versus energy ratio E over V0 for a fixed step height, showing R falling toward but never reaching zero"
+/>
+
+$R$ drops fast as $E/V_0$ grows past 1, but the curve only approaches
+the axis asymptotically. It never actually touches $R=0$ at any finite
+energy, the visual form of the $R>0$ claim the next section makes
+explicit.
 
 ## Physical Interpretation
 

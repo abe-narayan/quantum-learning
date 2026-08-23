@@ -42,7 +42,32 @@ because both answers turn out to be more specific, and more honest, than
 Both numbers in the "quantum queries" column were *derived* in this
 course, not quoted: Deutsch-Jozsa's single query from the exact $\pm1$/$0$
 amplitude split, Grover's $O(\sqrt N)$ from the exact rotation-angle
-formula. Neither is asymptotic hand-waving.
+formula. Neither is asymptotic hand-waving. Plotting Grover's actual
+$\frac{\pi}{4}\sqrt N$ formula against the classical $N$ makes the shape
+of "quadratic, not exponential" visible directly, rather than only as two
+entries in a table:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        { label: "Classical (N = 2ⁿ)", color: "muted", points: Array.from({ length: 19 }, (_, i) => i + 2).map((n) => ({ x: n, y: 2 ** n })) },
+        {
+          label: "Grover quantum (~π/4·√N)",
+          color: "accent",
+          points: Array.from({ length: 19 }, (_, i) => i + 2).map((n) => ({ x: n, y: (Math.PI / 4) * Math.sqrt(2 ** n) }))
+        }
+      ]
+    }
+  ]}
+  ariaLabel="Classical query count versus Grover's quantum query count, as a function of n, for N = 2^n"
+/>
+
+The gap widens fast: Grover's curve barely lifts off the axis while the
+classical curve rockets upward, but it never approaches Deutsch-Jozsa's
+flat, constant $1$ query. Two genuinely different shapes of advantage,
+not two versions of the same thing.
 
 ### Why Deutsch-Jozsa's exponential gap depends entirely on the promise
 

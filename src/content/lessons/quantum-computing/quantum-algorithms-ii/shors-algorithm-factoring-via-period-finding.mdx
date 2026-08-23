@@ -5,6 +5,15 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding"
 ).map((problem) => problem.meta);
 
+export const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+
+export const shorN = 15;
+export const shorA = 7;
+export const shorR = 4; // the order of 7 mod 15, from classicalOrder(7, 15)
+export const shorAHalfPower = shorA ** (shorR / 2) % shorN;
+export const shorGcdMinus = gcd(shorAHalfPower - 1, shorN);
+export const shorGcdPlus = gcd(shorAHalfPower + 1, shorN);
+
 export const lessonMeta = {
   title: "Shor's Algorithm: Factoring via Period Finding",
   description:
@@ -95,7 +104,20 @@ $\gcd(4-1,15)=\gcd(3,15)=3$ and $\gcd(4+1,15)=\gcd(5,15)=5$, exactly the
 two prime factors of $15$. Both gcd computations and the modular
 exponentiation are classical arithmetic; the only piece this worked
 example *assumed* rather than computed is $r=4$ itself, which the next
-two lessons obtain quantum-mechanically.
+two lessons obtain quantum-mechanically. Laid out as a pipeline, the same
+four numbers make the reduction's shape obvious: three plain arithmetic
+steps once $r$ is in hand, each one computed for real (not just quoted)
+below:
+
+<PipelineDiagram
+  steps={[
+    { label: "Order r", detail: `r = ${shorR}` },
+    { label: "a^(r/2) mod N", detail: `${shorA}^${shorR / 2} mod ${shorN} = ${shorAHalfPower}` },
+    { label: "gcd(a^(r/2) - 1, N)", detail: `gcd(${shorAHalfPower - 1}, ${shorN}) = ${shorGcdMinus}`, highlight: true },
+    { label: "gcd(a^(r/2) + 1, N)", detail: `gcd(${shorAHalfPower + 1}, ${shorN}) = ${shorGcdPlus}`, highlight: true }
+  ]}
+  ariaLabel="The classical reduction pipeline from order r to the two gcd factors, for a=7, N=15"
+/>
 
 ## Common Mistakes
 

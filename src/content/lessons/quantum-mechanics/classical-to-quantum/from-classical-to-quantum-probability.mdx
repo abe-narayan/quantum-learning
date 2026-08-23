@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability"
@@ -106,6 +107,10 @@ relative phase. This is exactly the fringe pattern: as position $x$ on the
 screen changes, the relative phase between the two paths changes (their
 path lengths to the two slits differ), sweeping through exactly this
 range.
+
+<InteractiveSection description="Set the relative phase to π (opposite phase). Watch the combined probability drop to zero even though both individual amplitudes are nonzero. That's the θ=π row above, live. Now sweep the phase slowly from 0 to π and watch the combined probability fall continuously from double the classical value down to zero.">
+  <LazyComplexAmplitudeExplorer />
+</InteractiveSection>
 
 ### Why no hidden definite path explains this
 

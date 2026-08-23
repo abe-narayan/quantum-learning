@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/degeneracy-in-practice"
@@ -101,6 +102,10 @@ On the now-collapsed $|00\rangle$, $Z_1$'s eigenvalue is $+1$ with
 $(Z_0,Z_1)=(+1,+1)$ now uniquely identifies the state as $|00\rangle$,
 this course's CSCO machinery working exactly as designed, on a real
 two-qubit state.
+
+<InteractiveSection description="Prepare |Φ+⟩, measure qubit 0. Confirm qubit 1's outcome is forced to match, exactly as this lesson's Z₀/Z₁ collapse calculation predicts.">
+  <LazyTwoQubitExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 

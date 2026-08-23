@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed"
@@ -144,6 +145,14 @@ $1-\text{Tr}(\rho_A^2)=2(0.3)^2=0.18$, so $\text{Tr}(\rho_A^2)=0.82$,
 closer to 1 (less mixed) than the Bell state's 0.5, matching the
 intuition that this state is less entangled than a maximally entangled
 Bell pair (its amplitudes are $90\%/10\%$, not $50\%/50\%$).
+
+$\rho_A=\text{diag}(0.9,0.1)$ is itself just a Z-basis mixture of
+$|0\rangle$ and $|1\rangle$ weighted 90/10, exactly the kind of object
+the density matrix explorer builds directly:
+
+<InteractiveSection description="Build ρ from |0⟩ and |1⟩ weighted 90/10. Check that the purity reading matches 0.82 exactly: this is literally the reduced state ρ_A this worked example just computed by hand, not a different state that happens to look similar.">
+  <LazyDensityMatrixExplorer />
+</InteractiveSection>
 
 ## Common Mistakes
 

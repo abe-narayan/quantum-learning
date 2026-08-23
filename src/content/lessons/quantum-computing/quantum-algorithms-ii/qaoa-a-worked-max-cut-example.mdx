@@ -50,6 +50,25 @@ $\gamma\approx0.6,\ \beta\approx0.3$ gives `expectedCutSize`
 $\approx1.999$, within $0.05\%$ of the true maximum $2$, again at
 $p=1$.
 
+Every optimal triangle coloring is a 1-vertex-vs-2-vertex split (the
+"pigeonhole" argument in the Worked Example below explains why 2 is the
+ceiling); the grid-searched parameters push the circuit's measured
+distribution to land on one of these split colorings almost every time:
+
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.5, y: 0.1, group: 0 },
+    { id: "1", x: 0.15, y: 0.9, group: 1 },
+    { id: "2", x: 0.85, y: 0.9, group: 1 }
+  ]}
+  edges={[
+    { from: "0", to: "1", cut: true },
+    { from: "0", to: "2", cut: true },
+    { from: "1", to: "2", cut: false }
+  ]}
+  ariaLabel="Triangle graph at the optimal Max-Cut split found by the grid search, cutting exactly 2 of 3 edges"
+/>
+
 ### Why grid search, not a closed form
 
 Unlike VQE's smooth, exactly-solvable single-qubit landscape, QAOA's

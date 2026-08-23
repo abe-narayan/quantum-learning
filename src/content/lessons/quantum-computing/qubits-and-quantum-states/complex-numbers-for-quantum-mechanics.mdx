@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics"
@@ -125,7 +126,13 @@ $$
 
 A number written this way has modulus $r$ and **phase** (or **argument**)
 $\theta$. Every complex number has both a rectangular form and a polar
-form: they're the same information, viewed two ways.
+form: they're the same information, viewed two ways. It's easier to feel
+that equivalence by moving a number between the two forms yourself than
+by reading it in equations alone:
+
+<InteractiveSection description="Set a complex number to 3+4i using the rectangular sliders. Read off its modulus and phase in the polar readout. Then sweep the phase slider through a full turn (0 to 2π) and watch the point trace a circle while the modulus stays fixed. That circle *is* what 'multiplying by e^{iθ} rotates the point' means.">
+  <LazyComplexAmplitudeExplorer />
+</InteractiveSection>
 
 ### Why polar form matters: multiplication adds phases
 

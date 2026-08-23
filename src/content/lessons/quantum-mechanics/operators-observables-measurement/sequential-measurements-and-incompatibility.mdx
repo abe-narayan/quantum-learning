@@ -1,9 +1,18 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, applySingleQubitGate } from "@/lib/quantum/gates";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility"
 ).map((problem) => problem.meta);
+
+export const zero = StateVector.zero(1);
+export const xBasisProbs = applySingleQubitGate(zero, HADAMARD, 0).probabilities(); // [P(X=+1), P(X=-1)] for state |0>
+export const plusState = applySingleQubitGate(zero, HADAMARD, 0); // H|0> = |+>
+export const minusState = applySingleQubitGate(StateVector.basis(1, 1), HADAMARD, 0); // H|1> = |->
+export const zAfterPlus = plusState.probabilities();
+export const zAfterMinus = minusState.probabilities();
 
 export const lessonMeta = {
   title: "Sequential Measurements and Incompatibility",
@@ -68,6 +77,44 @@ $$
 was $100\%$ predictable. After it, $Z$'s outcome is completely random
 again. The $X$ measurement didn't just add new information, it
 *erased* the old certainty entirely.
+
+Laid out as a tree, every branch of this three-step sequence is visible
+at once:
+
+<MeasurementTree
+  root={{
+    label: "|0⟩",
+    children: [
+      {
+        label: `Z=0 (${(zero.probabilities()[0] * 100).toFixed(0)}%)`,
+        probability: zero.probabilities()[0],
+        children: [
+          {
+            label: `X=+1 (${(xBasisProbs[0] * 100).toFixed(0)}%)`,
+            probability: xBasisProbs[0],
+            children: [
+              { label: `Z=0 (${(zAfterPlus[0] * 100).toFixed(0)}%)`, probability: zAfterPlus[0] },
+              { label: `Z=1 (${(zAfterPlus[1] * 100).toFixed(0)}%)`, probability: zAfterPlus[1] }
+            ]
+          },
+          {
+            label: `X=-1 (${(xBasisProbs[1] * 100).toFixed(0)}%)`,
+            probability: xBasisProbs[1],
+            children: [
+              { label: `Z=0 (${(zAfterMinus[0] * 100).toFixed(0)}%)`, probability: zAfterMinus[0] },
+              { label: `Z=1 (${(zAfterMinus[1] * 100).toFixed(0)}%)`, probability: zAfterMinus[1] }
+            ]
+          }
+        ]
+      }
+    ]
+  }}
+  ariaLabel="Sequential Z-then-X-then-Z measurement tree starting from |0>, showing certainty at step 1 collapsing to 50/50 by step 3"
+/>
+
+Both paths through the $X$ branch land on the same $50/50$ split at the
+final $Z$ measurement, exactly the "doesn't matter which $X$ outcome
+occurred" fact proven below.
 
 ## Physical Interpretation
 

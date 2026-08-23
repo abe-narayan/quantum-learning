@@ -5,6 +5,7 @@ import { applySingleQubitGate, applyCNOT, HADAMARD, PAULI_X, PAULI_Z } from "@/l
 import { measureQubit } from "@/lib/quantum/measurement";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/quantum-teleportation"
@@ -113,6 +114,10 @@ Look closely: **Bob's qubit (the last factor) is $|\psi\rangle$ itself,
 or a simple, fixed transformation of it, in every single branch**, and
 which branch Alice is in is exactly what her two measurement outcomes
 will tell her.
+
+<InteractiveSection description="Build the pre-measurement part of this exact protocol yourself, in 3-qubit mode: H on qubit 1 and CNOT(1,2) to prepare the shared Bell pair, then CNOT(0,1) and H on qubit 0, the two steps just derived above. Inspect the resulting state's amplitudes and check them against the four-branch formula above: all 8 basis states end up populated, with magnitude 0.3 wherever the formula has an α term and 0.4 wherever it has a β term, since α=0.6 and β=0.8i here.">
+  <LazyCircuitBuilder />
+</InteractiveSection>
 
 ### Alice measures her two qubits
 

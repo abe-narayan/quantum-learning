@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-phase-flip-code"
@@ -67,6 +68,10 @@ For an arbitrary $\alpha,\beta$, a $Z$ error on any one of the three
 qubits is detected and corrected exactly by this construction, checked
 directly (to floating-point precision, accounting only for ordinary
 numerical error) for all three qubit positions, plus the no-error case.
+
+<InteractiveSection description="Inject a Z error on qubit 2 this time. The syndrome bits still come from the same underlying CNOT structure, just conjugated by H on every qubit. Confirm the decode table still points at the errored qubit, and that the corrected state matches the original.">
+  <LazySyndromeExplorer mode="phase-flip" />
+</InteractiveSection>
 
 ## Physical Interpretation
 

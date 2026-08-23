@@ -1,9 +1,16 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PAULI_Z } from "@/lib/quantum/gates";
+import { costFunction, exactGroundStateEnergy } from "@/lib/quantum/vqe";
+import { eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits"
 ).map((problem) => problem.meta);
+
+export const zGroundEnergy = exactGroundStateEnergy(PAULI_Z);
+export const [zEigenA, zEigenB] = eigenvaluesHermitian2x2(PAULI_Z);
+export const zExcitedEnergy = Math.max(zEigenA, zEigenB);
 
 export const lessonMeta = {
   title: "The Variational Principle and Ansatz Circuits",
@@ -101,7 +108,27 @@ $\langle+|Z|+\rangle=\langle+|-\rangle=0$ (an even, $50/50$ mix of the two
 eigenvalues under this particular state). $E_0=-1$ for $H=Z$, and indeed
 $0\geq-1$: the variational principle holds, though this particular
 $\theta,\varphi$ is far from optimal (the true minimizer is
-$\theta=\pi,\varphi=0$, giving $|1\rangle$, energy exactly $-1$).
+$\theta=\pi,\varphi=0$, giving $|1\rangle$, energy exactly $-1$). Placed
+on the actual energy spectrum, the inequality is a picture, not just an
+arithmetic check: the trial value has nowhere to go but at or above the
+floor $E_0$ sets. That isn't special to $\theta=\pi/2$; sweeping $\theta$
+across its *entire* range shows the trial energy staying at or above
+$E_0$ everywhere, never dipping below it even once:
+
+<InteractiveSection description="Drag θ from 0 to 2π. Watch ⟨ψ|H|ψ⟩ touch the E₀ line exactly at θ=π (the true minimizer) and never cross below it anywhere else, exactly what the variational principle guarantees.">
+  <ParametricCurve
+    frames={[{
+      paramLabel: "⟨ψ|H|ψ⟩ vs θ (φ=0 fixed)",
+      series: [{
+        label: "⟨ψ(θ)|Z|ψ(θ)⟩",
+        color: "brand",
+        points: Array.from({ length: 61 }, (_, i) => ({ x: (i / 60) * 2 * Math.PI, y: costFunction(PAULI_Z, { theta: (i / 60) * 2 * Math.PI, phi: 0 }) }))
+      }]
+    }]}
+    referenceLines={[{ y: zGroundEnergy, label: "E₀ (floor)" }, { y: zExcitedEnergy, label: "E₁" }]}
+    ariaLabel="Trial energy expectation value versus theta for H=Z, showing the curve never dropping below the E0 reference line"
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

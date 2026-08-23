@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/angular-momentum-and-spin/spin-one-half-systems"
@@ -71,6 +72,10 @@ sphere point *is* the expectation value direction
 $(\langle S_x\rangle,\langle S_y\rangle,\langle S_z\rangle)$, normalized.
 This was always true; this lesson just makes the physical meaning behind
 a picture this platform has used since Course 1 explicit.
+
+<InteractiveSection description="Apply a rotation and watch the point move. This is now literally a spin-1/2 particle's magnetic-moment direction, not just an abstract qubit state. Every gate you've ever applied to a qubit was always a rotation of a real spin.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 

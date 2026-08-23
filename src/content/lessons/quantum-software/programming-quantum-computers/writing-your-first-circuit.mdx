@@ -1,10 +1,17 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
+import { QuantumCircuit, runCircuit, sampleMeasurements } from "@/lib/quantum/circuitBuilder";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/programming-quantum-computers/writing-your-first-circuit"
 ).map((problem) => problem.meta);
+
+export const ghzSampleCircuit = new QuantumCircuit(3).h(0).cnot(0, 1).cnot(1, 2);
+export const ghzSampleState = runCircuit(ghzSampleCircuit);
+export const ghzSampleCounts = sampleMeasurements(ghzSampleState, 5000);
+export const ghzCount000 = ghzSampleCounts["000"] || 0;
+export const ghzCount111 = ghzSampleCounts["111"] || 0;
 
 export const lessonMeta = {
   title: "Writing Your First Circuit",
@@ -78,6 +85,22 @@ and 2479. The deviation from a perfectly even split is genuine
 **statistical (shot) noise**, not a bug. It shrinks (relatively) as
 shot count grows, following the standard $1/\sqrt{\text{shots}}$
 statistical scaling any repeated-sampling estimate obeys.
+
+Here's one real, live run of exactly that: the exact bars are pinned at
+0.5 by construction; the sampled bars are this page's own actual
+`sampleMeasurements` call, jittering around 0.5 by whatever this
+particular run of 5000 shots happened to land on.
+
+<BarChart
+  ariaLabel="Exact GHZ probabilities vs. one real 5000-shot sampled run"
+  bars={[
+    { label: "000 exact", value: 0.5 },
+    { label: "000 sampled", value: ghzCount000 / 5000, highlight: true },
+    { label: "111 exact", value: 0.5 },
+    { label: "111 sampled", value: ghzCount111 / 5000, highlight: true }
+  ]}
+  maxValue={0.6}
+/>
 
 ## Physical Interpretation
 

@@ -1,9 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/simulating-quantum-systems/tensor-network-methods"
 ).map((problem) => problem.meta);
+
+export const mpsBondDimension = 16;
+export const mpsMemoryBytes = (n) => 16 * n * 2 * mpsBondDimension * mpsBondDimension;
 
 export const lessonMeta = {
   title: "Tensor Network Methods",
@@ -68,6 +72,47 @@ tradeoff, not a limitation of current tensor-network techniques waiting
 to be engineered away: highly-entangled states fundamentally do not
 compress this way, by the same information-counting argument that
 established the $2^n$ wall in the first place.
+
+Computational Cost & Scaling's own `stateVectorMemoryBytes` curve makes a
+good baseline for exactly how large this gap gets. A matrix-product-state
+representation with bond dimension $D$ stores roughly $n$ tensors of
+shape $D\times2\times D$, so its total memory is about $32nD^2$ bytes,
+linear in $n$ instead of exponential. Fixing $D=16$ (a modest bond
+dimension, enough for mild entanglement but far from generic) and
+plotting both curves on the same log scale over 10-50 qubits:
+
+<InteractiveSection description="Trace the MPS curve: it barely rises across the whole range, because it only grows linearly in qubit count. The state-vector curve is the same exponential line from Computational Cost & Scaling. The gap between them, not either curve alone, is what 'exploiting limited entanglement' buys you, and only for states an MPS with this bond dimension can actually represent.">
+  <ParametricCurve
+    ariaLabel="Log10 memory in bytes versus qubit count for generic state-vector simulation and a bond-dimension-16 matrix product state, 10 to 50 qubits"
+    frames={[
+      {
+        paramLabel: "10-50 qubits, MPS bond dimension D=16",
+        series: [
+          {
+            label: "state-vector: log₁₀(16·2ⁿ)",
+            color: "brand",
+            points: Array.from({ length: 21 }, (_, i) => 10 + i * 2).map((n) => ({ x: n, y: Math.log10(stateVectorMemoryBytes(n)) }))
+          },
+          {
+            label: "MPS (D=16): log₁₀(32nD²)",
+            color: "accent",
+            points: Array.from({ length: 21 }, (_, i) => 10 + i * 2).map((n) => ({ x: n, y: Math.log10(mpsMemoryBytes(n)) }))
+          }
+        ]
+      }
+    ]}
+    referenceLines={[
+      { y: 9, label: "1 GB" },
+      { y: 15, label: "1 PB" }
+    ]}
+  />
+</InteractiveSection>
+
+This is exactly the tradeoff the rest of this lesson describes in words:
+the MPS curve is only honest for states this bond dimension can actually
+capture. Raise the true entanglement past what $D=16$ can represent and
+the required $D$ climbs back toward $2^{n/2}$, and the accent curve
+above would swing back up to meet the brand one.
 
 ## Physical Interpretation
 

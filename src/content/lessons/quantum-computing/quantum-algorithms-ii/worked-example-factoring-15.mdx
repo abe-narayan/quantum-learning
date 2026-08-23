@@ -1,9 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { periodFindingMeasurementDistribution } from "@/lib/quantum/shor";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/worked-example-factoring-15"
 ).map((problem) => problem.meta);
+
+export const periodDistribution = periodFindingMeasurementDistribution(7, 15, 6);
 
 export const lessonMeta = {
   title: "Worked Example: Factoring 15",
@@ -44,6 +47,11 @@ one genuinely quantum step: the interference pattern from applying the
 QFT to the counting register after the modular-exponentiation state was
 prepared.
 
+<BarChart
+  bars={Array.from({ length: 16 }, (_, i) => ({ label: String(i * 4), value: periodDistribution[i * 4], highlight: periodDistribution[i * 4] > 0 }))}
+  ariaLabel="Measurement probability at every fourth outcome of the period-finding distribution for a=7, N=15, t=6 counting qubits"
+/>
+
 ### Step 3: read off the period
 
 A single measurement returns one of the four peak locations at random,
@@ -81,6 +89,16 @@ Euclid's algorithm twice) is ordinary classical computation a laptop
 performs instantly. This is the concrete, worked version of Lesson 1's
 abstract claim: quantum speedup lives in one specific, narrow subroutine,
 not throughout the whole algorithm.
+
+<PipelineDiagram
+  steps={[
+    { label: "Pick a = 7", detail: "gcd(7, 15) = 1" },
+    { label: "Quantum: period-finding circuit", detail: "peaks at 0, 16, 32, 48", highlight: true },
+    { label: "Read off r = 4", detail: "classicalOrder(7, 15) = 4" },
+    { label: "gcd(a^(r/2) ± 1, N)", detail: "3 × 5 = 15" }
+  ]}
+  ariaLabel="The full factor-15 pipeline, with the single genuinely quantum step highlighted"
+/>
 
 ## Worked Example
 

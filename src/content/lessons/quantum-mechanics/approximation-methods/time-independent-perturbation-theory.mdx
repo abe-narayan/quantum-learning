@@ -1,9 +1,20 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { firstOrderEnergyCorrection, secondOrderEnergyCorrection } from "@/lib/quantum/approximationMethods";
+import { harmonicOscillatorEnergyLevels, positionOperator } from "@/lib/quantum/harmonicOscillator";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/approximation-methods/time-independent-perturbation-theory"
 ).map((problem) => problem.meta);
+
+export const petH0diag = harmonicOscillatorEnergyLevels(8, 1);
+export const petX = positionOperator(8, 1, 1);
+export const petX4 = petX.mul(petX).mul(petX).mul(petX);
+export const petLambda = 0.01;
+export const petHprime = petX4.scale(petLambda);
+export const petE0 = petH0diag[0];
+export const petE1 = petE0 + firstOrderEnergyCorrection(petH0diag, petHprime, 0);
+export const petE2 = petE1 + secondOrderEnergyCorrection(petH0diag, petHprime, 0);
 
 export const lessonMeta = {
   title: "Time-Independent Perturbation Theory",
@@ -105,6 +116,26 @@ This platform's engine confirms this two independent ways: building the
 $x^4$ matrix from `positionOperator` (itself built from `annihilationOperator`/`creationOperator`)
 and reading off `firstOrderEnergyCorrection(H0diag, Hprime, 0)` gives
 $0.0075$ for $\lambda=0.01$, matching $\frac34(0.01)=0.0075$ exactly.
+
+The corrections stack in order, each one a smaller nudge than the last:
+adding `secondOrderEnergyCorrection(H0diag, Hprime, 0)` on top gives the
+full second-order-corrected energy directly below, computed from the same
+$8$-state truncated basis and the same $H'=\lambda x^4$ matrix, not a
+separate calculation.
+
+<EnergyLevelDiagram
+  levels={[
+    { label: "E₀ (unperturbed)", energy: petE0 },
+    { label: "E₀+E₀⁽¹⁾", energy: petE1 },
+    { label: "E₀+E₀⁽¹⁾+E₀⁽²⁾", energy: petE2, highlight: true }
+  ]}
+  ariaLabel="Ground state energy of the quartic anharmonic oscillator, unperturbed, then with the first-order correction added, then with the second-order correction added"
+/>
+
+The first-order step pushes the energy up (a quartic perturbation raises
+the ground state); the second-order step pulls it back down slightly, the
+same sign pattern Practice Question 2 asks you to justify from the
+formula itself.
 
 ## Common Mistakes
 

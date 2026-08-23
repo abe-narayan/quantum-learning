@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/wave-mechanics-challenge"
@@ -96,6 +97,10 @@ time-dependent phases): a genuine beat frequency set exactly by the
 energy gap, exactly what the Wavefunction Explorer's superposition preset
 animates. A single eigenstate has no second term to beat against, so no
 oscillation survives.
+
+<InteractiveSection description="Load the superposition preset and watch the beat frequency. Does it match (E2-E1)/ħ?">
+  <LazyWavefunctionExplorer />
+</InteractiveSection>
 
 ## Common Mistakes, Revisited
 

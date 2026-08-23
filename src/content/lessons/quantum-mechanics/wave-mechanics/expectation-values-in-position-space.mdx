@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/expectation-values-in-position-space"
@@ -87,6 +88,10 @@ Gaussian wave packets this course builds constantly, $\Delta x$ *is* the
 packet's "width" parameter by construction (verified numerically in this
 platform's own test suite: a Gaussian packet built with width $\sigma$ has
 `variancePosition()` equal to $\sigma^2$).
+
+<InteractiveSection description="Widen the Gaussian preset's σ. Predict how ⟨x⟩ and Δx change, then check the readout.">
+  <LazyWavefunctionExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 

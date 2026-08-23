@@ -1,9 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { hydrogenEnergyLevel } from "@/lib/quantum/hydrogenAtom";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels"
 ).map((problem) => problem.meta);
+
+export const hydrogenLevels = [1, 2, 3, 4, 5, 6].map((n) => ({
+  label: `n = ${n}`,
+  energy: hydrogenEnergyLevel(n),
+}));
 
 export const lessonMeta = {
   title: "Hydrogen Energy Levels",
@@ -90,6 +96,16 @@ $$
 
 confirmed directly: `hydrogenEnergyLevel(3) - hydrogenEnergyLevel(2)`
 $\approx1.89\text{ eV}$, matching the well-known Balmer-alpha transition.
+
+The levels crowding together as $n$ grows, exactly as described above,
+is easiest to see plotted rather than just stated:
+
+<EnergyLevelDiagram
+  levels={hydrogenLevels}
+  unit="eV"
+  transition={{ fromLabel: "n = 3", toLabel: "n = 2", caption: "Balmer-α, 1.89 eV" }}
+  ariaLabel="Hydrogen energy levels n=1 through n=6, crowding toward the ionization threshold"
+/>
 
 ## Common Mistakes
 

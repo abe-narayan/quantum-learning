@@ -5,6 +5,11 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/probability-and-quantum-states"
 ).map((problem) => problem.meta);
 
+export const workedExampleCPlus = 0.6;
+export const workedExampleCMinus = 0.8;
+export const workedExamplePPlus = workedExampleCPlus ** 2;
+export const workedExamplePMinus = workedExampleCMinus ** 2;
+
 export const lessonMeta = {
   title: "Probability and Quantum States",
   description:
@@ -153,7 +158,18 @@ $$
 P(+1) = |0.6|^2 = 0.36, \qquad P(-1)=|0.8|^2=0.64
 $$
 
-(Check: $0.36+0.64=1$ ✓, consistent with normalization as required.)
+(Check: $0.36+0.64=1$ ✓, consistent with normalization as required.) The
+Born rule turns an overlap into a bar you can see, not just a number:
+
+<BarChart
+  bars={[
+    { label: "P(+1)", value: workedExamplePPlus },
+    { label: "P(-1)", value: workedExamplePMinus },
+  ]}
+  ariaLabel="Bar chart of P(+1) and P(-1) for the worked example"
+/>
+
+Two bars, summing to exactly 1, visibly, not just algebraically.
 
 $$
 \langle A\rangle = (+1)(0.36) + (-1)(0.64) = -0.28

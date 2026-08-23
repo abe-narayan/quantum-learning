@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"
@@ -134,7 +135,13 @@ $$
 A useful immediate consequence: $|e^{i\theta}| = \sqrt{\cos^2\theta+\sin^2\theta} = 1$
 for every real $\theta$. Multiplying by $e^{i\theta}$ never changes a
 number's modulus. It only rotates it. Keep this fact; it resurfaces
-directly in the Unitary Operators lesson.
+directly in the Unitary Operators lesson. It's easier to feel this as a
+fact about rotation, not just an algebraic identity, by watching it happen
+rather than only reading it:
+
+<InteractiveSection description="Set the phase slider to sweep from 0 to 2π. Watch the point trace the unit circle while the modulus stays fixed at 1. This is e^{iθ}. Now change the magnitude away from 1: does the point still trace a circle, and if so, what changes about it?">
+  <LazyComplexAmplitudeExplorer />
+</InteractiveSection>
 
 ### Multiplication in polar form: phases add
 

@@ -1,9 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { phaseGate } from "@/lib/quantum/gates";
+import { phaseEstimation } from "@/lib/quantum/qft";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/quantum-phase-estimation"
 ).map((problem) => problem.meta);
+
+export const qpeExactProbs = phaseEstimation(phaseGate(2 * Math.PI * (3 / 8)), [Complex.ZERO, Complex.ONE], 3).probabilities();
+export const qpeSmearedProbs = phaseEstimation(phaseGate(2 * Math.PI * (1 / 3)), [Complex.ZERO, Complex.ONE], 3).probabilities();
 
 export const lessonMeta = {
   title: "Quantum Phase Estimation",
@@ -105,6 +111,20 @@ probability $1.0$ (to 6 decimal places) on the combined index
 corresponding to precision register $=3$, eigenstate qubit $=1$, exactly
 as derived, not merely close.
 
+<BarChart
+  bars={[0, 1, 2, 3, 4, 5, 6, 7].map((x) => ({
+    label: String(x),
+    value: qpeExactProbs[x * 2 + 1],
+    highlight: x === 3,
+    caption: `${(qpeExactProbs[x * 2 + 1] * 100).toFixed(1)}%`
+  }))}
+  ariaLabel="Precision-register measurement probability for phi=3/8, t=3, showing a single certain spike at outcome 3"
+/>
+
+Every measured value from `phaseEstimation` here lands on outcome $3$;
+the other seven bars are exactly zero, not just small. That single spike
+is what "exactly representable" means in practice.
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -112,8 +132,21 @@ as derived, not merely close.
 The derivation above assumed $\varphi N$ is an integer; for other phases,
 the precision register's state is a superposition peaked near the nearest
 representable value rather than a single certain outcome, still useful,
-but a probability distribution, not a certainty.
+but a probability distribution, not a certainty. Repeating the same
+circuit for $\varphi=1/3$ (which never terminates in binary) at the same
+$t=3$ shows exactly this: probability smears across several neighboring
+outcomes instead of collapsing onto one.
 </Callout>
+
+<BarChart
+  bars={[0, 1, 2, 3, 4, 5, 6, 7].map((x) => ({
+    label: String(x),
+    value: qpeSmearedProbs[x * 2 + 1],
+    highlight: x === Math.round((1 / 3) * 8),
+    caption: `${(qpeSmearedProbs[x * 2 + 1] * 100).toFixed(1)}%`
+  }))}
+  ariaLabel="Precision-register measurement probability for phi=1/3, t=3, showing probability smeared across several neighboring outcomes instead of one certain spike"
+/>
 
 <Callout type="mistake">
 **Confusing which qubit controls which power of $U$.** Precision qubit $0$

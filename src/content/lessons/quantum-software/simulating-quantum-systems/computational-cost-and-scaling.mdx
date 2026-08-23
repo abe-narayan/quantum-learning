@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/simulating-quantum-systems/computational-cost-and-scaling"
@@ -48,7 +49,36 @@ $16\times2^n$ bytes.
 The crossover from "runs on a laptop" (20 qubits) to "needs a serious
 research cluster" (40 qubits) to "exceeds essentially any single
 existing system's storage" (50 qubits) spans just 30 additional qubits.
-This is what "exponential" concretely looks like.
+This is what "exponential" concretely looks like. The table above shows
+four snapshots; the curve below is every qubit count from 10 to 50,
+each point computed directly from `stateVectorMemoryBytes`, plotted on
+a log scale (a straight line here means *exponential* growth in the
+underlying, un-logged bytes):
+
+<ParametricCurve
+  ariaLabel="State-vector memory (log10 bytes) vs qubit count, 10 to 50 qubits"
+  frames={[
+    {
+      paramLabel: "10-50 qubits",
+      series: [
+        {
+          label: "log₁₀(memory in bytes)",
+          color: "brand",
+          points: Array.from({ length: 21 }, (_, i) => 10 + i * 2).map((n) => ({ x: n, y: Math.log10(stateVectorMemoryBytes(n)) })),
+        },
+      ],
+    }
+  ]}
+  referenceLines={[
+    { y: 9, label: "1 GB" },
+    { y: 15, label: "1 PB" },
+  ]}
+/>
+
+Trace the line past 40 qubits: it crosses from gigabyte territory into
+petabyte territory in barely 10 more qubits, exactly the "narrow
+20-qubit span" the table already states, now visible as a slope rather
+than four isolated rows.
 
 ### Time cost per gate, and per circuit
 

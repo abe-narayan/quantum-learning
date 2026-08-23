@@ -1,9 +1,30 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { firstOrderTransitionProbability, exactTwoLevelTransitionProbability } from "@/lib/quantum/approximationMethods";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/approximation-methods/time-dependent-perturbation-theory"
 ).map((problem) => problem.meta);
+
+export const omegaFi = 1; // Ef - Ei, with Ei=0, Ef=1, ħ=1
+export const tValues = Array(60).fill(0).map((_, i) => (i / 59) * 3);
+export const couplingStrengths = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5];
+
+export const transitionCurveFrames = couplingStrengths.map((V) => ({
+  paramLabel: `V = ${V}`,
+  series: [
+    {
+      label: "Perturbative (1st order)",
+      color: "accent",
+      points: tValues.map((t) => ({ x: t, y: firstOrderTransitionProbability(V, omegaFi, t) })),
+    },
+    {
+      label: "Exact (RK4)",
+      color: "brand",
+      points: tValues.map((t) => ({ x: t, y: exactTwoLevelTransitionProbability(0, 1, V, t, 300) })),
+    },
+  ],
+}));
 
 export const lessonMeta = {
   title: "Time-Dependent Perturbation Theory",
@@ -90,6 +111,24 @@ exact calculation gives $0.363$. The true system is genuinely
 Rabi-oscillating (its exact transition probability rises and falls
 periodically), a behavior the first-order formula, which only captures
 the *initial* rise, cannot see at all.
+
+Watching both curves over time, at several coupling strengths, makes the
+breakdown visible directly rather than only from the table's four rows:
+
+<ParametricCurve
+  frames={transitionCurveFrames}
+  sliderLabel="Coupling strength V"
+  referenceLines={[{ y: 1, label: "P = 1 (unitarity bound)" }]}
+  ariaLabel="Perturbative versus exact transition probability over time, at several coupling strengths"
+/>
+
+Increase $V$ from $0.01$ toward $0.5$: at weak coupling the two curves
+sit right on top of each other. Past roughly $V\approx0.1$, the
+perturbative (accent) curve keeps climbing past the exact (brand) curve's
+first peak, eventually shooting straight through $P=1$, a value no real
+probability can exceed. The exact curve never does; it genuinely
+oscillates, rising and falling, exactly the Rabi behavior described
+above.
 
 ## Common Mistakes
 

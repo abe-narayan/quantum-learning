@@ -5,6 +5,12 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"
 ).map((problem) => problem.meta);
 
+export const csDemoU = { x: 3, y: 1 };
+export const csDemoV = { x: 1, y: 2 };
+export const csDemoC = (csDemoV.x * csDemoU.x + csDemoV.y * csDemoU.y) / (csDemoV.x * csDemoV.x + csDemoV.y * csDemoV.y);
+export const csDemoCV = { x: csDemoC * csDemoV.x, y: csDemoC * csDemoV.y };
+export const csDemoW = { x: csDemoU.x - csDemoCV.x, y: csDemoU.y - csDemoCV.y };
+
 export const lessonMeta = {
   title: "Inner Products and Orthogonality",
   description:
@@ -142,6 +148,22 @@ $w=u-cv$ built during the Cauchy-Schwarz proof is exactly the first step
 of **Gram-Schmidt orthogonalization**: subtracting off the component along
 $v$ leaves a piece orthogonal to it, which is how an arbitrary basis gets
 converted into an orthonormal one, one vector at a time.
+
+For real vectors $u=(3,1)$ and $v=(1,2)$, the proof's $c=\langle
+v,u\rangle/\langle v,v\rangle$ comes out to exactly $1$, so $cv=(1,2)$ and
+$w=u-cv=(2,-1)$. Drawing $w$ starting at $cv$'s tip and ending at $u$'s
+tip shows the whole construction at once: $cv$ is $u$'s shadow along $v$,
+and $w$ is what's left over, sitting at a right angle to $v$.
+
+<VectorDiagram
+  vectors={[
+    { label: "v", x: csDemoV.x, y: csDemoV.y, color: "muted" },
+    { label: "u", x: csDemoU.x, y: csDemoU.y, color: "brand" },
+    { label: "cv", x: csDemoCV.x, y: csDemoCV.y, color: "accent" },
+    { label: "w = u − cv", x: csDemoU.x, y: csDemoU.y, from: { x: csDemoCV.x, y: csDemoCV.y }, color: "foreground", dashed: true }
+  ]}
+  ariaLabel="Vector diagram showing u decomposed into cv, the projection along v, plus w, the leftover piece orthogonal to v"
+/>
 
 ## Physical Interpretation
 

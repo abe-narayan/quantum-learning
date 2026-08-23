@@ -1,0 +1,109 @@
+import type { GateInstruction } from "@/lib/quantum/circuitBuilder";
+
+const ROW_HEIGHT = 56;
+const COLUMN_WIDTH = 64;
+const LABEL_WIDTH = 40;
+
+/**
+ * A fixed, non-interactive circuit diagram — the same SVG rendering
+ * approach as the Circuit Builder simulator's `CircuitDiagram`, but for a
+ * lesson that just wants to SHOW a specific circuit (e.g. "here is the
+ * teleportation circuit") rather than let a student build one. Takes the
+ * platform's real `GateInstruction[]` type directly, so a lesson can
+ * either hand-write a short instruction list or reuse one already built
+ * with `QuantumCircuit` elsewhere in the same file — never a hand-drawn
+ * picture disconnected from the actual gate sequence being taught.
+ */
+export function StaticCircuitDiagram({
+  numQubits,
+  instructions,
+  highlightColumn,
+  ariaLabel,
+}: {
+  numQubits: number;
+  instructions: GateInstruction[];
+  /** Optional 0-indexed column to draw at full emphasis while the rest dim slightly. */
+  highlightColumn?: number;
+  ariaLabel?: string;
+}) {
+  const columns = instructions.length;
+  const width = LABEL_WIDTH + (columns + 1) * COLUMN_WIDTH;
+  const height = numQubits * ROW_HEIGHT;
+
+  return (
+    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={ariaLabel ?? "Circuit diagram"} className="min-w-full">
+        {Array.from({ length: numQubits }, (_, q) => (
+          <g key={`wire-${q}`}>
+            <line
+              x1={LABEL_WIDTH}
+              y1={q * ROW_HEIGHT + ROW_HEIGHT / 2}
+              x2={width}
+              y2={q * ROW_HEIGHT + ROW_HEIGHT / 2}
+              className="stroke-border"
+              strokeWidth={2}
+            />
+            <text x={4} y={q * ROW_HEIGHT + ROW_HEIGHT / 2 + 4} className="fill-muted-foreground text-xs font-mono">
+              q{q}
+            </text>
+          </g>
+        ))}
+
+        {instructions.map((instr, col) => {
+          const cx = LABEL_WIDTH + col * COLUMN_WIDTH + COLUMN_WIDTH / 2;
+          const opacity = highlightColumn === undefined || col === highlightColumn ? 1 : 0.35;
+          const rowY = (q: number) => q * ROW_HEIGHT + ROW_HEIGHT / 2;
+
+          if (instr.targets.length === 1) {
+            const q = instr.targets[0];
+            const label = instr.gate === "RX" || instr.gate === "RY" || instr.gate === "RZ" || instr.gate === "P"
+              ? `${instr.gate}(${instr.param.toFixed(2)})`
+              : instr.gate;
+            return (
+              <g key={col} opacity={opacity}>
+                <rect x={cx - 18} y={rowY(q) - 18} width={36} height={36} rx={8} className="fill-surface stroke-brand" strokeWidth={1.5} />
+                <text x={cx} y={rowY(q) + 5} textAnchor="middle" className="fill-foreground text-sm font-semibold">
+                  {label}
+                </text>
+              </g>
+            );
+          }
+
+          const [a, b] = instr.targets;
+          const top = Math.min(rowY(a), rowY(b));
+          const bottom = Math.max(rowY(a), rowY(b));
+
+          return (
+            <g key={col} opacity={opacity}>
+              <line x1={cx} y1={top} x2={cx} y2={bottom} className="stroke-brand" strokeWidth={2} />
+              {instr.gate === "CNOT" && (
+                <>
+                  <circle cx={cx} cy={rowY(a)} r={5} className="fill-brand" />
+                  <circle cx={cx} cy={rowY(b)} r={12} className="fill-surface stroke-brand" strokeWidth={1.5} />
+                  <line x1={cx - 12} y1={rowY(b)} x2={cx + 12} y2={rowY(b)} className="stroke-brand" strokeWidth={1.5} />
+                  <line x1={cx} y1={rowY(b) - 12} x2={cx} y2={rowY(b) + 12} className="stroke-brand" strokeWidth={1.5} />
+                </>
+              )}
+              {instr.gate === "CZ" && (
+                <>
+                  <circle cx={cx} cy={rowY(a)} r={5} className="fill-brand" />
+                  <circle cx={cx} cy={rowY(b)} r={5} className="fill-brand" />
+                </>
+              )}
+              {instr.gate === "SWAP" && (
+                <>
+                  <text x={cx} y={rowY(a) + 5} textAnchor="middle" className="fill-brand text-base font-bold">
+                    ×
+                  </text>
+                  <text x={cx} y={rowY(b) + 5} textAnchor="middle" className="fill-brand text-base font-bold">
+                    ×
+                  </text>
+                </>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}

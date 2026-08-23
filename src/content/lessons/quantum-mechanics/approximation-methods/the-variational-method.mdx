@@ -1,9 +1,30 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { gaussianTrialEnergy } from "@/lib/quantum/approximationMethods";
+import { createGrid } from "@/lib/quantum/wavefunction";
+import { harmonicOscillatorPotential, harmonicOscillatorEnergyLevel } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/approximation-methods/the-variational-method"
 ).map((problem) => problem.meta);
+
+export const trialGrid = createGrid(1024, 0.05);
+export const trialPotential = harmonicOscillatorPotential(trialGrid, 1, 1);
+export const exactE0 = harmonicOscillatorEnergyLevel(0, 1);
+export const sigmaValues = Array(40).fill(0).map((_, i) => 0.2 + (i / 39) * 2.8);
+
+export const variationalCurveFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "E(σ)",
+        color: "brand",
+        points: sigmaValues.map((sigma) => ({ x: sigma, y: gaussianTrialEnergy(trialGrid, trialPotential, sigma) })),
+      },
+    ],
+  },
+];
 
 export const lessonMeta = {
   title: "The Variational Method",
@@ -93,6 +114,22 @@ particular trial family can, at its optimal parameter, reproduce it
 essentially exactly. (For a Hamiltonian whose true ground state isn't
 close to any Gaussian, the same procedure would still give a valid upper
 bound, just a much looser one.)
+
+The scan itself, plotted directly (every point a real
+`gaussianTrialEnergy` call, not an illustrative curve), shows the bound
+in action:
+
+<ParametricCurve
+  frames={variationalCurveFrames}
+  sliderLabel=""
+  referenceLines={[{ y: exactE0, label: `E₀ = ${exactE0}` }]}
+  ariaLabel="Trial energy E(sigma) versus Gaussian width sigma, with the exact ground energy marked"
+/>
+
+Every point on the curve sits at or above the dashed $E_0=0.5$ line,
+exactly as the theorem requires, dipping down to touch it only right at
+the optimal $\sigma\approx0.704$. Move away from that width in either
+direction (narrower or wider) and $E(\sigma)$ rises; it never dips below.
 
 ## Common Mistakes
 

@@ -32,6 +32,12 @@ export const capstoneState = new StateVector([
   Complex.fromPolar(Math.sqrt(0.3), Math.PI / 3),
 ]);
 
+export const capstoneConcurrence = 2 * Math.sqrt(0.21);
+export const capstoneEntropy = -0.7 * Math.log2(0.7) - 0.3 * Math.log2(0.3);
+export const capstoneMixedness = 1 - 0.58;
+export const capstoneChshFraction = 2.0623 / (2 * Math.SQRT2);
+
+
 ## Motivation
 
 This course built up a full toolkit for describing quantum states beyond
@@ -132,6 +138,21 @@ reach at best $|S|\approx2.20$, a real, genuine violation, consistent
 with $C\approx0.92$ indicating strong-but-not-maximal entanglement, and
 well short of $2\sqrt2$, consistent with this state not being a Bell
 state.
+
+Four independently-built tools, one consistent picture: each bar below
+is shown as a fraction of its own maximum, so a taller bar means "more
+entangled/correlated" the same way across all four, despite their very
+different native scales (the exact numbers are in each caption).
+
+<BarChart
+  bars={[
+    { label: "Concurrence C", value: capstoneConcurrence, caption: `${capstoneConcurrence.toFixed(3)} (max 1)` },
+    { label: "Entropy E", value: capstoneEntropy, caption: `${capstoneEntropy.toFixed(3)} bits (max 1)` },
+    { label: "Reduced mixedness", value: capstoneMixedness / 0.5, caption: `${capstoneMixedness.toFixed(2)} (max 0.5)`, highlight: true },
+    { label: "CHSH S / max", value: capstoneChshFraction, caption: "S≈2.062 (bound 2, max 2.83)" }
+  ]}
+  ariaLabel="Four entanglement-related metrics for this capstone state, each shown as a fraction of its own maximum"
+/>
 
 ## Physical Interpretation
 

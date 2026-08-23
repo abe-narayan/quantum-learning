@@ -1,9 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { PAULI_X, rotationAboutAxis, applySingleQubitGate } from "@/lib/quantum/gates";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/crosstalk"
 ).map((problem) => problem.meta);
+
+export const IDEAL_STATE = applySingleQubitGate(StateVector.zero(2), PAULI_X, 0);
 
 export const lessonMeta = {
   title: "Crosstalk",
@@ -57,6 +61,28 @@ $$
 Confirmed directly via `applySingleQubitGate` and `rotationAboutAxis`
 composed on a 2-qubit `StateVector`, matching this closed form to
 machine precision for every tested $\epsilon$ (0.01 through 0.2 radians).
+
+<InteractiveSection description="Drag ε from 0 up toward 0.2 radians and watch fidelity fall away from 1, slowly at first (it's an even function of ε near 0) then more steeply. The marker's exact value always matches cos²(ε/2), computed fresh at every position, not read off a lookup table.">
+  <ParametricCurve
+    frames={[0, 0.02, 0.05, 0.08, 0.1, 0.15, 0.2].map((epsilon) => ({
+      paramLabel: `ε = ${epsilon.toFixed(2)} rad (F = ${IDEAL_STATE.innerProduct(applySingleQubitGate(IDEAL_STATE, rotationAboutAxis({ x: 1, y: 0, z: 0 }, epsilon), 1)).magnitudeSquared().toFixed(4)})`,
+      series: [
+        { label: "F(ε) = cos²(ε/2)", color: "brand", points: Array.from({ length: 50 }, (_, i) => ({ x: (i / 49) * 0.25, y: IDEAL_STATE.innerProduct(applySingleQubitGate(IDEAL_STATE, rotationAboutAxis({ x: 1, y: 0, z: 0 }, (i / 49) * 0.25), 1)).magnitudeSquared() })) },
+        {
+          label: "current ε",
+          color: "accent",
+          points: [
+            { x: epsilon, y: 0 },
+            { x: epsilon, y: 1 }
+          ]
+        }
+      ]
+    }))}
+    sliderLabel="Leak angle ε"
+    referenceLines={[{ y: 1, label: "F = 1 (no crosstalk)" }]}
+    ariaLabel="Fidelity F(ε) = cos²(ε/2) as a function of the unwanted rotation angle ε on the spectator qubit"
+  />
+</InteractiveSection>
 
 ### Why crosstalk gets worse at scale
 
