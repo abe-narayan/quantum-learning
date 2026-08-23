@@ -5,6 +5,7 @@ import {
   harmonicOscillatorPotential,
   infiniteSquareWellPotential,
   finiteSquareWellPotential,
+  finiteSquareWellGroundStateEnergy,
   barrierPotential,
   infiniteSquareWellEnergyLevel,
   harmonicOscillatorEnergyLevel,
@@ -126,3 +127,38 @@ describe("harmonicOscillatorEigenstate", () => {
 function harmonicOscillatorPotentialFor(grid: ReturnType<typeof createGrid>, omega: number): number[] {
   return grid.x.map((x) => 0.5 * omega * omega * x * x);
 }
+
+describe("finiteSquareWellGroundStateEnergy", () => {
+  it("returns an energy strictly between -depth and 0", () => {
+    const E = finiteSquareWellGroundStateEnergy(1, 5);
+    expect(E).toBeGreaterThan(-5);
+    expect(E).toBeLessThan(0);
+  });
+
+  it("satisfies the transcendental quantization condition directly", () => {
+    const halfWidth = 1;
+    const depth = 5;
+    const E = finiteSquareWellGroundStateEnergy(halfWidth, depth);
+    const k = Math.sqrt(2 * (E + depth));
+    const kappa = Math.sqrt(-2 * E);
+    expect(Math.tan(k * halfWidth)).toBeCloseTo(kappa / k, 6);
+  });
+
+  it("sits above the bottom of the well by less than the infinite well's ground energy of the same width", () => {
+    const halfWidth = 1;
+    const depth = 5;
+    const E = finiteSquareWellGroundStateEnergy(halfWidth, depth);
+    const energyAboveBottom = E + depth;
+    expect(energyAboveBottom).toBeLessThan(infiniteSquareWellEnergyLevel(1, 2 * halfWidth));
+  });
+
+  it("is robust for a shallow well and a narrow deep well", () => {
+    expect(finiteSquareWellGroundStateEnergy(1, 0.3)).toBeCloseTo(-0.103, 2);
+    expect(finiteSquareWellGroundStateEnergy(0.5, 20)).toBeLessThan(0);
+  });
+
+  it("throws on non-positive halfWidth or depth", () => {
+    expect(() => finiteSquareWellGroundStateEnergy(0, 5)).toThrow(/halfWidth/);
+    expect(() => finiteSquareWellGroundStateEnergy(1, 0)).toThrow(/depth/);
+  });
+});

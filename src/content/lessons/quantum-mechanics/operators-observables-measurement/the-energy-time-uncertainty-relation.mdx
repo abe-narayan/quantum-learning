@@ -1,0 +1,186 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/operators-observables-measurement/the-energy-time-uncertainty-relation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Energy-Time Uncertainty Relation",
+  description:
+    "Deriving Delta E * Delta t >= hbar/2 honestly -- time isn't an operator, so this isn't a special case of the general commutator bound, but a direct consequence of Ehrenfest's theorem applied to it.",
+  course: "operators-observables-measurement",
+  module: "the-energy-time-uncertainty-relation",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 24,
+  prerequisites: [
+    "quantum-mechanics/classical-to-quantum/expectation-values-and-uncertainty",
+    "quantum-mechanics/wave-mechanics/wave-packet-dynamics-and-dispersion",
+  ],
+  objectives: [
+    "Explain why time cannot appear in the general uncertainty relation the way position and momentum do",
+    "Define a characteristic evolution timescale for an arbitrary observable and derive the energy-time bound from it",
+    "Show that a stationary state's infinite characteristic timescale is exactly consistent with its zero energy uncertainty",
+  ],
+};
+
+## Motivation
+
+Every uncertainty relation built so far — $\Delta x\Delta p\ge\hbar/2$,
+the general $\Delta A\Delta B\ge\tfrac12|\langle[A,B]\rangle|$ — came from
+a commutator between two *operators*. Energy-time uncertainty,
+$\Delta E\,\Delta t\gtrsim\hbar/2$, is quoted constantly but can't come
+from that same route: in ordinary quantum mechanics (fixed Hamiltonian,
+no relativity), **time is a parameter, not an operator** — there's no
+$\hat t$ to take a commutator with $\hat H$. This lesson derives the
+relation honestly, from a genuinely different starting point.
+
+## Intuition
+
+Instead of asking "how spread out is time," ask a question that *does*
+make sense: "how long does it take for this state to visibly change?"
+Define that as a *timescale*, not an uncertainty in an operator's
+eigenvalues, and the energy-time relation falls out of tools you already
+have — Ehrenfest's theorem and the ordinary operator uncertainty bound.
+
+## Mathematical Development
+
+### A timescale for any observable
+
+For an observable $A$ with no explicit time dependence, define its
+**characteristic evolution timescale** in state $|\psi(t)\rangle$ as
+
+$$
+\Delta t_A \equiv \frac{\Delta A}{\left|\,d\langle A\rangle/dt\,\right|}
+$$
+
+— literally, "how long it takes $\langle A\rangle$ to change by one
+standard deviation, at its current rate of change." A large $\Delta t_A$
+means $\langle A\rangle$ is changing slowly (relative to its own spread);
+a small one means it's changing fast.
+
+### Applying the general uncertainty bound to $H$ and $A$
+
+The general relation from Expectation Values and Uncertainty, applied to
+$H$ and this same $A$:
+
+$$
+\Delta E\,\Delta A \ge \frac12\big|\langle[H,A]\rangle\big|
+$$
+
+### Bringing in Ehrenfest's theorem
+
+Ehrenfest's theorem (derived in Wave Packet Dynamics and Dispersion, for
+*any* observable with no explicit time dependence) states
+
+$$
+\frac{d\langle A\rangle}{dt} = \frac{i}{\hbar}\langle[H,A]\rangle \quad\Longrightarrow\quad \big|\langle[H,A]\rangle\big| = \hbar\left|\frac{d\langle A\rangle}{dt}\right|
+$$
+
+Substituting into the uncertainty bound:
+
+$$
+\Delta E\,\Delta A \ge \frac{\hbar}{2}\left|\frac{d\langle A\rangle}{dt}\right|
+$$
+
+Dividing both sides by $|d\langle A\rangle/dt|$ and recognizing the
+definition of $\Delta t_A$:
+
+$$
+\boxed{\;\Delta E\,\Delta t_A \ge \frac{\hbar}{2}\;}
+$$
+
+— derived, not asserted, and honest about what $\Delta t$ actually means:
+not an uncertainty in a measured time, but the shortest timescale on
+which *any* observable of the system can change appreciably.
+
+## Physical Interpretation
+
+A state with a very sharply defined energy ($\Delta E$ small) must have
+*every* observable's expectation value changing slowly — a large
+$\Delta t_A$ for every choice of $A$. Taken to its limit, this is exactly
+the stationary-state result already known from two earlier courses:
+
+- **From Classical to Quantum**'s Stationary States lesson: an energy
+  eigenstate has $\Delta E=0$ exactly.
+- **This relation**, then, demands $\Delta t_A=\infty$ for *every*
+  observable $A$ — $\langle A\rangle$ never changes at all.
+- **Directly confirmed**: an energy eigenstate's $|\psi(t)|^2$ (and hence
+  every expectation value built from it) is exactly time-independent,
+  proven in both the finite-dimensional and continuous-position settings
+  already. The energy-time relation and the stationary-state result are
+  not two separate facts — one is the extreme limit of the other.
+
+## Worked Example
+
+**A state has $\Delta E = 0.5$ (natural units, $\hbar=1$) and, for some
+observable $A$, $\Delta A = 2$ with $|d\langle A\rangle/dt| = 3$. Is the
+energy-time bound satisfied?**
+
+$$
+\Delta t_A = \frac{\Delta A}{|d\langle A\rangle/dt|} = \frac{2}{3} \approx 0.667
+$$
+
+$$
+\Delta E\,\Delta t_A = 0.5 \times 0.667 \approx 0.333
+$$
+
+Compare to $\hbar/2=0.5$: $0.333 < 0.5$ — **this would violate the
+bound**, meaning such a state (with exactly these numbers) cannot
+actually exist as a valid quantum state. In practice, if $\Delta E=0.5$
+is fixed, self-consistency forces $\Delta A/|d\langle A\rangle/dt|\ge1$
+for every observable — the relation is a genuine constraint on what
+combinations of these quantities are physically possible, not just a
+computed check.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating $\Delta t$ as "the uncertainty in a measured time," the way
+$\Delta x$ is the uncertainty in a measured position.** Time is never a
+measurement outcome with a probability distribution in this framework —
+$\Delta t_A$ is a *timescale derived from* $A$'s dynamics, a
+fundamentally different kind of quantity.
+</Callout>
+
+<Callout type="mistake">
+**Trying to derive this the same way as $\Delta x\Delta p\ge\hbar/2$,
+via $[\hat E,\hat t]$.** There is no $\hat t$ operator to commute with
+anything in ordinary (non-relativistic, fixed-Hamiltonian) quantum
+mechanics — this is exactly why the derivation had to go through
+Ehrenfest's theorem instead.
+</Callout>
+
+## Practice Questions
+
+1. For a stationary state, use this lesson's relation directly (not the
+   stationary-state result itself) to argue that $\Delta t_A$ must be
+   infinite for every $A$, given $\Delta E=0$.
+2. A state has $\Delta E=2$. What is the minimum possible value of
+   $\Delta t_A$ for any observable $A$ in this state?
+3. Explain in one or two sentences why a *short-lived* excited state
+   (one that decays quickly, small $\Delta t$ for some relevant
+   observable) is expected to have a correspondingly large spread in
+   energy — a real, measurable effect called "natural linewidth."
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\Delta E\,\Delta t_A\ge\hbar/2$ is derived from the general operator
+  uncertainty bound applied to $H$ and any observable $A$, combined with
+  Ehrenfest's theorem — not from a commutator with a nonexistent time
+  operator.
+- $\Delta t_A\equiv\Delta A/|d\langle A\rangle/dt|$ is a timescale, not an
+  uncertainty in a measured quantity.
+- The relation's extreme limit ($\Delta E=0 \Rightarrow \Delta
+  t_A=\infty$) exactly reproduces the already-proven fact that stationary
+  states never change — a genuine consistency check across three
+  separate derivations in this platform's courses.
+
+## Further Exploration
+
+Next: **Degeneracy in Practice**, a single fully worked multi-qubit
+system pulling together spectral decomposition, compatible observables,
+and the generalized measurement postulate from earlier in this course.

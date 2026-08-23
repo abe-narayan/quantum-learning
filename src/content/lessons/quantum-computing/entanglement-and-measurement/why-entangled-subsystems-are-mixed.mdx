@@ -1,0 +1,204 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Why Entangled Subsystems Are Mixed",
+  description:
+    "A complete proof, for 2-qubit pure states, that a reduced state is mixed exactly when the global state is entangled — connecting reduced purity directly to the separability determinant this platform already computes.",
+  course: "entanglement-and-measurement",
+  module: "why-entangled-subsystems-are-mixed",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/entanglement-and-measurement/partial-trace-and-reduced-states"],
+  objectives: [
+    "Derive an exact algebraic identity relating a 2-qubit reduced state's purity to its separability determinant",
+    "Prove that a pure 2-qubit state is a product state if and only if both reduced states are pure",
+    "Explain why this identity does not, by itself, extend to systems larger than two qubits",
+  ],
+};
+
+## Motivation
+
+The last lesson found something that looked almost too convenient: a
+maximally entangled Bell state's reduced density matrix came out exactly
+maximally mixed. Was that a coincidence of the specific example, or is
+there a real, provable connection between "how entangled the whole state
+is" and "how mixed each part is"? This lesson proves there is — and
+gets an exact formula out of the proof, not just a qualitative statement.
+
+## Mathematical Development
+
+### Setting up the general 2-qubit case
+
+Let $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$ be any
+normalized 2-qubit state. Quantum Gates & Circuits already established
+(and this course's Concurrence lesson will lean on again) that
+$|\psi\rangle$ is a product state exactly when $ad-bc=0$ — that's
+precisely `testSeparability`'s determinant test.
+
+The partial trace (last lesson) gives qubit 0's reduced state:
+
+$$
+\rho_A = \begin{pmatrix} |a|^2+|b|^2 & ac^*+bd^* \\ (ac^*+bd^*)^* & |c|^2+|d|^2 \end{pmatrix}
+$$
+
+Write $p=|a|^2+|b|^2$ (so $q=|c|^2+|d|^2=1-p$ by normalization) and
+$z=ac^*+bd^*$ for the off-diagonal entry.
+
+### The purity identity, derived
+
+For any $2\times2$ density matrix $\begin{pmatrix}p&z\\z^*&1-p\end{pmatrix}$,
+direct matrix multiplication gives
+$\text{Tr}(\rho_A^2)=p^2+(1-p)^2+2|z|^2$. So:
+
+$$
+1-\text{Tr}(\rho_A^2) = 1-p^2-(1-p)^2-2|z|^2 = 2p(1-p)-2|z|^2 = 2\big(pq-|z|^2\big)
+$$
+
+Now expand $pq-|z|^2$ directly in terms of $a,b,c,d$:
+
+$$
+pq = |a|^2|c|^2+|a|^2|d|^2+|b|^2|c|^2+|b|^2|d|^2
+$$
+
+$$
+|z|^2 = |ac^*+bd^*|^2 = |a|^2|c|^2+|b|^2|d|^2 + 2\,\text{Re}(ab^*c^*d)
+$$
+
+$$
+pq-|z|^2 = |a|^2|d|^2+|b|^2|c|^2-2\,\text{Re}(ab^*c^*d)
+$$
+
+Compare this to $|ad-bc|^2=(ad-bc)(a^*d^*-b^*c^*)=|a|^2|d|^2+|b|^2|c|^2-2\,\text{Re}(ad\,b^*c^*)$.
+Since complex multiplication commutes, $ab^*c^*d=ad\,b^*c^*$ — the same
+product, just reordered — so $pq-|z|^2=|ad-bc|^2$ exactly. Substituting
+back:
+
+$$
+\boxed{1-\text{Tr}(\rho_A^2) = 2|ad-bc|^2}
+$$
+
+An exact algebraic identity, holding for *every* normalized 2-qubit pure
+state, with no approximation anywhere in the derivation. It is verified
+numerically against the engine (`purity` composed with
+`reducedDensityMatrixQubit0`, compared to `testSeparability`'s
+determinant) for a Bell state, a product state, a partially entangled
+state, and an unstructured "random-looking" state — all four agree to
+floating-point precision.
+
+### The theorem
+
+Since $|ad-bc|^2\geq0$ always, the identity immediately gives
+$\text{Tr}(\rho_A^2)\leq1$, with equality **exactly when** $ad-bc=0$ —
+exactly `testSeparability`'s condition for a product state. This proves,
+for 2-qubit pure states:
+
+$$
+\rho_A \text{ is pure} \iff |\psi\rangle_{AB} \text{ is a product state} \iff \rho_A \text{ is not mixed}
+$$
+
+Equivalently: **a 2-qubit pure state's reduced state is mixed if and
+only if the state is entangled.** Not "mixed states are somehow
+associated with entanglement" as a vague slogan — a specific, provable,
+iff statement, with the exact amount of mixedness ($1-\text{Tr}(\rho_A^2)$)
+pinned to the exact amount the separability determinant is nonzero by.
+
+### Scope: this is a 2-qubit statement
+
+This proof used the 2-qubit reduced-density-matrix formula explicitly —
+it is not a general $n$-qubit argument. The underlying idea (a pure
+global state has a mixed reduced state exactly when there's entanglement
+across the cut) is true far more generally, provable with the Schmidt
+decomposition for any bipartite split of any dimension — but that
+general proof needs a general eigendecomposition, which this platform
+does not implement (see `docs/ARCHITECTURE.md`). The identity boxed
+above is airtight for exactly the case this course actually uses: two
+qubits, one cut.
+
+## Physical Interpretation
+
+A reduced state's mixedness is not "our uncertainty leaking in" the way
+it was for the classical mixtures two lessons ago — the global state
+$|\psi\rangle_{AB}$ is completely known, with zero uncertainty about it
+whatsoever. The mixedness of $\rho_A$ is instead a direct, provable
+signature of *correlation with something outside the subsystem being
+described*. This is the deepest sense in which entanglement is not
+classical correlation: even perfect, complete knowledge of the whole
+system does not give perfect knowledge of any one part of it, whenever
+that part is entangled with the rest.
+
+## Worked Example
+
+**Use the boxed identity to find $\text{Tr}(\rho_A^2)$ for
+$|\psi\rangle=\sqrt{0.9}\,|00\rangle+\sqrt{0.1}\,|11\rangle$ without
+computing the partial trace directly.**
+
+Here $a=\sqrt{0.9}$, $b=c=0$, $d=\sqrt{0.1}$, so
+$ad-bc=\sqrt{0.9}\sqrt{0.1}=\sqrt{0.09}=0.3$. By the identity,
+$1-\text{Tr}(\rho_A^2)=2(0.3)^2=0.18$, so $\text{Tr}(\rho_A^2)=0.82$ —
+closer to 1 (less mixed) than the Bell state's 0.5, matching the
+intuition that this state is less entangled than a maximally entangled
+Bell pair (its amplitudes are $90\%/10\%$, not $50\%/50\%$).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking any nonzero purity loss means "maximal" entanglement.**
+$1-\text{Tr}(\rho_A^2)$ ranges continuously from 0 (product state) to
+0.5 (maximally entangled, at $|ad-bc|=0.5$, the largest a normalized
+state allows) — it's a graded quantity, not a yes/no flag.
+</Callout>
+
+<Callout type="mistake">
+**Assuming this proof generalizes automatically to 3+ qubits, or to
+mixed global states.** It doesn't, without further work this platform
+doesn't undertake (see the Scope note above). Overclaiming this here
+would be exactly the kind of unjustified generalization this course
+avoids elsewhere.
+</Callout>
+
+## Practice Questions
+
+1. Using the boxed identity, find $\text{Tr}(\rho_A^2)$ for
+   $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$ without
+   computing the partial trace directly.
+2. For $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$,
+   express $\text{Tr}(\rho_A^2)$ as a function of $\theta$ using the
+   identity, and confirm it matches $\cos^4\theta+\sin^4\theta$ (which
+   you can get directly from $\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$).
+3. Confirm algebraically that $|ad-bc|$ reaches its maximum possible
+   value, $0.5$, for a Bell state, and explain why normalization
+   $|a|^2+|b|^2+|c|^2+|d|^2=1$ prevents it from ever exceeding $0.5$ for
+   a state of the form $a|00\rangle+d|11\rangle$ ($b=c=0$).
+4. Why does this lesson's proof break down immediately for a 3-qubit
+   pure state, even before reaching the question of a general
+   eigensolver? (Hint: what does $\rho_A$ even look like — its dimension
+   — once "the rest of the system" is two qubits instead of one?)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- For any normalized 2-qubit pure state $a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$,
+  $1-\text{Tr}(\rho_A^2)=2|ad-bc|^2$ — an exact algebraic identity, proven
+  by direct expansion.
+- Consequently, $\rho_A$ is pure if and only if the global state is a
+  product state — entanglement and reduced-state mixedness are
+  mathematically equivalent for 2-qubit pure states.
+- The mixedness of an entangled subsystem's reduced state reflects
+  correlation with the rest of the system, not any uncertainty about the
+  (perfectly well-defined) global state.
+- This specific proof is a 2-qubit result; the broader idea generalizes
+  via the Schmidt decomposition, which this platform does not implement
+  in general.
+
+## Further Exploration
+
+Next: **Purity, von Neumann Entropy, and Information**, which puts
+today's purity-based reasoning on a more complete footing with the
+standard information-theoretic measure of mixedness.

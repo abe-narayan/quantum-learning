@@ -44,6 +44,39 @@ export function finiteSquareWellPotential(grid: Grid1D, halfWidth: number, depth
   return grid.x.map((x) => (Math.abs(x) <= halfWidth ? -depth : 0));
 }
 
+/**
+ * The ground (lowest, even-parity) bound-state energy of a finite square
+ * well of half-width `halfWidth` and depth `depth`, found by bisection on
+ * the well's transcendental quantization condition
+ *
+ *   tan(k * halfWidth) = sqrt(2*depth - k^2) / k
+ *
+ * (derived from matching psi and psi' at the well's edge for the
+ * even-parity ansatz — oscillating inside, exponentially decaying
+ * outside). Returns E relative to V=0 outside the well, i.e. a negative
+ * number satisfying -depth < E < 0. This is deliberately narrow in scope
+ * — the ground state only, via a single bounded root-find on a
+ * well-understood equation — not a general eigensolver (see
+ * docs/ARCHITECTURE.md for why this platform doesn't have one of those).
+ */
+export function finiteSquareWellGroundStateEnergy(halfWidth: number, depth: number): number {
+  if (!(halfWidth > 0)) throw new Error("finiteSquareWellGroundStateEnergy requires halfWidth > 0.");
+  if (!(depth > 0)) throw new Error("finiteSquareWellGroundStateEnergy requires depth > 0.");
+
+  const kMax = Math.min(Math.PI / (2 * halfWidth), Math.sqrt(2 * depth));
+  const quantizationGap = (k: number) => Math.tan(k * halfWidth) - Math.sqrt(2 * depth - k * k) / k;
+
+  let lo = 1e-9;
+  let hi = kMax - 1e-9;
+  for (let i = 0; i < 100; i++) {
+    const mid = (lo + hi) / 2;
+    if (quantizationGap(mid) > 0) hi = mid;
+    else lo = mid;
+  }
+  const k = (lo + hi) / 2;
+  return (k * k) / 2 - depth;
+}
+
 /** A rectangular barrier of full width `2*halfWidth`, height `height`, centered at `center`. */
 export function barrierPotential(grid: Grid1D, center: number, halfWidth: number, height: number): number[] {
   return grid.x.map((x) => (Math.abs(x - center) <= halfWidth ? height : 0));

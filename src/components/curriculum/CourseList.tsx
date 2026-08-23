@@ -22,6 +22,10 @@ export function CourseList({
         const lessonByModule = new Map(
           lessons.filter((lesson) => lesson.course === course.slug).map((lesson) => [lesson.module, lesson])
         );
+        const totalModules = course.modules.length;
+        const completedModules = course.modules.filter((module) => lessonByModule.has(module.slug)).length;
+        const isComplete = completedModules === totalModules;
+        const isStarted = completedModules > 0;
 
         return (
           <Card key={course.slug}>
@@ -30,9 +34,12 @@ export function CourseList({
                 <h3 className="text-lg font-semibold text-foreground">{course.title}</h3>
                 <p className="mt-1 max-w-xl text-sm text-muted-foreground">{course.description}</p>
               </div>
-              <div className="flex shrink-0 flex-wrap gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
                 <Badge tone="brand">{DIFFICULTY_LABEL[course.difficulty]}</Badge>
                 <Badge>{course.estimatedHours}h</Badge>
+                <Badge tone={isComplete ? "accent" : isStarted ? "neutral" : "neutral"}>
+                  {completedModules}/{totalModules} lessons{isComplete ? " · complete" : ""}
+                </Badge>
               </div>
             </div>
 

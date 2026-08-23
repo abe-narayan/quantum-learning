@@ -1,0 +1,172 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Measurement Postulate, Generalized",
+  description:
+    "Restating Born's rule with projectors instead of raw coefficients -- correct whether or not the measured eigenvalue is degenerate, and reducing exactly to the familiar |c_i|^2 form when it isn't.",
+  course: "operators-observables-measurement",
+  module: "the-measurement-postulate-generalized",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 22,
+  prerequisites: [
+    "quantum-mechanics/operators-observables-measurement/complete-sets-of-commuting-observables",
+    "quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics",
+  ],
+  objectives: [
+    "State the measurement postulate using projectors and show it reduces to |c_i|^2 in the nondegenerate case",
+    "Compute a measurement probability and the post-measurement collapsed state for a degenerate eigenvalue",
+    "Explain why collapse is described by the projector, not by simply picking one eigenvector arbitrarily",
+  ],
+};
+
+## Motivation
+
+From Classical to Quantum's measurement postulate was stated as
+$P(a_i)=|c_i|^2$ for the coefficient $c_i=\langle a_i|\psi\rangle$ of a
+*single* eigenvector $|a_i\rangle$. That's exactly right when $a_i$ is
+nondegenerate — but it doesn't even typecheck when several eigenvectors
+share the eigenvalue $a_i$, since there's no single $|a_i\rangle$ to take
+a coefficient of. This lesson fixes that using last lesson's projectors.
+
+## Intuition
+
+Instead of asking "how much of this *one* eigenvector is in my state," the
+generalized rule asks "how much of my state lies in this *whole
+eigenspace*" — a question that makes sense whether the eigenspace is one
+dimension or several, answered by the projector onto that eigenspace.
+
+## Mathematical Development
+
+### The generalized Born rule
+
+For an observable $A=\sum_i a_iP_i$ (spectral decomposition, distinct
+eigenvalues $a_i$, projectors $P_i$ possibly higher-rank) measured on a
+normalized state $|\psi\rangle$:
+
+$$
+P(a_i) = \langle\psi|P_i|\psi\rangle
+$$
+
+and the state **collapses** to
+
+$$
+|\psi\rangle \;\longrightarrow\; \frac{P_i|\psi\rangle}{\|P_i|\psi\rangle\|}
+$$
+
+— literally: apply the projector (keeping only the component of
+$|\psi\rangle$ lying in that eigenspace), then renormalize. This is
+exactly `state.applyMatrix(P_i).normalize()` using operations this
+platform's `StateVector` already had.
+
+### Reducing to the familiar case
+
+When $a_i$ is nondegenerate, $P_i=|a_i\rangle\langle a_i|$, so
+
+$$
+P(a_i) = \langle\psi|a_i\rangle\langle a_i|\psi\rangle = \langle a_i|\psi\rangle^*\langle a_i|\psi\rangle = |c_i|^2
+$$
+
+using $\langle\psi|a_i\rangle=\langle a_i|\psi\rangle^*$ (conjugate
+symmetry of the inner product) — exactly recovering the earlier formula.
+The generalized rule isn't a different postulate, it's the same one,
+correctly accounting for degeneracy.
+
+### Degenerate case: probabilities add
+
+When $a_i$ is degenerate with orthonormal eigenvectors
+$|e_{i,1}\rangle,\ldots,|e_{i,d}\rangle$, expanding
+$P_i=\sum_k|e_{i,k}\rangle\langle e_{i,k}|$ gives
+
+$$
+P(a_i) = \sum_{k=1}^d |\langle e_{i,k}|\psi\rangle|^2
+$$
+
+— the sum of the individual squared-coefficient probabilities across
+every eigenvector *sharing* that eigenvalue. This matches ordinary
+probability theory exactly: "probability the outcome is $a_i$" is the sum
+over every way the system could produce that outcome.
+
+## Physical Interpretation
+
+Collapse to $P_i|\psi\rangle/\|P_i|\psi\rangle\|$ (rather than, say,
+picking one specific eigenvector out of the degenerate subspace) is the
+physically correct rule: a measurement that only resolves "the eigenvalue
+is $a_i$" gives you no information about *where* in that eigenspace the
+state actually was, and — critically — doesn't destroy whatever
+information *was* there. Projecting keeps exactly the part of
+$|\psi\rangle$ consistent with the observed outcome, nothing more,
+nothing less.
+
+## Worked Example
+
+**For $N=\mathrm{diag}(1,1,2)$ and $|\psi\rangle=\tfrac{1}{\sqrt3}
+(|0\rangle+|1\rangle+|2\rangle)$, find $P(N=1)$ and the post-measurement
+state.**
+
+$$
+P(N{=}1) = \langle\psi|P_1|\psi\rangle = \left|\frac{1}{\sqrt3}\right|^2 + \left|\frac{1}{\sqrt3}\right|^2 = \frac13+\frac13 = \frac23
+$$
+
+$$
+P_1|\psi\rangle = \frac{1}{\sqrt3}|0\rangle + \frac{1}{\sqrt3}|1\rangle, \qquad \|P_1|\psi\rangle\| = \sqrt{\frac23}
+$$
+
+$$
+|\psi'\rangle = \frac{P_1|\psi\rangle}{\sqrt{2/3}} = \frac{1}{\sqrt2}|0\rangle + \frac{1}{\sqrt2}|1\rangle
+$$
+
+(A quick check: $P(N{=}2)=|1/\sqrt3|^2=\tfrac13$, and $\tfrac23+\tfrac13=1$
+— probabilities sum to 1, as they must.)
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Collapsing to an arbitrarily chosen single eigenvector.** The correct
+post-measurement state is the *normalized projection*, which in general
+retains a superposition *within* the degenerate eigenspace — only if the
+pre-measurement state happened to already be a single eigenvector does
+collapse leave it looking "simple."
+</Callout>
+
+<Callout type="mistake">
+**Forgetting to renormalize after applying the projector.** $P_i|\psi
+\rangle$ generally has norm less than 1 (some probability went to *other*
+outcomes) — dividing by $\|P_i|\psi\rangle\|$ is not optional.
+</Callout>
+
+## Practice Questions
+
+1. For the worked example's $|\psi\rangle$, verify $P(N{=}2)=\tfrac13$
+   directly using the projector $P_2=|2\rangle\langle2|$.
+2. If $|\psi\rangle$ had been exactly $|0\rangle$ to begin with, what
+   would $P(N{=}1)$ and the post-measurement state be? (No calculation
+   needed if you reason about it correctly.)
+3. Explain briefly why $\sum_iP(a_i)=1$ is guaranteed for *any* normalized
+   $|\psi\rangle$, using completeness ($\sum_iP_i=I$) from the first
+   lesson of this course.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $P(a_i)=\langle\psi|P_i|\psi\rangle$, with collapse to
+  $P_i|\psi\rangle/\|P_i|\psi\rangle\|$ — correct for any eigenvalue,
+  degenerate or not.
+- This reduces exactly to $|c_i|^2$ in the nondegenerate case — a
+  generalization, not a different rule.
+- In the degenerate case, the probability is the sum of $|c|^2$ over
+  every eigenvector sharing that eigenvalue, and the post-measurement
+  state can remain a genuine superposition within the degenerate
+  subspace.
+
+## Further Exploration
+
+Next: **Sequential Measurements and Incompatibility**, making
+"measuring one observable disturbs another" completely concrete with a
+worked numeric example using operators you already know well.

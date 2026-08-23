@@ -1,0 +1,187 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Concurrence: A Two-Qubit Entanglement Measure",
+  description:
+    "A second, independently-computed entanglement measure for pure 2-qubit states, built directly from amplitudes rather than eigenvalues — proven to agree exactly with entanglement entropy on which states are entangled, and derived from machinery this platform already had.",
+  course: "entanglement-and-measurement",
+  module: "concurrence-a-two-qubit-measure",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states"],
+  objectives: [
+    "Define concurrence for a pure 2-qubit state directly from its amplitudes",
+    "Prove concurrence's exact algebraic relationship to reduced-state purity",
+    "State precisely why the general mixed-state Wootters concurrence formula is out of scope here",
+  ],
+};
+
+## Motivation
+
+Entanglement entropy needed an eigenvalue calculation — small for a
+$2\times2$ reduced state, but a genuinely different kind of computation
+than anything amplitude-based. **Concurrence** answers the same
+question — how entangled is this pure 2-qubit state? — with a formula
+built directly from the four amplitudes, no diagonalization required.
+Better still, this course doesn't have to build it from scratch: it's
+already sitting inside a function this platform wrote long before this
+course existed.
+
+## Mathematical Development
+
+### The formula, and where it already lives
+
+For $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$
+(normalized), **concurrence** is defined as
+
+$$
+C(|\psi\rangle) = 2|ad-bc|
+$$
+
+Quantum Gates & Circuits' `testSeparability` already computes
+`determinantMagnitude`$=|ad-bc|$ to test whether $|\psi\rangle$ factors
+into a product state — the *same* quantity, used there as a yes/no
+separability test. Concurrence is nothing more than twice that same
+number, kept as a graded quantity instead of thresholded into a boolean.
+`concurrenceOfPureState` in `entanglement.ts` is a two-line function that
+calls `testSeparability` and doubles its determinant — not a
+coincidence of implementation convenience, but a direct reuse of an
+identity that was already proven true.
+
+### Exact relationship to purity
+
+Lesson 5 proved $1-\text{Tr}(\rho_A^2)=2|ad-bc|^2$ for any normalized
+2-qubit pure state. Substituting $C=2|ad-bc|$, i.e.
+$|ad-bc|=C/2$:
+
+$$
+1-\text{Tr}(\rho_A^2) = 2\left(\frac{C}{2}\right)^2 = \frac{C^2}{2}
+\qquad\Longleftrightarrow\qquad
+C = \sqrt{2\big(1-\text{Tr}(\rho_A^2)\big)}
+$$
+
+Concurrence and reduced purity are not just qualitatively related —
+they determine each other exactly, by this formula. Both are 0 together
+(product states) and both reach their respective maxima together (Bell
+states: $C=1$, $\text{Tr}(\rho_A^2)=0.5$).
+
+### Range and the partially-entangled family
+
+$C$ ranges from $0$ (product state) to $1$ (Bell state — the maximum a
+normalized state allows, matching Lesson 5's proof that $|ad-bc|\leq0.5$).
+For $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$
+($b=c=0$): $C(\theta)=2|\cos\theta\sin\theta|=|\sin2\theta|$ — computed
+directly and checked against the engine for several values of $\theta$,
+including the general formula, not just the endpoints.
+
+### Concurrence vs. entanglement entropy: related, not identical
+
+Both $C(\theta)=|\sin2\theta|$ and $E(\theta)$ (Lesson 7's entanglement
+entropy for the same family) are 0 at $\theta=0$ and reach their maximum
+at $\theta=\pi/4$, and both are verified to be zero or nonzero together
+for every state tested — but they are genuinely different functions of
+$\theta$, not two names for the same number. $C$ is built from
+amplitudes with no logarithm anywhere; $E$ is a Shannon entropy, built
+from $\cos^2\theta,\sin^2\theta$ through $-p\log_2p$ terms. They agree on
+*which* states are entangled, and on the direction of "more" vs. "less,"
+without being numerically equal at intermediate $\theta$ — two
+independent, cross-checking measures rather than duplicates of each
+other.
+
+### Scope: pure two-qubit states only
+
+$C=2|ad-bc|$ is the pure-state concurrence formula for exactly two
+qubits — it is not the general definition. The Wootters concurrence for
+a general *mixed* two-qubit state requires the eigenvalues of the
+non-Hermitian matrix product $\rho(\sigma_y\otimes\sigma_y)\rho^*(\sigma_y\otimes\sigma_y)$,
+a genuinely harder numerical problem (eigenvalues of a non-Hermitian
+matrix, which don't even have to be real) that this platform's
+$2\times2$-Hermitian-only eigensolver cannot handle and does not attempt.
+`concurrenceOfPureState` is named and scoped accordingly — it is not a
+drop-in replacement for the general formula, and this course does not
+claim it is.
+
+## Physical Interpretation
+
+Two structurally different roads — diagonalizing a reduced density
+matrix, or evaluating a determinant of amplitudes — arrive at
+consistent conclusions about how entangled a state is. That agreement is
+itself informative: it means "how entangled is this state" is a
+well-posed physical question with an answer robust to which valid
+measure you use to ask it, at least for the pure 2-qubit states this
+course covers.
+
+## Worked Example
+
+**Compute the concurrence of $|\psi(0.3)\rangle=\cos(0.3)|00\rangle+\sin(0.3)|11\rangle$
+two ways: directly from the determinant, and from the $|\sin2\theta|$
+shortcut.**
+
+Directly: $a=\cos(0.3)\approx0.9553$, $d=\sin(0.3)\approx0.2955$,
+$b=c=0$, so $|ad-bc|=|ad|\approx0.2823$, giving $C\approx0.5646$.
+Via the shortcut: $|\sin(2\times0.3)|=|\sin(0.6)|\approx0.5646$ — the
+same value, as the derivation guarantees for every $\theta$, not just
+this one.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Using $C=2|ad-bc|$ on a mixed 2-qubit density matrix.** This formula
+requires a pure state's amplitudes $a,b,c,d$ directly — it has no
+well-defined input for a mixed $\rho_{AB}$. The general mixed-state
+Wootters concurrence is a different, more involved formula this platform
+does not implement (see the Scope note above).
+</Callout>
+
+<Callout type="mistake">
+**Expecting $C(\theta)$ and $E(\theta)$ to be numerically equal.** They
+agree on the two endpoints ($0$ and maximal) and on ordering, but are
+different functions in between — check the worked example's
+$\theta=0.3$: $C\approx0.565$, while $E(0.3)$ (Lesson 7's entropy
+formula) comes out to a different number.
+</Callout>
+
+## Practice Questions
+
+1. Compute the concurrence of $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$
+   directly from $a,b,c,d$.
+2. Using the exact relationship derived above, find $\text{Tr}(\rho_A^2)$
+   for a state with concurrence $C=0.6$, without computing the reduced
+   density matrix directly.
+3. Compute $E(0.3)$ (entanglement entropy, from Lesson 7's formula, using
+   $\cos^2(0.3)\approx0.9126,\sin^2(0.3)\approx0.0874$) and compare it
+   numerically to $C(0.3)\approx0.5646$ from the worked example — confirm
+   they're close but not equal.
+4. Explain, using this lesson's exact identity, why $C=1$ forces
+   $\text{Tr}(\rho_A^2)=0.5$ exactly — i.e., why maximal concurrence
+   necessarily means a maximally mixed reduced state, not just a "very
+   mixed" one.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $C(|\psi\rangle)=2|ad-bc|$ is exactly twice the determinant magnitude
+  `testSeparability` already computes — a direct reuse, not a
+  reimplementation.
+- $C$ and reduced purity satisfy the exact identity
+  $C=\sqrt{2(1-\text{Tr}(\rho_A^2))}$, tying the two measures together
+  precisely.
+- $C$ ranges from 0 (product states) to 1 (Bell states), agreeing with
+  entanglement entropy on which states are entangled without being
+  numerically identical to it.
+- This is the pure two-qubit formula specifically; the general
+  mixed-state Wootters concurrence needs non-Hermitian eigenvalues this
+  platform does not compute.
+
+## Further Exploration
+
+Next: **Unitary Evolution and Measurement of Density Matrices**, which
+extends the density-matrix formalism past static description — to how
+$\rho$ changes under gates and what happens to it during measurement.

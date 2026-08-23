@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { JOURNEY_STEPS } from "@/lib/journey";
 
@@ -10,11 +11,17 @@ export function LearningJourney() {
             The learning journey
           </p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
-            From a single qubit to real algorithms
+            From the math to real algorithms
           </h2>
           <p className="mt-3 text-muted-foreground">
             Each stage builds directly on the last — the math, the physics, and
-            the intuition all move together.
+            the intuition all move together. The same foundations also lead
+            into a full theoretical-physics track, from the Schrödinger
+            equation through tunneling and beyond — see the{" "}
+            <Link href="/learn" className="text-brand hover:underline">
+              full curriculum
+            </Link>
+            .
           </p>
         </div>
 

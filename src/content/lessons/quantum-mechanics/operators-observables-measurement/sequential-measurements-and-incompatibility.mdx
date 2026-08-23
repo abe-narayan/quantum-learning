@@ -1,0 +1,141 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Sequential Measurements and Incompatibility",
+  description:
+    "A fully worked, numeric measure-then-measure-then-measure-again sequence on a single qubit, showing exactly how an incompatible measurement destroys an earlier certainty.",
+  course: "operators-observables-measurement",
+  module: "sequential-measurements-and-incompatibility",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 18,
+  prerequisites: ["quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized"],
+  objectives: [
+    "Track a state through a sequence of three measurements of two incompatible observables",
+    "Show explicitly how an intervening incompatible measurement destroys a prior certainty",
+    "Connect the numeric result back to the [X,Z] != 0 result from earlier in this course",
+  ],
+};
+
+## Motivation
+
+"Incompatible observables disturb each other" has been stated abstractly
+(uncertainty relations, non-commuting operators) since the very first
+course on this platform. This lesson finally makes it fully concrete:
+one specific qubit, three measurements, real numbers at every step.
+
+## Intuition
+
+If $Z$ and $X$ shared an eigenbasis, measuring one right after the other
+would never change anything — you'd already be sitting in an eigenstate
+of both. Since $[X,Z]\ne0$ (proven earlier this course), no such shared
+eigenstate exists in general, and this lesson shows exactly what breaks.
+
+## Mathematical Development
+
+### Step 1 — measure $Z$ on $|0\rangle$
+
+Start in $|0\rangle$, already a $Z$-eigenstate. $P(Z{=}0)=1$, with
+certainty — no surprise, and the state doesn't change.
+
+### Step 2 — measure $X$
+
+Rewrite $|0\rangle$ in the $X$-eigenbasis:
+$|0\rangle=\tfrac{1}{\sqrt2}(|+\rangle+|-\rangle)$ (from the Global Phase
+lesson's basis-change machinery). Using the generalized Born rule from
+last lesson with the rank-1 projectors $P_+=|+\rangle\langle+|$,
+$P_-=|-\rangle\langle-|$:
+
+$$
+P(X{=}{+}1) = |\langle+|0\rangle|^2 = \left|\frac{1}{\sqrt2}\right|^2 = \frac12, \qquad P(X{=}{-}1) = \frac12
+$$
+
+Suppose the outcome is $+1$. The state collapses to
+$|\psi\rangle=|+\rangle = \tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$.
+
+### Step 3 — measure $Z$ again
+
+$$
+P(Z{=}0) = |\langle0|+\rangle|^2 = \left|\frac1{\sqrt2}\right|^2 = \frac12, \qquad P(Z{=}1) = \frac12
+$$
+
+**The certainty from Step 1 is gone.** Before the $X$ measurement, $Z$
+was $100\%$ predictable. After it, $Z$'s outcome is completely random
+again — the $X$ measurement didn't just add new information, it
+*erased* the old certainty entirely.
+
+## Physical Interpretation
+
+This is what "incompatible" means operationally, not just algebraically:
+measuring $X$ forces the state into an $X$-eigenstate, and an
+$X$-eigenstate is (by the last course's basis-change formulas) an
+*equal* superposition in the $Z$-basis — as far from a $Z$-eigenstate as
+a normalized state can get. The disturbance isn't a technological
+limitation or measurement noise; it's what the state genuinely becomes.
+
+## Worked Example
+
+**Suppose instead the Step 2 outcome had been $X{=}{-}1$. Redo Step 3.**
+
+Collapse to $|\psi\rangle=|-\rangle=\tfrac1{\sqrt2}(|0\rangle-|1\rangle)$.
+
+$$
+P(Z{=}0) = |\langle0|-\rangle|^2 = \left|\frac1{\sqrt2}\right|^2 = \frac12
+$$
+
+Exactly the same $50/50$ result — the *specific* $X$ outcome doesn't
+matter for how thoroughly it scrambles $Z$; either $X$-eigenstate is
+equally far (in this precise sense) from either $Z$-eigenstate.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking the disturbance is somehow avoidable with a "gentler"
+measurement.** For genuinely incompatible observables, any measurement
+that extracts $X$'s definite value necessarily leaves $Z$ maximally
+uncertain — this is a feature of the state, not an artifact of a
+particular measuring apparatus.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting to renormalize (or re-expand) between steps.** Each
+measurement's probabilities must be computed using the *post-collapse*
+state from the previous step, not the original $|0\rangle$ — Step 3's
+probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
+</Callout>
+
+## Practice Questions
+
+1. Redo this entire sequence starting from $|1\rangle$ instead of
+   $|0\rangle$ and confirm you still get $50/50$ for the final $Z$
+   measurement.
+2. If Steps 1 and 3 measured the *same* compatible pair (say, $Z$ then
+   $Z$ again, with no $X$ in between), what would Step 3's probabilities
+   be, and why?
+3. Using $[X,Z]=-2iY\ne0$ from earlier in this course, explain in one
+   sentence why you should have *expected* Step 3 to be non-trivial,
+   before doing any calculation.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Measuring $Z$, then $X$, then $Z$ again on $|0\rangle$ takes a certain
+  outcome ($P(Z{=}0)=1$) to a completely uncertain one
+  ($P(Z{=}0)=\tfrac12$) — a fully explicit, numeric demonstration of
+  disturbance by an incompatible measurement.
+- The result doesn't depend on which $X$-outcome occurred — both
+  $X$-eigenstates are equally "unaligned" with the $Z$-basis.
+- This is the concrete face of the abstract $[X,Z]\ne0$ result proven
+  earlier in this course.
+
+## Further Exploration
+
+Next: **The Energy-Time Uncertainty Relation**, deriving a different kind
+of uncertainty bound — one that doesn't come from a commutator between
+two operators, since time isn't an operator at all.

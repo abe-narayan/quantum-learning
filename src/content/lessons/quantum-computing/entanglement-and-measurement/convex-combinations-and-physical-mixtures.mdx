@@ -1,0 +1,182 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/entanglement-and-measurement/convex-combinations-and-physical-mixtures"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Convex Combinations and Physical Mixtures",
+  description:
+    "The general N-component mixture, and the sharpest fact about density matrices yet: completely different preparation recipes can produce the exact same ρ — and no experiment can ever tell them apart.",
+  course: "entanglement-and-measurement",
+  module: "convex-combinations-and-physical-mixtures",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/entanglement-and-measurement/pure-states-and-mixed-states"],
+  objectives: [
+    "Build a density matrix from an arbitrary N-component probabilistic ensemble",
+    "Prove that two different ensembles can produce an identical density matrix",
+    "State precisely why ρ, not the preparation recipe, is the physically complete description",
+  ],
+};
+
+## Motivation
+
+The last lesson's worked example already produced a strange result: a
+50/50 mixture of $|0\rangle,|1\rangle$ and a 50/50 mixture of
+$|+\rangle,|-\rangle$ gave the exact same density matrix, $I/2$. That
+wasn't a coincidence specific to those four states — it's the general
+rule, and it deserves to be stated as its own fact rather than left as a
+one-off curiosity: **different physical preparation procedures can be
+completely indistinguishable.**
+
+## Mathematical Development
+
+### The general mixture
+
+For any finite set of pure states $|\psi_1\rangle,\dots,|\psi_n\rangle$
+(not necessarily orthogonal, not necessarily related in any way) with
+probabilities $p_1,\dots,p_n\geq0$ summing to 1:
+
+$$
+\rho = \sum_{i=1}^n p_i |\psi_i\rangle\langle\psi_i|
+$$
+
+This is exactly the same construction as last lesson's two-component
+case, just with $n$ terms instead of 2. The engine's `convexCombination`
+implements precisely this, checking both constraints — probabilities
+nonnegative, summing to 1 — and rejecting a call that violates either
+(this is not pedantry: a set of "probabilities" that don't sum to 1, or
+that includes a negative one, does not correspond to any physical
+ensemble, and the function refuses to silently produce a matrix for it).
+
+### Two different ensembles, the same ρ — proven in general
+
+Take the $Z$-basis ensemble $\{(\tfrac12,|0\rangle),(\tfrac12,|1\rangle)\}$
+and the $X$-basis ensemble $\{(\tfrac12,|+\rangle),(\tfrac12,|-\rangle)\}$.
+Both give $\rho=I/2$, computed in the last lesson. This generalizes: for
+*any* orthonormal basis $\{|a\rangle,|b\rangle\}$ of a qubit,
+
+$$
+\tfrac12|a\rangle\langle a| + \tfrac12|b\rangle\langle b| = \tfrac12(|a\rangle\langle a|+|b\rangle\langle b|) = \tfrac12 I
+$$
+
+The last equality is the **completeness relation**: for any orthonormal
+basis, $|a\rangle\langle a|+|b\rangle\langle b|=I$ (this platform proved
+and used this identity already, in Operators, Observables & Measurement,
+for computing expectation values from spectral decompositions). So
+*every* orthonormal basis, mixed 50/50, gives $I/2$ — infinitely many
+different physical recipes ("flip a fair coin, prepare $|0\rangle$ or
+$|1\rangle$"; "flip a fair coin, prepare $|+\rangle$ or $|-\rangle$"; "flip
+a fair coin, prepare $|i\rangle$ or $|{-i}\rangle$"; ...), all producing
+the identical density matrix.
+
+### Why this matters: ρ is the complete physical description
+
+If two different preparation recipes yield the same $\rho$, then by
+$\langle A\rangle=\text{Tr}(\rho A)$ (Lesson 1) they give *identical*
+predictions for every observable, every measurement, every experiment —
+with no exception. There is no possible experiment that could reveal
+which recipe was actually used. This is not a limitation of current
+technology; it is a statement about what "physical state" *means* in
+quantum mechanics. The ensemble — the story about coins and preparation
+— is not part of the physics. Only $\rho$ is. Two ensembles that produce
+the same $\rho$ are, physically, the same state, full stop.
+
+This is genuinely different from the classical case: a classical
+probability distribution *does* remember its full history (a coin that
+is "70% heads" is a different distribution from a coin that's "30%
+heads," and mixtures of distinguishable classical distinguishable
+outcomes never collide into the same distribution this way for a generic
+choice of bases). The quantum mixture's ability to "forget" its
+preparation recipe entirely, for a whole continuum of different bases,
+is a genuinely quantum phenomenon with no classical analogue.
+
+## Physical Interpretation
+
+Given a density matrix $\rho$, asking "but which ensemble was it *really*
+prepared from?" is not a question quantum mechanics answers — it's not
+a question quantum mechanics considers meaningful. $\rho$ is the state;
+full stop. This reframes what a density matrix *is*: not "a record of an
+experimenter's uncertainty about a hidden true ket," but the complete,
+final physical description, exactly on the same footing $|\psi\rangle$
+holds for pure states.
+
+## Worked Example
+
+**Show that the ensemble $\{(0.5,|0\rangle),(0.25,|1\rangle),(0.25,|+\rangle)\}$
+is a valid mixture (i.e., that its probabilities are legitimate), and
+compute its density matrix.**
+
+Probabilities: $0.5+0.25+0.25=1$, all nonnegative — a valid ensemble
+(three components this time, not two; the formalism doesn't care).
+
+$$
+\rho = 0.5\begin{pmatrix}1&0\\0&0\end{pmatrix} + 0.25\begin{pmatrix}0&0\\0&1\end{pmatrix} + 0.25\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}
+= \begin{pmatrix}0.625&0.125\\0.125&0.375\end{pmatrix}
+$$
+
+Unlike the earlier examples, this one is *not* $I/2$ — a nonuniform
+mixture of non-mutually-orthogonal states has no reason to collapse to
+the maximally mixed state, and it doesn't here (verified directly
+against `convexCombination`'s output).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming a mixture's components must be orthogonal.** They don't have
+to be — the worked example above mixes $|0\rangle$, $|1\rangle$, and
+$|+\rangle$, and $|+\rangle$ is not orthogonal to either of the other
+two. The only requirement is that the probabilities are nonnegative and
+sum to 1.
+</Callout>
+
+<Callout type="mistake">
+**Believing $\rho$ "secretly remembers" which ensemble prepared it.** It
+doesn't — that's precisely today's point. Two different ensembles giving
+the same $\rho$ are physically identical states, not merely
+experimentally hard to distinguish.
+</Callout>
+
+## Practice Questions
+
+1. Verify the completeness relation $|i\rangle\langle i|+|{-i}\rangle\langle-i|=I$
+   for the $Y$-eigenbasis $|i\rangle=\frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$,
+   $|{-i}\rangle=\frac{1}{\sqrt2}(|0\rangle-i|1\rangle)$, and conclude that
+   a 50/50 mixture of $|i\rangle,|{-i}\rangle$ also gives $I/2$.
+2. Compute the density matrix for the ensemble
+   $\{(0.6,|0\rangle),(0.4,|1\rangle)\}$, and compare it to
+   $\{(0.5,|0\rangle),(0.1,|1\rangle),(0.4,|1\rangle)\}$ (splitting the
+   $|1\rangle$ weight into two identical-state terms). Explain why these
+   two ensembles must give the same $\rho$ even though they list a
+   different number of components.
+3. Why does `convexCombination` reject an ensemble with probabilities
+   $\{0.7,0.5\}$ (summing to 1.2) even though both are individually valid
+   probabilities?
+4. Two experimenters prepare qubits by different physical processes but
+   both end up with $\rho=I/2$. Can any measurement, however precise,
+   determine which process was used on a given qubit? Justify your answer
+   using this lesson's central result.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A general mixture is $\rho=\sum_ip_i|\psi_i\rangle\langle\psi_i|$ for
+  any number of components, with $p_i\geq0$ summing to 1 — the components
+  need not be orthogonal.
+- Every orthonormal basis, mixed with equal weight, produces $I/2$ — a
+  direct consequence of the completeness relation.
+- Different ensembles producing the same $\rho$ are physically identical:
+  every observable's expectation value depends on $\rho$ alone, so no
+  experiment can distinguish them.
+- $\rho$ is the complete physical description of a quantum state; the
+  preparation ensemble is not independently physically meaningful.
+
+## Further Exploration
+
+Next: **Partial Trace and Reduced States** — the tool that finally
+answers the question this course opened with: what *is* the state of one
+qubit of an entangled pair, on its own?

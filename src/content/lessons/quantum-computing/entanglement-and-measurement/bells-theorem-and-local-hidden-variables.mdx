@@ -1,0 +1,212 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Bell's Theorem and Local Hidden Variables",
+  description:
+    "A complete, self-contained proof that no local hidden-variable theory can produce a CHSH correlation value greater than 2 — the classical bound quantum mechanics is about to be shown violating.",
+  course: "entanglement-and-measurement",
+  module: "bells-theorem-and-local-hidden-variables",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices"],
+  objectives: [
+    "State the local hidden-variable (LHV) model precisely, including exactly what 'local' means",
+    "Prove the CHSH inequality |S|≤2 holds for every LHV model, with no exceptions",
+    "Explain precisely what kind of theory Bell's theorem does, and does not, rule out",
+  ],
+};
+
+## Motivation
+
+Bell States and Entanglement, back in Quantum Gates & Circuits, showed
+that measuring both qubits of $|\Phi^+\rangle$ in the $X$-basis still
+gives perfect correlation — and promised that no *predetermined*
+classical description of the two qubits could reproduce that, in full
+generality, without checking every possible measurement choice at once.
+This lesson delivers that proof. It is entirely about classical
+probability and combinatorics — no quantum mechanics appears anywhere in
+it — which is exactly the point: it establishes a hard limit that *any*
+theory of the type described below must obey, before quantum mechanics
+is checked against that limit in the next lesson.
+
+## Mathematical Development
+
+### The local hidden-variable model, precisely
+
+Two experimenters, Alice and Bob, each hold one particle from a pair
+produced by a common source. Alice chooses a measurement setting
+$a\in\{A,A'\}$ and gets an outcome $\pm1$; Bob independently chooses
+$b\in\{B,B'\}$ and gets an outcome $\pm1$. A **local hidden-variable
+(LHV) model** proposes: there is some variable $\lambda$ (possibly
+unmeasurable, of any nature at all — "hidden") produced by the source
+and shared by both particles, and each outcome is a definite,
+predetermined function of $\lambda$ and *only that party's own setting*:
+
+$$
+\text{Alice's outcome} = A(a,\lambda) \in\{+1,-1\}, \qquad \text{Bob's outcome} = B(b,\lambda)\in\{+1,-1\}
+$$
+
+The word **local** refers specifically to $A(a,\lambda)$ not depending
+on $b$, and $B(b,\lambda)$ not depending on $a$ — whatever Bob chooses
+to measure cannot affect Alice's predetermined outcome function, and
+vice versa. This is the precise assumption Bell's theorem tests, not a
+vague notion of "classical physics" in general.
+
+### The CHSH combination, for a fixed λ
+
+Define, for one fixed value of $\lambda$:
+
+$$
+S(\lambda) = A(a,\lambda)B(b,\lambda) + A(a,\lambda)B(b',\lambda) + A(a',\lambda)B(b,\lambda) - A(a',\lambda)B(b',\lambda)
+$$
+
+Factor by grouping the two terms that share $A(a,\lambda)$ and the two
+that share $A(a',\lambda)$:
+
+$$
+S(\lambda) = A(a,\lambda)\big[B(b,\lambda)+B(b',\lambda)\big] + A(a',\lambda)\big[B(b,\lambda)-B(b',\lambda)\big]
+$$
+
+Since $B(b,\lambda),B(b',\lambda)\in\{+1,-1\}$, exactly one of two cases
+holds: either they're equal (making $B(b,\lambda)+B(b',\lambda)=\pm2$
+and $B(b,\lambda)-B(b',\lambda)=0$), or they're opposite (making the sum
+$0$ and the difference $\pm2$). In the first case,
+$S(\lambda)=\pm2A(a,\lambda)\in\{+2,-2\}$; in the second,
+$S(\lambda)=\pm2A(a',\lambda)\in\{+2,-2\}$. Either way:
+
+$$
+|S(\lambda)| = 2 \quad\text{for every single } \lambda
+$$
+
+not merely "at most 2" — for any *one* fixed $\lambda$, this
+combination is always exactly $\pm2$, since every outcome is
+deterministic once $\lambda$ is fixed.
+
+### Averaging over λ gives the CHSH inequality
+
+Real experiments don't control $\lambda$ — it varies from trial to
+trial according to some probability distribution $p(\lambda)$ set by the
+source. The measurable correlation is
+$E(a,b)=\int A(a,\lambda)B(b,\lambda)\,p(\lambda)\,d\lambda$, and the
+CHSH combination of *these* is:
+
+$$
+S = E(a,b)+E(a,b')+E(a',b)-E(a',b') = \int S(\lambda)\,p(\lambda)\,d\lambda
+$$
+
+Using $|S(\lambda)|=2$ for every $\lambda$, and that $p(\lambda)$ is a
+genuine probability density ($p(\lambda)\geq0$, integrating to 1):
+
+$$
+|S| = \left|\int S(\lambda)p(\lambda)\,d\lambda\right| \leq \int|S(\lambda)|\,p(\lambda)\,d\lambda = \int 2\,p(\lambda)\,d\lambda = 2
+$$
+
+$$
+\boxed{|S| \leq 2}
+$$
+
+This is the **CHSH inequality**. It was derived using nothing but: (1)
+outcomes are $\pm1$, (2) each party's outcome depends only on its own
+setting and $\lambda$, and (3) $\lambda$ has *some* probability
+distribution. No assumption about what $\lambda$ physically is, how
+complicated it can be, or how it's distributed was ever needed — the
+bound holds for every LHV model without exception, which is exactly why
+a violation of it (checked with the actual engine in the next lesson) is
+so significant.
+
+## Physical Interpretation
+
+Bell's theorem does not merely show that "classical physics predicts
+different numbers than quantum mechanics for this experiment" — it
+shows that *no* theory fitting the LHV structure above, regardless of
+how exotic its hidden mechanism, can ever produce $|S|>2$. If an
+experiment measures $|S|>2$, every local hidden-variable explanation is
+simultaneously ruled out at once, not just whichever specific classical
+model someone happened to write down.
+
+**What this does not rule out:** hidden-variable theories that are
+*nonlocal* — where $A(a,\lambda)$ is allowed to depend on Bob's distant
+setting $b$ too. Bohmian mechanics is a real, actively-studied example
+of exactly such a theory, and it is not excluded by Bell's theorem,
+because it does not satisfy the locality assumption the proof above
+depends on. Bell's theorem is a precise statement about *local*
+determinism specifically, not determinism in general.
+
+## Worked Example
+
+**Suppose a source always sends $\lambda$ such that
+$A(A,\lambda)=A(A',\lambda)=+1$ and $B(B,\lambda)=B(B',\lambda)=+1$ for
+every trial (a trivial, fully deterministic LHV model with no randomness
+at all). Compute $S$.**
+
+$E(a,b)=(+1)(+1)=1$ for every pair of settings (since the outcomes are
+always $+1$ regardless of setting, with no $\lambda$-averaging needed —
+a single deterministic case). So
+$S=1+1+1-1=2$ — right at the boundary, not exceeding it, exactly as the
+inequality requires ($|S|\leq2$, and this trivial model saturates it
+without violating it).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking Bell's theorem proves "there are no hidden variables."** It
+proves something more specific and more powerful: no *local*
+hidden-variable model can reach $|S|>2$. Nonlocal hidden-variable
+theories are a separate category, untouched by this proof.
+</Callout>
+
+<Callout type="mistake">
+**Believing $|S(\lambda)|=2$ for a fixed $\lambda$ contradicts
+$|S|\le2$ for the averaged, measured $S$.** They're consistent: the
+proof shows each individual $\lambda$ gives exactly $\pm2$, and
+averaging values that are each exactly $\pm2$ can only ever produce
+something with magnitude *at most* 2 (it can't average to something
+outside the range of the values being averaged) — never more.
+</Callout>
+
+## Practice Questions
+
+1. Suppose $A(a,\lambda)=A(a',\lambda)=+1$ always, but
+   $B(b,\lambda)=+1,B(b',\lambda)=-1$ always. Compute $S$ for this
+   deterministic model and confirm it satisfies $|S|\leq2$.
+2. In the factoring step, explain why exactly one of
+   "$B(b,\lambda)=B(b',\lambda)$" or "$B(b,\lambda)\neq B(b',\lambda)$"
+   must hold for any fixed $\lambda$, given that both outcomes are in
+   $\{+1,-1\}$.
+3. Why does the proof of $|S|\leq2$ never need to know the actual
+   probability distribution $p(\lambda)$, beyond it being a valid
+   probability distribution (nonnegative, integrates to 1)?
+4. A friend proposes a hidden-variable model where Bob's outcome
+   function is allowed to depend on Alice's setting $a$ as well as
+   Bob's own setting $b$. Explain, citing the specific step in the proof
+   above that would break, why this model is not covered by the CHSH
+   inequality proven here.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A local hidden-variable (LHV) model has each party's outcome
+  determined by a shared variable $\lambda$ and *only that party's own*
+  setting — this locality assumption is precise and essential to the
+  proof.
+- For any fixed $\lambda$, the CHSH combination $S(\lambda)$ is exactly
+  $\pm2$, a direct consequence of both parties' outcomes being $\pm1$.
+- Averaging over $\lambda$'s distribution can only ever produce
+  $|S|\leq2$ — the CHSH inequality, proven for every LHV model without
+  exception.
+- Bell's theorem rules out *local* hidden-variable theories specifically
+  — it says nothing about nonlocal hidden-variable theories like Bohmian
+  mechanics.
+
+## Further Exploration
+
+Next: **The CHSH Inequality and Quantum Violation**, which computes $S$
+for an actual entangled quantum state using the real density-matrix
+engine — and finds a value that breaks the bound just proven.

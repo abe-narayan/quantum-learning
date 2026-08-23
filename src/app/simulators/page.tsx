@@ -6,6 +6,7 @@ import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/La
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 
 export const metadata: Metadata = {
   title: "Simulators",
@@ -16,11 +17,6 @@ const COMING_SOON_SIMULATORS = [
   {
     title: "Circuit builder",
     description: "Drag and drop gates onto a circuit and watch the resulting state evolve.",
-    tag: "Coming soon",
-  },
-  {
-    title: "Entanglement visualizer",
-    description: "See how measuring one qubit of an entangled pair affects the other.",
     tag: "Coming soon",
   },
   {
@@ -83,6 +79,18 @@ export default function SimulatorsPage() {
           </p>
           <div className="mt-6">
             <LazyWavefunctionExplorer />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Density Matrix Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Build a single-qubit density matrix live from two mixed-in pure states and watch it move on the
+            Bloch sphere — pure states sit exactly on the surface, and every real mixture pulls the point
+            strictly inside, by exactly the amount purity and von Neumann entropy predict.
+          </p>
+          <div className="mt-6">
+            <LazyDensityMatrixExplorer />
           </div>
         </section>
       </div>

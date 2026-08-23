@@ -254,6 +254,11 @@ top of, so the math is written and verified exactly once.
 | `wavefunction.ts` | `Grid1D` (a centered, power-of-two position grid) and `Wavefunction1D` — a discretized ψ(x) with normalization, probability density, inner product/overlap, position and momentum expectation values/variances, potential/kinetic/total energy expectation values, and `superposition()` for combining eigenstates. The continuous-position analogue of `state.ts`'s `StateVector`, but for an infinite-dimensional (grid-discretized) Hilbert space instead of a finite qubit register |
 | `potentials.ts` | Potential-energy functions (`freeParticlePotential`, `infiniteSquareWellPotential`, `harmonicOscillatorPotential`, `finiteSquareWellPotential`, `barrierPotential`) plus, for the two closed-form-solvable ones, analytical energy-level formulas and eigenstate constructors (`infiniteSquareWellEigenstate`, `harmonicOscillatorEigenstate`, the latter via Hermite polynomials for $n=0..3$) — deliberately *not* a numerical eigensolver; see below |
 | `timeEvolution.ts` | `SplitOperatorEvolver` — genuine numerical time evolution under the time-dependent Schrödinger equation via the symmetric (Strang) split-operator Fourier method, plus `probabilityLeftAndRightOf` for the tunneling preset's transmission/reflection accounting |
+| `densityMatrix.ts` | `pureStateDensityMatrix`, `computationalBasisDensityMatrix`, `maximallyMixedState`, `convexCombination` (mixtures), `purity`/`isPureState`, `validateDensityMatrix` (Hermiticity/trace/positivity, the last exact only for $2\times2$), `eigenvaluesHermitian2x2` (closed-form quadratic-formula solver, **not** a general eigensolver), `vonNeumannEntropy`, `densityMatrixExpectationValue`/`densityMatrixMeasurementProbability`/`densityMatrixCollapse` (the generalized Born rule and collapse), `evolveDensityMatrix` ($\rho'=U\rho U^\dagger$) — built for `entanglement-and-measurement`; see below for scope |
+| `partialTrace.ts` | `partialTrace(rho, totalQubits, tracedOutQubits)` — a general $n$-qubit partial trace via bitmask index summation (not hardcoded to 2 qubits), plus `reducedDensityMatrixQubit0`/`reducedDensityMatrixQubit1` convenience wrappers for the 2-qubit case this course actually uses |
+| `entanglement.ts` | `entanglementEntropy` (reduced-state von Neumann entropy — valid **only** for a globally pure state, and typed to take a `StateVector` accordingly) and `concurrenceOfPureState` (pure two-qubit concurrence $C=2|ad-bc|$, reusing `twoQubit.ts`'s `testSeparability` determinant directly rather than reimplementing it) plus `isEntangled`; deliberately does **not** implement general mixed-state entanglement measures (see below) |
+| `chsh.ts` | `spinObservableInXZPlane`, `correlationExpectation`, `chshValue`, and the `CHSH_CLASSICAL_BOUND`/`CHSH_QUANTUM_BOUND` constants — the CHSH inequality machinery for `entanglement-and-measurement`'s Bell-test lessons |
+| `bloch.ts` | Gained `densityMatrixToBlochVector` this session (`stateToBlochVector`/`stateToBlochAngles`/`blochStateFromAngles` predate it) — the Bloch vector of a single-qubit density matrix via $\langle X\rangle,\langle Y\rangle,\langle Z\rangle$, letting the existing `BlochSphereCanvas` render mixed states (strictly inside the sphere) with zero new rendering code |
 
 ### Qubit ordering convention
 
@@ -330,29 +335,54 @@ mixed into a rendering file. The convention going forward:
 `src/components/simulators/<name>/` for rendering,
 `src/lib/quantum/` for math, never mixed in one file.
 
-**What's deliberately not built yet:** density matrices, partial trace,
-von Neumann entropy, and a **general** eigensolver (matrix diagonalization
-for an arbitrary-dimensional Hermitian operator). Those are real
-requirements (a future multipartite-entanglement course and an
-error-correction simulator will need the first three eventually) but
-weren't needed to teach pure-state entanglement, measurement, no-cloning,
-teleportation, two-level time evolution and the harmonic oscillator
-(Course 4), or — somewhat more surprisingly — continuous-position wave
-mechanics either (Course 5, Wave Mechanics): finite-dimensional two-level
-evolution reused the *existing* `rotationAboutAxis` function (any
-traceless $2\times2$ Hermitian $H=\frac{\hbar\omega}{2}(\hat n\cdot
-\vec\sigma)$ has $e^{-iHt/\hbar}=$ `rotationAboutAxis(n, ωt)` exactly),
-and continuous-position evolution needed a *numerical time-integration*
-engine (the split-operator method, §6b) rather than a diagonalization
-routine — the known-solvable systems' (infinite well, harmonic oscillator)
-eigenstates are evaluated from their **closed-form formulas**
-(`potentials.ts`), with the numerical time-evolution engine then used to
-*verify* those formulas (confirming stationarity and matching analytical
-energies), not to *discover* them. A general eigensolver remains
-deferred, next likely triggered by a future course needing eigenstates of
-a potential with no closed form (e.g. an arbitrary numerically-specified
-1D potential, or a multipartite-entanglement simulator's density-matrix
-diagonalization).
+**Density matrices, partial trace, and von Neumann entropy are now
+built** (`densityMatrix.ts`, `partialTrace.ts`, `entanglement.ts`,
+`chsh.ts` — see the table above), for `entanglement-and-measurement`.
+Deliberately still **not** built: a **general** eigensolver (matrix
+diagonalization for an arbitrary-dimensional Hermitian operator).
+`eigenvaluesHermitian2x2` is an exact closed-form quadratic-formula
+solver for exactly $2\times2$ Hermitian matrices — the one size this
+course's reduced single-qubit density matrices ever need — not a general
+eigensolver in a small disguise. This bounds three things explicitly,
+each documented in its own module's doc comments and taught as an
+explicit scope limit in the course itself rather than glossed over:
+`vonNeumannEntropy` cannot be called on anything larger than $2\times2$
+(throws, doesn't approximate); `validateDensityMatrix`'s positivity check
+returns `null` — not `true`/`false` — above $2\times2$, since exact
+positivity testing for a general (possibly rank-deficient) Hermitian
+matrix needs machinery (Cholesky/LDL with zero-pivot handling) this
+platform doesn't implement; and `entanglementEntropy`/
+`concurrenceOfPureState` only accept a pure `StateVector`, since reduced
+entropy stops being a valid entanglement measure the moment the global
+state is mixed (proved with a concrete counterexample —
+$\rho_{AB}=I/4$, a manifestly unentangled product of two mixed qubits,
+whose reduced state nonetheless has entropy 1 bit — in the "Entanglement
+Entropy for Pure Bipartite States" lesson). The general mixed-state
+Wootters concurrence (needing eigenvalues of a non-Hermitian $4\times4$
+matrix product) and multipartite (3+ qubit) entanglement measures remain
+out of scope for the same underlying reason: no general eigensolver.
+A general eigensolver remains deferred, next likely triggered by a
+future course needing eigenstates of a potential with no closed form
+(e.g. an arbitrary numerically-specified 1D potential) or a genuine
+mixed-state/multipartite entanglement treatment (the
+`advanced-quantum-mechanics` placeholder course, much later in the
+Quantum Mechanics pillar, will need this eventually — its own
+`density-matrices-and-mixed-states` and `entanglement-formal-treatment`
+modules should build on top of, not duplicate, `entanglement-and-measurement`'s
+two-qubit-scoped treatment when that course is eventually written).
+
+Two-level finite-dimensional evolution (Course 4) and continuous-position
+wave mechanics (Course 5) never needed a general eigensolver either:
+two-level time evolution reused the *existing* `rotationAboutAxis`
+function (any traceless $2\times2$ Hermitian $H=\frac{\hbar\omega}{2}(\hat
+n\cdot\vec\sigma)$ has $e^{-iHt/\hbar}=$ `rotationAboutAxis(n, ωt)`
+exactly), and continuous-position evolution needed a *numerical
+time-integration* engine (the split-operator method, §6b) rather than a
+diagonalization routine — the known-solvable systems' (infinite well,
+harmonic oscillator) eigenstates are evaluated from their **closed-form
+formulas** (`potentials.ts`), with the numerical time-evolution engine
+then used to *verify* those formulas (confirming stationarity and
+matching analytical energies), not to *discover* them.
 
 ---
 
@@ -549,6 +579,48 @@ suite (cross-checked against a brute-force DFT and Parseval's theorem);
 only the second is fast enough for a real-time animation loop calling it
 hundreds of times per second. No dependency was added either way — the
 efficient form is still under 100 lines.
+
+### The Density Matrix Explorer
+
+`src/components/simulators/density-matrix-explorer/` is deliberately
+**single-qubit-focused** — the task that produced it explicitly ruled out
+a general circuit-builder-scale visualization, and the engine's own
+$2\times2$-only closed-form pieces (`eigenvaluesHermitian2x2`,
+`vonNeumannEntropy`) make a single qubit the natural, honest scope
+anyway. It reuses far more than it builds:
+
+1. **Math** — `densityMatrix.ts`, `bloch.ts`'s new
+   `densityMatrixToBlochVector` (§6), all framework-free.
+2. **Rendering — zero new 3D/SVG code.** The existing `BlochSphereCanvas`
+   (built for the pure-state Bloch Sphere Explorer) draws *any* point
+   inside or on the unit sphere; it never assumed the vector it's handed
+   has length exactly 1. Feeding it a mixed state's Bloch vector (which
+   the linearity of $\langle A\rangle=\text{Tr}(\rho A)$ guarantees has
+   $|r|\le1$, with equality only for pure states) makes mixedness
+   directly visible — the point sits strictly inside the wireframe sphere
+   — with no rendering changes at all, only a new data source.
+3. **State model** — two independently-adjustable Bloch-sphere points
+   (`component1`, `component2`, each a `BlochAngles` reused from
+   `bloch-sphere/presets.ts`'s existing angle-slider UI) plus a mixing
+   weight $p$; the explorer composes
+   $\rho=p\cdot\rho_1+(1-p)\cdot\rho_2$ live via `convexCombination`,
+   then derives the Bloch vector, purity, entropy, and
+   `validateDensityMatrix`'s checks from that single `rho` on every
+   render — no separate "mixed state" data model parallel to the
+   density-matrix one.
+4. **Presets carry the pedagogy, not just convenience.** `presets.ts`'s
+   two 50/50 presets — $\{|0\rangle,|1\rangle\}$ and
+   $\{|+\rangle,|-\rangle\}$ — are chosen specifically so both land on
+   the exact same $\rho=I/2$, making Pure States and Mixed States'
+   "different ensembles, identical physical state" argument something a
+   learner can click through and see directly, not just read.
+5. **Lesson integration** — `LazyDensityMatrixExplorer.tsx`, the same
+   `dynamic(..., { ssr: false })` pattern as every other simulator;
+   embedded in "Pure States and Mixed States" (the lesson whose central
+   distinction it visualizes) and added to `/simulators` as the platform's
+   5th real, fully interactive entry, replacing the old "Entanglement
+   visualizer" coming-soon placeholder it directly supersedes in scope
+   (a single qubit's mixedness, not a full multi-qubit circuit view).
 
 ---
 
@@ -1067,64 +1139,143 @@ inconsistency worth fixing.)*
 - Nothing was removed from or restructured in any existing course,
   simulator, or the Problems system beyond the additions above.
 
+**A documentation gap between Session 9 and Session 10:** two courses —
+`Operators, Observables & Measurement` (8 lessons) and `One-Dimensional
+Quantum Systems` (5 lessons), both Quantum Mechanics pillar — were
+designed and fully authored in the session between this changelog's
+Session 9 and Session 10 entries, along with several `/learn` and
+`/lessons` UI fixes (course completion badges, a derived "Start Here"
+callout, corrected stale copy). That session's own changelog entry was
+never written. Recorded here, retroactively, for the same reason
+Session 8 recorded Session 7's own retroactive gap: an inaccurate
+changelog is a real inconsistency, not a cosmetic one — not backfilled
+in full narrative detail here since that isn't this session's work to
+narrate accurately, but flagged so it isn't mistaken for undone work.
+
+### Session 10 — Density-Matrix Engine + Entanglement, Mixed States & Bell Tests (Course, complete) + Density Matrix Explorer
+
+- **New engine files** — `densityMatrix.ts`, `partialTrace.ts`,
+  `entanglement.ts`, `chsh.ts` (see §6's table for what each contains and
+  §6's updated "deliberately not built yet" note for the exact, tested
+  scope boundaries — $2\times2$-only eigenvalues/entropy, `null`
+  positivity above $2\times2$, pure-state-only entanglement measures).
+  `matrix.ts` gained `trace()` and `isHermitian()`; `bloch.ts` gained
+  `densityMatrixToBlochVector()`. No existing engine file's existing
+  behavior was changed.
+- **A key mathematical result derived and verified, not just asserted:**
+  for any normalized 2-qubit pure state $a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$,
+  $1-\text{Tr}(\rho_A^2)=2|ad-bc|^2$ exactly — proven by direct expansion
+  in "Why Entangled Subsystems Are Mixed," then reused to derive
+  concurrence's exact relationship to reduced purity
+  ($C=\sqrt{2(1-\text{Tr}(\rho_A^2))}$) in the next lesson, rather than
+  presenting concurrence as an unrelated second formula.
+- **A real content bug found via browser verification and fixed:** a
+  numeric problem's hand-written solution steps (not the graded answer,
+  which was already computed correctly via a real `chshValue` call)
+  claimed $S=1$ for a specific CHSH configuration where Bob reuses
+  Alice's settings; the correct value, confirmed by direct engine
+  computation, is $S=0$ (a hand arithmetic slip:
+  $\cos(\pi/2-\pi/2)=\cos(0)=1$, not $0$, was mis-simplified while
+  writing the explanation text). Caught by testing the problem live in a
+  browser and submitting the (wrong) hand-derived answer myself, which
+  the grader correctly rejected — fixed in
+  `same-settings-chsh-value.ts`'s hints/solution/explanation text; no
+  engine code was involved in the bug or the fix.
+- **`curriculum.ts`** — `entanglement-and-measurement`'s original
+  4-module placeholder (which included "Multipartite Entanglement: GHZ
+  and W States," out of scope for a two-qubit-only engine) redesigned to
+  a real 12-lesson sequence; see §9's roadmap note for why. Re-estimated
+  at 9 hours; slug and pillar unchanged (`quantum-algorithms-i`'s
+  existing prerequisite reference stays valid).
+- **`src/content/lessons/quantum-computing/entanglement-and-measurement/`**
+  (new) — all 12 lessons. Derivations worth calling out beyond the purity
+  identity above: $\langle A\rangle=\text{Tr}(\rho A)$ re-derived from
+  $\langle\psi|A|\psi\rangle$ via the cyclic trace property (Lesson 1);
+  the partial trace derived from a single defining requirement
+  ($\text{Tr}[(A\otimes I)\rho_{AB}]=\text{Tr}(A\rho_A)$ for every local
+  observable $A$), not presented as a formula to accept (Lesson 4); the
+  CHSH inequality's $|S|\le2$ proven in full for every local
+  hidden-variable model via the standard factoring argument (Lesson 10);
+  $E(a,b)=\cos(\theta_a-\theta_b)$ derived by direct matrix-element
+  calculation for $|\Phi^+\rangle$, then used to get $S=2\sqrt2$ exactly
+  at the standard configuration (Lesson 11, cross-checked against
+  `chshValue`'s numerical output to floating-point precision). The
+  $\rho_{AB}=I/4$ counterexample (Lesson 7) is a genuine, engine-verified
+  proof that reduced entropy fails as an entanglement measure once the
+  global state is mixed, not an asserted caveat.
+- **`src/content/problems/quantum-computing/entanglement-and-measurement/`**
+  (new) — 32 problems, 2–3 per lesson, registered and linked via
+  `<PracticeLinks />`.
+- **`src/components/simulators/density-matrix-explorer/`** (new) — the
+  **Density Matrix Explorer**, this session's one new interactive
+  visualization, deliberately single-qubit-scoped; architecture
+  documented in §6b (it reuses the existing `BlochSphereCanvas` with zero
+  new rendering code — only a new density-matrix-to-Bloch-vector data
+  source). Embedded in "Pure States and Mixed States," and added to
+  `/simulators` as the platform's 5th real, fully interactive entry,
+  replacing the "Entanglement visualizer" coming-soon placeholder it
+  supersedes in scope.
+- **No new dependencies.**
+- **Test suite: 388 tests, up from 250** (95 new engine tests across
+  `densityMatrix.test.ts`, `partialTrace.test.ts`, `entanglement.test.ts`,
+  `chsh.test.ts`, `format.test.ts`, plus additions to `matrix.test.ts` and
+  `bloch.test.ts` — including the CHSH standard-configuration angles
+  verified to reach $2\sqrt2$ via a brute-force numerical search over the
+  other observable, not merely asserted at one configuration).
+- Nothing was removed from or restructured in any existing course,
+  simulator, or the Problems system beyond the additions above.
+
 ## 9. Implementation Roadmap
 
 **Done:** foundation (data model, MDX pipeline, quantum engine, IA/nav);
 the Bloch sphere simulator; Vitest infrastructure; `Qubits & Quantum
 States` and `Quantum Gates & Circuits` (Quantum Computing pillar) fully
 authored (20 lessons); `Mathematical Foundations for Quantum Mechanics`,
-`From Classical to Quantum`, and `Wave Mechanics` (Quantum Mechanics
-pillar) fully authored (35 lessons); cross-course prerequisites, exercised
-across five separate course boundaries now; the 2-qubit state explorer,
-the Complex Amplitude Explorer, and the Wavefunction Explorer, all
-embedded in real lessons; the Problems system (data model, 3 validator
-types, `localStorage`-backed progress behind a swappable interface,
-catalog + detail UI, topic/difficulty filtering) with 86 problems across
-both pillars.
+`From Classical to Quantum`, `Wave Mechanics`, `Operators, Observables &
+Measurement`, and `One-Dimensional Quantum Systems` (Quantum Mechanics
+pillar) fully authored (56 lessons); `Entanglement, Mixed States & Bell
+Tests` (Quantum Computing pillar, 12 lessons) — density matrices, partial
+trace, mixed states, purity, von Neumann entropy, two pure-state
+entanglement measures, and the CHSH inequality, all built on a genuinely
+new engine layer (`densityMatrix.ts`, `partialTrace.ts`, `entanglement.ts`,
+`chsh.ts` — §6); cross-course prerequisites, exercised across eight
+separate course boundaries now; the 2-qubit state explorer, the Complex
+Amplitude Explorer, the Wavefunction Explorer, and the Density Matrix
+Explorer, all embedded in real lessons; the Problems system (data model,
+3 validator types, `localStorage`-backed progress behind a swappable
+interface, catalog + detail UI, topic/difficulty filtering) with 153
+problems across both pillars.
 
-**A real architectural consideration for whoever writes the next
-Quantum Mechanics course: `one-dimensional-systems` needs a conscious
-redesign, not a placeholder fill-in.** Its current placeholder modules
-(Infinite Square Well, Finite Square Well, Quantum Tunneling, The
-Harmonic Oscillator, Step Potentials & Scattering) now substantially
-overlap with what `wave-mechanics` just built — the infinite well, the
-harmonic oscillator in position space, and tunneling are all already
-covered there, rigorously, with a working numerical simulator. Simply
-authoring that course's placeholder titles as originally scoped would
-mean re-deriving results `wave-mechanics` already derived. The finite
-square well and step potentials/scattering are the genuinely new content
-left; whoever designs that course next should treat it as "the systems
-Wave Mechanics didn't get to," explicitly cross-referencing rather than
-repeating, the same way `wave-mechanics` itself cross-referenced (rather
-than repeated) the harmonic oscillator from `classical-to-quantum`. Not
-fixed this session, since it's `one-dimensional-systems`'s scope to
-resolve, not `wave-mechanics`'s — flagged here so it isn't rediscovered
-the hard way.
+**`one-dimensional-systems` and `operators-observables-measurement` were
+redesigned rather than filled in as originally placeholder-scoped**,
+exactly as the architectural consideration previously flagged in this
+section recommended (their own changelog write-ups are still pending —
+a documentation gap, not a content one; the courses themselves are
+complete and cross-referenced correctly against `wave-mechanics`).
 
-**Next — `Operators, Observables & Measurement`, the more clearly
-non-overlapping continuation.** Its placeholder modules (Operators &
-Eigenvalues, Hermitian Operators, Commutators, the Uncertainty Principle,
-the Measurement Postulate, Expectation Values) largely revisit ideas
-`classical-to-quantum` and `wave-mechanics` already built, but at a level
-of generality (arbitrary observables, not just $\hat x/\hat p$ or Pauli
-operators; a general treatment of simultaneous measurability via
-commuting observables) neither of those courses aimed for — closer to a
-genuine "operators in full generality" course than a repeat. Its
-prerequisite already points at `wave-mechanics` in `curriculum.ts`.
+**`entanglement-and-measurement`'s original 4-module placeholder
+(Multipartite Entanglement, Quantifying Entanglement, Mixed States &
+Density Matrices, CHSH & Bell Tests) was redesigned to 12 lessons before
+being authored**, for the same reason as the two courses above: the
+original "Multipartite Entanglement: GHZ and W States" module would have
+needed 3+ qubit machinery this engine deliberately doesn't build (see
+§6's updated "deliberately not built yet" note) — the redesigned sequence
+stays honestly within two-qubit scope throughout, building density
+matrices up from first principles (Lesson 1) through a full worked CHSH
+violation and a synthesis capstone (Lessons 11–12).
 
-**Then — expand the math engine for continuous and mixed-state systems.**
-A general eigensolver (matrix diagonalization for an
-arbitrary-dimensional Hermitian operator — needed once a course requires
-eigenstates of a potential with no closed form), plus density matrices,
-partial trace, and von Neumann entropy — needed once
-`entanglement-and-measurement` (multipartite entanglement, mixed states,
-Bell tests) gets written for real, or once any simulator needs to show a
-reduced/mixed state. Deferred again this session for the same reason as
-the last two: none of `wave-mechanics`'s solvable systems needed either
-one (see §6's updated "deliberately not built yet" note for why the
-harmonic oscillator and infinite well specifically didn't).
+**The math engine now has density matrices, partial trace, and von
+Neumann entropy** (`densityMatrix.ts`, `partialTrace.ts`,
+`entanglement.ts`, `chsh.ts` — §6), scoped to exactly what
+`entanglement-and-measurement` needs: two-qubit density matrices, a
+general-$n$-qubit partial trace, and a $2\times2$-only closed-form
+entropy/eigenvalue solver. **A general eigensolver (matrix
+diagonalization for an arbitrary-dimensional Hermitian operator) remains
+deferred** — still not needed by any built course, next likely triggered
+by a course needing eigenstates of a potential with no closed form, or a
+genuine mixed-state/multipartite entanglement treatment.
 
-**Then — the quiz-taking UI.** The `Quiz` data model and registry lookups
+**Next — the quiz-taking UI.** The `Quiz` data model and registry lookups
 already exist (§7b) with zero authored quizzes; building the actual
 navigation/scoring/review UI is real, separate design work best done
 against a handful of real quizzes.

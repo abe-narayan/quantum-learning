@@ -52,4 +52,42 @@ describe("Matrix", () => {
     expect(result[0].equals(vector[0])).toBe(true);
     expect(result[1].equals(vector[1])).toBe(true);
   });
+
+  it("trace() sums the diagonal", () => {
+    const m = new Matrix([
+      [new Complex(3, 1), new Complex(0)],
+      [new Complex(0), new Complex(-1, -1)],
+    ]);
+    const trace = m.trace();
+    expect(trace.re).toBeCloseTo(2, 9);
+    expect(trace.im).toBeCloseTo(0, 9);
+  });
+
+  it("trace() throws for a non-square matrix", () => {
+    const m = new Matrix([[Complex.ONE, Complex.ZERO]]);
+    expect(() => m.trace()).toThrow(/square/);
+  });
+
+  it("identity has trace equal to its dimension", () => {
+    expect(Matrix.identity(4).trace().equals(new Complex(4))).toBe(true);
+  });
+
+  it("isHermitian() is true for Pauli-Z and false for a non-Hermitian matrix", () => {
+    const z = new Matrix([
+      [new Complex(1), Complex.ZERO],
+      [Complex.ZERO, new Complex(-1)],
+    ]);
+    expect(z.isHermitian()).toBe(true);
+
+    const notHermitian = new Matrix([
+      [new Complex(1), new Complex(2)],
+      [new Complex(0), new Complex(1)],
+    ]);
+    expect(notHermitian.isHermitian()).toBe(false);
+  });
+
+  it("isHermitian() is false for a non-square matrix", () => {
+    const m = new Matrix([[Complex.ONE, Complex.ZERO]]);
+    expect(m.isHermitian()).toBe(false);
+  });
 });

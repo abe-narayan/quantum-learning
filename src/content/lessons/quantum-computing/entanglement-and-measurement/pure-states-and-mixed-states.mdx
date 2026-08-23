@@ -1,0 +1,234 @@
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/entanglement-and-measurement/pure-states-and-mixed-states"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Pure States and Mixed States",
+  description:
+    "What a density matrix can express that a state vector cannot: classical uncertainty about which quantum state you have — and why |+⟩ and a 50/50 mix of |0⟩,|1⟩ give identical computational-basis statistics but are provably different states.",
+  course: "entanglement-and-measurement",
+  module: "pure-states-and-mixed-states",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/entanglement-and-measurement/from-state-vectors-to-density-matrices"],
+  objectives: [
+    "Construct a mixed-state density matrix as a probability-weighted sum of pure-state density matrices",
+    "Distinguish a classical mixture from a quantum superposition using an explicit worked example",
+    "Use Tr(ρ²) to detect the difference between two states with identical diagonal entries",
+  ],
+};
+
+export const zeroState = StateVector.zero(1);
+export const oneState = StateVector.basis(1, 1);
+export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+
+## Motivation
+
+Lesson 1 built $\rho=|\psi\rangle\langle\psi|$ from a single known state
+vector, and it agreed with $|\psi\rangle$ on every prediction. That
+raises the natural next question: is $\rho$ just decoration, or can it
+express something $|\psi\rangle$ genuinely cannot?
+
+It can. Suppose a qubit is prepared as $|0\rangle$ with probability 0.5
+and $|1\rangle$ with probability 0.5 — not a superposition, a *classical*
+coin flip deciding which pure state you actually got, with no
+superposition ever formed. There is no single ket for this: it isn't
+$\alpha|0\rangle+\beta|1\rangle$ for any $\alpha,\beta$, because that
+*is* a superposition, a specific quantum state, not a description of
+"I don't know which of two states this is." The density matrix is about
+to turn out to be exactly the right tool for this — and, once qubits get
+entangled starting a few lessons from now, exactly the tool needed to
+describe one qubit of an entangled pair.
+
+## Mathematical Development
+
+### Building a mixture
+
+If a system is prepared in state $|\psi_i\rangle$ with probability $p_i$
+(the $p_i\geq0$ summing to 1, and this is *classical* ignorance about
+preparation, not quantum superposition), its density matrix is the
+probability-weighted sum of each possibility's own density matrix:
+
+$$
+\rho = \sum_i p_i |\psi_i\rangle\langle\psi_i|
+$$
+
+This is called a **convex combination** of the pure states'
+density matrices (convex: weights nonnegative and summing to 1 — the
+same structure as an ordinary weighted average). Two structural facts
+carry over immediately from the single-state case, by linearity:
+
+$$
+\rho^\dagger = \sum_i p_i(|\psi_i\rangle\langle\psi_i|)^\dagger = \sum_i p_i|\psi_i\rangle\langle\psi_i| = \rho
+$$
+
+$$
+\text{Tr}(\rho) = \sum_i p_i\,\text{Tr}(|\psi_i\rangle\langle\psi_i|) = \sum_i p_i \cdot 1 = \sum_i p_i = 1
+$$
+
+Hermitian, trace 1 — the same two properties every pure-state $\rho$ has,
+now shown to survive mixing (a third property, positivity, also survives
+mixing a sum of positive-semidefinite matrices is positive-semidefinite —
+but proving that in general needs machinery this course doesn't build;
+the engine's `validateDensityMatrix` checks it exactly for the 2×2 case
+this course actually uses).
+
+### The classical mixture, computed
+
+For the 50/50 mix of $|0\rangle$ and $|1\rangle$ described above:
+
+$$
+\rho_{\text{mix}} = \tfrac12|0\rangle\langle0| + \tfrac12|1\rangle\langle1|
+= \tfrac12\begin{pmatrix}1&0\\0&0\end{pmatrix} + \tfrac12\begin{pmatrix}0&0\\0&1\end{pmatrix}
+= \begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}
+$$
+
+This is exactly $I/2$ — the **maximally mixed state**, the density
+matrix furthest from describing any single definite pure state. It says:
+"measured in the computational basis, 0 and 1 are equally likely" and
+nothing more.
+
+### The key comparison: ρ_mix vs. ρ_+
+
+Now compare $\rho_{\text{mix}}$ to $\rho_{|+\rangle}$ from Lesson 1:
+
+<QuantumStateDisplay state={plusState} label="|+⟩ = (|0⟩+|1⟩)/√2" />
+
+$$
+\rho_{|+\rangle} = \begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}
+\qquad\text{vs.}\qquad
+\rho_{\text{mix}} = \begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}
+$$
+
+**Identical diagonal entries** — both predict $P(0)=P(1)=0.5$ in the
+computational basis, so a single computational-basis measurement can
+never tell them apart. But the **off-diagonal entries differ**: $0.5$
+for $|+\rangle$, exactly $0$ for the mixture. Those off-diagonal terms
+are called **coherences**, and they carry real physical content: measure
+$X$ instead of $Z$. $|+\rangle$ is an eigenstate of $X$ with eigenvalue
+$+1$, so it gives $P(+)=1$ deterministically in the $X$ basis. The
+maximally mixed state gives $P(+)=P(-)=0.5$ in *every* basis, $X$
+included — no measurement basis distinguishes its two "halves." A single
+$X$-basis measurement, repeated enough times to build statistics,
+cleanly separates the two states — something the computational basis
+alone could never do.
+
+### Purity foreshadowed
+
+One number captures this difference directly: $\text{Tr}(\rho^2)$.
+
+$$
+\text{Tr}(\rho_{|+\rangle}^2) = 1 \qquad \text{Tr}(\rho_{\text{mix}}^2) = 0.5
+$$
+
+$\text{Tr}(\rho^2)=1$ exactly for every pure state (proven next lesson);
+anything less signals a genuine mixture, with $\text{Tr}(\rho^2)=1/d$ the
+minimum, reached exactly at maximally mixed. Both numbers above are
+computed by the engine's `purity` function and checked as regression
+tests — Lesson 6 derives *why* $\text{Tr}(\rho^2)$ behaves this way in
+general, not just for this one pair of examples.
+
+## Physical Interpretation
+
+A quantum superposition and a classical mixture are not two words for the
+same idea. $|+\rangle$ is one definite quantum state, in which "0 or 1"
+genuinely has no fixed answer until measured, and interference (the X
+measurement above) is fully available. $\rho_{\text{mix}}$ describes a
+qubit that *actually is* $|0\rangle$ or actually is $|1\rangle$ the whole
+time — you (the observer) just don't know which — and no measurement in
+any basis reveals any interference at all, because there genuinely is
+none. The density matrix is the first tool this course has built that
+can tell these two situations apart at all.
+
+## Interactive Experiment
+
+Try the two 50/50 presets below — mixing $|0\rangle,|1\rangle$, then
+mixing $|+\rangle,|-\rangle$ — and watch the Bloch-sphere point land on
+the *exact* same spot both times, dead center: $\rho=I/2$. Then drag the
+weight slider away from $0.5$ on either preset and watch the point move
+smoothly off-center, back toward the surface — purity and entropy update
+live as it does.
+
+<LazyDensityMatrixExplorer />
+
+## Worked Example
+
+**A qubit is prepared as $|+\rangle$ with probability 0.5 and $|-\rangle$
+with probability 0.5. Find $\rho$, and identify what familiar state it
+equals.**
+
+$|+\rangle\langle+|=\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}$,
+$|-\rangle\langle-|=\begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix}$.
+Averaging: $\rho=\tfrac12\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}+\tfrac12\begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix}=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$.
+A 50/50 mixture of $|+\rangle,|-\rangle$ is *also* the maximally mixed
+state — the same $\rho$ as a 50/50 mixture of $|0\rangle,|1\rangle$. This
+is a genuine, physically meaningful fact, not a coincidence of notation:
+$I/2$ has no memory of *which* basis it was "mixed in," because it truly
+is featureless in every basis simultaneously. There is no experiment
+that can tell a $\{|0\rangle,|1\rangle\}$-prepared maximally mixed qubit
+from a $\{|+\rangle,|-\rangle\}$-prepared one — they are the same
+physical state.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating $\tfrac12|0\rangle+\tfrac1{\sqrt2}|1\rangle$-style thinking as
+the same as a mixture.** A superposition $\alpha|0\rangle+\beta|1\rangle$
+is one specific pure ket — it has its own density matrix
+$|\psi\rangle\langle\psi|$, generally with nonzero coherence terms. A
+mixture is a probability-weighted sum of *entire density matrices*, not
+a sum of kets — there is no ket for $\rho_{\text{mix}}$ at all.
+</Callout>
+
+<Callout type="mistake">
+**Assuming equal diagonal entries means equal states.** As shown above,
+$\rho_{|+\rangle}$ and $\rho_{\text{mix}}$ share every diagonal entry but
+are entirely different physical states, distinguishable by measuring in
+a different basis (or, equivalently, by their different purity).
+</Callout>
+
+## Practice Questions
+
+1. A qubit is $|0\rangle$ with probability 0.8 and $|1\rangle$ with
+   probability 0.2. Write down $\rho$.
+2. Compute $\text{Tr}(\rho^2)$ for the state in question 1, and confirm
+   it's strictly between 0.5 and 1.
+3. A qubit is $|+\rangle$ with probability $p$ and $|-\rangle$ with
+   probability $1-p$. Show that $\rho=I/2$ for *every* value of $p$, not
+   just $p=0.5$. (This is a stronger and slightly different fact than the
+   worked example above — check it holds for general $p$.)
+4. Explain why no single measurement, in any one fixed basis, can ever
+   distinguish $\rho_{\text{mix}}=I/2$ from any other $I/2$-producing
+   mixture.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A classical mixture's density matrix is $\rho=\sum_ip_i|\psi_i\rangle\langle\psi_i|$
+  — a probability-weighted sum of pure-state density matrices, not a
+  weighted sum of kets.
+- Hermiticity and trace 1 survive mixing by linearity; positivity does
+  too (verified directly by the engine for the 2×2 case).
+- $|+\rangle$ and a 50/50 mixture of $|0\rangle,|1\rangle$ share every
+  computational-basis prediction but differ in their off-diagonal
+  coherence terms and in $\text{Tr}(\rho^2)$ — genuinely different
+  physical states, distinguishable by measuring in a different basis.
+- The maximally mixed state $I/2$ results from mixing *any* orthogonal
+  pair with equal weight, in any basis — it has no memory of which basis
+  produced it.
+
+## Further Exploration
+
+Next: **Convex Combinations and Physical Mixtures**, which generalizes
+today's 50/50 examples to arbitrary probability weights and arbitrary
+numbers of components, and pins down exactly which matrices can arise
+this way.

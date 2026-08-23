@@ -10,6 +10,10 @@ import {
   infiniteSquareWellEnergyLevel,
   harmonicOscillatorEnergyLevel as continuousHarmonicOscillatorEnergyLevel,
 } from "@/lib/quantum/potentials";
+import { projectorOntoSubspace } from "@/lib/quantum/projectors";
+import { commutator, expectationValue } from "@/lib/quantum/observables";
+import { finiteSquareWellGroundStateEnergy } from "@/lib/quantum/potentials";
+import { stepPotentialScattering, barrierScatteringTransmission } from "@/lib/quantum/scattering";
 
 describe("problem registry integrity", () => {
   const problems = getAllProblems();
@@ -277,5 +281,110 @@ describe("Wave Mechanics — demonstration problems match the continuous-positio
     const problem = getProblem("top-hat-normalization-constant");
     if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
     expect(problem.answer.value).toBeCloseTo(1 / Math.sqrt(8), 6);
+  });
+});
+
+describe("Operators, Observables & Measurement — demonstration problems match the engine", () => {
+  it("the trace-of-projector problem matches a directly-computed projector's trace", () => {
+    const problem = getProblem("trace-of-projector-equals-degeneracy");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const e0 = [Complex.ONE, Complex.ZERO, Complex.ZERO];
+    const e1 = [Complex.ZERO, Complex.ONE, Complex.ZERO];
+    const p = projectorOntoSubspace([e0, e1]);
+    const trace = p.get(0, 0).re + p.get(1, 1).re + p.get(2, 2).re;
+    expect(problem.answer.value).toBeCloseTo(trace, 9);
+  });
+
+  it("the [X,Z] commutator-entry problem matches commutator(PAULI_X, PAULI_Z) directly", () => {
+    const problem = getProblem("xz-commutator-entry");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const comm = commutator(PAULI_X, PAULI_Z);
+    expect(problem.answer.value).toBeCloseTo(comm.get(0, 1).magnitude(), 9);
+  });
+
+  it("the degenerate-measurement-probability and post-measurement-state problems match the engine", () => {
+    const probProblem = getProblem("degenerate-measurement-probability");
+    const stateProblem = getProblem("post-measurement-state-component");
+    if (probProblem?.answer.type !== "numeric" || stateProblem?.answer.type !== "numeric") {
+      throw new Error("expected numeric problems");
+    }
+    const c = new Complex(1 / Math.sqrt(3));
+    const psiAmplitudes = [c, c, c];
+    const e0 = [Complex.ONE, Complex.ZERO, Complex.ZERO];
+    const e1 = [Complex.ZERO, Complex.ONE, Complex.ZERO];
+    const p1 = projectorOntoSubspace([e0, e1]);
+
+    expect(probProblem.answer.value).toBeCloseTo(expectationValue({ amplitudes: psiAmplitudes }, p1).re, 5);
+
+    const projected = p1.apply(psiAmplitudes);
+    const norm = Math.sqrt(projected.reduce((sum, a) => sum + a.magnitudeSquared(), 0));
+    expect(stateProblem.answer.value).toBeCloseTo(projected[0].scale(1 / norm).re, 5);
+  });
+
+  it("the sequential-measurement-probability problem matches a direct Z-then-X-then-Z simulation", () => {
+    const problem = getProblem("sequential-measurement-probability");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const plus = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+    const zero = StateVector.basis(1, 0);
+    const p0 = projectorOntoSubspace([zero.amplitudes]);
+    expect(problem.answer.value).toBeCloseTo(expectationValue(plus, p0).re, 9);
+  });
+
+  it("the characteristic-timescale and minimum-timescale problems match the direct formula", () => {
+    const timescaleProblem = getProblem("characteristic-timescale-calculation");
+    const minProblem = getProblem("minimum-timescale-from-energy-spread");
+    if (timescaleProblem?.answer.type !== "numeric" || minProblem?.answer.type !== "numeric") {
+      throw new Error("expected numeric problems");
+    }
+    expect(timescaleProblem.answer.value).toBeCloseTo(2 / 3, 5);
+    expect(minProblem.answer.value).toBeCloseTo(0.5 / 2, 9);
+  });
+
+  it("the Bell-state Z0-measurement problem matches expectationValue on a real Bell state", () => {
+    const problem = getProblem("bell-state-z0-measurement-probability");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const bell = new StateVector([
+      new Complex(Math.SQRT1_2),
+      Complex.ZERO,
+      Complex.ZERO,
+      new Complex(Math.SQRT1_2),
+    ]);
+    const b00 = StateVector.basis(2, 0);
+    const b01 = StateVector.basis(2, 1);
+    const z0Plus = projectorOntoSubspace([b00.amplitudes, b01.amplitudes]);
+    expect(problem.answer.value).toBeCloseTo(expectationValue(bell, z0Plus).re, 9);
+  });
+});
+
+describe("One-Dimensional Systems — demonstration problems match the engine", () => {
+  it("the finite-well ground-state and energy-above-floor problems match finiteSquareWellGroundStateEnergy()", () => {
+    const groundProblem = getProblem("finite-well-ground-state-calculation");
+    const floorProblem = getProblem("energy-above-well-floor");
+    if (groundProblem?.answer.type !== "numeric" || floorProblem?.answer.type !== "numeric") {
+      throw new Error("expected numeric problems");
+    }
+    expect(groundProblem.answer.value).toBeCloseTo(finiteSquareWellGroundStateEnergy(2, 3), 5);
+    const worked = finiteSquareWellGroundStateEnergy(1, 5);
+    expect(floorProblem.answer.value).toBeCloseTo(worked + 5, 5);
+  });
+
+  it("the step-scattering problem matches stepPotentialScattering() directly", () => {
+    const problem = getProblem("step-scattering-calculation");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    expect(problem.answer.value).toBeCloseTo(stepPotentialScattering(8, 2).reflection, 6);
+  });
+
+  it("the barrier-transmission and second-resonant-width problems match barrierScatteringTransmission()", () => {
+    const transmissionProblem = getProblem("barrier-transmission-calculation");
+    const widthProblem = getProblem("second-resonant-width");
+    if (transmissionProblem?.answer.type !== "numeric" || widthProblem?.answer.type !== "numeric") {
+      throw new Error("expected numeric problems");
+    }
+    expect(transmissionProblem.answer.value).toBeCloseTo(barrierScatteringTransmission(6, 3, 1), 5);
+
+    const k2 = Math.sqrt(2 * (5 - 2));
+    const firstResonance = Math.PI / k2;
+    expect(widthProblem.answer.value).toBeCloseTo(2 * firstResonance, 4);
+    expect(barrierScatteringTransmission(5, 2, 2 * firstResonance)).toBeCloseTo(1, 6);
   });
 });

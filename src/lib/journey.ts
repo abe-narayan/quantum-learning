@@ -5,6 +5,10 @@ export type JourneyStep = {
 
 export const JOURNEY_STEPS: JourneyStep[] = [
   {
+    title: "Mathematical Foundations",
+    description: "The complex numbers and linear algebra every course here — physics or computing — builds on.",
+  },
+  {
     title: "Qubits",
     description: "The basic unit of quantum information, and how it differs from a classical bit.",
   },

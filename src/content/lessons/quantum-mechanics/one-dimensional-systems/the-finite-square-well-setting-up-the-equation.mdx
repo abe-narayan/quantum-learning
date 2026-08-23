@@ -1,0 +1,191 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/one-dimensional-systems/the-finite-square-well-setting-up-the-equation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Finite Square Well: Setting Up the Equation",
+  description:
+    "Unlike the infinite well's hard walls, a finite-depth well lets the wavefunction leak into the classically forbidden region -- deriving the resulting transcendental quantization condition from boundary matching alone.",
+  course: "one-dimensional-systems",
+  module: "the-finite-square-well-setting-up-the-equation",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 24,
+  prerequisites: [
+    "quantum-mechanics/wave-mechanics/the-infinite-square-well",
+    "quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier",
+  ],
+  objectives: [
+    "Write the three-region solution for a finite square well's bound states",
+    "Apply continuity of psi and psi' to derive the even-parity transcendental quantization condition",
+    "Explain why this equation has no closed-form solution, unlike the infinite well's",
+  ],
+};
+
+## Motivation
+
+The infinite square well's walls are a convenient idealization — no real
+potential is actually infinite. Make the walls finite (a well of depth
+$V_0$ rather than $\infty$), and the physics changes in a genuinely new
+way: the wavefunction no longer vanishes exactly at the boundary — the
+Tunneling and the Finite Barrier lesson already showed *why* a classically
+forbidden region allows a nonzero, exponentially decaying wavefunction
+rather than a zero one. This lesson applies that exact mechanism to a
+*bound* state instead of a barrier.
+
+## Intuition
+
+Picture the well the same way as before — a dip in potential energy from
+$-a$ to $a$ — but now only $V_0$ deep, not infinitely deep. A particle
+with energy $E$ satisfying $-V_0<E<0$ (bound, but not infinitely
+confined) has real oscillatory behavior *inside* the well and
+exponentially decaying behavior *outside* it, on both sides — no longer
+forced to exactly zero at $x=\pm a$, just small.
+
+## Mathematical Development
+
+### Three regions, two kinds of solution
+
+Take the well as $V(x)=-V_0$ for $|x|<a$, $V(x)=0$ for $|x|>a$ (matching
+this platform's `finiteSquareWellPotential` convention exactly). A bound
+state has $-V_0<E<0$. Define
+
+$$
+k \equiv \sqrt{2(E+V_0)} \quad(\text{inside, oscillatory}), \qquad \kappa \equiv \sqrt{-2E} \quad(\text{outside, decaying})
+$$
+
+(natural units, $\hbar=m=1$, matching every potential this platform's
+engine works in). Inside the well, the time-independent Schrödinger
+equation gives $\psi''=-k^2\psi$ (oscillatory, exactly as in the infinite
+well); outside, $\psi''=\kappa^2\psi$ (decaying, exactly as in the
+classically forbidden region of the Tunneling lesson). The physically
+sensible (normalizable) solution outside must decay as $|x|\to\infty$,
+ruling out the growing exponential on each side.
+
+### Restricting to even-parity solutions
+
+The potential is symmetric ($V(-x)=V(x)$), so its eigenstates can be
+chosen with definite parity — even or odd under $x\to-x$ (a general fact
+about symmetric potentials, not derived in full here). Take the even
+case first:
+
+$$
+\psi(x) = \begin{cases} B\,e^{\kappa x} & x<-a \\ A\cos(kx) & |x|\le a \\ B\,e^{-\kappa x} & x>a \end{cases}
+$$
+
+(the same $B$ on both sides, by the assumed symmetry).
+
+### Matching at the boundary
+
+Continuity of $\psi$ and $\psi'$ at $x=a$ (required for the Schrödinger
+equation's second derivative to stay well-defined — the same requirement
+used in the Tunneling lesson):
+
+$$
+A\cos(ka) = B\,e^{-\kappa a} \qquad\text{(continuity of $\psi$)}
+$$
+
+$$
+-Ak\sin(ka) = -B\kappa\,e^{-\kappa a} \qquad\text{(continuity of $\psi'$)}
+$$
+
+Dividing the second equation by the first eliminates both unknown
+amplitudes $A,B$ entirely:
+
+$$
+\boxed{\;k\tan(ka) = \kappa\;}
+$$
+
+This is the **transcendental quantization condition** for even-parity
+bound states. (The odd-parity case, using $\psi=A\sin(kx)$ inside,
+gives the companion equation $-k\cot(ka)=\kappa$ by an identical
+matching argument — not derived in full here, but the same mechanism.)
+
+### Why this has no closed form
+
+Both $k$ and $\kappa$ depend on the *same* energy $E$
+($k=\sqrt{2(E+V_0)}$, $\kappa=\sqrt{-2E}$), so this is one transcendental
+equation in one unknown ($E$, or equivalently $k$) — but with a
+trigonometric function tangled together with a square root, there's no
+algebraic manipulation that isolates $E$. This is qualitatively different
+from the infinite well, where the boundary condition ($\sin(kL)=0$) was
+solvable in closed form ($kL=n\pi$) precisely *because* the outside
+region was simply forbidden entirely, removing the $\kappa$ side of the
+equation altogether.
+
+## Physical Interpretation
+
+The transcendental equation packages a real physical trade-off: a deeper
+or wider well (larger $V_0$ or $a$) pushes $k\tan(ka)$ and $\kappa$ into
+agreement at a lower (more negative) $E$ — a more tightly bound state,
+matching intuition. Crucially, **a finite well supports only finitely
+many bound states** (possibly just one), unlike the infinite well's
+infinite ladder — a directly testable, qualitatively different
+prediction from the systems already solved.
+
+## Worked Example
+
+**Confirm that as $V_0\to\infty$ (with $a$ fixed), the transcendental
+equation forces $k\to\pi/(2a)$ — the infinite well's ground-state
+wavenumber.**
+
+As $V_0\to\infty$, $\kappa=\sqrt{-2E}=\sqrt{2(V_0-|E|)}\to\infty$ for any
+finite bound-state energy near the bottom of the well. The equation
+$k\tan(ka)=\kappa$ then forces $\tan(ka)\to\infty$, which happens exactly
+when $ka\to\pi/2$ — i.e. $k\to\pi/(2a)$. Comparing to the infinite well's
+formula $k_n=n\pi/(2a)$ for a well of full width $2a$ (Infinite Square
+Well lesson, relabeled to this well's centered convention): this is
+exactly $n=1$, the ground state. The finite well's transcendental
+equation correctly reduces to the already-solved infinite-well result in
+the appropriate limit — a genuine consistency check.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting that $k$ and $\kappa$ both depend on the same $E$.** They
+look like two independent variables in the boxed equation, but
+$k=\sqrt{2(E+V_0)}$ and $\kappa=\sqrt{-2E}$ are both functions of the
+*one* unknown energy — the equation has exactly one unknown, not two.
+</Callout>
+
+<Callout type="mistake">
+**Assuming odd and even states satisfy the same transcendental
+equation.** They don't — $k\tan(ka)=\kappa$ is specifically the
+even-parity condition; the odd-parity one has a cotangent instead, with
+a different sign.
+</Callout>
+
+## Practice Questions
+
+1. Derive the odd-parity matching conditions explicitly (using
+   $\psi=A\sin(kx)$ inside, $\psi=\mp Be^{\mp\kappa x}$ outside for
+   $x\gtrless a$) and confirm the resulting equation is
+   $-k\cot(ka)=\kappa$.
+2. For a very shallow, wide well, would you expect $k$ (and hence the
+   binding energy) to be small or large? Justify using the transcendental
+   equation's structure.
+3. Explain, without solving anything numerically, why a finite well must
+   have *at least* one bound state, no matter how shallow (hint: consider
+   $k\to0$ in the boxed equation).
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A finite well's bound states oscillate inside and decay exponentially
+  outside, matched via continuity of $\psi,\psi'$ at the boundary.
+- The even-parity condition $k\tan(ka)=\kappa$ (with
+  $k=\sqrt{2(E+V_0)}$, $\kappa=\sqrt{-2E}$) is transcendental — no
+  algebraic solution for $E$ exists.
+- As $V_0\to\infty$, the equation correctly reduces to the infinite
+  well's closed-form ground-state result — a genuine consistency check
+  between two courses' derivations.
+
+## Further Exploration
+
+Next: **Solving the Finite Well Numerically**, actually finding a bound
+state's energy for specific well parameters, and comparing directly to
+the infinite-well limit.

@@ -1,0 +1,186 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/operators-observables-measurement/spectral-decomposition-and-degeneracy"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Spectral Decomposition and Degeneracy",
+  description:
+    "Turning the spectral theorem's notation into real, provable machinery — projection operators, their defining properties, and what happens when an eigenvalue has more than one eigenvector.",
+  course: "operators-observables-measurement",
+  module: "spectral-decomposition-and-degeneracy",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 24,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/hermitian-operators"],
+  objectives: [
+    "Define a projection operator and prove its two defining properties: idempotence and completeness",
+    "Write any Hermitian operator's spectral decomposition using projectors, including onto degenerate eigenspaces",
+    "Compute the projector onto a multi-dimensional degenerate eigenspace and verify it against the engine",
+  ],
+};
+
+## Motivation
+
+Mathematical Foundations stated the spectral decomposition
+$A=\sum_i\lambda_i|e_i\rangle\langle e_i|$ and verified it for Pauli-$Z$,
+where every eigenvalue happens to be nondegenerate — each eigenvalue has
+exactly one eigenvector. That's the easy case. This lesson builds the
+machinery — projection operators — that makes the decomposition precise
+and correct even when an eigenvalue has an entire *subspace* of
+eigenvectors, which is the rule rather than the exception once systems get
+more interesting (multiple energy levels sharing one energy, as you'll
+see for real in the future Hydrogen Atom course).
+
+## Intuition
+
+A **projection operator** does exactly what the name suggests: given any
+vector, it keeps the part lying in some subspace and discards the rest —
+the linear-algebra analogue of a shadow cast onto a wall. Every term
+$|e_i\rangle\langle e_i|$ in the spectral decomposition is a projector
+onto the one-dimensional subspace spanned by $|e_i\rangle$; this lesson's
+only real extension is allowing that subspace to be bigger than one
+dimension.
+
+## Mathematical Development
+
+### Two defining properties
+
+An operator $P$ is a projector if it satisfies:
+
+$$
+P^2 = P \qquad \text{(idempotence)}
+$$
+
+$$
+P^\dagger = P \qquad \text{(Hermitian)}
+$$
+
+**Idempotence proven directly** for the rank-1 case $P=|e\rangle\langle
+e|$ with $|e\rangle$ normalized:
+
+$$
+P^2 = |e\rangle\langle e|e\rangle\langle e| = |e\rangle\cdot1\cdot\langle e| = |e\rangle\langle e| = P
+$$
+
+using $\langle e|e\rangle=1$. Physically: projecting twice does nothing
+more than projecting once — once you've kept only the component along
+$|e\rangle$, projecting *that* again changes nothing.
+
+### Projectors onto degenerate eigenspaces
+
+If eigenvalue $\lambda_i$ has $d$ orthonormal eigenvectors
+$|e_{i,1}\rangle,\ldots,|e_{i,d}\rangle$ (a $d$-dimensional eigenspace —
+Mathematical Foundations already noted these can always be chosen
+orthonormal via Gram-Schmidt), the projector onto the *whole eigenspace*
+is the sum of the individual rank-1 projectors:
+
+$$
+P_i = \sum_{k=1}^{d} |e_{i,k}\rangle\langle e_{i,k}|
+$$
+
+This is still idempotent (each term is individually idempotent, and
+cross terms vanish by orthogonality: $\langle e_{i,j}|e_{i,k}\rangle=0$
+for $j\ne k$) — proven exactly the same way, just with an extra sum. This
+is precisely what this platform's `projectorOntoSubspace(vectors)`
+function builds, and `outerProduct(ket, bra)` computes each
+$|e_{i,k}\rangle\langle e_{i,k}|$ term.
+
+### The full spectral decomposition, correctly stated
+
+$$
+A = \sum_i \lambda_i P_i, \qquad P_i = \sum_{k} |e_{i,k}\rangle\langle e_{i,k}|
+$$
+
+— summing over *distinct eigenvalues* $\lambda_i$, with $P_i$ now
+possibly higher-rank. Two consistency facts worth naming: the projectors
+onto different eigenspaces are mutually orthogonal, $P_iP_j=0$ for
+$i\ne j$ (a direct consequence of the eigenvector-orthogonality theorem
+from Mathematical Foundations), and they sum to the identity,
+$\sum_iP_i=I$ (**completeness** — projecting onto every eigenspace and
+adding the results has to reconstruct the original vector, since the
+eigenvectors span the whole space).
+
+## Physical Interpretation
+
+Degeneracy means an eigenvalue alone doesn't fully identify a unique
+basis state — knowing "the energy is $E_i$" only tells you the state
+lives *somewhere* in a $d$-dimensional eigenspace, not exactly where. The
+next lesson builds the tool for resolving this: a second, compatible
+observable that distinguishes states within the degenerate subspace.
+
+## Worked Example
+
+**Let $N=\mathrm{diag}(1,1,2)$ on $\mathbb{C}^3$. Find its spectral
+decomposition.**
+
+Eigenvalue $1$ has eigenspace $\mathrm{span}\{|0\rangle,|1\rangle\}$ (a
+degenerate, 2-dimensional eigenspace — the standard basis vectors $e_0,
+e_1$ of the 3-dimensional space); eigenvalue $2$ has eigenspace
+$\mathrm{span}\{|2\rangle\}$ (nondegenerate). So:
+
+$$
+P_1 = |0\rangle\langle0| + |1\rangle\langle1| = \begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix}, \qquad P_2 = |2\rangle\langle2| = \begin{pmatrix}0&0&0\\0&0&0\\0&0&1\end{pmatrix}
+$$
+
+$$
+N = 1\cdot P_1 + 2\cdot P_2 = \begin{pmatrix}1&0&0\\0&1&0\\0&0&2\end{pmatrix} \checkmark
+$$
+
+matching $N$ exactly — confirming both projectors and the decomposition
+directly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Writing a separate term for every eigen*vector* instead of every
+eigen*value*.** With a degenerate eigenvalue, the correct decomposition
+groups all its eigenvectors into one projector $P_i$ — writing
+$\lambda_i|e_{i,1}\rangle\langle e_{i,1}| + \lambda_i|e_{i,2}\rangle
+\langle e_{i,2}|$ separately gives the same operator, but treating them
+as two *different* terms with the same eigenvalue obscures that they're
+one eigenspace, which matters for the measurement postulate two lessons
+ahead.
+</Callout>
+
+<Callout type="mistake">
+**Assuming $P^2=P$ for any Hermitian operator.** It's specific to
+projectors — Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
+*extra* condition beyond Hermiticity.
+</Callout>
+
+## Practice Questions
+
+1. Verify $P_1^2=P_1$ directly for the $N$ example above, by matrix
+   multiplication.
+2. For a Hermitian operator with three distinct eigenvalues on a
+   4-dimensional space, what are the possible dimensions of its
+   eigenspaces (listing all ways they could add up to 4)?
+3. Confirm $P_1P_2=0$ for the $N$ example's two projectors, by direct
+   matrix multiplication.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A projector satisfies $P^2=P$ and $P^\dagger=P$; $|e\rangle\langle e|$
+  for a normalized $|e\rangle$ is the simplest (rank-1) example.
+- A degenerate eigenspace's projector sums the rank-1 projectors of an
+  orthonormal basis for that eigenspace: $P_i=\sum_k|e_{i,k}\rangle
+  \langle e_{i,k}|$.
+- The full spectral decomposition $A=\sum_i\lambda_iP_i$, summed over
+  *distinct* eigenvalues, holds correctly whether or not any eigenvalue
+  is degenerate.
+- `outerProduct` and `projectorOntoSubspace` (this platform's new engine
+  functions) build exactly these objects, tested against idempotence,
+  completeness, and the reconstruction of Pauli-$Z$ from its own
+  projectors.
+
+## Further Exploration
+
+Next: **Simultaneous Eigenstates and Compatible Observables**, using
+projectors to prove exactly when two observables can share a common
+eigenbasis — and why that's the same condition as their commutator
+vanishing.

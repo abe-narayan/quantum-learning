@@ -1,0 +1,208 @@
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/entanglement-and-measurement/from-state-vectors-to-density-matrices"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "From State Vectors to Density Matrices",
+  description:
+    "The operator ρ=|ψ⟩⟨ψ| that carries exactly the same information as a state vector — derived, not just defined, and cross-checked against every expectation value this platform has computed so far.",
+  course: "entanglement-and-measurement",
+  module: "from-state-vectors-to-density-matrices",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors"],
+  objectives: [
+    "Construct the density matrix ρ=|ψ⟩⟨ψ| for a pure state from its amplitudes",
+    "Prove Tr(ρ)=1 and ρ=ρ† follow directly from |ψ⟩ being normalized",
+    "Derive ⟨A⟩=Tr(ρA) from the ordinary expectation-value formula ⟨ψ|A|ψ⟩",
+  ],
+};
+
+export const zeroState = StateVector.zero(1);
+export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+
+## Motivation
+
+Multi-Qubit State Vectors ended on an unanswered question: for an
+entangled pair like the Bell state, "what is qubit 0's state, on its
+own?" has no good answer — there is no single-qubit ket that describes
+it. That's not a gap in notation to patch over; it's a sign the state
+*vector* is the wrong tool for the job, and this course exists to build
+the right one.
+
+The fix starts here, with a state vector's whole physical content
+repackaged into a different mathematical object: not a list of
+amplitudes, but an operator. Every prediction a state vector makes —
+every probability, every expectation value — survives the repackaging
+exactly. Nothing is lost yet. What's gained shows up over the next few
+lessons: this new object turns out to describe things $|\psi\rangle$
+simply cannot.
+
+## Mathematical Development
+
+### The definition
+
+For a normalized state $|\psi\rangle$, define its **density matrix**:
+
+$$
+\rho = |\psi\rangle\langle\psi|
+$$
+
+This is an outer product, not an inner product — $|\psi\rangle\langle\psi|$
+is a $d\times d$ matrix (for a $d$-dimensional system), not a number.
+Concretely, if $|\psi\rangle = \sum_i c_i |i\rangle$, then $\rho$'s
+entry in row $i$, column $j$ is $\rho_{ij} = c_i c_j^*$.
+
+<QuantumStateDisplay state={zeroState} label="|0⟩" />
+
+$$
+\rho_{|0\rangle} = |0\rangle\langle0| = \begin{pmatrix}1\\0\end{pmatrix}\begin{pmatrix}1&0\end{pmatrix} = \begin{pmatrix}1&0\\0&0\end{pmatrix}
+$$
+
+For $|+\rangle = \frac{1}{\sqrt2}(|0\rangle+|1\rangle)$:
+
+<QuantumStateDisplay state={plusState} label="|+⟩" />
+
+$$
+\rho_{|+\rangle} = |+\rangle\langle+| = \frac{1}{2}\begin{pmatrix}1\\1\end{pmatrix}\begin{pmatrix}1&1\end{pmatrix} = \begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}
+$$
+
+Both match `pureStateDensityMatrix`'s output exactly — checked directly
+in this module's regression tests.
+
+### ρ is Hermitian with trace 1 — proven, not assumed
+
+Two structural facts follow immediately from $|\psi\rangle$ being a
+normalized ket, for *any* pure state:
+
+**Hermitian.** $\rho^\dagger = (|\psi\rangle\langle\psi|)^\dagger =
+|\psi\rangle\langle\psi| = \rho$, since taking the dagger of an outer
+product reverses and conjugates — $(|a\rangle\langle b|)^\dagger =
+|b\rangle\langle a|$ — and here $|a\rangle=|b\rangle=|\psi\rangle$, so
+nothing changes.
+
+**Trace 1.** Writing $|\psi\rangle=\sum_i c_i|i\rangle$, the diagonal
+entries are $\rho_{ii}=c_ic_i^*=|c_i|^2$, so
+$\text{Tr}(\rho)=\sum_i|c_i|^2$ — exactly the normalization condition
+$\langle\psi|\psi\rangle=1$ this platform has enforced on every state
+vector since Quantum States & State Vectors. Trace 1 isn't a separate
+assumption about $\rho$; it's the same normalization fact, restated.
+
+These two properties — Hermitian, trace 1 — are not incidental. Lesson
+2 shows they're the *complete* characterization of what makes a matrix
+a valid density matrix (together with one more condition, positivity),
+whether or not it comes from a single $|\psi\rangle$ at all.
+
+### Expectation values: ⟨A⟩ = Tr(ρA)
+
+The ordinary formula for an observable's expectation value is
+$\langle A\rangle=\langle\psi|A|\psi\rangle$. Insert $\rho$:
+
+$$
+\text{Tr}(\rho A) = \text{Tr}(|\psi\rangle\langle\psi|A)
+$$
+
+Using the cyclic property of trace, $\text{Tr}(|\psi\rangle\langle\psi|A)
+=\text{Tr}(\langle\psi|A|\psi\rangle)$. But $\langle\psi|A|\psi\rangle$
+is already a $1\times1$ matrix — a plain number — and the trace of a
+number is itself:
+
+$$
+\text{Tr}(\rho A) = \langle\psi|A|\psi\rangle = \langle A\rangle
+$$
+
+So $\langle A\rangle=\text{Tr}(\rho A)$ is not a new postulate for density
+matrices — it's the *same* expectation-value formula, re-derived using
+only the cyclic property of trace. As a check, for $\langle+|Z|+\rangle$:
+
+$$
+\text{Tr}(\rho_{|+\rangle}Z) = \text{Tr}\begin{pmatrix}0.5&-0.5\\0.5&-0.5\end{pmatrix} = 0.5-0.5 = 0 = \langle+|Z|+\rangle
+$$
+
+using $\rho_{|+\rangle}Z=\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}\begin{pmatrix}1&0\\0&-1\end{pmatrix}$.
+`densityMatrixExpectationValue` and `observables.ts`'s `expectationValue`
+agree to numerical precision for every observable — enforced as a
+regression test (`densityMatrix.test.ts`), not just checked once here.
+
+## Physical Interpretation
+
+$\rho=|\psi\rangle\langle\psi|$ is not a new theory of quantum states —
+it's the *same* state vector, viewed as an operator instead of a list of
+numbers. Every prediction (probabilities, expectation values) computed
+from $\rho$ agrees exactly with the one computed from $|\psi\rangle$
+directly. What changes is what the object *can express*: an operator
+can be built in ways a normalized vector cannot — added together,
+weighted by probabilities, restricted to part of a larger system — and
+those constructions are exactly what the rest of this course is about.
+
+## Worked Example
+
+**Compute the density matrix of $|1\rangle$, and use it to find
+$\langle Z\rangle$ via $\text{Tr}(\rho Z)$.**
+
+$|1\rangle=\begin{pmatrix}0\\1\end{pmatrix}$, so
+$\rho=|1\rangle\langle1|=\begin{pmatrix}0\\1\end{pmatrix}\begin{pmatrix}0&1\end{pmatrix}=\begin{pmatrix}0&0\\0&1\end{pmatrix}$.
+With $Z=\begin{pmatrix}1&0\\0&-1\end{pmatrix}$:
+$\rho Z=\begin{pmatrix}0&0\\0&1\end{pmatrix}\begin{pmatrix}1&0\\0&-1\end{pmatrix}=\begin{pmatrix}0&0\\0&-1\end{pmatrix}$,
+so $\text{Tr}(\rho Z)=0+(-1)=-1$. This matches the direct calculation
+$\langle1|Z|1\rangle=-1$ — $Z$'s eigenvalue on $|1\rangle$, as expected
+since $|1\rangle$ is a $Z$-eigenstate.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Writing ρ as if it were a ket.** $\rho=|\psi\rangle\langle\psi|$ is a
+matrix (an operator), not a vector — it has a bra *and* a ket, multiplied
+as an outer product. $\langle\psi|\psi\rangle$ (inner product, a number)
+and $|\psi\rangle\langle\psi|$ (outer product, a matrix) look similar but
+are entirely different objects.
+</Callout>
+
+<Callout type="mistake">
+**Thinking density matrices are only for "mixed" or uncertain states.**
+Every pure state has a perfectly well-defined density matrix — $\rho$
+isn't a hedge against not knowing $|\psi\rangle$. The distinction between
+pure and genuinely mixed states is the subject of the next lesson.
+</Callout>
+
+## Practice Questions
+
+1. Compute the density matrix of $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$.
+2. Verify by direct matrix multiplication that $\text{Tr}(\rho_{|-\rangle}X)$
+   matches $\langle-|X|-\rangle$.
+3. Explain, in one or two sentences, why $\rho^\dagger=\rho$ follows
+   automatically from $\rho=|\psi\rangle\langle\psi|$ for *any* $|\psi\rangle$,
+   without needing $|\psi\rangle$ to have any special property.
+4. A global phase $e^{i\theta}|\psi\rangle$ gives the exact same physical
+   state as $|\psi\rangle$. Show that its density matrix
+   $(e^{i\theta}|\psi\rangle)(e^{i\theta}|\psi\rangle)^\dagger$ equals
+   $\rho=|\psi\rangle\langle\psi|$ exactly — global phase disappears
+   entirely in the density-matrix picture.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\rho=|\psi\rangle\langle\psi|$ repackages a normalized state vector as
+  an operator, carrying exactly the same physical information.
+- $\rho$ is automatically Hermitian ($\rho^\dagger=\rho$) and has trace 1
+  — both are direct consequences of $|\psi\rangle$ being a normalized ket,
+  not extra assumptions.
+- $\langle A\rangle=\text{Tr}(\rho A)$ is the same expectation-value
+  formula as $\langle\psi|A|\psi\rangle$, re-derived using the cyclic
+  property of trace — not a new postulate.
+- Global phase, which was always physically invisible, vanishes
+  completely from the density-matrix description.
+
+## Further Exploration
+
+Next: **Pure States and Mixed States**, where the density matrix finally
+does something a state vector cannot — describing a system prepared with
+classical uncertainty about *which* quantum state it's in.

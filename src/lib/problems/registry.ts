@@ -85,6 +85,73 @@ import { wallheightDtProduct } from "@/content/problems/quantum-mechanics/wave-m
 import { synthesisStationaryDensityConstant } from "@/content/problems/quantum-mechanics/wave-mechanics/synthesis-stationary-density-constant";
 import { synthesisBeatFrequencyCalculation } from "@/content/problems/quantum-mechanics/wave-mechanics/synthesis-beat-frequency-calculation";
 import { synthesisContinuumVsFiniteMapping } from "@/content/problems/quantum-mechanics/wave-mechanics/synthesis-continuum-vs-finite-mapping";
+import { traceOfProjectorEqualsDegeneracy } from "@/content/problems/quantum-mechanics/operators-observables-measurement/trace-of-projector-equals-degeneracy";
+import { whyGroupDegenerateEigenvectors } from "@/content/problems/quantum-mechanics/operators-observables-measurement/why-group-degenerate-eigenvectors";
+import { xzCommutatorEntry } from "@/content/problems/quantum-mechanics/operators-observables-measurement/xz-commutator-entry";
+import { sharedEigenbasisImpliesCommuteRecap } from "@/content/problems/quantum-mechanics/operators-observables-measurement/shared-eigenbasis-implies-commute-recap";
+import { whichPairCommutes } from "@/content/problems/quantum-mechanics/operators-observables-measurement/which-pair-commutes";
+import { distinctJointEigenvaluePairs } from "@/content/problems/quantum-mechanics/operators-observables-measurement/distinct-joint-eigenvalue-pairs";
+import { whyOneObservableMayNotSuffice } from "@/content/problems/quantum-mechanics/operators-observables-measurement/why-one-observable-may-not-suffice";
+import { degenerateMeasurementProbability } from "@/content/problems/quantum-mechanics/operators-observables-measurement/degenerate-measurement-probability";
+import { postMeasurementStateComponent } from "@/content/problems/quantum-mechanics/operators-observables-measurement/post-measurement-state-component";
+import { whyCollapseUsesWholeProjector } from "@/content/problems/quantum-mechanics/operators-observables-measurement/why-collapse-uses-whole-projector";
+import { sequentialMeasurementProbability } from "@/content/problems/quantum-mechanics/operators-observables-measurement/sequential-measurement-probability";
+import { whyOutcomeIndependentDisturbance } from "@/content/problems/quantum-mechanics/operators-observables-measurement/why-outcome-independent-disturbance";
+import { characteristicTimescaleCalculation } from "@/content/problems/quantum-mechanics/operators-observables-measurement/characteristic-timescale-calculation";
+import { minimumTimescaleFromEnergySpread } from "@/content/problems/quantum-mechanics/operators-observables-measurement/minimum-timescale-from-energy-spread";
+import { stationaryStateInfiniteTimescale } from "@/content/problems/quantum-mechanics/operators-observables-measurement/stationary-state-infinite-timescale";
+import { bellStateZ0MeasurementProbability } from "@/content/problems/quantum-mechanics/operators-observables-measurement/bell-state-z0-measurement-probability";
+import { whyDifferentFactorObservablesCommute } from "@/content/problems/quantum-mechanics/operators-observables-measurement/why-different-factor-observables-commute";
+import { synthesisRepeatedMeasurementCertainty } from "@/content/problems/quantum-mechanics/operators-observables-measurement/synthesis-repeated-measurement-certainty";
+import { synthesisWhatCompleteMeans } from "@/content/problems/quantum-mechanics/operators-observables-measurement/synthesis-what-complete-means";
+import { synthesisNotAStrictGeneralization } from "@/content/problems/quantum-mechanics/operators-observables-measurement/synthesis-not-a-strict-generalization";
+import { synthesisZeroEnergyUncertaintyConsequence } from "@/content/problems/quantum-mechanics/operators-observables-measurement/synthesis-zero-energy-uncertainty-consequence";
+import { tangentBranchDivergencePoint } from "@/content/problems/quantum-mechanics/one-dimensional-systems/tangent-branch-divergence-point";
+import { whyNoClosedFormFiniteWell } from "@/content/problems/quantum-mechanics/one-dimensional-systems/why-no-closed-form-finite-well";
+import { finiteWellGroundStateCalculation } from "@/content/problems/quantum-mechanics/one-dimensional-systems/finite-well-ground-state-calculation";
+import { energyAboveWellFloor } from "@/content/problems/quantum-mechanics/one-dimensional-systems/energy-above-well-floor";
+import { whyFiniteWellAlwaysBinds } from "@/content/problems/quantum-mechanics/one-dimensional-systems/why-finite-well-always-binds";
+import { stepScatteringCalculation } from "@/content/problems/quantum-mechanics/one-dimensional-systems/step-scattering-calculation";
+import { whyReflectionAlwaysPositive } from "@/content/problems/quantum-mechanics/one-dimensional-systems/why-reflection-always-positive";
+import { whatIsActuallyBounded } from "@/content/problems/quantum-mechanics/one-dimensional-systems/what-is-actually-bounded";
+import { barrierTransmissionCalculation } from "@/content/problems/quantum-mechanics/one-dimensional-systems/barrier-transmission-calculation";
+import { secondResonantWidth } from "@/content/problems/quantum-mechanics/one-dimensional-systems/second-resonant-width";
+import { whyResonanceDependsOnK2L } from "@/content/problems/quantum-mechanics/one-dimensional-systems/why-resonance-depends-on-k2l";
+import { synthesisBoundVsContinuousSpectrum } from "@/content/problems/quantum-mechanics/one-dimensional-systems/synthesis-bound-vs-continuous-spectrum";
+import { synthesisWellDepthAndBoundStateCount } from "@/content/problems/quantum-mechanics/one-dimensional-systems/synthesis-well-depth-and-bound-state-count";
+import { synthesisTunnelingVsResonanceRegimes } from "@/content/problems/quantum-mechanics/one-dimensional-systems/synthesis-tunneling-vs-resonance-regimes";
+import { minusStateXExpectationViaRho } from "@/content/problems/quantum-computing/entanglement-and-measurement/minus-state-x-expectation-via-rho";
+import { oneStateDensityMatrixChoice } from "@/content/problems/quantum-computing/entanglement-and-measurement/one-state-density-matrix-choice";
+import { whyRhoIsHermitian } from "@/content/problems/quantum-computing/entanglement-and-measurement/why-rho-is-hermitian";
+import { biasedMixturePurity } from "@/content/problems/quantum-computing/entanglement-and-measurement/biased-mixture-purity";
+import { plusMinusMixtureIdentity } from "@/content/problems/quantum-computing/entanglement-and-measurement/plus-minus-mixture-identity";
+import { superpositionVsMixture } from "@/content/problems/quantum-computing/entanglement-and-measurement/superposition-vs-mixture";
+import { threeComponentMixtureEntry } from "@/content/problems/quantum-computing/entanglement-and-measurement/three-component-mixture-entry";
+import { indistinguishableEnsembles } from "@/content/problems/quantum-computing/entanglement-and-measurement/indistinguishable-ensembles";
+import { zeroOneProductReducedState } from "@/content/problems/quantum-computing/entanglement-and-measurement/zero-one-product-reduced-state";
+import { definingRequirementXCheck } from "@/content/problems/quantum-computing/entanglement-and-measurement/defining-requirement-x-check";
+import { whyTraceOutEverythingIsMeaningless } from "@/content/problems/quantum-computing/entanglement-and-measurement/why-trace-out-everything-is-meaningless";
+import { psiMinusPurityViaIdentity } from "@/content/problems/quantum-computing/entanglement-and-measurement/psi-minus-purity-via-identity";
+import { whyProofNeedsTwoQubits } from "@/content/problems/quantum-computing/entanglement-and-measurement/why-proof-needs-two-qubits";
+import { entropyOfSixtyFortyMixture } from "@/content/problems/quantum-computing/entanglement-and-measurement/entropy-of-sixty-forty-mixture";
+import { nearPureEntropyCalculation } from "@/content/problems/quantum-computing/entanglement-and-measurement/near-pure-entropy-calculation";
+import { whyOneBitIsTheMaximum } from "@/content/problems/quantum-computing/entanglement-and-measurement/why-one-bit-is-the-maximum";
+import { weaklyEntangledStateEntropy } from "@/content/problems/quantum-computing/entanglement-and-measurement/weakly-entangled-state-entropy";
+import { diagnosingTheI4Counterexample } from "@/content/problems/quantum-computing/entanglement-and-measurement/diagnosing-the-i4-counterexample";
+import { psiMinusConcurrence } from "@/content/problems/quantum-computing/entanglement-and-measurement/psi-minus-concurrence";
+import { purityFromConcurrence } from "@/content/problems/quantum-computing/entanglement-and-measurement/purity-from-concurrence";
+import { maxConcurrenceImpliesMaximallyMixed } from "@/content/problems/quantum-computing/entanglement-and-measurement/max-concurrence-implies-maximally-mixed";
+import { xGateOnBiasedMixture } from "@/content/problems/quantum-computing/entanglement-and-measurement/x-gate-on-biased-mixture";
+import { measuringP1OnBiasedMixture } from "@/content/problems/quantum-computing/entanglement-and-measurement/measuring-p1-on-biased-mixture";
+import { maximallyMixedInvarianceProof } from "@/content/problems/quantum-computing/entanglement-and-measurement/maximally-mixed-invariance-proof";
+import { deterministicLhvChshValue } from "@/content/problems/quantum-computing/entanglement-and-measurement/deterministic-lhv-chsh-value";
+import { localityAssumptionNonlocalHv } from "@/content/problems/quantum-computing/entanglement-and-measurement/locality-assumption-nonlocal-hv";
+import { sameSettingsChshValue } from "@/content/problems/quantum-computing/entanglement-and-measurement/same-settings-chsh-value";
+import { sameAxisPerfectCorrelation } from "@/content/problems/quantum-computing/entanglement-and-measurement/same-axis-perfect-correlation";
+import { whatAChshViolationRulesOut } from "@/content/problems/quantum-computing/entanglement-and-measurement/what-a-chsh-violation-rules-out";
+import { phaseInvarianceOfEntanglementMeasures } from "@/content/problems/quantum-computing/entanglement-and-measurement/phase-invariance-of-entanglement-measures";
+import { whyConcurrenceNeedsStatevector } from "@/content/problems/quantum-computing/entanglement-and-measurement/why-concurrence-needs-statevector";
+import { purityBetweenTwoKnownValues } from "@/content/problems/quantum-computing/entanglement-and-measurement/purity-between-two-known-values";
 
 /**
  * Problems are plain, statically-imported TypeScript objects rather than
@@ -184,6 +251,73 @@ export const PROBLEMS: Problem[] = [
   synthesisStationaryDensityConstant,
   synthesisBeatFrequencyCalculation,
   synthesisContinuumVsFiniteMapping,
+  traceOfProjectorEqualsDegeneracy,
+  whyGroupDegenerateEigenvectors,
+  xzCommutatorEntry,
+  sharedEigenbasisImpliesCommuteRecap,
+  whichPairCommutes,
+  distinctJointEigenvaluePairs,
+  whyOneObservableMayNotSuffice,
+  degenerateMeasurementProbability,
+  postMeasurementStateComponent,
+  whyCollapseUsesWholeProjector,
+  sequentialMeasurementProbability,
+  whyOutcomeIndependentDisturbance,
+  characteristicTimescaleCalculation,
+  minimumTimescaleFromEnergySpread,
+  stationaryStateInfiniteTimescale,
+  bellStateZ0MeasurementProbability,
+  whyDifferentFactorObservablesCommute,
+  synthesisRepeatedMeasurementCertainty,
+  synthesisWhatCompleteMeans,
+  synthesisNotAStrictGeneralization,
+  synthesisZeroEnergyUncertaintyConsequence,
+  tangentBranchDivergencePoint,
+  whyNoClosedFormFiniteWell,
+  finiteWellGroundStateCalculation,
+  energyAboveWellFloor,
+  whyFiniteWellAlwaysBinds,
+  stepScatteringCalculation,
+  whyReflectionAlwaysPositive,
+  whatIsActuallyBounded,
+  barrierTransmissionCalculation,
+  secondResonantWidth,
+  whyResonanceDependsOnK2L,
+  synthesisBoundVsContinuousSpectrum,
+  synthesisWellDepthAndBoundStateCount,
+  synthesisTunnelingVsResonanceRegimes,
+  minusStateXExpectationViaRho,
+  oneStateDensityMatrixChoice,
+  whyRhoIsHermitian,
+  biasedMixturePurity,
+  plusMinusMixtureIdentity,
+  superpositionVsMixture,
+  threeComponentMixtureEntry,
+  indistinguishableEnsembles,
+  zeroOneProductReducedState,
+  definingRequirementXCheck,
+  whyTraceOutEverythingIsMeaningless,
+  psiMinusPurityViaIdentity,
+  whyProofNeedsTwoQubits,
+  entropyOfSixtyFortyMixture,
+  nearPureEntropyCalculation,
+  whyOneBitIsTheMaximum,
+  weaklyEntangledStateEntropy,
+  diagnosingTheI4Counterexample,
+  psiMinusConcurrence,
+  purityFromConcurrence,
+  maxConcurrenceImpliesMaximallyMixed,
+  xGateOnBiasedMixture,
+  measuringP1OnBiasedMixture,
+  maximallyMixedInvarianceProof,
+  deterministicLhvChshValue,
+  localityAssumptionNonlocalHv,
+  sameSettingsChshValue,
+  sameAxisPerfectCorrelation,
+  whatAChshViolationRulesOut,
+  phaseInvarianceOfEntanglementMeasures,
+  whyConcurrenceNeedsStatevector,
+  purityBetweenTwoKnownValues,
 ];
 
 export function getAllProblems(): Problem[] {

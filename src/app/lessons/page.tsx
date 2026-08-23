@@ -18,7 +18,7 @@ export default async function LessonsPage() {
       <PageHeader
         eyebrow="Lessons"
         title="Lesson catalog"
-        description="Every course across all four tracks, in one place. Most lessons are still being written — this is the full map of what's coming."
+        description="Every course across all four tracks, in one place — seven courses fully written so far (marked complete below), the rest mapped out as what's coming next."
       />
 
       <div className="mt-14 space-y-16">

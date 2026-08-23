@@ -126,6 +126,21 @@ export class Matrix {
     return true;
   }
 
+  /** The trace, sum of diagonal entries — defined for any square matrix. */
+  trace(): Complex {
+    if (this.rows !== this.cols) {
+      throw new Error(`trace() requires a square matrix (got ${this.rows}x${this.cols}).`);
+    }
+    let sum = Complex.ZERO;
+    for (let i = 0; i < this.rows; i++) sum = sum.add(this.get(i, i));
+    return sum;
+  }
+
+  /** Whether this matrix equals its own conjugate transpose, i.e. A = A†. */
+  isHermitian(epsilon = 1e-9): boolean {
+    return this.rows === this.cols && this.equals(this.dagger(), epsilon);
+  }
+
   private assertSameShape(other: Matrix) {
     if (this.rows !== other.rows || this.cols !== other.cols) {
       throw new Error("Matrices must have the same shape.");

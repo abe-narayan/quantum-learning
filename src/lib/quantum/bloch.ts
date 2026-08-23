@@ -1,5 +1,8 @@
 import { Complex } from "./complex";
 import { StateVector } from "./state";
+import type { Matrix } from "./matrix";
+import { PAULI_X, PAULI_Y, PAULI_Z } from "./gates";
+import { densityMatrixExpectationValue } from "./densityMatrix";
 
 export type BlochVector = { x: number; y: number; z: number };
 export type BlochAngles = { theta: number; phi: number };
@@ -47,4 +50,29 @@ export function blochStateFromAngles({ theta, phi }: BlochAngles): StateVector {
   const alpha = new Complex(Math.cos(theta / 2), 0);
   const beta = Complex.fromPolar(Math.sin(theta / 2), phi);
   return new StateVector([alpha, beta]);
+}
+
+function assertSingleQubitDensityMatrix(rho: Matrix) {
+  if (rho.rows !== 2 || rho.cols !== 2) {
+    throw new Error(`densityMatrixToBlochVector requires a single-qubit (2x2) density matrix (got ${rho.rows}x${rho.cols}).`);
+  }
+}
+
+/**
+ * The Bloch vector (x, y, z) of a single-qubit density matrix, computed the
+ * same way as `stateToBlochVector` but via the generalized Born rule
+ * ⟨A⟩=Tr(ρA) instead of ⟨ψ|A|ψ⟩ — so it works for a genuinely mixed ρ, not
+ * just a pure state's outer product. Since Tr(·) is linear, this is exactly
+ * the probability-weighted average of the component states' own Bloch
+ * vectors for a mixture, and reduces to |r|=1 (the sphere's surface) only
+ * for pure states — |r|<1 places the point strictly inside the sphere,
+ * which is what makes the Bloch sphere a faithful picture of mixedness.
+ */
+export function densityMatrixToBlochVector(rho: Matrix): BlochVector {
+  assertSingleQubitDensityMatrix(rho);
+  return {
+    x: densityMatrixExpectationValue(rho, PAULI_X).re,
+    y: densityMatrixExpectationValue(rho, PAULI_Y).re,
+    z: densityMatrixExpectationValue(rho, PAULI_Z).re,
+  };
 }

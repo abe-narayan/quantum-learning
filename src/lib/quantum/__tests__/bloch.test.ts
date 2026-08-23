@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Complex } from "../complex";
 import { StateVector } from "../state";
-import { stateToBlochVector, stateToBlochAngles, blochStateFromAngles } from "../bloch";
+import { stateToBlochVector, stateToBlochAngles, blochStateFromAngles, densityMatrixToBlochVector } from "../bloch";
+import { Matrix } from "../matrix";
+import { pureStateDensityMatrix, maximallyMixedState, convexCombination } from "../densityMatrix";
 
 function expectVector(actual: { x: number; y: number; z: number }, expected: { x: number; y: number; z: number }) {
   expect(actual.x).toBeCloseTo(expected.x, 9);
@@ -33,6 +35,33 @@ describe("stateToBlochVector", () => {
     const phased = new StateVector(base.amplitudes.map((a) => a.mul(Complex.fromPolar(1, 0.42))));
 
     expectVector(stateToBlochVector(phased), stateToBlochVector(base));
+  });
+});
+
+describe("densityMatrixToBlochVector", () => {
+  it("agrees with stateToBlochVector for pure states", () => {
+    const state = blochStateFromAngles({ theta: 0.9, phi: 1.7 });
+    const rho = pureStateDensityMatrix(state);
+    expectVector(densityMatrixToBlochVector(rho), stateToBlochVector(state));
+  });
+
+  it("maps the maximally mixed state to the origin", () => {
+    expectVector(densityMatrixToBlochVector(maximallyMixedState(2)), { x: 0, y: 0, z: 0 });
+  });
+
+  it("is the probability-weighted average of the components' Bloch vectors for a mixture", () => {
+    const zero = pureStateDensityMatrix(StateVector.basis(1, 0));
+    const plus = pureStateDensityMatrix(blochStateFromAngles({ theta: Math.PI / 2, phi: 0 }));
+    const mixed = convexCombination([
+      { probability: 0.3, density: zero },
+      { probability: 0.7, density: plus },
+    ]);
+    const expected = { x: 0.7 * 1, y: 0, z: 0.3 * 1 };
+    expectVector(densityMatrixToBlochVector(mixed), expected);
+  });
+
+  it("throws for a non-2x2 matrix", () => {
+    expect(() => densityMatrixToBlochVector(Matrix.identity(4))).toThrow(/2x2/);
   });
 });
 
