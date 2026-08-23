@@ -1,0 +1,183 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/the-harmonic-oscillator-in-position-space"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Harmonic Oscillator in Position Space",
+  description:
+    "A second, independent derivation of the harmonic oscillator's energy spectrum -- this time by direct substitution into the position-space Schrodinger equation -- confirming the ladder-operator result from the last course by an entirely different route.",
+  course: "wave-mechanics",
+  module: "the-harmonic-oscillator-in-position-space",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 24,
+  prerequisites: [
+    "quantum-mechanics/wave-mechanics/the-infinite-square-well",
+    "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
+  ],
+  objectives: [
+    "Verify by direct substitution that the Gaussian ground state solves the position-space Schrodinger equation with E_0 = hbar*omega/2",
+    "Connect the position-space eigenstates to the ladder-operator treatment from the last course as two representations of the same physics",
+    "Identify the physical potential V(x) = (1/2) m omega^2 x^2 the abstract H = hbar*omega(N+1/2) from the last course was standing in for",
+  ],
+};
+
+## Motivation
+
+The last course solved the harmonic oscillator entirely algebraically —
+ladder operators, a commutator, and pure linear algebra, with a promise
+that "the connection between this $H$ and the physical potential
+$\tfrac12m\omega^2x^2$ is made precise once continuous position is
+developed." This lesson is that promise kept: a second, independent
+derivation of the *same* energy spectrum, this time by direct
+substitution into the position-space Schrödinger equation — and the two
+routes agreeing exactly is real evidence the physics is being described
+consistently across the whole platform.
+
+## Intuition
+
+The classical harmonic oscillator's potential energy is
+$V(x)=\tfrac12m\omega^2x^2$ — a parabola, the potential every stable
+equilibrium looks like to leading order near its minimum (any smooth
+potential's Taylor expansion around a minimum starts with a quadratic
+term). The ground state should be some localized "blob" centered at the
+minimum; a Gaussian is the natural guess, and this lesson checks it works.
+
+## Mathematical Development
+
+### The candidate ground state
+
+Guess $\psi_0(x) = \left(\dfrac{m\omega}{\pi\hbar}\right)^{1/4}
+e^{-m\omega x^2/(2\hbar)}$ — the exact formula
+`harmonicOscillatorEigenstate(grid, 0, omega, mass)` evaluates on the
+grid.
+
+### Direct verification
+
+Compute the derivatives needed for the Schrödinger equation:
+
+$$
+\psi_0'(x) = -\frac{m\omega}{\hbar}x\,\psi_0(x)
+$$
+
+$$
+\psi_0''(x) = -\frac{m\omega}{\hbar}\psi_0(x) + \left(\frac{m\omega}{\hbar}\right)^{\!2} x^2\,\psi_0(x) = \frac{m\omega}{\hbar}\left[\left(\frac{m\omega}{\hbar}\right)x^2 - 1\right]\psi_0(x)
+$$
+
+Substitute into $-\dfrac{\hbar^2}{2m}\psi_0'' + \dfrac12 m\omega^2x^2\psi_0$:
+
+$$
+-\frac{\hbar^2}{2m}\cdot\frac{m\omega}{\hbar}\left[\frac{m\omega}{\hbar}x^2-1\right]\psi_0 + \frac12m\omega^2x^2\psi_0 = -\frac{\hbar\omega}{2}\left[\frac{m\omega}{\hbar}x^2-1\right]\psi_0 + \frac12m\omega^2x^2\psi_0
+$$
+
+$$
+= -\frac{m\omega^2}{2}x^2\psi_0 + \frac{\hbar\omega}{2}\psi_0 + \frac12m\omega^2x^2\psi_0 = \frac{\hbar\omega}{2}\,\psi_0
+$$
+
+The $x^2\psi_0$ terms cancel *exactly*, leaving
+
+$$
+-\frac{\hbar^2}{2m}\psi_0'' + \frac12m\omega^2x^2\psi_0 = \frac{\hbar\omega}{2}\,\psi_0
+$$
+
+— precisely the time-independent Schrödinger equation with eigenvalue
+$E_0=\hbar\omega/2$. This is exactly the ladder-operator result's ground
+state energy, now confirmed by direct calculus, with no reference to
+$a,a^\dagger$ anywhere in this derivation.
+
+### The excited states
+
+The higher eigenstates $\psi_n(x) \propto H_n(\sqrt{m\omega/\hbar}\,x)\,
+e^{-m\omega x^2/(2\hbar)}$ (Hermite polynomials $H_n$ multiplying the same
+Gaussian envelope — `harmonicOscillatorEigenstate` implements $n=0..3$
+via exactly this closed form) can be checked the same way, each giving
+$E_n=\hbar\omega(n+\tfrac12)$ — the identical, equally-spaced ladder
+derived purely algebraically last course. Two totally different
+derivations (raising/lowering operators on an abstract Hilbert space;
+direct substitution into a differential equation) landing on the exact
+same spectrum is not a coincidence — it's the same physical system,
+correctly described in two different mathematical languages.
+
+## Physical Interpretation
+
+The Gaussian shape reflects the classical turning points: the harmonic
+potential rises steeply away from $x=0$, so the wavefunction decays
+smoothly into the classically forbidden region — visibly different from
+the infinite well's abrupt, hard cutoff to exactly zero (compare the two
+Explorer presets directly).
+
+## Interactive Experiment
+
+Compare the Harmonic Oscillator presets' shapes to the Infinite Well's:
+the harmonic ground state's Gaussian tails extend smoothly outward
+(classically forbidden but quantum-mechanically present, however small),
+where the well's eigenstates are hard-clipped to exactly zero at the
+boundary. Both are numerically confirmed stationary, and both match
+their respective analytical energies in the comparison panel.
+
+<LazyWavefunctionExplorer />
+
+## Worked Example
+
+**For $\omega=2$ (natural units, $\hbar=m=1$), find $E_0,E_1,E_2$ and
+confirm the spacing is exactly $\omega$.**
+
+$$
+E_n = \omega\left(n+\tfrac12\right) \;\Longrightarrow\; E_0=1,\; E_1=3,\; E_2=5
+$$
+
+$$
+E_1-E_0 = 2 = \omega, \qquad E_2-E_1 = 2 = \omega \;\checkmark
+$$
+
+— matching `harmonicOscillatorEnergyLevel(n, omega)` and the last
+course's algebraic result exactly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking this derivation and the ladder-operator one describe
+different physical systems.** They're the same oscillator; the different
+mathematical routes are a feature, not a coincidence to be suspicious of
+— cross-checking a result by an independent method is exactly how physics
+confirms understanding.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the derivative product rule** when computing $\psi_0''$ —
+$\psi_0'=-\frac{m\omega}{\hbar}x\psi_0$ is itself a product of $x$ and
+$\psi_0(x)$, so differentiating again needs the product rule, not just
+differentiating the exponent.
+</Callout>
+
+## Practice Questions
+
+1. Confirm $\psi_0(x)$ as given is properly normalized by checking the
+   prefactor against the general Gaussian normalization worked out in the
+   Probability Density lesson (with $\sigma^2=\hbar/(2m\omega)$).
+2. Without redoing the full calculation, argue from the shape of the
+   equation why doubling $\omega$ should roughly double the energy
+   spacing.
+3. In natural units, if $\omega=0.5$, what is $E_3$?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Direct substitution of the Gaussian ansatz $\psi_0(x)\propto
+  e^{-m\omega x^2/(2\hbar)}$ into the position-space Schrödinger equation
+  gives $E_0=\hbar\omega/2$ exactly, with the $x^2$ terms cancelling.
+- Excited states multiply the same Gaussian envelope by Hermite
+  polynomials, reproducing $E_n=\hbar\omega(n+\tfrac12)$.
+- This confirms, via an entirely independent method, the energy spectrum
+  the last course derived algebraically from $[a,a^\dagger]=1$.
+
+## Further Exploration
+
+Next: **Wave Packet Dynamics and Dispersion**, returning to the free
+particle to work out exactly how (and how fast) a localized packet spreads
+over time.

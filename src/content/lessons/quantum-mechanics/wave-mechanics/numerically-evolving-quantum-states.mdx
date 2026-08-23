@@ -1,0 +1,206 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Numerically Evolving Quantum States",
+  description:
+    "How the Wavefunction Explorer actually integrates the Schrodinger equation forward in time -- the split-operator Fourier method, why it's built from a Taylor-expandable approximation, and the honest numerical trade-offs that come with it.",
+  course: "wave-mechanics",
+  module: "numerically-evolving-quantum-states",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 24,
+  prerequisites: ["quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier"],
+  objectives: [
+    "Derive the leading-order error in approximating exp(A+B) by exp(A)exp(B), and identify it with the commutator [A,B]",
+    "Explain why the split-operator method is unconditionally norm-preserving regardless of time step, while still being only approximately accurate",
+    "Describe, at a conceptual level, why the method needs the potential and wall-height parameters to be numerically well-matched to the time step",
+  ],
+};
+
+## Motivation
+
+Every numerical claim this course has made — norm staying at 1.0000,
+energy matching analytical formulas, stationary states staying stationary
+— rests on one specific numerical method. This lesson opens that method
+up: not to make you re-implement it, but so every number the simulator
+has shown you all course is something you can actually account for.
+
+## Intuition
+
+The formal solution to the time-dependent Schrödinger equation is
+$|\psi(t)\rangle = e^{-i\hat Ht/\hbar}|\psi(0)\rangle$ — but $\hat H
+=\hat T+\hat V$ (kinetic plus potential) is a *sum* of two operators that
+don't commute (they act naturally in different bases — momentum space for
+$\hat T$, position space for $\hat V$), so $e^{-i\hat Ht/\hbar}$ can't
+simply be split into $e^{-i\hat Tt/\hbar}$ times $e^{-i\hat Vt/\hbar}$. It
+*can*, however, be split approximately, for a short enough time step —
+and doing that approximation carefully, many times in a row, is the whole
+method.
+
+## Mathematical Development
+
+### Why the split isn't exact
+
+For two operators $A,B$ that don't commute, compare
+$e^{(A+B)\Delta t}$ to $e^{A\Delta t}e^{B\Delta t}$ by Taylor-expanding
+both to second order in $\Delta t$:
+
+$$
+e^{(A+B)\Delta t} = I + (A+B)\Delta t + \frac{(A+B)^2}{2}\Delta t^2 + \cdots = I+(A+B)\Delta t+\frac{A^2+AB+BA+B^2}{2}\Delta t^2+\cdots
+$$
+
+$$
+e^{A\Delta t}e^{B\Delta t} = \left(I+A\Delta t+\frac{A^2}{2}\Delta t^2\right)\left(I+B\Delta t+\frac{B^2}{2}\Delta t^2\right) = I+(A+B)\Delta t+\frac{A^2+2AB+B^2}{2}\Delta t^2+\cdots
+$$
+
+Subtracting, the two expressions agree exactly through order
+$\Delta t^1$, and differ at order $\Delta t^2$ by
+
+$$
+\frac{AB-BA}{2}\Delta t^2 = \frac{[A,B]}{2}\Delta t^2
+$$
+
+**The leading error is proportional to the commutator.** If $\hat T$ and
+$\hat V$ commuted, the split would be exact at every order — they don't
+(that's the whole content of $[\hat x,\hat p]\ne0$), so splitting is only
+approximate, with error shrinking as $\Delta t\to0$.
+
+### The symmetric (Strang) split
+
+Naively splitting $e^{-i(\hat T+\hat V)\Delta t/\hbar}\approx e^{-i\hat
+V\Delta t/\hbar}e^{-i\hat T\Delta t/\hbar}$ has $O(\Delta t^2)$ error per
+step, as derived above. The platform instead uses the **symmetric**
+version,
+
+$$
+e^{-i\hat H\Delta t/\hbar} \approx e^{-i\hat V\Delta t/(2\hbar)}\;e^{-i\hat T\Delta t/\hbar}\;e^{-i\hat V\Delta t/(2\hbar)}
+$$
+
+— half a potential step, a full kinetic step, half a potential step. This
+extra symmetry (not proven here, but a standard result) cancels the
+leading error term entirely, leaving $O(\Delta t^3)$ error per step —
+substantially more accurate for the same cost, which is exactly why
+`SplitOperatorEvolver.step()` is implemented as potential-half, kinetic,
+potential-half, in that order.
+
+### The kinetic step and the FFT
+
+$\hat V$ is diagonal (just multiplication) in position space, so
+$e^{-i\hat V\Delta t/(2\hbar)}$ is a simple pointwise multiplication.
+$\hat T=\hat p^2/2m$ is diagonal in *momentum* space instead — so the
+method Fourier-transforms to momentum space (the Momentum Space lesson's
+FFT), applies $e^{-i\hbar k^2\Delta t/(2m)}$ pointwise there, and
+transforms back. Every one of these three factors is a **pure phase**
+(magnitude exactly 1, pointwise or via a unitary transform) — which is
+*why* the method is unconditionally norm-preserving (proven in the
+Probability Density lesson) regardless of how large $\Delta t$ is, even
+though large $\Delta t$ still hurts *accuracy* (the commutator error just
+derived).
+
+### Norm-preserving is not the same as accurate
+
+This distinction matters enough that this platform's own development
+surfaced it directly: a numerical experiment with the infinite well's
+tall-but-finite wall used a wall height and time step whose product was
+too large. The *state* still evolved with norm locked at exactly
+$1.0000$ and a visibly correct, stationary density — but the *energy*
+expectation value, computed via the momentum-space kinetic term, drifted
+by thousands of percent, because $\langle p^2\rangle$ is disproportionately
+sensitive to poorly-resolved high-frequency content near the (very tall,
+under-resolved) wall. The fix was straightforward once identified: keep
+`wallHeight * dt` small, which is exactly the commutator-error argument
+above applied concretely (a huge $V$ makes $[\hat T,\hat V]$'s effective
+contribution huge too, for a fixed $\Delta t$). Every infinite-well and
+harmonic-oscillator preset in this course is tuned with this constraint in
+mind — an honest engineering trade-off, not swept under the rug.
+
+## Physical Interpretation
+
+The split-operator method is a genuine physics simulation, not a curve
+fit or an animation trick: every frame is produced by literally applying
+the approximate short-time propagator derived above, repeatedly. Its
+accuracy is controllable (smaller $\Delta t$, better accuracy, at the
+cost of more computation) in a way a purely decorative animation could
+never offer, because there's no "correct answer" being approximated in a
+decorative animation — there is here.
+
+## Interactive Experiment
+
+Use the Step button (rather than Play) on any stationary preset to advance
+one single symmetric split-operator step at a time, and watch
+$\langle H\rangle$ in the comparison panel — for a *reasonable* time step
+(this course's presets are tuned this way) it should barely move at all,
+step to step, even though each step is only an approximation.
+
+<LazyWavefunctionExplorer />
+
+## Worked Example
+
+**Why does making $\Delta t$ ten times smaller improve the split-operator
+method's per-step error by roughly $1000\times$, not $10\times$?**
+
+The (symmetric) method's per-step error scales as $O(\Delta t^3)$ — so
+shrinking $\Delta t$ by a factor of 10 shrinks the *per-step* error by
+$10^3=1000$. (Note this doesn't mean the *total* simulated trajectory
+gets 1000× more accurate for free: reaching the same total simulated time
+now requires 10× more steps, each contributing error, so the *total*
+accumulated error improves by roughly $1000/10=100\times$ — still a
+substantial win for a $10\times$ smaller time step.)
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming norm conservation proves accuracy.** It doesn't — this
+lesson's own worked example (the infinite-well energy blowup) is a
+concrete, real case where norm was exact to 8 decimal places while energy
+was off by a factor of 30. Different quantities can be sensitive to
+different kinds of numerical error.
+</Callout>
+
+<Callout type="mistake">
+**Thinking a smaller $\Delta t$ is "free."** It's more accurate per
+simulated time unit, but costs proportionally more computation to reach
+the same total time — the platform's presets balance this deliberately
+for smooth, responsive animation.
+</Callout>
+
+## Practice Questions
+
+1. If $[\hat T,\hat V]=0$ for some special potential, what would that
+   imply about the split-operator method's accuracy for that potential
+   specifically?
+2. Explain in one sentence why the *kinetic* step is done in momentum
+   space rather than position space.
+3. Using the commutator-error argument, explain qualitatively why a
+   *taller* barrier (larger $V$) needs a *smaller* time step for the same
+   accuracy, all else equal.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $e^{-i(\hat T+\hat V)\Delta t/\hbar}$ isn't exactly splittable because
+  $[\hat T,\hat V]\ne 0$; the leading error in a naive split is
+  proportional to that commutator.
+- The symmetric (Strang) split used by this platform cancels the leading
+  error term, giving $O(\Delta t^3)$ per-step accuracy from three pure-phase
+  factors (potential half-step, kinetic step via FFT, potential half-step).
+- Every factor being a pure phase is exactly why norm is preserved
+  *exactly*, independent of $\Delta t$ — a genuinely different guarantee
+  from *accuracy*, which does depend on $\Delta t$.
+- A real numerical issue (wall height times time step too large,
+  corrupting the energy calculation while leaving norm and shape intact)
+  was found and fixed during this platform's own development, and is
+  documented honestly rather than hidden.
+
+## Further Exploration
+
+Next: the **Wave Mechanics Challenge**, synthesizing every idea from this
+course — the wavefunction, momentum space, the Schrödinger equation, and
+the concrete solvable systems — into a single set of capstone questions.

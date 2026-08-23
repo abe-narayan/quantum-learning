@@ -1,0 +1,202 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/the-infinite-square-well"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Infinite Square Well",
+  description:
+    "Solving the time-independent Schrodinger equation exactly for a particle confined between infinite walls — a complete derivation of quantized energies and normalized eigenstates from boundary conditions alone.",
+  course: "wave-mechanics",
+  module: "the-infinite-square-well",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 26,
+  prerequisites: ["quantum-mechanics/wave-mechanics/free-particle-wave-packets"],
+  objectives: [
+    "Set up and solve the time-independent Schrodinger equation for the infinite square well",
+    "Derive the boundary conditions that force quantized energy levels E_n = n^2*pi^2*hbar^2/(2mL^2)",
+    "Normalize the resulting eigenstates and verify orthogonality between different levels",
+  ],
+};
+
+## Motivation
+
+This is the first potential this course solves completely and exactly:
+a particle strictly confined to $0 < x < L$ by walls of infinite
+potential energy. It's the cleanest possible illustration of a deep
+principle — confinement forces quantization — worked out with nothing
+beyond the time-independent Schrödinger equation and two boundary
+conditions.
+
+## Intuition
+
+Classically, a ball bouncing between two rigid walls can have *any*
+energy — bounce it harder, it just goes faster. Quantum mechanically, the
+wavefunction must fit the box the way a guitar string's vibration must
+fit its fixed length: only certain wavelengths (hence only certain
+energies) are geometrically possible.
+
+## Mathematical Development
+
+### Setting up the equation
+
+The potential is $V(x)=0$ for $0<x<L$ and $V(x)=\infty$ outside. Inside
+the well, the time-independent Schrödinger equation (from two lessons
+ago) reduces to
+
+$$
+-\frac{\hbar^2}{2m}\psi''(x) = E\,\psi(x) \quad\Longrightarrow\quad \psi''(x) = -k^2\psi(x), \qquad k \equiv \frac{\sqrt{2mE}}{\hbar}
+$$
+
+with general solution $\psi(x) = A\sin(kx) + B\cos(kx)$.
+
+### Boundary conditions force quantization
+
+Outside the well $\psi=0$ (infinite potential energy makes the region
+inaccessible), and $\psi$ must be continuous, so $\psi(0)=\psi(L)=0$.
+
+$\psi(0)=0$: $A\sin(0)+B\cos(0) = B = 0$, eliminating the cosine term
+entirely.
+
+$\psi(L)=0$: with $B=0$, this requires $A\sin(kL)=0$. Since $A=0$ would
+give the trivial (zero, unnormalizable) solution, we need
+$\sin(kL)=0$, which holds only for
+
+$$
+kL = n\pi, \qquad n = 1, 2, 3, \ldots
+$$
+
+($n=0$ is excluded — it gives $\psi\equiv0$ everywhere, not a valid
+state). This is the entire mechanism: **the boundary conditions permit
+only a discrete set of $k$ values**, and since $E=\hbar^2k^2/(2m)$, only a
+discrete set of energies.
+
+### The energy levels
+
+$$
+k_n = \frac{n\pi}{L} \quad\Longrightarrow\quad \boxed{E_n = \frac{n^2\pi^2\hbar^2}{2mL^2}}, \qquad n=1,2,3,\ldots
+$$
+
+— exactly `infiniteSquareWellEnergyLevel(n, L, mass)`'s formula (natural
+units drop the $\hbar^2$). Unlike the harmonic oscillator's *equally
+spaced* ladder from the last course, these levels spread apart
+quadratically ($E_n\propto n^2$) — a genuinely different spectrum, from a
+genuinely different confining mechanism.
+
+### Normalized eigenstates
+
+$$
+\psi_n(x) = A\sin\!\left(\frac{n\pi x}{L}\right), \qquad 0<x<L
+$$
+
+Normalizing: $\int_0^L A^2\sin^2(n\pi x/L)\,dx = A^2\cdot\dfrac L2 = 1$
+(using $\int_0^L\sin^2(\cdot)\,dx=L/2$, a standard half-period average),
+giving $A=\sqrt{2/L}$:
+
+$$
+\psi_n(x) = \sqrt{\frac{2}{L}}\,\sin\!\left(\frac{n\pi x}{L}\right)
+$$
+
+— matching `infiniteSquareWellEigenstate`'s formula exactly (shifted to a
+well centered at $x=0$ rather than starting at $x=0$, a pure relabeling of
+the origin that changes nothing physical, as the What Is a Wavefunction
+lesson's continuum-limit discussion already established).
+
+### Orthogonality
+
+Distinct eigenstates satisfy $\int_0^L\psi_n(x)\psi_m(x)\,dx=0$ for
+$n\ne m$ — a direct consequence of $\hat H$'s Hermiticity (proven in
+general in Mathematical Foundations: distinct eigenvalues of a Hermitian
+operator have orthogonal eigenvectors), confirmed here numerically by
+`overlapProbability` between different-$n$ eigenstates in the engine's
+test suite.
+
+## Physical Interpretation
+
+$n$ counts the number of "humps" in $\psi_n$ (equivalently, $n-1$
+internal nodes — points where $\psi_n=0$ inside the well). More nodes
+means more curvature means more kinetic energy — exactly why $E_n$
+increases with $n$, visible directly by comparing the Explorer's ground
+and excited state presets.
+
+## Interactive Experiment
+
+The Infinite Well presets use a **very tall but finite** wall (not a
+literal infinity — the Numerically Evolving Quantum States lesson
+explains why) with height chosen so tunneling leakage is astronomically
+negligible. Play the ground state and watch $\langle H\rangle$ stay
+locked near the analytical $E_1$; switch to the excited state and change
+$n$ to see the energy jump by roughly $n^2$, and the extra nodes appear
+directly in the plotted density.
+
+<LazyWavefunctionExplorer />
+
+## Worked Example
+
+**For $L=10$ (natural units, $\hbar=m=1$), find $E_1$ and $E_3$, and
+confirm $E_3/E_1=9$.**
+
+$$
+E_n = \frac{n^2\pi^2}{2L^2} = \frac{n^2\pi^2}{200}
+$$
+
+$$
+E_1 = \frac{\pi^2}{200} \approx 0.0493, \qquad E_3 = \frac{9\pi^2}{200} \approx 0.444
+$$
+
+$$
+\frac{E_3}{E_1} = \frac{9\pi^2/200}{\pi^2/200} = 9 = 3^2 \;\checkmark
+$$
+
+matching the $E_n\propto n^2$ scaling directly, and matching the
+Wavefunction Explorer's live comparison panel for these exact preset
+defaults.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Including the cosine term.** $\psi(0)=0$ eliminates $B\cos(kx)$
+entirely — a common error is keeping both terms and applying boundary
+conditions incorrectly, or forgetting $n=0$ must be excluded (it isn't a
+valid state, not merely the "ground state with zero energy").
+</Callout>
+
+<Callout type="mistake">
+**Assuming a literal infinite wall in a numerical simulation.** A
+literal infinity can't be represented on a computer or evolved with the
+periodic-boundary numerical method this course uses — the platform uses a
+finite but very tall wall instead, an honest, standard, well-controlled
+approximation (see the Numerically Evolving Quantum States lesson).
+</Callout>
+
+## Practice Questions
+
+1. For $L=5$, find $E_1, E_2, E_4$ and confirm the ratios match
+   $1:4:16$.
+2. How many internal nodes does $\psi_4(x)$ have inside the well?
+3. Explain briefly why $\psi_n(0)=\psi_n(L)=0$ is required physically
+   (not just mathematically) — what would $\psi_n(0)\ne 0$ imply about
+   the particle's presence outside the well?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Boundary conditions $\psi(0)=\psi(L)=0$, applied to the general
+  solution $A\sin(kx)+B\cos(kx)$, force $k_n=n\pi/L$ and hence quantized
+  $E_n=n^2\pi^2\hbar^2/(2mL^2)$.
+- Normalized eigenstates are $\psi_n(x)=\sqrt{2/L}\sin(n\pi x/L)$,
+  mutually orthogonal by Hermiticity.
+- These are exactly the formulas implemented in `potentials.ts` and
+  visualized live in the Wavefunction Explorer's infinite-well presets.
+
+## Further Exploration
+
+Next: **The Harmonic Oscillator in Position Space**, reconnecting the
+purely algebraic energy spectrum from the last course to an explicit,
+position-space wavefunction — a genuinely different representation of the
+same physics.

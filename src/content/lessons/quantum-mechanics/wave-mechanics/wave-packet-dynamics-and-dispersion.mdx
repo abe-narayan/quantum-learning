@@ -1,0 +1,182 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/wave-packet-dynamics-and-dispersion"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Wave Packet Dynamics and Dispersion",
+  description:
+    "Deriving Ehrenfest's theorem (why <x> obeys Newton's law on average), and explaining -- from the momentum-space phase evolution directly -- why a free wave packet inevitably spreads over time.",
+  course: "wave-mechanics",
+  module: "wave-packet-dynamics-and-dispersion",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 22,
+  prerequisites: ["quantum-mechanics/wave-mechanics/the-harmonic-oscillator-in-position-space"],
+  objectives: [
+    "Derive Ehrenfest's theorem d<x>/dt = <p>/m from the abstract time-evolution machinery",
+    "Explain, from momentum-space phase evolution, why a free wave packet's position spread grows with time",
+    "Verify the dispersion formula numerically against the Wavefunction Explorer's live variance readout",
+  ],
+};
+
+## Motivation
+
+The Free-Particle Wave Packets lesson asserted the packet's *average*
+position obeys $d\langle x\rangle/dt=\langle p\rangle/m$ without proof.
+This lesson proves it (Ehrenfest's theorem), and goes further: explaining
+*why* the packet doesn't just move — it spreads, growing wider over time,
+a genuinely quantum effect with no classical counterpart for a free
+particle.
+
+## Intuition
+
+A wave packet is a superposition of plane waves with a spread of momenta
+$\Delta p$ (uncertainty principle, unavoidable for any localized state).
+Different momentum components move at different velocities ($v=p/m$) —
+the faster components pull ahead, the slower ones lag behind, and the
+packet inevitably stretches out, exactly like a group of runners with
+slightly different speeds spreading apart over a long race, even though
+each individual runner just moves in a straight line.
+
+## Mathematical Development
+
+### Ehrenfest's theorem
+
+For any observable $A$ with no explicit time dependence, differentiating
+$\langle A\rangle=\langle\psi|A|\psi\rangle$ and using $i\hbar\,d|\psi
+\rangle/dt=\hat H|\psi\rangle$ on each factor gives the general result
+
+$$
+\frac{d\langle A\rangle}{dt} = \frac{i}{\hbar}\langle[\hat H,A]\rangle
+$$
+
+Apply this to $A=\hat x$ with $\hat H=\hat p^2/2m+V(x)$. Since $V(x)$
+commutes with $\hat x$ (both just multiply by functions of $x$), only the
+kinetic term contributes:
+
+$$
+[\hat H,\hat x] = \frac{1}{2m}[\hat p^2,\hat x]
+$$
+
+Using $[\hat p^2,\hat x] = \hat p[\hat p,\hat x]+[\hat p,\hat x]\hat p =
+\hat p(-i\hbar)+(-i\hbar)\hat p = -2i\hbar\hat p$ (from
+$[\hat p,\hat x]=-i\hbar$, the antisymmetric partner of the commutator
+derived two lessons ago):
+
+$$
+[\hat H,\hat x] = \frac{-2i\hbar\hat p}{2m} = \frac{-i\hbar\hat p}{m}
+$$
+
+$$
+\frac{d\langle x\rangle}{dt} = \frac{i}{\hbar}\left(\frac{-i\hbar}{m}\right)\langle\hat p\rangle = \frac{\langle p\rangle}{m}
+$$
+
+— exactly the group-velocity result from two lessons ago, now derived
+from the general time-evolution machinery rather than assumed.
+
+### Why a free packet spreads
+
+Each momentum component $\phi(k)$ evolves with its *own* phase,
+$e^{-i\hbar k^2t/(2m)}$ (from the free-particle energy $E(k)=\hbar^2
+k^2/(2m)$) — a $k$-*dependent* rate, unlike a simple overall phase. Since
+different $k$-components drift apart at different rates $v(k)=\hbar
+k/m$, the packet's spatial envelope literally stretches as time passes.
+Working through the resulting integral (standard, not reproduced in full
+here) gives the position variance's exact growth:
+
+$$
+\sigma(t)^2 = \sigma_0^2 + \left(\frac{\hbar t}{2m\sigma_0}\right)^{\!2}
+$$
+
+— starting at the initial width $\sigma_0$ and growing *quadratically* in
+$t$ for large $t$. This is exactly what `timeEvolution.test.ts` checks
+numerically: a zero-momentum Gaussian packet evolved forward under the
+platform's split-operator method has its `variancePosition()` match this
+formula directly, confirming the simulator reproduces genuine dispersive
+physics, not merely translation.
+
+## Physical Interpretation
+
+Dispersion is not decoherence, noise, or numerical error — it's exact,
+unitary quantum mechanics. A free particle's wavefunction spreading is as
+real and as inevitable as its average position advancing; both follow
+directly from the same Schrödinger equation. (A *bound* state, like the
+infinite well or harmonic oscillator eigenstates from the last two
+lessons, does *not* spread — its probability density is exactly
+stationary, which is precisely what makes those states special.)
+
+## Interactive Experiment
+
+Play the Free Gaussian Packet preset and watch the density curve visibly
+widen and flatten over time, even though the total probability (norm)
+stays exactly 1 — probability isn't lost, it's redistributed over a
+larger region, exactly as the formula above predicts.
+
+<LazyWavefunctionExplorer />
+
+## Worked Example
+
+**A packet starts with $\sigma_0=1$ (natural units, $\hbar=m=1$). What is
+$\sigma(t)$ at $t=5$?**
+
+$$
+\sigma(5)^2 = 1^2 + \left(\frac{5}{2\cdot1\cdot1}\right)^{\!2} = 1 + 6.25 = 7.25
+$$
+
+$$
+\sigma(5) = \sqrt{7.25} \approx 2.69
+$$
+
+— more than doubling the packet's width in 5 time units, matching the
+platform's own dispersion regression test (`timeEvolution.test.ts`)
+exactly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking dispersion means the wavefunction is losing probability.**
+Norm stays exactly 1 throughout — dispersion redistributes probability
+over a wider region, it never destroys it.
+</Callout>
+
+<Callout type="mistake">
+**Expecting bound states to disperse too.** Energy eigenstates
+(infinite well, harmonic oscillator) are exactly stationary — dispersion
+is specifically a free-particle (or more generally, non-eigenstate)
+phenomenon, driven by different momentum components moving at different
+rates.
+</Callout>
+
+## Practice Questions
+
+1. Using Ehrenfest's theorem's general form, what would
+   $d\langle p\rangle/dt$ equal for a particle in a potential $V(x)$?
+   (This is Ehrenfest's second theorem — a direct analogue of Newton's
+   second law.)
+2. For $\sigma_0=2$, at what time $t$ does $\sigma(t)$ first exceed
+   $2\sigma_0$?
+3. Explain briefly why a *narrower* initial packet ($\sigma_0$ small)
+   disperses *faster* — connect this to the uncertainty principle.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Ehrenfest's theorem $d\langle x\rangle/dt=\langle p\rangle/m$ follows
+  directly from the general $d\langle A\rangle/dt=(i/\hbar)\langle[\hat
+  H,A]\rangle$ identity and the canonical commutator.
+- A free wave packet's different momentum components drift at different
+  rates, causing the packet to spread: $\sigma(t)^2=\sigma_0^2+(\hbar
+  t/(2m\sigma_0))^2$.
+- This is genuine, unitary (norm-preserving) quantum dynamics, numerically
+  verified against the platform's split-operator time evolution.
+
+## Further Exploration
+
+Next: **Tunneling and the Finite Barrier** — a genuinely non-classical
+phenomenon, where part of a wave packet crosses a barrier it classically
+never could.

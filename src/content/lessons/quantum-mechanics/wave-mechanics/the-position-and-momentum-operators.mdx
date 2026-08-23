@@ -1,0 +1,198 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/the-position-and-momentum-operators"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Position and Momentum Operators",
+  description:
+    "Redeeming the last course's preview: deriving p-hat = -i*hbar*d/dx from the plane-wave eigenfunction requirement, and reproving the canonical commutator [x,p]=i*hbar directly, this time from calculus rather than assertion.",
+  course: "wave-mechanics",
+  module: "the-position-and-momentum-operators",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/wave-mechanics/expectation-values-in-position-space"],
+  objectives: [
+    "State the position operator's action in position space and explain why it's just multiplication",
+    "Derive the momentum operator p-hat = -i*hbar*d/dx from requiring plane waves to be its eigenfunctions with eigenvalue p",
+    "Compute [x,p]psi(x) directly by calculus and reproduce [x,p]=i*hbar exactly",
+  ],
+};
+
+## Motivation
+
+The "From Classical to Quantum" course's Position and Momentum lesson was
+explicit that it was a *preview* — it stated $[\hat x,\hat p]=i\hbar$ and
+moved on, promising the derivation once continuous position existed. This
+lesson is that promise kept: $\hat p$ isn't asserted here, it's *derived*
+from a single physical requirement.
+
+## Intuition
+
+A free particle with definite momentum $p$ is described (from ordinary
+wave physics — de Broglie's relation $p=\hbar k$) by a plane wave $e^{ikx}
+= e^{ipx/\hbar}$. Whatever operator represents momentum, it had better
+have this plane wave as an eigenfunction with eigenvalue $p$ — that single
+requirement pins down the operator's form completely.
+
+## Mathematical Development
+
+### The position operator
+
+In the position representation, the position operator acts by simple
+multiplication:
+
+$$
+\hat x\,\psi(x) = x\,\psi(x)
+$$
+
+This is what makes $\langle x\rangle = \int\psi^* (x\psi)\,dx = \int
+x|\psi|^2 dx$ from the last lesson consistent with the general
+$\langle\psi|\hat x|\psi\rangle$ definition — $\hat x$ acting as "multiply
+by $x$" is precisely what reproduces that formula.
+
+### Deriving the momentum operator
+
+Require an operator $\hat p$ such that the plane wave $\phi_p(x) =
+e^{ipx/\hbar}$ is an eigenfunction with eigenvalue $p$:
+
+$$
+\hat p\,\phi_p(x) = p\,\phi_p(x)
+$$
+
+Differentiate $\phi_p$ once: $\dfrac{d\phi_p}{dx} = \dfrac{ip}{\hbar}\phi_p(x)$.
+Rearranging,
+
+$$
+p\,\phi_p(x) = \frac{\hbar}{i}\frac{d\phi_p}{dx} = -i\hbar\,\frac{d\phi_p}{dx}
+$$
+
+Comparing to the eigenvalue equation above identifies the operator
+directly:
+
+$$
+\boxed{\hat p = -i\hbar\,\frac{d}{dx}}
+$$
+
+This is a genuine derivation, not a postulate: the *only* input was "plane
+waves carry definite momentum $p=\hbar k$," a statement about what
+momentum physically means, translated into an eigenvalue requirement.
+
+### Hermiticity check
+
+For $\hat p$ to be a valid observable it must be Hermitian (the last
+course's requirement for real eigenvalues). Using integration by parts
+(boundary terms vanish for normalizable $\psi,\phi$, which go to zero at
+$\pm\infty$):
+
+$$
+\int \phi^*\left(-i\hbar\frac{d\psi}{dx}\right)dx = -i\hbar\Big[\phi^*\psi\Big]_{-\infty}^{\infty} + i\hbar\int\frac{d\phi^*}{dx}\psi\,dx = \int\left(-i\hbar\frac{d\phi}{dx}\right)^{\!*}\psi\,dx
+$$
+
+confirming $\langle\phi|\hat p\psi\rangle = \langle\hat p\phi|\psi\rangle$
+— exactly the Hermiticity condition, and exactly why the factor of $i$ in
+$\hat p=-i\hbar\,d/dx$ isn't optional: a plain real derivative
+$d/dx$ alone is *anti*-Hermitian, and the $i$ is precisely what fixes that.
+
+### Reproving the commutator
+
+Apply $[\hat x,\hat p] = \hat x\hat p - \hat p\hat x$ to an arbitrary
+$\psi(x)$, using the product rule on the second term:
+
+$$
+\hat x\hat p\,\psi = x\left(-i\hbar\frac{d\psi}{dx}\right) = -i\hbar x\psi'
+$$
+
+$$
+\hat p\hat x\,\psi = -i\hbar\frac{d}{dx}(x\psi) = -i\hbar\left(\psi + x\psi'\right) = -i\hbar\psi - i\hbar x\psi'
+$$
+
+Subtracting,
+
+$$
+[\hat x,\hat p]\psi = \hat x\hat p\,\psi - \hat p\hat x\,\psi = -i\hbar x\psi' - \left(-i\hbar\psi - i\hbar x\psi'\right) = i\hbar\,\psi
+$$
+
+Since this holds for *every* $\psi$, the operators satisfy
+
+$$
+[\hat x,\hat p] = i\hbar\,\hat I
+$$
+
+— exactly the relation the last course stated, now derived from two lines
+of calculus rather than asserted. The uncertainty principle
+$\Delta x\,\Delta p \ge \tfrac12|\langle[\hat x,\hat p]\rangle| =
+\hbar/2$, proven in full generality in that course's Expectation Values
+and Uncertainty lesson, applies here completely unchanged — the abstract
+proof never needed to know $\hat p$'s explicit form, only that the
+commutator was $i\hbar$.
+
+## Physical Interpretation
+
+$\hat x$ and $\hat p$ don't commute because "multiply by $x$" and "take a
+derivative" are fundamentally incompatible operations — a function sharply
+localized in $x$ (a spike) has wildly oscillating derivatives (high
+momentum content), and vice versa. This *is* the uncertainty principle,
+seen as a statement about ordinary calculus.
+
+## Worked Example
+
+**Verify $\hat p\phi_p(x)=p\,\phi_p(x)$ directly for $\phi_p(x)=e^{ipx/\hbar}$.**
+
+$$
+\hat p\,\phi_p = -i\hbar\frac{d}{dx}e^{ipx/\hbar} = -i\hbar\cdot\frac{ip}{\hbar}\,e^{ipx/\hbar} = p\,e^{ipx/\hbar} = p\,\phi_p
+$$
+
+confirming the eigenvalue equation this whole derivation was built to
+satisfy, by direct substitution.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Dropping the factor of $i$.** $\hat p = -\hbar\,d/dx$ (missing the $i$)
+is not Hermitian and gives an imaginary $[\hat x,\hat p]$ — the $i$ is
+load-bearing, not decorative.
+</Callout>
+
+<Callout type="mistake">
+**Applying $\hat x\hat p$ and $\hat p\hat x$ in the wrong order.**
+$\hat p\hat x\,\psi$ requires differentiating the *product* $x\psi(x)$
+(product rule, picking up the extra $\psi$ term) — it is not the same as
+$x$ times $\hat p\psi$.
+</Callout>
+
+## Practice Questions
+
+1. Show that $\hat x$ is trivially Hermitian (i.e. that "multiply by the
+   real number $x$" satisfies the Hermiticity condition without needing
+   integration by parts).
+2. Compute $[\hat p,\hat x]$ directly (not by just negating the result
+   above — redo the calculation with the operators in the other order) and
+   confirm it equals $-i\hbar$.
+3. Using $\hat p = -i\hbar\,d/dx$, compute $\hat p^2\psi$ for
+   $\psi(x)=\sin(kx)$, and identify what physical quantity
+   $\langle\psi|\hat p^2|\psi\rangle/(2m)$ represents.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\hat x$ acts by multiplication; $\hat p = -i\hbar\,d/dx$ is *derived*
+  from requiring plane waves $e^{ipx/\hbar}$ to be its eigenfunctions with
+  eigenvalue $p$.
+- The factor of $i$ is exactly what makes $\hat p$ Hermitian, via
+  integration by parts.
+- $[\hat x,\hat p]=i\hbar$ follows from two lines of calculus (product
+  rule), reproving what the last course previewed.
+- The uncertainty principle's proof from the last course applies
+  unchanged, since it only used the commutator's value.
+
+## Further Exploration
+
+Next: **Momentum Space and the Fourier Transform** — the momentum-space
+representation $\phi(k)$ this section's plane-wave eigenfunctions build
+toward, and the actual numerical machinery (a real FFT) this platform uses
+to compute it, explored live in the Wavefunction Explorer.

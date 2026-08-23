@@ -250,6 +250,10 @@ top of, so the math is written and verified exactly once.
 | `observables.ts` | `expectationValue`, `variance`, `uncertainty`, `commutator`, `commutatorExpectation` — added for the "From Classical to Quantum" course's Expectation Values and Uncertainty lesson; kept separate from `measurement.ts` since these describe the *statistics* of an observable's outcome distribution (a property of state + operator), not the act of sampling/collapsing one |
 | `harmonicOscillator.ts` | `annihilationOperator`, `creationOperator`, `numberOperator`, `harmonicOscillatorEnergyLevels` — the harmonic oscillator's ladder operators as finite, truncated `dimension`×`dimension` matrices on the Fock basis, letting the existing `Matrix` engine represent them exactly like every other operator, with the truncation's one honest approximation (documented in the file and tested directly) confined to the single boundary case where `a†` would need a level past the cutoff |
 | `amplitude.ts` | `normalizedTwoLevelAmplitudes`, `interferenceProbability`, `classicalSumProbability` — built for the Complex Amplitude Explorer's two-amplitude interference mode (see §6b); deliberately thin wrappers around `Complex`, not a parallel state-vector abstraction |
+| `fourier.ts` | A hand-written, iterative, in-place radix-2 Cooley-Tukey `fft`/`ifft` pair (grid sizes must be a power of 2), plus `momentumGrid` and the physically-normalized `positionToMomentum`/`momentumToPosition` wrappers. Built for Wave Mechanics — see below for why hand-written rather than a dependency, and why iterative rather than the initially-simpler recursive form |
+| `wavefunction.ts` | `Grid1D` (a centered, power-of-two position grid) and `Wavefunction1D` — a discretized ψ(x) with normalization, probability density, inner product/overlap, position and momentum expectation values/variances, potential/kinetic/total energy expectation values, and `superposition()` for combining eigenstates. The continuous-position analogue of `state.ts`'s `StateVector`, but for an infinite-dimensional (grid-discretized) Hilbert space instead of a finite qubit register |
+| `potentials.ts` | Potential-energy functions (`freeParticlePotential`, `infiniteSquareWellPotential`, `harmonicOscillatorPotential`, `finiteSquareWellPotential`, `barrierPotential`) plus, for the two closed-form-solvable ones, analytical energy-level formulas and eigenstate constructors (`infiniteSquareWellEigenstate`, `harmonicOscillatorEigenstate`, the latter via Hermite polynomials for $n=0..3$) — deliberately *not* a numerical eigensolver; see below |
+| `timeEvolution.ts` | `SplitOperatorEvolver` — genuine numerical time evolution under the time-dependent Schrödinger equation via the symmetric (Strang) split-operator Fourier method, plus `probabilityLeftAndRightOf` for the tunneling preset's transmission/reflection accounting |
 
 ### Qubit ordering convention
 
@@ -327,24 +331,28 @@ mixed into a rendering file. The convention going forward:
 `src/lib/quantum/` for math, never mixed in one file.
 
 **What's deliberately not built yet:** density matrices, partial trace,
-von Neumann entropy, and *general* Hamiltonian time evolution (an
-eigendecomposition-based matrix exponential for an arbitrary-dimensional
-Hermitian operator). Those are real requirements (a future
-multipartite-entanglement course, an error-correction simulator, noise
-simulation, and continuous-position wavefunction evolution all need them
-eventually) but weren't needed to teach pure-state entanglement,
-measurement, no-cloning, teleportation, or (as of the "From Classical to
-Quantum" course) two-level time evolution and the harmonic oscillator —
-all of which are expressible with pure `StateVector`s, partial
-measurement, and (for two-level evolution specifically) the *existing*
-`rotationAboutAxis` function, reused rather than duplicated: any traceless
-$2\times2$ Hermitian Hamiltonian is $H=\frac{\hbar\omega}{2}(\hat n\cdot
-\vec\sigma)$, and $e^{-iHt/\hbar}$ is exactly `rotationAboutAxis(n, ωt)`
-— no new matrix-exponential code was needed for the Time Evolution and
-the Schrödinger Equation lesson. General-dimension time evolution
-(needing a real eigensolver) remains deferred, next likely triggered by
-the future Wave Mechanics course or a multipartite-entanglement
-simulator.
+von Neumann entropy, and a **general** eigensolver (matrix diagonalization
+for an arbitrary-dimensional Hermitian operator). Those are real
+requirements (a future multipartite-entanglement course and an
+error-correction simulator will need the first three eventually) but
+weren't needed to teach pure-state entanglement, measurement, no-cloning,
+teleportation, two-level time evolution and the harmonic oscillator
+(Course 4), or — somewhat more surprisingly — continuous-position wave
+mechanics either (Course 5, Wave Mechanics): finite-dimensional two-level
+evolution reused the *existing* `rotationAboutAxis` function (any
+traceless $2\times2$ Hermitian $H=\frac{\hbar\omega}{2}(\hat n\cdot
+\vec\sigma)$ has $e^{-iHt/\hbar}=$ `rotationAboutAxis(n, ωt)` exactly),
+and continuous-position evolution needed a *numerical time-integration*
+engine (the split-operator method, §6b) rather than a diagonalization
+routine — the known-solvable systems' (infinite well, harmonic oscillator)
+eigenstates are evaluated from their **closed-form formulas**
+(`potentials.ts`), with the numerical time-evolution engine then used to
+*verify* those formulas (confirming stationarity and matching analytical
+energies), not to *discover* them. A general eigensolver remains
+deferred, next likely triggered by a future course needing eigenstates of
+a potential with no closed form (e.g. an arbitrary numerically-specified
+1D potential, or a multipartite-entanglement simulator's density-matrix
+diagonalization).
 
 ---
 
@@ -457,6 +465,90 @@ though the two-amplitude mode's *display* happens to coincide with a
 single qubit's — `interferenceProbability`/`classicalSumProbability`
 operate directly on `Complex` values, which is both the more honest
 modeling choice and avoids a spurious dependency.
+
+---
+
+### The Wavefunction Explorer
+
+`src/components/simulators/wavefunction-explorer/` is the first simulator
+built around a genuinely running numerical simulation (a
+`requestAnimationFrame` loop repeatedly advancing real physics) rather
+than a deterministic function of slider state, which drove one
+architectural decision the other three simulators didn't need:
+
+1. **Math** — `wavefunction.ts`, `fourier.ts`, `potentials.ts`,
+   `timeEvolution.ts` (§6), all framework-free.
+2. **Presets, not free-form configuration** — `presets.ts` defines 7 named
+   presets (free Gaussian packet, infinite-well ground/excited,
+   harmonic-oscillator ground/excited, a two-eigenstate superposition,
+   and tunneling), each a `build(params)` function returning a complete,
+   consistent `{grid, potential, psi0, dt, stepsPerFrame, ...}` bundle
+   from a small preset-specific parameter schema (`ParamSpec[]`), rendered
+   generically by `PresetControls.tsx`. A fully general "pick any
+   potential, any initial state" UI was deliberately rejected — it would
+   allow physically inconsistent or unsupported combinations (e.g. a
+   harmonic-oscillator eigenstate above the closed-form Hermite
+   polynomials' $n=3$ cutoff), where a curated preset list keeps every
+   reachable configuration honest.
+3. **State ownership split for correctness, not just organization** —
+   `WavefunctionExplorer.tsx` (config: which preset, which parameter
+   values, view mode) mounts `WavefunctionSimulation.tsx` (the evolving
+   `psi`/`t`/`isPlaying` state and the animation loop) **keyed on the
+   config**. This isn't a stylistic choice: an early version reset the
+   simulation state via a `useEffect` instead, which still renders once
+   with the *previous* preset's `psi` next to the *new* preset's `setup`
+   (different grids) before the effect runs — and `ComparisonPanel`'s
+   fidelity calculation, reading both together, threw on exactly that
+   render. Remounting via `key` makes the mismatch structurally
+   impossible: `psi`'s initial state is always `setup.psi0` for the exact
+   `setup` that instance was built with. `ComparisonPanel` additionally
+   guards on grid equality before computing overlap, as defense in depth.
+4. **Visualization** — `WavefunctionCanvas.tsx`, one SVG component with
+   three modes (`|ψ(x)|²`+schematic $V(x)$ overlay, `Re/Im`, `|φ(k)|²`)
+   selected by a small tab control, auto-scaled to each render's actual
+   data range. The momentum-space mode has one non-obvious requirement:
+   `k` comes back from `momentumGrid` in raw FFT bin order (0, increasing
+   positive frequencies, then wrapped negative ones), which isn't
+   monotonic — the mode sorts before plotting, and critically computes
+   the x-axis scale (`scaleX`) from that *same sorted* array (an earlier
+   version scaled from the unsorted array, taking min/max from bin 0 and
+   the last raw bin — both near zero — which collapsed the entire curve
+   off-screen; caught during browser verification, not by any unit test,
+   since the engine-level math was correct and only the pixel-mapping was
+   wrong).
+5. **Playback and accessibility** — `PlaybackControls.tsx` plus
+   `usePrefersReducedMotion.ts` (duplicated from the Bloch sphere
+   simulator's identical hook, matching this codebase's per-simulator
+   self-containment convention rather than introducing cross-simulator
+   imports for one ~20-line hook). When reduced motion is preferred, the
+   continuous Play button is replaced entirely by a manual Step button —
+   no autonomous animation loop ever runs for those users, rather than
+   merely skipping the *entry* animation as some simulators might.
+6. **`StatePanel`/`ComparisonPanel` receive precomputed values, not raw
+   `psi`.** Both originally called `psi.expectationMomentum()` and
+   `psi.expectationEnergy()` independently — each internally performs its
+   own momentum-space Fourier transform, so a single animation frame was
+   silently computing that transform three times over. `Wavefunction1D`
+   gained `momentumStatistics(mass)`, returning `{meanMomentum,
+   kineticEnergy}` from one transform; `WavefunctionSimulation` calls it
+   once per frame and passes the numbers down as props. Found via direct
+   performance measurement during browser verification (a preset with
+   only 4 lightweight evolution steps per frame was still rendering at a
+   small fraction of 60fps), not by guessing — see the Session 9
+   changelog entry for the numbers.
+
+**Performance note on the FFT itself:** `fourier.ts`'s first
+implementation was a textbook recursive Cooley-Tukey FFT, which slices
+the input array with `.filter()` at every recursion level — clean and
+easy to verify against a brute-force DFT, but its allocation overhead
+made a heavier preset (150 split-operator steps/frame at grid size 512)
+run roughly 60× slower than the same computation via an iterative,
+in-place, bit-reversal-permutation FFT with cached twiddle factors (the
+standard efficient form). Both implementations pass the identical test
+suite (cross-checked against a brute-force DFT and Parseval's theorem);
+only the second is fast enough for a real-time animation loop calling it
+hundreds of times per second. No dependency was added either way — the
+efficient form is still under 100 lines.
 
 ---
 
@@ -891,61 +983,161 @@ inconsistency worth fixing.)*
 - Nothing was removed from or restructured in any existing course,
   simulator, or the Problems system beyond the additions above.
 
+### Session 9 — Wave Mechanics (Course 5) + Wavefunction Explorer
+
+- **`curriculum.ts`** — replaced `wave-mechanics`'s original 5 placeholder
+  modules with a real 13-lesson sequence bridging finite-dimensional
+  quantum mechanics (Course 4) to continuous position: What Is a
+  Wavefunction?, Probability Density and Normalization, Expectation
+  Values in Position Space, The Position and Momentum Operators, Momentum
+  Space and the Fourier Transform, The Schrödinger Equation in Position
+  Space, Free-Particle Wave Packets, The Infinite Square Well, The
+  Harmonic Oscillator in Position Space, Wave Packet Dynamics and
+  Dispersion, Tunneling and the Finite Barrier, Numerically Evolving
+  Quantum States, and a Wave Mechanics Challenge capstone. Retitled from
+  "Wave Mechanics & the Schrödinger Equation" to "Wave Mechanics" (the
+  equation is one topic among several the course now covers, not the
+  whole of it) and re-estimated at 9 hours (13 lessons at this course's
+  actual depth, not the 5-module placeholder's guess).
+- **New engine files** — `fourier.ts`, `wavefunction.ts`, `potentials.ts`,
+  `timeEvolution.ts` (see §6's table and §6b's Wavefunction Explorer
+  section for what each contains, the FFT performance story, and the
+  state-management bug found and fixed during browser verification).
+  `Wavefunction1D` gained a `superposition()` static method and a
+  `momentumStatistics()` method (the latter added mid-session once
+  profiling showed the naive per-panel FFT calls were the dominant cost —
+  see §6b, point 6).
+- **A genuine numerical correctness bug found and fixed, not just a UI
+  bug:** the infinite-well presets' first working version used a wall
+  height of `1e6` (matching the engine's default) with `dt=0.001` —
+  norm-preserving exactly (as split-operator evolution always is,
+  regardless of time step) but the *energy* expectation value, computed
+  via the momentum-space kinetic term, drifted by over 3000% after a
+  fraction of a second of simulated evolution, because `<p^2>` is
+  disproportionately sensitive to poorly-resolved high-frequency content
+  near an under-resolved (too-large `V*dt`) wall — even though `|ψ(x)|²`
+  and the norm both looked completely correct. Fixed by rebalancing to
+  `wallHeight=200`, `dt=0.0002` (product $0.04\ll1$) across the three
+  affected presets (infinite-well ground/excited, superposition), with a
+  new `timeEvolution.test.ts` regression test that *reproduces the bad
+  combination* deliberately (asserting norm stays exact while energy error
+  exceeds 1, i.e. explicitly documenting the failure mode) alongside a
+  test confirming the corrected combination stays accurate. This exact
+  incident is written up as this course's own worked example in the
+  "Numerically Evolving Quantum States" lesson — a real engineering
+  mistake made honest, rather than a hypothetical cautionary tale.
+- **`src/content/lessons/quantum-mechanics/wave-mechanics/`** (new) — all
+  13 lessons. Derivations worth calling out: $\hat p=-i\hbar\,d/dx$
+  derived from requiring plane waves to be its eigenfunctions (not
+  asserted, redeeming Course 4's explicit preview), $[\hat x,\hat
+  p]=i\hbar$ re-derived directly by calculus (product rule on two lines),
+  the position-space Schrödinger equation derived by substituting that
+  operator into Course 4's already-proven $i\hbar\,d|\psi\rangle/dt=H
+  |\psi\rangle$, the infinite well solved completely from boundary
+  conditions, the harmonic oscillator's ground state verified by direct
+  substitution to reproduce $E_0=\hbar\omega/2$ (cross-checking Course 4's
+  independent ladder-operator derivation of the same number), Ehrenfest's
+  theorem derived from the general $d\langle A\rangle/dt$ identity, the
+  tunneling barrier solved via the sign flip in $\psi''=\kappa^2\psi$ for
+  $E<V$, and the split-operator method's Trotter error derived via a
+  direct Taylor-expansion comparison of $e^{(A+B)\Delta t}$ against
+  $e^{A\Delta t}e^{B\Delta t}$.
+- **`src/content/problems/quantum-mechanics/wave-mechanics/`** (new) — 30
+  problems (numeric/multiple-choice/conceptual only, no new problem type),
+  2–3 per lesson, registered and linked via `<PracticeLinks />`.
+- **`src/components/simulators/wavefunction-explorer/`** (new) — the
+  **Wavefunction Explorer**, this session's one new interactive
+  visualization and the platform's first built around continuous physical
+  simulation rather than deterministic slider-driven display; architecture
+  documented in §6b. Embedded in the 8 lessons whose content it directly
+  illustrates (Momentum Space, the Schrödinger Equation, Free-Particle
+  Wave Packets, the Infinite Well, the Harmonic Oscillator, Wave Packet
+  Dynamics, Tunneling, and Numerically Evolving Quantum States), and added
+  to `/simulators` as the 4th real, fully interactive entry.
+- **No new dependencies.** The FFT this course needed was hand-written
+  (§6b explains why, and the resulting performance work) rather than a
+  numerical-computing package pulled in for one operation, matching this
+  platform's standing "smallest necessary footprint" default.
+- **Test suite: 250 tests, up from 186** (57 new engine tests across
+  `fourier.test.ts`, `wavefunction.test.ts`, `potentials.test.ts`,
+  `timeEvolution.test.ts` — including the deliberate-failure regression
+  test above — plus 8 new registry tests verifying the new course's
+  demonstration-problem answers against `potentials.ts`'s analytical
+  formulas and hand-derived formulas directly).
+- Nothing was removed from or restructured in any existing course,
+  simulator, or the Problems system beyond the additions above.
+
 ## 9. Implementation Roadmap
 
 **Done:** foundation (data model, MDX pipeline, quantum engine, IA/nav);
 the Bloch sphere simulator; Vitest infrastructure; `Qubits & Quantum
 States` and `Quantum Gates & Circuits` (Quantum Computing pillar) fully
-authored (20 lessons); `Mathematical Foundations for Quantum Mechanics`
-and `From Classical to Quantum` (Quantum Mechanics pillar) fully authored
-(22 lessons); cross-course prerequisites, exercised across four separate
-course boundaries now; the 2-qubit state explorer and the Complex
-Amplitude Explorer, both embedded in real lessons; the Problems system
-(data model, 3 validator types, `localStorage`-backed progress behind a
-swappable interface, catalog + detail UI, topic/difficulty filtering) with
-56 problems across both pillars.
+authored (20 lessons); `Mathematical Foundations for Quantum Mechanics`,
+`From Classical to Quantum`, and `Wave Mechanics` (Quantum Mechanics
+pillar) fully authored (35 lessons); cross-course prerequisites, exercised
+across five separate course boundaries now; the 2-qubit state explorer,
+the Complex Amplitude Explorer, and the Wavefunction Explorer, all
+embedded in real lessons; the Problems system (data model, 3 validator
+types, `localStorage`-backed progress behind a swappable interface,
+catalog + detail UI, topic/difficulty filtering) with 86 problems across
+both pillars.
 
-**Next — Wave Mechanics, the natural continuation.** `classical-to-quantum`
-ends by explicitly previewing continuous position/momentum and deferring
-their full development; `wave-mechanics` (already scaffolded in
-`curriculum.ts` with 5 placeholder modules, prerequisite already pointing
-at `classical-to-quantum`) is the course that redeems that preview —
-wavefunctions, the position representation, and the time-dependent/
-time-independent Schrödinger equation in the continuous setting. This is
-also the first course that will genuinely need engine additions this
-platform doesn't have yet (see below).
+**A real architectural consideration for whoever writes the next
+Quantum Mechanics course: `one-dimensional-systems` needs a conscious
+redesign, not a placeholder fill-in.** Its current placeholder modules
+(Infinite Square Well, Finite Square Well, Quantum Tunneling, The
+Harmonic Oscillator, Step Potentials & Scattering) now substantially
+overlap with what `wave-mechanics` just built — the infinite well, the
+harmonic oscillator in position space, and tunneling are all already
+covered there, rigorously, with a working numerical simulator. Simply
+authoring that course's placeholder titles as originally scoped would
+mean re-deriving results `wave-mechanics` already derived. The finite
+square well and step potentials/scattering are the genuinely new content
+left; whoever designs that course next should treat it as "the systems
+Wave Mechanics didn't get to," explicitly cross-referencing rather than
+repeating, the same way `wave-mechanics` itself cross-referenced (rather
+than repeated) the harmonic oscillator from `classical-to-quantum`. Not
+fixed this session, since it's `one-dimensional-systems`'s scope to
+resolve, not `wave-mechanics`'s — flagged here so it isn't rediscovered
+the hard way.
 
-**Then — the historical/experimental motivation course.** The original
-`classical-to-quantum` placeholder titles (blackbody radiation, the
-photoelectric effect, wave-particle duality, de Broglie) were real,
-valuable content that this session's course redesign deliberately
-replaced rather than kept — see the Session 8 changelog entry for the
-reasoning. That content doesn't have a home in the curriculum right now;
-it's a real gap, not a silently dropped requirement, and the cleanest fix
-is likely a new early course in the Quantum Mechanics pillar (before or
-alongside `mathematical-foundations`) rather than trying to fold it back
-into `classical-to-quantum`.
+**Next — `Operators, Observables & Measurement`, the more clearly
+non-overlapping continuation.** Its placeholder modules (Operators &
+Eigenvalues, Hermitian Operators, Commutators, the Uncertainty Principle,
+the Measurement Postulate, Expectation Values) largely revisit ideas
+`classical-to-quantum` and `wave-mechanics` already built, but at a level
+of generality (arbitrary observables, not just $\hat x/\hat p$ or Pauli
+operators; a general treatment of simultaneous measurability via
+commuting observables) neither of those courses aimed for — closer to a
+genuine "operators in full generality" course than a repeat. Its
+prerequisite already points at `wave-mechanics` in `curriculum.ts`.
 
-**Then — expand the math engine for continuous systems.** A real
-eigensolver (needed for general, not just 2-level, time evolution), plus
-density matrices, partial trace, and von Neumann entropy — needed once
-`wave-mechanics` or the renamed `entanglement-and-measurement` course
-(multipartite entanglement, mixed states, Bell tests) get written for
-real, or once any simulator needs to show a reduced/mixed state. Deferred
-again this session for the same reason as before: two-level time evolution
-and the harmonic oscillator's spectrum didn't need either one.
+**Then — expand the math engine for continuous and mixed-state systems.**
+A general eigensolver (matrix diagonalization for an
+arbitrary-dimensional Hermitian operator — needed once a course requires
+eigenstates of a potential with no closed form), plus density matrices,
+partial trace, and von Neumann entropy — needed once
+`entanglement-and-measurement` (multipartite entanglement, mixed states,
+Bell tests) gets written for real, or once any simulator needs to show a
+reduced/mixed state. Deferred again this session for the same reason as
+the last two: none of `wave-mechanics`'s solvable systems needed either
+one (see §6's updated "deliberately not built yet" note for why the
+harmonic oscillator and infinite well specifically didn't).
 
 **Then — the quiz-taking UI.** The `Quiz` data model and registry lookups
 already exist (§7b) with zero authored quizzes; building the actual
 navigation/scoring/review UI is real, separate design work best done
 against a handful of real quizzes.
 
-**Also pending:** progress & personalization *beyond* single-problem
-state (lesson completion, cross-problem streak-free progress summaries —
-still no auth/database, same `ProgressStore`-interface discipline
-`lib/problems/progress` already established); revisiting the 8-item flat
-navbar if it grows further; Hardware & Software pillar content
-(architecture-complete, purely a writing task); the still-unbuilt
-`/simulators` entries (circuit builder, entanglement visualizer,
-interference playground), each a genuine separate project rather than a
-quick follow-on to the Complex Amplitude Explorer.
+**Also pending:** the historical/experimental motivation course (Session
+8's gap — blackbody radiation, the photoelectric effect, wave-particle
+duality — still has no home in the curriculum); progress &
+personalization *beyond* single-problem state (lesson completion,
+cross-problem streak-free progress summaries — still no auth/database,
+same `ProgressStore`-interface discipline `lib/problems/progress` already
+established); revisiting the 8-item flat navbar if it grows further;
+Hardware & Software pillar content (architecture-complete, purely a
+writing task); the still-unbuilt `/simulators` entries (circuit builder,
+entanglement visualizer, interference playground), each a genuine
+separate project rather than a quick follow-on to the existing three
+interactive simulators.

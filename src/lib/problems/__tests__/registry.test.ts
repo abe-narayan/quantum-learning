@@ -6,6 +6,10 @@ import { Complex } from "@/lib/quantum/complex";
 import { HADAMARD, PAULI_X, PAULI_Y, PAULI_Z, applySingleQubitGate, applyCNOT, rotationAboutAxis } from "@/lib/quantum/gates";
 import { commutatorExpectation, uncertainty } from "@/lib/quantum/observables";
 import { annihilationOperator, harmonicOscillatorEnergyLevels } from "@/lib/quantum/harmonicOscillator";
+import {
+  infiniteSquareWellEnergyLevel,
+  harmonicOscillatorEnergyLevel as continuousHarmonicOscillatorEnergyLevel,
+} from "@/lib/quantum/potentials";
 
 describe("problem registry integrity", () => {
   const problems = getAllProblems();
@@ -203,5 +207,75 @@ describe("From Classical to Quantum — demonstration problems match the engine"
     for (const pauli of [PAULI_X, PAULI_Y, PAULI_Z]) {
       expect(pauli.equals(pauli.dagger(), 1e-9)).toBe(true);
     }
+  });
+});
+
+describe("Wave Mechanics — demonstration problems match the continuous-position engine", () => {
+  it("the infinite-well energy-level problem matches infiniteSquareWellEnergyLevel()", () => {
+    const problem = getProblem("infinite-well-energy-level");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    expect(problem.answer.value).toBeCloseTo(infiniteSquareWellEnergyLevel(2, 6), 6);
+  });
+
+  it("the infinite-well energy-ratio problem matches a direct ratio of infiniteSquareWellEnergyLevel()", () => {
+    const problem = getProblem("infinite-well-energy-ratio");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const ratio = infiniteSquareWellEnergyLevel(4, 6) / infiniteSquareWellEnergyLevel(2, 6);
+    expect(problem.answer.value).toBeCloseTo(ratio, 6);
+  });
+
+  it("the harmonic-ground-state-energy and harmonic-level-spacing problems match harmonicOscillatorEnergyLevel()", () => {
+    const groundProblem = getProblem("harmonic-ground-state-energy");
+    const spacingProblem = getProblem("harmonic-level-spacing");
+    if (groundProblem?.answer.type !== "numeric" || spacingProblem?.answer.type !== "numeric") {
+      throw new Error("expected numeric problems");
+    }
+    expect(groundProblem.answer.value).toBeCloseTo(continuousHarmonicOscillatorEnergyLevel(0, 3), 6);
+    const spacing = continuousHarmonicOscillatorEnergyLevel(2, 2.5) - continuousHarmonicOscillatorEnergyLevel(1, 2.5);
+    expect(spacingProblem.answer.value).toBeCloseTo(spacing, 6);
+  });
+
+  it("the dispersion-formula-calculation problem matches the analytical sigma(t) formula", () => {
+    const problem = getProblem("dispersion-formula-calculation");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const sigma0 = 1;
+    const t = 4;
+    const sigmaT = Math.sqrt(sigma0 ** 2 + (t / (2 * sigma0)) ** 2);
+    expect(problem.answer.value).toBeCloseTo(sigmaT, 5);
+  });
+
+  it("the kappa-calculation problem matches the analytical decay-constant formula", () => {
+    const problem = getProblem("kappa-calculation");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const kappa = Math.sqrt(2 * (10 - 6));
+    expect(problem.answer.value).toBeCloseTo(kappa, 5);
+  });
+
+  it("the uncertainty-product-gaussian problem matches sigma * (1/(2*sigma))", () => {
+    const problem = getProblem("uncertainty-product-gaussian");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const sigma = 2;
+    const deltaK = 1 / (2 * sigma);
+    expect(problem.answer.value).toBeCloseTo(sigma * deltaK, 6);
+    expect(problem.answer.value).toBeCloseTo(0.5, 6);
+  });
+
+  it("the synthesis-beat-frequency-calculation problem matches E2-E1 from infiniteSquareWellEnergyLevel()", () => {
+    const problem = getProblem("synthesis-beat-frequency-calculation");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    const beat = infiniteSquareWellEnergyLevel(2, 10) - infiniteSquareWellEnergyLevel(1, 10);
+    expect(problem.answer.value).toBeCloseTo(beat, 5);
+  });
+
+  it("the wallheight-dt-product problem matches the Wavefunction Explorer's actual preset constants", () => {
+    const problem = getProblem("wallheight-dt-product");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    expect(problem.answer.value).toBeCloseTo(200 * 0.0002, 6);
+  });
+
+  it("the top-hat-normalization-constant problem matches 1/sqrt(L)", () => {
+    const problem = getProblem("top-hat-normalization-constant");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+    expect(problem.answer.value).toBeCloseTo(1 / Math.sqrt(8), 6);
   });
 });

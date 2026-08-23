@@ -55,6 +55,36 @@ import { basisDependenceOfInterference } from "@/content/problems/quantum-mechan
 import { whyGatesAreUnitary } from "@/content/problems/quantum-mechanics/classical-to-quantum/why-gates-are-unitary";
 import { threeQubitDimensionSynthesis } from "@/content/problems/quantum-mechanics/classical-to-quantum/three-qubit-dimension-synthesis";
 import { qubitAsInstanceOfPostulates } from "@/content/problems/quantum-mechanics/classical-to-quantum/qubit-as-instance-of-postulates";
+import { topHatNormalizationConstant } from "@/content/problems/quantum-mechanics/wave-mechanics/top-hat-normalization-constant";
+import { amplitudeDensityVsProbability } from "@/content/problems/quantum-mechanics/wave-mechanics/amplitude-density-vs-probability";
+import { probabilityInSubregion } from "@/content/problems/quantum-mechanics/wave-mechanics/probability-in-subregion";
+import { whyNormIsPreserved } from "@/content/problems/quantum-mechanics/wave-mechanics/why-norm-is-preserved";
+import { meanPositionTophat } from "@/content/problems/quantum-mechanics/wave-mechanics/mean-position-tophat";
+import { varianceTophat } from "@/content/problems/quantum-mechanics/wave-mechanics/variance-tophat";
+import { momentumEigenvalueCalculation } from "@/content/problems/quantum-mechanics/wave-mechanics/momentum-eigenvalue-calculation";
+import { whyPHatNeedsI } from "@/content/problems/quantum-mechanics/wave-mechanics/why-p-hat-needs-i";
+import { commutatorAntisymmetryPositionMomentum } from "@/content/problems/quantum-mechanics/wave-mechanics/commutator-antisymmetry-position-momentum";
+import { uncertaintyProductGaussian } from "@/content/problems/quantum-mechanics/wave-mechanics/uncertainty-product-gaussian";
+import { momentumWidthFromPositionWidth } from "@/content/problems/quantum-mechanics/wave-mechanics/momentum-width-from-position-width";
+import { stationaryPhaseCalculation } from "@/content/problems/quantum-mechanics/wave-mechanics/stationary-phase-calculation";
+import { kineticTermForm } from "@/content/problems/quantum-mechanics/wave-mechanics/kinetic-term-form";
+import { groupVelocityCalculation } from "@/content/problems/quantum-mechanics/wave-mechanics/group-velocity-calculation";
+import { whyPlaneWaveNotNormalizable } from "@/content/problems/quantum-mechanics/wave-mechanics/why-plane-wave-not-normalizable";
+import { infiniteWellEnergyLevel } from "@/content/problems/quantum-mechanics/wave-mechanics/infinite-well-energy-level";
+import { infiniteWellEnergyRatio } from "@/content/problems/quantum-mechanics/wave-mechanics/infinite-well-energy-ratio";
+import { infiniteWellNodeCount } from "@/content/problems/quantum-mechanics/wave-mechanics/infinite-well-node-count";
+import { harmonicGroundStateEnergy } from "@/content/problems/quantum-mechanics/wave-mechanics/harmonic-ground-state-energy";
+import { harmonicLevelSpacing } from "@/content/problems/quantum-mechanics/wave-mechanics/harmonic-level-spacing";
+import { ehrenfestSecondTheorem } from "@/content/problems/quantum-mechanics/wave-mechanics/ehrenfest-second-theorem";
+import { dispersionFormulaCalculation } from "@/content/problems/quantum-mechanics/wave-mechanics/dispersion-formula-calculation";
+import { kappaCalculation } from "@/content/problems/quantum-mechanics/wave-mechanics/kappa-calculation";
+import { transmissionQualitative } from "@/content/problems/quantum-mechanics/wave-mechanics/transmission-qualitative";
+import { trotterErrorOrder } from "@/content/problems/quantum-mechanics/wave-mechanics/trotter-error-order";
+import { whySymmetricSplitBetter } from "@/content/problems/quantum-mechanics/wave-mechanics/why-symmetric-split-better";
+import { wallheightDtProduct } from "@/content/problems/quantum-mechanics/wave-mechanics/wallheight-dt-product";
+import { synthesisStationaryDensityConstant } from "@/content/problems/quantum-mechanics/wave-mechanics/synthesis-stationary-density-constant";
+import { synthesisBeatFrequencyCalculation } from "@/content/problems/quantum-mechanics/wave-mechanics/synthesis-beat-frequency-calculation";
+import { synthesisContinuumVsFiniteMapping } from "@/content/problems/quantum-mechanics/wave-mechanics/synthesis-continuum-vs-finite-mapping";
 
 /**
  * Problems are plain, statically-imported TypeScript objects rather than
@@ -124,6 +154,36 @@ export const PROBLEMS: Problem[] = [
   whyGatesAreUnitary,
   threeQubitDimensionSynthesis,
   qubitAsInstanceOfPostulates,
+  topHatNormalizationConstant,
+  amplitudeDensityVsProbability,
+  probabilityInSubregion,
+  whyNormIsPreserved,
+  meanPositionTophat,
+  varianceTophat,
+  momentumEigenvalueCalculation,
+  whyPHatNeedsI,
+  commutatorAntisymmetryPositionMomentum,
+  uncertaintyProductGaussian,
+  momentumWidthFromPositionWidth,
+  stationaryPhaseCalculation,
+  kineticTermForm,
+  groupVelocityCalculation,
+  whyPlaneWaveNotNormalizable,
+  infiniteWellEnergyLevel,
+  infiniteWellEnergyRatio,
+  infiniteWellNodeCount,
+  harmonicGroundStateEnergy,
+  harmonicLevelSpacing,
+  ehrenfestSecondTheorem,
+  dispersionFormulaCalculation,
+  kappaCalculation,
+  transmissionQualitative,
+  trotterErrorOrder,
+  whySymmetricSplitBetter,
+  wallheightDtProduct,
+  synthesisStationaryDensityConstant,
+  synthesisBeatFrequencyCalculation,
+  synthesisContinuumVsFiniteMapping,
 ];
 
 export function getAllProblems(): Problem[] {

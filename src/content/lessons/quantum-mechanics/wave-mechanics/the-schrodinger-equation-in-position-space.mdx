@@ -1,0 +1,183 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/the-schrodinger-equation-in-position-space"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Schrödinger Equation in Position Space",
+  description:
+    "Translating the abstract i*hbar*d|psi>/dt = H|psi> from the last course into the position-space differential equation, by substituting the explicit p-hat this course just derived.",
+  course: "wave-mechanics",
+  module: "the-schrodinger-equation-in-position-space",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 24,
+  prerequisites: [
+    "quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform",
+    "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation",
+  ],
+  objectives: [
+    "Derive the position-space Schrodinger equation from the abstract time-evolution postulate and the explicit p-hat operator",
+    "Identify the kinetic and potential energy terms in the resulting Hamiltonian",
+    "Explain, at a physical level, how the Wavefunction Explorer numerically integrates this equation forward in time",
+  ],
+};
+
+## Motivation
+
+The last course derived $i\hbar\,d|\psi\rangle/dt = H|\psi\rangle$ from
+requiring the evolution generator to be Hermitian, and worked with $H$ as
+an abstract matrix. This lesson substitutes the explicit position-space
+Hamiltonian and gets the differential equation every introductory quantum
+mechanics course calls *the* Schrödinger equation — showing it's a special
+case of what's already been proven, not a new postulate.
+
+## Intuition
+
+Energy in classical mechanics splits into kinetic ($p^2/2m$) plus
+potential ($V(x)$). The Hamiltonian operator does the same split, with
+$p$ replaced by the operator $\hat p$ derived two lessons ago. Substituting
+that operator's explicit differential form into the abstract time-evolution
+equation is genuinely mechanical — no new physical input required.
+
+## Mathematical Development
+
+### The position-space Hamiltonian
+
+By direct analogy with the classical energy $E = \dfrac{p^2}{2m}+V(x)$,
+promote each piece to its operator:
+
+$$
+\hat H = \frac{\hat p^2}{2m} + V(\hat x) = \frac{1}{2m}\left(-i\hbar\frac{d}{dx}\right)^{\!2} + V(x) = -\frac{\hbar^2}{2m}\frac{d^2}{dx^2} + V(x)
+$$
+
+using $\hat p^2 = (-i\hbar\,d/dx)(-i\hbar\,d/dx) = -\hbar^2\,d^2/dx^2$
+directly (apply the derivative twice; the two factors of $i$ give
+$i^2=-1$, cancelling the earlier minus sign into a plus, which combines
+with the overall minus to leave $-\hbar^2$).
+
+### Substituting into the abstract equation
+
+Take $i\hbar\,d|\psi\rangle/dt = \hat H|\psi\rangle$ from the last course
+and apply $\langle x|\cdot\rangle$ to both sides (i.e., work in the
+position representation, exactly as every quantity in this course has
+been). The left side becomes $i\hbar\,\partial\psi(x,t)/\partial t$;
+the right side, using the explicit $\hat H$ above, becomes
+$-\frac{\hbar^2}{2m}\partial^2\psi/\partial x^2+V(x)\psi(x,t)$. Together:
+
+$$
+\boxed{\;i\hbar\,\frac{\partial\psi(x,t)}{\partial t} = -\frac{\hbar^2}{2m}\frac{\partial^2\psi(x,t)}{\partial x^2} + V(x)\,\psi(x,t)\;}
+$$
+
+This *is* the time-dependent Schrödinger equation — derived here as a
+direct substitution into an equation already proven from Hermiticity, not
+introduced as a fresh axiom.
+
+### Stationary states, revisited
+
+The last course's Stationary States lesson showed that energy
+eigenstates evolve by a pure phase, $|\psi(t)\rangle =
+e^{-iEt/\hbar}|\psi(0)\rangle$, with $|\psi(t)\rangle$'s *probabilities*
+exactly constant in time. In position space, this means: if $\psi_n(x)$
+solves the **time-independent** Schrödinger equation
+
+$$
+-\frac{\hbar^2}{2m}\psi_n''(x) + V(x)\psi_n(x) = E_n\,\psi_n(x)
+$$
+
+(an eigenvalue equation for the differential operator $\hat H$, exactly
+analogous to $H|\psi\rangle=E|\psi\rangle$ for a matrix), then
+$\psi(x,t)=e^{-iE_nt/\hbar}\psi_n(x)$ solves the full time-dependent
+equation, and $|\psi(x,t)|^2=|\psi_n(x)|^2$ for all $t$ — the numerically
+verified stationarity the Infinite Square Well and Harmonic Oscillator
+lessons build on directly.
+
+## Physical Interpretation
+
+The kinetic term $-\frac{\hbar^2}{2m}\psi''$ measures curvature: a
+sharply-curving wavefunction (large $|\psi''|$) carries large kinetic
+energy, exactly matching the earlier lesson's observation that a tightly
+localized wavefunction has broad, high-momentum Fourier content. The
+potential term simply weights each position by its local potential
+energy, position-space's most literal ingredient.
+
+## Interactive Experiment
+
+Every preset in the Wavefunction Explorer numerically solves this exact
+equation forward in time — not a canned animation, a genuine finite
+timestep integration (the next lessons build the specific potentials and
+the specific numerical method). Play any preset and watch the live
+$\langle H\rangle$ readout: for an eigenstate preset it should stay
+essentially fixed at the analytical $E_n$, a direct, numerical
+confirmation that the simulator is solving *this* equation correctly and
+not merely animating a plausible-looking picture.
+
+<LazyWavefunctionExplorer />
+
+## Worked Example
+
+**Verify that $\psi(x,t)=e^{-iEt/\hbar}\psi_0(x)$ satisfies the
+time-dependent equation, given that $\psi_0$ solves the time-independent
+one with energy $E$.**
+
+$$
+i\hbar\frac{\partial\psi}{\partial t} = i\hbar\left(\frac{-iE}{\hbar}\right)e^{-iEt/\hbar}\psi_0(x) = E\,e^{-iEt/\hbar}\psi_0(x)
+$$
+
+$$
+\hat H\psi = e^{-iEt/\hbar}\,\hat H\psi_0(x) = e^{-iEt/\hbar}\,E\,\psi_0(x)
+$$
+
+(using the time-independent equation on $\psi_0$ in the last step). The
+two sides match exactly, confirming the ansatz.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing the time-dependent and time-independent equations.** The
+time-independent one is an eigenvalue equation for $\hat H$ with no time
+dependence at all — it determines the *stationary states* $\psi_n(x)$ and
+their energies, which then get dressed with a phase factor to build actual
+time-dependent solutions.
+</Callout>
+
+<Callout type="mistake">
+**Dropping the $\hbar^2$ or a sign in the kinetic term.** The double
+derivative and the two factors of $-i\hbar$ combine to a **positive**
+$\hbar^2/2m$ coefficient with an overall **minus** sign in front — a
+common transcription slip.
+</Callout>
+
+## Practice Questions
+
+1. Starting from $\hat p=-i\hbar\,d/dx$, show explicitly that $\hat
+   p^2\psi = -\hbar^2\psi''$ (apply the operator twice, step by step).
+2. Why does $|\psi(x,t)|^2=|\psi_n(x)|^2$ for all $t$, given
+   $\psi(x,t)=e^{-iE_nt/\hbar}\psi_n(x)$? (One line, using
+   $|e^{i\theta}|=1$.)
+3. In natural units ($\hbar=m=1$, this platform's convention), write the
+   time-independent Schrödinger equation with the $\hbar$'s and $m$'s
+   dropped.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\hat H = -\dfrac{\hbar^2}{2m}\dfrac{d^2}{dx^2}+V(x)$, from directly
+  substituting $\hat p=-i\hbar\,d/dx$ into the classical energy split.
+- Substituting into $i\hbar\,d|\psi\rangle/dt=\hat H|\psi\rangle$ gives the
+  time-dependent Schrödinger equation — a derivation, not a new axiom.
+- Stationary states solve the time-independent (eigenvalue) version and
+  evolve by a pure phase, with probability density exactly constant.
+- The Wavefunction Explorer numerically integrates the time-dependent
+  equation directly; the accuracy of that integration is checkable via the
+  live $\langle H\rangle$ readout against known analytical energies.
+
+## Further Exploration
+
+Next: **Free-Particle Wave Packets**, the simplest nontrivial solution
+($V=0$) — a Gaussian packet that drifts and spreads, worked out both
+analytically and via the live simulator.

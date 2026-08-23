@@ -1,0 +1,152 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/wave-mechanics-challenge"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Wave Mechanics Challenge",
+  description:
+    "A synthesis capstone connecting every idea in this course -- the wavefunction, momentum space, the position-space Schrodinger equation, and the solvable systems -- into a single coherent picture, alongside the finite-dimensional postulates from the last course.",
+  course: "wave-mechanics",
+  module: "wave-mechanics-challenge",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 26,
+  prerequisites: ["quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states"],
+  objectives: [
+    "Map every idea from this course onto its finite-dimensional counterpart from the last course",
+    "Solve synthesis problems that combine tools from more than one lesson in this course",
+    "Identify what remains genuinely open for future courses (angular momentum, three dimensions, multi-particle systems)",
+  ],
+};
+
+## Motivation
+
+This course took the postulates from "From Classical to Quantum" — proven
+there for finite-dimensional Hilbert spaces — and carried them across to
+continuous position, one lesson at a time: the wavefunction as a
+continuum-limit basis expansion, momentum space as a Fourier-transform
+basis change, the Schrödinger equation as calculus substituted into
+already-proven dynamics, and three genuinely solved systems (the infinite
+well, the harmonic oscillator, and tunneling). None of it required new
+physical postulates — only new mathematical machinery to express the same
+four postulates in an infinite-dimensional setting.
+
+## Recap: Finite Dimensions to Continuous Position
+
+| Finite-dimensional (last course) | Continuous position (this course) |
+|---|---|
+| State = unit vector in $\mathbb{C}^n$ | State = $\psi(x)$ with $\int|\psi|^2dx=1$ |
+| Basis $\{|i\rangle\}$, $\sum_i|c_i|^2=1$ | Position basis $\{|x\rangle\}$, $\int|\psi(x)|^2dx=1$ (What Is a Wavefunction) |
+| $\langle A\rangle=\langle\psi|A|\psi\rangle$, a finite sum | $\langle f(x)\rangle=\int f(x)|\psi(x)|^2dx$ (Expectation Values) |
+| $[\hat x,\hat p]=i\hbar$ (stated) | $[\hat x,\hat p]=i\hbar$ (derived from $\hat p=-i\hbar\,d/dx$) |
+| Change of basis via inner products | Momentum space $\phi(k)$ via the Fourier transform |
+| $i\hbar\,d\lvert\psi\rangle/dt=H\lvert\psi\rangle$, $H$ a matrix | Same equation, $H=-\tfrac{\hbar^2}{2m}\tfrac{d^2}{dx^2}+V(x)$ |
+| Harmonic oscillator via ladder operators | Same spectrum, via direct substitution of a Gaussian ansatz |
+| $U(t)=e^{-iHt/\hbar}$, exact for 2-level systems | Split-operator numerical approximation, exact only as $\Delta t\to0$ |
+
+The last row is the one genuinely new feature: finite-dimensional
+evolution (a $2\times2$ or truncated matrix exponential) could often be
+computed exactly. Continuous-position evolution generally cannot — which
+is exactly why this course needed to build a real numerical engine (the
+FFT, the split-operator method) rather than only proving formulas on
+paper.
+
+## Worked Synthesis Examples
+
+**1. A particle is in the infinite well's ground state. Using both this
+course's position-space energy formula and Ehrenfest's theorem, explain
+why $\langle x\rangle$ and $\langle p\rangle$ are both exactly constant in
+time for this state, without recomputing any integral.**
+
+The ground state is an energy eigenstate, so (Schrödinger Equation in
+Position Space lesson) it evolves by a pure phase,
+$\psi(x,t)=e^{-iE_1t/\hbar}\psi_1(x)$, and $|\psi(x,t)|^2=|\psi_1(x)|^2$
+for all $t$ — every expectation value computed from $|\psi|^2$, including
+$\langle x\rangle$, is therefore time-independent. Ehrenfest's theorem
+then gives $d\langle x\rangle/dt=\langle p\rangle/m=0$ automatically
+(a constant $\langle x\rangle$ has zero derivative), consistent with the
+well's symmetric ground state having $\langle p\rangle=0$ by parity.
+
+**2. Compare the harmonic oscillator's ground state to the infinite
+well's ground state: which has a nonzero wavefunction outside its
+"classical" region, and why?**
+
+The harmonic oscillator's Gaussian ground state (Harmonic Oscillator in
+Position Space) has smooth exponential tails extending past the classical
+turning points — a direct consequence of the *smooth*, finite potential
+allowing exponentially decaying (not zero) solutions there, exactly the
+Tunneling lesson's forbidden-region mechanism, applied to a bound state
+instead of a barrier. The infinite well's walls are (numerically,
+approximately) infinite, so its "forbidden region" decay constant
+$\kappa\to\infty$, collapsing the tail to exactly zero — the well is the
+$V_0\to\infty$ limiting case of the same underlying physics.
+
+**3. A superposition of two energy eigenstates is prepared. Using the
+Schrödinger equation in position space, explain why its probability
+density oscillates in time, while a single eigenstate's does not.**
+
+$\psi(x,t) = \tfrac{1}{\sqrt2}\left(\psi_1(x)e^{-iE_1t/\hbar} +
+\psi_2(x)e^{-iE_2t/\hbar}\right)$. Computing $|\psi(x,t)|^2$ produces
+cross terms proportional to $\cos\!\big((E_2-E_1)t/\hbar\big)$ (from
+expanding $|a+b|^2=|a|^2+|b|^2+2\,\mathrm{Re}(a^*b)$ with the two
+time-dependent phases) — a genuine beat frequency set exactly by the
+energy gap, exactly what the Wavefunction Explorer's superposition preset
+animates. A single eigenstate has no second term to beat against, so no
+oscillation survives.
+
+## Common Mistakes, Revisited
+
+<Callout type="mistake">
+**Treating "continuous" quantum mechanics as a different theory from the
+finite-dimensional qubit picture.** Every result in this course specialized
+the same four postulates to an infinite-dimensional Hilbert space — no new
+axiom was introduced anywhere.
+</Callout>
+
+<Callout type="mistake">
+**Confusing numerical approximation with physical approximation.** The
+split-operator method's $\Delta t$-dependent error is a *numerical*
+artifact of simulating on a computer; it has nothing to do with the
+physics itself being approximate. The underlying Schrödinger equation this
+course derived is exact.
+</Callout>
+
+## Practice Questions
+
+1. Using the recap table, identify which single derivation in this course
+   most directly reproved something the last course had only stated
+   (rather than genuinely deriving something new).
+2. A particle tunnels through a barrier. Using Ehrenfest's theorem,
+   explain whether $\langle p\rangle$ is conserved throughout the process
+   (hint: consider whether $V(x)$ is uniform).
+3. If a future course extended this platform to three spatial dimensions,
+   which single piece of this course's machinery (the grid, the FFT, the
+   split-operator method) would need the most fundamental rework, and
+   which would generalize essentially unchanged?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Every idea in this course — the wavefunction, momentum space, the
+  Schrödinger equation, bound states, tunneling — is the last course's
+  finite-dimensional postulates, carried across to continuous position by
+  a continuum limit, a Fourier transform, and direct calculus.
+- The one genuinely new ingredient is numerical: continuous-position time
+  evolution generally has no closed form, so this course built (and
+  honestly documented the limitations of) a real split-operator engine.
+- Bound states (well, oscillator) are stationary; superpositions of
+  distinct energies beat at a frequency set exactly by the energy gap;
+  barriers transmit a calculable, generally nonzero fraction of any
+  incident wave packet.
+
+## Further Exploration
+
+This completes **Wave Mechanics**. Three-dimensional systems, angular
+momentum, and spin — genuinely new structure this course's 1D machinery
+doesn't yet cover — are the natural next steps deeper into the Quantum
+Mechanics pillar, building on the position-space Schrödinger equation,
+Fourier techniques, and bound-state intuition developed here.

@@ -1,0 +1,165 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/expectation-values-in-position-space"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Expectation Values in Position Space",
+  description:
+    "Turning the abstract <A> = <psi|A|psi> from the last course into concrete integrals over psi(x), and deriving position variance and the shape of the uncertainty it measures.",
+  course: "wave-mechanics",
+  module: "expectation-values-in-position-space",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/wave-mechanics/probability-density-and-normalization"],
+  objectives: [
+    "Derive <x> and <x^2> as integrals from the abstract expectation-value postulate",
+    "Compute position variance and connect it to the platform's variancePosition() implementation",
+    "Generalize to <f(x)> for an arbitrary function of position",
+  ],
+};
+
+## Motivation
+
+The last course defined $\langle A\rangle = \langle\psi|A|\psi\rangle$ for
+a finite-dimensional observable $A$, computed as a sum over basis states.
+This lesson makes the exact same definition concrete for the position
+observable, where the "sum over basis states" becomes an integral — the
+same continuum-limit move as the last two lessons, now applied to a
+specific, extremely useful observable.
+
+## Intuition
+
+If $|\psi(x)|^2$ is the probability density of finding the particle at
+$x$, then the *average* position, over many identical measurements, is
+just the probability-weighted average of $x$ — precisely the same
+"multiply each outcome by its probability and sum" recipe from the very
+first probability lesson of the last course, with a sum turned into an
+integral.
+
+## Mathematical Development
+
+### Deriving $\langle x\rangle$ from the abstract postulate
+
+Starting from $\langle x\rangle = \langle\psi|\hat x|\psi\rangle$ (with
+$\hat x$ the position operator, formally defined in the next lesson as
+"multiply by $x$"), inserting the position-basis expansion
+$|\psi\rangle=\int\psi(x)|x\rangle dx$ and using
+$\langle x|x'\rangle=\delta(x-x')$ collapses the double integral to a
+single one:
+
+$$
+\langle x\rangle = \int \psi(x)^*\,x\,\psi(x)\,dx = \int x\,|\psi(x)|^2\,dx
+$$
+
+— exactly the probability-weighted average described above, now derived
+rather than assumed. The same derivation with $x^2$ in place of $x$ gives
+
+$$
+\langle x^2\rangle = \int x^2\,|\psi(x)|^2\,dx
+$$
+
+and, more generally, for *any* function $f(x)$ of position,
+
+$$
+\langle f(x)\rangle = \int f(x)\,|\psi(x)|^2\,dx
+$$
+
+— this is exactly how the platform computes
+`expectationPotential(V)` (the case $f = V$) and, via a discretized
+Riemann sum over the grid, `expectationPosition()` (the case $f(x)=x$).
+
+### Position variance
+
+Exactly as in the finite-dimensional case,
+
+$$
+(\Delta x)^2 = \langle x^2\rangle - \langle x\rangle^2
+$$
+
+measures how spread out the position probability density is —
+`Wavefunction1D.variancePosition()` computes precisely this. For the
+Gaussian wave packets this course builds constantly, $\Delta x$ *is* the
+packet's "width" parameter by construction (verified numerically in this
+platform's own test suite: a Gaussian packet built with width $\sigma$ has
+`variancePosition()` equal to $\sigma^2$).
+
+## Physical Interpretation
+
+$\langle x\rangle$ is where you'd expect to find the particle on average;
+$\Delta x$ is how much any single measurement is likely to deviate from
+that average. A tightly localized wavefunction (small $\Delta x$) predicts
+measurements clustered near $\langle x\rangle$; a broad one predicts wide
+scatter — the same interpretation as any probability distribution's mean
+and standard deviation, because that is exactly what these are.
+
+## Worked Example
+
+**For the top-hat $\psi(x)=1/\sqrt L$ on $[0,L]$, find $\langle x\rangle$
+and $\Delta x$.**
+
+$$
+\langle x\rangle = \int_0^L x \cdot \frac1L\,dx = \frac{L}{2}
+$$
+
+by symmetry (as expected — the midpoint of a uniform distribution).
+
+$$
+\langle x^2\rangle = \int_0^L x^2\cdot\frac1L\,dx = \frac{L^2}{3}
+$$
+
+$$
+(\Delta x)^2 = \frac{L^2}{3} - \frac{L^2}{4} = \frac{L^2}{12}, \qquad \Delta x = \frac{L}{2\sqrt3}
+$$
+
+matching the well-known variance of a continuous uniform distribution —
+here derived from the Born rule, not imported from classical statistics.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Computing $\langle x^2\rangle$ as $\langle x\rangle^2$.** These are
+generally different (equal only for a state with zero variance, which no
+normalizable wavefunction actually has) — squaring the average is not the
+same as averaging the square.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the weight $|\psi(x)|^2$ isn't $\psi(x)$.** The expectation
+integral always carries the *probability density* as its weight, which
+for complex $\psi$ means $\psi^*\psi$, not $\psi$ or $\psi^2$.
+</Callout>
+
+## Practice Questions
+
+1. For the Gaussian $\psi(x) = (\pi\sigma^2)^{-1/4}e^{-x^2/(2\sigma^2)}$
+   centered at the origin, what is $\langle x\rangle$ by symmetry alone,
+   with no integral needed?
+2. Using the general formula $\langle f(x)\rangle=\int f(x)|\psi(x)|^2dx$,
+   write down (don't evaluate) the integral for $\langle V(x)\rangle$
+   given a potential $V(x)$.
+3. True or false, with justification: $\Delta x$ can be exactly zero for
+   some valid, normalized wavefunction.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\langle f(x)\rangle = \int f(x)|\psi(x)|^2\,dx$, derived directly from
+  the abstract $\langle\psi|A|\psi\rangle$ postulate via the position-basis
+  expansion.
+- $\langle x\rangle$ and $(\Delta x)^2=\langle x^2\rangle-\langle
+  x\rangle^2$ are the mean and variance of the position probability
+  density, exactly as for any probability distribution.
+- The platform's `expectationPosition()`, `variancePosition()`, and
+  `expectationPotential()` are direct, discretized implementations of
+  these integrals.
+
+## Further Exploration
+
+Next: **The Position and Momentum Operators**, formally defining $\hat x$
+and (crucially) $\hat p$, and reconnecting to the $[x,p]=i\hbar$
+commutator the last course previewed but deferred.

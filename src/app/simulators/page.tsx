@@ -5,6 +5,7 @@ import { PlaceholderCard } from "@/components/ui/PlaceholderCard";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 
 export const metadata: Metadata = {
   title: "Simulators",
@@ -70,6 +71,18 @@ export default function SimulatorsPage() {
           </p>
           <div className="mt-6">
             <LazyComplexAmplitudeExplorer />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Wavefunction Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            A real 1D numerical wavefunction simulator — position and momentum grids, an actual FFT, and
+            genuine time evolution via the split-operator method. Watch wave packets disperse, energy
+            eigenstates stay stationary, superpositions beat, and particles tunnel through barriers.
+          </p>
+          <div className="mt-6">
+            <LazyWavefunctionExplorer />
           </div>
         </section>
       </div>

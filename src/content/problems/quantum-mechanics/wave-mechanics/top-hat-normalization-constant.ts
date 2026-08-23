@@ -1,0 +1,42 @@
+import type { NumericProblem } from "@/lib/problems/types";
+
+export const topHatNormalizationConstant: NumericProblem = {
+  meta: {
+    slug: "top-hat-normalization-constant",
+    title: "Normalizing a Top-Hat Wavefunction",
+    course: "wave-mechanics",
+    lesson: "quantum-mechanics/wave-mechanics/what-is-a-wavefunction",
+    difficulty: "beginner",
+    estimatedMinutes: 4,
+    problemType: "numeric",
+    tags: ["normalization", "wavefunction"],
+    prerequisites: ["quantum-mechanics/wave-mechanics/what-is-a-wavefunction"],
+  },
+  question: {
+    type: "numeric",
+    prompt: "A particle's wavefunction is psi(x) = A for 0 <= x <= 8, and 0 elsewhere. Find A (take A real and positive).",
+    inputHint: "a decimal",
+  },
+  answer: {
+    type: "numeric",
+    value: 0.353553,
+    tolerance: 0.001,
+    incorrectFeedback: "Normalization requires the integral of |A|^2 over the interval to equal 1: |A|^2 * L = 1, so A = 1/sqrt(L).",
+  },
+  hints: [
+    { text: "Normalization requires integral of |psi(x)|^2 dx = 1 over the region where psi is nonzero." },
+    { text: "Here that's |A|^2 times the interval's length, set equal to 1." },
+  ],
+  solution: {
+    steps: [
+      { description: "Normalization: $\\int_0^8 |A|^2\\,dx = |A|^2 \\cdot 8 = 1$." },
+      { description: "Solve for $A$.", latex: "A = \\frac{1}{\\sqrt{8}} \\approx 0.3536" },
+    ],
+    finalAnswer: "$A \\approx 0.3536$",
+  },
+  explanation: {
+    correctIdea: "Normalization fixes the overall scale of a wavefunction by requiring total probability to equal 1.",
+    whyCorrect: "$A=1/\\sqrt{L}$ makes $\\int_0^L|A|^2dx=1$ exactly, for any interval length $L$.",
+    whyWrong: ["Forgetting to take the square root (using $A=1/L$ instead of $1/\\sqrt L$) is the most common slip — normalization involves $|A|^2$, not $A$."],
+  },
+};

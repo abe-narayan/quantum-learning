@@ -1,0 +1,176 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/what-is-a-wavefunction"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "What Is a Wavefunction?",
+  description:
+    "Extending the postulates from finite-dimensional qubits to continuous position, by taking the discrete basis you already know and letting the spacing shrink to zero.",
+  course: "wave-mechanics",
+  module: "what-is-a-wavefunction",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 22,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics"],
+  objectives: [
+    "Derive the continuous wavefunction psi(x) as the continuum limit of a discrete position basis",
+    "Explain why psi(x) is an amplitude density, not an amplitude, and why that distinction is forced by the continuum limit",
+    "Identify which of the four postulates from the last course change in this limit, and which don't",
+  ],
+};
+
+## Motivation
+
+Every state this platform has built so far lives in a finite-dimensional
+space: a qubit is $\mathbb{C}^2$, three qubits are $\mathbb{C}^8$. Position
+is different. A particle isn't at one of finitely many discrete spots — it
+can be at *any* real number $x$. The postulates from the last course
+(state, observable, measurement, dynamics) don't change their content when
+we make this move, but their *representation* does, and working out
+exactly how is this lesson's entire job.
+
+## Intuition
+
+Don't start from continuous $x$ directly — start from what you already
+know. Chop space into a fine grid of positions $x_1, x_2, \ldots, x_N$
+spaced $\Delta x$ apart (this is *exactly* the grid this course's numerical
+simulator uses internally). A particle's state on this grid is an ordinary
+finite-dimensional state vector, $|\psi\rangle = \sum_i c_i|x_i\rangle$,
+with $\sum_i |c_i|^2 = 1$ by the Born rule you already know. Then ask: what
+happens to this description as $\Delta x \to 0$?
+
+## Mathematical Development
+
+### The continuum limit
+
+On the grid, $P(\text{at } x_i) = |c_i|^2$. As the grid refines
+($\Delta x \to 0$, $N \to \infty$), the probability of being in any single
+*point* must go to zero — a continuous particle isn't "at" one exact point
+with nonzero probability, any more than a continuous random variable is.
+What survives the limit is the probability of being in a small *interval*
+$[x, x+\Delta x]$. For this to have a sensible, $\Delta x$-independent
+limit, the coefficients must scale as
+
+$$
+c_i = \psi(x_i)\sqrt{\Delta x}
+$$
+
+for some function $\psi$ — the $\sqrt{\Delta x}$ is exactly what's needed
+so that $|c_i|^2 = |\psi(x_i)|^2 \Delta x$ stays finite and proportional to
+the interval width as $\Delta x \to 0$. The normalization condition
+becomes
+
+$$
+\sum_i |c_i|^2 = \sum_i |\psi(x_i)|^2 \Delta x \;\xrightarrow{\Delta x \to 0}\; \int |\psi(x)|^2\,dx = 1
+$$
+
+— a Riemann sum turning into an integral, nothing more exotic than that.
+The state itself, $|\psi\rangle = \sum_i c_i |x_i\rangle = \sum_i
+\psi(x_i)\sqrt{\Delta x}\,|x_i\rangle$, becomes (informally, dividing
+through the bookkeeping of the limit)
+
+$$
+|\psi\rangle = \int \psi(x)\,|x\rangle\,dx
+$$
+
+with $\langle x|x'\rangle = \delta(x-x')$ (a Dirac delta) replacing the
+discrete $\langle x_i|x_j\rangle = \delta_{ij}$ — the continuum's version
+of an orthonormal basis. **This platform's numerical simulator is this
+same construction, deliberately left at finite $\Delta x$**: `Grid1D`
+*is* $\{x_1,\ldots,x_N\}$, and a `Wavefunction1D`'s `amplitudes` array
+*is* $\{\psi(x_1),\ldots,\psi(x_N)\}$ — the discretization this lesson
+derives as a limit is the platform's literal implementation strategy, not
+an unrelated approximation.
+
+### Why $\psi(x)$ is a density, not an amplitude
+
+The scaling $c_i = \psi(x_i)\sqrt{\Delta x}$ is the crux: $\psi(x)$ itself
+is **not** a probability amplitude in the same sense $c_i$ was — it's an
+**amplitude density**, with units of (probability)$^{1/2}$ per unit
+length. $|\psi(x)|^2$ is a probability *density*: $|\psi(x)|^2\,dx$ is a
+probability, but $|\psi(x)|^2$ alone is not (it can be larger than 1, and
+routinely is, wherever the wavefunction is tightly localized). This is a
+direct, forced consequence of the continuum limit — not a separate
+postulate bolted on afterward.
+
+### What changed, and what didn't
+
+Revisit the four postulates from the last course:
+
+- **State**: still a normalized vector in a Hilbert space — just now an
+  infinite-dimensional one ($L^2(\mathbb{R})$, square-integrable
+  functions), with $\psi(x)$ as its components in the position basis.
+- **Observable**: still a Hermitian operator (position and momentum
+  operators are built explicitly in later lessons).
+- **Measurement**: still Born's rule — reinterpreted as a *density* for a
+  continuous outcome, exactly as derived above.
+- **Dynamics**: still $i\hbar\,d|\psi\rangle/dt = H|\psi\rangle$ — position
+  space just makes $H$ a differential operator instead of a matrix (a
+  later lesson).
+
+Nothing here is new physics. It's the same postulates, in a basis with a
+continuum of labels instead of finitely many.
+
+## Physical Interpretation
+
+A finite-dimensional qubit's amplitudes told you "how much of $|0\rangle$,
+how much of $|1\rangle$." $\psi(x)$ tells you the analogous thing for
+every possible position simultaneously — a function's worth of amplitude
+information, which is exactly why continuous quantum mechanics needs
+calculus where finite-dimensional quantum computing needed only linear
+algebra.
+
+## Worked Example
+
+**A particle's wavefunction is $\psi(x) = A$ for $x \in [0, L]$ and $0$
+elsewhere. Find $A$.**
+
+Normalization requires $\int_0^L |A|^2\,dx = 1$, so $|A|^2 L = 1$, giving
+$A = 1/\sqrt{L}$ (taking $A$ real and positive, a free choice — see the
+Superposition, Interference, and Phase lesson on why an overall phase
+never matters).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating $\psi(x)$ itself as a probability.** It isn't — it can be
+negative, complex, or larger than 1 in magnitude. Only $|\psi(x)|^2\,dx$
+is ever a probability.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the $dx$.** $|\psi(x)|^2$ alone has units of probability
+*per length* — comparing it directly to a plain probability, without the
+interval width, compares two different kinds of quantities.
+</Callout>
+
+## Practice Questions
+
+1. Why must $c_i$ scale as $\sqrt{\Delta x}$, specifically, rather than as
+   $\Delta x$ or as a constant, for the continuum limit to work?
+2. For the top-hat wavefunction above with $L=4$, what is $A$?
+3. Which of the four postulates literally does not need to be restated at
+   all when moving from qubits to continuous position?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Chopping space into a fine grid and taking $\Delta x \to 0$ forces
+  $c_i = \psi(x_i)\sqrt{\Delta x}$ — the unique scaling that keeps
+  normalization finite in the limit.
+- $\psi(x)$ is an amplitude *density*; $|\psi(x)|^2\,dx$, not $|\psi(x)|^2$
+  alone, is a probability.
+- The four postulates from the last course are unchanged in content —
+  only their representation (functions instead of finite vectors) is new.
+- This platform's numerical `Grid1D`/`Wavefunction1D` types are this
+  lesson's discrete construction, deliberately left un-taken-to-the-limit.
+
+## Further Exploration
+
+Next: **Probability Density and Normalization**, making the Born-rule
+reinterpretation above fully precise and connecting it to concrete
+expectation-value calculations.

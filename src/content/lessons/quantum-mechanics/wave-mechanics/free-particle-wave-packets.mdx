@@ -1,0 +1,166 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/wave-mechanics/free-particle-wave-packets"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Free-Particle Wave Packets",
+  description:
+    "Why a single plane wave cannot represent a real, localized particle, and how superposing a narrow band of momenta builds a normalizable Gaussian wave packet with a well-defined group velocity.",
+  course: "wave-mechanics",
+  module: "free-particle-wave-packets",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 22,
+  prerequisites: ["quantum-mechanics/wave-mechanics/the-schrodinger-equation-in-position-space"],
+  objectives: [
+    "Explain why a single plane wave is not normalizable and cannot represent a physical free particle",
+    "Construct a Gaussian wave packet as a superposition of plane waves with a spread of momenta",
+    "Derive the group velocity v = p0/m and identify it in the platform's live simulator",
+  ],
+};
+
+## Motivation
+
+The plane wave $e^{ipx/\hbar}$ from two lessons ago is the momentum
+operator's eigenfunction — but $\int|e^{ipx/\hbar}|^2dx = \int 1\,dx$
+diverges. A plane wave literally cannot be normalized: it isn't a valid
+physical state, only a useful mathematical building block. A real free
+particle needs a *superposition* of plane waves — which is exactly what a
+wave packet is.
+
+## Intuition
+
+Superposition, interference, and phase (the last course's own lesson)
+already established that combining amplitudes with the right relative
+phases builds new, structured states. A wave packet superposes plane
+waves across a narrow band of momenta centered on $p_0$, with phases
+arranged so they interfere *constructively* in one localized region and
+*destructively* everywhere else — producing a normalizable, localized
+"lump" that still carries a well-defined average momentum.
+
+## Mathematical Development
+
+### Building the packet
+
+Take $\phi(k)$ (momentum-space amplitude) to be a Gaussian centered at
+$k_0=p_0/\hbar$ with width $\Delta k$:
+
+$$
+\phi(k) \propto e^{-(k-k_0)^2/(4\Delta k^2)}
+$$
+
+Applying the inverse Fourier transform from two lessons ago gives the
+position-space wavefunction — a calculation whose result (the Gaussian
+transforms to a Gaussian, worked out explicitly in that lesson) is
+
+$$
+\psi(x,0) \propto e^{-x^2/(4\sigma^2)}\,e^{ik_0 x}, \qquad \sigma = \frac{1}{2\Delta k}
+$$
+
+— an envelope localized near $x=0$ with width $\sigma$, modulated by a
+plane wave carrying the average momentum $p_0=\hbar k_0$. This is exactly
+`Wavefunction1D.gaussianPacket(grid, {center, width, momentum})`'s
+construction, generalized to an arbitrary center.
+
+### Group velocity
+
+The envelope's peak moves at the **group velocity**, not the phase
+velocity of the underlying plane wave. For the free-particle dispersion
+relation $E(k)=\hbar^2k^2/(2m)$ (from $\hat H=\hat p^2/2m$, restated in
+terms of $k=p/\hbar$),
+
+$$
+v_g = \frac{d\omega}{dk}\bigg|_{k_0} = \frac{1}{\hbar}\frac{dE}{dk}\bigg|_{k_0} = \frac{\hbar k_0}{m} = \frac{p_0}{m}
+$$
+
+— exactly the classical velocity $p_0/m$. This matches directly:
+$\langle x\rangle$'s rate of change under Schrödinger evolution equals
+$\langle p\rangle/m$ (Ehrenfest's theorem, a short calculation deferred to
+the Wave Packet Dynamics lesson, but numerically verified here already),
+so the packet's average position advances exactly like a free classical
+particle.
+
+## Physical Interpretation
+
+A wave packet is the quantum object closest to "a particle with a
+definite position and momentum" — it has *some* spread in both (bounded
+below by $\Delta x\Delta p\ge\hbar/2$, from the Momentum Space lesson),
+but for a macroscopic object that spread is utterly negligible, which is
+exactly why classical mechanics ever looked like a good approximation:
+Ehrenfest's theorem says a wave packet's average position obeys Newton's
+laws.
+
+## Interactive Experiment
+
+The Wavefunction Explorer's **Free Gaussian Packet** preset builds exactly
+this state. Set momentum to a nonzero value and watch $\langle x\rangle$
+in the state panel advance at a constant rate — measure it against the
+formula $v_g=p_0/m$ (natural units, $m=1$, so $v_g=p_0$ directly) by
+comparing the displayed $\langle p\rangle$ to the rate $\langle
+x\rangle$ changes at.
+
+<LazyWavefunctionExplorer />
+
+## Worked Example
+
+**A packet has $p_0=2$ (natural units, $m=1$). After $\Delta t=3$, by how
+much should $\langle x\rangle$ have advanced, if the packet started at
+$x_0=-15$?**
+
+$$
+\langle x(t)\rangle = x_0 + v_g\,t = -15 + (2)(3) = -9
+$$
+
+— directly checkable against the simulator's live $\langle x\rangle$
+readout after playing that preset forward to $t=3$ (this exact check is
+also one of `timeEvolution.test.ts`'s engine tests, verified to match this
+formula numerically).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Trying to normalize a bare plane wave.** It cannot be done — $\int
+1\,dx$ diverges no matter how you rescale. Plane waves are useful
+idealizations for defining momentum eigenstates, never themselves
+physical states.
+</Callout>
+
+<Callout type="mistake">
+**Confusing phase velocity and group velocity.** For matter waves these
+differ by a factor of 2 ($v_{\rm phase}=\hbar k/(2m)=v_g/2$ for a free
+particle) — it's the *group* velocity, the envelope's speed, that matches
+the classical particle velocity.
+</Callout>
+
+## Practice Questions
+
+1. Why is $\Delta k$ (momentum-space width) inversely related to $\sigma$
+   (position-space width) for a Gaussian packet — connect this to the
+   uncertainty principle from two lessons ago.
+2. For $p_0=-3$ and $m=1$, what is the group velocity, and which
+   direction does the packet move?
+3. Explain in one or two sentences why Ehrenfest's theorem (packet
+   averages obey classical mechanics) is *consistent* with, not a
+   violation of, the underlying quantum uncertainty.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A single plane wave isn't normalizable; a Gaussian superposition of
+  plane waves across a narrow momentum band builds a genuine, localized,
+  normalizable wave packet.
+- The packet's envelope moves at the group velocity $v_g=dE/dp=p_0/m$ —
+  the classical velocity, recovered from purely quantum machinery.
+- This is exactly what `gaussianPacket` constructs, and exactly what the
+  Wavefunction Explorer's Free Gaussian Packet preset animates.
+
+## Further Exploration
+
+Next: **The Infinite Square Well**, the first genuinely bound (confined)
+system this course solves — deriving quantized energy levels from
+boundary conditions alone.
