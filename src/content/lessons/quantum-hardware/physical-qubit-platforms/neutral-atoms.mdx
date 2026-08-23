@@ -1,0 +1,140 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/physical-qubit-platforms/neutral-atoms"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Neutral Atoms",
+  description:
+    "Uncharged atoms held in place by focused laser light (optical tweezers) rather than electric fields: trading trapped ions' Coulomb-based confinement for a scheme that scales to hundreds of individually-addressable qubits in reconfigurable 2D and 3D arrangements.",
+  course: "physical-qubit-platforms",
+  module: "neutral-atoms",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 18,
+  prerequisites: ["quantum-hardware/physical-qubit-platforms/trapped-ions"],
+  objectives: [
+    "Explain how optical tweezers trap a neutral (uncharged) atom, in contrast to an ion trap's electric fields",
+    "State why neutral-atom arrays scale differently from trapped-ion chains",
+    "Describe Rydberg blockade at a conceptual level as the mechanism enabling two-qubit gates between neutral atoms",
+  ],
+};
+
+## Motivation
+
+Trapped ions rely on the ion's electric charge, but that same charge
+means ions repel each other, limiting how densely they can be packed in
+a single trap. Neutral atoms sidestep this entirely: an uncharged atom
+feels no long-range Coulomb repulsion from its neighbors, opening the
+door to a very different, and highly scalable, trapping scheme.
+
+## Engineering Development
+
+### Optical tweezers: trapping without charge
+
+A neutral atom has no net charge for a static or oscillating electric
+field to grip the way an ion trap does. Instead, **optical tweezers**
+use a tightly focused laser beam: an atom is attracted toward the point
+of highest light intensity (a consequence of how an atom's induced
+electric dipole interacts with the light field), effectively pinning it
+at the beam's focus. Because each tweezer is just a separately-steerable
+focused laser spot, an experiment can create many independent traps
+arranged in essentially any 2D (or even 3D) pattern, a qualitatively
+different scaling path from a trapped-ion chain's fixed linear geometry.
+
+### Reconfigurable arrays
+
+Since each atom sits in its own independently-controlled optical
+tweezer, the *entire array geometry* can be reconfigured between
+experiments (or even mid-experiment): atoms can be rearranged, and
+individual defects (a trap that failed to load an atom) can sometimes be
+corrected by moving a neighboring atom into the gap. This flexibility
+has let neutral-atom platforms scale to hundreds of qubits, among the
+largest qubit counts of any platform to date.
+
+### Rydberg blockade: how two-qubit gates work
+
+Neutral atoms don't have a shared mechanical mode the way trapped ions
+do. Instead, two-qubit gates typically use **Rydberg blockade**: briefly
+exciting an atom to a highly excited ("Rydberg") state, whose enormously
+large electron orbit creates a strong interaction with any *nearby*
+atom also being excited, strong enough to shift the neighbor's energy
+levels and prevent it from being excited to the same Rydberg state at
+the same time. This blockade effect, one atom's excitation
+conditionally suppressing its neighbor's, is what implements an
+entangling two-qubit gate, conceptually similar in spirit to Quantum
+Algorithms I's controlled-phase gates, but arising from genuine atomic
+physics rather than an abstract circuit element.
+
+## Physical Interpretation
+
+Neutral atoms' central engineering advantage is genuinely different
+from trapped ions' or superconducting qubits'. It's not raw speed, and
+not per-qubit coherence time alone, but *scalable, flexible geometry*:
+the ability to lay out and rearrange large numbers of identical,
+naturally-uniform qubits (since, like trapped ions, they're real atoms,
+not fabricated devices that vary chip-to-chip).
+
+## Worked Example
+
+**Why can't a plain (non-Rydberg) neutral atom implement a two-qubit
+gate as directly as an ion's shared vibrational mode?**
+
+An ordinary (non-excited) neutral atom has essentially no long-range
+interaction with its neighbors. That absence of interaction is exactly
+what made it easy to trap densely in the first place, but it also means
+two ordinary neutral atoms sitting near each other don't naturally
+influence one another's quantum state. Rydberg blockade solves this by
+*temporarily* creating a strong interaction on demand (via the Rydberg
+excitation), rather than relying on an always-on coupling the way trapped
+ions' shared vibrational mode does.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming "neutral" means "no interactions, ever."** Neutral atoms have
+no long-range Coulomb interaction, but Rydberg excitation deliberately
+creates a strong, controllable interaction on demand. The platform's
+entire two-qubit gate mechanism depends on this being possible.
+</Callout>
+
+<Callout type="mistake">
+**Confusing optical tweezers with a laser used to drive a gate.**
+Tweezers are for *trapping/positioning* the atom; gates and readout
+generally use separate, differently-tuned lasers. Trapping and
+manipulation are distinct engineering functions, even though both use
+light.
+</Callout>
+
+## Practice Questions
+
+1. Why does an ion trap need electric fields specifically, while a
+   neutral atom cannot be trapped the same way?
+2. What specific engineering advantage do reconfigurable optical-tweezer
+   arrays provide that a fixed trapped-ion chain does not?
+3. Explain Rydberg blockade in one or two sentences, focusing on what
+   happens to a neighboring atom's ability to also become excited.
+4. Is Rydberg blockade's interaction always-on (like ions' Coulomb
+   repulsion) or switched on deliberately? Why does this distinction
+   matter for gate design?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Optical tweezers trap neutral atoms using focused laser light, not
+  electric fields, since neutral atoms carry no net charge for an
+  electric field to grip.
+- This enables large, flexible, reconfigurable 2D/3D arrays, a
+  different scaling path from trapped ions' linear chains, reaching
+  some of the largest qubit counts of any current platform.
+- Two-qubit gates use Rydberg blockade: a temporary, deliberately
+  induced strong interaction between neighboring excited atoms, not an
+  always-on coupling like trapped ions' shared vibrational mode.
+
+## Further Exploration
+
+Next: **Photonic Qubits**, a platform that doesn't trap anything at all.
+Information travels rather than sits still.

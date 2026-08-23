@@ -248,7 +248,7 @@ top of, so the math is written and verified exactly once.
 | `twoQubit.ts` | `testSeparability` and `twoQubitJointProbabilities` — the two genuinely 2-qubit-specific math functions (see below); deliberately its own file rather than folded into `state.ts`, since the separability test doesn't generalize past 2 qubits the way everything else in the engine does |
 | `format.ts` | `formatAmplitudeLatex` — the one formatting helper shared between the Bloch sphere simulator and lesson-embedded state displays, kept here (not under `components/`) since multiple, otherwise-unrelated UI pieces consume it |
 | `observables.ts` | `expectationValue`, `variance`, `uncertainty`, `commutator`, `commutatorExpectation` — added for the "From Classical to Quantum" course's Expectation Values and Uncertainty lesson; kept separate from `measurement.ts` since these describe the *statistics* of an observable's outcome distribution (a property of state + operator), not the act of sampling/collapsing one |
-| `harmonicOscillator.ts` | `annihilationOperator`, `creationOperator`, `numberOperator`, `harmonicOscillatorEnergyLevels` — the harmonic oscillator's ladder operators as finite, truncated `dimension`×`dimension` matrices on the Fock basis, letting the existing `Matrix` engine represent them exactly like every other operator, with the truncation's one honest approximation (documented in the file and tested directly) confined to the single boundary case where `a†` would need a level past the cutoff |
+| `harmonicOscillator.ts` | `annihilationOperator`, `creationOperator`, `numberOperator`, `harmonicOscillatorEnergyLevels`, `positionOperator` (added for Approximation Methods' perturbation-theory lesson — $x=\sqrt{1/2m\omega}(a+a^\dagger)$ in the truncated Fock basis) — the harmonic oscillator's ladder operators as finite, truncated `dimension`×`dimension` matrices on the Fock basis, letting the existing `Matrix` engine represent them exactly like every other operator, with the truncation's one honest approximation (documented in the file and tested directly) confined to the single boundary case where `a†` would need a level past the cutoff |
 | `amplitude.ts` | `normalizedTwoLevelAmplitudes`, `interferenceProbability`, `classicalSumProbability` — built for the Complex Amplitude Explorer's two-amplitude interference mode (see §6b); deliberately thin wrappers around `Complex`, not a parallel state-vector abstraction |
 | `fourier.ts` | A hand-written, iterative, in-place radix-2 Cooley-Tukey `fft`/`ifft` pair (grid sizes must be a power of 2), plus `momentumGrid` and the physically-normalized `positionToMomentum`/`momentumToPosition` wrappers. Built for Wave Mechanics — see below for why hand-written rather than a dependency, and why iterative rather than the initially-simpler recursive form |
 | `wavefunction.ts` | `Grid1D` (a centered, power-of-two position grid) and `Wavefunction1D` — a discretized ψ(x) with normalization, probability density, inner product/overlap, position and momentum expectation values/variances, potential/kinetic/total energy expectation values, and `superposition()` for combining eigenstates. The continuous-position analogue of `state.ts`'s `StateVector`, but for an infinite-dimensional (grid-discretized) Hilbert space instead of a finite qubit register |
@@ -259,6 +259,26 @@ top of, so the math is written and verified exactly once.
 | `entanglement.ts` | `entanglementEntropy` (reduced-state von Neumann entropy — valid **only** for a globally pure state, and typed to take a `StateVector` accordingly) and `concurrenceOfPureState` (pure two-qubit concurrence $C=2|ad-bc|$, reusing `twoQubit.ts`'s `testSeparability` determinant directly rather than reimplementing it) plus `isEntangled`; deliberately does **not** implement general mixed-state entanglement measures (see below) |
 | `chsh.ts` | `spinObservableInXZPlane`, `correlationExpectation`, `chshValue`, and the `CHSH_CLASSICAL_BOUND`/`CHSH_QUANTUM_BOUND` constants — the CHSH inequality machinery for `entanglement-and-measurement`'s Bell-test lessons |
 | `bloch.ts` | Gained `densityMatrixToBlochVector` this session (`stateToBlochVector`/`stateToBlochAngles`/`blochStateFromAngles` predate it) — the Bloch vector of a single-qubit density matrix via $\langle X\rangle,\langle Y\rangle,\langle Z\rangle$, letting the existing `BlochSphereCanvas` render mixed states (strictly inside the sphere) with zero new rendering code |
+| `oracles.ts` | `applyBitOracle`, `applyPhaseOracle`, `constantFunction`, `balancedFunction` — the oracle-construction primitives for Quantum Algorithms I |
+| `qft.ts` | `quantumFourierTransform`/`inverseQuantumFourierTransform`, `phaseEstimation` (restricted to 2×2 unitaries) |
+| `grover.ts` | `uniformSuperposition`, `groverDiffusion` (built from an explicit `reflectAboutZero` helper, not a phase-oracle reuse — see §8 Session 11 for the bug this avoided), `groverIteration`, `optimalGroverIterations`, `runGrover` |
+| `shor.ts` | `classicalOrder`, `periodFindingState` (exact closed-form joint-state construction, not a gate-level modular-exponentiation circuit — an explicit scope choice), `quantumFourierTransformOnQubits`, `periodFindingMeasurementDistribution` |
+| `vqe.ts` | `ansatzState`, `costFunction`, `exactGroundStateEnergy` ($2\times2$ closed form), `runVqe` (direct coordinate-wise pattern search — the smallest correct optimizer, not a general-purpose gradient descent implementation) |
+| `qaoa.ts` | `uniformSuperposition`, `applyCostUnitary`, `applyMixerUnitary`, `qaoaCircuit`, `expectedCutSize`, `bruteForceMaxCut` |
+| `errorCorrection.ts` | `encodeBitFlipCode`/`runBitFlipCorrectionCycle` and the phase-flip equivalents (real 3-qubit encoding, ancilla-based syndrome extraction via genuine CNOTs + partial measurement — not a shortcut), `applyBitFlipError`/`applyPhaseFlipError` |
+| `angularMomentum.ts` | `angularMomentumZ`/`X`/`Y`, `angularMomentumRaising`/`Lowering`, `totalAngularMomentumSquared` — general (any half-integer or integer) $j$, built from ladder-operator matrix elements exactly like `harmonicOscillator.ts`'s truncated Fock basis |
+| `sphericalHarmonics.ts` | `sphericalHarmonic` (explicit closed forms, $l=0,1,2$ only — throws for unsupported $l,m$, deliberately not a general Legendre-polynomial solver), `sphericalHarmonicNormSquared`/`InnerProduct` (numerical integration) |
+| `hydrogenAtom.ts` | `hydrogenEnergyLevel`, explicit closed-form `radial1s`/`radial2s`/`radial2p` (not a general Laguerre-polynomial solver — the same truncation philosophy as `harmonicOscillator.ts` and `sphericalHarmonics.ts`), `radialNormSquared`/`InnerProduct`, `mostProbableRadius1s` |
+| `approximationMethods.ts` | `firstOrderEnergyCorrection`/`secondOrderEnergyCorrection`/`firstOrderStateCorrection` (finite-dimensional perturbation theory), `gaussianTrialEnergy`/`minimizeGaussianTrialEnergy` (variational method, reusing `wavefunction.ts`'s `Wavefunction1D.expectationEnergy` directly), `wkbActionIntegral`/`wkbQuantizedEnergy` (semiclassical quantization), `firstOrderTransitionProbability`/`exactTwoLevelTransitionProbability` (time-dependent perturbation theory; the latter a general-purpose RK4 two-level integrator, reused unchanged in the Quantum Hardware pillar for Rabi-oscillation gate timing and calibration), `exactTwoLevelState` (Session 12: the same RK4 integration exposing the full complex two-level state, not just the final population, so a Bloch vector can be computed from it), `exactTwoLevelTrajectory` (Session 12: a single continuous RK4 pass recording evenly-spaced samples along the way, for the Rabi/Qubit Dynamics Explorer's scrubbable time slider, instead of re-integrating from t=0 for every requested sample) |
+| `identicalParticles.ts` | `tensorProduct`, `symmetrize`/`antisymmetrize` (deliberately exactly-2-particle scope), `exchangeParticles`, `normalizeVector` — the Pauli exclusion principle falls directly out of `antisymmetrize(a,a)` throwing on a zero vector, not asserted separately |
+| `openSystems.ts` | `applyKrausChannel`, `isTracePreserving`, `amplitudeDampingChannel`/`dephasingChannel`, `applyChannelRepeatedly`, `decayProbabilityForTimestep` (connects discrete Kraus-channel stepping to continuous $T_1$/$T_2$ exponential decay *exactly*, for any step count — not merely a fine-stepping approximation) |
+| `pathIntegral.ts` | `euclideanFreeParticleAction`/`euclideanFreePropagator` (closed form) and `discretizedTwoSlicePropagator` (genuine discretized sum-over-paths, verified against the closed form to ~$10^{-15}$ relative error) — deliberately Euclidean-time only; see below for why |
+| `thermalPhysics.ts` | `thermalPhotonOccupation` — the Bose-Einstein occupation formula behind why qubits need millikelvin cooling |
+| `circuitBuilder.ts` | `QuantumCircuit` (chained gate-instruction builder) + `runCircuit` (dispatches to `gates.ts`, unchanged) + `sampleMeasurements` — the "circuit as data, executed later" pattern real SDKs use, distinct from `gates.ts`'s direct-application style; gained `runInstructions(numQubits, instructions)` in Session 12 (`runCircuit` now delegates to it), letting the Circuit Builder simulator replay an arbitrary *prefix* of a instruction list for its step-scrubbing feature without constructing a full `QuantumCircuit` per prefix |
+| `simulationCost.ts` | `stateVectorAmplitudeCount`/`stateVectorMemoryBytes`/`estimatedGateFlops` — plain arithmetic, made into real (tested, problem-reusable) functions rather than only quoted as numbers in lesson prose |
+| `noisyCircuitSimulation.ts` | `runNoisyCircuit` — interleaves `densityMatrix.ts`'s `evolveDensityMatrix` with `openSystems.ts`'s `applyKrausChannel` after every gate; deliberately single-qubit-scoped (see below) |
+| `gateDecomposition.ts` | `matricesEqualUpToGlobalPhase` — the one reusable utility a decomposition-verification lesson needs; the specific decompositions themselves are just `rotationY`/`rotationZ` compositions, not separately wrapped |
+| `transpilation.ts` | `cnotOnLinearChain` (SWAP-network CNOT for limited connectivity, verified to reproduce a direct `applyCNOT`'s result exactly) + `swapOverheadForLinearChain` |
 
 ### Qubit ordering convention
 
@@ -621,6 +641,120 @@ anyway. It reuses far more than it builds:
    5th real, fully interactive entry, replacing the old "Entanglement
    visualizer" coming-soon placeholder it directly supersedes in scope
    (a single qubit's mixedness, not a full multi-qubit circuit view).
+
+### The Circuit Builder (Session 12)
+
+`src/components/simulators/circuit-builder/` is the first simulator to
+render a genuine **circuit diagram** rather than a state readout, and the
+first to need a **step-scrubbing timeline** (replaying an arbitrary
+prefix of a gate sequence, not just "current state after everything so
+far"):
+
+1. **Math** — `circuitBuilder.ts`'s existing `GateInstruction`/`QuantumCircuit`,
+   plus the new `runInstructions(numQubits, instructions)` (§6), which
+   `runCircuit` now delegates to. The simulator computes
+   `state = runInstructions(numQubits, instructions.slice(0, step))` on
+   every render — the step slider is genuinely just an array-slice index,
+   not a separate "replay" code path.
+2. **State** — `numQubits` (2 or 3), the full `instructions: GateInstruction[]`
+   built so far, and `step` (where in that list the display currently is).
+   Adding a gate appends to `instructions` and auto-advances `step`.
+3. **Visualization** — `CircuitDiagram.tsx`, a dependency-free SVG circuit
+   diagram (fixed-pixel-math rows for qubits, columns for instructions):
+   single-qubit gates as labeled boxes, two-qubit gates as a connector
+   line between control and target with a symbol per gate (CNOT: dot +
+   ⊕; CZ: dot + dot; SWAP: × + ×). Columns at or past the current `step`
+   render at reduced opacity, so "what's been applied so far" is visually
+   obvious without a separate legend. `StateInspector.tsx` is the
+   N-qubit generalization of the 2-qubit explorer's `StatePanel` (a ket
+   expression plus a per-basis-state amplitude/probability table).
+4. **Controls** — `GateControls.tsx`: qubit-count toggle, a single-qubit
+   gate palette with a target-qubit selector, and CNOT/CZ/SWAP buttons
+   with control/target dropdowns (disabled with an inline warning when
+   control equals target).
+5. **Lesson integration** — `LazyCircuitBuilder.tsx`, the standard lazy
+   wrapper; embedded in `/simulators`, in Quantum Gates & Circuits'
+   capstone ("Building Quantum Circuits" — build and verify the lesson's
+   own hand-designed circuits before checking the printed answer), and in
+   Programming Quantum Computers' "Writing Your First Circuit" (replicate
+   the lesson's exact GHZ circuit before reading its exact numbers) — this
+   closes the long-pending circuit-builder gap flagged in the Session 11
+   roadmap update.
+
+### The Grover's Algorithm Explorer (Session 12)
+
+`src/components/simulators/grover-explorer/` needed zero new engine math
+— `grover.ts`'s `uniformSuperposition`/`groverIteration`/`optimalGroverIterations`
+(§6, including the `reflectAboutZero` bug fix documented in Session 11)
+were reused exactly as-is. `AmplitudeBars.tsx` renders every basis
+state's signed real amplitude and probability as a bar chart (Grover's
+amplitudes stay real throughout, starting from a real uniform
+superposition), with the marked state highlighted; `GroverControls.tsx`
+steps one full oracle-plus-diffusion iteration at a time and reports the
+theoretical optimum alongside the current iteration count, so overshoot
+past the optimum is directly visible as the marked bar shrinking back
+down. Embedded in both Grover lessons in Quantum Algorithms I, with
+instruction text asking the learner to predict the optimal iteration
+count before stepping past it.
+
+### The Rabi / Qubit Dynamics Explorer (Session 12)
+
+`src/components/simulators/rabi-explorer/` required one genuine physics
+verification step before any UI was written, per this session's explicit
+instruction not to expose unreliable physics: `approximationMethods.ts`'s
+existing `exactTwoLevelTransitionProbability` (an RK4 integrator, §6) was
+refactored to share its stepping logic with two new exports,
+`exactTwoLevelState` (the full complex two-level state, not just the
+final population) and `exactTwoLevelTrajectory` (a single continuous RK4
+pass recording evenly-spaced samples, avoiding re-integrating from t=0
+for every point on a scrubbable timeline). Verified against three
+independent checks before building the UI: Bloch-vector norm stays
+exactly 1 at every sampled time, on and off resonance (unitarity,
+confirmed numerically); the resonant case ($E_i=E_f$) matches the
+closed-form $P_1(t)=\sin^2(Vt)$ exactly; and the off-resonant maximum
+population matches the correctly-derived generalized-Rabi closed form
+$P_{1,\max}=4V^2/(\Delta^2+4V^2)$ (for the platform's specific Hamiltonian
+convention $H=\begin{pmatrix}E_i&V\\V&E_f\end{pmatrix}$, $\Delta=E_f-E_i$)
+— all three are also permanent Vitest assertions, not just a one-off
+scratch check. The Bloch-sphere half of the display reuses
+`BlochSphereCanvas` and `stateToBlochVector` with zero new rendering
+code, the same precedent the Density Matrix Explorer set.
+`PopulationCurve.tsx` is a small dependency-free SVG line plot of
+$P_1(t)$; `RabiControls.tsx` exposes coupling strength $V$, detuning
+$\Delta$, and a time slider (indexing into the precomputed trajectory,
+the same scrubbing pattern the Circuit Builder established) plus
+play/pause. Embedded in Quantum Hardware's Control Electronics (predict
+$P_1(t)=\sin^2(Vt)$ on resonance, then detune and watch the maximum
+reachable population drop) and Calibration (run a Rabi-scan calibration
+by hand against the simulator, then check the recovered $\Omega$).
+Deliberately scoped to a fixed initial state $|0\rangle$ rather than an
+arbitrary one, and to the exactly-solvable driven two-level Hamiltonian
+already verified elsewhere in the platform — no rotating-wave-approximation
+machinery or multi-level modeling was added.
+
+### The Noise & Decoherence Explorer (Session 12)
+
+`src/components/simulators/noise-explorer/` is the 4th and last new
+simulator this session, chosen after checking the curriculum for actual
+need: `amplitudeDampingChannel`/`dephasingChannel`/`applyKrausChannel`
+(`openSystems.ts`, §6, already fully tested) are applied step by step to
+a single-qubit density matrix, starting from any of the existing Bloch
+sphere presets. It reuses almost everything: `BlochSphereCanvas` for the
+shrinking Bloch vector, and the Density Matrix Explorer's own
+`DensityMatrixStatePanel` component directly (no new state-readout UI at
+all) for the $\rho$/purity/entropy/validation display. The only new
+piece is `DecayCurve.tsx`, a small SVG line plot of purity across
+successive channel applications (the step-indexed analogue of the Rabi
+Explorer's continuous-time `PopulationCurve`). Embedded in Advanced
+Topics in Quantum Mechanics' "Open Quantum Systems & Kraus Operators"
+(watch the trace-preservation condition hold at every intermediate step,
+not just algebraically) and Quantum Hardware's "T1 & T2 Decoherence"
+(compare dephasing, which leaves z untouched, against amplitude damping,
+which pulls the whole vector to the north pole, from the same starting
+state). Two channel types only (amplitude damping, dephasing) — the two
+this platform's engine actually implements; no continuous-time Lindblad
+solver was added, consistent with `openSystems.ts`'s existing documented
+scope limit.
 
 ---
 
@@ -1225,9 +1359,340 @@ narrate accurately, but flagged so it isn't mistaken for undone work.
 - Nothing was removed from or restructured in any existing course,
   simulator, or the Problems system beyond the additions above.
 
+### Session 11 — Full-Curriculum Completion Sprint (all 14 remaining courses)
+
+An overnight sprint authoring every course that was still "Coming Soon":
+5 more Quantum Mechanics courses (Quantum Algorithms I & II and Error
+Correction & Fault Tolerance were Quantum Computing pillar and are listed
+separately below; Angular Momentum & Spin, The Hydrogen Atom,
+Approximation Methods, Identical Particles & Many-Body Systems, and
+Advanced Topics in Quantum Mechanics complete the Quantum Mechanics
+pillar), 3 Quantum Computing pillar courses (Quantum Algorithms I,
+Quantum Algorithms II, Quantum Error Correction & Fault Tolerance), and
+the entirety of the previously-empty Quantum Hardware pillar (Physical
+Qubit Platforms, Control & Readout, Noise Decoherence & Scaling) and
+Quantum Software pillar (Programming Quantum Computers, Simulating
+Quantum Systems, Compilation & Hybrid Algorithms) — 14 courses, ~65
+lessons, ~245 problems, 20 new engine files (table above), bringing the
+platform to all 22 courses authored.
+
+**Curriculum redesign, not blind placeholder-filling.** `curriculum.ts`'s
+`advanced-quantum-mechanics` entry originally listed
+`density-matrices-and-mixed-states`, `entanglement-formal-treatment`, and
+`epr-and-bell-inequalities` as its first three modules — nearly identical
+in scope to Session 10's already-complete `entanglement-and-measurement`
+course. Redesigned before authoring (not after) to a genuinely
+non-overlapping 4-lesson sequence: Open Quantum Systems & Kraus
+Operators, Decoherence & the Quantum-to-Classical Transition, The Path
+Integral Formulation, and a capstone — building on the density-matrix
+foundation Session 10 already established rather than re-deriving it.
+`quantum-algorithms-ii`, `error-correction-and-fault-tolerance`, and
+`angular-momentum-and-spin` were each expanded from their original
+4-5-module placeholder to a fuller (7-8-module) sequence where the
+subject matter genuinely warranted it; `the-hydrogen-atom`,
+`approximation-methods`, and `identical-particles` kept their original
+module counts, since those were already right-sized. Every Quantum
+Hardware and Quantum Software course shifted deliberately toward
+architecture/engineering-tradeoff framing rather than the proof-heavy
+style of the Quantum Mechanics pillar, per this session's own design
+brief.
+
+**Three real engine bugs found and fixed, each caught by a test that
+checked an intermediate state rather than only a final outcome:**
+
+- **`groverDiffusion`** originally reused `applyPhaseOracle(s,[0])` for
+  "reflect about $|0\rangle$" — this implements $I-2|0\rangle\langle0|$,
+  the *negative* of the needed $2|0\rangle\langle0|-I$. The sign error is
+  a pure global phase, invisible to every probability-based test (Grover's
+  own success-probability numbers looked correct even with the bug), and
+  was only caught by testing `groverDiffusion(|s\rangle)===|s\rangle`
+  directly. Fixed with an explicit `reflectAboutZero` helper; the bug and
+  fix became the lesson's own worked Common Mistakes example.
+- **`encodeBitFlipCode`** built its initial state as
+  `[alpha, beta, 0,0,0,0,0,0]` — placing $\beta$ at basis index 1 (binary
+  `001`), when the platform's qubit-0-is-MSB convention (§6) requires
+  index 4 (binary `100`). The bug completely broke the encoding circuit
+  (`CNOT(0,1)`'s control qubit never saw the $\beta$ term at all); caught
+  by a step-by-step debug script printing intermediate amplitudes after
+  each CNOT, not by the final recovery check alone. Fixed by correcting
+  the initial-state array to `[alpha,0,0,0,beta,0,0,0]`.
+- **A QAOA test** asserted one graph's good $(\gamma,\beta)$ parameters
+  also worked for a different graph; a grid search showed they didn't
+  (0.76 achieved cut vs. the required >0.95). Fixed by grid-searching
+  per-graph optimal parameters rather than assuming portability — a test
+  bug, not an engine bug, but the kind that would have silently validated
+  a wrong claim in the lesson otherwise.
+
+**Two production-build bugs found by running `npm run build`, not caught
+by `tsc`/`lint`/`vitest`:** MDX/remark parses a bare `{...}` outside a
+`$...$` math block as a JSX expression. Two lessons had this: a markdown
+heading literally titled `### Verified decompositions into {Rz, Ry}`, and
+bold prose containing `e^{-t/T}` outside math delimiters — both threw
+`ReferenceError` at prerender time (`Rz`/`t` "not defined"), not at
+typecheck or test time. Fixed by rewording the heading and wrapping the
+formula in `$...$`. This is the same known MDX failure mode documented
+earlier in this file (`{jsExpression}` inside lesson content isn't
+evaluated the way it looks like it should be) — worth restating here
+because it surfaces only at `next build` time, which is why that build is
+a mandatory step, not an optional extra check.
+
+**Content-quality corrections found during writing, before publishing:**
+the 3-qubit bit-flip code's weight-2 error case was initially described
+as "detected but miscorrected to the wrong qubit"; direct engine
+verification showed the actual consequence is more specific — the
+prescribed correction produces the code's own undetectable weight-3
+logical flip, swapping $\alpha$ and $\beta$ exactly. The lesson, its
+Common Mistakes callout, and a practice problem were rewritten to state
+this precisely. A period-finding lesson's practice problem originally
+used $a=2,N=21$ ($r=6$, and $2^6/6$ is not an integer, giving 10 smeared
+peaks instead of a clean $r$), silently violating the lesson's own
+"exactly $r$ clean peaks" claim; switched to $a=4,N=15$ ($r=2$,
+$2^6/2=32$ exact) and added an explicit divisibility caveat to the
+lesson.
+
+**Verification discipline, unchanged from Session 10 but now applied
+across 14 courses:** every new engine file's key formulas were checked
+via a throwaway `vite-node` scratch script against an independent method
+(direct enumeration, a known closed-form identity, a brute-force search)
+*before* any lesson prose referencing specific numbers was written, then
+the scratch script deleted and replaced with a permanent, leaner Vitest
+suite. Every numeric problem's graded value is computed by calling the
+real engine function, never hand-typed.
+
+**Real-world reuse across pillar boundaries, not just within-course
+reuse:** `approximationMethods.ts`'s `exactTwoLevelTransitionProbability`
+(built for a Quantum Mechanics time-dependent-perturbation-theory lesson)
+turns out to be *exactly* the resonant two-level Rabi formula
+($P_1(t)=\sin^2(\Omega t)$ at $E_i=E_f$) — reused unchanged in the
+Quantum Hardware pillar for gate-timing (`t_\pi=\pi/(2\Omega)`) and
+calibration (recovering a hidden $\Omega$ from a scanned Rabi curve).
+`openSystems.ts`'s Kraus channels (built for Advanced Topics in Quantum
+Mechanics) are reused unchanged in Noise, Decoherence & Scaling ($T_1$/$T_2$,
+connected via the new `decayProbabilityForTimestep`) and again in
+Simulating Quantum Systems' `noisyCircuitSimulation.ts`. Quantum
+Algorithms II's `vqe.ts` (`exactGroundStateEnergy`) is cross-checked
+exactly against a completely independent, circuit-as-data VQE
+implementation built in Compilation & Hybrid Algorithms using
+`circuitBuilder.ts` — two different code paths computing the same
+physics agree to floating-point precision, a genuine correctness check,
+not a restated example.
+
+**Two honest, explicitly-stated scope limitations, in the same spirit as
+this file's existing "deliberately not built" notes:**
+`pathIntegral.ts` uses Euclidean (imaginary) time only — the real-time
+path integral's $e^{iS/\hbar}$ weight is a pure, undamped phase, which a
+brute-force grid sum cannot reliably converge on without a regularization
+scheme beyond this course's scope; Euclidean time's $e^{-S_E/\hbar}$
+weight is a genuine, standard technique (Wick rotation, used throughout
+statistical mechanics) that decays properly and integrates to
+~$10^{-15}$ relative error against the closed form.
+`noisyCircuitSimulation.ts`'s `runNoisyCircuit` is scoped to single-qubit
+circuits — a correct multi-qubit version needs each gate expanded to a
+full $2^n\times2^n$ unitary via tensor products with identity on every
+untouched qubit, real and well-understood machinery, just not needed by
+any lesson this session wrote.
+
+**No new dependencies.** Every new engine file uses only `Complex`,
+`Matrix`, `StateVector`, and plain arithmetic already in the codebase.
+
+**Test suite: 574 tests across 48 files** (up from 388 at the end of
+Session 10; the exact count immediately before this session's visible
+portion began is not preserved, since work continued directly from an
+earlier, separately-summarized part of the same sprint — 486 tests/38
+files is the earliest number confirmed in this entry's own working
+context, itself after 4 of the 14 courses were already done).
+`npx tsc --noEmit`, `npm run lint`, and `npx vitest run` were run after
+every single course, not batched to the end, so every reported number
+above reflects a real, passing state at the time it was checked, not a
+final cleanup pass papering over intermediate breakage.
+
+**Production build verified, not assumed.** `npm run build` succeeded
+after fixing the two MDX bugs above, generating all 522 static routes
+(155 lesson pages, 356 problem pages, plus the fixed top-level/pillar/hub
+pages) with no prerender errors. Real browser verification (Chrome,
+against a locally running `next dev` server, restarted mid-session
+specifically because a long-lived dev process from earlier in the
+session predated most of this session's new content and was serving
+stale 404s for it) confirmed: `/learn`, `/hardware`, and `/software`
+render every course's correct, derived completion count; representative
+lesson pages from the Quantum Mechanics, Quantum Hardware, and Quantum
+Software pillars render LaTeX, code blocks, callouts, and
+`<PracticeLinks>` correctly with zero console errors; the `/problems`
+catalog renders; and one full problem page's numeric-answer grading was
+exercised live (submitted `10`, correctly marked "Correct" against the
+π-pulse-duration engine calculation) — an end-to-end check of engine →
+authored problem → registry wiring → UI → grading, not just a visual
+spot check.
+
+**Nothing was removed from or restructured in any existing course,
+simulator, or the Problems system beyond the additions above.** No new
+simulators were built this session — Priority 3 in this sprint's own
+brief ("simulations only after lessons and problems are complete") was
+never reached within the session's scope; see the roadmap update below
+for what a follow-up simulator pass should prioritize.
+
+### Session 12 — Overnight Polish + Interactivity Sprint
+
+An editorial, interactivity, and problem-coverage pass across the full
+22-course, 155-lesson platform, run to a different brief than Session
+11's content-authoring sprint: no new courses, but human-quality prose,
+new simulators, and fixing a real, confirmed problem-coverage gap.
+
+**Editorial pass, all 155 lessons.** 8 parallel forks read every lesson
+against explicit criteria (no em dashes in prose, no banned AI-sounding
+phrases, explains *why* before equations, natural transitions, assumes
+only prerequisite-established knowledge) and rewrote where it genuinely
+improved the lesson, leaving already-strong paragraphs alone. **A
+self-report from that first pass turned out to be wrong for 22 files**
+(entirely within Entanglement, Mixed States & Bell Tests and Quantum
+Algorithms I, plus one file each in Quantum Algorithms II and Wave
+Mechanics): a fresh, independent grep swept the *entire* lesson corpus
+afterward and found 386 em dashes still present in files whose fork had
+claimed zero remaining. A second round of 3 parallel forks fixed all 386
+(genuine sentence-level rewrites, not mechanical deletion, including
+occurrences hiding in `lessonMeta.title`/`description` string fields, not
+just markdown prose), verified independently this time both by each
+fork's own final grep and by a corpus-wide grep run directly, confirming
+**zero em dashes remain across all 155 lesson files.** The lesson here:
+a subagent's "0 remaining" self-report is a claim, not a fact, and is
+worth independently re-verifying on a task like this rather than trusted
+outright, even when the same instruction was followed. No math,
+equations, or physics content was touched in either pass; both were
+scoped to punctuation, sentence structure, and prose voice only.
+
+**Four new simulators built** (Circuit Builder, Grover's Algorithm
+Explorer, Rabi/Qubit Dynamics Explorer, Noise & Decoherence Explorer —
+full architecture in §6b), bringing the platform to 9 real interactive
+simulators. Each reused existing, already-tested engine code rather than
+duplicating math: Circuit Builder is a thin UI over `circuitBuilder.ts`
+(gaining one new export, `runInstructions`, for step-scrubbing); Grover's
+Algorithm Explorer needed zero new engine code at all; the Rabi Explorer
+required one genuine physics verification pass before any UI was
+written (Bloch-vector unitarity, the exact resonant closed form, and the
+correctly-derived generalized-Rabi closed form all checked and made
+permanent Vitest assertions, not just a scratch-script sanity check) and
+added `exactTwoLevelState`/`exactTwoLevelTrajectory` to
+`approximationMethods.ts`; the Noise & Decoherence Explorer reuses
+`openSystems.ts`'s existing Kraus channels and the Density Matrix
+Explorer's own state-panel component directly, adding no new engine
+math. All 4 are embedded with deliberate pedagogical framing (predict,
+then check) in 8 lessons total across Quantum Gates & Circuits,
+Programming Quantum Computers, Quantum Algorithms I, Quantum Hardware's
+Control & Readout, and Advanced Topics in Quantum Mechanics — never
+inserted merely because a simulator existed.
+
+**A severe, confirmed problem-coverage gap fixed.** Qubits & Quantum
+States (1 problem across 10 lessons, 9 lessons with zero) and Quantum
+Gates & Circuits (4 problems across 10 lessons, 6-7 lessons with zero)
+were exactly as under-covered as the user's own brief specifically
+flagged as a concern — confirmed by direct inspection before writing
+anything, not assumed. 4 parallel forks wrote 55 new problems (mixed
+numeric/multiple-choice/conceptual, every numeric answer computed by a
+genuine call into the tested quantum engine at module load time, never
+hand-typed) bringing both courses to 3 problems per lesson, and wired
+`<PracticeLinks>` into all 20 lesson files (several of which had no
+problems-system wiring of any kind before this session). Every problem
+was scoped to what its specific lesson (or an earlier prerequisite)
+actually teaches, checked against the lesson's own text by each writing
+fork before being authored.
+
+**One real, load-bearing bug found and fixed via a programmatic
+check, not a self-report.** A script cross-referencing every lesson's
+`prerequisites` array against the actual set of authored lesson slugs
+found `complex-numbers-for-quantum-mechanics.mdx` listing
+`"...qubits-and-quantum-states/classical-bit-vs-qubit"` as a
+prerequisite — a slug that has never existed as a lesson file (the
+actual file is `what-is-a-qubit.mdx`; `classical-bit-vs-qubit` is that
+lesson's *internal* `module` field, a different identifier used only for
+`curriculum.ts`'s own course-ordering lookups, not for cross-lesson
+links). `LessonLayout.tsx` resolves `prerequisites` entries via
+`allLessons.find(lesson => lesson.slug === prereqSlug)` — a mismatched
+reference doesn't throw, it silently fails the `.find()` and renders no
+prerequisite link at all. Fixed by correcting the reference to the real
+lesson slug; re-running the same check across all 155 lessons afterward
+confirmed zero broken references and zero self-references remain.
+
+**One accessibility gap fixed in newly-written code.** The Circuit
+Builder's SVG circuit diagram made each gate a mouse-only click target
+(no `tabIndex`, no keyboard handler, no `role`) to jump the state display
+to that step — a real gap, even though the same functionality was also
+reachable via the redundant step slider. Fixed with `role="button"`,
+`tabIndex={0}`, a descriptive `aria-label` per gate, an `onKeyDown`
+handler for Enter/Space, and a visible `focus-visible` outline.
+
+**Test suite: 583 tests across 48 files** (up from the sprint's stated
+574 baseline — 9 net new, all in `approximationMethods.test.ts` covering
+`exactTwoLevelTrajectory`: resonant case matches $\sin^2(Vt)$ exactly at
+every sample, normalization preserved on and off resonance, agreement
+with an independently-run single-shot integration, the off-resonant
+maximum matches the closed-form generalized-Rabi formula, correct
+behavior at $t=0$, and rejection of invalid `tMax`/`samples`).
+`npx tsc --noEmit`, `npm run lint`, and `npx vitest run` all pass clean
+on the final state, run fresh after every fork's work landed, not just
+once at the end.
+
+**Production build verified against the final state, not an
+intermediate one.** `npm run build` succeeded generating all 577 static
+routes (155 lesson pages, 411 problem pages — up from 356, all 55 new
+ones included — plus the fixed top-level/pillar/hub pages and the new
+`/simulators` entries), with no prerender errors. Real browser
+verification (Chrome, against a freshly-restarted `next dev` server —
+the previous long-lived dev process, again like Session 11's note,
+predated this session's newest routes and served a stale 404 for one
+until restarted) exercised: the Rabi Explorer's coupling-strength,
+detuning, and time-scrubbing controls with live KaTeX-rendered
+$P(1)$/$\Omega_\text{eff}$ output and Bloch-sphere trajectory; the Noise
+Explorer's channel switch (amplitude damping vs. dephasing) showing the
+qualitatively different Bloch-vector shrinkage each channel produces,
+with the density-matrix and purity-curve panels updating live; a
+newly-authored problem's full interaction loop end to end — wrong
+answer, custom incorrect-feedback text, "Try Again," correct answer,
+"Correct," and the KaTeX-rendered step-by-step solution reveal — with
+zero console errors throughout.
+
+**Not done this session, stated honestly rather than glossed over:** a
+dedicated, full manual terminology/redundancy/difficulty-progression
+audit across all 22 courses (Priority 6) was not run as its own pass;
+the prerequisite-graph integrity check above is real but narrower in
+scope than that full audit. Problem coverage for the other 20 courses
+was not re-audited here — Session 11's own fork survey (predating this
+entry) found them adequately covered, and this session's work targeted
+specifically the two courses that survey confirmed as gaps. UI/accessibility
+polish was applied only to the Circuit Builder component this session
+wrote, not swept across the platform's pre-existing simulators and pages.
+
 ## 9. Implementation Roadmap
 
-**Done:** foundation (data model, MDX pipeline, quantum engine, IA/nav);
+**Update after Session 11:** all 22 courses across all 4 pillars are now
+fully authored (see Session 11's changelog entry above for the complete
+list). The items below this point are the roadmap as it stood through
+Session 10 — kept as history rather than rewritten, since the "Also
+pending" list's curriculum-content items are now done. **What's next,
+concretely:**
+
+- **Resolved in Session 12.** The platform now has 9 real interactive
+  simulators: the 5 from before Session 11 (Bloch Sphere, 2-Qubit State,
+  Complex Amplitude, Wavefunction, Density Matrix) plus 4 new ones built
+  in Session 12 (Circuit Builder, Grover's Algorithm Explorer, Rabi/Qubit
+  Dynamics Explorer, Noise & Decoherence Explorer — see §6b for each).
+  The remaining long-standing "Coming soon" placeholder is the
+  interference playground; picking a genuinely distinct next candidate
+  (rather than something Session 12's 4 already substantially overlap in
+  spirit with, e.g. QFT/phase visualizers) would be the natural next
+  simulator-pass target, applying this file's own "prefer fewer excellent
+  simulations" principle (§6b) rather than adding for its own sake.
+- **A global redundancy/prerequisite re-audit** beyond the one
+  redesign Session 11 already made (`advanced-quantum-mechanics` vs.
+  `entanglement-and-measurement`) would be worth a dedicated pass now
+  that all 22 courses exist simultaneously — Session 11 checked its own
+  new courses against each other and against pre-existing courses as it
+  went, but did not do a from-scratch cross-check of the full, final
+  22-course prerequisite graph in one pass.
+- **The quiz-taking UI** (below) and **general eigensolver** (below)
+  remain exactly as deferred as they were at the end of Session 10 —
+  neither was needed by any of Session 11's 14 courses either.
+
+**Done (through Session 10):** foundation (data model, MDX pipeline, quantum engine, IA/nav);
 the Bloch sphere simulator; Vitest infrastructure; `Qubits & Quantum
 States` and `Quantum Gates & Circuits` (Quantum Computing pillar) fully
 authored (20 lessons); `Mathematical Foundations for Quantum Mechanics`,
@@ -1280,15 +1745,17 @@ already exist (§7b) with zero authored quizzes; building the actual
 navigation/scoring/review UI is real, separate design work best done
 against a handful of real quizzes.
 
-**Also pending:** the historical/experimental motivation course (Session
-8's gap — blackbody radiation, the photoelectric effect, wave-particle
-duality — still has no home in the curriculum); progress &
-personalization *beyond* single-problem state (lesson completion,
-cross-problem streak-free progress summaries — still no auth/database,
-same `ProgressStore`-interface discipline `lib/problems/progress` already
-established); revisiting the 8-item flat navbar if it grows further;
-Hardware & Software pillar content (architecture-complete, purely a
-writing task); the still-unbuilt `/simulators` entries (circuit builder,
-entanglement visualizer, interference playground), each a genuine
-separate project rather than a quick follow-on to the existing three
-interactive simulators.
+**Also pending (as of Session 10 — see the Session 11 update at the top
+of this section for what's changed since):** the historical/experimental
+motivation course (Session 8's gap — blackbody radiation, the
+photoelectric effect, wave-particle duality — still has no home in the
+curriculum); progress & personalization *beyond* single-problem state
+(lesson completion, cross-problem streak-free progress summaries — still
+no auth/database, same `ProgressStore`-interface discipline
+`lib/problems/progress` already established); revisiting the 8-item flat
+navbar if it grows further; ~~Hardware & Software pillar content
+(architecture-complete, purely a writing task)~~ **done as of Session
+11**; the still-unbuilt `/simulators` entries (circuit builder,
+entanglement visualizer, interference playground) — **still unbuilt
+after Session 11 too; see this section's Session 11 update above for
+current priority order.**

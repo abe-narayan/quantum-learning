@@ -1,0 +1,153 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/control-and-readout/calibration"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Calibration",
+  description:
+    "Control Electronics' θ=2Ωt formula is useless without knowing the qubit's actual Rabi frequency Ω. A Rabi calibration experiment finds it by scanning pulse duration and locating the first population-transfer peak, demonstrated here by recovering a hidden Ω to within 0.1% purely from scanned exactTwoLevelTransitionProbability data.",
+  course: "control-and-readout",
+  module: "calibration",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/control-and-readout/qubit-readout-techniques"],
+  objectives: [
+    "Explain why every control parameter (Rabi frequency, resonance frequency) must be measured, not assumed",
+    "Describe the Rabi calibration procedure: scan pulse duration, locate the first population peak",
+    "Recover an unknown Rabi frequency numerically from scanned population-transfer data",
+  ],
+};
+
+## Motivation
+
+Control Electronics derived $t=\theta/(2\Omega)$ assuming $\Omega$ is
+already known. In a real lab, it isn't: every device's actual Rabi
+frequency depends on the specific hardware (drive line attenuation,
+qubit-drive coupling strength, exact resonance frequency), and drifts
+over time with temperature and other conditions. **Calibration** is the
+experimental process of measuring these parameters directly, rather than
+assuming a datasheet value.
+
+## Engineering Development
+
+### The Rabi calibration experiment
+
+The standard technique: apply a drive pulse of *known* duration $t$ (but
+*unknown* $\Omega$), measure the resulting population $P_1$ via readout
+(previous lesson), and repeat for a range of durations. Since
+$P_1(t)=\sin^2(\Omega t)$ (Control Electronics), scanning $t$ traces out
+the full oscillation, and the *duration of the first peak* directly
+gives $t_\pi=\pi/(2\Omega)$, from which $\Omega=\pi/(2t_\pi)$ follows
+immediately.
+
+### A worked numerical calibration
+
+Suppose the true (unknown to the calibration procedure) Rabi frequency
+is $\Omega_{\text{true}}=2\pi\times18\text{ MHz}$. Scanning
+`exactTwoLevelTransitionProbability(0,0,\Omega_{\text{true}},t)` over
+$t\in[0,20]\text{ ns}$ (scoped to just past the expected first peak; a
+real calibration scan doesn't need to sweep multiple oscillation
+periods) in fine steps and finding the duration of maximum
+$P_1$ gives $t_\pi\approx13.89\text{ ns}$. Inverting,
+$\Omega_{\text{recovered}}=\pi/(2\times13.89\text{ ns})\approx2\pi\times18.0\text{ MHz}$,
+matching the true (hidden) value to within the scan's resolution. This
+is exactly the procedure a real lab runs, except with actual noisy
+hardware measurements standing in for this platform's exact engine
+calls.
+
+Try running a calibration scan yourself: pick a coupling strength $V$
+below, step through time, and find where P(1) first peaks. Recompute
+$\Omega$ from that peak time using $t_\pi=\pi/(2V)$, then compare it to
+the slider's actual $V$ value to check your recovered number. Then set a
+nonzero detuning and see why a calibration scan run at the wrong drive
+frequency would recover the wrong (and lower-than-true) Rabi frequency
+entirely.
+
+<LazyRabiExplorer />
+
+### Calibration must be repeated
+
+Because the actual physical parameters drift (temperature fluctuations,
+slow electronic drift, occasional hardware changes), this calibration
+procedure isn't a one-time setup step: real devices re-run calibration
+routines regularly (sometimes multiple times per day) to keep the
+control parameters accurate. A gate computed from a stale $\Omega$ value
+silently implements the *wrong* rotation angle, with no error message.
+It's purely a systematic miscalibration.
+
+## Physical Interpretation
+
+Calibration is the unglamorous but unavoidable link between "the physics
+works" (verified throughout this platform's engine) and "the specific
+device in the lab today behaves as assumed." Every hardware course
+lesson so far implicitly depends on accurate calibration; none of
+Control Electronics' formulas are useful with a wrong $\Omega$.
+
+## Worked Example
+
+**If a Rabi scan's peak is found at $t=20\text{ ns}$ instead of the
+expected $13.89\text{ ns}$, what does this imply about the actual
+$\Omega$, and by roughly what factor was the assumed value wrong?**
+
+$$
+\Omega_{\text{actual}} = \frac{\pi}{2(20\text{ ns})} \approx 2\pi\times12.5\text{ MHz}
+$$
+
+Compared to the assumed $2\pi\times18\text{ MHz}$, the actual Rabi
+frequency is about $12.5/18\approx0.69\times$ the assumed value (roughly
+31% lower). Any gate computed using the wrong, assumed $\Omega$ would
+implement a systematically incorrect rotation angle until recalibrated.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating calibration as a one-time setup step.** Real hardware drifts;
+production systems recalibrate routinely, not just once when the device
+is first built.
+</Callout>
+
+<Callout type="mistake">
+**Assuming a miscalibrated gate produces an obvious error.** It doesn't.
+It silently implements the wrong rotation angle, which can look like a
+subtle, hard-to-diagnose algorithm bug rather than an obviously "broken"
+gate.
+</Callout>
+
+## Practice Questions
+
+1. Explain, in your own words, why scanning pulse duration and finding
+   the first population peak recovers $\Omega$.
+2. If a calibration scan finds $t_\pi=10\text{ ns}$, what is the
+   corresponding $\Omega$ (in the form $2\pi\times f$, solving for $f$
+   in Hz)?
+3. Why must calibration be repeated periodically, rather than performed
+   once when a device is built?
+4. Explain why a miscalibrated $\Omega$ produces a systematic (not
+   random) error, and why this makes it especially important to catch
+   via a deliberate calibration routine.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Rabi calibration finds a device's actual $\Omega$ experimentally: scan
+  pulse duration, locate the first population-transfer peak, invert
+  $t_\pi=\pi/(2\Omega)$.
+- Demonstrated numerically: recovering a hidden $\Omega=2\pi\times18\text{ MHz}$
+  to within scan resolution purely from scanned `exactTwoLevelTransitionProbability`
+  data.
+- Calibration must be repeated regularly, since real hardware parameters
+  drift. A miscalibrated device fails silently (wrong rotation angle),
+  not with an obvious error.
+
+## Further Exploration
+
+This closes **Control & Readout**. The next course, **Noise, Decoherence
+& Scaling**, quantifies the error sources this course has been
+identifying qualitatively (readout error, drift, decoherence) using
+Advanced Topics in Quantum Mechanics' Kraus-channel machinery directly.

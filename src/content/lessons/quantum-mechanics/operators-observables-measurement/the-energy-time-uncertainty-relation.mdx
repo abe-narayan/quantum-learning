@@ -27,12 +27,12 @@ export const lessonMeta = {
 
 ## Motivation
 
-Every uncertainty relation built so far — $\Delta x\Delta p\ge\hbar/2$,
-the general $\Delta A\Delta B\ge\tfrac12|\langle[A,B]\rangle|$ — came from
+Every uncertainty relation built so far, $\Delta x\Delta p\ge\hbar/2$,
+the general $\Delta A\Delta B\ge\tfrac12|\langle[A,B]\rangle|$, came from
 a commutator between two *operators*. Energy-time uncertainty,
 $\Delta E\,\Delta t\gtrsim\hbar/2$, is quoted constantly but can't come
 from that same route: in ordinary quantum mechanics (fixed Hamiltonian,
-no relativity), **time is a parameter, not an operator** — there's no
+no relativity), **time is a parameter, not an operator**. There's no
 $\hat t$ to take a commutator with $\hat H$. This lesson derives the
 relation honestly, from a genuinely different starting point.
 
@@ -42,7 +42,7 @@ Instead of asking "how spread out is time," ask a question that *does*
 make sense: "how long does it take for this state to visibly change?"
 Define that as a *timescale*, not an uncertainty in an operator's
 eigenvalues, and the energy-time relation falls out of tools you already
-have — Ehrenfest's theorem and the ordinary operator uncertainty bound.
+have: Ehrenfest's theorem and the ordinary operator uncertainty bound.
 
 ## Mathematical Development
 
@@ -55,7 +55,7 @@ $$
 \Delta t_A \equiv \frac{\Delta A}{\left|\,d\langle A\rangle/dt\,\right|}
 $$
 
-— literally, "how long it takes $\langle A\rangle$ to change by one
+Literally, "how long it takes $\langle A\rangle$ to change by one
 standard deviation, at its current rate of change." A large $\Delta t_A$
 means $\langle A\rangle$ is changing slowly (relative to its own spread);
 a small one means it's changing fast.
@@ -91,26 +91,26 @@ $$
 \boxed{\;\Delta E\,\Delta t_A \ge \frac{\hbar}{2}\;}
 $$
 
-— derived, not asserted, and honest about what $\Delta t$ actually means:
+Derived, not asserted, and honest about what $\Delta t$ actually means:
 not an uncertainty in a measured time, but the shortest timescale on
 which *any* observable of the system can change appreciably.
 
 ## Physical Interpretation
 
 A state with a very sharply defined energy ($\Delta E$ small) must have
-*every* observable's expectation value changing slowly — a large
+*every* observable's expectation value changing slowly, a large
 $\Delta t_A$ for every choice of $A$. Taken to its limit, this is exactly
 the stationary-state result already known from two earlier courses:
 
 - **From Classical to Quantum**'s Stationary States lesson: an energy
   eigenstate has $\Delta E=0$ exactly.
 - **This relation**, then, demands $\Delta t_A=\infty$ for *every*
-  observable $A$ — $\langle A\rangle$ never changes at all.
+  observable $A$: $\langle A\rangle$ never changes at all.
 - **Directly confirmed**: an energy eigenstate's $|\psi(t)|^2$ (and hence
   every expectation value built from it) is exactly time-independent,
   proven in both the finite-dimensional and continuous-position settings
   already. The energy-time relation and the stationary-state result are
-  not two separate facts — one is the extreme limit of the other.
+  not two separate facts. One is the extreme limit of the other.
 
 ## Worked Example
 
@@ -126,11 +126,11 @@ $$
 \Delta E\,\Delta t_A = 0.5 \times 0.667 \approx 0.333
 $$
 
-Compare to $\hbar/2=0.5$: $0.333 < 0.5$ — **this would violate the
+Compare to $\hbar/2=0.5$: $0.333 < 0.5$. **This would violate the
 bound**, meaning such a state (with exactly these numbers) cannot
 actually exist as a valid quantum state. In practice, if $\Delta E=0.5$
 is fixed, self-consistency forces $\Delta A/|d\langle A\rangle/dt|\ge1$
-for every observable — the relation is a genuine constraint on what
+for every observable. The relation is a genuine constraint on what
 combinations of these quantities are physically possible, not just a
 computed check.
 
@@ -139,7 +139,7 @@ computed check.
 <Callout type="mistake">
 **Treating $\Delta t$ as "the uncertainty in a measured time," the way
 $\Delta x$ is the uncertainty in a measured position.** Time is never a
-measurement outcome with a probability distribution in this framework —
+measurement outcome with a probability distribution in this framework.
 $\Delta t_A$ is a *timescale derived from* $A$'s dynamics, a
 fundamentally different kind of quantity.
 </Callout>
@@ -148,7 +148,7 @@ fundamentally different kind of quantity.
 **Trying to derive this the same way as $\Delta x\Delta p\ge\hbar/2$,
 via $[\hat E,\hat t]$.** There is no $\hat t$ operator to commute with
 anything in ordinary (non-relativistic, fixed-Hamiltonian) quantum
-mechanics — this is exactly why the derivation had to go through
+mechanics. This is exactly why the derivation had to go through
 Ehrenfest's theorem instead.
 </Callout>
 
@@ -162,7 +162,7 @@ Ehrenfest's theorem instead.
 3. Explain in one or two sentences why a *short-lived* excited state
    (one that decays quickly, small $\Delta t$ for some relevant
    observable) is expected to have a correspondingly large spread in
-   energy — a real, measurable effect called "natural linewidth."
+   energy, a real, measurable effect called "natural linewidth."
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -170,13 +170,13 @@ Ehrenfest's theorem instead.
 
 - $\Delta E\,\Delta t_A\ge\hbar/2$ is derived from the general operator
   uncertainty bound applied to $H$ and any observable $A$, combined with
-  Ehrenfest's theorem — not from a commutator with a nonexistent time
+  Ehrenfest's theorem, not from a commutator with a nonexistent time
   operator.
 - $\Delta t_A\equiv\Delta A/|d\langle A\rangle/dt|$ is a timescale, not an
   uncertainty in a measured quantity.
 - The relation's extreme limit ($\Delta E=0 \Rightarrow \Delta
   t_A=\infty$) exactly reproduces the already-proven fact that stationary
-  states never change — a genuine consistency check across three
+  states never change, a genuine consistency check across three
   separate derivations in this platform's courses.
 
 ## Further Exploration

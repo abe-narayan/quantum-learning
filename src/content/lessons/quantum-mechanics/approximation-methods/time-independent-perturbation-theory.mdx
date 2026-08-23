@@ -1,0 +1,158 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/approximation-methods/time-independent-perturbation-theory"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Time-Independent Perturbation Theory",
+  description:
+    "For a Hamiltonian H=H₀+H′ with H′ small, the corrected energies and states can be built order by order from H₀'s own eigenbasis, verified here against an exactly-known result: the quartic anharmonic oscillator's ground-state shift, λ⟨0|x⁴|0⟩=3λ/4.",
+  course: "approximation-methods",
+  module: "time-independent-perturbation-theory",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/the-hydrogen-atom/fine-structure-introduction"],
+  objectives: [
+    "State the first- and second-order energy correction formulas and the first-order state correction formula",
+    "Explain why the perturbation matrix H′ must be expressed in H₀'s eigenbasis for these formulas to apply directly",
+    "Apply first-order perturbation theory to the quartic anharmonic oscillator and check it against an exact closed-form matrix element",
+  ],
+};
+
+## Motivation
+
+The Hydrogen Atom solved $H=p^2/2m-e^2/4\pi\epsilon_0r$ exactly. Almost
+no other Hamiltonian of physical interest can be solved exactly: real
+atoms have electron-electron repulsion, real oscillators are slightly
+anharmonic, real spins sit in small stray magnetic fields. Perturbation
+theory is the systematic answer. If $H=H_0+H'$ with $H_0$ exactly
+solvable and $H'$ "small," you can build the true energies and states as
+a correction series in $H'$, order by order.
+
+## Mathematical Development
+
+### Setup: H₀'s eigenbasis
+
+Let $H_0|n^{(0)}\rangle=E_n^{(0)}|n^{(0)}\rangle$ be already solved (this
+course's harmonic oscillator, or hydrogen, are natural choices for
+$H_0$). Writing $H'$ as a matrix *in this same eigenbasis*, so that
+$H'_{mn}=\langle m^{(0)}|H'|n^{(0)}\rangle$, is the essential setup step
+every formula below assumes.
+
+### First-order energy correction
+
+$$
+E_n^{(1)} = \langle n^{(0)}|H'|n^{(0)}\rangle = H'_{nn}
+$$
+
+This is literally just the diagonal entry of $H'$ in the $H_0$
+eigenbasis: no sum, no derivation needed to *use* it, though the formula
+itself follows from expanding $(H_0+H')|\psi_n\rangle=E_n|\psi_n\rangle$
+in powers of $H'$ and collecting first-order terms.
+
+### Second-order energy correction
+
+$$
+E_n^{(2)} = \sum_{m\neq n} \frac{|H'_{mn}|^2}{E_n^{(0)}-E_m^{(0)}}
+$$
+
+Every *other* state $m$ contributes here, weighted by how strongly $H'$
+couples $n$ to $m$ ($|H'_{mn}|^2$) and how close their unperturbed
+energies are (a small energy gap in the denominator makes a close-lying
+state contribute disproportionately). This formula assumes $E_n^{(0)}$
+is non-degenerate, a genuine restriction, stated honestly rather than
+silently assumed (degenerate perturbation theory needs an extra
+diagonalization step this course doesn't cover).
+
+### First-order state correction
+
+$$
+|n^{(1)}\rangle = \sum_{m\neq n} \frac{H'_{mn}}{E_n^{(0)}-E_m^{(0)}}\,|m^{(0)}\rangle
+$$
+
+The perturbed state "mixes in" other unperturbed eigenstates here, with
+coefficients built from the same matrix elements and energy gaps as
+above. By convention, the $|n^{(0)}\rangle$ component of this correction
+is taken to be exactly 0, fixing the overall normalization freedom at
+this order.
+
+## Physical Interpretation
+
+Perturbation theory is only as good as "$H'$ small" actually is. The
+worked example below applies it to a case with a fully independent exact
+check, giving a genuine numerical confirmation, not just trust in the
+formula.
+
+## Worked Example
+
+**The quartic anharmonic oscillator, $H=H_0+\lambda x^4$ ($H_0$ the
+ordinary harmonic oscillator, $m=\omega=\hbar=1$). Find the first-order
+ground-state energy shift.**
+
+Using $x=\sqrt{1/2}(a+a^\dagger)$ (Harmonic Oscillator's ladder
+operators), a closed-form identity for the harmonic oscillator gives
+$\langle0|x^4|0\rangle=\frac34$ exactly, independent of perturbation
+theory, a fact about $H_0$'s own ground state alone. So:
+
+$$
+E_0^{(1)} = \lambda\langle0|x^4|0\rangle = \frac{3\lambda}{4}
+$$
+
+This platform's engine confirms this two independent ways: building the
+$x^4$ matrix from `positionOperator` (itself built from `annihilationOperator`/`creationOperator`)
+and reading off `firstOrderEnergyCorrection(H0diag, Hprime, 0)` gives
+$0.0075$ for $\lambda=0.01$, matching $\frac34(0.01)=0.0075$ exactly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Using H′ in the wrong basis.** These formulas require $H'_{mn}$
+computed in $H_0$'s *own* eigenbasis, not an arbitrary basis (like the
+position basis directly): the matrix elements $\langle m^{(0)}|H'|n^{(0)}\rangle$
+depend on this specific choice.
+</Callout>
+
+<Callout type="mistake">
+**Applying second-order perturbation theory to a degenerate $E_n^{(0)}$.**
+The $E_n^{(0)}-E_m^{(0)}$ denominator is exactly zero for a genuinely
+degenerate pair, and the formula breaks (this platform's engine
+deliberately throws rather than silently returning $\pm\infty$ or NaN).
+</Callout>
+
+## Practice Questions
+
+1. Explain in words why $E_n^{(1)}=H'_{nn}$ requires no sum over other
+   states, while $E_n^{(2)}$ does.
+2. For the quartic oscillator worked example, is $E_0^{(2)}$ (this
+   course's engine gives a small negative number) consistent with the
+   general expectation that a repulsive perturbation ($\lambda x^4>0$
+   everywhere) still gives a negative second-order correction? (Hint:
+   second-order corrections to the *ground* state are always
+   $\leq0$. Why?)
+3. If $H'_{mn}=0$ for all $m\neq n$ at a particular $n$, what does this
+   imply about $E_n^{(2)}$ and $|n^{(1)}\rangle$ at that $n$?
+4. Why does the first-order state correction conventionally set its own
+   $|n^{(0)}\rangle$ coefficient to exactly 0, rather than leaving it
+   undetermined?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $H=H_0+H'$ with $H_0$ solvable: $E_n^{(1)}=H'_{nn}$,
+  $E_n^{(2)}=\sum_{m\neq n}|H'_{mn}|^2/(E_n^{(0)}-E_m^{(0)})$,
+  $|n^{(1)}\rangle=\sum_{m\neq n}\frac{H'_{mn}}{E_n^{(0)}-E_m^{(0)}}|m^{(0)}\rangle$.
+- All three require $H'$ expressed in $H_0$'s eigenbasis, and
+  non-degenerate $E_n^{(0)}$.
+- The quartic anharmonic oscillator's first-order shift,
+  $\frac34\lambda$, is checked here against an independent exact matrix
+  element, a genuine numerical confirmation, not a circular check.
+
+## Further Exploration
+
+Next: **The Variational Method**, a completely different approximation
+strategy, one that needs no small parameter at all, only a guessed
+trial wavefunction.

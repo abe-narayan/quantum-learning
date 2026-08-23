@@ -1,0 +1,147 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/approximation-methods/time-dependent-perturbation-theory"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Time-Dependent Perturbation Theory",
+  description:
+    "First-order time-dependent perturbation theory gives a closed-form transition probability for a suddenly-switched-on coupling, verified here against a direct 2-level Runge-Kutta integration: nearly exact for weak coupling, and dramatically wrong (predicting the wrong long-time probability entirely) once the coupling gets strong.",
+  course: "approximation-methods",
+  module: "time-dependent-perturbation-theory",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/approximation-methods/the-wkb-approximation"],
+  objectives: [
+    "State the first-order transition probability formula for a constant perturbation switched on at t=0",
+    "Explain physically what each factor (Vfi, ωfi, t) controls in the resulting probability",
+    "Identify, from a direct numerical comparison, the regime where first-order perturbation theory breaks down",
+  ],
+};
+
+## Motivation
+
+Every previous lesson in this course asked "what is the corrected
+*energy*?" This lesson asks a different question: given a system sitting
+in state $|i\rangle$, with a perturbation $V$ switched on at $t=0$
+coupling it to a nearby state $|f\rangle$, what's the probability of
+finding it in $|f\rangle$ at time $t$?
+
+## Mathematical Development
+
+### The first-order transition probability
+
+For $H=H_0+V$ with $V$ constant for $t>0$, coupling only $|i\rangle$ and
+$|f\rangle$ (matrix element $V_{fi}$), separated by
+$\omega_{fi}=(E_f-E_i)/\hbar$, first-order time-dependent perturbation
+theory gives:
+
+$$
+P_{i\to f}(t) = \frac{4|V_{fi}|^2}{\hbar^2\omega_{fi}^2}\sin^2\!\left(\frac{\omega_{fi}t}{2}\right)
+$$
+
+This is derived by integrating $i\hbar\dot c_f=V_{fi}e^{i\omega_{fi}t}$ to
+first order in $V$, starting from $c_f(0)=0,c_i(0)=1$ (a standard,
+if lengthy, integration this lesson states rather than re-derives step
+by step). Two limits worth noting: as $\omega_{fi}\to0$ (degenerate
+levels), the formula's $\sin^2$ ratio limit gives
+$P_{i\to f}(t)\to|V_{fi}|^2t^2/\hbar^2$ (quadratic growth); for
+$\omega_{fi}\neq0$, $P_{i\to f}(t)$ oscillates, bounded by
+$4|V_{fi}|^2/\hbar^2\omega_{fi}^2$.
+
+### An exact comparison
+
+Because this is only a two-level system, the *exact* (non-perturbative)
+answer is also directly computable: numerically integrate
+$i\hbar\dot{\vec c}=H\vec c$ with
+$H=\begin{pmatrix}E_i&V\\V&E_f\end{pmatrix}$ via 4th-order Runge-Kutta
+(a genuine, general-purpose small-step ODE integration, not a
+perturbative shortcut). This gives a completely independent check of
+where the first-order formula is trustworthy.
+
+## Physical Interpretation
+
+$|V_{fi}|^2$ sets the overall transition strength: no coupling, no
+transition, regardless of anything else. The $\sin^2(\omega_{fi}t/2)$
+factor makes the probability genuinely oscillate in time (it is *not* a
+monotonically growing quantity in general). A system can transition to
+$|f\rangle$ and then transition back, entirely consistent with unitary
+(probability-conserving) time evolution.
+
+## Worked Example
+
+**Compare perturbative and exact transition probabilities for weak vs.
+strong coupling ($E_i=0,E_f=1,\hbar=1$).**
+
+| $V$ | $t$ | Perturbative | Exact | Ratio |
+|---|---|---|---|---|
+| 0.01 | 1 | 0.000092 | 0.000092 | 1.0000 |
+| 0.01 | 3 | 0.000398 | 0.000398 | 1.0004 |
+| 0.1 | 3 | 0.039800 | 0.038397 | 1.037 |
+| 0.5 | 3 | 0.994996 | 0.363165 | 2.740 |
+
+For weak coupling ($V=0.01$), perturbative and exact agree to 4 decimal
+places. For strong coupling ($V=0.5$) at $t=3$, the perturbative formula
+predicts a probability near 1 (nearly certain transition) while the
+exact calculation gives $0.363$. The true system is genuinely
+Rabi-oscillating (its exact transition probability rises and falls
+periodically), a behavior the first-order formula, which only captures
+the *initial* rise, cannot see at all.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Trusting the perturbative formula for strong coupling or long times.**
+The worked example's $V=0.5$ case shows a factor-of-2.7 disagreement.
+First-order perturbation theory is a leading-order approximation, valid
+specifically when $|V_{fi}|\ll\hbar|\omega_{fi}|$ (weak coupling relative
+to the energy splitting), not a universally accurate formula.
+</Callout>
+
+<Callout type="mistake">
+**Interpreting $P_{i\to f}(t)$ growing past its perturbative bound as
+physical.** The exact probability is always $\leq1$ by unitarity, no
+matter how strong $V$ is; if a perturbative estimate exceeds what's
+physically sensible, that's itself a signal the perturbative
+approximation has broken down, not a real prediction.
+</Callout>
+
+## Practice Questions
+
+1. In the limit $\omega_{fi}\to0$ (degenerate $E_i,E_f$), what happens to
+   $P_{i\to f}(t)$ as $t$ grows? Does it stay bounded, or grow without
+   limit? Is this consistent with $P\leq1$ for large enough $t$?
+2. Using the table above, at what rough combination of $V$ and $t$ does
+   the perturbative and exact answer start to visibly diverge (say, by
+   more than 5%)?
+3. Explain physically why $P_{i\to f}(t)$ oscillating in time (rather
+   than monotonically increasing) is required by unitarity, not just a
+   mathematical curiosity of the formula.
+4. Why does this lesson use direct Runge-Kutta integration as the
+   "exact" check, rather than another perturbative formula at a higher
+   order?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- First-order time-dependent perturbation theory gives
+  $P_{i\to f}(t)=\dfrac{4|V_{fi}|^2}{\hbar^2\omega_{fi}^2}\sin^2(\omega_{fi}t/2)$
+  for a constant perturbation switched on at $t=0$.
+- Checked directly against exact 2-level Runge-Kutta integration: nearly
+  exact for weak coupling, badly wrong (off by a factor of $\sim2.7$ in
+  this course's worked example) for strong coupling and long times.
+- The breakdown is a genuine numerical fact about this specific
+  comparison, not a general claim: it demonstrates exactly what "first
+  order" and "small perturbation" mean in practice.
+
+## Further Exploration
+
+This closes **Approximation Methods**. The next course, **Identical
+Particles & Many-Body Systems**, tackles a completely different kind of
+complication: not an approximation to a single particle's Hamiltonian,
+but the fundamental indistinguishability of multiple identical
+particles.

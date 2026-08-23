@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Mathematical Foundations Challenge",
   description:
-    "A synthesis capstone — no new mathematics, just problems and worked examples that require combining tools from more than one earlier lesson, and a recap map of how everything connects.",
+    "A synthesis capstone, no new mathematics, just problems and worked examples that require combining tools from more than one earlier lesson, and a recap map of how everything connects.",
   course: "mathematical-foundations",
   module: "mathematical-foundations-challenge",
   order: 1,
@@ -25,11 +25,11 @@ export const lessonMeta = {
 ## Motivation
 
 This lesson introduces no new mathematics. Ten lessons have built a
-genuine toolkit — complex numbers, vector spaces, inner products, bra-ket
+genuine toolkit: complex numbers, vector spaces, inner products, bra-ket
 notation, operators, eigenvalues, Hermiticity, unitarity, tensor products,
 and the postulates connecting all of it to physical prediction. The point
 of a challenge lesson is to prove, to yourself, that the pieces actually
-fit together — with problems that don't announce which single lesson they
+fit together, with problems that don't announce which single lesson they
 come from, the way most of the practice questions so far have.
 
 ## Recap: What Each Lesson Contributed
@@ -53,12 +53,12 @@ come from, the way most of the practice questions so far have.
 necessarily unitary?**
 
 Real and symmetric means $M^\dagger = M^T = M$ (conjugation does nothing
-to a real matrix) — so $M$ is Hermitian. Check $M^\dagger M$: since
+to a real matrix), so $M$ is Hermitian. Check $M^\dagger M$: since
 $M^\dagger=M$, $M^\dagger M = M^2 = I$ directly from the given condition.
-So $M^\dagger M=I$, which is exactly the unitarity condition — **yes**,
+So $M^\dagger M=I$, which is exactly the unitarity condition. **Yes**,
 necessarily. (Pauli-$X$ is the standard example: real, symmetric, and
 $X^2=I$.) This combines the Hermitian Operators lesson's adjoint
-definition with the Unitary Operators lesson's defining condition —
+definition with the Unitary Operators lesson's defining condition;
 neither lesson alone states this fact.
 
 **2. A $2\times2$ Hermitian matrix has trace $5$ and determinant $6$. What
@@ -66,9 +66,9 @@ are its eigenvalues, and are its eigenvectors necessarily orthogonal?**
 
 From the Eigenvalues lesson's $2\times2$ shortcut,
 $\lambda^2-5\lambda+6=0 \Rightarrow (\lambda-2)(\lambda-3)=0 \Rightarrow
-\lambda=2,3$ — two *different* eigenvalues. From the Hermitian Operators
+\lambda=2,3$, two *different* eigenvalues. From the Hermitian Operators
 lesson's second theorem, eigenvectors of a Hermitian operator with
-different eigenvalues are automatically orthogonal — so **yes**, without
+different eigenvalues are automatically orthogonal, so **yes**, without
 any further calculation.
 
 **3. Two qubits are each individually normalized. Is their combined
@@ -77,7 +77,7 @@ two-qubit state via the tensor product automatically normalized too?**
 Let $|u\rangle,|v\rangle$ each have norm $1$. Using the tensor-product
 inner-product rule from the Tensor Products lesson,
 $\langle u\otimes v, u\otimes v\rangle = \langle u,u\rangle\langle
-v,v\rangle = 1\cdot1=1$ — **yes**, automatically, with no separate
+v,v\rangle = 1\cdot1=1$. **Yes**, automatically, with no separate
 renormalization step needed. This combines the Inner Products lesson's
 norm definition with the Tensor Products lesson's multiplicative rule for
 inner products on simple tensors.
@@ -87,7 +87,7 @@ inner products on simple tensors.
 <Callout type="mistake">
 **The single most common error across this entire course: using an
 amplitude directly instead of its squared modulus.** It shows up as early
-as Complex Numbers and as late as the Born rule — always the same fix,
+as Complex Numbers and as late as the Born rule; always the same fix,
 square the modulus first.
 </Callout>
 
@@ -107,7 +107,7 @@ notation; always check a source's convention before mixing formulas.
 
 1. A $2\times2$ unitary matrix has real entries. Show that it must be a
    rotation matrix $\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}$
-   or a reflection (same form with an overall sign flip on one column) —
+   or a reflection (same form with an overall sign flip on one column),
    using the fact that its columns must form an orthonormal set.
 2. A Hermitian operator has eigenvalues $1, 1, 4$ (one repeated). Is a
    generic pair of eigenvectors from the repeated eigenvalue $1$
@@ -134,22 +134,22 @@ notation; always check a source's convention before mixing formulas.
 
 ## Summary
 
-- No new mathematics — this lesson exercises the ten lessons before it in
+- No new mathematics. This lesson exercises the ten lessons before it in
   combination.
 - The recap table above is worth returning to as a reference throughout
   the rest of the Quantum Mechanics pillar.
 - The recurring theme across every derivation in this course:
   consistency requirements (norms staying $1$, matrix elements
   determining an operator, probabilities summing to $1$) are what force
-  the structure — nothing here was arbitrary.
+  the structure. Nothing here was arbitrary.
 
 ## Further Exploration
 
 This completes **Mathematical Foundations for Quantum Mechanics**. The
-Quantum Mechanics pillar continues with **From Classical to Quantum** —
-the experiments (blackbody radiation, the photoelectric effect,
-wave-particle duality) that forced physics to adopt exactly the framework
-this course just built. If you haven't already, the **Quantum Computing**
-pillar's courses apply this same linear algebra to qubits, gates, and
-circuits — everything from state vectors to entanglement to measurement
-in that track is a direct application of a lesson in this one.
+Quantum Mechanics pillar continues with **From Classical to Quantum**,
+which turns this mathematics into the actual postulates, dynamics, and
+physical predictions of quantum theory. If you haven't already, the
+**Quantum Computing** pillar's courses apply this same linear algebra to
+qubits, gates, and circuits; everything from state vectors to
+entanglement to measurement in that track is a direct application of a
+lesson in this one.

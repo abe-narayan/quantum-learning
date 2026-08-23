@@ -9,7 +9,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Momentum Space and the Fourier Transform",
   description:
-    "The momentum-space wavefunction phi(k) as a basis change, exactly like the finite-dimensional basis changes from Mathematical Foundations — computed here by a real, tested numerical Fourier transform, not a black box.",
+    "The momentum-space wavefunction phi(k) as a basis change, exactly like the finite-dimensional basis changes from Mathematical Foundations, computed here by a real, tested numerical Fourier transform, not a black box.",
   course: "wave-mechanics",
   module: "momentum-space-and-the-fourier-transform",
   order: 1,
@@ -30,7 +30,7 @@ Hilbert space is just re-expressing the same vector in different
 coordinates, with the new coefficients found via inner products against
 the new basis vectors. Momentum space is the *exact same idea*, with the
 momentum eigenfunctions $\phi_p(x)=e^{ipx/\hbar}$ from the last lesson as
-the new "basis" — the only twist is that the basis is now a continuum, so
+the new "basis." The only twist is that the basis is now a continuum, so
 the change-of-basis sum becomes an integral: the Fourier transform.
 
 ## Intuition
@@ -38,8 +38,8 @@ the change-of-basis sum becomes an integral: the Fourier transform.
 $\psi(x)$ answers "how much amplitude at each position?" $\phi(k)$ (using
 wavenumber $k=p/\hbar$, this platform's convention with $\hbar=1$) answers
 the *same physical state's* "how much amplitude at each momentum?" They
-are two different-basis descriptions of one vector $|\psi\rangle$ —
-neither is more fundamental, exactly as $|+\rangle$ isn't more fundamental
+are two different-basis descriptions of one vector $|\psi\rangle$.
+Neither is more fundamental, exactly as $|+\rangle$ isn't more fundamental
 than $|0\rangle,|1\rangle$.
 
 ## Mathematical Development
@@ -55,10 +55,10 @@ $$
 \psi(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} \phi(k)\,e^{ikx}\,dk
 $$
 
-(natural units, $\hbar=1$, so momentum equals wavenumber $k$ — the
+(natural units, $\hbar=1$, so momentum equals wavenumber $k$, the
 convention this whole course uses, consistent with the energy formulas
-already derived in the last course). The $1/\sqrt{2\pi}$ isn't arbitrary:
-it's exactly what makes the transform **unitary** — a basis change, not a
+already derived in the last course). The $1/\sqrt{2\pi}$ isn't arbitrary.
+It's exactly what makes the transform **unitary**: a basis change, not a
 distortion.
 
 ### Parseval's theorem: the transform preserves norm
@@ -68,7 +68,7 @@ $$
 $$
 
 This is the continuous version of "changing basis preserves length" (a
-unitary matrix satisfies $\|Uv\|=\|v\|$) — total probability is 1 whether
+unitary matrix satisfies $\|Uv\|=\|v\|$). Total probability is 1 whether
 computed from $|\psi(x)|^2$ or from $|\phi(k)|^2$, because they describe
 the same state. This platform's `fourier.test.ts` verifies this identity
 numerically for the platform's actual FFT-based implementation, not just
@@ -78,30 +78,30 @@ algebraically.
 
 A literal integral over infinite continuous $x$ can't run on a computer.
 The platform's `fourier.ts` module implements the **discrete** Fourier
-transform on the finite grid `Grid1D` already introduced — a genuine,
+transform on the finite grid `Grid1D` already introduced: a genuine,
 hand-written, tested radix-2 FFT (`fft`/`ifft`), with the continuous
 formula above recovered as the grid spacing $\Delta x\to0$. The engine
 applies the exact normalization convention derived above (a factor of
 $\Delta x/\sqrt{2\pi}$ on top of the raw discrete transform) precisely so
-that the *numerical* Parseval identity holds to machine precision — this
+that the *numerical* Parseval identity holds to machine precision. This
 is directly, numerically checked in the test suite, not assumed.
 
 ### Momentum-space uncertainty
 
 Since $\hat p$ acts as multiplication by $\hbar k$ in momentum space
 (the Fourier-transform mirror of $\hat x$ acting as multiplication by $x$
-in position space — provable, though not proven here, by transforming the
+in position space, provable, though not proven here, by transforming the
 eigenvalue equation from the last lesson), the momentum-space variance
 $(\Delta p)^2 = \langle p^2\rangle - \langle p\rangle^2$ is computed from
-$|\phi(k)|^2$ exactly as $(\Delta x)^2$ was computed from $|\psi(x)|^2$ —
-which is exactly how `Wavefunction1D.expectationMomentum()` and
+$|\phi(k)|^2$ exactly as $(\Delta x)^2$ was computed from $|\psi(x)|^2$.
+This is exactly how `Wavefunction1D.expectationMomentum()` and
 `.expectationKineticEnergy()` are implemented: transform to momentum
 space, then take the same kind of weighted average as before.
 
 ## Physical Interpretation
 
 A wavefunction narrow in $x$ (tightly localized position) is *necessarily*
-broad in $k$ (spread across many momenta), and vice versa — not as a
+broad in $k$ (spread across many momenta), and vice versa, not as a
 mysterious "principle" but as an ordinary, provable fact about Fourier
 transforms (a signal concentrated in time has a broad frequency spectrum).
 The uncertainty principle derived abstractly in the last course, and
@@ -109,12 +109,12 @@ re-derived from calculus two lessons ago, is *this* fact, restated.
 
 ## Interactive Experiment
 
-Switch the Wavefunction Explorer's view mode to **|φ(k)|²** on any preset
-— the free Gaussian packet's momentum-space view is a Gaussian too (the
+Switch the Wavefunction Explorer's view mode to **|φ(k)|²** on any preset.
+The free Gaussian packet's momentum-space view is a Gaussian too (the
 Fourier transform of a Gaussian is a Gaussian, verified numerically in
 this course's engine tests), centered exactly at the packet's momentum
 parameter. Try narrowing the packet's spatial width and watch its
-momentum-space width grow wider in direct proportion — the uncertainty
+momentum-space width grow wider in direct proportion: the uncertainty
 principle, live.
 
 <LazyWavefunctionExplorer />
@@ -129,7 +129,7 @@ $\phi(k)\propto e^{-\sigma^2 k^2}$ (a standard transform pair, verified
 directly in `fourier.test.ts` against the platform's own FFT), which is a
 Gaussian in $k$ with variance $(\Delta k)^2 = 1/(4\sigma^2)$, so
 $\Delta k = 1/(2\sigma)$. With $\hbar=1$, $\Delta p=\Delta k$, giving
-$\Delta x\,\Delta p = \sigma\cdot\dfrac{1}{2\sigma}=\dfrac12$ — the
+$\Delta x\,\Delta p = \sigma\cdot\dfrac{1}{2\sigma}=\dfrac12$: the
 Gaussian packet exactly saturates the uncertainty bound $\Delta x\Delta
 p\ge\hbar/2$, the minimum-uncertainty state referenced (but not derived)
 in the last course.
@@ -138,7 +138,7 @@ in the last course.
 
 <Callout type="mistake">
 **Treating $\phi(k)$ as a separate, unrelated function from $\psi(x)$.**
-They're the *same state* in two bases — every physical prediction (energy,
+They're the *same state* in two bases. Every physical prediction (energy,
 momentum statistics, etc.) computed from either must agree, and the
 platform's engine tests check exactly this kind of cross-consistency.
 </Callout>
@@ -146,7 +146,7 @@ platform's engine tests check exactly this kind of cross-consistency.
 <Callout type="mistake">
 **Forgetting the normalization convention when comparing formulas from
 different textbooks.** Some references use $2\pi$ instead of $\sqrt{2\pi}$
-factors, or define $k$ vs. $p=\hbar k$ differently — the physics is
+factors, or define $k$ vs. $p=\hbar k$ differently. The physics is
 identical, but the constants only match once conventions are pinned down,
 exactly as this lesson pins down the platform's.
 </Callout>
@@ -166,14 +166,14 @@ exactly as this lesson pins down the platform's.
 
 ## Summary
 
-- $\phi(k)$ is $\psi(x)$ expressed in the momentum eigenbasis — the same
+- $\phi(k)$ is $\psi(x)$ expressed in the momentum eigenbasis, the same
   vector, different coordinates, exactly like any finite-dimensional
   basis change.
 - The Fourier transform pair with $1/\sqrt{2\pi}$ normalization is
   unitary: Parseval's theorem guarantees norm is preserved.
 - The platform computes this with a real, tested FFT on a finite grid,
   with the continuous integral as its $\Delta x\to0$ limit.
-- A Gaussian wave packet exactly saturates $\Delta x\Delta p=\hbar/2$ —
+- A Gaussian wave packet exactly saturates $\Delta x\Delta p=\hbar/2$,
   the tightest uncertainty allowed.
 
 ## Further Exploration

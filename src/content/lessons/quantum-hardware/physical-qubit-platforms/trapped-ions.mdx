@@ -1,0 +1,141 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/physical-qubit-platforms/trapped-ions"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Trapped Ions",
+  description:
+    "A qubit encoded in an individual ion's internal electronic (or hyperfine) states, held in place by oscillating electric fields: trading superconducting qubits' speed for dramatically longer coherence times and, uniquely, all-to-all connectivity via a shared vibrational mode.",
+  course: "physical-qubit-platforms",
+  module: "trapped-ions",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/physical-qubit-platforms/superconducting-qubits"],
+  objectives: [
+    "Explain how an ion trap confines a charged atom using oscillating electric fields",
+    "State why trapped ions have much longer coherence times than superconducting qubits, and at what cost",
+    "Explain how the shared motional (vibrational) mode enables two-qubit gates between ANY pair of trapped ions, not just neighbors",
+  ],
+};
+
+## Motivation
+
+Where a superconducting qubit is an entirely artificial circuit, a
+trapped-ion qubit uses a real atom: specifically, a single ion (a
+charged atom, missing or carrying an extra electron) suspended in free
+space by electromagnetic fields, with the qubit encoded in two of its
+naturally-occurring internal energy levels. This is a fundamentally
+different engineering starting point, and it shows up directly in the
+platform's tradeoffs.
+
+## Engineering Development
+
+### The trap itself
+
+A **Paul trap** confines a charged ion using rapidly oscillating
+(radio-frequency) electric fields. No static field configuration alone
+can trap a charge in 3D (a consequence of Earnshaw's theorem, a classical
+electrostatics result), so the field must oscillate fast enough that the
+ion feels an effective, time-averaged confining potential. Multiple ions
+in the same trap arrange themselves in a line, held apart by mutual
+Coulomb repulsion balanced against the trap's confinement.
+
+### Why coherence times are so much longer
+
+The qubit states are real atomic energy levels (electronic or hyperfine,
+meaning nuclear-spin-related, transitions), which are, unlike a
+lithographically-fabricated superconducting circuit, identical for every
+ion of the same species and extremely well isolated from environmental
+noise. Nature already built a "device" whose levels don't drift.
+Trapped-ion coherence times routinely reach seconds, several orders of
+magnitude longer than superconducting qubits' microseconds. The cost is
+that gate speeds are much slower (often microseconds, not nanoseconds),
+since gates rely on laser pulses driving comparatively slow atomic
+transitions and shared mechanical (vibrational) motion.
+
+### All-to-all connectivity via the shared motional mode
+
+The ions in a linear trap share collective vibrational modes (the whole
+chain can oscillate together, like coupled pendulums). A two-qubit gate
+works by using one ion's internal state to briefly excite this shared
+motion, which the *other* ion's internal state can then sense, entangling
+them regardless of physical separation along the chain. This gives
+trapped ions a genuine engineering advantage over most solid-state
+platforms: any ion can be entangled with any other in the same trap, not
+just its physical neighbors, a fundamentally different connectivity
+graph from superconducting qubits' typically nearest-neighbor layout.
+
+## Physical Interpretation
+
+The core platform tradeoff is now visible directly: superconducting
+qubits sacrifice coherence time for speed and (relatively) easier
+fabrication at scale; trapped ions sacrifice speed for coherence time and
+gain flexible connectivity. Neither is strictly better; which matters
+more depends on the specific algorithm and error-correction overhead, a
+question the Noise, Decoherence & Scaling course returns to
+quantitatively.
+
+## Worked Example
+
+**A trapped-ion two-qubit gate takes about $10\mu s$; the ion's coherence
+time is about $1s$. Compare this "gate count budget" to a superconducting
+qubit's ($10ns$ gate, $10\mu s$ coherence).**
+
+Trapped ion: $1s/10\mu s=10^5$ gates fit within one coherence time.
+Superconducting: $10\mu s/10ns=10^3$ gates fit within one coherence
+time. Despite trapped ions being roughly 1000× *slower* per gate, their
+much longer coherence time gives them a *larger* raw gate budget in this
+comparison, a concrete numerical illustration of why "gate speed alone"
+is a misleading platform comparison metric.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming faster gates always mean a "better" platform.** As the worked
+example shows directly, the ratio of coherence time to gate time, not
+gate speed alone, sets the realistic operation budget.
+</Callout>
+
+<Callout type="mistake">
+**Thinking trapped-ion connectivity is unlimited for free.** All-to-all
+connectivity via the shared motional mode is a genuine architectural
+advantage, but it doesn't scale trivially: as more ions share one
+trap's vibrational modes, gate fidelity and speed both degrade, a real
+engineering constraint the Noise, Decoherence & Scaling course develops.
+</Callout>
+
+## Practice Questions
+
+1. Why can't a static (non-oscillating) electric field alone trap a
+   charged ion in 3D?
+2. Using the worked example's numbers, if a superconducting device
+   somehow achieved a $100\mu s$ coherence time at the same $10ns$ gate
+   speed, would its gate budget exceed the trapped ion's $10^5$? Compute
+   the new ratio.
+3. Explain, in your own words, how the shared vibrational mode allows a
+   two-qubit gate between two ions that aren't in direct contact.
+4. Name one advantage and one disadvantage of trapped ions relative to
+   superconducting qubits, using this lesson's specific numbers.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Trapped ions use real atoms confined by oscillating electric fields
+  (a Paul trap), a fundamentally different physical starting point from
+  superconducting circuits.
+- Coherence times reach seconds (vs. superconducting qubits' microseconds),
+  at the cost of slower gates (microseconds, not nanoseconds).
+- The shared motional mode gives genuine all-to-all connectivity within
+  one trap, a real architectural advantage, though one that faces its
+  own scaling limits.
+
+## Further Exploration
+
+Next: **Neutral Atoms**, a platform that keeps trapped ions' long
+coherence times while addressing scalability differently, using light,
+not electric fields, for confinement.

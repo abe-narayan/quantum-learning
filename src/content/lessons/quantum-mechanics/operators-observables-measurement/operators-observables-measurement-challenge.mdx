@@ -25,10 +25,10 @@ export const lessonMeta = {
 ## Motivation
 
 This course took four ideas the earlier quantum-mechanics courses had
-already introduced in a specific, sometimes special-cased form —
+already introduced in a specific, sometimes special-cased form:
 eigenvalues as measurement outcomes, the Born rule, uncertainty
-relations, "compatible observables" — and rebuilt each one at full
-generality: projectors instead of bare eigenvectors, degenerate
+relations, "compatible observables", and rebuilt each one at full
+generality. Projectors instead of bare eigenvectors, degenerate
 eigenspaces instead of assuming they don't exist, a proven (not asserted)
 criterion for compatibility, and an honestly-derived energy-time bound
 that doesn't pretend time is an operator.
@@ -44,7 +44,7 @@ that doesn't pretend time is an operator.
 | "Incompatible observables disturb each other" (stated) | A fully numeric $Z\to X\to Z$ sequence showing exactly how (Sequential Measurements) |
 | $\Delta x\Delta p\ge\hbar/2$ specifically (Wave Mechanics) | $\Delta E\,\Delta t_A\ge\hbar/2$ for *any* observable $A$, derived via Ehrenfest's theorem (Energy-Time Uncertainty) |
 
-Nothing in the right column contradicts the left column — every general
+Nothing in the right column contradicts the left column, every general
 result reduces exactly to the specific one in the nondegenerate,
 single-observable case already covered.
 
@@ -55,11 +55,11 @@ course's tools, how many *additional*, mutually-compatible observables
 would generically be needed, at minimum, to fully resolve it into three
 individually-labeled states?**
 
-At minimum one — a second observable whose eigenvalues happen to take
+At minimum one, a second observable whose eigenvalues happen to take
 three *different* values across the 3-dimensional degenerate eigenspace
 resolves it completely (Complete Sets of Commuting Observables). Whether
 one suffices in a *specific* physical case depends on whether such an
-observable exists and is physically available to measure — the
+observable exists and is physically available to measure. The
 Worked System lesson's $(Z_0,Z_1)$ pair needed exactly two observables
 total (one degenerate on its own, resolved by the second) because that
 was the natural symmetry available; a different system's degeneracy
@@ -71,12 +71,12 @@ again. What's the probability of getting $a_i$ again, and why, using the
 Measurement Postulate, Generalized?**
 
 Probability $1$. After the first measurement, the state is
-$P_i|\psi\rangle/\|P_i|\psi\rangle\|$ — already entirely within the
+$P_i|\psi\rangle/\|P_i|\psi\rangle\|$, already entirely within the
 $a_i$-eigenspace, so $P_i$ applied to it returns it unchanged (projectors
 are idempotent, Spectral Decomposition), giving
 $P(a_i\text{ again})=\langle\psi'|P_i|\psi'\rangle=1$. Repeated
 immediate measurement of the same observable never disturbs its own
-outcome — only an *incompatible* observable measured in between can, as
+outcome. Only an *incompatible* observable measured in between can, as
 Sequential Measurements demonstrated.
 
 **3. Two observables $A$ and $B$ satisfy $[A,B]=0$. A student claims this
@@ -85,11 +85,11 @@ $B$ then $A$. Is this exactly right?**
 
 Not quite as stated. Compatibility guarantees the two measurements don't
 *disturb* each other's probability distribution or destroy each other's
-definiteness — but if the *pre-measurement* state isn't already an
+definiteness, but if the *pre-measurement* state isn't already an
 eigenstate of both, the two individual outcomes are still genuinely
 random (with the same joint probabilities regardless of order). What's
 guaranteed is that a *second* measurement of $A$ after measuring $B$
-(compatible) reproduces $A$'s *first* outcome with certainty — exactly
+(compatible) reproduces $A$'s *first* outcome with certainty, exactly
 because collapse onto a shared eigenbasis for one operator leaves the
 state an eigenstate of the other too.
 
@@ -98,15 +98,15 @@ state an eigenstate of the other too.
 <Callout type="mistake">
 **Treating this course's generalizations as replacing the earlier
 postulates.** They're the same postulates, made precise for a case
-(degeneracy) the earlier statements quietly assumed away — exactly the
+(degeneracy) the earlier statements quietly assumed away, exactly the
 same relationship "From Classical to Quantum" had to "Mathematical
 Foundations," and "Wave Mechanics" had to "From Classical to Quantum."
 </Callout>
 
 <Callout type="mistake">
 **Assuming every quantum system has trivial (nondegenerate) spectra.**
-Real, physically important systems — including ones a few courses away
-on this platform, like the hydrogen atom's energy levels — are highly
+Real, physically important systems, including ones a few courses away
+on this platform, like the hydrogen atom's energy levels, are highly
 degenerate. This course's machinery isn't a mathematical nicety; it's
 required infrastructure for that content.
 </Callout>
@@ -114,11 +114,11 @@ required infrastructure for that content.
 ## Practice Questions
 
 1. Using the recap table, identify the one lesson in this course whose
-   result was *not* a strict generalization of something already proven
-   — i.e., which lesson introduced content with no earlier "special case"
+   result was *not* a strict generalization of something already proven,
+   i.e., which lesson introduced content with no earlier "special case"
    version at all?
 2. A CSCO has three observables. Explain, in your own words, what
-   "complete" is doing in that name — complete with respect to what,
+   "complete" is doing in that name, complete with respect to what,
    exactly?
 3. If $\Delta E=0$ for a state (from the Energy-Time Uncertainty lesson),
    what does this course's collapse formalism predict happens if you
@@ -134,20 +134,21 @@ required infrastructure for that content.
   underlying idea: the earlier courses' postulates, made precise for
   degenerate spectra and multi-observable systems.
 - Every general result in this course reduces exactly to its
-  already-proven nondegenerate special case — a real, checked consistency
+  already-proven nondegenerate special case, a real, checked consistency
   property, not a coincidence.
-- Degeneracy isn't a mathematical edge case to note in passing — it's the
+- Degeneracy isn't a mathematical edge case to note in passing. It's the
   generic situation for real physical systems with enough symmetry, and
   this course's tools are the honest prerequisite for describing them
   correctly.
 
 ## Further Exploration
 
-This completes **Operators, Observables & Measurement**. The two most
-natural next steps are: **One-Dimensional Quantum Systems**, extending
-Wave Mechanics' solvable potentials to the finite square well and
-scattering off a step potential (systems this platform hasn't yet
-solved); or a future course building the density-matrix and partial-trace
-machinery this platform's engine doesn't have yet, needed for
-multipartite entanglement and mixed states in the Quantum Computing
-pillar.
+This completes **Operators, Observables & Measurement**. The natural next
+step is **One-Dimensional Quantum Systems**, extending Wave Mechanics'
+solvable potentials to the finite square well and scattering off a step
+potential. The density-matrix and partial-trace machinery this recap
+table doesn't yet cover (needed for mixed states and the reduced state of
+an entangled subsystem) arrives later, in the Quantum Computing pillar's
+Entanglement, Mixed States & Bell Tests course, and gets extended again
+in this course's own Advanced Quantum Mechanics material on open systems
+and decoherence.

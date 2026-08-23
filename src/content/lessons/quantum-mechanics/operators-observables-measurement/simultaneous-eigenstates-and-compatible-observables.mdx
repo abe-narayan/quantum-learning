@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Simultaneous Eigenstates and Compatible Observables",
   description:
-    "Proving, both directions, that two Hermitian operators share a complete eigenbasis if and only if they commute — the deeper fact underneath the last course's zero-uncertainty-tradeoff result for commuting observables.",
+    "Proving, both directions, that two Hermitian operators share a complete eigenbasis if and only if they commute: the deeper fact underneath the last course's zero-uncertainty-tradeoff result for commuting observables.",
   course: "operators-observables-measurement",
   module: "simultaneous-eigenstates-and-compatible-observables",
   order: 1,
@@ -28,7 +28,7 @@ From Classical to Quantum proved that commuting observables have no
 uncertainty tradeoff: $[A,B]=0$ makes the general bound $\Delta A\,\Delta
 B\ge\tfrac12|\langle[A,B]\rangle|$ vacuous ($\ge 0$, always true). That
 result was a *consequence*. This lesson proves the *reason*: commuting
-Hermitian operators can always be simultaneously diagonalized — there
+Hermitian operators can always be simultaneously diagonalized. There
 exists one basis that is an eigenbasis for *both* operators at once, so a
 single state can have a perfectly definite value of both observables
 together.
@@ -36,7 +36,7 @@ together.
 ## Intuition
 
 If two operators share a common eigenbasis, applying either one to a
-basis vector just rescales it — and rescaling commutes with rescaling,
+basis vector just rescales it, and rescaling commutes with rescaling,
 whatever order you do it in. The interesting content is the converse:
 commuting is not just a *consequence* of sharing a basis, it's
 *equivalent* to it.
@@ -54,7 +54,7 @@ AB|e_i\rangle = A(b_i|e_i\rangle) = b_ia_i|e_i\rangle = a_ib_i|e_i\rangle = B(a_
 $$
 
 So $AB$ and $BA$ agree on every vector of a basis, hence agree on every
-vector (by linearity — any vector is a linear combination of basis
+vector (by linearity: any vector is a linear combination of basis
 vectors). Therefore $AB=BA$, i.e. $[A,B]=0$.
 
 ### Commute $\implies$ shared eigenbasis (nondegenerate case)
@@ -68,7 +68,7 @@ A\big(B|a\rangle\big) = (AB)|a\rangle = (BA)|a\rangle = B\big(A|a\rangle\big) = 
 $$
 
 using $AB=BA$ in the middle step. So $B|a\rangle$ is *also* an
-eigenvector of $A$ with eigenvalue $a$ — but the eigenvalue $a$ is
+eigenvector of $A$ with eigenvalue $a$, but the eigenvalue $a$ is
 nondegenerate, so its eigenspace is only one-dimensional, meaning
 $B|a\rangle$ must be proportional to $|a\rangle$:
 $B|a\rangle=\mu|a\rangle$ for some scalar $\mu$. That's exactly the
@@ -77,7 +77,7 @@ eigenvalue $\mu$). Since this holds for every nondegenerate eigenvector of
 $A$, $A$ and $B$ share an eigenbasis wherever $A$'s spectrum is
 nondegenerate.
 
-(The degenerate case needs one more step — $B$ restricted to a degenerate
+(The degenerate case needs one more step. $B$ restricted to a degenerate
 eigenspace of $A$ is itself Hermitian on that subspace, so it has *its
 own* orthonormal eigenbasis *within* the eigenspace, by the spectral
 theorem applied one dimension down. That basis is simultaneously an
@@ -90,7 +90,7 @@ Complete Sets of Commuting Observables lesson uses next.)
 "Compatible observables" and "commuting observables" are the same thing,
 now proven rather than merely named. When $[A,B]=0$, a state can be
 prepared with perfectly definite values of *both* $A$ and $B$
-simultaneously — measuring one doesn't disturb the other's value, because
+simultaneously. Measuring one doesn't disturb the other's value, because
 they share the same eigenbasis and a measurement of either just projects
 onto (a subspace of) that shared basis.
 
@@ -108,7 +108,7 @@ $$
 $$
 
 Since $[X,Z]\ne0$, $X$ and $Z$ do **not** commute, so by this lesson's
-theorem they cannot share an eigenbasis — confirmed directly: $Z$'s
+theorem they cannot share an eigenbasis, confirmed directly: $Z$'s
 eigenbasis is $\{|0\rangle,|1\rangle\}$, $X$'s is
 $\{|+\rangle,|-\rangle\}$, and neither $|0\rangle$ nor $|1\rangle$ is an
 eigenvector of $X$ (applying $X$ swaps them instead of rescaling either
@@ -119,13 +119,13 @@ one).
 <Callout type="mistake">
 **Assuming any two Hermitian operators share *some* common eigenvector.**
 That's much weaker than sharing a full eigen*basis*, and isn't guaranteed
-even then — $[A,B]\ne0$ generically means *no* nonzero vector is an
+even then: $[A,B]\ne0$ generically means *no* nonzero vector is an
 eigenvector of both.
 </Callout>
 
 <Callout type="mistake">
 **Confusing "commute" with "equal" or "similar."** $[A,B]=0$ says nothing
-about $A$ and $B$ being close to each other as operators — the identity
+about $A$ and $B$ being close to each other as operators. The identity
 $I$ commutes with *everything*, including operators wildly different from
 itself.
 </Callout>
@@ -145,11 +145,11 @@ itself.
 
 ## Summary
 
-- Two operators share an eigenbasis if and only if they commute — proven
+- Two operators share an eigenbasis if and only if they commute, proven
   in both directions (the nondegenerate direction fully; the degenerate
   direction sketched, completed next lesson).
 - "Compatible observables" is exactly synonymous with "commuting
-  observables" — not a separate physical assumption.
+  observables," not a separate physical assumption.
 - $X$ and $Z$ (and $X,Y$; $Y,Z$) are incompatible: $[X,Z]=-2iY\ne0$,
   confirmed directly and consistent with their genuinely different
   eigenbases.

@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "From Classical to Quantum Probability",
   description:
-    "The double-slit experiment, worked with real numbers — why no probability distribution over a hidden definite path can reproduce quantum interference, and what has to replace it.",
+    "The double-slit experiment, worked with real numbers: why no probability distribution over a hidden definite path can reproduce quantum interference, and what has to replace it.",
   course: "classical-to-quantum",
   module: "from-classical-to-quantum-probability",
   order: 1,
@@ -27,18 +27,18 @@ export const lessonMeta = {
 The last lesson defined classical probability precisely: it always
 describes ignorance about one underlying definite fact. This lesson
 presents a real, repeatedly confirmed experiment whose numbers cannot be
-explained that way, no matter how the ignorance is described — the
+explained that way, no matter how the ignorance is described: the
 double-slit experiment, and interference from it.
 
 ## Intuition
 
-Fire particles — electrons, photons, even large molecules — one at a
+Fire particles, electrons, photons, even large molecules, one at a
 time at a screen with two narrow slits, and record where each one lands.
 Common sense says: each particle goes through slit 1 or slit 2 (maybe you
 don't know which, but *something* definite happens), and the pattern that
 builds up should be the sum of "pattern with only slit 1 open" and
 "pattern with only slit 2 open." That's not what happens. The actual
-pattern has bright and dark fringes — bands where particles land far more
+pattern has bright and dark fringes, bands where particles land far more
 or less often than either single-slit pattern alone would predict, some
 spots going almost completely dark even though *both* slits are open and
 either one alone would have put particles there.
@@ -48,7 +48,7 @@ either one alone would have put particles there.
 ### The classical prediction
 
 If "going through slit 1" and "going through slit 2" are mutually
-exclusive events — whatever your uncertainty about which one happens —
+exclusive events, whatever your uncertainty about which one happens,
 ordinary (Kolmogorov) probability requires:
 
 $$
@@ -58,13 +58,13 @@ $$
 where $P_1, P_2$ are the probabilities with only that one slit open. This
 is just the classical addition rule from the last lesson, applied to two
 alternatives. It doesn't matter *what* hidden fact determines which slit a
-given particle used, or whether you know it — as long as some definite
+given particle used, or whether you know it. As long as some definite
 fact exists, probabilities of exclusive alternatives add.
 
 ### The actual rule: add amplitudes, then square
 
 Experimentally, the correct prediction instead assigns a complex
-**amplitude** to each path — $\psi_1$ for slit 1, $\psi_2$ for slit 2 —
+**amplitude** to each path, $\psi_1$ for slit 1, $\psi_2$ for slit 2,
 and adds the amplitudes *before* computing a probability:
 
 $$
@@ -72,7 +72,7 @@ P(\text{land at } x) = |\psi_1(x) + \psi_2(x)|^2
 $$
 
 Because $\psi_1$ and $\psi_2$ are complex, this is **not** the same as
-$|\psi_1|^2 + |\psi_2|^2$ in general — expanding the square directly
+$|\psi_1|^2 + |\psi_2|^2$ in general. Expanding the square directly
 shows why:
 
 $$
@@ -83,7 +83,7 @@ The cross terms are the entire story: they vanish for real, same-sign
 numbers added the "classical" way, but not for complex amplitudes with a
 relative phase. Where the cross terms are positive, the pattern brightens
 past the classical prediction (**constructive interference**); where
-they're negative, it dims — potentially to zero even though both
+they're negative, it dims, potentially to zero even though both
 individual probabilities are positive (**destructive interference**).
 
 ### A concrete calculation
@@ -98,7 +98,7 @@ as $\theta$ varies:
 | $\pi/2$ | $0.5$ | $0.5$ |
 | $\pi$ (opposite phase) | $0.5$ | $0.0$ |
 
-The classical prediction never changes — it only depends on the
+The classical prediction never changes; it only depends on the
 individual magnitudes, which are fixed at $0.5$ each. The quantum
 prediction swings from **double** the classical value (perfectly
 constructive) to **zero** (perfectly destructive), purely as a function of
@@ -111,15 +111,15 @@ range.
 
 Suppose, to save the classical picture, each particle really does travel
 through exactly one slit, definitely, and you're merely ignorant of
-which. Then the classical addition rule from the last lesson has to hold
-— it holds for *any* probability distribution over any hidden variables
+which. Then the classical addition rule from the last lesson has to hold.
+It holds for *any* probability distribution over any hidden variables
 whatsoever, as long as the underlying event ("used slit 1" vs. "used slit
 2") is genuinely one-or-the-other. The $\theta=\pi$ row above is the
 direct contradiction: the observed probability is exactly zero at a point
 where each individual slit, alone, would place particles there with
 positive probability. No redistribution of hidden ignorance changes that
 row's arithmetic. The amplitude-based rule isn't an alternative
-description of the same physics — it's required by the actual numbers.
+description of the same physics. It's required by the actual numbers.
 
 ## Physical Interpretation
 
@@ -130,7 +130,7 @@ amplitude rule predicts. A related, equally important fact: if you add a
 detector that determines which slit each particle actually used, the
 interference pattern disappears, and the classical addition rule is
 restored. Extracting which-path information genuinely changes the
-physical outcome — a deep fact about measurement this course will return
+physical outcome, a deep fact about measurement this course will return
 to, not a limitation of the detector.
 
 ## Worked Example
@@ -148,7 +148,7 @@ $$
 |\psi_1+\psi_2|^2 \approx 0.9^2+0.5196^2 \approx 0.81+0.27=1.08
 $$
 
-The quantum prediction ($1.08$) exceeds the classical one ($0.72$) —
+The quantum prediction ($1.08$) exceeds the classical one ($0.72$),
 partial constructive interference, consistent with $\theta=\pi/3$ sitting
 between the fully-constructive ($\theta=0$) and neutral ($\theta=\pi/2$)
 cases from the table above.
@@ -157,17 +157,17 @@ cases from the table above.
 
 <Callout type="mistake">
 **Assuming interference is just "small effects averaging out weirdly."**
-It isn't a statistical artifact — it's the exact, reproducible, single-
-particle-at-a-time behavior, and it can send a probability all the way to
-zero at a spot where two positive contributions individually placed
-particles.
+It isn't a statistical artifact. It's the exact, reproducible,
+single-particle-at-a-time behavior, and it can send a probability all the
+way to zero at a spot where two positive contributions individually
+placed particles.
 </Callout>
 
 <Callout type="mistake">
 **Believing a not-yet-invented, more clever hidden variable could still
 rescue the classical addition rule.** The contradiction shown above uses
 only the *actually measured* probabilities and the classical addition
-axiom — it doesn't depend on any specific guess about what the hidden
+axiom. It doesn't depend on any specific guess about what the hidden
 variable might be.
 </Callout>
 
@@ -187,20 +187,20 @@ variable might be.
 ## Summary
 
 - Classical probability requires $P = P_1+P_2$ for mutually exclusive
-  alternatives — always, regardless of what the hidden alternative is.
+  alternatives, always, regardless of what the hidden alternative is.
 - The measured double-slit pattern instead follows $P =
   \lvert\psi_1+\psi_2\rvert^2$, which can range from double the classical
   value to exactly zero depending on relative phase.
 - This numerically contradicts the classical rule at specific, calculable
-  points — ruling out any hidden-definite-path explanation, not merely
+  points, ruling out any hidden-definite-path explanation, not merely
   disfavoring one.
 - Which-path measurement destroys the interference and restores the
-  classical rule — a genuine physical effect, not a limitation of
+  classical rule, a genuine physical effect, not a limitation of
   detectors.
 
 ## Further Exploration
 
 Next: **Why Complex Amplitudes?**, which asks the sharper question this
-lesson's arithmetic sets up — why *complex* numbers specifically, rather
+lesson's arithmetic sets up: why *complex* numbers specifically, rather
 than ordinary signed real ones, are what's required to make this rule
 work in general.

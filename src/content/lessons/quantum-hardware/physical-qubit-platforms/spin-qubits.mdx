@@ -1,0 +1,141 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/physical-qubit-platforms/spin-qubits"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Spin Qubits",
+  description:
+    "A qubit encoded directly in a single electron's (or nucleus's) spin, confined in a semiconductor quantum dot: literally Angular Momentum & Spin's spin-1/2 two-level system, built into solid-state hardware small enough that fabrication tooling from the existing semiconductor industry applies almost directly.",
+  course: "physical-qubit-platforms",
+  module: "spin-qubits",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 18,
+  prerequisites: ["quantum-hardware/physical-qubit-platforms/photonic-qubits"],
+  objectives: [
+    "Explain how a quantum dot confines a single electron whose spin serves as the qubit",
+    "State why spin qubits' small physical size is a genuine scalability advantage",
+    "Compare spin qubits' coherence/gate-speed regime to superconducting qubits and trapped ions",
+  ],
+};
+
+## Motivation
+
+Angular Momentum & Spin built spin-1/2's two-level structure
+mathematically; spin qubits are the platform that uses it as literally
+as possible: a single electron's actual spin, confined in a tiny region
+of semiconductor, encoding one qubit with no additional artificial
+circuit or atomic transition needed.
+
+## Engineering Development
+
+### The quantum dot
+
+A **quantum dot** is a nanoscale region of semiconductor, created by
+precisely patterned electrodes on a chip, small enough to confine a
+single electron. This confinement uses essentially the same physics as
+this platform's Wave Mechanics course's infinite/finite square well
+(spatial confinement forcing discrete energy levels), applied here in a
+real fabricated device rather than an idealized 1D model. The confined
+electron's spin, up or down along some chosen axis, is the qubit,
+directly realizing spin-1/2's two states, $|\!\uparrow\rangle$ and
+$|\!\downarrow\rangle$.
+
+### Why small size matters
+
+A quantum dot is dramatically smaller than a superconducting qubit's
+circuit or a trapped ion's confinement region, closer to the scale of
+existing transistors. This means spin-qubit fabrication can, in
+principle, leverage much of the same lithographic tooling and
+manufacturing infrastructure the semiconductor industry has spent
+decades perfecting for classical chips, a genuine, concrete scalability
+argument distinct from any advantage claimed by the other platforms in
+this course.
+
+### Coherence and gate speed
+
+Spin qubits sit in an intermediate regime: coherence times generally
+longer than superconducting qubits' microseconds (particularly for
+nuclear-spin-based qubits, which are extremely well isolated from
+charge noise) but gate operations are typically driven electrically or
+magnetically at speeds closer to superconducting qubits' nanosecond
+scale than trapped ions' microsecond scale, a genuinely different
+point in the coherence/speed tradeoff space than either platform already
+covered.
+
+## Physical Interpretation
+
+Spin qubits' central engineering pitch isn't raw coherence time or gate
+speed individually. It's *manufacturability at scale*, riding on
+existing semiconductor fabrication expertise. Whether this translates
+into a practical advantage depends on solving spin-qubit-specific
+challenges (uniform, reliable dot fabrication; addressing individual
+spins without disturbing neighbors) that remain active engineering
+problems.
+
+## Worked Example
+
+**Why is confining a single electron in a quantum dot conceptually the
+same problem as Wave Mechanics' particle-in-a-box, even though the
+physical device looks completely different?**
+
+Both are the same underlying physics: a particle (there, idealized; here,
+a real electron) confined by a potential energy barrier to a finite
+spatial region, forcing discrete energy levels via the boundary
+conditions the wavefunction must satisfy. The quantum dot's confining
+potential is created by real electrode voltages rather than an idealized
+infinite wall, but the qualitative consequence, quantized energy levels
+from spatial confinement, is the identical physical mechanism Wave
+Mechanics already derived.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking "smaller" automatically means "easier to build at scale."**
+Small size gives a manufacturing-compatibility advantage, but
+spin qubits still face real, unresolved engineering challenges
+(uniformity across many fabricated dots, precise individual addressing)
+before that advantage translates into a working large-scale device.
+</Callout>
+
+<Callout type="mistake">
+**Confusing spin qubits with superconducting qubits because both are
+"solid-state."** The qubit itself is physically different: a
+single confined electron's spin, versus a collective circuit
+excitation, with correspondingly different physics governing
+coherence and control.
+</Callout>
+
+## Practice Questions
+
+1. What physical mechanism confines an electron in a quantum dot, and
+   how does it parallel Wave Mechanics' particle-in-a-box?
+2. Name the specific manufacturing advantage spin qubits claim over
+   superconducting qubits or trapped ions.
+3. Where does spin qubits' coherence/speed regime sit relative to
+   superconducting qubits and trapped ions, per this lesson?
+4. Is spin qubits' "manufacturability" advantage automatically decisive
+   for building a large-scale quantum computer? What open challenges
+   does this lesson name?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Spin qubits confine a single electron in a semiconductor quantum dot,
+  encoding the qubit directly in its spin: the same physics as Wave
+  Mechanics' confinement problems and Angular Momentum & Spin's
+  spin-1/2 system, built into real hardware.
+- Small device size offers a genuine, distinct scalability argument:
+  compatibility with existing semiconductor fabrication tooling.
+- Sits in an intermediate coherence/speed regime, longer coherence than
+  superconducting qubits, faster gates than trapped ions, with its own
+  unresolved fabrication-uniformity challenges.
+
+## Further Exploration
+
+Next: **Capstone: Comparing Qubit Platforms**, which puts all five
+platforms side by side on the same axes, rather than one at a time.

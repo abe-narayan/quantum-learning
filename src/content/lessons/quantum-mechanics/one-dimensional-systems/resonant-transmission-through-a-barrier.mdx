@@ -27,22 +27,22 @@ export const lessonMeta = {
 
 ## Motivation
 
-Tunneling and the Finite Barrier covered $E<V_0$ — a barrier taller than
+Tunneling and the Finite Barrier covered $E<V_0$: a barrier taller than
 the particle's energy, crossed only by the exponentially-suppressed
 tunneling mechanism. This lesson covers the complementary regime,
 $E>V_0$: the particle has enough energy to classically cross the
-barrier, so *something* transmits — but exactly how much, as a function
+barrier, so *something* transmits. Exactly how much, as a function
 of energy, turns out to have a genuinely surprising structure.
 
 ## Intuition
 
 A barrier with $E>V_0$ has the *same* three-region structure as the
 step-potential problem, just with a third region (transmitted wave)
-past a *second* boundary — and, crucially, inside the barrier the
+past a *second* boundary. Crucially, inside the barrier the
 wavefunction still **oscillates** (not decays, since $E>V_0$ there
 means $k$ is real inside too), unlike the tunneling case's exponential
 decay. Two boundaries means two reflected waves can interfere with each
-other — and interference, constructive or destructive, is exactly what
+other, and interference, constructive or destructive, is exactly what
 produces resonances.
 
 ## Mathematical Development
@@ -51,12 +51,12 @@ produces resonances.
 
 Barrier of height $V_0$, full width $L$, spanning $0$ to $L$; particle
 energy $E>V_0$. Inside the barrier, $k_2=\sqrt{2(E-V_0)}$ (real,
-oscillatory — the key difference from tunneling's $\kappa=\sqrt{2(V_0-E)}$).
+oscillatory, the key difference from tunneling's $\kappa=\sqrt{2(V_0-E)}$).
 Matching $\psi,\psi'$ at *both* $x=0$ and $x=L$ (four equations, the same
 kind of boundary-matching used for the step, just doubled) gives, after
-elimination of every amplitude except the incident and transmitted ones
-— a longer algebraic exercise than the single-step case, not repeated in
-full here — the standard closed-form result:
+elimination of every amplitude except the incident and transmitted ones,
+the standard closed-form result (a longer algebraic exercise than the
+single-step case, not repeated in full here):
 
 $$
 \boxed{\;T = \left[1 + \frac{V_0^2\sin^2(k_2L)}{4E(E-V_0)}\right]^{-1}\;}
@@ -74,7 +74,7 @@ $$
 k_2L = n\pi, \qquad n=1,2,3,\ldots
 $$
 
-At these special energies, the barrier is **perfectly transparent** —
+At these special energies, the barrier is **perfectly transparent**:
 every incident particle transmits, none reflects, despite the barrier
 being, in every other sense, a genuine obstacle.
 
@@ -87,7 +87,7 @@ cancelling the net reflection entirely. Here, the two boundaries of the
 barrier play the role of the film's two surfaces, and the resonance
 condition $k_2L=n\pi$ is exactly the same "round-trip phase is a
 multiple of $2\pi$" condition that governs optical thin-film
-interference — the same physics as light, showing up because both are
+interference: the same physics as light, showing up because both are
 governed by a wave equation with boundary matching.
 
 ## Worked Example
@@ -101,10 +101,10 @@ $$
 
 First resonance ($n=1$): $L=\pi/k_2\approx1.2825$. Substituting into the
 transmission formula, $\sin(k_2L)=\sin(\pi)=0$ exactly, so the
-$\sin^2$ term vanishes and $T=1/[1+0]=1$ — confirmed directly, and
+$\sin^2$ term vanishes and $T=1/[1+0]=1$, confirmed directly, and
 matched by this platform's own test suite for `barrierScatteringTransmission`.
 For comparison, at a *non*-resonant width like $L=1$: $k_2L\approx2.449$
-(not a multiple of $\pi$), giving $T\approx0.9736$ — still high (a
+(not a multiple of $\pi$), giving $T\approx0.9736$, still high (a
 narrow barrier relative to the wavelength), but not exactly 1.
 
 ## Common Mistakes
@@ -113,7 +113,7 @@ narrow barrier relative to the wavelength), but not exactly 1.
 **Confusing this formula with the tunneling ($E<V_0$) case.** The
 tunneling regime's transmission falls off roughly as $e^{-2\kappa L}$
 (Tunneling and the Finite Barrier); this regime's oscillates with $L$
-via $\sin^2(k_2L)$ and can reach exactly $1$ — qualitatively different
+via $\sin^2(k_2L)$ and can reach exactly $1$, qualitatively different
 behavior, because the wavefunction oscillates rather than decays inside
 the barrier.
 </Callout>
@@ -122,7 +122,7 @@ the barrier.
 **Thinking resonance requires fine-tuning both $E$ and $L$
 independently.** For a *fixed* barrier ($V_0,L$ given), resonances occur
 at a discrete, predictable sequence of *energies* $E$ satisfying
-$k_2(E)L=n\pi$ — an experimentally realistic, adjustable knob (scan the
+$k_2(E)L=n\pi$, an experimentally realistic, adjustable knob (scan the
 incident particle's energy) rather than an impossible-to-achieve
 coincidence.
 </Callout>
@@ -133,7 +133,7 @@ coincidence.
 2. Find the *second* resonant width ($n=2$) for the $E=5,V_0=2$ example
    above.
 3. Explain in one or two sentences why the resonance condition depends
-   only on $k_2L$ (not on $V_0$ or $E$ separately) — connect this to the
+   only on $k_2L$ (not on $V_0$ or $E$ separately). Connect this to the
    optical thin-film analogy's "round-trip phase" language.
 
 <PracticeLinks problems={practiceProblems} />
@@ -144,7 +144,7 @@ coincidence.
   $T=[1+V_0^2\sin^2(k_2L)/(4E(E-V_0))]^{-1}$, oscillating with barrier
   width rather than decaying exponentially (the tunneling regime's
   behavior).
-- $T=1$ exactly whenever $k_2L=n\pi$ — perfect transmission at discrete
+- $T=1$ exactly whenever $k_2L=n\pi$: perfect transmission at discrete
   resonant energies, directly analogous to anti-reflective optical
   coatings.
 - This is the genuine complement to Wave Mechanics' tunneling treatment:

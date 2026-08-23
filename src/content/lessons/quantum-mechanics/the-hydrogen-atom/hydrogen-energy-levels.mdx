@@ -1,0 +1,138 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Hydrogen Energy Levels",
+  description:
+    "Solving the radial equation for the Coulomb potential gives Eₙ=−13.6 eV/n², quantized by the bound-state boundary condition alone, independent of l, and reproduced exactly by this platform's verified hydrogenEnergyLevel() function.",
+  course: "the-hydrogen-atom",
+  module: "hydrogen-energy-levels",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/the-hydrogen-atom/the-radial-equation"],
+  objectives: [
+    "State the hydrogen energy formula Eₙ=−13.6 eV/n² and identify where the constant 13.6 eV (one Rydberg) comes from physically",
+    "Explain why the energy depends only on n, not on l or m, for the pure Coulomb potential specifically",
+    "Connect the n=1 ground state energy to the reference scales already used in Wave Mechanics and the Bohr model",
+  ],
+};
+
+## Motivation
+
+Solving the radial equation from the previous lesson for hydrogen's
+specific Coulomb potential $V(r)=-e^2/4\pi\epsilon_0r$ (subject to the
+bound-state requirement that $u(r)\to0$ as $r\to\infty$) turns out to
+force $E$ to only a discrete, countable set of values. This lesson states
+that result and unpacks what it means physically; the next lesson uses
+the actual radial wavefunctions (already built and verified in this
+course's engine) to see the states themselves.
+
+## Mathematical Development
+
+### The quantization condition
+
+Solving $-\dfrac{\hbar^2}{2m}\dfrac{d^2u}{dr^2}+\left[-\dfrac{e^2}{4\pi\epsilon_0r}+\dfrac{l(l+1)\hbar^2}{2mr^2}\right]u=Eu$
+with $u(0)=0$ and $u(r)\to0$ as $r\to\infty$ is a standard (if lengthy)
+bound-state ODE calculation: the same *category* of problem as the
+finite square well in Wave Mechanics, just with a different
+$V_{\text{eff}}(r)$. The result is that normalizable solutions exist only
+for a specific discrete set of energies:
+
+$$
+E_n = -\frac{m e^4}{32\pi^2\epsilon_0^2\hbar^2}\cdot\frac1{n^2} = -\frac{13.6\text{ eV}}{n^2}, \qquad n=1,2,3,\ldots
+$$
+
+where $n$ (the **principal quantum number**) is a positive integer that
+emerges from the same kind of boundary-condition counting argument the
+harmonic oscillator and finite well used, except here the messy
+combination of physical constants collapses to the clean number
+$13.6\text{ eV}$, called **one Rydberg** ($\text{Ry}$).
+
+### Why the energy doesn't depend on l or m
+
+A striking feature specific to the pure $1/r$ Coulomb potential: $E_n$
+depends *only* on $n$, not on $l$ (despite $l$ appearing explicitly in
+the effective potential solved above) or $m$. This is a special
+"accidental" degeneracy of the exact Coulomb form: for $n\geq2$,
+states with different $l$ (and hence different-shaped radial
+wavefunctions) share exactly the same energy. Combined with the $2l+1$
+degeneracy in $m$ from Angular Momentum & Spin, the total degeneracy of
+level $n$ is $n^2$ (summing $2l+1$ over $l=0,\ldots,n-1$, a direct
+algebra exercise, not a new physical input).
+
+## Physical Interpretation
+
+$-13.6\text{ eV}$ is the ionization energy of hydrogen: exactly the
+energy needed to free a ground-state electron completely (to $E=0$, the
+threshold of an unbound state). As $n\to\infty$, $E_n\to0^-$: the
+levels crowd together approaching the ionization threshold, exactly the
+"Rydberg series" pattern seen in hydrogen's real emission spectrum.
+`hydrogenEnergyLevel(n)` in this platform's engine computes exactly this
+formula and was verified against $E_1=-13.6$, $E_2=-3.4$, $E_4=-0.85$ eV.
+
+## Worked Example
+
+**What photon energy is released when an electron falls from $n=3$ to
+$n=2$? (This is the first line of the hydrogen Balmer series.)**
+
+$$
+E_3 = -\frac{13.6}{9} \approx -1.51\text{ eV}, \qquad E_2 = -\frac{13.6}{4} = -3.40\text{ eV}
+$$
+
+$$
+\Delta E = E_3 - E_2 \approx -1.51 - (-3.40) = 1.89\text{ eV}
+$$
+
+confirmed directly: `hydrogenEnergyLevel(3) - hydrogenEnergyLevel(2)`
+$\approx1.89\text{ eV}$, matching the well-known Balmer-alpha transition.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting the sign.** $E_n$ is negative for every bound state: the
+electron is bound (has less energy than a free electron at rest at
+infinity). A "higher" energy level (larger $n$) means a *less negative*
+number, not a larger positive one.
+</Callout>
+
+<Callout type="mistake">
+**Assuming $E$ depends on $l$.** This would be true for almost any other
+central potential (a finite spherical well, for instance); the
+$l$-independence is a special feature of the *exact* $1/r$ Coulomb form,
+not a general rule this course's earlier central-potential argument
+implies.
+</Callout>
+
+## Practice Questions
+
+1. Compute $E_5$ using the formula, and check it against
+   `hydrogenEnergyLevel(5)`.
+2. What is the total degeneracy (counting all $l$ and $m$) of the $n=2$
+   level? List the specific $(l,m)$ pairs.
+3. A photon carries away $10.2\text{ eV}$ when an electron transitions
+   from $n=2$ to $n=1$. Verify this using $E_1$ and $E_2$.
+4. Why does $E_n\to0$ as $n\to\infty$ correspond physically to the
+   electron becoming unbound, rather than to some other special state?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Solving the radial equation for the Coulomb potential, with bound-state
+  boundary conditions, quantizes energy: $E_n=-13.6\text{ eV}/n^2$.
+- This $13.6\text{ eV}$ (one Rydberg) is hydrogen's ground-state
+  ionization energy.
+- $E_n$ depends only on $n$ (not $l$ or $m$), a special feature of the
+  exact $1/r$ potential, giving each level an $n^2$-fold degeneracy.
+
+## Further Exploration
+
+Next: **Orbitals & Quantum Numbers**, which combines the verified
+`radial1s`/`radial2s`/`radial2p` functions with Angular Momentum &
+Spin's $Y_l^m$ to build the actual 1s/2s/2p electron probability
+distributions.

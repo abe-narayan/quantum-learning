@@ -1,0 +1,156 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/phase-kickback"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Phase Kickback",
+  description:
+    "Deriving, algebraically, why preparing the oracle's output qubit in |−⟩ turns f(x)'s value into a phase on the input register instead of a separate qubit's value, the one trick Deutsch-Jozsa and Grover's algorithm both build on.",
+  course: "quantum-algorithms-i",
+  module: "phase-kickback",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/quantum-parallelism-and-the-oracle-model"],
+  objectives: [
+    "Derive U_f|x⟩|−⟩=(−1)^f(x)|x⟩|−⟩ directly from the oracle's defining relation",
+    "Explain why the ancilla qubit's own state is left completely unchanged by this process",
+    "Connect the bit-oracle and phase-oracle engine primitives via this identity, not just by definition",
+  ],
+};
+
+## Motivation
+
+The last lesson's oracle $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$
+writes $f(x)$'s value into a second qubit. That's the *honest* definition,
+but every algorithm from here on actually wants $f(x)$'s value somewhere
+else entirely: as a **phase** multiplying $|x\rangle$ directly, with no
+second qubit needed at all. This lesson derives exactly when and why that
+substitution is legitimate.
+
+## Mathematical Development
+
+### The derivation
+
+Prepare the output qubit not in $|0\rangle$, but in
+$|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$, and apply $U_f$:
+
+$$
+U_f|x\rangle|-\rangle = U_f|x\rangle\frac{|0\rangle-|1\rangle}{\sqrt2} = \frac{U_f|x\rangle|0\rangle - U_f|x\rangle|1\rangle}{\sqrt2} = \frac{|x\rangle|0\oplus f(x)\rangle - |x\rangle|1\oplus f(x)\rangle}{\sqrt2}
+$$
+
+Two cases, both worth writing out fully. If $f(x)=0$:
+$0\oplus0=0,\ 1\oplus0=1$, giving
+$\frac{|x\rangle|0\rangle-|x\rangle|1\rangle}{\sqrt2}=|x\rangle|-\rangle$,
+unchanged. If $f(x)=1$: $0\oplus1=1,\ 1\oplus1=0$, giving
+$\frac{|x\rangle|1\rangle-|x\rangle|0\rangle}{\sqrt2}=-|x\rangle|-\rangle$,
+picks up an overall minus sign. Both cases combine into one formula:
+
+$$
+\boxed{U_f|x\rangle|-\rangle = (-1)^{f(x)}|x\rangle|-\rangle}
+$$
+
+### Why this is called "kickback"
+
+The ancilla started in $|-\rangle$ and **ends in $|-\rangle$, completely
+unchanged**. The phase $(-1)^{f(x)}$ that "should" have landed on the
+ancilla (the qubit $U_f$ actually acts on) instead shows up attached to
+$|x\rangle$, the register $U_f$ was never defined to modify directly. This
+is why it's called *kickback*: the effect of the computation gets kicked
+back onto the control-like register instead of staying on the target.
+
+### Linearity extends this to a superposition over x
+
+$U_f$ is linear, so applying it to $\left(\sum_x c_x|x\rangle\right)|-\rangle$
+distributes the identity above over every term:
+
+$$
+U_f\left(\sum_x c_x|x\rangle\right)|-\rangle = \left(\sum_x (-1)^{f(x)}c_x|x\rangle\right)|-\rangle
+$$
+
+The ancilla factors out completely and stays $|-\rangle$ throughout; after
+this step it can be ignored (or discarded) entirely, and what remains is
+exactly `applyPhaseOracle`'s action: $\sum_x c_x|x\rangle \to \sum_x
+(-1)^{f(x)}c_x|x\rangle$, i.e. a sign flip on exactly the $x$ where $f(x)=1$.
+This is not a second, independent definition: it's the same $U_f$, checked
+directly in `oracles.test.ts` by preparing $|+\rangle|-\rangle$, applying
+`applyBitOracle`, and confirming the reduced state on the $x$ register
+matches `applyPhaseOracle` applied directly, to floating-point precision.
+
+## Physical Interpretation
+
+Phase kickback is the mechanism that turns "compute $f$" into "multiply
+each branch of a superposition by a sign depending on $f$," a *global*
+property of the whole superposition rather than a per-branch classical bit.
+Once $f(x)$'s value is a phase, it becomes something interference (via
+Hadamards, or the QFT) can act on, which is precisely why this trick shows
+up as the very first step inside Deutsch-Jozsa and Grover's algorithm both.
+
+## Worked Example
+
+**Confirm the kickback identity directly for $x$ such that $f(x)=1$, using
+$|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$ and the oracle's action on
+each basis term separately.**
+
+$U_f|x\rangle|0\rangle = |x\rangle|0\oplus1\rangle=|x\rangle|1\rangle$.
+$U_f|x\rangle|1\rangle=|x\rangle|1\oplus1\rangle=|x\rangle|0\rangle$. So:
+
+$$
+U_f|x\rangle\frac{|0\rangle-|1\rangle}{\sqrt2} = \frac{|x\rangle|1\rangle - |x\rangle|0\rangle}{\sqrt2} = -\frac{|x\rangle|0\rangle-|x\rangle|1\rangle}{\sqrt2} = -|x\rangle|-\rangle
+$$
+
+Exactly $(-1)^1|x\rangle|-\rangle = -|x\rangle|-\rangle$, matching the boxed
+formula for $f(x)=1$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking the ancilla's state changes.** It doesn't: $|-\rangle$ is an
+eigenstate of the "apply $X$ conditioned on $f(x)$" operation with
+eigenvalue $(-1)^{f(x)}$, and applying an operator to one of its own
+eigenstates never changes the state, only multiplies it by the eigenvalue.
+</Callout>
+
+<Callout type="mistake">
+**Assuming this trick works for *any* ancilla state, not just $|-\rangle$
+or $|0\rangle$.** Preparing the ancilla in $|0\rangle$ gives the ordinary
+bit-flip oracle from the last lesson; preparing it in, say, $|+\rangle$
+gives neither a clean phase nor a clean bit flip: $|-\rangle$ is
+specifically the state that makes $X$ act as a $-1$ eigenvalue, which is
+exactly what this derivation needs.
+</Callout>
+
+## Practice Questions
+
+1. Redo the worked-example derivation for $f(x)=0$ directly (rather than
+   citing the boxed formula), confirming the sign comes out $+1$.
+2. Explain why $\frac{1}{\sqrt2}\sum_x(-1)^{f(x)}|x\rangle$, obtained after
+   discarding the ancilla, is still a valid normalized state on its own.
+3. Suppose $f$ is the constant-1 function. What does phase kickback do to
+   $\sum_x c_x|x\rangle$ as a whole? (Compare to a global phase on the
+   entire register.)
+4. Phase kickback is sometimes demonstrated with the control qubit of a
+   controlled-$U$ gate, not an oracle. Explain the structural similarity:
+   what plays the role of "$|-\rangle$" in that more general setting?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $U_f|x\rangle|-\rangle=(-1)^{f(x)}|x\rangle|-\rangle$, derived directly
+  from $U_f$'s XOR definition, not asserted.
+- The ancilla, prepared in $|-\rangle$, is left completely unchanged; the
+  effect of $f(x)$ is "kicked back" onto $|x\rangle$ as a phase instead.
+- By linearity, this extends to any superposition over $x$, reproducing
+  exactly `applyPhaseOracle`'s action, verified directly against
+  `applyBitOracle`, not just defined to match.
+
+## Further Exploration
+
+Next: **The Deutsch-Jozsa Algorithm**, the first full algorithm built from
+this trick, determining whether $f$ is constant or balanced with exactly
+one query, where any classical algorithm needs exponentially many in the
+worst case.

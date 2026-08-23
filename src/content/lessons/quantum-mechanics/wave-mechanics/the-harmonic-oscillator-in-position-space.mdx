@@ -9,7 +9,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "The Harmonic Oscillator in Position Space",
   description:
-    "A second, independent derivation of the harmonic oscillator's energy spectrum -- this time by direct substitution into the position-space Schrodinger equation -- confirming the ladder-operator result from the last course by an entirely different route.",
+    "A second, independent derivation of the harmonic oscillator's energy spectrum, this time by direct substitution into the position-space Schrodinger equation, confirming the ladder-operator result from the last course by an entirely different route.",
   course: "wave-mechanics",
   module: "the-harmonic-oscillator-in-position-space",
   order: 1,
@@ -28,20 +28,20 @@ export const lessonMeta = {
 
 ## Motivation
 
-The last course solved the harmonic oscillator entirely algebraically —
+The last course solved the harmonic oscillator entirely algebraically:
 ladder operators, a commutator, and pure linear algebra, with a promise
 that "the connection between this $H$ and the physical potential
 $\tfrac12m\omega^2x^2$ is made precise once continuous position is
 developed." This lesson is that promise kept: a second, independent
 derivation of the *same* energy spectrum, this time by direct
-substitution into the position-space Schrödinger equation — and the two
+substitution into the position-space Schrödinger equation. The two
 routes agreeing exactly is real evidence the physics is being described
 consistently across the whole platform.
 
 ## Intuition
 
 The classical harmonic oscillator's potential energy is
-$V(x)=\tfrac12m\omega^2x^2$ — a parabola, the potential every stable
+$V(x)=\tfrac12m\omega^2x^2$, a parabola, the potential every stable
 equilibrium looks like to leading order near its minimum (any smooth
 potential's Taylor expansion around a minimum starts with a quadratic
 term). The ground state should be some localized "blob" centered at the
@@ -52,7 +52,7 @@ minimum; a Gaussian is the natural guess, and this lesson checks it works.
 ### The candidate ground state
 
 Guess $\psi_0(x) = \left(\dfrac{m\omega}{\pi\hbar}\right)^{1/4}
-e^{-m\omega x^2/(2\hbar)}$ — the exact formula
+e^{-m\omega x^2/(2\hbar)}$, the exact formula
 `harmonicOscillatorEigenstate(grid, 0, omega, mass)` evaluates on the
 grid.
 
@@ -84,7 +84,7 @@ $$
 -\frac{\hbar^2}{2m}\psi_0'' + \frac12m\omega^2x^2\psi_0 = \frac{\hbar\omega}{2}\,\psi_0
 $$
 
-— precisely the time-independent Schrödinger equation with eigenvalue
+precisely the time-independent Schrödinger equation with eigenvalue
 $E_0=\hbar\omega/2$. This is exactly the ladder-operator result's ground
 state energy, now confirmed by direct calculus, with no reference to
 $a,a^\dagger$ anywhere in this derivation.
@@ -93,27 +93,27 @@ $a,a^\dagger$ anywhere in this derivation.
 
 The higher eigenstates $\psi_n(x) \propto H_n(\sqrt{m\omega/\hbar}\,x)\,
 e^{-m\omega x^2/(2\hbar)}$ (Hermite polynomials $H_n$ multiplying the same
-Gaussian envelope — `harmonicOscillatorEigenstate` implements $n=0..3$
+Gaussian envelope, `harmonicOscillatorEigenstate` implements $n=0..3$
 via exactly this closed form) can be checked the same way, each giving
-$E_n=\hbar\omega(n+\tfrac12)$ — the identical, equally-spaced ladder
+$E_n=\hbar\omega(n+\tfrac12)$, the identical, equally-spaced ladder
 derived purely algebraically last course. Two totally different
 derivations (raising/lowering operators on an abstract Hilbert space;
 direct substitution into a differential equation) landing on the exact
-same spectrum is not a coincidence — it's the same physical system,
+same spectrum is not a coincidence. It's the same physical system,
 correctly described in two different mathematical languages.
 
 ## Physical Interpretation
 
 The Gaussian shape reflects the classical turning points: the harmonic
 potential rises steeply away from $x=0$, so the wavefunction decays
-smoothly into the classically forbidden region — visibly different from
+smoothly into the classically forbidden region, visibly different from
 the infinite well's abrupt, hard cutoff to exactly zero (compare the two
 Explorer presets directly).
 
 ## Interactive Experiment
 
-Compare the Harmonic Oscillator presets' shapes to the Infinite Well's:
-the harmonic ground state's Gaussian tails extend smoothly outward
+Compare the Harmonic Oscillator presets' shapes to the Infinite Well's.
+The harmonic ground state's Gaussian tails extend smoothly outward
 (classically forbidden but quantum-mechanically present, however small),
 where the well's eigenstates are hard-clipped to exactly zero at the
 boundary. Both are numerically confirmed stationary, and both match
@@ -134,7 +134,7 @@ $$
 E_1-E_0 = 2 = \omega, \qquad E_2-E_1 = 2 = \omega \;\checkmark
 $$
 
-— matching `harmonicOscillatorEnergyLevel(n, omega)` and the last
+matching `harmonicOscillatorEnergyLevel(n, omega)` and the last
 course's algebraic result exactly.
 
 ## Common Mistakes
@@ -142,13 +142,13 @@ course's algebraic result exactly.
 <Callout type="mistake">
 **Thinking this derivation and the ladder-operator one describe
 different physical systems.** They're the same oscillator; the different
-mathematical routes are a feature, not a coincidence to be suspicious of
-— cross-checking a result by an independent method is exactly how physics
+mathematical routes are a feature, not a coincidence to be suspicious of.
+Cross-checking a result by an independent method is exactly how physics
 confirms understanding.
 </Callout>
 
 <Callout type="mistake">
-**Forgetting the derivative product rule** when computing $\psi_0''$ —
+**Forgetting the derivative product rule** when computing $\psi_0''$.
 $\psi_0'=-\frac{m\omega}{\hbar}x\psi_0$ is itself a product of $x$ and
 $\psi_0(x)$, so differentiating again needs the product rule, not just
 differentiating the exponent.

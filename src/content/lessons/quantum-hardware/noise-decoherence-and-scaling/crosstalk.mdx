@@ -1,0 +1,143 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/noise-decoherence-and-scaling/crosstalk"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Crosstalk",
+  description:
+    "T1/T2 are single-qubit noise; crosstalk is genuinely multi-qubit: driving one qubit's gate unintentionally rotates a neighbor too. Built directly from this platform's existing gate engine: an intended X on qubit 0 with an ε-strength leak onto qubit 1 gives fidelity cos²(ε/2) exactly, verified to 1e-15.",
+  course: "noise-decoherence-and-scaling",
+  module: "crosstalk",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence"],
+  objectives: [
+    "Explain crosstalk as an unwanted multi-qubit effect, distinct from T1/T2's single-qubit picture",
+    "Compute the fidelity loss from a small unwanted rotation leaking onto a spectator qubit",
+    "Explain why crosstalk gets structurally worse as qubit count and density increase",
+  ],
+};
+
+## Motivation
+
+Every noise source this course has covered so far, T1, T2, is a
+single-qubit story: one qubit, coupled to its own environment. Crosstalk
+is different in kind: driving a gate on one qubit unintentionally
+disturbs a *different* qubit nearby, a genuinely multi-qubit effect with
+no single-qubit analogue.
+
+## Engineering Development
+
+### What crosstalk physically is
+
+A microwave (or laser) pulse aimed at one qubit is never perfectly
+localized. Some of its energy inevitably leaks onto physically or
+spectrally nearby qubits, especially as devices pack qubits more densely
+to scale up (Physical Qubit Platforms' connectivity discussion). This
+"leak" acts as an unwanted, unintended small rotation on the
+**spectator** qubit, even though only the **target** qubit's gate was
+requested.
+
+### Quantifying the fidelity loss
+
+Using this platform's existing gate engine directly (no new machinery
+needed): intending an X gate on qubit 0 of a 2-qubit system, but with
+crosstalk causing an unwanted rotation of angle $\epsilon$ on qubit 1,
+the actual final state differs from the ideal (X⊗I) target state with
+fidelity:
+
+$$
+F(\epsilon) = |\langle\text{ideal}|\text{actual}\rangle|^2 = \cos^2(\epsilon/2)
+$$
+
+Confirmed directly via `applySingleQubitGate` and `rotationAboutAxis`
+composed on a 2-qubit `StateVector`, matching this closed form to
+machine precision for every tested $\epsilon$ (0.01 through 0.2 radians).
+
+### Why crosstalk gets worse at scale
+
+Unlike T1/T2 (properties of a single qubit's isolation, which don't
+inherently worsen just because a device has more qubits), crosstalk is
+fundamentally about *proximity and density*: as more qubits are packed
+into a fixed area (or connected via more shared control lines), the
+opportunities for unwanted leakage multiply. This is a genuinely
+different scaling concern from decoherence, developed further in the
+next lesson.
+
+## Physical Interpretation
+
+Crosstalk sits at the intersection of Control Electronics (imperfect
+pulse localization) and Physical Qubit Platforms (device geometry/density).
+It's not a fundamental physical limit the way T1/T2 ultimately trace
+back to unavoidable environmental coupling, but rather an engineering
+challenge in pulse shaping, filtering, and qubit layout that can, in
+principle, be reduced (though not eliminated) with better design.
+
+## Worked Example
+
+**A device's crosstalk causes $\epsilon=0.05$ radians of unwanted
+rotation on a spectator qubit for every gate on its neighbor. What's the
+fidelity loss for a single such gate?**
+
+$$
+F(0.05) = \cos^2(0.025) \approx 0.999375
+$$
+
+A $0.0625\%$ fidelity loss per gate from crosstalk alone. Small for
+one gate, but exactly the kind of per-operation error that compounds
+across a deep circuit (Error Correction & Fault Tolerance's threshold
+discussion), motivating active crosstalk suppression techniques
+(pulse shaping, frequency detuning between neighbors) in real hardware.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating crosstalk as just another form of T1/T2 decoherence.**
+It's structurally different: T1/T2 are properties of a single qubit's
+coupling to its environment; crosstalk is a multi-qubit effect tied to
+device geometry and control precision, requiring different mitigation
+strategies (Sources of Noise's coherent/incoherent distinction applies
+here too: crosstalk from a fixed, deterministic leakage pattern is
+coherent, and can in principle be characterized and partially corrected).
+</Callout>
+
+<Callout type="mistake">
+**Assuming crosstalk fidelity loss is negligible because $\epsilon$ is
+small.** As the worked example shows, even a modest per-gate loss
+compounds significantly across many gates in a real circuit; small
+per-operation errors are exactly what error correction exists to manage.
+</Callout>
+
+## Practice Questions
+
+1. Compute the fidelity loss for $\epsilon=0.1$ radians, and compare it
+   to the worked example's $\epsilon=0.05$ result.
+2. Why is crosstalk described as fundamentally about "proximity and
+   density," unlike T1/T2?
+3. Is crosstalk generally a coherent or incoherent error, per Sources of
+   Noise's classification? Explain your reasoning.
+4. If a device's qubit count quadruples while keeping the same physical
+   chip area (denser packing), would you expect crosstalk to get better,
+   worse, or stay the same? Justify using this lesson's discussion.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Crosstalk is a genuinely multi-qubit noise source: driving one qubit's
+  gate unintentionally rotates a nearby spectator qubit.
+- Computed directly from this platform's existing gate engine: fidelity
+  loss follows $F(\epsilon)=\cos^2(\epsilon/2)$, verified to machine
+  precision.
+- Unlike T1/T2, crosstalk worsens with qubit density, a structurally
+  different scaling concern, central to the next lesson.
+
+## Further Exploration
+
+Next: **Scaling Challenges**, which puts T1/T2, crosstalk, and readout
+error together into the question of what it actually takes to build a
+much larger quantum device.

@@ -1,0 +1,162 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Capstone: Fault-Tolerant Thresholds and Resource Overhead",
+  description:
+    "The threshold theorem's qualitative logic: why increasing code distance helps only below a critical physical error rate, plus honest, explicitly-cited (not derived) figures for physical-to-logical qubit overhead, closing the loop back to Quantum Algorithms II's Shor's-algorithm capstone.",
+  course: "error-correction-and-fault-tolerance",
+  module: "capstone-fault-tolerant-thresholds-and-resource-overhead",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction"],
+  objectives: [
+    "Explain the threshold theorem's qualitative logic: why larger distance only helps below a critical physical error rate",
+    "State why concatenation/larger distance makes logical error rate worse, not better, above threshold",
+    "Connect this course's own distance-3 codes to what Shor's algorithm (Quantum Algorithms II) actually needs at scale",
+  ],
+};
+
+## Motivation
+
+This course's distance-3 codes correct up to 1 error, but real hardware
+makes errors continuously, at some physical rate per gate. Does adding
+more error correction always help? The **threshold theorem** answers
+precisely: only sometimes, and understanding why closes the loop back to
+Quantum Algorithms II's Shor's-algorithm capstone, which flagged
+fault-tolerant hardware as the missing ingredient for factoring at
+cryptographic scale.
+
+## Mathematical Development
+
+### The qualitative logic of the threshold
+
+A distance-$d$ code fails (produces an uncorrected logical error) roughly
+when *more than* $d/2$ physical qubits have errors, a specific, rare
+combination out of many possible ways errors could land. If the physical
+per-qubit error rate $p$ is small, the probability of $d/2$ or more errors
+occurring together shrinks *faster* than $d$ grows (a combinatorial fact:
+the number of ways to choose $d/2$ specific failing qubits out of $n$
+grows polynomially in $d$, but the probability of any specific
+combination all failing shrinks exponentially in $d/2$), so increasing
+$d$ (a bigger surface code grid, say) drives the logical error rate
+toward zero. This only works while $p$ is below some critical value, the
+**threshold** $p_{\text{th}}$: above it, more physical qubits mean *more*
+opportunities for errors to combine, and increasing $d$ makes the logical
+error rate *worse*, not better.
+
+### Why this platform doesn't derive p_th's actual value
+
+The threshold's numeric value depends on the specific code, the physical
+noise model, and the decoding algorithm used, a genuinely empirical,
+code-specific calculation (often done by large-scale numerical
+simulation in the research literature), not something derivable from the
+qualitative combinatorial argument above alone. Commonly cited figures
+for surface codes are in the rough neighborhood of $p_{\text{th}}\sim
+0.5$–$1\%$ per gate, cited here as a widely-referenced approximate
+figure from the literature, explicitly **not** a number this platform's
+own (much smaller, 3-qubit) codes derive or verify.
+
+### Resource overhead, honestly scoped
+
+Reaching a low enough logical error rate for a long computation (like
+factoring a cryptographically relevant number via Shor's algorithm, from
+Quantum Algorithms II) is estimated, in published research, to need on
+the order of **hundreds to low thousands of physical qubits per logical
+qubit**, depending heavily on the target error rate, the exact code, and
+the specific algorithm's circuit depth. This is, again, a cited
+range from the literature; this platform's own $[[3,1,3]]$ and
+$[[9,1,3]]$ codes are far too small to derive such a figure, and no
+claim is made that they could.
+
+## Physical Interpretation
+
+This closes the exact gap Quantum Algorithms II's capstone identified:
+Shor's algorithm needs one long circuit to succeed essentially in a
+single shot, at cryptographically relevant scale, achievable only with
+physical error rates safely below threshold and a code with distance
+large enough to suppress the residual logical error rate over the whole
+circuit's duration. VQE and QAOA, by contrast, tolerate a much higher
+effective error rate precisely because their hybrid structure doesn't
+need any single circuit execution to be perfect, the same distinction
+that lesson drew, now explained by *why* fault tolerance is expensive.
+
+## Worked Example
+
+**Using the qualitative threshold argument, explain (without citing a
+specific number) why a distance-3 code run on hardware with physical
+error rate well above $p_{\text{th}}$ would perform *worse* than using no
+error correction at all.**
+
+Error correction adds physical qubits and additional two-qubit gates
+(the syndrome-extraction CNOTs from Lesson 2); each new gate is itself
+an opportunity for a new physical error. Above threshold, the rate at
+which these *extra* gates introduce new errors outpaces the rate at which
+the code corrects existing ones, so the *net* logical error rate is
+higher with the code running than without it, the same reasoning
+Lesson 6's weight-2-error worked example illustrated concretely
+(recovery, run past the code's design limit, actively converts a
+correctable-looking situation into a full logical error) generalized to
+the many-error, above-threshold regime.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming more error correction is always better.** Above threshold,
+it's actively worse: the qualitative argument above, and Lesson 6's
+concrete weight-2-error example, both show why adding correction
+machinery can introduce more error than it removes.
+</Callout>
+
+<Callout type="mistake">
+**Treating the cited $p_{\text{th}}$ and qubit-overhead figures as this
+platform's own derived results.** They aren't: this course's own
+simulated codes are distance-3, far too small to derive a threshold or a
+realistic overhead estimate; the cited figures are widely-referenced
+literature values, explicitly marked as such rather than presented as
+something this platform computed.
+</Callout>
+
+## Practice Questions
+
+1. Using the combinatorial argument, explain qualitatively why a
+   distance-5 code's failure probability (needing $\geq3$ simultaneous
+   errors) is lower than a distance-3 code's (needing $\geq2$) at the
+   same small physical error rate $p$.
+2. Why does the threshold depend on the *decoding algorithm* used, not
+   just the code's stabilizer structure? (Hint: recall Lesson 6's
+   distinction between "detected" and "correctly recovered.")
+3. Referring back to Quantum Algorithms II's capstone, explain in your
+   own words why VQE's hybrid structure makes it comparatively insensitive
+   to being run somewhat above a hypothetical "threshold" for its own
+   error tolerance, in a way Shor's algorithm's circuit is not.
+4. If a real device's physical error rate is confirmed below
+   $p_{\text{th}}$, does that guarantee today's hardware can already run
+   a cryptographically relevant factoring computation? What else does the
+   resource-overhead discussion suggest is still needed?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The threshold theorem: below a critical physical error rate
+  $p_{\text{th}}$, increasing code distance drives logical error rate
+  toward zero; above it, more error correction makes things worse.
+- $p_{\text{th}}$'s actual value and realistic qubit-overhead figures are
+  cited from the literature, explicitly not derived by this platform's
+  own small, distance-3 codes.
+- This closes the loop to Quantum Algorithms II: Shor's algorithm's need
+  for fault-tolerant hardware is exactly the "below threshold, high
+  enough distance" regime this lesson describes; VQE/QAOA's NISQ-friendliness
+  is exactly why they don't need it.
+
+## Further Exploration
+
+This completes **Quantum Error Correction & Fault Tolerance**, and with
+it, the full Quantum Computing pillar sequence from single qubits through
+fault-tolerant hardware requirements.

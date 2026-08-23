@@ -1,0 +1,150 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Capstone: From Abstract Algebra to the Hydrogen Atom",
+  description:
+    "A synthesis of this course's six lessons (commutation relations, ladder operators, spherical harmonics, spin, Stern-Gerlach, and addition of angular momentum) and a precise preview of exactly which pieces the next course reuses to solve a real three-dimensional atom.",
+  course: "angular-momentum-and-spin",
+  module: "capstone-from-abstract-algebra-to-the-hydrogen-atom",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum"],
+  objectives: [
+    "Summarize the logical chain from commutation relations to the quantized angular momentum spectrum",
+    "State precisely which of this course's results the Hydrogen Atom course will reuse directly, and how",
+    "Explain why solving a 3D central-potential problem separates into a radial equation and an angular part this course already solved",
+  ],
+};
+
+## Motivation
+
+This course built one continuous argument: a commutation relation
+($[L_x,L_y]=i\hbar L_z$) led to a discrete spectrum ($j$ half-integer or
+integer), which led to explicit functions ($Y_l^m$) and an explicit
+$2\times2$ representation (spin-$\tfrac12$), which turned out to already
+be sitting inside this platform's oldest, most-used machinery. This
+capstone connects the pieces, then previews exactly how the next course
+uses them.
+
+## Mathematical Development
+
+### The logical chain, in one line each
+
+1. $\vec L=\vec r\times\vec p$ and the canonical commutators give
+   $[L_x,L_y]=i\hbar L_z$ (Lesson 1).
+2. Ladder operators $J_\pm=J_x\pm iJ_y$, built from that commutator alone,
+   force $j=0,\tfrac12,1,\tfrac32,\dots$ and $m=-j,\dots,j$ (Lesson 2).
+3. Single-valuedness under $\varphi\to\varphi+2\pi$ restricts *orbital*
+   $l$ to integers only, giving the explicit $Y_l^m(\theta,\varphi)$
+   (Lesson 3).
+4. $j=\tfrac12$, with no position-space restriction, is exactly this
+   platform's Pauli-matrix qubit engine (Lesson 4), physically realized
+   in the Stern-Gerlach experiment (Lesson 5).
+5. Combining two spin-$\tfrac12$s reproduces, exactly, the Bell states
+   already built for an entirely different purpose (Lesson 6).
+
+### What the Hydrogen Atom course reuses directly
+
+A hydrogen atom's Hamiltonian, $H=\frac{p^2}{2m}-\frac{e^2}{4\pi\epsilon_0r}$,
+depends only on the *distance* $r$ from the nucleus, not the direction:
+a **central potential**. For any central potential, $\vec L^{\,2}$ and
+$L_z$ both commute with $H$ (a fact the next course proves, building on
+this course's operators), so energy eigenstates can be chosen as
+simultaneous eigenstates of $H$, $\vec L^{\,2}$, and $L_z$, which means
+the *angular* part of every hydrogen wavefunction is *exactly* one of
+this course's $Y_l^m(\theta,\varphi)$ functions, unchanged, with only a
+still-to-be-solved radial function $R(r)$ multiplying it:
+
+$$
+\psi_{n,l,m}(r,\theta,\varphi) = R_{n,l}(r)\,Y_l^m(\theta,\varphi)
+$$
+
+This is the single biggest reason this course had to come before the
+Hydrogen Atom course, not after: the angular part of the problem is
+*entirely solved already*, by Lesson 3's explicit functions, before any
+radial equation is even written down.
+
+## Physical Interpretation
+
+Separating a 3D problem into "radial" and "angular" pieces isn't a
+computational trick specific to hydrogen: it's a direct consequence of
+the potential depending only on $r$, and it works precisely because
+$\vec L^{\,2}$, $L_z$, and $H$ share a common eigenbasis whenever that
+symmetry holds. The angular momentum machinery this course built is the
+*general* tool; hydrogen is simply the first, and most famous, place it
+gets applied to a genuinely 3D system.
+
+## Worked Example
+
+**Given that hydrogen's ground state has $l=0$, predict which spherical
+harmonic appears in its wavefunction, without solving any radial
+equation.**
+
+$l=0$ has exactly one allowed $m$ value, $m=0$ (from Lesson 2's $2l+1$
+count). So the ground state's angular part is $Y_0^0=\frac{1}{2\sqrt\pi}$
+(a constant, independent of $\theta,\varphi$), predicting that the
+hydrogen ground state has **no angular dependence at all**, spherically
+symmetric, before any radial calculation is done. (The next course
+confirms this independently from the actual Schrödinger equation
+solution.)
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming this course's results only apply to hydrogen specifically.**
+The angular momentum algebra applies to *any* central potential (a
+uniform sphere, a 3D harmonic oscillator, any $V(r)$); hydrogen is the
+next course's specific example, not the scope of what this course
+proved.
+</Callout>
+
+<Callout type="mistake">
+**Thinking the radial equation still needs to determine the angular
+shape.** It doesn't: Lesson 3 already fully determined
+$Y_l^m(\theta,\varphi)$; the radial equation's only job is finding
+$R_{n,l}(r)$ and the resulting energy levels.
+</Callout>
+
+## Practice Questions
+
+1. For $l=1$, list all allowed $m$ values and state how many distinct
+   spherical harmonics could appear in an $l=1$ hydrogen state's angular
+   part.
+2. Explain, using only the logical chain above (not the next course's
+   content), why you can already predict the ground state has no angular
+   dependence before solving any Schrödinger equation.
+3. If a central potential problem had $l=2$ as its ground-state angular
+   momentum (unlike hydrogen, whose ground state has $l=0$), how many
+   different $m$-degenerate states would share that same energy, from
+   angular momentum alone?
+4. Summarize, in your own words, the single most surprising result from
+   this entire course (your choice) and explain briefly why it surprised
+   you.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- This course's six lessons form one continuous derivation: commutation
+  relations → quantized spectrum → explicit spherical harmonics → the
+  spin-$\tfrac12$ special case → its experimental confirmation → two-spin
+  combination.
+- Central potentials (hydrogen included) separate into radial ×
+  angular parts, with the angular part being exactly this course's
+  $Y_l^m$ functions, no new derivation needed for that piece.
+- The singlet/Bell-state identity from Lesson 6 is a genuine, verified
+  mathematical fact connecting this course to Quantum Gates & Circuits,
+  not a coincidence of notation.
+
+## Further Exploration
+
+This completes **Angular Momentum & Spin**. Next: **The Hydrogen Atom**,
+which solves the radial equation this capstone previewed, completing the
+first genuinely three-dimensional solved system in this platform's
+Quantum Mechanics pillar.

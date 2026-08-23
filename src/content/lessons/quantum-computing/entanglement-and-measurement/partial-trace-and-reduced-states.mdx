@@ -11,7 +11,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Partial Trace and Reduced States",
   description:
-    "The operation state vectors cannot express at all — deriving the partial trace from the single requirement that it must reproduce local measurement statistics correctly, then computing it for a product state and a Bell pair.",
+    "The operation state vectors cannot express at all: deriving the partial trace from the single requirement that it must reproduce local measurement statistics correctly, then computing it for a product state and a Bell pair.",
   course: "entanglement-and-measurement",
   module: "partial-trace-and-reduced-states",
   order: 1,
@@ -33,7 +33,7 @@ This is the payoff lesson for a question this course has been building
 toward since its very first paragraph: for a 2-qubit state, what is the
 state of qubit 0 *alone*? Multi-Qubit State Vectors showed a state
 vector has no answer whenever the qubits are entangled. The density
-matrix, unlike the state vector, can answer this — via an operation
+matrix, unlike the state vector, can answer this, via an operation
 called the **partial trace**, which this lesson derives from a single,
 non-negotiable physical requirement rather than just presenting as a
 formula to memorize.
@@ -45,13 +45,13 @@ formula to memorize.
 Whatever "qubit 0's reduced state" $\rho_A$ means, it has to get local
 measurements right: for any single-qubit observable $A_{\text{op}}$
 acting on qubit 0 only, measuring it on the full 2-qubit state must give
-the same answer as measuring it on $\rho_A$ alone —
+the same answer as measuring it on $\rho_A$ alone:
 
 $$
 \text{Tr}\big[(A_{\text{op}}\otimes I)\,\rho_{AB}\big] = \text{Tr}(A_{\text{op}}\,\rho_A)
 $$
 
-This isn't a guess at a reasonable-sounding property — it is *the*
+This isn't a guess at a reasonable-sounding property; it is *the*
 defining requirement. Anything claiming to be "qubit 0's state" that
 gets this wrong for even one observable isn't describing qubit 0.
 
@@ -67,19 +67,19 @@ $$
 = \sum_{i,i'} (A_{\text{op}})_{ii'} \left[\sum_j (\rho_{AB})_{i'j,\,ij}\right]
 $$
 
-The bracketed sum depends only on $i,i'$ — call it $(\rho_A)_{i'i}$.
-Then the whole expression is $\sum_{i,i'}(A_{\text{op}})_{ii'}(\rho_A)_{i'i}=\text{Tr}(A_{\text{op}}\rho_A)$
-— exactly the right side, for *any* $A_{\text{op}}$. This proves the
+The bracketed sum depends only on $i,i'$; call it $(\rho_A)_{i'i}$.
+Then the whole expression is $\sum_{i,i'}(A_{\text{op}})_{ii'}(\rho_A)_{i'i}=\text{Tr}(A_{\text{op}}\rho_A)$,
+exactly the right side, for *any* $A_{\text{op}}$. This proves the
 defining requirement is satisfied *if and only if*
 
 $$
 (\rho_A)_{i'i} = \sum_j (\rho_{AB})_{i'j,\,ij}
 $$
 
-— sum over the traced-out qubit's index, keeping it matched between bra
+This sums over the traced-out qubit's index, keeping it matched between bra
 and ket, while the kept qubit's indices stay free. This is the
 **partial trace**, $\rho_A=\text{Tr}_B(\rho_{AB})$, and it is not one
-reasonable choice among several — it is the *unique* operation making
+reasonable choice among several; it is the *unique* operation making
 local observables come out right. `partialTrace.ts` implements exactly
 this index sum (generalized to any number of qubits via bitmask
 indexing, not hardcoded to 2), matching the same qubit-0-is-MSB
@@ -89,7 +89,7 @@ on this platform.
 ### A product state: the sanity check
 
 For a product state $\rho_{AB}=\rho_A\otimes\rho_B$, the partial trace
-must return $\rho_A$ exactly — tracing out a completely independent
+must return $\rho_A$ exactly: tracing out a completely independent
 subsystem shouldn't change anything about the other one. Take
 $|{+}0\rangle$:
 
@@ -100,12 +100,12 @@ $$
 \text{Tr}_A\big(\rho_{|{+}0\rangle}\big) = \rho_{|0\rangle} = \begin{pmatrix}1&0\\0&0\end{pmatrix}
 $$
 
-Exactly the individual factors — confirmed directly against
+Exactly the individual factors, confirmed directly against
 `reducedDensityMatrixQubit0`/`reducedDensityMatrixQubit1` in this
 module's tests. And as a numeric check of the defining requirement
 itself, using $A_{\text{op}}=X$: $\langle{+}0|X\otimes I|{+}0\rangle=1$
 (since $|+\rangle$ is $X$'s $+1$-eigenstate), and $\text{Tr}(\rho_{|+\rangle}X)=1$
-too — both sides of the requirement genuinely agree, not just in the
+too: both sides of the requirement genuinely agree, not just in the
 abstract derivation but for this concrete state.
 
 ### An entangled state: something new
@@ -123,11 +123,11 @@ expectation is $\langle\psi(\theta)|Z\otimes I|\psi(\theta)\rangle
 =\cos^2\theta\,(+1)+\sin^2\theta\,(-1)=\cos2\theta$ (the $|00\rangle,|11\rangle$
 cross-terms vanish since $Z\otimes I$ maps each basis term to $\pm$
 itself, and $\langle00|11\rangle=0$). And directly from $\rho_A(\theta)$:
-$\text{Tr}(\rho_A(\theta)Z)=\cos^2\theta-\sin^2\theta=\cos2\theta$ —
+$\text{Tr}(\rho_A(\theta)Z)=\cos^2\theta-\sin^2\theta=\cos2\theta$:
 identical, for every $\theta$, exactly as the derivation guarantees.
 
-At $\theta=\pi/4$ (a Bell state), $\rho_A=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$
-— the reduced state of one qubit of a maximally entangled pair is
+At $\theta=\pi/4$ (a Bell state), $\rho_A=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$.
+The reduced state of one qubit of a maximally entangled pair is
 *maximally mixed*, even though the full 2-qubit state $|\Phi^+\rangle$
 is perfectly well-defined and pure. This is the central, striking fact
 the next lesson takes apart in full.
@@ -137,7 +137,7 @@ the next lesson takes apart in full.
 The partial trace answers, precisely and uniquely, what earlier lessons
 in this platform could only gesture at: measuring only qubit 0 of an
 entangled pair, with qubit 1 never touched, behaves *exactly* as if
-qubit 0 were literally described by $\rho_A=\text{Tr}_B(\rho_{AB})$ —
+qubit 0 were literally described by $\rho_A=\text{Tr}_B(\rho_{AB})$,
 not as an approximation or a bookkeeping convenience, but because
 $\rho_A$ was *defined* to make that true.
 
@@ -154,26 +154,26 @@ $\rho_{01,10}=\rho_{10,01}=\tfrac12$ (off-diagonal). The reduced
 $(\rho_B)_{jj'}$ sums over qubit 0's index $i$ while requiring it to
 *match* between bra and ket: $(\rho_B)_{jj'}=\sum_i(\rho_{AB})_{ij,ij'}$.
 The off-diagonal entry $\rho_{01,10}$ has bra-qubit-0-index $0$ and
-ket-qubit-0-index $1$ — since these don't match, this entry is *excluded*
+ket-qubit-0-index $1$; since these don't match, this entry is *excluded*
 from the sum entirely, for any $j,j'$. Only the two diagonal entries
 survive: $(\rho_B)_{11}=\rho_{01,01}=\tfrac12$ (from $i=0$) and
 $(\rho_B)_{00}=\rho_{10,10}=\tfrac12$ (from $i=1$), with every
 off-diagonal $(\rho_B)_{jj'}$, $j\neq j'$, receiving no contribution at
-all. Result: $\rho_B=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$ —
+all. Result: $\rho_B=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$,
 maximally mixed, same as $|\Phi^+\rangle$'s reduced states.
 
 ## Common Mistakes
 
 <Callout type="mistake">
 **Tracing out the wrong qubit.** `partialTrace(rho, 2, [1])` traces out
-qubit 1, leaving qubit 0's reduced state — the argument names *which
+qubit 1, leaving qubit 0's reduced state. The argument names *which
 qubit disappears*, not which one you keep. Mixing this up silently
 swaps $\rho_A$ and $\rho_B$ whenever the two aren't equal.
 </Callout>
 
 <Callout type="mistake">
 **Expecting the partial trace to "reveal" a hidden pure state.** For an
-entangled global state, $\rho_A$ is genuinely mixed — there is no pure
+entangled global state, $\rho_A$ is genuinely mixed; there is no pure
 state it's secretly hiding. The mixedness is real, not a computational
 artifact.
 </Callout>
@@ -184,7 +184,7 @@ artifact.
    for the computational basis state $|01\rangle$ (a product state).
 2. For $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$,
    verify the defining requirement using $A_{\text{op}}=X$ instead of $Z$.
-   ($\rho_A(\theta)$ is diagonal and $X$ has zero diagonal entries — both
+   ($\rho_A(\theta)$ is diagonal and $X$ has zero diagonal entries, so both
    sides should come out to exactly $0$, for every $\theta$, unlike the
    $Z$ case above.)
 3. Explain in one sentence why $\text{Tr}_B(\rho_A\otimes\rho_B)=\rho_A$
@@ -201,10 +201,10 @@ artifact.
 
 - The partial trace is uniquely determined by requiring
   $\text{Tr}[(A_{\text{op}}\otimes I)\rho_{AB}]=\text{Tr}(A_{\text{op}}\rho_A)$
-  for every local observable $A_{\text{op}}$ — not chosen for convenience.
+  for every local observable $A_{\text{op}}$, not chosen for convenience.
 - For a product state, the partial trace returns the untouched factor
   exactly, as a sanity check on the definition.
-- For an entangled state, the reduced state is genuinely mixed — for a
+- For an entangled state, the reduced state is genuinely mixed: for a
   Bell state, exactly maximally mixed ($I/2$) on either qubit.
 - This platform's `partialTrace` respects the qubit-0-is-MSB convention
   used everywhere else, generalized to any number of qubits via bitmask
@@ -213,6 +213,6 @@ artifact.
 ## Further Exploration
 
 Next: **Why Entangled Subsystems Are Mixed**, which takes the striking
-fact from today's last example — a pure global state with a mixed
-local state — and proves it's not a special property of Bell states, but
+fact from today's last example, a pure global state with a mixed
+local state, and proves it's not a special property of Bell states, but
 a necessary consequence of entanglement itself.

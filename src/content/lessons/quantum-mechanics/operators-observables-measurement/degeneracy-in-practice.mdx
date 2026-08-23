@@ -27,15 +27,15 @@ export const lessonMeta = {
 
 ## Motivation
 
-Every tool this course has built — spectral decomposition, compatible
-observables, complete sets, the generalized measurement postulate — is
+Every tool this course has built (spectral decomposition, compatible
+observables, complete sets, the generalized measurement postulate) is
 about to get applied to one concrete, already-familiar system: a Bell
 state, from the Quantum Gates & Circuits course. No new physics here,
 just this course's machinery, all at once, on a system you already know.
 
 ## Intuition
 
-$\hat Z$ on a single qubit has two nondegenerate eigenvalues — no
+$\hat Z$ on a single qubit has two nondegenerate eigenvalues, no
 degeneracy to worry about. Move to *two* qubits, and an observable that
 only looks at *one* of them ($\hat Z$ on qubit 0, ignoring qubit 1
 entirely) automatically becomes degenerate on the 4-dimensional combined
@@ -48,7 +48,7 @@ contrived example.
 ### Building the observables
 
 Let $Z_0=Z\otimes I$ (Pauli-$Z$ on qubit 0, identity on qubit 1) and
-$Z_1=I\otimes Z$ (identity on qubit 0, Pauli-$Z$ on qubit 1) — both
+$Z_1=I\otimes Z$ (identity on qubit 0, Pauli-$Z$ on qubit 1), both
 constructed directly via this platform's existing `Matrix.tensor()`, no
 new engine code needed. Their eigenvalues on the four basis states:
 
@@ -60,7 +60,7 @@ new engine code needed. Their eigenvalues on the four basis states:
 | $\lvert11\rangle$ | $-1$ | $-1$ |
 
 $Z_0$ alone is degenerate ($+1$ on both $|00\rangle,|01\rangle$); so is
-$Z_1$. But the *pair* $(Z_0,Z_1)$ gives four distinct tuples — a genuine
+$Z_1$. But the *pair* $(Z_0,Z_1)$ gives four distinct tuples, a genuine
 CSCO for this space, exactly as Complete Sets of Commuting Observables
 predicted.
 
@@ -73,7 +73,7 @@ $$
 Z_0Z_1 = (Z\otimes I)(I\otimes Z) = (ZI)\otimes(IZ) = Z\otimes Z = (IZ)\otimes(ZI) = (I\otimes Z)(Z\otimes I) = Z_1Z_0
 $$
 
-so $[Z_0,Z_1]=0$ — confirmed directly, not merely asserted, and a
+so $[Z_0,Z_1]=0$, confirmed directly, not merely asserted, and a
 completely general fact ($A\otimes I$ and $I\otimes B$ commute for *any*
 $A,B$, since they act on independent subsystems).
 
@@ -83,7 +83,7 @@ Take the Bell state $|\Phi^+\rangle=\tfrac{1}{\sqrt2}(|00\rangle+
 |11\rangle)$. In amplitude order $(|00\rangle,|01\rangle,|10\rangle,
 |11\rangle)$, this is $\left(\tfrac1{\sqrt2},0,0,\tfrac1{\sqrt2}\right)$.
 $Z_0$'s eigenvalue $+1$ projector is $P_+=\mathrm{projectorOntoSubspace}
-(\{|00\rangle,|01\rangle\})$ (degenerate — spans two basis states). By
+(\{|00\rangle,|01\rangle\})$ (degenerate, spans two basis states). By
 the generalized Born rule,
 
 $$
@@ -92,13 +92,13 @@ $$
 
 Suppose the outcome is $+1$. $P_+|\Phi^+\rangle$ keeps only the
 $|00\rangle,|01\rangle$ components: $\left(\tfrac1{\sqrt2},0,0,0\right)$,
-which — already normalized — collapses to exactly $|00\rangle$.
+which, already normalized, collapses to exactly $|00\rangle$.
 
 ### Then measuring $Z_1$
 
 On the now-collapsed $|00\rangle$, $Z_1$'s eigenvalue is $+1$ with
 **certainty** ($|00\rangle$ is already a $Z_1$-eigenstate). The full pair
-$(Z_0,Z_1)=(+1,+1)$ now uniquely identifies the state as $|00\rangle$ —
+$(Z_0,Z_1)=(+1,+1)$ now uniquely identifies the state as $|00\rangle$,
 this course's CSCO machinery working exactly as designed, on a real
 two-qubit state.
 
@@ -107,8 +107,8 @@ two-qubit state.
 This *is* the Bell state's famous perfect correlation, seen through this
 course's formalism instead of asserted as a special fact: measuring
 qubit 0 as $0$ forces qubit 1 to also be $0$, because the only
-$|\Phi^+\rangle$-component consistent with $Z_0{=}{+}1$ is $|00\rangle$
-— there is no $|01\rangle$ component in $|\Phi^+\rangle$ at all. The
+$|\Phi^+\rangle$-component consistent with $Z_0{=}{+}1$ is $|00\rangle$.
+There is no $|01\rangle$ component in $|\Phi^+\rangle$ at all. The
 "spooky" correlation from Bell States and Entanglement is, precisely,
 this lesson's projector-and-collapse mechanics applied to an entangled
 input.
@@ -120,8 +120,8 @@ and what does $Z_1$ then give with certainty?**
 
 $P_-$ keeps the $|10\rangle,|11\rangle$ components of $|\Phi^+\rangle$:
 only $|11\rangle$ is present, so the state collapses to $|11\rangle$
-directly. Measuring $Z_1$ on $|11\rangle$ then gives $-1$ with certainty
-— the two qubits are again perfectly correlated ($Z_0=Z_1=-1$ this time),
+directly. Measuring $Z_1$ on $|11\rangle$ then gives $-1$ with certainty,
+the two qubits are again perfectly correlated ($Z_0=Z_1=-1$ this time),
 consistent with $|\Phi^+\rangle$ containing only the $|00\rangle$ and
 $|11\rangle$ terms.
 
@@ -130,13 +130,13 @@ $|11\rangle$ terms.
 <Callout type="mistake">
 **Thinking $Z_0$ and $Z_1$ commuting is special to the Bell state.**
 It's a property of the *operators* ($A\otimes I$ vs. $I\otimes B$),
-completely independent of which state they're applied to — the Bell
+completely independent of which state they're applied to. The Bell
 state is just an interesting *input* to already-compatible observables.
 </Callout>
 
 <Callout type="mistake">
 **Expecting $Z_0$ alone to fully determine the state.** It's degenerate
-on this 4-dimensional space by construction — only the *pair*
+on this 4-dimensional space by construction. Only the *pair*
 $(Z_0,Z_1)$ is a complete set here.
 </Callout>
 
@@ -157,11 +157,11 @@ $(Z_0,Z_1)$ is a complete set here.
 
 - $Z_0=Z\otimes I$ and $Z_1=I\otimes Z$ each have degenerate eigenvalues
   alone, but form a complete set of commuting observables together.
-- Operators on different tensor factors always commute — a general,
+- Operators on different tensor factors always commute, a general,
   directly-verified fact, not specific to this example.
 - Measuring $Z_0$ on the Bell state $|\Phi^+\rangle$ and collapsing gives
   exactly the correlated outcome Bell States and Entanglement already
-  described qualitatively — now derived from this course's own
+  described qualitatively, now derived from this course's own
   machinery.
 
 ## Further Exploration

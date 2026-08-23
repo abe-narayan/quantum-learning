@@ -1,0 +1,146 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/identical-particles/multi-electron-atoms-introduction"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Multi-Electron Atoms (Introduction)",
+  description:
+    "Combining hydrogen's already-derived n² orbital degeneracy with exclusion's 2-electrons-per-orbital (spin up/down) limit gives each shell a maximum capacity of 2n² electrons, explaining, without any new machinery, why the periodic table's shells fill the way they do.",
+  course: "identical-particles",
+  module: "multi-electron-atoms-introduction",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/identical-particles/the-pauli-exclusion-principle"],
+  objectives: [
+    "Derive the 2n² maximum shell capacity by combining hydrogen's n² orbital count with exclusion's spin-up/spin-down limit per orbital",
+    "State why exact hydrogen-like orbitals are only an approximation for multi-electron atoms, and name the missing physics (electron-electron repulsion)",
+    "Read off a simple electron configuration (e.g. for carbon or neon) using the shell-filling picture",
+  ],
+};
+
+## Motivation
+
+The Hydrogen Atom course found $n^2$ degenerate orbitals for shell $n$
+(Hydrogen Energy Levels). The Pauli Exclusion Principle course found
+that each single-particle state, spatial orbital *and* spin, can hold
+at most one electron. Multiplying these two already-established facts
+together, with no new physics, gives the entire logical basis for the
+periodic table's shell structure.
+
+## Mathematical Development
+
+### Shell capacity: 2n²
+
+Shell $n$ has $n^2$ distinct spatial orbitals (Hydrogen Energy Levels'
+degeneracy count: $\sum_{l=0}^{n-1}(2l+1)=n^2$). Each spatial orbital,
+by exclusion, can hold at most 2 electrons, one spin-up, one spin-down
+(these are genuinely different complete single-particle states, as the
+previous lesson established). So shell $n$ holds at most:
+
+$$
+2n^2 \text{ electrons}
+$$
+
+$n=1$: $2(1)^2=2$ electrons (fills 1s). $n=2$: $2(2)^2=8$ electrons
+(fills 2s and 2p together). $n=3$: $2(3)^2=18$, though in real multi-electron
+atoms the filling order gets more complicated starting around here (a
+genuine complication this introduction names but doesn't resolve; see
+below).
+
+### What's exactly hydrogen-like, and what isn't
+
+The orbital *shapes* and *degeneracy counts* used above come directly
+from Hydrogen Energy Levels and Orbitals & Quantum Numbers, genuinely
+reused, not re-derived. What's *not* reused: hydrogen's exact
+$l$-independence of energy (Hydrogen Energy Levels' special result for
+the pure $1/r$ potential) breaks down in a multi-electron atom, because
+each electron now also feels the other electrons' repulsion, not just
+the nucleus's attraction. This repulsion is not spherically symmetric
+in the same simple $1/r$ way, and, critically, it does depend on $l$
+(a $2s$ electron, closer to the nucleus, feels the nuclear attraction
+more directly than a $2p$ electron of the same $n$, which is
+"screened" more by inner electrons). This is exactly why real multi-electron
+filling order is 1s, 2s, 2p, 3s, 3p, 4s, 3d, ... rather than simply
+increasing $n$.
+
+## Physical Interpretation
+
+This course does not attempt to solve the true multi-electron
+Hamiltonian (which has no exact closed-form solution even for helium,
+the two-electron case: a genuinely hard many-body problem, active
+research territory for larger atoms). What this introduction provides is
+the *qualitative* structure, shell capacities and the shape of the
+filling logic, using hydrogen's exact orbitals as an approximate
+single-particle basis, which is both an honest, standard approximation
+and as far as this course's scope goes.
+
+## Worked Example
+
+**Using the shell-filling picture, write the electron configuration for
+carbon (6 electrons).**
+
+Fill lowest shells first: 1s holds 2 (fills, using its full $2(1)^2=2$
+capacity). Remaining 4 electrons go into $n=2$: 2s holds 2 more (full,
+$2(0+1)^2$... more precisely 2s alone holds 2, its own sub-shell
+capacity), leaving 2 electrons for 2p. Configuration:
+$1s^2\,2s^2\,2p^2$, matching carbon's known configuration, built here
+entirely from the $n^2$-orbital-count-times-2-for-spin logic, no
+periodic table lookup required.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming multi-electron atoms fill strictly by increasing n.** Real
+atoms deviate starting around $n=3$ (4s fills before 3d, for instance),
+a direct consequence of electron-electron screening breaking hydrogen's
+exact $l$-independence, as this lesson's Mathematical Development
+section explains. This course's $2n^2$ formula is exactly right for
+*capacity*, but filling *order* needs the screening correction this
+introduction only names, not derives.
+</Callout>
+
+<Callout type="mistake">
+**Thinking multi-electron atoms are "solved" the same way hydrogen was.**
+Hydrogen's Schrödinger equation has an exact closed-form solution;
+multi-electron atoms, even helium, do not. This course uses hydrogen's
+orbitals only as an approximate starting basis, an honest scope
+limitation stated explicitly rather than glossed over.
+</Callout>
+
+## Practice Questions
+
+1. Compute the shell capacity for $n=3$ using $2n^2$, and explain what
+   each factor of the formula represents physically.
+2. Write the electron configuration for neon (10 electrons), following
+   the worked example's method.
+3. Why can't the shell-filling picture developed here be used to compute
+   an EXACT ground-state energy for a multi-electron atom, even though it
+   correctly predicts electron configurations?
+4. Name the one physical effect, absent from the pure hydrogen
+   treatment, that's responsible for the 4s-before-3d filling anomaly.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Shell $n$ holds at most $2n^2$ electrons: $n^2$ spatial orbitals
+  (Hydrogen Energy Levels) times 2 (exclusion's spin-up/spin-down limit
+  per orbital).
+- This reuses hydrogen's orbitals as an approximate single-particle
+  basis, genuinely useful for electron configurations, but not an exact
+  solution to the true multi-electron Hamiltonian.
+- Electron-electron repulsion (screening) breaks hydrogen's exact
+  $l$-independence of energy, which is why real filling order departs
+  from strict increasing-$n$ starting around $n=3$.
+
+## Further Exploration
+
+This closes **Identical Particles & Many-Body Systems**. The next
+course, **Advanced Topics in Quantum Mechanics**, builds on density
+matrices and entanglement, genuinely new material building on, not
+repeating, the already-completed Entanglement, Mixed States & Bell Tests
+course.

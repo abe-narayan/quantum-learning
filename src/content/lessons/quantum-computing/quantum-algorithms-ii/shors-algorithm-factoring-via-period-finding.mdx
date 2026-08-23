@@ -1,0 +1,146 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Shor's Algorithm: Factoring via Period Finding",
+  description:
+    "The classical number-theory reduction at the heart of Shor's algorithm: turning 'factor N' into 'find the order of a mod N', derived from a single algebraic identity, before any quantum circuit enters the picture.",
+  course: "quantum-algorithms-ii",
+  module: "shors-algorithm-factoring-via-period-finding",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage"],
+  objectives: [
+    "State the order-finding problem and Shor's classical reduction from factoring to it",
+    "Derive why a^(r/2) mod N, when r is even and not −1, yields nontrivial factors of N",
+    "Identify exactly which part of the algorithm is classical and which needs a quantum speedup",
+  ],
+};
+
+## Motivation
+
+RSA encryption's security rests on factoring large numbers being hard: no
+known *classical* algorithm factors an $n$-digit number in time
+polynomial in $n$. Shor's algorithm factors in polynomial time on a
+quantum computer, and the surprising part is *where* the quantum speedup
+actually enters. It's not in factoring directly, but in a narrower
+subroutine, finding the **order** of a number modulo $N$, that the rest
+of the algorithm is entirely classical number theory built around.
+
+## Mathematical Development
+
+### The order-finding problem
+
+For integers $a,N$ with $\gcd(a,N)=1$, the **order** of $a$ modulo $N$ is
+the smallest positive integer $r$ with $a^r\equiv1\pmod N$. This always
+exists (a consequence of Euler's theorem, taken as given here) and is
+exactly what `classicalOrder` computes by brute force, useful for
+checking answers and for the toy examples this course actually runs, even
+though brute force itself doesn't scale.
+
+### The reduction: factoring from an even order
+
+Suppose you know $r$, the order of some $a$ modulo $N$, and $r$ happens to
+be **even**. Then $a^r\equiv1\pmod N$ can be rewritten as
+
+$$
+(a^{r/2})^2 \equiv 1 \pmod N \quad\Longrightarrow\quad (a^{r/2}-1)(a^{r/2}+1) \equiv 0 \pmod N
+$$
+
+using the difference-of-squares factorization directly. This means $N$
+divides the product $(a^{r/2}-1)(a^{r/2}+1)$. If $N$ divides *neither*
+factor individually (which happens precisely when $a^{r/2}\not\equiv\pm1
+\pmod N$), then $N$ must share a nontrivial common factor with each one
+separately. Computing $\gcd(a^{r/2}-1,\,N)$ and $\gcd(a^{r/2}+1,\,N)$
+therefore reveals genuine, nontrivial factors of $N$, an entirely
+classical calculation (Euclid's algorithm) once $r$ is known.
+
+### When the reduction fails, and why that's still fine
+
+Two things can go wrong: $r$ could be odd (no $a^{r/2}$ to work with at
+all), or $a^{r/2}\equiv-1\pmod N$ (the product's second factor is
+divisible by $N$ outright, giving only the trivial factor $N$ itself from
+that side). Both failures are handled the same way: pick a different
+random $a$ and try again. It's a standard (but nontrivial, and not
+re-derived here) result of number theory that for a randomly chosen $a$
+coprime to $N$, the order $r$ is even and $a^{r/2}\not\equiv-1\pmod N$
+with probability at least $1/2$, so a handful of random restarts succeeds
+with overwhelming probability. This platform doesn't prove that
+probability bound; it's cited as a known classical result the rest of the
+algorithm depends on, not derived from scratch.
+
+## Physical Interpretation
+
+Every step above (the algebra, the gcd computation, the random restarts)
+is completely classical, and completely efficient; a classical computer
+does all of it in polynomial time without difficulty. The *only* step that
+needs a quantum computer is **finding $r$ itself** for a large $N$, since
+brute-force order-finding takes exponentially many trial multiplications
+in the worst case. Shor's actual contribution is a quantum subroutine for
+that one step, the subject of the next lesson.
+
+## Worked Example
+
+**Given $N=15$, $a=7$: verify $r=4$ (already computed via
+`classicalOrder`) leads to genuine factors via the reduction above.**
+
+$r=4$ is even. $a^{r/2}=7^2=49\equiv49-45=4\pmod{15}$ (not $\equiv-1\equiv14$,
+so the reduction applies). Compute
+$\gcd(4-1,15)=\gcd(3,15)=3$ and $\gcd(4+1,15)=\gcd(5,15)=5$, exactly the
+two prime factors of $15$. Both gcd computations and the modular
+exponentiation are classical arithmetic; the only piece this worked
+example *assumed* rather than computed is $r=4$ itself, which the next
+two lessons obtain quantum-mechanically.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Believing Shor's algorithm is "a quantum computer that factors
+directly."** It's a classical reduction (factoring → order-finding) plus
+one quantum subroutine (order-finding). The factoring step itself, once
+$r$ is known, is entirely classical gcd arithmetic.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting to check $a^{r/2}\not\equiv-1\pmod N$.** Skipping this check
+can produce $\gcd(a^{r/2}+1,N)=N$, the trivial "factor" $N$ itself, not
+useful information. This is exactly why a failed attempt calls for
+picking a new $a$, not for concluding $N$ is prime.
+</Callout>
+
+## Practice Questions
+
+1. For $N=21$, $a=2$: compute the order $r$ of $2$ mod $21$ (by trial
+   multiplication), and check whether $r$ is even.
+2. Using the $r$ found in question 1, compute the two gcd's and confirm
+   they give nontrivial factors of $21$.
+3. Explain, using the difference-of-squares identity, why an *odd* $r$
+   gives the reduction nothing to work with (there's no integer $r/2$).
+4. If $a^{r/2}\equiv-1\pmod N$ for your chosen $a$, what should you do
+   next, and why does trying a *different* $a$ have a reasonable chance of
+   avoiding the same failure?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Order-finding: the smallest $r$ with $a^r\equiv1\pmod N$.
+- If $r$ is even and $a^{r/2}\not\equiv-1\pmod N$,
+  $\gcd(a^{r/2}\pm1,N)$ give nontrivial factors of $N$, derived directly
+  from the difference-of-squares identity.
+- Every step of the reduction is classical and efficient; only
+  order-finding itself needs a quantum speedup for large $N$.
+- A random restart strategy handles the two ways the reduction can fail,
+  succeeding with probability at least $1/2$ per attempt (a cited, not
+  re-derived, number-theory result).
+
+## Further Exploration
+
+Next: **The Quantum Period-Finding Circuit**, which builds $r$
+quantum-mechanically using exactly the phase estimation machinery from
+Quantum Algorithms I.

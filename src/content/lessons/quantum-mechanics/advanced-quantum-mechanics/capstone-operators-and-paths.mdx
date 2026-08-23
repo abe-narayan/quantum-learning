@@ -1,0 +1,136 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/advanced-quantum-mechanics/capstone-operators-and-paths"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Capstone: Operators, Paths, and What's Still Open",
+  description:
+    "Connecting this course's two new perspectives, open-system/Kraus-operator decoherence and the path-integral sum, back to the operator formalism running through every earlier course, and stating honestly what quantum foundations still leaves unresolved.",
+  course: "advanced-quantum-mechanics",
+  module: "capstone-operators-and-paths",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/advanced-quantum-mechanics/the-path-integral-formulation"],
+  objectives: [
+    "Summarize how Kraus operators, decoherence, and the path integral each extend or reframe the operator formalism from earlier courses",
+    "State clearly what decoherence explains and what it leaves open about measurement",
+    "Identify where each of this course's tools will reappear in the Quantum Computing pillar (error correction, noise, hardware)",
+  ],
+};
+
+## Motivation
+
+This course deliberately avoided re-deriving density matrices,
+entanglement, or Bell inequalities. Entanglement, Mixed States & Bell
+Tests already built that foundation thoroughly. What this course added
+were two genuinely new directions: open-system evolution (going beyond
+unitary dynamics) and an entirely different formulation of quantum
+mechanics itself (the path integral). This capstone connects both back
+to the bigger picture.
+
+## Synthesis
+
+### From closed to open systems
+
+Every prior course's dynamics, Wave Mechanics' time evolution,
+Entanglement's `evolveDensityMatrix`, assumed a closed, isolated
+system. This course's Kraus operators, $\rho\to\sum_kK_k\rho K_k^\dagger$,
+generalize that to open systems, with unitary evolution as the special
+one-operator case. This isn't a contradiction of anything learned
+before. It's a strict extension, verified directly (trace-preservation
+condition) rather than assumed.
+
+### From operators to paths
+
+The path integral is a genuinely different formulation, not an extension
+in the same sense. It computes the same physical predictions (transition
+amplitudes) via a completely different mathematical object (a sum over
+histories, rather than an operator acting on a state). This course
+verified their consistency in one specific, tractable case (the free
+particle, Euclidean time) via the Chapman-Kolmogorov composition law,
+rather than asserting the equivalence in general.
+
+### What decoherence resolves, and what it doesn't
+
+Stated plainly, one more time, because it's easy to blur: decoherence
+(this course's Kraus-channel demonstration) explains why *coherent
+superpositions* don't survive contact with an environment, a real,
+checkable, and important physical fact. It does *not*, by itself, explain
+why a measurement yields one *definite* outcome rather than a
+probabilistic mixture of possibilities. That remains a genuinely open
+question in the foundations of quantum mechanics (interpretations like
+Copenhagen, many-worlds, or objective collapse models each answer it
+differently, and this course takes no position on which is correct).
+
+## Where This Goes Next
+
+- **Kraus operators and decoherence** reappear directly in Quantum
+  Computing's **Error Correction & Fault Tolerance** (why errors need
+  correcting at all) and Quantum Hardware's **Noise, Decoherence & Scaling**
+  (T1/T2 times, literally the amplitude-damping and dephasing timescales
+  this course just built). This course's engine functions
+  (`amplitudeDampingChannel`, `dephasingChannel`) are built generally
+  enough to be reused there directly, not re-derived.
+- **The path integral** underlies modern approaches to quantum
+  simulation and certain quantum algorithm analyses, previewed but not
+  developed further in this platform's current scope.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating decoherence as "solving" the measurement problem.** As stated
+repeatedly in this course: decoherence explains coherence loss, not
+outcome selection. Claiming otherwise overstates what was actually shown.
+</Callout>
+
+<Callout type="mistake">
+**Thinking the path integral and operator formalism are competing
+theories.** They're the same physics in different mathematical clothing.
+This course's numerical check (Chapman-Kolmogorov) is evidence of
+consistency in one case, not a claim that one approach is "more
+fundamental" than the other.
+</Callout>
+
+## Practice Questions
+
+1. In one sentence each, state what a Kraus channel generalizes, and
+   what the path integral reframes, using this course's specific
+   terminology.
+2. Why is "decoherence solves the measurement problem" an overclaim, per
+   this course's explicit discussion?
+3. Name the two specific engine functions from this course that will be
+   reused directly (not re-derived) in the future Noise, Decoherence &
+   Scaling course.
+4. Looking back across this entire course, which single numerical result
+   most convincingly demonstrates that "sum over paths" and "solve the
+   Schrödinger equation" give the same physics, in the one case actually
+   tested here?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- This course extended (not repeated) Entanglement, Mixed States & Bell
+  Tests: open quantum systems via Kraus operators, a numerical
+  demonstration of decoherence, and Feynman's path integral as a genuinely
+  different formulation, verified consistent with the operator picture in
+  one tractable case.
+- Decoherence explains coherence loss into an environment; it does not
+  resolve which single outcome is observed upon measurement, an honest,
+  explicitly-stated open question.
+- This course's Kraus-channel machinery is built to be reused directly in
+  the Quantum Computing pillar's hardware-noise and error-correction
+  courses, not just as a one-off demonstration.
+
+## Further Exploration
+
+This closes **Advanced Topics in Quantum Mechanics**, and the entire
+Quantum Mechanics pillar. The Quantum Hardware and Quantum Software
+pillars (Physical Qubit Platforms, Control & Readout, Noise, Decoherence
+& Scaling, Programming Quantum Computers, Simulating Quantum Systems,
+Compilation & Hybrid Algorithms) pick up directly from here, applying
+this course's decoherence machinery to real hardware constraints.

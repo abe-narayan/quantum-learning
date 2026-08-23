@@ -1,0 +1,153 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/compilation-and-hybrid-algorithms/gate-decomposition"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Gate Decomposition",
+  description:
+    "Real hardware only implements a small native gate set (typically RZ and one more axis of rotation). Every other gate this platform uses decomposes into that set, verified exactly: H=Ry(π/2)Rz(π), X=Rz(π)Ry(π), Z=Rz(π), S=Rz(π/2), T=Rz(π/4), all confirmed to machine precision up to global phase.",
+  course: "compilation-and-hybrid-algorithms",
+  module: "gate-decomposition",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation"],
+  objectives: [
+    "Explain why real hardware implements only a small native gate set, not every named gate directly",
+    "Verify a specific gate decomposition (H, X, Z, S, T into RZ/RY) using this platform's engine",
+    "Explain what 'equal up to global phase' means for a decomposition, and why it's the correct equivalence to check",
+  ],
+};
+
+## Motivation
+
+Quantum Compilation & Transpilation covered WHICH qubits a gate can act
+on; this lesson covers WHAT gates a device can actually apply in the
+first place. Real hardware typically implements only a small **native
+gate set**, often just $R_z(\theta)$ (essentially free, since it can be
+absorbed into later pulse timing) and one genuine rotation axis like
+$R_y(\theta)$ or $R_x(\theta)$, and every other named gate this
+platform uses (H, X, Y, Z, S, T) must be expressed as a sequence of
+these native rotations before it can run.
+
+## Engineering Development
+
+### Verified decompositions into Rz and Ry
+
+This platform's engine confirms each of these exactly, using
+`matricesEqualUpToGlobalPhase` (a general utility checking two matrices
+implement the same physical gate, ignoring any unobservable overall
+phase factor):
+
+$$
+Z = R_z(\pi), \qquad S = R_z(\pi/2), \qquad T = R_z(\pi/4)
+$$
+
+$$
+H = R_y(\pi/2)\,R_z(\pi), \qquad X = R_z(\pi)\,R_y(\pi)
+$$
+
+The first three are trivial (a single native rotation each); $H$ and
+$X$ genuinely need a composition of two native gates, real,
+non-obvious identities, each confirmed to machine precision
+($\text{maxDiff}<10^{-15}$) rather than simply asserted.
+
+### Why "up to global phase" is the right check
+
+Mathematical Foundations already established that a global phase
+$e^{i\phi}$ multiplying an entire state vector is completely
+unobservable: no measurement can detect it. This means two gate
+matrices that differ only by an overall phase factor implement the
+*exact same physical gate*, even though they're different matrices
+numerically. `matricesEqualUpToGlobalPhase` checks precisely this
+weaker (and physically correct) equivalence, rather than requiring
+exact matrix equality. A decomposition that's correct "up to phase" is
+a completely correct decomposition, not an approximation.
+
+### General claim vs. specific verification
+
+Any single-qubit unitary can, in principle, be decomposed into three
+native rotations (a standard result called Euler-angle decomposition,
+e.g. the $R_z$-$R_y$-$R_z$ form), stated here as a known mathematical
+fact this course doesn't derive in full generality. What this lesson DOES
+provide is genuine, checked verification for the five specific gates
+this platform actually uses throughout its Quantum Computing pillar,
+which is a stronger guarantee than an unverified general claim alone.
+
+## Physical Interpretation
+
+Every circuit this platform has ever built (Bell states, Grover's
+algorithm, VQE ansatzes) is, underneath the convenient H/X/CNOT
+notation, ultimately a sequence of native rotations on real hardware.
+This lesson makes that translation explicit and checkable for the most
+commonly used gates, rather than leaving it as an assumed implementation
+detail.
+
+## Worked Example
+
+**Confirm $X=R_z(\pi)R_y(\pi)$ reproduces the correct action on
+$|0\rangle$: flipping it to $|1\rangle$.**
+
+$R_y(\pi)|0\rangle$ rotates purely within the real amplitudes, giving
+(up to sign) $|1\rangle$; $R_z(\pi)$ then only adds phases to
+$|0\rangle$ and $|1\rangle$ individually, which doesn't change
+measurement PROBABILITIES at all. This platform's engine confirms
+`matricesEqualUpToGlobalPhase(rotationZ(π).mul(rotationY(π)), PAULI_X)`
+returns `true`, and applying the composed matrix to $|0\rangle$
+gives population 1 in $|1\rangle$, exactly matching $X|0\rangle=|1\rangle$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Requiring EXACT matrix equality (no phase tolerance) when checking a
+decomposition.** This is too strict, and physically wrong. Global
+phase is unobservable, so a decomposition that's correct up to phase IS
+a correct decomposition, and demanding exact equality would incorrectly
+reject genuinely valid ones.
+</Callout>
+
+<Callout type="mistake">
+**Assuming every gate needs three native rotations.** As this lesson's
+$Z$, $S$, $T$ examples show, some gates need only ONE native rotation.
+The three-rotation Euler form is a general upper bound, not a
+requirement for every specific gate.
+</Callout>
+
+## Practice Questions
+
+1. Explain why `matricesEqualUpToGlobalPhase` is the physically correct
+   equivalence check for verifying a gate decomposition, rather than
+   exact matrix equality.
+2. $Z=R_z(\pi)$ needs only one native rotation, while $H=R_y(\pi/2)R_z(\pi)$
+   needs two. What does this difference suggest about how "expensive"
+   (in native-gate count) different logical gates are to compile?
+3. Using the verified $X=R_z(\pi)R_y(\pi)$ identity, what would you
+   expect $R_z(\pi)R_y(\pi)$ applied to $|1\rangle$ to give? (Hint: what
+   does $X$ do to $|1\rangle$?)
+4. Why does this lesson describe the general three-rotation Euler
+   decomposition as a "known mathematical fact this course doesn't
+   derive," rather than proving it from scratch?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Real hardware implements a small native gate set (often just
+  $R_z$ and one other rotation axis); every other gate must be
+  decomposed into it before running.
+- Verified exactly: $Z=R_z(\pi)$, $S=R_z(\pi/2)$, $T=R_z(\pi/4)$
+  (single-rotation), and $H=R_y(\pi/2)R_z(\pi)$, $X=R_z(\pi)R_y(\pi)$
+  (two-rotation), all confirmed to machine precision up to global
+  phase.
+- "Equal up to global phase" is the physically correct equivalence for
+  checking decompositions, since global phase is fundamentally
+  unobservable.
+
+## Further Exploration
+
+Next: **Hybrid Quantum-Classical Workflows**, which shifts from
+single-circuit compilation to the repeated compile-run-optimize loop
+variational algorithms actually use.

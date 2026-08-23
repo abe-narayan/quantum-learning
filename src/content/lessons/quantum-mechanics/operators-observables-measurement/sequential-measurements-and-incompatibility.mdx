@@ -32,18 +32,18 @@ one specific qubit, three measurements, real numbers at every step.
 ## Intuition
 
 If $Z$ and $X$ shared an eigenbasis, measuring one right after the other
-would never change anything — you'd already be sitting in an eigenstate
+would never change anything. You'd already be sitting in an eigenstate
 of both. Since $[X,Z]\ne0$ (proven earlier this course), no such shared
 eigenstate exists in general, and this lesson shows exactly what breaks.
 
 ## Mathematical Development
 
-### Step 1 — measure $Z$ on $|0\rangle$
+### Step 1: measure $Z$ on $|0\rangle$
 
 Start in $|0\rangle$, already a $Z$-eigenstate. $P(Z{=}0)=1$, with
-certainty — no surprise, and the state doesn't change.
+certainty. No surprise, and the state doesn't change.
 
-### Step 2 — measure $X$
+### Step 2: measure $X$
 
 Rewrite $|0\rangle$ in the $X$-eigenbasis:
 $|0\rangle=\tfrac{1}{\sqrt2}(|+\rangle+|-\rangle)$ (from the Global Phase
@@ -58,7 +58,7 @@ $$
 Suppose the outcome is $+1$. The state collapses to
 $|\psi\rangle=|+\rangle = \tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$.
 
-### Step 3 — measure $Z$ again
+### Step 3: measure $Z$ again
 
 $$
 P(Z{=}0) = |\langle0|+\rangle|^2 = \left|\frac1{\sqrt2}\right|^2 = \frac12, \qquad P(Z{=}1) = \frac12
@@ -66,7 +66,7 @@ $$
 
 **The certainty from Step 1 is gone.** Before the $X$ measurement, $Z$
 was $100\%$ predictable. After it, $Z$'s outcome is completely random
-again — the $X$ measurement didn't just add new information, it
+again. The $X$ measurement didn't just add new information, it
 *erased* the old certainty entirely.
 
 ## Physical Interpretation
@@ -74,7 +74,7 @@ again — the $X$ measurement didn't just add new information, it
 This is what "incompatible" means operationally, not just algebraically:
 measuring $X$ forces the state into an $X$-eigenstate, and an
 $X$-eigenstate is (by the last course's basis-change formulas) an
-*equal* superposition in the $Z$-basis — as far from a $Z$-eigenstate as
+*equal* superposition in the $Z$-basis, as far from a $Z$-eigenstate as
 a normalized state can get. The disturbance isn't a technological
 limitation or measurement noise; it's what the state genuinely becomes.
 
@@ -88,7 +88,7 @@ $$
 P(Z{=}0) = |\langle0|-\rangle|^2 = \left|\frac1{\sqrt2}\right|^2 = \frac12
 $$
 
-Exactly the same $50/50$ result — the *specific* $X$ outcome doesn't
+Exactly the same $50/50$ result. The *specific* $X$ outcome doesn't
 matter for how thoroughly it scrambles $Z$; either $X$-eigenstate is
 equally far (in this precise sense) from either $Z$-eigenstate.
 
@@ -98,14 +98,14 @@ equally far (in this precise sense) from either $Z$-eigenstate.
 **Thinking the disturbance is somehow avoidable with a "gentler"
 measurement.** For genuinely incompatible observables, any measurement
 that extracts $X$'s definite value necessarily leaves $Z$ maximally
-uncertain — this is a feature of the state, not an artifact of a
+uncertain. This is a feature of the state, not an artifact of a
 particular measuring apparatus.
 </Callout>
 
 <Callout type="mistake">
 **Forgetting to renormalize (or re-expand) between steps.** Each
 measurement's probabilities must be computed using the *post-collapse*
-state from the previous step, not the original $|0\rangle$ — Step 3's
+state from the previous step, not the original $|0\rangle$. Step 3's
 probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
 </Callout>
 
@@ -127,9 +127,9 @@ probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
 
 - Measuring $Z$, then $X$, then $Z$ again on $|0\rangle$ takes a certain
   outcome ($P(Z{=}0)=1$) to a completely uncertain one
-  ($P(Z{=}0)=\tfrac12$) — a fully explicit, numeric demonstration of
+  ($P(Z{=}0)=\tfrac12$), a fully explicit, numeric demonstration of
   disturbance by an incompatible measurement.
-- The result doesn't depend on which $X$-outcome occurred — both
+- The result doesn't depend on which $X$-outcome occurred. Both
   $X$-eigenstates are equally "unaligned" with the $Z$-basis.
 - This is the concrete face of the abstract $[X,Z]\ne0$ result proven
   earlier in this course.
@@ -137,5 +137,5 @@ probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
 ## Further Exploration
 
 Next: **The Energy-Time Uncertainty Relation**, deriving a different kind
-of uncertainty bound — one that doesn't come from a commutator between
+of uncertainty bound, one that doesn't come from a commutator between
 two operators, since time isn't an operator at all.

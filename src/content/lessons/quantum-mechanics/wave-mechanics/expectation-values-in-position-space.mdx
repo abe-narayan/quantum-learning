@@ -27,7 +27,7 @@ export const lessonMeta = {
 The last course defined $\langle A\rangle = \langle\psi|A|\psi\rangle$ for
 a finite-dimensional observable $A$, computed as a sum over basis states.
 This lesson makes the exact same definition concrete for the position
-observable, where the "sum over basis states" becomes an integral — the
+observable, where the "sum over basis states" becomes an integral: the
 same continuum-limit move as the last two lessons, now applied to a
 specific, extremely useful observable.
 
@@ -35,7 +35,7 @@ specific, extremely useful observable.
 
 If $|\psi(x)|^2$ is the probability density of finding the particle at
 $x$, then the *average* position, over many identical measurements, is
-just the probability-weighted average of $x$ — precisely the same
+just the probability-weighted average of $x$, precisely the same
 "multiply each outcome by its probability and sum" recipe from the very
 first probability lesson of the last course, with a sum turned into an
 integral.
@@ -55,8 +55,9 @@ $$
 \langle x\rangle = \int \psi(x)^*\,x\,\psi(x)\,dx = \int x\,|\psi(x)|^2\,dx
 $$
 
-— exactly the probability-weighted average described above, now derived
-rather than assumed. The same derivation with $x^2$ in place of $x$ gives
+which is exactly the probability-weighted average described above, now
+derived rather than assumed. The same derivation with $x^2$ in place of
+$x$ gives
 
 $$
 \langle x^2\rangle = \int x^2\,|\psi(x)|^2\,dx
@@ -68,9 +69,9 @@ $$
 \langle f(x)\rangle = \int f(x)\,|\psi(x)|^2\,dx
 $$
 
-— this is exactly how the platform computes
-`expectationPotential(V)` (the case $f = V$) and, via a discretized
-Riemann sum over the grid, `expectationPosition()` (the case $f(x)=x$).
+This is exactly how the platform computes `expectationPotential(V)` (the
+case $f = V$) and, via a discretized Riemann sum over the grid,
+`expectationPosition()` (the case $f(x)=x$).
 
 ### Position variance
 
@@ -80,7 +81,7 @@ $$
 (\Delta x)^2 = \langle x^2\rangle - \langle x\rangle^2
 $$
 
-measures how spread out the position probability density is —
+measures how spread out the position probability density is.
 `Wavefunction1D.variancePosition()` computes precisely this. For the
 Gaussian wave packets this course builds constantly, $\Delta x$ *is* the
 packet's "width" parameter by construction (verified numerically in this
@@ -93,8 +94,8 @@ $\langle x\rangle$ is where you'd expect to find the particle on average;
 $\Delta x$ is how much any single measurement is likely to deviate from
 that average. A tightly localized wavefunction (small $\Delta x$) predicts
 measurements clustered near $\langle x\rangle$; a broad one predicts wide
-scatter — the same interpretation as any probability distribution's mean
-and standard deviation, because that is exactly what these are.
+scatter. That's the same interpretation as any probability distribution's
+mean and standard deviation, because that is exactly what these are.
 
 ## Worked Example
 
@@ -105,7 +106,7 @@ $$
 \langle x\rangle = \int_0^L x \cdot \frac1L\,dx = \frac{L}{2}
 $$
 
-by symmetry (as expected — the midpoint of a uniform distribution).
+by symmetry, as expected: the midpoint of a uniform distribution.
 
 $$
 \langle x^2\rangle = \int_0^L x^2\cdot\frac1L\,dx = \frac{L^2}{3}
@@ -115,7 +116,7 @@ $$
 (\Delta x)^2 = \frac{L^2}{3} - \frac{L^2}{4} = \frac{L^2}{12}, \qquad \Delta x = \frac{L}{2\sqrt3}
 $$
 
-matching the well-known variance of a continuous uniform distribution —
+matching the well-known variance of a continuous uniform distribution,
 here derived from the Born rule, not imported from classical statistics.
 
 ## Common Mistakes
@@ -123,7 +124,7 @@ here derived from the Born rule, not imported from classical statistics.
 <Callout type="mistake">
 **Computing $\langle x^2\rangle$ as $\langle x\rangle^2$.** These are
 generally different (equal only for a state with zero variance, which no
-normalizable wavefunction actually has) — squaring the average is not the
+normalizable wavefunction actually has). Squaring the average is not the
 same as averaging the square.
 </Callout>
 

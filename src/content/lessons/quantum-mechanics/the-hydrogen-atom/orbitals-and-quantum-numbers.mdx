@@ -1,0 +1,152 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Orbitals & Quantum Numbers",
+  description:
+    "Combining the verified radial1s/radial2s/radial2p functions with Angular Momentum & Spin's Yₗᵐ builds the actual full 3D wavefunctions ψₙₗₘ=Rₙₗ(r)Yₗᵐ(θ,φ), the real 'orbitals' behind chemistry's s/p/d shorthand.",
+  course: "the-hydrogen-atom",
+  module: "orbitals-and-quantum-numbers",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels"],
+  objectives: [
+    "State the three quantum numbers (n, l, m) that label a hydrogen orbital and their allowed ranges",
+    "Assemble ψₙₗₘ(r,θ,φ)=Rₙₗ(r)Yₗᵐ(θ,φ) from the platform's already-verified radial and angular pieces",
+    "Connect the most-probable-radius result to the classical Bohr model's radius, and explain what it does and doesn't mean",
+  ],
+};
+
+## Motivation
+
+"Orbital" is chemistry's word for what quantum mechanics actually
+produces: a specific $\psi_{nlm}(r,\theta,\varphi)$, fully determined by
+three quantum numbers. Nothing new needs deriving here: this lesson is
+about assembly: multiplying the previous lesson's radial functions by
+Angular Momentum & Spin's spherical harmonics and reading off what the
+resulting full wavefunctions look like.
+
+## Mathematical Development
+
+### The three quantum numbers
+
+$$
+\psi_{nlm}(r,\theta,\varphi) = R_{nl}(r)\, Y_l^m(\theta,\varphi)
+$$
+
+- $n=1,2,3,\ldots$ (principal quantum number): sets the energy, $E_n=-13.6\text{ eV}/n^2$.
+- $l=0,1,\ldots,n-1$ (orbital angular momentum quantum number): sets $\vec L^{\,2}=l(l+1)\hbar^2$; chemistry labels $l=0,1,2,3$ as $s,p,d,f$.
+- $m=-l,\ldots,l$ (magnetic quantum number): sets $L_z=m\hbar$.
+
+Every allowed $(n,l,m)$ triple names one orbital. "2p" means $n=2,l=1$
+(with $m=-1,0,1$ giving three degenerate 2p orbitals); "1s" means
+$n=1,l=0,m=0$, the only orbital allowed at $n=1$.
+
+### Assembling ψ from already-verified pieces
+
+This platform never had to derive a new radial-times-angular product
+formula: it's already built, in two separately-verified pieces:
+`radial1s`/`radial2s`/`radial2p` (verified normalized, previous lessons)
+and `sphericalHarmonic({l,m},θ,φ)` (verified normalized and orthogonal,
+Angular Momentum & Spin). The full 3D probability density is:
+
+$$
+|\psi_{nlm}(r,\theta,\varphi)|^2 = |R_{nl}(r)|^2\,|Y_l^m(\theta,\varphi)|^2
+$$
+
+This is a genuine product of two independently-normalized pieces, which is
+exactly why the combined 3D integral $\int|\psi_{nlm}|^2\,r^2\sin\theta\,dr\,d\theta\,d\varphi=1$
+automatically, without any new normalization work: each factor already
+integrates to 1 over its own variables.
+
+### The 1s orbital's radial shape
+
+The previous course's `mostProbableRadius1s()` function directly
+maximizes $r^2|R_{10}(r)|^2$ (not $|R_{10}(r)|^2$ alone: the $r^2$
+comes from the spherical volume element, and matters: the *density*
+$|R_{10}|^2$ is actually largest at $r=0$, but the *probability of
+finding the electron in a thin shell at radius r* is largest away from
+the origin, weighted by the shell's growing surface area $4\pi r^2$).
+The verified result is $r=1$ (in units where the Bohr radius $a_0=1$),
+exactly the Bohr model's ground-state radius, though arrived at by a
+completely different route (probability-density maximization, not a
+classical circular-orbit assumption).
+
+## Physical Interpretation
+
+The 1s and 2s orbitals ($l=0$) are spherically symmetric: $Y_0^0$ is a
+constant, so all angular dependence vanishes, and the "shape" is purely
+radial. The 2p orbitals ($l=1$) are genuinely directional, following
+$Y_1^{-1},Y_1^0,Y_1^1$'s angular dependence; this directionality is
+exactly what determines molecular bond geometry in chemistry (though
+that application is well beyond this course's scope).
+
+## Worked Example
+
+**Confirm that $\psi_{100}$ (the 1s orbital) is properly normalized,
+using the fact that both factors are independently normalized.**
+
+$$
+\int|\psi_{100}|^2\,r^2\sin\theta\,dr\,d\theta\,d\varphi = \left(\int|R_{10}(r)|^2r^2\,dr\right)\left(\int|Y_0^0(\theta,\varphi)|^2\sin\theta\,d\theta\,d\varphi\right) = (1)(1) = 1
+$$
+
+using `radialNormSquared(radial1s)`$\approx1$ (verified, previous
+lesson) and `sphericalHarmonicNormSquared({l:0,m:0})`$\approx1$
+(verified, Angular Momentum & Spin), no new integral needed.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing $|R_{nl}(r)|^2$ (radial probability density) with $r^2|R_{nl}(r)|^2$
+(radial distribution, probability per unit r).** The 1s density
+$|R_{10}(r)|^2$ actually peaks at $r=0$; only the $r^2$-weighted version
+peaks at $r=1$ (the Bohr radius). Both are used, for different
+questions: "how dense is it right at a point" vs. "how likely is a
+measurement to land in this shell."
+</Callout>
+
+<Callout type="mistake">
+**Reading "most probable radius equals the Bohr radius" as "the electron
+orbits at that radius."** Unlike the Bohr model's fixed circular orbit,
+the hydrogen ground state has a nonzero probability of being measured at
+*any* $r>0$: $r=1$ is only the single most likely value, from a broad
+continuous distribution, not a trajectory.
+</Callout>
+
+## Practice Questions
+
+1. List all $(n,l,m)$ triples for $n=3$, grouped by $l$, and state the
+   chemistry shorthand name (3s, 3p, 3d) for each group.
+2. Why is $|\psi_{1s}|^2$ spherically symmetric while $|\psi_{2p_0}|^2$
+   is not? Trace this to a specific property of $Y_0^0$ vs. $Y_1^0$.
+3. Explain in one sentence why $\int|\psi_{nlm}|^2\,d^3r=1$ follows
+   automatically from the radial and angular pieces each separately
+   normalizing to 1, without a new 3D integral.
+4. Is the most-probable-radius result ($r=1$ for 1s) evidence that the
+   Bohr model was secretly correct about orbits? Explain what it does
+   and doesn't establish.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Three quantum numbers $(n,l,m)$ label every hydrogen orbital; $n$
+  sets energy, $l$ sets $\vec L^{\,2}$, $m$ sets $L_z$.
+- $\psi_{nlm}=R_{nl}(r)Y_l^m(\theta,\varphi)$ assembles directly from
+  this course's verified radial functions and Angular Momentum & Spin's
+  verified spherical harmonics; normalization comes for free.
+- The 1s state's most probable radius, found by direct numerical
+  maximization, is exactly the Bohr radius, a genuine, checkable
+  agreement between the full quantum treatment and the older Bohr model,
+  despite very different derivations.
+
+## Further Exploration
+
+Next: **Fine Structure (Introduction)**, a conceptual closer previewing
+the small corrections (relativistic and spin-orbit effects) this
+course's non-relativistic treatment leaves out.

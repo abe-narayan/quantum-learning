@@ -25,32 +25,32 @@ export const lessonMeta = {
 
 ## Motivation
 
-A classical bit is always either 0 or 1. Every computer you've ever used — your
-laptop, your phone — is built entirely out of bits in one of these two states.
-It's a simple, robust idea, and it's wrong for describing how nature actually
-behaves at the scale of electrons and photons.
+A classical bit is always either 0 or 1. Every computer you've ever used
+(your laptop, your phone) is built entirely out of bits in one of these two
+states. It's a simple, robust idea, and it's wrong for describing how nature
+actually behaves at the scale of electrons and photons.
 
 When physicists tried to describe systems like a single electron's spin or a
 photon's polarization, they found something a classical bit can't capture:
 the system can be in a combination of "0" and "1" at once, in a precise
-mathematical sense — not just "we don't know which one it is yet." A qubit is
+mathematical sense, not just "we don't know which one it is yet." A qubit is
 the unit of information built to describe this.
 
 ## Intuition
 
 A useful (if imperfect) way to start: imagine a coin that hasn't landed yet.
-While it's spinning in the air, it isn't heads, and it isn't tails — it's
+While it's spinning in the air, it isn't heads, and it isn't tails. It's
 genuinely in a mixture of both possibilities. A qubit's superposition is
 similar in spirit, but stronger: it's not a coin whose outcome is merely
 *unknown*, it's a system whose state is a real, mathematical combination of
 $|0\rangle$ and $|1\rangle$, and that combination has consequences you can
-measure — like interference between the two possibilities — that a "maybe
+measure, like interference between the two possibilities, that a "maybe
 heads, maybe tails" coin could never produce.
 
 <Callout type="note">
 Superposition is not classical uncertainty. A classical bit you haven't
 looked at yet is still secretly 0 or 1. A qubit in superposition has no
-definite value until it's measured — that's a physical fact, not a gap in
+definite value until it's measured. That's a physical fact, not a gap in
 your knowledge.
 </Callout>
 
@@ -74,7 +74,7 @@ $$
 $$
 
 This condition exists because $|\alpha|^2$ and $|\beta|^2$ will turn out to
-be *probabilities* — and probabilities have to add up to 1.
+be *probabilities*, and probabilities have to add up to 1.
 
 ## Physical Interpretation
 
@@ -83,7 +83,7 @@ The connection between the math and what you can actually observe is the
 you get outcome 0 with probability $|\alpha|^2$ and outcome 1 with
 probability $|\beta|^2$. Measurement is the one place where the smooth,
 continuous evolution of $\alpha$ and $\beta$ gives way to a single, random,
-classical outcome — the superposition **collapses**.
+classical outcome: the superposition **collapses**.
 
 This is why normalization matters physically, not just mathematically: it's
 exactly the statement that "probability of 0" plus "probability of 1" must
@@ -91,8 +91,8 @@ equal 1.
 
 ## Interactive Visualization
 
-Every qubit state can be pictured as a point on the surface of a sphere — the
-**Bloch sphere** — where the north pole is $|0\rangle$, the south pole is
+Every qubit state can be pictured as a point on the surface of a sphere, the
+**Bloch sphere**, where the north pole is $|0\rangle$, the south pole is
 $|1\rangle$, and every other point is some superposition of the two.
 
 Try it yourself: apply a gate below and watch $\alpha$, $\beta$, and the
@@ -122,7 +122,7 @@ $$
 P(0) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}, \qquad P(1) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}
 $$
 
-So this qubit, when measured, gives 0 or 1 with equal 50% probability — an
+So this qubit, when measured, gives 0 or 1 with equal 50% probability: an
 **equal superposition**. This is exactly the state a Hadamard gate produces
 from $|0\rangle$, which you'll meet in the next course.
 
@@ -131,7 +131,7 @@ from $|0\rangle$, which you'll meet in the next course.
 <Callout type="mistake">
 **Forgetting to square the amplitude.** The probability of an outcome is
 $|\alpha|^2$, not $\alpha$ itself. For a real amplitude like $-\tfrac{1}{\sqrt2}$,
-the probability is still a positive $\tfrac12$ — the sign disappears once you
+the probability is still a positive $\tfrac12$. The sign disappears once you
 square it, but it isn't irrelevant: it affects how this state interferes with
 others later on.
 </Callout>
@@ -166,8 +166,8 @@ and a 64% chance of measuring 1.
 ## Further Exploration
 
 We've been using $\alpha$ and $\beta$ as complex numbers without really using
-their complex structure yet — every example above could have used real
+their complex structure yet: every example above could have used real
 numbers. That changes fast. Next in this course: **Complex Numbers for
 Quantum Mechanics**, which builds the machinery (polar form, Euler's
-formula) that phases like $e^{i\varphi}$ on the Bloch sphere actually need —
+formula) that phases like $e^{i\varphi}$ on the Bloch sphere actually need,
 followed by **Dirac Notation**, which makes the bra-ket formalism precise.

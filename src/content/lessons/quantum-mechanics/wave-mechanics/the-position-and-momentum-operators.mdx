@@ -25,17 +25,17 @@ export const lessonMeta = {
 ## Motivation
 
 The "From Classical to Quantum" course's Position and Momentum lesson was
-explicit that it was a *preview* — it stated $[\hat x,\hat p]=i\hbar$ and
+explicit that it was a *preview*: it stated $[\hat x,\hat p]=i\hbar$ and
 moved on, promising the derivation once continuous position existed. This
-lesson is that promise kept: $\hat p$ isn't asserted here, it's *derived*
+lesson is that promise kept. $\hat p$ isn't asserted here, it's *derived*
 from a single physical requirement.
 
 ## Intuition
 
 A free particle with definite momentum $p$ is described (from ordinary
-wave physics — de Broglie's relation $p=\hbar k$) by a plane wave $e^{ikx}
+wave physics, de Broglie's relation $p=\hbar k$) by a plane wave $e^{ikx}
 = e^{ipx/\hbar}$. Whatever operator represents momentum, it had better
-have this plane wave as an eigenfunction with eigenvalue $p$ — that single
+have this plane wave as an eigenfunction with eigenvalue $p$. That single
 requirement pins down the operator's form completely.
 
 ## Mathematical Development
@@ -51,7 +51,7 @@ $$
 
 This is what makes $\langle x\rangle = \int\psi^* (x\psi)\,dx = \int
 x|\psi|^2 dx$ from the last lesson consistent with the general
-$\langle\psi|\hat x|\psi\rangle$ definition — $\hat x$ acting as "multiply
+$\langle\psi|\hat x|\psi\rangle$ definition: $\hat x$ acting as "multiply
 by $x$" is precisely what reproduces that formula.
 
 ### Deriving the momentum operator
@@ -77,8 +77,8 @@ $$
 \boxed{\hat p = -i\hbar\,\frac{d}{dx}}
 $$
 
-This is a genuine derivation, not a postulate: the *only* input was "plane
-waves carry definite momentum $p=\hbar k$," a statement about what
+This is a genuine derivation, not a postulate. The *only* input was
+"plane waves carry definite momentum $p=\hbar k$," a statement about what
 momentum physically means, translated into an eigenvalue requirement.
 
 ### Hermiticity check
@@ -92,8 +92,8 @@ $$
 \int \phi^*\left(-i\hbar\frac{d\psi}{dx}\right)dx = -i\hbar\Big[\phi^*\psi\Big]_{-\infty}^{\infty} + i\hbar\int\frac{d\phi^*}{dx}\psi\,dx = \int\left(-i\hbar\frac{d\phi}{dx}\right)^{\!*}\psi\,dx
 $$
 
-confirming $\langle\phi|\hat p\psi\rangle = \langle\hat p\phi|\psi\rangle$
-— exactly the Hermiticity condition, and exactly why the factor of $i$ in
+confirming $\langle\phi|\hat p\psi\rangle = \langle\hat p\phi|\psi\rangle$,
+exactly the Hermiticity condition, and exactly why the factor of $i$ in
 $\hat p=-i\hbar\,d/dx$ isn't optional: a plain real derivative
 $d/dx$ alone is *anti*-Hermitian, and the $i$ is precisely what fixes that.
 
@@ -122,18 +122,18 @@ $$
 [\hat x,\hat p] = i\hbar\,\hat I
 $$
 
-— exactly the relation the last course stated, now derived from two lines
+exactly the relation the last course stated, now derived from two lines
 of calculus rather than asserted. The uncertainty principle
 $\Delta x\,\Delta p \ge \tfrac12|\langle[\hat x,\hat p]\rangle| =
 \hbar/2$, proven in full generality in that course's Expectation Values
-and Uncertainty lesson, applies here completely unchanged — the abstract
+and Uncertainty lesson, applies here completely unchanged. The abstract
 proof never needed to know $\hat p$'s explicit form, only that the
 commutator was $i\hbar$.
 
 ## Physical Interpretation
 
 $\hat x$ and $\hat p$ don't commute because "multiply by $x$" and "take a
-derivative" are fundamentally incompatible operations — a function sharply
+derivative" are fundamentally incompatible operations. A function sharply
 localized in $x$ (a spike) has wildly oscillating derivatives (high
 momentum content), and vice versa. This *is* the uncertainty principle,
 seen as a statement about ordinary calculus.
@@ -153,14 +153,14 @@ satisfy, by direct substitution.
 
 <Callout type="mistake">
 **Dropping the factor of $i$.** $\hat p = -\hbar\,d/dx$ (missing the $i$)
-is not Hermitian and gives an imaginary $[\hat x,\hat p]$ — the $i$ is
+is not Hermitian and gives an imaginary $[\hat x,\hat p]$. The $i$ is
 load-bearing, not decorative.
 </Callout>
 
 <Callout type="mistake">
 **Applying $\hat x\hat p$ and $\hat p\hat x$ in the wrong order.**
 $\hat p\hat x\,\psi$ requires differentiating the *product* $x\psi(x)$
-(product rule, picking up the extra $\psi$ term) — it is not the same as
+(product rule, picking up the extra $\psi$ term). It is not the same as
 $x$ times $\hat p\psi$.
 </Callout>
 
@@ -170,7 +170,7 @@ $x$ times $\hat p\psi$.
    real number $x$" satisfies the Hermiticity condition without needing
    integration by parts).
 2. Compute $[\hat p,\hat x]$ directly (not by just negating the result
-   above — redo the calculation with the operators in the other order) and
+   above, redo the calculation with the operators in the other order) and
    confirm it equals $-i\hbar$.
 3. Using $\hat p = -i\hbar\,d/dx$, compute $\hat p^2\psi$ for
    $\psi(x)=\sin(kx)$, and identify what physical quantity
@@ -192,7 +192,7 @@ $x$ times $\hat p\psi$.
 
 ## Further Exploration
 
-Next: **Momentum Space and the Fourier Transform** — the momentum-space
+Next: **Momentum Space and the Fourier Transform**, the momentum-space
 representation $\phi(k)$ this section's plane-wave eigenfunctions build
 toward, and the actual numerical machinery (a real FFT) this platform uses
 to compute it, explored live in the Wavefunction Explorer.

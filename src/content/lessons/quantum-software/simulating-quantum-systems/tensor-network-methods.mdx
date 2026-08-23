@@ -1,0 +1,148 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/simulating-quantum-systems/tensor-network-methods"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Tensor Network Methods",
+  description:
+    "Computational Cost & Scaling's 2ⁿ wall assumes GENERIC states. Tensor networks exploit a specific structural fact (limited entanglement) to represent certain circuits far more cheaply, at the direct cost of being unable to represent a fully generic, highly-entangled state efficiently at all.",
+  course: "simulating-quantum-systems",
+  module: "tensor-network-methods",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-software/simulating-quantum-systems/computational-cost-and-scaling"],
+  objectives: [
+    "Explain what a tensor network representation exploits (limited entanglement) that a generic state-vector cannot",
+    "State why this technique is NOT a general solution to the 2ⁿ wall, only a workaround for a specific class of states",
+    "Connect entanglement entropy (already built in Entanglement, Mixed States & Bell Tests) to when tensor networks are and aren't effective",
+  ],
+};
+
+## Motivation
+
+Computational Cost & Scaling's exponential wall assumed nothing special
+about the state being simulated: every one of the $2^n$ amplitudes was
+treated as independent information that must be stored. Many physically
+important states, though, aren't nearly this generic. Their
+entanglement structure is limited, and tensor network methods are built
+specifically to exploit that.
+
+## Engineering Development
+
+### The key structural fact: limited entanglement
+
+Entanglement, Mixed States & Bell Tests built **entanglement entropy**
+as a precise measure of how "spread out" correlations are between parts
+of a system. A generic $n$-qubit state can have entanglement entropy up
+to $\sim n$ (near-maximal, requiring the full $2^n$-dimensional
+description); many physically realistic states, particularly the
+ground states of many real physical Hamiltonians, have entanglement
+entropy that grows much more slowly, often just with the *boundary*
+between regions rather than their full volume (an "area law," a genuine
+physics result well beyond this course's scope to derive, but directly
+motivating why tensor networks work as well as they do for these
+specific systems).
+
+### What a tensor network representation does
+
+Instead of one flat list of $2^n$ amplitudes, a tensor network
+represents the state as a *network* of smaller, connected tensors, one
+per qubit (or small group of qubits), linked by "bond" indices whose
+size controls how much entanglement the representation can capture. If
+the true entanglement is limited, a network with small bond dimensions
+can represent the state *exactly* (or to excellent approximation) using
+far fewer total numbers than $2^n$, sometimes only *linearly* many in
+$n$, not exponentially many.
+
+### The direct tradeoff: this is not a free lunch
+
+Tensor networks are NOT a general replacement for state-vector
+simulation. A state with genuinely high (near-maximal) entanglement
+entropy requires bond dimensions that grow back toward the same $2^n$
+cost this technique was trying to avoid. This is a real, principled
+tradeoff, not a limitation of current tensor-network techniques waiting
+to be engineered away: highly-entangled states fundamentally do not
+compress this way, by the same information-counting argument that
+established the $2^n$ wall in the first place.
+
+## Physical Interpretation
+
+Tensor networks are a genuine example of a broader theme: exploiting
+known structure in a specific problem to beat a generic worst-case cost
+bound. They work spectacularly well for many real physical systems
+(especially in condensed matter physics, where "area law" entanglement
+is common) and are one of the most successful classical simulation
+techniques in existence for THOSE systems, while being no help
+whatsoever for a circuit specifically designed (like many quantum
+algorithm circuits, including Quantum Algorithms I's Grover's algorithm)
+to generate near-maximal entanglement.
+
+## Worked Example
+
+**Why would a tensor network method be a poor choice for simulating
+Quantum Algorithms I's Grover's algorithm at scale, even though it might
+work well for a condensed-matter ground-state calculation?**
+
+Grover's algorithm's amplitude amplification process generically
+produces states with substantial entanglement across the full register
+as the search progresses. There's no reason to expect an "area law"
+structure limiting this growth, unlike a physical ground state's often
+more local correlations. A tensor network representation would need bond
+dimensions that grow back toward exponential to capture this, defeating
+the entire purpose of using the technique.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating tensor networks as a general solution that makes the 2ⁿ wall
+obsolete.** They exploit a SPECIFIC structural property (limited
+entanglement) present in many, but far from all, physically interesting
+states. Algorithm circuits specifically designed to generate
+entanglement are exactly the cases this technique doesn't help with.
+</Callout>
+
+<Callout type="mistake">
+**Assuming "more advanced technique" always means "strictly better."**
+Tensor networks trade GENERALITY for efficiency on a specific class of
+problems. State-vector simulation remains the right, simpler choice
+whenever the state's entanglement structure isn't known to be limited.
+</Callout>
+
+## Practice Questions
+
+1. What specific physical property does a tensor network representation
+   exploit that a generic state-vector representation ignores?
+2. Explain, in your own words, why a highly-entangled state requires
+   large bond dimensions, defeating the purpose of the tensor-network
+   approach.
+3. Name one class of physical systems (per this lesson) where tensor
+   networks work especially well, and explain why.
+4. Using the worked example's reasoning, would you expect tensor
+   networks to help simulate Quantum Algorithms II's QAOA on a densely
+   connected graph? Explain your reasoning by analogy.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Tensor networks represent a quantum state as a network of small,
+  connected tensors rather than one flat $2^n$-amplitude list,
+  exploiting limited entanglement to use far fewer numbers when
+  possible.
+- This is a real, principled tradeoff, not a general win. States with
+  near-maximal entanglement require bond dimensions that grow back
+  toward the same exponential cost.
+- Works especially well for many real physical systems (condensed
+  matter ground states with "area law" entanglement); offers no help for
+  circuits specifically designed to generate high entanglement.
+
+## Further Exploration
+
+Next: **Noise Simulation**, which returns to state-vector-style
+simulation (density matrices, not tensor networks) to model what a
+NOISY circuit's output actually looks like, reusing Advanced Topics in
+Quantum Mechanics' Kraus-channel machinery directly.

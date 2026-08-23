@@ -1,0 +1,133 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/physical-qubit-platforms/superconducting-qubits"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Superconducting Qubits",
+  description:
+    "A qubit built from a nonlinear LC circuit cooled to millikelvin temperatures: the Josephson junction that makes it anharmonic (so it behaves like a two-level system, not a harmonic oscillator), driven by microwave pulses whose duration is a real, computable gate time reusing this platform's own two-level Rabi model.",
+  course: "physical-qubit-platforms",
+  module: "superconducting-qubits",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/the-bloch-sphere"],
+  objectives: [
+    "Explain why a Josephson junction's nonlinearity is required to isolate a usable two-level qubit from an otherwise-harmonic circuit",
+    "State superconducting qubits' typical coherence-time and gate-speed regime, and why both matter for real computation",
+    "Compute a single-qubit gate time from a given Rabi frequency, reusing this platform's exact two-level Rabi model",
+  ],
+};
+
+## Motivation
+
+A superconducting qubit is, physically, a tiny electrical circuit: an
+inductor and capacitor, cooled in a dilution refrigerator to
+millikelvin temperatures (colder than deep space) so that thermal noise
+doesn't wash out the delicate quantum states. The engineering challenge
+this lesson opens with is that a plain LC circuit is a quantum harmonic
+oscillator (Approximation Methods' oscillator, revisited here as real
+hardware), and a harmonic oscillator's evenly-spaced levels make a
+*terrible* qubit, since a "0→1" drive pulse would just as happily drive
+"1→2," "2→3," and so on.
+
+## Engineering Development
+
+### The Josephson junction: breaking the harmonic spacing
+
+A **Josephson junction**, a thin insulating barrier between two
+superconductors, replaces the plain inductor with a genuinely
+*nonlinear* circuit element. This nonlinearity makes the energy levels
+*unevenly* spaced (anharmonic), so a microwave pulse tuned to the
+0→1 gap no longer resonantly drives 1→2 as well. This is precisely
+what makes an artificial "atom" out of a circuit, isolating a clean
+two-level qubit ($|0\rangle,|1\rangle$) from what would otherwise be an
+infinite oscillator ladder.
+
+### Coherence time and gate speed
+
+Superconducting qubits' defining tradeoff is relatively short coherence
+times (typically microseconds, with energy relaxation $T_1$ and dephasing
+$T_2$ both in this range for current devices) but very fast gates
+(single-qubit gates typically tens of nanoseconds). The *ratio* of gate
+time to coherence time, not either number alone, is what determines
+how many operations fit before decoherence dominates; the Noise,
+Decoherence & Scaling course develops this tradeoff quantitatively.
+
+### Gate time from the Rabi model
+
+A single-qubit gate is implemented by driving the qubit at its resonance
+frequency for a carefully timed pulse. In the idealized resonant-drive
+model, the population transfer follows exactly the two-level Rabi
+formula $P_1(t)=\sin^2(\Omega t)$. This platform's `exactTwoLevelTransitionProbability`,
+evaluated with equal energies ($E_i=E_f$, exact resonance), reproduces
+this closed form to machine precision (already verified in
+Approximation Methods' time-dependent perturbation theory context, now
+reused directly for real hardware). A full population transfer
+("$\pi$-pulse," implementing an X gate) occurs at
+$t=\pi/(2\Omega)$, a genuine, computable gate time from a given drive
+strength $\Omega$ (the Rabi frequency), not a hardcoded number.
+
+## Worked Example
+
+**A superconducting qubit is driven at Rabi frequency
+$\Omega=2\pi\times25\text{ MHz}$. How long is a $\pi$-pulse (X gate)?**
+
+$$
+t_\pi = \frac{\pi}{2\Omega} = \frac{\pi}{2(2\pi\times25\times10^6)} = \frac1{100\times10^6}\text{ s} = 10\text{ ns}
+$$
+
+Confirmed directly: `exactTwoLevelTransitionProbability(0,0,Omega,t)`
+at $t=\pi/(2\Omega)$ gives $P_1\approx1.0$ to machine precision. This
+platform's own engine, reused unchanged from a purely mathematical
+context, correctly predicts a realistic superconducting-qubit gate
+time (tens of nanoseconds, matching the "fast gates" claim above).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking a plain LC circuit alone makes a good qubit.** Its evenly
+spaced levels mean any drive resonant with 0→1 is equally resonant with
+every other adjacent transition. The Josephson junction's
+anharmonicity is what makes isolating a two-level subspace possible at
+all.
+</Callout>
+
+<Callout type="mistake">
+**Comparing platforms by coherence time alone.** A short coherence time
+paired with proportionally fast gates can still allow many operations.
+It's the ratio (roughly, gate count before decoherence) that matters,
+not either number in isolation.
+</Callout>
+
+## Practice Questions
+
+1. Why does an evenly-spaced (harmonic) energy ladder make a poor
+   two-level qubit, specifically in terms of pulse resonance?
+2. Using $t_\pi=\pi/(2\Omega)$, find the $\pi$-pulse duration for
+   $\Omega=2\pi\times50\text{ MHz}$.
+3. What physical role does the Josephson junction play that a plain
+   inductor cannot provide?
+4. Why is comparing "gate time vs. coherence time" more informative than
+   either quantity in isolation, when judging a hardware platform?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Superconducting qubits are engineered nonlinear LC circuits; the
+  Josephson junction's anharmonicity isolates a usable two-level
+  subspace from an otherwise evenly-spaced oscillator ladder.
+- Typical regime: microsecond coherence times, nanosecond gate times,
+  meaning fast gates relative to decoherence, a real engineering advantage.
+- Gate time follows directly from the Rabi model already built and
+  verified in Approximation Methods, reused here unchanged for a genuine
+  hardware calculation.
+
+## Further Exploration
+
+Next: **Trapped Ions**, a completely different physical platform, with
+the opposite speed/coherence tradeoff.

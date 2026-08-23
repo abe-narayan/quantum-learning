@@ -1,0 +1,142 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-phase-flip-code"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Three-Qubit Phase-Flip Code",
+  description:
+    "Deriving Z=HXH to turn the bit-flip code into a phase-flip code by pure conjugation: same circuit, same syndrome table, a Hadamard sandwich on every step, verified to correct a Z error on any of the three qubits exactly.",
+  course: "error-correction-and-fault-tolerance",
+  module: "the-three-qubit-phase-flip-code",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code"],
+  objectives: [
+    "Derive Z=HXH and use it to explain why conjugating the bit-flip code by H produces a phase-flip code",
+    "Construct the phase-flip code's encoding and correction circuit from the bit-flip code plus Hadamards",
+    "Verify the phase-flip code corrects a Z error on any of the three qubits exactly",
+  ],
+};
+
+## Motivation
+
+Rather than design a second code from scratch, this lesson gets one for
+free: a single algebraic identity turns the entire bit-flip code,
+encoding, syndrome extraction, decode table, into a phase-flip code, just
+by surrounding every step with Hadamards.
+
+## Mathematical Development
+
+### The key identity: Z = HXH
+
+$$
+HXH = \begin{pmatrix}\frac1{\sqrt2}&\frac1{\sqrt2}\\\frac1{\sqrt2}&-\frac1{\sqrt2}\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}\frac1{\sqrt2}&\frac1{\sqrt2}\\\frac1{\sqrt2}&-\frac1{\sqrt2}\end{pmatrix}
+$$
+
+Multiplying $XH$ first: $XH=\begin{pmatrix}\frac1{\sqrt2}&-\frac1{\sqrt2}\\\frac1{\sqrt2}&\frac1{\sqrt2}\end{pmatrix}$
+(swapping $H$'s two rows). Then $H(XH)$:
+row 0 of $H$, $\left(\frac1{\sqrt2},\frac1{\sqrt2}\right)$, dotted with
+$XH$'s columns $\left(\frac1{\sqrt2},\frac1{\sqrt2}\right)$ and
+$\left(-\frac1{\sqrt2},\frac1{\sqrt2}\right)$ gives $(1,0)$; row 1,
+$\left(\frac1{\sqrt2},-\frac1{\sqrt2}\right)$, gives $(0,-1)$. Result:
+$\begin{pmatrix}1&0\\0&-1\end{pmatrix}=Z$, confirming $HXH=Z$ exactly
+(and by the same computation with $H^2=I$, $HZH=X$: the relationship
+runs both directions).
+
+### Turning the code around
+
+If $U$ is any circuit built from $X$ gates and CNOTs (like the bit-flip
+code's encoder and error), then $H^{\otimes n}UH^{\otimes n}$ replaces
+every $X$ in $U$ with $HXH=Z$, because inserting $HH=I$ between every
+pair of gates in $U$ converts each one individually. Applying $H$ to
+every qubit before and after the *entire* bit-flip pipeline therefore
+converts an $X$-error-correcting code into a $Z$-error-correcting code,
+with identical CNOT structure and an identical decode table underneath.
+`encodePhaseFlipCode` and `runPhaseFlipCorrectionCycle` implement exactly
+this: encode via `encodeBitFlipCode`, then $H$ on every qubit; correct by
+un-Hadamarding, running the ordinary bit-flip correction cycle, then
+re-Hadamarding.
+
+### Verified, not just derived
+
+For an arbitrary $\alpha,\beta$, a $Z$ error on any one of the three
+qubits is detected and corrected exactly by this construction, checked
+directly (to floating-point precision, accounting only for ordinary
+numerical error) for all three qubit positions, plus the no-error case.
+
+## Physical Interpretation
+
+The phase-flip code isn't a second, independently-designed piece of
+engineering. It's the *same* code, viewed in a rotated basis. This is a
+recurring and powerful pattern in quantum information: many "different"
+constructions turn out to be the same one, conjugated by a fixed
+change of basis, once you know which conjugation to apply.
+
+## Worked Example
+
+**Confirm $HZH=X$ using $H^2=I$ and $HXH=Z$ directly, without a separate
+matrix computation.**
+
+From $HXH=Z$, left-multiply both sides by $H$ and right-multiply by $H$:
+$H(HXH)H=HZH$, i.e. $(HH)X(HH)=HZH$. Since $HH=I$: $IXI=HZH$, so
+$X=HZH$, exactly the claimed reverse relationship, derived from the
+forward one algebraically rather than recomputed from scratch.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming the phase-flip code needs an entirely separate derivation.**
+It doesn't. Every step (encoding, syndrome CNOTs, decode table) is
+identical to the bit-flip code's, conjugated by $H$. Rederiving it from
+scratch would duplicate work the $HXH=Z$ identity already does in one
+line.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting to un-Hadamard before running the ordinary bit-flip
+correction cycle.** `runPhaseFlipCorrectionCycle` explicitly applies $H$
+to every qubit *before* calling the bit-flip correction logic and again
+*after*. Omitting either step would run bit-flip syndrome extraction on
+a state still in the wrong basis.
+</Callout>
+
+## Practice Questions
+
+1. Verify $HYH=-Y$ directly (using $Y=iXZ$ from the previous lesson,
+   plus $HXH=Z$ and $HZH=X$).
+2. Explain why a $Z$ error on the bit-flip code (without the Hadamard
+   conjugation) produces syndrome $(0,0)$, "no error detected," even
+   though an error occurred, using the fact that $Z$ only changes relative
+   phase, not which computational-basis term has amplitude.
+3. If both an $X$ error and a $Z$ error hit the *same* physical qubit
+   (together forming, up to phase, a $Y$ error), can either the bit-flip
+   code alone or the phase-flip code alone correct it? What would be
+   needed to correct this combined case?
+4. Using $H^{\otimes n}UH^{\otimes n}$'s general gate-replacement property,
+   predict what conjugating a $Z$-detecting syndrome circuit by $H$ again
+   would produce.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $HXH=Z$ (and $HZH=X$) is an exact algebraic identity, derived by direct
+  matrix multiplication.
+- Conjugating the entire bit-flip code by $H^{\otimes n}$ converts it into
+  a phase-flip code with identical structure underneath.
+- Verified directly: a $Z$ error on any of the three qubits is detected
+  and corrected exactly, for arbitrary $\alpha,\beta$.
+- Practice Question 3 previews this course's next real gap: neither code
+  alone corrects a combined $X$-and-$Z$ error on the same qubit, the
+  Shor code's actual purpose.
+
+## Further Exploration
+
+Next: **The Shor Code: Combining Both**, concatenating these two
+constructions to correct an arbitrary single-qubit error, introduced
+conceptually, since simulating its full 9-qubit circuit is beyond this
+course's engine.

@@ -11,7 +11,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Capstone: Analyzing Quantum Correlations",
   description:
-    "Every tool this course built, applied end to end to one unfamiliar entangled state — purity, entropy, concurrence, partial trace, and a genuine (if partial) CHSH violation, plus an honest demonstration of exactly where this engine's scope ends.",
+    "Every tool this course built, applied end to end to one unfamiliar entangled state: purity, entropy, concurrence, partial trace, and a genuine (if partial) CHSH violation, plus an honest demonstration of exactly where this engine's scope ends.",
   course: "entanglement-and-measurement",
   module: "capstone-analyzing-quantum-correlations",
   order: 1,
@@ -19,7 +19,7 @@ export const lessonMeta = {
   estimatedMinutes: 35,
   prerequisites: ["quantum-computing/entanglement-and-measurement/the-chsh-inequality"],
   objectives: [
-    "Apply every tool from this course — density matrix, partial trace, purity, entropy, concurrence, CHSH — to a single unfamiliar state",
+    "Apply every tool from this course (density matrix, partial trace, purity, entropy, concurrence, CHSH) to a single unfamiliar state",
     "Distinguish which computations require a pure global state and which work on any valid density matrix",
     "State precisely, with a working example, where this platform's density-matrix engine's scope ends",
   ],
@@ -35,7 +35,7 @@ export const capstoneState = new StateVector([
 ## Motivation
 
 This course built up a full toolkit for describing quantum states beyond
-what a state vector can express — one lesson, one tool, at a time. This
+what a state vector can express, one lesson, one tool, at a time. This
 capstone runs the entire toolkit against a single state none of the
 earlier lessons used, to show it working together as one coherent
 analysis rather than as eleven separate ideas.
@@ -50,7 +50,7 @@ $$
 
 Unlike every earlier worked example in this course, this state has both
 an unequal amplitude split ($0.7/0.3$, not $0.5/0.5$) *and* a nontrivial
-relative phase ($e^{i\pi/3}$, not just $\pm1$) — a genuine test that
+relative phase ($e^{i\pi/3}$, not just $\pm1$), a genuine test that
 every formula in this course handles complex amplitudes correctly, not
 just the real-valued special cases used for teaching clarity earlier.
 
@@ -60,7 +60,7 @@ just the real-valued special cases used for teaching clarity earlier.
 
 With $a=\sqrt{0.7},b=c=0,d=\sqrt{0.3}\,e^{i\pi/3}$:
 $ad-bc=\sqrt{0.7}\sqrt{0.3}\,e^{i\pi/3}=\sqrt{0.21}\,e^{i\pi/3}$, so
-$|ad-bc|=\sqrt{0.21}\approx0.4583$ — the phase $e^{i\pi/3}$ affects only
+$|ad-bc|=\sqrt{0.21}\approx0.4583$. The phase $e^{i\pi/3}$ affects only
 $ad-bc$'s phase, not its magnitude, and concurrence only ever uses the
 magnitude:
 
@@ -68,11 +68,11 @@ $$
 C(|\psi\rangle) = 2\sqrt{0.21} \approx 0.9165
 $$
 
-Close to, but noticeably below, a Bell state's $C=1$ — this state is
+Close to, but noticeably below, a Bell state's $C=1$: this state is
 strongly but not maximally entangled. The reduced state
 $\rho_A=\text{Tr}_B(\rho)$ has diagonal entries $|a|^2=0.7,|d|^2=0.3$
 (the phase disappears entirely from the diagonal, and $b=c=0$ means no
-off-diagonal terms either), so $\rho_A=\text{diag}(0.7,0.3)$ — already
+off-diagonal terms either), so $\rho_A=\text{diag}(0.7,0.3)$, already
 diagonal, making its von Neumann entropy just the Shannon entropy of
 $(0.7,0.3)$:
 
@@ -83,24 +83,24 @@ $$
 Both computed directly by `entanglementEntropy` and
 `concurrenceOfPureState`, and cross-checked against Lesson 5's identity:
 $1-\text{Tr}(\rho_A^2)=2|ad-bc|^2=2(0.21)=0.42$, so
-$\text{Tr}(\rho_A^2)=0.58$ — matching `purity(reducedA)` exactly.
+$\text{Tr}(\rho_A^2)=0.58$, matching `purity(reducedA)` exactly.
 
 ### Mixing in noise: which tools still apply
 
 Build a genuinely mixed global state,
 $\rho_{\text{noisy}}=0.8\,\rho_\psi+0.2\,(I/4)$, and ask what can still
 be computed. `purity(reducedA)` and `vonNeumannEntropy` on the *reduced*
-state still work — reduced states are always $2\times2$ for a 2-qubit
+state still work: reduced states are always $2\times2$ for a 2-qubit
 system, regardless of whether the global state is pure. Numerically,
 the reduced state becomes $\rho_A=\text{diag}(0.66,0.34)$ (the mixing
-weight blends linearly into the diagonal — $0.8\times0.7+0.2\times0.5=0.66$
-— since partial trace is linear), giving entropy $\approx0.9248$ bits,
+weight blends linearly into the diagonal, $0.8\times0.7+0.2\times0.5=0.66$,
+since partial trace is linear), giving entropy $\approx0.9248$ bits,
 slightly higher than the pure state's $0.8813$ (extra classical noise
 adds extra uncertainty, on top of the entanglement that was already
 there).
 
 But `entanglementEntropy` and `concurrenceOfPureState` **cannot** be
-called on $\rho_{\text{noisy}}$ at all — both require a `StateVector`
+called on $\rho_{\text{noisy}}$ at all: both require a `StateVector`
 argument, and $\rho_{\text{noisy}}$, being genuinely mixed, has no state
 vector to pass them. This is exactly Lesson 7's warning, not a new
 restriction: reduced entropy stops being a valid entanglement measure
@@ -109,26 +109,26 @@ let you compute the wrong thing here.
 
 There is a second, sharper boundary. Attempting
 `vonNeumannEntropy(rhoNoisy)` **directly on the full $4\times4$ global
-density matrix** throws an error —
-`eigenvaluesHermitian2x2 requires a 2x2 matrix (got 4x4)` — because
+density matrix** throws an error,
+`eigenvaluesHermitian2x2 requires a 2x2 matrix (got 4x4)`, because
 computing it would need the eigenvalues of a general $4\times4$
 Hermitian matrix, and this platform's closed-form eigensolver is
 explicitly scoped to $2\times2$ only (Lesson 6). `purity` and
 `validateDensityMatrix`'s Hermiticity/trace checks *do* still work on
 the full $4\times4$ matrix (purity only needs a trace, no
 diagonalization), but `validateDensityMatrix`'s positivity check
-reports `null` rather than true or false for a matrix this size —
+reports `null` rather than true or false for a matrix this size:
 another honest, engine-enforced boundary, not a bug.
 
 ### A partial CHSH violation
 
 Using the standard angle configuration from Lesson 11
-($\theta_a=0,\theta_{a'}=\pi/2,\theta_b=\pi/4,\theta_{b'}=-\pi/4$) —
-which was derived specifically for $|\Phi^+\rangle$, not this state —
+($\theta_a=0,\theta_{a'}=\pi/2,\theta_b=\pi/4,\theta_{b'}=-\pi/4$),
+derived specifically for $|\Phi^+\rangle$ and not this state,
 `chshValue` gives $S\approx2.0623$ for $|\psi\rangle$: still above the
 classical bound of 2, but only barely, nowhere near $2\sqrt2$. A
 numerical search over $B,B'$ (holding $A,A'$ fixed) finds this state can
-reach at best $|S|\approx2.20$ — a real, genuine violation, consistent
+reach at best $|S|\approx2.20$, a real, genuine violation, consistent
 with $C\approx0.92$ indicating strong-but-not-maximal entanglement, and
 well short of $2\sqrt2$, consistent with this state not being a Bell
 state.
@@ -137,12 +137,12 @@ state.
 
 Every number in this analysis is internally consistent with every other
 one: high (but not maximal) concurrence goes with high (but not maximal)
-entanglement entropy, goes with a real (but not maximal) CHSH violation
-— three independently-built tools, agreeing on the same qualitative
+entanglement entropy, goes with a real (but not maximal) CHSH violation:
+three independently-built tools, agreeing on the same qualitative
 picture from three different directions, exactly as a coherent theory
-should. And the honesty boundaries — what happens when a pure-state tool
+should. And the honesty boundaries (what happens when a pure-state tool
 meets a mixed input, what happens when a $2\times2$-only tool meets a
-$4\times4$ matrix — aren't failures of the engine; they're the engine
+$4\times4$ matrix) aren't failures of the engine; they're the engine
 correctly refusing to compute something it was never built to compute
 correctly.
 
@@ -151,7 +151,7 @@ correctly.
 <Callout type="mistake">
 **Assuming a relative phase changes concurrence or entropy for this
 family of states.** For $a|00\rangle+d|11\rangle$-type states, both
-depend only on $|a|,|d|$ — the phase of $d$ affects the *state* (and
+depend only on $|a|,|d|$. The phase of $d$ affects the *state* (and
 would matter for e.g. CHSH, which depends on the full complex
 amplitudes) but not these two particular derived quantities.
 </Callout>
@@ -172,7 +172,7 @@ entangled state.
    compared to the ordinary $|\Phi^+\rangle$ (phase $0$).
 2. Explain, citing the specific type signatures involved, why
    `concurrenceOfPureState` takes a `StateVector` rather than a `Matrix`
-   as its argument — and why this is a feature, not an oversight.
+   as its argument, and why this is a feature, not an oversight.
 3. Using Lesson 5's identity, predict $\text{Tr}(\rho_A^2)$ for a state
    with $|ad-bc|=0.48$, and check it against a value between this
    lesson's $|\psi\rangle$ ($|ad-bc|\approx0.458$, purity $0.58$) and a
@@ -188,8 +188,8 @@ entangled state.
 
 ## Summary
 
-- Every tool in this course — density matrix, partial trace, purity,
-  entropy, concurrence, CHSH — applies cleanly to a single unfamiliar
+- Every tool in this course (density matrix, partial trace, purity,
+  entropy, concurrence, CHSH) applies cleanly to a single unfamiliar
   entangled state with a nontrivial phase, agreeing on a consistent
   physical picture.
 - Reduced-state tools (`purity`, `vonNeumannEntropy` on a $2\times2$
@@ -198,16 +198,16 @@ entangled state.
   `concurrenceOfPureState`) require a pure global `StateVector` by their
   very type signature.
 - Attempting `vonNeumannEntropy` on a full $4\times4$ mixed global state
-  throws — a real, engine-enforced boundary at exactly the dimension
+  throws: a real, engine-enforced boundary at exactly the dimension
   this platform's closed-form eigensolver stops covering.
 - A strongly (but not maximally) entangled state gives a real (but
-  weaker than $2\sqrt2$) CHSH violation — the three measures built in
+  weaker than $2\sqrt2$) CHSH violation. The three measures built in
   this course agree quantitatively, not just qualitatively.
 
 ## Further Exploration
 
 This completes **Entanglement, Mixed States & Bell Tests**. From here,
 **Quantum Algorithms I: Foundations** picks up multi-qubit interference
-for a different purpose — using entanglement and superposition together
+for a different purpose, using entanglement and superposition together
 to solve problems no classical algorithm can match, starting with
 quantum parallelism.

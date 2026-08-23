@@ -1,0 +1,138 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/simulating-quantum-systems/state-vector-simulation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "State-Vector Simulation",
+  description:
+    "Every StateVector calculation this platform has ever run, from the first Bell state through Quantum Algorithms II's Shor's-algorithm period finding, IS state-vector simulation, the exact technique this lesson names and examines as a technique, not a fact about qubits.",
+  course: "simulating-quantum-systems",
+  module: "state-vector-simulation",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 18,
+  prerequisites: ["quantum-software/programming-quantum-computers/simulators-vs-real-hardware"],
+  objectives: [
+    "Identify state-vector simulation as the specific technique this platform's engine has used throughout, not a new algorithm",
+    "State exactly what a state-vector simulator computes and guarantees (exact amplitudes, up to floating-point precision)",
+    "Distinguish 'simulating a quantum computer' from 'being a quantum computer' precisely",
+  ],
+};
+
+## Motivation
+
+This course's title is "Simulating Quantum Systems," but this
+platform has been doing exactly that since its very first lesson.
+Rather than introducing new machinery, this opening lesson does
+something different: it names and examines the technique already in
+constant use, as a technique with specific guarantees and specific
+limits, setting up the rest of this course's cost analysis.
+
+## Engineering Development
+
+### What state-vector simulation actually is
+
+A **state-vector simulator** represents an $n$-qubit quantum state
+exactly as a list of $2^n$ complex amplitudes, precisely this
+platform's `StateVector` class, used without exception in every
+Quantum Computing pillar course. Applying a gate updates these
+amplitudes directly via ordinary linear algebra (`applySingleQubitGate`,
+`applyCNOT`), exact matrix multiplication, not an approximation of any
+kind.
+
+### What it guarantees
+
+A state-vector simulator computes the *exact* quantum state (up to
+ordinary floating-point rounding, the same kind of error present in any
+numerical computation). Every amplitude, every probability, every
+expectation value this platform has ever displayed came from this exact
+technique. This is fundamentally different from *sampling* (Writing
+Your First Circuit's `sampleMeasurements`), which only estimates
+probabilities statistically; a state-vector simulation, by contrast,
+computes those probabilities exactly.
+
+### Simulating vs. being
+
+"Simulating a quantum computer" on a classical machine (this platform's
+entire engine) and "being a quantum computer" (Physical Qubit Platforms'
+actual hardware) compute the *same* mathematical answer for a given
+circuit, but by *completely different physical means*. This precision
+matters: nothing about this platform's engine is somehow "not really"
+quantum mechanics; the linear algebra is exact. But it is being
+executed by classical hardware (Simulators vs. Real Hardware's
+opposite-failure-modes framing), which is exactly what makes this
+course's cost question (next lesson) a real one.
+
+## Physical Interpretation
+
+Every numerical claim this entire platform has ever verified, Grover's
+algorithm's success probability, the Bell state's entanglement, the
+hydrogen atom's energy levels via a truncated basis, rests on this
+exact technique, used without ever being named as such until now. This
+lesson's contribution is entirely conceptual: recognizing the common
+thread, not adding new capability.
+
+## Worked Example
+
+**Is running `runCircuit` on this platform's `QuantumCircuit` "real
+quantum computing," or "just simulation"?**
+
+It's state-vector simulation: genuinely exact quantum-mechanical
+calculation, computed on ordinary classical hardware. It is NOT running
+on an actual quantum device (Physical Qubit Platforms), and so carries
+none of real hardware's physical noise (Noise, Decoherence & Scaling).
+But it is also not an approximation of the underlying physics in any
+way; the amplitudes it computes are exactly what an ideal, noiseless
+quantum computer would produce for the same circuit.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking "simulation" means "approximation."** State-vector simulation
+computes EXACT amplitudes (up to floating-point precision). The
+approximation, when it exists, is in techniques like Tensor Network
+Methods (a later lesson in this course), not in the state-vector
+approach itself.
+</Callout>
+
+<Callout type="mistake">
+**Assuming this platform's engine is "not really" doing quantum
+mechanics because it runs on classical hardware.** The linear algebra is
+exact quantum mechanics; only the substrate executing it (classical bits
+and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
+</Callout>
+
+## Practice Questions
+
+1. In one sentence, define what a state-vector simulator computes and
+   what precision it achieves.
+2. Contrast state-vector simulation with shot-based sampling
+   (`sampleMeasurements`): which one gives EXACT probabilities, and
+   which only estimates them?
+3. Is a state-vector simulation running on a classical computer "doing
+   real quantum mechanics"? Explain your answer precisely.
+4. Name three specific prior-course results (from anywhere in this
+   platform) that were computed via state-vector simulation, even though
+   the term wasn't used at the time.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- State-vector simulation represents an $n$-qubit state as $2^n$ exact
+  complex amplitudes, updated via exact linear algebra, precisely this
+  platform's `StateVector` engine, used throughout every prior course.
+- It computes exact probabilities (up to floating-point precision),
+  fundamentally different from statistical sampling.
+- It's genuine, exact quantum-mechanical calculation executed on
+  classical hardware, not an approximation, but also not physically
+  "being" a quantum computer.
+
+## Further Exploration
+
+Next: **Computational Cost & Scaling**, which quantifies precisely what
+this technique costs, the $2^n$ growth Simulators vs. Real Hardware
+already previewed, developed here in full.

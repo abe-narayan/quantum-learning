@@ -1,0 +1,148 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/noise-decoherence-and-scaling/scaling-challenges"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Scaling Challenges",
+  description:
+    "Compounding per-gate error rates across a deep circuit, computed directly: even a 99.9% per-gate fidelity drops below 37% success probability by 1000 sequential gates. The concrete numerical reason 'just add more qubits' badly understates what scaling a useful quantum computer actually requires.",
+  course: "noise-decoherence-and-scaling",
+  module: "scaling-challenges",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 22,
+  prerequisites: ["quantum-hardware/noise-decoherence-and-scaling/crosstalk"],
+  objectives: [
+    "Compute how per-gate error compounds multiplicatively across a circuit of many sequential gates",
+    "Explain why qubit COUNT alone is an incomplete measure of a device's usefulness",
+    "Connect compounding error directly to Error Correction & Fault Tolerance's threshold theorem",
+  ],
+};
+
+## Motivation
+
+Physical Qubit Platforms and this course's earlier lessons have built up
+individual error sources (T1/T2, crosstalk, readout error) in isolation.
+This lesson asks the question that actually matters for building a
+useful device: what happens when you chain hundreds or thousands of
+imperfect operations together?
+
+## Engineering Development
+
+### Errors compound multiplicatively
+
+If each gate succeeds with probability $p$ (independent, per-gate
+fidelity), then $N$ sequential gates succeed with probability
+$p^N$, not $p$, and not $p\times N$ subtracted from 1, but a genuine
+exponential decay in $N$.
+
+| Per-gate fidelity | N=10 | N=100 | N=1000 |
+|---|---|---|---|
+| 99.9% | 99.0% | 90.5% | 36.8% |
+| 99% | 90.4% | 36.6% | $4.3\times10^{-5}$ |
+| 95% | 59.9% | 0.6% | $\approx0$ |
+
+Even a genuinely excellent 99.9% per-gate fidelity, better than most
+current real hardware, drops to 36.8% overall success by 1000 gates,
+barely better than a coin flip's worth of confidence in the final
+answer. This single table is the quantitative core of why "quantum
+supremacy"-scale algorithms need either extremely low error rates or
+active error correction, not just "more qubits."
+
+### Qubit count is an incomplete metric
+
+A device with 1000 "noisy" qubits (a common marketing framing) is not
+automatically more capable than a much smaller device with dramatically
+lower error rates. The compounding-error table above applies per
+*qubit* too, and a computation using many qubits for many sequential
+gates compounds error across both dimensions simultaneously. Metrics
+like **quantum volume** (not derived in full here, but conceptually: a
+combined measure of qubit count, connectivity, and per-gate error
+together) exist specifically because raw qubit count alone is
+misleading.
+
+### Where error correction fits in
+
+Error Correction & Fault Tolerance's **threshold theorem** result
+(already built in the Quantum Computing pillar) is the direct answer to
+this lesson's compounding-error problem: if the *physical* per-gate
+error rate is below a certain threshold, encoding logical qubits
+redundantly (Quantum Computing's bit-flip and Shor codes) can suppress
+the *logical* error rate arbitrarily far below the physical rate, at
+the cost of needing many physical qubits per logical qubit. This
+lesson's compounding-error table is precisely the motivating problem
+that result exists to solve.
+
+## Physical Interpretation
+
+"Scaling" a quantum computer means two different, both-necessary things
+simultaneously: increasing qubit count, AND decreasing per-gate error
+rate (or adding error correction overhead to compensate). A device that
+scales only the first while ignoring the second doesn't become more
+useful, per this lesson's own compounding-error numbers.
+
+## Worked Example
+
+**How many sequential 99.9%-fidelity gates can run before overall
+success probability drops below 50%?**
+
+$$
+0.999^N = 0.5 \implies N = \frac{\ln0.5}{\ln0.999} \approx 693
+$$
+
+Fewer than 700 gates, even at a fidelity most current hardware hasn't
+reached. This concretely illustrates why useful, deep quantum circuits
+(many algorithms need thousands to millions of gates) are out of reach
+without either substantially better physical fidelities or active error
+correction.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating "N qubits" as a complete description of a device's
+capability.** As this lesson's table shows, per-gate error rate matters
+at least as much as qubit count. A large, noisy device can be less
+useful than a smaller, cleaner one for a given task.
+</Callout>
+
+<Callout type="mistake">
+**Assuming error compounds additively (subtracting N×(1-p) from 1)
+rather than multiplicatively (p^N).** These give very different answers
+at large N. The multiplicative form is what unitarity/independent-trial
+probability actually requires.
+</Callout>
+
+## Practice Questions
+
+1. Using $p^N$, compute the success probability for 500 gates at 99.9%
+   per-gate fidelity.
+2. Redo the worked example's calculation for a 99.99% per-gate fidelity
+   target: how many gates can run before dropping below 50% success?
+3. Explain in one sentence why quantum volume (or similar combined
+   metrics) exist, rather than reporting qubit count alone.
+4. How does this lesson's compounding-error problem directly motivate
+   the existence of Error Correction & Fault Tolerance's threshold
+   theorem?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Per-gate errors compound multiplicatively: $N$ sequential gates at
+  fidelity $p$ succeed with probability $p^N$, an exponential decay in
+  circuit depth.
+- Even 99.9% per-gate fidelity drops to 36.8% success by 1000 gates,
+  the concrete numerical reason deep circuits need either very low error
+  rates or active error correction.
+- Qubit count alone is an incomplete capability metric; per-gate error
+  rate (and connectivity) matter at least as much.
+
+## Further Exploration
+
+Next: **Roadmaps to Fault Tolerance**, which closes this course by
+connecting every error source covered so far to the concrete overhead
+numbers (physical qubits per logical qubit) that real fault-tolerant
+quantum computing roadmaps target.

@@ -1,0 +1,167 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Syndrome Measurement and the Recovery Map",
+  description:
+    "The general recovery procedure, measure every stabilizer, look up the syndrome, apply the matching correction, stated for any stabilizer code, plus the [[n,k,d]] parameters that describe a code's size, logical qubit count, and error-correcting power.",
+  course: "error-correction-and-fault-tolerance",
+  module: "syndrome-measurement-and-the-recovery-map",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"],
+  objectives: [
+    "State the general recovery procedure for any stabilizer code",
+    "Define the [[n,k,d]] code parameters and give the 3-qubit codes' own parameters",
+    "Explain the relationship between code distance and how many errors a code can correct",
+  ],
+};
+
+## Motivation
+
+Every code this course has built follows the same four-step procedure.
+This lesson names that procedure explicitly and generally, then gives the
+standard notation, $[[n,k,d]]$, that lets any two codes' error-correcting
+power be compared at a glance.
+
+## Mathematical Development
+
+### The recovery procedure, in general
+
+For any stabilizer code with generators $g_1,\dots,g_m$:
+
+1. **Measure every generator** $g_i$, obtaining a syndrome bit for each
+   (via ancilla-based measurement, exactly as Lesson 2 built, never
+   measuring the data qubits directly).
+2. **Look up the syndrome** in a precomputed table mapping syndrome
+   patterns to the most likely error.
+3. **Apply the matching correction** (a Pauli operator, or product of
+   Paulis, that reverses the identified error).
+4. The corrected state is guaranteed to be back in the code space,
+   *exactly* the original encoded state, for any error the code was
+   designed to handle.
+
+This is precisely `runBitFlipCorrectionCycle`'s four steps (extract
+syndrome via ancilla CNOTs and measurement, `decodeBitFlipSyndrome` looks
+up the table, apply $X$ to the identified qubit, return the corrected
+3-qubit state), described here in the vocabulary that generalizes to any
+stabilizer code, not just this one.
+
+### Code parameters: [[n,k,d]]
+
+A quantum code is described by three numbers: $n$ (physical qubits used),
+$k$ (logical qubits protected), and $d$ (the code's **distance**, the
+minimum number of physical qubits an *undetectable* error must act on).
+The 3-qubit bit-flip code is $[[3,1,3]]$: $3$ physical qubits, $1$
+logical qubit, and distance $3$ (a weight-3 error, $X$ on all three
+qubits simultaneously, exactly flips the logical state undetected,
+since it maps $|000\rangle\leftrightarrow|111\rangle$ while leaving both
+$Z_0Z_1$ and $Z_1Z_2$ syndromes at $(0,0)$; no weight-1 or weight-2
+error does this). The Shor code is $[[9,1,3]]$, the same distance, at
+$9\times$ the physical qubit cost, since its distance-3 protection covers
+*both* error types ($X$ and $Z$), not just one.
+
+### Distance and correctable error count
+
+A distance-$d$ code corrects any error affecting **fewer than $d/2$**
+physical qubits, the same relationship classical coding theory uses,
+here applying to quantum codes with the extra restriction to the
+$X$/$Z$/$Y$ error model established earlier. For $d=3$: corrects any
+single-qubit error ($1<3/2$), exactly what Lessons 2 and 3 verified
+directly; a genuine two-qubit error is not guaranteed correctable by a
+distance-3 code (consistent with the practice question, several lessons
+back, about simultaneous errors on two data qubits).
+
+## Physical Interpretation
+
+$[[n,k,d]]$ makes the fundamental tradeoff of quantum error correction
+explicit: larger $d$ (more error-correcting power) generally costs more
+physical qubits $n$ per logical qubit $k$, exactly the resource-overhead
+question the capstone returns to with concrete numbers for real
+fault-tolerant architectures.
+
+## Worked Example
+
+**Confirm the bit-flip code's distance is exactly 3, not less, by
+checking what happens for a weight-1 and a weight-2 error.**
+
+A weight-1 error (single $X$) always flips at least one of $Z_0Z_1,Z_1Z_2$
+(shown directly in Lesson 5), always detected and correctly reversed, as
+Lesson 2 verified. A weight-2 error, $X_0X_1$: syndrome from $Z_0Z_1$ is
+unchanged (both qubits it touches flipped together, preserving their
+parity), but $Z_1Z_2$'s syndrome *does* flip (qubit 1 flipped, qubit 2
+didn't), giving syndrome $(0,1)$, which the decode table reads as "error
+on qubit 2." Applying the recovery procedure's prescribed fix, $X_2$, to
+the already-corrupted state gives a net applied error of
+$X_0X_1\cdot X_2=X_0X_1X_2$, exactly the weight-3 logical error
+identified below, so "recovery" here doesn't fail gently: it actively
+converts a 2-qubit error into a full logical bit flip
+($\alpha\leftrightarrow\beta$), confirmed directly by the engine (a
+$0.6,0.8$ encoding, hit by $X_0X_1$ and "recovered," comes out as
+$0.8,0.6$, swapped). Only the weight-3 error $X_0X_1X_2$ on its own,
+with no recovery attempted, is truly undetectable at the syndrome stage
+($Z_0Z_1$: both flip, parity preserved; $Z_1Z_2$: both flip, parity
+preserved) while still swapping $\alpha\leftrightarrow\beta$, the
+genuinely undetectable case confirming $d=3$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing "detected" with "safely handled."** The worked example's
+weight-2 case *does* trigger a nonzero syndrome, but running the
+recovery procedure on it doesn't just fail to help, it actively converts
+the 2-qubit error into a full logical bit flip. A distance-3 code is only
+guaranteed correct for weight-1 errors; running its recovery procedure on
+a weight-2 error can make things categorically worse, not merely
+"not better."
+</Callout>
+
+<Callout type="mistake">
+**Assuming bigger n always means a better code.** $n$ is a *cost*
+(physical qubits spent), not a benefit. The meaningful comparison is the
+ratio of $d$ (or correctable error count) to $n$, which is what makes
+$[[9,1,3]]$ (Shor) less resource-efficient than later codes with the same
+distance but fewer physical qubits (not covered in this course, but named
+here as a real, active area this platform doesn't build).
+</Callout>
+
+## Practice Questions
+
+1. Confirm the phase-flip code (Lesson 3) is also $[[3,1,3]]$, using the
+   same distance argument with $X_0X_1X_2$ replaced by $Z_0Z_1Z_2$.
+2. Using the "$d/2$" rule, how many simultaneous single-qubit errors
+   could a hypothetical $[[5,1,5]]$ code correct?
+3. Explain why the weight-2 error $X_0X_1$ in the worked example is
+   *detected* (a nonzero syndrome appears) yet running the recovery
+   procedure on it produces a full logical error rather than a partial
+   fix. Point to exactly which step turns a 2-qubit physical error into
+   a 1-bit logical one.
+4. Why does the Shor code's distance stay at $3$ (not increase) despite
+   using $9$ qubits instead of $3$? What did the extra 6 qubits actually
+   buy, if not a larger distance?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The general recovery procedure: measure every stabilizer, look up the
+  syndrome, apply the matching correction, exactly what Lesson 2's
+  circuit already implements.
+- $[[n,k,d]]$ notation: $n$ physical qubits, $k$ logical qubits, distance
+  $d$; the bit-flip and phase-flip codes are both $[[3,1,3]]$, and Shor's
+  code is $[[9,1,3]]$.
+- A distance-$d$ code corrects any error affecting fewer than $d/2$
+  qubits, verified directly for the bit-flip code's weight-1 (corrected),
+  weight-2 (detected but miscorrected), and weight-3 (undetectable) cases.
+
+## Further Exploration
+
+Next: **Surface Codes: A Conceptual Introduction**, the family of codes
+real quantum hardware roadmaps actually build toward: higher distance,
+much better qubit efficiency, at the cost of substantially more complex
+syndrome decoding.

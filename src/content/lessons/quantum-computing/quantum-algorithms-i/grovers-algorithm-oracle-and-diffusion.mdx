@@ -1,0 +1,167 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Grover's Algorithm: Oracle and Diffusion",
+  description:
+    "The two building blocks of unstructured search: a phase-marking oracle, and a diffusion operator derived algebraically as H^⊗n(2|0⟩⟨0|−I)H^⊗n, including a real sign bug this exact derivation caught during engine development.",
+  course: "quantum-algorithms-i",
+  module: "grovers-algorithm-oracle-and-diffusion",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/quantum-phase-estimation"],
+  objectives: [
+    "State Grover's problem (unstructured search) and why no classical algorithm beats O(N) queries",
+    "Derive the diffusion operator 2|s⟩⟨s|−I as H^⊗n(2|0⟩⟨0|−I)H^⊗n",
+    "Explain why a sign error in the reflection step is invisible to a success-probability-only test",
+  ],
+};
+
+## Motivation
+
+Given a "black box" that marks one specific item among $N=2^n$ unsorted
+possibilities (no structure, no ordering, nothing to exploit), a classical
+algorithm needs $O(N)$ queries on average to find it: check items one at a
+time, no shortcut available. **Grover's algorithm** finds it in
+$O(\sqrt N)$ queries, and this quadratic speedup is the *best possible*
+for unstructured search (proven elsewhere, not claimed here), not an
+artifact of insufficient cleverness.
+
+## Mathematical Development
+
+### The oracle
+
+Grover's oracle marks the target directly with a sign, using
+`applyPhaseOracle`: $|x\rangle\to-|x\rangle$ for the marked $x$, unchanged
+otherwise. This is exactly the phase-oracle form Phase Kickback derived
+from the bit-oracle model with the ancilla in $|-\rangle$, reused here
+directly, not redefined.
+
+### The diffusion operator, derived
+
+Let $|s\rangle=H^{\otimes n}|0\rangle^{\otimes n}$ be the uniform
+superposition. Grover's **diffusion operator** is $D=2|s\rangle\langle
+s|-I$, a reflection about $|s\rangle$. Substitute $|s\rangle=H^{\otimes
+n}|0\rangle$ directly:
+
+$$
+D = 2|s\rangle\langle s| - I = 2H^{\otimes n}|0\rangle\langle0|H^{\otimes n} - I
+$$
+
+Since $H^{\otimes n}$ is its own inverse ($H^{\otimes n}H^{\otimes
+n}=I$), insert $I=H^{\otimes n}H^{\otimes n}$ into the second term:
+
+$$
+D = H^{\otimes n}\big(2|0\rangle\langle0|-I\big)H^{\otimes n}
+$$
+
+$2|0\rangle\langle0|-I$ is a **reflection about $|0\rangle^{\otimes n}$**:
+acting on $|0\rangle^{\otimes n}$ itself gives
+$2|0\rangle\langle0|0\rangle-|0\rangle=2|0\rangle-|0\rangle=|0\rangle$
+(unchanged); acting on any *other* basis state $|k\neq0\rangle$ gives
+$2|0\rangle\langle0|k\rangle-|k\rangle=0-|k\rangle=-|k\rangle$ (sign
+flipped, since $\langle0|k\rangle=0$). So $D$'s full circuit is: $H^{\otimes
+n}$, flip the sign of every basis state *except* $|0\rangle^{\otimes n}$,
+$H^{\otimes n}$ again.
+
+### A real bug this exact distinction caught
+
+An earlier version of `groverDiffusion` built the middle step by reusing
+`applyPhaseOracle(s, [0])`, which flips *only* index $0$ and leaves
+everything else alone: precisely the **opposite** reflection,
+$I-2|0\rangle\langle0|$, not $2|0\rangle\langle0|-I$. The two differ by an
+overall factor of $-1$, an unobservable global phase, so every
+success-probability test (measuring $P(\text{marked item})$ after running
+full Grover iterations) passed anyway, since a global phase never affects
+Born-rule probabilities. The bug was caught only by testing the reflection
+*in isolation*: $D|s\rangle$ must equal $|s\rangle$ **exactly** (not
+$-|s\rangle$), and the buggy version failed that specific check. This is
+precisely why `grover.test.ts` tests `groverDiffusion(|s\rangle)=|s\rangle$`
+directly, not just Grover's end-to-end success rate: some bugs are
+invisible to outcome-only tests.
+
+## Physical Interpretation
+
+Geometrically, both the oracle and the diffusion operator are reflections:
+the oracle reflects about the "unmarked" subspace, diffusion reflects
+about $|s\rangle$, and composing two reflections is always a rotation.
+The next lesson makes this rotation picture exact and uses it to derive
+Grover's $O(\sqrt N)$ query count directly.
+
+Step through a few full iterations below (each step applies the oracle
+and diffusion together, exactly as `groverIteration` does) and watch the
+marked bar grow while the others shrink. Try a small N first: with N=4
+you should see the marked state's probability jump close to 1 in a
+single step.
+
+<LazyGroverExplorer />
+
+## Worked Example
+
+**Verify $2|0\rangle\langle0|-I$ acting on $|1\rangle$ (a 1-qubit basis
+state, $k\neq0$) gives $-|1\rangle$.**
+
+$\langle0|1\rangle=0$ (orthogonal basis states), so
+$2|0\rangle\langle0|1\rangle-|1\rangle=2|0\rangle(0)-|1\rangle=-|1\rangle$.
+Matches the general rule: every state except $|0\rangle$ itself picks up a
+sign flip.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Building the reflection by flipping $|0\rangle$'s sign instead of
+everything else's.** This is exactly the bug described above: the
+resulting operator is $-(2|0\rangle\langle0|-I)$, differing from the
+correct diffusion operator by an unobservable-in-aggregate but
+structurally wrong global phase.
+</Callout>
+
+<Callout type="mistake">
+**Testing only end-to-end success probability.** A global-phase bug can
+hide indefinitely behind measurement statistics that only ever depend on
+$|{\rm amplitude}|^2$. Testing an intermediate operator's exact action on
+a known input (as `groverDiffusion(|s\rangle)=|s\rangle` does) catches
+what an outcome-only test cannot.
+</Callout>
+
+## Practice Questions
+
+1. Show that $2|0\rangle\langle0|-I$ acting on $|0\rangle$ (for any number
+   of qubits) leaves it exactly unchanged.
+2. Using $D=H^{\otimes n}(2|0\rangle\langle0|-I)H^{\otimes n}$, explain why
+   $D$ applied twice returns the original state (i.e. $D$ is its own
+   inverse).
+3. Confirm algebraically that $-(2|0\rangle\langle0|-I)$ and
+   $2|0\rangle\langle0|-I$ give identical measurement probabilities for
+   any input state, using $|{-z}|^2=|z|^2$.
+4. Why is "the marked-item oracle reflects about the unmarked subspace" an
+   accurate description, given that it only ever flips the sign of the
+   *marked* item (not every unmarked one)? (Hint: a reflection about a
+   subspace and a sign flip on its orthogonal complement have the same
+   overall effect up to global phase; connect this to question 3.)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Grover's oracle marks the target with a sign flip via `applyPhaseOracle`,
+  reusing the same phase-oracle primitive Deutsch-Jozsa and phase
+  kickback established.
+- The diffusion operator $D=2|s\rangle\langle s|-I$ is derived exactly as
+  $H^{\otimes n}(2|0\rangle\langle0|-I)H^{\otimes n}$, a reflection about
+  $|0\rangle^{\otimes n}$ sandwiched between two Hadamard layers.
+- A real implementation bug, reflecting the wrong basis state, produced
+  a global-phase error invisible to success-probability tests, caught only
+  by testing $D|s\rangle=|s\rangle$ directly.
+
+## Further Exploration
+
+Next: **Grover's Algorithm: Amplitude Amplification**, which composes the
+oracle and diffusion operator into a rotation and derives the exact,
+closed-form optimal number of iterations.

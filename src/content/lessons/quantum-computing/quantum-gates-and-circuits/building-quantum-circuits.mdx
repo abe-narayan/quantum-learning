@@ -2,6 +2,13 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
 import { measureQubit } from "@/lib/quantum/measurement";
+import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/building-quantum-circuits"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "Building Quantum Circuits",
@@ -34,19 +41,19 @@ export const ghzMeasured = measureQubit(ghzStep3, 0, 0.9); // outcome 1
 
 Nine lessons have built a genuine toolkit: tensor products, entanglement,
 CNOT, partial measurement, no-cloning, teleportation, interference. This
-lesson doesn't introduce new mathematics — it uses everything at once, on
+lesson doesn't introduce new mathematics. It uses everything at once, on
 a circuit you haven't seen yet, extending the two-qubit Bell state to
 three qubits for the first time.
 
 ## A circuit identity, revisited
 
-Before building something new, one more circuit-equivalence check —
+Before building something new, one more circuit-equivalence check,
 useful in its own right, and good practice for verifying that two
 differently-drawn circuits compute the same thing. **Controlled Gates and
 CNOT** showed $\text{SWAP}=\text{CNOT}(0,1)\cdot\text{CNOT}(1,0)\cdot\text{CNOT}(0,1)$
 by tracking $|10\rangle$ through all three steps. That same
-step-by-step-tracking technique — apply one gate, note the new state,
-apply the next — is the general method for verifying *any* circuit
+step-by-step-tracking technique, apply one gate, note the new state,
+apply the next, is the general method for verifying *any* circuit
 identity, and it's exactly what the rest of this lesson does for a
 brand-new circuit.
 
@@ -60,16 +67,16 @@ $\text{CNOT}(0,1)$, then $\text{CNOT}(0,2)$.
 <QuantumStateDisplay state={ghzStep0} label="Start: |000⟩" />
 <QuantumStateDisplay state={ghzStep1} label="After H on qubit 0" />
 <QuantumStateDisplay state={ghzStep2} label="After CNOT(0, 1)" />
-<QuantumStateDisplay state={ghzStep3} label="After CNOT(0, 2) — done" />
+<QuantumStateDisplay state={ghzStep3} label="After CNOT(0, 2): done" />
 
 $$
 |000\rangle \xrightarrow{H} \frac{|000\rangle+|100\rangle}{\sqrt2} \xrightarrow{\text{CNOT}(0,1)} \frac{|000\rangle+|110\rangle}{\sqrt2} \xrightarrow{\text{CNOT}(0,2)} \frac{|000\rangle+|111\rangle}{\sqrt2}
 $$
 
-This is a **GHZ state** (named for Greenberger, Horne, and Zeilinger) —
+This is a **GHZ state** (named for Greenberger, Horne, and Zeilinger),
 the natural three-party generalization of a Bell pair. Qubit 0's
 superposition, via two CNOTs instead of one, has been copied onto *both*
-of the other qubits' correlation structure — not their amplitudes
+of the other qubits' correlation structure, not their amplitudes
 (no-cloning still holds; nothing here clones an unknown state, since
 $|0\rangle$ is a known state and this whole circuit is fixed and public),
 but their entanglement with qubit 0.
@@ -80,7 +87,7 @@ but their entanglement with qubit 0.
 proof: if $\frac{1}{\sqrt2}(|000\rangle+|111\rangle)$ factored as
 $|a\rangle\otimes|b\rangle\otimes|c\rangle$, every one of the six
 "mixed" basis terms ($|001\rangle,|010\rangle,|011\rangle,|100\rangle,|101\rangle,|110\rangle$)
-would need zero amplitude — forcing at least one of $|a\rangle,|b\rangle,|c\rangle$
+would need zero amplitude, forcing at least one of $|a\rangle,|b\rangle,|c\rangle$
 to have a zero component, which then also zeroes out one of the surviving
 terms ($|000\rangle$ or $|111\rangle$). Genuinely entangled, same
 technique, one qubit more.
@@ -89,7 +96,7 @@ technique, one qubit more.
 
 <QuantumStateDisplay state={ghzMeasured.collapsed} label={`Qubit 0 measured → outcome ${ghzMeasured.outcome}`} />
 
-All three qubits become exactly determined and equal — measuring *any
+All three qubits become exactly determined and equal: measuring *any
 one* of the three tells you, with certainty, what the other two are.
 Three-party correlation, from the same H-plus-CNOTs pattern that built a
 two-party one, extended by exactly one more CNOT.
@@ -105,19 +112,23 @@ getting this right.
 
 <Callout type="mistake">
 **Confusing "many CNOTs from one qubit" with cloning.** The GHZ circuit
-uses qubit 0 as the control for two separate CNOTs — this spreads
+uses qubit 0 as the control for two separate CNOTs. This spreads
 *correlation*, not the qubit's unknown amplitude information. If qubit 0
 had started in an arbitrary unknown state instead of $|0\rangle$, the
 same circuit would still work exactly as derived (try it: replace
-$|000\rangle$ with $|\psi\rangle\otimes|00\rangle$ and redo the algebra) —
+$|000\rangle$ with $|\psi\rangle\otimes|00\rangle$ and redo the algebra),
 and it still wouldn't violate no-cloning, because the result is one
 *entangled* 3-qubit state, not three independent copies of $|\psi\rangle$.
 </Callout>
 
 ## Practice: The Course Challenge
 
-Work through this multi-step problem in full — it draws on nearly every
-lesson in this course.
+Work through this multi-step problem in full. It draws on nearly every
+lesson in this course. Use the circuit builder below to check your work:
+build each circuit you design, run it, and compare the resulting state
+and probabilities against what you predicted by hand before you look.
+
+<LazyCircuitBuilder />
 
 **1.** Starting from $|00\rangle$, design a circuit (a sequence of gates)
 that prepares $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$.
@@ -139,20 +150,22 @@ $|\Psi^-\rangle$. Predict what measuring any one qubit tells you about
 the other two.
 
 **5.** Explain, in your own words, why none of the circuits you just
-built could be used to send a message faster than light — even though
+built could be used to send a message faster than light, even though
 measuring one qubit instantly tells you something about qubits that
 might be far away.
 
+<PracticeLinks problems={practiceProblems} />
+
 ## Summary
 
-- Every technique from this course — tensor products, CNOT, entanglement
-  proofs, partial measurement, interference — composes directly: circuits
+- Every technique from this course, tensor products, CNOT, entanglement
+  proofs, partial measurement, interference, composes directly: circuits
   are built the same way regardless of how many qubits are involved.
 - The GHZ state, $\frac{1}{\sqrt2}(|000\rangle+|111\rangle)$, extends a
   Bell pair to three parties using one extra CNOT from the same control
   qubit, with a matching extension to the entanglement and correlation
   arguments.
-- Analyzing any circuit — is it entangled, what does measurement do —
+- Analyzing any circuit, is it entangled, what does measurement do,
   reuses the exact same techniques regardless of circuit size.
 
 ## Further Exploration
@@ -161,10 +174,10 @@ This completes **Quantum Gates & Circuits**. You now have the complete
 toolkit for multi-qubit systems: tensor products, circuit notation,
 controlled gates, entanglement, multi-qubit measurement, no-cloning,
 teleportation, and interference. The next course in this pillar,
-**Entanglement, Mixed States & Bell Tests**, pushes entanglement further
-— beyond pairs to arbitrary multipartite states, and beyond pure states
+**Entanglement, Mixed States & Bell Tests**, pushes entanglement further,
+beyond pairs to arbitrary multipartite states, and beyond pure states
 to the mixed-state formalism needed once a qubit is entangled with
 something you can't observe. After that, **Quantum Algorithms I:
-Foundations** is where interference — the mechanism from two lessons ago
-— stops being a standalone curiosity and becomes the engine behind
+Foundations** is where interference, the mechanism from two lessons ago,
+stops being a standalone curiosity and becomes the engine behind
 algorithms that outperform anything classical.

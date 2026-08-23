@@ -26,9 +26,9 @@ export const lessonMeta = {
 ## Motivation
 
 Classically, a ball with less energy than a hill's height can never cross
-it — it rolls partway up and back down, full stop. Quantum mechanically,
+it. It rolls partway up and back down, full stop. Quantum mechanically,
 this is false: solve the Schrödinger equation honestly inside the
-"forbidden" region, and the wavefunction doesn't vanish there — it decays,
+"forbidden" region, and the wavefunction doesn't vanish there. It decays,
 smoothly and continuously, which is all that's needed for some amplitude
 to survive to the far side of a barrier that isn't infinitely thick.
 
@@ -38,7 +38,7 @@ The infinite well's math showed that in a classically *allowed* region
 ($E>V$), $\psi$ oscillates (sines and cosines). This lesson asks: what
 happens in a classically *forbidden* region ($E<V$)? The same equation,
 solved honestly, gives a different but equally legitimate kind of
-solution — not zero, not oscillatory, but exponential.
+solution: not zero, not oscillatory, but exponential.
 
 ## Mathematical Development
 
@@ -51,7 +51,7 @@ $$
 -\frac{\hbar^2}{2m}\psi''(x) + V_0\psi(x) = E\,\psi(x) \quad\Longrightarrow\quad \psi''(x) = \kappa^2\,\psi(x), \qquad \kappa \equiv \frac{\sqrt{2m(V_0-E)}}{\hbar}
 $$
 
-Critically, $\kappa^2$ is **positive** here (since $V_0>E$) — the
+Critically, $\kappa^2$ is **positive** here (since $V_0>E$), the
 opposite sign from the well's $\psi''=-k^2\psi$. This flips the character
 of the solution entirely: instead of $\sin,\cos$ (oscillatory), the
 general solution is
@@ -60,7 +60,7 @@ $$
 \psi(x) = C\,e^{\kappa x} + D\,e^{-\kappa x}
 $$
 
-— real exponentials. **The wavefunction is nonzero inside the barrier.**
+real exponentials. **The wavefunction is nonzero inside the barrier.**
 It decays (for a wave incident from the left, the physically relevant
 solution is dominated by the decaying $e^{-\kappa x}$ term), but decaying
 is not the same as vanishing.
@@ -69,10 +69,10 @@ is not the same as vanishing.
 
 If the barrier extends from $x=0$ to $x=a$ (finite width $a$), the
 decaying amplitude $\psi(0)e^{-\kappa a}$ at $x=a$ is small but nonzero
-for finite $\kappa a$ — and matching this to an oscillatory solution
+for finite $\kappa a$, and matching this to an oscillatory solution
 resuming beyond the barrier (where $V=0$ again and $E>V$ once more)
 produces a transmitted wave with nonzero amplitude. The transmission
-probability falls off roughly as $e^{-2\kappa a}$ — exponentially
+probability falls off roughly as $e^{-2\kappa a}$, exponentially
 sensitive to both the barrier's height (through $\kappa$) and its width
 $a$, which is exactly why tunneling is dramatic for subatomic barriers
 and utterly negligible for everyday macroscopic ones (a wide barrier
@@ -83,7 +83,7 @@ infinitely wide, $e^{-2\kappa a}\to0$ exactly, recovering the classical
 ## Physical Interpretation
 
 Tunneling isn't the particle "borrowing energy" or briefly violating
-energy conservation — energy is exactly conserved throughout. It's a
+energy conservation. Energy is exactly conserved throughout. It's a
 direct, unavoidable consequence of the Schrödinger equation being a
 second-order differential equation: continuity of $\psi$ and $\psi'$
 across the barrier's edges (required for $\psi''$ to stay well-defined)
@@ -96,7 +96,7 @@ The Wavefunction Explorer's **Tunneling Through a Barrier** preset sends a
 Gaussian packet at a rectangular barrier. Play it forward past the
 interaction and check the comparison panel: $P(\text{transmitted})$ and
 $P(\text{reflected})$ should sum to almost exactly 1 (probability
-conservation — nothing is created or destroyed by the barrier), split
+conservation, nothing is created or destroyed by the barrier), split
 between the two outcomes in a ratio that depends sharply on the barrier's
 height and width, exactly as $e^{-2\kappa a}$ predicts. Try raising the
 barrier height and watch the transmitted fraction shrink.
@@ -110,7 +110,7 @@ does the transmission probability increase or decrease, and roughly by
 how much?**
 
 $\kappa=\sqrt{2m(V_0-E)}/\hbar$ increases (since $V_0$ increased), so
-$\kappa a$ increases, so $e^{-2\kappa a}$ — the rough transmission scale —
+$\kappa a$ increases, so $e^{-2\kappa a}$, the rough transmission scale,
 *decreases*, and it decreases exponentially fast in $\kappa$, meaning even
 a modest barrier-height increase can suppress transmission dramatically.
 This qualitative prediction is directly checkable: raise the Explorer's
@@ -120,14 +120,14 @@ barrier height parameter and watch $P(\text{transmitted})$ fall sharply.
 
 <Callout type="mistake">
 **Thinking $\psi=0$ inside a classically forbidden region.** It's
-exponentially *small* for a thick or tall barrier, not exactly zero — the
+exponentially *small* for a thick or tall barrier, not exactly zero. The
 distinction is the entire mechanism behind tunneling.
 </Callout>
 
 <Callout type="mistake">
 **Expecting all-or-nothing transmission.** A real packet is a
 superposition (Free-Particle Wave Packets lesson) of many momenta, some
-above and some below the classical threshold — this course's tunneling
+above and some below the classical threshold. This course's tunneling
 preset genuinely splits into transmitted and reflected *parts*, not one
 outcome or the other, matching the correct probabilistic interpretation.
 </Callout>
@@ -135,13 +135,13 @@ outcome or the other, matching the correct probabilistic interpretation.
 ## Practice Questions
 
 1. Why does $\kappa^2$ flip sign between the classically allowed
-   ($E>V$) and forbidden ($E<V$) cases — trace it through the
+   ($E>V$) and forbidden ($E<V$) cases? Trace it through the
    Schrödinger equation directly.
 2. If a barrier's width is doubled (height fixed), what happens to the
    rough transmission estimate $e^{-2\kappa a}$?
 3. Explain briefly why $P(\text{transmitted})+P(\text{reflected})\approx1$
-   is a *check* on the simulator's correctness, not merely a nice-to-have
-   — what would it mean physically if this sum were significantly less
+   is a *check* on the simulator's correctness, not merely a nice-to-have.
+   What would it mean physically if this sum were significantly less
    than 1?
 
 <PracticeLinks problems={practiceProblems} />
@@ -149,7 +149,7 @@ outcome or the other, matching the correct probabilistic interpretation.
 ## Summary
 
 - In a classically forbidden region, the Schrödinger equation gives
-  exponential (not oscillatory) solutions — the wavefunction decays but
+  exponential (not oscillatory) solutions. The wavefunction decays but
   does not vanish.
 - A barrier of finite width lets a nonzero (though possibly tiny)
   amplitude survive to the far side, producing genuine, calculable
@@ -162,7 +162,7 @@ outcome or the other, matching the correct probabilistic interpretation.
 
 ## Further Exploration
 
-Next: **Numerically Evolving Quantum States** — a conceptual look at
+Next: **Numerically Evolving Quantum States**, a conceptual look at
 *how* this platform's simulator actually integrates the Schrödinger
 equation forward in time, tying together every numerical claim made in
 this course.

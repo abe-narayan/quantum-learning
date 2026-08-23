@@ -1,0 +1,145 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Shor Code: Combining Both",
+  description:
+    "Concatenating the bit-flip and phase-flip codes into a 9-qubit code that corrects an arbitrary single-qubit error, the construction derived from the last two lessons' building blocks, introduced conceptually since simulating its full circuit is beyond this course's engine.",
+  course: "error-correction-and-fault-tolerance",
+  module: "the-shor-code-combining-both",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-phase-flip-code"],
+  objectives: [
+    "Describe the Shor code's concatenated construction: phase-flip encoding, then bit-flip encoding each resulting qubit",
+    "Explain why concatenation corrects a Y error, which neither 3-qubit code alone corrects",
+    "State exactly why this platform simulates the two 3-qubit codes but not the full 9-qubit Shor code",
+  ],
+};
+
+## Motivation
+
+Practice Question 3 from two lessons ago asked what happens when both an
+$X$ and $Z$ error hit the same qubit. Neither 3-qubit code alone handles
+it. Peter Shor's 1995 code answers this by **concatenating** the two
+constructions: nine physical qubits, protecting against an arbitrary
+single-qubit error (any combination of $X$, $Y$, $Z$) on any one of them.
+
+## Mathematical Development
+
+### The construction
+
+First, phase-flip-encode the logical qubit into 3 qubits:
+$\alpha|+++\rangle+\beta|---\rangle$ (using
+`encodePhaseFlipCode`'s construction: $\alpha|000\rangle+\beta|111\rangle$
+with $H$ on every qubit turns $|000\rangle\to|+++\rangle$,
+$|111\rangle\to|---\rangle$). Then bit-flip-encode **each of those three
+qubits individually** into its own group of 3 physical qubits: $9$
+physical qubits total, in $3$ groups of $3$.
+
+### Why this catches every single-qubit error
+
+An $X$ error on one physical qubit is caught by that qubit's own
+bit-flip group, exactly as in Lesson 2. The outer phase-flip structure
+is irrelevant to it. A $Z$ error on one physical qubit flips the relative
+phase *within* its group of three identical qubits, which (because all
+three qubits in a group carry the same logical bit-flip-encoded value)
+is equivalent to a single logical $Z$ on that whole group: exactly what
+the outer phase-flip code (Lesson 3) is built to catch, now applied at
+the level of the three groups rather than three individual qubits. A $Y$
+error (both at once, on the same physical qubit) is caught by both
+mechanisms simultaneously, independently. The inner code doesn't care
+that an outer-level phase problem also exists, and vice versa.
+
+### Scope: conceptual, not simulated
+
+This platform simulates the two 3-qubit codes exactly, with real
+CNOT-based encoding and genuine partial-measurement syndrome extraction.
+The full 9-qubit Shor code needs the same ideas nested: bit-flip
+syndrome extraction *within* each group of 3, plus phase-flip syndrome
+extraction *across* the three groups, genuinely more circuitry and
+qubit bookkeeping than this course's engine builds. This is an honest,
+documented scope limit, not a claim that the construction is somehow
+different or unverifiable in principle; every piece of it is the same
+two mechanisms already built and verified separately, just nested.
+
+## Physical Interpretation
+
+Concatenation is a general strategy, not specific to Shor's code:
+protect the protectors. A code that handles one error type, nested inside
+a code that handles the other, ends up handling both, and this same
+nesting idea, taken further (codes protecting codes protecting codes), is
+exactly how real fault-tolerant quantum computing scales, a theme the
+capstone returns to.
+
+## Worked Example
+
+**Trace what happens to a lone $Z$ error on one physical qubit within the
+first group of three.**
+
+That qubit's own inner bit-flip code doesn't detect it at all ($Z$ errors
+are exactly what Lesson 2's code is blind to, as established there). But
+$Z$ acting on any one of the three identical qubits in a
+$\alpha|000\rangle+\beta|111\rangle$-encoded group has the same effect on
+the group's overall relative phase regardless of *which* of the three
+qubits it hit, so the outer phase-flip code, watching the three groups
+as its own three "logical qubits," sees exactly a logical $Z$ error on
+that one group, and corrects it using Lesson 3's mechanism at the
+group level.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming 9 qubits are needed because $3\times3=9$ is somehow a
+coincidence of the numbers.** It's structural: 3 groups (for the outer
+phase-flip code's 3 logical positions) of 3 qubits each (for each group's
+own inner bit-flip protection). The concatenation, not arithmetic
+coincidence, produces exactly 9.
+</Callout>
+
+<Callout type="mistake">
+**Believing this platform's engine could easily be extended to simulate
+the full Shor code with minor changes.** The syndrome extraction alone
+needs bookkeeping across two nested levels (within-group and
+across-group), a genuinely larger circuit, not a small addition to what
+Lessons 2 and 3 already built.
+</Callout>
+
+## Practice Questions
+
+1. How many physical qubits would a 3-level concatenation (bit-flip code,
+   inside phase-flip code, inside another bit-flip code) use? Generalize
+   the counting argument from this lesson.
+2. Explain why a $Y$ error on one physical qubit is caught by *both* the
+   inner and outer mechanisms independently, rather than needing a
+   dedicated third mechanism for the combined case.
+3. The Shor code uses 9 physical qubits to protect 1 logical qubit, a
+   9:1 overhead. Why might a lower-overhead code be preferable in
+   practice, even if Shor's code was historically first?
+4. Explain, in your own words, why this lesson's honesty about
+   *not* simulating the 9-qubit circuit doesn't undermine confidence that
+   the construction actually works.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The Shor code nests the bit-flip code inside the phase-flip code: 3
+  groups of 3 physical qubits, 9 total.
+- $X$ errors are caught within a group (inner code); $Z$ errors are caught
+  across groups (outer code, acting on relative phase); $Y$ errors are
+  caught by both simultaneously.
+- This platform simulates the two 3-qubit building blocks exactly but not
+  the full nested 9-qubit circuit, an explicit, documented scope
+  boundary.
+
+## Further Exploration
+
+Next: **Stabilizer Formalism Basics**, which gives a compact, general
+language for describing codes like these, using the two 3-qubit codes
+already built as the concrete worked examples.

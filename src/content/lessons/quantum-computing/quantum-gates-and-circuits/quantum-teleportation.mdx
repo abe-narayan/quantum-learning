@@ -3,6 +3,12 @@ import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD, PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
 import { measureQubit } from "@/lib/quantum/measurement";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/quantum-teleportation"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "Quantum Teleportation",
@@ -42,8 +48,8 @@ export const bobFinal = applySingleQubitGate(bobAfterX, PAULI_Z, 2);
 
 The last lesson proved you can't copy an unknown qubit state. This lesson
 shows what you *can* do instead: move it. Alice can hand Bob a qubit in
-exactly the state $|\psi\rangle$ she has — without either of them ever
-learning what $\alpha$ and $\beta$ are — using only a pre-shared
+exactly the state $|\psi\rangle$ she has, without either of them ever
+learning what $\alpha$ and $\beta$ are, using only a pre-shared
 entangled pair and two classical bits sent over an ordinary channel.
 Nothing about this is a trick or an approximation; it's an exact,
 completely derivable protocol using only tools already in this course.
@@ -52,12 +58,12 @@ completely derivable protocol using only tools already in this course.
 
 Alice has a qubit in an unknown state and wants Bob, far away, to end up
 holding a qubit in that same state. She can't just measure her qubit and
-describe the result to Bob — measurement only reveals one classical bit
+describe the result to Bob: measurement only reveals one classical bit
 about it (collapsing the rest), nowhere near enough to reconstruct
 $\alpha,\beta$ exactly. Cloning is ruled out. What's left is stranger and
 more powerful: entangle her unknown qubit with a shared resource, measure
 *that*, and let the entanglement itself carry the necessary information
-to Bob's qubit — up to a small, fully-known correction Alice tells him
+to Bob's qubit, up to a small, fully-known correction Alice tells him
 how to apply.
 
 ## Mathematical Development
@@ -66,7 +72,7 @@ how to apply.
 
 Three qubits. Qubit 0 is Alice's **message** qubit, in the unknown state
 she wants to send: $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$. Qubits 1
-and 2 are a Bell pair prepared in advance and shared between them — Alice
+and 2 are a Bell pair prepared in advance and shared between them: Alice
 holds qubit 1, Bob holds qubit 2, and they may be arbitrarily far apart
 by this point.
 
@@ -78,8 +84,8 @@ $$
 
 ### Alice entangles her two qubits
 
-Alice applies $\text{CNOT}(0,1)$ — her message qubit as control, her half
-of the Bell pair as target — to the full 3-qubit state:
+Alice applies $\text{CNOT}(0,1)$, her message qubit as control, her half
+of the Bell pair as target, to the full 3-qubit state:
 
 <QuantumStateDisplay state={afterEntangle} label="After CNOT(0,1)" />
 
@@ -96,15 +102,15 @@ $$
 <QuantumStateDisplay state={afterHadamard} label="After H on qubit 0" />
 
 Expanding $H$ on qubit 0 for all four terms and regrouping by Alice's two
-qubits (0 and 1) — the full expansion is mechanical but exactly the same
-bilinear distribution from Tensor Products — produces:
+qubits (0 and 1), the full expansion is mechanical but exactly the same
+bilinear distribution from Tensor Products, produces:
 
 $$
 \frac12\Big[\,|00\rangle\otimes(\alpha|0\rangle+\beta|1\rangle) + |01\rangle\otimes(\beta|0\rangle+\alpha|1\rangle) + |10\rangle\otimes(\alpha|0\rangle-\beta|1\rangle) + |11\rangle\otimes(-\beta|0\rangle+\alpha|1\rangle)\,\Big]
 $$
 
 Look closely: **Bob's qubit (the last factor) is $|\psi\rangle$ itself,
-or a simple, fixed transformation of it, in every single branch** — and
+or a simple, fixed transformation of it, in every single branch**, and
 which branch Alice is in is exactly what her two measurement outcomes
 will tell her.
 
@@ -114,10 +120,10 @@ will tell her.
 <QuantumStateDisplay state={secondMeasurement.collapsed} label={`Qubit 1 measured → outcome ${secondMeasurement.outcome}`} />
 
 Each of Alice's two measurements is exactly 50/50, **regardless of
-$\alpha,\beta$** — a fact worth pausing on: if her outcome statistics
+$\alpha,\beta$**, a fact worth pausing on: if her outcome statistics
 depended on the message, Bob could learn something about $|\psi\rangle$
 just from knowing *how* Alice's measurements were distributed, without
-even receiving her result — which would break no-signaling. They don't
+even receiving her result, which would break no-signaling. They don't
 depend on it, so nothing leaks that way.
 
 ### Bob applies a correction
@@ -133,15 +139,15 @@ four states depending on Alice's outcomes $(m_0,m_1)$:
 | $11$ | $-\beta\vert0\rangle+\alpha\vert1\rangle = XZ\vert\psi\rangle$ | apply $Z$, then $X$ |
 
 Alice sends her two classical bits to Bob (at ordinary, light-speed-limited
-communication speed — nothing here is instantaneous). Bob applies the
+communication speed, nothing here is instantaneous). Bob applies the
 matching correction:
 
 <QuantumStateDisplay state={bobUncorrected} label="Bob's qubit, before correction" showProbabilities={false} />
 <QuantumStateDisplay state={bobAfterX} label="After applying X" showProbabilities={false} />
-<QuantumStateDisplay state={bobFinal} label="After applying Z — recovers |ψ⟩ exactly" showProbabilities={false} />
+<QuantumStateDisplay state={bobFinal} label="After applying Z: recovers |ψ⟩ exactly" showProbabilities={false} />
 
 For the branch shown here (outcome $11$), Bob applies $X$ then $Z$ and
-recovers $\alpha|0\rangle+\beta|1\rangle$ exactly — the *original*
+recovers $\alpha|0\rangle+\beta|1\rangle$ exactly, the *original*
 $\alpha=0.6$, $\beta=0.8i$, with no approximation. This holds for every
 one of the four branches: the correction table above is exact, not
 probabilistic.
@@ -149,24 +155,24 @@ probabilistic.
 ## Physical Interpretation
 
 Nothing here violates no-cloning: Alice's message qubit is *destroyed* by
-her measurements (its amplitudes are gone the moment she measures),
-exactly one copy of $|\psi\rangle$ exists at any time — first on Alice's
+her measurements (its amplitudes are gone the moment she measures);
+exactly one copy of $|\psi\rangle$ exists at any time, first on Alice's
 qubit, later on Bob's, never both simultaneously. Nothing violates
 no-signaling either: without Alice's two classical bits, Bob's qubit
 (averaged over the four equally-likely branches he doesn't yet know
-which of) carries no usable information about $\psi$ at all — the
+which of) carries no usable information about $\psi$ at all. The
 classical message is doing indispensable work, at ordinary speed.
 
 ## Common Mistakes
 
 <Callout type="mistake">
-**"Teleportation sends information faster than light."** It doesn't —
+**"Teleportation sends information faster than light."** It doesn't.
 Bob cannot reconstruct $|\psi\rangle$ until Alice's classical bits
 arrive, and those travel no faster than any other classical signal.
 </Callout>
 
 <Callout type="mistake">
-**"Teleportation clones the state — now there are two.**" There is
+**"Teleportation clones the state, now there are two."** There is
 exactly one $|\psi\rangle$ at any time. Alice's message qubit is
 consumed by her measurement; it does not survive alongside Bob's copy.
 </Callout>
@@ -180,9 +186,11 @@ consumed by her measurement; it does not survive alongside Bob's copy.
 3. Suppose Alice's classical message is lost in transit. Describe exactly
    what Bob's qubit looks like to him (hint: he doesn't know which of the
    four branches he's in).
-4. Why does the protocol need a *pre-shared* Bell pair — could Alice and
+4. Why does the protocol need a *pre-shared* Bell pair? Could Alice and
    Bob instead just send an unentangled pair of qubits and get the same
    result?
+
+<PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
@@ -190,14 +198,14 @@ consumed by her measurement; it does not survive alongside Bob's copy.
   to Bob's, using a shared Bell pair, one CNOT, one Hadamard, two
   measurements, and a correction chosen from a fixed 4-row table.
 - Alice's two measurement outcomes are always exactly 50/50 each,
-  independent of $\psi$ — required for consistency with no-signaling.
+  independent of $\psi$, required for consistency with no-signaling.
 - The protocol destroys the original (measurement collapses it),
   consistent with no-cloning; it requires two classical bits of
   communication, consistent with no faster-than-light signaling.
 
 ## Further Exploration
 
-Next: **Interference in Quantum Circuits** — a shift in focus, from
+Next: **Interference in Quantum Circuits**, a shift in focus, from
 "correlate and measure" to "arrange phases so specific outcomes reinforce
 or cancel," the mechanism every quantum algorithm in later courses relies
 on.

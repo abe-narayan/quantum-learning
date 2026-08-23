@@ -1,0 +1,158 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/control-and-readout/cryogenic-systems"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Cryogenic Systems",
+  description:
+    "Why superconducting and spin qubits need millikelvin cooling, made precise: the Bose-Einstein thermal occupation n̄=1/(exp(ħω/k_BT)-1) for a 5 GHz qubit is ~10⁻⁷ at 15 mK, jumps above 1 already at 4 K, and exceeds 1000 at room temperature. A real, computed reason dilution refrigerators exist.",
+  course: "control-and-readout",
+  module: "cryogenic-systems",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms"],
+  objectives: [
+    "State the thermal photon occupation formula and explain what a large vs. small n̄ means physically for a qubit",
+    "Compute n̄ for a realistic qubit frequency at several temperatures and identify why 4K alone is insufficient",
+    "Describe a dilution refrigerator's staged cooling at a conceptual level",
+  ],
+};
+
+## Motivation
+
+Physical Qubit Platforms mentioned superconducting and spin qubits
+operate at millikelvin temperatures almost in passing. This lesson makes
+precise exactly *why*: not "cold is generally good for delicate
+things," but a specific, computable physical requirement.
+
+## Engineering Development
+
+### Thermal photon occupation
+
+A qubit's energy-level structure is, to good approximation near its
+lowest transition, a harmonic mode at some frequency $\omega$
+(Superconducting Qubits' anharmonic oscillator, right near its 0-1 gap).
+In thermal equilibrium at temperature $T$, the mean number of thermal
+photons occupying that mode follows the **Bose-Einstein distribution**:
+
+$$
+\bar n = \frac1{\exp(\hbar\omega/k_BT)-1}
+$$
+
+$\bar n\ll1$ means the mode is almost always found in its ground state,
+exactly the reliable, well-defined starting point a qubit computation
+needs. $\bar n\gtrsim1$ means the mode is thermally populated: even with
+no computation happening yet, thermal noise has already randomized which
+level the system sits in, before any gate is applied.
+
+### The numbers, computed directly
+
+For a representative 5 GHz superconducting qubit frequency,
+`thermalPhotonOccupation` gives:
+
+| Temperature | $\bar n$ |
+|---|---|
+| 15 mK (dilution fridge base) | $\approx1.1\times10^{-7}$ |
+| 100 mK | $\approx0.10$ |
+| 4 K (simple cryocooler) | $\approx16.2$ |
+| 300 K (room temperature) | $\approx1250$ |
+
+Two things stand out directly from this table: room temperature is
+wildly unusable ($\bar n\sim1000$, thousands of thermal photons per
+mode), and, more subtly, **4 K, though very cold, is still nowhere
+near cold enough** ($\bar n\approx16$, over an order of magnitude too
+warm). This is exactly why dilution refrigerators push further, to the
+$10$-$20$ mK range, rather than stopping at the comparatively easy-to-reach
+4 K stage.
+
+### Staged cooling
+
+A dilution refrigerator cools in stages: roughly room temperature, then
+liquid nitrogen temperature ($\sim77$ K), a pulse-tube stage ($\sim4$ K,
+reachable with comparatively simple mechanical cooling), and finally the
+dilution stage itself (a genuinely different cooling mechanism, based on
+the physics of mixing two isotopes of helium) reaching the millikelvin
+range. Each stage is progressively harder to build and more expensive
+to operate, a real engineering reason systems don't just try to jump
+straight to millikelvin in one step.
+
+## Physical Interpretation
+
+The 4 K vs. 15 mK gap in the table above is the single most important
+number in this lesson: it's not a matter of "colder is nicer," but a
+specific, computed threshold. $\bar n$ crosses from safely below 1 to
+well above 1 somewhere in that gap, which is exactly why the last,
+hardest cooling stage (the dilution refrigerator itself, not just a
+simpler mechanical cryocooler) is unavoidable for this class of qubit.
+
+## Worked Example
+
+**At what rough temperature does $\bar n=1$ for a 5 GHz qubit?**
+
+Setting $\bar n=1$: $\exp(\hbar\omega/k_BT)=2$, so
+$T=\hbar\omega/(k_B\ln2)$. With $\omega=2\pi\times5\times10^9\text{ Hz}$:
+
+$$
+T = \frac{(1.055\times10^{-34})(2\pi\times5\times10^9)}{(1.381\times10^{-23})(\ln2)} \approx 0.35\text{ K} = 350\text{ mK}
+$$
+
+Consistent with the table: at $100$ mK, $\bar n\approx0.10$ (below 1);
+by $4$ K, $\bar n\approx16$ (well above 1). The crossover sits
+somewhere in between, matching this estimate.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking any cryogenic temperature is "cold enough."** As the table
+shows directly, 4 K, genuinely very cold by everyday standards, still
+gives $\bar n\approx16$, more than an order of magnitude too warm for
+reliable qubit operation.
+</Callout>
+
+<Callout type="mistake">
+**Assuming higher qubit frequency always makes thermal noise worse.**
+The formula shows the opposite: HIGHER $\omega$ at fixed $T$ gives a
+SMALLER $\bar n$ (larger $\hbar\omega/k_BT$ makes the exponential
+larger). This is part of why qubit designs favor GHz-scale transition
+frequencies rather than much lower ones.
+</Callout>
+
+## Practice Questions
+
+1. Compute $\bar n$ for a 5 GHz qubit at 50 mK, and state whether this is
+   "safe" ($\bar n\ll1$) by this lesson's standard.
+2. Using the worked example's method, estimate the temperature at which
+   $\bar n=1$ for a 10 GHz qubit (double the frequency). Is it higher or
+   lower than the 5 GHz case's 350 mK, and does this match the
+   frequency-dependence stated in Common Mistakes?
+3. Why is reaching 4K comparatively "easy" while continuing to 15mK is
+   comparatively "hard"? What does this lesson say motivates a
+   multi-stage cooling design instead of one big cooling step?
+4. If a research group discovered a qubit design with a much LOWER
+   transition frequency (say, 500 MHz instead of 5 GHz), would this make
+   the cryogenic requirement easier or harder to meet, holding
+   temperature fixed? Use the formula to justify your answer.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Thermal photon occupation $\bar n=1/(\exp(\hbar\omega/k_BT)-1)$
+  quantifies exactly how "safe" a given qubit frequency and temperature
+  combination is.
+- For a representative 5 GHz qubit: $\bar n\approx10^{-7}$ at 15 mK
+  (safe), but already $\approx16$ at 4 K. 4 K alone is insufficient,
+  which is why dilution refrigerators exist as a distinct, harder cooling
+  stage.
+- Staged cooling (room temp → 77 K → 4 K → millikelvin) reflects real
+  engineering cost tradeoffs, not an arbitrary design choice.
+
+## Further Exploration
+
+Next: **Control Electronics**, which covers how microwave pulses are
+actually generated and delivered to drive the qubits this lesson keeps
+cold enough to use.

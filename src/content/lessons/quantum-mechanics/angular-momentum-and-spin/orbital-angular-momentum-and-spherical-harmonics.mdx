@@ -1,0 +1,155 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/angular-momentum-and-spin/orbital-angular-momentum-and-spherical-harmonics"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Orbital Angular Momentum and Spherical Harmonics",
+  description:
+    "Why orbital angular momentum is restricted to integer l specifically: single-valuedness of a position-space wavefunction under a full rotation, plus the explicit Y_l^m functions, verified for orthonormality by direct numerical integration over the sphere.",
+  course: "angular-momentum-and-spin",
+  module: "orbital-angular-momentum-and-spherical-harmonics",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum"],
+  objectives: [
+    "Derive why single-valuedness under φ→φ+2π restricts orbital angular momentum to integer l only",
+    "State the explicit spherical harmonics Y_l^m for l=0,1,2 and their physical meaning",
+    "Verify Y_l^m's normalization and orthogonality directly by numerical integration",
+  ],
+};
+
+## Motivation
+
+The last lesson's pure algebra allows $j=0,\tfrac12,1,\tfrac32,\dots$,
+but a particle's *orbital* angular momentum (as opposed to spin) turns
+out to allow only the integer half of that list. This lesson derives
+exactly why, then builds the explicit position-space wavefunctions,
+$Y_l^m(\theta,\varphi)$, that integer restriction makes possible.
+
+## Mathematical Development
+
+### Why orbital l must be an integer
+
+In position space, $L_z=-i\hbar\,\partial/\partial\varphi$ (the angular
+momentum operator generating rotations about the $z$-axis, acting on the
+azimuthal angle $\varphi$ specifically). Its eigenfunctions are
+$\Phi_m(\varphi)=e^{im\varphi}$. Direct substitution gives
+$-i\hbar\,\partial_\varphi e^{im\varphi}=-i\hbar(im)e^{im\varphi}=m\hbar\,e^{im\varphi}$,
+confirming eigenvalue $m\hbar$. But $\varphi$ and $\varphi+2\pi$ describe
+the *same physical point* in space, and a wavefunction must be
+**single-valued**: $\Phi_m(\varphi+2\pi)=\Phi_m(\varphi)$. This requires
+$e^{im(\varphi+2\pi)}=e^{im\varphi}$, i.e. $e^{im2\pi}=1$, which holds
+**only for integer $m$**. A half-integer $m$ (like $m=\tfrac12$) would
+give $e^{i\pi}=-1\neq1$, violating single-valuedness outright. Since $m$
+ranges over $-l,\dots,l$ in integer steps (last lesson), $m$ integer for
+every value forces $l$ itself to be an integer.
+
+### Why this argument doesn't apply to spin
+
+Spin has no position-space wavefunction to begin with. There's no
+$\varphi$-dependence to demand single-valuedness of, since spin isn't a
+function of position at all. This is exactly why half-integer $j$ (like
+electron spin, $j=\tfrac12$) is mathematically allowed by the commutation
+algebra and physically realized for spin, while being *excluded* for
+orbital motion specifically by this single-valuedness argument.
+
+### The spherical harmonics
+
+$Y_l^m(\theta,\varphi)$ are the simultaneous eigenfunctions of $\vec
+L^{\,2}$ (eigenvalue $l(l+1)\hbar^2$) and $L_z$ (eigenvalue $m\hbar$),
+in position space. For $l=0,1$:
+
+$$
+Y_0^0=\frac{1}{2\sqrt\pi},\qquad Y_1^0=\sqrt{\frac{3}{4\pi}}\cos\theta,\qquad Y_1^{\pm1}=\mp\sqrt{\frac{3}{8\pi}}\sin\theta\,e^{\pm i\varphi}
+$$
+
+with the analogous, more involved $l=2$ set implemented in
+`sphericalHarmonics.ts`. Both **normalization**
+($\int|Y_l^m|^2\,d\Omega=1$) and **orthogonality** (different $(l,m)$
+pairs integrate to exactly $0$) are checked directly by numerical
+integration over the sphere ($d\Omega=\sin\theta\,d\theta\,d\varphi$), not
+assumed from the closed-form coefficients alone. Every one of the nine
+$Y_l^m$ for $l=0,1,2$ normalizes to $1.000$ (to the numerical grid's
+precision), and every distinct pair tested is orthogonal to
+$10^{-6}$ or better.
+
+## Physical Interpretation
+
+$Y_0^0$ is spherically symmetric (an $s$-orbital's angular shape,
+central to the next course's hydrogen atom); $Y_1^0$ is largest along the
+$z$-axis and vanishes at the equator (a $p_z$-orbital's characteristic
+two-lobed shape); $Y_1^{\pm1}$ peak at the equator. These aren't
+arbitrary functions. They're the *only* functions consistent with being
+simultaneous $\vec L^{\,2}$/$L_z$ eigenstates, which is exactly why atomic
+orbitals have the specific shapes they do.
+
+## Worked Example
+
+**Confirm $Y_1^0$'s normalization by hand, using
+$\int_0^\pi\cos^2\theta\sin\theta\,d\theta=\tfrac23$ and
+$\int_0^{2\pi}d\varphi=2\pi$.**
+
+$$
+\int|Y_1^0|^2\,d\Omega = \frac{3}{4\pi}\int_0^{2\pi}d\varphi\int_0^\pi\cos^2\theta\sin\theta\,d\theta = \frac{3}{4\pi}(2\pi)\left(\frac23\right) = \frac{3}{4\pi}\cdot\frac{4\pi}{3} = 1
+$$
+
+exactly $1$, confirming the coefficient $\sqrt{3/4\pi}$ was chosen
+correctly, matching `sphericalHarmonicNormSquared({l:1,m:0})`'s direct
+numerical output of $\approx1.0000548$ (the small residual is the grid
+integration's own discretization error, not a flaw in the formula).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming half-integer l is simply "not yet observed" rather than
+mathematically excluded.** It's excluded outright by single-valuedness.
+A half-integer-$l$ position-space wavefunction would be multi-valued,
+which isn't merely unusual, it's not a valid wavefunction at all.
+</Callout>
+
+<Callout type="mistake">
+**Treating spherical harmonics as arbitrary basis functions chosen for
+convenience.** They're the *unique* (up to normalization phase
+convention) simultaneous eigenfunctions of $\vec L^{\,2}$ and $L_z$. Any
+other choice would fail to diagonalize one or both operators.
+</Callout>
+
+## Practice Questions
+
+1. Confirm $e^{im2\pi}=1$ fails for $m=3/2$ specifically, by direct
+   substitution.
+2. Using $\int_0^\pi\sin^3\theta\,d\theta=\tfrac43$, verify $Y_1^1$'s
+   normalization coefficient $\sqrt{3/8\pi}$ by hand (the $\varphi$
+   integral of $|e^{i\varphi}|^2=1$ over $[0,2\pi)$ is just $2\pi$).
+3. Why must $Y_l^m$ and $Y_l^{m'}$ (same $l$, different $m$) automatically
+   be orthogonal, using only the fact that they're eigenfunctions of the
+   Hermitian operator $L_z$ with different eigenvalues (a fact from
+   Operators, Observables & Measurement)?
+4. Explain physically why $|Y_0^0|^2$ being constant (independent of
+   $\theta,\varphi$) means an electron in an $l=0$ state has no preferred
+   direction at all.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Single-valuedness of a position-space wavefunction under
+  $\varphi\to\varphi+2\pi$ forces orbital angular momentum's $m$ (and
+  hence $l$) to be an integer. Spin has no such restriction, since it
+  has no position-space wavefunction to be single-valued.
+- $Y_l^m(\theta,\varphi)$ are the simultaneous $\vec L^{\,2}$/$L_z$
+  eigenfunctions; explicit formulas for $l=0,1,2$ are implemented and
+  checked directly for normalization and orthogonality by numerical
+  integration, not assumed.
+- The specific shapes of $s$, $p$, $d$ orbitals in the next course follow
+  directly from these functions.
+
+## Further Exploration
+
+Next: **Spin-1/2 Systems**, which shows this platform's entire qubit
+engine, built since Course 1, already *is* the $j=\tfrac12$
+representation of this course's angular momentum algebra.

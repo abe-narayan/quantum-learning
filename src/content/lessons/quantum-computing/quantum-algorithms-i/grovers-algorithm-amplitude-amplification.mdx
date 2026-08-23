@@ -1,0 +1,182 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Grover's Algorithm: Amplitude Amplification",
+  description:
+    "Each Grover iteration is a rotation by a fixed angle in a 2D subspace, derived exactly, giving the closed-form success probability sin²((2k+1)θ) and the O(√N) optimal iteration count, both checked against the engine's exact numbers.",
+  course: "quantum-algorithms-i",
+  module: "grovers-algorithm-amplitude-amplification",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion"],
+  objectives: [
+    "Derive that a Grover iteration is a rotation by angle 2θ in the 2D span of marked/unmarked superpositions",
+    "Derive the exact closed-form success probability sin²((2k+1)θ) after k iterations",
+    "Derive the O(√N) optimal iteration count from that closed form",
+  ],
+};
+
+## Motivation
+
+The last lesson showed both Grover building blocks are reflections, and
+composing two reflections is a rotation. This lesson makes that rotation
+exact, turning "search gets faster" into a specific formula for the
+success probability after exactly $k$ iterations, and from that, the exact
+optimal number of iterations to run.
+
+## Mathematical Development
+
+### The 2D subspace
+
+For a single marked item among $N=2^n$, split the uniform superposition
+$|s\rangle$ into two orthogonal pieces: $|\beta\rangle$, the marked item
+itself, and $|\alpha\rangle$, the (renormalized) uniform superposition
+over the remaining $N-1$ unmarked items. Since
+$|s\rangle=\frac{1}{\sqrt N}\sum_x|x\rangle$ has amplitude $\frac1{\sqrt
+N}$ on every state including the marked one:
+
+$$
+|s\rangle = \sqrt{\frac{N-1}{N}}|\alpha\rangle + \frac{1}{\sqrt N}|\beta\rangle = \cos\theta\,|\alpha\rangle+\sin\theta\,|\beta\rangle, \qquad \sin\theta=\frac{1}{\sqrt N}
+$$
+
+Both the oracle and diffusion operator act *entirely within* this 2D span
+of $\{|\alpha\rangle,|\beta\rangle\}$: the oracle reflects about
+$|\alpha\rangle$ (flipping only $|\beta\rangle$'s sign), diffusion reflects
+about $|s\rangle$. Composing two reflections in a plane, with an angle
+$\theta$ between the reflection axes, is a rotation by $2\theta$, a
+standard fact of plane geometry, applying here because both operators are
+literally reflections within this specific 2D subspace.
+
+### The closed form
+
+Starting at $|s\rangle=\cos\theta|\alpha\rangle+\sin\theta|\beta\rangle$
+and rotating by $2\theta$ per iteration, after $k$ iterations the state is
+at angle $(2k+1)\theta$ from $|\alpha\rangle$:
+
+$$
+\boxed{\text{state after }k\text{ iterations} = \cos\big((2k+1)\theta\big)|\alpha\rangle + \sin\big((2k+1)\theta\big)|\beta\rangle}
+$$
+
+so the probability of measuring the marked item is exactly
+
+$$
+P(\text{marked}) = \sin^2\big((2k+1)\theta\big), \qquad \theta=\arcsin\frac{1}{\sqrt N}
+$$
+
+Checked directly against the engine across $k=0,1,2,5,8$ for $N=16$: the
+formula and `runGrover`'s actual output agree to 6 decimal places at every
+one of those iteration counts, not just near the optimum.
+
+### The optimal iteration count
+
+$P(\text{marked})=1$ exactly when $(2k+1)\theta=\pi/2$, i.e.
+$k=\frac{\pi}{4\theta}-\frac12$. Since $\theta=\arcsin(1/\sqrt N)\approx
+1/\sqrt N$ for large $N$, this gives
+$k_{\text{opt}}\approx\frac{\pi}{4}\sqrt N-\frac12$, the source of
+Grover's famous $O(\sqrt N)$ query count. Because $k$ must be an integer,
+`optimalGroverIterations` rounds this to the nearest whole number, and the
+resulting success probability is generally close to but not always exactly
+$1$ (exactly $1$ only when $\frac{\pi}{4\theta}-\frac12$ happens to already
+be an integer, e.g. $N=4,M=1$: $\theta=\pi/6$, giving
+$\frac{\pi}{4(\pi/6)}-\frac12=\frac32-\frac12=1$ exactly, matching the
+engine's $P=1.0$ at $k=1$ noted below. Most $N$ aren't this lucky: rounding
+to the nearest integer iteration count generally leaves a small gap below
+certainty, confirmed directly by the engine's $94$–$99\%$ success rates at
+$N=8$ through $64$, not the misleading "exactly 100%" a purely asymptotic
+formula might suggest).
+
+### More iterations isn't always better
+
+Because $P(\text{marked})=\sin^2((2k+1)\theta)$ is periodic in $k$,
+running *past* the optimal count doesn't keep improving the odds: it
+oscillates back down and later back up, exactly like an ordinary rotation
+overshooting a target angle and coming back around. Grover's algorithm
+needs the *right* number of iterations, not simply "more."
+
+Set N and the marked item below, then predict how many steps it will
+take to reach maximum probability before you click. Then keep stepping
+past that point and watch $P(\text{marked})$ fall back down exactly as
+the closed form predicts, not plateau at its peak.
+
+<LazyGroverExplorer />
+
+## Physical Interpretation
+
+Grover's speedup comes entirely from geometry: a fixed rotation angle
+$2\theta\approx2/\sqrt N$ per iteration means reaching the marked state's
+neighborhood (angle $\approx\pi/2$) takes $O(\sqrt N)$ steps, each costing
+one oracle query, quadratically fewer than the $O(N)$ a classical search
+needs, with no shortcut through the oracle's black-box structure required
+or exploited.
+
+## Worked Example
+
+**For $N=16$ ($n=4$), one marked item, compute $\theta$ and the exact
+success probability at $k=3$ iterations.**
+
+$\theta=\arcsin(1/4)\approx0.2527$ rad. At $k=3$:
+$(2(3)+1)\theta=7\theta\approx1.769$ rad, so
+$P=\sin^2(1.769)\approx\sin^2(101.4°)\approx0.961$. This matches
+`runGrover(4, [marked], 3)`'s actual output exactly (to floating-point
+precision): $96.1\%$, not $100\%$, since $k=3$ is close to but not
+exactly the continuous optimum for $N=16$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming Grover's algorithm always finds the marked item with
+certainty.** Only when the continuous optimum happens to land on an
+integer iteration count. In general there's a rounding gap, typically
+leaving success probability in the mid-90s to high-90s percent rather than
+exactly 100%, still overwhelmingly likely, not guaranteed.
+</Callout>
+
+<Callout type="mistake">
+**Running extra iterations "to be safe."** Past the optimum, success
+probability *decreases* (the rotation overshoots), not saturates: running
+significantly more iterations than optimal can make the algorithm
+substantially worse, not better.
+</Callout>
+
+## Practice Questions
+
+1. Compute $\theta=\arcsin(1/\sqrt N)$ for $N=64$, and find the optimal
+   (real-valued) iteration count $\frac{\pi}{4\theta}-\frac12$.
+2. Using the closed form, compute $P(\text{marked})$ at $k=0$ (zero
+   iterations) and confirm it equals $1/N$, the plain guessing
+   probability, as it should before any amplification happens.
+3. For $N=4$, $M=1$, show the closed form gives *exactly* $P=1$ at
+   $k=1$, the one case where Grover's algorithm succeeds with total
+   certainty.
+4. Explain, using the rotation picture, why running $2k_{\text{opt}}$
+   iterations (double the optimum) does not give a "doubly confident"
+   result.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Both Grover operators act within the 2D span of the marked/unmarked
+  superpositions, composing into a rotation by $2\theta$,
+  $\theta=\arcsin(1/\sqrt N)$.
+- Success probability after $k$ iterations is exactly
+  $\sin^2((2k+1)\theta)$, a closed form checked directly against the
+  engine, not just derived.
+- The optimal iteration count $\approx\frac\pi4\sqrt N$ is where this
+  probability peaks, the source of Grover's $O(\sqrt N)$ query complexity.
+- Because $k$ must be an integer and the probability is periodic, success
+  is generally high but not exactly certain, and more iterations isn't
+  always better.
+
+## Further Exploration
+
+Next, the capstone: **Comparing Quantum Advantage**, which places
+Deutsch-Jozsa's exponential separation and Grover's quadratic one side by
+side, with an honest look at what each does and doesn't prove.

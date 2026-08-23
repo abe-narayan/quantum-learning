@@ -30,7 +30,7 @@ export const lessonMeta = {
 From Classical to Quantum's measurement postulate was stated as
 $P(a_i)=|c_i|^2$ for the coefficient $c_i=\langle a_i|\psi\rangle$ of a
 *single* eigenvector $|a_i\rangle$. That's exactly right when $a_i$ is
-nondegenerate — but it doesn't even typecheck when several eigenvectors
+nondegenerate, but it doesn't even typecheck when several eigenvectors
 share the eigenvalue $a_i$, since there's no single $|a_i\rangle$ to take
 a coefficient of. This lesson fixes that using last lesson's projectors.
 
@@ -38,7 +38,7 @@ a coefficient of. This lesson fixes that using last lesson's projectors.
 
 Instead of asking "how much of this *one* eigenvector is in my state," the
 generalized rule asks "how much of my state lies in this *whole
-eigenspace*" — a question that makes sense whether the eigenspace is one
+eigenspace*," a question that makes sense whether the eigenspace is one
 dimension or several, answered by the projector onto that eigenspace.
 
 ## Mathematical Development
@@ -59,7 +59,7 @@ $$
 |\psi\rangle \;\longrightarrow\; \frac{P_i|\psi\rangle}{\|P_i|\psi\rangle\|}
 $$
 
-— literally: apply the projector (keeping only the component of
+Literally: apply the projector (keeping only the component of
 $|\psi\rangle$ lying in that eigenspace), then renormalize. This is
 exactly `state.applyMatrix(P_i).normalize()` using operations this
 platform's `StateVector` already had.
@@ -73,7 +73,7 @@ P(a_i) = \langle\psi|a_i\rangle\langle a_i|\psi\rangle = \langle a_i|\psi\rangle
 $$
 
 using $\langle\psi|a_i\rangle=\langle a_i|\psi\rangle^*$ (conjugate
-symmetry of the inner product) — exactly recovering the earlier formula.
+symmetry of the inner product), exactly recovering the earlier formula.
 The generalized rule isn't a different postulate, it's the same one,
 correctly accounting for degeneracy.
 
@@ -87,7 +87,7 @@ $$
 P(a_i) = \sum_{k=1}^d |\langle e_{i,k}|\psi\rangle|^2
 $$
 
-— the sum of the individual squared-coefficient probabilities across
+the sum of the individual squared-coefficient probabilities across
 every eigenvector *sharing* that eigenvalue. This matches ordinary
 probability theory exactly: "probability the outcome is $a_i$" is the sum
 over every way the system could produce that outcome.
@@ -98,7 +98,7 @@ Collapse to $P_i|\psi\rangle/\|P_i|\psi\rangle\|$ (rather than, say,
 picking one specific eigenvector out of the degenerate subspace) is the
 physically correct rule: a measurement that only resolves "the eigenvalue
 is $a_i$" gives you no information about *where* in that eigenspace the
-state actually was, and — critically — doesn't destroy whatever
+state actually was, and, critically, doesn't destroy whatever
 information *was* there. Projecting keeps exactly the part of
 $|\psi\rangle$ consistent with the observed outcome, nothing more,
 nothing less.
@@ -121,15 +121,15 @@ $$
 |\psi'\rangle = \frac{P_1|\psi\rangle}{\sqrt{2/3}} = \frac{1}{\sqrt2}|0\rangle + \frac{1}{\sqrt2}|1\rangle
 $$
 
-(A quick check: $P(N{=}2)=|1/\sqrt3|^2=\tfrac13$, and $\tfrac23+\tfrac13=1$
-— probabilities sum to 1, as they must.)
+(A quick check: $P(N{=}2)=|1/\sqrt3|^2=\tfrac13$, and $\tfrac23+\tfrac13=1$,
+probabilities sum to 1, as they must.)
 
 ## Common Mistakes
 
 <Callout type="mistake">
 **Collapsing to an arbitrarily chosen single eigenvector.** The correct
 post-measurement state is the *normalized projection*, which in general
-retains a superposition *within* the degenerate eigenspace — only if the
+retains a superposition *within* the degenerate eigenspace. Only if the
 pre-measurement state happened to already be a single eigenvector does
 collapse leave it looking "simple."
 </Callout>
@@ -137,7 +137,7 @@ collapse leave it looking "simple."
 <Callout type="mistake">
 **Forgetting to renormalize after applying the projector.** $P_i|\psi
 \rangle$ generally has norm less than 1 (some probability went to *other*
-outcomes) — dividing by $\|P_i|\psi\rangle\|$ is not optional.
+outcomes). Dividing by $\|P_i|\psi\rangle\|$ is not optional.
 </Callout>
 
 ## Practice Questions
@@ -156,9 +156,9 @@ outcomes) — dividing by $\|P_i|\psi\rangle\|$ is not optional.
 ## Summary
 
 - $P(a_i)=\langle\psi|P_i|\psi\rangle$, with collapse to
-  $P_i|\psi\rangle/\|P_i|\psi\rangle\|$ — correct for any eigenvalue,
+  $P_i|\psi\rangle/\|P_i|\psi\rangle\|$: correct for any eigenvalue,
   degenerate or not.
-- This reduces exactly to $|c_i|^2$ in the nondegenerate case — a
+- This reduces exactly to $|c_i|^2$ in the nondegenerate case, a
   generalization, not a different rule.
 - In the degenerate case, the probability is the sum of $|c|^2$ over
   every eigenvector sharing that eigenvalue, and the post-measurement

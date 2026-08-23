@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Eigenvalues and Eigenvectors",
   description:
-    "The vectors an operator only rescales, not rotates — the characteristic equation, worked eigenvalue problems for the Pauli matrices, and the trace/determinant shortcuts.",
+    "The vectors an operator only rescales, not rotates: the characteristic equation, worked eigenvalue problems for the Pauli matrices, and the trace/determinant shortcuts.",
   course: "mathematical-foundations",
   module: "eigenvalues-and-eigenvectors",
   order: 1,
@@ -25,7 +25,7 @@ export const lessonMeta = {
 ## Motivation
 
 Most vectors, hit with an operator, come out pointing in some new
-direction. A special few come out pointing the *same* direction — only
+direction. A special few come out pointing the *same* direction, only
 stretched or shrunk. Those are an operator's **eigenvectors**, and they
 matter enormously in physics: for the operators representing physical
 observables, eigenvectors turn out to be exactly the states with a
@@ -33,7 +33,7 @@ definite, predictable value of that observable.
 
 ## Intuition
 
-Picture an operator as a transformation of the plane — most directions get
+Picture an operator as a transformation of the plane. Most directions get
 tilted somewhere else, but there's usually a couple of special axes that
 just get stretched along themselves. Those axes are the eigenvectors; the
 stretch factor along each is its eigenvalue.
@@ -49,7 +49,7 @@ $$
 A|v\rangle = \lambda|v\rangle
 $$
 
-The requirement $v\ne0$ matters — $A\cdot0=\lambda\cdot0$ is true for
+The requirement $v\ne0$ matters: $A\cdot0=\lambda\cdot0$ is true for
 *every* $\lambda$ and tells you nothing.
 
 ### The characteristic equation
@@ -63,7 +63,7 @@ $$
 \det(A-\lambda I) = 0
 $$
 
-This is the **characteristic equation** — a polynomial in $\lambda$ whose
+This is the **characteristic equation**, a polynomial in $\lambda$ whose
 roots are exactly $A$'s eigenvalues.
 
 ### The $2\times2$ case, worked in general
@@ -95,7 +95,7 @@ $\det(X)=0\cdot0-1\cdot1=-1$, so $\lambda^2-1=0 \Rightarrow
 
 **Eigenvector for $\lambda=1$:** solve $(X-I)v=0$:
 $\begin{pmatrix}-1&1\\1&-1\end{pmatrix}\begin{pmatrix}v_1\\v_2\end{pmatrix}=0
-\Rightarrow v_1=v_2$. Normalizing, $v = \frac{1}{\sqrt2}(1,1)$ — this is
+\Rightarrow v_1=v_2$. Normalizing, $v = \frac{1}{\sqrt2}(1,1)$, this is
 $|+\rangle$ from the Quantum Computing track, if you've seen it.
 
 **Eigenvector for $\lambda=-1$:** solve $(X+I)v=0 \Rightarrow v_1=-v_2$,
@@ -110,7 +110,7 @@ confirmed).
 ### Diagonalization
 
 If $A$ has a full basis of eigenvectors $\{|v_i\rangle\}$ with eigenvalues
-$\{\lambda_i\}$, then in that basis $A$'s matrix is diagonal — the
+$\{\lambda_i\}$, then in that basis $A$'s matrix is diagonal: the
 off-diagonal entries $\langle v_i|A|v_j\rangle$ for $i\ne j$ vanish,
 because $A|v_j\rangle=\lambda_j|v_j\rangle$ is proportional to
 $|v_j\rangle$, which is orthogonal to $\langle v_i|$ when the eigenbasis
@@ -166,7 +166,7 @@ trace, you've made an arithmetic error somewhere.
    using the trace/determinant shortcut.
 2. Find an eigenvector of $Y$ for its eigenvalue $+1$.
 3. Find the eigenvalues of $\begin{pmatrix}3&0\\0&5\end{pmatrix}$ without
-   any calculation — explain why a diagonal matrix's eigenvalues are
+   any calculation. Explain why a diagonal matrix's eigenvalues are
    immediate.
 4. A $2\times2$ matrix has trace $6$ and one eigenvalue is $2$. What is
    the other?
@@ -177,13 +177,13 @@ trace, you've made an arithmetic error somewhere.
 
 - $A|v\rangle=\lambda|v\rangle$, $v\ne0$; eigenvalues are the roots of the
   characteristic equation $\det(A-\lambda I)=0$.
-- For a $2\times2$ matrix, $\lambda^2-\operatorname{tr}(A)\lambda+\det(A)=0$
-  — eigenvalues sum to the trace and multiply to the determinant.
+- For a $2\times2$ matrix, $\lambda^2-\operatorname{tr}(A)\lambda+\det(A)=0$:
+  eigenvalues sum to the trace and multiply to the determinant.
 - Pauli-$X$ has eigenvalues $\pm1$ with eigenvectors $|+\rangle,|-\rangle$.
 - A full eigenbasis diagonalizes an operator's matrix.
 
 ## Further Exploration
 
 Next: **Hermitian Operators**, which proves eigenvalues are always real
-and eigenvectors from different eigenvalues are always orthogonal — for
+and eigenvectors from different eigenvalues are always orthogonal, for
 the specific class of operators representing physical observables.

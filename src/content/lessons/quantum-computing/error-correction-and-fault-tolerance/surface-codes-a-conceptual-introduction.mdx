@@ -1,0 +1,170 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Surface Codes: A Conceptual Introduction",
+  description:
+    "Why real quantum hardware roadmaps build toward surface codes rather than the Shor code: nearest-neighbor-only stabilizers on a 2D grid, arbitrarily improvable distance, and a genuinely honest account of why this platform doesn't simulate one.",
+  course: "error-correction-and-fault-tolerance",
+  module: "surface-codes-a-conceptual-introduction",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map"],
+  objectives: [
+    "Describe the surface code's 2D lattice structure and its two types of local stabilizers",
+    "Explain why nearest-neighbor-only stabilizers matter for real hardware, using this platform's own qubit-connectivity-free engine as a contrast",
+    "State precisely why this platform covers surface codes conceptually rather than in simulated code",
+  ],
+};
+
+## Motivation
+
+The Shor code needs 9-qubit-wide stabilizers and offers no way to improve
+its distance without redesigning the whole code. The **surface code**,
+the leading candidate for real, large-scale fault-tolerant quantum
+computing, fixes both problems: every stabilizer touches only 4
+neighboring qubits on a 2D grid, and distance grows simply by making the
+grid bigger, with no fundamental redesign.
+
+## Mathematical Development
+
+### The lattice structure
+
+Physical qubits sit on the edges of a 2D grid. Two types of stabilizer,
+one per grid vertex and one per grid face, are each a product of $Z$'s
+(vertex stabilizers) or $X$'s (face stabilizers) on the 4 qubits touching
+that vertex or face, always exactly 4 qubits, **regardless of how large
+the grid grows**. This is the key structural improvement over the 3- and
+9-qubit codes: every one of this course's earlier codes needed a
+stabilizer touching *every* qubit in some group; a surface code's
+stabilizers stay local and small, however large the overall code gets.
+
+### Distance scales with grid size
+
+A surface code's distance equals the grid's linear size (roughly, the
+shorter of its two dimensions): a $d\times d$ grid gives a
+distance-$d$ code, using $O(d^2)$ physical qubits for 1 logical qubit.
+Unlike the Shor code, where reaching a larger distance means an entirely
+different, hand-designed construction, a surface code's distance is a
+single tunable parameter: build a bigger grid, get a more robust code,
+using the same stabilizer *pattern*, just repeated.
+
+### Why locality matters for real hardware
+
+Every code this course built and simulated used `applyCNOT` and
+`applyControlledGate` between whichever two qubit indices a lesson
+specified; this platform's engine has no notion of physical qubit
+*layout* or *connectivity* at all, so any two qubits can interact as
+easily as any other. Real hardware is not like this: physical qubits sit
+at fixed locations, and a two-qubit gate is far easier (and far less
+error-prone) between physically adjacent qubits than between distant
+ones. A stabilizer that only ever needs 4 *neighboring* physical qubits,
+never a long-range interaction across the whole device, is directly
+implementable on hardware with only local connectivity, which is exactly
+why surface codes, not the Shor code, are what real superconducting and
+other qubit-platform roadmaps are built around (a fact this course's
+Quantum Hardware pillar develops further).
+
+### Scope: conceptual only
+
+Genuinely simulating even a small surface code (say, distance 3, needing
+roughly 9 physical qubits plus additional stabilizer-measurement
+ancillas, arranged and connected on an actual 2D pattern) is substantially
+more engineering than this course's `errorCorrection.ts` builds. Real
+implementations also need a nontrivial *decoding* algorithm (commonly
+minimum-weight perfect matching) to interpret many simultaneous syndrome
+measurements, itself a serious piece of software distinct from the
+simple lookup table Lesson 2's 3-qubit code could use. This is named
+explicitly as out of scope, not glossed over: this course teaches the
+structural *idea* (local stabilizers, tunable distance) precisely, without
+claiming a working simulated implementation that doesn't exist here.
+
+## Physical Interpretation
+
+The surface code's core insight is architectural, not purely
+mathematical: trade some qubit efficiency (more physical qubits per
+logical qubit than a hypothetical "optimal" code) for a stabilizer
+structure that real, physically-constrained hardware can actually
+measure, exactly the kind of tradeoff the Quantum Hardware pillar's
+courses (built on the different but related question of what physical
+qubits can and can't easily do) explore from the engineering side.
+
+## Worked Example
+
+**Compare qubit efficiency: the Shor code's 9 physical qubits for
+distance 3, versus a surface code's approximate qubit count for the same
+distance.**
+
+A distance-3 surface code needs roughly $3^2=9$ data qubits (matching the
+Shor code's count here, since both happen to need $\sim d^2$ or $3d$
+qubits respectively at this small size) *plus* separate ancilla qubits for
+each stabilizer measurement (proportional to the number of stabilizers,
+also $O(d^2)$), so at distance 3 specifically, the surface code isn't
+obviously more efficient. The real advantage shows up at *larger*
+distance: reaching distance 11, say, needs a Shor-style code with an
+entirely different, much larger hand-designed construction, while a
+surface code just needs an $11\times11$ grid of the *same* repeated
+stabilizer pattern, an engineering and design advantage that grows with
+scale, not a small-distance one.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming surface codes always use fewer qubits than the Shor code.**
+At small distance, the comparison is roughly even: the surface code's
+real advantage is in how its qubit count and stabilizer structure scale
+to *larger* distances with a repeated, local pattern, not in beating the
+Shor code outright at distance 3.
+</Callout>
+
+<Callout type="mistake">
+**Believing this platform's flexible any-qubit-to-any-qubit gates reflect
+real hardware.** They don't: this engine's gate functions accept any
+two qubit indices with no notion of physical distance, which is precisely
+why surface codes' locality requirement is a *real hardware constraint*
+this platform's engine doesn't model or need to model for its educational
+purposes.
+</Callout>
+
+## Practice Questions
+
+1. Why does a vertex stabilizer's 4-qubit locality remain exactly 4,
+   regardless of whether the overall grid is $3\times3$ or $30\times30$?
+2. Explain, using the distance-and-correctable-error relationship from
+   the last lesson, why a $30\times30$ surface code tolerates far more
+   simultaneous errors than a $3\times3$ one.
+3. Name one piece of real hardware engineering (not covered by this
+   platform's engine) that a working surface-code implementation would
+   need beyond what Lessons 2–3's 3-qubit codes required.
+4. Why might a hardware platform with only nearest-neighbor qubit
+   connectivity struggle to implement the *Shor* code efficiently, even
+   though this platform's own engine implements it (conceptually) with no
+   difficulty at all?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Surface codes use local, 4-qubit stabilizers on a 2D grid, a
+  structural improvement over the Shor code's whole-group stabilizers.
+- Distance scales directly with grid size, using a single repeated
+  stabilizer pattern rather than a new hand-designed construction per
+  distance.
+- Local stabilizers match real hardware's nearest-neighbor connectivity
+  constraints, a genuine engineering reason, not just a mathematical
+  preference, for their dominance in real roadmaps.
+- This platform covers the structural idea conceptually; simulating even
+  a small surface code (plus its decoding algorithm) is explicitly out of
+  scope.
+
+## Further Exploration
+
+Next, the capstone: **Fault-Tolerant Thresholds and Resource Overhead**,
+which quantifies exactly how many physical qubits real roadmaps expect to
+need per logical qubit, tying this course's abstract distance parameter
+to concrete numbers.

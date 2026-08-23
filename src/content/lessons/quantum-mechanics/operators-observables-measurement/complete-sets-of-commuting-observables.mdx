@@ -24,8 +24,8 @@ export const lessonMeta = {
 
 ## Motivation
 
-The very first worked example of this course used $N=\mathrm{diag}(1,1,2)$
-— an operator whose eigenvalue $1$ doesn't tell you which of two
+The very first worked example of this course used $N=\mathrm{diag}(1,1,2)$,
+an operator whose eigenvalue $1$ doesn't tell you which of two
 orthogonal states you're in, only that you're *somewhere* in their span.
 If $N$ were the only observable you ever had access to, you'd have no way
 to fully label the state. This lesson builds the fix: find a second
@@ -35,8 +35,8 @@ eigenvectors.
 
 ## Intuition
 
-Think of $N$'s eigenvalue as a coarse label — "which shelf" — and a
-second, compatible observable as a finer label — "which position on the
+Think of $N$'s eigenvalue as a coarse label, "which shelf," and a
+second, compatible observable as a finer label, "which position on the
 shelf." Together, the two labels uniquely address every state, even
 though neither one alone does the job.
 
@@ -47,7 +47,7 @@ though neither one alone does the job.
 Take $N=\mathrm{diag}(1,1,2)$ from the first lesson, with its
 2-dimensional degenerate eigenspace $\mathrm{span}\{|0\rangle,|1\rangle\}$
 for eigenvalue $1$. Any **diagonal** matrix automatically commutes with
-$N$ (diagonal matrices always commute with each other — multiplying two
+$N$ (diagonal matrices always commute with each other: multiplying two
 diagonal matrices in either order just multiplies corresponding diagonal
 entries). So take
 
@@ -66,9 +66,9 @@ $(N,M)$ now uniquely labels every basis state:
 | $\lvert1\rangle$ | 1 | $-5$ |
 | $\lvert2\rangle$ | 2 | 7 |
 
-No single column has three different entries — $N$ alone can't
+No single column has three different entries. $N$ alone can't
 distinguish $|0\rangle$ from $|1\rangle$, and (in this particular example)
-$M$ alone happens to distinguish everything on its own — but the *pair*
+$M$ alone happens to distinguish everything on its own, but the *pair*
 $(N,M)$ always works together as a joint label, which is the property
 that generalizes to cases (like real physical systems) where no single
 observable would suffice alone.
@@ -77,7 +77,7 @@ observable would suffice alone.
 
 A set of mutually commuting observables $\{A,B,C,\ldots\}$ is a
 **complete set of commuting observables** (a CSCO) if their *joint*
-eigenvalues $(a,b,c,\ldots)$ uniquely label every basis state — no two
+eigenvalues $(a,b,c,\ldots)$ uniquely label every basis state: no two
 distinct basis states share the same full tuple of eigenvalues. Every
 observable in the set is compatible with every other (all commute
 pairwise, so the last lesson guarantees a shared eigenbasis exists for
@@ -89,7 +89,7 @@ unresolved.
 This is exactly the structure behind labeling real quantum states with
 multiple **quantum numbers**. A preview, not derived here: the hydrogen
 atom's energy alone doesn't uniquely specify a state (many different
-orbital shapes share the same energy) — it takes a complete set,
+orbital shapes share the same energy). It takes a complete set,
 conventionally $\{H, L^2, L_z\}$ (energy, total angular momentum
 squared, and one component of angular momentum), to fully label a state
 as $|n,l,m\rangle$. That's a future course's derivation; the *reason* it
@@ -108,8 +108,8 @@ $$
 MN = \begin{pmatrix}5&0&0\\0&-5&0\\0&0&7\end{pmatrix}\begin{pmatrix}1&0&0\\0&1&0\\0&0&2\end{pmatrix} = \begin{pmatrix}5&0&0\\0&-5&0\\0&0&14\end{pmatrix}
 $$
 
-$NM=MN$, so $[N,M]=0$, exactly as claimed — diagonal matrices commuting
-is not a coincidence specific to this example, it holds for *any* two
+$NM=MN$, so $[N,M]=0$, exactly as claimed. Diagonal matrices commuting
+is not a coincidence specific to this example; it holds for *any* two
 diagonal matrices, since multiplying diagonal matrices only ever
 multiplies matching diagonal entries, an operation that plainly doesn't
 care about order.
@@ -119,20 +119,20 @@ care about order.
 <Callout type="mistake">
 **Assuming any second observable resolves a degeneracy.** It must both
 commute with the first *and* take different values on the degenerate
-eigenvectors — a compatible observable that happens to be constant across
+eigenvectors. A compatible observable that happens to be constant across
 the whole degenerate eigenspace resolves nothing.
 </Callout>
 
 <Callout type="mistake">
 **Thinking a CSCO must consist of exactly two observables.** The number
-needed depends entirely on how much degeneracy there is to resolve — one
+needed depends entirely on how much degeneracy there is to resolve. One
 suffices for a fully nondegenerate spectrum, and real physical systems
 (like hydrogen) can need three or more.
 </Callout>
 
 ## Practice Questions
 
-1. For $N=\mathrm{diag}(1,1,1)$ (every eigenvalue equal — total
+1. For $N=\mathrm{diag}(1,1,1)$ (every eigenvalue equal, total
    degeneracy), what is the smallest additional information needed to
    fully label a basis state? Is $N$ itself useful at all here?
 2. Give a different diagonal $M'$ (not equal to the one above) that also
@@ -158,5 +158,5 @@ suffices for a fully nondegenerate spectrum, and real physical systems
 ## Further Exploration
 
 Next: **The Measurement Postulate, Generalized**, using this course's
-projectors to state Born's rule correctly for degenerate eigenvalues —
+projectors to state Born's rule correctly for degenerate eigenvalues,
 where the earlier $|c_i|^2$ form silently assumed there wasn't any.

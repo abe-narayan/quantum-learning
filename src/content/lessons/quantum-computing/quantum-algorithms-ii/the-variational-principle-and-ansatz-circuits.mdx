@@ -1,0 +1,160 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Variational Principle and Ansatz Circuits",
+  description:
+    "Every state's energy expectation value sits above the true ground energy, a short, complete proof that motivates a fundamentally different kind of quantum algorithm: search over circuit parameters with a classical optimizer, rather than a fixed sequence of gates.",
+  course: "quantum-algorithms-ii",
+  module: "the-variational-principle-and-ansatz-circuits",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-algorithms-ii/worked-example-factoring-15"],
+  objectives: [
+    "Prove the variational principle: ⟨ψ|H|ψ⟩ ≥ E₀ for any normalized |ψ⟩",
+    "Define an ansatz circuit and explain what 'expressive enough' means precisely",
+    "Contrast the hybrid quantum-classical algorithm structure with Shor's fixed-circuit structure",
+  ],
+};
+
+## Motivation
+
+Shor's algorithm is a fixed sequence of gates, run once, with a classical
+post-processing step at the end. **VQE (the variational quantum
+eigensolver)** and **QAOA** work completely differently: a
+parameterized circuit is run many times, with a *classical optimizer*
+adjusting its parameters between runs to improve some measured quantity,
+a genuinely hybrid loop, not a one-shot circuit. This lesson derives the
+mathematical fact that makes that loop meaningful at all.
+
+## Mathematical Development
+
+### The variational principle, proved
+
+Let $H$ be a Hermitian Hamiltonian with eigenvalues
+$E_0\le E_1\le\cdots$ and corresponding orthonormal eigenstates
+$|\phi_0\rangle,|\phi_1\rangle,\dots$ ($E_0$ the ground-state energy). Any
+normalized state $|\psi\rangle$ can be written in this eigenbasis:
+$|\psi\rangle=\sum_ic_i|\phi_i\rangle$, with $\sum_i|c_i|^2=1$. Then:
+
+$$
+\langle\psi|H|\psi\rangle = \sum_i|c_i|^2E_i \geq \sum_i|c_i|^2E_0 = E_0\sum_i|c_i|^2 = E_0
+$$
+
+using $E_i\geq E_0$ for every $i$ in the inequality step. So
+**$\langle\psi|H|\psi\rangle\geq E_0$ for every normalized $|\psi\rangle$,
+with equality exactly when $|\psi\rangle=|\phi_0\rangle$** (any weight on
+a higher-energy eigenstate strictly increases the expectation value,
+unless that eigenstate happens to be degenerate with $E_0$). This is the
+**variational principle**: the ground energy is a genuine lower bound on
+every state's energy expectation value, and minimizing that expectation
+value over some family of states can only approach $E_0$ from above,
+never overshoot below it.
+
+### The ansatz and the hybrid loop
+
+An **ansatz** is a parameterized circuit $|\psi(\vec\theta)\rangle$. This
+platform's single-qubit VQE uses
+$|\psi(\theta,\varphi)\rangle=R_z(\varphi)R_y(\theta)|0\rangle$, which
+reaches *every* point on the Bloch sphere as $\theta,\varphi$ vary, so it
+can represent the exact ground state of *any* single-qubit Hamiltonian,
+not merely approximate it. The **hybrid loop**: measure
+$\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ on the quantum device
+(via `costFunction`, reusing `expectationValue` directly), feed that
+number to a classical optimizer, get updated parameters, repeat.
+`runVqe` implements this with pattern search (try a step in each parameter
+direction, keep whichever improves the cost, shrink the step when nothing
+does), a genuine, if simple, optimizer, not a hardcoded answer.
+
+### Why the variational principle matters for an imperfect optimizer
+
+The variational principle guarantees `runVqe`'s output energy is *always*
+at least $E_0$, no matter how badly the optimizer performs or how few
+iterations it runs, a real safety property this course's tests check
+directly (`result.energy >= exact - 1e-6` for every Hamiltonian tried).
+The optimizer can fail to *reach* $E_0$; the variational principle
+guarantees it can never report something *below* $E_0$, which would signal
+a bug (in the ansatz, the cost function, or the optimizer) rather than a
+better answer.
+
+## Physical Interpretation
+
+VQE and QAOA are built for a different regime than Shor's algorithm: they
+tolerate imperfect answers (an approximate ground energy, a near-optimal
+cut) in exchange for using much shallower circuits. This is the reason
+this family of algorithms is the leading candidate for near-term ("NISQ",
+covered in the capstone) hardware that can't yet run Shor's deep,
+long-coherence-time circuits reliably.
+
+## Worked Example
+
+**For $H=Z$ (eigenvalues $+1,-1$), confirm the variational principle holds
+for the ansatz state at $\theta=\pi/2,\varphi=0$ (i.e. $|+\rangle$).**
+
+$Z|+\rangle=|-\rangle$, and
+$\langle+|Z|+\rangle=\langle+|-\rangle=0$ (an even, $50/50$ mix of the two
+eigenvalues under this particular state). $E_0=-1$ for $H=Z$, and indeed
+$0\geq-1$: the variational principle holds, though this particular
+$\theta,\varphi$ is far from optimal (the true minimizer is
+$\theta=\pi,\varphi=0$, giving $|1\rangle$, energy exactly $-1$).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Believing a lower measured energy is always more trustworthy.** The
+variational principle says the *true* minimum is a hard floor. If an
+implementation ever reports an energy below the Hamiltonian's actual
+smallest eigenvalue, that's evidence of a bug, not a better answer.
+</Callout>
+
+<Callout type="mistake">
+**Assuming any ansatz can represent any Hamiltonian's ground state.**
+This platform's specific $R_z R_y$ single-qubit ansatz can (it spans the
+whole Bloch sphere), but a poorly chosen or insufficiently expressive
+ansatz for a larger system can systematically fail to reach $E_0$ no
+matter how well the classical optimizer runs, a real and active
+limitation of VQE in practice.
+</Callout>
+
+## Practice Questions
+
+1. Prove the variational principle's equality case: show that if
+   $|\psi\rangle=|\phi_0\rangle$ exactly, $\langle\psi|H|\psi\rangle=E_0$.
+2. For $H=-Z$ (eigenvalues $-1,+1$, so $E_0=-1$ still, but now belonging
+   to $|1\rangle$ rather than $|0\rangle$), which $(\theta,\varphi)$
+   minimizes the ansatz energy?
+3. Explain, using the eigenbasis expansion in the derivation, why a state
+   with *any* nonzero overlap with an excited eigenstate has strictly
+   higher energy than $E_0$ (assuming no degeneracy at $E_0$).
+4. Why does this platform's ansatz needing only 2 real parameters
+   ($\theta,\varphi$) to span every single-qubit state not generalize
+   automatically to larger systems? (Hint: how many real parameters does a
+   general $n$-qubit pure state need?)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The variational principle, $\langle\psi|H|\psi\rangle\geq E_0$ for any
+  normalized $|\psi\rangle$, follows directly from expanding $|\psi\rangle$
+  in $H$'s eigenbasis.
+- An ansatz circuit parameterizes a family of trial states; the hybrid
+  loop alternates quantum expectation-value measurement with classical
+  parameter updates.
+- This platform's single-qubit ansatz is exactly expressive enough to
+  reach any single-qubit ground state, verified directly, not merely
+  argued.
+- The variational principle guarantees the optimizer's output energy is
+  never below the true ground energy, a genuine safety check built into
+  this course's own tests.
+
+## Further Exploration
+
+Next: **VQE: A Worked Toy Example**, running the full hybrid optimization
+loop on two different Hamiltonians and confirming convergence to their
+exact ground-state energies.

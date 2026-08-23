@@ -7,6 +7,10 @@ import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
+import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
+import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
+import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
+import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
 
 export const metadata: Metadata = {
   title: "Simulators",
@@ -14,11 +18,6 @@ export const metadata: Metadata = {
 };
 
 const COMING_SOON_SIMULATORS = [
-  {
-    title: "Circuit builder",
-    description: "Drag and drop gates onto a circuit and watch the resulting state evolve.",
-    tag: "Coming soon",
-  },
   {
     title: "Interference playground",
     description: "Explore how amplitude interference powers algorithms like Grover's.",
@@ -91,6 +90,54 @@ export default function SimulatorsPage() {
           </p>
           <div className="mt-6">
             <LazyDensityMatrixExplorer />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Circuit Builder</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Build a real circuit gate by gate on 2 or 3 qubits, then step through it to watch the state vector
+            evolve at every stage. The same build-then-run model real quantum SDKs use.
+          </p>
+          <div className="mt-6">
+            <LazyCircuitBuilder />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Grover&rsquo;s Algorithm Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Step through Grover&rsquo;s algorithm one oracle-and-diffusion iteration at a time and watch the
+            marked state&rsquo;s amplitude grow, using the platform&rsquo;s real, tested Grover engine, not a
+            scripted animation.
+          </p>
+          <div className="mt-6">
+            <LazyGroverExplorer />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Rabi / Qubit Dynamics Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Drive a two-level system and watch population oscillate between the ground and excited state, exactly
+            (via direct numerical integration of the Schrödinger equation), both as a P(1) curve over time and as
+            a genuine Bloch-sphere trajectory. Detune the drive and watch the maximum transferable population
+            drop below 1, following 4V²/(Δ²+4V²) exactly.
+          </p>
+          <div className="mt-6">
+            <LazyRabiExplorer />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Noise &amp; Decoherence Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Apply a real Kraus-operator noise channel (amplitude damping or dephasing) to a qubit step by step and
+            watch its Bloch vector shrink from the sphere&rsquo;s surface toward the channel&rsquo;s fixed point,
+            with purity and entropy updating live from the platform&rsquo;s tested open-systems engine.
+          </p>
+          <div className="mt-6">
+            <LazyNoiseExplorer />
           </div>
         </section>
       </div>

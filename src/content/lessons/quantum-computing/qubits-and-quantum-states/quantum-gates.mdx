@@ -1,9 +1,15 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/qubits-and-quantum-states/quantum-gates"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "Quantum Gates",
   description:
-    "The X, Y, Z, H, S, and T gates — what they do to a qubit, why they must be unitary, and how each one moves the Bloch vector.",
+    "The X, Y, Z, H, S, and T gates: what they do to a qubit, why they must be unitary, and how each one moves the Bloch vector.",
   course: "qubits-and-quantum-states",
   module: "quantum-gates",
   order: 1,
@@ -19,19 +25,19 @@ export const lessonMeta = {
 
 ## Motivation
 
-Everything up to now has described qubit *states* — points on the sphere.
+Everything up to now has described qubit *states*: points on the sphere.
 This lesson introduces the *operations*: the tools that move a qubit from
 one point to another. These are quantum gates, and every quantum circuit
 you'll ever see is just a sequence of them.
 
 ## Intuition
 
-A classical logic gate (AND, NOT, OR) takes a bit and produces a bit — and
+A classical logic gate (AND, NOT, OR) takes a bit and produces a bit, and
 most of them are irreversible: given the output of an AND gate, you can't
 recover its two inputs. Quantum gates are different by requirement: they
 must be **reversible**, which turns out to mean every quantum gate is a
-*rotation* of the Bloch sphere. Rotations never destroy information —
-rotate one way, then rotate back, and you're exactly where you started.
+*rotation* of the Bloch sphere. Rotations never destroy information.
+Rotate one way, then rotate back, and you're exactly where you started.
 That single constraint shapes everything about how quantum gates behave.
 
 ## Mathematical Development
@@ -52,7 +58,7 @@ For this to equal $\langle\psi|\psi\rangle$ for *every* state
 $|\psi\rangle$, we need $U^\dagger U = I$. A matrix satisfying this is
 called **unitary**. Unitary matrices are automatically invertible (with
 $U^{-1}=U^\dagger$), which is exactly the reversibility property from the
-intuition above — undoing a gate is just applying its conjugate
+intuition above: undoing a gate is just applying its conjugate
 transpose.
 
 ### The gates
@@ -61,7 +67,7 @@ Each gate below is unitary (check $U^\dagger U=I$ yourself as practice for
 any of them), acts on a single qubit, and has a specific geometric meaning
 as a rotation of the Bloch vector by some angle about some axis.
 
-**$X$ — bit flip.**
+**$X$: bit flip.**
 
 $$
 X = \begin{pmatrix}0&1\\1&0\end{pmatrix}, \qquad X|0\rangle=|1\rangle, \quad X|1\rangle=|0\rangle
@@ -77,23 +83,23 @@ Y = \begin{pmatrix}0&-i\\i&0\end{pmatrix}, \qquad Y|0\rangle=i|1\rangle, \quad Y
 $$
 
 Rotates by $\pi$ about the $y$-axis. Notice $Y|0\rangle = i|1\rangle$, not
-plain $|1\rangle$ — an extra phase factor $i$ appears that $X|0\rangle$
+plain $|1\rangle$: an extra phase factor $i$ appears that $X|0\rangle$
 didn't have. Geometrically $X|0\rangle$ and $Y|0\rangle$ land at the exact
 same point on the sphere. The next lesson explains precisely why that
 extra $i$ doesn't matter.
 
-**$Z$ — phase flip.**
+**$Z$: phase flip.**
 
 $$
 Z = \begin{pmatrix}1&0\\0&-1\end{pmatrix}, \qquad Z|0\rangle=|0\rangle, \quad Z|1\rangle=-|1\rangle
 $$
 
 Leaves $|0\rangle$ untouched and flips the sign of $|1\rangle$'s
-coefficient. Rotates by $\pi$ about the $z$-axis — which is why it fixes
+coefficient. Rotates by $\pi$ about the $z$-axis, which is why it fixes
 the poles (they sit *on* the $z$-axis) while still doing something to
 every other point.
 
-**$H$ — Hadamard.**
+**$H$: Hadamard.**
 
 $$
 H = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}, \qquad H|0\rangle=|+\rangle, \quad H|1\rangle=|-\rangle
@@ -101,30 +107,30 @@ $$
 
 Let's verify $H|0\rangle$ directly:
 $H|0\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}(|0\rangle+|1\rangle) = |+\rangle$.
-$H$ is the gate that *creates* superposition from a definite state — and,
+$H$ is the gate that *creates* superposition from a definite state, and
 since it's its own inverse ($H^2=I$, worth checking), it also *removes*
 superposition: $H|+\rangle=|0\rangle$. Geometrically, $H$ rotates by $\pi$
-about the diagonal axis exactly between the $x$- and $z$-axes — the only
+about the diagonal axis exactly between the $x$- and $z$-axes, the only
 one of these six gates whose axis isn't a coordinate axis.
 
-**$S$ and $T$ — phase gates.**
+**$S$ and $T$: phase gates.**
 
 $$
 S = \begin{pmatrix}1&0\\0&i\end{pmatrix}, \qquad T = \begin{pmatrix}1&0\\0&e^{i\pi/4}\end{pmatrix}
 $$
 
 Both leave $|0\rangle$ alone and multiply $|1\rangle$'s coefficient by a
-phase — $i=e^{i\pi/2}$ for $S$, $e^{i\pi/4}$ for $T$. In the canonical
+phase: $i=e^{i\pi/2}$ for $S$, $e^{i\pi/4}$ for $T$. In the canonical
 Bloch form, multiplying $\beta$ by $e^{i\delta}$ is exactly adding
 $\delta$ to $\varphi$: $S$ rotates by $\pi/2$ about the $z$-axis (a
 quarter turn), $T$ by $\pi/4$ (an eighth turn). Unlike $X,Y,Z,H$, neither
-is its own inverse — $S^2=Z$ (two quarter-turns make a half-turn) and
+is its own inverse: $S^2=Z$ (two quarter-turns make a half-turn) and
 $S^4=I$.
 
 ## Physical Interpretation
 
 Every gate here rotates the Bloch vector by a fixed angle about a fixed
-axis. That's not a coincidence of these six examples — it's a general
+axis. That's not a coincidence of these six examples. It's a general
 fact about single-qubit gates that the next lesson proves directly. Once
 you see it that way, you don't need to memorize six unrelated matrices;
 you need one geometric picture ("rotate the sphere") and six axis/angle
@@ -136,7 +142,7 @@ pairs.
 
 Starting from $|0\rangle$, apply each gate one at a time (resetting to
 $|0\rangle$ between each) and watch where the vector lands. Then try
-composing two gates without resetting — e.g. $H$ then $S$ then $H$ — and
+composing two gates without resetting, e.g. $H$ then $S$ then $H$, and
 predict the final position before you click, using the matrices above.
 
 ## Worked Example
@@ -150,7 +156,7 @@ $$
 
 Bloch coordinates use $\alpha=0,\beta=i$:
 $x=2\operatorname{Re}(\alpha^*\beta)=0$, $y=2\operatorname{Im}(\alpha^*\beta)=0$,
-$z=|\alpha|^2-|\beta|^2 = 0-1=-1$. That's $(0,0,-1)$ — the south pole,
+$z=|\alpha|^2-|\beta|^2 = 0-1=-1$. That's $(0,0,-1)$, the south pole,
 exactly where $X|0\rangle=|1\rangle$ also lands. Same point, different
 amplitudes: $i|1\rangle$ vs. plain $|1\rangle$.
 
@@ -158,13 +164,13 @@ amplitudes: $i|1\rangle$ vs. plain $|1\rangle$.
 
 <Callout type="mistake">
 **Assuming every gate is its own inverse.** $X,Y,Z,H$ are (applying any
-of them twice gives back the identity), but $S$ and $T$ are not — $S$
+of them twice gives back the identity), but $S$ and $T$ are not: $S$
 needs to be applied four times, $T$ needs eight, to return to identity.
 </Callout>
 
 <Callout type="mistake">
 **Reading matrix-vector multiplication in the wrong order.** $U|\psi\rangle$
-means "apply $U$'s rows to $|\psi\rangle$'s column" — the standard
+means "apply $U$'s rows to $|\psi\rangle$'s column," the standard
 matrix-vector product. If your arithmetic keeps producing the wrong
 answer, write out $|\psi\rangle$ as an explicit column vector first.
 </Callout>
@@ -183,19 +189,21 @@ answer, write out $|\psi\rangle$ as an explicit column vector first.
 5. Predict, without a calculator, what $T^8|1\rangle$ equals. Justify it
    from the rotation-angle picture, not matrix multiplication.
 
+<PracticeLinks problems={practiceProblems} />
+
 ## Summary
 
 - Gates must be unitary ($U^\dagger U = I$) so that valid states map to
-  valid states — this is what makes them reversible.
+  valid states. This is what makes them reversible.
 - $X,Y,Z$ each rotate by $\pi$ about their respective axis; $H$ rotates by
   $\pi$ about the diagonal between $x$ and $z$; $S$ and $T$ rotate by
   $\pi/2$ and $\pi/4$ about $z$.
-- $Y|0\rangle=i|1\rangle$ lands on the same Bloch point as $X|0\rangle=|1\rangle$
-  — same rotation, different overall phase.
+- $Y|0\rangle=i|1\rangle$ lands on the same Bloch point as $X|0\rangle=|1\rangle$,
+  same rotation, different overall phase.
 
 ## Further Exploration
 
 Next: **Single-Qubit Rotations**, which generalizes every gate in this
-lesson into one formula — a rotation by *any* angle about *any* axis —
+lesson into one formula, a rotation by *any* angle about *any* axis,
 and proves the claim that every single-qubit gate is secretly one of
 these.

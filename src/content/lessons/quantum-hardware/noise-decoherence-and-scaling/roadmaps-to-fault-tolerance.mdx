@@ -1,0 +1,139 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/noise-decoherence-and-scaling/roadmaps-to-fault-tolerance"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Roadmaps to Fault Tolerance",
+  description:
+    "Closing this course by connecting every noise source covered, T1/T2, crosstalk, compounding gate error, to the concrete physical-to-logical qubit overhead (often estimated in the hundreds to low thousands of physical qubits per logical qubit) that real hardware roadmaps target, and being honest about how far current devices are from that goal.",
+  course: "noise-decoherence-and-scaling",
+  module: "roadmaps-to-fault-tolerance",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/noise-decoherence-and-scaling/scaling-challenges"],
+  objectives: [
+    "Summarize how this course's noise sources feed into the physical-to-logical qubit overhead question",
+    "Explain the NISQ (noisy intermediate-scale quantum) era's defining characteristic, honestly",
+    "State what 'fault tolerant' actually means as a target, distinguishing it from simply 'more qubits'",
+  ],
+};
+
+## Motivation
+
+Every prior lesson in this course built one piece of the noise picture:
+sources, T1/T2, crosstalk, compounding error. This capstone-style lesson
+asks the practical roadmap question: what does it actually take to reach
+a genuinely fault-tolerant quantum computer, and how far away is that?
+
+## Synthesis
+
+### From physical error rate to logical qubits
+
+Error Correction & Fault Tolerance's threshold theorem says: below a
+critical physical error rate, encoding into logical qubits (using
+redundant physical qubits per logical one) can suppress logical error
+rate arbitrarily. The catch, which that course's honest-scope framing
+already flagged, is that the overhead is large. Depending on the code and
+target logical error rate, estimates commonly range from the low hundreds
+to several thousand physical qubits per logical qubit for full fault
+tolerance at a useful scale, a genuinely large multiplier, not a minor
+implementation detail.
+
+### The NISQ era
+
+**NISQ** (Noisy Intermediate-Scale Quantum) names the current era
+honestly: devices with tens to a few thousand physical qubits, without
+full error correction, whose usefulness is bounded by exactly this
+course's compounding-error problem (Scaling Challenges). NISQ-era
+algorithms (Quantum Algorithms II's VQE and QAOA are exactly this
+category) are specifically designed to extract value from shallow
+circuits, few enough sequential gates that compounding error stays
+tolerable, rather than assuming fault tolerance is already available.
+
+### What "fault tolerant" actually targets
+
+A fault-tolerant quantum computer isn't simply "a quantum computer with
+more qubits." It's a device where logical error rates are suppressed
+far enough below physical error rates that arbitrarily long, deep
+computations become reliable, via the specific error-correction overhead
+mechanism above. This is a qualitatively different target from
+NISQ-scale devices, not merely a bigger version of one.
+
+## Honest Scope Statement
+
+This course covered noise sources, T1/T2, crosstalk, and compounding
+error quantitatively; it did not derive the threshold theorem itself
+(Error Correction & Fault Tolerance's scope) or attempt to predict a
+timeline for reaching fault tolerance, genuinely active, evolving
+engineering questions across the entire field, not settled facts this
+platform can state with false precision.
+
+## Worked Example
+
+**A target logical error rate requires roughly 1000 physical qubits per
+logical qubit (a representative, illustrative estimate). How many
+physical qubits would a 50-logical-qubit fault-tolerant algorithm need?**
+
+$$
+50 \times 1000 = 50{,}000 \text{ physical qubits}
+$$
+
+Dramatically more than any current device's qubit count, illustrating
+concretely why fault-tolerant quantum computing at a useful scale is
+described as a longer-term target rather than an immediate one.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Conflating "large qubit count" with "fault tolerant."** As the worked
+example shows, a fault-tolerant algorithm's PHYSICAL qubit requirement
+can be orders of magnitude larger than its LOGICAL qubit count. A
+1000-physical-qubit NISQ device and a 1000-physical-qubit slice of a
+fault-tolerant system are not the same kind of thing.
+</Callout>
+
+<Callout type="mistake">
+**Treating NISQ as a permanent limitation rather than a named era.**
+NISQ describes the CURRENT state of the field honestly. It's a
+description of where hardware is now, not a claim about where it must
+remain.
+</Callout>
+
+## Practice Questions
+
+1. Using the worked example's 1000-to-1 estimate, how many physical
+   qubits would a 10-logical-qubit fault-tolerant algorithm need?
+2. What specifically does NISQ stand for, and what does it describe
+   about current hardware?
+3. Why are VQE and QAOA (Quantum Algorithms II) specifically well-suited
+   to the NISQ era, connecting to this course's Scaling Challenges
+   lesson?
+4. Explain, in your own words, why "more qubits" alone does not equal
+   "closer to fault tolerant," using this lesson's physical-vs-logical
+   distinction.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The threshold theorem's error-correction overhead (commonly estimated
+  in the hundreds to low thousands of physical qubits per logical qubit)
+  is the concrete target real hardware roadmaps are built around.
+- NISQ honestly names the current era: noisy, intermediate-scale devices
+  without full error correction, whose usefulness is bounded by this
+  course's compounding-error problem.
+- Fault tolerance is a qualitatively different target from "more
+  qubits." It requires suppressing logical error rates far below
+  physical ones, at real and substantial physical-qubit overhead cost.
+
+## Further Exploration
+
+This closes **Noise, Decoherence & Scaling**, and the entire Quantum
+Hardware pillar. The Quantum Software pillar's courses (Programming
+Quantum Computers, Simulating Quantum Systems, Compilation & Hybrid
+Algorithms) pick up from here, covering how software actually targets
+and works around exactly the hardware constraints this pillar described.

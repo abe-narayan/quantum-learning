@@ -1,0 +1,143 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/identical-particles/indistinguishability"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Indistinguishability",
+  description:
+    "Two identical quantum particles literally cannot be tracked as 'particle 1' vs 'particle 2': swapping their labels must leave every physical prediction unchanged, which forces the combined wavefunction to be either exactly symmetric or exactly antisymmetric under exchange.",
+  course: "identical-particles",
+  module: "indistinguishability",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/approximation-methods/time-dependent-perturbation-theory"],
+  objectives: [
+    "Explain why quantum indistinguishability is stronger than classical 'looks the same'",
+    "Define the exchange operator P₁₂ and show its eigenvalues must be ±1",
+    "Build a two-particle product state and confirm it is (in general) neither a +1 nor a -1 exchange eigenstate",
+  ],
+};
+
+## Motivation
+
+Two classical billiard balls of the same mass and color are identical in
+every measurable property, yet you could in principle paint a tiny dot on
+one and track it. Classically, indistinguishability is a statement
+about *information you don't bother collecting*, not a fact about
+reality. Two electrons cannot be told apart even in principle: there is
+no dot to paint, no trajectory to follow between measurements. This
+lesson makes that difference mathematically precise.
+
+## Mathematical Development
+
+### The exchange operator
+
+For a two-particle state $\psi(1,2)$ (particle 1 in some situation,
+particle 2 in another), define the **exchange operator**
+$P_{12}\psi(1,2)=\psi(2,1)$: it swaps which particle is "assigned" to
+which single-particle state. Since the particles are physically
+identical, swapping them must leave every observable prediction
+unchanged: $|P_{12}\psi|^2=|\psi|^2$ everywhere.
+
+### Why the eigenvalues are exactly ±1
+
+Applying $P_{12}$ twice returns the original labeling exactly:
+$P_{12}^2\psi(1,2)=P_{12}\psi(2,1)=\psi(1,2)$, so $P_{12}^2=I$. If
+$\psi$ is an eigenstate, $P_{12}\psi=\lambda\psi$, then
+$P_{12}^2\psi=\lambda^2\psi=\psi$, forcing $\lambda^2=1$, so
+$\lambda=+1$ or $\lambda=-1$, no other value is possible. Nature turns
+out to use both: particles with $\lambda=+1$ (symmetric wavefunctions)
+are **bosons**; particles with $\lambda=-1$ (antisymmetric) are
+**fermions**. The next lesson names this the spin-statistics
+connection.
+
+### A generic product state is not an eigenstate
+
+Given two single-particle states $|a\rangle,|b\rangle$ (built as
+ordinary vectors in some orbital basis), the plain product
+$|a\rangle\otimes|b\rangle$ (particle 1 in $a$, particle 2 in $b$) is
+*not*, in general, an eigenstate of $P_{12}$ at all. Exchanging gives
+$|b\rangle\otimes|a\rangle$, a genuinely different vector whenever
+$a\neq b$. This platform's `exchangeParticles` function performs exactly
+this swap on a combined amplitude vector, confirmed directly: applying
+it to a plain tensor product does *not* return the same vector (nor its
+negative), while applying it to `symmetrize(a,b)` or `antisymmetrize(a,b)`
+does, with eigenvalue $+1$ and $-1$ respectively (verified next lesson).
+
+## Physical Interpretation
+
+Because a plain product state isn't a valid exchange eigenstate, "particle
+1 in state $a$, particle 2 in state $b$" is not, by itself, a physically
+meaningful description of two identical particles. Only the symmetric
+or antisymmetric *combination* is. This is the mathematical content of
+"you cannot track which particle is which": the state itself refuses to
+single one out.
+
+## Worked Example
+
+**Confirm numerically that $|0\rangle\otimes|1\rangle$ is not an
+eigenstate of exchange, using a 3-dimensional single-particle basis
+$\{|0\rangle,|1\rangle,|2\rangle\}$.**
+
+`tensorProduct(e0, e1)` gives the combined vector with a 1 in the "particle
+1 in state 0, particle 2 in state 1" slot; `exchangeParticles` on that
+vector gives the "particle 1 in state 1, particle 2 in state 0" vector,
+a different vector entirely (not equal to the original, and not equal to
+its negative), confirming directly that a bare product state carries
+spurious, unphysical "which particle is where" information that a valid
+two-identical-particle state cannot have.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking indistinguishability just means "hard to tell apart in
+practice."** Classical identical particles are indistinguishable in this
+weaker sense too, but can still (in principle) be tracked via continuous
+trajectories. Quantum indistinguishability is the stronger claim that no
+physically meaningful state can carry "particle 1 vs particle 2"
+information at all.
+</Callout>
+
+<Callout type="mistake">
+**Assuming any two-particle wavefunction automatically has a definite
+exchange symmetry.** As the worked example shows, a bare product state
+$|a\rangle\otimes|b\rangle$ does not. Definite exchange symmetry is a
+special property that must be built in explicitly (next lesson).
+</Callout>
+
+## Practice Questions
+
+1. Show algebraically that $P_{12}^2=I$ follows directly from the
+   definition $P_{12}\psi(1,2)=\psi(2,1)$.
+2. Why does $P_{12}^2=I$ restrict its eigenvalues to exactly $\{+1,-1\}$,
+   and not, say, any value with $|\lambda|=1$?
+3. If $|a\rangle=|b\rangle$ (both particles assigned to the *same*
+   single-particle state), is the bare product $|a\rangle\otimes|a\rangle$
+   an eigenstate of $P_{12}$? What eigenvalue?
+4. Explain, in one sentence, why "particle 1 is in state $a$" is not a
+   physically meaningful statement for two identical particles, using
+   this lesson's exchange-operator argument.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Quantum indistinguishability means no measurable prediction can depend
+  on which identical particle is "labeled" which, a genuinely stronger
+  statement than classical indistinguishability.
+- The exchange operator $P_{12}$ satisfies $P_{12}^2=I$, forcing its
+  eigenvalues to be exactly $+1$ or $-1$.
+- A bare product state $|a\rangle\otimes|b\rangle$ is generally not a
+  $P_{12}$ eigenstate at all, confirmed directly by this platform's
+  `exchangeParticles` function, so it isn't, by itself, a valid state
+  of two identical particles.
+
+## Further Exploration
+
+Next: **Bosons & Fermions**, which builds the actual $+1$ and $-1$
+eigenstates explicitly (symmetrization and antisymmetrization) and
+verifies their eigenvalues directly.

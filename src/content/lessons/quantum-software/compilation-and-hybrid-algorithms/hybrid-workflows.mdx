@@ -1,0 +1,153 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Hybrid Quantum-Classical Workflows",
+  description:
+    "VQE and QAOA (Quantum Algorithms II) were built as physics: a parametrized circuit and an energy function. This lesson names the SOFTWARE PATTERN underneath both, a repeated quantum-evaluate/classical-update loop, and shows every previous course's compilation concerns (transpilation, decomposition, noise) apply on EVERY iteration, not just once.",
+  course: "compilation-and-hybrid-algorithms",
+  module: "hybrid-workflows",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 18,
+  prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/gate-decomposition"],
+  objectives: [
+    "Describe the general hybrid quantum-classical loop structure underlying VQE and QAOA",
+    "Explain why compilation overhead (transpilation, decomposition) matters more for hybrid algorithms than single-shot circuits",
+    "Identify which parts of a hybrid algorithm run on the quantum device and which run classically",
+  ],
+};
+
+## Motivation
+
+Quantum Algorithms II built VQE and QAOA as physics: minimize
+$\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ over parameters
+$\vec\theta$. This lesson looks at the same algorithms from a software
+angle: what does actually running one look like, step by step, and what
+does this course's compilation machinery mean for that process?
+
+## Engineering Development
+
+### The general hybrid loop
+
+Every variational algorithm follows the same repeated pattern:
+
+1. **Classical**: propose parameters $\vec\theta$ (initially a guess,
+   later informed by previous iterations).
+2. **Quantum**: build and run a circuit implementing the parametrized
+   ansatz $|\psi(\vec\theta)\rangle$, going through transpilation
+   (previous lessons) and returning measurement statistics.
+3. **Classical**: compute the cost function (e.g. $\langle H\rangle$)
+   from those measurement results, and decide the next $\vec\theta$
+   (Quantum Algorithms II's `runVqe` coordinate-wise search, or a
+   gradient-based method).
+4. **Repeat** until convergence.
+
+This is exactly what `runVqe` and `runQaoa` (Quantum Algorithms II)
+already implement, just described here as a general software pattern
+rather than a physics algorithm, the SAME structure Quantum SDKs
+Overview named as PennyLane's specific area of strength.
+
+### Why compilation overhead compounds here
+
+Every prior lesson's compilation concern, transpilation's SWAP
+overhead, gate decomposition into native rotations, noise (Noise,
+Decoherence & Scaling), applies once PER ITERATION of this loop, not
+once total. A VQE run with 100 optimization iterations transpiles and
+executes its ansatz circuit 100 separate times; any per-circuit
+overhead (SWAP gates, native-gate translation, statistical shot noise)
+is paid 100 times over, not once. This is a real, often-dominant cost
+driver for hybrid algorithms specifically, distinct from a single-shot
+circuit's one-time compilation cost.
+
+### What runs where
+
+The quantum device does exactly one job: prepare $|\psi(\vec\theta)\rangle$
+and report measurement statistics. EVERY OTHER STEP, proposing new
+parameters, computing the cost function from measurement results,
+deciding convergence, runs on ordinary classical hardware. This
+division is precisely why these are called "hybrid" algorithms: neither
+purely classical nor purely quantum, but a genuine collaboration between
+the two, with the quantum device doing only the one piece (native
+quantum-mechanical evaluation) classical computers fundamentally cannot
+do efficiently.
+
+## Physical Interpretation
+
+Recognizing this loop structure explains a real, practical fact about
+NISQ-era algorithms (Noise, Decoherence & Scaling): their total runtime
+is often dominated by the NUMBER OF ITERATIONS times per-iteration
+overhead, not by any single circuit's raw gate count, which is exactly
+why minimizing per-circuit compilation and execution overhead (this
+course's entire subject) matters disproportionately for hybrid
+algorithms specifically.
+
+## Worked Example
+
+**A VQE run needs 200 iterations; each iteration's ansatz circuit needs
+6 SWAP gates for connectivity (Quantum Compilation & Transpilation) on
+top of its native circuit. How many total SWAP gates does the full
+optimization run require?**
+
+$$
+200 \times 6 = 1200 \text{ SWAP gates total}
+$$
+
+A substantial number, even though each individual iteration's
+overhead (6 SWAPs) sounds modest. This directly motivates
+connectivity-aware ansatz design (choosing which qubits interact to
+minimize per-iteration SWAP count) as a real, high-leverage optimization
+for hybrid algorithms specifically.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating VQE/QAOA's classical optimizer as a minor implementation
+detail.** It's an equal partner in the algorithm's structure. The
+quantum device does ONE well-defined job (state preparation and
+measurement); everything else, including the crucial decision of what
+to try next, is genuinely classical computation.
+</Callout>
+
+<Callout type="mistake">
+**Underestimating per-iteration overhead because a single iteration's
+cost looks small.** As the worked example shows, modest per-iteration
+overhead multiplies substantially across the many iterations a real
+optimization run needs.
+</Callout>
+
+## Practice Questions
+
+1. List the four steps of the general hybrid loop, in order.
+2. For a VQE run with 500 iterations and 4 SWAP gates of overhead per
+   iteration, compute the total SWAP-gate count across the full run.
+3. Which specific step in the hybrid loop is the ONLY one that must run
+   on an actual quantum device, and why can't classical hardware perform
+   it efficiently instead?
+4. Explain why PennyLane's differentiable-programming design (Quantum
+   SDKs Overview) is particularly well-suited to STEP 3 of this lesson's
+   general loop specifically.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Every variational algorithm follows the same loop: classical parameter
+  proposal, quantum circuit execution, classical cost evaluation,
+  repeat, exactly what `runVqe`/`runQaoa` already implement.
+- Compilation overhead (SWAP gates, native-gate decomposition) applies
+  PER ITERATION, compounding substantially across a full optimization
+  run, a real, often-dominant cost for hybrid algorithms specifically.
+- The quantum device's role is narrowly scoped to state preparation and
+  measurement; every other step is genuine classical computation.
+
+## Further Exploration
+
+Next: **Variational Algorithm Implementation**, which builds this exact
+loop end to end using this platform's own `QuantumCircuit`, closing the
+gap between this course's software concepts and Quantum Algorithms II's
+physics.

@@ -1,0 +1,163 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Ladder Operators and the Angular Momentum Spectrum",
+  description:
+    "The full quantized spectrum of angular momentum, j(j+1)ħ² total, m from −j to +j in integer steps, derived from the commutation algebra alone, using the same raising/lowering strategy already proven for the harmonic oscillator.",
+  course: "angular-momentum-and-spin",
+  module: "ladder-operators-and-the-angular-momentum-spectrum",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 35,
+  prerequisites: ["quantum-mechanics/angular-momentum-and-spin/angular-momentum-commutation-relations"],
+  objectives: [
+    "Derive [Jz,J±]=±ħJ± and explain why this makes J± raise/lower Jz's eigenvalue by ħ",
+    "Derive the boundedness argument that forces m between −j and +j",
+    "State why j must be an integer or half-integer, not any real number",
+  ],
+};
+
+## Motivation
+
+From Classical to Quantum, the harmonic oscillator's entire energy
+spectrum was derived from the ladder operators $a,a^\dagger$ and the
+single relation $[a,a^\dagger]=1$, no calculus, no wavefunctions. Angular
+momentum's spectrum comes from exactly the same strategy, applied to a
+different pair of ladder operators built from $L_x,L_y$ (or the general
+$J_x,J_y$) instead.
+
+## Mathematical Development
+
+### Building the ladder operators
+
+Define $J_\pm=J_x\pm iJ_y$. From last lesson's commutators:
+
+$$
+[J_z,J_\pm] = [J_z,J_x]\pm i[J_z,J_y] = i\hbar J_y \pm i(-i\hbar J_x) = \pm\hbar(J_x\pm iJ_y) = \pm\hbar J_\pm
+$$
+
+### J± raises/lowers Jz's eigenvalue by ħ
+
+Suppose $J_z|j,m\rangle=m\hbar|j,m\rangle$ for some eigenstate. Then:
+
+$$
+J_z(J_\pm|j,m\rangle) = (J_\pm J_z + [J_z,J_\pm])|j,m\rangle = J_\pm(m\hbar)|j,m\rangle \pm\hbar J_\pm|j,m\rangle = (m\pm1)\hbar\,(J_\pm|j,m\rangle)
+$$
+
+So $J_\pm|j,m\rangle$ is itself a $J_z$ eigenstate, with eigenvalue
+raised (or lowered) by exactly $\hbar$, precisely the harmonic
+oscillator's $a^\dagger|n\rangle\propto|n+1\rangle$ argument, with $J_z$'s
+spectrum playing the role $\hat N$'s did there.
+
+### Boundedness forces a top and bottom rung
+
+$\vec J^{\,2}-J_z^2=J_x^2+J_y^2$ is a sum of squares of Hermitian
+operators, so its expectation value in *any* state is $\geq0$. Writing
+$\vec J^{\,2}$'s eigenvalue as $j(j+1)\hbar^2$ (a labeling convention,
+not yet a constraint) on a state with $J_z$ eigenvalue $m\hbar$:
+
+$$
+j(j+1)\hbar^2 - m^2\hbar^2 \geq 0 \implies m^2 \leq j(j+1)
+$$
+
+$m$ is bounded above and below. Since $J_+$ keeps raising $m$ by 1
+indefinitely unless it eventually annihilates the state, there must be a
+**top rung** $m=j$ where $J_+|j,j\rangle=0$, and by the same logic a
+**bottom rung** $m=-j$ where $J_-|j,-j\rangle=0$; otherwise $m$ would
+exceed its bound. Both terminations are needed simultaneously, and since
+$J_+$ raises $m$ in steps of exactly $1$ (in units of $\hbar$), the
+distance from the bottom rung to the top, $j-(-j)=2j$, must be a
+**non-negative integer**, forcing
+
+$$
+\boxed{j = 0,\ \tfrac12,\ 1,\ \tfrac32,\ 2,\ \dots}
+$$
+
+exactly the half-integer-or-integer spectrum angular momentum is famous
+for, derived here from pure algebra, not assumed.
+
+### Verified directly
+
+`angularMomentumRaising(j)` acting on the top state ($m=j$, index 0 in
+this platform's basis convention) gives exactly the zero vector, for
+every $j$ tested; `angularMomentumLowering(j)` similarly annihilates the
+bottom state. Both are checked directly, confirming the boundedness
+argument produces exactly the matrices this platform's engine
+independently builds from the raw matrix-element formula.
+
+## Physical Interpretation
+
+Nothing about *space* or *rotation* entered this derivation. It's pure
+consequence of the commutation algebra $[J_i,J_j]=i\hbar\epsilon_{ijk}J_k$.
+This is exactly why the same math applies unchanged to spin (which has
+no classical rotational picture at all): spin-1/2's $j=\tfrac12$ isn't a
+separate assumption, it's the *smallest nontrivial solution* this
+algebra allows.
+
+## Worked Example
+
+**For $j=1$, list every allowed value of $m$ and confirm there are
+exactly $2j+1=3$ of them.**
+
+Starting at the top rung $m=j=1$ and stepping down by $1$ until reaching
+the bottom rung $m=-j=-1$: $m=1,0,-1$, exactly $3=2(1)+1$ values,
+matching `angularMomentumZ(1)`'s $3\times3$ matrix having exactly 3
+diagonal entries, $1,0,-1$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming $j$ can be any half-integer independently of the specific
+system.** The *set* of allowed $j$ values is $0,\tfrac12,1,\tfrac32,\dots$
+in general, but which $j$ a specific physical system actually has (spin-
+$\tfrac12$ for an electron's intrinsic spin, integer $l$ for orbital
+angular momentum specifically, shown next lesson) is additional physical
+input, not derivable from the commutation algebra alone.
+</Callout>
+
+<Callout type="mistake">
+**Confusing $\vec J^{\,2}$'s eigenvalue $j(j+1)\hbar^2$ with $(j\hbar)^2$.**
+They're different numbers for any $j>0$: $j(j+1)>j^2$ always, reflecting
+that $\vec J^{\,2}$ includes contributions from $J_x^2+J_y^2$, not just
+$J_z^2$'s own eigenvalue squared.
+</Callout>
+
+## Practice Questions
+
+1. For $j=3/2$, list all four allowed values of $m$.
+2. Confirm $j(j+1)>j^2$ for $j=1$ specifically, and explain what physical
+   quantity the difference, $j(j+1)-j^2=j$, represents (Hint: relate it
+   to $J_x^2+J_y^2$'s expectation value on the top state $|j,j\rangle$).
+3. Using $[J_z,J_+]=\hbar J_+$ directly (not the general argument),
+   verify that if $J_z|j,m\rangle=m\hbar|j,m\rangle$ then
+   $J_z(J_+|j,m\rangle)=(m+1)\hbar(J_+|j,m\rangle)$, showing every step
+   of the algebra explicitly.
+4. Why does the boundedness argument need *both* a top rung and a bottom
+   rung to conclude $2j$ is an integer? What would go wrong with only one
+   of the two?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $J_\pm=J_x\pm iJ_y$ satisfy $[J_z,J_\pm]=\pm\hbar J_\pm$, making them
+  raise/lower $J_z$'s eigenvalue by exactly $\hbar$, the same strategy as
+  the harmonic oscillator's ladder operators.
+- Boundedness ($J_x^2+J_y^2\geq0$) forces a top and bottom rung, and the
+  integer-step spacing between them forces $j=0,\tfrac12,1,\tfrac32,\dots$,
+  derived, not assumed.
+- Verified directly: `angularMomentumRaising`/`Lowering` annihilate the
+  predicted top/bottom states exactly, for every $j$ tested.
+
+## Further Exploration
+
+Next: **Orbital Angular Momentum and Spherical Harmonics**, which shows
+specifically why *orbital* angular momentum is restricted to integer $j$
+only. Half-integer orbital angular momentum, while allowed by this
+lesson's algebra alone, turns out to be physically excluded for a
+particle in ordinary 3D space.

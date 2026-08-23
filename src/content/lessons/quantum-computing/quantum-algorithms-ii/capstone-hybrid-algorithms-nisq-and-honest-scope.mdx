@@ -1,0 +1,166 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Capstone: Hybrid Algorithms, NISQ, and Honest Scope",
+  description:
+    "Shor's algorithm and the VQE/QAOA family side by side: circuit depth, error tolerance, and hardware requirements, plus an explicit accounting of exactly which pieces of each algorithm this course built, simulated directly, or left as a documented, honest gap.",
+  course: "quantum-algorithms-ii",
+  module: "capstone-hybrid-algorithms-nisq-and-honest-scope",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example"],
+  objectives: [
+    "Contrast Shor's algorithm's circuit-depth and error-tolerance requirements with VQE/QAOA's",
+    "Define the NISQ era precisely and explain why it favors hybrid algorithms",
+    "Give a complete, honest accounting of this course's toy-vs-real-scale gaps",
+  ],
+};
+
+## Motivation
+
+This course built two structurally different families of quantum
+algorithm: Shor's, a long, precise, fixed circuit needing everything to go
+right in one shot; VQE/QAOA, short, repeated, error-tolerant circuits
+whose classical outer loop can partly compensate for imperfect quantum
+hardware. This capstone makes the comparison explicit, and closes with a
+complete list of what this course actually built versus simulated
+versus left as a documented gap.
+
+## Mathematical Development
+
+### Circuit depth and error tolerance
+
+Shor's algorithm needs a circuit whose depth grows with $N$ (more counting
+qubits, more controlled modular multiplications) and whose *entire*
+output must be correct. A single bit-flip anywhere in a deep circuit can
+corrupt the period-finding measurement beyond recovery, which is why
+factoring cryptographically relevant numbers is believed to require
+**fault-tolerant** hardware (physical qubits protected by quantum error
+correction, the next course's subject) that doesn't exist at scale yet.
+
+VQE and QAOA use comparatively shallow circuits (one ansatz layer, or a
+few QAOA layers) run *many times*, with the classical optimizer able to
+partially average out or route around some kinds of noise. They aren't
+immune to it, but they're structurally more tolerant of imperfection than
+a single long, must-be-exactly-right circuit.
+
+### The NISQ era, defined
+
+**NISQ** (Noisy Intermediate-Scale Quantum) names the current hardware
+era: tens to a few thousand physical qubits, no error correction, limited
+circuit depth before noise dominates the signal. VQE and QAOA are the
+leading NISQ-era algorithm candidates precisely because their hybrid
+structure was designed around these constraints. Shor's algorithm, at
+cryptographically relevant scale, is understood to need
+**fault-tolerant** hardware, a different, more demanding hardware
+regime this platform's `error-correction-and-fault-tolerance` course
+covers next.
+
+### A complete accounting
+
+Table of exactly what this course built:
+
+| Algorithm | What was derived | What the engine simulates directly | What was scoped out |
+|---|---|---|---|
+| Deutsch-Jozsa (prior course) | Full circuit and amplitude formula | Full circuit, exactly | Nothing omitted |
+| QFT / phase estimation | Full circuit and derivation | Full circuit, exactly | Multi-qubit controlled-$U$ (restricted to $2\times2$ $U$) |
+| Grover's | Full circuit and rotation formula | Full circuit, exactly | Nothing omitted |
+| Shor's (period finding) | Full number-theory reduction | The period-finding *state* directly (not gate-by-gate) and its QFT analysis, exactly | The controlled-modular-exponentiation circuit itself; continued fractions |
+| VQE | Variational principle, ansatz | Full hybrid loop, exactly, for 1 qubit | Multi-qubit ansätze and Hamiltonians |
+| QAOA | Cost/mixer derivation | Full circuit, exactly, for small graphs | A real classical optimizer (grid search substitutes); large-graph scaling |
+
+Every "simulates directly, exactly" entry is backed by this course's
+tests, not just its lessons. Every "scoped out" entry is a real,
+documented limitation, not a claim that this platform secretly does
+more than it does.
+
+## Physical Interpretation
+
+The honest version of "quantum computers will change everything" is
+narrower and more interesting than the slogan: different algorithms need
+different hardware regimes (NISQ-tolerant vs. fault-tolerant), different
+algorithms have different kinds of speedup guarantees (proven-optimal vs.
+promise-dependent vs. heuristic-with-no-guarantee), and this platform's
+own engine mirrors that honesty, building exactly the pieces that
+demonstrate each mechanism, and saying exactly which pieces it doesn't
+build.
+
+## Worked Example
+
+**Classify VQE's error tolerance relative to Shor's, using the circuit
+depth argument above.**
+
+VQE's ansatz circuit here is exactly 2 gates deep ($R_y$ then $R_z$) run
+once per cost evaluation, repeated across many optimizer iterations. A
+single bad measurement barely perturbs the overall optimization
+trajectory, since the classical loop simply tries again with adjusted
+parameters. Shor's period-finding circuit, by contrast, is one long
+circuit (Hadamards, many controlled modular multiplications, a QFT) that
+must produce a *single* usable measurement. An error partway through
+directly corrupts that one shot, with no built-in mechanism to average it
+away. This structural difference, not just historical accident, is why
+VQE is considered NISQ-friendly and Shor's algorithm is not.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Believing NISQ-era hardware can already run useful VQE/QAOA at scales
+that beat classical computers.** Whether NISQ-era VQE/QAOA achieves a
+genuine, practically useful quantum advantage on any real-world problem
+remains an open, actively debated research question. This course's toy
+examples demonstrate the *mechanism*, not a proven practical advantage at
+scale.
+</Callout>
+
+<Callout type="mistake">
+**Treating "hybrid quantum-classical" as a stopgap until fault-tolerant
+hardware arrives.** Even in a future fault-tolerant era, classical
+computers remain far cheaper for many subroutines (the gcd computations in
+Shor's algorithm, the parameter updates in VQE). Hybrid architectures are
+a lasting design pattern, not just a NISQ-era workaround.
+</Callout>
+
+## Practice Questions
+
+1. Using the depth argument, explain why increasing QAOA's layer count
+   $p$ (making the circuit deeper) is a tradeoff, not a free improvement,
+   on NISQ-era hardware.
+2. Why does Shor's algorithm's period-finding step specifically need many
+   *coherent* qubits (no measurement until the very end), while VQE can
+   measure after every single ansatz execution?
+3. From this capstone's table, name one algorithm this course implements
+   with zero scope limitations, and one with the most scope limitations.
+   What's different about their underlying mathematical structure that
+   explains the difference?
+4. In your own words, summarize the difference between "provably optimal"
+   (Grover's), "promise-dependent exponential" (Deutsch-Jozsa), and
+   "heuristic, no guarantee" (QAOA) as three distinct *kinds* of quantum
+   advantage claim.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Shor's algorithm needs one long, precise, fault-tolerant-scale circuit;
+  VQE/QAOA use short, repeated, comparatively noise-tolerant circuits, a
+  structural difference driving which hardware era each targets.
+- NISQ (today's hardware) favors hybrid algorithms specifically because
+  their classical loop can partially compensate for imperfect quantum
+  execution.
+- This course's full accounting: every genuinely simulated piece is
+  tested exactly; every scoped-out piece (modular-exponentiation
+  circuitry, continued fractions, multi-qubit ansätze, a real classical
+  optimizer for QAOA) is named explicitly, not glossed over.
+
+## Further Exploration
+
+This completes **Quantum Algorithms II: Advanced**. From here, **Quantum
+Error Correction & Fault Tolerance** picks up exactly where this
+capstone left off: the hardware regime Shor's algorithm actually needs,
+and how noisy physical qubits become reliable logical ones.

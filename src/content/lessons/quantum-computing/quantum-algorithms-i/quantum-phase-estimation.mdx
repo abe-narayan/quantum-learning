@@ -1,0 +1,160 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/quantum-phase-estimation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Quantum Phase Estimation",
+  description:
+    "Reading a unitary's eigenphase directly out of a qubit register, derived by showing the pre-measurement state is exactly QFT|phase·N⟩, so the inverse QFT recovers the phase exactly, then verified on a phase gate with a known eigenphase.",
+  course: "quantum-algorithms-i",
+  module: "quantum-phase-estimation",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform"],
+  objectives: [
+    "Derive the phase estimation circuit's pre-measurement state as exactly QFT|phase·N⟩",
+    "Explain why phase estimation is restricted, on this platform, to single-qubit unitaries with a known eigenstate",
+    "Compute a phase estimation result by hand for an exactly-representable phase and check it against the engine",
+  ],
+};
+
+## Motivation
+
+Every eigenstate of a unitary $U$ satisfies $U|\psi\rangle=e^{2\pi i\varphi}|\psi\rangle$
+for some phase $\varphi\in[0,1)$, a single real number encoding everything
+$U$ does to that eigenstate. **Quantum phase estimation (QPE)** reads
+$\varphi$ out into an ordinary qubit register, as a binary fraction, using
+nothing but controlled-$U$ applications and the inverse QFT.
+
+## Mathematical Development
+
+### The circuit
+
+Use two registers: $t$ "precision" qubits, initialized to
+$|0\rangle^{\otimes t}$, and an "eigenstate" register holding
+$|\psi\rangle$ (a $U$-eigenstate). Apply $H$ to every precision qubit.
+Apply $U^{2^{t-1-q}}$ to the eigenstate register, controlled by precision
+qubit $q$, for each $q=0,\dots,t-1$ (qubit 0 controls the *largest* power,
+matching this platform's qubit-0-is-MSB convention). Apply the inverse QFT
+to the precision register. Measure it.
+
+### Deriving the pre-measurement state
+
+After the Hadamards, the precision register is
+$\frac{1}{\sqrt{2^t}}\sum_{x=0}^{2^t-1}|x\rangle$, with $x$'s bits exactly
+the precision qubits. Each controlled-$U^{2^{t-1-q}}$, conditioned on
+precision qubit $q$ being $1$, multiplies the eigenstate by
+$e^{2\pi i\varphi\cdot2^{t-1-q}}$ (since $|\psi\rangle$ is a $U$-eigenstate,
+applying $U^{2^{t-1-q}}$ just raises the eigenvalue to that power). Summing
+the contributions from every qubit whose bit is set in $x$ reproduces
+exactly $e^{2\pi i\varphi x}$, because $x=\sum_q b_q2^{t-1-q}$ (the
+ordinary binary expansion, MSB-first, matching this platform's own
+`StateVector.basis` indexing) is precisely the sum of the individual bit
+contributions. So after all controlled-$U$ applications:
+
+$$
+\frac{1}{\sqrt{2^t}}\sum_x e^{2\pi i\varphi x}|x\rangle\ \otimes\ |\psi\rangle
+$$
+
+Compare this to the QFT's own defining formula,
+$\text{QFT}|j\rangle=\frac{1}{\sqrt N}\sum_ke^{2\pi ijk/N}|k\rangle$: the
+precision register's state is **exactly $\text{QFT}|\varphi N\rangle$**
+whenever $\varphi N$ is an integer ($N=2^t$), matching term for term with
+$j=\varphi N$. Applying the inverse QFT therefore recovers
+$|\varphi N\rangle$ **exactly**, as a computational basis state, whenever
+$\varphi$ is exactly representable with $t$ bits. Measuring the precision
+register then gives $\varphi N$ with certainty, and dividing by $N=2^t$
+recovers $\varphi$.
+
+### Scope: single-qubit unitaries only
+
+`phaseEstimation` implements this for a $2\times2$ unitary $U$ specifically:
+controlled-$U^{2^k}$ needs `applyControlledGate`, which this platform's
+engine only supports for a genuine $2\times2$ gate, one control, one
+target. A general multi-qubit $U$ would need a controlled-*multi-qubit*-gate
+primitive this platform doesn't build (see the engine's "deliberately not
+built" scope notes); every worked example in this course therefore uses a
+single-qubit unitary with a known eigenstate (a phase gate or Pauli
+rotation), not an arbitrary black-box $U$.
+
+## Physical Interpretation
+
+Phase estimation is the QFT run in reverse on a phase that's already been
+"written" onto a register by repeated controlled-$U$ applications, the
+same interference machinery Deutsch-Jozsa used to read out a global
+constant-or-balanced fact, generalized to read out an arbitrary real number
+(to $t$-bit precision) instead of one bit. It's the component every
+period-finding algorithm (Shor's algorithm, in the next course) is built
+from.
+
+## Worked Example
+
+**Estimate the phase of $U=\text{phaseGate}(2\pi\cdot\frac38)$, eigenstate
+$|1\rangle$ (phaseGate's own $+1$-phase eigenstate, up to the phase itself),
+using $t=3$ precision qubits.**
+
+$\varphi=3/8$ is exactly representable in 3 bits ($3/8 = 0.011_2$), so
+$\varphi\cdot2^3=3$ exactly. The derivation above guarantees the precision
+register measures $|011\rangle=|3\rangle$ with certainty. Directly from the
+engine: `phaseEstimation` with this $U$, eigenstate, and $t=3$ gives
+probability $1.0$ (to 6 decimal places) on the combined index
+corresponding to precision register $=3$, eigenstate qubit $=1$, exactly
+as derived, not merely close.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Expecting an exact answer for a phase not representable in $t$ bits.**
+The derivation above assumed $\varphi N$ is an integer; for other phases,
+the precision register's state is a superposition peaked near the nearest
+representable value rather than a single certain outcome, still useful,
+but a probability distribution, not a certainty.
+</Callout>
+
+<Callout type="mistake">
+**Confusing which qubit controls which power of $U$.** Precision qubit $0$
+controls the *largest* power ($U^{2^{t-1}}$), not the smallest; swapping
+this convention silently reads out the phase's bits in the wrong order.
+</Callout>
+
+## Practice Questions
+
+1. Repeat the derivation's logic for $\varphi=1/4$ with $t=2$ precision
+   qubits: which basis state should the precision register measure with
+   certainty?
+2. Explain why $U^{2^{t-1-q}}$, not $U^{q}$ or $U^{2^q}$, is the correct
+   power for precision qubit $q$, using the binary expansion
+   $x=\sum_qb_q2^{t-1-q}$.
+3. What happens to `phaseEstimation`'s precision register if $\varphi=1/3$
+   (not exactly representable in any finite number of bits) and $t=3$? You
+   don't need to compute exact probabilities; describe qualitatively what
+   the derivation predicts.
+4. Why does this platform's `phaseEstimation` require the caller to already
+   know a genuine eigenstate of $U$, rather than accepting an arbitrary
+   input state?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- QPE's pre-measurement precision-register state is exactly
+  $\text{QFT}|\varphi N\rangle$, derived from tracking each controlled-$U$
+  application's phase contribution, not asserted.
+- The inverse QFT recovers $\varphi N$ exactly whenever $\varphi$ is
+  exactly representable with $t$ precision bits.
+- This platform's implementation is restricted to single-qubit unitaries
+  with a known eigenstate, a deliberate, documented scope limit, not an
+  oversight.
+- Verified directly: a $3/8$-phase gate with 3 precision qubits gives
+  probability $1.0$ on the correct outcome.
+
+## Further Exploration
+
+Next: **Grover's Algorithm**, which returns to Deutsch-Jozsa's style of
+problem (a search rather than a period) and gets a *quadratic*, not
+exponential, speedup, for reasons this course makes precise rather than
+hand-waves.

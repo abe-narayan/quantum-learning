@@ -1,0 +1,149 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/approximation-methods/the-wkb-approximation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The WKB Approximation",
+  description:
+    "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within 0.06% at this platform's grid resolution, a genuinely different approximation route arriving at (nearly) the same answer as perturbation theory and the variational method.",
+  course: "approximation-methods",
+  module: "the-wkb-approximation",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/approximation-methods/the-variational-method"],
+  objectives: [
+    "State the WKB (Bohr-Sommerfeld) quantization condition and identify the classically allowed region it integrates over",
+    "Explain physically why WKB works well for large quantum numbers (the semiclassical/correspondence-principle limit)",
+    "Compute WKB-quantized energies numerically and compare them to the exact harmonic oscillator spectrum",
+  ],
+};
+
+## Motivation
+
+Perturbation theory needs a small parameter; the variational method
+needs a good guessed shape. WKB (Wentzel-Kramers-Brillouin) takes a
+third, geometric route: treat the wavefunction as approximately a
+classical wave with a slowly-varying local wavelength set by the local
+classical momentum $p(x)=\sqrt{2m(E-V(x))}$, and demand that this wave
+close consistently on itself between the classical turning points.
+
+## Mathematical Development
+
+### The classically allowed region
+
+For energy $E$ and potential $V(x)$, the classically allowed region is
+wherever $E>V(x)$ (a classical particle with that energy could physically
+be there); its boundary points (where $E=V(x)$) are the **turning
+points**, $x_1<x_2$. The local classical momentum is
+$p(x)=\sqrt{2m(E-V(x))}$, real and positive only inside this region.
+
+### The quantization condition
+
+Demanding the semiclassical wave be single-valued and vanish smoothly at
+both turning points (a technical boundary-matching argument this course
+states rather than derives in full) gives:
+
+$$
+\int_{x_1}^{x_2} p(x)\,dx = \left(n+\frac12\right)\pi\hbar, \qquad n=0,1,2,\ldots
+$$
+
+This is the **Bohr-Sommerfeld quantization condition** (with the
+$\frac12$ Maslov correction for two smooth/"soft" turning points, the
+standard case for a smooth confining potential like the harmonic
+oscillator). This platform's `wkbActionIntegral` computes the left side
+directly, as a Riemann sum over the grid restricted to where $E>V(x)$;
+`wkbQuantizedEnergy` bisects on $E$ until the integral matches the right
+side for a given $n$, the same bisection strategy Wave Mechanics'
+`finiteSquareWellGroundStateEnergy` already used for a different
+transcendental equation.
+
+## Physical Interpretation
+
+WKB is a *semiclassical* approximation. It's built entirely from the
+classical momentum $p(x)$, with quantum mechanics entering only through
+the $\hbar$ in the quantization condition. It tends to work best when
+the potential varies slowly on the scale of the local de Broglie
+wavelength, physically the "large quantum number" or "correspondence
+principle" regime where a quantum system starts behaving classically.
+The harmonic oscillator is a special case where WKB happens to be exact
+at *every* $n$, not just asymptotically for large $n$: a genuine,
+checkable mathematical fact about this specific potential's shape, not a
+general property of WKB.
+
+## Worked Example
+
+**Compute the WKB-quantized energies for the harmonic oscillator
+($m=\omega=1$) at $n=0,1,2,3$, and compare to the exact
+$E_n=(n+\frac12)\hbar\omega$.**
+
+| $n$ | Exact | WKB (this engine) | Difference |
+|---|---|---|---|
+| 0 | 0.5000 | 0.5003 | 0.00026 |
+| 1 | 1.5000 | 1.4999 | 0.00008 |
+| 2 | 2.5000 | 2.5003 | 0.00031 |
+| 3 | 3.5000 | 3.4996 | 0.00038 |
+
+Every WKB value matches the exact answer to within $\sim0.04\%$ (the
+small residual differences are pure grid-resolution numerical error in
+the Riemann-sum action integral and bisection, not a limitation of WKB
+itself: WKB is mathematically exact for the harmonic oscillator).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking WKB is always this accurate.** The harmonic oscillator's
+exactness is special (tied to its potential's specific quadratic shape).
+For a generic potential, WKB is an *approximation* that improves as $n$
+grows, and can be noticeably off for small $n$. This course doesn't
+implement a second example to contrast against, but the distinction
+matters for correctly interpreting the harmonic oscillator's near-perfect
+result here.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the $\frac12$ in $(n+\frac12)\pi\hbar$.** Omitting it
+(using $n\pi\hbar$ instead) is a common error that shifts every
+predicted energy level. The Maslov correction for two soft turning
+points is not optional bookkeeping.
+</Callout>
+
+## Practice Questions
+
+1. Where exactly does the classically allowed region's boundary sit, in
+   terms of $E$ and $V(x)$?
+2. Explain in words why $p(x)=\sqrt{2m(E-V(x))}$ becomes imaginary
+   outside the classically allowed region, and why the action integral
+   only sums over the region where it's real.
+3. If a potential's turning points move further apart as $E$ increases,
+   what does this imply about how the action integral $\int p\,dx$
+   behaves as $E$ grows? (Hint: this behavior is exactly what
+   `wkbQuantizedEnergy`'s bisection search relies on.)
+4. Why is WKB's near-perfect harmonic-oscillator result described here
+   as a "genuine, checkable fact about this potential," rather than
+   general evidence that WKB is always this accurate?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- WKB quantizes energy via
+  $\int_{x_1}^{x_2}p(x)dx=(n+\frac12)\pi\hbar$, using the classical
+  local momentum and the potential's turning points.
+- This platform computes the action integral as a Riemann sum over the
+  classically allowed region, and bisects on $E$ to match the
+  quantization condition, reusing the same numerical strategy as the
+  finite-well ground-state calculation.
+- For the harmonic oscillator, WKB reproduces the exact spectrum to
+  within grid-resolution numerical error at every $n$ tested, a special
+  exactness of this potential, not a general WKB guarantee.
+
+## Further Exploration
+
+Next: **Time-Dependent Perturbation Theory**, which asks a different
+question entirely: not "what is the corrected energy," but "given a
+small time-dependent nudge, what's the probability of a transition
+between states?"

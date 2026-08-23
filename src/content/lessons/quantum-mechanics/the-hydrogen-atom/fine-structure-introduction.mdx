@@ -1,0 +1,125 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/the-hydrogen-atom/fine-structure-introduction"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Fine Structure (Introduction)",
+  description:
+    "A conceptual capstone: this course's Eₙ=−13.6 eV/n² is the non-relativistic, spin-free answer. Fine structure (spin-orbit coupling and relativistic corrections) splits the l-degeneracy this course relied on, at the ~10⁻⁴ eV scale. Honest about what was and wasn't derived.",
+  course: "the-hydrogen-atom",
+  module: "fine-structure-introduction",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers"],
+  objectives: [
+    "State what fine structure is (spin-orbit coupling + relativistic kinetic correction) at a qualitative level",
+    "Explain which of this course's specific results (e.g. exact l-independence of Eₙ) fine structure breaks, and why",
+    "Correctly state this course's scope: energies and wavefunctions derived here are the non-relativistic, spin-free approximation",
+  ],
+};
+
+## Motivation
+
+Every energy value this course computed ($E_n=-13.6\text{ eV}/n^2$,
+independent of $l$ and $m$) came from solving the non-relativistic
+Schrödinger equation with a spin-free electron. Real hydrogen has neither
+property exactly: the electron has spin, and at the $\sim0.1\%$ level,
+relativistic corrections matter. This closing lesson is honest about
+that gap rather than pretending it doesn't exist, and previews (without
+deriving) what the next level of approximation adds.
+
+## Conceptual Overview
+
+### Two corrections, roughly the same size
+
+**Spin-orbit coupling.** The orbiting electron sees the proton
+circulating around *it* (in the electron's own rest frame), a moving
+charge, which is a current, which generates a magnetic field. The
+electron's own spin magnetic moment then couples to this field, adding
+an energy term $\propto\vec L\cdot\vec S$. This term explicitly breaks
+the clean separation this course used between $\vec L$ (orbital) and
+$\vec S$ (spin, from Angular Momentum & Spin); the good quantum numbers
+become total angular momentum $\vec J=\vec L+\vec S$ eigenstates (a
+direct application of Addition of Angular Momentum), not separate $L_z$
+and $S_z$ eigenstates.
+
+**Relativistic kinetic correction.** This course used the
+non-relativistic $p^2/2m$ throughout. The next-order relativistic
+correction (from expanding $\sqrt{p^2c^2+m^2c^4}-mc^2$ instead) shifts
+energies by an amount that depends on both $n$ and $l$.
+
+### What breaks, specifically
+
+Both corrections scale as roughly $(\alpha)^2\times13.6\text{ eV}\approx10^{-4}\times13.6\text{ eV}$,
+where $\alpha\approx1/137$ is the fine-structure constant, small enough
+that this course's $E_n=-13.6/n^2$ is an excellent approximation for most
+purposes, but large enough to be precisely measured spectroscopically
+(historically, this is exactly how fine structure was first discovered).
+The specific result these corrections break is the exact
+$l$-independence of $E_n$ from Hydrogen Energy Levels: with fine
+structure, states of the same $n$ but different total angular momentum
+$j$ get slightly different energies.
+
+## Honest Scope Statement
+
+This course derived the leading-order, non-relativistic, spin-free
+hydrogen atom completely and correctly: energies, orbitals, and their
+degeneracies are all genuine, checkable results, not simplifications
+that hide wrong answers. Fine structure is a real, separate
+next-order correction this course does not derive; doing so requires
+either full relativistic quantum mechanics (the Dirac equation) or
+degenerate perturbation theory applied to $\vec L\cdot\vec S$, both
+beyond this course's scope. What's presented here is the map of what's
+missing, not the missing calculation itself.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking the $l$-independence of $E_n$ (Hydrogen Energy Levels) is
+exact in real hydrogen.** It's exact only in the non-relativistic,
+spin-free model this course builds; real hydrogen's spectral lines show
+fine splitting that depends on $j$, not just $n$.
+</Callout>
+
+<Callout type="mistake">
+**Assuming fine structure is a large effect.** At $\sim10^{-4}$ relative
+size, it's a precision correction, not a qualitative change: this
+course's $E_n=-13.6/n^2$ remains an excellent approximation for
+essentially every purpose outside high-resolution spectroscopy.
+</Callout>
+
+## Practice Questions
+
+1. What two physical effects combine to produce fine structure, at a
+   qualitative level?
+2. Which specific result from Hydrogen Energy Levels does fine structure
+   modify, and why does adding electron spin make this modification
+   necessary?
+3. Roughly how large is the fine-structure correction relative to
+   $E_n$ itself (order of magnitude)?
+4. Why is $\vec J=\vec L+\vec S$, rather than separate $L_z$ and $S_z$
+   eigenstates, the right basis once spin-orbit coupling is included?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Fine structure combines spin-orbit coupling ($\vec L\cdot\vec S$) and
+  a relativistic kinetic correction, both scaling as $\sim\alpha^2E_n$.
+- It breaks this course's exact $l$-independence of $E_n$: real
+  hydrogen's energy levels split slightly by total angular momentum $j$.
+- This course's results are the genuine, correct non-relativistic,
+  spin-free hydrogen atom, a real foundation, not a simplification that
+  needs to be unlearned, just one with a clearly stated next-order
+  correction beyond its scope.
+
+## Further Exploration
+
+This closes **The Hydrogen Atom**. The next course, **Approximation
+Methods**, builds the general tools (perturbation theory, the
+variational principle) that a full fine-structure calculation would
+actually use, applied there to more tractable example systems.

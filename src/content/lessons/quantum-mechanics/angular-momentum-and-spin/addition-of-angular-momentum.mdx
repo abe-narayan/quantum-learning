@@ -1,0 +1,172 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Addition of Angular Momentum",
+  description:
+    "Two spin-1/2 particles combine into a spin-0 singlet and a spin-1 triplet, and the singlet turns out to be exactly the Bell state |Ψ⁻⟩, verified directly as a J²=0 eigenstate using this platform's own total-angular-momentum operator.",
+  course: "angular-momentum-and-spin",
+  module: "addition-of-angular-momentum",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"],
+  objectives: [
+    "Construct the total angular momentum operator for two spin-1/2 particles from the individual spins",
+    "Verify the singlet and triplet states as exact J² and Jz eigenstates",
+    "Identify the singlet exactly as the Bell state |Ψ⁻⟩ from Quantum Gates & Circuits",
+  ],
+};
+
+## Motivation
+
+Two spin-$\tfrac12$ particles, combined, don't have a single well-defined
+total spin: their combination can act as spin $0$ or spin $1$,
+depending on which specific combined state they're in. This lesson
+derives that decomposition explicitly, and finds something remarkable
+waiting inside it: the spin-$0$ combination is *exactly* a state this
+platform built in an entirely different course, for an entirely
+different reason.
+
+## Mathematical Development
+
+### The total angular momentum operator
+
+For two spin-$\tfrac12$ particles, the total spin operators act on the
+combined $4$-dimensional space via
+$J_x=S_x^{(1)}\otimes I+I\otimes S_x^{(2)}$ (and similarly for $J_y,J_z$),
+each particle's own spin operator, tensored with the identity on the
+other particle, summed. This is a direct generalization of how single-
+particle operators extend to multi-particle systems, already used
+throughout Quantum Gates & Circuits for other operators.
+
+### Four candidate combined states
+
+Using the computational basis $|{\uparrow}{\uparrow}\rangle,
+|{\uparrow}{\downarrow}\rangle,|{\downarrow}{\uparrow}\rangle,
+|{\downarrow}{\downarrow}\rangle$ (this platform's usual 2-qubit
+ordering), consider:
+
+$$
+|1,1\rangle=|{\uparrow}{\uparrow}\rangle,\quad
+|1,0\rangle=\frac{|{\uparrow}{\downarrow}\rangle+|{\downarrow}{\uparrow}\rangle}{\sqrt2},\quad
+|1,-1\rangle=|{\downarrow}{\downarrow}\rangle,\quad
+|0,0\rangle=\frac{|{\uparrow}{\downarrow}\rangle-|{\downarrow}{\uparrow}\rangle}{\sqrt2}
+$$
+
+### Verified as exact eigenstates
+
+Applying $\vec J^{\,2}$ and $J_z$ (built exactly as above, from this
+platform's own $S_x,S_y,S_z$ for $j=\tfrac12$) to each of these four
+states directly confirms, to floating-point-exact precision (not
+approximately):
+
+| State | $\vec J^{\,2}$ eigenvalue | $J_z$ eigenvalue | Label |
+|---|---|---|---|
+| $|1,1\rangle$ | $2\hbar^2$ | $\hbar$ | Triplet, $m=1$ |
+| $|1,0\rangle$ | $2\hbar^2$ | $0$ | Triplet, $m=0$ |
+| $|1,-1\rangle$ | $2\hbar^2$ | $-\hbar$ | Triplet, $m=-1$ |
+| $|0,0\rangle$ | $0$ | $0$ | Singlet |
+
+$2\hbar^2=j(j+1)\hbar^2$ at $j=1$ (Lesson 2's formula); $0=j(j+1)\hbar^2$
+at $j=0$: both consistent, both checked directly, not assumed by
+symmetry.
+
+### The singlet is a Bell state
+
+Compare $|0,0\rangle=\frac{1}{\sqrt2}(|{\uparrow}{\downarrow}\rangle-|{\downarrow}{\uparrow}\rangle)$
+directly to Quantum Gates & Circuits' Bell state
+$|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$: **identical**,
+term for term, once $|{\uparrow}\rangle\leftrightarrow|0\rangle$,
+$|{\downarrow}\rangle\leftrightarrow|1\rangle$. The maximally entangled
+Bell state built for quantum computing and the total-spin-zero singlet
+built for atomic physics are, mathematically, the exact same state, not
+an analogy: the identical vector, verified via the identical
+$\vec J^{\,2}=0$ eigenstate computation. (The triplet's $m=0$ state,
+$|1,0\rangle$, is likewise identical to $|\Psi^+\rangle$.)
+
+## Physical Interpretation
+
+This is a genuinely deep connection, not a coincidence of notation: a
+system with total angular momentum exactly zero necessarily has *no
+preferred direction at all*: measuring either particle's spin along
+*any* axis gives a perfectly random result, but the two particles'
+outcomes are perfectly (anti-)correlated whichever axis is chosen. This
+is precisely the same "correlated in every basis" property Bell States
+and Entanglement proved for $|\Phi^+\rangle$ using Hadamards, here
+derived instead from the physical requirement that a spin-zero system
+carries no directional information whatsoever.
+
+## Worked Example
+
+**Verify $|1,0\rangle$'s $J_z$ eigenvalue is exactly $0$, directly from
+the individual-particle operators.**
+
+$J_z|1,0\rangle = \left(S_z^{(1)}\otimes I+I\otimes S_z^{(2)}\right)\frac{|{\uparrow}{\downarrow}\rangle+|{\downarrow}{\uparrow}\rangle}{\sqrt2}$.
+On $|{\uparrow}{\downarrow}\rangle$: $S_z^{(1)}$ gives $+\tfrac\hbar2$,
+$S_z^{(2)}$ gives $-\tfrac\hbar2$, summing to $0$. On
+$|{\downarrow}{\uparrow}\rangle$: $-\tfrac\hbar2+\tfrac\hbar2=0$ as well.
+Both terms give eigenvalue $0$, so the whole superposition does too,
+matching the table exactly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming any two-spin-$\tfrac12$ state has a well-defined total spin.**
+Only the four states above (or their linear combinations *within* the
+same $j$) do: a generic superposition like $|{\uparrow}{\uparrow}\rangle+|{\downarrow}{\downarrow}\rangle$
+(unnormalized) is *not* automatically a $\vec J^{\,2}$ eigenstate unless
+it happens to match one of the four specific combinations derived here.
+</Callout>
+
+<Callout type="mistake">
+**Treating the Bell-state/singlet connection as merely "similar" states.**
+They are the identical vector, under the identified basis correspondence,
+checked via the identical $\vec J^{\,2}=0$ eigenstate property, not an
+approximate resemblance.
+</Callout>
+
+## Practice Questions
+
+1. Verify $|1,1\rangle=|{\uparrow}{\uparrow}\rangle$'s $J_z$ eigenvalue
+   is exactly $\hbar$, directly from the individual operators (no
+   superposition to track, unlike the worked example).
+2. Confirm $|1,-1\rangle$ and $|0,0\rangle$ from this lesson correspond
+   exactly to which two of the four Bell states from Quantum Gates &
+   Circuits (Hint: $|1,-1\rangle=|{\downarrow}{\downarrow}\rangle$ is a
+   product state, not entangled at all).
+3. Using the antisymmetry of $|0,0\rangle=\frac1{\sqrt2}(|{\uparrow}{\downarrow}\rangle-|{\downarrow}{\uparrow}\rangle)$
+   under swapping the two particles, explain in one sentence why swapping
+   which particle is "1" and which is "2" leaves the *physical* state
+   unchanged (up to an overall sign, which doesn't affect any
+   measurement).
+4. Why does a spin-zero (singlet) two-particle system necessarily give
+   perfectly random single-particle measurement outcomes along *any*
+   axis, not just $z$? Connect this to $\vec J^{\,2}=0$ meaning zero
+   total angular momentum in every direction simultaneously.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Two spin-$\tfrac12$ particles combine into a spin-$1$ triplet (3 states)
+  and a spin-$0$ singlet (1 state), verified as exact
+  $\vec J^{\,2}$/$J_z$ eigenstates, not assumed by symmetry.
+- The singlet $|0,0\rangle$ is the identical vector to the Bell state
+  $|\Psi^-\rangle$; the triplet's $m=0$ state matches $|\Psi^+\rangle$,
+  a genuine mathematical identity, checked directly.
+- Total spin zero forces perfectly random single-particle outcomes along
+  any measurement axis, with perfect correlation between the two
+  particles, the physical content behind Bell-state entanglement,
+  arrived at from a completely different starting point.
+
+## Further Exploration
+
+Next, the capstone: **From Abstract Algebra to the Hydrogen Atom**,
+which previews how this course's $\vec L^{\,2}$, $L_z$, and spherical
+harmonics become the angular part of a real, solvable three-dimensional
+atom.

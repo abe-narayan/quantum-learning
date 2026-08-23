@@ -24,8 +24,8 @@ export const lessonMeta = {
 
 ## Motivation
 
-Physical transformations — rotate a system, evolve it forward in time,
-apply a quantum gate — need a mathematical object that turns one vector
+Physical transformations (rotate a system, evolve it forward in time,
+apply a quantum gate) need a mathematical object that turns one vector
 into another. Not every such map is well-behaved enough to reason about
 easily; the ones that are turn out to be exactly the **linear** ones, and
 almost everything physics does to a quantum state is represented by one.
@@ -35,8 +35,8 @@ almost everything physics does to a quantum state is represented by one.
 A linear operator is a rule for turning vectors into vectors that respects
 the vector-space structure: scale the input, and the output scales the
 same way; add two inputs, and the output adds the same way. That's a
-strong restriction — most functions you could dream up aren't linear —
-but it's exactly the restriction that makes an operator fully determined
+strong restriction (most functions you could dream up aren't linear), but
+it's exactly the restriction that makes an operator fully determined
 by what it does to a basis, rather than needing to be specified vector by
 vector.
 
@@ -63,18 +63,18 @@ $$
 
 (expanding $A|e_j\rangle$ itself in the basis, using $A_{ij}=\langle
 e_i|A|e_j\rangle$ as exactly its $i$-th coordinate). So once every
-$A_{ij}$ is known, $A$'s action on *every* vector is known — an operator
+$A_{ij}$ is known, $A$'s action on *every* vector is known: an operator
 on an $n$-dimensional space is completely specified by an $n\times n$
 grid of numbers.
 
 ### Composition, derived from completeness
 
-Applying two operators in sequence, $A$ then $B$ — written $(AB)|v\rangle
-:= A(B|v\rangle)$ — is itself linear, hence itself has matrix elements
+Applying two operators in sequence, $A$ then $B$, written $(AB)|v\rangle
+:= A(B|v\rangle)$, is itself linear, hence itself has matrix elements
 $(AB)_{ik}=\langle e_i|AB|e_k\rangle$. Insert the completeness relation
 $\sum_j|e_j\rangle\langle e_j|=I$ (from the last lesson) directly between
-$A$ and $B$ — legal because inserting the identity operator never changes
-anything:
+$A$ and $B$, which is legal because inserting the identity operator never
+changes anything:
 
 $$
 \langle e_i|AB|e_k\rangle = \langle e_i|A\Big(\sum_j|e_j\rangle\langle e_j|\Big)B|e_k\rangle = \sum_j \langle e_i|A|e_j\rangle\langle e_j|B|e_k\rangle = \sum_j A_{ij}B_{jk}
@@ -91,7 +91,7 @@ definition.
 The **identity operator** $I$ satisfies $I|v\rangle=|v\rangle$ for every
 $v$; its matrix (in any orthonormal basis) is the identity matrix. An
 operator $A$ has an **inverse** $A^{-1}$ if $AA^{-1}=A^{-1}A=I$. Not every
-operator has one — $A=\begin{pmatrix}1&1\\1&1\end{pmatrix}$ sends the
+operator has one: $A=\begin{pmatrix}1&1\\1&1\end{pmatrix}$ sends the
 nonzero vector $(1,-1)$ to $(0,0)$, and any operator that sends a nonzero
 vector to zero can't be undone (there's no way to recover which input
 produced that zero output), so it has no inverse.
@@ -101,7 +101,7 @@ produced that zero output), so it has no inverse.
 Every gate in a quantum circuit, every observable in the sense of "the
 mathematical object representing a measurable quantity," and the operator
 governing how a state evolves in time are all linear operators. The next
-three lessons single out two special families — Hermitian and unitary —
+three lessons single out two special families, Hermitian and unitary,
 that carry specific physical meaning; every quantum-mechanical operator
 you'll ever meet belongs to at least one of them.
 
@@ -118,15 +118,15 @@ AB = \begin{pmatrix}2&0\\0&3\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix} = 
 $$
 
 Via the derived formula, the $(1,2)$ entry (using 1-indexing) is
-$\sum_j A_{1j}B_{j2} = A_{11}B_{12}+A_{12}B_{22} = 2\cdot1+0\cdot0=2$ —
+$\sum_j A_{1j}B_{j2} = A_{11}B_{12}+A_{12}B_{22} = 2\cdot1+0\cdot0=2$,
 matching the direct computation.
 
 ## Common Mistakes
 
 <Callout type="mistake">
-**Assuming $AB=BA$.** Operator composition generally does not commute —
+**Assuming $AB=BA$.** Operator composition generally does not commute:
 $AB$ and $BA$ can differ, sometimes drastically. (Whether two particular
-operators commute turns out to be physically important — commuting
+operators commute turns out to be physically important. Commuting
 observables can be measured simultaneously, a topic the Operators,
 Observables & Measurement course develops fully.)
 </Callout>
@@ -163,5 +163,5 @@ exactly when it sends some nonzero vector to zero.
 ## Further Exploration
 
 Next: **Eigenvalues and Eigenvectors**, the vectors an operator leaves
-"directionally unchanged" — which turn out to be exactly the states with
+"directionally unchanged," which turn out to be exactly the states with
 definite physical properties.

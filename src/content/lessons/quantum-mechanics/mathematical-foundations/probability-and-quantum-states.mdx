@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Probability and Quantum States",
   description:
-    "The postulates that connect all of this course's linear algebra to physical predictions — states as unit vectors, observables as Hermitian operators, the Born rule, and expectation values, with every consistency check derived rather than assumed.",
+    "The postulates that connect all of this course's linear algebra to physical predictions: states as unit vectors, observables as Hermitian operators, the Born rule, and expectation values, with every consistency check derived rather than assumed.",
   course: "mathematical-foundations",
   module: "probability-and-quantum-states",
   order: 1,
@@ -26,7 +26,7 @@ export const lessonMeta = {
 
 Nine lessons of linear algebra have built unit vectors, inner products,
 Hermitian and unitary operators, eigenvalues, and tensor products. None of
-that, by itself, is physics — it's mathematics that happens to be useful
+that, by itself, is physics. It's mathematics that happens to be useful
 for physics. This lesson supplies the missing piece: the specific
 postulates that connect the mathematics to actual, checkable predictions
 about what an experiment will show.
@@ -46,16 +46,16 @@ sentence is a lesson you've already done the work for.
 
 A quantum system's state is a vector $|\psi\rangle$ with $\|\psi\rangle\|=1$,
 in a complex vector space equipped with an inner product (a **Hilbert
-space** — the name for exactly the structure built across this course).
+space**, the name for exactly the structure built across this course).
 Two states are the same if they differ only by an overall phase:
 $|\psi\rangle$ and $e^{i\alpha}|\psi\rangle$ represent the identical
-physical situation, for any real $\alpha$ — a fact this lesson will
+physical situation, for any real $\alpha$, a fact this lesson will
 justify below rather than just assert.
 
 ### Postulate 2: observables are Hermitian operators
 
 A measurable physical quantity corresponds to a Hermitian operator $A$.
-Its possible outcomes are exactly its eigenvalues — guaranteed real by the
+Its possible outcomes are exactly its eigenvalues, guaranteed real by the
 Hermitian Operators lesson, exactly matching the physical requirement that
 measurement outcomes are real numbers.
 
@@ -69,8 +69,8 @@ $$
 P(\lambda_i) = |\langle e_i|\psi\rangle|^2
 $$
 
-This is a genuine postulate of quantum mechanics — not something derived
-from more basic principles in this course, or anywhere else in physics —
+This is a genuine postulate of quantum mechanics, not something derived
+from more basic principles in this course, or anywhere else in physics,
 but it isn't arbitrary either: it's the *unique* rule consistent with
 everything already built. Expand $|\psi\rangle=\sum_i c_i|e_i\rangle$
 where $c_i=\langle e_i|\psi\rangle$ (the completeness relation, Bra-Ket
@@ -83,12 +83,12 @@ $$
 using the completeness relation again in the second-to-last step, and
 $\|\psi\|=1$ (Postulate 1) in the last. Normalization, orthonormal
 eigenbases, and the completeness relation all conspire to make this
-come out exactly right — a real consistency check, not a coincidence.
+come out exactly right: a real consistency check, not a coincidence.
 
 ### Expectation value, and why it matches $\langle\psi|A|\psi\rangle$
 
-The **expectation value** — the average outcome over many repeated
-measurements — is $\langle A\rangle = \sum_i \lambda_i P(\lambda_i)$ by
+The **expectation value**, the average outcome over many repeated
+measurements, is $\langle A\rangle = \sum_i \lambda_i P(\lambda_i)$ by
 definition of "average." Substitute the Born rule and simplify using the
 spectral decomposition:
 
@@ -97,7 +97,7 @@ $$
 $$
 
 This recovers exactly the "sandwich" formula stated without proof back in
-the Hermitian Operators lesson — now derived as a consequence of the Born
+the Hermitian Operators lesson, now derived as a consequence of the Born
 rule, closing the loop between that lesson and this one.
 
 ### Why global phase is unobservable
@@ -107,7 +107,7 @@ outcome probability: $\langle e_i|e^{i\alpha}\psi\rangle =
 e^{i\alpha}\langle e_i|\psi\rangle$, so
 $P(\lambda_i) = |e^{i\alpha}\langle e_i|\psi\rangle|^2 =
 |e^{i\alpha}|^2\,|\langle e_i|\psi\rangle|^2 = |\langle
-e_i|\psi\rangle|^2$ — completely unchanged, because $|e^{i\alpha}|=1$
+e_i|\psi\rangle|^2$, completely unchanged, because $|e^{i\alpha}|=1$
 (Complex Numbers lesson). Every prediction this framework makes depends
 only on $|\psi\rangle$ up to an overall phase, which is exactly Postulate
 1's claim, now justified rather than just stated.
@@ -115,7 +115,7 @@ only on $|\psi\rangle$ up to an overall phase, which is exactly Postulate
 ### Measurement and collapse
 
 After a measurement yields outcome $\lambda_i$, the state becomes
-$|e_i\rangle$ — the corresponding eigenvector. A repeated, immediate
+$|e_i\rangle$, the corresponding eigenvector. A repeated, immediate
 re-measurement of the same observable then gives $\lambda_i$ again with
 certainty ($P(\lambda_i)=|\langle e_i|e_i\rangle|^2=1$), matching the
 operational meaning of "the system now definitely has that value."
@@ -131,14 +131,15 @@ reproduce.
 ## Physical Interpretation
 
 Collect the four postulates together, each now tied to a specific earlier
-lesson: **state** = unit vector (Vector Spaces, Inner Products); **
-observable** = Hermitian operator (Hermitian Operators); **outcome** =
-eigenvalue (Eigenvalues and Eigenvectors); **probability** = Born rule via
-the spectral decomposition (this lesson, built on the Bra-Ket Formalism's
-completeness relation). Unitary operators (not directly a postulate here,
-but essential) describe how a state evolves *between* measurements. This
-short list is the mathematical skeleton of every calculation the rest of
-quantum mechanics will ask you to do.
+lesson: **state** equals unit vector (Vector Spaces, Inner Products);
+**observable** equals Hermitian operator (Hermitian Operators);
+**outcome** equals eigenvalue (Eigenvalues and Eigenvectors);
+**probability** equals Born rule via the spectral decomposition (this
+lesson, built on the Bra-Ket Formalism's completeness relation). Unitary
+operators (not directly a postulate here, but essential) describe how a
+state evolves *between* measurements. This short list is the mathematical
+skeleton of every calculation the rest of quantum mechanics will ask you
+to do.
 
 ## Worked Example
 
@@ -174,21 +175,21 @@ Both routes agree, as the general derivation above guarantees they must.
 <Callout type="mistake">
 **Using the amplitude directly instead of its squared modulus.**
 $P(\lambda_i)=|\langle e_i|\psi\rangle|^2$, not $\langle
-e_i|\psi\rangle$ itself — the single most common error in this entire
+e_i|\psi\rangle$ itself, the single most common error in this entire
 course, worth flagging one last time at the point where it matters most.
 </Callout>
 
 <Callout type="mistake">
 **Believing global phase is physically meaningful.** $|\psi\rangle$ and
 $e^{i\alpha}|\psi\rangle$ predict identically for *every* observable, as
-derived above — only the *relative* phase between terms in a
+derived above; only the *relative* phase between terms in a
 superposition, not an overall phase on the whole state, is observable.
 </Callout>
 
 ## Practice Questions
 
 1. Using the worked example's setup, verify $P(+1)+P(-1)=1$ directly
-   (already shown above — restate the calculation in your own words).
+   (already shown above, restate the calculation in your own words).
 2. A state has $\langle e_1|\psi\rangle = \frac{1}{\sqrt3}$ and two other
    eigenvectors with equal overlap. If probabilities must sum to $1$ and
    are all equal, what is $|\langle e_2|\psi\rangle|^2$?
@@ -204,9 +205,9 @@ superposition, not an overall phase on the whole state, is observable.
 
 ## Summary
 
-- State = unit vector; observable = Hermitian operator; outcome =
-  eigenvalue; probability = Born rule, $P(\lambda_i)=|\langle
-  e_i|\psi\rangle|^2$ — a postulate, verified consistent with
+- State equals unit vector; observable equals Hermitian operator; outcome
+  equals eigenvalue; probability equals Born rule, $P(\lambda_i)=|\langle
+  e_i|\psi\rangle|^2$, a postulate, verified consistent with
   normalization via the completeness relation.
 - $\langle A\rangle=\langle\psi|A|\psi\rangle$ is derived from the Born
   rule and the spectral decomposition, not assumed independently.
@@ -221,6 +222,6 @@ superposition, not an overall phase on the whole state, is observable.
 This closes the course's core development. Next: **Mathematical
 Foundations Challenge**, a synthesis lesson connecting every tool built
 here across multiple lessons at once, before the Quantum Mechanics pillar
-continues into **From Classical to Quantum** — the historical and
-experimental motivation for why physics needed this framework in the
-first place.
+continues into **From Classical to Quantum**, which turns this
+mathematics into the actual postulates, dynamics, and physical
+predictions of quantum mechanics.

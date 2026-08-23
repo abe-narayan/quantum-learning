@@ -1,0 +1,141 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Quantum Compilation & Transpilation",
+  description:
+    "Physical Qubit Platforms' connectivity constraint made concrete: a CNOT(0,3) request on a linear-chain device needs exactly 4 extra SWAP gates to execute, verified to reproduce the logical CNOT's exact result, using nothing but gates.ts's existing applySwap and applyCNOT.",
+  course: "compilation-and-hybrid-algorithms",
+  module: "quantum-compilation-and-transpilation",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 22,
+  prerequisites: ["quantum-software/simulating-quantum-systems/noise-simulation"],
+  objectives: [
+    "Explain why a logical circuit's gates may not directly match a specific device's connectivity constraints",
+    "Compute the SWAP-gate overhead for bridging a given control/target distance on a linear-chain device",
+    "Verify that a SWAP-network CNOT reproduces the same logical result as an idealized, connectivity-ignoring CNOT",
+  ],
+};
+
+## Motivation
+
+Every circuit this platform's `QuantumCircuit` has built (Programming
+Quantum Computers) freely calls `cnot(control, target)` between any two
+qubit indices, a purely logical, connectivity-agnostic operation.
+Physical Qubit Platforms already noted real hardware often only supports
+gates between *specific*, physically adjacent qubit pairs. **Transpilation**
+is the compilation step that bridges this gap: rewriting a logical
+circuit into one a specific device's connectivity can actually execute.
+
+## Engineering Development
+
+### The connectivity problem
+
+Consider the simplest realistic connectivity constraint: a **linear
+chain**, where qubit $i$ can only directly interact with qubit $i\pm1$.
+A logical circuit requesting `CNOT(0, 3)` cannot run directly on such a
+device. Qubits 0 and 3 aren't adjacent.
+
+### The SWAP-network solution
+
+The standard fix: physically move (via SWAP gates) the control qubit's
+data stepwise until it sits next to the target, apply the real CNOT,
+then swap back to restore the original qubit ordering. This is exactly
+what this platform's `cnotOnLinearChain` implements, using nothing
+beyond `applySwap` and `applyCNOT` (both already built and tested in
+Quantum Gates & Circuits). This platform's test suite confirms
+directly: running `cnotOnLinearChain` for control=0, target=3 on a test
+state gives EXACTLY the same final amplitudes (difference $<10^{-9}$)
+as an idealized, connectivity-ignoring `applyCNOT(state, 0, 3)`. The
+SWAP network reproduces the correct logical result, at a real,
+computable cost.
+
+### Counting the overhead
+
+For control/target separated by distance $d=|{\text{control}-\text{target}}|$
+on a linear chain, bridging the gap needs $d-1$ SWAP gates each way (to
+walk the control qubit's data into position and back).
+$\text{swapOverheadForLinearChain}$ gives exactly $2(d-1)$ total SWAP
+gates. Each SWAP itself decomposes into three CNOTs (Quantum Gates &
+Circuits), so this overhead compounds directly into Noise, Decoherence &
+Scaling's per-gate compounding-error problem: every inserted SWAP is
+several more real gates that can fail.
+
+## Physical Interpretation
+
+Transpilation is not a cosmetic renaming step. It can substantially
+change a circuit's real cost. A logical circuit that looks compact in
+terms of gate count can expand significantly once connectivity
+constraints are honestly accounted for, which is exactly why real
+device topology (Physical Qubit Platforms' connectivity comparison
+across platforms) matters for algorithm performance, not just raw qubit
+count or gate speed.
+
+## Worked Example
+
+**How many SWAP gates does bridging control=0, target=5 need on a
+6-qubit linear chain?**
+
+$$
+\text{overhead} = 2(d-1) = 2(5-1) = 8 \text{ SWAP gates}
+$$
+
+8 extra SWAPs (24 extra CNOTs, since each SWAP is 3 CNOTs) just to
+execute what was logically a single two-qubit gate. This concretely
+shows why algorithms designed with connectivity in mind (grouping
+interacting qubits close together) can run substantially more
+efficiently than ones that ignore it.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming a logical circuit's gate count is what actually runs on
+hardware.** Transpilation can substantially inflate the real gate count.
+The worked example's single logical CNOT becomes 8 SWAPs (24 CNOTs)
+plus the original CNOT, a huge multiplier for a distant qubit pair.
+</Callout>
+
+<Callout type="mistake">
+**Thinking SWAP-network transpilation changes what the circuit
+COMPUTES.** It doesn't. This platform's own test suite confirms the
+SWAP-network version gives EXACTLY the same result as the idealized
+direct CNOT; only the physical execution path (and cost) differs, not
+the logical outcome.
+</Callout>
+
+## Practice Questions
+
+1. Compute the SWAP overhead for control=1, target=4 on a linear chain.
+2. Why does the overhead formula use $d-1$ (not $d$) SWAPs each way?
+3. Each SWAP decomposes into 3 CNOTs. For the worked example's 8-SWAP
+   case, how many total CNOT-equivalent operations does the fully
+   transpiled circuit contain (including the original logical CNOT)?
+4. Explain why an algorithm designer who knows the target hardware's
+   connectivity in advance might deliberately order which qubits
+   interact, rather than treating all qubit pairs as equally cheap.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Transpilation rewrites a logical circuit to respect a specific
+  device's connectivity constraints. SWAP-network insertion is the
+  standard technique for limited (e.g. linear-chain) connectivity.
+- Verified directly: `cnotOnLinearChain` reproduces an idealized direct
+  CNOT's exact result, at a real, computable SWAP-gate cost of
+  $2(d-1)$.
+- This overhead compounds directly with Noise, Decoherence & Scaling's
+  per-gate error accumulation. Connectivity-aware circuit design is a
+  genuine performance concern, not a minor detail.
+
+## Further Exploration
+
+Next: **Gate Decomposition**, which covers the OTHER major compilation
+step: translating each individual gate into a specific hardware's native
+gate set, verified directly against several of this platform's own gate
+matrices.

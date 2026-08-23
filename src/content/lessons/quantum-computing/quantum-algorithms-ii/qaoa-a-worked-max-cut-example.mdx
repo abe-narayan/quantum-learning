@@ -1,0 +1,136 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "QAOA: A Worked Max-Cut Example",
+  description:
+    "p=1 QAOA run on a triangle graph and a single edge, both reaching within a fraction of a percent of the true brute-force optimum, good parameters found by grid search, then checked against the exact maximum.",
+  course: "quantum-algorithms-ii",
+  module: "qaoa-a-worked-max-cut-example",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/quantum-algorithms-ii/qaoa-and-combinatorial-optimization"],
+  objectives: [
+    "Run p=1 QAOA on two small graphs and compare the result to the brute-force optimum",
+    "Explain why a grid search over (γ,β) was used to find good parameters, rather than a closed form",
+    "Identify what changes for a graph large enough that brute force is no longer practical",
+  ],
+};
+
+## Motivation
+
+The last lesson established the baseline (no optimization: expected cut
+$=|E|/2$) and the mechanism (cost phases, then a mixer). This lesson runs
+the actual $p=1$ circuit at good parameters and checks the result against
+`bruteForceMaxCut`, the true answer, computable directly since these
+graphs are small enough to check every one of the $2^n$ colorings.
+
+## Mathematical Development
+
+### Single edge (2 nodes, 1 edge)
+
+True maximum: `bruteForceMaxCut(2, [[0,1]])` $=1$ (cutting the one edge is
+trivially achievable, color the two nodes differently). A grid search
+over $\gamma,\beta\in(0,\pi)$ found $\gamma\approx1.55,\ \beta\approx0.40$
+gives `expectedCutSize` $\approx0.9997$, within $0.03\%$ of the true
+maximum, using a single layer.
+
+### Triangle (3 nodes, all 3 edges)
+
+True maximum: `bruteForceMaxCut(3, [[0,1],[1,2],[0,2]])` $=2$ (any
+single-vertex-vs-two-vertex split cuts exactly 2 of the 3 edges. A
+triangle can never have all 3 edges cut simultaneously, since that would
+need a proper 2-coloring of an odd cycle, impossible). A grid search found
+$\gamma\approx0.6,\ \beta\approx0.3$ gives `expectedCutSize`
+$\approx1.999$, within $0.05\%$ of the true maximum $2$, again at
+$p=1$.
+
+### Why grid search, not a closed form
+
+Unlike VQE's smooth, exactly-solvable single-qubit landscape, QAOA's
+$(\gamma,\beta)$ cost landscape for even a small graph has no simple
+closed-form optimum. Real QAOA implementations typically use gradient
+descent or Bayesian optimization over $(\gamma,\beta)$, run alongside the
+quantum circuit in the classical part of the hybrid loop. A grid search
+is the smallest honest substitute for that outer loop: it doesn't
+represent a full classical optimizer implementation, but it does find
+genuinely good parameters via genuinely evaluating the same
+`qaoaCircuit`/`expectedCutSize` functions a real optimizer would call.
+
+## Physical Interpretation
+
+Both results land close to, but not exactly at, the true maximum: the
+honest, typical signature of a heuristic algorithm at low circuit depth
+($p=1$). Real QAOA research studies how the approximation ratio (achieved
+cut ÷ true maximum) improves as $p$ grows, and whether it can be pushed
+arbitrarily close to $1$ for hard instances, an open, actively studied
+question this course's two small worked examples can illustrate the
+flavor of but not settle.
+
+## Worked Example
+
+**Confirm the triangle result is consistent with the "no odd cycle can be
+fully cut" fact used above.**
+
+A triangle's 3 vertices, 2-colored, must have at least two vertices
+sharing a color (pigeonhole: 3 vertices, 2 colors). The edge between those
+two same-colored vertices is *not* cut. So at most 2 of the 3 edges can
+ever be cut, confirming `bruteForceMaxCut`'s answer of $2$ from a
+structural argument, not just by checking all 8 colorings by computer.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming QAOA's near-100% result here generalizes to larger, harder
+graphs.** Both worked examples are small and structurally simple. Real
+Max-Cut instances at meaningful scale are NP-hard, and QAOA's
+approximation ratio in practice depends heavily on graph structure and
+circuit depth $p$, not guaranteed to stay this close to optimal.
+</Callout>
+
+<Callout type="mistake">
+**Treating the grid-search parameters as universal.** $\gamma\approx0.6,
+\beta\approx0.3$ was good specifically for the triangle;
+$\gamma\approx1.55,\beta\approx0.4$ was good specifically for the single
+edge. Different graphs need their own optimized parameters, found fresh
+each time.
+</Callout>
+
+## Practice Questions
+
+1. Using the pigeonhole argument from the worked example, explain why
+   *any* odd cycle (not just a triangle) has a Max-Cut strictly less than
+   its total edge count.
+2. For a 4-node cycle (square: edges (0,1),(1,2),(2,3),(3,0)), is a
+   perfect cut (all 4 edges) possible? Find the 2-coloring that achieves
+   it if so.
+3. Why does `expectedCutSize` need to average over *all* measurement
+   outcomes (weighted by probability) rather than just checking the most
+   likely one?
+4. What would need to change about this lesson's approach, not
+   necessarily in detail, just in kind, to handle a graph with, say, 20
+   nodes, where brute-force checking is no longer practical?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $p=1$ QAOA reaches $\approx99.97\%$ of the true maximum for a single
+  edge and $\approx99.95\%$ for a triangle, at grid-searched parameters.
+- A grid search stands in for QAOA's real classical outer-loop optimizer,
+  honestly scoped as a substitute, not a full implementation.
+- Both results are checked against `bruteForceMaxCut`, itself only
+  practical because these graphs are small, a real limitation that
+  doesn't affect QAOA's own circuit, only this course's ability to verify
+  it by brute force.
+
+## Further Exploration
+
+Next, the capstone: **Hybrid Algorithms, NISQ, and Honest Scope**, which
+places Shor's algorithm and the VQE/QAOA family side by side against what
+today's actual quantum hardware can and can't do.

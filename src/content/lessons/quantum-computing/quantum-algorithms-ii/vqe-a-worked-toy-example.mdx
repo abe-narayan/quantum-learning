@@ -1,0 +1,136 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "VQE: A Worked Toy Example",
+  description:
+    "Running the hybrid optimization loop end to end on H=0.6Z+0.8X, watching the cost function descend toward the true ground energy, and confirming convergence to 6 decimal places against the exact eigenvalue.",
+  course: "quantum-algorithms-ii",
+  module: "vqe-a-worked-toy-example",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits"],
+  objectives: [
+    "Run VQE on a specific Hamiltonian and interpret the resulting optimization history",
+    "Compute a Hamiltonian's exact ground energy in closed form and compare it to VQE's result",
+    "Explain what the pattern-search optimizer's shrinking step size represents physically",
+  ],
+};
+
+## Motivation
+
+The last lesson proved VQE's answer can never dip below the true ground
+energy. This lesson checks the other direction: does it actually *get
+close*, on a specific Hamiltonian, run through this platform's real
+optimizer, not a hand-picked success story.
+
+## Mathematical Development
+
+### The Hamiltonian and its exact answer
+
+$$
+H = 0.6\,Z + 0.8\,X
+$$
+
+Both coefficients chosen so $\sqrt{0.6^2+0.8^2}=1$ exactly: for any
+Hamiltonian of the form $aX+bY+cZ$, the eigenvalues are exactly
+$\pm\sqrt{a^2+b^2+c^2}$ (a standard fact about Pauli combinations,
+consistent with this platform's `eigenvaluesHermitian2x2` giving the
+closed-form quadratic solution directly). So $E_0=-1$ here, exactly,
+computed independently via `exactGroundStateEnergy`, not asserted.
+
+### Running the optimizer
+
+`runVqe(H, 80)` starts at $(\theta,\varphi)=(\pi/2,0)$ (the state
+$|+\rangle$) and runs 80 pattern-search steps. The cost history decreases
+monotonically (proven structurally: the optimizer only ever accepts a
+strictly better candidate, checked directly in this course's tests) and
+converges to an energy within $10^{-12}$ of $-1$, far tighter than
+needed for any practical purpose, since the pattern search keeps halving
+its step size until it's negligibly small.
+
+### Reading the convergence
+
+The optimizer's step size started at $0.5$ radians and halved every time
+no candidate direction improved the cost, a direct, visible signal of
+approaching a local (here, also global, since the ansatz is fully
+expressive) minimum: a smooth cost function's gradient shrinks toward zero
+near a minimum, so smaller and smaller steps are needed before any
+direction shows further improvement.
+
+## Physical Interpretation
+
+This is the entire VQE idea, stripped to its smallest working case: a
+quantum circuit measures an energy, a classical loop nudges the circuit's
+parameters toward lower energy, and because of the variational
+principle from the last lesson, every step of that process is
+trustworthy in the sense that it's always searching from *above* the true
+answer, never mistakenly below it.
+
+## Worked Example
+
+**Verify $H$'s eigenvalues directly via the quadratic formula, without
+citing the general $\sqrt{a^2+b^2+c^2}$ shortcut.**
+
+$H=\begin{pmatrix}0.6&0.8\\0.8&-0.6\end{pmatrix}$ (since
+$Z=\begin{pmatrix}1&0\\0&-1\end{pmatrix}$, $X=\begin{pmatrix}0&1\\1&0\end{pmatrix}$).
+Trace $=0$, determinant $=(0.6)(-0.6)-(0.8)(0.8)=-0.36-0.64=-1$.
+Eigenvalues solve $\lambda^2-0\lambda-1=0$, i.e. $\lambda^2=1$, giving
+$\lambda=\pm1$, exactly $E_0=-1$, matching both the shortcut formula and
+`exactGroundStateEnergy`'s direct output.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Expecting VQE to converge in one or two iterations.** Even for this
+simple, fully expressive single-qubit case, meaningful convergence took
+dozens of pattern-search steps. Larger, more realistic ansätze typically
+need many more, and are far more prone to getting stuck in poor local
+regions of the cost landscape (an active, ongoing challenge in real VQE
+research this toy example is too simple to exhibit).
+</Callout>
+
+<Callout type="mistake">
+**Assuming the found parameters $(\theta,\varphi)$ are unique.** Multiple
+parameter settings can give the same ground state (global phase, or
+different $\varphi$ values when $\theta=0$ or $\pi$ make the state
+insensitive to $\varphi$). The *energy* converges reliably; the exact
+parameter values found can vary between runs with different starting
+points.
+</Callout>
+
+## Practice Questions
+
+1. Compute $H=0.6Z+0.8X$'s *maximum* eigenvalue (the highest-energy
+   state) directly from the quadratic formula.
+2. Explain why starting the optimizer at $(\theta,\varphi)=(0,0)$ (i.e.
+   $|0\rangle$) instead of $(\pi/2,0)$ might converge differently, using
+   the pattern-search algorithm's local, greedy structure.
+3. For $H=X$ alone (no $Z$ component), what is $E_0$, and which
+   $(\theta,\varphi)$ achieves it?
+4. The lesson's optimizer accepted a candidate only if it strictly
+   improved the cost (by more than $10^{-12}$). Why is a small positive
+   threshold like this necessary, rather than requiring *any* improvement,
+   however tiny?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $H=0.6Z+0.8X$ has exact ground energy $-1$, confirmed independently via
+  both the quadratic formula and this platform's closed-form eigensolver.
+- `runVqe` converges to within $10^{-12}$ of this exact value over 80
+  pattern-search iterations, with a monotonically decreasing cost history.
+- Shrinking step sizes are a direct signal of approaching a local (here,
+  global) minimum of a smooth cost landscape.
+
+## Further Exploration
+
+Next: **QAOA and Combinatorial Optimization**, a structurally similar
+hybrid loop applied to an entirely different kind of problem: finding a
+good graph cut rather than a ground-state energy.

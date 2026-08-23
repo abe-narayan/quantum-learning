@@ -1,13 +1,20 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics"
+).map((problem) => problem.meta);
+
 export const lessonMeta = {
   title: "Complex Numbers for Quantum Mechanics",
   description:
-    "The arithmetic and geometry of complex numbers — the language every quantum amplitude is written in.",
+    "The arithmetic and geometry of complex numbers, the language every quantum amplitude is written in.",
   course: "qubits-and-quantum-states",
   module: "complex-numbers-for-quantum-mechanics",
   order: 1,
   difficulty: "foundational",
   estimatedMinutes: 25,
-  prerequisites: ["quantum-computing/qubits-and-quantum-states/classical-bit-vs-qubit"],
+  prerequisites: ["quantum-computing/qubits-and-quantum-states/what-is-a-qubit"],
   objectives: [
     "Add, multiply, and conjugate complex numbers confidently",
     "Convert between rectangular and polar form using Euler's formula",
@@ -18,27 +25,27 @@ export const lessonMeta = {
 ## Motivation
 
 In the last lesson, $\alpha$ and $\beta$ showed up as "complex numbers" and
-we mostly left it at that — every example used real values like
+we mostly left it at that: every example used real values like
 $\tfrac{1}{\sqrt2}$. That was deliberately gentle. It's about to stop being
-gentle: the Bloch sphere's phase factor $e^{i\varphi}$, the difference
+gentle. The Bloch sphere's phase factor $e^{i\varphi}$, the difference
 between a $Z$ gate and an $S$ gate, and the reason quantum interference
-exists at all — all of it comes down to genuinely complex amplitudes,
-not just real ones with a sign.
+exists at all all come down to genuinely complex amplitudes, not just real
+ones with a sign.
 
 So before going further, we need the actual toolkit: how to add, multiply,
 and geometrically picture complex numbers. If you've seen this before,
-treat this lesson as a fast, quantum-flavored refresher — the polar form
+treat this lesson as a fast, quantum-flavored refresher. The polar form
 and Euler's formula sections are the parts that matter most going forward.
 
 ## Intuition
 
 A real number lives on a line. A complex number lives on a **plane**: one
-axis for its real part, one for its imaginary part. That's really it — a
+axis for its real part, one for its imaginary part. That's really it. A
 complex number is just an ordered pair $(a, b)$, written $a + bi$, plotted
 as a point (or an arrow from the origin) in this plane.
 
 The "imaginary" unit $i$ is defined by one property: $i^2 = -1$. That's the
-entire rulebook. Everything else — every identity in this lesson — follows
+entire rulebook. Everything else, every identity in this lesson, follows
 from treating $i$ like any other algebraic symbol, except that whenever
 $i^2$ shows up, you replace it with $-1$.
 
@@ -72,14 +79,14 @@ $$
 z z^* = (a+bi)(a-bi) = a^2 - abi + abi - b^2i^2 = a^2 + b^2
 $$
 
-That quantity — always real, always $\geq 0$ — defines the **modulus**
+That quantity, always real, always $\geq 0$, defines the **modulus**
 (length) of $z$:
 
 $$
 |z| = \sqrt{z z^*} = \sqrt{a^2+b^2}
 $$
 
-This is exactly the reason $|\alpha|^2$ and $|\beta|^2$ from the last lesson
+This is exactly why $|\alpha|^2$ and $|\beta|^2$ from the last lesson
 are guaranteed to be real, non-negative numbers suitable for probabilities,
 no matter how complex $\alpha$ and $\beta$ get: $|\alpha|^2 = \alpha\alpha^*$
 by construction.
@@ -87,8 +94,8 @@ by construction.
 ### Polar form and Euler's formula
 
 Rectangular form $(a, b)$ is one way to locate a point in the plane; polar
-coordinates — a distance $r$ and an angle $\theta$ from the positive real
-axis — are another. They're related by $a = r\cos\theta$,
+coordinates, a distance $r$ and an angle $\theta$ from the positive real
+axis, are another. They're related by $a = r\cos\theta$,
 $b = r\sin\theta$, so:
 
 $$
@@ -118,7 +125,7 @@ $$
 
 A number written this way has modulus $r$ and **phase** (or **argument**)
 $\theta$. Every complex number has both a rectangular form and a polar
-form — they're the same information, viewed two ways.
+form: they're the same information, viewed two ways.
 
 ### Why polar form matters: multiplication adds phases
 
@@ -133,9 +140,10 @@ $$
 quantum computing cares about phase at all: applying a phase gate to a
 qubit multiplies an amplitude by $e^{i\theta}$ for some $\theta$, and this
 identity is exactly what tells you the *new* phase is the old phase plus
-$\theta$ — nothing about the probability (which depends on $r$) changes.
+$\theta$, with nothing about the probability (which depends on $r$)
+changing.
 
-Conjugation is simple in polar form too: $z^* = re^{-i\theta}$ — same
+Conjugation is simple in polar form too: $z^* = re^{-i\theta}$, same
 modulus, negated phase. You can check this matches
 $\cos(-\theta)+i\sin(-\theta) = \cos\theta - i\sin\theta$.
 
@@ -143,9 +151,9 @@ $\cos(-\theta)+i\sin(-\theta) = \cos\theta - i\sin\theta$.
 
 In quantum mechanics, an amplitude's **modulus** will always turn out to
 control a probability (through $|\alpha|^2$), while its **phase** carries
-information that never shows up in a probability by itself — only in how
-one amplitude compares to another. That split — "how much" vs. "in what
-phase" — is precisely $r$ and $\theta$ in $z = re^{i\theta}$. You'll see
+information that never shows up in a probability by itself, only in how
+one amplitude compares to another. That split, "how much" versus "in what
+phase," is precisely $r$ and $\theta$ in $z = re^{i\theta}$. You'll see
 this made completely explicit when we reach the Bloch sphere: the
 $e^{i\varphi}$ you'll write there is not a decoration, it's literally this
 lesson's polar form.
@@ -168,7 +176,7 @@ Modulus: $|11-2i| = \sqrt{11^2 + (-2)^2} = \sqrt{125} = 5\sqrt5$.
 
 **Check it against polar form.** $|3+4i| = \sqrt{9+16}=5$ and
 $|1-2i|=\sqrt{1+4}=\sqrt5$. Since magnitudes multiply, we should get
-$5 \cdot \sqrt5 = 5\sqrt5$ — matches, without needing to expand anything.
+$5 \cdot \sqrt5 = 5\sqrt5$, which matches, without needing to expand anything.
 
 **Verify Euler's formula at $\theta = \pi/2$:**
 
@@ -176,7 +184,7 @@ $$
 e^{i\pi/2} = \cos\!\left(\frac{\pi}{2}\right) + i\sin\!\left(\frac{\pi}{2}\right) = 0 + i(1) = i
 $$
 
-So $e^{i\pi/2} = i$ exactly — a fact you'll meet again the moment we define
+So $e^{i\pi/2} = i$ exactly, a fact you'll meet again the moment we define
 the $S$ gate.
 
 ## Common Mistakes
@@ -188,7 +196,7 @@ silently breaks every calculation downstream. $i^2 = -1$, always.
 
 <Callout type="mistake">
 **Confusing $|z|$ with $z$ itself.** $|z|$ is always a non-negative real
-number — a distance. It has thrown away the phase entirely. Two very
+number, a distance. It has thrown away the phase entirely. Two very
 different complex numbers can have the same modulus (e.g. $1$ and $i$ both
 have modulus $1$), so knowing $|z|$ alone never tells you $z$.
 </Callout>
@@ -211,6 +219,8 @@ $-a+bi$.
    $(a, b)$ satisfy geometrically? (Hint: revisit the definition of
    modulus.)
 
+<PracticeLinks problems={practiceProblems} />
+
 ## Summary
 
 - A complex number $a+bi$ is a point in the plane; $i^2=-1$ is the only new
@@ -220,11 +230,11 @@ $-a+bi$.
 - Polar form $z=re^{i\theta}=r(\cos\theta+i\sin\theta)$ (Euler's formula)
   separates a complex number into a magnitude $r$ and a phase $\theta$.
 - Multiplying complex numbers multiplies their magnitudes and **adds**
-  their phases — the reason phase gates compose the way they do.
+  their phases, the reason phase gates compose the way they do.
 
 ## Further Exploration
 
 Next: **Dirac Notation**, which packages complex-valued vectors like
 $\alpha|0\rangle+\beta|1\rangle$ into a compact algebra with its own
-built-in notion of "multiplication" — the inner product — built directly
+built-in notion of "multiplication," the inner product, built directly
 on the conjugate you just learned.

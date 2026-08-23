@@ -1,0 +1,163 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Capstone: Comparing Quantum Advantage",
+  description:
+    "Deutsch-Jozsa's exponential separation and Grover's quadratic one, side by side: what each algorithm actually proves, what it needs to be true to matter, and why 'quantum computers are exponentially faster' is not a fair summary of either.",
+  course: "quantum-algorithms-i",
+  module: "capstone-comparing-quantum-advantage",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification"],
+  objectives: [
+    "State the query complexity of Deutsch-Jozsa and Grover's algorithm precisely, classical vs. quantum",
+    "Explain why Deutsch-Jozsa's exponential separation depends entirely on its promise",
+    "Explain why Grover's quadratic speedup is provably optimal, not merely the best known",
+  ],
+};
+
+## Motivation
+
+Two algorithms, two very different kinds of "faster." This lesson puts
+them side by side and asks the harder question neither individual lesson
+addressed: faster at what, compared to what, and under what assumptions,
+because both answers turn out to be more specific, and more honest, than
+"quantum computers win."
+
+## Mathematical Development
+
+### The comparison, precisely
+
+| | Classical queries (worst case) | Quantum queries | Separation |
+|---|---|---|---|
+| Deutsch-Jozsa | $2^{n-1}+1$ | $1$ | Exponential |
+| Grover's search | $N$ (i.e. $2^n$) | $O(\sqrt N)=O(2^{n/2})$ | Quadratic |
+
+Both numbers in the "quantum queries" column were *derived* in this
+course, not quoted: Deutsch-Jozsa's single query from the exact $\pm1$/$0$
+amplitude split, Grover's $O(\sqrt N)$ from the exact rotation-angle
+formula. Neither is asymptotic hand-waving.
+
+### Why Deutsch-Jozsa's exponential gap depends entirely on the promise
+
+The $2^{n-1}+1$ classical bound is only a *worst-case adversarial* bound,
+and it only applies because the problem is a **promise problem**: $f$ is
+guaranteed to be constant or balanced, nothing else. Remove the promise
+(ask "is $f$ constant?" for an arbitrary $f$ with no guarantee), and the
+quantum algorithm from this course gives no reliable answer at all (its
+derivation used the promise explicitly to rule out every amplitude value
+except $0$ and $\pm1$). Deutsch-Jozsa's exponential separation is real, but
+it's a separation for a problem *engineered* to showcase interference, not
+evidence that exponential speedups are available whenever you want one.
+
+### Why Grover's speedup is provably optimal
+
+Unlike Deutsch-Jozsa, Grover's quadratic speedup isn't just "the best
+algorithm found so far": it's been proven (a result outside this course's
+scope, due to Bennett, Bernstein, Brassard, and Vazirani) that **no**
+quantum algorithm can search an unstructured space of $N$ items in fewer
+than $\Omega(\sqrt N)$ oracle queries. Grover's algorithm doesn't just
+happen to be fast; unstructured search genuinely cannot go faster than
+quadratically, quantum or otherwise. This is a meaningfully different, and
+stronger, kind of result than "we haven't found a better classical
+algorithm yet."
+
+### What "quantum advantage" actually requires
+
+Both results share a hidden assumption worth stating explicitly: the
+speedup is counted in **oracle queries**, not real-world running time.
+Building a genuine quantum oracle for some function of interest (encoding
+"is this database entry a match," say) as an efficient reversible circuit
+is a separate, often much harder engineering problem than the query-count
+theorems address. A quadratic (or even exponential) query-count advantage
+doesn't automatically translate into a faster *wall-clock* algorithm for a
+real problem unless a genuinely efficient oracle exists for it. The gap
+between "provably fewer queries" and "actually useful today" is exactly
+where most of the difficulty in quantum algorithm design still lives.
+
+## Physical Interpretation
+
+Interference is the entire mechanism behind both results: Deutsch-Jozsa's
+amplitude on $|0\rangle^{\otimes n}$ collapsing to exactly $0$ or $\pm1$,
+Grover's rotation concentrating amplitude on the marked state, and
+interference is a genuinely quantum resource with no classical analogue.
+What differs between the two algorithms is how much structure the *problem
+itself* offers for interference to exploit: an engineered promise (total,
+exponential advantage) versus a genuinely unstructured search (partial,
+quadratic advantage, but provably the most available).
+
+## Worked Example
+
+**For $n=10$ ($N=1024$), compare Deutsch-Jozsa's and Grover's query
+counts to the corresponding classical worst case.**
+
+Deutsch-Jozsa: classical $2^9+1=513$ queries vs. quantum $1$, a
+$513\times$ reduction. Grover: classical $1024$ queries (average case
+$\approx512$) vs. quantum
+$\approx\frac{\pi}{4}\sqrt{1024}=\frac{\pi}{4}(32)\approx25$ queries, about
+a $20\times$ reduction, not the $513\times$ Deutsch-Jozsa achieves at the
+same $n$. The gap between "exponential" and "quadratic" is not a small
+difference in practice, and it only widens as $n$ grows further.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating "quantum computers are exponentially faster" as a general
+fact.** It's true for specially-constructed promise problems like
+Deutsch-Jozsa; it's false for unstructured search (Grover, quadratic,
+provably optimal) and false in general: most problems have no known
+quantum speedup at all.
+</Callout>
+
+<Callout type="mistake">
+**Equating query complexity with real-world speed.** Both results count
+oracle calls, not wall-clock time. A real speedup additionally requires an
+efficient way to actually build the oracle for the problem you care about:
+a separate, often harder, engineering question this course's toy oracles
+sidestepped by construction.
+</Callout>
+
+## Practice Questions
+
+1. For $n=20$, compute Deutsch-Jozsa's classical query bound and Grover's
+   approximate optimal quantum query count, and compare their respective
+   speedup factors.
+2. Explain, in your own words, why "provably optimal" (Grover) is a
+   stronger claim than "exponential separation for one engineered problem"
+   (Deutsch-Jozsa), even though the numerical speedup is smaller.
+3. Why doesn't Deutsch-Jozsa's algorithm work at all once the
+   constant-or-balanced promise is dropped? Point to the specific step in
+   its derivation that relied on the promise.
+4. Name one thing a real quantum algorithm needs, beyond a good query
+   complexity bound, before it can outperform a classical computer on an
+   actual task.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Deutsch-Jozsa: exponential separation ($2^{n-1}+1$ vs. $1$), but only for
+  a promise problem engineered to make it possible.
+- Grover: quadratic separation ($N$ vs. $O(\sqrt N)$), proven optimal for
+  unstructured search specifically, a smaller but structurally stronger
+  result.
+- Both speedups are measured in oracle queries; a real-world speedup
+  additionally requires an efficient oracle construction for the actual
+  problem at hand.
+- Interference is the shared mechanism; how much of it a problem allows
+  depends on how much structure the problem itself offers.
+
+## Further Exploration
+
+This completes **Quantum Algorithms I: Foundations**. From here,
+**Quantum Algorithms II: Advanced** builds directly on the QFT and phase
+estimation machinery from this course: Shor's algorithm reuses phase
+estimation for period finding, and the variational algorithms (VQE, QAOA)
+introduce a fundamentally different, classically-assisted approach to
+quantum computation.

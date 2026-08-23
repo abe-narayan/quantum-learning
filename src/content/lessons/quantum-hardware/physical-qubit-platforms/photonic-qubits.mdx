@@ -1,0 +1,150 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/physical-qubit-platforms/photonic-qubits"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Photonic Qubits",
+  description:
+    "A qubit encoded in a single photon's polarization or path: the only major platform where the qubit doesn't sit still, trading essentially perfect coherence (light doesn't decohere in flight) for the genuinely hard problem of making two photons interact at all.",
+  course: "physical-qubit-platforms",
+  module: "photonic-qubits",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 18,
+  prerequisites: ["quantum-hardware/physical-qubit-platforms/neutral-atoms"],
+  objectives: [
+    "Explain how a qubit can be encoded in a photon's polarization or spatial path",
+    "State why photonic qubits have essentially no decoherence in the usual sense, and what limits them instead (loss)",
+    "Explain, at a conceptual level, why two-photon gates are fundamentally harder than gates on matter-based qubits",
+  ],
+};
+
+## Motivation
+
+Every platform so far, superconducting circuits, trapped ions, neutral
+atoms, encodes a qubit in something that sits still, confined at a
+fixed location. A photonic qubit is different in kind: the qubit *is* a
+particle of light, and it doesn't sit anywhere. It travels, typically
+through optical fiber or free space, at the speed of light.
+
+## Engineering Development
+
+### Encoding a qubit in light
+
+A single photon's **polarization** (the orientation of its oscillating
+electric field, horizontal vs. vertical, or left- vs. right-circular)
+gives a natural two-level system: $|H\rangle$ and $|V\rangle$ map
+directly onto $|0\rangle$ and $|1\rangle$. Alternatively, **path
+encoding** uses which of two physical routes (waveguides or fiber paths)
+the photon travels; a photon in a superposition of two paths is a
+qubit in superposition, directly realizing the same math this platform's
+`the-bloch-sphere` and interferometer-based lessons already built,
+now with an actual physical interferometer.
+
+### (Nearly) no decoherence, but real loss
+
+A photon traveling through good optical fiber or free space doesn't
+interact much with its environment along the way; there's no
+thermal bath jostling it the way a solid-state qubit sits in one. This
+gives photonic qubits exceptionally long *coherence* times in the usual
+sense. The real limiting factor is different: **photon loss**. Fiber
+absorption, imperfect optical components, and coupling inefficiencies
+mean a photon has some probability of simply not arriving at all, which
+functions like a qubit vanishing outright rather than dephasing
+gradually. This is a genuinely different failure mode from every
+previous platform's gradual $T_1$/$T_2$ decay, and it demands different
+engineering solutions (the Noise, Decoherence & Scaling course develops
+loss as its own error channel).
+
+### Why two-photon gates are hard
+
+Every previous platform's two-qubit gate relies on some direct physical
+interaction: Coulomb-mediated shared motion for ions, Rydberg blockade
+for neutral atoms, direct capacitive coupling for superconducting
+circuits. Photons, by contrast, essentially don't interact with each
+other at all in ordinary optical media (two light beams normally pass
+straight through one another). Building an effective photon-photon
+interaction requires either exotic nonlinear optical materials
+(inefficient with current technology) or clever measurement-based
+tricks (using photon detection itself, combined with post-selection, to
+implement an effective, probabilistic, two-qubit gate). This is *the*
+central engineering challenge specific to photonic quantum computing,
+without a clean analogue on any other platform covered so far.
+
+## Physical Interpretation
+
+Photonic qubits' tradeoff is genuinely distinct from every other
+platform's speed-vs-coherence axis: essentially perfect coherence in
+flight, but a fundamentally hard interaction problem for multi-qubit
+gates, plus a qualitatively different error mode (loss, not gradual
+decoherence). This is also why photonic qubits are the natural carrier
+for quantum communication and networking between separate quantum
+computers, even when a different platform (superconducting, ion, atom)
+handles the actual computation.
+
+## Worked Example
+
+**Why doesn't a photon's polarization "decohere" the way a
+superconducting qubit's state does, even over a long fiber trip?**
+
+Decoherence (Advanced Topics in Quantum Mechanics' dephasing channel)
+requires the qubit to interact, even weakly, with an uncontrolled
+environment that gradually randomizes its phase. A photon traveling
+through well-isolated fiber largely doesn't interact with anything along
+its path; there's no "bath" continuously nudging it the way a solid-state
+qubit sits embedded in a noisy physical device. The dominant failure mode
+instead is binary: the photon survives to be detected, or it's lost
+(absorbed, scattered) along the way, a fundamentally different
+statistical structure than gradual dephasing.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming "no decoherence" means "no errors."** Photon loss is a real,
+often dominant error source for photonic platforms. It just has a
+different mathematical character (binary survive/lost) than gradual
+$T_1$/$T_2$ decay.
+</Callout>
+
+<Callout type="mistake">
+**Assuming photonic two-qubit gates work the same way as matter-qubit
+gates, just with light instead.** The lack of a natural photon-photon
+interaction is a fundamentally different (and harder) engineering
+problem than anything the other platforms in this course face.
+</Callout>
+
+## Practice Questions
+
+1. Name two physical properties of a photon that can each encode a
+   qubit.
+2. Why is "loss" a fundamentally different kind of error from $T_1$/$T_2$
+   decoherence, in terms of what actually happens to the qubit?
+3. Why don't two ordinary light beams naturally interact the way two
+   trapped ions' motion or two neutral atoms' Rydberg states do?
+4. Why might a hybrid architecture use photons specifically for
+   communication between separate quantum processors, even if those
+   processors themselves use superconducting or ion qubits?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Photonic qubits encode information in a photon's polarization or
+  path, the only platform in this course where the qubit travels rather
+  than sits still.
+- Photons barely interact with their environment in transit, giving
+  excellent coherence in the usual sense; the dominant error is loss
+  (a photon failing to arrive), a qualitatively different failure mode.
+- The near-total absence of natural photon-photon interaction makes
+  two-qubit gates the platform's defining engineering challenge, without
+  a direct analogue among the matter-based platforms.
+
+## Further Exploration
+
+Next: **Spin Qubits**, a solid-state platform that, unlike
+superconducting circuits, encodes its qubit in something genuinely
+atomic: an electron or nuclear spin, embedded directly in a
+semiconductor.

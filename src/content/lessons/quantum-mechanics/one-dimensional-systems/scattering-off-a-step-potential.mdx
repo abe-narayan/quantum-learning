@@ -25,12 +25,12 @@ export const lessonMeta = {
 ## Motivation
 
 A ball rolling toward a downhill (or gentle uphill, as long as it has
-enough energy) step always makes it across — classically, with
+enough energy) step always makes it across, classically, with
 certainty. A quantum particle, remarkably, does not: some of its
 probability always reflects, no matter how much energy it has above the
 step. This lesson derives exactly how much, from nothing but plane waves
-and boundary matching — no numerics needed this time, a fully closed-form
-result.
+and boundary matching. No numerics are needed this time; it's a fully
+closed-form result.
 
 ## Intuition
 
@@ -39,7 +39,7 @@ from superpositions of plane waves; scattering problems instead work
 directly with individual plane waves (idealized, not normalizable on
 their own, but the standard and cleanest tool for describing a steady
 beam of particles). A step in $V(x)$ changes the particle's wavenumber
-abruptly — and just like light partially reflecting at any interface
+abruptly, and just like light partially reflecting at any interface
 where its speed changes (a glass-air boundary, for instance), a matter
 wave partially reflects wherever its wavenumber changes discontinuously.
 
@@ -48,7 +48,7 @@ wave partially reflects wherever its wavenumber changes discontinuously.
 ### Setting up the two regions
 
 Let $V(x)=0$ for $x<0$ and $V(x)=V_0>0$ for $x\ge0$, with a particle of
-energy $E>V_0$ incident from the left (over-the-step scattering — the
+energy $E>V_0$ incident from the left (over-the-step scattering: the
 particle has enough energy to classically continue past $x=0$).
 Define $k_1=\sqrt{2E}$ (region 1) and $k_2=\sqrt{2(E-V_0)}$ (region 2, a
 real, smaller wavenumber since $E>V_0$). The general stationary-state
@@ -58,10 +58,10 @@ $$
 \psi_1(x) = e^{ik_1x} + r\,e^{-ik_1x} \quad(x<0), \qquad \psi_2(x) = t\,e^{ik_2x} \quad(x\ge0)
 $$
 
-— an incident wave (amplitude 1, normalized this way by convention),
-a reflected wave (amplitude $r$), and a transmitted wave (amplitude
-$t$). No left-moving wave in region 2, since nothing is incident from the
-right.
+Here $e^{ik_1x}$ is an incident wave (amplitude 1, normalized this way by
+convention), $r\,e^{-ik_1x}$ a reflected wave (amplitude $r$), and
+$t\,e^{ik_2x}$ a transmitted wave (amplitude $t$). There's no left-moving
+wave in region 2, since nothing is incident from the right.
 
 ### Matching at $x=0$
 
@@ -88,9 +88,9 @@ $$
 ### Reflection and transmission probabilities
 
 The reflection probability is simply $R=|r|^2$. The transmission
-probability needs an extra factor of $k_2/k_1$ (accounting for the
-different *probability flux* — a wave with smaller wavenumber carries
-probability more slowly, so equal amplitude doesn't mean equal flux):
+probability needs an extra factor of $k_2/k_1$, accounting for the
+different *probability flux*: a wave with smaller wavenumber carries
+probability more slowly, so equal amplitude doesn't mean equal flux.
 
 $$
 R = \left(\frac{k_1-k_2}{k_1+k_2}\right)^{\!2}, \qquad T = \frac{k_2}{k_1}|t|^2 = \frac{4k_1k_2}{(k_1+k_2)^2}
@@ -103,18 +103,18 @@ $$
 R+T = \frac{(k_1-k_2)^2+4k_1k_2}{(k_1+k_2)^2} = \frac{k_1^2+2k_1k_2+k_2^2}{(k_1+k_2)^2} = \frac{(k_1+k_2)^2}{(k_1+k_2)^2} = 1 \;\checkmark
 $$
 
-using $(k_1-k_2)^2+4k_1k_2=k_1^2-2k_1k_2+k_2^2+4k_1k_2=k_1^2+2k_1k_2+k_2^2=(k_1+k_2)^2$
-— a genuine algebraic identity, not an assumption.
+using $(k_1-k_2)^2+4k_1k_2=k_1^2-2k_1k_2+k_2^2+4k_1k_2=k_1^2+2k_1k_2+k_2^2=(k_1+k_2)^2$,
+a genuine algebraic identity, not an assumption.
 
 ## Physical Interpretation
 
 $R=0$ only in the trivial case $k_1=k_2$ (no step at all, $V_0=0$).
-Otherwise $R>0$ always — however small the step, however large the
+Otherwise $R>0$ always: however small the step, however large the
 particle's energy above it, *some* reflection survives. This is exactly
 analogous to a light wave partially reflecting at any interface between
 media with different refractive indices, however similar those indices
-are — the same physics (a wave equation with a discontinuous coefficient)
-producing the same qualitative behavior.
+are. It's the same physics, a wave equation with a discontinuous
+coefficient, producing the same qualitative behavior.
 
 ## Worked Example
 
@@ -133,7 +133,7 @@ T = 1-R \approx 0.98387
 $$
 
 So even with the particle's energy $2.5\times$ the step height, about
-$1.6\%$ of an incident beam still reflects — small, but never zero, and
+$1.6\%$ of an incident beam still reflects: small, but never zero, and
 exactly what this platform's `stepPotentialScattering` function computes
 and its test suite confirms sums to exactly 1 with $R$.
 
@@ -141,14 +141,14 @@ and its test suite confirms sums to exactly 1 with $R$.
 
 <Callout type="mistake">
 **Forgetting the $k_2/k_1$ factor in $T$.** Probability flux, not
-amplitude-squared alone, is what must be conserved — $|t|^2$ alone
+amplitude-squared alone, is what must be conserved. $|t|^2$ alone
 doesn't equal the transmission probability unless $k_1=k_2$.
 </Callout>
 
 <Callout type="mistake">
 **Expecting classical behavior to reappear for large $E$.** $R\to0$ only
 in the limit $E\to\infty$ (where $k_2\to k_1$), never exactly at any
-finite energy — the reflection is genuinely persistent, not a
+finite energy. The reflection is genuinely persistent, not a
 small-energy artifact.
 </Callout>
 
@@ -158,7 +158,7 @@ small-energy artifact.
 2. Show that $R\to0$ as $V_0\to0$ directly from the boxed formula (not by
    re-deriving from scratch).
 3. Explain briefly why $t=2k_1/(k_1+k_2)$ can be *greater* than 1
-   (amplitude, not probability) without violating anything — what
+   (amplitude, not probability) without violating anything: what
    physical quantity is actually guaranteed to be $\le1$?
 
 <PracticeLinks problems={practiceProblems} />
@@ -170,11 +170,11 @@ small-energy artifact.
 - $R=r^2$ and $T=(k_2/k_1)t^2$ satisfy $R+T=1$ exactly, an algebraic
   identity.
 - Quantum particles partially reflect off *any* potential step, however
-  much energy they have above it — a genuine, persistent departure from
+  much energy they have above it: a genuine, persistent departure from
   classical mechanics.
 
 ## Further Exploration
 
 Next: **Resonant Transmission Through a Barrier**, extending this
-two-region result to a full barrier — and a striking consequence:
+two-region result to a full barrier, with a striking consequence:
 special energies where a barrier becomes perfectly, exactly transparent.

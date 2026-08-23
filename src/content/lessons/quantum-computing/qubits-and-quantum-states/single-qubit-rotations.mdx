@@ -1,4 +1,10 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/qubits-and-quantum-states/single-qubit-rotations"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "Single-Qubit Rotations",
@@ -19,7 +25,7 @@ export const lessonMeta = {
 
 ## Motivation
 
-Six named gates is a start, but it's a strange place to stop — there's
+Six named gates is a start, but it's a strange place to stop. There's
 nothing physically special about rotating by exactly $\pi/4$ versus, say,
 $17°$. This lesson replaces the six fixed gates with one continuous
 family, parametrized by any angle you like, and shows that the six gates
@@ -28,11 +34,11 @@ from last lesson were just convenient specific cases all along.
 ## Intuition
 
 If every gate is a rotation of the Bloch vector (last lesson's closing
-claim), then the natural next question is: what's the *general* rotation
-— by any angle $\theta$, about any axis $\hat n$? Ordinary 3D rotations
+claim), then the natural next question is: what's the *general* rotation,
+by any angle $\theta$, about any axis $\hat n$? Ordinary 3D rotations
 have exactly this kind of general formula (Rodrigues' rotation formula, if
 you've seen it); single-qubit gates have a close cousin of it, built from
-the same three matrices — $X$, $Y$, $Z$ — you already know.
+the same three matrices, $X$, $Y$, $Z$, you already know.
 
 ## Mathematical Development
 
@@ -49,12 +55,12 @@ formula, $e^{i\alpha}=\cos\alpha+i\sin\alpha$. That resemblance is exact:
 $R_{\hat n}(\theta) = e^{-i\theta(n_xX+n_yY+n_zZ)/2}$, and the reason the
 expansion terminates in just a cosine and a sine term (rather than an
 infinite matrix series) is that $(n_xX+n_yY+n_zZ)^2=I$ for any unit vector
-$\hat n$ — a fact you can check directly by matrix multiplication for any
+$\hat n$, a fact you can check directly by matrix multiplication for any
 particular $\hat n$, and which plays exactly the role $i^2=-1$ played in
 deriving Euler's formula itself.
 
-Once again, the half-angle $\theta/2$ shows up — same phenomenon as the
-Bloch sphere's canonical form, same reason: rotating the physical Bloch
+Once again, the half-angle $\theta/2$ shows up, the same phenomenon as the
+Bloch sphere's canonical form, for the same reason: rotating the physical Bloch
 vector by $\theta$ corresponds to a $\theta/2$ rotation "in amplitude
 space."
 
@@ -71,12 +77,12 @@ R_z(\theta) = \begin{pmatrix}e^{-i\theta/2} & 0\\0&e^{i\theta/2}\end{pmatrix}
 $$
 
 $R_z$ is the easiest to read directly: it multiplies $\alpha$ by
-$e^{-i\theta/2}$ and $\beta$ by $e^{i\theta/2}$ — an overall phase
+$e^{-i\theta/2}$ and $\beta$ by $e^{i\theta/2}$, an overall phase
 difference of $\theta$ between them. Since only the *relative* phase
 $\varphi$ is physical (next lesson makes this precise), $R_z(\theta)$'s
 entire effect is $\varphi \to \varphi+\theta$, leaving $\theta$-the-latitude
 completely fixed. $R_x$ and $R_y$ mix $\alpha$ and $\beta$ together, so in
-general they change both the Bloch $\theta$ and $\varphi$ at once —
+general they change both the Bloch $\theta$ and $\varphi$ at once,
 except when the state already sits exactly on the rotation's own axis, in
 which case (as with any rotation) nothing moves at all.
 
@@ -89,7 +95,7 @@ $$
 R_z\!\left(\frac{\pi}{2}\right) = \begin{pmatrix}e^{-i\pi/4}&0\\0&e^{i\pi/4}\end{pmatrix} = e^{-i\pi/4}\begin{pmatrix}1&0\\0&e^{i\pi/2}\end{pmatrix} = e^{-i\pi/4}\begin{pmatrix}1&0\\0&i\end{pmatrix} = e^{-i\pi/4}S
 $$
 
-$R_z(\pi/2)$ and $S$ differ by the overall factor $e^{-i\pi/4}$ — exactly
+$R_z(\pi/2)$ and $S$ differ by the overall factor $e^{-i\pi/4}$, exactly
 the kind of global phase the Bloch sphere derivation showed doesn't
 matter. The same pattern holds for every other named gate: $X=iR_x(\pi)$,
 $Z=iR_z(\pi)$, and so on. "Six special gates" and "one continuous family
@@ -101,7 +107,7 @@ generality.
 This is the payoff of the whole geometric picture: **every possible
 single-qubit operation is a rotation of the Bloch sphere**, full stop.
 There is no single-qubit gate that does something the rotation formula
-can't describe — $R_{\hat n}(\theta)$, ranging over all axes and angles,
+can't describe. $R_{\hat n}(\theta)$, ranging over all axes and angles,
 covers every physically distinct single-qubit unitary (up to the global
 phase that was never physical anyway). Six gates were a convenient,
 standard vocabulary; the rotation formula is the whole language.
@@ -113,11 +119,11 @@ standard vocabulary; the rotation formula is the whole language.
 - Set $\theta$ and $\varphi$ to something away from the poles (e.g. via
   the $|+\rangle$ preset), then apply $R_z$ at a few different angles.
   Watch the state panel: $\theta$ should stay exactly fixed while
-  $\varphi$ changes — confirm this numerically, not just visually.
+  $\varphi$ changes. Confirm this numerically, not just visually.
 - From the same starting state, try $R_x$ and $R_y$ instead. Unlike
   $R_z$, these generally move *both* $\theta$ and $\varphi$.
 - Prepare $|0\rangle$ (a pole) and apply $R_z$ at any angle. Nothing
-  moves — $|0\rangle$ sits exactly on the $z$-axis, the rotation's own
+  moves: $|0\rangle$ sits exactly on the $z$-axis, the rotation's own
   axis.
 
 ## Worked Example
@@ -125,7 +131,7 @@ standard vocabulary; the rotation formula is the whole language.
 **Apply $R_z(\pi/2)$ to $|+\rangle$ and identify the result.**
 
 $|+\rangle$ has $\theta=\pi/2$, $\varphi=0$. $R_z(\pi/2)$ adds $\pi/2$ to
-$\varphi$, giving $\theta=\pi/2$, $\varphi=\pi/2$ — exactly $|{+i}\rangle$.
+$\varphi$, giving $\theta=\pi/2$, $\varphi=\pi/2$, exactly $|{+i}\rangle$.
 This matches the $S$ gate's known action ($S$ and $R_z(\pi/2)$ differ only
 by global phase, so they must agree on where the state lands): $S|+\rangle=|{+i}\rangle$.
 
@@ -133,22 +139,22 @@ by global phase, so they must agree on where the state lands): $S|+\rangle=|{+i}
 
 <Callout type="mistake">
 **Assuming any rotation changes both $\theta$ and $\varphi$.** Only true
-in general. $R_z$ specifically *never* changes $\theta$ — it's a rotation
+in general. $R_z$ specifically *never* changes $\theta$: it's a rotation
 about the very axis $\theta$ is measured from.
 </Callout>
 
 <Callout type="mistake">
 **Mixing up rotation direction conventions.** Different textbooks and
 tools can define "positive angle" as clockwise or counterclockwise around
-a given axis. This course's convention matches the matrices given above
-— if your hand-computed answer's *sign* looks flipped from the simulator,
+a given axis. This course's convention matches the matrices given above.
+If your hand-computed answer's *sign* looks flipped from the simulator,
 check the convention before assuming an arithmetic error.
 </Callout>
 
 ## Practice Questions
 
 1. Starting from $|1\rangle$ (the south pole), $R_z(\theta)$ leaves it
-   fixed for any $\theta$ — but $R_x(\theta)$ does not. Explain
+   fixed for any $\theta$, but $R_x(\theta)$ does not. Explain
    geometrically why (is $|1\rangle$ on the $x$-axis, or perpendicular to
    it?), then find the smallest positive $\theta$ for which
    $R_x(\theta)|1\rangle$ returns to the same Bloch point as $|1\rangle$.
@@ -159,6 +165,8 @@ check the convention before assuming an arithmetic error.
 4. Two rotations, $R_z(\pi/3)$ and $R_z(\pi/6)$, are applied one after
    another to some state. What single rotation has the same net effect?
 
+<PracticeLinks problems={practiceProblems} />
+
 ## Summary
 
 - The general rotation is
@@ -166,15 +174,15 @@ check the convention before assuming an arithmetic error.
   structurally an "Euler's formula for the Bloch sphere."
 - $R_x,R_y,R_z$ are the coordinate-axis special cases; $X,Y,Z,H,S,T$ are
   all specific $(\hat n,\theta)$ choices, up to global phase.
-- $R_z(\theta)$ changes only $\varphi$, never $\theta$ — a directly
+- $R_z(\theta)$ changes only $\varphi$, never $\theta$, a directly
   testable, falsifiable claim.
 - Every single-qubit gate is, physically, some rotation of the Bloch
-  sphere — there's nothing else a single-qubit gate could be.
+  sphere. There's nothing else a single-qubit gate could be.
 
 ## Further Exploration
 
-Next: **Global Phase vs. Relative Phase**, which finally proves — rather
-than just asserts — that an overall phase factor changes nothing
+Next: **Global Phase vs. Relative Phase**, which finally proves, rather
+than just asserts, that an overall phase factor changes nothing
 physical, while a *relative* phase between $\alpha$ and $\beta$ changes
 everything about how a state behaves once other qubits or later
 measurements get involved.

@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "From Postulates to Quantum Computing",
   description:
-    "A synthesis capstone connecting every idea in this course directly to qubits, gates, and circuits — a qubit is simply the smallest nontrivial example of everything just derived.",
+    "A synthesis capstone connecting every idea in this course directly to qubits, gates, and circuits: a qubit is simply the smallest nontrivial example of everything just derived.",
   course: "classical-to-quantum",
   module: "from-postulates-to-quantum-computing",
   order: 1,
@@ -28,8 +28,8 @@ This course built the postulates of quantum mechanics from the ground
 up: states, observables, measurement, dynamics, uncertainty, and two
 concrete solvable systems (a generic two-level system and the harmonic
 oscillator). The Quantum Computing pillar, if you haven't taken it yet
-(or even if you have), is not a different subject requiring new physics
-— it's this exact framework, applied to the smallest nontrivial Hilbert
+(or even if you have), is not a different subject requiring new physics.
+It's this exact framework, applied to the smallest nontrivial Hilbert
 space there is.
 
 ## Recap: A Qubit Is a Two-Level Quantum System
@@ -38,11 +38,11 @@ space there is.
 |---|---|
 | State = unit vector in $\mathbb{C}^n$, up to phase | Qubit state $\alpha\lvert0\rangle+\beta\lvert1\rangle$, $\lvert\alpha\rvert^2+\lvert\beta\rvert^2=1$ |
 | Observable = Hermitian operator | The computational-basis measurement (a projective measurement in the $\{\lvert0\rangle,\lvert1\rangle\}$ basis) |
-| Measurement = Born rule | $P(0)=\lvert\alpha\rvert^2$, $P(1)=\lvert\beta\rvert^2$ — the exact same formula, in the exact same words |
-| Dynamics = unitary evolution | Quantum gates ($X,H,S,\ldots$) — every gate is a unitary matrix |
+| Measurement = Born rule | $P(0)=\lvert\alpha\rvert^2$, $P(1)=\lvert\beta\rvert^2$, the exact same formula, in the exact same words |
+| Dynamics = unitary evolution | Quantum gates ($X,H,S,\ldots$), every gate is a unitary matrix |
 | Uncertainty relation | The Pauli operators' commutators, worked directly in this course's Expectation Values lesson |
 | Two-level Hamiltonian evolution | Bloch-sphere rotation, computed by this platform's `rotationAboutAxis`, reused directly in the Time Evolution lesson |
-| Tensor products, multiple systems | Multi-qubit states — the same construction, this course's Mathematical Foundations prerequisite already built it in general |
+| Tensor products, multiple systems | Multi-qubit states, the same construction, this course's Mathematical Foundations prerequisite already built it in general |
 
 Nothing on the right side of this table is a new postulate. Every entry
 is a direct instance of the corresponding entry on the left, specialized
@@ -55,11 +55,11 @@ unitary, using this course's own derivation rather than "because that's
 the rule"?**
 
 Postulate 4 (Dynamics) requires evolution to be unitary because
-normalization must be preserved — the Unitary Operators lesson
+normalization must be preserved: the Unitary Operators lesson
 (Mathematical Foundations) proved unitarity is exactly the condition
 guaranteeing that. A "gate" is nothing but a name for a short, discrete
 step of this course's continuous $U(t)=e^{-iHt/\hbar}$ evolution (Time
-Evolution lesson) — the same requirement, just applied over a fixed,
+Evolution lesson), the same requirement, just applied over a fixed,
 useful time interval instead of continuously.
 
 **2. The Hadamard gate takes $|0\rangle\to|+\rangle$. Using the
@@ -74,7 +74,7 @@ $\{|0\rangle,|1\rangle\}$ basis has coefficients with a *fixed* relative
 phase ($\varphi=0$ for $H|0\rangle$), so measuring in that same basis
 gives fixed probabilities $P(0)=P(1)=\tfrac12$ regardless of what phase
 gate was applied beforehand. A phase gate changes $\varphi$, invisibly to
-a $\{|0\rangle,|1\rangle\}$-basis measurement — but a
+a $\{|0\rangle,|1\rangle\}$-basis measurement, but a
 $\{|+\rangle,|-\rangle\}$-basis measurement reveals it immediately, via
 the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
 
@@ -85,7 +85,7 @@ was normalized on its own?**
 This is the Tensor Products and Composite Systems lesson's result
 (Mathematical Foundations): $\langle u\otimes v,u\otimes v\rangle =
 \langle u,u\rangle\langle v,v\rangle = 1\cdot1=1$, derived from the
-multiplicative rule for inner products on simple tensors — no separate
+multiplicative rule for inner products on simple tensors, no separate
 renormalization step is ever needed.
 
 ## Common Mistakes, Revisited
@@ -99,8 +99,8 @@ built for general quantum systems.
 
 <Callout type="mistake">
 **Forgetting that "qubit" just means "the smallest nontrivial Hilbert
-space."** Nothing about the postulates requires exactly two dimensions —
-qubits are convenient and physically realizable, not mathematically
+space."** Nothing about the postulates requires exactly two dimensions.
+Qubits are convenient and physically realizable, not mathematically
 special.
 </Callout>
 
@@ -131,7 +131,7 @@ special.
 - Interference, uncertainty, and time evolution all reduce to identities
   this course already derived, evaluated at $\mathbb{C}^2$.
 - Nothing about quantum computing requires new physics beyond what this
-  course built — only a choice of which Hilbert space to specialize to.
+  course built, only a choice of which Hilbert space to specialize to.
 
 ## Further Exploration
 

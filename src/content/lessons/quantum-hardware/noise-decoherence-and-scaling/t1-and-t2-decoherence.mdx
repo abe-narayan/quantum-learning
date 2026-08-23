@@ -1,0 +1,145 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "T1 & T2 Decoherence",
+  description:
+    "T1 and T2 aren't new physics. They're Advanced Topics in Quantum Mechanics' amplitude damping and dephasing channels, connected to continuous exponential decay via decayProbabilityForTimestep, verified exactly: stepping a discrete Kraus channel over one full T1 gives P(1)=e⁻¹ to 9 decimal places, for any step count.",
+  course: "noise-decoherence-and-scaling",
+  module: "t1-and-t2-decoherence",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-hardware/noise-decoherence-and-scaling/sources-of-noise"],
+  objectives: [
+    "State the definitions of T1 (energy relaxation time) and T2 (dephasing/coherence time) as continuous exponential decay constants",
+    "Connect T1/T2 to this platform's discrete Kraus-channel model via decayProbabilityForTimestep",
+    "Explain the general inequality T2 ≤ 2T1, and why T2 cannot exceed this bound",
+  ],
+};
+
+## Motivation
+
+Every hardware datasheet reports T1 and T2. Physical Qubit
+Platforms and Advanced Topics in Quantum Mechanics already built
+everything needed to define them precisely and compute with them
+directly, rather than treating them as opaque spec-sheet numbers.
+
+## Engineering Development
+
+### T1: energy relaxation
+
+**T1** is the exponential time constant for a qubit prepared in
+$|1\rangle$ to decay toward $|0\rangle$: $P_1(t)=e^{-t/T_1}$. This is
+exactly `amplitudeDampingChannel`'s continuous-time limit. Connecting the
+discrete channel to this continuous law uses
+`decayProbabilityForTimestep(T1,dt)`$=1-e^{-dt/T_1}$ as the per-step
+damping probability $\gamma$, chosen so that $N$ repeated applications
+over total time $t=N\,dt$ give $(1-\gamma)^N=e^{-N\,dt/T_1}=e^{-t/T_1}$
+**exactly**, for any step count $N$ (not merely as a fine-stepping
+approximation; this platform's test suite confirms $N=10$, $100$, and
+$1000$ all give $P_1(T_1)=e^{-1}$ to 9 decimal places).
+
+### T2: dephasing / coherence time
+
+**T2** is the analogous time constant for off-diagonal coherence decay:
+$|\rho_{01}(t)|=|\rho_{01}(0)|\,e^{-t/T_2}$, exactly
+`dephasingChannel`'s continuous-time limit, connected the same way via
+`decayProbabilityForTimestep(T2,dt)` as the per-step dephasing
+probability $\lambda$.
+
+### The T2 ≤ 2T1 bound
+
+T1 processes (energy relaxation) *also* randomize phase as a side
+effect; losing populational information necessarily disturbs
+coherence too, while T2 processes (pure dephasing) need not involve any
+energy loss at all. This asymmetry gives the general bound
+$T_2\leq2T_1$: coherence can never outlast twice the energy-relaxation
+time, though it can decay much faster (if pure dephasing dominates)
+independent of T1. A device with $T_2$ close to $2T_1$ is described as
+"T1-limited" (dephasing is not the bottleneck); one with $T_2\ll2T_1$ is
+"T2-limited" (dephasing dominates).
+
+Compare the two channels directly: start from $|+\rangle$ (equal parts
+$|0\rangle$ and $|1\rangle$, maximal initial coherence) and step through
+dephasing, watching only x and y shrink while z stays at 0. Then switch
+to amplitude damping from the same starting state and watch z move too,
+as the state is pulled all the way to the north pole, exactly the
+qualitative T1-vs-T2 distinction this section just derived.
+
+<LazyNoiseExplorer />
+
+## Physical Interpretation
+
+T1 and T2 aren't independent free parameters a device designer can set
+arbitrarily. They reflect two physically distinct (if related)
+processes: T1 requires an energy-exchanging coupling to the environment
+(the qubit must be able to release energy somewhere); T2 requires only a
+fluctuating, energy-neutral perturbation (a randomly shifting local
+field is enough). This is why realistic devices often report $T_2<2T_1$
+substantially; dephasing processes with no direct T1 analogue are
+common (Sources of Noise's flux-noise example).
+
+## Worked Example
+
+**A device has $T_1=80\mu s$. What is the absolute maximum possible
+$T_2$, and what does it mean if the measured $T_2$ is only $30\mu s$?**
+
+Maximum: $T_2\leq2T_1=160\mu s$. A measured $T_2=30\mu s$, far below
+this ceiling, indicates the device is strongly **T2-limited**: some
+additional pure-dephasing process (beyond whatever contributes to T1) is
+the dominant coherence-loss mechanism, and improving T1 alone would do
+very little for overall coherence. The engineering priority should be
+identifying and suppressing the extra dephasing source instead.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming T1 and T2 are independent, unrelated numbers.** They're
+physically related via $T_2\leq2T_1$. Reported $T_2$ values exceeding
+this bound would indicate a measurement or definition error, not a
+genuinely better device.
+</Callout>
+
+<Callout type="mistake">
+**Assuming decayProbabilityForTimestep's exact match to $e^{-t/T}$ is
+merely a good approximation.** It's an EXACT identity, for any step
+count. The telescoping product
+$(1-\gamma)^N=(e^{-dt/T})^N=e^{-Ndt/T}$ has no approximation error at
+all, unlike (for example) the WKB approximation from Approximation
+Methods, which genuinely IS approximate.
+</Callout>
+
+## Practice Questions
+
+1. For $T_1=100\mu s$, what per-step damping probability $\gamma$
+   corresponds to a $dt=1\mu s$ timestep?
+2. If a device's measured $T_2$ equals exactly $2T_1$, what does this
+   say about its dominant decoherence mechanism?
+3. Using the worked example's numbers, would doubling $T_1$ (to $160\mu s$)
+   necessarily double the measured $T_2$? Why or why not?
+4. Explain physically why T1 processes necessarily disturb phase
+   coherence too, while T2 (pure dephasing) processes need not involve
+   any energy exchange.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- T1 (energy relaxation) and T2 (dephasing) are the continuous-time
+  limits of `amplitudeDampingChannel` and `dephasingChannel`, connected
+  exactly (not approximately) via `decayProbabilityForTimestep`.
+- The bound $T_2\leq2T_1$ reflects that energy relaxation necessarily
+  disturbs phase, while pure dephasing needs no energy exchange.
+- A device's $T_2/T_1$ ratio diagnoses whether it's T1-limited or
+  T2-limited, a real, actionable engineering distinction.
+
+## Further Exploration
+
+Next: **Crosstalk**, a genuinely two-qubit noise source this lesson's
+single-qubit T1/T2 picture doesn't capture.

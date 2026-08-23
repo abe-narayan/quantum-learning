@@ -1,0 +1,155 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Quantum Fourier Transform",
+  description:
+    "The discrete Fourier transform acting directly on amplitudes, defined, checked to reduce to H for a single qubit, built as a circuit from Hadamards and controlled-phase rotations, and cross-checked against the closed-form DFT formula for every basis state up to 4 qubits.",
+  course: "quantum-algorithms-i",
+  module: "the-quantum-fourier-transform",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"],
+  objectives: [
+    "State the QFT's defining formula and verify it reduces to H for a single qubit",
+    "Describe the standard QFT circuit (Hadamards, controlled-phase rotations, a final swap) and why each piece is there",
+    "Compute the QFT of a small basis state by hand and cross-check it against the engine",
+  ],
+};
+
+## Motivation
+
+Deutsch-Jozsa used $H^{\otimes n}$ as an interference step: turn phases into
+measurable amplitudes. The **quantum Fourier transform (QFT)** is the
+natural generalization of that idea, the same "Hadamard trick," but general
+enough to extract not just a single yes/no bit but an entire *periodic
+pattern* out of a phase, which is exactly what phase estimation (next
+lesson) and, eventually, Shor's algorithm need.
+
+## Mathematical Development
+
+### The definition
+
+For an $n$-qubit register ($N=2^n$), the QFT acts on basis states as:
+
+$$
+\text{QFT}|j\rangle = \frac{1}{\sqrt{N}}\sum_{k=0}^{N-1} e^{2\pi i jk/N}|k\rangle
+$$
+
+This is the ordinary discrete Fourier transform, applied directly to a
+state vector's amplitudes instead of a classical array, and it's the
+closed-form definition, not a circuit yet; the circuit comes next.
+
+### Checking it reduces to H
+
+For $n=1$ ($N=2$): $\text{QFT}|0\rangle =
+\frac{1}{\sqrt2}\left(e^{0}|0\rangle+e^{0}|1\rangle\right)=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)=H|0\rangle$,
+and $\text{QFT}|1\rangle=\frac{1}{\sqrt2}\left(|0\rangle+e^{i\pi}|1\rangle\right)=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)=H|1\rangle$.
+The QFT is exactly $H$ for a single qubit, confirmed directly against the
+engine, not just algebraically. This is a genuine special case, not a
+coincidence: $H^{\otimes n}$ (Deutsch-Jozsa's tool) and the QFT are the
+same construction at $n=1$, and only diverge once $n>1$ needs finer phase
+resolution than a single Hadamard can provide.
+
+### The circuit
+
+Implementing the $N\times N$ DFT matrix directly would cost $O(N^2)$ gate
+operations, exponential in $n$. The standard QFT circuit instead uses
+only $O(n^2)$ gates: apply $H$ to qubit 0, then a chain of controlled-phase
+rotations $\text{CPHASE}(2\pi/2^k)$ from each later qubit onto qubit 0 (each
+adding a progressively finer correction to qubit 0's phase); repeat for
+qubit 1 using only the *remaining* qubits; and so on down to the last
+qubit, which gets only $H$. A final layer of swaps reverses the qubit
+order, since this construction naturally produces the output qubits in
+reverse, a bookkeeping step, not new physics. Every rotation is a single
+`applyControlledGate(phaseGate(angle), control, target)` call; no
+multi-qubit or multi-controlled gate is needed anywhere in the circuit.
+`quantumFourierTransform` implements exactly this, and its output is
+checked directly against the closed-form DFT sum above for *every* basis
+state, $n=2$ through $n=4$: not spot-checked, exhaustively checked.
+
+### Inverse
+
+$\text{QFT}^{-1}$ reverses every step in the opposite order, with every
+rotation angle negated. `inverseQuantumFourierTransform` composed with
+`quantumFourierTransform` returns the original state exactly (checked to
+$10^{-9}$ on an arbitrary normalized 2-qubit state), the defining property
+of an inverse, not just a name.
+
+## Physical Interpretation
+
+The QFT is a change of basis: from "which computational basis state" to
+"which frequency of phase oscillation across computational basis states,"
+implemented as a genuinely efficient quantum circuit for a transform that
+would need exponentially many operations classically applied element by
+element (though classically computing the *same* transform via the
+classical FFT is itself efficient, $O(N\log N)$; the QFT's advantage is
+specifically that it acts on $n=\log_2N$ *qubits* in $O(n^2)$ gates, a
+different resource entirely from a classical array of size $N$). The point
+of the next several lessons is what this change of basis buys you when a
+phase already encodes something you want to know.
+
+## Worked Example
+
+**Compute $\text{QFT}|01\rangle$ for $n=2$ ($j=1$, $N=4$) directly from the
+formula, and compare to the engine's output.**
+
+$$
+\text{QFT}|01\rangle = \frac12\sum_{k=0}^3 e^{2\pi i(1)k/4}|k\rangle = \frac12\left(|00\rangle + i|01\rangle - |10\rangle - i|11\rangle\right)
+$$
+
+using $e^{0}=1,\ e^{i\pi/2}=i,\ e^{i\pi}=-1,\ e^{i3\pi/2}=-i$. The engine's
+output for `quantumFourierTransform(StateVector.basis(2, 1))` is
+$(0.5,\ 0.5i,\ -0.5,\ -0.5i)$, the identical four amplitudes.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing the QFT with the classical FFT conceptually.** Both compute a
+discrete Fourier transform, but the QFT acts on $\log_2N$ qubits via
+$O(n^2)$ gates and outputs a *quantum state* you can't simply "read off":
+extracting the transformed values back out requires a specific measurement
+strategy (exactly what phase estimation builds next), not a printout.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the final swap.** Without it, the circuit still computes a
+valid, invertible unitary, but not the QFT as conventionally defined
+(the amplitudes land on the *bit-reversed* index). `quantumFourierTransform`
+includes it; dropping it would silently break the direct-DFT-formula match
+this lesson's worked example relies on.
+</Callout>
+
+## Practice Questions
+
+1. Compute $\text{QFT}|10\rangle$ for $n=2$ directly from the formula.
+2. Verify $\text{QFT}|00\rangle$ gives the uniform superposition (all four
+   amplitudes equal), for any $n$.
+3. Using the definition, explain why $\text{QFT}$ is a unitary operation
+   (Hint: what is $\sum_k|e^{2\pi ijk/N}|^2$?).
+4. Why does implementing the $N\times N$ DFT matrix directly cost $O(N^2)$
+   operations, while the circuit version costs $O(n^2)=O((\log N)^2)$? What
+   resource is being traded for what?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\text{QFT}|j\rangle=\frac{1}{\sqrt N}\sum_k e^{2\pi ijk/N}|k\rangle$:
+  the discrete Fourier transform acting on amplitudes.
+- Reduces exactly to $H$ for a single qubit, verified, not asserted.
+- Implemented as $O(n^2)$ Hadamard and controlled-phase gates plus a final
+  swap, not the $O(N^2)$ direct matrix, exhaustively checked against the
+  closed-form DFT sum for every basis state up to 4 qubits.
+- `inverseQuantumFourierTransform` undoes it exactly, checked directly by
+  round-trip.
+
+## Further Exploration
+
+Next: **Quantum Phase Estimation**, which uses the QFT's inverse as its
+final step to read a unitary's eigenphase directly out of a register.

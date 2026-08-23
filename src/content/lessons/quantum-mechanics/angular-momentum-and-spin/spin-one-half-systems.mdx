@@ -1,0 +1,146 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/angular-momentum-and-spin/spin-one-half-systems"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Spin-1/2 Systems",
+  description:
+    "This platform's qubit engine, built since Course 1, already is the j=1/2 representation of the angular momentum algebra: Sx,Sy,Sz are exactly (ħ/2)X,(ħ/2)Y,(ħ/2)Z, and the Bloch sphere already shown was always secretly a spin-1/2 direction all along.",
+  course: "angular-momentum-and-spin",
+  module: "spin-one-half-systems",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/angular-momentum-and-spin/orbital-angular-momentum-and-spherical-harmonics"],
+  objectives: [
+    "Identify the Pauli spin operators Sx,Sy,Sz as (ħ/2) times the Pauli matrices, exactly the j=1/2 case of Jx,Jy,Jz",
+    "Explain why spin-1/2, unlike orbital angular momentum, has no position-space wavefunction restriction",
+    "Reinterpret the Bloch sphere (Qubits & Quantum States) as the physical spin direction for a spin-1/2 particle",
+  ],
+};
+
+## Motivation
+
+This lesson doesn't build new machinery. It identifies machinery this
+platform has used since its very first course as a special case of what
+the last three lessons derived abstractly. Spin-$\tfrac12$ is $j=\tfrac12$,
+no more and no less, and the Pauli matrices this platform calls $X,Y,Z$
+are, up to a factor of $\hbar/2$, exactly $J_x,J_y,J_z$.
+
+## Mathematical Development
+
+### The identification
+
+$j=\tfrac12$'s general angular momentum operators (Lesson 2's ladder
+construction) are exactly $2\times2$ matrices. Comparing
+`angularMomentumX(0.5)`, `angularMomentumY(0.5)`, `angularMomentumZ(0.5)`
+directly against `PAULI_X`, `PAULI_Y`, `PAULI_Z`:
+
+$$
+S_x=\frac\hbar2X,\qquad S_y=\frac\hbar2Y,\qquad S_z=\frac\hbar2Z
+$$
+
+confirmed to match exactly (to floating-point precision) in this
+platform's own test suite, not a coincidence or an analogy, but the
+literal $j=\tfrac12$ instance of the general construction Lesson 2 built.
+$S_z$'s eigenvalues are $\pm\hbar/2$ (i.e. $m=\pm\tfrac12$, exactly the
+"$-j$ to $j$ in integer steps" rule with $j=\tfrac12$ giving the two
+values $-\tfrac12,+\tfrac12$), and $\vec S^{\,2}$'s eigenvalue is
+$\tfrac12\left(\tfrac12+1\right)\hbar^2=\tfrac34\hbar^2$, Lesson 2's
+$j(j+1)\hbar^2$ formula, at $j=\tfrac12$.
+
+### No single-valuedness restriction
+
+Lesson 3's integer-$l$ argument relied entirely on a position-space
+wavefunction's behavior under $\varphi\to\varphi+2\pi$. Spin has no
+position dependence: $|{\uparrow}\rangle,|{\downarrow}\rangle$
+(this platform's $|0\rangle,|1\rangle$) aren't functions of angle at all,
+so that restriction simply doesn't apply, and $j=\tfrac12$, forbidden
+for orbital motion, is exactly what's physically realized for an
+electron's intrinsic spin.
+
+### The Bloch sphere, reinterpreted
+
+Every rotation this platform has ever applied to a qubit
+(`rotationAboutAxis`, used since Qubits & Quantum States) is, physically,
+a rotation of the spin-$\tfrac12$ angular momentum direction. The Bloch
+sphere point *is* the expectation value direction
+$(\langle S_x\rangle,\langle S_y\rangle,\langle S_z\rangle)$, normalized.
+This was always true; this lesson just makes the physical meaning behind
+a picture this platform has used since Course 1 explicit.
+
+## Physical Interpretation
+
+Every single-qubit fact already proven (Pauli matrix algebra, the Bloch
+sphere, $R_x,R_y,R_z$ rotations, measurement probabilities) is,
+physically, a fact about a spin-$\tfrac12$ particle in a magnetic field or
+similar setting. This course doesn't rebuild any of it; it identifies
+what was already built as the concrete physical system this whole course
+has been leading to.
+
+## Worked Example
+
+**Confirm $\vec S^{\,2}=S_x^2+S_y^2+S_z^2=\tfrac34\hbar^2 I$ using the
+Pauli matrices directly (with $\hbar=1$, this platform's convention).**
+
+$X^2=Y^2=Z^2=I$ (each Pauli matrix squares to the identity, a fact from
+Qubits & Quantum States). So
+$S_x^2+S_y^2+S_z^2=\tfrac14(X^2+Y^2+Z^2)=\tfrac14(I+I+I)=\tfrac34I$,
+exactly $j(j+1)=\tfrac12\cdot\tfrac32=\tfrac34$, matching Lesson 2's
+general formula at $j=\tfrac12$ exactly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking spin-$\tfrac12$ needed a separate, independent derivation.**
+It's the direct $j=\tfrac12$ instance of Lesson 2's general construction.
+The Pauli matrices already built for this platform's qubit engine
+satisfy the exact same commutation algebra, verified directly, not
+merely by analogy.
+</Callout>
+
+<Callout type="mistake">
+**Picturing a spin-$\tfrac12$ particle as literally spinning in space,
+like a classical top.** The "spin" name is historical; there is no
+position-space wavefunction associated with it (unlike orbital angular
+momentum), so there is no literal rotational motion to picture, only
+the abstract angular-momentum algebra, realized at $j=\tfrac12$.
+</Callout>
+
+## Practice Questions
+
+1. Confirm $S_z|{\uparrow}\rangle=\tfrac\hbar2|{\uparrow}\rangle$ and
+   $S_z|{\downarrow}\rangle=-\tfrac\hbar2|{\downarrow}\rangle$ directly
+   from $Z|0\rangle=|0\rangle$, $Z|1\rangle=-|1\rangle$.
+2. Using $S_\pm=S_x\pm iS_y$ and Lesson 2's general ladder formula,
+   confirm $S_+|{\downarrow}\rangle\propto|{\uparrow}\rangle$ and
+   $S_+|{\uparrow}\rangle=0$.
+3. Explain why $\vec S^{\,2}$ commutes with $S_z$ (a general angular
+   momentum fact from Lesson 2) but $S_x$ and $S_z$ do not. Connect this
+   to which quantities can be simultaneously measured for a spin-1/2
+   particle.
+4. If spin-1/2 has no position-space wavefunction, what does
+   $|\psi\rangle=\alpha|{\uparrow}\rangle+\beta|{\downarrow}\rangle$
+   actually describe physically, if not "where" the particle is?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $S_x,S_y,S_z=\tfrac\hbar2X,\tfrac\hbar2Y,\tfrac\hbar2Z$: the literal
+  $j=\tfrac12$ case of this course's general angular momentum operators,
+  confirmed to match exactly, not merely analogous.
+- Spin has no position-space wavefunction, so Lesson 3's integer-only
+  restriction never applies, exactly why $j=\tfrac12$ is physically
+  realized for spin but excluded for orbital motion.
+- The Bloch sphere, used since Course 1, is physically the spin
+  direction $(\langle S_x\rangle,\langle S_y\rangle,\langle S_z\rangle)$.
+
+## Further Exploration
+
+Next: **The Stern-Gerlach Experiment**, the historical experiment that
+first revealed spin quantization directly, simulated here using this
+platform's existing rotation and measurement machinery.

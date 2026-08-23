@@ -25,7 +25,7 @@ export const lessonMeta = {
 ## Motivation
 
 The last lesson proved $|S|\leq2$ for *every* local hidden-variable
-model — a hard mathematical wall. This lesson computes what quantum
+model: a hard mathematical wall. This lesson computes what quantum
 mechanics actually predicts for a specific entangled state and specific
 measurement choices, using the density-matrix machinery this course has
 built, and finds a number on the other side of that wall.
@@ -35,7 +35,7 @@ built, and finds a number on the other side of that wall.
 ### The quantum correlation
 
 For two single-qubit $\pm1$-valued observables $M_a,M_b$ (Hermitian,
-eigenvalues exactly $\pm1$ — see `spinObservableInXZPlane`, which builds
+eigenvalues exactly $\pm1$; see `spinObservableInXZPlane`, which builds
 $M(\theta)=\cos\theta\,Z+\sin\theta\,X$, a spin measurement at angle
 $\theta$ from $Z$ in the $X$-$Z$ plane, verified Hermitian with trace 0
 and determinant $-1$ for any $\theta$), quantum mechanics predicts the
@@ -46,8 +46,8 @@ E(a,b) = \langle M_a\otimes M_b\rangle = \text{Tr}\big[\rho\,(M_a\otimes M_b)\bi
 $$
 
 This is exactly Lesson 9's generalized Born-rule expectation-value
-formula, applied to the two-outcome product observable $M_a\otimes M_b$
-— the same quantity a local hidden-variable model calls
+formula, applied to the two-outcome product observable $M_a\otimes M_b$,
+the same quantity a local hidden-variable model calls
 $E(a,b)=\int A(a,\lambda)B(b,\lambda)p(\lambda)\,d\lambda$ (both are
 "the average of the product of two $\pm1$ outcomes"), which is exactly
 why the two theories' predictions for $S$ can be directly compared.
@@ -75,14 +75,14 @@ E(a,b) = \tfrac12\big[c_ac_b + s_as_b + s_as_b + c_ac_b\big] = c_ac_b+s_as_b = \
 $$
 
 using the angle-difference identity. A complete, exact derivation for
-$|\Phi^+\rangle$ specifically — not a numerical fit. It is additionally
+$|\Phi^+\rangle$ specifically, not a numerical fit. It is additionally
 checked directly against `correlationExpectation`'s numerical output for
 several angle pairs, as a regression test.
 
 ### The standard configuration: S = 2√2, exactly
 
 Choose $\theta_a=0$ ($A=Z$), $\theta_{a'}=\pi/2$ ($A'=X$),
-$\theta_b=\pi/4$, $\theta_{b'}=-\pi/4$ — the standard optimal CHSH
+$\theta_b=\pi/4$, $\theta_{b'}=-\pi/4$, the standard optimal CHSH
 configuration. Using $E(a,b)=\cos(\theta_a-\theta_b)$ for each term:
 
 $$
@@ -97,10 +97,10 @@ $$
 S = \cos\tfrac\pi4+\cos\tfrac\pi4+\cos\tfrac\pi4+\cos\tfrac\pi4 = 4\cdot\frac{\sqrt2}{2} = 2\sqrt2 \approx 2.828
 $$
 
-$2\sqrt2>2$ — **the CHSH inequality is violated**, by an entangled
+$2\sqrt2>2$: **the CHSH inequality is violated**, by an entangled
 quantum state, at this specific and fully specified measurement
 configuration. `chshValue` computes exactly this and returns
-$2.8284271247461903$ for $|\Phi^+\rangle$ at these angles — matching
+$2.8284271247461903$ for $|\Phi^+\rangle$ at these angles, matching
 $2\sqrt2$ to floating-point precision, and additionally confirmed (by a
 fine-grained numerical search over $\theta_b,\theta_{b'}$ with
 $\theta_a,\theta_{a'}$ held fixed) to be the true maximum reachable by
@@ -109,19 +109,19 @@ $\theta_a,\theta_{a'}$ held fixed) to be the true maximum reachable by
 ### Tsirelson's bound
 
 $2\sqrt2$ is not a coincidence of this particular state and these
-particular angles — it is provably the maximum $|S|$ *any* quantum state
+particular angles: it is provably the maximum $|S|$ *any* quantum state
 and *any* choice of observables can ever reach (**Tsirelson's bound**,
 `CHSH_QUANTUM_BOUND`). Proving that in full generality requires operator-norm
 bounds beyond this course's scope; what this lesson establishes directly
 is that this specific, fully worked configuration reaches it exactly,
 and that it cannot be improved by retuning $B,B'$ for this state (via
-the numerical search above) — strong, if not fully general, evidence for
+the numerical search above), strong, if not fully general, evidence for
 the bound's tightness.
 
 ### Degradation with noise
 
-Mix $|\Phi^+\rangle$ with the maximally mixed state — a Werner-state-style
-model, $\rho(\eta)=(1-\eta)\,\rho_{\Phi^+}+\eta\,(I/4)$ — and recompute
+Mix $|\Phi^+\rangle$ with the maximally mixed state (a Werner-state-style
+model, $\rho(\eta)=(1-\eta)\,\rho_{\Phi^+}+\eta\,(I/4)$) and recompute
 $S$ at the same fixed angles as $\eta$ (noise) increases:
 
 | $\eta$ | $S$ |
@@ -133,7 +133,7 @@ $S$ at the same fixed angles as $\eta$ (noise) increases:
 | 0.5 | 1.414 |
 
 $S$ decreases monotonically, dropping *below* the classical bound of 2
-somewhere between $\eta=0.2$ and $\eta=0.3$ — past that point, this
+somewhere between $\eta=0.2$ and $\eta=0.3$; past that point, this
 particular experiment can no longer rule out a local hidden-variable
 explanation, even though the state is still entangled for a wide range
 of $\eta$ beyond that point (mixing in noise reduces both purity and the
@@ -146,11 +146,11 @@ directly from `chshValue` and `convexCombination`, not estimated.
 
 A CHSH violation, observed in a real laboratory (this has been done,
 repeatedly, closing progressively more loopholes over decades), rules
-out *every* local hidden-variable explanation simultaneously — not by
+out *every* local hidden-variable explanation simultaneously: not by
 refuting one specific classical model, but by exceeding a bound that
 Lesson 10 proved holds for the entire category. This is the precise,
 falsifiable, and already-tested sense in which entanglement is not
-classical correlation with unknown extra detail — it's a strictly
+classical correlation with unknown extra detail. It's a strictly
 stronger kind of correlation, quantitatively bounded away from anything
 locality permits.
 
@@ -167,7 +167,7 @@ $$
 
 $=\cos(\pi/4)+\cos(3\pi/4) = \frac{\sqrt2}2-\frac{\sqrt2}2=0$. Simply
 swapping which angle is called $b$ versus $b'$ changes which correlations
-get a $+$ and which get a $-$ in $S$'s definition — the *maximum*
+get a $+$ and which get a $-$ in $S$'s definition: the *maximum*
 achievable violation depends on getting this assignment right, not just
 on using the same four physical measurement angles.
 
@@ -178,13 +178,13 @@ on using the same four physical measurement angles.
 worked example shows, even the maximally entangled $|\Phi^+\rangle$ gives
 $S=0$ at a poorly chosen (or mis-assigned) set of angles. Violation
 requires both an entangled state *and* a well-chosen measurement
-configuration — entanglement is necessary but not sufficient for a given
+configuration: entanglement is necessary but not sufficient for a given
 choice of angles to show a violation.
 </Callout>
 
 <Callout type="mistake">
 **Treating $2\sqrt2$ as an approximation.** It is an exact value,
-reachable exactly (not merely approached) by the derivation above — the
+reachable exactly (not merely approached) by the derivation above. The
 engine's output ($2.8284271247461903$) differs from $2\sqrt2$ only by
 ordinary floating-point rounding, not by any physical approximation.
 </Callout>
@@ -205,7 +205,7 @@ ordinary floating-point rounding, not by any physical approximation.
    original observation.
 4. Explain, in your own words, why a measured $|S|>2$ in a real
    laboratory experiment is a stronger conclusion than "quantum mechanics
-   is confirmed" — what specific class of alternative theories does it
+   is confirmed": what specific class of alternative theories does it
    rule out, and which class does it leave untouched?
 
 <PracticeLinks problems={practiceProblems} />
@@ -215,17 +215,17 @@ ordinary floating-point rounding, not by any physical approximation.
 - $E(a,b)=\text{Tr}[\rho(M_a\otimes M_b)]$ is the quantum correlation,
   directly comparable to a local hidden-variable model's $E(a,b)$.
 - For $|\Phi^+\rangle$ and in-plane spin observables,
-  $E(a,b)=\cos(\theta_a-\theta_b)$ exactly — derived by direct
+  $E(a,b)=\cos(\theta_a-\theta_b)$ exactly, derived by direct
   calculation, not fit to data.
 - At the standard configuration, $S=2\sqrt2\approx2.828$, exactly,
   violating the classical bound of 2 proven in the last lesson.
 - Mixing noise into the state reduces $S$ monotonically, crossing back
   below the classical bound well before the state becomes fully
-  unentangled — a quantitative link between mixedness and the strength
+  unentangled, a quantitative link between mixedness and the strength
   of nonlocal correlation.
 
 ## Further Exploration
 
 Next, and last: **Capstone: Analyzing Quantum Correlations**, which
-brings every tool from this course — density matrices, partial trace,
-entropy, concurrence, and CHSH — to bear on a single unfamiliar state.
+brings every tool from this course (density matrices, partial trace,
+entropy, concurrence, and CHSH) to bear on a single unfamiliar state.

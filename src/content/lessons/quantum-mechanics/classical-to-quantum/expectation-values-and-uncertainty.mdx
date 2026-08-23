@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Expectation Values and Uncertainty",
   description:
-    "A full derivation of the generalized uncertainty relation ΔA·ΔB ≥ ½|⟨[A,B]⟩| from Cauchy-Schwarz — the precise, general reason two observables can fail to both be definite at once.",
+    "A full derivation of the generalized uncertainty relation ΔA·ΔB ≥ ½|⟨[A,B]⟩| from Cauchy-Schwarz: the precise, general reason two observables can fail to both be definite at once.",
   course: "classical-to-quantum",
   module: "expectation-values-and-uncertainty",
   order: 1,
@@ -25,10 +25,10 @@ export const lessonMeta = {
 ## Motivation
 
 The Postulates lesson stated that a state generally doesn't give a
-definite value for an observable — only a probability distribution over
+definite value for an observable, only a probability distribution over
 outcomes. That distribution has a spread, and this lesson makes "how
 much spread" precise, then derives exactly when two different observables
-are forced to have a *trade-off* in their spreads — the uncertainty
+are forced to have a *trade-off* in their spreads: the uncertainty
 principle, as a genuine theorem rather than a slogan about disturbing
 what you measure.
 
@@ -36,7 +36,7 @@ what you measure.
 
 If you measured the same observable on many identically-prepared copies
 of the same state, you'd get a distribution of outcomes with some average
-and some spread around that average — exactly like a real, empirical
+and some spread around that average, exactly like real, empirical
 statistics. Quantum uncertainty is that same ordinary statistical spread,
 computed for the underlying quantum probability distribution.
 
@@ -52,7 +52,7 @@ $$
 \operatorname{Var}(A) = \langle (A-\langle A\rangle)^2\rangle = \langle A^2\rangle - \langle A\rangle^2
 $$
 
-— the same "mean of the squared deviation" formula as ordinary
+the same "mean of the squared deviation" formula as ordinary
 statistics, since $P(\lambda_i)$ from the Born rule is a genuine
 probability distribution. The **uncertainty** is
 $\Delta A = \sqrt{\operatorname{Var}(A)}$, the standard deviation of
@@ -66,7 +66,7 @@ $\tilde A = A - \langle A\rangle I$, $\tilde B = B - \langle B\rangle I$
 numbers). By construction, $\langle\tilde A\rangle=\langle\tilde
 B\rangle=0$, and $\operatorname{Var}(A)=\langle\tilde A^2\rangle$,
 $\operatorname{Var}(B)=\langle\tilde B^2\rangle$. Also note
-$[\tilde A,\tilde B]=[A,B]$ exactly — subtracting a constant multiple of
+$[\tilde A,\tilde B]=[A,B]$ exactly: subtracting a constant multiple of
 the identity never changes a commutator, since the identity commutes with
 everything.
 
@@ -104,7 +104,7 @@ kind of argument the Hermitian Operators lesson used, with a sign
 flipped).
 
 So $\langle f|g\rangle = (\text{real number}) + (\text{purely imaginary
-number})$ — a genuine complex number with those exact real and imaginary
+number})$, a genuine complex number with those exact real and imaginary
 parts. Its squared magnitude is the sum of the squares of those two parts,
 so dropping the non-negative real-part-squared term only makes the bound
 weaker, never wrong:
@@ -129,14 +129,14 @@ $$
 
 This is the **generalized uncertainty relation**. It's a genuine theorem,
 derived entirely from Cauchy-Schwarz and the definitions of Hermitian and
-anti-Hermitian operators — nothing here invoked measurement disturbance,
+anti-Hermitian operators. Nothing here invoked measurement disturbance,
 experimental limitations, or any physical argument beyond the postulates
 already established.
 
 ### When is there no trade-off at all?
 
 If $[A,B]=0$ (the operators **commute**), the right-hand side is zero,
-and the inequality places no restriction at all — both observables *can*
+and the inequality places no restriction at all. Both observables *can*
 be made simultaneously as sharp as you like (in particular, simultaneous
 eigenstates of both exist). Uncertainty trade-offs are specifically a
 consequence of **non-commuting** observables, not a universal fact about
@@ -148,7 +148,7 @@ The familiar position-momentum uncertainty principle, $\Delta x\,\Delta p
 \ge \hbar/2$, is this exact relation applied to the specific commutator
 $[x,p]=i\hbar$ (introduced properly in the Position and Momentum lesson).
 The derivation above shows this isn't about clumsy measuring instruments
-disturbing a system — it's a structural fact about non-commuting
+disturbing a system. It's a structural fact about non-commuting
 Hermitian operators, true even for perfect, idealized measurements.
 
 ## Worked Example
@@ -161,7 +161,7 @@ $\langle[X,Y]\rangle = 2i\langle Z\rangle = 2i$, so the right-hand side is
 $\tfrac12|2i| = 1$. For the left-hand side: $\langle X\rangle=0$,
 $\langle X^2\rangle=\langle I\rangle=1$ (since $X^2=I$), so
 $\operatorname{Var}(X)=1$, $\Delta X=1$; identically $\Delta Y=1$. So
-$\Delta X\,\Delta Y = 1 \ge 1$ — the bound is **exactly saturated**, not
+$\Delta X\,\Delta Y = 1 \ge 1$: the bound is **exactly saturated**, not
 merely satisfied. (This is expected: $|0\rangle$ is a special "minimum
 uncertainty" state for this pair, not a coincidence of the numbers
 chosen.)
@@ -170,8 +170,8 @@ chosen.)
 
 <Callout type="mistake">
 **Describing uncertainty as "measuring one property disturbs the other."**
-The derivation above never mentions a measurement disturbing anything —
-it's a property of the state and the two operators, true even for a
+The derivation above never mentions a measurement disturbing anything.
+It's a property of the state and the two operators, true even for a
 single idealized measurement of each, considered separately.
 </Callout>
 
@@ -201,7 +201,7 @@ any trade-off at all.
 ## Summary
 
 - $\operatorname{Var}(A)=\langle A^2\rangle-\langle A\rangle^2$;
-  $\Delta A = \sqrt{\operatorname{Var}(A)}$ — ordinary statistics applied
+  $\Delta A = \sqrt{\operatorname{Var}(A)}$: ordinary statistics applied
   to the Born-rule distribution.
 - $\Delta A\,\Delta B \ge \tfrac12|\langle[A,B]\rangle|$, derived from
   Cauchy-Schwarz applied to the shifted operators $\tilde A,\tilde B$.

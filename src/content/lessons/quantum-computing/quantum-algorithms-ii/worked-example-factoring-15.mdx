@@ -1,0 +1,147 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/worked-example-factoring-15"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Worked Example: Factoring 15",
+  description:
+    "Every piece from the last two lessons run end to end: the quantum period-finding circuit's exact output, a peak read off and confirmed against the classical order, and the gcd step recovering 15 = 3 × 5, with an honest account of what did and didn't need a quantum computer.",
+  course: "quantum-algorithms-ii",
+  module: "worked-example-factoring-15",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-algorithms-ii/the-quantum-period-finding-circuit"],
+  objectives: [
+    "Run the complete factor-15 pipeline: quantum period-finding output, period recovery, classical gcd",
+    "Identify exactly which step used quantum interference and which steps were classical arithmetic",
+    "Explain why this toy example does not demonstrate a real cryptographic-scale quantum advantage",
+  ],
+};
+
+## Motivation
+
+$N=15$ is the standard first example for Shor's algorithm precisely
+because it's small enough to compute every step by hand *and* run through
+this platform's actual engine: a genuine end-to-end demonstration, not a
+description of one.
+
+## Mathematical Development
+
+### Step 1: choose a
+
+Pick $a=7$ (coprime to $15$; checked by $\gcd(7,15)=1$).
+
+### Step 2: the quantum period-finding circuit
+
+With $t=6$ counting qubits, `periodFindingMeasurementDistribution(7, 15,
+6)` gives exactly four peaks, at outcomes $0,16,32,48$, each with
+probability $0.25$, and (numerically) zero everywhere else. This is the
+one genuinely quantum step: the interference pattern from applying the
+QFT to the counting register after the modular-exponentiation state was
+prepared.
+
+### Step 3: read off the period
+
+A single measurement returns one of the four peak locations at random,
+say $32$. Dividing by $2^t=64$ gives the fraction $32/64=1/2$. In general
+this fraction approximates $k/r$ for some integer $k$; the classical
+continued-fractions algorithm (not implemented here, see the last
+lesson's scope note) would recover $r=4$ from it reliably even when the
+fraction doesn't reduce as cleanly as this particular outcome does. For
+this specific worked example, the reduced fraction's denominator, $2$,
+undersells the true period. This is a known subtlety of continued
+fractions recovery ($k$ and $r$ can share a common factor, here $k=2,r=4$
+both divisible by $2$), and it's exactly why real implementations run the
+circuit several times and combine the results rather than trusting one
+shot. This
+platform's `classicalOrder(7, 15)` independently confirms the true
+period directly: $r=4$.
+
+### Step 4: the classical reduction
+
+From Lesson 1's reduction: $r=4$ is even, $a^{r/2}=7^2\bmod15=49\bmod15=4$,
+not $\equiv-1\equiv14\pmod{15}$, so the reduction applies cleanly.
+$\gcd(4-1,15)=\gcd(3,15)=3$, $\gcd(4+1,15)=\gcd(5,15)=5$.
+
+$$
+\boxed{15 = 3 \times 5}
+$$
+
+## Physical Interpretation
+
+Precisely one step in this pipeline needed a quantum computer: producing
+the period-finding measurement distribution's sharp peaks via
+interference. Every other step (picking $a$, checking $\gcd(a,N)=1$,
+interpreting the measured fraction, computing $a^{r/2}\bmod N$, running
+Euclid's algorithm twice) is ordinary classical computation a laptop
+performs instantly. This is the concrete, worked version of Lesson 1's
+abstract claim: quantum speedup lives in one specific, narrow subroutine,
+not throughout the whole algorithm.
+
+## Worked Example
+
+**Confirm $\gcd(7,15)=1$ directly, verifying $a=7$ was a legitimate
+choice.**
+
+$15=2(7)+1$, so $\gcd(7,15)=\gcd(7,1)=1$ (Euclid's algorithm, one step).
+This confirms $7$ is coprime to $15$, so the whole pipeline above was
+valid to run.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating "factoring 15" as evidence Shor's algorithm threatens real
+RSA keys today.** $15$ has $4$ bits; real RSA keys have thousands. Running
+this exact pipeline at cryptographically relevant size needs a
+controlled-modular-exponentiation circuit with thousands of logical
+qubits and deep circuits, protected by error correction: engineering far
+beyond both this course's toy engine and current quantum hardware. This
+worked example demonstrates the *mechanism*, not a practical attack.
+</Callout>
+
+<Callout type="mistake">
+**Assuming a single measurement always gives the exact period directly.**
+Here it happened to reduce cleanly to $r/2$ instead of $r$ itself. Real
+implementations account for this by running the circuit multiple times
+and combining results, not by trusting one shot.
+</Callout>
+
+## Practice Questions
+
+1. Repeat the pipeline for $N=21$, $a=2$ (order $r=6$, from earlier
+   practice): predict the period-finding peaks with $t=6$ counting qubits,
+   then carry out the classical reduction to find $21$'s factors.
+2. Suppose the measured outcome in Step 3 had been $16$ instead of $32$.
+   What fraction would $16/64$ reduce to, and would it still correctly
+   identify $r=4$?
+3. Why does checking $\gcd(a,N)=1$ *before* running the quantum circuit
+   matter? What would go wrong (conceptually) with modular exponentiation
+   if $a$ and $N$ shared a common factor?
+4. List, in order, every step of this worked example that was purely
+   classical computation, and the one step that was not.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $N=15$, $a=7$: quantum period-finding gives peaks at multiples of $16$;
+  the true period $r=4$ is confirmed via `classicalOrder`.
+- The classical reduction ($a^{r/2}\bmod N$, two gcd computations) gives
+  $15=3\times5$ directly.
+- Exactly one step, the period-finding measurement distribution's
+  interference pattern, is quantum; everything else is classical
+  arithmetic, run instantly on ordinary hardware.
+- This toy example demonstrates Shor's algorithm's mechanism honestly; it
+  is not, and does not claim to be, a cryptographically relevant
+  factorization.
+
+## Further Exploration
+
+Next: **The Variational Principle and Ansatz Circuits**, a completely
+different style of quantum algorithm, built for today's noisy, small
+quantum devices rather than the large fault-tolerant machines Shor's
+algorithm needs.

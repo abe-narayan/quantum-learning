@@ -1,0 +1,146 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/programming-quantum-computers/circuit-representation-in-code"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Circuit Representation in Code",
+  description:
+    "Quantum Gates & Circuits applied matrices directly, immediately. Real software instead builds a circuit as DATA first, a list of named instructions, and only executes it later, exactly the pattern this platform's own QuantumCircuit class implements, reusing every gate from gates.ts unchanged underneath.",
+  course: "programming-quantum-computers",
+  module: "circuit-representation-in-code",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/building-quantum-circuits"],
+  objectives: [
+    "Explain why real quantum SDKs separate circuit CONSTRUCTION from circuit EXECUTION",
+    "Describe a circuit as a list of gate instructions (name, targets, parameters), not a sequence of immediately-applied matrices",
+    "Build and run a simple circuit using this platform's QuantumCircuit class",
+  ],
+};
+
+## Motivation
+
+Quantum Gates & Circuits taught the physics: apply this matrix, to this
+qubit, right now, and watch the state vector change immediately. Real
+software doesn't usually work this way. A quantum program is typically
+built as a *description* of a circuit first (a list of instructions),
+which is only later sent off to be executed (on a simulator or real
+hardware). This lesson covers that software-engineering pattern
+directly.
+
+## Engineering Development
+
+### Build first, run later
+
+Every major quantum SDK (Qiskit, Cirq, PennyLane, and others) follows
+the same basic shape: construct a circuit object by appending gate
+instructions to it, then pass the finished circuit to a separate
+execution step. This isn't just stylistic. It's what allows a circuit
+to be inspected, optimized (Compilation & Hybrid Algorithms' own
+transpilation lesson), or sent to different backends (a simulator today,
+real hardware tomorrow) without rewriting the circuit itself.
+
+### This platform's QuantumCircuit
+
+```
+const circuit = new QuantumCircuit(2);
+circuit.h(0).cnot(0, 1);
+const state = runCircuit(circuit);
+```
+
+`circuit.h(0).cnot(0,1)` doesn't touch any quantum state at all. It
+appends two `GateInstruction` objects (plain data: `{gate:"H",
+targets:[0]}` and `{gate:"CNOT",targets:[0,1]}`) to a list.
+`runCircuit(circuit)` is the separate execution step: it starts from
+$|00\rangle$ and dispatches each instruction to the exact same
+`applySingleQubitGate`/`applyCNOT` functions Quantum Gates & Circuits
+already used directly. No new gate physics, only a new way of
+organizing *when* that physics runs.
+
+### Why this separation matters
+
+Because the circuit is just data until `runCircuit` is called, the same
+circuit object can be executed multiple times (Qubit Readout Techniques'
+multi-shot statistics), inspected instruction-by-instruction before
+running (useful for debugging), or, in a real SDK, transformed by an
+optimizer before ever touching real hardware. None of this is possible
+if gates are applied immediately and irreversibly as each line of code
+runs.
+
+## Physical Interpretation
+
+This lesson introduces no new physics whatsoever. `SINGLE_QUBIT_MATRICES`
+inside `circuitBuilder.ts` is literally the same `PAULI_X`, `HADAMARD`,
+etc. from `gates.ts`. The entire content here is about *software
+structure*, a genuinely different kind of lesson from this platform's
+physics-heavy courses, matching how real quantum programming actually
+looks day to day.
+
+## Worked Example
+
+**Build a circuit implementing $H\,Z\,H$ on a single qubit (a known
+identity: $HZH=X$), and confirm it flips $|0\rangle$ to $|1\rangle$.**
+
+```
+const circuit = new QuantumCircuit(1);
+circuit.h(0).z(0).h(0);
+const state = runCircuit(circuit);
+```
+
+This platform's test suite confirms `state.probabilities()` gives
+exactly `[0, 1]`. The circuit-as-data representation reproduces the
+matrix identity $HZH=X$ exactly, since underneath, `runCircuit` is doing
+nothing more than applying $H$, then $Z$, then $H$ in sequence, exactly
+as Quantum Gates & Circuits' direct approach would.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming `circuit.h(0)` immediately changes some quantum state.** It
+only appends an instruction to a list. Nothing about any quantum state
+exists until `runCircuit` is actually called.
+</Callout>
+
+<Callout type="mistake">
+**Thinking this is a fundamentally different kind of quantum computing.**
+It's the identical physics (every instruction dispatches to Quantum
+Gates & Circuits' own functions). Only the software organization
+(data-then-execute, vs. immediate-execute) has changed.
+</Callout>
+
+## Practice Questions
+
+1. After calling `circuit.h(0).cnot(0,1)` but BEFORE calling
+   `runCircuit`, what (if anything) has happened to any quantum state?
+2. Why does separating circuit construction from execution make later
+   optimization (Compilation & Hybrid Algorithms) possible in a way that
+   immediate execution would not?
+3. Write out (in your own words, not code) the sequence of
+   `GateInstruction` objects that `circuit.x(0).h(1).cnot(0,1)` would
+   produce.
+4. Explain why `runCircuit`'s implementation needs no new gate-physics
+   code beyond what Quantum Gates & Circuits' `gates.ts` already
+   provides.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Real quantum SDKs build a circuit as data (a list of gate
+  instructions) before executing it, a "build first, run later"
+  pattern.
+- This platform's `QuantumCircuit`/`runCircuit` implement exactly this
+  pattern, dispatching every instruction to the same gate functions
+  Quantum Gates & Circuits already built and tested.
+- This is a software-structure lesson, not new physics, a genuinely
+  different kind of content from this platform's matrix-heavy courses.
+
+## Further Exploration
+
+Next: **Quantum SDKs Overview**, which surveys how real-world SDKs
+extend this basic pattern with additional structure (registers,
+backends, transpilation).

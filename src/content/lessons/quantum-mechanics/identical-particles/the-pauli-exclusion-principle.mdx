@@ -1,0 +1,139 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/identical-particles/the-pauli-exclusion-principle"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Pauli Exclusion Principle",
+  description:
+    "No two identical fermions can occupy the same single-particle state. This isn't an extra postulate, but a direct algebraic consequence of antisymmetrization: antisymmetrize(a,a) is exactly the zero vector, which this platform's normalizeVector correctly refuses to treat as a state.",
+  course: "identical-particles",
+  module: "the-pauli-exclusion-principle",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/identical-particles/bosons-and-fermions"],
+  objectives: [
+    "State the Pauli exclusion principle and derive it directly from the antisymmetrization formula",
+    "Explain why this platform's engine throwing on antisymmetrize(a,a) is the correct behavior, not a limitation",
+    "Distinguish exclusion for fermions occupying the exact same single-particle state from any restriction on bosons",
+  ],
+};
+
+## Motivation
+
+The previous lesson noted, almost in passing, that
+$|\psi_A\rangle\propto|a\rangle\otimes|a\rangle-|a\rangle\otimes|a\rangle=0$
+whenever both fermions are assigned the same single-particle state. This
+lesson takes that observation seriously: it *is* the Pauli exclusion
+principle, not a separate physical law layered on top of
+antisymmetrization.
+
+## Mathematical Development
+
+### The vanishing is exact, not approximate
+
+$$
+|a\rangle\otimes|a\rangle - |a\rangle\otimes|a\rangle = \vec 0
+$$
+
+This is exactly the zero vector, algebraically, for any $|a\rangle$
+whatsoever. There is no normalization constant that turns a zero vector
+into a unit-norm state; `normalizeVector` in this platform's engine
+checks the norm before dividing and throws precisely because no valid
+state exists to return. This is the *correct* behavior of a
+mathematically honest implementation, not an error to work around.
+
+### Statement of the principle
+
+**No two identical fermions can occupy the same single-particle quantum
+state.** For electrons specifically, "state" means a full specification
+including spin. Two electrons *can* share the same spatial orbital
+(like hydrogen's 1s) provided their spins differ (one spin-up, one
+spin-down), since a spin-up electron and a spin-down electron are, in
+the full state description, genuinely different single-particle states
+even with identical spatial wavefunctions.
+
+### No such restriction for bosons
+
+The symmetric combination $|\psi_S\rangle\propto|a\rangle\otimes|a\rangle+|a\rangle\otimes|a\rangle=2|a\rangle\otimes|a\rangle$
+is manifestly nonzero and normalizes just fine. Bosons face no
+analogous restriction, and in fact tend to *prefer* clustering into the
+same state at low temperature (Bose-Einstein condensation, well beyond
+this course's scope but a direct large-N consequence of this same
+symmetric-combination mathematics).
+
+## Physical Interpretation
+
+Exclusion is why atoms have structure at all: it's the reason a multi-electron
+atom's electrons fill successive shells (Multi-Electron Atoms, next
+lesson) rather than all collapsing into the lowest-energy 1s orbital, and
+ultimately why ordinary matter takes up space and resists compression.
+None of this needs to be added as extra physics; it falls entirely out
+of demanding the two-electron wavefunction be antisymmetric.
+
+## Worked Example
+
+**Confirm directly that `antisymmetrize(e0, e0)` throws, using a
+3-dimensional basis, and explain exactly why.**
+
+Calling `antisymmetrize(e0, e0)` computes
+`tensorProduct(e0,e0) - tensorProduct(e0,e0)`, which is the zero vector
+in every component by construction (subtracting an identical vector from
+itself). `normalizeVector` then computes this vector's norm (exactly 0)
+and throws `"Cannot normalize a (near-)zero vector, this state does not
+exist."` This platform's test suite confirms this exact throw occurs,
+matching the physical claim precisely: the state "two identical fermions,
+both in orbital $e_0$" does not exist.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking exclusion means two fermions can never have the same energy,
+or the same spatial wavefunction.** It specifically forbids the *same
+complete single-particle state*: two electrons in hydrogen's 1s orbital
+with opposite spins are in different states (different spin part) and
+are completely allowed.
+</Callout>
+
+<Callout type="mistake">
+**Applying exclusion to bosons.** As the Mathematical Development section
+shows directly, $|\psi_S\rangle$ never vanishes at $a=b$. There is no
+boson exclusion principle.
+</Callout>
+
+## Practice Questions
+
+1. Derive, in one line of algebra, why $|a\rangle\otimes|a\rangle-|a\rangle\otimes|a\rangle=\vec0$
+   for any $|a\rangle$.
+2. Two electrons in hydrogen's 1s orbital, one spin-up and one
+   spin-down: does this violate exclusion? Why or why not, using the
+   "complete single-particle state" definition?
+3. Why does this platform's engine treat `normalizeVector`'s throw on a
+   zero vector as a feature (a correct physical statement) rather than
+   fixing it to return some fallback vector?
+4. Explain why Bose-Einstein condensation (bosons clustering into the
+   same state) is not just "allowed" but actively suggested by the
+   symmetric-combination math, in a way exclusion actively forbids for
+   fermions.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The Pauli exclusion principle is a direct algebraic consequence of
+  antisymmetrization: $|a\rangle\otimes|a\rangle-|a\rangle\otimes|a\rangle=\vec0$
+  identically, for any single-particle state $a$.
+- This platform's `antisymmetrize(a,a)` throws exactly because no valid
+  normalized state exists, correct behavior, not a limitation.
+- "State," for electrons, includes spin. Two electrons can share a
+  spatial orbital if their spins differ, since that makes their complete
+  single-particle states genuinely distinct.
+
+## Further Exploration
+
+Next: **Multi-Electron Atoms (Introduction)**, which uses exclusion
+directly to explain why electrons fill successive shells rather than all
+crowding into hydrogen's 1s orbital.

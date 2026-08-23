@@ -9,7 +9,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Why Complex Amplitudes?",
   description:
-    "Signed real numbers can only ever interfere fully constructively or fully destructively — why the continuum of partial interference seen in experiment specifically requires a complex phase.",
+    "Signed real numbers can only ever interfere fully constructively or fully destructively. Why the continuum of partial interference seen in experiment specifically requires a complex phase.",
   course: "classical-to-quantum",
   module: "why-complex-amplitudes",
   order: 1,
@@ -26,7 +26,7 @@ export const lessonMeta = {
 ## Motivation
 
 The last lesson showed amplitudes have to add before squaring. It didn't
-explain why those amplitudes need to be *complex* specifically — signed
+explain why those amplitudes need to be *complex* specifically. Signed
 real numbers can also add constructively ($(+1)+(+1)=2$) or destructively
 ($(+1)+(-1)=0$). This lesson makes that question precise, and answers it.
 
@@ -34,13 +34,13 @@ real numbers can also add constructively ($(+1)+(+1)=2$) or destructively
 
 A signed real number has exactly one bit of "direction" information: its
 sign. Two same-signed amplitudes always reinforce fully; two
-opposite-signed amplitudes always cancel fully (if equal in magnitude) —
-there's no in-between. But the actual double-slit fringe pattern varies
+opposite-signed amplitudes always cancel fully (if equal in magnitude).
+There's no in-between. But the actual double-slit fringe pattern varies
 *continuously* as you move across the screen: fully bright at the center,
 smoothly dimming through every intermediate brightness, down to fully
 dark, then smoothly brightening again. A quantity with only two possible
 "directions" cannot produce a smooth continuum of outcomes. Something with
-a continuously adjustable direction can — and that's exactly what a
+a continuously adjustable direction can, and that's exactly what a
 complex number's phase is.
 
 ## Mathematical Development
@@ -56,12 +56,12 @@ $$
 $$
 
 The cross term $2\psi_1\psi_2$ has a fixed sign for any fixed pair of real
-numbers — you can dial its *magnitude* by changing $\psi_1$ or $\psi_2$,
+numbers. You can dial its *magnitude* by changing $\psi_1$ or $\psi_2$,
 but not smoothly sweep it from "fully constructive" through "no effect"
 to "fully destructive" using a *single* continuously-adjustable
 parameter that leaves the individual probabilities $\psi_1^2,\psi_2^2$
 unchanged. The experimentally observed fringe pattern needs exactly that:
-a single knob — position on the screen — that continuously retunes the
+a single knob, position on the screen, that continuously retunes the
 interference from bright to dark while the two paths' individual
 intensities stay essentially fixed.
 
@@ -71,7 +71,7 @@ Write $\psi_2 = |\psi_2|e^{i\theta}$ (polar form, from the Complex
 Numbers lesson). The cross term in $|\psi_1+\psi_2|^2$ becomes
 proportional to $\cos\theta$ (worked out fully in the Complex Numbers
 lesson's treatment of $z+z^*$-type sums), which sweeps continuously
-through every value in $[-1,1]$ as $\theta$ varies over a full turn —
+through every value in $[-1,1]$ as $\theta$ varies over a full turn,
 exactly the smooth constructive-to-destructive continuum the experiment
 shows, controlled by a single real parameter $\theta$ that leaves
 $|\psi_1|,|\psi_2|$ untouched. This is precisely why polar form and
@@ -83,7 +83,7 @@ turn out to be physically indispensable: the phase $\theta$ *is* the
 
 In the double-slit setup, the phase difference between the two paths
 comes from the difference in distance each path travels to reach a given
-point on the screen — a longer path accumulates more phase, in direct
+point on the screen. A longer path accumulates more phase, in direct
 analogy to how a wave's phase advances with distance traveled. This is
 the same idea de Broglie's matter-wave picture and the Schrödinger
 equation (a later lesson in this course) make precise; for now, the
@@ -94,25 +94,25 @@ mathematical object with exactly that continuous phase built in.
 ## Physical Interpretation
 
 <Callout type="note">
-A deeper question — could a real (but higher-dimensional) vector space
+A deeper question, could a real (but higher-dimensional) vector space
 somehow reproduce every quantum prediction, without ever invoking complex
-numbers explicitly — turns out to be subtler than it looks, and wasn't
+numbers explicitly, turns out to be subtler than it looks, and wasn't
 fully settled until very recently. Experiments completed in the 2020s,
 building on a theoretical argument that "real quantum mechanics" predicts
 different results from ordinary complex quantum mechanics in certain
 multi-particle entangled scenarios, ruled the real-only version out
 directly. That argument needs entanglement machinery well beyond this
-lesson, so it isn't derived here — but it's worth knowing the question has
+lesson, so it isn't derived here, but it's worth knowing the question has
 a genuine, experimentally-confirmed answer, not just a mathematical
 convenience.
 </Callout>
 
 Try the explorer below to build direct intuition: with a single amplitude,
 notice that rotating the phase slider (magnitude held fixed) never changes
-the probability readout — phase alone carries no probability information
+the probability readout. Phase alone carries no probability information
 for a lone amplitude. Switch to two-amplitude mode and watch the relative
 phase between $\alpha$ and $\beta$ sweep the combined probability
-continuously between the "quantum" and "classical" values — the exact
+continuously between the "quantum" and "classical" values, the exact
 continuum this lesson just derived the necessity of.
 
 ## Interactive Experiment
@@ -124,14 +124,14 @@ continuum this lesson just derived the necessity of.
 **Three paths contribute equal-magnitude real amplitudes
 $\psi_1=\psi_2=\psi_3=0.4$. What is $(\psi_1+\psi_2+\psi_3)^2$, and why
 can no relabeling of signs alone reproduce a case where each *pair*
-partially — not fully — interferes?**
+partially, not fully, interferes?**
 
 With all positive, $(\psi_1+\psi_2+\psi_3)^2 = (1.2)^2=1.44$ (fully
 constructive). Flipping any sign only ever fully cancels or fully
-reinforces that particular pair — e.g. $\psi_1=0.4,\psi_2=-0.4$ cancels
+reinforces that particular pair; e.g. $\psi_1=0.4,\psi_2=-0.4$ cancels
 those two completely regardless of $\psi_3$. There is no assignment of
 signs that makes, say, the $\psi_1$-$\psi_2$ pair interfere at 30% of
-maximum while the $\psi_1$-$\psi_3$ pair interferes at 70% — signs are a
+maximum while the $\psi_1$-$\psi_3$ pair interferes at 70%. Signs are a
 2-valued choice per amplitude, but the experiment needs a continuous
 value per *pair*. Complex phases, one continuously-adjustable angle per
 amplitude, supply exactly that: $\theta_1-\theta_2$ and $\theta_1-\theta_3$
@@ -148,7 +148,7 @@ a substitute for the whole continuum $\theta\in[0,2\pi)$ provides.
 <Callout type="mistake">
 **Assuming phase is directly observable, the way position is.** A single
 amplitude's phase changes nothing about *its own* probability
-($|\psi|^2$ doesn't depend on $\theta$) — phase only becomes physically
+($|\psi|^2$ doesn't depend on $\theta$). Phase only becomes physically
 meaningful *relative* to another amplitude it's added to, as the explorer
 above demonstrates directly.
 </Callout>
@@ -161,7 +161,7 @@ above demonstrates directly.
    of $\psi_2$?
 2. For $\psi_1=0.5$, $\psi_2=0.5e^{i\theta}$, find the value of $\theta$
    (other than $0$ and $\pi$) where the interference term contributes
-   exactly zero — i.e., where the quantum and classical predictions
+   exactly zero, i.e., where the quantum and classical predictions
    coincide.
 3. Explain in your own words why "a continuous knob that doesn't change
    $|\psi_1|$ or $|\psi_2|$" is something a sign bit structurally cannot
@@ -172,7 +172,7 @@ above demonstrates directly.
 ## Summary
 
 - Signed real amplitudes only ever produce full constructive or full
-  destructive interference for a fixed pair of magnitudes — a 2-valued
+  destructive interference for a fixed pair of magnitudes, a 2-valued
   outcome.
 - Experimentally, interference varies continuously, requiring a
   continuously-adjustable parameter (a phase) that leaves the individual
@@ -181,12 +181,12 @@ above demonstrates directly.
   the cross term in $\lvert\psi_1+\psi_2\rvert^2$ depends on $\theta$
   continuously via $\cos\theta$.
 - Whether a real (but higher-dimensional) alternative could work is a
-  genuine, now experimentally settled question — complex amplitudes are
+  genuine, now experimentally settled question. Complex amplitudes are
   confirmed necessary, not merely convenient.
 
 ## Further Exploration
 
 Next: **The Postulates of Quantum Mechanics**, which states the full,
-formal framework — states, observables, measurement, and dynamics — that
+formal framework, states, observables, measurement, and dynamics, that
 the last three lessons' physical arguments and the Mathematical
 Foundations course's linear algebra together justify.

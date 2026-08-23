@@ -1,0 +1,145 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Stabilizer Formalism Basics",
+  description:
+    "The bit-flip code's syndrome measurements, renamed and generalized: Z0Z1 and Z1Z2 are exactly the code's stabilizer generators, and a syndrome bit flipping from 0 to 1 is exactly the statement that an error anticommutes with that generator.",
+  course: "error-correction-and-fault-tolerance",
+  module: "stabilizer-formalism-basics",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both"],
+  objectives: [
+    "Define a stabilizer generator and verify Z0Z1, Z1Z2 stabilize the bit-flip code's two basis states",
+    "Explain syndrome measurement as measuring stabilizer generators' ±1 eigenvalues",
+    "Derive why an X error anticommutes with exactly the stabilizers whose syndrome it flips",
+  ],
+};
+
+## Motivation
+
+The last three lessons built two specific codes from scratch, gate by
+gate. The **stabilizer formalism** is the general language every real
+quantum error-correcting code is described in, and this lesson's whole
+point is that it isn't new: the two syndrome measurements already built
+for the bit-flip code *are* stabilizer measurements, just not named that
+way yet.
+
+## Mathematical Development
+
+### Stabilizer generators, defined
+
+A **stabilizer** for a quantum code is an operator $g$ (built from tensor
+products of Paulis) satisfying $g|\psi\rangle=+|\psi\rangle$ for every
+valid codeword $|\psi\rangle$. The code's states are simultaneous $+1$
+eigenstates of every stabilizer generator.
+
+### The bit-flip code's stabilizers
+
+Claim: $Z_0Z_1$ and $Z_1Z_2$ (the tensor products $Z\otimes Z\otimes I$
+and $I\otimes Z\otimes Z$) stabilize $\alpha|000\rangle+\beta|111\rangle$.
+Check on each basis term: $Z|0\rangle=+|0\rangle$, so
+$Z_0Z_1|000\rangle=(+1)(+1)|000\rangle=+|000\rangle$; $Z|1\rangle=-|1\rangle$,
+so $Z_0Z_1|111\rangle=(-1)(-1)|111\rangle=+|111\rangle$. Both basis terms
+are $+1$ eigenstates, so their superposition is too (both terms scale by
+the identical $+1$). The same check applies to $Z_1Z_2$. **These two
+operators are exactly the parities `runBitFlipCorrectionCycle`'s ancillas
+extract.** Measuring $Z_0Z_1$ via an ancilla-CNOT-measurement circuit is
+precisely computing "does qubit 0 agree with qubit 1," the same
+computation, now identified as measuring a stabilizer's eigenvalue rather
+than described as an ad-hoc parity check.
+
+### Syndromes are eigenvalue flips
+
+An error $E$ **anticommutes** with a stabilizer $g$ if $Eg=-gE$. If
+$|\psi\rangle$ is a $+1$ eigenstate of $g$ and $E$ anticommutes with it:
+
+$$
+g(E|\psi\rangle) = -Eg|\psi\rangle = -E(+|\psi\rangle) = -(E|\psi\rangle)
+$$
+
+so $E|\psi\rangle$ is a **$-1$** eigenstate of $g$: measuring $g$ after
+the error gives $-1$ (syndrome bit $1$) instead of $+1$ (syndrome bit
+$0$). $X_0$ anticommutes with $Z_0Z_1$ (since $X$ and $Z$ anticommute on
+the same qubit: $XZ=-ZX$, checked directly in an earlier lesson's $HXH=Z$
+computation's building blocks) but *commutes* with $Z_1Z_2$ (acting on
+different qubits, so the operators trivially commute), exactly
+reproducing Lesson 2's decode table entry $(1,0)\to$ qubit 0, now derived
+from (anti)commutation rather than read off a truth table.
+
+## Physical Interpretation
+
+The stabilizer formalism doesn't add new physics to what Lessons 2 and 3
+already built. It gives the *same* syndrome-measurement idea a
+compact algebraic language (which Pauli operators stabilize the code,
+which errors anticommute with which stabilizers) that scales to far more
+complex codes than a 3-qubit truth table could describe by hand,
+including the surface codes covered conceptually two lessons from now.
+
+## Worked Example
+
+**Verify $X_1$ anticommutes with both $Z_0Z_1$ and $Z_1Z_2$, reproducing
+the decode table's $(1,1)\to$ qubit 1 entry.**
+
+$X_1$ acts nontrivially only on qubit 1, so it anticommutes with any
+stabilizer containing a $Z$ on qubit 1 and commutes with any that
+doesn't touch qubit 1 at all. Both $Z_0Z_1$ (has $Z$ on qubit 1) and
+$Z_1Z_2$ (also has $Z$ on qubit 1) contain a $Z$ on qubit 1, so $X_1$
+anticommutes with *both*, flipping both syndrome bits to $1$:
+$(1,1)$, exactly matching the decode table's qubit-1 entry from Lesson
+2, now derived from the operators' structure rather than just quoted.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating the stabilizer formalism as unrelated new material.** Every
+stabilizer-language fact in this lesson ($Z_0Z_1,Z_1Z_2$ as generators;
+syndromes as eigenvalue flips) was already built, concretely, in Lesson
+2. This lesson only supplies the general vocabulary.
+</Callout>
+
+<Callout type="mistake">
+**Assuming any two Pauli operators either always commute or always
+anticommute.** It depends on which qubits they act on and which specific
+Paulis: same-qubit $X$ and $Z$ anticommute; operators acting on entirely
+different qubits always commute; same-qubit identical Paulis (like
+$Z_0Z_1$ and $Z_0$ alone) commute.
+</Callout>
+
+## Practice Questions
+
+1. Verify $X_2$ anticommutes with $Z_1Z_2$ but commutes with $Z_0Z_1$,
+   reproducing the decode table's qubit-2 entry.
+2. Explain why $Z_0$ (a phase-flip error, not the code's stabilizer)
+   commutes with both $Z_0Z_1$ and $Z_1Z_2$, consistent with Lesson 2's
+   finding that this code is blind to $Z$ errors entirely.
+3. For the phase-flip code (Lesson 3), what are the stabilizer generators,
+   in terms of $X$ instead of $Z$? (Hint: use the $HZH=X$ conjugation.)
+4. Why must a code's stabilizer generators always commute *with each
+   other* (not just with the code's own states)? What would go wrong if
+   two stabilizers anticommuted?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $Z_0Z_1,Z_1Z_2$ are the bit-flip code's stabilizer generators, verified
+  directly against both codewords.
+- Syndrome measurement is exactly measuring a stabilizer's $\pm1$
+  eigenvalue; an error flips it exactly when the error anticommutes with
+  that stabilizer.
+- Every entry in Lesson 2's decode table is re-derivable from
+  (anti)commutation relations alone, the stabilizer formalism is a
+  compact restatement, not new content.
+
+## Further Exploration
+
+Next: **Syndrome Measurement and the Recovery Map**, formalizing the
+full error-correction procedure (detect, decode, correct) in the language
+this lesson introduced.

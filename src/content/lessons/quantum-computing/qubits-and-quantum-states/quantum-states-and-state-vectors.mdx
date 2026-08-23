@@ -1,3 +1,10 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors"
+).map((problem) => problem.meta);
+
 export const lessonMeta = {
   title: "Quantum States and State Vectors",
   description:
@@ -21,17 +28,17 @@ Everything so far has treated $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$
 almost like a definition handed down from nowhere. It's time to ask a
 sharper question: *why* is a qubit's state a vector at all, and what
 physical fact is encoded in that choice? The answer is also the reason
-superposition is possible in the first place — and it has no classical
+superposition is possible in the first place, and it has no classical
 counterpart.
 
 ## Intuition
 
 A classical bit's state space is the *set* $\{0, 1\}$. Sets don't come
-with addition — "0 + 1" isn't a classical bit state, it's meaningless. A
+with addition: "0 + 1" isn't a classical bit state, it's meaningless. A
 qubit's state space, by contrast, is a **vector space**: $\mathbb{C}^2$,
 the set of pairs of complex numbers, which *does* come with addition and
-scalar multiplication built in. That structural difference — set vs.
-vector space — is the entire reason a qubit can be "part $|0\rangle$, part
+scalar multiplication built in. That structural difference, set versus
+vector space, is the entire reason a qubit can be "part $|0\rangle$, part
 $|1\rangle$" while a classical bit cannot be "part 0, part 1." Superposition
 isn't a strange add-on; it's a direct consequence of which kind of
 mathematical object we chose to represent the state.
@@ -47,7 +54,7 @@ $\langle\psi|\psi\rangle=1$.
 
 Because $\mathbb{C}^2$ is a vector space, if $|0\rangle$ and $|1\rangle$
 are valid states, then *any* linear combination
-$\alpha|0\rangle+\beta|1\rangle$ is a candidate state too — the vector
+$\alpha|0\rangle+\beta|1\rangle$ is a candidate state too. The vector
 space doesn't restrict you to the basis vectors themselves. Normalization
 is the only extra constraint: not every vector in $\mathbb{C}^2$
 corresponds to a physical state, only the ones on the "unit sphere"
@@ -67,7 +74,7 @@ counting parameters:
   predictions. That's **one more** real parameter ($\gamma$) that carries
   no physical information: **2** remain.
 
-Two real numbers. That's not a coincidence — it's exactly the count you
+Two real numbers. That's not a coincidence: it's exactly the count you
 need to specify a point on the surface of a sphere (two angles, like
 latitude and longitude on Earth). That sphere is the subject of the next
 lesson.
@@ -75,7 +82,7 @@ lesson.
 ### Superposition and interference
 
 Because addition is a real operation in this vector space, you can combine
-states and get genuine cancellation or reinforcement — something
+states and get genuine cancellation or reinforcement, something
 classical probability cannot do. Compare two ways of "not knowing" a bit:
 
 **Classical mixture.** A bit that's 0 with probability $p$ and 1 with
@@ -85,8 +92,8 @@ $P(\text{0 or 1}) = p + (1-p) = 1$, and that's the whole story.
 **Quantum superposition.** A qubit $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$:
 the *amplitudes* add (when combined with other amplitudes later, e.g.
 through a gate), and only afterward do you square to get a probability.
-Because squaring a sum is not the same as summing squares —
-$|\alpha+\beta|^2 \neq |\alpha|^2+|\beta|^2$ in general — quantum
+Because squaring a sum is not the same as summing squares,
+$|\alpha+\beta|^2 \neq |\alpha|^2+|\beta|^2$ in general, quantum
 combinations can produce probabilities that are *larger* than either part
 alone (constructive interference) or *exactly zero* even when both parts
 are individually nonzero (destructive interference). This gap between
@@ -99,7 +106,7 @@ Treating $\mathbb{C}^2$ as the state space is a physical claim, not just a
 notational convenience: it says nature genuinely allows combinations that
 a classical description cannot represent, and it predicts real,
 measurable interference effects. Every one of those predictions has been
-confirmed experimentally — this is not a mathematical formalism chosen
+confirmed experimentally. This is not a mathematical formalism chosen
 for elegance, it's the formalism that happens to match reality.
 
 ## Worked Example
@@ -112,7 +119,7 @@ $$
 \left|\frac12\right|^2 + \left|\frac{\sqrt3}{2}i\right|^2 = \frac14 + \frac34 = 1 \checkmark
 $$
 
-Yes — the coefficients being complex doesn't prevent normalization; only
+Yes. The coefficients being complex doesn't prevent normalization; only
 the *moduli squared* need to sum to 1.
 
 **A partially specified state.** Suppose $|\psi\rangle = \frac{3}{5}|0\rangle + \beta|1\rangle$
@@ -130,7 +137,7 @@ normalization alone only pins down $|\beta|$, not $\beta$'s phase.)
 <Callout type="mistake">
 **Thinking superposition means "randomly 0 or 1, we just don't know
 which."** That describes a classical mixture, which behaves completely
-differently — it can never produce interference. A qubit in superposition
+differently: it can never produce interference. A qubit in superposition
 has no definite pre-existing value at all, which is a physical claim, not
 an admission of ignorance (see Lesson 1's callout on exactly this point).
 </Callout>
@@ -138,7 +145,7 @@ an admission of ignorance (see Lesson 1's callout on exactly this point).
 <Callout type="mistake">
 **Forgetting normalization after combining states.** If you add two
 already-normalized states, $|\psi\rangle+|\phi\rangle$ is almost never
-itself normalized — you generally need to renormalize (divide by the norm
+itself normalized. You generally need to renormalize (divide by the norm
 of the sum) before treating it as a physical state.
 </Callout>
 
@@ -156,16 +163,18 @@ of the sum) before treating it as a physical state.
    not a vector space" is the reason classical bits can't be in
    superposition.
 
+<PracticeLinks problems={practiceProblems} />
+
 ## Summary
 
 - A qubit's state is a normalized vector in the complex vector space
-  $\mathbb{C}^2$ — a physical postulate, not just notation.
+  $\mathbb{C}^2$, a physical postulate, not just notation.
 - Because $\mathbb{C}^2$ has addition built in, superposition is a direct
   consequence of the vector-space structure.
 - Counting real parameters: 4 (from $\alpha,\beta$) $-$ 1 (normalization)
   $-$ 1 (global phase, next lesson) $=$ **2** real degrees of freedom.
 - Amplitudes add before squaring, which is what makes quantum interference
-  possible — probabilities alone could never do this.
+  possible. Probabilities alone could never do this.
 
 ## Further Exploration
 

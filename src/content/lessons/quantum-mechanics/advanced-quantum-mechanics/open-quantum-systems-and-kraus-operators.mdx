@@ -1,0 +1,162 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Open Quantum Systems & Kraus Operators",
+  description:
+    "Every evolution this platform has built so far (Wave Mechanics' time evolution, Entanglement's 'unitary evolution and measurement of density matrices') was CLOSED-system: no environment. Kraus operators, ρ→ΣₖKₖρKₖ†, extend this to genuinely open systems: non-unitary, trace-preserving, and the actual mathematical language of decoherence.",
+  course: "advanced-quantum-mechanics",
+  module: "open-quantum-systems-and-kraus-operators",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices"],
+  objectives: [
+    "Explain why an open (environment-coupled) system cannot evolve purely unitarily",
+    "State the Kraus operator sum representation and its trace-preservation condition",
+    "Verify numerically that a specific Kraus set is (or isn't) a valid physical channel",
+  ],
+};
+
+## Motivation
+
+Entanglement, Mixed States & Bell Tests built density matrices and
+covered their unitary evolution, but a genuinely *isolated* system
+evolving unitarily forever is an idealization. Every real system
+eventually interacts with something outside itself: stray photons, a
+measuring apparatus, thermal vibrations. This lesson introduces the
+mathematical language for that, **open quantum systems**, building
+directly on, and going beyond, the density-matrix foundation Entanglement
+already established.
+
+## Mathematical Development
+
+### Why unitary evolution alone isn't enough
+
+$\rho\to U\rho U^\dagger$ (Entanglement's evolution rule) always preserves
+purity exactly: $\text{Tr}(\rho^2)$ never changes under it (a fact
+already provable from $U$'s unitarity alone). But real decoherence
+*does* change purity. A pure state genuinely becomes mixed over time
+through environmental interaction. No unitary evolution of the system
+*alone* can do this; the resolution is that the system's evolution,
+when the environment is "traced out," need not be unitary at all.
+
+### The Kraus operator sum representation
+
+Any physically valid (completely positive, trace-preserving) evolution
+of an open system can be written as:
+
+$$
+\rho \to \mathcal E(\rho) = \sum_k K_k\,\rho\,K_k^\dagger
+$$
+
+for some set of **Kraus operators** $\{K_k\}$ satisfying
+$\sum_kK_k^\dagger K_k=I$ (the **trace-preservation condition**: it
+guarantees $\text{Tr}(\mathcal E(\rho))=\text{Tr}(\rho)$, so total
+probability stays 1). A single unitary $U$ is the special case of exactly
+one Kraus operator, $K_0=U$ (then $K_0^\dagger K_0=U^\dagger U=I$
+automatically). Kraus operators are a genuine *generalization* of
+unitary evolution, not a replacement for it.
+
+### Verified directly against the trace-preservation condition
+
+This platform's `isTracePreserving` function checks $\sum_kK_k^\dagger
+K_k=I$ directly, entry by entry, not just for the two decoherence
+channels this course builds (amplitude damping, dephasing, both
+confirmed trace-preserving), but also against a deliberately broken
+example (a single Kraus operator scaled by 2, which fails the condition
+outright) to confirm the check actually discriminates valid from invalid
+channels, rather than trivially returning `true`.
+
+Watch the trace-preservation condition play out physically, not just
+algebraically: pick amplitude damping below, start from $|+\rangle$, and
+step forward. Every intermediate step is a genuine, valid quantum state
+(total probability exactly 1, Bloch vector never leaving the sphere's
+interior), even though it's visibly losing purity along the way.
+
+<LazyNoiseExplorer />
+
+## Physical Interpretation
+
+Physically, $\{K_k\}$ encodes *what could have happened* during the
+system's interaction with its environment. Each $K_k$ corresponds to
+one possible "environment outcome" (even though nothing is actually
+measured or recorded), and the sum $\sum_kK_k\rho K_k^\dagger$ correctly
+accounts for the system's state averaged over every possibility. This is
+exactly why it changes purity: it's a genuine statistical mixture over
+unknown environmental branches, encoded directly in the operator sum.
+
+## Worked Example
+
+**Confirm the amplitude damping channel, $K_0=\begin{pmatrix}1&0\\0&\sqrt{1-\gamma}\end{pmatrix}$,
+$K_1=\begin{pmatrix}0&\sqrt\gamma\\0&0\end{pmatrix}$, is trace-preserving.**
+
+$$
+K_0^\dagger K_0 = \begin{pmatrix}1&0\\0&1-\gamma\end{pmatrix}, \qquad K_1^\dagger K_1 = \begin{pmatrix}0&0\\0&\gamma\end{pmatrix}
+$$
+
+$$
+K_0^\dagger K_0 + K_1^\dagger K_1 = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I
+$$
+
+confirmed for every $\gamma\in[0,1]$ by this platform's
+`isTracePreserving(amplitudeDampingChannel(gamma))`, which returns `true`
+across the full range.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming any set of matrices can serve as Kraus operators.** The
+trace-preservation condition $\sum_kK_k^\dagger K_k=I$ is a real
+constraint. An arbitrarily chosen matrix set (like a single operator
+scaled by 2, this lesson's counter-example) generally fails it and does
+not describe a physical channel.
+</Callout>
+
+<Callout type="mistake">
+**Thinking open-system evolution "violates" quantum mechanics' unitarity
+postulate.** It doesn't. The FULL system-plus-environment evolves
+unitarily; the Kraus representation is exactly what that global unitary
+evolution looks like once the environment's degrees of freedom are
+traced out (not tracked). Nothing about quantum mechanics' foundations
+is being bent.
+</Callout>
+
+## Practice Questions
+
+1. Show that a single unitary $K_0=U$ automatically satisfies the
+   trace-preservation condition.
+2. Why does $\rho\to U\rho U^\dagger$ always preserve purity exactly,
+   while a general Kraus channel need not?
+3. Verify by direct matrix multiplication that the dephasing channel's
+   $K_0,K_1$ (given in this course's engine) satisfy
+   $K_0^\dagger K_0+K_1^\dagger K_1=I$ for $\lambda=0.4$.
+4. Physically, what does each individual $K_k$ represent, and why does
+   summing over all of them (rather than picking just one) correctly
+   describe the system when no measurement of the environment actually
+   occurs?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Open (environment-coupled) systems cannot, in general, evolve purely
+  unitarily: genuine purity loss requires going beyond
+  $\rho\to U\rho U^\dagger$.
+- The Kraus representation $\rho\to\sum_kK_k\rho K_k^\dagger$, subject to
+  $\sum_kK_k^\dagger K_k=I$, is the general framework, a strict
+  generalization of unitary evolution, not a replacement.
+- This platform's `isTracePreserving` verifies the condition directly,
+  confirmed both for genuine channels (amplitude damping, dephasing) and
+  against a deliberately invalid counter-example.
+
+## Further Exploration
+
+Next: **Decoherence & the Quantum-to-Classical Transition**, which uses
+these exact channels to watch coherence decay numerically, and asks what
+that decay means physically.

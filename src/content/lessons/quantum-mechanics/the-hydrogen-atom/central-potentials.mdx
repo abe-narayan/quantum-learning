@@ -1,0 +1,136 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/the-hydrogen-atom/central-potentials"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Central Potentials",
+  description:
+    "Proving [H,L²]=[H,Lz]=0 for any potential depending only on r: the single fact that lets hydrogen's angular part reuse Angular Momentum & Spin's spherical harmonics without any new derivation.",
+  course: "the-hydrogen-atom",
+  module: "central-potentials",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom"],
+  objectives: [
+    "Define a central potential and identify hydrogen's Coulomb potential as one",
+    "Explain why [H,L²]=[H,Lz]=0 for any central potential, at the level of what depends on angle vs. radius",
+    "State why this lets energy eigenstates be chosen as simultaneous L², Lz eigenstates",
+  ],
+};
+
+## Motivation
+
+Angular Momentum & Spin's capstone previewed the punchline: hydrogen's
+wavefunction separates into $R(r)Y_l^m(\theta,\varphi)$, with the angular
+part already fully solved. This lesson proves *why* that separation is
+valid at all: the answer is a commutator, not a coincidence.
+
+## Mathematical Development
+
+### Central potentials
+
+A potential is **central** if it depends only on the distance from the
+origin, $V(r)$, never on direction. Hydrogen's electron-proton Coulomb
+attraction, $V(r)=-\dfrac{e^2}{4\pi\epsilon_0 r}$, is exactly this form:
+it only knows how far the electron is from the nucleus, not which way.
+
+### Why H commutes with L² and Lz
+
+The Hamiltonian is $H=\dfrac{p^2}{2m}+V(r)$. $L_z=xp_y-yp_x$ (Angular
+Momentum & Spin, Lesson 1) is built entirely from position and momentum
+components; crucially, $V(r)$ (depending only on the radial distance
+$r=\sqrt{x^2+y^2+z^2}$) commutes with $L_z$, because rotating about the
+$z$-axis doesn't change $r$ at all (a rotation preserves distance from
+the origin by definition), and $L_z$ *generates* exactly that rotation.
+The kinetic term $p^2/2m$ commutes with $L_z$ too, since $L_z$ generates
+rotations and rotations don't change how "spread out" a wavefunction's
+momentum is, only its direction. Both pieces of $H$ separately commute
+with $L_z$, so $[H,L_z]=0$. The identical argument (rotations about any
+axis preserve $r$) gives $[H,\vec L^{\,2}]=0$ too.
+
+### Why this matters: simultaneous eigenstates
+
+Operators, Observables & Measurement proved that commuting Hermitian
+operators share a common eigenbasis. Since $H$, $\vec L^{\,2}$, and $L_z$
+all mutually commute, energy eigenstates can be *chosen* to simultaneously
+satisfy $\vec L^{\,2}\psi=l(l+1)\hbar^2\psi$ and $L_z\psi=m\hbar\psi$,
+which means the angular part of any such $\psi$ is forced to be exactly
+one of Angular Momentum & Spin's $Y_l^m(\theta,\varphi)$ functions,
+already fully derived and verified there, with zero new angular
+calculation needed here.
+
+## Physical Interpretation
+
+This isn't special to hydrogen: *any* central potential (a 3D harmonic
+oscillator, a finite spherical well, hydrogen) separates the same way,
+for the same reason: rotational symmetry of $V(r)$ guarantees $H$
+commutes with the generators of rotation. Hydrogen is simply the specific
+$V(r)=-e^2/4\pi\epsilon_0r$ case this course solves completely.
+
+## Worked Example
+
+**Confirm $[p^2, L_z]=0$ using only that $p^2=p_x^2+p_y^2+p_z^2$ is
+rotationally symmetric (built the same way from $p_x,p_y,p_z$ as $r^2$
+is from $x,y,z$), without expanding every term explicitly.**
+
+$L_z$ generates rotation about $z$ acting identically on any vector
+built symmetrically from $(x,y,z)$ or $(p_x,p_y,p_z)$: $r^2=x^2+y^2+z^2$
+and $p^2=p_x^2+p_y^2+p_z^2$ have the *same* rotational structure (a sum
+of squares of all three Cartesian components), so whatever argument
+shows $[L_z,r^2]=0$ (rotation preserves distance) applies identically to
+$[L_z,p^2]=0$ (rotation preserves total momentum magnitude); both are
+rotationally invariant scalars, and $L_z$, generating rotations, commutes
+with any rotationally invariant quantity by definition.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming this separation works for *any* potential.** It specifically
+requires $V$ to depend only on $r$: a potential like $V(x,y,z)=xyz$ or
+even $V=x^2$ alone (not $x^2+y^2+z^2$) is *not* central, and $H$ would
+not commute with $L_z$ or $\vec L^{\,2}$ for such a potential.
+</Callout>
+
+<Callout type="mistake">
+**Thinking $[H,L_z]=0$ means $H$ and $L_z$ are the same operator, or that
+energy determines $m$.** It means they *can* be simultaneously
+diagonalized: energy eigenstates are highly degenerate in $m$ precisely
+because $H$ doesn't depend on $m$ at all (only on $n$, and, before fine
+structure, not even on $l$) for the Coulomb potential specifically.
+</Callout>
+
+## Practice Questions
+
+1. Is $V(x,y,z)=x^2+y^2+z^2$ (the 3D harmonic oscillator) a central
+   potential? Justify using the definition.
+2. Is $V(x,y,z)=x^2+y^2$ (no $z$-dependence, but not full 3D symmetry) a
+   central potential? Why or why not?
+3. Explain in one sentence why $[H,L_z]=0$ is necessary (though not
+   sufficient on its own) for the energy eigenstates to be labeled by a
+   definite $m$ quantum number.
+4. If $[H,\vec L^{\,2}]=0$ but a specific potential's energy levels
+   *did* depend on $l$ (unlike hydrogen's, which don't), would that
+   contradict $[H,\vec L^{\,2}]=0$? Explain why or why not.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A central potential $V(r)$ depends only on distance from the origin,
+  never direction; hydrogen's Coulomb potential is exactly this form.
+- $[H,L_z]=[H,\vec L^{\,2}]=0$ for any central potential, since rotations
+  preserve $r$ and hence preserve $V(r)$ and the rotationally-symmetric
+  kinetic term.
+- This lets energy eigenstates be chosen as simultaneous $H$, $\vec
+  L^{\,2}$, $L_z$ eigenstates, forcing the angular part to be exactly
+  one of Angular Momentum & Spin's already-derived $Y_l^m$ functions.
+
+## Further Exploration
+
+Next: **The Radial Equation**, which uses this separation to reduce
+hydrogen's full 3D Schrödinger equation to a single ordinary differential
+equation in $r$ alone.

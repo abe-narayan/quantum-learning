@@ -24,8 +24,8 @@ export const lessonMeta = {
 
 ## Motivation
 
-The last lesson derived a genuine physical result — $k\tan(ka)=\kappa$
-— with no algebraic way to isolate $E$. That's not a dead end; it's
+The last lesson derived a genuine physical result, $k\tan(ka)=\kappa$,
+with no algebraic way to isolate $E$. That's not a dead end. It's
 exactly the situation numerical methods are for. This lesson solves it
 for real, honestly, the same way the split-operator method from Wave
 Mechanics was a genuine numerical technique rather than a shortcut.
@@ -33,10 +33,10 @@ Mechanics was a genuine numerical technique rather than a shortcut.
 ## Intuition
 
 Plot both sides of $k\tan(ka)=\kappa$ as functions of $k$ (for fixed
-well parameters) — the left side is a repeating, diverging tangent
+well parameters). The left side is a repeating, diverging tangent
 curve; the right side, $\kappa=\sqrt{2V_0-k^2}$, is a single quarter-circle
 arc from $(0,\sqrt{2V_0})$ down to $(\sqrt{2V_0},0)$. Wherever the two
-curves cross is a valid bound-state wavenumber — the classic **graphical
+curves cross is a valid bound-state wavenumber, the classic **graphical
 solution** every introductory course shows a picture of. Bisection is
 just that same idea, automated: repeatedly halve a bracket known to
 contain a sign change in $k\tan(ka)-\kappa$, converging on the crossing
@@ -52,7 +52,7 @@ As $k$ increases toward the first point where $\tan(ka)$ diverges (at
 $ka=\pi/2$) or where $\kappa(k)$ reaches zero (at $k=\sqrt{2V_0}$),
 whichever comes first, $g(k)$ eventually becomes positive. Since $g$ is
 continuous on that interval and changes sign, the Intermediate Value
-Theorem guarantees a root — bisection just repeatedly evaluates $g$ at
+Theorem guarantees a root. Bisection just repeatedly evaluates $g$ at
 the midpoint of a shrinking bracket and keeps the half containing the
 sign change, converging geometrically fast (each step halves the
 uncertainty). This platform's `finiteSquareWellGroundStateEnergy`
@@ -71,8 +71,8 @@ $$
 **Verify this actually satisfies the quantization condition**: computing
 $k\tan(ka)$ and $\kappa=\sqrt{-2E}$ from the *unrounded* bisection output
 (not the truncated decimals above, which accumulate rounding error in a
-tangent function this sensitive) gives agreement to better than $10^{-6}$
-— exactly what this platform's own test suite checks directly, rather
+tangent function this sensitive) gives agreement to better than $10^{-6}$,
+exactly what this platform's own test suite checks directly, rather
 than trusting a by-hand verification with rounded inputs.
 
 ### Comparing to the infinite well
@@ -80,7 +80,7 @@ than trusting a by-hand verification with rounded inputs.
 For the *same width* ($2a=2$), the infinite well's ground state is
 $E_1^{\rm(infinite)}=\pi^2/(2\cdot2^2)\approx1.2337$ above the bottom of
 its well (Infinite Square Well lesson). This finite well's ground state
-sits at $E+V_0\approx0.7036$ above *its* well's bottom —
+sits at $E+V_0\approx0.7036$ above *its* well's bottom,
 **noticeably lower** than the infinite well's, even though both wells
 have the same width and this one has a depth ($V_0=5$) much larger than
 either ground energy.
@@ -88,23 +88,24 @@ either ground energy.
 ## Physical Interpretation
 
 The finite well's ground state sits lower (relative to its own floor)
-because the wavefunction isn't forced to zero at the walls — it leaks
+because the wavefunction isn't forced to zero at the walls. It leaks
 into the classically forbidden region on both sides, effectively
 "seeing" a well slightly wider than its literal boundaries. Confinement
 that isn't perfectly rigid always costs a little less zero-point energy
-than confinement that is — a real, general trend, not specific to this
+than confinement that is, a real, general trend, not specific to this
 one example.
 
 ## Interactive Experiment
 
-There isn't a dedicated preset for this in the Wavefunction Explorer —
-deliberately: without a general numerical eigensolver (this platform's
-documented, honest limitation), there's no closed-form eigenstate to
-hand the simulator the way the infinite well and harmonic oscillator
-presets do. The bisection method here is a different, complementary
-numerical technique — solving one transcendental equation for a single
-number, not evolving a full wavefunction — and is exactly as legitimate
-a piece of numerical physics for that narrower job.
+There isn't a dedicated preset for this in the Wavefunction Explorer,
+and deliberately so: without a general numerical eigensolver (this
+platform's documented, honest limitation), there's no closed-form
+eigenstate to hand the simulator the way the infinite well and harmonic
+oscillator presets do. The bisection method here is a different,
+complementary numerical technique. It solves one transcendental
+equation for a single number rather than evolving a full wavefunction,
+and it's exactly as legitimate a piece of numerical physics for that
+narrower job.
 
 ## Worked Example
 
@@ -114,13 +115,13 @@ have, at minimum, based on the graphical picture?**
 The quarter-circle $\kappa=\sqrt{10-k^2}$ spans $k\in(0,\sqrt{10}
 \approx3.162)$. The tangent curve $k\tan(ka)$ (even states) has branches
 starting at $ka=0,\pi,2\pi,\ldots$ and diverging as $ka\to\pi/2,3\pi/2,
-\ldots$; with $a=1$, that's branches near $k\approx1.571,4.712,\ldots$
-— only the first branch ($k\in(0,1.571)$) overlaps the quarter-circle's
+\ldots$; with $a=1$, that's branches near $k\approx1.571,4.712,\ldots$.
+Only the first branch ($k\in(0,1.571)$) overlaps the quarter-circle's
 domain, giving exactly **one** even bound state (confirmed: the
 bisection found it at $k\approx1.186$, safely inside that branch). The
 odd-parity equation would need its own check, but by the same reasoning
 (its first branch spans roughly $k\in(\pi/2a,\ldots)$) there is likely
-exactly one odd state too for these parameters — this well supports a
+exactly one odd state too for these parameters. This well supports a
 small, finite number of bound states in total, not the infinite ladder
 the infinite well has.
 
@@ -129,13 +130,13 @@ the infinite well has.
 <Callout type="mistake">
 **Treating bisection as an approximation to be distrusted.** For a
 continuous function with a confirmed sign change, bisection converges to
-the *exact* root to within any desired tolerance — it's not a heuristic,
+the *exact* root to within any desired tolerance. It's not a heuristic,
 it's a rigorous, provably-convergent method.
 </Callout>
 
 <Callout type="mistake">
 **Expecting the finite well's ground state to exceed the infinite well's
-(same width).** It's always the *opposite* — a finite well's confinement
+(same width).** It's always the *opposite*: a finite well's confinement
 is always "gentler," giving a lower ground energy above its own floor,
 never higher.
 </Callout>
@@ -161,7 +162,7 @@ never higher.
   crossings between a repeating tangent curve and a fixed quarter-circle
   arc; bisection automates finding one such crossing rigorously.
 - For $a=1,V_0=5$: ground state $E\approx-4.2964$, sitting
-  $\approx0.7036$ above the well's floor — lower than the same-width
+  $\approx0.7036$ above the well's floor, lower than the same-width
   infinite well's $\approx1.2337$.
 - A finite well supports only finitely many bound states, a genuinely
   different qualitative prediction from the infinite well's endless
@@ -170,6 +171,6 @@ never higher.
 ## Further Exploration
 
 Next: **Scattering Off a Step Potential**, moving from bound states to
-*unbound* ones — and a genuinely surprising result: quantum particles
+*unbound* ones, and a genuinely surprising result: quantum particles
 partially reflect off a step even when they have more than enough energy
 to classically sail over it.

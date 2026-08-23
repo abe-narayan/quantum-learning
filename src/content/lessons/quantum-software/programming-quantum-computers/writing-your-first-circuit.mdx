@@ -1,0 +1,154 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/programming-quantum-computers/writing-your-first-circuit"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Writing Your First Circuit",
+  description:
+    "A complete, hands-on walkthrough: build a 3-qubit GHZ state circuit, run it exactly, then sample it 5000 times and watch the measured 000/111 split converge toward the exact 50/50 probabilities, the full build-run-sample workflow in one worked example.",
+  course: "programming-quantum-computers",
+  module: "writing-your-first-circuit",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-software/programming-quantum-computers/quantum-sdks-overview"],
+  objectives: [
+    "Build a multi-qubit circuit from scratch using QuantumCircuit's chained methods",
+    "Distinguish exact simulation (runCircuit) from shot-based sampling (sampleMeasurements)",
+    "Explain why real hardware always reports the sampled version, never the exact amplitudes directly",
+  ],
+};
+
+## Motivation
+
+Every previous lesson in this course discussed the pattern
+conceptually. This lesson does it: build a real circuit, run it, and
+look at both kinds of output this platform's engine can produce, exact
+amplitudes and shot-based samples, end to end.
+
+## Walkthrough
+
+### Step 1: Build the circuit
+
+A **GHZ state** ($\frac1{\sqrt2}(|000\rangle+|111\rangle)$, a 3-qubit
+generalization of the Bell state) is built with:
+
+```
+const circuit = new QuantumCircuit(3);
+circuit.h(0).cnot(0, 1).cnot(1, 2);
+```
+
+Nothing has run yet. `circuit.instructions` holds three
+`GateInstruction` objects (Circuit Representation in Code), waiting to
+be executed.
+
+Build this exact circuit yourself below (H on q0, then CNOT(0,1), then
+CNOT(1,2) on 3 qubits) and confirm you get the same two-peak
+distribution before reading Step 2's exact numbers.
+
+<LazyCircuitBuilder />
+
+### Step 2: Run it exactly
+
+```
+const state = runCircuit(circuit);
+```
+
+This platform's engine confirms `state.probabilities()` gives exactly
+`[0.5, 0, 0, 0, 0, 0, 0, 0.5]`: probability $0.5$ each for
+$|000\rangle$ and $|111\rangle$, zero everywhere else, matching the GHZ
+state exactly.
+
+### Step 3: Sample it like real hardware would
+
+```
+const counts = sampleMeasurements(state, 5000);
+```
+
+Real hardware (and honest simulators) don't hand back exact amplitudes.
+They report a finite number of individual measurement shots
+(Qubit Readout Techniques). Running this platform's `sampleMeasurements`
+with 5000 shots gives counts close to (but not exactly) a 2500/2500
+split between "000" and "111", e.g. one representative run gave 2521
+and 2479. The deviation from a perfectly even split is genuine
+**statistical (shot) noise**, not a bug. It shrinks (relatively) as
+shot count grows, following the standard $1/\sqrt{\text{shots}}$
+statistical scaling any repeated-sampling estimate obeys.
+
+## Physical Interpretation
+
+The gap between Step 2's exact probabilities and Step 3's sampled counts
+*is* the central practical fact of running anything on real quantum
+hardware: you never directly observe $|\psi\rangle$'s amplitudes, only
+statistics accumulated over many runs, always with finite-shot noise on
+top of whatever hardware error (Noise, Decoherence & Scaling) is also
+present.
+
+## Worked Example
+
+**Using this platform's confirmed test-suite result (5000 shots on a
+Bell state, `00`/`11` split), what range of `00` counts is expected 95%
+of the time, treating this as a binomial sampling process?**
+
+For $p=0.5$, $n=5000$: standard deviation
+$\sigma=\sqrt{np(1-p)}=\sqrt{5000\times0.25}=\sqrt{1250}\approx35.4$.
+A 95% range is roughly $\pm2\sigma\approx\pm71$ around the expected
+mean of 2500, so counts between about 2429 and 2571 are expected 95% of
+the time, purely from statistical shot noise, with a perfect,
+noiseless simulator and an exact 50/50 underlying probability.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Expecting sampled counts to exactly match the underlying probabilities.**
+Even with a perfect, noiseless quantum state, finite-shot sampling
+always shows statistical fluctuation. The worked example's $\pm71$-count
+range at 5000 shots is real and expected, not evidence of a broken
+circuit.
+</Callout>
+
+<Callout type="mistake">
+**Confusing shot noise (statistical, present even for a perfect
+simulator) with hardware error (physical, from Noise, Decoherence &
+Scaling's actual error sources).** Both contribute to real hardware
+results; only shot noise is present in this lesson's idealized
+`sampleMeasurements` example.
+</Callout>
+
+## Practice Questions
+
+1. Write out (conceptually) the three `GateInstruction`s the GHZ
+   circuit's `.h(0).cnot(0,1).cnot(1,2)` chain produces.
+2. Using the same $\sqrt{np(1-p)}$ formula, estimate the standard
+   deviation for 10,000 shots instead of 5000. Does statistical noise
+   grow or shrink (in absolute count) with more shots? What about as a
+   FRACTION of total shots?
+3. Why does real hardware always report sampled counts, never exact
+   amplitudes directly?
+4. If a sampled experiment gave 4000 "000" counts and 1000 "111" counts
+   out of 5000 shots (badly off from the expected 50/50 split), would
+   this most likely indicate shot noise alone, or something else?
+   Explain your reasoning using the worked example's expected range.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Building a circuit (`.h(0).cnot(0,1).cnot(1,2)`) creates instructions
+  as data; `runCircuit` executes them, giving exact GHZ-state
+  probabilities `[0.5,...,0.5]`.
+- `sampleMeasurements` illustrates what real hardware actually reports:
+  shot-based counts with genuine statistical fluctuation around the
+  exact probabilities.
+- At 5000 shots on a perfect 50/50 state, roughly $\pm71$ counts of
+  deviation is expected 95% of the time from shot noise alone.
+
+## Further Exploration
+
+Next: **Simulators vs. Real Hardware**, which adds genuine hardware
+error on top of this lesson's pure shot noise, completing the picture of
+what a real device's output actually looks like.

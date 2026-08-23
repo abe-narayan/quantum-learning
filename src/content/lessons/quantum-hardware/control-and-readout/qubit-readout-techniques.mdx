@@ -1,0 +1,147 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/control-and-readout/qubit-readout-techniques"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Qubit Readout Techniques",
+  description:
+    "Measuring a qubit's state without destroying the information first: dispersive readout couples the qubit to a resonator whose frequency shifts depending on the qubit's state, an indirect measurement scheme, and readout fidelity is a genuine probabilistic classification problem, not a perfect binary readout.",
+  course: "control-and-readout",
+  module: "qubit-readout-techniques",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/control-and-readout/control-electronics"],
+  objectives: [
+    "Explain the dispersive readout scheme at a conceptual level: measuring a resonator, not the qubit directly",
+    "State why readout fidelity is a genuine, imperfect probabilistic quantity, distinct from ideal projective measurement",
+    "Connect readout error to the broader error budget alongside gate errors and decoherence",
+  ],
+};
+
+## Motivation
+
+Measurement and Probability (Quantum Computing pillar) treats
+measurement as an instantaneous, ideal projection. Real qubit readout is
+neither instantaneous nor ideal: it takes real time, involves real
+noise, and has a real, measurable error rate. This lesson covers how
+readout actually works in hardware, and honestly quantifies how far it
+falls short of the textbook ideal.
+
+## Engineering Development
+
+### Dispersive readout: measure the resonator, not the qubit
+
+Directly probing a qubit's energy levels risks disturbing (or fully
+collapsing) the state in an uncontrolled way. **Dispersive readout**
+sidesteps this: the qubit is coupled to a separate microwave resonator,
+engineered so that the resonator's own resonant frequency shifts
+slightly depending on whether the qubit is in $|0\rangle$ or $|1\rangle$
+(a "dispersive," off-resonant coupling, strong enough to shift the
+resonator's frequency, weak enough not to directly drive qubit
+transitions). Sending a probe tone into the resonator and measuring the
+reflected/transmitted signal's phase or amplitude reveals which
+frequency the resonator sat at, and therefore, indirectly, which state
+the qubit was in, without directly bombarding the qubit itself.
+
+### Readout is probabilistic, not perfect
+
+Real readout doesn't cleanly return "0" or "1." It returns an analog
+signal (voltage, phase) that must be classified into one of two bins.
+Noise in this signal means the classification is imperfect: a
+qubit truly in $|0\rangle$ occasionally gets misclassified as "1," and
+vice versa. **Readout fidelity** quantifies this: the probability the
+reported classical bit matches the qubit's actual (pre-measurement)
+state. Representative current values sit in the 95-99% range depending
+on platform and integration time, good, but a real, nonzero error
+source, not the textbook's perfect projective measurement.
+
+### Readout error joins the broader error budget
+
+Readout error compounds with gate errors and decoherence
+(Physical Qubit Platforms' coherence-time discussion, and the Noise,
+Decoherence & Scaling course) into the device's overall error
+budget. A computation with perfect gates but 97% readout fidelity still
+has a real 3% chance of reporting the wrong final answer on any single
+run, motivating the standard practice of running a circuit many times
+and taking a statistical distribution over outcomes, rather than trusting
+any single shot.
+
+## Physical Interpretation
+
+Dispersive readout is a clean illustration of a broader hardware theme:
+almost nothing in real quantum hardware is the clean, idealized
+operation described in an introductory circuits course. Every
+operation (gates, readout, even the "instantaneous" measurement
+postulate) has a real, engineered, imperfect physical implementation
+underneath it, with its own error characteristics worth knowing
+explicitly rather than assuming away.
+
+## Worked Example
+
+**A circuit is run 1000 times on hardware with 97% readout fidelity (and
+otherwise-perfect gates and no decoherence, for this idealized
+example). Roughly how many of the 1000 reported outcomes are expected to
+be readout errors?**
+
+$$
+1000 \times (1-0.97) = 1000\times0.03 = 30
+$$
+
+About 30 of the 1000 shots are expected to report the wrong bit purely
+from readout error, even though the underlying quantum state and gates
+were assumed perfect in this idealized example. This is exactly why real
+experiments report statistics over many shots rather than trusting a
+single run.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming readout directly measures the qubit.** Dispersive readout
+measures a coupled RESONATOR's frequency shift, an indirect scheme,
+specifically designed to avoid the disturbance a direct qubit
+measurement would risk.
+</Callout>
+
+<Callout type="mistake">
+**Treating readout fidelity as if it were 100%.** As the worked example
+shows, even a "good" 97% fidelity produces a real, non-negligible error
+rate on any single measurement, an important, quantifiable
+contribution to a device's overall error budget, not a rounding
+error to ignore.
+</Callout>
+
+## Practice Questions
+
+1. Why does dispersive readout measure a resonator instead of the qubit
+   directly? What risk does this avoid?
+2. For 1000 shots at 99% readout fidelity, roughly how many are expected
+   to be readout errors? Compare to the worked example's 97% case.
+3. Explain in one sentence why running a circuit many times (rather than
+   once) is standard practice, connecting directly to readout fidelity.
+4. Readout fidelity and gate fidelity are both sources of error. Are
+   they the same kind of error, or different? (Hint: think about WHEN
+   each error occurs relative to the actual quantum state.)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Dispersive readout measures a qubit indirectly, via a coupled
+  resonator's state-dependent frequency shift, not a direct
+  measurement of the qubit itself.
+- Readout fidelity (representatively 95-99%) is a real, nonzero error
+  source, a probabilistic classification problem, not the textbook's
+  perfect projective measurement.
+- Readout error joins gate error and decoherence in a device's overall
+  error budget, motivating multi-shot statistics over any single run.
+
+## Further Exploration
+
+Next: **Calibration**, which covers how a real device's actual pulse
+parameters (Rabi frequency, resonance frequency) are found and kept
+accurate over time, since none of this lesson's or the previous
+lesson's formulas work with parameters that drift uncalibrated.

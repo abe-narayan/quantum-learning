@@ -1,0 +1,145 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/approximation-methods/the-variational-method"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Variational Method",
+  description:
+    "⟨H⟩ for ANY normalized trial wavefunction is guaranteed ≥ the true ground energy, a one-line inequality that turns 'guess a wavefunction, minimize over its parameters' into a rigorous approximation method, verified here by minimizing a Gaussian trial's ⟨H⟩ on the harmonic oscillator and landing within 0.001% of the exact answer.",
+  course: "approximation-methods",
+  module: "the-variational-method",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/approximation-methods/time-independent-perturbation-theory"],
+  objectives: [
+    "State and justify the variational theorem: ⟨ψ_trial|H|ψ_trial⟩ ≥ E₀ for any normalized trial state",
+    "Use a parametrized trial wavefunction (a Gaussian of variable width) and minimize its energy expectation numerically",
+    "Explain why the variational method needs no small parameter, unlike perturbation theory",
+  ],
+};
+
+## Motivation
+
+Perturbation theory needed $H=H_0+H'$ with $H'$ small, useless if no
+part of $H$ is close to something already solved. The variational
+method asks a different question entirely: given *any* guessed
+normalized wavefunction, how good an estimate of the ground energy does
+it give, and can that guess be systematically improved?
+
+## Mathematical Development
+
+### The variational theorem
+
+For any normalized trial state $|\psi_{\text{trial}}\rangle$ (not
+necessarily an eigenstate of anything),
+
+$$
+\langle\psi_{\text{trial}}|H|\psi_{\text{trial}}\rangle \geq E_0
+$$
+
+where $E_0$ is the true ground-state energy. This holds because any
+normalized state can be expanded in $H$'s own (unknown) true
+eigenbasis, $|\psi_{\text{trial}}\rangle=\sum_nc_n|n\rangle$ with
+$\sum_n|c_n|^2=1$; then
+$\langle\psi_{\text{trial}}|H|\psi_{\text{trial}}\rangle=\sum_n|c_n|^2E_n\geq\sum_n|c_n|^2E_0=E_0$,
+since every $E_n\geq E_0$ by definition of $E_0$ being the smallest.
+
+### Using it: minimize over trial parameters
+
+Pick a trial wavefunction family with adjustable parameters. This
+course uses a Gaussian, $\psi(x;\sigma)\propto e^{-x^2/4\sigma^2}$, with
+$\sigma$ (width) as the one free parameter. Compute
+$E(\sigma)=\langle\psi_\sigma|H|\psi_\sigma\rangle$ for each $\sigma$,
+then minimize over $\sigma$. By the theorem above, *every* value of
+$E(\sigma)$ is an upper bound on $E_0$: minimizing just finds the
+*tightest* bound this particular trial family can produce.
+
+### Reusing this platform's existing machinery
+
+No new continuous-wavefunction infrastructure is needed:
+`Wavefunction1D.gaussianPacket` (Wave Mechanics) already builds a
+normalized Gaussian on the grid, and `expectationEnergy` (built from the
+same kinetic + potential expectation-value machinery Wave Mechanics
+verified) already computes $\langle H\rangle$ for it. This lesson's
+`minimizeGaussianTrialEnergy` is a thin wrapper: scan $\sigma$ over a
+range, evaluate `expectationEnergy` at each, keep the minimum. This is
+the same direct-search optimization strategy Quantum Algorithms II's VQE
+lesson already used for a different (qubit) variational problem.
+
+## Physical Interpretation
+
+The variational method's real power shows up when the true answer
+*isn't* known in advance. For a genuinely hard many-body Hamiltonian,
+minimizing $\langle H\rangle$ over an educated-guess trial family is
+often the only tractable route to a ground-energy estimate, and the
+theorem guarantees the answer errs on a known side (too high, never too
+low).
+
+## Worked Example
+
+**Minimize the Gaussian trial energy for the harmonic oscillator
+($m=\omega=1$), and compare to the exact $E_0=0.5$.**
+
+Scanning $\sigma$ from 0.2 to 3 in 300 steps and calling
+`expectationEnergy` at each gives a minimum at $\sigma\approx0.704$,
+with $E(\sigma)\approx0.50002$, within $0.004\%$ of the exact $E_0=0.5$.
+This near-perfect agreement isn't a coincidence: the harmonic
+oscillator's *true* ground state genuinely *is* a Gaussian, so this
+particular trial family can, at its optimal parameter, reproduce it
+essentially exactly. (For a Hamiltonian whose true ground state isn't
+close to any Gaussian, the same procedure would still give a valid upper
+bound, just a much looser one.)
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting the trial wavefunction must be normalized before computing
+⟨H⟩.** `gaussianPacket` normalizes automatically, but a hand-built trial
+function must be explicitly normalized first, or the $\langle H\rangle\geq E_0$
+inequality doesn't hold as stated (it needs
+$\langle\psi_{\text{trial}}|\psi_{\text{trial}}\rangle=1$ specifically).
+</Callout>
+
+<Callout type="mistake">
+**Assuming a lower ⟨H⟩ always means a "better" trial family in every
+sense.** It means a tighter upper bound on $E_0$ specifically. The
+theorem says nothing about how close the trial *wavefunction itself* is
+to the true ground state, only about the energy expectation value.
+</Callout>
+
+## Practice Questions
+
+1. State the variational theorem in one sentence, including which
+   direction the inequality goes and why.
+2. A badly-chosen fixed width ($\sigma=3$, far from the optimum) gives a
+   *higher* trial energy than the optimized $\sigma\approx0.704$. Is this
+   consistent with the variational theorem? Explain.
+3. If a trial wavefunction family happens to include the true ground
+   state exactly (at some specific parameter value), what does the
+   variational method's minimization procedure find?
+4. Why doesn't the variational method require identifying a "small"
+   part of the Hamiltonian, unlike perturbation theory?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\langle\psi_{\text{trial}}|H|\psi_{\text{trial}}\rangle\geq E_0$ for
+  any normalized trial state, proven by expanding in $H$'s own true
+  (unknown) eigenbasis.
+- Minimizing over a trial family's parameters finds the tightest upper
+  bound that family can produce, reusing this platform's existing
+  `Wavefunction1D`/`expectationEnergy` machinery directly.
+- For the harmonic oscillator, a Gaussian trial's optimized energy
+  matches the exact $E_0=0.5$ to within $0.004\%$, which is expected
+  since the true ground state genuinely is Gaussian-shaped here.
+
+## Further Exploration
+
+Next: **The WKB Approximation**, a semiclassical method that turns out
+to give the *exact* harmonic oscillator spectrum too, for a completely
+different mathematical reason.

@@ -25,11 +25,11 @@ export const lessonMeta = {
 ## Motivation
 
 Every observable in this course so far has lived on a finite-dimensional
-Hilbert space — a handful of numbers was enough to specify a state
+Hilbert space, a handful of numbers was enough to specify a state
 completely. A real particle's position doesn't work that way: it can, in
 principle, take a continuum of values. This lesson previews what changes
 and, more importantly, what doesn't, when position and momentum enter the
-picture — without building the full continuous machinery, which is the
+picture, without building the full continuous machinery, which is the
 subject of the Wave Mechanics course.
 
 ## Intuition
@@ -38,9 +38,9 @@ Position and momentum are the original pair the entire theory of
 quantum mechanics grew out of: Heisenberg's uncertainty principle,
 stated for exactly this pair, is the single most famous consequence of
 everything derived so far in this course. The postulates don't change at
-all for a continuous observable — states are still vectors, position and
+all for a continuous observable: states are still vectors, position and
 momentum are still Hermitian operators, measurement is still governed by
-the Born rule — only the *label* on the basis states becomes a continuous
+the Born rule, only the *label* on the basis states becomes a continuous
 variable $x$ instead of a discrete index $i$.
 
 ## Mathematical Development
@@ -50,7 +50,7 @@ variable $x$ instead of a discrete index $i$.
 A particle's state is a vector $|\psi\rangle$ in an infinite-dimensional
 Hilbert space; position eigenstates $|x\rangle$ exist for every real
 number $x$ (with subtleties around normalization that a fully rigorous
-treatment handles carefully — deferred to Wave Mechanics). Position and
+treatment handles carefully, deferred to Wave Mechanics). Position and
 momentum are both Hermitian operators, $\hat x$ and $\hat p$, and satisfy
 the **canonical commutation relation**:
 
@@ -60,13 +60,13 @@ $$
 
 <Callout type="note">
 This relation is the quantum version of a classical structure (the
-Poisson bracket $\{x,p\}=1$) turned into a commutator — a standard and
+Poisson bracket $\{x,p\}=1$) turned into a commutator, a standard and
 motivated step, but not one this lesson derives from first principles;
 doing so rigorously needs the position-space representation ($\hat p$
 acting as $-i\hbar\,d/dx$ on wavefunctions) built in the Wave Mechanics
 course. Here, $[\hat x,\hat p]=i\hbar$ is taken as given, and its
-*consequences* — which this course already has every tool needed to
-derive — are worked out below.
+*consequences*, which this course already has every tool needed to
+derive, are worked out below.
 </Callout>
 
 ### The Heisenberg uncertainty principle, derived
@@ -86,7 +86,7 @@ $$
 
 (using $\langle i\hbar\rangle = i\hbar\langle\psi|\psi\rangle = i\hbar$
 for a normalized state, so $|\langle i\hbar\rangle|=\hbar$). This is the
-**Heisenberg uncertainty principle**, $\Delta x\,\Delta p\ge\hbar/2$ — not
+**Heisenberg uncertainty principle**, $\Delta x\,\Delta p\ge\hbar/2$, not
 a new postulate, but the general uncertainty relation from earlier in
 this course, evaluated for this one specific, historically first-studied
 pair of observables.
@@ -117,7 +117,7 @@ $$
 $$
 
 The canonical commutation relation for $\hat x,\hat p$ isn't a separate
-fact from the harmonic oscillator's ladder algebra — it's a direct
+fact from the harmonic oscillator's ladder algebra. It's a direct
 algebraic consequence of it, confirmed by the same commutator machinery
 built in the Expectation Values lesson.
 
@@ -125,11 +125,11 @@ built in the Expectation Values lesson.
 
 Momentum plays a second role beyond "an observable": it generates
 translations in space, exactly the way the Hamiltonian generates
-translations in time (Time Evolution lesson) — a deep structural
+translations in time (Time Evolution lesson), a deep structural
 parallel this course doesn't develop fully, but worth knowing exists.
 Historically, $[\hat x,\hat p]=i\hbar$ (via Heisenberg's matrix mechanics)
 and the Schrödinger equation (via wave mechanics) were discovered
-independently and only later shown to be the same theory — this course,
+independently and only later shown to be the same theory. This course,
 by building the Schrödinger equation from unitarity and now connecting
 $[\hat x,\hat p]$ to the harmonic oscillator's algebra, has effectively
 retraced both routes from the same postulates.
@@ -146,7 +146,7 @@ $$
 
 Small in everyday units, but for an electron (mass $\approx
 9.1\times10^{-31}$ kg) this corresponds to a minimum velocity uncertainty
-of roughly $\Delta p/m \approx 5.8\times10^5$ m/s — not negligible at
+of roughly $\Delta p/m \approx 5.8\times10^5$ m/s, not negligible at
 all on an atomic scale, which is exactly why quantum effects dominate
 atomic physics but are undetectable for everyday (much more massive)
 objects.
@@ -156,14 +156,14 @@ objects.
 <Callout type="mistake">
 **Treating $\hat p$ as an ordinary number rather than an operator.** Every
 manipulation above used $[\hat x,\hat p]$ as an operator commutator, the
-same object type as $[X,Y]$ for the Pauli matrices — the physics is
+same object type as $[X,Y]$ for the Pauli matrices, the physics is
 identical in kind, just on an infinite-dimensional space.
 </Callout>
 
 <Callout type="mistake">
 **Re-deriving the uncertainty bound from scratch instead of reusing the
 general relation.** $\Delta x\Delta p\ge\hbar/2$ is a single substitution
-into the Expectation Values lesson's already-proven inequality — there's
+into the Expectation Values lesson's already-proven inequality, there's
 no need for a separate argument specific to position and momentum.
 </Callout>
 
@@ -188,15 +188,15 @@ no need for a separate argument specific to position and momentum.
   derivation needs the continuous position representation built in Wave
   Mechanics, but its *consequences* don't.
 - Substituting directly into the general uncertainty relation gives
-  $\Delta x\,\Delta p\ge\hbar/2$ — the famous bound, as a special case of
+  $\Delta x\,\Delta p\ge\hbar/2$, the famous bound, as a special case of
   a theorem already proven.
 - $[\hat x,\hat p]=i\hbar$ follows directly from $[a,a^\dagger]=1$ once
   $\hat x,\hat p$ are written in terms of the harmonic oscillator's ladder
-  operators — one algebra, two familiar faces.
+  operators: one algebra, two familiar faces.
 
 ## Further Exploration
 
 Next: **Superposition, Interference, and Phase**, which returns to the
 amplitude-and-phase picture from earlier in this course and ties it
-together with everything built since — operators, evolution, and
-uncertainty — using the Complex Amplitude Explorer directly.
+together with everything built since, operators, evolution, and
+uncertainty, using the Complex Amplitude Explorer directly.

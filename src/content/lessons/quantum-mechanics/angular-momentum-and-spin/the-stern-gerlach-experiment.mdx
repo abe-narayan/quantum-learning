@@ -1,0 +1,153 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Stern-Gerlach Experiment",
+  description:
+    "The 1922 experiment that first revealed spin quantization directly: a silver atom beam splitting into exactly two spots, not a continuous smear, reproduced here as a sequence of qubit measurements along different axes, using machinery this platform already built.",
+  course: "angular-momentum-and-spin",
+  module: "the-stern-gerlach-experiment",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/angular-momentum-and-spin/spin-one-half-systems"],
+  objectives: [
+    "Explain what the original Stern-Gerlach experiment measured and why two spots (not a continuum) was the surprising result",
+    "Compute the outcome probabilities for a sequential Z-then-X-then-Z Stern-Gerlach experiment",
+    "Explain why the third measurement doesn't reproduce the first, using measurement's disturbance of incompatible observables",
+  ],
+};
+
+## Motivation
+
+In 1922, Otto Stern and Walther Gerlach sent silver atoms through a
+non-uniform magnetic field and looked at where they landed on a screen.
+Classically, if the atoms' magnetic moments pointed in random directions,
+the beam should smear into a continuous vertical band. It didn't. It
+split into **exactly two** distinct spots. This was the first direct
+experimental evidence of $S_z$'s quantized, two-valued spectrum,
+$\pm\hbar/2$, derived abstractly over the last three lessons.
+
+## Mathematical Development
+
+### What the apparatus measures
+
+The magnetic field gradient deflects atoms by an amount proportional to
+their spin's component along the field's axis. A Stern-Gerlach (SG)
+apparatus oriented along $z$ physically measures $S_z$, sorting atoms
+into the $|{\uparrow}\rangle$ (deflected one way) and
+$|{\downarrow}\rangle$ (deflected the other) outcomes with the ordinary
+Born-rule probabilities this platform has computed since Course 1. An SG
+apparatus can be oriented along any axis; rotating it corresponds
+exactly to `rotationAboutAxis` from Qubits & Quantum States, applied
+before measuring in the computational ($S_z$) basis.
+
+### The sequential experiment
+
+Prepare an atom in $|{\uparrow}\rangle$ (post-select on the
+$S_z$-apparatus's "up" outcome). Send it through a **second** SG
+apparatus oriented along $x$. Since
+$|{\uparrow}\rangle=\frac1{\sqrt2}(|{+}\rangle+|{-}\rangle)$ (standard
+basis change, already used throughout this platform), the Born rule gives
+exactly $50\%/50\%$ for the two $x$-outcomes. Post-select on "$+x$."
+Send that atom through a **third** apparatus, oriented back along $z$.
+Naively, since the atom was originally measured "$\uparrow$," it might be
+expected to give "$\uparrow$" again with certainty. It doesn't: the state
+after the second measurement is $|{+}\rangle$, which is an *equal*
+superposition of $|{\uparrow}\rangle$ and $|{\downarrow}\rangle$, giving
+another $50\%/50\%$ split, computed directly via `qubitMeasurementProbabilities`
+applied to $|+\rangle=\text{rotationY}(\pi/2)|0\rangle$'s known form
+(exactly matching the platform's `the-bloch-sphere`/`measurement-and-probability`
+lessons' machinery).
+
+### Why the third measurement erases the first
+
+The $x$-measurement is not merely "additional information" layered on
+top of the $z$-information. It actively **disturbs** it, because
+$S_x,S_z$ don't commute (Lesson 1). Measuring $S_x$ collapses the state
+into an $S_x$ eigenstate, which (having equal overlap with both $S_z$
+eigenstates) carries no memory of the original $S_z$ outcome at all. This
+is the same measurement-disturbance principle from Operators, Observables
+& Measurement, now demonstrated on a physically historical experiment
+rather than an abstract one.
+
+## Physical Interpretation
+
+The two-spot result alone already proved quantization; the *sequential*
+experiment goes further, demonstrating that $S_x$ and $S_z$ are
+genuinely incompatible observables in a way no amount of classical
+imprecision could produce. A classical magnetic moment with some
+definite (if unknown) 3D direction would give a $z$-measurement result
+correlated with its history, not a fresh, uncorrelated $50/50$ coin flip
+every time a different axis is measured in between.
+
+## Worked Example
+
+**Compute the joint probability of the sequence
+"$\uparrow$" (first, $z$), "$+$" (second, $x$), "$\uparrow$" (third,
+$z$ again).**
+
+$P(\uparrow\text{ first})=\tfrac12$ (starting from an unpolarized beam,
+by symmetry). Given "$\uparrow$," $P(+\text{ second})=\tfrac12$ (computed
+above). Given "$+$," $P(\uparrow\text{ third})=\tfrac12$ (computed above,
+since the second measurement erased the correlation with the first). Net
+joint probability: $\tfrac12\times\tfrac12\times\tfrac12=\tfrac18$. Each
+stage is genuinely independent of the one before it, once an intervening
+incompatible measurement has occurred.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Expecting the third measurement to reproduce the first with
+certainty.** It doesn't, because the intervening $x$-measurement actively
+randomizes the $z$-information. This isn't experimental imperfection,
+it's the Born rule applied correctly to the post-$x$-measurement state.
+</Callout>
+
+<Callout type="mistake">
+**Picturing the original two-spot result as consistent with a classical
+"hidden" continuous magnetic moment that just happens to always measure
+as one of two values.** The sequential experiment specifically rules out
+this picture; see the Physical Interpretation above.
+</Callout>
+
+## Practice Questions
+
+1. Compute $P(\downarrow\text{ third}\mid+\text{ second})$, and confirm
+   it sums with $P(\uparrow\text{ third}\mid+\text{ second})$ to $1$.
+2. Repeat the joint-probability calculation for the sequence
+   "$\uparrow$," "$-$" (second apparatus's other $x$-outcome),
+   "$\downarrow$" (third).
+3. If the *second* apparatus were oriented along $z$ again instead of
+   $x$ (i.e., measuring the same axis twice in a row with nothing in
+   between), what would $P(\uparrow\text{ second}\mid\uparrow\text{
+   first})$ be, and why is this case different from the $x$-then-$z$
+   sequence?
+4. Explain, in your own words, why the original (single-apparatus)
+   Stern-Gerlach result, exactly two spots, not a smear, was already
+   enough to rule out a classical continuous magnetic moment, before even
+   considering the sequential experiment.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A Stern-Gerlach apparatus measures spin along its own orientation axis:
+  two discrete outcomes, not a classical continuum, the first direct
+  evidence of spin quantization.
+- A sequential $z$-then-$x$-then-$z$ experiment gives $50/50$ odds at
+  every stage, including the third. The intervening $x$-measurement
+  erases the earlier $z$-information entirely.
+- This is measurement disturbance from incompatible observables
+  ($[S_x,S_z]\neq0$), demonstrated on a real historical experiment, not
+  just asserted abstractly.
+
+## Further Exploration
+
+Next: **Addition of Angular Momentum**, combining two spin-$\tfrac12$
+particles, connecting directly to the Bell states this platform built
+in Quantum Gates & Circuits.

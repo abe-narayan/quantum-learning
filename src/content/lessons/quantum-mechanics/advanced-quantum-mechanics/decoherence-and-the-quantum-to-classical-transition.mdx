@@ -1,0 +1,146 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Decoherence & the Quantum-to-Classical Transition",
+  description:
+    "Applying the dephasing channel repeatedly to |+⟩ drives its off-diagonal coherence from 0.5 toward exactly 0 and its purity from 1.0 toward exactly 0.5 (maximally mixed), a genuine numerical demonstration of why macroscopic superpositions don't survive contact with an environment, using nothing but repeated Kraus-channel application.",
+  course: "advanced-quantum-mechanics",
+  module: "decoherence-and-the-quantum-to-classical-transition",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators"],
+  objectives: [
+    "Track off-diagonal coherence decay numerically under repeated dephasing",
+    "Explain decoherence's role in the quantum-to-classical transition, and what it does and doesn't resolve about measurement",
+    "Distinguish decoherence (coherence loss into an unmeasured environment) from wavefunction collapse (an actual measurement outcome)",
+  ],
+};
+
+## Motivation
+
+Why don't we see cats in superpositions of alive and dead, or coins
+spinning in superpositions of heads and tails? Decoherence is the
+standard, well-established (if partial) answer: a macroscopic system is
+never truly isolated, and the previous lesson's Kraus-channel machinery
+shows exactly how contact with an environment destroys quantum
+coherence, even with no measurement, and no observer, involved at all.
+
+## Mathematical Development
+
+### Off-diagonal coherence, tracked numerically
+
+Starting from $|+\rangle=\frac1{\sqrt2}(|0\rangle+|1\rangle)$'s density
+matrix (off-diagonal entries $\pm0.5$, purity exactly 1, a pure state),
+applying the dephasing channel (previous lesson, $\lambda=0.3$)
+repeatedly gives:
+
+| Applications | Off-diagonal magnitude | Purity |
+|---|---|---|
+| 0 | 0.500 | 1.000 |
+| 1 | 0.350 | 0.745 |
+| 2 | 0.245 | 0.620 |
+| 5 | 0.084 | 0.514 |
+| 10 | 0.014 | 0.500 |
+| 20 | 0.0004 | 0.500 |
+
+Off-diagonal coherence decays geometrically toward exactly 0; purity
+decays toward exactly 0.5, the maximally mixed state for a single qubit.
+The state carries no phase information left at all, only classical
+(diagonal) probabilities.
+
+### What survives: the diagonal
+
+Throughout this entire process, the diagonal entries ($P(0)=P(1)=0.5$
+for $|+\rangle$) never change. Dephasing, true to its name, destroys
+*phase* information while leaving *populations* untouched. What remains
+after full decoherence is a state that looks exactly like a classical
+50/50 probabilistic mixture, mathematically indistinguishable from "the
+system was secretly in $|0\rangle$ or $|1\rangle$ all along, we just
+didn't know which."
+
+## Physical Interpretation
+
+This is decoherence's actual physical content: environmental interaction
+doesn't destroy superposition by some mysterious mechanism. It
+*spreads* the coherence out into correlations with environmental degrees
+of freedom nobody is tracking, which is mathematically identical to
+tracing them out and watching the system's own density matrix lose its
+off-diagonal terms. **What decoherence does NOT do**: it does not, by
+itself, explain why a *single, definite* outcome is observed upon
+measurement (the diagonal state after decoherence is still a
+*probabilistic mixture*, not a single realized outcome). That remains a
+genuinely open interpretational question this course states honestly
+rather than claiming to resolve.
+
+## Worked Example
+
+**After how many dephasing applications ($\lambda=0.3$) does $|+\rangle$'s
+off-diagonal magnitude first drop below 0.01?**
+
+From the table above: at 10 applications, off-diagonal $\approx0.014$
+(still above 0.01); at 20 applications, $\approx0.0004$ (well below).
+Since each application multiplies the off-diagonal magnitude by exactly
+$(1-\lambda)=0.7$ (a direct consequence of the dephasing Kraus operators'
+structure), the threshold is crossed at
+$n=\log(0.01/0.5)/\log(0.7)\approx10.9$, i.e. the 11th application,
+directly checkable against `applyChannelRepeatedly`'s engine output.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing decoherence with wavefunction collapse.** Decoherence turns a
+pure superposition into a mixed (probabilistic) state. It does NOT, by
+itself, pick out one definite outcome. The state after full decoherence
+is still "50% this, 50% that," not "definitely this." What actually
+selects one outcome upon measurement remains an open question in the
+foundations of quantum mechanics, not settled by decoherence alone.
+</Callout>
+
+<Callout type="mistake">
+**Thinking decoherence only matters for exotic macroscopic superpositions.**
+The same math applies to any qubit weakly coupled to any uncontrolled
+environment. This is precisely why real quantum computers need error
+correction and careful isolation (previewed here, developed fully in
+Quantum Computing's Error Correction and Noise/Decoherence courses).
+</Callout>
+
+## Practice Questions
+
+1. Verify that each dephasing application multiplies the off-diagonal
+   magnitude by exactly $(1-\lambda)$, using the Kraus operators from the
+   previous lesson.
+2. Why does the diagonal of the density matrix stay exactly constant
+   under repeated dephasing, while the off-diagonal decays?
+3. Explain in one sentence why "the system decohered into a probabilistic
+   mixture" is not the same claim as "the system's measurement outcome
+   was determined."
+4. If $\lambda=1$ (maximal dephasing per application), how many
+   applications are needed to reach purity 0.5? Why does this differ from
+   the $\lambda=0.3$ case's gradual, many-application decay?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Repeated dephasing drives $|+\rangle$'s off-diagonal coherence toward 0
+  and its purity toward 0.5, a genuine numerical demonstration of
+  decoherence, not an assertion.
+- The diagonal (populations) are unaffected; only phase information is
+  lost, so the resulting state looks exactly like a classical probabilistic
+  mixture.
+- Decoherence explains the *loss of quantum coherence*, but does not by
+  itself explain *definite measurement outcomes*, an honest, explicitly
+  stated scope limitation, not a resolved question.
+
+## Further Exploration
+
+Next: **The Path Integral Formulation**, a complete change of
+perspective: not decoherence or density matrices at all, but an
+entirely different (and equivalent) way of formulating quantum mechanics
+itself.

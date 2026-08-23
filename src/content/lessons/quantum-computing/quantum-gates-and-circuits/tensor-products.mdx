@@ -11,7 +11,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Tensor Products: Combining Qubits",
   description:
-    "How two qubits become a single four-amplitude system — the tensor product, derived rather than just defined.",
+    "How two qubits become a single four-amplitude system, the tensor product, derived rather than just defined.",
   course: "quantum-gates-and-circuits",
   module: "tensor-products",
   order: 1,
@@ -31,14 +31,14 @@ export const ketOneZero = StateVector.basis(1, 1).tensor(StateVector.zero(1));
 ## Motivation
 
 Everything in the last course lived on one qubit's Bloch sphere. Real
-computation needs more than one qubit working together — but "more than
+computation needs more than one qubit working together, but "more than
 one qubit" is not simply "do the single-qubit thing twice." A classical
 2-bit register needs 2 bits to describe: which one of $\{00,01,10,11\}$ it's
 in. A quantum 2-qubit register needs to describe a *superposition* over
-all four of those possibilities simultaneously — which turns out to
+all four of those possibilities simultaneously, which turns out to
 require exactly 4 complex amplitudes, not 2. This lesson derives where
 that "4" comes from, and it won't stop at 4: by the end, you'll see why
-$n$ qubits need $2^n$ amplitudes — the single fact that makes quantum
+$n$ qubits need $2^n$ amplitudes, the single fact that makes quantum
 computers exponentially hard to simulate classically, and (later courses)
 part of why they can be exponentially powerful.
 
@@ -47,9 +47,9 @@ part of why they can be exponentially powerful.
 Think of two independent qubits as two independent Bloch spheres. Fully
 describing "where qubit A is" takes its own $(\theta,\varphi)$, and
 "where qubit B is" takes another, independent, pair. Combining them
-shouldn't lose any of that information — whatever mathematical operation
+shouldn't lose any of that information: whatever mathematical operation
 combines two qubit states needs to preserve both spheres' worth of detail
-*and* leave room for something classical bits could never do: correlation
+*and* leave room for something classical bits could never do, correlation
 between them that isn't just "A's state" plus "B's state" separately. The
 **tensor product**, written $\otimes$, is that operation.
 
@@ -65,8 +65,8 @@ $$
 |a\rangle \otimes |b\rangle = \begin{pmatrix}a_0\\a_1\end{pmatrix} \otimes \begin{pmatrix}b_0\\b_1\end{pmatrix} = \begin{pmatrix}a_0 b_0\\a_0 b_1\\a_1 b_0\\a_1 b_1\end{pmatrix}
 $$
 
-Every entry of the first vector multiplies every entry of the second —
-this is exactly what makes the result 4-dimensional from two
+Every entry of the first vector multiplies every entry of the second.
+This is exactly what makes the result 4-dimensional from two
 2-dimensional inputs ($2\times2=4$), rather than 4-dimensional from
 "stacking" them ($2+2=4$ would give the wrong structure entirely; stacking
 loses the ability to represent correlations).
@@ -88,14 +88,14 @@ rule.
 <QuantumStateDisplay state={ketZeroOne} label="|0⟩ ⊗ |1⟩" />
 <QuantumStateDisplay state={ketOneZero} label="|1⟩ ⊗ |0⟩" />
 
-Notice these are different states — **order matters**. $|0\rangle\otimes|1\rangle$
+Notice these are different states: **order matters**. $|0\rangle\otimes|1\rangle$
 and $|1\rangle\otimes|0\rangle$ are as distinct as the classical strings
 "01" and "10".
 
 ### Combining superpositions: cross terms
 
-The tensor product is *bilinear* — it distributes over addition in each
-argument — so combining two states that are each already superpositions
+The tensor product is *bilinear*, it distributes over addition in each
+argument, so combining two states that are each already superpositions
 produces every pairwise cross term:
 
 $$
@@ -103,7 +103,7 @@ $$
 $$
 
 All four terms are generally nonzero even if you started with two
-"simple" single-qubit superpositions — this is the mechanism, not yet the
+"simple" single-qubit superpositions. This is the mechanism, not yet the
 full story, behind why multi-qubit states can look complicated fast.
 
 ### Normalization survives tensoring
@@ -117,14 +117,14 @@ $$
 \langle a\otimes b|a\otimes b\rangle = \sum_{i,j}|a_ib_j|^2 = \left(\sum_i|a_i|^2\right)\left(\sum_j|b_j|^2\right) = \langle a|a\rangle\langle b|b\rangle = 1\cdot1 = 1
 $$
 
-Yes — tensoring two normalized states always gives a normalized state, so
+Yes. Tensoring two normalized states always gives a normalized state, so
 you never need a separate renormalization step just because you combined
 two qubits.
 
 ### Dimension growth and the qubit-ordering convention
 
 Tensoring $n$ single qubits together gives a $2^n$-dimensional state
-vector — each additional qubit *doubles* the dimension rather than adding
+vector: each additional qubit *doubles* the dimension rather than adding
 a fixed amount to it. Three qubits need 8 amplitudes; ten qubits need
 1024; fifty qubits need more amplitudes than there are atoms on Earth to
 store classically. This exponential growth is the whole reason
@@ -134,7 +134,7 @@ exploit.
 
 One convention needs to be fixed and used consistently everywhere from
 here on: **qubit 0 is the leftmost (most significant) label in a
-multi-qubit ket.** For three qubits, $|q_0q_1q_2\rangle$ — so
+multi-qubit ket.** For three qubits, $|q_0q_1q_2\rangle$, so
 $|100\rangle$ has qubit 0 equal to 1 and qubits 1, 2 equal to 0. This
 matches how the simulator engine indexes qubits, and it's the convention
 every lesson, test, and future circuit diagram on this platform will use.
@@ -142,7 +142,7 @@ every lesson, test, and future circuit diagram on this platform will use.
 ## Physical Interpretation
 
 That composite systems are described by the tensor product of their
-parts' state spaces is itself a postulate of quantum mechanics — not
+parts' state spaces is itself a postulate of quantum mechanics, not
 something derivable from the single-qubit postulates you already know.
 It's an experimentally confirmed fact about how nature composes systems,
 and everything about multi-qubit computing follows from taking it
@@ -174,7 +174,7 @@ $$
 $$
 
 Each coefficient has magnitude $\frac12$, so every one of the four
-outcomes is equally likely if measured — makes sense, since $|+\rangle$
+outcomes is equally likely if measured. That makes sense, since $|+\rangle$
 and $|-\rangle$ are each individually 50/50 in the computational basis,
 and the qubits here are completely independent (no correlation has been
 introduced yet).
@@ -183,7 +183,7 @@ introduced yet).
 
 <Callout type="mistake">
 **Multiplying probabilities instead of amplitudes.** It's tempting to
-combine "50% this, 50% that" intuitively and skip the amplitude algebra —
+combine "50% this, 50% that" intuitively and skip the amplitude algebra,
 but relative *phases* between terms only show up correctly if you
 multiply amplitudes first and take $|\cdot|^2$ afterward, not the other
 way around. This matters enormously once gates introduce phases.
@@ -214,7 +214,7 @@ track which ket is qubit 0.
   every amplitude of $|b\rangle$; basis states tensor by concatenating
   labels, $|i\rangle\otimes|j\rangle=|ij\rangle$.
 - Tensoring two normalized states always yields a normalized state.
-- $n$ qubits need $2^n$ amplitudes — exponential growth is structural, not
+- $n$ qubits need $2^n$ amplitudes: exponential growth is structural, not
   incidental.
 - Qubit 0 is the leftmost label in a multi-qubit ket, everywhere on this
   platform.
@@ -222,6 +222,6 @@ track which ket is qubit 0.
 ## Further Exploration
 
 Next: **Multi-Qubit State Vectors**, where we ask the sharper question
-this lesson set up — is every valid multi-qubit state actually *reachable*
+this lesson set up: is every valid multi-qubit state actually *reachable*
 as a tensor product of single-qubit states? The answer is no, and the
 states that aren't are the entangled ones.

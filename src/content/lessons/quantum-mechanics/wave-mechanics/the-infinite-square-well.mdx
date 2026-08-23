@@ -9,7 +9,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "The Infinite Square Well",
   description:
-    "Solving the time-independent Schrodinger equation exactly for a particle confined between infinite walls — a complete derivation of quantized energies and normalized eigenstates from boundary conditions alone.",
+    "Solving the time-independent Schrodinger equation exactly for a particle confined between infinite walls, a complete derivation of quantized energies and normalized eigenstates from boundary conditions alone.",
   course: "wave-mechanics",
   module: "the-infinite-square-well",
   order: 1,
@@ -28,17 +28,17 @@ export const lessonMeta = {
 This is the first potential this course solves completely and exactly:
 a particle strictly confined to $0 < x < L$ by walls of infinite
 potential energy. It's the cleanest possible illustration of a deep
-principle — confinement forces quantization — worked out with nothing
+principle: confinement forces quantization, worked out with nothing
 beyond the time-independent Schrödinger equation and two boundary
 conditions.
 
 ## Intuition
 
 Classically, a ball bouncing between two rigid walls can have *any*
-energy — bounce it harder, it just goes faster. Quantum mechanically, the
+energy: bounce it harder, it just goes faster. Quantum mechanically, the
 wavefunction must fit the box the way a guitar string's vibration must
-fit its fixed length: only certain wavelengths (hence only certain
-energies) are geometrically possible.
+fit its fixed length. Only certain wavelengths, and hence only certain
+energies, are geometrically possible.
 
 ## Mathematical Development
 
@@ -70,8 +70,8 @@ $$
 kL = n\pi, \qquad n = 1, 2, 3, \ldots
 $$
 
-($n=0$ is excluded — it gives $\psi\equiv0$ everywhere, not a valid
-state). This is the entire mechanism: **the boundary conditions permit
+($n=0$ is excluded: it gives $\psi\equiv0$ everywhere, not a valid
+state). This is the entire mechanism. **The boundary conditions permit
 only a discrete set of $k$ values**, and since $E=\hbar^2k^2/(2m)$, only a
 discrete set of energies.
 
@@ -81,10 +81,10 @@ $$
 k_n = \frac{n\pi}{L} \quad\Longrightarrow\quad \boxed{E_n = \frac{n^2\pi^2\hbar^2}{2mL^2}}, \qquad n=1,2,3,\ldots
 $$
 
-— exactly `infiniteSquareWellEnergyLevel(n, L, mass)`'s formula (natural
+exactly `infiniteSquareWellEnergyLevel(n, L, mass)`'s formula (natural
 units drop the $\hbar^2$). Unlike the harmonic oscillator's *equally
 spaced* ladder from the last course, these levels spread apart
-quadratically ($E_n\propto n^2$) — a genuinely different spectrum, from a
+quadratically ($E_n\propto n^2$), a genuinely different spectrum, from a
 genuinely different confining mechanism.
 
 ### Normalized eigenstates
@@ -101,7 +101,7 @@ $$
 \psi_n(x) = \sqrt{\frac{2}{L}}\,\sin\!\left(\frac{n\pi x}{L}\right)
 $$
 
-— matching `infiniteSquareWellEigenstate`'s formula exactly (shifted to a
+matching `infiniteSquareWellEigenstate`'s formula exactly (shifted to a
 well centered at $x=0$ rather than starting at $x=0$, a pure relabeling of
 the origin that changes nothing physical, as the What Is a Wavefunction
 lesson's continuum-limit discussion already established).
@@ -109,7 +109,7 @@ lesson's continuum-limit discussion already established).
 ### Orthogonality
 
 Distinct eigenstates satisfy $\int_0^L\psi_n(x)\psi_m(x)\,dx=0$ for
-$n\ne m$ — a direct consequence of $\hat H$'s Hermiticity (proven in
+$n\ne m$, a direct consequence of $\hat H$'s Hermiticity (proven in
 general in Mathematical Foundations: distinct eigenvalues of a Hermitian
 operator have orthogonal eigenvectors), confirmed here numerically by
 `overlapProbability` between different-$n$ eigenstates in the engine's
@@ -118,15 +118,15 @@ test suite.
 ## Physical Interpretation
 
 $n$ counts the number of "humps" in $\psi_n$ (equivalently, $n-1$
-internal nodes — points where $\psi_n=0$ inside the well). More nodes
-means more curvature means more kinetic energy — exactly why $E_n$
+internal nodes, points where $\psi_n=0$ inside the well). More nodes
+means more curvature means more kinetic energy, exactly why $E_n$
 increases with $n$, visible directly by comparing the Explorer's ground
 and excited state presets.
 
 ## Interactive Experiment
 
 The Infinite Well presets use a **very tall but finite** wall (not a
-literal infinity — the Numerically Evolving Quantum States lesson
+literal infinity: the Numerically Evolving Quantum States lesson
 explains why) with height chosen so tunneling leakage is astronomically
 negligible. Play the ground state and watch $\langle H\rangle$ stay
 locked near the analytical $E_1$; switch to the excited state and change
@@ -160,7 +160,7 @@ defaults.
 
 <Callout type="mistake">
 **Including the cosine term.** $\psi(0)=0$ eliminates $B\cos(kx)$
-entirely — a common error is keeping both terms and applying boundary
+entirely. A common error is keeping both terms and applying boundary
 conditions incorrectly, or forgetting $n=0$ must be excluded (it isn't a
 valid state, not merely the "ground state with zero energy").
 </Callout>
@@ -168,7 +168,7 @@ valid state, not merely the "ground state with zero energy").
 <Callout type="mistake">
 **Assuming a literal infinite wall in a numerical simulation.** A
 literal infinity can't be represented on a computer or evolved with the
-periodic-boundary numerical method this course uses — the platform uses a
+periodic-boundary numerical method this course uses. The platform uses a
 finite but very tall wall instead, an honest, standard, well-controlled
 approximation (see the Numerically Evolving Quantum States lesson).
 </Callout>
@@ -179,7 +179,7 @@ approximation (see the Numerically Evolving Quantum States lesson).
    $1:4:16$.
 2. How many internal nodes does $\psi_4(x)$ have inside the well?
 3. Explain briefly why $\psi_n(0)=\psi_n(L)=0$ is required physically
-   (not just mathematically) — what would $\psi_n(0)\ne 0$ imply about
+   (not just mathematically). What would $\psi_n(0)\ne 0$ imply about
    the particle's presence outside the well?
 
 <PracticeLinks problems={practiceProblems} />
@@ -198,5 +198,5 @@ approximation (see the Numerically Evolving Quantum States lesson).
 
 Next: **The Harmonic Oscillator in Position Space**, reconnecting the
 purely algebraic energy spectrum from the last course to an explicit,
-position-space wavefunction — a genuinely different representation of the
+position-space wavefunction, a genuinely different representation of the
 same physics.

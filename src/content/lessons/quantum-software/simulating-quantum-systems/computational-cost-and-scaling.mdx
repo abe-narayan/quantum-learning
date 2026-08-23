@@ -1,0 +1,154 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/simulating-quantum-systems/computational-cost-and-scaling"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Computational Cost & Scaling",
+  description:
+    "Computed exactly, not estimated: state-vector memory is 16×2ⁿ bytes, crossing 1 petabyte around 50 qubits, and per-gate cost scales the same way, since every gate application touches every one of the 2ⁿ amplitudes at least once.",
+  course: "simulating-quantum-systems",
+  module: "computational-cost-and-scaling",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-software/simulating-quantum-systems/state-vector-simulation"],
+  objectives: [
+    "Compute exact memory requirements for state-vector simulation at a given qubit count",
+    "Explain why each gate application costs O(2ⁿ), and how this compounds over a full circuit",
+    "State at what rough qubit count state-vector simulation becomes infeasible on real classical hardware, and why",
+  ],
+};
+
+## Motivation
+
+State-Vector Simulation named the technique; this lesson prices it
+exactly. Every number here follows directly from a single fact already
+built into this platform's engine: `applySingleQubitGate` iterates over
+every amplitude in the state (Circuit Representation in Code's
+underlying implementation), an $O(2^n)$ operation, every single time.
+
+## Engineering Development
+
+### Memory cost
+
+Each complex amplitude needs two double-precision floats (real and
+imaginary), 8 bytes each: 16 bytes per amplitude. Total memory:
+$16\times2^n$ bytes.
+
+| Qubits | Amplitudes | Memory |
+|---|---|---|
+| 20 | ~1.0 million | ~16.8 MB |
+| 30 | ~1.07 billion | ~17.2 GB |
+| 40 | ~1.1 trillion | ~17.6 TB |
+| 50 | ~1.13 quadrillion | ~18.0 PB |
+
+The crossover from "runs on a laptop" (20 qubits) to "needs a serious
+research cluster" (40 qubits) to "exceeds essentially any single
+existing system's storage" (50 qubits) spans just 30 additional qubits.
+This is what "exponential" concretely looks like.
+
+### Time cost per gate, and per circuit
+
+Every gate application (Circuit Representation in Code's
+`applySingleQubitGate`/`applyCNOT`) touches every amplitude, an $O(2^n)$
+operation. A full circuit with `numGates` sequential gates costs roughly
+$\text{numGates}\times2^n$ total floating-point operations, computed
+directly by this platform's `estimatedGateFlops`. Combined with
+Scaling Challenges' compounding-fidelity-error result, this is a second,
+independent reason deep circuits are expensive: not just accumulating
+physical error on real hardware, but accumulating classical simulation
+cost too, if simulating instead of running on hardware.
+
+### Where the wall actually bites
+
+State-vector simulation is genuinely practical up to roughly 30-40
+qubits on serious classical hardware (well beyond a laptop, but within
+reach of research computing clusters), and essentially impossible
+beyond about 50, for any currently existing or plausible near-future
+classical computer. This concrete range is why quantum advantage
+experiments specifically target circuits in or beyond this regime: it's
+the qubit count at which *no* classical simulation technique (including
+the more sophisticated approaches the rest of this course covers) can
+straightforwardly keep up.
+
+## Physical Interpretation
+
+This cost is not a limitation of any particular implementation choice.
+It's a direct consequence of quantum mechanics' own structure: an
+$n$-qubit state genuinely has $2^n$ independent complex degrees of
+freedom (Mathematical Foundations' tensor-product dimension counting),
+and representing that exactly requires storing all of them. This is, in
+one sense, exactly *why* quantum computers are potentially powerful:
+classical memory cannot compress this information away for a generic
+state.
+
+## Worked Example
+
+**A circuit runs 500 gates on 35 qubits. Roughly how many floating-point
+operations does exact state-vector simulation require?**
+
+$$
+\text{estimatedGateFlops}(35, 500) = 500\times2^{35} \approx 500\times3.44\times10^{10} \approx1.72\times10^{13}
+$$
+
+About 17 trillion operations. On hardware performing $\sim10^{12}$
+operations per second (a fast modern system), this circuit alone would
+take roughly 17 seconds, for JUST 35 qubits and a modest 500 gates,
+illustrating how quickly even "reasonable-sounding" circuit sizes push
+into serious computational cost.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating memory and time cost as separate concerns with different
+qubit-count thresholds.** Both scale as $2^n$ from the SAME underlying
+fact (every gate touches every amplitude). They cross into
+"impractical" territory together, not independently.
+</Callout>
+
+<Callout type="mistake">
+**Assuming better classical hardware (more RAM, faster CPUs) meaningfully
+pushes back the qubit-count wall.** Because the cost is exponential, a
+10× hardware improvement buys only $\log_2(10)\approx3.3$ additional
+qubits, a real but modest gain against exponential growth, not a
+solution to it.
+</Callout>
+
+## Practice Questions
+
+1. Compute the exact memory (in bytes) for a 25-qubit state-vector
+   simulation.
+2. Using the worked example's methodology, estimate the total
+   floating-point operations for a 1000-gate circuit on 30 qubits.
+3. If a research group upgrades from a system that can simulate 40
+   qubits to one with 1000× more memory, roughly how many additional
+   qubits can they now simulate? Use the Common Mistakes section's
+   reasoning.
+4. Explain, using the tensor-product dimension-counting idea from
+   Mathematical Foundations, why $2^n$ growth is a fact about quantum
+   mechanics itself, not an artifact of how this platform's engine
+   happens to be implemented.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Memory cost is exactly $16\times2^n$ bytes; time cost per circuit is
+  roughly $\text{numGates}\times2^n$ operations, both computed directly
+  by this platform's `stateVectorMemoryBytes`/`estimatedGateFlops`.
+- The practical wall sits around 30-40 qubits (serious clusters) to ~50
+  qubits (beyond any existing classical system), a narrow 20-qubit span
+  covering "easy" to "impossible."
+- This cost is fundamental (from $2^n$ genuine degrees of freedom in an
+  $n$-qubit state), not an implementation artifact fixable by better
+  classical hardware alone.
+
+## Further Exploration
+
+Next: **Tensor Network Methods**, which push past this wall for a
+specific, important class of circuits, not by cheating the $2^n$ fact,
+but by exploiting structure (limited entanglement) that a generic
+state-vector simulator ignores.

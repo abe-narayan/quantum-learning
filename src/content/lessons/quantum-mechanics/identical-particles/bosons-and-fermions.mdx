@@ -1,0 +1,143 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/identical-particles/bosons-and-fermions"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Bosons & Fermions",
+  description:
+    "symmetrize(a,b) and antisymmetrize(a,b) build the actual +1 and -1 exchange eigenstates from any two single-particle states, verified directly against exchangeParticles, not just asserted to have the right symmetry.",
+  course: "identical-particles",
+  module: "bosons-and-fermions",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/identical-particles/indistinguishability"],
+  objectives: [
+    "Construct the normalized symmetric and antisymmetric combinations of two single-particle states",
+    "Verify numerically that these combinations are genuine +1 and -1 eigenstates of the exchange operator",
+    "State the spin-statistics connection (integer spin = boson, half-integer spin = fermion) as an experimental fact this course doesn't derive",
+  ],
+};
+
+## Motivation
+
+The previous lesson showed a bare product state isn't a valid
+two-identical-particle state. This lesson builds the states that
+actually are valid: the symmetric combination (bosons) and the
+antisymmetric combination (fermions), and checks both directly against
+the exchange operator rather than trusting the construction blindly.
+
+## Mathematical Development
+
+### Symmetric combination: bosons
+
+$$
+|\psi_S\rangle = \mathcal N\big(|a\rangle\otimes|b\rangle + |b\rangle\otimes|a\rangle\big)
+$$
+
+with $\mathcal N$ a normalization constant. Applying $P_{12}$ swaps the
+two terms, which simply reproduces the same sum: $P_{12}|\psi_S\rangle=+|\psi_S\rangle$,
+a genuine $+1$ eigenstate, for *any* choice of $a,b$, including $a=b$.
+
+### Antisymmetric combination: fermions
+
+$$
+|\psi_A\rangle = \mathcal N\big(|a\rangle\otimes|b\rangle - |b\rangle\otimes|a\rangle\big)
+$$
+
+Applying $P_{12}$ swaps the two terms and flips their relative sign back:
+$P_{12}|\psi_A\rangle=-|\psi_A\rangle$, a genuine $-1$ eigenstate,
+*except* when $a=b$: then the two terms are identical and cancel
+exactly, giving the zero vector, not a valid (normalizable) state at
+all. This is the Pauli exclusion principle, previewed here and made the
+whole subject of the next lesson.
+
+### Verified directly, not just asserted
+
+This platform's `symmetrize`/`antisymmetrize` functions build exactly
+these combinations (with `normalizeVector` handling the division), and
+`exchangeParticles` independently swaps the combined vector's two
+particle-labels. Checking `exchangeParticles(symmetrize(a,b))` against
+`symmetrize(a,b)` itself (expecting exact equality) and
+`exchangeParticles(antisymmetrize(a,b))` against the *negative* of
+`antisymmetrize(a,b)` (expecting exact equality), both confirmed to
+floating-point precision, is a genuine numerical proof that the
+construction has the claimed eigenvalue, not a restatement of the
+algebra that built it.
+
+## Physical Interpretation
+
+**The spin-statistics theorem** (a deep result from relativistic quantum
+field theory, well beyond this course's scope, stated here as an
+experimentally-confirmed fact) says: particles with integer spin
+($0,1,2,\ldots$, photons, the recently-covered spin-1 case from
+Angular Momentum & Spin) are bosons; particles with half-integer spin
+($\frac12,\frac32,\ldots$, electrons, protons, neutrons) are fermions.
+This course takes the connection as given and explores its
+consequences, rather than deriving it.
+
+## Worked Example
+
+**Using a 3-dimensional single-particle basis $\{|0\rangle,|1\rangle,|2\rangle\}$,
+confirm `antisymmetrize(e0,e1)` is a genuine $-1$ eigenstate.**
+
+`antisymmetrize(e0,e1)` gives the normalized vector proportional to
+$|0\rangle\otimes|1\rangle-|1\rangle\otimes|0\rangle$. Applying
+`exchangeParticles` to this result gives exactly the *negative* of the
+input, matching to floating-point precision (`maxDiff` between
+`antisymmetrize(e0,e1)` and $-$`exchangeParticles(antisymmetrize(e0,e1))`
+is exactly 0 in this platform's test suite), a direct numerical
+confirmation of the $-1$ eigenvalue.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting the normalization step matters.** $|a\rangle\otimes|b\rangle\pm|b\rangle\otimes|a\rangle$
+is *not* automatically normalized even when $|a\rangle,|b\rangle$
+individually are (its norm depends on whether $a,b$ are orthogonal, and
+whether $a=b$). `normalizeVector` handles this correctly in both cases,
+rather than assuming a fixed $1/\sqrt2$ factor.
+</Callout>
+
+<Callout type="mistake">
+**Thinking symmetrization/antisymmetrization is a choice experimenters
+make.** It's dictated entirely by the particle species (boson vs.
+fermion) via the spin-statistics connection, not a modeling choice
+applied differently depending on the situation.
+</Callout>
+
+## Practice Questions
+
+1. Show that $|\psi_S\rangle$ is a valid (normalizable) state for
+   *every* choice of $a,b$, including $a=b$, while $|\psi_A\rangle$ is
+   not.
+2. If $a$ and $b$ are orthogonal and each individually normalized, what
+   is $\||a\rangle\otimes|b\rangle+|b\rangle\otimes|a\rangle\|^2$, before
+   normalizing? (This is exactly what `normalizeVector` divides out.)
+3. Photons have spin 1; electrons have spin 1/2. Which symmetrization
+   rule applies to each, per the spin-statistics connection?
+4. Why is checking `exchangeParticles(antisymmetrize(a,b))` against
+   $-$`antisymmetrize(a,b)` numerically a stronger confirmation than just
+   re-deriving the algebra that built `antisymmetrize` in the first
+   place?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $|\psi_S\rangle\propto|a\rangle\otimes|b\rangle+|b\rangle\otimes|a\rangle$
+  is always a valid $+1$ exchange eigenstate (bosons).
+- $|\psi_A\rangle\propto|a\rangle\otimes|b\rangle-|b\rangle\otimes|a\rangle$
+  is a valid $-1$ exchange eigenstate only when $a\neq b$ (fermions); at
+  $a=b$ it vanishes entirely.
+- The spin-statistics theorem (integer spin ↔ boson, half-integer spin ↔
+  fermion) is taken as an experimental fact; this platform's engine
+  verifies the ±1 eigenvalue claims directly, not just the construction.
+
+## Further Exploration
+
+Next: **The Pauli Exclusion Principle**, which takes the $a=b$
+vanishing result seriously as physics, not just an edge case.

@@ -1,11 +1,17 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applyCNOT, applySwap } from "@/lib/quantum/gates";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "Controlled Gates and CNOT",
   description:
-    "The general controlled-U operation, worked out completely for CNOT — matrix, truth table, and why SWAP is three CNOTs.",
+    "The general controlled-U operation, worked out completely for CNOT: matrix, truth table, and why SWAP is three CNOTs.",
   course: "quantum-gates-and-circuits",
   module: "controlled-gates-and-cnot",
   order: 1,
@@ -35,9 +41,9 @@ export const swapDemo = [0, 1, 2, 3].map((step) => {
 
 Tensor products build multi-qubit states; the last lesson's circuit
 notation showed how to draw operations on them. But every gate mentioned
-so far still acts on one qubit independently of the others — nothing yet
+so far still acts on one qubit independently of the others. Nothing yet
 lets one qubit's value affect what happens to another. **Controlled
-gates** are that missing ingredient, and CNOT — controlled-NOT — is the
+gates** are that missing ingredient, and CNOT (controlled-NOT) is the
 single most important one in this course.
 
 ## Intuition
@@ -45,7 +51,7 @@ single most important one in this course.
 A controlled-$U$ gate is a conditional: "if the control qubit is
 $|1\rangle$, apply $U$ to the target; if the control is $|0\rangle$, do
 nothing." For a classical bit this would be an ordinary `if` statement.
-For a qubit, the control can be in *superposition* — and then the gate
+For a qubit, the control can be in *superposition*, and then the gate
 does something no classical conditional can: it applies $U$ and
 not-$U$ simultaneously, in proportion to the control's amplitudes,
 producing correlation between the two qubits that wasn't there before.
@@ -55,8 +61,8 @@ producing correlation between the two qubits that wasn't there before.
 ### The general controlled-U construction
 
 Write the projectors onto $|0\rangle$ and $|1\rangle$ as
-$|0\rangle\langle0|$ and $|1\rangle\langle1|$ (outer products — a ket
-times a bra, not a bra times a ket — producing a matrix, not a number).
+$|0\rangle\langle0|$ and $|1\rangle\langle1|$ (outer products, a ket
+times a bra, not a bra times a ket, producing a matrix, not a number).
 As matrices:
 
 $$
@@ -70,7 +76,7 @@ $$
 $$
 
 Read this as: "if the control projects onto $|0\rangle$, apply identity
-to the target; if it projects onto $|1\rangle$, apply $U$ instead" — both
+to the target; if it projects onto $|1\rangle$, apply $U$ instead." Both
 terms are always present in the sum, and whichever piece of the control's
 amplitude occupies each branch gets the corresponding target operation
 applied to it.
@@ -106,8 +112,8 @@ $|00\rangle,|01\rangle,|10\rangle,|11\rangle$ order):
 </div>
 
 Qubit 0 (the control) is always left alone; qubit 1 (the target) flips
-exactly when qubit 0 is 1. This truth table — $00\to00$, $01\to01$,
-$10\to11$, $11\to10$ — is CNOT's complete classical-looking behavior on
+exactly when qubit 0 is 1. This truth table, $00\to00$, $01\to01$,
+$10\to11$, $11\to10$, is CNOT's complete classical-looking behavior on
 basis states. Its genuinely quantum behavior only shows up once the
 control is in superposition, which is the subject of the next lesson.
 
@@ -115,14 +121,14 @@ control is in superposition, which is the subject of the next lesson.
 
 $\text{CNOT}^2 = I$: applying the same conditional flip twice always
 undoes it, since flipping the target bit twice returns it to where it
-started, regardless of the control. This makes CNOT — like $X$, $Z$, $H$
-before it — reversible, exactly as every quantum gate must be.
+started, regardless of the control. This makes CNOT, like $X$, $Z$, $H$
+before it, reversible, exactly as every quantum gate must be.
 
 ## Physical Interpretation
 
 CNOT is the standard building block for creating correlation between
 qubits *deliberately*. Applied to a control that's already in
-superposition, it doesn't produce a definite outcome for the target — it
+superposition, it doesn't produce a definite outcome for the target. It
 produces a target whose value is now tied to the control's, in whatever
 proportion the control's amplitudes dictate. That's entanglement, built
 on demand, and it's exactly the next lesson's subject.
@@ -146,7 +152,7 @@ Track $|10\rangle$ through all three steps:
   <QuantumStateDisplay state={swapDemo[3]} label="After CNOT(0,1) again" showProbabilities={false} />
 </div>
 
-$|10\rangle \to |11\rangle \to |01\rangle \to |01\rangle$ — the qubits end
+$|10\rangle \to |11\rangle \to |01\rangle \to |01\rangle$: the qubits end
 up swapped, $|10\rangle\to|01\rangle$, exactly as claimed, using nothing
 but the CNOT you just derived, three times in a row.
 
@@ -154,7 +160,7 @@ but the CNOT you just derived, three times in a row.
 
 <Callout type="mistake">
 **Assuming CNOT always entangles its inputs.** Applied to $|10\rangle$
-above, the output $|11\rangle$ is still a plain product state — no
+above, the output $|11\rangle$ is still a plain product state, no
 entanglement at all. CNOT only *creates* entanglement when its control
 qubit starts in superposition. The next lesson makes this precise.
 </Callout>
@@ -162,7 +168,7 @@ qubit starts in superposition. The next lesson makes this precise.
 <Callout type="mistake">
 **Confusing control and target.** $\text{CNOT}(0,1)$ (control=qubit 0)
 and $\text{CNOT}(1,0)$ (control=qubit 1) are different gates with
-different matrices — swapping which qubit is which changes the result, as
+different matrices. Swapping which qubit is which changes the result, as
 the SWAP derivation above relies on directly.
 </Callout>
 
@@ -178,6 +184,8 @@ the SWAP derivation above relies on directly.
    control (0,1 then 1,0 then 0,1), rather than using the same control
    three times?
 
+<PracticeLinks problems={practiceProblems} />
+
 ## Summary
 
 - $\text{C-}U = |0\rangle\langle0|\otimes I + |1\rangle\langle1|\otimes U$
@@ -185,10 +193,10 @@ the SWAP derivation above relies on directly.
 - CNOT's matrix, derived directly, matches its truth table: the target
   flips exactly when the control is 1.
 - CNOT is its own inverse, and three alternating CNOTs implement SWAP.
-- CNOT on a basis state never entangles anything by itself — superposition
+- CNOT on a basis state never entangles anything by itself. Superposition
   on the control is required, which is where the next lesson begins.
 
 ## Further Exploration
 
-Next: **Bell States and Entanglement** — put a control qubit into
+Next: **Bell States and Entanglement**, put a control qubit into
 superposition *before* the CNOT, and watch what comes out.

@@ -27,8 +27,8 @@ export const lessonMeta = {
 The last lesson derived $\int|\psi(x)|^2\,dx = 1$ from a continuum limit.
 This lesson treats that condition as a working tool: normalizing
 wavefunctions, computing region probabilities, and understanding *why* a
-correctly-evolving quantum state can never drift out of normalization —
-a claim this platform's numerical engine can actually be checked against,
+correctly-evolving quantum state can never drift out of normalization, a
+claim this platform's numerical engine can actually be checked against,
 not just asserted.
 
 ## Intuition
@@ -59,15 +59,15 @@ $$
 P(a \le x \le b) = \int_a^b |\psi(x)|^2\,dx
 $$
 
-— literally what `Wavefunction1D.probabilityDensity()` returns pointwise,
-summed (as a Riemann sum, `probability * dx`) over the relevant grid
-points; this platform's `probabilityLeftAndRightOf` function used by the
-Wavefunction Explorer's tunneling comparison is exactly this integral,
-split at the barrier.
+which is literally what `Wavefunction1D.probabilityDensity()` returns
+pointwise, summed (as a Riemann sum, `probability * dx`) over the
+relevant grid points. This platform's `probabilityLeftAndRightOf`
+function used by the Wavefunction Explorer's tunneling comparison is
+exactly this integral, split at the barrier.
 
 ### Why normalization survives time evolution
 
-This is not a separate assumption — it's forced by the dynamics postulate.
+This is not a separate assumption. It's forced by the dynamics postulate.
 Time evolution is $|\psi(t)\rangle = U(t)|\psi(0)\rangle$ for a unitary
 $U(t)$ (derived from Hermiticity of $H$ in the Time Evolution lesson of the
 last course, and reproven directly for position space two lessons ahead).
@@ -78,23 +78,23 @@ $$
 $$
 
 using $U^\dagger U = I$. So if $\psi(0)$ starts normalized, it is
-*exactly* normalized at every later time — not approximately, not on
+*exactly* normalized at every later time: not approximately, not on
 average, exactly. The Wavefunction Explorer's split-operator time
 evolution is built from three factors that are each individually a pure
 phase (multiplication by a unit-modulus number, either pointwise in
-position space or via a unitary Fourier transform) — so the simulator's
+position space or via a unitary Fourier transform), so the simulator's
 `Norm ‖ψ‖` readout staying at $1.0000$ for as long as you let it run isn't
-a coincidence or good luck: it's this unitarity theorem, holding to
+a coincidence or good luck. It's this unitarity theorem, holding to
 floating-point precision.
 
 ## Physical Interpretation
 
 Norm conservation is probability conservation: the particle doesn't
 appear or disappear, get created or destroyed, as time passes. Any
-numerical method that lets the norm drift is quietly violating this — one
+numerical method that lets the norm drift is quietly violating this, one
 of the reasons the split-operator method (built from exact-phase factors)
-is the right tool, rather than e.g. a naive explicit finite-difference
-scheme (which does not automatically preserve norm and can even blow up).
+is the right tool, rather than say a naive explicit finite-difference
+scheme, which does not automatically preserve norm and can even blow up.
 
 ## Worked Example
 
@@ -106,7 +106,7 @@ standard Gaussian integral), so normalization requires
 $|A|^2\sigma\sqrt\pi = 1$, giving $A = (\pi\sigma^2)^{-1/4}$. The region
 probability $P(-\sigma\le x\le\sigma) = \int_{-\sigma}^{\sigma}|\psi|^2 dx$
 evaluates (numerically, via the standard normal CDF) to
-$\mathrm{erf}(1/\sqrt2) \approx 0.683$ — the familiar "68% within one
+$\mathrm{erf}(1/\sqrt2) \approx 0.683$, the familiar "68% within one
 standard deviation," here derived from a genuinely quantum probability
 density rather than assumed from statistics.
 
@@ -114,14 +114,14 @@ density rather than assumed from statistics.
 
 <Callout type="mistake">
 **Forgetting to square before integrating.** Normalization uses
-$|\psi(x)|^2$, not $\psi(x)$ — for a complex $\psi$, that's
+$|\psi(x)|^2$, not $\psi(x)$. For a complex $\psi$, that's
 $\psi(x)^*\psi(x)$, not $\psi(x)^2$.
 </Callout>
 
 <Callout type="mistake">
 **Assuming any function can be normalized.** If $\int|\psi|^2 dx$
 diverges (e.g. $\psi(x)=1$ for all $x$, a plane wave), no rescaling fixes
-it — such states aren't literally normalizable and require special
+it. Such states aren't literally normalizable and require special
 handling (briefly touched on in the Free-Particle Wave Packets lesson).
 </Callout>
 
@@ -144,7 +144,7 @@ handling (briefly touched on in the Free-Particle Wave Packets lesson).
 - Any wavefunction with finite $\int|\psi|^2 dx$ can be normalized by
   rescaling.
 - Unitary time evolution preserves the inner product exactly, so a
-  normalized state stays normalized forever — a theorem, not an
+  normalized state stays normalized forever: a theorem, not an
   approximation, and one the simulator's exact norm conservation
   demonstrates directly.
 

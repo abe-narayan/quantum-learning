@@ -1,0 +1,120 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Capstone: Comparing Qubit Platforms",
+  description:
+    "No single platform wins on every axis: putting superconducting circuits, trapped ions, neutral atoms, photons, and spin qubits side by side on coherence time, gate speed, connectivity, and scalability makes the actual engineering tradeoff space visible at once.",
+  course: "physical-qubit-platforms",
+  module: "capstone-comparing-qubit-platforms",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/physical-qubit-platforms/spin-qubits"],
+  objectives: [
+    "Compare all five platforms on the same four axes: coherence time, gate speed, connectivity, and scalability path",
+    "Explain why no platform dominates on every axis simultaneously",
+    "Identify which platform a given application's priorities (e.g. long computations vs. fast iteration) would favor",
+  ],
+};
+
+## Motivation
+
+Five lessons, five platforms, each with its own physical mechanism and
+its own tradeoffs. This capstone doesn't introduce new physics. It puts
+everything side by side, which is where the actual engineering
+decision-making happens in practice.
+
+## The Comparison
+
+| Platform | Coherence time | Gate speed | Connectivity | Scaling path |
+|---|---|---|---|---|
+| Superconducting | ~microseconds | ~nanoseconds (fast) | mostly nearest-neighbor | lithographic fabrication, many labs/companies actively scaling |
+| Trapped ions | ~seconds (long) | ~microseconds (slow) | all-to-all within a trap | chain length limited; modular/networked traps an active research direction |
+| Neutral atoms | ~seconds (long) | ~microseconds | flexible, reconfigurable geometry | hundreds of qubits already demonstrated; among the largest current counts |
+| Photonic | effectively no decoherence in flight; loss-limited instead | very fast per operation | naturally networked (light travels) | strong for communication/networking; two-qubit gates remain the hard problem |
+| Spin qubits | intermediate–long | ~nanoseconds | nearest-neighbor (dot-to-dot) | leverages existing semiconductor fabrication tooling |
+
+(These are representative orders of magnitude for illustrating the
+tradeoff space, not precise specifications of any particular device;
+real numbers vary by generation, vendor, and continue to improve.)
+
+### The general pattern: no free lunch
+
+Every platform trades something for something else: superconducting
+qubits trade coherence for speed and fabrication maturity; trapped ions
+and neutral atoms trade gate speed for coherence and (for neutral atoms)
+flexible geometry; photons trade an entirely different error model
+(loss, not decoherence) for a much harder gate mechanism; spin qubits
+trade smaller, more standard fabrication for intermediate performance on
+every other axis. This isn't a temporary state of immaturity to be
+"solved." It reflects genuine underlying physics tradeoffs: strong
+environmental isolation, which improves coherence, tends to also
+weaken the coupling needed for fast gates.
+
+## Worked Example
+
+**A research group needs to run a long calculation requiring many
+sequential gates, but connectivity between arbitrary qubits matters less
+than raw operation count. Which platform's tradeoff profile favors this?**
+
+Trapped ions or neutral atoms: both offer long coherence times, giving a
+large "gate budget" (as computed directly in the Trapped Ions lesson's
+worked example: $\sim10^5$ gates before decoherence dominates, versus
+$\sim10^3$ for a representative superconducting device), favoring
+platforms where coherence time, not raw gate speed, is the limiting
+resource for this specific priority.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Looking for a single "best" platform.** This lesson's comparison table
+has no row that wins on every column. The right platform depends on
+which axis a specific application actually needs most.
+</Callout>
+
+<Callout type="mistake">
+**Treating these numbers as fixed, permanent specifications.** Every
+platform's numbers have improved substantially over time and continue
+to; this table describes representative *orders of magnitude* and
+qualitative tradeoffs, not a snapshot to memorize as timeless fact.
+</Callout>
+
+## Practice Questions
+
+1. Using this lesson's table, which platform would you recommend for an
+   application prioritizing photon-based communication between two
+   separate quantum processors?
+2. Explain why "strong environmental isolation" (good for coherence)
+   tends to work against "fast, strong coupling" (good for gate speed),
+   using at least one specific platform's physical mechanism as an
+   example.
+3. If a new fabrication breakthrough dramatically improved superconducting
+   qubits' coherence time without changing anything else, would this
+   table's fundamental "no free lunch" pattern disappear? Why or why not?
+4. Which platform's connectivity advantage comes from a shared physical
+   mode, and which platform's comes from reconfigurable geometry?
+   Explain the difference between these two mechanisms.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Comparing coherence time, gate speed, connectivity, and scalability
+  side by side shows every platform trading strength on one axis for
+  weakness on another; no platform dominates across the board.
+- This reflects genuine physical tradeoffs (isolation vs. coupling
+  strength), not simply immature engineering that will resolve itself.
+- Application priorities (raw gate count vs. fast iteration vs.
+  networking) should drive platform choice, not a single "best" ranking.
+
+## Further Exploration
+
+This closes **Physical Qubit Platforms**. The next course, **Control &
+Readout**, goes one layer deeper into any of these platforms: how the
+classical engineering (cryogenics, control electronics, calibration)
+actually drives and reads out the qubits this course described.

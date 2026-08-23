@@ -52,3 +52,17 @@ export function numberOperator(dimension: number): Matrix {
 export function harmonicOscillatorEnergyLevels(dimension: number, hbarOmega: number): number[] {
   return Array.from({ length: dimension }, (_, n) => (n + 0.5) * hbarOmega);
 }
+
+/**
+ * The position operator x = sqrt(1/(2*m*omega)) * (a + a†) in the truncated
+ * Fock basis (natural units, hbar=1) — used by Approximation Methods to
+ * build matrix elements of position-dependent perturbations (e.g. a
+ * quartic anharmonic term) without introducing any continuous-grid
+ * machinery; this stays entirely within the finite-dimensional Matrix
+ * representation this module already established.
+ */
+export function positionOperator(dimension: number, mass = 1, omega = 1): Matrix {
+  const a = annihilationOperator(dimension);
+  const aDagger = creationOperator(dimension);
+  return a.add(aDagger).scale(Math.sqrt(1 / (2 * mass * omega)));
+}

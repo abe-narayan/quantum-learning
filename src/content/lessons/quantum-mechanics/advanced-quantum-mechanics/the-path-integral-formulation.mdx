@@ -1,0 +1,176 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/advanced-quantum-mechanics/the-path-integral-formulation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Path Integral Formulation (Introduction)",
+  description:
+    "Feynman's alternative to the Schrödinger equation: sum a weight exp(-S/ħ) over every possible path, not just the classical one. Verified here in Euclidean (imaginary) time, where the free-particle path sum is a genuine convergent numerical integral: splitting one time interval into two and summing over every intermediate position reproduces the exact propagator to 1 part in 10¹⁵.",
+  course: "advanced-quantum-mechanics",
+  module: "the-path-integral-formulation",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"],
+  objectives: [
+    "State the path integral's central idea: sum over ALL paths, each weighted by exp(-S/ħ) or exp(iS/ħ)",
+    "Explain why this course uses Euclidean (imaginary) time rather than real time for its numerical example",
+    "Verify the Chapman-Kolmogorov composition law numerically: splitting one time step into two and integrating over the intermediate position reproduces the exact propagator",
+  ],
+};
+
+## Motivation
+
+Every quantum mechanics lesson so far in this course, the Schrödinger
+equation, operators, eigenstates, is built on Hamiltonian/operator
+language. Feynman's path integral formulation is a genuinely different
+starting point, mathematically equivalent but conceptually distinct:
+instead of asking "how does the wavefunction evolve," it asks "what is
+the amplitude for every possible way the particle could get from here to
+there, added up?"
+
+## Mathematical Development
+
+### The central idea
+
+The propagator $K(x_f,t_f;x_i,t_i)$, the amplitude for a particle to go
+from $x_i$ at time $t_i$ to $x_f$ at time $t_f$, is, in Feynman's
+formulation, a sum over *every conceivable path* connecting the two
+points, each weighted by $e^{iS[\text{path}]/\hbar}$, where $S$ is the
+classical action of that specific path (not just the classical,
+least-action path: every path, however wild, contributes):
+
+$$
+K(x_f,t_f;x_i,t_i) = \int\mathcal D[x(t)]\;e^{iS[x(t)]/\hbar}
+$$
+
+This is a genuinely different-looking object from anything in the
+operator formalism, yet provably gives identical physical predictions,
+a fact this course states rather than proves in full generality.
+
+### Why this lesson uses Euclidean (imaginary) time
+
+The real-time weight $e^{iS/\hbar}$ is a pure phase: its magnitude
+never decays, making the "sum over paths" a delicate, oscillatory
+(Fresnel-type) integral that resists naive numerical grid integration
+without additional care (a regularization or stationary-phase technique
+beyond this course's scope). Substituting *imaginary* time,
+$\tau=it$ (a standard technique called **Wick rotation**, used
+throughout statistical mechanics and quantum field theory, not a
+simplification invented for this platform), turns the weight into
+$e^{-S_E/\hbar}$, a genuine, positive, exponentially-decaying real
+Gaussian. This is trivial to integrate numerically to high precision,
+while preserving exactly the same "sum over paths" structure this lesson
+is actually trying to teach.
+
+### The free-particle Euclidean propagator
+
+For a free particle, the exact Euclidean propagator is:
+
+$$
+K_E(x_f,x_i;\tau) = \sqrt{\frac{m}{2\pi\hbar\tau}}\;\exp\!\left(-\frac{m(x_f-x_i)^2}{2\hbar\tau}\right)
+$$
+
+This is a genuine closed-form Gaussian, `euclideanFreePropagator` in this
+platform's engine.
+
+### The discretized path sum, verified against the exact answer
+
+Splitting the interval $\tau$ into two halves and integrating over every
+possible intermediate position $x_1$:
+
+$$
+K_E(x_f,x_i;\tau) \overset{?}{=} \int_{-\infty}^\infty K_E(x_f,x_1;\tau/2)\,K_E(x_1,x_i;\tau/2)\;dx_1
+$$
+
+is the **Chapman-Kolmogorov composition law**, a genuine mathematical
+identity (equivalent to the Gaussian convolution theorem) that any
+correct path-sum formulation must satisfy. This platform's
+`discretizedTwoSlicePropagator` computes the right-hand side directly, as
+a Riemann sum over a fine $x_1$ grid, literally summing over every
+discretized two-segment path, and matches the exact left-hand side to a
+relative error of $\sim10^{-15}$ (machine precision) across every tested
+$(x_f,x_i,\tau)$ combination.
+
+## Physical Interpretation
+
+The "sum over all paths" picture makes certain physics intuitive that's
+opaque in the operator picture, most dramatically, why the *classical*
+path (the one satisfying $\delta S=0$) dominates in the macroscopic
+limit: paths near the classical one interfere constructively (nearby
+actions are nearly equal), while wildly different paths interfere
+destructively against their neighbors. This is a genuine, if informal,
+route to understanding the classical limit, complementary to, not a
+replacement for, the operator-based reasoning used throughout this
+platform's other courses.
+
+## Worked Example
+
+**Verify the composition law numerically for $x_f=3,x_i=-1,\tau=2$
+($m=\hbar=1$).**
+
+Exact: $K_E(3,-1;2)=\sqrt{1/4\pi}\exp(-16/4)\approx0.0051667$.
+Discretized (splitting $\tau=2$ into two halves of $\tau/2=1$ each,
+integrating $x_1$ over $[-30,30]$ with 12000 steps):
+$\approx0.0051667$, matching to a relative difference of
+$\sim1.3\times10^{-15}$, confirmed directly by this platform's test
+suite.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking this lesson's Euclidean-time example is "the real path integral,
+simplified."** It's a genuine, standard technique (Wick rotation) used
+throughout physics, not a dumbed-down substitute, but it IS a
+deliberately chosen special case (free particle, imaginary time) rather
+than the fully general real-time, interacting-particle path integral,
+which is far more mathematically involved.
+</Callout>
+
+<Callout type="mistake">
+**Assuming only the classical path contributes.** Every path contributes
+to the sum, including wild, non-classical ones. The discretized
+verification here literally integrates over every intermediate position
+$x_1$, not just the one lying on the classical straight-line trajectory.
+</Callout>
+
+## Practice Questions
+
+1. Why does Euclidean time turn the oscillatory weight $e^{iS/\hbar}$
+   into a real, decaying $e^{-S_E/\hbar}$?
+2. Explain what the Chapman-Kolmogorov composition law states, in words,
+   and why it's a necessary consistency check for any correct
+   path-sum formulation.
+3. In the worked example, which specific intermediate position $x_1$
+   would a purely classical treatment single out, and how does that
+   compare to what the discretized sum actually does (integrate over
+   every $x_1$)?
+4. This lesson's `discretizedTwoSlicePropagator` splits $\tau$ into only
+   TWO segments (one intermediate point). How would you expect the
+   agreement with the exact answer to change if it split $\tau$ into many
+   more segments instead: better, worse, or the same? Why?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The path integral computes the propagator as a sum over every possible
+  path, each weighted by $e^{iS/\hbar}$, a genuinely different starting
+  point from the Schrödinger-equation/operator formalism.
+- This course uses Euclidean (imaginary) time specifically because it
+  turns the real-time formulation's oscillatory weight into a
+  numerically well-behaved decaying real Gaussian, a standard technique,
+  not a simplification unique to this platform.
+- The discretized two-segment path sum reproduces the exact free-particle
+  propagator to $\sim10^{-15}$ relative error, a genuine numerical
+  confirmation of the Chapman-Kolmogorov composition law.
+
+## Further Exploration
+
+Next: **Capstone: Operators, Paths, and What's Still Open**, which
+closes this course by connecting the operator and path-integral
+perspectives and stating honestly what remains genuinely open in the
+foundations of quantum mechanics.

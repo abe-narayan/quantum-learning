@@ -1,0 +1,158 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Three-Qubit Bit-Flip Code",
+  description:
+    "Encoding α|0⟩+β|1⟩ into α|000⟩+β|111⟩ via two CNOTs, extracting a syndrome via two real ancilla qubits and genuine partial measurement, and recovering the exact original state after an X error on any of the three qubits, verified, not just described.",
+  course: "error-correction-and-fault-tolerance",
+  module: "the-three-qubit-bit-flip-code",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/why-quantum-errors-are-different"],
+  objectives: [
+    "Derive the encoding circuit α|0⟩+β|1⟩ → α|000⟩+β|111⟩ from two CNOTs",
+    "Construct the Z0Z1/Z1Z2 syndrome-extraction circuit and its 4-outcome decode table",
+    "Verify the full encode-error-correct cycle recovers the exact original state for every single-qubit X error",
+  ],
+};
+
+## Motivation
+
+This lesson builds the smallest genuine quantum error-correcting code:
+protection against a single $X$ (bit-flip) error on any one of three
+physical qubits, using nothing beyond CNOT and partial measurement, both
+already fully built and tested on this platform.
+
+## Mathematical Development
+
+### Encoding
+
+Starting from a single logical qubit $\alpha|0\rangle+\beta|1\rangle$ on
+qubit 0, with two fresh qubits at $|0\rangle$:
+
+$$
+(\alpha|0\rangle+\beta|1\rangle)|00\rangle = \alpha|000\rangle+\beta|100\rangle \xrightarrow{\text{CNOT}(0,1)} \alpha|000\rangle+\beta|110\rangle \xrightarrow{\text{CNOT}(0,2)} \alpha|000\rangle+\beta|111\rangle
+$$
+
+Each CNOT copies qubit 0's value into a fresh qubit, not cloning the
+*superposition* (which no-cloning forbids), only entangling the fresh
+qubits' computational-basis value with qubit 0's, term by term. The
+result, $\alpha|000\rangle+\beta|111\rangle$, is `encodeBitFlipCode`'s
+exact output.
+
+### The syndrome
+
+Append two ancilla qubits (indices 3,4), and extract two parities via
+CNOTs into them: $\text{CNOT}(0,3),\text{CNOT}(1,3)$ puts qubit 0
+$\oplus$ qubit 1's value onto ancilla 3; $\text{CNOT}(1,4),\text{CNOT}(2,4)$
+puts qubit 1 $\oplus$ qubit 2's value onto ancilla 4. For the *unerrored*
+codeword, both parities are always $0$ (all three data bits agree, in
+each term of the superposition). Measuring the two ancillas, genuine
+partial measurement, via `measureQubit`, exactly as built in Quantum
+Gates & Circuits, gives a **syndrome** $(s_1,s_2)$ without ever directly
+measuring the three data qubits.
+
+### The decode table
+
+If a single $X$ error hit exactly one data qubit, exactly the parities
+involving that qubit flip:
+
+| Syndrome $(s_1,s_2)$ | Error location |
+|---|---|
+| $(0,0)$ | none |
+| $(1,0)$ | qubit 0 |
+| $(1,1)$ | qubit 1 |
+| $(0,1)$ | qubit 2 |
+
+`decodeBitFlipSyndrome` implements exactly this table. Applying $X$ to
+the indicated qubit (or nothing, for $(0,0)$) restores the original
+encoded state exactly, verified directly for every one of the four
+cases, on an arbitrary $\alpha,\beta$, not just checked once.
+
+### Why this doesn't collapse the logical information
+
+The syndrome only depends on whether data qubits *agree*, never on their
+individual values. Both terms $|000\rangle$ and $|111\rangle$ give
+syndrome $(0,0)$ identically, so measuring it reveals nothing about
+whether the state was closer to $|000\rangle$ or $|111\rangle$ (i.e.
+nothing about $\alpha$ vs. $\beta$). This is exactly the "measure only
+the syndrome, never the data" principle the previous lesson described in
+the abstract, now built and checked concretely.
+
+## Physical Interpretation
+
+Three physical qubits, entangled together, do the job no single qubit
+could: store one logical qubit's information so that any single bit-flip
+error, on any one of the three, is both detectable and exactly reversible,
+without ever looking directly at the protected superposition itself.
+
+## Worked Example
+
+**Trace the correction cycle for an $X$ error on qubit 1.**
+
+Encoded state: $\alpha|000\rangle+\beta|111\rangle$. After $X$ on qubit 1:
+$\alpha|010\rangle+\beta|101\rangle$. Syndrome extraction: ancilla 3
+picks up qubit0$\oplus$qubit1 $=0\oplus1=1$ for both terms (checking
+$|010\rangle$: $0\oplus1=1$; $|101\rangle$: $1\oplus0=1$), so syndrome bit
+$s_1=1$ with certainty. Ancilla 4 picks up qubit1$\oplus$qubit2
+$=1\oplus0=1$ (both terms again), so $s_2=1$. Syndrome $(1,1)\to$ qubit 1,
+matching the decode table exactly. Applying $X$ to qubit 1 gives back
+$\alpha|000\rangle+\beta|111\rangle$, the original encoded state,
+confirmed by direct engine computation to floating-point precision.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Measuring the data qubits directly to check for errors.** This would
+collapse $\alpha|000\rangle+\beta|111\rangle$ to either $|000\rangle$ or
+$|111\rangle$ outright, destroying the encoded superposition, exactly
+what syndrome extraction is built to avoid.
+</Callout>
+
+<Callout type="mistake">
+**Expecting this code to correct a phase-flip ($Z$) error.** It doesn't.
+A $Z$ error on any data qubit leaves every parity unchanged (the
+relative sign between $|000\rangle$ and $|111\rangle$ isn't something
+$Z_0Z_1$ or $Z_1Z_2$-style parity checks detect), so this specific code
+is silent to it entirely. The next lesson builds the code that catches
+exactly this case.
+</Callout>
+
+## Practice Questions
+
+1. Trace the correction cycle for an $X$ error on qubit 0, computing both
+   syndrome bits from the actual computational-basis terms.
+2. Trace the correction cycle for an $X$ error on qubit 2.
+3. Explain why the syndrome for a $Z$-error case would come out $(0,0)$,
+   "no error detected," even though an error genuinely occurred (a
+   concrete illustration of the previous Common Mistake).
+4. What happens to this code's guarantee if $X$ errors occur
+   simultaneously on *two* different data qubits, rather than just one?
+   (Hint: compute the resulting syndrome and check whether it matches any
+   single-qubit entry in the decode table.)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Encoding: two CNOTs turn $\alpha|0\rangle+\beta|1\rangle$ into
+  $\alpha|000\rangle+\beta|111\rangle$.
+- Syndrome extraction uses two ancilla qubits and genuine partial
+  measurement; the data qubits' superposition is never directly touched.
+- The 4-entry decode table identifies which (if any) qubit had an $X$
+  error; applying $X$ to that qubit exactly restores the original state,
+  verified for every case, not merely argued.
+- This code is silent to $Z$ errors entirely, a real, documented
+  limitation the next lesson's dual code addresses.
+
+## Further Exploration
+
+Next: **The Three-Qubit Phase-Flip Code**, the dual construction:
+identical machinery, conjugated by Hadamard, protecting against exactly
+the error type this lesson's code misses.

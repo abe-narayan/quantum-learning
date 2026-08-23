@@ -1,0 +1,157 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/qaoa-and-combinatorial-optimization"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "QAOA and Combinatorial Optimization",
+  description:
+    "Max-Cut as a diagonal cost Hamiltonian, the alternating cost/mixer circuit, and why the resulting expectation value is exactly the expected number of cut edges, derived and checked exactly on the uniform superposition, where the answer is knowable in advance.",
+  course: "quantum-algorithms-ii",
+  module: "qaoa-and-combinatorial-optimization",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example"],
+  objectives: [
+    "Formulate Max-Cut as a cost Hamiltonian C=Σ(1-Z_iZ_j)/2 over graph edges",
+    "Derive the cost unitary's action as a pure phase e^{-iγ·(cut count)} on each basis state",
+    "Explain the mixer's role and verify the uniform superposition gives exactly half of every edge cut in expectation",
+  ],
+};
+
+## Motivation
+
+**QAOA (the quantum approximate optimization algorithm)** applies the same
+hybrid loop as VQE, a parameterized circuit and a classically-optimized
+cost, to combinatorial optimization instead of finding a ground energy.
+The first, standard example is **Max-Cut**: split a graph's vertices into
+two groups to maximize the number of edges crossing between them, an
+NP-hard problem in general.
+
+## Mathematical Development
+
+### Max-Cut as a Hamiltonian
+
+Represent a 2-coloring of $n$ vertices as a computational basis state
+$|z\rangle$, $z\in\{0,1\}^n$. For each edge $(i,j)$, define
+$Z_i,Z_j$'s eigenvalues as $+1$ (bit 0) or $-1$ (bit 1). Then
+$\frac{1-Z_iZ_j}{2}$ equals $1$ exactly when $i,j$ have *different* bits
+(the edge is cut) and $0$ when they match. Summing over every edge:
+
+$$
+C = \sum_{(i,j)\in E}\frac{1-Z_iZ_j}{2}
+$$
+
+is a Hamiltonian whose eigenvalue on $|z\rangle$ is exactly the number of
+edges cut by that particular 2-coloring. Maximizing $\langle C\rangle$ is
+literally Max-Cut.
+
+### The cost unitary is a pure phase
+
+$C$ is diagonal in the computational basis (built entirely from $Z$
+operators), so $U_C(\gamma)=e^{-i\gamma C}$ acts on each basis state by a
+phase equal to its own eigenvalue:
+
+$$
+U_C(\gamma)|z\rangle = e^{-i\gamma\cdot(\text{cut count of }z)}|z\rangle
+$$
+
+`applyCostUnitary` implements exactly this, computing each basis index's
+cut count directly (summing $1$ for every edge whose two endpoint bits
+differ) and multiplying by the corresponding phase, with **no change to
+any measurement probability** (a pure phase operator, checked directly:
+probabilities before and after `applyCostUnitary` match to $10^{-9}$).
+
+### The mixer
+
+$U_C$ alone can't change which outcomes are likely. It only adds phases.
+The **mixer** $U_B(\beta)=e^{-i\beta B}$, $B=\sum_iX_i$, is what actually
+moves amplitude between basis states, implemented as $R_x(2\beta)$ applied
+independently to every qubit (`applyMixerUnitary`), reusing the ordinary
+single-qubit rotation gate, not a new primitive. Alternating $U_C$ and
+$U_B$ for $p$ layers, starting from the uniform superposition
+(`qaoaCircuit`), is the full QAOA circuit; $p=1$ is the smallest
+nontrivial case this course's worked example uses.
+
+### A checkable baseline
+
+Before running any optimization, check the *starting point*: the uniform
+superposition itself, with no cost/mixer layers applied at all, gives
+every basis state equal probability $1/2^n$, so the expected cut size is
+just the average over *all* $2^n$ colorings. For any single edge, exactly
+half of all colorings cut it (matching the endpoints' bits differently)
+and half don't, so the expected cut count from the uniform superposition
+alone is exactly $|E|/2$, half the edge count, for *any* graph. For a
+3-edge triangle: `expectedCutSize` on the plain uniform superposition
+gives exactly $1.5$, confirmed directly, not just argued.
+
+## Physical Interpretation
+
+QAOA's cost unitary "tags" each candidate coloring with a phase
+proportional to its quality, and the mixer lets those phases interfere.
+This is structurally the same idea as Grover's oracle-then-diffusion
+pattern, now applied to a continuous-valued cost instead of a single
+marked item, and tuned by a classical optimizer choosing $\gamma,\beta$
+rather than a fixed formula.
+
+## Worked Example
+
+**Confirm the uniform-superposition baseline for a single edge (2 nodes,
+1 edge): expected cut size should be exactly $0.5$.**
+
+Two colorings cut the edge ($|01\rangle,|10\rangle$), two don't
+($|00\rangle,|11\rangle$), each with probability $0.25$ in the uniform
+superposition. Expected cut size
+$=0.25(0)+0.25(1)+0.25(1)+0.25(0)=0.5$, exactly half of the single edge,
+matching the general $|E|/2$ rule and the engine's direct output.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Expecting the cost unitary alone to improve the measured cut size.**
+It's a pure phase operator. Measurement probabilities (and hence the
+expected cut size) are completely unchanged by $U_C$ on its own.
+Improvement only happens once the mixer lets those phases turn into
+amplitude changes.
+</Callout>
+
+<Callout type="mistake">
+**Assuming QAOA always finds the exact maximum cut.** It's a heuristic,
+approximate algorithm. The next lesson's worked example shows $p=1$
+QAOA reaching *close to* but not exactly the true maximum, and more
+layers ($p>1$) generally improve, but don't guarantee, further
+convergence.
+</Callout>
+
+## Practice Questions
+
+1. Compute the expected cut size of the uniform superposition for a
+   4-edge graph, using the $|E|/2$ rule.
+2. Explain why $U_C(\gamma)$'s action can be computed directly from a
+   basis state's index alone (no matrix multiplication needed), using its
+   diagonal structure.
+3. For a single edge, write out $U_C(\gamma)$'s phase on each of the 4
+   basis states explicitly ($|00\rangle,|01\rangle,|10\rangle,|11\rangle$).
+4. Why is $B=\sum_iX_i$ (independent single-qubit rotations) a reasonable
+   choice of mixer, given that the goal is to explore *different*
+   colorings rather than stay fixed at one?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Max-Cut's cost Hamiltonian $C=\sum(1-Z_iZ_j)/2$ has eigenvalue equal to
+  the cut count, for any coloring.
+- The cost unitary is a pure phase operator (verified: leaves every
+  probability unchanged); the mixer is what actually moves amplitude.
+- The uniform superposition's expected cut size is exactly $|E|/2$ for
+  any graph, a checkable baseline before any optimization runs.
+
+## Further Exploration
+
+Next: **QAOA: A Worked Max-Cut Example**, running $p=1$ QAOA on a
+triangle graph and a single edge, both reaching within a few percent of
+the true optimum.

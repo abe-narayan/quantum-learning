@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Entanglement Entropy for Pure Bipartite States",
   description:
-    "Combining the last two lessons into the standard entanglement measure — and a rigorous counterexample proving exactly why it stops being valid the moment the global state is mixed.",
+    "Combining the last two lessons into the standard entanglement measure, with a rigorous counterexample proving exactly why it stops being valid the moment the global state is mixed.",
   course: "entanglement-and-measurement",
   module: "entanglement-entropy-for-pure-states",
   order: 1,
@@ -30,7 +30,7 @@ export const lessonMeta = {
 Two pieces are now on the table: Lesson 5 proved that, for a 2-qubit
 *pure* state, the reduced state's mixedness is exactly equivalent to
 entanglement. Lesson 6 built the standard way to quantify mixedness, von
-Neumann entropy. Combining them gives **entanglement entropy** — but the
+Neumann entropy. Combining them gives **entanglement entropy**, but the
 word "pure" in the first sentence is not decoration, and this lesson
 proves exactly why it can't be dropped.
 
@@ -45,12 +45,12 @@ $$
 E(|\psi\rangle) = S(\rho_A) = S(\rho_B)
 $$
 
-The two are always equal for a pure bipartite state (not asserted —
+The two are always equal for a pure bipartite state (not asserted:
 `entanglementEntropy`'s tests check it directly for several states, and
 it follows from the fact that $\rho_A$ and $\rho_B$ share the same
 nonzero eigenvalues for any pure bipartite state, a standard consequence
 of the Schmidt decomposition). `entanglementEntropy` in `entanglement.ts`
-computes $S(\rho_A)$ specifically — `pureStateDensityMatrix`, then
+computes $S(\rho_A)$ specifically: `pureStateDensityMatrix`, then
 `reducedDensityMatrixQubit0`, then `vonNeumannEntropy`, composing three
 pieces this course has already built and tested individually.
 
@@ -65,7 +65,7 @@ $\Rightarrow$ zero entropy). Bell states give exactly 1 bit (maximally
 mixed reduced state). The partially entangled family
 $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$
 interpolates continuously between the two, since Lesson 4 already found
-$\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$ directly — this
+$\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$ directly. This
 is a genuine graded measure, not a binary "entangled or not" flag, and
 it increases monotonically as $\theta$ moves from $0$ toward $\pi/4$
 (verified directly in `entanglement.test.ts`).
@@ -74,15 +74,15 @@ it increases monotonically as $\theta$ moves from $0$ toward $\pi/4$
 
 Try applying the same formula, $S(\rho_A)$, to a *mixed* 2-qubit global
 state and see what goes wrong. Take
-$\rho_{AB}=I/4$ — the maximally mixed state on two qubits. This is
+$\rho_{AB}=I/4$, the maximally mixed state on two qubits. This is
 manifestly a **product state with zero entanglement**: $I/4=(I/2)\otimes(I/2)$
 exactly, the tensor product of two independent, unentangled, maximally
-mixed qubits — there is no correlation between them whatsoever, let
+mixed qubits. There is no correlation between them whatsoever, let
 alone entanglement.
 
 Its reduced state, computed by the same partial trace as always, is
 $\rho_A=\text{Tr}_B(I/4)=I/2$ (verified directly against the engine),
-giving $S(\rho_A)=1$ bit — the *same* value as a maximally entangled
+giving $S(\rho_A)=1$ bit, the *same* value as a maximally entangled
 Bell state. Reduced entropy just reported "maximal entanglement" for a
 state that has provably none at all.
 
@@ -95,16 +95,16 @@ global state doesn't have to distinguish between:
 1. Uncertainty about qubit A *because it's entangled with qubit B*
    (genuine entanglement).
 2. Uncertainty about qubit A *because the whole preparation was already
-   a classical mixture, with no entanglement involved at all* — exactly
+   a classical mixture, with no entanglement involved at all*, exactly
    what happened with $I/4$, where the mixedness came entirely from
    preparing each qubit independently as a mixed state.
 
-For a pure global state, source 2 is impossible by definition — there's
+For a pure global state, source 2 is impossible by definition: there's
 no leftover global uncertainty to confuse with entanglement, which is
 exactly what made Lesson 5's proof work. For a mixed global state, the
 two sources add together in $S(\rho_A)$ with no way to separate them
 back out from $\rho_A$ alone. This is a real, structural limitation, not
-a minor technicality — it's the reason a genuine measure of mixed-state
+a minor technicality: it's the reason a genuine measure of mixed-state
 entanglement (like the mixed-state Wootters concurrence, mentioned but
 not implemented in the next lesson) needs fundamentally more machinery
 than "just take the reduced entropy."
@@ -112,7 +112,7 @@ than "just take the reduced entropy."
 ## Physical Interpretation
 
 Entanglement entropy is the right tool exactly when there is no
-independent, non-entanglement source of mixedness to confuse it with —
+independent, non-entanglement source of mixedness to confuse it with,
 guaranteed only when the full system starts in a definite, known pure
 state. The moment the global state itself carries classical uncertainty,
 reduced entropy stops being a reliable signal of entanglement
@@ -126,7 +126,7 @@ using Lesson 5's identity as a shortcut.**
 Lesson 5 gives $\rho_A=\text{diag}(0.9,0.1)$ directly from
 $|a|^2=0.9,|d|^2=0.1$ (no off-diagonal terms here since $b=c=0$). This is
 already diagonal, so (Lesson 6) its entropy is just the Shannon entropy
-of $(0.9,0.1)$: $E=-0.9\log_2(0.9)-0.1\log_2(0.1)\approx0.469$ bits —
+of $(0.9,0.1)$: $E=-0.9\log_2(0.9)-0.1\log_2(0.1)\approx0.469$ bits,
 well above 0 (it's entangled) but well below 1 bit (less than maximally
 entangled), consistent with its lopsided $90\%/10\%$ amplitude split.
 
@@ -136,7 +136,7 @@ entangled), consistent with its lopsided $90\%/10\%$ amplitude split.
 **Computing $S(\rho_A)$ for a mixed global state and calling it
 "entanglement entropy."** As the $I/4$ counterexample shows, this can
 report large values for states with zero entanglement. Entanglement
-entropy, as defined here, requires the global state to be pure —
+entropy, as defined here, requires the global state to be pure:
 `entanglementEntropy`'s implementation works only with a `StateVector`
 for exactly this reason, not a general density matrix.
 </Callout>
@@ -159,7 +159,7 @@ not simply "entangled, like any other entangled state."
    that is manifestly a product state (i.e., $\rho_{AB}=\rho_A\otimes\rho_B$
    for some pair of single-qubit density matrices), and show its reduced
    entropy $S(\rho_A)$ is nonetheless nonzero whenever $\rho_A$ itself is
-   mixed — reinforcing why this construction can't be trusted as an
+   mixed, reinforcing why this construction can't be trusted as an
    entanglement measure once $\rho_{AB}$ is mixed.
 4. Why does the diagnosis in "Diagnosing the failure" specifically fail
    to apply when $\rho_{AB}$ is pure? Point to the exact step in Lesson
@@ -172,10 +172,10 @@ not simply "entangled, like any other entangled state."
 - Entanglement entropy $E(|\psi\rangle)=S(\rho_A)$ is well-defined and
   meaningful only for a globally *pure* bipartite state.
 - It equals 0 for product states, 1 bit for Bell states, and varies
-  continuously in between — a genuine graded measure, not a flag.
+  continuously in between: a genuine graded measure, not a flag.
 - $\rho_{AB}=I/4$ is a concrete, verified counterexample: a product
   (zero-entanglement) mixed global state whose reduced entropy is a
-  full 1 bit — proving reduced entropy is not a valid entanglement
+  full 1 bit, proving reduced entropy is not a valid entanglement
   measure once the global state is mixed.
 - The failure has a precise cause: a mixed global state lets reduced
   entropy conflate real entanglement with ordinary classical mixedness,
@@ -184,5 +184,5 @@ not simply "entangled, like any other entangled state."
 ## Further Exploration
 
 Next: **Concurrence: A Two-Qubit Entanglement Measure**, a second,
-independently-derived measure for pure 2-qubit states — reusing machinery
+independently-derived measure for pure 2-qubit states, reusing machinery
 this platform already built for testing separability.

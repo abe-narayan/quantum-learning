@@ -1,0 +1,161 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Deutsch-Jozsa Algorithm",
+  description:
+    "One oracle query settles constant-vs-balanced with certainty, derived by tracking the amplitude on |0...0⟩ through two Hadamard layers and a phase-kickback oracle, then checked against the actual engine for a balanced and a constant function.",
+  course: "quantum-algorithms-i",
+  module: "the-deutsch-jozsa-algorithm",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/phase-kickback"],
+  objectives: [
+    "State the Deutsch-Jozsa promise problem and the classical query lower bound it beats",
+    "Derive the |0...0⟩-amplitude formula (1/N)Σₓ(−1)^f(x) after the full circuit",
+    "Prove this amplitude is exactly ±1 for constant f and exactly 0 for balanced f",
+  ],
+};
+
+## Motivation
+
+$f:\{0,1\}^n\to\{0,1\}$ is *promised* to be either constant (same output on
+every input) or balanced (exactly half 0, half 1), never anything in
+between. Classically, distinguishing these with certainty needs
+$2^{n-1}+1$ queries in the worst case: check that many inputs, and if
+they're all equal, it could still be balanced with the very next query
+breaking the pattern. Deutsch-Jozsa solves this with exactly **one** query
+to $U_f$, using the phase-kickback trick from last lesson plus a second
+layer of Hadamards to turn phases back into a directly measurable answer.
+
+## Mathematical Development
+
+### The circuit
+
+Prepare $n$ input qubits at $|0\rangle^{\otimes n}$ and one ancilla at
+$|1\rangle$. Apply $H$ to every qubit (input becomes the uniform
+superposition; ancilla $|1\rangle\to|-\rangle$). Apply $U_f$: by last
+lesson's identity, this multiplies each $|x\rangle$ by $(-1)^{f(x)}$ and
+leaves the ancilla at $|-\rangle$, decoupled. Apply $H^{\otimes n}$ to the
+input register again. Measure the input register.
+
+### Tracking the amplitude on |0...0⟩
+
+After phase kickback, the input register is
+$\frac{1}{\sqrt{2^n}}\sum_x(-1)^{f(x)}|x\rangle$. The key fact about
+$H^{\otimes n}$ needed next: $H^{\otimes n}|x\rangle =
+\frac{1}{\sqrt{2^n}}\sum_z(-1)^{x\cdot z}|z\rangle$, where $x\cdot z$ is the
+bitwise dot product mod 2 (this is $H^{\otimes n}$'s general action on any
+basis state, a direct generalization of $H|0\rangle=|+\rangle$,
+$H|1\rangle=|-\rangle$ combined bit by bit). Applying this to every term:
+
+$$
+H^{\otimes n}\left(\frac{1}{\sqrt{2^n}}\sum_x(-1)^{f(x)}|x\rangle\right) = \frac{1}{2^n}\sum_x\sum_z(-1)^{f(x)}(-1)^{x\cdot z}|z\rangle
+$$
+
+The amplitude on $|z=0\rangle$ specifically: since $x\cdot0=0$ for every
+$x$, that factor is always $1$, leaving
+
+$$
+\boxed{\text{amplitude on }|0\rangle^{\otimes n} = \frac{1}{2^n}\sum_x(-1)^{f(x)}}
+$$
+
+### Constant vs. balanced, resolved exactly
+
+If $f$ is constant, every term $(-1)^{f(x)}$ is the same sign, so the sum
+is $\pm2^n$, giving amplitude $\pm1$, probability $|{\pm1}|^2=1$ of
+measuring $|0\rangle^{\otimes n}$, **with certainty**. If $f$ is balanced,
+exactly half the terms are $+1$ and half are $-1$ by the promise itself, so
+the sum is exactly $0$: probability $0$ of measuring
+$|0\rangle^{\otimes n}$, **also with certainty**. There is no ambiguous
+middle case, because the promise ruled it out from the start. One
+measurement, one query, a definite answer either way:
+
+$$
+\text{measure } |0\rangle^{\otimes n} \iff f \text{ is constant}
+$$
+
+Both cases are verified directly against the engine (`applyBitOracle` +
+`HADAMARD` composed exactly as derived above): a balanced function built
+from `balancedFunction` gives $P(0^n)=0$ exactly; either constant function
+gives $P(0^n)=1$ exactly, not approximately, to floating-point precision.
+
+## Physical Interpretation
+
+The classical lower bound is about *worst-case adversarial inputs*; the
+quantum algorithm sidesteps it entirely by never querying individual
+inputs at all. It queries the oracle exactly once, in superposition, and
+lets interference between all $2^n$ branches (constructive for constant
+$f$, perfectly destructive for balanced $f$) decide the global answer.
+Nothing about any *individual* $f(x)$ is ever learned; only the global
+constant-or-balanced fact is, which is exactly what the promise problem
+asked for.
+
+## Worked Example
+
+**Run Deutsch-Jozsa on the balanced function $f(x)=x_1\oplus x_2$ (parity
+of the two input bits) for $n=2$. Confirm $P(00)=0$.**
+
+$f(00)=0,\,f(01)=1,\,f(10)=1,\,f(11)=0$, two 0s, two 1s: genuinely
+balanced. Sum: $(-1)^0+(-1)^1+(-1)^1+(-1)^0 = 1-1-1+1=0$. Amplitude on
+$|00\rangle$ is $0/4=0$, so $P(00)=0$ exactly: measuring anything *but*
+$|00\rangle$ correctly reports "balanced." This is exactly the
+`balancedFunction(0b10)`-style construction (parity against a fixed
+bitmask) this course's engine uses, and the $0$ result matches the
+engine's output exactly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking Deutsch-Jozsa works for an arbitrary (non-promised) function.**
+It doesn't: a function that's neither constant nor balanced can land
+anywhere between amplitude $-1$ and $1$ on $|0\rangle^{\otimes n}$, giving
+no reliable answer at all. The promise is what makes the two cases exactly
+$0$ and exactly $\pm1$, with nothing in between.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the second layer of Hadamards.** Phase kickback alone leaves
+the answer sitting as a *phase*, which no measurement can read directly;
+the second $H^{\otimes n}$ is what converts that phase pattern back into a
+measurable probability difference.
+</Callout>
+
+## Practice Questions
+
+1. Compute the constant-vs-balanced amplitude sum for the constant-1
+   function on $n=1$, and confirm $P(0)=1$.
+2. For $n=1$, is $f(0)=0,f(1)=1$ (the identity function) constant or
+   balanced? Compute the resulting amplitude on $|0\rangle$.
+3. Explain why $2^{n-1}+1$ classical queries are needed in the worst case
+   to be *certain* of constant-vs-balanced, using a specific adversarial
+   sequence of "all queries so far returned 0."
+4. Deutsch-Jozsa's promise is somewhat artificial: real-world problems
+   rarely come pre-labeled "constant or balanced." What does this suggest
+   about its value as a *demonstration* of quantum advantage versus a
+   *practically useful* algorithm?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Deutsch-Jozsa distinguishes constant from balanced $f$ with exactly one
+  oracle query, versus up to $2^{n-1}+1$ classically.
+- The amplitude on $|0\rangle^{\otimes n}$ after the full circuit is
+  exactly $\frac{1}{2^n}\sum_x(-1)^{f(x)}$, derived from $H^{\otimes n}$'s
+  general action, not asserted.
+- This amplitude is exactly $\pm1$ (constant) or exactly $0$ (balanced),
+  no ambiguous middle case, because the promise rules it out.
+- Both cases are checked directly against the engine, not just derived on
+  paper.
+
+## Further Exploration
+
+Next: **The Quantum Fourier Transform**, the generalization of the
+$H^{\otimes n}$-based interference trick used here to a much richer family
+of algorithms: phase estimation, and eventually Shor's algorithm.

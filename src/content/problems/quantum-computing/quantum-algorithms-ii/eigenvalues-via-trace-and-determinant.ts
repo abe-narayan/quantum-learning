@@ -1,0 +1,46 @@
+import type { ConceptualProblem } from "@/lib/problems/types";
+
+export const eigenvaluesViaTraceAndDeterminant: ConceptualProblem = {
+  meta: {
+    slug: "eigenvalues-via-trace-and-determinant",
+    title: "Finding H's Eigenvalues from Trace and Determinant",
+    course: "quantum-algorithms-ii",
+    lesson: "quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example",
+    difficulty: "intermediate",
+    estimatedMinutes: 6,
+    problemType: "conceptual",
+    tags: ["vqe", "eigenvalues"],
+    prerequisites: ["quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example"],
+  },
+  question: {
+    type: "conceptual",
+    prompt: "For H=0.6Z+0.8X, use its trace (0) and determinant (−1) to find its eigenvalues via the characteristic equation λ²−(trace)λ+(det)=0, without using the general √(a²+b²+c²) shortcut.",
+    placeholder: "Substitute trace=0, det=-1 into the characteristic equation...",
+  },
+  answer: {
+    type: "conceptual",
+    requiredConceptGroups: [
+      ["lambda\\^2", "λ²", "characteristic equation", "quadratic"],
+      ["\\+1", "-1", "plus or minus 1", "±1"],
+    ],
+    incorrectFeedback: "Substitute trace=0 and det=−1 into λ²−(trace)λ+(det)=0 and solve the resulting quadratic.",
+    partialFeedback: "Good — now state the two resulting eigenvalues explicitly.",
+  },
+  hints: [
+    { text: "The characteristic equation is λ² − (trace)λ + det = 0." },
+    { text: "With trace=0, det=−1: λ² − 1 = 0." },
+    { text: "λ² = 1 gives λ = ±1." },
+  ],
+  solution: {
+    steps: [
+      { description: "λ² − (0)λ + (−1) = 0, i.e. λ² = 1." },
+      { description: "λ = +1 or λ = −1." },
+    ],
+    finalAnswer: "Eigenvalues are +1 and −1, so E₀=−1 — matching both the shortcut formula and the engine's direct output.",
+  },
+  explanation: {
+    correctIdea: "The trace-and-determinant method is a completely general way to find 2×2 eigenvalues, independent of any Pauli-specific shortcut.",
+    whyCorrect: "This is exactly the general method eigenvaluesHermitian2x2 implements internally, applied here by hand.",
+    whyWrong: ["Using the √(a²+b²+c²) shortcut without deriving it from the characteristic equation skips exactly what this question asks for."],
+  },
+};

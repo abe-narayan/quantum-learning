@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Complex Numbers for Physics",
   description:
-    "Why physics needs numbers beyond the real line, and the full toolkit — conjugation, modulus, polar form, Euler's formula derived from first principles — that everything else in this course builds on.",
+    "Why physics needs numbers beyond the real line, and the full toolkit (conjugation, modulus, polar form, Euler's formula derived from first principles) that everything else in this course builds on.",
   course: "mathematical-foundations",
   module: "complex-numbers-for-physics",
   order: 1,
@@ -25,17 +25,17 @@ export const lessonMeta = {
 ## Motivation
 
 Real numbers can't solve $x^2 = -1$. For most of the history of mathematics
-that was fine — nothing in ordinary experience needed such a solution. Then
+that was fine: nothing in ordinary experience needed such a solution. Then
 physics ran into equations whose *real* solutions didn't tell the whole
-story: a damped oscillator's equation of motion, an AC circuit's voltage,
+story. A damped oscillator's equation of motion, an AC circuit's voltage,
 a wave's oscillation, all have natural descriptions in terms of a number
 system where $\sqrt{-1}$ exists. In classical physics, complex numbers are
-almost always a convenience — you do the calculation with them and take
+almost always a convenience: you do the calculation with them and take
 the real part at the end, and you could have done the whole thing with
 sines and cosines instead, just more painfully.
 
 Quantum mechanics is different. The complex numbers aren't a shortcut you
-could avoid with more work — the theory's central objects (amplitudes) are
+could avoid with more work. The theory's central objects (amplitudes) are
 inherently complex, and a version of quantum mechanics built only from real
 numbers genuinely predicts different, wrong physics. We won't prove that
 claim in this lesson (it takes the whole framework this course builds to
@@ -44,15 +44,15 @@ with vectors or physics.
 
 ## Intuition
 
-A complex number $z = a + bi$ can be pictured as a point $(a, b)$ in a
-plane — the **complex plane** — rather than a point on a line. Addition
+A complex number $z = a + bi$ can be pictured as a point $(a, b)$ in the
+**complex plane**, rather than a point on a line. Addition
 works exactly like vector addition. Multiplication is the interesting
 part: multiplying by $i$ doesn't move you along either axis, it **rotates**
 you $90°$ counterclockwise. Check it directly: $i \cdot (a + bi) = ai +
 bi^2 = -b + ai$, which is the point $(a,b)$ rotated a quarter turn. Once
 you see multiplication as a geometric operation (rotate and rescale) rather
 than just an algebra rule, polar form and Euler's formula stop looking
-mysterious — they're just the natural language for describing rotation and
+mysterious. They're just the natural language for describing rotation and
 scaling.
 
 ## Mathematical Development
@@ -89,7 +89,7 @@ $$
 |z| = \sqrt{zz^*} = \sqrt{a^2+b^2}
 $$
 
-This single fact — $zz^*$ is always real and non-negative — is the reason
+This single fact, that $zz^*$ is always real and non-negative, is the reason
 complex numbers can be turned into probabilities at all: whatever a
 "probability amplitude" turns out to be, multiplying it by its own
 conjugate always produces something you can legally call a probability.
@@ -107,7 +107,7 @@ $$
 ### Deriving Euler's formula
 
 The expression $\cos\theta + i\sin\theta$ turns out to equal a single
-exponential, $e^{i\theta}$ — **Euler's formula**. This is worth deriving,
+exponential, $e^{i\theta}$: this is **Euler's formula**. It's worth deriving,
 not just accepting. The Taylor series for $e^x$ converges for complex
 inputs too, so substitute $x = i\theta$:
 
@@ -124,7 +124,7 @@ e^{i\theta} = \underbrace{\left(1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - 
 $$
 
 The two bracketed series are exactly the Maclaurin series for $\cos\theta$
-and $\sin\theta$ — a fact you can look up independently and confirm
+and $\sin\theta$, a fact you can look up independently and confirm
 matches term by term. So:
 
 $$
@@ -133,7 +133,7 @@ $$
 
 A useful immediate consequence: $|e^{i\theta}| = \sqrt{\cos^2\theta+\sin^2\theta} = 1$
 for every real $\theta$. Multiplying by $e^{i\theta}$ never changes a
-number's modulus — it only rotates it. Keep this fact; it resurfaces
+number's modulus. It only rotates it. Keep this fact; it resurfaces
 directly in the Unitary Operators lesson.
 
 ### Multiplication in polar form: phases add
@@ -146,7 +146,7 @@ z_1 z_2 = r_1r_2\, e^{i(\theta_1+\theta_2)}
 $$
 
 **Magnitudes multiply; phases add.** Conjugation in polar form is simple
-too: $z^* = re^{-i\theta}$ — same modulus, negated phase (check:
+too: $z^* = re^{-i\theta}$, same modulus, negated phase (check:
 $\cos(-\theta)+i\sin(-\theta) = \cos\theta - i\sin\theta$, matching
 $a - bi$ directly).
 
@@ -159,7 +159,7 @@ $$
 (\cos\theta+i\sin\theta)^n = \cos(n\theta) + i\sin(n\theta)
 $$
 
-— **De Moivre's theorem**, a one-line consequence of Euler's formula
+This is **De Moivre's theorem**, a one-line consequence of Euler's formula
 rather than a separate fact to memorize. It answers a question that looks
 hard in rectangular form: solve $z^n = 1$. Writing $z = e^{i\theta}$,
 the equation becomes $e^{in\theta}=1=e^{i\cdot 0}$, so $n\theta$ must be an
@@ -176,9 +176,9 @@ where this exact spacing is the whole mechanism.
 ### A forward look: complex numbers as $2\times2$ real matrices
 
 Here is a fact that previews the rest of this course: the number $i$ can be
-represented by the real matrix $\begin{pmatrix}0&-1\\1&0\end{pmatrix}$ — a
-$90°$ rotation, matching the geometric picture from the Intuition section
-exactly — and a general complex number $a+bi$ by
+represented by the real matrix $\begin{pmatrix}0&-1\\1&0\end{pmatrix}$, a
+$90°$ rotation matching the geometric picture from the Intuition section
+exactly, and a general complex number $a+bi$ by
 $\begin{pmatrix}a&-b\\b&a\end{pmatrix}$. Multiply two such matrices and
 check that the result matches complex multiplication:
 
@@ -186,9 +186,9 @@ $$
 \begin{pmatrix}a&-b\\b&a\end{pmatrix}\begin{pmatrix}c&-d\\d&c\end{pmatrix} = \begin{pmatrix}ac-bd & -(ad+bc)\\ad+bc & ac-bd\end{pmatrix}
 $$
 
-which is exactly the matrix for $(ac-bd)+(ad+bc)i$ — the rectangular-form
+which is exactly the matrix for $(ac-bd)+(ad+bc)i$, the rectangular-form
 product derived above. Complex numbers aren't *needed* in some absolute
-sense — they can be simulated by real $2\times2$ matrices — but they're
+sense (they can be simulated by real $2\times2$ matrices), but they're
 dramatically more convenient. Once this course reaches Linear Operators,
 you'll have the language to see this as: complex numbers are one
 particular, especially simple, family of linear operators.
@@ -198,11 +198,11 @@ particular, especially simple, family of linear operators.
 In quantum mechanics, a state is described by complex numbers called
 **probability amplitudes**. An amplitude's modulus-squared will turn out to
 be a probability (the Probability and Quantum States lesson makes this
-precise); its **phase** carries information a plain probability can't —
+precise); its **phase** carries information a plain probability can't:
 two amplitudes with the same modulus but different phases behave
 differently when added together, which is the origin of quantum
 interference. None of that can be built from real numbers alone in a way
-that reproduces the actual experimental results — real amplitudes can
+that reproduces the actual experimental results. Real amplitudes can
 still cancel (interfere) when they have opposite sign, but real numbers
 give you only two "directions" (positive and negative) to interfere with,
 while a complex phase gives you a full continuous circle of them. That
@@ -215,7 +215,7 @@ richer structure is what the rest of quantum mechanics needs.
 Euler's formula with $\theta=\pi$: $e^{i\pi} = \cos\pi + i\sin\pi = -1 + 0
 = -1$. This is **Euler's identity**, $e^{i\pi}+1=0$, often called the most
 beautiful equation in mathematics for tying together five fundamental
-constants — but it's nothing more than Euler's formula evaluated at one
+constants, but it's nothing more than Euler's formula evaluated at one
 particular angle.
 
 For the cube roots of unity ($n=3$ in the roots-of-unity formula above):
@@ -231,13 +231,13 @@ You can verify $z_1^3=1$ directly: $z_1^3 = e^{2\pi i} = \cos(2\pi)+i\sin(2\pi)=
 <Callout type="mistake">
 **Treating $i$ as an unknown to "solve for" instead of a fixed object with
 $i^2=-1$.** Once you accept the definition, every subsequent step is
-ordinary algebra — the only special rule you ever need is $i^2=-1$.
+ordinary algebra: the only special rule you ever need is $i^2=-1$.
 </Callout>
 
 <Callout type="mistake">
 **Confusing a complex number with its modulus.** $z$ carries both magnitude
 *and* phase; $|z|$ throws the phase away entirely. A quantum amplitude and
-its modulus are not interchangeable — the modulus alone can't reproduce
+its modulus are not interchangeable: the modulus alone can't reproduce
 interference.
 </Callout>
 
@@ -255,7 +255,7 @@ phase can sum to a modulus of zero.
 3. Use De Moivre's theorem to compute $(1+i)^4$. (Hint: convert to polar
    form first.)
 4. Find all four fourth roots of unity, and plot them mentally on the unit
-   circle — what shape do they form?
+   circle. What shape do they form?
 5. If $z=re^{i\theta}$, explain in one sentence why $zz^*=r^2$ regardless of
    $\theta$.
 
@@ -265,7 +265,7 @@ phase can sum to a modulus of zero.
 
 - A complex number $z=a+bi$ lives in the complex plane; $i$ acts as a
   $90°$ rotation.
-- Conjugation and modulus: $z^*=a-bi$, $|z|=\sqrt{zz^*}=\sqrt{a^2+b^2}$ —
+- Conjugation and modulus: $z^*=a-bi$, $|z|=\sqrt{zz^*}=\sqrt{a^2+b^2}$,
   always real and non-negative.
 - Euler's formula, derived from the Taylor series:
   $e^{i\theta}=\cos\theta+i\sin\theta$; consequently $|e^{i\theta}|=1$.
@@ -273,13 +273,13 @@ phase can sum to a modulus of zero.
   $z_1z_2=r_1r_2e^{i(\theta_1+\theta_2)}$.
 - De Moivre's theorem and the $n$th roots of unity follow directly from
   Euler's formula.
-- A complex number can be represented as a real $2\times2$ matrix — a
+- A complex number can be represented as a real $2\times2$ matrix, a
   preview of Linear Operators.
 
 ## Further Exploration
 
 Next: **Vector Spaces**, where the complex numbers you just built become
-the *scalars* a vector space is allowed to use — the first step toward
+the *scalars* a vector space is allowed to use, the first step toward
 describing a quantum state as a vector rather than a single number. If
 you've studied the Quantum Computing track already, its **Complex Numbers
 for Quantum Mechanics** lesson covers the same arithmetic specialized to

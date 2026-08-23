@@ -1,0 +1,155 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-hardware/noise-decoherence-and-scaling/sources-of-noise"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Sources of Noise",
+  description:
+    "Every hardware course so far treated noise as a single abstract 'decoherence.' This lesson catalogs its actual physical sources, and classifies each as a coherent (gate) error or an incoherent (environment) error using the Kraus-channel language already built in Advanced Topics in Quantum Mechanics.",
+  course: "noise-decoherence-and-scaling",
+  module: "sources-of-noise",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-hardware/control-and-readout/calibration"],
+  objectives: [
+    "Distinguish coherent errors (miscalibration, systematic) from incoherent errors (genuine environmental decoherence)",
+    "Name at least four concrete physical noise sources across this platform's covered hardware types",
+    "Explain why classifying a noise source correctly (coherent vs. incoherent) determines how it can be mitigated",
+  ],
+};
+
+## Motivation
+
+Advanced Topics in Quantum Mechanics built the mathematics of open-system
+decoherence in the abstract; Control & Readout hinted at specific error
+sources (readout error, miscalibration) without organizing them. This
+lesson catalogs real noise sources and sorts them into two fundamentally
+different categories, a classification that determines which mitigation
+strategy actually applies.
+
+## Engineering Development
+
+### Coherent vs. incoherent errors
+
+A **coherent error** is a systematic, deterministic deviation: the
+device does something slightly wrong, consistently, the same way every
+time (Control & Readout's Calibration lesson: a stale $\Omega$ value
+implements a systematically wrong rotation angle). This is, in
+principle, fully correctable once diagnosed; recalibration fixes it
+exactly.
+
+An **incoherent error** is a genuine, irreversible loss of information
+to an uncontrolled environment, exactly what Advanced Topics in Quantum
+Mechanics' Kraus channels model. This can be *mitigated* (better
+isolation, error correction) but not simply "fixed" by recalibrating a
+number, since the lost information isn't recoverable from the device
+alone.
+
+### A catalog of physical sources
+
+- **Miscalibration drift** (coherent): Control & Readout's Calibration
+  lesson; slow parameter drift between calibration runs.
+- **Amplitude damping / energy relaxation** (incoherent): the qubit
+  spontaneously decays to its ground state, releasing energy to the
+  environment; modeled by `amplitudeDampingChannel`.
+- **Dephasing** (incoherent): random phase kicks from fluctuating
+  fields (e.g., flux noise in superconducting qubits, electric field
+  noise for trapped ions); modeled by `dephasingChannel`.
+- **Thermal photon population** (incoherent): Cryogenic Systems'
+  $\bar n$; residual thermal photons directly perturb the qubit.
+- **Control line noise**: imperfections in the classical electronics
+  generating drive pulses (Control Electronics), which can be either
+  coherent (a systematic pulse-shape distortion) or incoherent (random
+  electronic noise on the line), depending on its specific origin.
+- **Crosstalk**: unwanted coupling between supposedly-independent
+  qubits (next lesson's dedicated topic).
+
+### Why the classification matters for mitigation
+
+A coherent miscalibration error is fixed by better/more frequent
+calibration (Control & Readout), with no new hardware needed. An
+incoherent decoherence error fundamentally cannot be fixed this way; it
+requires either better physical isolation (reducing the coupling to the
+environment in the first place) or active error correction (Quantum
+Computing's Error Correction & Fault Tolerance course, redundantly
+encoding information so it survives some amount of unavoidable loss).
+Misidentifying which category a given error falls into leads to
+wasted engineering effort: recalibrating against a source that's
+actually environmental accomplishes nothing.
+
+## Physical Interpretation
+
+This distinction is the practical, hardware-facing version of a theme
+this platform's Advanced Topics in Quantum Mechanics course already
+established: decoherence (this lesson's incoherent errors) is
+irreducibly different from a deterministic, correctable mistake. Every
+real device's overall error budget is a mix of both categories, and
+serious engineering effort goes into correctly attributing observed
+errors to the right bucket.
+
+## Worked Example
+
+**A device's gate fidelity drops over the course of a day, but is
+restored to its original value immediately after recalibration. Is this
+most likely a coherent or incoherent error source?**
+
+Coherent: the fact that recalibration alone restores full fidelity
+(with no hardware change) is exactly the signature of a systematic,
+deterministic parameter drift (Control & Readout's Calibration lesson).
+An incoherent, genuinely environmental error would not be fixable by
+simply re-measuring and re-setting a classical control parameter.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming all noise is "decoherence."** Miscalibration and other
+coherent errors are a genuinely different (and often more easily fixed)
+category. Lumping everything together as "decoherence" obscures which
+mitigation strategy actually applies.
+</Callout>
+
+<Callout type="mistake">
+**Assuming incoherent errors can be "calibrated away."** Recalibration
+fixes systematic, deterministic errors; it cannot recover information
+genuinely lost to an uncontrolled environment. That requires isolation
+improvements or active error correction instead.
+</Callout>
+
+## Practice Questions
+
+1. Classify each as coherent or incoherent: (a) a stale Rabi frequency
+   value from Control & Readout, (b) amplitude damping from spontaneous
+   emission, (c) dephasing from fluctuating magnetic flux.
+2. Why does recalibration fully fix a coherent error but not an
+   incoherent one?
+3. Name two engineering mitigation strategies for incoherent errors,
+   and explain why neither is "recalibration."
+4. If crosstalk between two qubits were purely systematic (the same
+   deterministic shift every time), would it belong in the coherent or
+   incoherent category? Explain your reasoning.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Coherent errors are systematic and deterministic (fixable by better
+  calibration); incoherent errors are genuine information loss to an
+  environment (mitigated by isolation or error correction, not
+  recalibration).
+- Real noise sources include miscalibration drift, amplitude damping,
+  dephasing, thermal photon population, control line noise, and
+  crosstalk, spanning both categories.
+- Correctly classifying an observed error is a prerequisite for choosing
+  an effective mitigation strategy.
+
+## Further Exploration
+
+Next: **T1 & T2 Decoherence**, which quantifies the two specific
+incoherent error channels (amplitude damping, dephasing) this lesson
+named, connecting Advanced Topics in Quantum Mechanics' discrete Kraus
+channels directly to the continuous decay times real hardware datasheets
+report.

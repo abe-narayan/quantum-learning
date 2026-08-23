@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "The Bra-Ket Formalism",
   description:
-    "Dirac's notation for general vector spaces — kets, bras, outer products as operators, the completeness relation, and operator matrix elements — the notation every remaining lesson in this course is written in.",
+    "Dirac's notation for general vector spaces: kets, bras, outer products as operators, the completeness relation, and operator matrix elements, the notation every remaining lesson in this course is written in.",
   course: "mathematical-foundations",
   module: "bra-ket-formalism",
   order: 1,
@@ -26,14 +26,14 @@ export const lessonMeta = {
 If you've completed the Quantum Computing track, you've already met kets,
 bras, and the inner product applied specifically to qubits, in that
 track's Dirac Notation lesson. This lesson develops the same notation for
-a general vector space, and goes further — into outer products and the
-completeness relation — which the rest of this course needs.
+a general vector space, and goes further, into outer products and the
+completeness relation, which the rest of this course needs.
 </Callout>
 
 ## Motivation
 
-Every result from the last two lessons — inner products, norms,
-orthogonality — can be written in ordinary vector and matrix notation. But
+Every result from the last two lessons, inner products, norms,
+orthogonality, can be written in ordinary vector and matrix notation. But
 quantum mechanics almost never is written that way, because Paul Dirac
 invented a notation compact enough to make the extra structure (operators,
 in particular) far easier to write and reason about. It's worth learning
@@ -42,18 +42,18 @@ new lesson introduces another piece of it.
 
 ## Intuition
 
-A **ket** $|v\rangle$ is just a name for a vector — nothing new yet, only
+A **ket** $|v\rangle$ is just a name for a vector, nothing new yet, only
 notation. The payoff comes from its partner, the **bra** $\langle v|$,
-because a bra and a ket combine into $\langle u|v\rangle$ — read
+because a bra and a ket combine into $\langle u|v\rangle$. Read
 left-to-right it looks like "bra-c-ket," which is where the names come
-from — and that combination is exactly the inner product from the last
+from, and that combination is exactly the inner product from the last
 lesson.
 
 ## Mathematical Development
 
 ### Ket, bra, and the inner product
 
-$|v\rangle$ denotes a vector — concretely, for $\mathbb{C}^n$, a column
+$|v\rangle$ denotes a vector, concretely, for $\mathbb{C}^n$, a column
 vector. The bra $\langle v|$ is its **conjugate transpose**: lay the
 column on its side and conjugate every entry.
 
@@ -61,7 +61,7 @@ $$
 |v\rangle = \begin{pmatrix}v_1\\\vdots\\v_n\end{pmatrix} \quad\Longrightarrow\quad \langle v| = \begin{pmatrix}v_1^* & \cdots & v_n^*\end{pmatrix}
 $$
 
-A bra times a ket is ordinary matrix multiplication of a row by a column —
+A bra times a ket is ordinary matrix multiplication of a row by a column,
 a single number, and exactly the standard inner product:
 
 $$
@@ -76,7 +76,7 @@ $\langle u|$.
 ### More abstractly: bras as linear functionals
 
 More generally (beyond concrete column vectors), a bra is a **linear
-functional** — a linear map from $V$ to $\mathbb{C}$ — defined by how it
+functional**, a linear map from $V$ to $\mathbb{C}$, defined by how it
 acts on kets: $\langle v|$ acts on $|w\rangle$ to produce the number
 $\langle v,w\rangle$. Every inner product space has exactly one such
 functional for each vector $|v\rangle$; the concrete conjugate-transpose
@@ -88,7 +88,7 @@ wavefunctions) later in the Quantum Mechanics pillar.
 
 ### The outer product
 
-Reversing the order, $|u\rangle\langle v|$ — a ket times a bra — is a
+Reversing the order, $|u\rangle\langle v|$, a ket times a bra, is a
 column times a row, which produces a **matrix**, not a number:
 
 $$
@@ -96,7 +96,7 @@ $$
 $$
 
 This **outer product** is an operator: applied to a ket $|w\rangle$, it
-gives $|u\rangle\langle v|w\rangle = \langle v|w\rangle\,|u\rangle$ — the
+gives $|u\rangle\langle v|w\rangle = \langle v|w\rangle\,|u\rangle$, the
 number $\langle v|w\rangle$ times the vector $|u\rangle$. A concrete and
 important example: $|0\rangle\langle0|$ for the standard basis of
 $\mathbb{C}^2$ is
@@ -105,7 +105,7 @@ $$
 |0\rangle\langle0| = \begin{pmatrix}1\\0\end{pmatrix}\begin{pmatrix}1&0\end{pmatrix} = \begin{pmatrix}1&0\\0&0\end{pmatrix}
 $$
 
-which sends $|0\rangle\mapsto|0\rangle$ and $|1\rangle\mapsto0$ — it
+which sends $|0\rangle\mapsto|0\rangle$ and $|1\rangle\mapsto0$: it
 **projects** onto $|0\rangle$. Projectors built from outer products are
 central to how measurement is described mathematically, developed in the
 Probability and Quantum States lesson.
@@ -119,7 +119,7 @@ $$
 \sum_i |e_i\rangle\langle e_i| = I
 $$
 
-This deserves a derivation, not just acceptance — it's one of the most
+This deserves a derivation, not just acceptance. It's one of the most
 useful identities in all of quantum mechanics. Apply the left side to an
 arbitrary $|\psi\rangle$, expanded in this basis as
 $|\psi\rangle=\sum_j c_j|e_j\rangle$:
@@ -138,7 +138,7 @@ equals the identity operator.
 ### Operator matrix elements
 
 For an operator $A$, the number $\langle i|A|j\rangle$ (a bra, then $A$,
-then a ket — read as $\langle i|$ acting on the vector $A|j\rangle$) is
+then a ket, read as $\langle i|$ acting on the vector $A|j\rangle$) is
 called a **matrix element**, and it's literally the $(i,j)$ entry of $A$'s
 matrix in the basis $\{|i\rangle\}$. The Linear Operators lesson develops
 this fully; for a preview, take $A$ to be the Pauli-$X$ matrix
@@ -162,7 +162,7 @@ carry the entire Hermitian Operators lesson.
 ## Physical Interpretation
 
 The completeness relation is the formal version of "any state can be
-decomposed into basis states, and the decomposition is unique" — the same
+decomposed into basis states, and the decomposition is unique," the same
 fact from the Vector Spaces lesson about coordinates, now written as an
 operator identity rather than a sentence. Projectors like
 $|e_i\rangle\langle e_i|$ are the mathematical objects that represent
@@ -213,7 +213,7 @@ itself.
 - $\langle u|v\rangle$ is a number (the inner product); $|u\rangle\langle
   v|$ is an operator (the outer product).
 - Completeness relation: $\sum_i|e_i\rangle\langle e_i|=I$ for any
-  orthonormal basis — derived by checking it acts as the identity on an
+  orthonormal basis, derived by checking it acts as the identity on an
   arbitrary vector.
 - $\langle i|A|j\rangle$ is $A$'s $(i,j)$ matrix element in the basis
   $\{|i\rangle\}$.
@@ -221,5 +221,5 @@ itself.
 ## Further Exploration
 
 Next: **Linear Operators**, which develops matrix representation and
-composition fully — including a derivation of matrix multiplication
+composition fully, including a derivation of matrix multiplication
 *from* the completeness relation just built here.

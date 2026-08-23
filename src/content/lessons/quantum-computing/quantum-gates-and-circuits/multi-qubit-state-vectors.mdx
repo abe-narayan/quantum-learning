@@ -1,11 +1,17 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "Multi-Qubit State Vectors",
   description:
-    "Why some multi-qubit states can't be built from a tensor product at all — a dimension-counting argument for entanglement.",
+    "Why some multi-qubit states can't be built from a tensor product at all, a dimension-counting argument for entanglement.",
   course: "quantum-gates-and-circuits",
   module: "multi-qubit-state-vectors",
   order: 1,
@@ -35,7 +41,7 @@ export const productExample = StateVector.zero(1).tensor(
 The last lesson built multi-qubit states *out of* single-qubit ones, via
 $\otimes$. That raises an obvious question: does every valid multi-qubit
 state arise this way? If it did, two qubits would really just be "two
-separate qubits" dressed up in bigger notation — nothing new would be
+separate qubits" dressed up in bigger notation. Nothing new would be
 possible that a pair of independent single-qubit systems couldn't already
 do. The answer is no, and pinning down exactly why is one of the most
 important arguments in this course.
@@ -44,7 +50,7 @@ important arguments in this course.
 
 Compare two ways of specifying a 2-qubit state. A **product state**
 $|a\rangle\otimes|b\rangle$ is fully determined by two points on two
-Bloch spheres — that's it, nothing more to specify. A **general** 2-qubit
+Bloch spheres: that's it, nothing more to specify. A **general** 2-qubit
 state is specified by 4 independent complex amplitudes. If those two
 counts don't match, there must be states of the second kind that no
 choice of the first kind can reach. They don't match, and the gap between
@@ -76,14 +82,14 @@ Normalization removes 1. Overall global phase (multiplying the whole
 before) removes 1 more: $8-1-1=6$ real parameters.
 
 $6 > 4$. The general state space is strictly larger than the set of
-product states can reach — there is a genuine two-real-parameter's worth
+product states can reach. There is a genuine two-real-parameter's worth
 of states that no tensor product of single-qubit states can produce.
 Those are the **entangled** states.
 
 ### A state that isn't a product
 
 Take the (unnormalized-looking, but check it) state
-$\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ — you'll recognize this in two
+$\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$: you'll recognize this in two
 lessons as a specific, famous state. Suppose it *were* a product state
 $|a\rangle\otimes|b\rangle = a_0b_0|00\rangle+a_0b_1|01\rangle+a_1b_0|10\rangle+a_1b_1|11\rangle$.
 Matching coefficients:
@@ -93,10 +99,10 @@ a_0b_0=\frac{1}{\sqrt2}, \quad a_0b_1=0, \quad a_1b_0=0, \quad a_1b_1=\frac{1}{\
 $$
 
 From $a_0b_1=0$: either $a_0=0$ or $b_1=0$. If $a_0=0$, then
-$a_0b_0=0\neq\frac{1}{\sqrt2}$ — contradiction. If $b_1=0$, then
-$a_1b_1=0\neq\frac{1}{\sqrt2}$ — also a contradiction. Either way, no
+$a_0b_0=0\neq\frac{1}{\sqrt2}$, a contradiction. If $b_1=0$, then
+$a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction. Either way, no
 choice of $a_0,a_1,b_0,b_1$ works. This state genuinely cannot be
-factored — a fully worked version of exactly this proof, for this exact
+factored. A fully worked version of exactly this proof, for this exact
 state, is the centerpiece of the next lesson.
 
 <QuantumStateDisplay state={bellNumerator} label="Cannot be factored as |a⟩ ⊗ |b⟩" />
@@ -104,16 +110,16 @@ state, is the centerpiece of the next lesson.
 Compare with a state that *does* factor, to make sure you can tell the
 difference:
 
-<QuantumStateDisplay state={productExample} label="|0⟩ ⊗ |+⟩ — an ordinary product state" />
+<QuantumStateDisplay state={productExample} label="|0⟩ ⊗ |+⟩: an ordinary product state" />
 
 ## Physical Interpretation
 
-A product state means the two qubits are physically independent — you
+A product state means the two qubits are physically independent: you
 could describe qubit A's state completely on its own, hand it to someone
 else, and lose no information. An entangled state has no such
 description: asking "what is qubit A's state, by itself?" has no good
 answer, only the pair together has a well-defined state. This isn't a
-limitation of notation — it reflects something genuinely different about
+limitation of notation. It reflects something genuinely different about
 how the system behaves, with consequences (starting next lesson) for what
 happens when you measure just one of the two qubits.
 
@@ -128,9 +134,9 @@ $a_0b_0\neq0$, $a_0\neq0$; then $a_1b_0=0$ forces $a_1=0$ or $b_0=0$. Try
 $a_1=0$ (consistent with $a_1b_1=0$ automatically). Then
 $|a\rangle=|0\rangle$, and $b_0=1,b_1=1$ up to normalization gives
 $|b\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)=|+\rangle$. Check:
-$|0\rangle\otimes|+\rangle = \frac{1}{\sqrt2}(|00\rangle+|01\rangle)$ ✓ —
+$|0\rangle\otimes|+\rangle = \frac{1}{\sqrt2}(|00\rangle+|01\rangle)$, yes,
 it factors. This state, unlike the Bell numerator above, is *not*
-entangled — qubit 0 is definitely $|0\rangle$, qubit 1 is independently
+entangled: qubit 0 is definitely $|0\rangle$, qubit 1 is independently
 $|+\rangle$.
 
 ## Common Mistakes
@@ -138,14 +144,14 @@ $|+\rangle$.
 <Callout type="mistake">
 **Assuming every multi-qubit state is "really" two separate qubits."**
 The parameter-counting argument above shows this is false for a whole
-$2$-real-parameter family of 2-qubit states — and the gap only grows for
+$2$-real-parameter family of 2-qubit states, and the gap only grows for
 more qubits.
 </Callout>
 
 <Callout type="mistake">
 **Trying to guess factorability instead of solving for it.** Some states
 factor in ways that aren't obvious by inspection (like the worked example
-above). When in doubt, set up the four coefficient equations and solve —
+above). When in doubt, set up the four coefficient equations and solve,
 or look for a contradiction the way the Bell-numerator proof does.
 </Callout>
 
@@ -160,15 +166,17 @@ or look for a contradiction the way the Bell-numerator proof does.
 3. Does $\frac{1}{\sqrt2}(|00\rangle - |11\rangle)$ factor? (Use the same
    coefficient-matching method as the Bell-numerator proof.)
 4. Explain in one or two sentences why "entangled" is a property of the
-   *state*, not of the *qubits themselves* — the same two physical qubits
+   *state*, not of the *qubits themselves*: the same two physical qubits
    can be prepared in either an entangled or a product state.
+
+<PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
 - A general $n$-qubit state needs $2^n$ complex amplitudes, one
   normalization constraint, and has one unobservable global phase.
 - Counting real parameters shows product states are a strictly smaller
-  set than all valid multi-qubit states — the states outside that set are
+  set than all valid multi-qubit states; the states outside that set are
   entangled.
 - $\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ provably cannot be written as
   any $|a\rangle\otimes|b\rangle$.
@@ -178,5 +186,5 @@ or look for a contradiction the way the Bell-numerator proof does.
 ## Further Exploration
 
 Next: **Quantum Circuit Notation**, the diagrams used to describe
-multi-qubit operations — then **Controlled Gates and CNOT**, the specific
+multi-qubit operations, then **Controlled Gates and CNOT**, the specific
 gate that turns product states into entangled ones on purpose.

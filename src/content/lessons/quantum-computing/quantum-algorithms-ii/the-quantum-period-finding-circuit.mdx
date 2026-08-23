@@ -1,0 +1,167 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-ii/the-quantum-period-finding-circuit"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Quantum Period-Finding Circuit",
+  description:
+    "Building (1/√2^t)Σₓ|x⟩|aˣ mod N⟩ and applying the QFT to the x register: the exact interference step that turns modular exponentiation's hidden period into a directly measurable pattern, honestly scoped around the one piece of circuitry this platform doesn't build.",
+  course: "quantum-algorithms-ii",
+  module: "the-quantum-period-finding-circuit",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding"],
+  objectives: [
+    "Describe the period-finding state (1/√2^t)Σₓ|x⟩|aˣ mod N⟩ and why applying the QFT to the x register reveals r",
+    "Explain precisely which piece of the circuit this platform builds directly rather than gate-by-gate, and why",
+    "Predict where the QFT's output amplitude peaks, in terms of 2^t and r",
+  ],
+};
+
+## Motivation
+
+Order-finding needs the period of the function $f(x)=a^x\bmod N$, and
+periods are exactly what the QFT (Quantum Algorithms I) is built to
+extract from a phase pattern. This lesson connects the two: build the
+right state, apply the QFT, and read off the period from where the output
+amplitude concentrates.
+
+## Mathematical Development
+
+### The period-finding state
+
+Using $t$ "counting" qubits and a second register sized to hold values
+mod $N$, prepare
+
+$$
+\frac{1}{\sqrt{2^t}}\sum_{x=0}^{2^t-1}|x\rangle\,|a^x\bmod N\rangle
+$$
+
+A real circuit builds this via $H^{\otimes t}$ on the counting register
+followed by a sequence of controlled modular multiplications (each
+counting qubit $q$ conditionally multiplying the second register by
+$a^{2^{t-1-q}}\bmod N$, mirroring phase estimation's controlled-$U^{2^k}$
+structure exactly). **This platform constructs this exact state directly
+from its closed-form amplitudes instead of building that gate sequence.**
+`periodFindingState` places amplitude $1/\sqrt{2^t}$ at index $(x,\,a^x\bmod
+N)$ for every $x$, which is precisely what the real circuit outputs, just
+without implementing the controlled-modular-multiplication circuitry
+itself. That circuitry is real, substantial engineering (a genuine
+"quantum arithmetic" subroutine), well beyond this course's educational
+scope, and explicitly not built here. What *is* built and directly
+verified is everything downstream: the QFT-based extraction from this
+state, which is the actual interference mechanism the algorithm depends
+on.
+
+### Why the period shows up after the QFT
+
+For a periodic $f$ with period $r$ (so $a^x\bmod N$ repeats every $r$
+steps in $x$), grouping the sum by residue class mod $r$ and applying the
+QFT to the $x$ register produces constructive interference exactly at
+$x$-register outcomes that are multiples of $2^t/r$. This is the same
+"amplitude concentrates at exact multiples" structure phase estimation
+produced for an exactly-representable eigenphase, because a periodic
+function's Fourier transform is itself concentrated at multiples of the
+reciprocal period. `quantumFourierTransformOnQubits` (a QFT restricted to
+an explicit list of qubits, rather than an entire register) applies the
+QFT to just the counting register, leaving the second register alone,
+exactly what the real circuit's QFT step does.
+
+### Checked, not just claimed
+
+For $a=7$, $N=15$ (order $r=4$, from the last lesson) with $t=6$ counting
+qubits, `periodFindingMeasurementDistribution` gives probability exactly
+$0.25$ at outcomes $0,16,32,48$, precisely the multiples of
+$2^6/4=16$, and numerically zero everywhere else. Measuring this
+distribution and dividing the observed outcome by $2^t$ gives a fraction
+very close to $k/r$ for some integer $k$; a classical algorithm called the
+**continued fractions algorithm** recovers $r$ from that fraction exactly.
+This platform does not implement continued fractions (a well-understood,
+purely classical algorithm, not a quantum one). The worked example next
+lesson identifies $r$ directly from the observed peak locations instead,
+which is sufficient to demonstrate the mechanism honestly without
+reimplementing a standard classical number-theory routine.
+
+## Physical Interpretation
+
+Nothing new physically happens here beyond what phase estimation already
+established. Modular exponentiation just supplies a *periodic* function
+instead of an arbitrary one, and periodicity is exactly the structure the
+QFT is built to expose as a small set of sharp peaks rather than a spread
+across every outcome.
+
+## Worked Example
+
+**Predict, before computing, where `periodFindingMeasurementDistribution(7,
+15, 6)`'s probability peaks should occur.**
+
+$r=4$ (from the previous lesson), $t=6$, so $2^t=64$. Peaks are predicted
+at multiples of $64/4=16$: outcomes $0,16,32,48$, four peaks, each with
+probability $1/r=0.25$ (since the total probability, $1$, splits evenly
+across exactly $r$ peaks by the symmetry of a period-$r$ function's
+Fourier transform). This is exactly what the engine computes, not
+approximately, to six decimal places.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming this platform runs a literal controlled-modular-multiplication
+circuit.** It doesn't. `periodFindingState` constructs the *exact output*
+of such a circuit directly from its closed-form amplitudes, an explicit
+and documented scope choice, not a hidden shortcut.
+</Callout>
+
+<Callout type="mistake">
+**Expecting exactly one sharp peak.** A periodic function with period $r$
+concentrates its amplitude near multiples of $2^t/r$, not into one single
+outcome. Order finding needs at least one of them, and the
+continued-fractions post-processing step (not implemented here) is what
+turns "a peak location" into "the actual value of $r$" reliably. When
+$2^t$ happens to be an exact multiple of $r$ (as in this lesson's $a=7$
+example, $64/4=16$), those peaks are perfectly sharp: exactly $r$
+outcomes, each with probability exactly $1/r$. When it isn't, the
+"peaks" smear across roughly $2r$ nearby outcomes instead of landing
+exactly on $r$ of them, still usable by continued fractions, but not the
+clean picture the sharp case suggests.
+</Callout>
+
+## Practice Questions
+
+1. For $a=4,N=15$ (order $r=2$, check this by direct computation),
+   predict where `periodFindingMeasurementDistribution`'s peaks occur
+   using $t=6$ counting qubits, and confirm $2^t/r$ is a whole number
+   first.
+2. Explain why the total probability across all peaks must sum to
+   exactly $1$, and why (for this platform's exactly-periodic toy
+   examples) it splits evenly across exactly $r$ of them.
+3. What specifically would need to be built for this platform to run
+   period-finding on an $N$ too large for brute-force
+   `classicalOrder` to check answers against?
+4. Why is choosing $t$ larger than $\log_2N$ (rather than exactly
+   $\log_2N$) generally necessary for reliable period recovery in a real
+   implementation? (You don't need the full continued-fractions argument,
+   just the resolution intuition from phase estimation.)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The period-finding state $(1/\sqrt{2^t})\sum_x|x\rangle|a^x\bmod
+  N\rangle$ is built directly from its closed-form amplitudes, an
+  explicit, documented substitute for a real controlled-modular-arithmetic
+  circuit this platform doesn't implement.
+- Applying the QFT to the counting register concentrates probability at
+  exact multiples of $2^t/r$, verified exactly for the $a=7,N=15$ case.
+- Recovering $r$ from an observed peak needs the classical continued
+  fractions algorithm, also not implemented here: an honestly scoped
+  limitation, not a hidden gap.
+
+## Further Exploration
+
+Next: **Worked Example: Factoring 15**, running the complete pipeline,
+period finding, the classical reduction, and gcd, on the smallest number
+that actually demonstrates Shor's algorithm end to end.
