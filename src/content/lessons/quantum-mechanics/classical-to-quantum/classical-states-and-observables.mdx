@@ -1,0 +1,168 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/classical-states-and-observables"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Classical States and Observables",
+  description:
+    "What classical physics means by a 'state' and an 'observable' — phase space, determinism, and epistemic probability — the picture quantum mechanics has to replace, not extend.",
+  course: "classical-to-quantum",
+  module: "classical-states-and-observables",
+  order: 1,
+  difficulty: "foundational",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge"],
+  objectives: [
+    "Describe a classical system's state as a point in phase space",
+    "Explain why classical observables are ordinary functions of the state",
+    "Distinguish probability from ignorance (epistemic) from the different kind of probability quantum mechanics needs",
+  ],
+};
+
+## Motivation
+
+Eleven lessons of linear algebra built a powerful mathematical toolkit
+without saying much about physics at all. Before applying that toolkit,
+it's worth being precise about what it's replacing — what "state" and
+"observable" meant *before* quantum mechanics, so the differences that are
+coming aren't differences of degree, but differences of kind.
+
+## Intuition
+
+Drop a ball. At any instant, everything there is to know about it —
+where it is, how fast it's moving — is two numbers: position and
+momentum. Nothing about the ball is hidden, approximate, or waiting to be
+resolved. That confidence — a system has a definite, complete state at
+every instant, and every physical quantity is just some function of that
+state — is the classical picture, and it held up for centuries because it
+matches everyday experience almost perfectly.
+
+## Mathematical Development
+
+### Phase space
+
+A classical particle moving in one dimension has a **state** completely
+specified by two real numbers: its position $x$ and its momentum $p$. The
+set of all possible $(x,p)$ pairs is called **phase space**. A system with
+more degrees of freedom (three-dimensional motion, multiple particles)
+just needs more coordinates — phase space grows, but the idea doesn't
+change: a state is a point, full stop.
+
+### Observables are functions of the state
+
+A classical **observable** — anything you could measure, like energy,
+momentum, or angular momentum — is an ordinary real-valued function of the
+phase-space point:
+
+$$
+O = O(x, p)
+$$
+
+For a particle of mass $m$ under a potential $V(x)$, momentum is simply
+$p$ itself, and the total energy is the sum of kinetic and potential
+parts:
+
+$$
+E(x,p) = \frac{p^2}{2m} + V(x)
+$$
+
+Given the state $(x,p)$, every observable's value is completely
+determined — there's no step where "measuring" $E$ could give an
+ambiguous or probabilistic answer. This is the feature quantum mechanics
+is going to remove, and it's worth naming precisely, because "observable"
+is going to mean something structurally different very soon: not a
+function you plug numbers into, but an operator acting on a vector, as
+the Mathematical Foundations course already built.
+
+### Determinism
+
+Classical mechanics (via Newton's laws, or equivalently Hamilton's
+equations, which this course won't need in detail) evolves a state
+$(x(t), p(t))$ forward in time in a completely determined way: the same
+initial state always produces the same future, and in principle, knowing
+the present state exactly lets you predict any future state exactly.
+
+### Where classical probability actually comes from
+
+Classical physics does use probability constantly — statistical
+mechanics, thermodynamics, coin flips, dice. But in every classical case,
+the probability describes **ignorance**, not indeterminacy. A coin's
+outcome looks random only because you don't know (or didn't measure
+precisely enough to compute) its exact initial spin, air resistance, and
+landing conditions; a classical probability distribution $\rho(x,p)$ over
+phase space represents *your* uncertainty about which point the system
+occupies, not any uncertainty the system itself has. In principle — even
+if not in practice — a classical system always has one exact, definite
+state, whether or not you know what it is. This is called **epistemic**
+probability, from the Greek for knowledge.
+
+## Physical Interpretation
+
+The classical picture — definite states, observables as their functions,
+probability as ignorance — isn't wrong. It's an extraordinarily accurate
+description of ordinary objects. The entire point of this course is to
+locate precisely where and why it stops being accurate, and the answer is
+not "classical mechanics needs a small correction." As the next lesson
+shows, some experimentally-measured probabilities cannot be explained by
+*any* underlying definite state, however unknown — a fundamentally
+different kind of probability is required, not just better bookkeeping
+for the classical kind.
+
+## Worked Example
+
+**A classical harmonic oscillator has mass $m=1$, spring constant $k=4$,
+and is in the state $x=1$, $p=2$. Find its total energy.**
+
+$$
+E(x,p) = \frac{p^2}{2m} + \frac{1}{2}kx^2 = \frac{2^2}{2(1)} + \frac{1}{2}(4)(1)^2 = 2 + 2 = 4
+$$
+
+This value is exact and unambiguous — there is nothing probabilistic
+about evaluating a function at a known point.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating classical probability and quantum probability as the same kind
+of thing, just applied to smaller objects.** Classical probability always
+traces back to not knowing the exact state; the next lesson shows quantum
+probability can't be explained that way, even in principle.
+</Callout>
+
+<Callout type="mistake">
+**Assuming "observable" means the same thing in both theories.** Classical
+observables are functions of a state; quantum observables — built
+carefully across the Mathematical Foundations course — are Hermitian
+operators. These are different *kinds* of mathematical object, not the
+same kind viewed at different scales.
+</Callout>
+
+## Practice Questions
+
+1. A classical particle of mass $2$ has state $x=3, p=4$, moving under
+   $V(x) = x^2$. Find its total energy.
+2. A weather forecaster says "70% chance of rain tomorrow." Is this
+   epistemic probability, in the classical sense? Justify your answer.
+3. Explain why, classically, knowing a system's exact state at one instant
+   is (in principle) enough to know its state at every future instant.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A classical state is a point $(x,p)$ in phase space; observables are
+  functions $O(x,p)$ of that point.
+- Classical evolution is deterministic: the same state always produces the
+  same future.
+- Classical probability is epistemic — it reflects ignorance about which
+  definite state a system occupies, never genuine indeterminacy in the
+  system itself.
+
+## Further Exploration
+
+Next: **From Classical to Quantum Probability**, which introduces the
+specific experimental fact — interference — that no epistemic probability
+distribution over any hidden classical state can reproduce.

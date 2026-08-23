@@ -1,0 +1,208 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Quantum Harmonic Oscillator",
+  description:
+    "The single most important solvable system in quantum mechanics, built entirely algebraically from ladder operators — a real derivation of the integer, equally-spaced energy spectrum, with zero calculus.",
+  course: "classical-to-quantum",
+  module: "the-quantum-harmonic-oscillator",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/stationary-states"],
+  objectives: [
+    "State the canonical commutation relation [a, a†] = 1 and derive the number operator's key algebraic identities",
+    "Prove the harmonic oscillator's energy spectrum is a non-negative integer ladder, using only algebra",
+    "Compute ladder-operator actions using the platform's truncated matrix representation",
+  ],
+};
+
+## Motivation
+
+The quantum harmonic oscillator — a particle in a potential well shaped
+like $V(x)=\tfrac12 m\omega^2x^2$ — is the single most-used solvable
+system in all of quantum mechanics: molecular vibrations, the
+electromagnetic field's individual modes, and countless approximations
+all reduce to it. The traditional route to its solution is a differential
+equation (deferred to the Wave Mechanics course); this lesson takes a
+different, fully rigorous route that needs nothing beyond the linear
+algebra already built — **ladder operators**.
+
+## Intuition
+
+Instead of solving for energy eigenstates directly, define two operators
+— one that steps a state *down* one energy level, one that steps it *up*
+— and let pure algebra determine which energies are even possible. It's
+the difference between climbing a ladder by inspecting each rung
+individually versus proving, from the ladder's construction alone, that
+rungs exist only at integer heights.
+
+## Mathematical Development
+
+### The ladder operators
+
+Postulate two operators $a$ (**annihilation**) and $a^\dagger$
+(**creation**), satisfying the single defining relation:
+
+$$
+[a, a^\dagger] = aa^\dagger - a^\dagger a = 1
+$$
+
+(the identity operator on the right — this is the harmonic oscillator's
+version of the canonical commutation relation the Position and Momentum
+lesson will connect to $[x,p]=i\hbar$ directly). Define the **number
+operator** $N = a^\dagger a$. It's Hermitian by direct check:
+$N^\dagger = (a^\dagger a)^\dagger = a^\dagger a^{\dagger\dagger} =
+a^\dagger a = N$ — so by the Hermitian Operators lesson, $N$ has real
+eigenvalues and an orthonormal eigenbasis, call it $\{|n\rangle\}$ with
+$N|n\rangle = n|n\rangle$.
+
+### a lowers n by 1; a† raises it by 1
+
+From the defining relation, $[N,a] = [a^\dagger a, a] = a^\dagger[a,a] +
+[a^\dagger,a]a = 0 + (-1)a = -a$ (using $[a,a]=0$ trivially and
+$[a^\dagger,a]=-[a,a^\dagger]=-1$). So $Na = aN - a = a(N-I)$. Applying
+both sides to $|n\rangle$:
+
+$$
+N(a|n\rangle) = a(N-I)|n\rangle = a(n-1)|n\rangle = (n-1)\,(a|n\rangle)
+$$
+
+So $a|n\rangle$ is an eigenvector of $N$ with eigenvalue $n-1$ (or the
+zero vector) — $a$ lowers the level by exactly one step. An identical
+computation with $[N,a^\dagger]=+a^\dagger$ shows $a^\dagger|n\rangle$ has
+eigenvalue $n+1$ — $a^\dagger$ raises by one step.
+
+### The spectrum is exactly the non-negative integers
+
+Positive-definiteness of the inner product (Inner Products lesson) gives:
+
+$$
+n = \langle n|N|n\rangle = \langle n|a^\dagger a|n\rangle = \|a|n\rangle\|^2 \ge 0
+$$
+
+so every eigenvalue $n$ is non-negative. But repeatedly applying $a$
+lowers $n$ by exactly $1$ each time — if $n$ weren't an integer, this
+process would eventually produce a state with a **negative** eigenvalue,
+contradicting the inequality just derived. The only way to avoid that is
+for the lowering to terminate exactly at $n=0$, where $a|0\rangle$ is
+the literal zero vector rather than a new eigenstate with a negative
+label. Both requirements together force the spectrum to be exactly the
+non-negative integers:
+
+$$
+n = 0, 1, 2, 3, \ldots
+$$
+
+This is a complete derivation, not a stated fact — every step above uses
+only the commutation relation and results already proven earlier in this
+course.
+
+### Energy levels
+
+The harmonic oscillator's Hamiltonian is $H = \hbar\omega\left(N +
+\tfrac12\right)$ (the connection between this $H$ and the physical
+potential $\tfrac12m\omega^2x^2$ is made precise once continuous position
+is developed, in the Position and Momentum lesson and beyond — for now,
+take $H$'s form as the definition of "a quantum harmonic oscillator" at
+this algebraic level). Its eigenvalues follow immediately:
+
+$$
+E_n = \hbar\omega\left(n+\tfrac12\right), \qquad n=0,1,2,\ldots
+$$
+
+Two features worth naming: the levels are **equally spaced** by
+$\hbar\omega$, and the ground state ($n=0$) has energy $E_0=\hbar\omega/2$
+— **not zero**. This is the famous **zero-point energy**: even in its
+lowest possible state, a quantum harmonic oscillator is never
+perfectly at rest.
+
+### A finite matrix representation
+
+The true ladder is infinite-dimensional, but truncating to the lowest
+`dimension` levels — representing $a,a^\dagger,N$ as `dimension`×`dimension`
+matrices on the Fock basis $\{|0\rangle,\ldots,|{\rm dimension}-1\rangle\}$
+— reproduces every identity above *exactly*, except that $a^\dagger$
+sends the truncated top level to $0$ instead of to a level that no longer
+exists in the truncated basis (a standard, well-understood approximation,
+accurate for describing the low-lying levels well below the cutoff). This
+is precisely what this platform's `annihilationOperator`,
+`creationOperator`, and `numberOperator` functions build, letting the
+existing finite-dimensional `Matrix` engine represent the harmonic
+oscillator exactly like every other operator on this site — no new kind
+of machinery required.
+
+## Physical Interpretation
+
+Zero-point energy isn't a mathematical curiosity — it's measurable (the
+Casimir effect, among others, depends on it directly). The equally-spaced
+spectrum is why systems that behave like harmonic oscillators — molecular
+bonds vibrating, electromagnetic field modes — emit and absorb light at
+sharp, evenly-spaced frequencies, each corresponding to a single-step
+$n\to n\pm1$ transition.
+
+## Worked Example
+
+**In a 5-level truncated representation ($\hbar\omega=1$), compute
+$a^\dagger|2\rangle$ and the energy $E_2$.**
+
+By the raising rule, $a^\dagger|n\rangle=\sqrt{n+1}\,|n+1\rangle$, so
+$a^\dagger|2\rangle = \sqrt{3}\,|3\rangle$ — a state safely below the
+5-level truncation's top index ($4$), so this is exact, not an
+approximation. The energy is
+$E_2=\hbar\omega(2+\tfrac12)=1\cdot2.5=2.5$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting the zero-point energy.** $E_n=\hbar\omega n$ (without the
+$+\tfrac12$) is a common slip — the ground state energy is
+$\hbar\omega/2$, not $0$.
+</Callout>
+
+<Callout type="mistake">
+**Confusing $N$ (number operator, integer eigenvalues $0,1,2,\ldots$)
+with $H$ (energy operator, eigenvalues $\hbar\omega(n+\tfrac12)$).** $H$
+is a specific linear function of $N$, not the same operator.
+</Callout>
+
+## Practice Questions
+
+1. Compute $a|3\rangle$ using the lowering rule.
+2. In a 4-level truncated representation, what does $a^\dagger|3\rangle$
+   equal? (This is the honest truncation-error case — think carefully
+   about what the truncated matrix actually does here versus what the
+   true, untruncated oscillator would give.)
+3. For $\hbar\omega=2$, find $E_0, E_1, E_2$, and confirm consecutive
+   levels differ by exactly $\hbar\omega$.
+4. Using $n=\langle n|N|n\rangle=\|a|n\rangle\|^2\ge0$, explain in one or
+   two sentences why the ladder *must* terminate rather than continuing
+   to arbitrarily negative $n$.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $a,a^\dagger$ satisfy $[a,a^\dagger]=1$; $N=a^\dagger a$ is Hermitian,
+  with $a$ lowering and $a^\dagger$ raising $N$'s eigenvalue by exactly
+  $1$.
+- Positive-definiteness plus the integer-step lowering together force the
+  spectrum of $N$ to be exactly $0,1,2,\ldots$ — a complete algebraic
+  derivation.
+- $H=\hbar\omega(N+\tfrac12)$ gives $E_n=\hbar\omega(n+\tfrac12)$ —
+  equally spaced, with nonzero zero-point energy $E_0=\hbar\omega/2$.
+- The platform's `annihilationOperator`/`creationOperator`/`numberOperator`
+  functions are a finite, truncated, exact-except-at-the-boundary matrix
+  representation of this same algebra.
+
+## Further Exploration
+
+Next: **Position and Momentum**, which introduces the continuous
+observables the harmonic oscillator's true physical Hamiltonian is built
+from, and connects their commutation relation to the uncertainty
+principle derived earlier in this course.

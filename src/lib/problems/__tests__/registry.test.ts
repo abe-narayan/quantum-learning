@@ -3,7 +3,9 @@ import { getAllProblems, getProblem, getProblemsForLesson } from "../registry";
 import { getCourse } from "@/lib/content/curriculum";
 import { StateVector } from "@/lib/quantum/state";
 import { Complex } from "@/lib/quantum/complex";
-import { HADAMARD, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
+import { HADAMARD, PAULI_X, PAULI_Y, PAULI_Z, applySingleQubitGate, applyCNOT, rotationAboutAxis } from "@/lib/quantum/gates";
+import { commutatorExpectation, uncertainty } from "@/lib/quantum/observables";
+import { annihilationOperator, harmonicOscillatorEnergyLevels } from "@/lib/quantum/harmonicOscillator";
 
 describe("problem registry integrity", () => {
   const problems = getAllProblems();
@@ -105,6 +107,101 @@ describe("demonstration problems — expected answers match the real quantum eng
 
     for (const group of problem.answer.requiredConceptGroups) {
       expect(group.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("From Classical to Quantum — demonstration problems match the engine", () => {
+  it("the Rabi-probability problem's answer matches rotationAboutAxis directly", () => {
+    const problem = getProblem("rabi-probability-at-time");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+
+    const plus = [new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)];
+    const omegaT = Math.PI / 3;
+    const evolved = rotationAboutAxis({ x: 0, y: 0, z: 1 }, omegaT).apply(plus);
+    // P(+) = |<+|psi(t)>|^2
+    const overlap = evolved.reduce(
+      (sum, amplitude) => sum.add(new Complex(Math.SQRT1_2).conjugate().mul(amplitude)),
+      Complex.ZERO
+    );
+    expect(problem.answer.value).toBeCloseTo(overlap.magnitudeSquared(), 6);
+    expect(problem.answer.value).toBeCloseTo(0.75, 6);
+  });
+
+  it("the Y-uncertainty-in-|+> problem's answer matches the engine's uncertainty() function", () => {
+    const problem = getProblem("uncertainty-of-y-in-plus-state");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+
+    const plus = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+    expect(problem.answer.value).toBeCloseTo(uncertainty(plus, PAULI_Y), 9);
+  });
+
+  it("the Y,Z uncertainty-bound problem's answer matches the engine's commutatorExpectation()", () => {
+    const problem = getProblem("uncertainty-bound-yz");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+
+    const plus = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+    const bound = 0.5 * commutatorExpectation(plus, PAULI_Y, PAULI_Z).magnitude();
+    expect(problem.answer.value).toBeCloseTo(bound, 9);
+  });
+
+  it("the harmonic-oscillator energy-level problem matches harmonicOscillatorEnergyLevels()", () => {
+    const problem = getProblem("harmonic-oscillator-energy-level");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+
+    const levels = harmonicOscillatorEnergyLevels(4, 3);
+    expect(problem.answer.value).toBeCloseTo(levels[3], 9);
+  });
+
+  it("the ladder-lowering-coefficient problem matches annihilationOperator()", () => {
+    const problem = getProblem("ladder-lowering-coefficient");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+
+    const dimension = 5;
+    const a = annihilationOperator(dimension);
+    const basisFour = Array.from({ length: dimension }, (_, i) => (i === 4 ? new Complex(1) : Complex.ZERO));
+    const result = a.apply(basisFour);
+    expect(problem.answer.value).toBeCloseTo(result[3].magnitude(), 9);
+  });
+
+  it("the three-qubit dimension problem matches an actual tensor product", () => {
+    const problem = getProblem("three-qubit-dimension-synthesis");
+    if (problem?.answer.type !== "numeric") throw new Error("expected a numeric problem");
+
+    const oneQubit = StateVector.zero(1);
+    const threeQubits = oneQubit.tensor(oneQubit).tensor(oneQubit);
+    expect(problem.answer.value).toBe(threeQubits.dimension);
+  });
+
+  it("the postulate probability/expectation-value problems are internally consistent", () => {
+    const probProblem = getProblem("postulate-probability-calculation");
+    const expProblem = getProblem("postulate-expectation-value");
+    if (probProblem?.answer.type !== "numeric" || expProblem?.answer.type !== "numeric") {
+      throw new Error("expected numeric problems");
+    }
+
+    const pPlus = Math.cos(Math.PI / 3) ** 2;
+    const pMinus = 1 - pPlus;
+    expect(probProblem.answer.value).toBeCloseTo(pPlus, 9);
+    expect(expProblem.answer.value).toBeCloseTo(pPlus - pMinus, 9);
+  });
+
+  it("the interference-vs-classical problems match direct Complex arithmetic", () => {
+    const quantumProblem = getProblem("quantum-interference-calculation");
+    const classicalProblem = getProblem("classical-sum-comparison");
+    if (quantumProblem?.answer.type !== "numeric" || classicalProblem?.answer.type !== "numeric") {
+      throw new Error("expected numeric problems");
+    }
+
+    const psi1 = new Complex(0.3);
+    const psi2 = Complex.fromPolar(0.3, (2 * Math.PI) / 3);
+    expect(quantumProblem.answer.value).toBeCloseTo(psi1.add(psi2).magnitudeSquared(), 6);
+    expect(classicalProblem.answer.value).toBeCloseTo(psi1.magnitudeSquared() + psi2.magnitudeSquared(), 9);
+  });
+
+  it("Pauli operators referenced across these problems are Hermitian, matching what the lessons claim", () => {
+    for (const pauli of [PAULI_X, PAULI_Y, PAULI_Z]) {
+      expect(pauli.equals(pauli.dagger(), 1e-9)).toBe(true);
     }
   });
 });

@@ -1,0 +1,170 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/stationary-states"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Stationary States",
+  description:
+    "Why energy eigenstates never change their measurement statistics over time, and why the expectation value of any Hamiltonian is exactly conserved for every state, not just its eigenstates — both proved directly from the time evolution operator.",
+  course: "classical-to-quantum",
+  module: "stationary-states",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 20,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"],
+  objectives: [
+    "Prove that an energy eigenstate evolves only by an overall phase",
+    "Explain why that makes every measurement probability time-independent for such a state",
+    "Prove that ⟨H⟩ is exactly conserved for any state, not only eigenstates of H",
+  ],
+};
+
+## Motivation
+
+The last lesson's worked example showed a superposition of energy
+eigenstates precessing — its measurement statistics genuinely change over
+time. This lesson proves the complementary fact directly: a state that
+starts as a *single* energy eigenstate never precesses at all, in a
+precise sense worth deriving rather than assuming.
+
+## Intuition
+
+If a state starts out as one exact "note" of the Hamiltonian (a single
+energy eigenstate), time evolution can only ever produce that same note,
+just shifted in phase — there's no other eigenstate around for it to leak
+into. A chord (superposition of several notes) is different: each note's
+phase advances at its own rate, and the *relative* phase between notes —
+which is what determines the chord's character — genuinely changes.
+
+## Mathematical Development
+
+### Energy eigenstates evolve by a single phase
+
+Let $|n\rangle$ satisfy $H|n\rangle = E_n|n\rangle$. The evolution
+operator is defined by its Taylor series, exactly like $e^{i\theta}$ was
+built from the Taylor series in the Complex Numbers lesson:
+
+$$
+U(t)|n\rangle = e^{-iHt/\hbar}|n\rangle = \sum_{k=0}^\infty \frac{1}{k!}\left(\frac{-iHt}{\hbar}\right)^k|n\rangle = \sum_{k=0}^\infty \frac{1}{k!}\left(\frac{-iE_nt}{\hbar}\right)^k|n\rangle = e^{-iE_nt/\hbar}|n\rangle
+$$
+
+(each power of $H$ acting on $|n\rangle$ just returns $E_n^k|n\rangle$,
+since $|n\rangle$ is an eigenvector of $H$, so the whole series collapses
+back into a plain number, $e^{-iE_nt/\hbar}$, times $|n\rangle$). So:
+
+$$
+|\psi(t)\rangle = e^{-iE_nt/\hbar}|n\rangle
+$$
+
+— the state at time $t$ is the *same* vector $|n\rangle$, multiplied by
+a single overall phase factor.
+
+### Every measurement probability is time-independent
+
+By Postulate 1, an overall phase factor doesn't change the physical
+state at all — $|n\rangle$ and $e^{-iE_nt/\hbar}|n\rangle$ represent the
+identical physical situation for every value of $t$. Concretely, for
+*any* observable $B$ with eigenbasis $\{|e_i\rangle\}$, the Born-rule
+probability is
+
+$$
+P(\lambda_i, t) = |\langle e_i|\psi(t)\rangle|^2 = |e^{-iE_nt/\hbar}|^2\,|\langle e_i|n\rangle|^2 = |\langle e_i|n\rangle|^2
+$$
+
+using $|e^{-iE_nt/\hbar}|=1$ (Complex Numbers lesson) — completely
+independent of $t$. This is why $|n\rangle$ is called a **stationary
+state**: not because the state *vector* is unchanging (it visibly isn't —
+it accrues phase continuously) but because every physically measurable
+prediction built from it is exactly constant in time.
+
+### Energy is exactly conserved, for any state
+
+Here's a stronger, more general fact: $\langle H\rangle$ itself is
+exactly conserved for *any* state, not only eigenstates of $H$. Since
+$U(t)=e^{-iHt/\hbar}$ is built purely out of $H$ (as a power series in
+$H$), it commutes with $H$: $U(t)H = HU(t)$, so $U^\dagger(t)HU(t)=H$
+exactly (using $U^\dagger(t)=U(-t)$, easily checked from the series).
+Then:
+
+$$
+\langle H\rangle_t = \langle\psi(t)|H|\psi(t)\rangle = \langle\psi(0)|U^\dagger(t)HU(t)|\psi(0)\rangle = \langle\psi(0)|H|\psi(0)\rangle = \langle H\rangle_0
+$$
+
+Total energy's expectation value never changes under Schrödinger
+evolution — the quantum version of energy conservation, and it holds
+generally, not just for the special case of an eigenstate.
+
+## Physical Interpretation
+
+"Stationary state" is standard language throughout chemistry and atomic
+physics: an electron in a definite energy eigenstate of an atom (an
+"orbital") has a probability distribution over position that is
+genuinely static in time, even though nothing about the underlying state
+vector has literally stopped changing. A superposition of two different
+orbitals, by contrast, has a probability distribution that visibly
+oscillates — the physical origin of phenomena like atomic transitions and
+Rabi oscillations, both built from exactly the precession picture the
+last lesson derived.
+
+## Worked Example
+
+**Verify stationarity directly for $H=\tfrac{\hbar\omega}{2}Z$,
+$|\psi(0)\rangle=|0\rangle$ (an eigenstate, with $H|0\rangle =
+\tfrac{\hbar\omega}{2}|0\rangle$).**
+
+By the formula above, $|\psi(t)\rangle = e^{-i(\hbar\omega/2)t/\hbar}|0\rangle
+= e^{-i\omega t/2}|0\rangle$ — matching the rotation-formula computation
+from the last lesson's practice question 1 exactly. The probability of
+measuring $|0\rangle$ again is $|e^{-i\omega t/2}|^2\cdot|\langle0|0\rangle|^2
+= 1\cdot1 = 1$ for every $t$ — certain, and constant, confirming
+stationarity concretely rather than only abstractly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Believing "stationary" means the state vector doesn't change at all.**
+It changes by an overall phase continuously — "stationary" refers
+specifically to every measurable prediction staying constant, which
+follows from that phase being unobservable, not from the phase being
+absent.
+</Callout>
+
+<Callout type="mistake">
+**Assuming energy conservation only holds for eigenstates of $H$.** The
+derivation above shows $\langle H\rangle$ is exactly conserved for *any*
+initial state — a genuinely more general fact than stationarity itself.
+</Callout>
+
+## Practice Questions
+
+1. Is a state that starts as a 50/50 superposition of two *different*
+   $H$-eigenstates a stationary state? Justify your answer using the
+   definition above, not just intuition.
+2. For $H=\tfrac{\hbar\omega}{2}Z$ and $|\psi(0)\rangle=|1\rangle$, find
+   $|\psi(t)\rangle$ and verify $P(1,t)=1$ for all $t$.
+3. Explain why $\langle H\rangle$ being exactly conserved for every state
+   is a *stronger* statement than "energy eigenstates are stationary" —
+   what extra case does it cover?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- An energy eigenstate evolves as $|\psi(t)\rangle=e^{-iE_nt/\hbar}|n\rangle$
+  — the same vector, times an overall phase.
+- Because global phase is unobservable, every measurement probability for
+  such a state is exactly constant in time — the definition of
+  "stationary."
+- $\langle H\rangle$ is exactly conserved for *any* state, derived from
+  $U(t)$ commuting with $H$ — a stronger, more general statement than
+  stationarity of eigenstates alone.
+
+## Further Exploration
+
+Next: **The Quantum Harmonic Oscillator**, which applies everything so
+far — Hermitian operators, eigenvalues, stationary states — to the single
+most important solvable system in quantum mechanics, built entirely from
+an algebraic ladder-operator structure rather than calculus.

@@ -1,0 +1,202 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Time Evolution and the Schrödinger Equation",
+  description:
+    "Deriving what unitary evolution must look like — the Hamiltonian, the Schrödinger equation, and a worked two-level example computed with the exact rotation machinery already built for the Bloch sphere.",
+  course: "classical-to-quantum",
+  module: "time-evolution-and-the-schrodinger-equation",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/expectation-values-and-uncertainty"],
+  objectives: [
+    "Derive that the generator of unitary time evolution must be Hermitian",
+    "State the time-dependent Schrödinger equation and derive it from U(t)=e^{-iHt/ℏ}",
+    "Compute a concrete two-level time evolution using the existing quantum engine",
+  ],
+};
+
+## Motivation
+
+Postulate 4 said evolution is unitary, without saying which unitary
+operator, or how it depends on time. This lesson derives the answer: the
+generator of continuous unitary evolution is forced to be Hermitian,
+which leads directly to the Schrödinger equation — not as a separate
+postulate to memorize, but as a consequence of unitarity plus ordinary
+calculus.
+
+## Intuition
+
+Think of evolving a state for a very short time $dt$ as a tiny nudge,
+$U(dt) \approx I + (\text{something}) \cdot dt$. Unitarity constrains what
+that "something" is allowed to be — and the constraint turns out to force
+it into exactly the same Hermitian-operator mold every observable already
+lives in.
+
+## Mathematical Development
+
+### The generator must be Hermitian
+
+Write the evolution operator for a short time step as
+$U(dt) = I - \tfrac{i}{\hbar}H\,dt + O(dt^2)$ for some operator $H$ to be
+determined ($\hbar$ and the factor of $i$ are conventional choices that
+make $H$ come out with units of energy, confirmed below). Impose
+unitarity, $U^\dagger(dt)U(dt)=I$, and keep only first-order terms in
+$dt$:
+
+$$
+U^\dagger U = \left(I+\tfrac{i}{\hbar}H^\dagger dt\right)\left(I-\tfrac{i}{\hbar}H\,dt\right) = I + \tfrac{i}{\hbar}(H^\dagger - H)\,dt + O(dt^2)
+$$
+
+For this to equal $I$ at first order, the $dt$ term must vanish:
+$H^\dagger = H$ — **the generator of unitary evolution must be
+Hermitian.** This is exactly why the Postulates lesson could already
+identify $H$ (once the physical identification below is made) with
+energy: Hermitian operators are precisely what Postulate 2 reserves for
+observables.
+
+### From the generator to the Schrödinger equation
+
+Chaining infinitesimal steps (or, equivalently, solving the differential
+equation this construction implies) gives the finite-time evolution
+operator:
+
+$$
+U(t) = e^{-iHt/\hbar}
+$$
+
+Differentiate both sides of $|\psi(t)\rangle = U(t)|\psi(0)\rangle$ with
+respect to $t$, using $\frac{d}{dt}e^{-iHt/\hbar} =
+-\tfrac{i}{\hbar}H\,e^{-iHt/\hbar}$ (ordinary calculus applied to the
+operator exponential):
+
+$$
+\frac{d}{dt}|\psi(t)\rangle = -\frac{i}{\hbar}H\,U(t)|\psi(0)\rangle = -\frac{i}{\hbar}H|\psi(t)\rangle
+$$
+
+Rearranged, this is the **time-dependent Schrödinger equation**:
+
+$$
+\boxed{i\hbar\frac{d}{dt}|\psi(t)\rangle = H|\psi(t)\rangle}
+$$
+
+$H$ is called the **Hamiltonian**, and it's physically identified with
+the system's total energy (the same identification that makes the
+$E=\hbar\omega$ relation from de Broglie/Planck-era physics consistent
+with this framework — a connection made precise once this course's
+successor, Wave Mechanics, introduces continuous position). This
+identification is itself a further physical input, not something the
+unitarity argument alone proves — it's confirmed by every subsequent
+prediction matching experiment.
+
+### A concrete two-level example — reusing existing machinery
+
+For a two-level system, any traceless Hermitian $2\times2$ matrix can be
+written $H = \tfrac{\hbar\omega}{2}(\hat n\cdot\vec\sigma)$ for a real
+number $\omega$, a unit vector $\hat n$, and the Pauli matrices
+$\vec\sigma=(X,Y,Z)$ (traceless is no real restriction — adding a
+multiple of the identity only contributes an unobservable global phase,
+as the Global Phase vs. Relative Phase lesson in the Quantum Computing
+track shows directly). Then:
+
+$$
+U(t) = e^{-iHt/\hbar} = e^{-i(\omega t/2)(\hat n\cdot\vec\sigma)} = \cos\!\left(\frac{\omega t}{2}\right)I - i\sin\!\left(\frac{\omega t}{2}\right)(\hat n\cdot\vec\sigma)
+$$
+
+This is **exactly** the `rotationAboutAxis` function already built in
+this platform's quantum engine for the Bloch Sphere Explorer — no new
+code is needed to compute it, only the substitution $\theta=\omega t$.
+Time evolution under a two-level Hamiltonian *is* a rotation of the Bloch
+sphere at constant angular velocity $\omega$ about the axis $\hat n$ — if
+you've used the Bloch Sphere Explorer's rotation gates, you've already
+computed this exact evolution operator, one discrete step at a time.
+
+## Physical Interpretation
+
+A state that starts as an eigenstate of $H$ stays an eigenstate of $H$
+for all time — the next lesson, Stationary States, proves this directly
+from the formula for $U(t)$ above. A state that starts as a
+superposition of two different-energy eigenstates instead **precesses**:
+its measurement probabilities for other observables oscillate in time at
+a frequency set by the energy difference between those eigenstates —
+exactly the rotation picture just derived.
+
+## Worked Example
+
+**$H = \frac{\hbar\omega}{2}Z$ (so $\hat n = \hat z$). The system starts
+in $|\psi(0)\rangle=|+\rangle$. Find $|\psi(t)\rangle$ and its
+probability of measuring $|+\rangle$ again at time $t$.**
+
+Using the rotation formula with $\hat n=\hat z$:
+
+$$
+U(t) = \cos\!\left(\frac{\omega t}{2}\right)I - i\sin\!\left(\frac{\omega t}{2}\right)Z
+$$
+
+Applied to $|+\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, and using
+$Z|0\rangle=|0\rangle$, $Z|1\rangle=-|1\rangle$:
+
+$$
+|\psi(t)\rangle = \frac{1}{\sqrt2}\left[\left(\cos\tfrac{\omega t}{2}-i\sin\tfrac{\omega t}{2}\right)|0\rangle + \left(\cos\tfrac{\omega t}{2}+i\sin\tfrac{\omega t}{2}\right)|1\rangle\right] = \frac{1}{\sqrt2}\left(e^{-i\omega t/2}|0\rangle+e^{i\omega t/2}|1\rangle\right)
+$$
+
+The probability of measuring $|+\rangle$ again is
+$|\langle+|\psi(t)\rangle|^2$. Computing $\langle+|\psi(t)\rangle =
+\tfrac{1}{\sqrt2}\left(\tfrac{1}{\sqrt2}e^{-i\omega t/2} +
+\tfrac{1}{\sqrt2}e^{i\omega t/2}\right) = \tfrac12(e^{-i\omega
+t/2}+e^{i\omega t/2}) = \cos(\omega t/2)$ (Euler's formula, again), the
+probability is $\cos^2(\omega t/2)$ — the state precesses around the
+Bloch sphere's equator at angular frequency $\omega$, returning to
+$|+\rangle$ exactly (probability $1$) at $t=0, \tfrac{2\pi}{\omega},
+\tfrac{4\pi}{\omega},\ldots$
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating the Schrödinger equation as something separate from
+unitarity, to be additionally postulated.** As derived above, it follows
+directly from requiring the generator of unitary evolution to be
+Hermitian — the two are the same statement in different forms.
+</Callout>
+
+<Callout type="mistake">
+**Confusing $H$ (an operator) with $E$ (a number).** $H$'s *eigenvalues*
+are energies; $H$ itself acts on the whole Hilbert space, not just on
+one eigenstate.
+</Callout>
+
+## Practice Questions
+
+1. For $H=\tfrac{\hbar\omega}{2}Z$ and initial state $|\psi(0)\rangle=|0\rangle$
+   (an eigenstate of $H$), use the rotation formula to find
+   $|\psi(t)\rangle$. (Compare your answer to the next lesson's claim
+   about eigenstates of $H$.)
+2. Using the worked example's result, at what time $t$ (in terms of
+   $\omega$) is the system guaranteed to be found in $|-\rangle$ instead
+   of $|+\rangle$ with certainty?
+3. Explain, using the derivation of $U(dt)$, why a non-Hermitian generator
+   would fail to produce a norm-preserving evolution.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Requiring $U(dt)=I-\tfrac{i}{\hbar}H\,dt$ to be unitary forces
+  $H^\dagger=H$ — the generator of time evolution must be Hermitian.
+- This gives $U(t)=e^{-iHt/\hbar}$, and differentiating it gives the
+  Schrödinger equation $i\hbar\,d|\psi\rangle/dt = H|\psi\rangle$.
+- For a two-level system, $U(t)$ is exactly the existing
+  `rotationAboutAxis` function — time evolution under a qubit Hamiltonian
+  is Bloch-sphere precession, reusing code rather than needing new math.
+
+## Further Exploration
+
+Next: **Stationary States**, which proves directly from $U(t)=e^{-iHt/\hbar}$
+that energy eigenstates never change their measurement statistics over
+time — only accumulate an overall phase.

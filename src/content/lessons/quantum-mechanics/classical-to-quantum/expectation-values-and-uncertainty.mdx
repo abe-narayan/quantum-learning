@@ -1,0 +1,216 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/expectation-values-and-uncertainty"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Expectation Values and Uncertainty",
+  description:
+    "A full derivation of the generalized uncertainty relation ΔA·ΔB ≥ ½|⟨[A,B]⟩| from Cauchy-Schwarz — the precise, general reason two observables can fail to both be definite at once.",
+  course: "classical-to-quantum",
+  module: "expectation-values-and-uncertainty",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics"],
+  objectives: [
+    "Compute the expectation value and uncertainty (standard deviation) of an observable in a given state",
+    "Derive the generalized uncertainty relation from the Cauchy-Schwarz inequality",
+    "Explain the uncertainty principle as a statement about commutators, not a measurement-disturbance story",
+  ],
+};
+
+## Motivation
+
+The Postulates lesson stated that a state generally doesn't give a
+definite value for an observable — only a probability distribution over
+outcomes. That distribution has a spread, and this lesson makes "how
+much spread" precise, then derives exactly when two different observables
+are forced to have a *trade-off* in their spreads — the uncertainty
+principle, as a genuine theorem rather than a slogan about disturbing
+what you measure.
+
+## Intuition
+
+If you measured the same observable on many identically-prepared copies
+of the same state, you'd get a distribution of outcomes with some average
+and some spread around that average — exactly like a real, empirical
+statistics. Quantum uncertainty is that same ordinary statistical spread,
+computed for the underlying quantum probability distribution.
+
+## Mathematical Development
+
+### Expectation value and uncertainty, formally
+
+For a normalized state $|\psi\rangle$ and Hermitian observable $A$, the
+**expectation value** is $\langle A\rangle = \langle\psi|A|\psi\rangle$
+(already used in the Hermitian Operators lesson), and the **variance** is
+
+$$
+\operatorname{Var}(A) = \langle (A-\langle A\rangle)^2\rangle = \langle A^2\rangle - \langle A\rangle^2
+$$
+
+— the same "mean of the squared deviation" formula as ordinary
+statistics, since $P(\lambda_i)$ from the Born rule is a genuine
+probability distribution. The **uncertainty** is
+$\Delta A = \sqrt{\operatorname{Var}(A)}$, the standard deviation of
+measurement outcomes.
+
+### Setting up the derivation
+
+Let $A,B$ be Hermitian, and define the *shifted* operators
+$\tilde A = A - \langle A\rangle I$, $\tilde B = B - \langle B\rangle I$
+(still Hermitian, since $\langle A\rangle,\langle B\rangle$ are real
+numbers). By construction, $\langle\tilde A\rangle=\langle\tilde
+B\rangle=0$, and $\operatorname{Var}(A)=\langle\tilde A^2\rangle$,
+$\operatorname{Var}(B)=\langle\tilde B^2\rangle$. Also note
+$[\tilde A,\tilde B]=[A,B]$ exactly — subtracting a constant multiple of
+the identity never changes a commutator, since the identity commutes with
+everything.
+
+Define $|f\rangle = \tilde A|\psi\rangle$, $|g\rangle=\tilde B|\psi\rangle$.
+Then $\langle f|f\rangle = \langle\psi|\tilde A^\dagger\tilde
+A|\psi\rangle = \langle\psi|\tilde A^2|\psi\rangle=\operatorname{Var}(A)$
+(using $\tilde A^\dagger=\tilde A$, Hermitian), and similarly
+$\langle g|g\rangle=\operatorname{Var}(B)$.
+
+### Applying Cauchy-Schwarz
+
+By the Cauchy-Schwarz inequality (Inner Products lesson):
+
+$$
+|\langle f|g\rangle|^2 \le \langle f|f\rangle\langle g|g\rangle = \operatorname{Var}(A)\operatorname{Var}(B)
+$$
+
+Now examine $\langle f|g\rangle = \langle\psi|\tilde A\tilde B|\psi\rangle$
+more closely. Split $\tilde A\tilde B$ into symmetric and antisymmetric
+parts:
+
+$$
+\tilde A\tilde B = \tfrac12(\tilde A\tilde B+\tilde B\tilde A) + \tfrac12(\tilde A\tilde B-\tilde B\tilde A) = \tfrac12\{\tilde A,\tilde B\} + \tfrac12[\tilde A,\tilde B]
+$$
+
+where $\{\cdot,\cdot\}$ is the **anticommutator**. The first piece,
+$\{\tilde A,\tilde B\}$, is Hermitian (its adjoint is
+$\tilde B^\dagger\tilde A^\dagger+\tilde A^\dagger\tilde B^\dagger =
+\tilde B\tilde A+\tilde A\tilde B$, the same operator back again), so its
+expectation value is **real**. The second piece, $[\tilde A,\tilde B]$,
+is *anti*-Hermitian (its adjoint is $\tilde B\tilde A-\tilde A\tilde
+B=-[\tilde A,\tilde B]$), and an operator whose adjoint is its own
+negative always has a purely **imaginary** expectation value (the same
+kind of argument the Hermitian Operators lesson used, with a sign
+flipped).
+
+So $\langle f|g\rangle = (\text{real number}) + (\text{purely imaginary
+number})$ — a genuine complex number with those exact real and imaginary
+parts. Its squared magnitude is the sum of the squares of those two parts,
+so dropping the non-negative real-part-squared term only makes the bound
+weaker, never wrong:
+
+$$
+|\langle f|g\rangle|^2 = \left(\tfrac12\langle\{\tilde A,\tilde B\}\rangle\right)^2 + \left(\tfrac12\langle[\tilde A,\tilde B]\rangle/i\right)^2 \ge \left(\tfrac12|\langle[A,B]\rangle|\right)^2
+$$
+
+### The result
+
+Combining with the Cauchy-Schwarz step above:
+
+$$
+\operatorname{Var}(A)\operatorname{Var}(B) \ge |\langle f|g\rangle|^2 \ge \left(\tfrac12|\langle[A,B]\rangle|\right)^2
+$$
+
+Taking square roots (everything here is non-negative):
+
+$$
+\boxed{\Delta A\,\Delta B \ge \tfrac12\left|\langle[A,B]\rangle\right|}
+$$
+
+This is the **generalized uncertainty relation**. It's a genuine theorem,
+derived entirely from Cauchy-Schwarz and the definitions of Hermitian and
+anti-Hermitian operators — nothing here invoked measurement disturbance,
+experimental limitations, or any physical argument beyond the postulates
+already established.
+
+### When is there no trade-off at all?
+
+If $[A,B]=0$ (the operators **commute**), the right-hand side is zero,
+and the inequality places no restriction at all — both observables *can*
+be made simultaneously as sharp as you like (in particular, simultaneous
+eigenstates of both exist). Uncertainty trade-offs are specifically a
+consequence of **non-commuting** observables, not a universal fact about
+all pairs.
+
+## Physical Interpretation
+
+The familiar position-momentum uncertainty principle, $\Delta x\,\Delta p
+\ge \hbar/2$, is this exact relation applied to the specific commutator
+$[x,p]=i\hbar$ (introduced properly in the Position and Momentum lesson).
+The derivation above shows this isn't about clumsy measuring instruments
+disturbing a system — it's a structural fact about non-commuting
+Hermitian operators, true even for perfect, idealized measurements.
+
+## Worked Example
+
+**For Pauli operators $A=X$, $B=Y$ (from the Mathematical Foundations
+course), $[X,Y]=2iZ$. In the state $|0\rangle$ (a $Z$-eigenstate,
+$\langle Z\rangle=1$), verify the uncertainty relation.**
+
+$\langle[X,Y]\rangle = 2i\langle Z\rangle = 2i$, so the right-hand side is
+$\tfrac12|2i| = 1$. For the left-hand side: $\langle X\rangle=0$,
+$\langle X^2\rangle=\langle I\rangle=1$ (since $X^2=I$), so
+$\operatorname{Var}(X)=1$, $\Delta X=1$; identically $\Delta Y=1$. So
+$\Delta X\,\Delta Y = 1 \ge 1$ — the bound is **exactly saturated**, not
+merely satisfied. (This is expected: $|0\rangle$ is a special "minimum
+uncertainty" state for this pair, not a coincidence of the numbers
+chosen.)
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Describing uncertainty as "measuring one property disturbs the other."**
+The derivation above never mentions a measurement disturbing anything —
+it's a property of the state and the two operators, true even for a
+single idealized measurement of each, considered separately.
+</Callout>
+
+<Callout type="mistake">
+**Assuming every pair of observables has a nontrivial trade-off.**
+Commuting observables ($[A,B]=0$) have no uncertainty relation forcing
+any trade-off at all.
+</Callout>
+
+## Practice Questions
+
+1. For $A=Z, B=X$ (so $[Z,X]=2iY$, by antisymmetry of the commutator
+   applied to the relation used in the worked example), in state
+   $|0\rangle$: find $\langle[Z,X]\rangle$ and the right-hand side bound.
+2. In the state $|+\rangle$, $X$ is definite (it's an eigenstate of $X$),
+   so $\Delta X=0$. Compute $\Delta Z$ in $|+\rangle$, then compute
+   $\langle[Z,X]\rangle$ in $|+\rangle$ and verify the uncertainty
+   relation still holds even with one side exactly zero.
+3. If $[A,B]=0$ for two observables, what does the derivation above say
+   about whether a state can be a simultaneous eigenstate of both?
+4. Explain, using the derivation, why $\operatorname{Var}(A)=0$ (a
+   definite value for $A$) forces $\langle[A,B]\rangle=0$ for that
+   particular state, for any $B$.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\operatorname{Var}(A)=\langle A^2\rangle-\langle A\rangle^2$;
+  $\Delta A = \sqrt{\operatorname{Var}(A)}$ — ordinary statistics applied
+  to the Born-rule distribution.
+- $\Delta A\,\Delta B \ge \tfrac12|\langle[A,B]\rangle|$, derived from
+  Cauchy-Schwarz applied to the shifted operators $\tilde A,\tilde B$.
+- The bound is exactly zero (no trade-off) whenever $[A,B]=0$.
+- This is a structural theorem about non-commuting Hermitian operators,
+  not a story about measurement disturbance.
+
+## Further Exploration
+
+Next: **Time Evolution and the Schrödinger Equation**, which uses
+Postulate 4 to derive exactly what $U(t)$ looks like, and works a genuine
+two-level example computed directly with the existing quantum engine.

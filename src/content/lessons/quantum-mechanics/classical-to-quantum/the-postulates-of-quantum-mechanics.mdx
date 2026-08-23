@@ -1,0 +1,192 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Postulates of Quantum Mechanics",
+  description:
+    "The complete, compact statement of quantum theory's mathematical content — states, observables, measurement, and dynamics — with each postulate physically motivated by what the last three lessons showed experiment requires.",
+  course: "classical-to-quantum",
+  module: "the-postulates-of-quantum-mechanics",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/why-complex-amplitudes"],
+  objectives: [
+    "State all four postulates of quantum mechanics",
+    "Explain the physical motivation behind each one, not just its mathematical statement",
+    "Apply the postulates to compute measurement probabilities for a concrete two-level system",
+  ],
+};
+
+## Motivation
+
+The Mathematical Foundations course built the complete linear-algebra
+toolkit — vectors, inner products, Hermitian and unitary operators, the
+Born rule — as pure mathematics. The last three lessons built the
+physical case for why nature needs exactly this kind of structure:
+amplitudes that interfere (not classical probabilities), and specifically
+complex ones (not merely signed real ones). This lesson puts the two
+halves together into the actual postulates of quantum mechanics — the
+short list of assumptions that, together, *is* the theory.
+
+## Intuition
+
+A postulate isn't proven the way a theorem is — it's the starting
+assumption a theory is built from, justified by how well its
+*consequences* match experiment, not by derivation from something more
+basic. Quantum mechanics has just four of them, and by this point in the
+course you already have all the mathematical machinery each one needs.
+
+## Mathematical Development
+
+### Postulate 1 — States
+
+The physical state of a system is a normalized vector $|\psi\rangle$ in a
+complex Hilbert space, with $|\psi\rangle$ and $e^{i\alpha}|\psi\rangle$
+representing the identical physical situation for any real $\alpha$.
+
+*Why a vector space, and why complex:* interference (lesson 2) requires
+combining multiple contributions — $|\psi\rangle = c_1|{\rm path}_1\rangle +
+c_2|{\rm path}_2\rangle+\cdots$ — which is exactly a linear combination,
+the defining operation of a vector space. The coefficients need to be
+complex specifically because only a complex phase supplies the continuous
+interference parameter lesson 3 showed the data requires. Normalization
+and the phase-invariance clause are exactly the content of the
+Probability and Quantum States lesson, derived there rather than merely
+asserted.
+
+### Postulate 2 — Observables
+
+Every measurable physical quantity corresponds to a Hermitian operator
+$A$ acting on that Hilbert space. Its possible measured values are
+exactly $A$'s eigenvalues.
+
+*Why Hermitian:* a measurement outcome is a real number, full stop — the
+Hermitian Operators lesson proved Hermiticity is exactly the algebraic
+condition guaranteeing real eigenvalues, and (for repeated identical
+measurements) that different outcomes correspond to orthogonal,
+perfectly-distinguishable states.
+
+### Postulate 3 — Measurement (the Born rule)
+
+If $A=\sum_i\lambda_i|e_i\rangle\langle e_i|$ (spectral decomposition),
+measuring $A$ on state $|\psi\rangle$ gives outcome $\lambda_i$ with
+probability $P(\lambda_i) = |\langle e_i|\psi\rangle|^2$, and the state
+becomes $|e_i\rangle$ immediately afterward.
+
+*Why this rule specifically:* this is exactly the amplitude-squared rule
+lessons 2 and 3 showed experiment requires, generalized from two
+interfering paths to a full basis of possible outcomes. The Probability
+and Quantum States lesson additionally checked this rule is *consistent*
+— total probability across all outcomes always sums to exactly $1$,
+guaranteed by the completeness relation.
+
+### Postulate 4 — Dynamics
+
+Between measurements, a state evolves according to $|\psi(t)\rangle =
+U(t)|\psi(0)\rangle$ for a unitary operator $U(t)$.
+
+*Why unitary:* the Unitary Operators lesson proved unitary operators are
+exactly the ones that preserve inner products, hence norms — evolution
+has to keep $|\psi\rangle$ normalized (total probability can't drift away
+from $1$ just from time passing), and unitarity is the precise, necessary
+and sufficient condition for that. This course's Time Evolution and the
+Schrödinger Equation lesson makes $U(t)$ fully explicit.
+
+### The complete picture
+
+| Postulate | States what | Justified by |
+|---|---|---|
+| 1. States | Physical state = unit vector, up to global phase | Interference needs superposition; phase invariance derived in Probability & Quantum States |
+| 2. Observables | Measurable quantity = Hermitian operator | Real outcomes require real eigenvalues |
+| 3. Measurement | Outcome probability = $\lvert\langle e_i\lvert\psi\rangle\rvert^2$ | The exact rule interference data requires |
+| 4. Dynamics | Time evolution = unitary operator | Normalization must be preserved over time |
+
+Every calculation the rest of this course — and the entire Quantum
+Computing pillar — performs is an application of these four statements to
+a specific system.
+
+## Physical Interpretation
+
+Notice what's *not* here: nothing about position, momentum, particles, or
+waves specifically. The postulates are deliberately general — they say
+nothing about what the Hilbert space or the particular observables *are*
+for any given physical system, only how states, observables, measurement,
+and evolution relate to each other once you've identified them. A qubit
+(finite-dimensional Hilbert space, spin-like observables) and a particle
+in space (infinite-dimensional Hilbert space, position and momentum
+observables) are both governed by the identical four postulates — only
+the specific Hilbert space and operators differ. Later lessons in this
+course apply the postulates to position and momentum; the Quantum
+Computing pillar applies the exact same postulates to qubits.
+
+## Worked Example
+
+**A two-level system (any system with exactly two possible outcomes for
+some observable $A$, with eigenvalues $+1,-1$ and eigenvectors
+$|e_+\rangle,|e_-\rangle$) is prepared in state
+$|\psi\rangle=\cos(\pi/6)|e_+\rangle+\sin(\pi/6)|e_-\rangle$. Find
+$P(+1)$, $P(-1)$, and $\langle A\rangle$.**
+
+By Postulate 3: $P(+1)=|\cos(\pi/6)|^2 = (\tfrac{\sqrt3}{2})^2=\tfrac34$,
+and $P(-1)=|\sin(\pi/6)|^2=(\tfrac12)^2=\tfrac14$. Check:
+$\tfrac34+\tfrac14=1$ ✓, consistent with $|\psi\rangle$ being normalized
+(Postulate 1). Expectation value:
+$\langle A\rangle = (+1)(\tfrac34)+(-1)(\tfrac14)=\tfrac12$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating the postulates as things to be "proven" from something deeper.**
+They're the theory's starting assumptions — justified by matching every
+experiment performed against them for over a century, not derived from a
+more fundamental theory. (Whether they *can* be derived from something
+more basic is an active, unresolved area of theoretical physics, not a
+gap in this course.)
+</Callout>
+
+<Callout type="mistake">
+**Forgetting Postulate 1's phase-invariance clause when checking whether
+two written-down states are "the same."** $|\psi\rangle$ and
+$-|\psi\rangle$ (global phase $\alpha=\pi$) are the identical physical
+state, even though they look different as vectors.
+</Callout>
+
+## Practice Questions
+
+1. A two-level system is in state
+   $|\psi\rangle=\frac{1}{\sqrt5}|e_+\rangle+\frac{2}{\sqrt5}|e_-\rangle$
+   (same eigenvalues as the worked example). Find $P(+1)$ and $\langle
+   A\rangle$.
+2. Explain, citing the specific earlier lesson, why Postulate 2 requires
+   Hermitian operators rather than allowing any linear operator.
+3. Explain, citing the specific earlier lesson, why Postulate 4 requires
+   unitary operators rather than allowing any invertible operator.
+4. Why does Postulate 1 need a full vector space rather than, say, a
+   single real number per state?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- **State**: a normalized vector, up to global phase. **Observable**: a
+  Hermitian operator, whose eigenvalues are the possible outcomes.
+  **Measurement**: outcome probabilities via
+  $P(\lambda_i)=\lvert\langle e_i\lvert\psi\rangle\rvert^2$, collapsing the
+  state to $\lvert e_i\rangle$. **Dynamics**: evolution by a unitary
+  operator.
+- Every one of the four is justified by a specific earlier result — none
+  is arbitrary.
+- The postulates say nothing about which physical system they apply to;
+  that specificity comes from choosing the Hilbert space and operators.
+
+## Further Exploration
+
+Next: **Expectation Values and Uncertainty**, which uses the postulates
+just stated to derive the general uncertainty relation between any two
+observables — the precise mathematical reason position and momentum can
+never both be perfectly definite at once.

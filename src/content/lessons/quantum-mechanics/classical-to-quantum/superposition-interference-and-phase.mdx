@@ -1,0 +1,185 @@
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/superposition-interference-and-phase"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Superposition, Interference, and Phase",
+  description:
+    "A full derivation showing interference is basis-dependent — a relative phase invisible to a measurement in one basis becomes a continuously-varying probability in another — unifying the double-slit picture with the precession result from Time Evolution.",
+  course: "classical-to-quantum",
+  module: "superposition-interference-and-phase",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/position-and-momentum"],
+  objectives: [
+    "State the superposition principle as a direct consequence of Postulate 1",
+    "Derive that relative phase is invisible when measuring in a superposition's own basis, but visible when measuring in a different one",
+    "Recognize the same cos²(φ/2)-type formula appearing in both interference and time-evolution contexts",
+  ],
+};
+
+## Motivation
+
+Early in this course, interference appeared as a fact about two physical
+paths to a screen. By now, the tools exist to state it far more
+generally, and more usefully: interference is a statement about
+*measurement bases*, not specifically about paths — and the exact same
+formula that produced the double-slit fringe pattern also produced the
+Time Evolution lesson's precession result. This lesson makes that
+unification explicit.
+
+## Intuition
+
+A superposition $|\psi\rangle = c_a|a\rangle+c_b|b\rangle$ has a relative
+phase between $c_a$ and $c_b$. Measure in the $\{|a\rangle,|b\rangle\}$
+basis itself, and that phase is completely invisible — $P(a)=|c_a|^2$
+doesn't care what phase $c_a$ carries. Measure in a *different* basis
+instead, and the phase suddenly matters enormously, continuously
+reshaping the outcome probabilities. Interference is what happens when
+you ask a question (a choice of measurement basis) that doesn't line up
+with the way a state happens to be written.
+
+## Mathematical Development
+
+### The superposition principle
+
+Postulate 1 says any normalized vector in the Hilbert space is a valid
+physical state. So if $|a\rangle,|b\rangle$ are both valid states, any
+normalized combination $|\psi\rangle=c_a|a\rangle+c_b|b\rangle$
+($|c_a|^2+|c_b|^2=1$) is too — this is the entire content of the
+**superposition principle**: nothing extra to postulate beyond the
+vector-space structure already built.
+
+### Measuring in the "natural" basis: no interference
+
+If $\{|a\rangle,|b\rangle\}$ is itself an orthonormal eigenbasis of the
+observable being measured, the Born rule gives $P(a)=|c_a|^2$,
+$P(b)=|c_b|^2$ directly — no cross terms, no dependence on the relative
+phase between $c_a$ and $c_b$ at all.
+
+### Measuring in a different basis: interference appears
+
+Take the concrete case $|\psi\rangle =
+\tfrac{1}{\sqrt2}\left(|0\rangle+e^{i\varphi}|1\rangle\right)$, and
+measure in the $\{|+\rangle,|-\rangle\}$ basis instead of
+$\{|0\rangle,|1\rangle\}$. Using
+$|+\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$:
+
+$$
+\langle+|\psi\rangle = \frac12\left(\langle0|+\langle1|\right)\left(|0\rangle+e^{i\varphi}|1\rangle\right) = \frac12\left(1+e^{i\varphi}\right)
+$$
+
+$$
+P(+) = |\langle+|\psi\rangle|^2 = \frac14\left|1+e^{i\varphi}\right|^2 = \frac14\left(1+e^{i\varphi}\right)\left(1+e^{-i\varphi}\right) = \frac14\left(2+e^{i\varphi}+e^{-i\varphi}\right) = \frac{1+\cos\varphi}{2}
+$$
+
+(using $e^{i\varphi}+e^{-i\varphi}=2\cos\varphi$, from Euler's formula).
+This is a genuine interference pattern in $\varphi$: $P(+)$ ranges from
+$1$ (at $\varphi=0$, fully constructive) down to $0$ (at $\varphi=\pi$,
+fully destructive) — exactly the double-slit fringe shape, now derived
+for a projective measurement in a rotated basis rather than for two
+physical paths to a screen. **The relative phase that was completely
+invisible when measuring in the $\{|0\rangle,|1\rangle\}$ basis is fully
+visible here.**
+
+### The same formula, twice
+
+Compare $P(+)=\tfrac{1+\cos\varphi}{2}$ to the Time Evolution lesson's
+result, $P(\text{still }|+\rangle\text{ at time }t) = \cos^2(\omega
+t/2)$. The half-angle identity $\cos^2(\theta/2) =
+\tfrac{1+\cos\theta}{2}$ shows these are the *same* formula, with
+$\varphi \leftrightarrow \omega t$. Precession in time and interference
+across a change of measurement basis are not two different phenomena
+that happen to look similar — they're the identical mathematical
+statement, $\tfrac{1+\cos(\text{phase})}{2}$, arising once from a state
+evolving and once from a state being probed in a different basis.
+
+## Physical Interpretation
+
+This reframes what "which-path information destroys interference" (from
+the earlier lesson) really means: detecting which path a particle took
+is, mathematically, a measurement in the $\{|0\rangle,|1\rangle\}$-type
+"path basis" — and as shown above, that basis is exactly the one in which
+the relative phase becomes invisible. Choosing *not* to measure which
+path, and instead measuring in a basis like $\{|+\rangle,|-\rangle\}$
+that mixes the two paths together, is precisely what makes the phase-
+dependent interference pattern appear. Nothing mysterious is added by
+"observation" — it's the ordinary Born rule, evaluated in two different
+bases.
+
+## Interactive Experiment
+
+Switch the explorer below to two-amplitude mode. The probability bars for
+$P(0)=|\alpha|^2$ and $P(1)=|\beta|^2$ (measuring in the state's own
+basis) stay fixed as you drag the relative-phase slider — confirming the
+"no interference in the natural basis" result above directly. The
+"quantum vs. classical" comparison beneath it is exactly the
+$\{|+\rangle,|-\rangle\}$-style cross-basis measurement this lesson just
+derived: watch it trace out the same $\tfrac{1+\cos\varphi}{2}$ shape as
+you sweep the slider through a full turn.
+
+<LazyComplexAmplitudeExplorer />
+
+## Worked Example
+
+**For $\varphi=2\pi/3$, find $P(+)$ using the derived formula.**
+
+$$
+P(+) = \frac{1+\cos(2\pi/3)}{2} = \frac{1+(-\tfrac12)}{2} = \frac{1/2}{2}=\frac14
+$$
+
+Check against the direct calculation:
+$\langle+|\psi\rangle=\tfrac12(1+e^{i2\pi/3})$, and
+$e^{i2\pi/3}=-\tfrac12+\tfrac{\sqrt3}{2}i$, so
+$1+e^{i2\pi/3}=\tfrac12+\tfrac{\sqrt3}{2}i$, with squared magnitude
+$\tfrac14+\tfrac34=1$; then $P(+)=\tfrac14\cdot1=\tfrac14$ ✓, matching.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming relative phase always shows up in probabilities, in every
+basis.** It's invisible in the superposition's own basis by construction
+— it only appears once you measure in a basis that mixes the original
+terms together.
+</Callout>
+
+<Callout type="mistake">
+**Treating interference and time evolution as unrelated topics that
+happen to share notation.** As derived above, they produce the literal
+same formula via the half-angle identity — not a coincidence, a genuine
+mathematical identity between two physically different setups.
+</Callout>
+
+## Practice Questions
+
+1. For $\varphi=\pi/2$, compute $P(+)$ using the derived formula, and
+   compare to $P(-)=1-P(+)$.
+2. Show that $P(+)+P(-)=1$ for any $\varphi$, directly from
+   $P(+)=\tfrac{1+\cos\varphi}{2}$ (you'll need $P(-)$'s analogous
+   formula, which has a minus sign in place of the plus).
+3. At what value(s) of $\varphi$ in $[0,2\pi)$ is $P(+)$ minimized, and
+   what is that minimum value?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Superposition is a direct consequence of Postulate 1's vector-space
+  structure — nothing extra to add.
+- Measuring in a superposition's own basis hides relative phase
+  completely; measuring in a different basis reveals it, via
+  $P=\tfrac{1+\cos\varphi}{2}$, derived directly from the Born rule.
+- This same formula (via a half-angle identity) is exactly the Time
+  Evolution lesson's precession probability — interference-across-bases
+  and precession-in-time are the same mathematics.
+
+## Further Exploration
+
+Next: **From Postulates to Quantum Computing**, the capstone connecting
+every idea in this course directly to the Quantum Computing pillar's
+treatment of qubits, gates, and circuits.

@@ -1,0 +1,144 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mechanics/classical-to-quantum/from-postulates-to-quantum-computing"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "From Postulates to Quantum Computing",
+  description:
+    "A synthesis capstone connecting every idea in this course directly to qubits, gates, and circuits — a qubit is simply the smallest nontrivial example of everything just derived.",
+  course: "classical-to-quantum",
+  module: "from-postulates-to-quantum-computing",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 25,
+  prerequisites: ["quantum-mechanics/classical-to-quantum/superposition-interference-and-phase"],
+  objectives: [
+    "Identify a qubit as a 2-dimensional Hilbert space with the same four postulates as any other quantum system",
+    "Map each result from this course onto its counterpart in the Quantum Computing pillar",
+    "Solve synthesis problems that combine tools from more than one lesson in this course",
+  ],
+};
+
+## Motivation
+
+This course built the postulates of quantum mechanics from the ground
+up: states, observables, measurement, dynamics, uncertainty, and two
+concrete solvable systems (a generic two-level system and the harmonic
+oscillator). The Quantum Computing pillar, if you haven't taken it yet
+(or even if you have), is not a different subject requiring new physics
+— it's this exact framework, applied to the smallest nontrivial Hilbert
+space there is.
+
+## Recap: A Qubit Is a Two-Level Quantum System
+
+| This course's postulate | Quantum Computing's version |
+|---|---|
+| State = unit vector in $\mathbb{C}^n$, up to phase | Qubit state $\alpha\lvert0\rangle+\beta\lvert1\rangle$, $\lvert\alpha\rvert^2+\lvert\beta\rvert^2=1$ |
+| Observable = Hermitian operator | The computational-basis measurement (a projective measurement in the $\{\lvert0\rangle,\lvert1\rangle\}$ basis) |
+| Measurement = Born rule | $P(0)=\lvert\alpha\rvert^2$, $P(1)=\lvert\beta\rvert^2$ — the exact same formula, in the exact same words |
+| Dynamics = unitary evolution | Quantum gates ($X,H,S,\ldots$) — every gate is a unitary matrix |
+| Uncertainty relation | The Pauli operators' commutators, worked directly in this course's Expectation Values lesson |
+| Two-level Hamiltonian evolution | Bloch-sphere rotation, computed by this platform's `rotationAboutAxis`, reused directly in the Time Evolution lesson |
+| Tensor products, multiple systems | Multi-qubit states — the same construction, this course's Mathematical Foundations prerequisite already built it in general |
+
+Nothing on the right side of this table is a new postulate. Every entry
+is a direct instance of the corresponding entry on the left, specialized
+to $\mathbb{C}^2$.
+
+## Worked Synthesis Examples
+
+**1. A quantum gate is applied to a qubit. Why must every gate be
+unitary, using this course's own derivation rather than "because that's
+the rule"?**
+
+Postulate 4 (Dynamics) requires evolution to be unitary because
+normalization must be preserved — the Unitary Operators lesson
+(Mathematical Foundations) proved unitarity is exactly the condition
+guaranteeing that. A "gate" is nothing but a name for a short, discrete
+step of this course's continuous $U(t)=e^{-iHt/\hbar}$ evolution (Time
+Evolution lesson) — the same requirement, just applied over a fixed,
+useful time interval instead of continuously.
+
+**2. The Hadamard gate takes $|0\rangle\to|+\rangle$. Using the
+interference result from this course, explain why measuring a qubit
+prepared this way in the $\{|0\rangle,|1\rangle\}$ basis gives no
+information about phase, but measuring in the $\{|+\rangle,|-\rangle\}$
+basis does.**
+
+This is exactly the Superposition, Interference, and Phase lesson's
+result, applied directly: $|+\rangle$ written in the
+$\{|0\rangle,|1\rangle\}$ basis has coefficients with a *fixed* relative
+phase ($\varphi=0$ for $H|0\rangle$), so measuring in that same basis
+gives fixed probabilities $P(0)=P(1)=\tfrac12$ regardless of what phase
+gate was applied beforehand. A phase gate changes $\varphi$, invisibly to
+a $\{|0\rangle,|1\rangle\}$-basis measurement — but a
+$\{|+\rangle,|-\rangle\}$-basis measurement reveals it immediately, via
+the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
+
+**3. Two qubits are combined via a tensor product. What guarantees the
+combined 4-dimensional state is automatically normalized, if each qubit
+was normalized on its own?**
+
+This is the Tensor Products and Composite Systems lesson's result
+(Mathematical Foundations): $\langle u\otimes v,u\otimes v\rangle =
+\langle u,u\rangle\langle v,v\rangle = 1\cdot1=1$, derived from the
+multiplicative rule for inner products on simple tensors — no separate
+renormalization step is ever needed.
+
+## Common Mistakes, Revisited
+
+<Callout type="mistake">
+**Treating quantum computing as needing its own separate physical
+postulates.** Every rule a quantum-computing course states about qubits
+and gates is a specific instance of the same four postulates this course
+built for general quantum systems.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting that "qubit" just means "the smallest nontrivial Hilbert
+space."** Nothing about the postulates requires exactly two dimensions —
+qubits are convenient and physically realizable, not mathematically
+special.
+</Callout>
+
+## Practice Questions
+
+1. A qubit gate must satisfy $U^\dagger U=I$. Using the Time Evolution
+   lesson's derivation, explain what physical requirement this
+   corresponds to.
+2. The CNOT gate acts on two qubits. Using the tensor-product machinery
+   from Mathematical Foundations, what is the dimension of the space it
+   acts on?
+3. Explain, using this course's uncertainty-relation derivation, why
+   measuring a qubit in the $Z$ basis and then immediately in the $X$
+   basis generally disturbs the outcome of a subsequent $Z$-basis
+   measurement.
+4. A two-level system's Hamiltonian is $H=\tfrac{\hbar\omega}{2}X$
+   instead of $\tfrac{\hbar\omega}{2}Z$. Using the rotation formula from
+   Time Evolution, what axis does this Hamiltonian's evolution rotate the
+   Bloch sphere about?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A qubit is a 2-dimensional complex Hilbert space; every quantum
+  computing rule (superposition, gates, measurement) is a direct instance
+  of this course's four postulates.
+- Interference, uncertainty, and time evolution all reduce to identities
+  this course already derived, evaluated at $\mathbb{C}^2$.
+- Nothing about quantum computing requires new physics beyond what this
+  course built — only a choice of which Hilbert space to specialize to.
+
+## Further Exploration
+
+This completes **From Classical to Quantum**. From here, two directions
+are both well-supported: continue deeper into the Quantum Mechanics
+pillar (Wave Mechanics, which builds the full continuous position
+representation this course previewed), or apply everything just learned
+directly to the Quantum Computing pillar's Qubits & Quantum States and
+Quantum Gates & Circuits courses, which are now, in a precise sense,
+worked examples of this course's postulates.

@@ -247,6 +247,9 @@ top of, so the math is written and verified exactly once.
 | `measurement.ts` | `measurementDistribution` / `measure` (full-register Born-rule probabilities and collapse) plus `qubitMeasurementProbabilities` / `measureQubit` (partial measurement of one qubit within a multi-qubit state, added for Quantum Gates & Circuits — see below) |
 | `twoQubit.ts` | `testSeparability` and `twoQubitJointProbabilities` — the two genuinely 2-qubit-specific math functions (see below); deliberately its own file rather than folded into `state.ts`, since the separability test doesn't generalize past 2 qubits the way everything else in the engine does |
 | `format.ts` | `formatAmplitudeLatex` — the one formatting helper shared between the Bloch sphere simulator and lesson-embedded state displays, kept here (not under `components/`) since multiple, otherwise-unrelated UI pieces consume it |
+| `observables.ts` | `expectationValue`, `variance`, `uncertainty`, `commutator`, `commutatorExpectation` — added for the "From Classical to Quantum" course's Expectation Values and Uncertainty lesson; kept separate from `measurement.ts` since these describe the *statistics* of an observable's outcome distribution (a property of state + operator), not the act of sampling/collapsing one |
+| `harmonicOscillator.ts` | `annihilationOperator`, `creationOperator`, `numberOperator`, `harmonicOscillatorEnergyLevels` — the harmonic oscillator's ladder operators as finite, truncated `dimension`×`dimension` matrices on the Fock basis, letting the existing `Matrix` engine represent them exactly like every other operator, with the truncation's one honest approximation (documented in the file and tested directly) confined to the single boundary case where `a†` would need a level past the cutoff |
+| `amplitude.ts` | `normalizedTwoLevelAmplitudes`, `interferenceProbability`, `classicalSumProbability` — built for the Complex Amplitude Explorer's two-amplitude interference mode (see §6b); deliberately thin wrappers around `Complex`, not a parallel state-vector abstraction |
 
 ### Qubit ordering convention
 
@@ -324,17 +327,24 @@ mixed into a rendering file. The convention going forward:
 `src/lib/quantum/` for math, never mixed in one file.
 
 **What's deliberately not built yet:** density matrices, partial trace,
-von Neumann entropy, and Hamiltonian time evolution. Those are real
-requirements (a future multipartite-entanglement course, an
-error-correction simulator, noise simulation, wavefunction time evolution
-all need them eventually) but weren't needed to teach pure-state
-entanglement, measurement, no-cloning, or teleportation — all of which
-are expressible with pure `StateVector`s and partial measurement alone —
-and would have meaningfully expanded this pass's scope. Next addition to
-this library, when a simulator or lesson actually needs it (the
-multipartite-entanglement course that replaced the old duplicate-content
-"Bell States" course, see the changelog below, is the most likely
-trigger).
+von Neumann entropy, and *general* Hamiltonian time evolution (an
+eigendecomposition-based matrix exponential for an arbitrary-dimensional
+Hermitian operator). Those are real requirements (a future
+multipartite-entanglement course, an error-correction simulator, noise
+simulation, and continuous-position wavefunction evolution all need them
+eventually) but weren't needed to teach pure-state entanglement,
+measurement, no-cloning, teleportation, or (as of the "From Classical to
+Quantum" course) two-level time evolution and the harmonic oscillator —
+all of which are expressible with pure `StateVector`s, partial
+measurement, and (for two-level evolution specifically) the *existing*
+`rotationAboutAxis` function, reused rather than duplicated: any traceless
+$2\times2$ Hermitian Hamiltonian is $H=\frac{\hbar\omega}{2}(\hat n\cdot
+\vec\sigma)$, and $e^{-iHt/\hbar}$ is exactly `rotationAboutAxis(n, ωt)`
+— no new matrix-exponential code was needed for the Time Evolution and
+the Schrödinger Equation lesson. General-dimension time evolution
+(needing a real eigensolver) remains deferred, next likely triggered by
+the future Wave Mechanics course or a multipartite-entanglement
+simulator.
 
 ---
 
@@ -406,6 +416,47 @@ per element. No JS animation loop, no extra hook. Measurement is narrated
 explicitly as a discrete event ("the state has collapsed — this was an
 instantaneous event, not a smooth transition") rather than animated as if
 it were continuous physical evolution.
+
+### The Complex Amplitude Explorer
+
+`src/components/simulators/complex-amplitude-explorer/` follows the same
+five-layer split, and is the first simulator to use plain SVG (not the
+Bloch sphere's canvas-style geometry or the 2-qubit explorer's tables) for
+its visualization:
+
+1. **Math** — the existing `Complex` class (magnitude/phase/`fromPolar`)
+   plus the two genuinely new helpers in `lib/quantum/amplitude.ts`
+   (two-level normalization and the quantum-vs-classical interference
+   comparison). No new math for anything `Complex` already computed.
+2. **State** — `ComplexAmplitudeExplorer.tsx` owns `re`/`im` as the single
+   source of truth for single-amplitude mode (magnitude/phase are always
+   *derived* from them, never stored separately, so the two control pairs
+   in `AmplitudeControls` can't drift out of sync), plus
+   `alphaMagnitude`/`alphaPhase`/`betaPhase` for two-amplitude mode.
+3. **Visualization** — `ComplexPlaneCanvas.tsx`, a pure SVG function of
+   `(re, im)`: axes, a unit-circle reference, the amplitude vector, and a
+   phase arc — deliberately no drag-to-set interaction on the canvas
+   itself (sliders and numeric inputs are the actual control surface, kept
+   simpler than the Bloch sphere's pointer-drag handling since there's no
+   3D camera to orbit here) — and `StatePanel.tsx` (the `a+bi`/magnitude/
+   phase/`|z|²` readout, via `KatexMath` + `formatAmplitudeLatex`, reused
+   rather than re-implemented).
+4. **Controls** — `AmplitudeControls.tsx` (synced real/imaginary and
+   magnitude/phase slider pairs) and `TwoAmplitudeMode.tsx` (the α/β
+   interference view — an α-magnitude slider with β's magnitude *derived*
+   to keep $|\alpha|^2+|\beta|^2=1$, and a relative-phase slider driving
+   the quantum-vs-classical probability comparison).
+5. **Lesson integration** — `LazyComplexAmplitudeExplorer.tsx`, the
+   identical `dynamic(..., { ssr: false })` wrapper pattern as the other
+   two simulators.
+
+**No dependency on `StateVector` for the interference math.** Two bare
+`Complex` amplitudes representing alternative *paths* (not a prepared
+2-level quantum state) are a different concept from a `StateVector`, even
+though the two-amplitude mode's *display* happens to coincide with a
+single qubit's — `interferenceProbability`/`classicalSumProbability`
+operate directly on `Complex` values, which is both the more honest
+modeling choice and avoids a spurious dependency.
 
 ---
 
@@ -729,40 +780,172 @@ is no quiz-taking UI. See §9.
 
 ---
 
+### Session 7 — Mathematical Foundations for Quantum Mechanics (Course 3, complete)
+
+*(This entry documents work completed in an earlier session that was
+never recorded here — added retroactively while auditing the platform,
+since an undocumented gap in the changelog is itself a real
+inconsistency worth fixing.)*
+
+- **`curriculum.ts`** — replaced `mathematical-foundations`'s 4
+  placeholder modules with the real 11-lesson sequence: Complex Numbers
+  for Physics, Vector Spaces, Inner Products and Orthogonality, The
+  Bra-Ket Formalism, Linear Operators, Eigenvalues and Eigenvectors,
+  Hermitian Operators, Unitary Operators, Tensor Products and Composite
+  Systems, Probability and Quantum States, and a Mathematical Foundations
+  Challenge capstone.
+- **`src/content/lessons/quantum-mechanics/mathematical-foundations/`**
+  (new) — all 11 lessons, each with real derivations (Euler's formula
+  from the Taylor series, the Cauchy-Schwarz proof, the completeness
+  relation, matrix multiplication derived from it, the Hermitian
+  real-eigenvalue and orthogonal-eigenvector proofs, the unitary
+  norm-preservation proof, dimension-counting for why entanglement is
+  generic, and the Born-rule normalization consistency check), explicitly
+  cross-linked to (but not dependent on) the Quantum Computing pillar's
+  parallel treatment of the same ideas applied to qubits.
+- **`src/content/problems/quantum-mechanics/mathematical-foundations/`**
+  (new) — 24 problems (numeric/multiple-choice/conceptual), 2–3 per
+  lesson, registered in `lib/problems/registry.ts` and linked from every
+  lesson via `<PracticeLinks />`.
+- **`src/lib/quantum/__tests__/mathFoundations.test.ts`** (new) — 30
+  tests verifying the lessons' mathematical claims against the engine
+  (Euler's formula via a manual Taylor-series partial sum, Pauli
+  eigenpairs, Hermitian/unitary checks, the spectral decomposition, the
+  completeness relation for two different bases, tensor-product dimension
+  and ordering for non-power-of-2 sizes, and global-phase invariance).
+- **No engine or component changes** — every lesson's math was expressible
+  with the existing `Complex`/`Matrix`/`StateVector` primitives and the
+  existing Problems architecture from Session 6.
+
+### Session 8 — From Classical to Quantum (Course 4) + Complex Amplitude Explorer
+
+- **`curriculum.ts`** — replaced `classical-to-quantum`'s original 5
+  historical-experiment placeholder modules with a real 11-lesson,
+  postulates-first sequence: Classical States and Observables, From
+  Classical to Quantum Probability, Why Complex Amplitudes?, The
+  Postulates of Quantum Mechanics, Expectation Values and Uncertainty,
+  Time Evolution and the Schrödinger Equation, Stationary States, The
+  Quantum Harmonic Oscillator, Position and Momentum, Superposition
+  Interference and Phase, and a capstone, From Postulates to Quantum
+  Computing. This is a deliberate scope change from the original
+  placeholder titles (blackbody radiation, the photoelectric effect,
+  etc.) — those were never authored, so nothing was lost — reasoned
+  through explicitly rather than blindly filled in: the historical/
+  experimental motivation for quantum mechanics is real, valuable content
+  that the *original* `classical-to-quantum` placeholder titles pointed
+  at, but it's a different course in spirit from "bridge the linear
+  algebra of Mathematical Foundations to the physical postulates," which
+  is what was actually requested and what the course's own prerequisite
+  (`mathematical-foundations`) and downstream courses (`wave-mechanics`,
+  `operators-observables-measurement`) are structured to expect next. The
+  historical-experiments content remains a real gap, noted in the roadmap
+  below rather than silently dropped.
+- **The course stays entirely finite-dimensional**, by design: time
+  evolution, the harmonic oscillator, and even the uncertainty principle
+  are all developed using only the existing finite-`Matrix`/`StateVector`
+  engine — continuous position, momentum-as-differentiation, and the full
+  wavefunction picture are explicitly previewed and deferred to the
+  future Wave Mechanics course (stated honestly in the Position and
+  Momentum lesson itself, not glossed over).
+- **`src/lib/quantum/observables.ts`, `harmonicOscillator.ts`,
+  `amplitude.ts`** (new) — see §6's engine table and §6b for what each
+  contains and why each is its own file; no existing engine file was
+  modified.
+- **`src/content/lessons/quantum-mechanics/classical-to-quantum/`** (new)
+  — all 11 lessons. Two genuinely new derivations worth calling out
+  beyond what §6b/§9 already cover: the generalized uncertainty relation
+  $\Delta A\Delta B\ge\tfrac12|\langle[A,B]\rangle|$, derived in full from
+  Cauchy-Schwarz (not merely stated), and the harmonic oscillator's
+  integer energy spectrum, derived entirely from the ladder-operator
+  algebra $[a,a^\dagger]=1$ with zero calculus. The two-level time
+  evolution worked example reuses `rotationAboutAxis` directly rather
+  than introducing new matrix-exponential code (see §6's updated
+  "deliberately not built yet" note).
+- **`src/content/problems/quantum-mechanics/classical-to-quantum/`** (new)
+  — 27 problems, 2–3 per lesson, registered and linked via
+  `<PracticeLinks />` exactly as in Session 7.
+- **`src/components/simulators/complex-amplitude-explorer/`** (new) — the
+  **Complex Amplitude Explorer**, this session's one new interactive
+  visualization; architecture documented in §6b. Embedded in "Why Complex
+  Amplitudes?" and "Superposition, Interference, and Phase" (the two
+  lessons whose content it directly illustrates), and added to
+  `/simulators` as a real, fully interactive entry — not a "coming soon"
+  placeholder.
+- **`src/components/problems/ProblemsCatalog.tsx`** — no change needed
+  this session (the "Quantum Mechanics" topic filter added in Session 7
+  already covers the new course's problems automatically, since it
+  filters by pillar rather than by course).
+- **Test suite: 186 tests, up from 145** (32 new engine tests for
+  `observables.ts`/`harmonicOscillator.ts`/`amplitude.ts`, plus 9 new
+  registry tests verifying the new course's demonstration-problem answers
+  against the engine — the Rabi/precession formula checked against
+  `rotationAboutAxis` directly, the uncertainty-bound problems checked
+  against `commutatorExpectation`, ladder-operator and energy-level
+  problems checked against `harmonicOscillator.ts`, and more).
+- **No new dependencies** — the Complex Amplitude Explorer is plain SVG,
+  matching the "prefer SVG/HTML/CSS over WebGL" instruction directly.
+- **A documentation gap found and fixed during this session's audit:**
+  Session 7 (Mathematical Foundations) was completed but never recorded
+  in this changelog — added retroactively above, since an inaccurate
+  changelog is a real inconsistency, not a cosmetic one.
+- Nothing was removed from or restructured in any existing course,
+  simulator, or the Problems system beyond the additions above.
+
 ## 9. Implementation Roadmap
 
 **Done:** foundation (data model, MDX pipeline, quantum engine, IA/nav);
-the Bloch sphere simulator; Vitest infrastructure; both
-`Qubits & Quantum States` and `Quantum Gates & Circuits` fully authored
-(20 lessons total); cross-course prerequisites; the 2-qubit state explorer
-(entanglement detection, partial/full measurement, correlation view,
-guided presets) embedded in three Course 2 lessons; the Problems system
+the Bloch sphere simulator; Vitest infrastructure; `Qubits & Quantum
+States` and `Quantum Gates & Circuits` (Quantum Computing pillar) fully
+authored (20 lessons); `Mathematical Foundations for Quantum Mechanics`
+and `From Classical to Quantum` (Quantum Mechanics pillar) fully authored
+(22 lessons); cross-course prerequisites, exercised across four separate
+course boundaries now; the 2-qubit state explorer and the Complex
+Amplitude Explorer, both embedded in real lessons; the Problems system
 (data model, 3 validator types, `localStorage`-backed progress behind a
-swappable interface, catalog + detail UI) with 5 demonstration problems
-embedded across 4 lessons.
+swappable interface, catalog + detail UI, topic/difficulty filtering) with
+56 problems across both pillars.
 
-**Next — scale the problems system's content, not its architecture.**
-The Phase 1 slice (5 problems) exists to prove the loop end-to-end, not to
-cover the curriculum. The natural next step is authoring more problems
-against the existing model — no new abstractions needed until a problem
-type Phase 1 didn't build (symbolic math, a real quantum-state/global-phase
-comparator, circuit-structure comparison) actually comes up in a lesson.
+**Next — Wave Mechanics, the natural continuation.** `classical-to-quantum`
+ends by explicitly previewing continuous position/momentum and deferring
+their full development; `wave-mechanics` (already scaffolded in
+`curriculum.ts` with 5 placeholder modules, prerequisite already pointing
+at `classical-to-quantum`) is the course that redeems that preview —
+wavefunctions, the position representation, and the time-dependent/
+time-independent Schrödinger equation in the continuous setting. This is
+also the first course that will genuinely need engine additions this
+platform doesn't have yet (see below).
+
+**Then — the historical/experimental motivation course.** The original
+`classical-to-quantum` placeholder titles (blackbody radiation, the
+photoelectric effect, wave-particle duality, de Broglie) were real,
+valuable content that this session's course redesign deliberately
+replaced rather than kept — see the Session 8 changelog entry for the
+reasoning. That content doesn't have a home in the curriculum right now;
+it's a real gap, not a silently dropped requirement, and the cleanest fix
+is likely a new early course in the Quantum Mechanics pillar (before or
+alongside `mathematical-foundations`) rather than trying to fold it back
+into `classical-to-quantum`.
+
+**Then — expand the math engine for continuous systems.** A real
+eigensolver (needed for general, not just 2-level, time evolution), plus
+density matrices, partial trace, and von Neumann entropy — needed once
+`wave-mechanics` or the renamed `entanglement-and-measurement` course
+(multipartite entanglement, mixed states, Bell tests) get written for
+real, or once any simulator needs to show a reduced/mixed state. Deferred
+again this session for the same reason as before: two-level time evolution
+and the harmonic oscillator's spectrum didn't need either one.
 
 **Then — the quiz-taking UI.** The `Quiz` data model and registry lookups
 already exist (§7b) with zero authored quizzes; building the actual
 navigation/scoring/review UI is real, separate design work best done
-against a handful of real quizzes, the same reasoning that kept the
-Problems UI itself out of scope until Course 2 existed to design against.
-
-**Then — expand the math engine.** Density matrices, partial trace, von
-Neumann entropy, basic Hamiltonian time evolution — needed once the
-renamed `entanglement-and-measurement` course (multipartite entanglement,
-mixed states, Bell tests) gets written for real, or once any simulator
-needs to show a reduced/mixed state.
+against a handful of real quizzes.
 
 **Also pending:** progress & personalization *beyond* single-problem
 state (lesson completion, cross-problem streak-free progress summaries —
-still no auth/database, same `ProgressStore`-interface discipline `lib/problems/progress`
-already established); revisiting the 8-item flat navbar if it grows
-further; Hardware & Software pillar content (architecture-complete,
-purely a writing task).
+still no auth/database, same `ProgressStore`-interface discipline
+`lib/problems/progress` already established); revisiting the 8-item flat
+navbar if it grows further; Hardware & Software pillar content
+(architecture-complete, purely a writing task); the still-unbuilt
+`/simulators` entries (circuit builder, entanglement visualizer,
+interference playground), each a genuine separate project rather than a
+quick follow-on to the Complex Amplitude Explorer.

@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { PlaceholderCard } from "@/components/ui/PlaceholderCard";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 
 export const metadata: Metadata = {
   title: "Simulators",
@@ -57,6 +58,18 @@ export default function SimulatorsPage() {
           </p>
           <div className="mt-6">
             <LazyTwoQubitExplorer />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Complex Plane &amp; Amplitude Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Manipulate a complex amplitude directly — real part, imaginary part, magnitude, and phase — and
+            see how they relate to probability. Switch to two-amplitude mode to watch relative phase drive
+            real interference.
+          </p>
+          <div className="mt-6">
+            <LazyComplexAmplitudeExplorer />
           </div>
         </section>
       </div>
