@@ -4,12 +4,14 @@ export type NavItem = {
   description: string;
 };
 
+// The logo already links home, so "Home" as a text link was pure duplication
+// — dropped rather than kept for symmetry. The four pillar pages moved into
+// `TRACK_NAV_ITEMS` (rendered as a grouped "Tracks" dropdown by Navbar.tsx)
+// since a flat 11-item bar was flagged repeatedly this session as real,
+// user-facing redundancy: Learn/Lessons/Mechanics/Computing/Hardware/Software
+// all ultimately render some view of the same curriculum data, and a
+// first-time visitor had no way to tell them apart from the labels alone.
 export const NAV_ITEMS: NavItem[] = [
-  {
-    label: "Home",
-    href: "/",
-    description: "Start here — an overview of the QuantumLearn platform.",
-  },
   {
     label: "Learn",
     href: "/learn",
@@ -26,10 +28,29 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Interactive tools for building intuition about quantum states.",
   },
   {
+    label: "Map",
+    href: "/map",
+    description: "An interactive map of how key concepts depend on each other.",
+  },
+  {
+    label: "Glossary",
+    href: "/glossary",
+    description: "An alphabetical reference of key terms, each linked to the lesson that covers it.",
+  },
+  {
     label: "Problems",
     href: "/problems",
     description: "Practice problems and quizzes to check your understanding.",
   },
+  {
+    label: "About",
+    href: "/about",
+    description: "Who QuantumLearn is for, and what we're building.",
+  },
+];
+
+/** The four pillar/track pages, grouped under one "Tracks" nav dropdown. */
+export const TRACK_NAV_ITEMS: NavItem[] = [
   {
     label: "Mechanics",
     href: "/mechanics",
@@ -49,10 +70,5 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Software",
     href: "/software",
     description: "The simulators, compilers, and SDKs behind quantum programs.",
-  },
-  {
-    label: "About",
-    href: "/about",
-    description: "Who QuantumLearn is for, and what we're building.",
   },
 ];

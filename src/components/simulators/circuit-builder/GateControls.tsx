@@ -118,7 +118,7 @@ export function GateControls({
               value={controlQubit}
               disabled={disabled}
               onChange={(e) => onControlQubitChange(Number(e.target.value))}
-              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground"
+              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {qubitIds.map((q) => (
                 <option key={q} value={q}>
@@ -133,7 +133,7 @@ export function GateControls({
               value={twoQubitTarget}
               disabled={disabled}
               onChange={(e) => onTwoQubitTargetChange(Number(e.target.value))}
-              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground"
+              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {qubitIds.map((q) => (
                 <option key={q} value={q}>

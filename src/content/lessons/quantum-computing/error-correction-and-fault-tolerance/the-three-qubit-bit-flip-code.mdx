@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code"
@@ -20,6 +21,12 @@ export const lessonMeta = {
     "Derive the encoding circuit α|0⟩+β|1⟩ → α|000⟩+β|111⟩ from two CNOTs",
     "Construct the Z0Z1/Z1Z2 syndrome-extraction circuit and its 4-outcome decode table",
     "Verify the full encode-error-correct cycle recovers the exact original state for every single-qubit X error",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized",
+      note: "Measuring the syndrome ancillas here leaves the encoded α,β completely undisturbed precisely because it is a degenerate projective measurement in that lesson's generalized sense, not a measurement of the logical qubit itself.",
+    },
   ],
 };
 
@@ -75,6 +82,18 @@ involving that qubit flip:
 the indicated qubit (or nothing, for $(0,0)$) restores the original
 encoded state exactly, verified directly for every one of the four
 cases, on an arbitrary $\alpha,\beta$, not just checked once.
+
+<PredictBeforeReveal
+  question="Injecting an X error on qubit 1 and extracting the syndrome requires measuring the two ancilla qubits. Does that measurement collapse or disturb the encoded superposition's α and β amplitudes at all?"
+  options={[
+    { label: "Yes, it partially collapses α and β", value: "collapses" },
+    { label: "No, α and β survive completely untouched", value: "untouched" },
+    { label: "It depends on which qubit the error hit", value: "depends" },
+    { label: "The syndrome can't be measured without measuring the data qubits directly", value: "cant-measure" },
+  ]}
+  correctValue="untouched"
+  explanation="Both branches of α|010⟩+β|101⟩ (the errored state) give the identical syndrome (1,1): the ancilla measurements depend only on whether pairs of data qubits agree, never on α or β individually. So the encoded superposition survives measurement completely untouched, exactly what the Explorer below shows: inject the error, watch (1,1) light up, then check the recovered amplitude table matches the original α, β exactly."
+/>
 
 <InteractiveSection title="Syndrome (1,1) points straight at qubit 1" description="Inject an X error on qubit 1. Watch both syndrome bits light up as (1,1). Confirm the decode table points at qubit 1, then check the recovered state's amplitude table matches the original exactly.">
   <LazySyndromeExplorer mode="bit-flip" />

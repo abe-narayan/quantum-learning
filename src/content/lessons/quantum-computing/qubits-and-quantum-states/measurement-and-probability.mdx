@@ -1,4 +1,5 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -20,6 +21,16 @@ export const lessonMeta = {
     "State the projective measurement postulate using inner products",
     "Compute measurement probabilities in bases other than the computational basis",
     "Explain why a single measurement can't reveal a state's amplitudes",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality",
+      note: "The general inner-product and orthogonality machinery this lesson's Born rule P(e_i) = |⟨e_i|ψ⟩|² is a direct, qubit-specific instance of.",
+    },
+    {
+      slug: "quantum-hardware/control-and-readout/qubit-readout-techniques",
+      note: "This lesson's idealized, instantaneous projective measurement, contrasted there against how a real device actually reads out a qubit (indirectly, imperfectly).",
+    },
   ],
 };
 
@@ -112,6 +123,18 @@ outcome's randomness isn't error or noise to be engineered away. The
 measurement postulate says it's a fundamental feature of the theory.
 
 ## Interactive Experiment
+
+<PredictBeforeReveal
+  question="Prepare |+⟩, apply an H gate to it, then measure in the computational (Z) basis. What outcome do you expect?"
+  options={[
+    { label: "0, every single time", value: "0" },
+    { label: "1, every single time", value: "1" },
+    { label: "50/50 split between 0 and 1", value: "5050" },
+    { label: "Random, with different odds each run", value: "random" },
+  ]}
+  correctValue="0"
+  explanation="H sends |+⟩ to |0⟩ exactly — a deterministic rotation, not a random one. So measuring afterward always reads 0. This is the trick behind 'measure in the X basis': applying H first, then measuring in Z, is mathematically the same as measuring directly in the {|+⟩,|−⟩} basis, and here it turns a state that was 50/50 in the Z basis into a certain outcome."
+/>
 
 <InteractiveSection title="Measure in Z, then fake an X-basis measurement" description={`Prepare |+⟩ using the preset, then click Measure several times in a row (using Reset or the preset button to re-prepare |+⟩ between clicks, since each measurement collapses the state). You should see roughly even 0s and 1s. The simulator's Measure button always measures in the computational (Z) basis, but you can measure in the X-basis with the tools you already have: apply H, then Measure. Try it from |+⟩: H sends |+⟩ to |0⟩ exactly (the next lesson derives why), so measuring afterward is deterministic, a clean way to see that "measure in the X basis" and "rotate then measure in Z" are the same operation.`}>
   <LazyBlochSphereExplorer />

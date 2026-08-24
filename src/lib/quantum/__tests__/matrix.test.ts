@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Complex } from "../complex";
-import { Matrix } from "../matrix";
+import { Matrix, tensorAll } from "../matrix";
 
 describe("Matrix", () => {
   it("multiplies a gate by a state vector correctly (Hadamard on |0>)", () => {
@@ -89,5 +89,60 @@ describe("Matrix", () => {
   it("isHermitian() is false for a non-square matrix", () => {
     const m = new Matrix([[Complex.ONE, Complex.ZERO]]);
     expect(m.isHermitian()).toBe(false);
+  });
+
+  it("mul() throws when the inner dimensions don't match", () => {
+    const a = new Matrix([[Complex.ONE, Complex.ZERO]]); // 1x2
+    const b = new Matrix([[Complex.ONE, Complex.ZERO]]); // 1x2, needs 2 rows to multiply
+    expect(() => a.mul(b)).toThrow(/1x2.*1x2/);
+  });
+
+  it("apply() throws when the vector length doesn't match the matrix's column count", () => {
+    const m = Matrix.identity(2);
+    expect(() => m.apply([Complex.ONE, Complex.ZERO, Complex.ZERO])).toThrow(/length-3/);
+  });
+
+  it("add() throws for mismatched shapes", () => {
+    const a = Matrix.identity(2);
+    const b = Matrix.identity(3);
+    expect(() => a.add(b)).toThrow(/shape/);
+  });
+
+  it("zeros() creates a matrix of the requested shape with every entry 0", () => {
+    const z = Matrix.zeros(2, 3);
+    expect(z.rows).toBe(2);
+    expect(z.cols).toBe(3);
+    for (let r = 0; r < 2; r++) {
+      for (let c = 0; c < 3; c++) {
+        expect(z.get(r, c).equals(Complex.ZERO)).toBe(true);
+      }
+    }
+  });
+
+  it("equals() is false for matrices of different shapes, even with matching leading entries", () => {
+    const a = Matrix.identity(2);
+    const b = new Matrix([
+      [Complex.ONE, Complex.ZERO, Complex.ZERO],
+      [Complex.ZERO, Complex.ONE, Complex.ZERO],
+    ]);
+    expect(a.equals(b)).toBe(false);
+  });
+
+  it("tensorAll() throws for an empty list", () => {
+    expect(() => tensorAll([])).toThrow(/at least one/);
+  });
+
+  it("tensorAll() of three matrices matches chained .tensor() calls, in order", () => {
+    const x = new Matrix([
+      [Complex.ZERO, Complex.ONE],
+      [Complex.ONE, Complex.ZERO],
+    ]);
+    const z = new Matrix([
+      [Complex.ONE, Complex.ZERO],
+      [Complex.ZERO, new Complex(-1)],
+    ]);
+    const expected = Matrix.identity(2).tensor(x).tensor(z);
+    const actual = tensorAll([Matrix.identity(2), x, z]);
+    expect(actual.equals(expected)).toBe(true);
   });
 });

@@ -1,85 +1,94 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, rotationAboutAxis, rotationX, rotationY, rotationZ, type Axis3 } from "@/lib/quantum/gates";
 import { measure } from "@/lib/quantum/measurement";
-import { stateToBlochVector, stateToBlochAngles, blochStateFromAngles, type BlochVector, type BlochAngles } from "@/lib/quantum/bloch";
+import { stateToBlochVector, stateToBlochAngles, blochStateFromAngles, type BlochAngles } from "@/lib/quantum/bloch";
 import { BlochSphereCanvas } from "./BlochSphereCanvas";
 import { BlochSphereControls } from "./BlochSphereControls";
 import { BlochSphereStatePanel } from "./BlochSphereStatePanel";
 import { STATE_PRESETS } from "./presets";
 import type { FixedGateDefinition, RotationAxisId } from "./gateDefinitions";
-import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import { useAnimatedBlochPoint, GATE_ROTATION_MS, COLLAPSE_MS } from "./useAnimatedBlochPoint";
 
-const ANIMATION_MS = 550;
+const COLLAPSE_FLASH_MS = 400;
+const URL_SYNC_DEBOUNCE_MS = 400;
+const COPY_CONFIRMATION_MS = 1500;
+const TWO_PI = 2 * Math.PI;
 
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
+// Minimal shareable state for this simulator is the pair of Bloch angles —
+// they fully determine the point on the sphere (global phase is invisible
+// on the sphere and doesn't affect anything rendered here).
+function clampTheta(value: number): number {
+  return Math.min(Math.PI, Math.max(0, value));
 }
 
-function slerp(a: BlochVector, b: BlochVector, t: number): BlochVector {
-  const dot = Math.min(1, Math.max(-1, a.x * b.x + a.y * b.y + a.z * b.z));
-  const theta = Math.acos(dot);
-  const sinTheta = Math.sin(theta);
+function normalizePhi(phi: number): number {
+  const wrapped = phi % TWO_PI;
+  return wrapped < 0 ? wrapped + TWO_PI : wrapped;
+}
 
-  if (sinTheta < 1e-6) {
-    const lerped = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t };
-    const norm = Math.hypot(lerped.x, lerped.y, lerped.z) || 1;
-    return { x: lerped.x / norm, y: lerped.y / norm, z: lerped.z / norm };
-  }
+function phiDelta(a: number, b: number): number {
+  const d = Math.abs(normalizePhi(a) - normalizePhi(b));
+  return Math.min(d, TWO_PI - d);
+}
 
-  const wa = Math.sin((1 - t) * theta) / sinTheta;
-  const wb = Math.sin(t * theta) / sinTheta;
-  return { x: wa * a.x + wb * b.x, y: wa * a.y + wb * b.y, z: wa * a.z + wb * b.z };
+/** Reads and validates `?theta=&phi=` from the URL. Never throws — returns null on anything malformed or absent. */
+function parseAnglesFromParams(params: { get(key: string): string | null }): BlochAngles | null {
+  const rawTheta = params.get("theta");
+  const rawPhi = params.get("phi");
+  if (rawTheta === null || rawPhi === null) return null;
+  const theta = Number(rawTheta);
+  const phi = Number(rawPhi);
+  if (!Number.isFinite(theta) || !Number.isFinite(phi)) return null;
+  return { theta: clampTheta(theta), phi: normalizePhi(phi) };
+}
+
+function matchPresetId(angles: BlochAngles, epsilon = 1e-2): string | null {
+  const match = STATE_PRESETS.find(
+    (preset) => Math.abs(preset.angles.theta - angles.theta) < epsilon && phiDelta(preset.angles.phi, angles.phi) < epsilon
+  );
+  return match?.id ?? null;
 }
 
 export function BlochSphereExplorer() {
-  const [state, setState] = useState(() => StateVector.zero(1));
-  const [renderPoint, setRenderPoint] = useState<BlochVector>({ x: 0, y: 0, z: 1 });
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [activePresetId, setActivePresetId] = useState<string | null>("0");
-  const [narration, setNarration] = useState<string>("Prepared |0⟩ — the north pole of the Bloch sphere.");
-  const [lastMeasurement, setLastMeasurement] = useState<0 | 1 | null>(null);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const rafRef = useRef<number | null>(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
+  // Parsed once for the initial-state lazy initializers below; this is a cheap pure
+  // computation, and only the very first render's value is actually used.
+  const initialAngles = parseAnglesFromParams(searchParams);
+
+  const [state, setState] = useState(() => (initialAngles ? blochStateFromAngles(initialAngles) : StateVector.zero(1)));
+  const { point: renderPoint, isAnimating, animateAlong, animateTo, snapTo } = useAnimatedBlochPoint(
+    initialAngles ? stateToBlochVector(blochStateFromAngles(initialAngles)) : { x: 0, y: 0, z: 1 }
+  );
+  const [activePresetId, setActivePresetId] = useState<string | null>(() =>
+    initialAngles ? matchPresetId(initialAngles) : "0"
+  );
+  const [narration, setNarration] = useState<string>(() =>
+    initialAngles ? "Restored the shared state from your link." : "Prepared |0⟩ — the north pole of the Bloch sphere."
+  );
+  const [lastMeasurement, setLastMeasurement] = useState<0 | 1 | null>(null);
+  const [collapseFlash, setCollapseFlash] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const urlSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstUrlSync = useRef(true);
 
   useEffect(() => {
     return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (flashTimeoutRef.current !== null) clearTimeout(flashTimeoutRef.current);
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
     };
-  }, []);
-
-  const runAnimation = useCallback(
-    (pointAtT: (t: number) => BlochVector, onComplete: () => void) => {
-      if (prefersReducedMotion) {
-        onComplete();
-        return;
-      }
-
-      setIsAnimating(true);
-      const start = performance.now();
-
-      const frame = (now: number) => {
-        const t = Math.min(1, (now - start) / ANIMATION_MS);
-        setRenderPoint(pointAtT(easeInOutCubic(t)));
-        if (t < 1) {
-          rafRef.current = requestAnimationFrame(frame);
-        } else {
-          setIsAnimating(false);
-          onComplete();
-        }
-      };
-
-      rafRef.current = requestAnimationFrame(frame);
-    },
-    [prefersReducedMotion]
-  );
-
-  const settleAt = useCallback((nextState: StateVector, point: BlochVector) => {
-    setState(nextState);
-    setRenderPoint(point);
   }, []);
 
   const applyGate = useCallback(
@@ -87,18 +96,18 @@ export function BlochSphereExplorer() {
       if (isAnimating) return;
       const startState = state;
       const nextState = applySingleQubitGate(startState, gate.matrix, 0);
-      const endPoint = stateToBlochVector(nextState);
 
       setActivePresetId(null);
       setLastMeasurement(null);
       setNarration(`Applied the ${gate.label} gate. ${gate.explanation}`);
 
-      runAnimation(
+      animateAlong(
         (t) => stateToBlochVector(startState.applyMatrix(rotationAboutAxis(gate.axis, gate.angle * t))),
-        () => settleAt(nextState, endPoint)
+        GATE_ROTATION_MS,
+        () => setState(nextState)
       );
     },
-    [isAnimating, state, runAnimation, settleAt]
+    [isAnimating, state, animateAlong]
   );
 
   const applyRotation = useCallback(
@@ -110,37 +119,33 @@ export function BlochSphereExplorer() {
 
       const startState = state;
       const nextState = applySingleQubitGate(startState, matrix, 0);
-      const endPoint = stateToBlochVector(nextState);
       const degrees = Math.round((angleRadians * 180) / Math.PI);
 
       setActivePresetId(null);
       setLastMeasurement(null);
       setNarration(`Applied ${axisId}(${degrees}°) — a ${degrees}° rotation about the ${axisId.slice(1)} axis.`);
 
-      runAnimation(
+      animateAlong(
         (t) => stateToBlochVector(startState.applyMatrix(rotationAboutAxis(axis, angleRadians * t))),
-        () => settleAt(nextState, endPoint)
+        GATE_ROTATION_MS,
+        () => setState(nextState)
       );
     },
-    [isAnimating, state, runAnimation, settleAt]
+    [isAnimating, state, animateAlong]
   );
 
   const goTo = useCallback(
     (nextState: StateVector, presetId: string | null, message: string) => {
       if (isAnimating) return;
-      const startPoint = renderPoint;
       const endPoint = stateToBlochVector(nextState);
 
       setActivePresetId(presetId);
       setLastMeasurement(null);
       setNarration(message);
 
-      runAnimation(
-        (t) => slerp(startPoint, endPoint, t),
-        () => settleAt(nextState, endPoint)
-      );
+      animateTo(endPoint, GATE_ROTATION_MS, () => setState(nextState));
     },
-    [isAnimating, renderPoint, runAnimation, settleAt]
+    [isAnimating, animateTo]
   );
 
   const applyPreset = useCallback(
@@ -159,9 +164,10 @@ export function BlochSphereExplorer() {
       setActivePresetId(null);
       setLastMeasurement(null);
       setNarration("Dragging θ and φ moves the state directly to any point on the sphere.");
-      settleAt(nextState, stateToBlochVector(nextState));
+      setState(nextState);
+      snapTo(stateToBlochVector(nextState));
     },
-    [isAnimating, settleAt]
+    [isAnimating, snapTo]
   );
 
   const applyMeasurement = useCallback(() => {
@@ -176,11 +182,15 @@ export function BlochSphereExplorer() {
       `Measured |${outcomeIndex}⟩ (this was random, weighted by the probabilities). The superposition is gone — the state has collapsed to |${outcomeIndex}⟩.`
     );
 
-    runAnimation(
-      (t) => slerp(renderPoint, endPoint, t),
-      () => settleAt(collapsed, endPoint)
-    );
-  }, [isAnimating, state, renderPoint, runAnimation, settleAt]);
+    // Collapse is a discontinuous physical event, not a unitary rotation — use a much faster
+    // settle than gate/rotation animations so it reads as a snap, plus a brief flash at the pole.
+    animateTo(endPoint, COLLAPSE_MS, () => {
+      setState(collapsed);
+      setCollapseFlash(true);
+      if (flashTimeoutRef.current !== null) clearTimeout(flashTimeoutRef.current);
+      flashTimeoutRef.current = setTimeout(() => setCollapseFlash(false), COLLAPSE_FLASH_MS);
+    });
+  }, [isAnimating, state, animateTo]);
 
   const reset = useCallback(() => {
     goTo(StateVector.zero(1), "0", "Reset to |0⟩.");
@@ -189,11 +199,49 @@ export function BlochSphereExplorer() {
   const angles = stateToBlochAngles(state);
   const probabilities = state.probabilities() as [number, number];
 
+  // Keep the URL in sync with the settled state so the page is always shareable.
+  // Debounced so a slider drag (which updates `state` on every input event) doesn't
+  // spam `history.replaceState` — only the value it settles on after a short pause
+  // gets written. Skips the very first run so mounting doesn't immediately rewrite
+  // the URL we just read from.
+  useEffect(() => {
+    if (isFirstUrlSync.current) {
+      isFirstUrlSync.current = false;
+      return;
+    }
+    if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    urlSyncTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      params.set("theta", angles.theta.toFixed(3));
+      params.set("phi", angles.phi.toFixed(3));
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, URL_SYNC_DEBOUNCE_MS);
+    return () => {
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+    // Deliberately depends only on the angles: `router`/`pathname` are stable, and
+    // reading the rest of the query string fresh from `window.location` (rather than
+    // depending on the `searchParams` hook) avoids re-running this effect off of our
+    // own `replace` calls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [angles.theta, angles.phi]);
+
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
+    } catch {
+      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+    }
+  }, []);
+
   return (
     <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
       <div>
         <div className="mx-auto max-w-sm">
-          <BlochSphereCanvas blochPoint={renderPoint} className="mx-auto w-full" />
+          <BlochSphereCanvas blochPoint={renderPoint} pulse={collapseFlash} className="mx-auto w-full" />
         </div>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           Drag the sphere to rotate the view — the vector&rsquo;s position is the quantum state itself.
@@ -212,20 +260,66 @@ export function BlochSphereExplorer() {
         <div className="mt-6">
           <BlochSphereStatePanel state={state} angles={angles} />
         </div>
+
+        <div className="mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
+          <div>
+            <Badge tone="brand" className="mb-1.5">
+              What we&rsquo;re studying
+            </Badge>
+            <p className="text-sm text-muted-foreground">
+              Every single-qubit state is a point on this sphere — gates are rotations of that point, and
+              measurement is a random snap to a pole.
+            </p>
+          </div>
+          <div>
+            <Badge tone="accent" className="mb-1.5">
+              What to notice
+            </Badge>
+            <p className="text-sm text-muted-foreground">
+              Rotations move the point smoothly; measurement is the only discontinuous jump you&rsquo;ll ever
+              see on this sphere.
+            </p>
+          </div>
+          <div className="sm:col-span-2">
+            <Badge tone="brand" className="mb-1.5">
+              Try this
+            </Badge>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
+              <li>
+                Apply H, then S, then H again — watch the state trace a path that never repeats a previous
+                point, then hit Measure and see it collapse anyway.
+              </li>
+              <li>
+                Drag θ and φ directly to the equator (θ=90°) and Measure ten times — notice the 50/50 split
+                even though nothing here is a coin flip.
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <BlochSphereControls
-        angles={angles}
-        probabilities={probabilities}
-        disabled={isAnimating}
-        activePresetId={activePresetId}
-        onApplyPreset={applyPreset}
-        onManualAngles={applyManualAngles}
-        onApplyGate={applyGate}
-        onApplyRotation={applyRotation}
-        onMeasure={applyMeasurement}
-        onReset={reset}
-      />
+      <div>
+        <div className="flex justify-end">
+          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+            {copied ? "Copied!" : "Copy link"}
+          </Button>
+        </div>
+
+        <div className="mt-4">
+          <BlochSphereControls
+            angles={angles}
+            probabilities={probabilities}
+            disabled={isAnimating}
+            activePresetId={activePresetId}
+            onApplyPreset={applyPreset}
+            onManualAngles={applyManualAngles}
+            onApplyGate={applyGate}
+            onApplyRotation={applyRotation}
+            onMeasure={applyMeasurement}
+            onReset={reset}
+          />
+        </div>
+      </div>
     </div>
   );
 }

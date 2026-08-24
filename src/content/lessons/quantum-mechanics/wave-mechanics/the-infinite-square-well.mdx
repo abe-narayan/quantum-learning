@@ -22,6 +22,12 @@ export const lessonMeta = {
     "Derive the boundary conditions that force quantized energy levels E_n = n^2*pi^2*hbar^2/(2mL^2)",
     "Normalize the resulting eigenstates and verify orthogonality between different levels",
   ],
+  related: [
+    {
+      slug: "quantum-hardware/physical-qubit-platforms/spin-qubits",
+      note: "This lesson's confinement-forces-quantization mechanism is exactly what a fabricated quantum dot uses to confine a single electron whose spin becomes the qubit.",
+    },
+  ],
 };
 
 ## Motivation
@@ -132,6 +138,16 @@ internal nodes, points where $\psi_n=0$ inside the well). More nodes
 means more curvature means more kinetic energy, exactly why $E_n$
 increases with $n$, visible directly by comparing the Explorer's ground
 and excited state presets.
+
+Real semiconductor devices build this exact confinement on purpose. A
+**quantum well** is a thin layer of one semiconductor sandwiched between
+layers of another with a higher bandgap, trapping electrons in a
+potential well only a few nanometers wide. The discrete $E_n$ ladder
+this lesson derives is the literal operating principle behind quantum
+well laser diodes, used in fiber-optic telecom transmitters and
+Blu-ray players: shrinking the well's width raises $E_n$ (this lesson's
+own $E_n\propto1/L^2$ scaling), which is exactly how engineers tune the
+emitted wavelength by design, not by chance.
 
 <InteractiveSection title="Change n, watch the nodes appear" description="The Infinite Well presets use a very tall but finite wall (not a literal infinity: the Numerically Evolving Quantum States lesson explains why) with height chosen so tunneling leakage is astronomically negligible. Play the ground state and watch ⟨H⟩ stay locked near the analytical E₁; switch to the excited state and change n to see the energy jump by roughly n², and the extra nodes appear directly in the plotted density.">
   <LazyWavefunctionExplorer />

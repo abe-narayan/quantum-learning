@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/gate-decomposition"
@@ -20,6 +21,12 @@ export const lessonMeta = {
     "Explain why real hardware implements only a small native gate set, not every named gate directly",
     "Verify a specific gate decomposition (H, X, Z, S, T into RZ/RY) using this platform's engine",
     "Explain what 'equal up to global phase' means for a decomposition, and why it's the correct equivalence to check",
+  ],
+  related: [
+    {
+      slug: "quantum-computing/qubits-and-quantum-states/single-qubit-rotations",
+      note: "The Rz/Ry rotation family used for every decomposition here is exactly that lesson's general axis-angle rotation formula, specialized to two fixed axes.",
+    },
   ],
 };
 
@@ -82,6 +89,18 @@ Stepping through all five verified gates one at a time, rather than
 reading two fixed diagrams, makes the "how many native rotations does
 THIS gate need" question concrete for every gate this platform uses,
 not just the two multi-rotation ones drawn above:
+
+<PredictBeforeReveal
+  question="How many native rotations does the Hadamard gate H need, compared to Z?"
+  options={[
+    { label: "The same as Z: just one", value: "same-one" },
+    { label: "Two, versus Z's one", value: "two-vs-one" },
+    { label: "Three, versus Z's one", value: "three-vs-one" },
+    { label: "Zero; H is already native", value: "zero" },
+  ]}
+  correctValue="two-vs-one"
+  explanation="Z=Rz(π) is already a single native rotation, but H=Ry(π/2)Rz(π) genuinely needs two, a real, non-obvious difference in compiled cost between two gates that look equally 'basic' in circuit notation. Step through the five gates below and watch Z, S, T stay a single RZ box while H and X expand to two."
+/>
 
 <InteractiveSection title="Step through all five decompositions" description="Slide across Z, S, T, H, and X. Notice the first three are a single Rz box (theta = pi, pi/2, pi/4 respectively); H and X are genuinely the two-rotation sequences drawn above. Every angle here is exactly the value this lesson already stated, just rendered as an actual circuit instead of a formula.">
   <CircuitDiagramExplorer

@@ -1,6 +1,7 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD, PAULI_Z } from "@/lib/quantum/gates";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
@@ -101,6 +102,18 @@ one**, with certainty, not because any measurement narrowed things down,
 but purely because the phases introduced by that single $Z$ gate caused
 constructive interference on $|01\rangle$ and destructive interference
 (exact cancellation) everywhere else.
+
+<PredictBeforeReveal
+  question="Starting from |00⟩: apply H to both qubits (uniform 4-way superposition), then Z to qubit 1 only, then H to both qubits again. How many of the four outcomes end up with nonzero probability?"
+  options={[
+    { label: "All four, still uniform", value: "four" },
+    { label: "Two outcomes, 50/50", value: "two" },
+    { label: "Exactly one outcome, with certainty", value: "one" },
+    { label: "Zero — the state cancels entirely", value: "zero" },
+  ]}
+  correctValue="one"
+  explanation="The Z gate turns |+⟩⊗|+⟩ into |+⟩⊗|−⟩, still uniform probabilities but with a relative phase now in place. The second H⊗H then collides those phases: H|+⟩=|0⟩ and H|−⟩=|1⟩, giving exactly |01⟩ with certainty. All the probability that was spread over four outcomes concentrates onto one, purely from interference — no measurement, no entanglement needed."
+/>
 
 <InteractiveSection title="Four outcomes collapse to one" description="Apply H to both qubits, then Z to qubit 1 only, then H to both again, the exact sequence just derived above. Watch all four probabilities collapse onto exactly one outcome, purely from interference, with no measurement and no entanglement involved anywhere in the sequence.">
   <LazyTwoQubitExplorer />

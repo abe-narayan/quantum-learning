@@ -3,6 +3,12 @@ import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { applySimonOracle } from "@/lib/quantum/oracles";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-algorithms-i/simons-algorithm"
+).map((problem) => problem.meta);
 
 export const simonCircuitState = (n, s) =>
   [
@@ -263,6 +269,8 @@ doesn't hand you the answer directly.
    $\Theta(2^{n/2})$ even with randomization. Explain, in your own words,
    why this makes Simon's quantum-classical gap a different *kind* of
    result, not just a bigger number.
+
+<PracticeLinks problems={practiceProblems} />
 
 ## Summary
 

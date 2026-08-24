@@ -164,6 +164,14 @@ device topology (Physical Qubit Platforms' connectivity comparison
 across platforms) matters for algorithm performance, not just raw qubit
 count or gate speed.
 
+Qiskit's real transpiler exposes this SWAP-insertion problem directly
+as a tunable choice: optimization levels 0 through 3 trade transpilation
+time against how hard it tries to minimize the resulting SWAP overhead,
+and every real IBM device publishes its exact coupling map (which
+physical qubit pairs actually support a two-qubit gate) for the
+transpiler to route against, exactly the connectivity constraint this
+lesson's own SWAP-counting worked example computes by hand.
+
 ## Worked Example
 
 **How many SWAP gates does bridging control=0, target=5 need on a

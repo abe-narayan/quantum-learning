@@ -33,10 +33,25 @@ export const lessonMeta = {
 
 ## Motivation
 
-Every prior lesson in this course built one piece of the noise picture:
-sources, T1/T2, crosstalk, compounding error. This capstone-style lesson
-asks the practical roadmap question: what does it actually take to reach
-a genuinely fault-tolerant quantum computer, and how far away is that?
+A modest 50-logical-qubit algorithm, protected the way the threshold
+theorem requires, can cost on the order of 50,000 physical qubits, a
+thousand-to-one tax paid before a single "useful" qubit does any work.
+Every noise source this course covered, sources, T1/T2, crosstalk,
+compounding error, feeds directly into that tax. This capstone-style
+lesson connects them to the concrete physical-to-logical overhead real
+hardware roadmaps target, and is honest about how far current devices
+are from paying it off.
+
+## Intuition
+
+Error correction's promise sounds almost free: encode a logical qubit
+redundantly across several physical ones, and the logical error rate
+drops below the physical error rate. What that promise doesn't
+advertise up front is the exchange rate, how many physical qubits it
+costs per logical qubit, and that number is the entire roadmap question
+this lesson closes the course with. Further down, a slider lets you
+sweep across a realistic range of exchange rates and watch the
+physical-qubit bill move.
 
 ## Synthesis
 
@@ -51,6 +66,16 @@ target logical error rate, estimates commonly range from the low hundreds
 to several thousand physical qubits per logical qubit for full fault
 tolerance at a useful scale, a genuinely large multiplier, not a minor
 implementation detail.
+
+Concretely, a surface-code-style logical qubit is built from a lattice of
+physical **data qubits** interleaved with **ancilla (syndrome)
+qubits** that repeatedly measure error syndromes without disturbing the
+encoded information. The small patch below makes the physical-to-logical
+overhead visual, though it's illustrative, not to scale: a real
+fault-tolerant logical qubit needs the low-hundreds-to-thousands overhead
+just described, not the handful of physical qubits pictured here.
+
+<LogicalQubitPatchDiagram ariaLabel="A small grid of data qubits interleaved with ancilla syndrome qubits, boxed and labeled as one logical qubit, illustrating the physical-to-logical overhead" />
 
 ### The NISQ era
 

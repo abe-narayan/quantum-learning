@@ -5,6 +5,7 @@ import { classicalOrder, periodFindingMeasurementDistribution } from "@/lib/quan
 import { BarChart } from "@/components/visualizations/BarChart";
 import { KatexMath } from "@/components/ui/KatexMath";
 import { PeriodFindingControls, coprimeBases } from "./PeriodFindingControls";
+import { LabNotes } from "./LabNotes";
 
 /**
  * A freely-explorable version of the period-finding circuit only ever shown
@@ -70,6 +71,33 @@ export function PeriodFindingExplorer() {
             display
           />
         </div>
+
+        <LabNotes
+          notes={[
+            {
+              label: "What we're studying",
+              content:
+                "This is the actual quantum subroutine behind Shor's algorithm — measuring reveals a distribution whose peak spacing exposes the hidden period r, without ever computing r directly.",
+            },
+            {
+              label: "Try this",
+              content: (
+                <ul className="list-disc space-y-1 pl-4">
+                  <li>
+                    Fix N=15, a=7 (the lesson&apos;s example) and increase counting qubits from 4 to 8 — watch the
+                    smeared peaks sharpen into exact ones as 2^t/r becomes closer to an integer.
+                  </li>
+                  <li>Try N=21 with a few different coprime bases and compare how many distinct peaks appear each time.</li>
+                </ul>
+              ),
+            },
+            {
+              label: "What's next",
+              content:
+                "Next: this distribution is what Shor's algorithm classically post-processes (continued fractions) to recover r — see that step worked through in the lesson.",
+            },
+          ]}
+        />
       </div>
 
       <PeriodFindingControls

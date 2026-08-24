@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { NAV_ITEMS } from "@/lib/nav";
+import { NAV_ITEMS, TRACK_NAV_ITEMS } from "@/lib/nav";
+
+// The navbar groups the four track pages under a "Tracks" dropdown to keep
+// its top-level item count sane, but the footer has no such pressure — it's
+// exactly where a complete, ungrouped site map belongs, so it lists both.
+const FOOTER_ITEMS = [...NAV_ITEMS, ...TRACK_NAV_ITEMS];
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -21,8 +26,8 @@ export function Footer() {
           </p>
         </div>
 
-        <nav className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm sm:flex sm:gap-6">
-          {NAV_ITEMS.map((item) => (
+        <nav className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm sm:flex sm:flex-wrap sm:gap-6">
+          {FOOTER_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { ValidationResult } from "@/lib/problems/validators/types";
 
 const STATUS_STYLES: Record<ValidationResult["status"], string> = {
-  correct: "border-accent/40 bg-accent/10 text-accent",
+  correct: "border-success/40 bg-success/10 text-success",
   partial: "border-warning/40 bg-warning/10 text-warning",
   incorrect: "border-border bg-surface-muted text-foreground",
 };

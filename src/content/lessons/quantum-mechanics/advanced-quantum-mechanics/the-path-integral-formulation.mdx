@@ -46,13 +46,35 @@ export const lessonMeta = {
 
 ## Motivation
 
-Every quantum mechanics lesson so far in this course, the Schrödinger
-equation, operators, eigenstates, is built on Hamiltonian/operator
-language. Feynman's path integral formulation is a genuinely different
-starting point, mathematically equivalent but conceptually distinct:
-instead of asking "how does the wavefunction evolve," it asks "what is
-the amplitude for every possible way the particle could get from here to
-there, added up?"
+Ask a quantum particle how it got from A to B, and Feynman's answer is:
+every way imaginable, all at once. Not just the straight line, or
+whatever trajectory Newton's laws would pick out — literally every
+conceivable path between the two points, including ones that zigzag
+wildly, double back on themselves, or wander off and return, each
+contributing its own share to the final amplitude. Every quantum
+mechanics lesson so far in this course, the Schrödinger equation,
+operators, eigenstates, is built on Hamiltonian/operator language,
+asking how the wavefunction evolves moment to moment. The path integral
+throws that question out and asks a completely different one instead:
+what is the amplitude for every possible way the particle could get from
+here to there, added up? Same physics, providing identical predictions,
+but a genuinely different picture of what's actually going on.
+
+## Intuition
+
+Picture every route between two points laid out at once, and give each
+one a spinning clock hand: the hand's angle is set by that specific
+path's classical action $S$, and its length is fixed. To find the total
+amplitude, add up all the clock hands, tip to tail, treating each as a
+tiny arrow in the complex plane. Paths whose actions are wildly
+different from their neighbors' point their hands in nearly random
+directions, so as a group they cancel each other out almost completely.
+Paths clustered near the one true classical trajectory, though, have
+nearly identical actions, so their hands point almost the same way and
+reinforce rather than cancel. That's the whole idea before any integral
+gets written down: probability comes from constructive interference
+among the paths near the classical one, and destructive interference
+washing out nearly everything else.
 
 ## Mathematical Development
 
@@ -62,8 +84,10 @@ The propagator $K(x_f,t_f;x_i,t_i)$, the amplitude for a particle to go
 from $x_i$ at time $t_i$ to $x_f$ at time $t_f$, is, in Feynman's
 formulation, a sum over *every conceivable path* connecting the two
 points, each weighted by $e^{iS[\text{path}]/\hbar}$, where $S$ is the
-classical action of that specific path (not just the classical,
-least-action path: every path, however wild, contributes):
+classical action of that specific path, $S[x(t)]=\int_{t_i}^{t_f}L\,dt=\int_{t_i}^{t_f}\left(\tfrac12m\dot x^2-V(x)\right)dt$
+(the time integral of the Lagrangian, kinetic minus potential energy,
+evaluated along that one path from $x_i$ to $x_f$; not just the
+classical, least-action path: every path, however wild, contributes):
 
 $$
 K(x_f,t_f;x_i,t_i) = \int\mathcal D[x(t)]\;e^{iS[x(t)]/\hbar}
@@ -115,7 +139,10 @@ correct path-sum formulation must satisfy. This platform's
 a Riemann sum over a fine $x_1$ grid, literally summing over every
 discretized two-segment path, and matches the exact left-hand side to a
 relative error of $\sim10^{-15}$ (machine precision) across every tested
-$(x_f,x_i,\tau)$ combination.
+$(x_f,x_i,\tau)$ combination. The Worked Example below plots the actual
+quantity being summed over $x_1$, worth glancing at now: it shows
+concretely where that Riemann sum's weight is concentrated, rather than
+leaving "sum over every intermediate position" as an abstract phrase.
 
 ## Physical Interpretation
 

@@ -1,6 +1,12 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD, PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/superdense-coding"
+).map((problem) => problem.meta);
 
 export const lessonMeta = {
   title: "Superdense Coding",
@@ -264,6 +270,8 @@ together for the joint decode circuit.
    probability exactly $0.25$. Using the general fact that measuring any
    qubit prepared independently of another gives no information about it,
    explain why $0.25 = 0.5 \times 0.5$ is exactly what you'd expect here.
+
+<PracticeLinks problems={practiceProblems} />
 
 ## Summary
 

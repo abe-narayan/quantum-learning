@@ -54,13 +54,33 @@ export const lessonMeta = {
 
 ## Motivation
 
-The Hydrogen Atom solved $H=p^2/2m-e^2/4\pi\epsilon_0r$ exactly. Almost
-no other Hamiltonian of physical interest can be solved exactly: real
-atoms have electron-electron repulsion, real oscillators are slightly
-anharmonic, real spins sit in small stray magnetic fields. Perturbation
-theory is the systematic answer. If $H=H_0+H'$ with $H_0$ exactly
-solvable and $H'$ "small," you can build the true energies and states as
-a correction series in $H'$, order by order.
+Exactly solvable quantum systems are rare, prized specimens: the free
+particle, the infinite well, the harmonic oscillator, hydrogen. Nudge any
+of them even slightly, a stray electric field, a whisper of anharmonicity,
+another electron's repulsion, and the exact solution disappears entirely;
+the Schrödinger equation for the nudged system generally has no
+closed-form answer at all. Perturbation theory doesn't try to solve the
+nudged problem from scratch. It asks a more modest question: if the easy
+version is already fully understood, can the answer to the almost-easy
+version be built as a correction, layered on top, order by order? The
+Hydrogen Atom solved $H=p^2/2m-e^2/4\pi\epsilon_0r$ exactly, but almost no
+other Hamiltonian of physical interest can be solved exactly: real atoms
+have electron-electron repulsion, real oscillators are slightly
+anharmonic, real spins sit in small stray magnetic fields. If
+$H=H_0+H'$ with $H_0$ exactly solvable and $H'$ "small," you can build the
+true energies and states as a correction series in $H'$, order by order.
+
+## Intuition
+
+Treat $H_0$'s eigenstates as fixed reference points you already
+understand completely, and $H'$ as a small push away from each one. To
+first order, a state doesn't move at all: it just picks up an energy
+shift equal to how much $H'$ pushes back against itself in its own
+direction, $\langle n|H'|n\rangle$, no mixing with any other state
+required. Real mixing only shows up at second order, where every other
+state $m$ contributes a tug proportional to how strongly $H'$ couples $n$
+to $m$, and inversely to how far apart their unperturbed energies sit:
+close, easily-perturbed neighbors matter far more than distant ones.
 
 ## Mathematical Development
 

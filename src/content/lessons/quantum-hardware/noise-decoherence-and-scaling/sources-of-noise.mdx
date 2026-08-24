@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
@@ -20,6 +21,12 @@ export const lessonMeta = {
     "Distinguish coherent errors (miscalibration, systematic) from incoherent errors (genuine environmental decoherence)",
     "Name at least four concrete physical noise sources across this platform's covered hardware types",
     "Explain why classifying a noise source correctly (coherent vs. incoherent) determines how it can be mitigated",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition",
+      note: "The abstract mathematics behind this lesson's 'incoherent error' category: a numerical demonstration of exactly why environmental coupling is irreversible and can't be recalibrated away.",
+    },
   ],
 };
 
@@ -58,7 +65,7 @@ alone.
   spontaneously decays to its ground state, releasing energy to the
   environment; modeled by `amplitudeDampingChannel`.
 - **Dephasing** (incoherent): random phase kicks from fluctuating
-  fields (e.g., flux noise in superconducting qubits, electric field
+  fields (e.g., flux noise in superconducting qubits, magnetic field
   noise for trapped ions); modeled by `dephasingChannel`.
 - **Thermal photon population** (incoherent): Cryogenic Systems'
   $\bar n$; residual thermal photons directly perturb the qubit.
@@ -108,6 +115,18 @@ rotation by the wrong angle), watch how each incoherent channel instead
 pulls the Bloch vector toward a fixed point it can never rotate back
 from on its own, exactly the irreversibility that makes "just
 recalibrate it" the wrong fix for this branch of the catalog:
+
+<PredictBeforeReveal
+  question="A qubit starts on the Bloch sphere's equator (a superposition, z=0). Repeated applications of dephasing act on it. Where does the Bloch point end up?"
+  options={[
+    { label: "At the north pole |0⟩", value: "north" },
+    { label: "At the south pole |1⟩", value: "south" },
+    { label: "Shrinks straight to the exact center of the sphere", value: "center" },
+    { label: "Stays exactly on the equator's surface", value: "equator" },
+  ]}
+  correctValue="center"
+  explanation="Dephasing shrinks x and y toward zero while leaving z untouched. Starting at the equator, z is already 0, so shrinking x and y to 0 lands the point at the exact center: the maximally mixed state. That's a genuinely different motion from amplitude damping, which instead pulls everything toward the north pole — neither is a rotation a later recalibration could undo, which is exactly why both sit in the incoherent branch of the tree above."
+/>
 
 <InteractiveSection title="Watch an incoherent channel act" description="Pick amplitude damping or dephasing, pick a starting state, and step through applications. Amplitude damping pulls everything toward |0⟩; dephasing shrinks x and y toward zero while leaving z untouched. Neither motion is a rotation a later, better-calibrated pulse could undo, which is exactly why these sit in the incoherent branch of the tree above.">
   <LazyNoiseExplorer />

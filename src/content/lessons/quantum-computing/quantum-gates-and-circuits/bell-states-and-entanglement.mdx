@@ -2,6 +2,7 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -23,6 +24,12 @@ export const lessonMeta = {
     "Derive the Bell state (|00⟩+|11⟩)/√2 from H then CNOT applied to |00⟩",
     "Prove this state cannot be written as any single-qubit product state",
     "Explain, with a calculation, why this is not the same as classical shared randomness",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum",
+      note: "That lesson proves this platform's Bell state |Ψ⁻⟩ is not merely analogous to but literally identical to the total-spin-zero singlet of two combined spin-1/2 particles, verified as the same J²=0 eigenstate.",
+    },
   ],
 };
 
@@ -133,6 +140,18 @@ statement about anyone's ignorance. Two entangled qubits behave as one
 system with no independently well-defined parts, and that fact is what
 every later lesson in this course (measurement, teleportation, and the
 no-cloning theorem) builds on directly.
+
+<PredictBeforeReveal
+  question="If you measure both qubits of |Φ+⟩ in the computational basis, many times, how often will the two outcomes agree (both 0 or both 1)?"
+  options={[
+    { label: "0% of the time", value: "0" },
+    { label: "25% of the time", value: "25" },
+    { label: "50% of the time", value: "50" },
+    { label: "100% of the time", value: "100" },
+  ]}
+  correctValue="100"
+  explanation="|Φ+⟩ = (|00⟩+|11⟩)/√2 has zero amplitude on |01⟩ and |10⟩, so measurement can only ever land on 00 or 11 — never a mismatch. Each outcome is 50/50 individually, but the two qubits agree 100% of the time. That's exactly what the Correlation table below shows for the Bell state (only the diagonal nonzero), in contrast to |++⟩, where all four outcomes are equally likely and the qubits agree only half the time."
+/>
 
 <InteractiveSection title="Watch the indicator flip" description='Try it yourself. Click Initialize → |++⟩ and check the entanglement indicator: a product state, as expected. Then click the Create a Bell state guided walkthrough and watch the indicator flip to "Entangled" the moment CNOT is applied. Open the Correlation table for both states: for |++⟩ the four outcomes are independent (25% each); for the Bell state, only the diagonal is nonzero, exactly the perfect correlation this lesson just derived.'>
   <LazyTwoQubitExplorer />

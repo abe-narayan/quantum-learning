@@ -24,11 +24,26 @@ export const lessonMeta = {
 
 ## Motivation
 
-Quantum Algorithms II built VQE and QAOA as physics: minimize
-$\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ over parameters
-$\vec\theta$. This lesson looks at the same algorithms from a software
-angle: what does actually running one look like, step by step, and what
-does this course's compilation machinery mean for that process?
+Every time VQE's classical optimizer proposes a new $\vec\theta$, the
+exact same ansatz circuit gets rebuilt, transpiled, and rerun from
+scratch. Pay that overhead once and it's a rounding error. Pay it 200
+times, a realistic VQE run, and it becomes the dominant cost of the
+entire computation. Quantum Algorithms II built VQE and QAOA as physics:
+minimize $\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ over
+parameters $\vec\theta$. This lesson looks at the same algorithms from a
+software angle: what does actually running one look like, step by step,
+and what does this course's compilation machinery cost when it repeats
+hundreds of times?
+
+## Intuition
+
+Think of the loop like tuning a guitar by ear: pluck a string (quantum),
+listen for how far off it is (classical), turn the peg a little
+(classical), pluck again. Each individual pluck is fast. What makes the
+process expensive is repetition: the peg-turning, listening, and
+re-plucking cycle runs hundreds of times before the string settles, and
+every single pluck pays this course's full compilation cost again from
+scratch. The slider further down makes that multiplication concrete.
 
 ## Engineering Development
 
@@ -77,18 +92,6 @@ is paid 100 times over, not once. This is a real, often-dominant cost
 driver for hybrid algorithms specifically, distinct from a single-shot
 circuit's one-time compilation cost.
 
-### What runs where
-
-The quantum device does exactly one job: prepare $|\psi(\vec\theta)\rangle$
-and report measurement statistics. EVERY OTHER STEP, proposing new
-parameters, computing the cost function from measurement results,
-deciding convergence, runs on ordinary classical hardware. This
-division is precisely why these are called "hybrid" algorithms: neither
-purely classical nor purely quantum, but a genuine collaboration between
-the two, with the quantum device doing only the one piece (native
-quantum-mechanical evaluation) classical computers fundamentally cannot
-do efficiently.
-
 <InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. The per-iteration bar stays fixed at 6 SWAP gates, exactly this section's overhead figure, while the total-run bar grows as N times 6, the same multiplication the worked example below performs by hand for N=200.">
   <BarChartExplorer
     sliderLabel="Iterations (N)"
@@ -103,6 +106,18 @@ do efficiently.
     }))}
   />
 </InteractiveSection>
+
+### What runs where
+
+The quantum device does exactly one job: prepare $|\psi(\vec\theta)\rangle$
+and report measurement statistics. EVERY OTHER STEP, proposing new
+parameters, computing the cost function from measurement results,
+deciding convergence, runs on ordinary classical hardware. This
+division is precisely why these are called "hybrid" algorithms: neither
+purely classical nor purely quantum, but a genuine collaboration between
+the two, with the quantum device doing only the one piece (native
+quantum-mechanical evaluation) classical computers fundamentally cannot
+do efficiently.
 
 ## Physical Interpretation
 

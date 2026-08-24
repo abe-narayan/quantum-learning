@@ -97,10 +97,15 @@ from.
 
 ### Two limits, verified
 
-For any pure state, one eigenvalue is 1 and the other is 0 (proven in
-Lesson 1's Hermitian-trace-1 discussion, made concrete by
-`eigenvaluesHermitian2x2` returning exactly $(1,0)$ for
-$\rho_{|0\rangle}$), so $S=-1\log_21-0\log_20=0$: **zero entropy**, the
+For any pure state, one eigenvalue is 1 and the other is 0. Trace 1
+alone (Lesson 1) doesn't force this by itself, but $\rho=|\psi\rangle\langle\psi|$
+is also idempotent, $\rho^2=|\psi\rangle\langle\psi|\psi\rangle\langle\psi|=|\psi\rangle\langle\psi|=\rho$
+since $\langle\psi|\psi\rangle=1$, and an idempotent matrix's eigenvalues
+must each satisfy $\lambda^2=\lambda$, so $\lambda\in\{0,1\}$; trace 1
+then forces exactly one of the two eigenvalues to be $1$ and the other
+$0$. This is made concrete by `eigenvaluesHermitian2x2` returning
+exactly $(1,0)$ for $\rho_{|0\rangle}$, so
+$S=-1\log_21-0\log_20=0$: **zero entropy**, the
 minimum, for every pure state without exception. For the maximally mixed
 qubit $I/2$, both eigenvalues are $0.5$, giving
 $S=-2(0.5\log_20.5)=-2(0.5)(-1)=1$: **exactly 1 bit**, the maximum a

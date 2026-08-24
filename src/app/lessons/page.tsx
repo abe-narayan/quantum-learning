@@ -5,17 +5,29 @@ import { CourseList } from "@/components/curriculum/CourseList";
 import { LessonSearch } from "@/components/curriculum/LessonSearch";
 import { COURSES, PILLARS, getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
+import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
+import { buildBreadcrumbSchema } from "@/lib/structuredData";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Lessons",
   description: "The full QuantumLearn lesson catalog, across every course and every track.",
-};
+  path: "/lessons",
+});
+
+const breadcrumbSchema = buildBreadcrumbSchema([
+  { name: "Home", url: BASE_URL },
+  { name: "Lessons", url: `${BASE_URL}/lessons` },
+]);
 
 export default async function LessonsPage() {
   const lessons = await getAllLessonsMeta();
 
   return (
     <Container className="py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <PageHeader
         eyebrow="Lessons"
         title="Lesson catalog"

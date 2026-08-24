@@ -24,10 +24,30 @@ export const lessonMeta = {
 
 ## Motivation
 
-Angular Momentum & Spin's capstone previewed the punchline: hydrogen's
-wavefunction separates into $R(r)Y_l^m(\theta,\varphi)$, with the angular
-part already fully solved. This lesson proves *why* that separation is
-valid at all: the answer is a commutator, not a coincidence.
+Hydrogen, the finite spherical well, and the 3D harmonic oscillator look
+nothing alike as potentials, yet every one of them factors into a radial
+piece times an angular piece, and the angular piece is always built from
+exactly the same handful of functions, $Y_l^m$, no matter which of the
+three $V(r)$ actually is. That's a strange thing for three unrelated
+potentials to have in common, unless there's a shared reason it has to be
+true. There is, and it has almost nothing to do with hydrogen
+specifically: it's about rotations. Angular Momentum & Spin's capstone
+previewed the punchline, that hydrogen's wavefunction separates into
+$R(r)Y_l^m(\theta,\varphi)$ with the angular part already fully solved.
+This lesson proves *why* that separation is valid at all: the answer is a
+commutator, not a coincidence.
+
+## Intuition
+
+A potential that only cares about distance from the origin, never
+direction, can't tell the difference between "before" and "after" you
+rotate the whole system around it. Rotating the electron's position
+doesn't change how far it is from the proton, so it can't change its
+potential energy either. That's the entire argument in one sentence:
+rotating everything is a symmetry of $V(r)$, and whenever some operation
+is a symmetry of the Hamiltonian, the operator that *generates* that
+operation, here, angular momentum, has to commute with $H$. Nothing more
+exotic than that is needed.
 
 ## Mathematical Development
 
@@ -46,11 +66,12 @@ components; crucially, $V(r)$ (depending only on the radial distance
 $r=\sqrt{x^2+y^2+z^2}$) commutes with $L_z$, because rotating about the
 $z$-axis doesn't change $r$ at all (a rotation preserves distance from
 the origin by definition), and $L_z$ *generates* exactly that rotation.
-The kinetic term $p^2/2m$ commutes with $L_z$ too, since $L_z$ generates
-rotations and rotations don't change how "spread out" a wavefunction's
-momentum is, only its direction. Both pieces of $H$ separately commute
-with $L_z$, so $[H,L_z]=0$. The identical argument (rotations about any
-axis preserve $r$) gives $[H,\vec L^{\,2}]=0$ too.
+
+The kinetic term $p^2/2m$ commutes with $L_z$ too, for the same kind of
+reason: $L_z$ generates rotations, and rotations don't change how "spread
+out" a wavefunction's momentum is, only its direction. Both pieces of $H$
+separately commute with $L_z$, so $[H,L_z]=0$. The identical argument
+(rotations about any axis preserve $r$) gives $[H,\vec L^{\,2}]=0$ too.
 
 ### Why this matters: simultaneous eigenstates
 

@@ -6,7 +6,7 @@ export const practiceProblems = getProblemsForLesson(
 ).map((problem) => problem.meta);
 
 export const toyCombinations = (n, k) => Array.from({ length: k }, (_, i) => (n - i) / (i + 1)).reduce((acc, term) => acc * term, 1);
-export const toyFailureProbability = (d, p) => Array.from({ length: d - Math.ceil(d / 2) }, (_, i) => Math.ceil(d / 2) + 1 + i).reduce((sum, k) => sum + toyCombinations(d, k) * p ** k * (1 - p) ** (d - k), 0);
+export const toyFailureProbability = (d, p) => Array.from({ length: d - Math.floor(d / 2) }, (_, i) => Math.floor(d / 2) + 1 + i).reduce((sum, k) => sum + toyCombinations(d, k) * p ** k * (1 - p) ** (d - k), 0);
 
 export const lessonMeta = {
   title: "Capstone: Fault-Tolerant Thresholds and Resource Overhead",
@@ -52,6 +52,15 @@ toward zero. This only works while $p$ is below some critical value, the
 **threshold** $p_{\text{th}}$: above it, more physical qubits mean *more*
 opportunities for errors to combine, and increasing $d$ makes the logical
 error rate *worse*, not better.
+
+**Concatenation** reaches the same tradeoff by a different route: instead
+of building one bigger code (a larger surface-code grid), encode each
+physical qubit of a distance-$d$ code in another copy of that same code,
+one level deeper. Effective distance compounds with each added level,
+while physical qubit count multiplies by roughly $n$ per level, so the
+identical below/above-$p_{\text{th}}$ logic applies to adding
+concatenation levels exactly as it does to growing a single code's
+distance: a net win only below threshold, a net loss above it.
 
 The shape of this crossover, not the real surface-code threshold value,
 is what a simple toy model can show honestly: treat $d$ physical qubits

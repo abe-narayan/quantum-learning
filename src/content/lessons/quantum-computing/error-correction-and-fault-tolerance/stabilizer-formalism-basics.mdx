@@ -21,6 +21,12 @@ export const lessonMeta = {
     "Explain syndrome measurement as measuring stabilizer generators' ±1 eigenvalues",
     "Derive why an X error anticommutes with exactly the stabilizers whose syndrome it flips",
   ],
+  related: [
+    {
+      slug: "quantum-mechanics/operators-observables-measurement/simultaneous-eigenstates-and-compatible-observables",
+      note: "The general theorem (commuting Hermitian operators share an eigenbasis) that stabilizer generators, as simultaneous +1 eigenstates, are a direct application of.",
+    },
+  ],
 };
 
 ## Motivation
@@ -38,8 +44,14 @@ way yet.
 
 A **stabilizer** for a quantum code is an operator $g$ (built from tensor
 products of Paulis) satisfying $g|\psi\rangle=+|\psi\rangle$ for every
-valid codeword $|\psi\rangle$. The code's states are simultaneous $+1$
-eigenstates of every stabilizer generator.
+valid codeword $|\psi\rangle$. Stabilizers multiply to give stabilizers
+($g_1|\psi\rangle=+|\psi\rangle$ and $g_2|\psi\rangle=+|\psi\rangle$
+together force $g_1g_2|\psi\rangle=+|\psi\rangle$), so the full set of a
+code's stabilizing operators forms a group; a **generator** is one of a
+small handful of stabilizers whose products (together with the identity)
+produce every element of that group, so listing the generators pins down
+the whole group without writing every element out by hand. The code's
+states are simultaneous $+1$ eigenstates of every stabilizer generator.
 
 ### The bit-flip code's stabilizers
 

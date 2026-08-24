@@ -55,6 +55,44 @@ decision-making happens in practice.
 tradeoff space, not precise specifications of any particular device;
 real numbers vary by generation, vendor, and continue to improve.)
 
+The table's five rows are five genuinely different physical structures,
+not just five sets of numbers; each platform lesson's own schematic,
+side by side, makes that concrete:
+
+<div className="not-prose grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+<div>
+<HardwarePlatformSchematic variant="superconducting" ariaLabel="Superconducting transmon qubit: an LC circuit with a Josephson junction replacing the inductor" />
+<p className="mt-1 text-center text-xs text-muted-foreground">Superconducting</p>
+</div>
+
+<div>
+<HardwarePlatformSchematic variant="trapped-ion" ariaLabel="Trapped ions: a linear chain of ions confined by RF electrodes, sharing a motional mode" />
+<p className="mt-1 text-center text-xs text-muted-foreground">Trapped ions</p>
+</div>
+
+<div>
+<HardwarePlatformSchematic variant="neutral-atom" ariaLabel="Neutral atoms: an optical tweezer array with a reconfigurable subset of traps loaded" />
+<p className="mt-1 text-center text-xs text-muted-foreground">Neutral atoms</p>
+</div>
+
+<div>
+<HardwarePlatformSchematic variant="photonic" ariaLabel="Photonic qubits: a single beam's polarization, viewed head-on as two perpendicular field-oscillation directions" />
+<p className="mt-1 text-center text-xs text-muted-foreground">Photonic</p>
+</div>
+
+<div>
+<HardwarePlatformSchematic variant="spin-qubit" ariaLabel="Spin qubits: an electron confined in a gate-defined quantum dot on a semiconductor substrate" />
+<p className="mt-1 text-center text-xs text-muted-foreground">Spin qubits</p>
+</div>
+
+</div>
+
+Five different physical mechanisms for the same underlying job (an
+isolated, controllable two-level system) is exactly why the table above
+has no row that wins on every column: each structure's own geometry is
+what produces its particular coherence/speed/connectivity tradeoff.
+
 The table's coherence-time column, read as a relative ordering rather
 than exact numbers (bar height is ordinal; the caption under each bar
 is the table's own qualitative entry, not a precise measurement):

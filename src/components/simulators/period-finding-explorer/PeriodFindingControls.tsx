@@ -1,7 +1,9 @@
-import { cn } from "@/lib/utils";
+import { PresetToggle } from "@/components/visualizations/PresetToggle";
 
 const N_PRESETS = [15, 21, 35];
 const X_BITS_OPTIONS = [4, 5, 6, 7];
+const N_TOGGLE_OPTIONS = N_PRESETS.map((n) => ({ n, label: String(n) }));
+const X_BITS_TOGGLE_OPTIONS = X_BITS_OPTIONS.map((bits) => ({ bits, label: String(bits) }));
 
 function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
@@ -41,23 +43,12 @@ export function PeriodFindingControls({
         <h3 id="pf-n-heading" className="text-sm font-semibold text-foreground">
           N (number to factor)
         </h3>
-        <div role="radiogroup" aria-label="N" className="mt-3 flex overflow-hidden rounded-full border border-border">
-          {N_PRESETS.map((n) => (
-            <button
-              key={n}
-              type="button"
-              role="radio"
-              aria-checked={N === n}
-              onClick={() => onNChange(n)}
-              className={cn(
-                "flex-1 px-3 py-1.5 text-sm font-medium transition-colors",
-                N === n ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted"
-              )}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
+        <PresetToggle
+          options={N_TOGGLE_OPTIONS}
+          index={N_TOGGLE_OPTIONS.findIndex((o) => o.n === N)}
+          onChange={(i) => onNChange(N_TOGGLE_OPTIONS[i].n)}
+          ariaLabel="N"
+        />
         <p className="mt-1 text-xs text-muted-foreground">Changing N picks a fresh set of valid bases a.</p>
       </section>
 
@@ -68,7 +59,7 @@ export function PeriodFindingControls({
         <select
           value={a}
           onChange={(e) => onAChange(Number(e.target.value))}
-          className="mt-3 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground"
+          className="mt-3 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {validBases.map((base) => (
             <option key={base} value={base}>
@@ -85,23 +76,12 @@ export function PeriodFindingControls({
         <h3 id="pf-t-heading" className="text-sm font-semibold text-foreground">
           Counting qubits t
         </h3>
-        <div role="radiogroup" aria-label="Counting qubits" className="mt-3 flex overflow-hidden rounded-full border border-border">
-          {X_BITS_OPTIONS.map((bits) => (
-            <button
-              key={bits}
-              type="button"
-              role="radio"
-              aria-checked={xBits === bits}
-              onClick={() => onXBitsChange(bits)}
-              className={cn(
-                "flex-1 px-3 py-1.5 text-sm font-medium transition-colors",
-                xBits === bits ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted"
-              )}
-            >
-              {bits}
-            </button>
-          ))}
-        </div>
+        <PresetToggle
+          options={X_BITS_TOGGLE_OPTIONS}
+          index={X_BITS_TOGGLE_OPTIONS.findIndex((o) => o.bits === xBits)}
+          onChange={(i) => onXBitsChange(X_BITS_TOGGLE_OPTIONS[i].bits)}
+          ariaLabel="Counting qubits"
+        />
         <p className="mt-1 text-xs text-muted-foreground">
           2^t outcomes in the counting register. More qubits sharpen the peaks but slow the computation down.
         </p>

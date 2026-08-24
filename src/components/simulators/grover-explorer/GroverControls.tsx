@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { PresetToggle } from "@/components/visualizations/PresetToggle";
+
+const QUBIT_OPTIONS = [2, 3, 4].map((n) => ({ n, label: `N=${2 ** n}` }));
 
 export function GroverControls({
   numQubits,
@@ -30,24 +32,13 @@ export function GroverControls({
         <h3 id="grover-qubits-heading" className="text-sm font-semibold text-foreground">
           Search space size
         </h3>
-        <div role="radiogroup" aria-label="Number of qubits" className="mt-3 flex overflow-hidden rounded-full border border-border">
-          {[2, 3, 4].map((n) => (
-            <button
-              key={n}
-              type="button"
-              role="radio"
-              aria-checked={numQubits === n}
-              disabled={disabled}
-              onClick={() => onNumQubitsChange(n)}
-              className={cn(
-                "flex-1 px-3 py-1.5 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
-                numQubits === n ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted"
-              )}
-            >
-              N={2 ** n}
-            </button>
-          ))}
-        </div>
+        <PresetToggle
+          options={QUBIT_OPTIONS}
+          index={QUBIT_OPTIONS.findIndex((o) => o.n === numQubits)}
+          onChange={(i) => onNumQubitsChange(QUBIT_OPTIONS[i].n)}
+          ariaLabel="Number of qubits"
+          disabled={disabled}
+        />
         <p className="mt-1 text-xs text-muted-foreground">{numQubits} qubits, N={dimension} basis states. Changing this resets the search.</p>
       </section>
 
@@ -59,7 +50,7 @@ export function GroverControls({
           value={markedIndex}
           disabled={disabled}
           onChange={(e) => onMarkedIndexChange(Number(e.target.value))}
-          className="mt-3 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground"
+          className="mt-3 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {Array.from({ length: dimension }, (_, i) => (
             <option key={i} value={i}>

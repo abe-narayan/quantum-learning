@@ -1,4 +1,5 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -94,6 +95,18 @@ equal 1.
 Every qubit state can be pictured as a point on the surface of a sphere, the
 **Bloch sphere**, where the north pole is $|0\rangle$, the south pole is
 $|1\rangle$, and every other point is some superposition of the two.
+
+<PredictBeforeReveal
+  question="Start from |0⟩ and apply a Hadamard gate (the gate below turns the vector to point straight out to the equator). If you then measure many times, what fraction of measurements will read |1⟩?"
+  options={[
+    { label: "0%", value: "0" },
+    { label: "25%", value: "25" },
+    { label: "50%", value: "50" },
+    { label: "100%", value: "100" },
+  ]}
+  correctValue="50"
+  explanation="A Hadamard gate takes |0⟩ to the equal superposition (1/√2)|0⟩ + (1/√2)|1⟩. By the Born rule, P(1) = |1/√2|² = 1/2, so measurement reads |1⟩ on about half of your attempts and |0⟩ on the other half — never something in between, even though the state itself was a genuine mix of both before you measured."
+/>
 
 <InteractiveSection title="Apply a gate, then measure" description="Try it yourself: apply a gate below and watch α, β, and the measurement probabilities update as the vector moves. Then hit Measure a few times from the same state and notice the outcomes are random, but always land on 0 or 1 with exactly the probabilities shown.">
   <LazyBlochSphereExplorer />

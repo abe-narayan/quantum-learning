@@ -91,6 +91,14 @@ $|x\rangle$, the register $U_f$ was never defined to modify directly. This
 is why it's called *kickback*: the effect of the computation gets kicked
 back onto the control-like register instead of staying on the target.
 
+Equivalently: for fixed $x$, $U_f$ acts on the ancilla alone as
+$X^{f(x)}$, the identity when $f(x)=0$ and a bit flip when $f(x)=1$,
+straight from $y\oplus f(x)$, and $|-\rangle$ is exactly $X$'s
+$-1$-eigenstate ($|+\rangle$ its $+1$-eigenstate). That eigenstate framing
+is what the callouts below mean by "$|-\rangle$ is an eigenstate of the
+apply-$X$-conditioned-on-$f(x)$ operation": applying an operator to its own
+eigenstate only ever multiplies it by a number, never moves it.
+
 ### Linearity extends this to a superposition over x
 
 $U_f$ is linear, so applying it to $\left(\sum_x c_x|x\rangle\right)|-\rangle$

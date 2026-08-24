@@ -30,10 +30,13 @@ export const lessonMeta = {
 
 ## Motivation
 
-The last lesson proved VQE's answer can never dip below the true ground
-energy. This lesson checks the other direction: does it actually *get
-close*, on a specific Hamiltonian, run through this platform's real
-optimizer, not a hand-picked success story.
+Proving an algorithm can't be wrong in one direction is one thing.
+Proving it actually lands close to the right answer is another. The
+last lesson showed VQE's cost function can never dip below the true
+ground energy, a real guarantee, but not yet a demonstration that the
+algorithm gets anywhere close to it. This lesson checks the other
+direction directly: run the real optimizer on a specific Hamiltonian,
+not a hand-picked success story, and see how close it actually gets.
 
 ## Mathematical Development
 
@@ -58,9 +61,10 @@ monotonically (proven structurally: the optimizer only ever accepts a
 strictly better candidate, checked directly in this course's tests) and
 converges to an energy within $10^{-12}$ of $-1$, far tighter than
 needed for any practical purpose, since the pattern search keeps halving
-its step size until it's negligibly small. This is the actual history
-array `runVqe` returned for this exact Hamiltonian, not a smoothed
-illustration:
+its step size until it's negligibly small.
+
+This is the actual history array `runVqe` returned for this exact
+Hamiltonian, not a smoothed illustration:
 
 <ParametricCurve
   frames={[

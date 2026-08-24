@@ -6,6 +6,7 @@ import { measureQubit } from "@/lib/quantum/measurement";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/quantum-teleportation"
@@ -102,9 +103,22 @@ $$
 
 <QuantumStateDisplay state={afterHadamard} label="After H on qubit 0" />
 
-Expanding $H$ on qubit 0 for all four terms and regrouping by Alice's two
-qubits (0 and 1), the full expansion is mechanical but exactly the same
-bilinear distribution from Tensor Products, produces:
+$H$ sends a $|0\rangle$ on qubit 0 to $\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$
+and a $|1\rangle$ on qubit 0 to $\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$.
+Applying that to all four terms above, before any regrouping:
+
+$$
+\frac12\Big[\,\alpha(|000\rangle+|100\rangle) + \alpha(|011\rangle+|111\rangle) + \beta(|010\rangle-|110\rangle) + \beta(|001\rangle-|101\rangle)\,\Big]
+$$
+
+Now collect these eight terms by Alice's two qubits (0 and 1, the first
+two labels), leaving Bob's qubit (the last label) as whatever's attached
+to each pair, the same bilinear regrouping from Tensor Products applied
+in reverse. The $|00\rangle$ pair picks up $\alpha|0\rangle$ (from
+$|000\rangle$) and $\beta|1\rangle$ (from $|001\rangle$); the $|01\rangle$
+pair picks up $\beta|0\rangle$ (from $|010\rangle$) and $\alpha|1\rangle$
+(from $|011\rangle$); and so on for $|10\rangle$ and $|11\rangle$. Doing
+this for all eight terms produces:
 
 $$
 \frac12\Big[\,|00\rangle\otimes(\alpha|0\rangle+\beta|1\rangle) + |01\rangle\otimes(\beta|0\rangle+\alpha|1\rangle) + |10\rangle\otimes(\alpha|0\rangle-\beta|1\rangle) + |11\rangle\otimes(-\beta|0\rangle+\alpha|1\rangle)\,\Big]
@@ -141,11 +155,23 @@ four states depending on Alice's outcomes $(m_0,m_1)$:
 | $00$ | $\alpha\vert0\rangle+\beta\vert1\rangle$ | none |
 | $01$ | $\beta\vert0\rangle+\alpha\vert1\rangle = X\vert\psi\rangle$ | apply $X$ |
 | $10$ | $\alpha\vert0\rangle-\beta\vert1\rangle = Z\vert\psi\rangle$ | apply $Z$ |
-| $11$ | $-\beta\vert0\rangle+\alpha\vert1\rangle = XZ\vert\psi\rangle$ | apply $Z$, then $X$ |
+| $11$ | $-\beta\vert0\rangle+\alpha\vert1\rangle = XZ\vert\psi\rangle$ | apply $X$, then $Z$ |
 
 Alice sends her two classical bits to Bob (at ordinary, light-speed-limited
 communication speed, nothing here is instantaneous). Bob applies the
 matching correction:
+
+<PredictBeforeReveal
+  question="Once Bob applies the correction his two classical bits tell him to, does his qubit end up in Alice's exact original state |ψ⟩ (α=0.6, β=0.8i), or just something close to it?"
+  options={[
+    { label: "Exactly |ψ⟩", value: "exact" },
+    { label: "Close, but with some error", value: "approx" },
+    { label: "Only matching measurement probabilities", value: "probs-only" },
+    { label: "A completely different state", value: "different" },
+  ]}
+  correctValue="exact"
+  explanation="The correction table above is exact, not probabilistic: each of the four branches is a fixed, known transformation of |ψ⟩ (identity, X, Z, or XZ), so undoing it with the matching gate recovers α=0.6, β=0.8i exactly, amplitudes and all, not just the right measurement odds. The QuantumStateDisplay panels below show this for the branch actually computed here: Bob's qubit before correction, after X, and after Z — landing precisely back on |ψ⟩."
+/>
 
 <QuantumStateDisplay state={bobUncorrected} label="Bob's qubit, before correction" showProbabilities={false} />
 <QuantumStateDisplay state={bobAfterX} label="After applying X" showProbabilities={false} />
@@ -186,7 +212,7 @@ consumed by her measurement; it does not survive alongside Bob's copy.
 
 1. Verify the $01$ row of the correction table: show that
    $X(\beta|0\rangle+\alpha|1\rangle)$ recovers $\alpha|0\rangle+\beta|1\rangle$.
-2. Verify the $11$ row: show that applying $Z$ then $X$ to
+2. Verify the $11$ row: show that applying $X$ then $Z$ to
    $-\beta|0\rangle+\alpha|1\rangle$ recovers $\alpha|0\rangle+\beta|1\rangle$.
 3. Suppose Alice's classical message is lost in transit. Describe exactly
    what Bob's qubit looks like to him (hint: he doesn't know which of the

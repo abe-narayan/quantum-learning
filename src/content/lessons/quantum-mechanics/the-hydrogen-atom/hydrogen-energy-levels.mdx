@@ -35,17 +35,42 @@ export const lessonMeta = {
     "Explain why the energy depends only on n, not on l or m, for the pure Coulomb potential specifically",
     "Connect the n=1 ground state energy to the reference scales already used in Wave Mechanics and the Bohr model",
   ],
+  related: [
+    {
+      slug: "quantum-hardware/physical-qubit-platforms/neutral-atoms",
+      note: "Neutral-atom qubits' 'Rydberg blockade' gate excites an atom to exactly this lesson's high-n hydrogen-like states; Eₙ=-13.6 eV/n² is why large n gives such an enormous, strongly-interacting orbit.",
+    },
+  ],
 };
 
 ## Motivation
 
-Solving the radial equation from the previous lesson for hydrogen's
-specific Coulomb potential $V(r)=-e^2/4\pi\epsilon_0r$ (subject to the
-bound-state requirement that $u(r)\to0$ as $r\to\infty$) turns out to
-force $E$ to only a discrete, countable set of values. This lesson states
-that result and unpacks what it means physically; the next lesson uses
-the actual radial wavefunctions (already built and verified in this
-course's engine) to see the states themselves.
+Heat hydrogen gas and it doesn't glow across a smooth rainbow. It emits
+at a handful of exact, discrete wavelengths, cataloged by Balmer in 1885
+as pure empirical numerology, a formula that fit the data perfectly with
+no physical justification behind it for decades. This lesson derives the
+number underneath those lines from nothing but the Schrödinger equation
+and a boundary condition. Solving the radial equation from the previous
+lesson for hydrogen's specific Coulomb potential
+$V(r)=-e^2/4\pi\epsilon_0r$ (subject to the bound-state requirement that
+$u(r)\to0$ as $r\to\infty$) turns out to force $E$ to only a discrete,
+countable set of values, exactly the discreteness Balmer saw and couldn't
+explain. This lesson states that result and unpacks what it means
+physically; the next lesson uses the actual radial wavefunctions (already
+built and verified in this course's engine) to see the states themselves.
+
+## Intuition
+
+The infinite square well forced only certain wavelengths to fit between
+two walls; here, the walls are gone, but the requirement is just as
+rigid. A generic solution to the radial equation blows up as $r\to\infty$,
+which isn't normalizable and can't describe a bound electron. Only for
+special values of $E$ does the blow-up cancel and the wavefunction
+actually decay to zero at infinity instead. That cancellation is a
+knife-edge condition, satisfied only at a discrete ladder of energies, not
+a continuum, for exactly the same reason a guitar string can only vibrate
+at certain frequencies: a boundary condition that must be satisfied
+exactly, not approximately, leaves only a countable set of solutions.
 
 ## Mathematical Development
 

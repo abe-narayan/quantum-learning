@@ -3,16 +3,28 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { COURSES } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { getAllProblemMeta } from "@/lib/problems/registry";
+import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
+import { buildBreadcrumbSchema } from "@/lib/structuredData";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "About",
   description: "What QuantumLearn is, and who it's built for.",
-};
+  path: "/about",
+});
 
-const SIMULATOR_COUNT = 10;
+const breadcrumbSchema = buildBreadcrumbSchema([
+  { name: "Home", url: BASE_URL },
+  { name: "About", url: `${BASE_URL}/about` },
+]);
+
+// Real simulator <section> count on /simulators — update this alongside that
+// page if a simulator is added or removed (no shared source of truth exists
+// for this one number, so it's hand-kept in sync rather than computed).
+const SIMULATOR_COUNT = 14;
 
 export default async function AboutPage() {
   const lessons = await getAllLessonsMeta();
@@ -27,6 +39,10 @@ export default async function AboutPage() {
 
   return (
     <Container className="py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <PageHeader
         eyebrow="About"
         title="About QuantumLearn"
@@ -81,6 +97,15 @@ export default async function AboutPage() {
           directly.
         </p>
       </Card>
+
+      <div className="mt-10 flex flex-wrap justify-center gap-3 text-center">
+        <Button href="/learn" size="lg">
+          Start learning
+        </Button>
+        <Button href="/simulators" size="lg" variant="secondary">
+          Try a simulator first
+        </Button>
+      </div>
     </Container>
   );
 }

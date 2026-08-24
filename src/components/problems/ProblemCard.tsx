@@ -18,7 +18,7 @@ const TYPE_LABEL: Record<ProblemType, string> = {
 export function ProblemCard({ problem }: { problem: ProblemMeta }) {
   return (
     <Link href={`/problems/${problem.slug}`} className="group block h-full">
-      <Card className="h-full transition-colors group-hover:border-brand/40 group-hover:bg-surface-muted">
+      <Card className="h-full transition-[color,background-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 group-hover:border-brand/40 group-hover:bg-surface-muted">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-foreground group-hover:text-brand">{problem.title}</h3>
           <Badge tone="brand">{DIFFICULTY_LABEL[problem.difficulty]}</Badge>

@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { radial1s, radial2s, radial2p } from "@/lib/quantum/hydrogenAtom";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers"
@@ -95,6 +96,18 @@ classical circular-orbit assumption).
 
 The three radial functions look genuinely different once plotted, not
 just algebraically different:
+
+<PredictBeforeReveal
+  question="Which of the three radial distributions, 1s, 2s, or 2p, shows a node (a radius where the probability touches zero, then rises again)?"
+  options={[
+    { label: "1s", value: "1s" },
+    { label: "2s", value: "2s" },
+    { label: "2p", value: "2p" },
+    { label: "None of them; all three are node-free", value: "none" },
+  ]}
+  correctValue="2s"
+  explanation="2s's (2−r) factor in radial2s changes sign at r=2, giving a genuine node the 1s and 2p profiles don't have: 1s peaks once near the origin, 2p peaks once farther out, and only 2s dips to zero and rises again. Slide through the three orbitals below and watch 2s's curve touch the axis."
+/>
 
 <ParametricCurve
   frames={radialDensityFrames}

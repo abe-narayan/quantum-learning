@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/Button";
+import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { cn } from "@/lib/utils";
 import { SINGLE_QUBIT_GATES, type SingleQubitGateId } from "./gateDefinitions";
 import { GUIDED_PRESETS } from "./presets";
+
+const TARGET_QUBIT_OPTIONS = ([0, 1] as const).map((qubit) => ({ qubit, label: `q${qubit}` }));
 
 export type InitId = "00" | "01" | "10" | "11" | "plus-plus" | "bell";
 
@@ -41,6 +44,14 @@ export function OperationControls({
         <h3 id="presets-heading" className="text-sm font-semibold text-foreground">
           Guided walkthrough
         </h3>
+        {/*
+          Hand-rolled rather than <PresetToggle>: selecting an option here doesn't just
+          swap a value, it kicks off `runPreset`'s own async, cancellable, multi-step
+          animation (see TwoQubitExplorer's `isRunning`/`cancelledRef`) that narrates and
+          disables the whole panel step-by-step. PresetToggle has no notion of a
+          disabled/in-progress option, so it can't represent "this preset is currently
+          animating" or block re-selection while one runs.
+        */}
         <div role="radiogroup" aria-label="Guided walkthrough" className="mt-3 flex flex-col gap-2">
           {GUIDED_PRESETS.map((preset) => (
             <button
@@ -89,26 +100,13 @@ export function OperationControls({
           <h3 id="gates-heading" className="text-sm font-semibold text-foreground">
             Apply a gate
           </h3>
-          <div role="radiogroup" aria-label="Target qubit" className="flex overflow-hidden rounded-full border border-border">
-            {([0, 1] as const).map((qubit) => (
-              <button
-                key={qubit}
-                type="button"
-                role="radio"
-                aria-checked={targetQubit === qubit}
-                disabled={disabled}
-                onClick={() => onTargetQubitChange(qubit)}
-                className={cn(
-                  "px-2.5 py-1 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
-                  targetQubit === qubit
-                    ? "bg-brand text-brand-foreground"
-                    : "bg-surface text-muted-foreground hover:bg-surface-muted"
-                )}
-              >
-                q{qubit}
-              </button>
-            ))}
-          </div>
+          <PresetToggle
+            options={TARGET_QUBIT_OPTIONS}
+            index={TARGET_QUBIT_OPTIONS.findIndex((option) => option.qubit === targetQubit)}
+            onChange={(i) => onTargetQubitChange(TARGET_QUBIT_OPTIONS[i].qubit)}
+            ariaLabel="Target qubit"
+            disabled={disabled}
+          />
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
           Single-qubit gates below apply to the selected target.

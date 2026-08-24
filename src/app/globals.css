@@ -27,7 +27,10 @@
   --accent: #0e7490;
   --accent-foreground: #ffffff;
 
-  --success: #16a34a;
+  /* Darkened from #16a34a (3.29:1 on white) to pass AA's 4.5:1 minimum for
+     normal text — this token is used as text color (Feedback.tsx), not just
+     backgrounds. */
+  --success: #15803d;
   /* Darkened from #d97706 (3.19:1 on white) to pass AA's 4.5:1 minimum for
      normal text — this token is used as text color, not just backgrounds. */
   --warning: #b45309;
@@ -56,8 +59,16 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark palette, shared by two selectors below:
+     - the media query is the default for visitors who haven't made an
+       explicit choice (`data-theme` unset) — it just follows the OS/browser.
+     - `[data-theme="dark"]` is the explicit override set by ThemeToggle
+       (src/components/layout/ThemeToggle.tsx) via `localStorage`, and wins
+       regardless of OS preference.
+   `:not([data-theme="light"])` keeps the media query from fighting an
+   explicit light override when the OS prefers dark. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #0a0a0f;
     --foreground: #e7e9ee;
 
@@ -70,10 +81,230 @@
     --brand-foreground: #0a0a0f;
     --accent: #22d3ee;
     --accent-foreground: #0a0a0f;
+
+    /* Brighter variants of the light-mode success/warning/danger hues —
+       each passes ~4.5:1 (in practice much higher) against the dark
+       --background, the same treatment --accent already gets above. Without
+       these, the light-mode colors (tuned for contrast on white) don't
+       reliably read against a dark background. */
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
   }
+}
+
+:root[data-theme="dark"] {
+  --background: #0a0a0f;
+  --foreground: #e7e9ee;
+
+  --surface: #101218;
+  --surface-muted: #16181f;
+  --border: #23262f;
+  --muted-foreground: #9096a3;
+
+  --brand: #818cf8;
+  --brand-foreground: #0a0a0f;
+  --accent: #22d3ee;
+  --accent-foreground: #0a0a0f;
+
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* ============================================================
+   Print styles
+   ============================================================
+   Lessons are long-form, math-heavy study material — printing (or
+   "print to PDF") one for offline reading is a real use case here, and
+   there was no @media print handling at all before this. Three jobs:
+
+     1. Strip chrome that has no meaning on paper (sticky navbar, search
+        trigger, theme toggle, mobile menu button, footer's link list,
+        interactive-only controls with no static equivalent).
+     2. Force the light-mode palette regardless of the viewer's current
+        theme — dark mode's inverted colors have no business on a printed
+        page.
+     3. Keep wide content (KaTeX display math, tables, code) from being cut
+        off at the page edge, and avoid ugly mid-block page breaks.
+
+   Done entirely here rather than as `print:` utilities scattered across
+   components, matching how this file already owns every other
+   cross-cutting, theme-like concern (dark mode above is CSS custom
+   properties + attribute/media selectors, not Tailwind `dark:` sprinkled
+   per component). Selectors below target stable structure (the app's one
+   `<header>`, `footer nav`, `aria-pressed`/`role` attributes, and class
+   combinations unique to a given MDX wrapper) so no component file needs
+   touching just to print correctly.
+   ============================================================ */
+@media print {
+  @page {
+    margin: 1.6cm;
+  }
+
+  /* --- 2. Force light-mode colors even under a dark OS/theme preference.
+     Custom properties still respect the cascade, so `!important` is
+     needed to reliably beat both `[data-theme="dark"]` (higher-specificity
+     attribute selector, see above) and `@media (prefers-color-scheme:
+     dark)` — the latter isn't restricted to `screen`, so on a dark-mode OS
+     it matches `print` too. */
+  :root {
+    --background: #ffffff !important;
+    --foreground: #0f1115 !important;
+    --surface: #ffffff !important;
+    --surface-muted: #f4f5f7 !important;
+    --border: #d7dae0 !important;
+    --muted-foreground: #3f4451 !important;
+    --brand: #4f46e5 !important;
+    --brand-foreground: #ffffff !important;
+    --accent: #0e7490 !important;
+    --accent-foreground: #ffffff !important;
+    --success: #15803d !important;
+    --warning: #b45309 !important;
+    --danger: #dc2626 !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f1115 !important;
+  }
+
+  /* `dark:prose-invert` (LessonLayout, src/components/lessons/LessonLayout.tsx)
+     drives lesson body copy through @tailwindcss/typography's own
+     `--tw-prose-*` variables — a completely separate system from
+     `--foreground` above, with the same "unscoped media query also
+     matches print" problem, so it needs its own reset back to the
+     plugin's `prose-neutral` (light) values (see
+     node_modules/@tailwindcss/typography/src/styles.js, the `neutral` key). */
+  .prose {
+    --tw-prose-body: #404040 !important;
+    --tw-prose-headings: #171717 !important;
+    --tw-prose-lead: #525252 !important;
+    --tw-prose-links: #171717 !important;
+    --tw-prose-bold: #171717 !important;
+    --tw-prose-counters: #737373 !important;
+    --tw-prose-bullets: #d4d4d4 !important;
+    --tw-prose-hr: #e5e5e5 !important;
+    --tw-prose-quotes: #171717 !important;
+    --tw-prose-quote-borders: #e5e5e5 !important;
+    --tw-prose-captions: #737373 !important;
+    --tw-prose-kbd: #171717 !important;
+    --tw-prose-code: #171717 !important;
+    --tw-prose-pre-code: #e5e5e5 !important;
+    --tw-prose-pre-bg: #262626 !important;
+    --tw-prose-th-borders: #d4d4d4 !important;
+    --tw-prose-td-borders: #e5e5e5 !important;
+  }
+
+  .prose a {
+    text-decoration: underline;
+  }
+
+  /* --- 1. Chrome that has no meaning on paper --- */
+
+  /* The navbar (src/components/layout/Navbar.tsx) is the only <header> in
+     the app, and it contains the search trigger, theme toggle, mobile
+     menu button, and the "Start learning" CTA — hiding it removes all of
+     them in one shot, with no need to touch that file. */
+  header {
+    display: none !important;
+  }
+
+  /* Keep the footer's copyright line; its link list is pure site
+     navigation, nothing a reader on paper can click through. */
+  footer nav {
+    display: none !important;
+  }
+
+  /* Toggle-style buttons expose their state via aria-pressed across this
+     codebase (LessonCompleteToggle's "Mark as complete", ProblemFilters,
+     WavefunctionHeroExplorer) — a reliable, non-invasive hook for "button
+     with no static equivalent" without touching any of those files. */
+  button[aria-pressed] {
+    display: none !important;
+  }
+
+  /* "Predict before you reveal" (PredictBeforeReveal.tsx) — the option
+     buttons have no static equivalent. Leave the question (and the
+     reveal panel, if already open) printed; drop only the button group. */
+  [role="radiogroup"] {
+    display: none !important;
+  }
+
+  /* Every embedded simulator/visualization in a lesson is wrapped in
+     <InteractiveSection> (src/components/mdx/InteractiveSection.tsx) —
+     `border-accent/30` + `bg-accent/5` together is a class combination
+     unique to that wrapper. Its title/description are plain text and
+     still print fine; only the interactive embed itself (the `mt-4`
+     child holding the canvas/SVG/controls) is swapped for a short note. */
+  .border-accent\/30.bg-accent\/5 > .mt-4 {
+    display: none !important;
+  }
+  .border-accent\/30.bg-accent\/5::after {
+    content: "Interactive figure — view online to try it.";
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.8em;
+    font-style: italic;
+    color: #3f4451;
+  }
+
+  /* --- 3. Wide content shouldn't be cut off, and shouldn't split badly --- */
+
+  .katex-display {
+    overflow-x: visible !important;
+  }
+  .katex-display > .katex {
+    max-width: 100% !important;
+    white-space: normal !important;
+  }
+
+  /* Every table (mdx-components.tsx wraps `<table>` in this) and every
+     hand-drawn SVG diagram (src/components/visualizations/*) uses this
+     same overflow-x-auto escape hatch for wide content — nothing should
+     force horizontal scrolling on a medium that can't scroll. */
+  .overflow-x-auto {
+    overflow-x: visible !important;
+  }
+
+  table {
+    font-size: 0.85em;
+  }
+  th,
+  td {
+    overflow-wrap: break-word;
+  }
+
+  pre,
+  pre code {
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere;
+    overflow-x: visible !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  table,
+  tr,
+  pre,
+  .katex-display,
+  .not-prose {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }

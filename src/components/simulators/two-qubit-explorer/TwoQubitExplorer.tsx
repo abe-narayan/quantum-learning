@@ -182,41 +182,54 @@ export function TwoQubitExplorer() {
   );
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
-      <div className="space-y-6">
-        <div
-          aria-live="polite"
-          className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
-        >
-          {narration}
-          {lastMeasurement ? (
-            <span className="mt-1 block font-mono text-xs text-brand">{lastMeasurement}</span>
-          ) : null}
+    <div className="not-prose space-y-4">
+      <p className="text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">What we&apos;re studying: </span>
+        Whether two qubits act independently or become entangled — correlated in a way no classical coin pair
+        can be.
+      </p>
+
+      <div className="grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
+        <div className="space-y-6">
+          <div
+            aria-live="polite"
+            className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
+          >
+            {narration}
+            {lastMeasurement ? (
+              <span className="mt-1 block font-mono text-xs text-brand">{lastMeasurement}</span>
+            ) : null}
+          </div>
+
+          <StatePanel state={state} />
+          <CorrelationView state={state} />
         </div>
 
-        <StatePanel state={state} />
-        <CorrelationView state={state} />
+        <div className="space-y-8">
+          <OperationControls
+            disabled={disabled}
+            targetQubit={targetQubit}
+            onTargetQubitChange={setTargetQubit}
+            onInitialize={initialize}
+            onApplyGate={applyGate}
+            onCnot={applyCnotAction}
+            onSwap={applySwapAction}
+            onPreset={runPreset}
+            activePresetId={activePresetId}
+          />
+          <MeasurementPanel
+            disabled={disabled}
+            onMeasureQubit={measureQubitAction}
+            onMeasureBoth={measureBothAction}
+            onReset={reset}
+          />
+        </div>
       </div>
 
-      <div className="space-y-8">
-        <OperationControls
-          disabled={disabled}
-          targetQubit={targetQubit}
-          onTargetQubitChange={setTargetQubit}
-          onInitialize={initialize}
-          onApplyGate={applyGate}
-          onCnot={applyCnotAction}
-          onSwap={applySwapAction}
-          onPreset={runPreset}
-          activePresetId={activePresetId}
-        />
-        <MeasurementPanel
-          disabled={disabled}
-          onMeasureQubit={measureQubitAction}
-          onMeasureBoth={measureBothAction}
-          onReset={reset}
-        />
-      </div>
+      <p className="text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">What&apos;s next: </span>
+        Try building the same Bell state gate-by-gate in the Circuit Builder.
+      </p>
     </div>
   );
 }

@@ -18,7 +18,7 @@ export function InteractiveSection({
   children: ReactNode;
 }) {
   return (
-    <div className="not-prose my-8 rounded-2xl border border-accent/30 bg-accent/5 p-5 sm:p-6">
+    <div className="not-prose my-8 rounded-xl border border-accent/30 bg-accent/5 p-6">
       <p className="text-xs font-semibold uppercase tracking-wide text-accent">{title}</p>
       <p className="mt-2 text-sm text-foreground">{description}</p>
       <div className="mt-4">{children}</div>

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { QAOA_GRAPH_PRESETS } from "./presets";
 
 export function QAOAControls({
@@ -22,25 +22,12 @@ export function QAOAControls({
         <h3 id="qaoa-graph-heading" className="text-sm font-semibold text-foreground">
           Graph
         </h3>
-        <div role="radiogroup" aria-label="Graph preset" className="mt-3 flex flex-col gap-1.5">
-          {QAOA_GRAPH_PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              role="radio"
-              aria-checked={presetId === preset.id}
-              onClick={() => onPresetChange(preset.id)}
-              className={cn(
-                "rounded-lg px-3 py-1.5 text-left text-sm font-medium transition-colors",
-                presetId === preset.id
-                  ? "bg-brand text-brand-foreground"
-                  : "bg-surface text-muted-foreground hover:bg-surface-muted"
-              )}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
+        <PresetToggle
+          options={QAOA_GRAPH_PRESETS}
+          index={QAOA_GRAPH_PRESETS.findIndex((p) => p.id === presetId)}
+          onChange={(i) => onPresetChange(QAOA_GRAPH_PRESETS[i].id)}
+          ariaLabel="Graph preset"
+        />
       </section>
 
       <section aria-labelledby="qaoa-gamma-heading">

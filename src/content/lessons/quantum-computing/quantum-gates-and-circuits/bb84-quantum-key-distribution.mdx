@@ -1,6 +1,12 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution"
+).map((problem) => problem.meta);
 
 export const zBasisEncode = (bit) => StateVector.basis(1, bit);
 export const xBasisEncode = (bit) => applySingleQubitGate(StateVector.basis(1, bit), HADAMARD, 0);
@@ -45,6 +51,12 @@ export const lessonMeta = {
     "Derive why matching-basis measurement recovers Alice's bit with certainty and mismatched-basis measurement gives a random result",
     "Explain how the sifting step (comparing bases, not bits) produces a shared secret key without revealing it",
     "Compute the detectable error rate an intercept-resend eavesdropper introduces on the sifted key",
+  ],
+  related: [
+    {
+      slug: "quantum-hardware/physical-qubit-platforms/photonic-qubits",
+      note: "Real BB84 systems send exactly this protocol's Z/X-basis qubits as a single photon's polarization; this lesson's abstract H-and-measure engine is, physically, the polarization optics that platform describes.",
+    },
   ],
 };
 
@@ -280,6 +292,8 @@ detectable disturbance.
    cases. Explain why this is also exactly Eve's own measurement
    probability when she guesses the wrong basis, and why that's not a
    coincidence.
+
+<PracticeLinks problems={practiceProblems} />
 
 ## Summary
 

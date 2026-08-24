@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { FrameSlider } from "@/components/visualizations/FrameSlider";
 
 export function RabiControls({
   driveStrength,
@@ -7,10 +9,12 @@ export function RabiControls({
   onDetuningChange,
   sampleIndex,
   maxSampleIndex,
+  currentTLabel,
   onSampleIndexChange,
   isPlaying,
   onTogglePlay,
   onReset,
+  prefersReducedMotion,
 }: {
   driveStrength: number;
   onDriveStrengthChange: (v: number) => void;
@@ -18,10 +22,12 @@ export function RabiControls({
   onDetuningChange: (d: number) => void;
   sampleIndex: number;
   maxSampleIndex: number;
+  currentTLabel: string;
   onSampleIndexChange: (i: number) => void;
   isPlaying: boolean;
   onTogglePlay: () => void;
   onReset: () => void;
+  prefersReducedMotion: boolean;
 }) {
   return (
     <div className="space-y-8">
@@ -65,24 +71,23 @@ export function RabiControls({
         <p className="mt-1 font-mono text-xs text-muted-foreground">Δ = {detuning.toFixed(2)}</p>
       </section>
 
-      <section aria-labelledby="rabi-time-heading">
-        <h3 id="rabi-time-heading" className="text-sm font-semibold text-foreground">
-          Time
-        </h3>
-        <input
-          type="range"
-          min={0}
+      <section aria-label="Time">
+        <FrameSlider
+          label="Time"
+          valueLabel={currentTLabel}
+          index={sampleIndex}
           max={maxSampleIndex}
-          step={1}
-          value={sampleIndex}
-          onChange={(e) => onSampleIndexChange(Number(e.target.value))}
-          className="mt-3 w-full accent-accent"
-          aria-label="Time step"
+          onChange={onSampleIndexChange}
+          boxed={false}
         />
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button variant="primary" size="sm" onClick={onTogglePlay}>
-            {isPlaying ? "Pause" : "Play"}
-          </Button>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {prefersReducedMotion ? (
+            <Badge tone="neutral">Reduced motion — drag the slider above to scrub</Badge>
+          ) : (
+            <Button variant="primary" size="sm" onClick={onTogglePlay}>
+              {isPlaying ? "Pause" : "Play"}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" onClick={onReset}>
             Reset
           </Button>

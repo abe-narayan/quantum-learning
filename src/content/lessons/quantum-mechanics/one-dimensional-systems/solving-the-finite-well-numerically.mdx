@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/one-dimensional-systems/solving-the-finite-well-numerically"
@@ -25,6 +26,12 @@ export const lessonMeta = {
     "Use bisection to numerically find a specific finite well's ground-state energy",
     "Compare a finite well's ground state to the infinite well's, quantifying how much shallower it sits",
   ],
+  related: [
+    {
+      slug: "quantum-mechanics/approximation-methods/the-wkb-approximation",
+      note: "The same bisection-on-energy root-finding strategy this lesson uses on k tan(ka)=κ is reused there to solve WKB's action-integral quantization condition.",
+    },
+  ],
 };
 
 ## Motivation
@@ -43,6 +50,18 @@ curve; the right side, $\kappa=\sqrt{2V_0-k^2}$, is a single quarter-circle
 arc from $(0,\sqrt{2V_0})$ down to $(\sqrt{2V_0},0)$. Wherever the two
 curves cross is a valid bound-state wavenumber, the classic **graphical
 solution** every introductory course shows a picture of.
+
+<PredictBeforeReveal
+  question="As the well gets deeper (V0 increases, half-width a fixed), what happens to the bound-state wavenumber k where the two curves cross?"
+  options={[
+    { label: "k moves to smaller values", value: "smaller" },
+    { label: "k moves to larger values", value: "larger" },
+    { label: "The crossing stays at the same k", value: "same" },
+    { label: "There's no longer any crossing at all", value: "none" },
+  ]}
+  correctValue="larger"
+  explanation="The quarter-circle κ(k)=√(2V0−k²) grows with V0 while the tangent branch k·tan(ka) stays fixed (it depends only on the width a, never on V0), pushing their crossing point to larger k — a deeper well pulls the bound state to a larger wavenumber. Drag the slider below from V0=1 up to V0=12 and watch the crossing move right."
+/>
 
 <ParametricCurve
   frames={[1, 2, 3, 5, 8, 12].map((v0) => ({

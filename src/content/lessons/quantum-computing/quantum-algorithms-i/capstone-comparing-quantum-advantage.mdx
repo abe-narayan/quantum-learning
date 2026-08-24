@@ -24,11 +24,17 @@ export const lessonMeta = {
 
 ## Motivation
 
-Two algorithms, two very different kinds of "faster." This lesson puts
-them side by side and asks the harder question neither individual lesson
-addressed: faster at what, compared to what, and under what assumptions,
-because both answers turn out to be more specific, and more honest, than
-"quantum computers win."
+Deutsch-Jozsa needs exactly one query, ever, no matter how large the
+problem grows. Grover needs roughly $\sqrt N$ queries where a classical
+computer needs $N$. Both get called "quantum speedup." Are they the same
+kind of advantage at different sizes, or something more fundamentally
+different from each other?
+
+They're not the same kind. This lesson puts the two algorithms side by
+side and asks the question neither individual lesson addressed: faster
+at what, compared to what, and under what assumptions, because the
+honest answer to each turns out to be far more specific than "quantum
+computers win."
 
 ## Mathematical Development
 
@@ -112,10 +118,15 @@ Interference is the entire mechanism behind both results: Deutsch-Jozsa's
 amplitude on $|0\rangle^{\otimes n}$ collapsing to exactly $0$ or $\pm1$,
 Grover's rotation concentrating amplitude on the marked state. Interference
 itself is a genuinely quantum resource with no classical analogue.
+
 What differs between the two algorithms is how much structure the *problem
 itself* offers for interference to exploit: an engineered promise (total,
 exponential advantage) versus a genuinely unstructured search (partial,
-quadratic advantage, but provably the most available).
+quadratic advantage, but provably the most available). That difference is
+exactly what the curve earlier in this lesson makes visible: Grover's line
+bends but never flattens the way Deutsch-Jozsa's constant, single-query
+line does, because unstructured search leaves interference less to work
+with, not because Grover's algorithm is doing anything wrong.
 
 ## Worked Example
 
@@ -123,12 +134,17 @@ quadratic advantage, but provably the most available).
 counts to the corresponding classical worst case.**
 
 Deutsch-Jozsa: classical $2^9+1=513$ queries vs. quantum $1$, a
-$513\times$ reduction. Grover: classical $1024$ queries (average case
-$\approx512$) vs. quantum
-$\approx\frac{\pi}{4}\sqrt{1024}=\frac{\pi}{4}(32)\approx25$ queries, about
-a $20\times$ reduction, not the $513\times$ Deutsch-Jozsa achieves at the
-same $n$. The gap between "exponential" and "quadratic" is not a small
-difference in practice, and it only widens as $n$ grows further.
+$513\times$ reduction.
+
+Grover: classical $1024$ queries (average case $\approx512$) vs. quantum
+$\approx\frac{\pi}{4}\sqrt{1024}=\frac{\pi}{4}(32)\approx25$ queries,
+about a $20\times$ reduction, not the $513\times$ Deutsch-Jozsa achieves
+at the same $n$.
+
+$n=10$ sits near the left edge of the curve plotted earlier, where both
+algorithms' query counts are still small in absolute terms. Even here the
+gap between "exponential" and "quadratic" is not a small difference, and
+it only widens as $n$ grows further.
 
 ## Common Mistakes
 
@@ -179,6 +195,13 @@ sidestepped by construction.
   depends on how much structure the problem itself offers.
 
 ## Further Exploration
+
+The question this lesson opened with, faster at what, compared to what,
+under which assumptions, carries forward into every algorithm ahead.
+Shor's algorithm gets its exponential speedup from a different kind of
+structured promise (periodicity, not a constant-vs-balanced guarantee):
+it's worth asking the same three questions of it before taking
+"exponential" at face value again.
 
 This completes **Quantum Algorithms I: Foundations**. From here,
 **Quantum Algorithms II: Advanced** builds directly on the QFT and phase

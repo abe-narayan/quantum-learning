@@ -27,6 +27,12 @@ export const lessonMeta = {
     "Compute n̄ for a realistic qubit frequency at several temperatures and identify why 4K alone is insufficient",
     "Describe a dilution refrigerator's staged cooling at a conceptual level",
   ],
+  related: [
+    {
+      slug: "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
+      note: "The Bose-Einstein occupation formula this lesson computes describes the thermal population of exactly that lesson's equally-spaced ħω energy ladder, the reason a qubit needs millikelvin cooling to sit reliably in its ground state.",
+    },
+  ],
 };
 
 ## Motivation
@@ -121,6 +127,22 @@ the physics of mixing two isotopes of helium) reaching the millikelvin
 range. Each stage is progressively harder to build and more expensive
 to operate, a real engineering reason systems don't just try to jump
 straight to millikelvin in one step.
+
+The dilution stage itself isn't one step either: it further splits into a
+**still** ($\sim0.7$-$1$ K, where the helium mixture is distilled and the
+first heavy filtering of control lines happens), a **cold plate**
+($\sim100$ mK, the same 100 mK checkpoint already in the table above,
+with $\bar n\approx0.10$), and finally the **mixing chamber** ($10$-$20$
+mK, matching this lesson's $15$ mK dilution-fridge-base figure), where the
+qubit chip itself is mounted:
+
+<DilutionRefrigeratorDiagram ariaLabel="Vertical cross-section of a dilution refrigerator's cooling stages, from 300 K room temperature down through 77 K, 4 K, the still, the cold plate, and the 10-20 mK mixing chamber where the qubit chip sits" />
+
+Each plate is progressively colder and physically smaller, nested inside
+the one above it; hardware gets placed at whichever stage its own
+temperature tolerance allows, cheapest (room temperature) components as
+far out as possible, and only the qubit chip itself at the very
+coldest, hardest-to-reach stage.
 
 ## Physical Interpretation
 

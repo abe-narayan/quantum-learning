@@ -1,16 +1,56 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { blochStateFromAngles, densityMatrixToBlochVector } from "@/lib/quantum/bloch";
 import { pureStateDensityMatrix, purity, vonNeumannEntropy, validateDensityMatrix } from "@/lib/quantum/densityMatrix";
 import { applyKrausChannel, amplitudeDampingChannel, dephasingChannel } from "@/lib/quantum/openSystems";
 import { BlochSphereCanvas } from "@/components/simulators/bloch-sphere/BlochSphereCanvas";
+import { useAnimatedBlochTarget } from "@/components/simulators/bloch-sphere/useAnimatedBlochPoint";
 import { DensityMatrixStatePanel } from "@/components/simulators/density-matrix-explorer/DensityMatrixStatePanel";
 import { STATE_PRESETS } from "@/components/simulators/bloch-sphere/presets";
 import { DecayCurve } from "./DecayCurve";
 import { NoiseControls, type ChannelType } from "./NoiseControls";
 
 const MAX_STEPS = 40;
+const URL_SYNC_DEBOUNCE_MS = 400;
+const COPY_CONFIRMATION_MS = 1500;
+const STRENGTH_MIN = 0.01;
+const STRENGTH_MAX = 0.5;
+
+// Minimal shareable state is the starting preset, channel type, and strength —
+// together they fully determine the trajectory computed below. The step scrub
+// is playback state, not configuration, so it's deliberately excluded: a
+// shared link reproduces the setup, not a paused mid-animation frame. Params
+// are prefixed (`noise_`) because this simulator shares /simulators with
+// other URL-stateful simulators.
+function isPresetId(value: string): boolean {
+  return STATE_PRESETS.some((preset) => preset.id === value);
+}
+
+function isChannelType(value: string): value is ChannelType {
+  return value === "amplitude-damping" || value === "dephasing";
+}
+
+function clampStrength(value: number): number {
+  return Math.min(STRENGTH_MAX, Math.max(STRENGTH_MIN, value));
+}
+
+/** Reads and validates `?noise_preset=&noise_channel=&noise_strength=`. Never throws — returns null on anything malformed or absent. */
+function parseNoiseParams(
+  params: { get(key: string): string | null }
+): { presetId: string; channel: ChannelType; strength: number } | null {
+  const rawPreset = params.get("noise_preset");
+  const rawChannel = params.get("noise_channel");
+  const rawStrength = params.get("noise_strength");
+  if (rawPreset === null || rawChannel === null || rawStrength === null) return null;
+  if (!isPresetId(rawPreset) || !isChannelType(rawChannel)) return null;
+  const strength = Number(rawStrength);
+  if (!Number.isFinite(strength)) return null;
+  return { presetId: rawPreset, channel: rawChannel, strength: clampStrength(strength) };
+}
 
 /**
  * A single-qubit noise channel applied step by step, watching the Bloch
@@ -21,10 +61,67 @@ const MAX_STEPS = 40;
  * separate or re-derived noise model.
  */
 export function NoiseExplorer() {
-  const [presetId, setPresetId] = useState("+");
-  const [channel, setChannel] = useState<ChannelType>("amplitude-damping");
-  const [strength, setStrength] = useState(0.15);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const initialFromUrl = parseNoiseParams(searchParams);
+
+  const [presetId, setPresetId] = useState(initialFromUrl?.presetId ?? "+");
+  const [channel, setChannel] = useState<ChannelType>(initialFromUrl?.channel ?? "amplitude-damping");
+  const [strength, setStrength] = useState(initialFromUrl?.strength ?? 0.15);
   const [steps, setSteps] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const urlSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstUrlSync = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+  }, []);
+
+  // Keep the URL in sync with the settled configuration so the page is always
+  // shareable. Debounced so a slider drag doesn't spam `history.replaceState` —
+  // only the value it settles on after a short pause gets written. Skips the
+  // very first run so mounting doesn't immediately rewrite the URL we just read
+  // from.
+  useEffect(() => {
+    if (isFirstUrlSync.current) {
+      isFirstUrlSync.current = false;
+      return;
+    }
+    if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    urlSyncTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      params.set("noise_preset", presetId);
+      params.set("noise_channel", channel);
+      params.set("noise_strength", strength.toFixed(3));
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, URL_SYNC_DEBOUNCE_MS);
+    return () => {
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+    // Deliberately depends only on the shareable state: `router`/`pathname` are
+    // stable, and reading the rest of the query string fresh from
+    // `window.location` (rather than depending on the `searchParams` hook)
+    // avoids re-running this effect off of our own `replace` calls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [presetId, channel, strength]);
+
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
+    } catch {
+      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+    }
+  }, []);
 
   const trajectory = useMemo(() => {
     const preset = STATE_PRESETS.find((p) => p.id === presetId) ?? STATE_PRESETS[0];
@@ -41,7 +138,8 @@ export function NoiseExplorer() {
 
   const clampedSteps = Math.min(steps, trajectory.length - 1);
   const rho = trajectory[clampedSteps];
-  const blochVector = useMemo(() => densityMatrixToBlochVector(rho), [rho]);
+  const targetBlochVector = useMemo(() => densityMatrixToBlochVector(rho), [rho]);
+  const { point: blochVector } = useAnimatedBlochTarget(targetBlochVector);
   const purityValue = useMemo(() => purity(rho), [rho]);
   const entropyValue = useMemo(() => vonNeumannEntropy(rho), [rho]);
   const validation = useMemo(() => validateDensityMatrix(rho), [rho]);
@@ -90,20 +188,66 @@ export function NoiseExplorer() {
         </div>
 
         <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
+
+        <div className="grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
+          <div>
+            <Badge tone="brand" className="mb-1.5">
+              What we&rsquo;re studying
+            </Badge>
+            <p className="text-sm text-muted-foreground">
+              Real qubits leak information to their environment — this applies an actual Kraus-operator
+              noise channel step by step so you can watch a pure state decay toward the channel&rsquo;s fixed
+              point.
+            </p>
+          </div>
+          <div>
+            <Badge tone="accent" className="mb-1.5">
+              What&rsquo;s next
+            </Badge>
+            <p className="text-sm text-muted-foreground">
+              Next: this is exactly the T1/T2 decay hardware engineers measure — see it framed that way in
+              the Quantum Hardware lessons.
+            </p>
+          </div>
+          <div className="sm:col-span-2">
+            <Badge tone="brand" className="mb-1.5">
+              Try this
+            </Badge>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
+              <li>
+                Start from |+⟩, choose Amplitude Damping, and step forward until purity nearly hits 1 again
+                at |0⟩. Then reset, pick Dephasing instead, and compare where the Bloch vector ends up.
+              </li>
+              <li>
+                Compare a low strength (0.05) against a high one (0.5) — same number of steps, very
+                different decay speed.
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <NoiseControls
-        presetId={presetId}
-        onPresetChange={handlePresetChange}
-        channel={channel}
-        onChannelChange={handleChannelChange}
-        strength={strength}
-        onStrengthChange={handleStrengthChange}
-        steps={clampedSteps}
-        maxSteps={MAX_STEPS}
-        onStepsChange={setSteps}
-        onReset={() => setSteps(0)}
-      />
+      <div>
+        <div className="flex justify-end">
+          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+            {copied ? "Copied!" : "Copy link"}
+          </Button>
+        </div>
+        <div className="mt-4">
+          <NoiseControls
+            presetId={presetId}
+            onPresetChange={handlePresetChange}
+            channel={channel}
+            onChannelChange={handleChannelChange}
+            strength={strength}
+            onStrengthChange={handleStrengthChange}
+            steps={clampedSteps}
+            maxSteps={MAX_STEPS}
+            onStepsChange={setSteps}
+            onReset={() => setSteps(0)}
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
@@ -96,6 +97,18 @@ $0.25$ at outcomes $0,16,32,48$, precisely the multiples of
 $2^6/4=16$, and numerically zero everywhere else. Sampling every fourth
 outcome from the real distribution shows exactly this: four sharp peaks
 against a flat floor of genuine zeros, not a smoothly-decaying curve:
+
+<PredictBeforeReveal
+  question="For a=7, N=15 (order r=4), with t=6 counting qubits (so 2^t=64 possible outcomes), where should the measurement probability peak after applying the QFT?"
+  options={[
+    { label: "One single peak, at outcome 0", value: "single" },
+    { label: "Peaks at multiples of 16: 0, 16, 32, 48", value: "mult16" },
+    { label: "Peaks at multiples of 4: 0, 4, 8, 12, ...", value: "mult4" },
+    { label: "A smooth spread across all 64 outcomes", value: "spread" },
+  ]}
+  correctValue="mult16"
+  explanation="A period-r function's QFT concentrates amplitude at multiples of 2^t/r. Here r=4 and 2^t=64, so 64/4=16: peaks land exactly at outcomes 0, 16, 32, 48, each with probability 1/r=0.25. That's precisely what the engine computes below, not approximately — four sharp peaks against a flat floor of genuine zeros everywhere else."
+/>
 
 <BarChart
   bars={Array.from({ length: 16 }, (_, i) => ({ label: String(i * 4), value: periodDistribution[i * 4], highlight: periodDistribution[i * 4] > 0 }))}

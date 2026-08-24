@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/control-and-readout/calibration"
@@ -59,6 +60,18 @@ matching the true (hidden) value to within the scan's resolution. This
 is exactly the procedure a real lab runs, except with actual noisy
 hardware measurements standing in for this platform's exact engine
 calls.
+
+<PredictBeforeReveal
+  question="If you run a calibration scan at the WRONG drive frequency (nonzero detuning) instead of exactly on resonance, what Ω do you recover?"
+  options={[
+    { label: "The correct Ω, just found more slowly", value: "correct-slow" },
+    { label: "A lower-than-true Ω", value: "lower" },
+    { label: "A higher-than-true Ω", value: "higher" },
+    { label: "No peak forms, so nothing is recovered", value: "no-peak" },
+  ]}
+  correctValue="lower"
+  explanation="Off resonance the achievable population never reaches 1, and inverting t_π=π/(2Ω) from that suppressed, shifted peak recovers a lower-than-true Ω — a real miscalibration hazard: a scan run slightly off the qubit's actual resonance silently reports the wrong frequency. Set a nonzero detuning in the Explorer below and check the recovered value against the slider's true setting."
+/>
 
 <InteractiveSection title="Recover Ω from a scan" description={`Try running a calibration scan yourself: pick a coupling strength V below, step through time, and find where P(1) first peaks. Recompute Ω from that peak time using t_π=π/(2V), then compare it to the slider's actual V value to check your recovered number. Then set a nonzero detuning and see why a calibration scan run at the wrong drive frequency would recover the wrong (and lower-than-true) Rabi frequency entirely.`}>
   <LazyRabiExplorer />

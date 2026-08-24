@@ -21,6 +21,12 @@ export const lessonMeta = {
     "Connect T1/T2 to this platform's discrete Kraus-channel model via decayProbabilityForTimestep",
     "Explain the general inequality T2 ≤ 2T1, and why T2 cannot exceed this bound",
   ],
+  related: [
+    {
+      slug: "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
+      note: "The Kraus-operator machinery behind T1/T2 decay was built here first, in the general case.",
+    },
+  ],
 };
 
 ## Motivation
@@ -79,6 +85,15 @@ fluctuating, energy-neutral perturbation (a randomly shifting local
 field is enough). This is why realistic devices often report $T_2<2T_1$
 substantially; dephasing processes with no direct T1 analogue are
 common (Sources of Noise's flux-noise example).
+
+T1 and T2 are not notation invented for qubits. Felix Bloch introduced
+both time constants in 1946 to describe nuclear spin relaxation, the
+foundation of NMR spectroscopy, and the same two numbers are measured in
+every voxel of a clinical MRI scan today (T1-weighted and T2-weighted are
+standard scan types), decades before either label appeared on a
+superconducting-qubit datasheet. A qubit's T1 and T2 are the same
+physical relaxation and dephasing processes Bloch defined, just measured
+on a different physical system.
 
 ## Worked Example
 

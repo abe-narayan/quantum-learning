@@ -48,7 +48,9 @@ export function BlochSphereHeroExplorer() {
   const [state, setState] = useState(() => StateVector.zero(1));
   const [renderPoint, setRenderPoint] = useState<BlochVector>({ x: 0, y: 0, z: 1 });
   const [isAnimating, setIsAnimating] = useState(false);
-  const [narration, setNarration] = useState("Prepared |0⟩. Click a gate to rotate the qubit's state.");
+  const [narration, setNarration] = useState(
+    "This is a real qubit state — |0⟩. Apply H and watch it enter superposition."
+  );
   const [lastMeasurement, setLastMeasurement] = useState<0 | 1 | null>(null);
 
   const rafRef = useRef<number | null>(null);
@@ -148,14 +150,14 @@ export function BlochSphereHeroExplorer() {
     <div className="relative mx-auto w-full max-w-sm">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -inset-10 -z-10 rounded-full opacity-70 blur-3xl"
+        className="pointer-events-none absolute -inset-10 -z-10 rounded-full opacity-35 blur-2xl"
         style={{
           backgroundImage:
             "radial-gradient(circle, color-mix(in srgb, var(--brand) 35%, transparent), transparent 70%)",
         }}
       />
 
-      <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+      <div className="rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8">
         <BlochSphereCanvas blochPoint={renderPoint} className="mx-auto h-auto w-full max-w-xs" />
 
         <p aria-live="polite" className="mt-4 min-h-[2.5rem] text-center text-xs text-muted-foreground">

@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
@@ -50,9 +51,13 @@ Both the oracle and diffusion operator act *entirely within* this 2D span
 of $\{|\alpha\rangle,|\beta\rangle\}$: the oracle reflects about
 $|\alpha\rangle$ (flipping only $|\beta\rangle$'s sign), diffusion reflects
 about $|s\rangle$. Composing two reflections in a plane, with an angle
-$\theta$ between the reflection axes, is a rotation by $2\theta$, a
-standard fact of plane geometry, applying here because both operators are
-literally reflections within this specific 2D subspace.
+$\theta$ between the reflection axes, is a rotation by $2\theta$: reflecting
+a vector at angle $\psi$ about a line at angle $\phi$ sends
+$\psi\mapsto2\phi-\psi$, so reflecting first about $|\alpha\rangle$ (angle
+$0$: $\psi\mapsto-\psi$) and then about $|s\rangle$ (angle $\theta$:
+$-\psi\mapsto2\theta-(-\psi)=\psi+2\theta$) advances every angle by exactly
+$2\theta$, a standard fact of plane geometry, applying here because both
+operators are literally reflections within this specific 2D subspace.
 
 ### The closed form
 
@@ -99,6 +104,18 @@ running *past* the optimal count doesn't keep improving the odds: it
 oscillates back down and later back up, exactly like an ordinary rotation
 overshooting a target angle and coming back around. Grover's algorithm
 needs the *right* number of iterations, not simply "more."
+
+<PredictBeforeReveal
+  question="If you keep running Grover iterations well past the count that gives the highest P(marked), what happens to P(marked)?"
+  options={[
+    { label: "It plateaus at its peak value", value: "plateau" },
+    { label: "It keeps climbing toward 1", value: "climb" },
+    { label: "It oscillates back down, then rises again later", value: "oscillate" },
+    { label: "It drops permanently to 0", value: "zero" },
+  ]}
+  correctValue="oscillate"
+  explanation="P(marked)=sin²((2k+1)θ) is periodic in k, exactly like an ordinary rotation that overshoots a target angle and comes back around. Running past the optimal iteration count doesn't lock in the peak — it oscillates back down, and later back up, exactly what the closed form predicts and what stepping past the peak below shows directly."
+/>
 
 <InteractiveSection title="Predict the peak, then overshoot it" description="Set N and the marked item below, then predict how many steps it will take to reach maximum probability before you click. Then keep stepping past that point and watch P(marked) fall back down exactly as the closed form predicts, not plateau at its peak.">
   <LazyGroverExplorer />

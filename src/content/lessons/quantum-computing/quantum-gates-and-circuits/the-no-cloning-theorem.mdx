@@ -3,6 +3,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { Complex } from "@/lib/quantum/complex";
 import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -107,6 +108,18 @@ $$
 Both sides are real, computable states, not just symbols; laying the
 engine's actual output for each side next to the other makes the
 mismatch impossible to miss:
+
+<PredictBeforeReveal
+  question="Apply H to qubit 0 (making it |+⟩), then CNOT(0,1) with qubit 1 as a blank |0⟩ — an attempt to 'copy' |+⟩. Does this circuit actually produce two independent copies, |+⟩ ⊗ |+⟩?"
+  options={[
+    { label: "Yes, exactly |+⟩ ⊗ |+⟩", value: "clones" },
+    { label: "No, it produces an entangled Bell state", value: "bell" },
+    { label: "No, it produces |0⟩ ⊗ |0⟩", value: "zero" },
+    { label: "Yes, but only approximately", value: "approx" },
+  ]}
+  correctValue="bell"
+  explanation="H then CNOT is exactly the circuit this lesson's linearity argument predicts will fail: it produces the Bell state |Φ+⟩ = (|00⟩+|11⟩)/√2, which has zero amplitude on |01⟩ and |10⟩. Genuine cloning would need |+⟩⊗|+⟩ = ½(|00⟩+|01⟩+|10⟩+|11⟩), with equal amplitude on all four terms. The two panels below show these real, computed states side by side — they don't match, which is the contradiction the proof above derives algebraically."
+/>
 
 <div className="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
   <QuantumStateDisplay state={actualCnotOutput} label="What a real device (H then CNOT) actually produces" />

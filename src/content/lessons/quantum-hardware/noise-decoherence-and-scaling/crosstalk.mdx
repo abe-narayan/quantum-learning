@@ -46,6 +46,12 @@ to scale up (Physical Qubit Platforms' connectivity discussion). This
 **spectator** qubit, even though only the **target** qubit's gate was
 requested.
 
+<CrosstalkDiagram ariaLabel="A chip layout with a target qubit being driven by an intended pulse, a faint dashed coupling line to an adjacent spectator qubit showing unwanted leakage, and other idle qubits elsewhere on the chip unaffected" />
+
+Only the physically (or spectrally) nearby spectator picks up the leak;
+the other, more distant qubits on the same chip are unaffected, which is
+exactly why crosstalk is a proximity effect rather than a device-wide one.
+
 ### Quantifying the fidelity loss
 
 Using this platform's existing gate engine directly (no new machinery

@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
@@ -111,7 +112,29 @@ exponential solution takes over. The wavefunction has to be continuous
 across both edges, which is exactly the matching condition that lets a
 sliver of amplitude survive to the far side.
 
+Two real devices depend directly on this exponential sensitivity to
+barrier width. A scanning tunneling microscope images individual atoms
+by measuring the tunneling current across the vacuum gap between a sharp
+metal tip and a surface, a current so sensitive to that gap's width that
+it can resolve height differences far smaller than a single atom. The
+same effect sets a practical limit on flash memory: the thin insulating
+layer that traps charge on a memory cell can't be made arbitrarily thin,
+because past a certain point the stored charge tunnels back out on its
+own, one of the physical limits on how far that layer can be scaled down.
+
 ## Interactive Experiment
+
+<PredictBeforeReveal
+  question="A Gaussian wave packet with energy below the barrier's height hits a barrier of finite width. Classically the packet always bounces back. Does any probability make it through quantum mechanically?"
+  options={[
+    { label: "No, exactly zero gets through", value: "zero" },
+    { label: "Yes, a small but nonzero fraction transmits", value: "nonzero" },
+    { label: "Yes, and it's always over 50%", value: "majority" },
+    { label: "It depends only on momentum, not the barrier", value: "momentum-only" },
+  ]}
+  correctValue="nonzero"
+  explanation="Inside the barrier ψ decays exponentially (Ce^{κx}+De^{-κx}), but decaying isn't vanishing: continuity of ψ and ψ' forces a nonzero, if small, amplitude to survive to the far side, giving genuine transmission roughly ~e^(-2κa). That's exactly what the Explorer's Tunneling preset below shows: a nonzero P(transmitted), not zero, splitting the packet's probability between transmission and reflection."
+/>
 
 <InteractiveSection title="Raise the barrier, watch it shrink" description="The Wavefunction Explorer's Tunneling Through a Barrier preset sends a Gaussian packet at a rectangular barrier. Play it forward past the interaction and check the comparison panel: P(transmitted) and P(reflected) should sum to almost exactly 1 (probability conservation, nothing is created or destroyed by the barrier), split between the two outcomes in a ratio that depends sharply on the barrier's height and width, exactly as e^(-2κa) predicts. Try raising the barrier height and watch the transmitted fraction shrink.">
   <LazyWavefunctionExplorer />

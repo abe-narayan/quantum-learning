@@ -1,15 +1,107 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { uniformSuperposition, groverIteration, optimalGroverIterations } from "@/lib/quantum/grover";
 import { AmplitudeBars } from "./AmplitudeBars";
 import { GroverControls } from "./GroverControls";
 import { KatexMath } from "@/components/ui/KatexMath";
+import { Button } from "@/components/ui/Button";
+
+const DEFAULT_NUM_QUBITS = 3;
+const DEFAULT_MARKED_INDEX = 5;
+const MIN_QUBITS = 2;
+const MAX_QUBITS = 4;
+const MAX_ITERATION = 200;
+const URL_SYNC_DEBOUNCE_MS = 400;
+const COPY_CONFIRMATION_MS = 1500;
+
+// Minimal shareable state is qubit count + marked index + iteration count —
+// together they fully determine the amplitude vector shown (it's a pure
+// function of these three via `groverIteration`). Params are prefixed
+// (`grover_`) because this simulator shares `/simulators` with other
+// URL-stateful simulators.
+function clampInt(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, Math.round(value)));
+}
+
+/** Reads and validates `?grover_n=&grover_m=&grover_i=`. Null if any is absent or malformed. */
+function parseGroverParams(
+  params: { get(key: string): string | null }
+): { numQubits: number; markedIndex: number; iteration: number } | null {
+  const rawN = params.get("grover_n");
+  const rawM = params.get("grover_m");
+  const rawI = params.get("grover_i");
+  if (rawN === null || rawM === null || rawI === null) return null;
+  const n = Number(rawN);
+  const m = Number(rawM);
+  const i = Number(rawI);
+  if (!Number.isFinite(n) || !Number.isFinite(m) || !Number.isFinite(i)) return null;
+  const numQubits = clampInt(n, MIN_QUBITS, MAX_QUBITS);
+  const markedIndex = clampInt(m, 0, 2 ** numQubits - 1);
+  const iteration = clampInt(i, 0, MAX_ITERATION);
+  return { numQubits, markedIndex, iteration };
+}
 
 export function GroverExplorer() {
-  const [numQubits, setNumQubits] = useState(3);
-  const [markedIndex, setMarkedIndex] = useState(5);
-  const [iteration, setIteration] = useState(0);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const initialGrover = parseGroverParams(searchParams);
+
+  const [numQubits, setNumQubits] = useState(initialGrover?.numQubits ?? DEFAULT_NUM_QUBITS);
+  const [markedIndex, setMarkedIndex] = useState(initialGrover?.markedIndex ?? DEFAULT_MARKED_INDEX);
+  const [iteration, setIteration] = useState(initialGrover?.iteration ?? 0);
+  const [copied, setCopied] = useState(false);
+
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const urlSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstUrlSync = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+  }, []);
+
+  // Keep the URL in sync with the settled state so the page is always shareable.
+  // Debounced, and skips the very first run so mounting doesn't immediately
+  // rewrite the URL we just read from.
+  useEffect(() => {
+    if (isFirstUrlSync.current) {
+      isFirstUrlSync.current = false;
+      return;
+    }
+    if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    urlSyncTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      params.set("grover_n", String(numQubits));
+      params.set("grover_m", String(markedIndex));
+      params.set("grover_i", String(iteration));
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, URL_SYNC_DEBOUNCE_MS);
+    return () => {
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+    // Deliberately depends only on the shareable state: `router`/`pathname` are
+    // stable, and reading the rest of the query string fresh from
+    // `window.location` (rather than depending on the `searchParams` hook)
+    // avoids re-running this effect off of our own `replace` calls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [numQubits, markedIndex, iteration]);
+
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
+    } catch {
+      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+    }
+  }, []);
 
   const state = useMemo(() => {
     let s = uniformSuperposition(numQubits);
@@ -35,44 +127,76 @@ export function GroverExplorer() {
   const handleReset = () => setIteration(0);
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-      <div className="space-y-6">
-        <div className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          {iteration === 0 ? (
-            <>Starting in the uniform superposition: every basis state has the same amplitude and probability.</>
-          ) : (
-            <>
-              After {iteration} iteration{iteration === 1 ? "" : "s"}: P(marked) = {(successProbability * 100).toFixed(1)}%.{" "}
-              {iteration === optimal
-                ? "This is the theoretical optimum. Stepping further will start to overshoot."
-                : iteration > optimal
-                  ? "Past the optimum: success probability is now falling back down."
-                  : null}
-            </>
-          )}
+    <div className="not-prose space-y-4">
+      <p className="text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">What we&apos;re studying: </span>
+        Grover&apos;s algorithm concentrates probability onto a marked item faster than any classical search —
+        but only up to a point.
+      </p>
+
+      <div className="grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
+        <div className="space-y-6">
+          <div className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+            {iteration === 0 ? (
+              <>Starting in the uniform superposition: every basis state has the same amplitude and probability.</>
+            ) : (
+              <>
+                After {iteration} iteration{iteration === 1 ? "" : "s"}: P(marked) = {(successProbability * 100).toFixed(1)}%.{" "}
+                {iteration === optimal
+                  ? "This is the theoretical optimum. Stepping further will start to overshoot."
+                  : iteration > optimal
+                    ? "Past the optimum: success probability is now falling back down."
+                    : null}
+              </>
+            )}
+          </div>
+
+          <AmplitudeBars state={state} markedIndices={[markedIndex]} />
+
+          <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+            <KatexMath
+              tex={`P(\\text{marked}) = ${successProbability.toFixed(4)}`}
+              display
+            />
+          </div>
         </div>
 
-        <AmplitudeBars state={state} markedIndices={[markedIndex]} />
-
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
-          <KatexMath
-            tex={`P(\\text{marked}) = ${successProbability.toFixed(4)}`}
-            display
-          />
+        <div>
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+          <div className="mt-4">
+            <GroverControls
+              numQubits={numQubits}
+              onNumQubitsChange={handleNumQubitsChange}
+              markedIndex={markedIndex}
+              onMarkedIndexChange={handleMarkedIndexChange}
+              iteration={iteration}
+              optimalIteration={optimal}
+              onStep={handleStep}
+              onReset={handleReset}
+              disabled={false}
+            />
+          </div>
         </div>
       </div>
 
-      <GroverControls
-        numQubits={numQubits}
-        onNumQubitsChange={handleNumQubitsChange}
-        markedIndex={markedIndex}
-        onMarkedIndexChange={handleMarkedIndexChange}
-        iteration={iteration}
-        optimalIteration={optimal}
-        onStep={handleStep}
-        onReset={handleReset}
-        disabled={false}
-      />
+      <div className="space-y-1 text-sm text-muted-foreground">
+        <p>
+          <span className="font-semibold text-foreground">Try this: </span>
+          Set 3 qubits, mark index 5, and step past the optimal iteration count shown in the controls — watch
+          P(marked) fall back down instead of climbing forever.
+        </p>
+        <p>Try 4 qubits (16 items) and compare how many iterations it takes versus 3 qubits (8 items).</p>
+      </div>
+
+      <p className="text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">What&apos;s next: </span>
+        See how the same-size search space collapses instantly in the Two-Qubit Explorer&apos;s measurement
+        panel — no amplification needed classically.
+      </p>
     </div>
   );
 }

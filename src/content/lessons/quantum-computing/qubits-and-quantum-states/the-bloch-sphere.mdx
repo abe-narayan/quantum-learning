@@ -21,6 +21,12 @@ export const lessonMeta = {
     "Convert between amplitudes (α, β) and Bloch coordinates (θ, φ) and (x, y, z)",
     "Read the geometric meaning of a state directly off its position on the sphere",
   ],
+  related: [
+    {
+      slug: "quantum-mechanics/angular-momentum-and-spin/spin-one-half-systems",
+      note: "The physics origin of this two-level system, worked out from angular momentum first.",
+    },
+  ],
 };
 
 ## Motivation
@@ -111,9 +117,23 @@ $$
 $$
 
 Substituting the canonical form, $|\alpha|^2-|\beta|^2 = \cos^2(\theta/2) - \sin^2(\theta/2) = \cos\theta$,
-exactly $z=\cos\theta$, as promised, via the double-angle identity. The
-$x$ and $y$ computations follow the same pattern and give
-$x=\sin\theta\cos\varphi$, $y=\sin\theta\sin\varphi$. All three:
+exactly $z=\cos\theta$, as promised, via the double-angle identity.
+
+The $x$ computation follows the same pattern, using $X|0\rangle=|1\rangle$
+and $X|1\rangle=|0\rangle$ (again, matrices you'll meet properly in the
+Quantum Gates lesson), which swap $\alpha$ and $\beta$'s roles instead of
+leaving them alone:
+
+$$
+\langle\psi|X|\psi\rangle = \alpha^*\beta\langle0|0\rangle + \beta^*\alpha\langle1|1\rangle = \alpha^*\beta + \beta^*\alpha = 2\operatorname{Re}(\alpha^*\beta)
+$$
+
+Substituting the canonical form, $\alpha=\cos(\theta/2)$ real and
+$\beta=e^{i\varphi}\sin(\theta/2)$, gives
+$2\operatorname{Re}(\alpha^*\beta) = 2\cos(\theta/2)\sin(\theta/2)\cos\varphi = \sin\theta\cos\varphi$
+by the same double-angle identity, matching $x$ below. $y$ follows
+identically using $Y|0\rangle=i|1\rangle$, $Y|1\rangle=-i|0\rangle$, giving
+$2\operatorname{Im}(\alpha^*\beta) = \sin\theta\sin\varphi$. All three:
 
 $$
 x = 2\operatorname{Re}(\alpha^*\beta), \qquad y = 2\operatorname{Im}(\alpha^*\beta), \qquad z = |\alpha|^2-|\beta|^2

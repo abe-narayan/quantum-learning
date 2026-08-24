@@ -110,9 +110,14 @@ probabilities before and after `applyCostUnitary` match to $10^{-9}$).
 
 $U_C$ alone can't change which outcomes are likely. It only adds phases.
 The **mixer** $U_B(\beta)=e^{-i\beta B}$, $B=\sum_iX_i$, is what actually
-moves amplitude between basis states, implemented as $R_x(2\beta)$ applied
-independently to every qubit (`applyMixerUnitary`), reusing the ordinary
-single-qubit rotation gate, not a new primitive. Alternating $U_C$ and
+moves amplitude between basis states. Because $B$ is a sum of single-qubit
+$X$ terms acting on different qubits, those terms commute and $e^{-i\beta
+B}$ factors into a tensor product of single-qubit exponentials
+$e^{-i\beta X_i}$, one per qubit. With this platform's rotation
+convention $R_x(\theta)=e^{-i\theta X/2}$, each factor $e^{-i\beta X_i}$
+is exactly $R_x(2\beta)$ on qubit $i$, so $U_B(\beta)$ is implemented as
+$R_x(2\beta)$ applied independently to every qubit (`applyMixerUnitary`),
+reusing the ordinary single-qubit rotation gate, not a new primitive. Alternating $U_C$ and
 $U_B$ for $p$ layers, starting from the uniform superposition
 (`qaoaCircuit`), is the full QAOA circuit; $p=1$ is the smallest
 nontrivial case this course's worked example uses.

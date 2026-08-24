@@ -1,0 +1,353 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-software/compilation-and-hybrid-algorithms/quantum-error-mitigation"
+).map((problem) => problem.meta);
+
+export const zneP = 0.05;
+
+export const zneCurvePoints = Array.from({ length: 21 }, (_, i) => {
+  const lambda = i * 0.25;
+  return { x: lambda, y: Math.pow(1 - zneP, lambda) };
+});
+
+export const zneE1 = Math.pow(1 - zneP, 1);
+export const zneE3 = Math.pow(1 - zneP, 3);
+export const zneExtrapolated = 1.5 * zneE1 - 0.5 * zneE3;
+export const zneResidualError = 1 - zneExtrapolated;
+
+export const zneMeasuredPoints = [
+  { x: 1, y: zneE1 },
+  { x: 3, y: zneE3 },
+];
+
+export const zneExtrapolationLinePoints = [
+  { x: 0, y: zneExtrapolated },
+  { x: 1, y: zneE1 },
+  { x: 3, y: zneE3 },
+];
+
+export const lessonMeta = {
+  title: "Quantum Error Mitigation",
+  description:
+    "Quantum SDKs Overview named error mitigation as one of the real features this platform's own SDK-pattern demo falls short of; this lesson builds it: zero-noise extrapolation's linear-in-noise-level formula, derived from the same depolarizing channel used elsewhere and checked against this platform's own applyChannelRepeatedly, plus readout-error mitigation's confusion-matrix inversion, worked numerically end to end.",
+  course: "compilation-and-hybrid-algorithms",
+  module: "quantum-error-mitigation",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 28,
+  prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows"],
+  objectives: [
+    "Distinguish error mitigation (a statistical correction of measured expectation values) from error correction (repairing the quantum state itself), and explain why they solve different problems",
+    "Derive zero-noise extrapolation's linear-in-noise-level formula for a traceless observable under a depolarizing channel, and use it to extrapolate two noisy measurements to the zero-noise limit",
+    "Build and invert a two-outcome readout confusion matrix to correct a measured probability distribution",
+    "State the fundamental sampling-overhead limitation that keeps error mitigation from substituting for fault-tolerant error correction at scale",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
+      note: "The depolarizing channel this lesson's zero-noise extrapolation derivation uses is a Kraus channel in exactly that lesson's sense, and applyKrausChannel/applyChannelRepeatedly (built there, reused by Noise Simulation) is what this lesson's E(1), E(3) numbers were checked against.",
+    },
+    {
+      slug: "quantum-software/simulating-quantum-systems/noise-simulation",
+      note: "That lesson's runNoisyCircuit interleaves ideal evolution with a noise channel once per gate; this lesson's noise-scaling model (repeating the channel λ times) is the same idea, deliberately scaled up rather than applied once.",
+    },
+    {
+      slug: "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead",
+      note: "That capstone's threshold theorem gives exponential error SUPPRESSION at polynomial physical-qubit overhead. This lesson's closing section states the opposite-shaped tradeoff error mitigation faces: no extra qubits, but sampling overhead that grows with circuit noise, not free.",
+    },
+    {
+      slug: "quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope",
+      note: "That capstone says a hybrid algorithm's classical loop can 'partially compensate for imperfect quantum execution' without saying how. This lesson names and derives the actual techniques behind that sentence.",
+    },
+  ],
+};
+
+## Motivation
+
+Quantum SDKs Overview said outright that a real production SDK's
+feature set includes "error mitigation" — one of the things this
+platform's own deliberately minimal `QuantumCircuit`/`runCircuit`
+pattern doesn't build. Nothing since has picked that thread back up.
+Quantum Error Correction & Fault Tolerance built a different,
+related idea (repairing the quantum state itself with extra qubits),
+and the NISQ capstone said a hybrid algorithm's classical loop can
+"partially compensate for imperfect quantum execution," without ever
+saying how. Both leave the same real, standard NISQ-era technique
+unnamed. This lesson names it, derives its core formula, and works a
+second technique numerically end to end.
+
+## Engineering Development
+
+### Mitigation is not correction
+
+Error correction (built across the entire previous course) repairs the
+*quantum state* itself: extra ancilla qubits, syndrome measurement, and
+an explicit recovery operation restore $|\psi\rangle$ before the
+computation continues, at a real, large physical-qubit overhead
+(Fault-Tolerant Thresholds' whole subject). **Error mitigation** asks a
+narrower question: for a hybrid algorithm like VQE or QAOA, what
+actually gets used at the end isn't the quantum state at all, it's a
+handful of *expectation values*, $\langle H\rangle$, computed from
+measurement statistics. Error mitigation accepts that every individual
+run is noisy, and instead corrects the **statistics computed from many
+noisy runs**, using no extra qubits at all, just extra circuit
+executions and classical post-processing.
+
+<PredictBeforeReveal
+  question="After running an error-mitigation protocol, is the quantum state the device actually prepared during any single circuit execution cleaner (less noisy) than before?"
+  options={[
+    { label: "Yes, mitigation purifies the state on every run", value: "yes" },
+    { label: "No, every individual run is exactly as noisy as ever; only the extrapolated NUMBER is corrected", value: "no" },
+    { label: "It depends on which mitigation technique is used", value: "depends" },
+  ]}
+  correctValue="no"
+  explanation="This is the single most important distinction from error correction. Mitigation never touches the physical state produced by any one run; every run is exactly as noisy as an unmitigated one. What gets corrected is the classically-computed NUMBER (an expectation value) obtained by combining several noisy runs in a specific way. Error correction repairs states; error mitigation repairs statistics."
+/>
+
+### Zero-noise extrapolation, derived
+
+The idea: deliberately run the SAME circuit at several different,
+known, amplified noise levels, measure the observable at each, and
+extrapolate the trend back to the (unreachable) zero-noise point.
+
+Model the noise as Advanced Topics in Quantum Mechanics' depolarizing
+channel, parameter $p$ per "noise unit":
+
+$$
+\varepsilon(\rho) = (1-p)\rho + p\,\frac{I}{2}
+$$
+
+For an observable $O$ with $\text{Tr}(O)=0$ (**traceless** — true of
+every individual Pauli, and hence of any Pauli-string Hamiltonian this
+platform's VQE/QAOA lessons use), the maximally-mixed piece contributes
+nothing:
+
+$$
+\langle O\rangle_{\varepsilon} = \text{Tr}(O\,\varepsilon(\rho)) = (1-p)\,\text{Tr}(O\rho) + p\,\frac{\text{Tr}(O)}{2} = (1-p)\langle O\rangle_{\text{ideal}}
+$$
+
+Applying the channel $n$ times in a row (Noise Simulation's
+`applyChannelRepeatedly`, reused here unchanged) compounds this factor:
+
+$$
+\langle O\rangle(n) = (1-p)^n\,\langle O\rangle_{\text{ideal}}
+$$
+
+**Digital zero-noise extrapolation** realizes different integer values
+of $n$ (the "noise level" $\lambda$) on real hardware via **unitary
+folding**: replacing each gate $G$ with $G\,G^\dagger\,G$ leaves the
+IDEAL action unchanged exactly ($G G^\dagger G = G(G^\dagger G) = G\cdot I=G$,
+since every gate is unitary) while tripling how many times the
+physical device's per-gate noise gets applied. Folding once gives
+$\lambda=3$; not folding gives $\lambda=1$; the ideal, unreachable
+target is $\lambda=0$.
+
+For small $p\lambda$, $(1-p)^\lambda \approx 1-p\lambda$: **linear in**
+$\lambda$. Two measurements at $\lambda=1$ and $\lambda=3$ pin down that
+line and extrapolate it to $\lambda=0$:
+
+$$
+\langle O\rangle_{\text{ideal}} \approx \langle O\rangle(0) = \frac{3\langle O\rangle(1) - \langle O\rangle(3)}{2} = \frac32\langle O\rangle(1) - \frac12\langle O\rangle(3)
+$$
+
+(the standard two-point linear-extrapolation formula, $y_0 = y_1 -
+x_1\frac{y_2-y_1}{x_2-x_1}$, evaluated at $x_1=1,x_2=3$.)
+
+<Callout type="note">
+This uses $\text{Tr}(O)=0$ specifically. For an observable with nonzero
+trace, the depolarizing channel drives $\langle O\rangle$ toward
+$\text{Tr}(O)/2$, not zero, and the same linear-extrapolation algebra
+still applies, just with an extra constant term to solve for.
+</Callout>
+
+### Checked against real numbers, not just the formula
+
+Take $p=0.05$ and a state ideally left in $\langle Z\rangle=+1$ (e.g.
+$|0\rangle$, with $Z$ traceless). This platform's own `applyKrausChannel`
+and `applyChannelRepeatedly`, applied to $\rho_0=|0\rangle\langle0|$
+with a single-qubit depolarizing channel built from `PAULI_X`,
+`PAULI_Y`, `PAULI_Z`, and `IDENTITY`, confirm $\langle
+Z\rangle(1)=(0.95)^1$ and $\langle Z\rangle(3)=(0.95)^3$ to at least 10
+decimal digits, exactly the closed form derived above:
+
+$$
+\langle Z\rangle(1) \approx 0.9500, \qquad \langle Z\rangle(3) \approx 0.8574
+$$
+
+<InteractiveSection title="The noisy curve, the two sampled points, and the extrapolation" description="The smooth curve is the exact (1-p)^lambda decay; the two marked points are what a real experiment actually measures, at lambda=1 (original circuit) and lambda=3 (folded once); the short line through them, extended back to lambda=0, is zero-noise extrapolation's estimate of the noise-free result.">
+  <ParametricCurve
+    ariaLabel="Zero-noise extrapolation: exact exponential decay of the Z expectation value versus noise level lambda, the two measured points at lambda=1 and lambda=3, and the linear extrapolation back to lambda=0"
+    frames={[
+      {
+        paramLabel: "p = 0.05 depolarizing noise per unit",
+        series: [
+          { label: "Exact decay (1-p)^λ", color: "muted", points: zneCurvePoints },
+          { label: "Measured (λ=1, λ=3)", color: "brand", points: zneMeasuredPoints },
+          { label: "Linear extrapolation to λ=0", color: "warning", points: zneExtrapolationLinePoints },
+        ],
+      },
+    ]}
+    referenceLines={[{ y: 1, label: "ideal (noise-free)" }]}
+  />
+</InteractiveSection>
+
+The extrapolated estimate,
+$\frac32(0.9500)-\frac12(0.8574)\approx0.9963$, lands close to the true
+ideal value $1$, but not exactly on it: the residual gap
+($\approx0.37\%$) is the $O(p^2)$ curvature the linear approximation
+drops. A **third** measurement (at $\lambda=5$, say) and a quadratic fit
+would shrink that residual further, the same "more data points, higher-order
+fit" tradeoff any extrapolation makes, just applied to noise instead of,
+say, the Wave Mechanics course's numerical time-stepping error.
+
+### Readout error mitigation
+
+A second, independent error source: even a perfectly-prepared state can
+be **misread** at measurement time (Qubit Readout Techniques). Model
+this with a **confusion matrix** $M$, built once by calibration
+(prepare $|0\rangle$, measure many times, record how often "1" is
+reported instead; repeat for $|1\rangle$):
+
+$$
+M = \begin{pmatrix}P(\text{read }0\mid\text{true }0) & P(\text{read }0\mid\text{true }1)\\ P(\text{read }1\mid\text{true }0) & P(\text{read }1\mid\text{true }1)\end{pmatrix}
+$$
+
+A perfect readout is $M=I$. Real superconducting-qubit readout is
+typically **asymmetric** (Qubit Readout Techniques, T1 & T2
+Decoherence): a $|1\rangle$ is more likely to be misread as $0$ (it can
+decay to $|0\rangle$ during the measurement pulse) than a $|0\rangle$ is
+to be misread as $1$. Whatever raw distribution the device reports,
+$\vec p_{\text{meas}}$, relates to the true distribution by
+$\vec p_{\text{meas}} = M\vec p_{\text{true}}$, so **inverting $M$
+recovers the true distribution from the raw one**:
+
+$$
+\vec p_{\text{true}} = M^{-1}\vec p_{\text{meas}}
+$$
+
+## Physical Interpretation
+
+Both techniques share the same shape: accept that any single circuit
+execution is noisy, then use EXTRA classical work (more circuit
+repetitions at controlled noise levels, or a one-time calibration matrix
+inversion) to pull a less-biased number out of many noisy ones. Neither
+technique changes what the quantum device physically does on any given
+run; both operate entirely on the classical side of the hybrid loop
+Hybrid Quantum-Classical Workflows already named, exactly the
+"classical optimizer can partially compensate" sentence the NISQ
+capstone left unexplained.
+
+## Worked Example: Correcting a measured distribution
+
+**A device's calibration gives**
+$M=\begin{pmatrix}0.98&0.15\\0.02&0.85\end{pmatrix}$ **(a
+15%-of-the-time $1\to0$ misread, a realistic asymmetric T1-during-readout
+error, versus only 2% the other way). A circuit's raw, uncorrected
+measurement gives $\vec p_{\text{meas}}=(0.20,0.80)$. Recover the true
+distribution.**
+
+First, $\det M = (0.98)(0.85)-(0.15)(0.02) = 0.833-0.003 = 0.830$, so
+
+$$
+M^{-1} = \frac{1}{0.830}\begin{pmatrix}0.85&-0.15\\-0.02&0.98\end{pmatrix}
+$$
+
+Then:
+
+$$
+\vec p_{\text{true}} = \frac{1}{0.830}\begin{pmatrix}0.85&-0.15\\-0.02&0.98\end{pmatrix}\begin{pmatrix}0.20\\0.80\end{pmatrix} = \frac{1}{0.830}\begin{pmatrix}0.170-0.120\\-0.004+0.784\end{pmatrix} = \frac{1}{0.830}\begin{pmatrix}0.050\\0.780\end{pmatrix} \approx \begin{pmatrix}0.060\\0.940\end{pmatrix}
+$$
+
+**Check:** $M\vec p_{\text{true}} = (0.98\times0.060+0.15\times0.940,\ 0.02\times0.060+0.85\times0.940) \approx (0.0588+0.1410,\ 0.0012+0.7990) = (0.200,\ 0.800)$,
+reproducing $\vec p_{\text{meas}}$ exactly, confirming the inversion.
+The correction is substantial: the raw circuit looked like $80\%$
+$|1\rangle$, but the readout-corrected estimate is closer to $94\%$
+$|1\rangle$ — the extra $14$ points were entirely the asymmetric
+misread rate, not the circuit's real behavior, and a VQE cost function
+computed from the raw (uncorrected) $80\%$ would be measurably biased.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating error mitigation as a cheaper substitute for error
+correction that happens to also work at scale.** It doesn't. The
+threshold theorem (Fault-Tolerant Thresholds) gives EXPONENTIAL error
+suppression at POLYNOMIAL physical-qubit overhead, once below threshold.
+Error mitigation gives no such scaling: extending zero-noise
+extrapolation or probabilistic error cancellation (a related, cited-not-derived
+technique using a quasi-probability decomposition of the noise instead
+of a linear fit) to deeper, noisier circuits requires exponentially MORE
+circuit repetitions to keep the statistical estimate's variance under
+control — a real, proven fundamental limit (Takagi et al. 2022;
+Quek et al.), not an engineering gap that better algorithms will close.
+Mitigation is a genuinely useful NISQ-era tool with no qubit overhead;
+it is not a scalable alternative to fault tolerance.
+</Callout>
+
+<Callout type="mistake">
+**Assuming the two-point extrapolation formula is exact.** It's the
+FIRST-ORDER (linear) approximation to a curve that's actually
+exponential, $(1-p)^\lambda$. This lesson's own numbers show a real,
+nonzero residual ($\approx0.37\%$) even in a clean, noiseless-simulation
+test case; on real hardware, with additional noise sources beyond a
+single depolarizing channel, the residual is generally larger still.
+"Extrapolated" means "a corrected estimate with reduced bias," not "the
+exact answer."
+</Callout>
+
+## Practice Questions
+
+1. Using $\langle O\rangle(\lambda)=(1-p)^\lambda\langle O\rangle_{\text{ideal}}$
+   with $p=0.1$, compute $\langle O\rangle(1)$ and $\langle O\rangle(3)$,
+   then apply the two-point extrapolation formula. How does the
+   residual error compare to this lesson's $p=0.05$ case, and why does
+   it grow with $p$?
+2. Why does zero-noise extrapolation's derivation specifically require
+   $\text{Tr}(O)=0$? What would change in the derivation for an
+   observable with $\text{Tr}(O)\ne0$?
+3. For the readout confusion matrix
+   $M=\begin{pmatrix}0.98&0.15\\0.02&0.85\end{pmatrix}$, what raw
+   measured distribution would a TRUE distribution of exactly
+   $(1,0)$ (perfect $|0\rangle$) produce? (Hint: this is $M$ applied
+   directly to $(1,0)^T$, no inversion needed.)
+4. Explain, in your own words, why "more circuit repetitions, no extra
+   qubits" (mitigation) and "more physical qubits, exponential
+   suppression" (correction) are fundamentally different resource
+   trades, not two versions of the same idea.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Error mitigation statistically corrects EXPECTATION VALUES computed
+  from many noisy runs; it never repairs any single run's quantum
+  state, unlike error correction.
+- Zero-noise extrapolation: for a traceless observable under a
+  depolarizing channel, $\langle O\rangle(\lambda)=(1-p)^\lambda\langle
+  O\rangle_{\text{ideal}}$, confirmed here against this platform's own
+  `applyChannelRepeatedly`; a two-point linear fit
+  ($\frac32\langle O\rangle(1)-\frac12\langle O\rangle(3)$) extrapolates
+  to an estimate close to, but not exactly at, the true zero-noise
+  value.
+- Readout error mitigation inverts a calibrated confusion matrix,
+  $\vec p_{\text{true}}=M^{-1}\vec p_{\text{meas}}$, worked numerically
+  above to a substantial, verified correction ($80\%\to94\%$).
+- Mitigation's fundamental limit: sampling overhead grows (provably,
+  eventually exponentially) with circuit noise, the opposite tradeoff
+  shape from error correction's polynomial-overhead, exponential-suppression
+  threshold theorem. Mitigation is a real NISQ-era tool, not a
+  substitute for fault tolerance at scale.
+
+## Further Exploration
+
+This is the piece the NISQ capstone's "the classical loop can partially
+compensate for imperfect quantum execution" line left unnamed, and the
+feature Quantum SDKs Overview flagged this platform's own minimal
+`QuantumCircuit` pattern as missing. Variational Algorithm
+Implementation's grid-search VQE loop is exactly where a real
+deployment would plug zero-noise extrapolation in: run the ansatz
+circuit at several folded noise levels per optimizer iteration instead
+of once, and extrapolate before handing the cost function back to the
+classical optimizer.

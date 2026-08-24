@@ -1,16 +1,21 @@
 import { describe, expect, it } from "vitest";
+import { Matrix } from "../matrix";
 import { StateVector } from "../state";
 import {
+  IDENTITY,
   PAULI_X,
+  PAULI_Y,
   PAULI_Z,
   HADAMARD,
   S_GATE,
   T_GATE,
+  phaseGate,
   rotationX,
   rotationY,
   rotationZ,
   rotationAboutAxis,
   applySingleQubitGate,
+  applyControlledGate,
 } from "../gates";
 
 const KET_0 = StateVector.zero(1);
@@ -113,5 +118,69 @@ describe("rotationAboutAxis matches the axis-aligned rotation gates", () => {
     const [rxProbs, xProbs] = [rx.probabilities(), x.probabilities()];
     expect(rxProbs[0]).toBeCloseTo(xProbs[0], 9);
     expect(rxProbs[1]).toBeCloseTo(xProbs[1], 9);
+  });
+
+  it("rotationAboutAxis rejects the zero vector — there is no well-defined rotation axis", () => {
+    expect(() => rotationAboutAxis({ x: 0, y: 0, z: 0 }, 1)).toThrow(/nonzero/);
+  });
+});
+
+describe("gate unitarity (U†U = I) — every fixed single-qubit gate must be a valid quantum operation", () => {
+  it("holds for every fixed gate constant", () => {
+    const identity2 = Matrix.identity(2);
+    for (const gate of [IDENTITY, PAULI_X, PAULI_Y, PAULI_Z, HADAMARD, S_GATE, T_GATE]) {
+      expect(gate.mul(gate.dagger()).equals(identity2, 1e-9)).toBe(true);
+      expect(gate.dagger().mul(gate).equals(identity2, 1e-9)).toBe(true);
+    }
+  });
+
+  it("holds for phaseGate at several angles", () => {
+    const identity2 = Matrix.identity(2);
+    for (const theta of [0, 0.7, Math.PI / 2, Math.PI, 5.1]) {
+      const gate = phaseGate(theta);
+      expect(gate.mul(gate.dagger()).equals(identity2, 1e-9)).toBe(true);
+    }
+  });
+
+  it("holds for rotationX/Y/Z and rotationAboutAxis at several angles and axes", () => {
+    const identity2 = Matrix.identity(2);
+    const thetas = [0.3, Math.PI / 2, 2.4, -1.1];
+    const axes = [
+      { x: 1, y: 0, z: 0 },
+      { x: 0, y: 1, z: 0 },
+      { x: 0, y: 0, z: 1 },
+      { x: 1, y: 1, z: 1 },
+    ];
+    for (const theta of thetas) {
+      for (const rotation of [rotationX(theta), rotationY(theta), rotationZ(theta)]) {
+        expect(rotation.mul(rotation.dagger()).equals(identity2, 1e-9)).toBe(true);
+      }
+      for (const axis of axes) {
+        const rotation = rotationAboutAxis(axis, theta);
+        expect(rotation.mul(rotation.dagger()).equals(identity2, 1e-9)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("gate application error handling", () => {
+  it("applySingleQubitGate rejects a gate that isn't 2x2", () => {
+    const wrongSize = Matrix.identity(3);
+    expect(() => applySingleQubitGate(StateVector.zero(2), wrongSize, 0)).toThrow(/2x2/);
+  });
+
+  it("applySingleQubitGate rejects an out-of-range target qubit", () => {
+    expect(() => applySingleQubitGate(StateVector.zero(2), PAULI_X, 2)).toThrow(/out of range/);
+    expect(() => applySingleQubitGate(StateVector.zero(2), PAULI_X, -1)).toThrow(/out of range/);
+  });
+
+  it("applyControlledGate rejects a gate that isn't 2x2", () => {
+    const wrongSize = Matrix.identity(3);
+    expect(() => applyControlledGate(StateVector.zero(2), wrongSize, 0, 1)).toThrow(/2x2/);
+  });
+
+  it("applyControlledGate rejects an out-of-range control or target qubit", () => {
+    expect(() => applyControlledGate(StateVector.zero(2), PAULI_X, 5, 1)).toThrow(/out of range/);
+    expect(() => applyControlledGate(StateVector.zero(2), PAULI_X, 0, 5)).toThrow(/out of range/);
   });
 });

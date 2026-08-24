@@ -124,9 +124,12 @@ function AxisLine({
 
 export function BlochSphereCanvas({
   blochPoint,
+  pulse,
   className,
 }: {
   blochPoint: { x: number; y: number; z: number };
+  /** Brief flash at the vector's tip — used to mark a discontinuous event like measurement collapse. */
+  pulse?: boolean;
   className?: string;
 }) {
   const [yaw, setYaw] = useState(INITIAL_YAW);
@@ -237,6 +240,16 @@ export function BlochSphereCanvas({
         style={{ fill: "url(#bloch-vector-live)" }}
       />
       <circle cx={origin.sx} cy={origin.sy} r={2.5} style={{ fill: "var(--muted-foreground)" }} />
+      {pulse ? (
+        <circle
+          cx={vector.sx}
+          cy={vector.sy}
+          r={7}
+          className="animate-ping motion-reduce:animate-none"
+          style={{ fill: "var(--brand)" }}
+          aria-hidden="true"
+        />
+      ) : null}
     </svg>
   );
 }

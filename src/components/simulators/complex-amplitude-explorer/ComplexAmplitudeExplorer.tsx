@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { Complex } from "@/lib/quantum/complex";
 import { ComplexPlaneCanvas } from "./ComplexPlaneCanvas";
 import { AmplitudeControls } from "./AmplitudeControls";
@@ -14,6 +16,47 @@ type Mode = "single" | "two-amplitude";
 
 const DEFAULT_RE = 1;
 const DEFAULT_IM = 0;
+const DEFAULT_ALPHA_MAGNITUDE = Math.SQRT1_2;
+const DEFAULT_BETA_PHASE = 0;
+const RE_IM_BOUND = 1.5;
+const URL_SYNC_DEBOUNCE_MS = 400;
+const COPY_CONFIRMATION_MS = 1500;
+
+// Minimal shareable state is the mode plus that mode's amplitude value(s):
+// (re, im) for single mode, or (alphaMagnitude, betaPhase) for two-amplitude
+// mode — alphaPhase is never driven by any control (no UI sets it away from
+// 0), so it isn't part of the shareable state. Both slices are read and
+// written together regardless of which mode is active, so switching modes
+// after loading a shared link doesn't lose the other slice's restored value.
+// Params are prefixed (`amp_`) because this simulator shares `/simulators`
+// with other URL-stateful simulators.
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+/** Reads and validates `?amp_re=&amp_im=`. Null if either is absent or malformed. */
+function parseSingleAmplitude(params: { get(key: string): string | null }): { re: number; im: number } | null {
+  const rawRe = params.get("amp_re");
+  const rawIm = params.get("amp_im");
+  if (rawRe === null || rawIm === null) return null;
+  const re = Number(rawRe);
+  const im = Number(rawIm);
+  if (!Number.isFinite(re) || !Number.isFinite(im)) return null;
+  return { re: clamp(re, -RE_IM_BOUND, RE_IM_BOUND), im: clamp(im, -RE_IM_BOUND, RE_IM_BOUND) };
+}
+
+/** Reads and validates `?amp_mag=&amp_bphase=`. Null if either is absent or malformed. */
+function parseTwoAmplitude(params: {
+  get(key: string): string | null;
+}): { alphaMagnitude: number; betaPhase: number } | null {
+  const rawMag = params.get("amp_mag");
+  const rawPhase = params.get("amp_bphase");
+  if (rawMag === null || rawPhase === null) return null;
+  const mag = Number(rawMag);
+  const phase = Number(rawPhase);
+  if (!Number.isFinite(mag) || !Number.isFinite(phase)) return null;
+  return { alphaMagnitude: clamp(mag, 0, 1), betaPhase: clamp(phase, -Math.PI, Math.PI) };
+}
 
 /**
  * A single amplitude's real/imaginary parts and its magnitude/phase are
@@ -23,13 +66,72 @@ const DEFAULT_IM = 0;
  * out of sync with each other.
  */
 export function ComplexAmplitudeExplorer() {
-  const [mode, setMode] = useState<Mode>("single");
-  const [re, setRe] = useState(DEFAULT_RE);
-  const [im, setIm] = useState(DEFAULT_IM);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const [alphaMagnitude, setAlphaMagnitude] = useState(Math.SQRT1_2);
+  const initialSingle = parseSingleAmplitude(searchParams);
+  const initialTwo = parseTwoAmplitude(searchParams);
+
+  const [mode, setMode] = useState<Mode>(() => (searchParams.get("amp_mode") === "two" ? "two-amplitude" : "single"));
+  const [re, setRe] = useState(() => initialSingle?.re ?? DEFAULT_RE);
+  const [im, setIm] = useState(() => initialSingle?.im ?? DEFAULT_IM);
+
+  const [alphaMagnitude, setAlphaMagnitude] = useState(() => initialTwo?.alphaMagnitude ?? DEFAULT_ALPHA_MAGNITUDE);
   const [alphaPhase, setAlphaPhase] = useState(0);
-  const [betaPhase, setBetaPhase] = useState(0);
+  const [betaPhase, setBetaPhase] = useState(() => initialTwo?.betaPhase ?? DEFAULT_BETA_PHASE);
+  const [copied, setCopied] = useState(false);
+
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const urlSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstUrlSync = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+  }, []);
+
+  // Keep the URL in sync with the settled state so the page is always shareable.
+  // Debounced so a slider drag doesn't spam `history.replaceState` — only the
+  // value it settles on after a short pause gets written. Skips the very first
+  // run so mounting doesn't immediately rewrite the URL we just read from.
+  useEffect(() => {
+    if (isFirstUrlSync.current) {
+      isFirstUrlSync.current = false;
+      return;
+    }
+    if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    urlSyncTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      params.set("amp_mode", mode === "two-amplitude" ? "two" : "single");
+      params.set("amp_re", re.toFixed(3));
+      params.set("amp_im", im.toFixed(3));
+      params.set("amp_mag", alphaMagnitude.toFixed(3));
+      params.set("amp_bphase", betaPhase.toFixed(3));
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, URL_SYNC_DEBOUNCE_MS);
+    return () => {
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+    // Deliberately depends only on the shareable state: `router`/`pathname` are
+    // stable, and reading the rest of the query string fresh from
+    // `window.location` (rather than depending on the `searchParams` hook)
+    // avoids re-running this effect off of our own `replace` calls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, re, im, alphaMagnitude, betaPhase]);
+
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
+    } catch {
+      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+    }
+  }, []);
 
   function applyPreset(presetRe: number, presetIm: number) {
     setRe(presetRe);
@@ -49,27 +151,31 @@ export function ComplexAmplitudeExplorer() {
 
   return (
     <div className="not-prose rounded-3xl border border-border bg-surface p-6">
+      <div className="mb-5">
+        <Badge tone="brand" className="mb-1.5">
+          What we&rsquo;re studying
+        </Badge>
+        <p className="text-sm text-muted-foreground">
+          An amplitude is a complex number, not a probability — this tool lets you see the difference
+          directly on the plane.
+        </p>
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="radiogroup" aria-label="Explorer mode" className="flex overflow-hidden rounded-full border border-border">
-          {(["single", "two-amplitude"] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              role="radio"
-              aria-checked={mode === m}
-              onClick={() => setMode(m)}
-              className={
-                "px-3.5 py-1.5 text-sm font-medium transition-colors " +
-                (mode === m ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted")
-              }
-            >
-              {m === "single" ? "Single Amplitude" : "Two Amplitudes (α, β)"}
-            </button>
-          ))}
+        <PresetToggle
+          options={[{ label: "Single Amplitude" }, { label: "Two Amplitudes (α, β)" }]}
+          index={mode === "single" ? 0 : 1}
+          onChange={(index) => setMode(index === 0 ? "single" : "two-amplitude")}
+          ariaLabel="Explorer mode"
+        />
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={handleCopyLink}>
+            {copied ? "Copied!" : "Copy link"}
+          </Button>
+          <Button variant="secondary" size="sm" onClick={reset}>
+            Reset
+          </Button>
         </div>
-        <Button variant="secondary" size="sm" onClick={reset}>
-          Reset
-        </Button>
       </div>
 
       {mode === "single" ? (
@@ -109,6 +215,19 @@ export function ComplexAmplitudeExplorer() {
         </div>
       )}
 
+      <div className="mt-6 rounded-xl border border-accent/30 bg-accent/5 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-accent">Try this</p>
+        <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-foreground">
+          <li>
+            Switch to Two Amplitudes, set both magnitudes equal, then slide β&rsquo;s phase from 0° to
+            180° — watch total probability swing between constructive and destructive interference.
+          </li>
+          <li>
+            In single mode, drag only the phase slider and confirm |z|² in the panel never moves.
+          </li>
+        </ul>
+      </div>
+
       <div className="mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
         <div>
           <Badge tone="brand" className="mb-1.5">
@@ -128,6 +247,15 @@ export function ComplexAmplitudeExplorer() {
             Drag the phase slider alone (magnitude fixed) and watch |z|² in the state panel above —
             it never moves. Multiplying an amplitude by a phase factor rotates it but never rescales
             it, and probability only depends on the rescaling.
+          </p>
+        </div>
+        <div className="sm:col-span-2">
+          <Badge tone="neutral" className="mb-1.5">
+            Interference lives in relative phase
+          </Badge>
+          <p className="text-sm text-muted-foreground">
+            Interference lives entirely in relative phase — flip β&rsquo;s phase by 180° and the two
+            amplitudes that used to add now cancel.
           </p>
         </div>
       </div>

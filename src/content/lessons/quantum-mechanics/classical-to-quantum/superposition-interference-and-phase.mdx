@@ -1,4 +1,5 @@
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -111,6 +112,18 @@ that mixes the two paths together, is precisely what makes the phase-
 dependent interference pattern appear. Nothing mysterious is added by
 "observation": it's the ordinary Born rule, evaluated in two different
 bases.
+
+<PredictBeforeReveal
+  question="In the explorer below, switch to two-amplitude mode and drag the relative-phase slider φ through a full turn (0 to 2π). What happens to P(0) and P(1), measured in the state's own {|0⟩,|1⟩} basis, as you drag?"
+  options={[
+    { label: "They cycle up and down with φ", value: "cycle" },
+    { label: "They stay exactly fixed", value: "fixed" },
+    { label: "They both drop to zero at φ=π", value: "zero" },
+    { label: "Only P(1) changes, P(0) stays fixed", value: "asymmetric" },
+  ]}
+  correctValue="fixed"
+  explanation="P(0)=|c₀|² and P(1)=|c₁|² depend only on the magnitudes of the amplitudes, and a relative phase e^{iφ} doesn't change either magnitude. So the bars stay exactly fixed no matter where you drag φ — that's the 'no interference in the natural basis' result derived above. It's only the quantum-vs-classical comparison beneath it, measuring in the {|+⟩,|−⟩} basis, that traces out the (1+cos φ)/2 curve as φ sweeps."
+/>
 
 <InteractiveSection title="Same state, two bases" description={`Switch the explorer below to two-amplitude mode. The probability bars for P(0)=|α|² and P(1)=|β|² (measuring in the state's own basis) stay fixed as you drag the relative-phase slider, confirming the "no interference in the natural basis" result above directly. The "quantum vs. classical" comparison beneath it is exactly the {|+⟩,|-⟩}-style cross-basis measurement this lesson just derived: watch it trace out the same (1+cos φ)/2 shape as you sweep the slider through a full turn.`}>
   <LazyComplexAmplitudeExplorer />

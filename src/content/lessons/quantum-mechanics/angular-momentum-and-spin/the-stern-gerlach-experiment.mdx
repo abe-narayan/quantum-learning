@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
@@ -163,6 +164,18 @@ including the "↑,+,↑" path just computed and its seven siblings.
 <MeasurementTree root={sequentialTree} ariaLabel="Sequential Stern-Gerlach measurement tree: z, then x, then z again" />
 
 Try the same sequence yourself, one measurement at a time:
+
+<PredictBeforeReveal
+  question="An atom measures 'up' along z, is then measured along x, then measured along z a third time. Does the third measurement reproduce 'up' with certainty?"
+  options={[
+    { label: "Yes, always up again", value: "always-up" },
+    { label: "No, it's 50/50 up or down", value: "5050" },
+    { label: "No, it's always down", value: "always-down" },
+    { label: "Only if the x-measurement gave '+'", value: "conditional" },
+  ]}
+  correctValue="5050"
+  explanation="After the x-measurement, the state is |+⟩ or |−⟩, an equal superposition of |↑⟩ and |↓⟩ either way, because Sx and Sz don't commute. The intervening x-measurement genuinely erases the earlier z-information — it's not extra information layered on top, it's a disturbance. So the third measurement gives a fresh 50/50 split, with no memory of the original 'up' result."
+/>
 
 <InteractiveSection description="Measure along Z, then X, then Z again. Watch the point re-randomize after the X measurement. The third Z outcome carries no memory of the first, exactly like every path in the tree above splitting 50/50 regardless of which branch you took to get there.">
   <LazyBlochSphereExplorer />

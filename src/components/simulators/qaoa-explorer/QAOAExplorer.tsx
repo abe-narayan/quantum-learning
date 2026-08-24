@@ -6,6 +6,7 @@ import { GraphDiagram, type GraphNode, type GraphEdge } from "@/components/visua
 import { KatexMath } from "@/components/ui/KatexMath";
 import { QAOAControls } from "./QAOAControls";
 import { QAOA_GRAPH_PRESETS } from "./presets";
+import { LabNotes } from "./LabNotes";
 
 /** Bit `node` of `index`, reading qubit 0 as the most-significant bit — the same convention `qaoaCircuit`'s own basis ordering and every gate in this engine use. */
 function bitAt(index: number, totalQubits: number, node: number): number {
@@ -34,6 +35,11 @@ export function QAOAExplorer() {
   const expected = useMemo(() => expectedCutSize(state, preset.edges), [state, preset]);
   const trueMax = useMemo(() => bruteForceMaxCut(preset.n, preset.edges), [preset]);
   const ratio = trueMax > 0 ? expected / trueMax : 1;
+  const ratioPercent = (ratio * 100).toFixed(1);
+  const noticeText =
+    ratio >= 0.995
+      ? `Approximation ratio ${ratioPercent}% — this (γ, β) pair is matching the true optimum for ${preset.label}.`
+      : `Approximation ratio ${ratioPercent}% — plateauing below the true optimum for ${preset.label}; sweep γ and β to see how high you can push it.`;
 
   const mostLikelyIndex = useMemo(() => {
     const probs = state.probabilities();
@@ -90,6 +96,37 @@ export function QAOAExplorer() {
             <p className="mt-1 font-mono text-lg text-accent">{trueMax}</p>
           </div>
         </div>
+
+        <LabNotes
+          notes={[
+            {
+              label: "What we're studying",
+              content:
+                "QAOA uses two angles — γ (how hard to reward good cuts) and β (how much to mix) — to bias measurement toward high-quality graph cuts, without ever brute-forcing every partition.",
+            },
+            {
+              label: "Try this",
+              content: (
+                <ul className="list-disc space-y-1 pl-4">
+                  <li>
+                    On the Triangle graph, sweep γ and β and try to push the approximation ratio above 90% — the
+                    true max for a triangle can never be perfectly reached with p=1, so notice where it plateaus.
+                  </li>
+                  <li>Switch to the 4-cycle and see whether the same (γ, β) that worked well on the triangle still performs well here.</li>
+                </ul>
+              ),
+            },
+            {
+              label: "What to notice",
+              content: noticeText,
+            },
+            {
+              label: "What's next",
+              content:
+                "Next: this p=1 circuit is the same one grid-searched by hand in the QAOA lesson — here you're doing that search yourself.",
+            },
+          ]}
+        />
       </div>
 
       <QAOAControls

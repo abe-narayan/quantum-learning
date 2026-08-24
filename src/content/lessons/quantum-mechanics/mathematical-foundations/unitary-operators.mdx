@@ -36,6 +36,12 @@ export const lessonMeta = {
     "Derive that unitary operators preserve inner products and norms, and that their eigenvalues have modulus 1",
     "Distinguish Hermitian from unitary operators, including examples that are one, the other, both, or neither",
   ],
+  related: [
+    {
+      slug: "quantum-computing/quantum-algorithms-i/quantum-phase-estimation",
+      note: "That algorithm's entire purpose, reading out the phase θ, exists only because this lesson proves a unitary's eigenvalues always have modulus 1, e^{iθ}, a pure phase and nothing else.",
+    },
+  ],
 };
 
 ## Motivation
@@ -125,6 +131,15 @@ covered in full once the Wave Mechanics course reaches the Schrödinger
 equation, which is exactly why a normalized state stays normalized
 forever as it evolves: unitarity *is* conservation of total probability,
 restated in operator language.
+
+This is also, concretely, what a real device's gate-calibration numbers
+are measuring. Randomized benchmarking, run routinely on IBM, Google, and
+IonQ hardware, applies long sequences of gates and tracks how the outcome
+statistics decay with sequence length, which amounts to a direct measure
+of how closely an implemented gate satisfies $U^\dagger U=I$. Leakage out
+of the two-level computational subspace and decoherence during the gate
+both show up as a measurable departure from unitarity, which is exactly
+the quantity a reported gate fidelity is quantifying.
 
 ## Worked Example
 

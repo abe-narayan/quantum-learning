@@ -7,7 +7,7 @@ import { FrameSlider } from "./FrameSlider";
 
 export type CurveSeries = {
   label: string;
-  color?: "brand" | "accent" | "muted";
+  color?: "brand" | "accent" | "muted" | "warning";
   points: { x: number; y: number }[];
 };
 
@@ -25,6 +25,7 @@ const COLOR_CLASSES: Record<NonNullable<CurveSeries["color"]>, string> = {
   brand: "stroke-brand",
   accent: "stroke-accent",
   muted: "stroke-muted-foreground",
+  warning: "stroke-warning",
 };
 
 /**

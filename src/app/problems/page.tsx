@@ -3,17 +3,29 @@ import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ProblemsCatalog } from "@/components/problems/ProblemsCatalog";
 import { getAllProblemMeta } from "@/lib/problems/registry";
+import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
+import { buildBreadcrumbSchema } from "@/lib/structuredData";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Problems",
   description: "Practice problems for checking your understanding of quantum computing, graded exactly against the real quantum engine.",
-};
+  path: "/problems",
+});
+
+const breadcrumbSchema = buildBreadcrumbSchema([
+  { name: "Home", url: BASE_URL },
+  { name: "Problems", url: `${BASE_URL}/problems` },
+]);
 
 export default function ProblemsPage() {
   const problems = getAllProblemMeta();
 
   return (
     <Container className="py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <PageHeader
         eyebrow="Problems"
         title="Practice what you've learned"

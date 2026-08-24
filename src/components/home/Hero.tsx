@@ -11,12 +11,12 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 -z-20"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--brand) 22%, transparent), transparent 55%), radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 50%), linear-gradient(var(--surface-muted), var(--background))",
+            "radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--brand) 11%, transparent), transparent 55%), radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 50%), linear-gradient(var(--surface-muted), var(--background))",
         }}
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-20 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
         style={{
           backgroundImage:
             "linear-gradient(color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px)",

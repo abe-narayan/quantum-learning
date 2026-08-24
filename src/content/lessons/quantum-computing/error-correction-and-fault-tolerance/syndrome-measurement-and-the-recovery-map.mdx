@@ -97,6 +97,17 @@ physical qubits $n$ per logical qubit $k$, exactly the resource-overhead
 question the capstone returns to with concrete numbers for real
 fault-tolerant architectures.
 
+Real devices add a constraint this lesson's lookup-table decode doesn't
+face at 3-qubit scale: speed. A physical qubit keeps decohering while
+the syndrome is being measured and decoded, so the correction has to be
+computed and applied before that error information goes stale. Google's
+2023 surface-code experiments paired syndrome extraction with a
+classical decoder running fast enough to keep pace with the device's
+measurement rate, a genuine real-time computing problem sitting on top
+of the decode-table lookup this lesson builds, and one that gets
+significantly harder as $n$ grows and the lookup table this lesson uses
+stops being a table at all.
+
 ## Interactive Experiment
 
 The four-step recovery procedure above is exactly what the platform's

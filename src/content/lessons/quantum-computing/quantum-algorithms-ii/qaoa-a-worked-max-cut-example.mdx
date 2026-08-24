@@ -46,11 +46,21 @@ export const lessonMeta = {
 
 ## Motivation
 
-The last lesson established the baseline (no optimization: expected cut
-$=|E|/2$) and the mechanism (cost phases, then a mixer). This lesson runs
-the actual $p=1$ circuit at good parameters and checks the result against
-`bruteForceMaxCut`, the true answer, computable directly since these
-graphs are small enough to check every one of the $2^n$ colorings.
+A single layer of QAOA, run on a triangle graph, lands within 0.05% of
+the best possible cut, on Max-Cut, a problem that's NP-hard in general.
+Is that luck, or is $p=1$ just enough structure for a graph this small?
+This lesson runs the actual circuit at good parameters and checks the
+result against `bruteForceMaxCut`, the true answer, computable directly
+since these graphs are small enough to check every one of the $2^n$
+colorings.
+
+Picture splitting a graph's vertices into two teams so that as many
+edges as possible cross between them: that's Max-Cut. The last lesson
+built the mechanism (cost phases, then a mixer) that biases the
+circuit's measurement distribution toward good splits, starting from a
+baseline of no optimization at all (expected cut $=|E|/2$). How good,
+concretely, is exactly what these two worked examples measure, and you
+can explore the cost landscape driving it yourself a bit further down.
 
 ## Mathematical Development
 

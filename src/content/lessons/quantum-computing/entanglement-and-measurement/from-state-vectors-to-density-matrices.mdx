@@ -1,6 +1,7 @@
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
@@ -80,6 +81,18 @@ in this module's regression tests.
 
 Watching $\rho$ get built live makes the outer-product mechanics
 concrete before the algebra below generalizes it:
+
+<PredictBeforeReveal
+  question="Set the mixing weight to 1 below so ρ=|ψ⟩⟨ψ| for a single pure state, then drag the point to different locations on the Bloch sphere. Does the point ever move inside the sphere, or does it stay on the surface?"
+  options={[
+    { label: "Moves inside for some states", value: "inside" },
+    { label: "Always stays exactly on the surface", value: "surface" },
+    { label: "Only touches the surface at the poles", value: "poles" },
+    { label: "Depends on the phase, not just the angle", value: "phase" },
+  ]}
+  correctValue="surface"
+  explanation="Every pure state has Tr(ρ²)=1, the maximum possible purity, which corresponds geometrically to sitting exactly on the sphere's surface — no matter which pure state you pick. It's only once you start mixing states with weight strictly between 0 and 1 (next lesson) that the point pulls inward, off the surface."
+/>
 
 <InteractiveSection title="Build ρ=|ψ⟩⟨ψ| from a single point" description="Set the mixing weight to 1 so only one component contributes: that's exactly ρ=|ψ⟩⟨ψ⟩ for whichever single Bloch point you pick, not a mixture yet. Try |0⟩, then |+⟩, then an arbitrary angle, and watch ρ change with it. The point stays exactly on the sphere's surface every time, matching Tr(ρ²)=1.">
   <LazyDensityMatrixExplorer />

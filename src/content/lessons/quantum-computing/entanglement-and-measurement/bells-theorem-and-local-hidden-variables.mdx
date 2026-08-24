@@ -61,16 +61,39 @@ export const lessonMeta = {
 
 ## Motivation
 
-Bell States and Entanglement, back in Quantum Gates & Circuits, showed
-that measuring both qubits of $|\Phi^+\rangle$ in the $X$-basis still
-gives perfect correlation, and promised that no *predetermined*
-classical description of the two qubits could reproduce that, in full
-generality, without checking every possible measurement choice at once.
-This lesson delivers that proof. It is entirely about classical
-probability and combinatorics (no quantum mechanics appears anywhere in
-it), which is exactly the point: it establishes a hard limit that *any*
-theory of the type described below must obey, before quantum mechanics
-is checked against that limit in the next lesson.
+Suppose Alice and Bob agree on any strategy they like before separating:
+coin flips, a shared secret code, an entire library of instructions
+distributed in advance. However clever that strategy, is there a limit
+to how correlated their measurement outcomes can be, once they're too
+far apart to communicate? There is, and it's a hard, provable ceiling.
+No scheme of this kind, however elaborate, can push a specific
+combination of four correlations past the number 2. Quantum mechanics,
+checked against this exact bound in the next lesson, blows straight
+through it.
+
+Bell States and Entanglement, back in Quantum Gates & Circuits, already
+showed something suggestive: measuring both qubits of $|\Phi^+\rangle$
+in the $X$-basis still gives perfect correlation, and promised that no
+*predetermined* classical description of the two qubits could reproduce
+that in full generality. This lesson delivers the proof. It is entirely
+classical probability and combinatorics, no quantum mechanics appears
+anywhere in it, which is exactly the point: it establishes a hard limit
+that *any* local, predetermined theory must obey, before quantum
+mechanics is checked against that limit next.
+
+## Intuition
+
+Picture Alice and Bob's shared strategy as a cheat sheet, $\lambda$,
+handed to both of them by the source before they separate. Each of them
+looks only at their own measurement setting and their own copy of the
+cheat sheet, never at what the other person chose or got. You might
+guess a rich enough cheat sheet could correlate their answers as
+strongly as you like. It can't: the specific combination of
+correlations defined below, called $S$, turns out to be boxed in at
+magnitude 2 no matter how the cheat sheet is designed or distributed.
+You can check this exhaustively yourself further down, stepping through
+all 16 possible deterministic cheat sheets and watching $S$ land on
+exactly $+2$ or $-2$, every single time.
 
 ## Mathematical Development
 

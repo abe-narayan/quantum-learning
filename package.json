@@ -3,12 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npm run generate:registry && npm run generate:search-index",
     "dev": "next dev",
+    "prebuild": "npm run generate:registry && npm run generate:search-index",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "pretest": "npm run generate:registry && npm run generate:search-index",
+    "test": "vitest run",
+    "generate:registry": "node scripts/generate-problem-registry.mjs",
+    "generate:search-index": "node scripts/generate-search-index.mjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

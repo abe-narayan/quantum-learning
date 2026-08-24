@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { stateVectorAmplitudeCount, stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const formatMemoryBytes = (bytes) => (
   bytes < 1e6 ? `${(bytes / 1e3).toFixed(1)} KB`
@@ -82,6 +83,18 @@ laptop handles this easily), already 17.2 GB at 30 qubits, and 18.0 PB
 at 50 qubits, beyond any existing classical system's storage. The wall
 isn't a rough estimate; it's an exact, computed curve.
 </Callout>
+
+<PredictBeforeReveal
+  question="At n=30 qubits, roughly how much memory does exact state-vector simulation need to store every amplitude?"
+  options={[
+    { label: "Around 17 MB", value: "mb" },
+    { label: "Around 17 GB", value: "gb" },
+    { label: "Around 17 TB", value: "tb" },
+    { label: "Around 17 PB", value: "pb" },
+  ]}
+  correctValue="gb"
+  explanation="17.2 GB at 30 qubits, already beyond a typical laptop's RAM. The curve climbs from 16.8 MB at n=20 to 18.0 PB at n=50, purely from the amplitude count doubling with every added qubit (2ⁿ). Slide the Explorer below up to n=30 and check its caption against this number."
+/>
 
 <InteractiveSection title="Feel the exponential wall yourself" description="Slide n from 10 up to 50 qubits. Both bars are log10-scaled since they span many orders of magnitude, but the captions show the real numbers, computed live by this platform's own stateVectorAmplitudeCount and stateVectorMemoryBytes, the exact same functions behind the 16.8 MB, 17.2 GB, and 18.0 PB figures quoted above.">
   <BarChartExplorer

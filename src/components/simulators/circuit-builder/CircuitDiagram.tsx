@@ -73,8 +73,8 @@ export function CircuitDiagram({
             return (
               <g
                 key={col}
-                opacity={opacity}
-                className="cursor-pointer rounded outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+                style={{ opacity }}
+                className="cursor-pointer rounded outline-none transition-opacity duration-200 motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
                 role="button"
                 tabIndex={0}
                 aria-label={`Jump to right after ${instructionLabel(instr)} on qubit ${q}`}
@@ -104,8 +104,8 @@ export function CircuitDiagram({
           return (
             <g
               key={col}
-              opacity={opacity}
-              className="cursor-pointer rounded outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+              style={{ opacity }}
+              className="cursor-pointer rounded outline-none transition-opacity duration-200 motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
               role="button"
               tabIndex={0}
               aria-label={`Jump to right after ${instr.gate} on qubits ${a} and ${b}`}

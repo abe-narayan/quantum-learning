@@ -44,6 +44,8 @@ export type LessonMeta = {
   /** Lesson slugs that should be understood first. */
   prerequisites: string[];
   objectives: string[];
+  /** Hand-curated pointers to other lessons with a real, verified connection. */
+  related?: { slug: string; note: string }[];
 };
 
 /** A lesson's metadata plus the slug derived from its file path. */

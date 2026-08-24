@@ -29,6 +29,12 @@ export const lessonMeta = {
     "State why readout fidelity is a genuine, imperfect probabilistic quantity, distinct from ideal projective measurement",
     "Connect readout error to the broader error budget alongside gate errors and decoherence",
   ],
+  related: [
+    {
+      slug: "quantum-computing/qubits-and-quantum-states/measurement-and-probability",
+      note: "The idealized, instantaneous projective measurement postulate this lesson explicitly contrasts against real, imperfect, indirect hardware readout.",
+    },
+  ],
 };
 
 ## Motivation
@@ -55,6 +61,13 @@ transitions). Sending a probe tone into the resonator and measuring the
 reflected/transmitted signal's phase or amplitude reveals which
 frequency the resonator sat at, and therefore, indirectly, which state
 the qubit was in, without directly bombarding the qubit itself.
+
+<DispersiveReadoutDiagram ariaLabel="Dispersive readout: the qubit couples only dispersively to a readout resonator, which is itself coupled to a feedline carrying the probe tone to and from an amplifier chain; the resonator, not the qubit, sits on the measured signal path" />
+
+The feedline, the thing an actual measurement instrument is connected
+to, only ever touches the resonator. The qubit sits one coupling step
+further away, its state readable only through the effect it has on the
+resonator's frequency, never sampled directly.
 
 ### Readout is probabilistic, not perfect
 

@@ -114,23 +114,66 @@ function NeutralAtomSchematic() {
 }
 
 function PhotonicSchematic() {
+  // A single beam (one physical path) traveling left to right. Polarization
+  // isn't which route the photon takes — it's the orientation of the field's
+  // oscillation plane, transverse to travel. That's shown as a head-on
+  // cross-section of the SAME beam: two perpendicular double-headed arrows
+  // (H and V), not two separate bent paths.
   return (
     <g>
-      <line x1={40} y1={90} x2={280} y2={90} className="stroke-border" strokeWidth={1} strokeDasharray="3 3" />
-      <line x1={60} y1={110} x2={60} y2={70} className="stroke-brand" strokeWidth={2.5} />
-      <line x1={60} y1={70} x2={100} y2={70} className="stroke-brand" strokeWidth={2.5} />
-      <Label x={80} y={60}>
-        H (|0⟩)
-      </Label>
-      <line x1={140} y1={110} x2={200} y2={110} className="stroke-accent" strokeWidth={2.5} />
-      <line x1={200} y1={110} x2={200} y2={150} className="stroke-accent" strokeWidth={2.5} />
-      <Label x={220} y={140}>
-        V (|1⟩)
-      </Label>
-      <circle cx={60} cy={90} r={4} className="fill-foreground" />
-      <Label x={160} y={30}>
+      <Label x={160} y={22}>
         polarization encoding
       </Label>
+
+      <circle cx={36} cy={100} r={4} className="fill-foreground" />
+      <line x1={36} y1={100} x2={290} y2={100} className="stroke-brand" strokeWidth={2.5} markerEnd="url(#photon-travel-arrow)" />
+      <Label x={110} y={122}>
+        photon travels &rarr;
+      </Label>
+
+      {/* head-on view of the same beam: field oscillation plane */}
+      <circle cx={205} cy={100} r={32} className="fill-surface stroke-border" strokeWidth={1} strokeDasharray="2 3" />
+      <line
+        x1={205}
+        y1={74}
+        x2={205}
+        y2={126}
+        className="stroke-accent"
+        strokeWidth={2.5}
+        markerStart="url(#pol-arrowhead)"
+        markerEnd="url(#pol-arrowhead)"
+      />
+      <line
+        x1={177}
+        y1={100}
+        x2={233}
+        y2={100}
+        className="stroke-brand"
+        strokeWidth={2.5}
+        markerStart="url(#pol-arrowhead)"
+        markerEnd="url(#pol-arrowhead)"
+      />
+      <Label x={205} y={62}>
+        V (|1⟩)
+      </Label>
+      {/* offset below the H arrow (mirroring V's label offset above its own
+          arrow) so it clears the long travel line's arrowhead at x=290,
+          which sits at the same height as the H arrow itself */}
+      <Label x={255} y={118}>
+        H (|0⟩)
+      </Label>
+      <Label x={205} y={168}>
+        field oscillation, head-on
+      </Label>
+
+      <defs>
+        <marker id="photon-travel-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" className="fill-brand" />
+        </marker>
+        <marker id="pol-arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" className="fill-foreground" />
+        </marker>
+      </defs>
     </g>
   );
 }

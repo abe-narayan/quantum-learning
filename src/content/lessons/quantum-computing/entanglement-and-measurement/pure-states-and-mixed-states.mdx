@@ -2,6 +2,7 @@ import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -147,6 +148,18 @@ time (you, the observer, just don't know which), and no measurement in
 any basis reveals any interference at all, because there genuinely is
 none. The density matrix is the first tool this course has built that
 can tell these two situations apart at all.
+
+<PredictBeforeReveal
+  question="A 50/50 mixture of |0⟩,|1⟩ and a 50/50 mixture of |+⟩,|−⟩ are both prepared. Where do their Bloch-sphere points land?"
+  options={[
+    { label: "Same spot: both land dead center", value: "same-center" },
+    { label: "Different spots, on opposite sides", value: "opposite" },
+    { label: "Different spots, same latitude", value: "same-latitude" },
+    { label: "Same spot, but off-center", value: "same-offcenter" },
+  ]}
+  correctValue="same-center"
+  explanation="Both mixtures compute to ρ=I/2, the exact same matrix, so both land at the exact same point: dead center. As the worked example shows, this holds for mixing any orthogonal pair with equal weight, in any basis — the maximally mixed state has no memory of which basis produced it."
+/>
 
 <InteractiveSection title="Two different mixtures, one center point" description="Try the two 50/50 presets below (mixing |0⟩,|1⟩, then mixing |+⟩,|−⟩) and watch the Bloch-sphere point land on the exact same spot both times, dead center: ρ=I/2. Then drag the weight slider away from 0.5 on either preset and watch the point move smoothly off-center, back toward the surface; purity and entropy update live as it does.">
   <LazyDensityMatrixExplorer />

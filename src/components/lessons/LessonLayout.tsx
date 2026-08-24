@@ -4,6 +4,8 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { COURSES, PILLARS, getCourse } from "@/lib/content/curriculum";
 import type { Course, LessonMeta, LessonMetaWithSlug } from "@/lib/content/types";
+import { getCourseCheckpointProblems } from "@/lib/problems/registry";
+import { CourseCheckpoint } from "@/components/problems/CourseCheckpoint";
 import { LessonCompleteToggle } from "./LessonCompleteToggle";
 
 const DIFFICULTY_LABEL: Record<LessonMeta["difficulty"], string> = {
@@ -75,10 +77,28 @@ export function LessonLayout({
         )
         .slice(0, 3)
     : [];
+  const checkpointProblems = finishedCourse ? getCourseCheckpointProblems(finishedCourse.slug) : [];
 
   const prerequisites = meta.prerequisites
     .map((prereqSlug) => allLessons.find((lesson) => lesson.slug === prereqSlug))
     .filter((lesson): lesson is LessonMetaWithSlug => Boolean(lesson));
+
+  // Reverse index of prerequisites, computed for free from data every lesson
+  // already carries: other-course lessons that list this one as a
+  // prerequisite. No authoring required, so it can be shown unconditionally
+  // whenever it's non-empty.
+  const resurfacesIn = allLessons.filter(
+    (lesson) => lesson.prerequisites.includes(slug) && lesson.course !== meta.course,
+  );
+
+  // Hand-curated cross-links (see `related` on LessonMeta). Only populated
+  // for a small, explicitly verified set of lessons.
+  const relatedElsewhere = (meta.related ?? [])
+    .map((entry) => {
+      const lesson = allLessons.find((candidate) => candidate.slug === entry.slug);
+      return lesson ? { lesson, note: entry.note } : null;
+    })
+    .filter((entry): entry is { lesson: LessonMetaWithSlug; note: string } => Boolean(entry));
 
   return (
     <Container className="py-16">
@@ -139,6 +159,44 @@ export function LessonLayout({
               );
             })}
           </p>
+        ) : null}
+
+        {resurfacesIn.length > 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            This concept resurfaces in:{" "}
+            {resurfacesIn.map((lesson, i) => {
+              const resurfaceCourse = getCourse(lesson.course);
+              const resurfacePillar = resurfaceCourse
+                ? PILLARS.find((p) => p.slug === resurfaceCourse.pillar)
+                : undefined;
+              return (
+                <span key={lesson.slug}>
+                  {i > 0 ? ", " : ""}
+                  <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
+                    {lesson.title}
+                  </Link>
+                  {resurfacePillar ? ` (${resurfacePillar.title})` : ""}
+                </span>
+              );
+            })}
+          </p>
+        ) : null}
+
+        {relatedElsewhere.length > 0 ? (
+          <div className="mt-6 rounded-2xl border border-border bg-surface-muted/60 p-5">
+            <p className="text-sm font-semibold text-foreground">Related elsewhere</p>
+            <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+              {relatedElsewhere.map(({ lesson, note }) => (
+                <li key={lesson.slug}>
+                  <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
+                    {lesson.title}
+                  </Link>
+                  {" — "}
+                  {note}
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : null}
 
         {meta.objectives.length > 0 ? (
@@ -225,6 +283,12 @@ export function LessonLayout({
             <div aria-hidden="true" />
           )}
         </nav>
+      ) : null}
+
+      {finishedCourse && checkpointProblems.length > 0 ? (
+        <div className="max-w-3xl">
+          <CourseCheckpoint courseTitle={finishedCourse.title} problems={checkpointProblems} />
+        </div>
       ) : null}
     </Container>
   );

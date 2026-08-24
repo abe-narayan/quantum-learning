@@ -25,6 +25,15 @@ const GROUP_FILL: Record<0 | 1, string> = {
   1: "fill-accent",
 };
 
+/** Text painted on top of a GROUP_FILL circle — each group's paired
+ * `-foreground` token, the same convention Button.tsx uses for text on a
+ * `--brand`/`--accent` background, rather than a hardcoded `fill-white`
+ * that doesn't adapt to either color or theme. */
+const GROUP_TEXT_FILL: Record<0 | 1, string> = {
+  0: "fill-brand-foreground",
+  1: "fill-accent-foreground",
+};
+
 /**
  * A small node-and-edge graph diagram for combinatorial-optimization lessons
  * (Max-Cut/QAOA): nodes colored by which side of a cut they're on, edges
@@ -79,7 +88,12 @@ export function GraphDiagram({
                 r={NODE_R}
                 className={n.group === undefined ? "fill-muted-foreground/60" : GROUP_FILL[n.group]}
               />
-              <text x={p.x} y={p.y + 4} textAnchor="middle" className="fill-white text-[11px] font-semibold">
+              <text
+                x={p.x}
+                y={p.y + 4}
+                textAnchor="middle"
+                className={`${n.group === undefined ? "fill-foreground" : GROUP_TEXT_FILL[n.group]} text-[11px] font-semibold`}
+              >
                 {n.label ?? n.id}
               </text>
             </g>

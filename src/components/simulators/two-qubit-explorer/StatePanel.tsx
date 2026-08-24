@@ -38,7 +38,7 @@ export function StatePanel({ state }: { state: StateVector }) {
           : "This state cannot be written as any single-qubit state ⊗ single-qubit state — the qubits are entangled."}
       </p>
 
-      <div className="overflow-hidden rounded-xl border border-border">
+      <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-surface-muted/60 text-xs uppercase tracking-wide text-muted-foreground">

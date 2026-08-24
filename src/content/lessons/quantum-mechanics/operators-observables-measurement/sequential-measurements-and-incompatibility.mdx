@@ -3,6 +3,7 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, applySingleQubitGate } from "@/lib/quantum/gates";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility"
@@ -117,6 +118,18 @@ at once:
 Both paths through the $X$ branch land on the same $50/50$ split at the
 final $Z$ measurement, exactly the "doesn't matter which $X$ outcome
 occurred" fact proven below.
+
+<PredictBeforeReveal
+  question="Start at |0⟩ (Z=0 with certainty). Measure X, then measure Z a third time. Is that final Z measurement still 100% certain to give Z=0?"
+  options={[
+    { label: "Yes, still 100% certain", value: "certain" },
+    { label: "No, it's now a 50/50 coin flip", value: "fifty-fifty" },
+    { label: "No, it flips to 100% certain Z=1", value: "certain-flip" },
+    { label: "It depends which X outcome occurred", value: "depends" },
+  ]}
+  correctValue="fifty-fifty"
+  explanation="Whichever X-outcome occurs, the qubit collapses to an X-eigenstate, an equal superposition in the Z-basis, so the third Z measurement comes back exactly 50/50, as derived above. It also doesn't depend on which X outcome occurred: both |+⟩ and |−⟩ give the identical 50/50 split. Try it live below: start at |0⟩, apply H, and measure repeatedly."
+/>
 
 <InteractiveSection title="Run the sequence yourself" description="Start at |0⟩, apply H (the X-basis change), and measure a few times: watch the Z-outcome go from 100% predictable to a genuine coin flip, live, on the real state — the exact three-step sequence worked out above, not a scripted animation.">
   <LazyBlochSphereExplorer />

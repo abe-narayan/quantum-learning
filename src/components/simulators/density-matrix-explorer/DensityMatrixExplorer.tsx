@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { blochStateFromAngles, densityMatrixToBlochVector, type BlochAngles } from "@/lib/quantum/bloch";
 import { pureStateDensityMatrix, convexCombination, purity, vonNeumannEntropy, validateDensityMatrix } from "@/lib/quantum/densityMatrix";
 import { BlochSphereCanvas } from "../bloch-sphere/BlochSphereCanvas";
+import { useAnimatedBlochTarget } from "../bloch-sphere/useAnimatedBlochPoint";
 import { DensityMatrixControls } from "./DensityMatrixControls";
 import { DensityMatrixStatePanel } from "./DensityMatrixStatePanel";
 import { MIXTURE_PRESETS } from "./presets";
@@ -12,6 +15,61 @@ import { MIXTURE_PRESETS } from "./presets";
 const DEFAULT_COMPONENT_1: BlochAngles = { theta: 0, phi: 0 };
 const DEFAULT_COMPONENT_2: BlochAngles = { theta: Math.PI, phi: 0 };
 const DEFAULT_WEIGHT = 1;
+const URL_SYNC_DEBOUNCE_MS = 400;
+const COPY_CONFIRMATION_MS = 1500;
+
+// Minimal shareable state is the mixing weight plus the two components' Bloch
+// angles — together they fully determine ρ via the same convex-combination
+// formula used below. Params are prefixed (`dm_`) because this simulator
+// shares /simulators with other URL-stateful simulators.
+function clampTheta(value: number): number {
+  return Math.min(Math.PI, Math.max(0, value));
+}
+
+function normalizePhi(phi: number): number {
+  const TWO_PI = 2 * Math.PI;
+  const wrapped = phi % TWO_PI;
+  return wrapped < 0 ? wrapped + TWO_PI : wrapped;
+}
+
+function clampWeight(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
+/** Reads and validates `?dm_t1=&dm_p1=&dm_t2=&dm_p2=&dm_w=`. Never throws — returns null on anything malformed or absent. */
+function parseDensityMatrixParams(
+  params: { get(key: string): string | null }
+): { component1: BlochAngles; component2: BlochAngles; weight: number } | null {
+  const rawT1 = params.get("dm_t1");
+  const rawP1 = params.get("dm_p1");
+  const rawT2 = params.get("dm_t2");
+  const rawP2 = params.get("dm_p2");
+  const rawW = params.get("dm_w");
+  if (rawT1 === null || rawP1 === null || rawT2 === null || rawP2 === null || rawW === null) return null;
+  const t1 = Number(rawT1);
+  const p1 = Number(rawP1);
+  const t2 = Number(rawT2);
+  const p2 = Number(rawP2);
+  const w = Number(rawW);
+  if (![t1, p1, t2, p2, w].every(Number.isFinite)) return null;
+  return {
+    component1: { theta: clampTheta(t1), phi: normalizePhi(p1) },
+    component2: { theta: clampTheta(t2), phi: normalizePhi(p2) },
+    weight: clampWeight(w),
+  };
+}
+
+function matchMixturePresetId(component1: BlochAngles, component2: BlochAngles, weight: number, epsilon = 1e-2): string | null {
+  const match = MIXTURE_PRESETS.find(
+    (preset) =>
+      Math.abs(preset.component1.theta - component1.theta) < epsilon &&
+      Math.abs(preset.component1.phi - component1.phi) < epsilon &&
+      Math.abs(preset.component2.theta - component2.theta) < epsilon &&
+      Math.abs(preset.component2.phi - component2.phi) < epsilon &&
+      Math.abs(preset.weight - weight) < epsilon
+  );
+  return match?.id ?? null;
+}
 
 /**
  * A single-qubit density matrix built live from ρ = p·ρ₁ + (1−p)·ρ₂, where
@@ -23,13 +81,35 @@ const DEFAULT_WEIGHT = 1;
  * by exactly the amount `purity` and `vonNeumannEntropy` predict.
  */
 export function DensityMatrixExplorer() {
-  const [component1, setComponent1] = useState<BlochAngles>(DEFAULT_COMPONENT_1);
-  const [component2, setComponent2] = useState<BlochAngles>(DEFAULT_COMPONENT_2);
-  const [weight, setWeight] = useState(DEFAULT_WEIGHT);
-  const [activePresetId, setActivePresetId] = useState<string | null>("pure-0");
-  const [narration, setNarration] = useState(
-    "Weight 1 on |0⟩ — a pure state, sitting exactly on the sphere's surface."
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const initialFromUrl = parseDensityMatrixParams(searchParams);
+
+  const [component1, setComponent1] = useState<BlochAngles>(initialFromUrl?.component1 ?? DEFAULT_COMPONENT_1);
+  const [component2, setComponent2] = useState<BlochAngles>(initialFromUrl?.component2 ?? DEFAULT_COMPONENT_2);
+  const [weight, setWeight] = useState(initialFromUrl?.weight ?? DEFAULT_WEIGHT);
+  const [activePresetId, setActivePresetId] = useState<string | null>(() =>
+    initialFromUrl ? matchMixturePresetId(initialFromUrl.component1, initialFromUrl.component2, initialFromUrl.weight) : "pure-0"
   );
+  const [narration, setNarration] = useState(() =>
+    initialFromUrl
+      ? "Restored the shared mixture from your link."
+      : "Weight 1 on |0⟩ — a pure state, sitting exactly on the sphere's surface."
+  );
+  const [copied, setCopied] = useState(false);
+
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const urlSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstUrlSync = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+  }, []);
 
   const rho = useMemo(() => {
     const rho1 = pureStateDensityMatrix(blochStateFromAngles(component1));
@@ -40,10 +120,51 @@ export function DensityMatrixExplorer() {
     ]);
   }, [component1, component2, weight]);
 
-  const blochVector = useMemo(() => densityMatrixToBlochVector(rho), [rho]);
+  const targetBlochVector = useMemo(() => densityMatrixToBlochVector(rho), [rho]);
+  const { point: blochVector } = useAnimatedBlochTarget(targetBlochVector);
   const purityValue = useMemo(() => purity(rho), [rho]);
   const entropyValue = useMemo(() => vonNeumannEntropy(rho), [rho]);
   const validation = useMemo(() => validateDensityMatrix(rho), [rho]);
+
+  // Keep the URL in sync with the settled mixture so the page is always shareable.
+  // Debounced so dragging a slider doesn't spam `history.replaceState` — only the
+  // value it settles on after a short pause gets written. Skips the very first run
+  // so mounting doesn't immediately rewrite the URL we just read from.
+  useEffect(() => {
+    if (isFirstUrlSync.current) {
+      isFirstUrlSync.current = false;
+      return;
+    }
+    if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    urlSyncTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      params.set("dm_t1", component1.theta.toFixed(3));
+      params.set("dm_p1", component1.phi.toFixed(3));
+      params.set("dm_t2", component2.theta.toFixed(3));
+      params.set("dm_p2", component2.phi.toFixed(3));
+      params.set("dm_w", weight.toFixed(3));
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, URL_SYNC_DEBOUNCE_MS);
+    return () => {
+      if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
+    };
+    // Deliberately depends only on the shareable state: `router`/`pathname` are
+    // stable, and reading the rest of the query string fresh from
+    // `window.location` (rather than depending on the `searchParams` hook)
+    // avoids re-running this effect off of our own `replace` calls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [component1.theta, component1.phi, component2.theta, component2.phi, weight]);
+
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
+    } catch {
+      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+    }
+  }, []);
 
   function applyMixturePreset(presetId: string) {
     const preset = MIXTURE_PRESETS.find((p) => p.id === presetId);
@@ -119,20 +240,38 @@ export function DensityMatrixExplorer() {
               panel: both land on the exact same ρ = I/2, even though they mix completely different states.
             </p>
           </div>
+          <div className="sm:col-span-2">
+            <Badge tone="neutral" className="mb-1.5">
+              What&rsquo;s next
+            </Badge>
+            <p className="text-sm text-muted-foreground">
+              Next: see what happens when a real noise channel — not a hand-picked mixture — pulls a pure
+              state toward the center → try the Noise &amp; Decoherence Explorer.
+            </p>
+          </div>
         </div>
       </div>
 
-      <DensityMatrixControls
-        component1={component1}
-        component2={component2}
-        weight={weight}
-        activePresetId={activePresetId}
-        onComponent1Change={handleComponent1Change}
-        onComponent2Change={handleComponent2Change}
-        onWeightChange={handleWeightChange}
-        onApplyMixturePreset={applyMixturePreset}
-        onReset={reset}
-      />
+      <div>
+        <div className="flex justify-end">
+          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+            {copied ? "Copied!" : "Copy link"}
+          </Button>
+        </div>
+        <div className="mt-4">
+          <DensityMatrixControls
+            component1={component1}
+            component2={component2}
+            weight={weight}
+            activePresetId={activePresetId}
+            onComponent1Change={handleComponent1Change}
+            onComponent2Change={handleComponent2Change}
+            onWeightChange={handleWeightChange}
+            onApplyMixturePreset={applyMixturePreset}
+            onReset={reset}
+          />
+        </div>
+      </div>
     </div>
   );
 }

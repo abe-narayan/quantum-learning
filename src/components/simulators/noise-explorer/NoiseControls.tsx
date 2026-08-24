@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { PresetToggle } from "@/components/visualizations/PresetToggle";
+import { FrameSlider } from "@/components/visualizations/FrameSlider";
 import { STATE_PRESETS } from "../bloch-sphere/presets";
 
 export type ChannelType = "amplitude-damping" | "dephasing";
@@ -33,24 +34,13 @@ export function NoiseControls({
         <h3 id="noise-preset-heading" className="text-sm font-semibold text-foreground">
           Starting state
         </h3>
-        <div role="radiogroup" aria-label="Starting state" className="mt-3 flex flex-wrap gap-2">
-          {STATE_PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              role="radio"
-              aria-checked={presetId === preset.id}
-              onClick={() => onPresetChange(preset.id)}
-              className={cn(
-                "rounded-full border px-3 py-1 font-mono text-sm transition-colors",
-                presetId === preset.id
-                  ? "border-brand bg-brand text-brand-foreground"
-                  : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
-              )}
-            >
-              {preset.ket}
-            </button>
-          ))}
+        <div className="mt-3">
+          <PresetToggle
+            options={STATE_PRESETS.map((preset) => ({ label: preset.ket }))}
+            index={STATE_PRESETS.findIndex((preset) => preset.id === presetId)}
+            onChange={(index) => onPresetChange(STATE_PRESETS[index].id)}
+            ariaLabel="Starting state"
+          />
         </div>
       </section>
 
@@ -58,22 +48,13 @@ export function NoiseControls({
         <h3 id="noise-channel-heading" className="text-sm font-semibold text-foreground">
           Noise channel
         </h3>
-        <div role="radiogroup" aria-label="Noise channel" className="mt-3 flex overflow-hidden rounded-full border border-border">
-          {(["amplitude-damping", "dephasing"] as const).map((c) => (
-            <button
-              key={c}
-              type="button"
-              role="radio"
-              aria-checked={channel === c}
-              onClick={() => onChannelChange(c)}
-              className={cn(
-                "flex-1 px-3 py-1.5 text-xs font-medium transition-colors",
-                channel === c ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted"
-              )}
-            >
-              {c === "amplitude-damping" ? "Amplitude damping" : "Dephasing"}
-            </button>
-          ))}
+        <div className="mt-3">
+          <PresetToggle
+            options={[{ label: "Amplitude damping" }, { label: "Dephasing" }]}
+            index={channel === "amplitude-damping" ? 0 : 1}
+            onChange={(index) => onChannelChange(index === 0 ? "amplitude-damping" : "dephasing")}
+            ariaLabel="Noise channel"
+          />
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
           {channel === "amplitude-damping"
@@ -103,16 +84,16 @@ export function NoiseControls({
         <h3 id="noise-steps-heading" className="text-sm font-semibold text-foreground">
           Applications (time steps)
         </h3>
-        <input
-          type="range"
-          min={0}
-          max={maxSteps}
-          step={1}
-          value={steps}
-          onChange={(e) => onStepsChange(Number(e.target.value))}
-          className="mt-3 w-full accent-accent"
-          aria-label="Number of channel applications"
-        />
+        <div className="mt-3">
+          <FrameSlider
+            label="Number of channel applications"
+            valueLabel={`${steps} application${steps === 1 ? "" : "s"}`}
+            index={steps}
+            max={maxSteps}
+            onChange={onStepsChange}
+            boxed={false}
+          />
+        </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button variant="ghost" size="sm" onClick={onReset}>
             Reset

@@ -21,6 +21,12 @@ export const lessonMeta = {
     "State why neutral-atom arrays scale differently from trapped-ion chains",
     "Describe Rydberg blockade at a conceptual level as the mechanism enabling two-qubit gates between neutral atoms",
   ],
+  related: [
+    {
+      slug: "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels",
+      note: "A 'Rydberg state' is literally a hydrogen-like high-n state named for this lesson's Rydberg energy unit; the same Eₙ=-13.6 eV/n² physics is why exciting an atom's outer electron to large n gives it the enormous, strongly-interacting orbit Rydberg blockade depends on.",
+    },
+  ],
 };
 
 ## Motivation
@@ -74,6 +80,13 @@ conditionally suppressing its neighbor's, is what implements an
 entangling two-qubit gate, conceptually similar in spirit to Quantum
 Algorithms I's controlled-phase gates, but arising from genuine atomic
 physics rather than an abstract circuit element.
+
+<RydbergBlockadeDiagram ariaLabel="Two neutral atoms: atom A excited to a Rydberg state with an enormously expanded orbital and a surrounding blockade radius; atom B, sitting within that radius, has its own excitation attempt shown suppressed" />
+
+Atom A's expanded Rydberg orbital is what creates the blockade radius
+around it; atom B, sitting inside that radius, has its energy levels
+shifted enough that the same laser can no longer excite it to |r⟩ &mdash;
+its excitation attempt is suppressed, not merely weaker.
 
 The excitation step itself, driving an atom from its ground state up to
 the Rydberg state, is a laser resonantly coupling two atomic levels: the
