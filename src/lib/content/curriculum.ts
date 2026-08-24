@@ -266,6 +266,8 @@ export const COURSES: Course[] = [
       { slug: "quantum-teleportation", title: "Quantum Teleportation" },
       { slug: "interference-in-quantum-circuits", title: "Interference in Quantum Circuits" },
       { slug: "building-quantum-circuits", title: "Building Quantum Circuits" },
+      { slug: "bb84-quantum-key-distribution", title: "BB84: Quantum Key Distribution" },
+      { slug: "superdense-coding", title: "Superdense Coding" },
     ],
   },
   {
@@ -310,6 +312,7 @@ export const COURSES: Course[] = [
       { slug: "grovers-algorithm-oracle-and-diffusion", title: "Grover's Algorithm: Oracle and Diffusion" },
       { slug: "grovers-algorithm-amplitude-amplification", title: "Grover's Algorithm: Amplitude Amplification" },
       { slug: "capstone-comparing-quantum-advantage", title: "Capstone: Comparing Quantum Advantage" },
+      { slug: "simons-algorithm", title: "Simon's Algorithm" },
     ],
   },
   {

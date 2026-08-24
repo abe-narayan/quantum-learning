@@ -90,10 +90,17 @@ an analogy: the identical vector, verified via the identical
 $\vec J^{\,2}=0$ eigenstate computation. (The triplet's $m=0$ state,
 $|1,0\rangle$, is likewise identical to $|\Psi^+\rangle$.)
 
-Checking this yourself in the same explorer used to build $|\Psi^-\rangle$
-in the first place makes the identity concrete rather than just asserted:
+Checking this yourself in the same explorer used to build Bell states in
+the first place makes the identity concrete rather than just asserted.
+The explorer's one-click "Bell" preset lands on $|\Phi^+\rangle$, not
+$|\Psi^-\rangle$, so reaching $|\Psi^-\rangle$ takes one extra step:
+after the Bell preset, target qubit q1 and apply X, then Z. That turns
+$(|00\rangle+|11\rangle)/\sqrt2$ into $-(|01\rangle-|10\rangle)/\sqrt2$,
+the same $|\Psi^-\rangle$ up to an unobservable global phase:
 
-<InteractiveSection description="Prepare |Ψ−⟩ in the explorer and check its correlation table. This is the exact same vector as the spin-0 singlet above, not an analogy: the same amplitudes, the same perfect anti-correlation in every basis.">
+<InteractiveSection
+  title="Prepare |Ψ⁻⟩ and find the singlet hiding inside"
+  description="Click the Bell preset, then target q1 and apply X followed by Z. Check the correlation table: this is the exact same vector as the spin-0 singlet above, not an analogy: the same amplitudes, the same perfect anti-correlation in every basis.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
@@ -174,7 +181,7 @@ approximate resemblance.
 
 ## Further Exploration
 
-Next, the capstone: **From Abstract Algebra to the Hydrogen Atom**,
+Next, the capstone: [From Abstract Algebra to the Hydrogen Atom](/lessons/quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom),
 which previews how this course's $\vec L^{\,2}$, $L_z$, and spherical
 harmonics become the angular part of a real, solvable three-dimensional
 atom.

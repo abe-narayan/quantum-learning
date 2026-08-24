@@ -3,6 +3,9 @@ import { StateVector } from "@/lib/quantum/state";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
+import { spinObservableInXZPlane, chshValue } from "@/lib/quantum/chsh";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/capstone-analyzing-quantum-correlations"
@@ -36,6 +39,34 @@ export const capstoneConcurrence = 2 * Math.sqrt(0.21);
 export const capstoneEntropy = -0.7 * Math.log2(0.7) - 0.3 * Math.log2(0.3);
 export const capstoneMixedness = 1 - 0.58;
 export const capstoneChshFraction = 2.0623 / (2 * Math.SQRT2);
+
+export const capstoneRho = pureStateDensityMatrix(capstoneState);
+export const capstoneChshA = spinObservableInXZPlane(0);
+export const capstoneChshAPrime = spinObservableInXZPlane(Math.PI / 2);
+export const capstoneChshBPrimeFixed = spinObservableInXZPlane(-Math.PI / 4);
+
+export const capstoneChshCurveThetaBs = Array.from({ length: 41 }, (_, i) => -Math.PI / 4 + (i / 40) * ((11 * Math.PI) / 12));
+
+export const capstoneChshCurveFrames = [
+  {
+    paramLabel: "θ_a, θ_a', θ_b' fixed at the Lesson 11 configuration; θ_b sweeps continuously",
+    series: [
+      {
+        label: "S(θ_b)",
+        color: "brand",
+        points: capstoneChshCurveThetaBs.map((thetaB) => ({
+          x: thetaB,
+          y: chshValue(capstoneRho, {
+            a: capstoneChshA,
+            aPrime: capstoneChshAPrime,
+            b: spinObservableInXZPlane(thetaB),
+            bPrime: capstoneChshBPrimeFixed,
+          }),
+        })),
+      },
+    ],
+  },
+];
 
 
 ## Motivation
@@ -153,6 +184,23 @@ different native scales (the exact numbers are in each caption).
   ]}
   ariaLabel="Four entanglement-related metrics for this capstone state, each shown as a fraction of its own maximum"
 />
+
+Holding $\theta_a=0,\theta_{a'}=\pi/2,\theta_{b'}=-\pi/4$ exactly as
+above and sweeping only $\theta_b$, `chshValue` recomputes $S$ live at
+every step: it passes exactly through $S\approx2.0623$ at
+$\theta_b=\pi/4$ (the Lesson 11 configuration quoted above), confirming
+the two numbers agree, but nearby angles do better, peaking around
+$\theta_b=\pi/8$ at $S\approx2.13$, direct numerical evidence for this
+lesson's own claim that a search over the angles beats the
+Lesson-11-derived configuration for this particular state.
+
+<InteractiveSection title="Sweep θ_b, watch S move past 2.0623" description="A, A', and B' held fixed at the Lesson 11 configuration; only θ_b sweeps continuously from -π/4 to 2π/3. The curve is S(θ_b), computed live at 41 points by the real chshValue engine. Read off where it crosses 2.0623 (the Lesson 11 configuration, marked by the dashed line) and where, nearby, it climbs a little higher.">
+  <ParametricCurve
+    frames={capstoneChshCurveFrames}
+    referenceLines={[{ y: 2.0623, label: "Lesson 11 config (θ_b=π/4)" }, { y: 2, label: "classical bound" }]}
+    ariaLabel="S as a continuous function of theta_b, with theta_a, theta_a prime, and theta_b prime held fixed at the Lesson 11 configuration, crossing 2.0623 at theta_b = pi/4 and peaking slightly higher nearby"
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 

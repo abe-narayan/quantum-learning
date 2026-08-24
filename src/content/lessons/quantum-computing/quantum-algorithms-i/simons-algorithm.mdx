@@ -1,0 +1,297 @@
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
+import { applySimonOracle } from "@/lib/quantum/oracles";
+
+export const simonCircuitState = (n, s) =>
+  [
+    ...Array.from({ length: n }, (_, q) => (st) => applySingleQubitGate(st, HADAMARD, q)),
+    (st) => applySimonOracle(st, n, s),
+    ...Array.from({ length: n }, (_, q) => (st) => applySingleQubitGate(st, HADAMARD, q)),
+  ].reduce((st, step) => step(st), StateVector.zero(2 * n));
+
+export const simonInputDistribution = (n, s) =>
+  ((probs) =>
+    Array.from({ length: 2 ** n }, (_, z) =>
+      probs.slice(z * 2 ** n, z * 2 ** n + 2 ** n).reduce((a, b) => a + b, 0)
+    )
+  )(simonCircuitState(n, s).probabilities());
+
+export const dotMod2 = (z, s) => (z & s).toString(2).split("").filter((b) => b === "1").length % 2;
+
+export const workedN = 2;
+export const workedS = 1;
+export const workedDistribution = simonInputDistribution(workedN, workedS);
+
+export const simonN = 3;
+export const simonHiddenStrings = [1, 2, 3, 4, 5, 6, 7];
+export const simonDistributions = simonHiddenStrings.map((s) => simonInputDistribution(simonN, s));
+export const simonFrames = simonHiddenStrings.map((s, i) => ({
+  paramLabel: `s = ${s.toString(2).padStart(simonN, "0")}`,
+  bars: Array.from({ length: 2 ** simonN }, (_, z) => ({
+    label: `|${z.toString(2).padStart(simonN, "0")}⟩`,
+    value: simonDistributions[i][z],
+    highlight: dotMod2(z, s) === 0,
+    caption: `${(simonDistributions[i][z] * 100).toFixed(0)}%`,
+  })),
+}));
+
+export const lessonMeta = {
+  title: "Simon's Algorithm",
+  description:
+    "A hidden XOR-mask string s recovered from measurements that always land orthogonal to s, derived from the same H-oracle-H structure as Deutsch-Jozsa but with a genuinely 2-to-1 oracle, then solved via linear algebra over F₂ — the direct conceptual ancestor of Shor's period-finding.",
+  course: "quantum-algorithms-i",
+  module: "simons-algorithm",
+  order: 1,
+  difficulty: "advanced",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"],
+  objectives: [
+    "State Simon's promise problem: a genuinely 2-to-1 oracle f(x)=f(x⊕s) hiding a nonzero string s",
+    "Derive why every measurement of the input register lands on a z orthogonal to s (z·s≡0 mod 2), never on a random string",
+    "Explain how n−1 independent measured z's let you solve for s via linear algebra over F₂, and how this generalizes to Shor's period-finding",
+  ],
+};
+
+## Motivation
+
+Deutsch-Jozsa's speedup, for all its cleanness, settles a somewhat
+contrived promise (constant vs. balanced) that a classical computer can
+still solve with a single query if you're willing to accept a small
+probability of error (guess a handful of random inputs; if $f$ were
+balanced, agreement across all of them is exponentially unlikely). Simon's
+problem doesn't have that escape hatch. Given $f:\{0,1\}^n\to\{0,1\}^n$
+*promised* to satisfy $f(x)=f(x\oplus s)$ for exactly one nonzero hidden
+string $s$, a genuinely **2-to-1** function, not merely balanced, finding
+$s$ classically requires $\Theta(2^{n/2})$ queries even with randomization
+allowed (the birthday-paradox bound: you need to query enough random
+inputs that two of them are likely to collide on the same output). The
+quantum algorithm below finds $s$ with high probability using only $O(n)$
+queries. That's a genuine, unconditional exponential separation between
+quantum and randomized classical query complexity, the first algorithm to
+show one, and its circuit shape is exactly the template Shor's algorithm
+scales up next: Hadamards, one oracle call, Hadamards again, then reading
+off something tied to a hidden algebraic object.
+
+## Mathematical Development
+
+### The oracle and the promise
+
+$f$ hides a nonzero string $s\in\{0,1\}^n$: $f(x)=f(x')$ if and only if
+$x'=x$ or $x'=x\oplus s$. This platform's `applySimonOracle(state,
+inputQubits, hiddenString)` implements exactly this, using
+$f(x)=\min(x,\,x\oplus s)$ as the concrete construction: since $s\neq0$,
+XOR-by-$s$ pairs up every $x$ with a distinct partner $x\oplus s\neq x$,
+partitioning all $2^n$ inputs into $2^{n-1}$ disjoint pairs
+$\{x,x\oplus s\}$, and taking the smaller element of each pair as that
+pair's shared output value is constant within a pair and different across
+pairs: genuinely 2-to-1, not just balanced.
+
+### The circuit
+
+Prepare an $n$-qubit input register and an $n$-qubit output register, both
+at $|0\rangle$. Apply $H^{\otimes n}$ to the input register only, giving
+the uniform superposition there. Apply the oracle: $|x\rangle|0\rangle\to
+|x\rangle|f(x)\rangle$. Apply $H^{\otimes n}$ to the input register again.
+Measure the input register.
+
+### Why every measured z is orthogonal to s
+
+After the oracle, the joint state is
+$\frac{1}{\sqrt{2^n}}\sum_x|x\rangle|f(x)\rangle$. Applying $H^{\otimes n}$
+to the input register, using the same identity from the Deutsch-Jozsa
+lesson, $H^{\otimes n}|x\rangle=\frac{1}{\sqrt{2^n}}\sum_z(-1)^{x\cdot
+z}|z\rangle$, gives
+
+$$
+\frac{1}{2^n}\sum_z\sum_x(-1)^{x\cdot z}\,|z\rangle|f(x)\rangle
+$$
+
+Group the inner sum by pairs $\{x,\,x\oplus s\}$ that share an output
+value. For a fixed $z$, the two terms in a pair contribute
+$(-1)^{x\cdot z}+(-1)^{(x\oplus s)\cdot z}$. Since $(x\oplus s)\cdot
+z\equiv x\cdot z+s\cdot z\pmod2$, this is
+$(-1)^{x\cdot z}\left[1+(-1)^{s\cdot z}\right]$: exactly $2\cdot(-1)^{x\cdot
+z}$ when $s\cdot z\equiv0\pmod2$ (the two terms interfere
+constructively), and exactly $0$ when $s\cdot z\equiv1\pmod2$ (they cancel
+perfectly). So every pair contributes nothing at all to any $z$ with
+$s\cdot z=1$, and the total amplitude on $|z\rangle$ is identically zero
+there:
+
+$$
+\boxed{P(z)>0 \implies z\cdot s\equiv0\pmod2}
+$$
+
+Summing the surviving amplitudes across all $2^{n-1}$ pairs shows the
+nonzero probability is spread *uniformly* over exactly the $2^{n-1}$
+strings orthogonal to $s$, each with probability $1/2^{n-1}$, never on
+any string that isn't orthogonal to $s$, and never concentrated on just
+one of them. Checked directly against the engine: for $n=2$, $s=01$,
+`simonInputDistribution(2, 1)` gives probability exactly $0.5$ at $z=00$
+and $z=10$ (both orthogonal to $s=01$), and exactly $0$ at $z=01$ and
+$z=11$:
+
+<BarChart
+  bars={[
+    { label: "|00⟩", value: workedDistribution[0], highlight: true, caption: `${(workedDistribution[0] * 100).toFixed(0)}%` },
+    { label: "|01⟩", value: workedDistribution[1], caption: `${(workedDistribution[1] * 100).toFixed(0)}%` },
+    { label: "|10⟩", value: workedDistribution[2], highlight: true, caption: `${(workedDistribution[2] * 100).toFixed(0)}%` },
+    { label: "|11⟩", value: workedDistribution[3], caption: `${(workedDistribution[3] * 100).toFixed(0)}%` },
+  ]}
+  ariaLabel="Measurement probability of the input register for n=2, hidden string s=01, showing nonzero probability only on the two strings orthogonal to s"
+  maxValue={0.5}
+/>
+
+This holds for every nonzero hidden string, not just this one. Sweeping
+$s$ over all seven nonzero 3-bit strings, run through the exact same
+circuit:
+
+<InteractiveSection
+  title="Every hidden string, same orthogonal pattern"
+  description="Step through every nonzero 3-bit hidden string s. For each one, the bar chart shows the real measured distribution over the input register after H, the oracle, H again: exactly the four strings z orthogonal to s (z·s ≡ 0 mod 2, highlighted) get nonzero probability, each landing at exactly 1/4, and every non-orthogonal z reads exactly zero, no matter which s defines the oracle."
+>
+  <BarChartExplorer
+    frames={simonFrames}
+    sliderLabel="hidden string s"
+    ariaLabel="Measurement probability distribution over the input register for every nonzero 3-bit hidden string s, showing nonzero probability only on strings orthogonal to s"
+    maxValue={0.25}
+  />
+</InteractiveSection>
+
+Every one of the seven sweeps lands probability exactly $1/4$ on exactly
+the four $z$'s orthogonal to that $s$, and exactly $0$ everywhere else.
+This is the boxed result above, not just for one convenient example.
+
+### Solving for s: linear algebra over F₂
+
+A single run gives one constraint: $z\cdot s\equiv0\pmod2$, a linear
+equation over the field $\mathbb{F}_2=\{0,1\}$ (addition and
+multiplication mod 2). One equation doesn't pin down $s$: the solution
+set of a single homogeneous equation in $n$ unknowns over $\mathbb{F}_2$
+is an $(n-1)$-dimensional subspace, generally many candidate strings. But
+each independent run gives another, independent constraint (as long as
+$z\neq0$: the all-zeros string satisfies $0\cdot s=0$ for *every* $s$, so
+it's the one measurement outcome that teaches you nothing. Discard it and
+measure again). Once you've collected $n-1$ measured strings
+$z_1,\dots,z_{n-1}$ that are linearly independent over $\mathbb{F}_2$,
+their span is an $(n-1)$-dimensional subspace of $\mathbb{F}_2^n$, and the
+set of vectors orthogonal to *all* of them (the orthogonal complement) is
+exactly 1-dimensional: $\{0,\,s\}$. Solving the resulting linear system by
+Gaussian elimination mod 2 (a standard, purely classical computation) then
+recovers $s$ directly, discarding the trivial all-zeros solution. This
+platform doesn't reimplement Gaussian elimination mod 2; the worked
+example below solves a small enough system by inspection instead, to keep
+the mechanism honest without reimplementing a standard linear-algebra
+routine.
+
+## Physical Interpretation
+
+The mechanism is identical in shape to Deutsch-Jozsa's: two Hadamard
+layers around one oracle call, interference doing all the work, nothing
+about any individual $f(x)$ ever learned. What's different is what
+interference reveals. Deutsch-Jozsa's oracle hid a single global bit
+(constant vs. balanced), extracted as a yes/no answer from the amplitude
+on one basis state. Simon's oracle hides an entire string $s\in
+\mathbb{F}_2^n$, and interference can't hand you $s$ directly in one shot.
+What it hands you, every single run, is one linear constraint on $s$.
+The quantum speedup is in how *cheaply* those constraints arrive (one
+oracle call per constraint, versus the classical cost of finding even one
+colliding pair by chance); assembling them into $s$ is honest, unglamorous
+classical linear algebra, exactly the same "quantum finds structure,
+classical post-processing finishes the job" division of labor Shor's
+algorithm uses next.
+
+## Worked Example
+
+**For $n=2$, hidden string $s=01$: list $f$, confirm the 2-to-1 property,
+and confirm the predicted measurement outcomes.**
+
+$f(x)=\min(x,x\oplus s)$: $f(00)=\min(00,01)=00$, $f(01)=\min(01,00)=00$,
+$f(10)=\min(10,11)=10$, $f(11)=\min(11,10)=10$. Two distinct output
+values, $00$ and $10$, each hit by exactly two inputs
+($\{00,01\}\to00$ and $\{10,11\}\to10$): genuinely 2-to-1, and $f(x)=f(x
+\oplus s)$ holds for all four $x$ by construction.
+
+Predicted measurement outcomes: $z$ orthogonal to $s=01$ means $z\cdot
+s=z_1\equiv0\pmod2$ (the second bit of $z$ is 0), so $z\in\{00,10\}$, each
+with probability $1/2^{n-1}=1/2$. This matches `simonInputDistribution(2,
+1)` exactly, shown above: $0.5$ at $z=00$ and $z=10$, $0$ elsewhere. With
+$n=2$, a single nonzero measured $z$ (here $z=10$, since $z=00$ is
+uninformative) already gives $n-1=1$ independent constraint,
+$z\cdot s=0$, i.e. $s_1=0$; combined with the promise that $s\neq00$, the
+only possibility left is $s=01$, recovering the hidden string from one
+useful run.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating Simon's separation as "the same kind of speedup as
+Deutsch-Jozsa, just bigger."** Deutsch-Jozsa's exact, single-query
+advantage disappears if the classical algorithm is allowed a small
+probability of error. Simon's $\Theta(2^{n/2})$-vs-$O(n)$ gap holds even
+against randomized classical algorithms, a genuinely different, stronger
+kind of separation, and the reason this algorithm (not Deutsch-Jozsa) is
+usually credited as the first real hint that quantum computers could be
+exponentially more powerful.
+</Callout>
+
+<Callout type="mistake">
+**Expecting a single run to reveal $s$.** One run gives one linear
+constraint on $s$, not $s$ itself. It takes roughly $n-1$ independent
+(nonzero, linearly independent) runs plus a classical linear-algebra
+solve to pin $s$ down. The quantum part supplies cheap constraints, but it
+doesn't hand you the answer directly.
+</Callout>
+
+## Practice Questions
+
+1. For $n=2$, $s=10$: compute $f(x)=\min(x,x\oplus s)$ for all four
+   inputs and confirm the 2-to-1 property directly, the same way the
+   worked example did for $s=01$.
+2. Using that same $s=10$, determine which of $z\in\{00,01,10,11\}$
+   satisfy $z\cdot s\equiv0\pmod2$, and predict which entries of
+   `simonInputDistribution(2, 2)` should be nonzero.
+3. Why does measuring $z=0\cdots0$ (the all-zeros string) never provide
+   any information about $s$, no matter what $s$ is?
+4. Once you've collected $n-1$ linearly independent nonzero measured
+   $z_i$'s, describe in words (no need for full Gaussian elimination) why
+   their orthogonal complement in $\mathbb{F}_2^n$ contains exactly one
+   nonzero vector, and why that vector must be $s$.
+5. Deutsch-Jozsa's classical query complexity is $2^{n-1}+1$ in the
+   worst case but $O(1)$ with randomization and bounded error. Simon's is
+   $\Theta(2^{n/2})$ even with randomization. Explain, in your own words,
+   why this makes Simon's quantum-classical gap a different *kind* of
+   result, not just a bigger number.
+
+## Summary
+
+- Simon's oracle hides a nonzero string $s$ via $f(x)=f(x\oplus s)$, a
+  genuinely 2-to-1 promise, implemented here as `applySimonOracle` via
+  $f(x)=\min(x,x\oplus s)$, hand-verified 2-to-1 for $n=2$, $s=01$ above.
+- Running $H^{\otimes n}$, the oracle, $H^{\otimes n}$ again, and
+  measuring the input register always lands on some $z$ with
+  $z\cdot s\equiv0\pmod2$, derived from pairwise constructive/destructive
+  interference, and checked exactly against the engine for every nonzero
+  3-bit $s$.
+- Each measured $z$ is one linear constraint on $s$ over $\mathbb{F}_2$;
+  $n-1$ independent nonzero constraints pin $s$ down uniquely via
+  classical linear algebra.
+- This is a genuine, unconditional exponential separation from randomized
+  classical query complexity ($\Theta(2^{n/2})$ vs. $O(n)$), not merely
+  an exact-vs-probabilistic distinction like Deutsch-Jozsa's.
+- The same shape is exactly what Shor's algorithm scales up next:
+  Hadamards around an oracle revealing a hidden algebraic structure via
+  interference, finished off by classical post-processing, generalizing
+  from XOR-periodicity over $\mathbb{F}_2^n$ (a hidden *additive* shift,
+  found via ordinary Hadamards) to genuine modular periodicity (a hidden
+  *multiplicative* period, found via the QFT).
+
+## Further Exploration
+
+Next, in Quantum Algorithms II: [Shor's Algorithm: Factoring via Period
+Finding](/lessons/quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding), where the same "interference reveals a hidden algebraic
+structure, classical post-processing finishes the job" template
+reappears, generalized from Simon's finite hidden string over
+$\mathbb{F}_2^n$ to a genuine hidden period of $a^x\bmod N$ over the
+integers.

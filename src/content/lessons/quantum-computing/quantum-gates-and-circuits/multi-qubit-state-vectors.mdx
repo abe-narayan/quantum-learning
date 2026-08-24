@@ -1,6 +1,7 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -123,6 +124,17 @@ limitation of notation. It reflects something genuinely different about
 how the system behaves, with consequences (starting next lesson) for what
 happens when you measure just one of the two qubits.
 
+## Interactive Experiment
+
+The factorability check above, matching coefficients and hunting for a
+contradiction, is exactly what the platform's real separability check
+computes for any 2-qubit state. Confirm both directions: a state that
+factors, and one that provably doesn't.
+
+<InteractiveSection title="Check factorability by computation, not just algebra" description="Initialize |++⟩ and read the state panel's Product state / Entangled indicator: Product state, since |+⟩⊗|+⟩ factors by construction. Then run the Create a Bell state guided walkthrough (H on qubit 0, then CNOT) and check the same indicator: Entangled, confirming by direct computation exactly what the coefficient-matching proof above showed algebraically for this state.">
+  <LazyTwoQubitExplorer />
+</InteractiveSection>
+
 ## Worked Example
 
 **Does $\frac{1}{\sqrt2}(|00\rangle + |01\rangle)$ factor as a product
@@ -185,6 +197,6 @@ or look for a contradiction the way the Bell-numerator proof does.
 
 ## Further Exploration
 
-Next: **Quantum Circuit Notation**, the diagrams used to describe
-multi-qubit operations, then **Controlled Gates and CNOT**, the specific
+Next: [Quantum Circuit Notation](/lessons/quantum-computing/quantum-gates-and-circuits/quantum-circuit-notation), the diagrams used to describe
+multi-qubit operations, then [Controlled Gates and CNOT](/lessons/quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot), the specific
 gate that turns product states into entangled ones on purpose.

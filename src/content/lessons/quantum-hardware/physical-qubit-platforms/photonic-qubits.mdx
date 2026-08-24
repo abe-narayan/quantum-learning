@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/photonic-qubits"
@@ -47,6 +48,10 @@ the photon travels; a photon in a superposition of two paths is a
 qubit in superposition, directly realizing the same math this platform's
 `the-bloch-sphere` and interferometer-based lessons already built,
 now with an actual physical interferometer.
+
+<InteractiveSection title="The same qubit math, a different physical carrier" description="This is the exact same Bloch sphere from the-bloch-sphere lesson — nothing about the underlying math changes when the qubit is a photon's polarization or path instead of a trapped ion's spin or a superconducting circuit's charge. Apply a gate and measure; whatever state you land on is exactly as valid a photonic-qubit state as it was for every other platform.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ### (Nearly) no decoherence, but real loss
 
@@ -148,7 +153,7 @@ problem than anything the other platforms in this course face.
 
 ## Further Exploration
 
-Next: **Spin Qubits**, a solid-state platform that, unlike
+Next: [Spin Qubits](/lessons/quantum-hardware/physical-qubit-platforms/spin-qubits), a solid-state platform that, unlike
 superconducting circuits, encodes its qubit in something genuinely
 atomic: an electron or nuclear spin, embedded directly in a
 semiconductor.

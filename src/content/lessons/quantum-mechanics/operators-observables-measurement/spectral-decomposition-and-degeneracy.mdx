@@ -1,9 +1,35 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { projectorOntoSubspace } from "@/lib/quantum/projectors";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/spectral-decomposition-and-degeneracy"
 ).map((problem) => problem.meta);
+
+export const e0 = [new Complex(1), new Complex(0), new Complex(0)];
+export const e1 = [new Complex(0), new Complex(1), new Complex(0)];
+export const e2 = [new Complex(0), new Complex(0), new Complex(1)];
+export const p1 = projectorOntoSubspace([e0, e1]);
+export const p2 = projectorOntoSubspace([e2]);
+export const idempotencePresets = [
+  {
+    label: "P₁ (degenerate, rank 2)",
+    panels: [
+      { label: "P₁", cells: matrixToCells(p1), highlightDiagonal: true },
+      { label: "P₁²", cells: matrixToCells(p1.mul(p1)), highlightDiagonal: true }
+    ]
+  },
+  {
+    label: "P₂ (nondegenerate, rank 1)",
+    panels: [
+      { label: "P₂", cells: matrixToCells(p2), highlightDiagonal: true },
+      { label: "P₂²", cells: matrixToCells(p2.mul(p2)), highlightDiagonal: true }
+    ]
+  }
+];
 
 export const lessonMeta = {
   title: "Spectral Decomposition and Degeneracy",
@@ -132,6 +158,13 @@ $$
 matching $N$ exactly, confirming both projectors and the decomposition
 directly.
 
+<InteractiveSection title="Check idempotence for both projectors" description="Switch between P₁ (built from platform's real projectorOntoSubspace on N's 2-dimensional degenerate eigenspace) and P₂ (the ordinary rank-1 case). Both satisfy P² = P, confirmed by direct computation rather than the general proof alone.">
+  <MatrixGridExplorer
+    presets={idempotencePresets}
+    ariaLabel="Choose a projector to compare it against its own square, confirming both the degenerate and nondegenerate projectors are idempotent"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -180,7 +213,7 @@ projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
 
 ## Further Exploration
 
-Next: **Simultaneous Eigenstates and Compatible Observables**, using
+Next: [Simultaneous Eigenstates and Compatible Observables](/lessons/quantum-mechanics/operators-observables-measurement/simultaneous-eigenstates-and-compatible-observables), using
 projectors to prove exactly when two observables can share a common
 eigenbasis, and why that's the same condition as their commutator
 vanishing.

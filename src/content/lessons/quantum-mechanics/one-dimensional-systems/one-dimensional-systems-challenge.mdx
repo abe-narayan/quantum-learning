@@ -1,9 +1,24 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { barrierScatteringTransmission } from "@/lib/quantum/scattering";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/one-dimensional-systems/one-dimensional-systems-challenge"
 ).map((problem) => problem.meta);
+
+export const challengeBarrierWidth = 1.2825;
+export const challengeBarrierHeights = [1, 2, 3, 4];
+export const challengeEnergyRange = (v0) => Array.from({ length: 120 }, (_, i) => v0 + 0.05 + (i / 119) * 8);
+export const challengeTransmissionFrames = challengeBarrierHeights.map((v0) => ({
+  paramLabel: `V0 = ${v0}`,
+  series: [
+    {
+      label: "T(E)",
+      color: "brand",
+      points: challengeEnergyRange(v0).map((e) => ({ x: e, y: barrierScatteringTransmission(e, v0, challengeBarrierWidth) })),
+    },
+  ],
+}));
 
 export const lessonMeta = {
   title: "One-Dimensional Systems Challenge",
@@ -75,6 +90,18 @@ the same kind of impedance mismatch that produces step reflection, just
 computed for two boundaries instead of one. The resonance condition is a
 special, narrow enhancement layered on top of that baseline behavior,
 useful for predicting where $T$ peaks, not for a generic energy.
+
+<InteractiveSection
+  title="Slide V0, watch resonance peaks emerge"
+  description="Slide the barrier height V0 and watch the transmission curve T(E) develop resonance peaks touching exactly 1, the exact mechanism behind Worked Example 2's comparison between resonant and off-resonant energies."
+>
+  <ParametricCurve
+    frames={challengeTransmissionFrames}
+    sliderLabel="Barrier height V0"
+    referenceLines={[{ y: 1, label: "T = 1 (resonance)" }]}
+    ariaLabel="Transmission probability T versus energy E for a barrier of width 1.2825, as barrier height V0 varies from 1 to 4, showing resonance peaks reaching T=1 amid an off-resonance baseline"
+  />
+</InteractiveSection>
 
 **3. Both the finite well and the barrier ($E>V_0$) involve the *same*
 oscillatory-inside-a-region behavior. Why does one produce a discrete

@@ -21,7 +21,7 @@ export const bohrRadiusAgreementMeaning: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["most probable", "single most likely", "peak", "maximum"],
-      ["not", "does not mean", "no fixed orbit", "distribution", "any radius", "nonzero probability"],
+      ["does not mean", "no fixed orbit", "distribution", "any radius", "nonzero probability"],
     ],
     incorrectFeedback: "Address both sides explicitly: what the r=1 result IS (a statement about the peak of a probability distribution) and what it is NOT (a claim about a fixed orbital radius).",
     partialFeedback: "Good — make sure you also state that the electron has nonzero probability of being found at other radii too.",

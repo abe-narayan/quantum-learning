@@ -1,9 +1,26 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PAULI_X, PAULI_Y, HADAMARD } from "@/lib/quantum/gates";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge"
 ).map((problem) => problem.meta);
+
+export const involutionPreset = (label, matrix) => ({
+  label,
+  panels: [
+    { label: "M", cells: matrixToCells(matrix) },
+    { label: "M†", cells: matrixToCells(matrix.dagger()) },
+    { label: "M²", cells: matrixToCells(matrix.mul(matrix)), highlightDiagonal: true }
+  ]
+});
+export const involutionPresets = [
+  involutionPreset("Pauli-X", PAULI_X),
+  involutionPreset("Pauli-Y", PAULI_Y),
+  involutionPreset("Hadamard", HADAMARD)
+];
 
 export const lessonMeta = {
   title: "Mathematical Foundations Challenge",
@@ -60,6 +77,13 @@ necessarily. (Pauli-$X$ is the standard example: real, symmetric, and
 $X^2=I$.) This combines the Hermitian Operators lesson's adjoint
 definition with the Unitary Operators lesson's defining condition;
 neither lesson alone states this fact.
+
+<InteractiveSection title="Check M = M† = M⁻¹ across three operators" description="All three of these are both Hermitian (M = M†) and their own inverse (M² = I), the exact combination the synthesis argument above needs. Switch between them and confirm both properties hold for each.">
+  <MatrixGridExplorer
+    presets={involutionPresets}
+    ariaLabel="Choose an operator to check simultaneously that it equals its own conjugate transpose and that squaring it gives the identity matrix"
+  />
+</InteractiveSection>
 
 **2. A $2\times2$ Hermitian matrix has trace $5$ and determinant $6$. What
 are its eigenvalues, and are its eigenvectors necessarily orthogonal?**

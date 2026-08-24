@@ -105,7 +105,7 @@ export function CircuitDiagram({
             <g
               key={col}
               opacity={opacity}
-              className="cursor-pointer"
+              className="cursor-pointer rounded outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
               role="button"
               tabIndex={0}
               aria-label={`Jump to right after ${instr.gate} on qubits ${a} and ${b}`}

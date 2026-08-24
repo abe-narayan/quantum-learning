@@ -94,13 +94,9 @@ about $|s\rangle$, and composing two reflections is always a rotation.
 The next lesson makes this rotation picture exact and uses it to derive
 Grover's $O(\sqrt N)$ query count directly.
 
-Step through a few full iterations below (each step applies the oracle
-and diffusion together, exactly as `groverIteration` does) and watch the
-marked bar grow while the others shrink. Try a small N first: with N=4
-you should see the marked state's probability jump close to 1 in a
-single step.
-
-<LazyGroverExplorer />
+<InteractiveSection title="Watch the marked bar grow" description={`Step through a few full iterations below (each step applies the oracle and diffusion together, exactly as groverIteration does) and watch the marked bar grow while the others shrink. Try a small N first: with N=4 you should see the marked state's probability jump close to 1 in a single step.`}>
+  <LazyGroverExplorer />
+</InteractiveSection>
 
 ## Worked Example
 
@@ -162,6 +158,6 @@ what an outcome-only test cannot.
 
 ## Further Exploration
 
-Next: **Grover's Algorithm: Amplitude Amplification**, which composes the
+Next: [Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification), which composes the
 oracle and diffusion operator into a rotation and derives the exact,
 closed-form optimal number of iterations.

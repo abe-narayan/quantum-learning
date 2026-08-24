@@ -11,6 +11,20 @@ export const wkbGrid = createGrid(256, 0.025);
 export const wkbEnergy = 1.5; // n=1: E=(n+1/2)ħω
 export const wkbTurningPoint = Math.sqrt(2 * wkbEnergy); // E = x^2/2 => x = sqrt(2E)
 
+export const wkbPotentialArray = harmonicOscillatorPotential(wkbGrid, 1, 1);
+export const wkbNs = [0, 1, 2, 3];
+export const wkbEnergyForN = (n) => n + 0.5; // E_n=(n+1/2)ħω, ħ=ω=1, same convention as wkbEnergy above
+
+export const wkbMomentumPointsForEnergy = (energy) => wkbGrid.x
+  .map((x, i) => ({ x, gap: energy - wkbPotentialArray[i] }))
+  .filter((p) => p.gap > 0)
+  .map((p) => ({ x: p.x, y: Math.sqrt(2 * p.gap) }));
+
+export const wkbMomentumFrames = wkbNs.map((n) => ({
+  paramLabel: `n = ${n}, E = ${wkbEnergyForN(n).toFixed(1)}`,
+  series: [{ label: "p(x) = √(2(E−V(x)))", color: "brand", points: wkbMomentumPointsForEnergy(wkbEnergyForN(n)) }]
+}));
+
 export const lessonMeta = {
   title: "The WKB Approximation",
   description:
@@ -116,6 +130,24 @@ small residual differences are pure grid-resolution numerical error in
 the Riemann-sum action integral and bisection, not a limitation of WKB
 itself: WKB is mathematically exact for the harmonic oscillator).
 
+The table's four energies are exactly the ones the action integral
+$\int_{x_1}^{x_2}p(x)dx$ is evaluated over. Watching the local classical
+momentum $p(x)=\sqrt{2(E-V(x))}$ itself, across only the classically
+allowed region, shows directly why higher $n$ means a bigger action
+integral: both the region's width (the turning points) and the peak
+momentum grow together.
+
+<InteractiveSection
+  title="Step through n, watch the action integral grow"
+  description="Step through the energy level n = 0 to 3, the same four levels as the table above. Each curve is the local classical momentum p(x), computed from the same harmonic oscillator potential, but shown only across the classically allowed region. Watch the turning points spread apart and the peak momentum grow as n increases — that growing area under the curve is exactly the action integral the quantization condition sets equal to (n+½)πħ."
+>
+  <ParametricCurve
+    frames={wkbMomentumFrames}
+    sliderLabel="Energy level n"
+    ariaLabel="Classical momentum p(x) across the classically allowed region, for the harmonic oscillator's n=0 through n=3 energy levels"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -167,7 +199,7 @@ points is not optional bookkeeping.
 
 ## Further Exploration
 
-Next: **Time-Dependent Perturbation Theory**, which asks a different
+Next: [Time-Dependent Perturbation Theory](/lessons/quantum-mechanics/approximation-methods/time-dependent-perturbation-theory), which asks a different
 question entirely: not "what is the corrected energy," but "given a
 small time-dependent nudge, what's the probability of a transition
 between states?"

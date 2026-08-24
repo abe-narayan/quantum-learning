@@ -86,7 +86,7 @@ export function RabiExplorer() {
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
             <p className="mb-2 text-xs font-medium text-muted-foreground">Population of |1⟩ over time</p>
-            <PopulationCurve samples={populationSamples} tMax={tMax} currentT={current.t} />
+            <PopulationCurve samples={populationSamples} tMax={tMax} currentT={current.t} currentP1={p1} />
           </div>
           <div>
             <p className="mb-2 text-xs font-medium text-muted-foreground">Bloch-sphere trajectory (drag to rotate)</p>

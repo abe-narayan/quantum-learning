@@ -1,15 +1,28 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"
 ).map((problem) => problem.meta);
 
-export const csDemoU = { x: 3, y: 1 };
 export const csDemoV = { x: 1, y: 2 };
-export const csDemoC = (csDemoV.x * csDemoU.x + csDemoV.y * csDemoU.y) / (csDemoV.x * csDemoV.x + csDemoV.y * csDemoV.y);
-export const csDemoCV = { x: csDemoC * csDemoV.x, y: csDemoC * csDemoV.y };
-export const csDemoW = { x: csDemoU.x - csDemoCV.x, y: csDemoU.y - csDemoCV.y };
+export const csDemoU = (angleDeg) => ({
+  x: 3.16 * Math.cos((angleDeg * Math.PI) / 180),
+  y: 3.16 * Math.sin((angleDeg * Math.PI) / 180)
+});
+export const csDemoProj = (angleDeg) =>
+  (csDemoV.x * csDemoU(angleDeg).x + csDemoV.y * csDemoU(angleDeg).y) / (csDemoV.x * csDemoV.x + csDemoV.y * csDemoV.y);
+export const csDemoCV = (angleDeg) => ({ x: csDemoProj(angleDeg) * csDemoV.x, y: csDemoProj(angleDeg) * csDemoV.y });
+export const csDemoFrame = (angleDeg) => ({
+  paramLabel: `u at ${angleDeg}°`,
+  vectors: [
+    { label: "v", x: csDemoV.x, y: csDemoV.y, color: "muted" },
+    { label: "u", x: csDemoU(angleDeg).x, y: csDemoU(angleDeg).y, color: "brand" },
+    { label: "cv", x: csDemoCV(angleDeg).x, y: csDemoCV(angleDeg).y, color: "accent" },
+    { label: "w = u − cv", x: csDemoU(angleDeg).x, y: csDemoU(angleDeg).y, from: csDemoCV(angleDeg), color: "foreground", dashed: true }
+  ]
+});
 
 export const lessonMeta = {
   title: "Inner Products and Orthogonality",
@@ -155,15 +168,13 @@ $w=u-cv=(2,-1)$. Drawing $w$ starting at $cv$'s tip and ending at $u$'s
 tip shows the whole construction at once: $cv$ is $u$'s shadow along $v$,
 and $w$ is what's left over, sitting at a right angle to $v$.
 
-<VectorDiagram
-  vectors={[
-    { label: "v", x: csDemoV.x, y: csDemoV.y, color: "muted" },
-    { label: "u", x: csDemoU.x, y: csDemoU.y, color: "brand" },
-    { label: "cv", x: csDemoCV.x, y: csDemoCV.y, color: "accent" },
-    { label: "w = u − cv", x: csDemoU.x, y: csDemoU.y, from: { x: csDemoCV.x, y: csDemoCV.y }, color: "foreground", dashed: true }
-  ]}
-  ariaLabel="Vector diagram showing u decomposed into cv, the projection along v, plus w, the leftover piece orthogonal to v"
-/>
+<InteractiveSection title="Watch w stay perpendicular to v" description="v is fixed. Drag the slider to spin u all the way around. cv (u's shadow along v) and w = u - cv update live — confirm w stays at a right angle to v for every angle, exactly as the Cauchy-Schwarz derivation guarantees.">
+  <VectorDiagramExplorer
+    frames={Array.from({ length: 36 }, (_, i) => csDemoFrame(i * 10))}
+    sliderLabel="Angle of u"
+    ariaLabel="A vector u sweeping through every angle, decomposed live into cv, the projection along the fixed vector v, plus w, the leftover piece orthogonal to v"
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 
@@ -236,6 +247,6 @@ for the opposite convention when reading other sources.
 
 ## Further Exploration
 
-Next: **The Bra-Ket Formalism**, which gives this exact inner-product
+Next: [The Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism), which gives this exact inner-product
 structure a compact, standard notation: bras, kets, outer products, and
 the completeness relation, used throughout the rest of quantum mechanics.

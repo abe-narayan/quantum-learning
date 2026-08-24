@@ -8,6 +8,16 @@ export const practiceProblems = getProblemsForLesson(
 export const workedExamplePPlus = Math.cos(Math.PI / 6) ** 2;
 export const workedExamplePMinus = Math.sin(Math.PI / 6) ** 2;
 
+export const postulatesFrame = (thetaDeg) => ({
+  paramLabel: `θ = ${thetaDeg}°, ⟨A⟩ = ${Math.cos((2 * thetaDeg * Math.PI) / 180).toFixed(2)}`,
+  bars: [
+    { label: "P(+1)", value: Math.cos((thetaDeg * Math.PI) / 180) ** 2, highlight: Math.abs(thetaDeg - 30) < 0.5 },
+    { label: "P(-1)", value: Math.sin((thetaDeg * Math.PI) / 180) ** 2 },
+  ],
+});
+
+export const postulatesFrames = Array.from({ length: 19 }, (_, i) => postulatesFrame(i * 5));
+
 export const lessonMeta = {
   title: "The Postulates of Quantum Mechanics",
   description:
@@ -152,6 +162,15 @@ $\langle A\rangle = (+1)(\tfrac34)+(-1)(\tfrac14)=\tfrac12$.
 A $3:1$ split, visible at a glance, exactly matching the $\cos^2(\pi/6):\sin^2(\pi/6)$
 ratio the algebra above predicts.
 
+<InteractiveSection title="Slide θ, watch the split move" description="The worked example fixed θ = π/6 = 30°. Drag θ from 0° to 90° and watch P(+1) = cos²θ and P(-1) = sin²θ recompute live, always summing to 1, with the 30° worked-example point marked.">
+  <BarChartExplorer
+    frames={postulatesFrames}
+    sliderLabel="θ (degrees)"
+    ariaLabel="P(+1) and P(-1) recomputed live as theta varies from 0 to 90 degrees, with the 30-degree worked example highlighted"
+    maxValue={1}
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -200,7 +219,7 @@ state, even though they look different as vectors.
 
 ## Further Exploration
 
-Next: **Expectation Values and Uncertainty**, which uses the postulates
+Next: [Expectation Values and Uncertainty](/lessons/quantum-mechanics/classical-to-quantum/expectation-values-and-uncertainty), which uses the postulates
 just stated to derive the general uncertainty relation between any two
 observables, the precise mathematical reason position and momentum can
 never both be perfectly definite at once.

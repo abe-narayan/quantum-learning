@@ -58,7 +58,7 @@ active error correction, not just "more qubits."
 The table samples three values of $N$; the full curve makes the decay's
 shape, and how differently each fidelity ages, visible directly:
 
-<InteractiveSection description="Step through the fidelity values from 95% up to 99.99%. At each one, watch how far along the x-axis the curve survives before collapsing toward zero. The gap between 99% and 99.9% is enormous, even though both round to 'about 99%.'">
+<InteractiveSection title="Step through per-gate fidelities from 95% to 99.99%" description="Step through the fidelity values from 95% up to 99.99%. At each one, watch how far along the x-axis the curve survives before collapsing toward zero. The gap between 99% and 99.9% is enormous, even though both round to 'about 99%.'">
   <ParametricCurve
     frames={FIDELITIES.map((fidelity) => ({
       paramLabel: `p = ${(fidelity * 100).toFixed(2)}%`,
@@ -164,7 +164,7 @@ probability actually requires.
 
 ## Further Exploration
 
-Next: **Roadmaps to Fault Tolerance**, which closes this course by
+Next: [Roadmaps to Fault Tolerance](/lessons/quantum-hardware/noise-decoherence-and-scaling/roadmaps-to-fault-tolerance), which closes this course by
 connecting every error source covered so far to the concrete overhead
 numbers (physical qubits per logical qubit) that real fault-tolerant
 quantum computing roadmaps target.

@@ -2,12 +2,36 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { StateVector } from "@/lib/quantum/state";
 import { quantumFourierTransform } from "@/lib/quantum/qft";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform"
 ).map((problem) => problem.meta);
 
 export const qftOfOne = quantumFourierTransform(StateVector.basis(2, 1));
+
+export const qftSweepJ = [0, 1, 2, 3];
+
+export const qftSweepStates = qftSweepJ.map((j) => quantumFourierTransform(StateVector.basis(2, j)));
+
+export const qftSweepRealFrames = qftSweepJ.map((j, i) => ({
+  paramLabel: `j = ${j} (|${qftSweepStates[i].basisLabel(j)}⟩ in)`,
+  bars: qftSweepStates[i].amplitudes.map((amp, k) => ({
+    label: `|${qftSweepStates[i].basisLabel(k)}⟩`,
+    value: amp.re,
+    caption: amp.re.toFixed(3),
+  })),
+}));
+
+export const qftSweepImagFrames = qftSweepJ.map((j, i) => ({
+  paramLabel: `j = ${j} (|${qftSweepStates[i].basisLabel(j)}⟩ in)`,
+  bars: qftSweepStates[i].amplitudes.map((amp, k) => ({
+    label: `|${qftSweepStates[i].basisLabel(k)}⟩`,
+    value: amp.im,
+    caption: amp.im.toFixed(3),
+  })),
+}));
 
 export const lessonMeta = {
   title: "The Quantum Fourier Transform",
@@ -130,6 +154,40 @@ in every one of the eight bars above, only four of which are nonzero at a
 time), but the phase steps by exactly $90°$ from one basis state to the
 next, precisely $e^{2\pi i(1)k/4}$ for $k=0,1,2,3$.
 
+### Sweeping which basis state gets transformed
+
+$j=1$ above is one of four possible 2-qubit inputs. The same
+`quantumFourierTransform` call, run on each of the other three basis
+states, produces a different evenly-spaced phase fan every time, all real
+output from the engine:
+
+<InteractiveSection
+  title="Same magnitude, a different phase fan each time"
+  description="Scrub j from 0 to 3 to change which basis state gets transformed. Watch the real and imaginary parts of the four output amplitudes below: every magnitude stays exactly 0.5, but the phase step from one basis state to the next changes with j, matching e to the 2 pi i j k over 4 exactly."
+>
+  <div className="space-y-4">
+    <BarChartExplorer
+      frames={qftSweepRealFrames}
+      sliderLabel="Input basis state j"
+      ariaLabel="Real part of each output amplitude of the quantum Fourier transform, as the input basis state j sweeps from 0 to 3"
+      maxValue={0.5}
+    />
+    <BarChartExplorer
+      frames={qftSweepImagFrames}
+      sliderLabel="Input basis state j"
+      ariaLabel="Imaginary part of each output amplitude of the quantum Fourier transform, as the input basis state j sweeps from 0 to 3"
+      maxValue={0.5}
+    />
+  </div>
+</InteractiveSection>
+
+At $j=0$ every amplitude is real and positive (the uniform superposition,
+Practice Question 2 below); at $j=1$ the phase fan above appears; at $j=2$
+the phase alternates by $180°$ each step (real, alternating sign, zero
+imaginary part); at $j=3$ the fan reappears running the opposite direction.
+Every one of these four patterns is the same formula,
+$e^{2\pi ijk/4}$, evaluated at a different $j$, not four separate facts.
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -174,5 +232,5 @@ this lesson's worked example relies on.
 
 ## Further Exploration
 
-Next: **Quantum Phase Estimation**, which uses the QFT's inverse as its
+Next: [Quantum Phase Estimation](/lessons/quantum-computing/quantum-algorithms-i/quantum-phase-estimation), which uses the QFT's inverse as its
 final step to read a unitary's eigenphase directly out of a register.

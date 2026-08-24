@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/spin-qubits"
@@ -69,6 +70,17 @@ magnetically at speeds closer to superconducting qubits' nanosecond
 scale than trapped ions' microsecond scale, a genuinely different
 point in the coherence/speed tradeoff space than either platform already
 covered.
+
+Driving a spin electrically or magnetically is, physically, the
+original context the two-level Rabi problem was built for (electron/
+nuclear spin resonance): an oscillating field resonant with the
+$|\!\uparrow\rangle$-$|\!\downarrow\rangle$ energy gap rotates the spin
+exactly the way a microwave tone rotates a superconducting qubit or a
+laser rotates a trapped ion's internal state.
+
+<InteractiveSection title="Drive a spin at resonance" description="Set detuning to zero and vary the coupling strength V, playing the role of the driving field's Rabi frequency: watch the population sweep from spin-down to spin-up and back at t_π=π/(2V), the same spin-resonance physics that gives this platform its gates. Move detuning away from zero and see the achievable population drop below 1, exactly what happens when the drive frequency misses the spin's actual resonance.">
+  <LazyRabiExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 
@@ -141,5 +153,5 @@ coherence and control.
 
 ## Further Exploration
 
-Next: **Capstone: Comparing Qubit Platforms**, which puts all five
+Next: [Capstone: Comparing Qubit Platforms](/lessons/quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms), which puts all five
 platforms side by side on the same axes, rather than one at a time.

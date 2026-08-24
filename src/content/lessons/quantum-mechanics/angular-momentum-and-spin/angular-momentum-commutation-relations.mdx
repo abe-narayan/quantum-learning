@@ -1,9 +1,33 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
+import { Complex } from "@/lib/quantum/complex";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/angular-momentum-and-spin/angular-momentum-commutation-relations"
 ).map((problem) => problem.meta);
+
+export const commCommutator = (j) => angularMomentumX(j)
+  .mul(angularMomentumY(j))
+  .add(angularMomentumY(j).mul(angularMomentumX(j)).scale(-1));
+
+export const commIJz = (j) => angularMomentumZ(j).scale(new Complex(0, 1));
+
+export const commJLabel = (j) => (j === 0.5 ? "j = 1/2" : j === 1.5 ? "j = 3/2" : `j = ${j}`);
+
+export const commPresetForJ = (j) => ({
+  label: commJLabel(j),
+  panels: [
+    { label: "Jx", cells: matrixToCells(angularMomentumX(j)) },
+    { label: "Jy", cells: matrixToCells(angularMomentumY(j)) },
+    { label: "[Jx,Jy] = JxJy − JyJx", cells: matrixToCells(commCommutator(j)), highlightDiagonal: true },
+    { label: "iJz (ħ=1)", cells: matrixToCells(commIJz(j)), highlightDiagonal: true }
+  ]
+});
+
+export const commJValues = [0.5, 1, 1.5, 2];
+export const commPresets = commJValues.map(commPresetForJ);
 
 export const lessonMeta = {
   title: "Angular Momentum Commutation Relations",
@@ -99,6 +123,16 @@ hand, confirming the same algebra holds for the abstract $J$ operators
 the rest of this course builds on (with $\hbar=1$ in this platform's
 convention).
 
+<InteractiveSection
+  title="Match [Jx,Jy] against iJz, entry by entry"
+  description="Pick a j value and compare [Jx,Jy], computed here by actually multiplying the real Jx and Jy matrices, against iJz side by side. They match exactly, entry by entry, for every j shown, not just the orbital case derived by hand above."
+>
+  <MatrixGridExplorer
+    presets={commPresets}
+    ariaLabel="The matrices Jx, Jy, their commutator JxJy minus JyJx, and iJz side by side, for several values of j, confirming the commutator equals iJz exactly"
+  />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 $[L_x,L_y]\neq0$ means $L_x$ and $L_y$ **cannot be simultaneously known
@@ -170,6 +204,6 @@ index order backward flips the sign.
 
 ## Further Exploration
 
-Next: **Ladder Operators and the Angular Momentum Spectrum**, which uses
+Next: [Ladder Operators and the Angular Momentum Spectrum](/lessons/quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum), which uses
 this commutation algebra alone (no wavefunctions, no calculus) to derive
 the entire quantized spectrum of angular momentum.

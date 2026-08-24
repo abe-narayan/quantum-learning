@@ -31,7 +31,6 @@ export function ComplexPlaneCanvas({ re, im }: { re: number; im: number }) {
     <svg
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       className="w-full max-w-xs"
-      role="img"
       aria-hidden="true"
     >
       {/* Unit circle */}

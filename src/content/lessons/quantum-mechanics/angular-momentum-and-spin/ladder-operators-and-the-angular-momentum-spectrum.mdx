@@ -1,9 +1,37 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { angularMomentumRaising } from "@/lib/quantum/angularMomentum";
+import { Complex } from "@/lib/quantum/complex";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum"
 ).map((problem) => problem.meta);
+
+export const ladderDim = (j) => Math.round(2 * j + 1);
+
+export const ladderBasisVector = (dim, index) =>
+  Array.from({ length: dim }, (_, i) => (i === index ? Complex.ONE : Complex.ZERO));
+
+export const ladderRaiseNorm = (j, mIndex) => Math.sqrt(
+  angularMomentumRaising(j)
+    .apply(ladderBasisVector(ladderDim(j), mIndex))
+    .reduce((acc, c) => acc + c.magnitudeSquared(), 0)
+);
+
+export const ladderMValues = (j) => Array.from({ length: ladderDim(j) }, (_, i) => j - i);
+
+export const ladderRaiseBarsForJ = (j) => ladderMValues(j).map((m, i) => ({
+  label: `m = ${m}`,
+  value: ladderRaiseNorm(j, i),
+  highlight: i === 0,
+  caption: ladderRaiseNorm(j, i).toFixed(2)
+}));
+
+export const ladderJValues = [0.5, 1, 1.5, 2];
+export const ladderFrames = ladderJValues.map((j) => ({
+  paramLabel: `j = ${j}`,
+  bars: ladderRaiseBarsForJ(j)
+}));
 
 export const lessonMeta = {
   title: "Ladder Operators and the Angular Momentum Spectrum",
@@ -90,6 +118,17 @@ bottom state. Both are checked directly, confirming the boundedness
 argument produces exactly the matrices this platform's engine
 independently builds from the raw matrix-element formula.
 
+<InteractiveSection
+  title="Watch J+ vanish exactly at the top rung"
+  description="Pick a j value. Each bar is the actual norm of J+ applied directly to that |j,m⟩ basis state, read off the real raising-operator matrix, not simulated. Every bar but the top one is nonzero (J+ successfully raises m by 1); the top-rung bar, m = j, is exactly zero, J+ annihilates it, precisely the boundedness argument above, made numeric."
+>
+  <BarChartExplorer
+    frames={ladderFrames}
+    sliderLabel="Total angular momentum j"
+    ariaLabel="Norm of J-plus applied to each basis state |j,m>, for m from the top rung down to the bottom rung, at several values of j"
+  />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 Nothing about *space* or *rotation* entered this derivation. It's pure
@@ -170,7 +209,7 @@ $J_z^2$'s own eigenvalue squared.
 
 ## Further Exploration
 
-Next: **Orbital Angular Momentum and Spherical Harmonics**, which shows
+Next: [Orbital Angular Momentum and Spherical Harmonics](/lessons/quantum-mechanics/angular-momentum-and-spin/orbital-angular-momentum-and-spherical-harmonics), which shows
 specifically why *orbital* angular momentum is restricted to integer $j$
 only. Half-integer orbital angular momentum, while allowed by this
 lesson's algebra alone, turns out to be physically excluded for a

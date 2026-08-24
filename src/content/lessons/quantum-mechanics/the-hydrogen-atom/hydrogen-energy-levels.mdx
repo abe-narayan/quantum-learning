@@ -11,6 +11,15 @@ export const hydrogenLevels = [1, 2, 3, 4, 5, 6].map((n) => ({
   energy: hydrogenEnergyLevel(n),
 }));
 
+export const hydrogenDegeneracyFrames = [1, 2, 3, 4, 5, 6].map((n) => ({
+  paramLabel: `n = ${n} (total n² = ${n * n})`,
+  bars: Array.from({ length: n }, (_, l) => ({
+    label: `l=${l}`,
+    value: 2 * l + 1,
+    caption: `${2 * l + 1}`,
+  })),
+}));
+
 export const lessonMeta = {
   title: "Hydrogen Energy Levels",
   description:
@@ -70,6 +79,17 @@ wavefunctions) share exactly the same energy. Combined with the $2l+1$
 degeneracy in $m$ from Angular Momentum & Spin, the total degeneracy of
 level $n$ is $n^2$ (summing $2l+1$ over $l=0,\ldots,n-1$, a direct
 algebra exercise, not a new physical input).
+
+<InteractiveSection
+  title="Slide n, watch the l shells stack to n²"
+  description="Slide n and watch each l shell's 2l+1 degeneracy stack up to the total n² degeneracy computed just above."
+>
+  <BarChartExplorer
+    frames={hydrogenDegeneracyFrames}
+    sliderLabel="Principal quantum number n"
+    ariaLabel="Bar chart of the degeneracy 2l+1 for each l value at fixed n, summing to the total n-squared degeneracy of hydrogen energy level n"
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 
@@ -148,7 +168,7 @@ implies.
 
 ## Further Exploration
 
-Next: **Orbitals & Quantum Numbers**, which combines the verified
+Next: [Orbitals & Quantum Numbers](/lessons/quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers), which combines the verified
 `radial1s`/`radial2s`/`radial2p` functions with Angular Momentum &
 Spin's $Y_l^m$ to build the actual 1s/2s/2p electron probability
 distributions.

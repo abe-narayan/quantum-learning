@@ -11,6 +11,19 @@ export const vEffL0 = effectivePotential(0);
 export const vEffL1 = effectivePotential(1);
 export const vEffL2 = effectivePotential(2);
 
+export const radialEffZoomGrid = Array(140).fill(0).map((_, i) => 0.5 + (i / 139) * 9.5);
+export const radialEffLValues = [0, 1, 2];
+export const radialEffFrames = radialEffLValues.map((l) => ({
+  paramLabel: `l = ${l}`,
+  series: [
+    {
+      label: "V_eff(r)",
+      color: "brand",
+      points: radialEffZoomGrid.map((r) => ({ x: r, y: -1 / r + (l * (l + 1)) / (2 * r * r) })),
+    },
+  ],
+}));
+
 export const lessonMeta = {
   title: "The Radial Equation",
   description:
@@ -127,6 +140,17 @@ of falling to $-\infty$, and the turn gets steeper as $l$ grows, exactly
 the repulsive barrier keeping higher-$l$ electrons away from the
 nucleus.
 
+<InteractiveSection
+  title="Slide l, watch the centrifugal barrier rise"
+  description="Slide l through 0, 1, and 2 and watch the centrifugal term lift the effective potential away from the bare Coulomb well — the same V_eff(r) formula plotted above, now scanned continuously through the values already shown."
+>
+  <ParametricCurve
+    frames={radialEffFrames}
+    sliderLabel="Angular momentum l"
+    ariaLabel="Effective potential negative one over r plus l times l plus one over two r squared, for l equals 0, 1, and 2, over r from 0.5 to 10"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -174,5 +198,5 @@ behavior.
 
 ## Further Exploration
 
-Next: **Hydrogen Energy Levels**, which solves this radial equation for
+Next: [Hydrogen Energy Levels](/lessons/quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels), which solves this radial equation for
 the Coulomb potential specifically, deriving $E_n=-13.6\text{ eV}/n^2$.

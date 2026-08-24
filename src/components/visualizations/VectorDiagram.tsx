@@ -71,7 +71,7 @@ export function VectorDiagram({
 
   return (
     <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
-      <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label={ariaLabel}>
+      <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} className="w-full" role="img" aria-label={ariaLabel}>
         {showGrid && (
           <g className="stroke-border" strokeWidth={1}>
             <line x1={axisXStart.x} y1={axisXStart.y} x2={axisXEnd.x} y2={axisXEnd.y} />

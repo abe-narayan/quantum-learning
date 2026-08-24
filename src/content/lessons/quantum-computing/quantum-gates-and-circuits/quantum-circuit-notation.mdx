@@ -1,6 +1,7 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
+import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -117,6 +118,16 @@ product are physically identical. This is the basis for "circuit
 identities," used later in this course to simplify or rewrite circuits
 without changing what they compute.
 
+## Interactive Experiment
+
+Build the exact two-column circuit derived above yourself, gate by gate,
+and step through it column by column, the same $H$-then-$\text{CNOT}$
+sequence shown in the two `QuantumStateDisplay` panels above.
+
+<InteractiveSection title="Build the circuit, one column at a time" description="Add H to qubit 0, then add CNOT with qubit 0 as control and qubit 1 as target. Drag the step slider back to 0, then forward one column at a time, and confirm the state inspector matches, column by column, the two states shown above: (|00⟩+|10⟩)/√2 after column 1, then the Bell state after column 2.">
+  <LazyCircuitBuilder />
+</InteractiveSection>
+
 ## Worked Example
 
 **A circuit has $X$ on qubit 1 in the first column, then $\text{CNOT}$
@@ -174,6 +185,6 @@ product, needed to keep the dimensions consistent.
 
 ## Further Exploration
 
-Next: **Controlled Gates and CNOT**, the dot-and-$\oplus$ notation
+Next: [Controlled Gates and CNOT](/lessons/quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot), the dot-and-$\oplus$ notation
 introduced here, worked out completely: the matrix, the truth table, and
 why it's the standard building block for entangling circuits.

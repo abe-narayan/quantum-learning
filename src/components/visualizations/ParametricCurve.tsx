@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { useFrameIndex } from "./useFrameIndex";
+import { FrameSlider } from "./FrameSlider";
 
 export type CurveSeries = {
   label: string;
@@ -49,15 +51,18 @@ export function ParametricCurve({
   referenceLines?: { y: number; label: string }[];
   ariaLabel: string;
 }) {
-  const [index, setIndex] = useState(0);
-  const frame = frames[Math.min(index, frames.length - 1)];
+  const { index, setIndex, frame } = useFrameIndex(frames);
 
-  const allPoints = frames.flatMap((f) => f.series.flatMap((s) => s.points));
-  const allY = [...allPoints.map((p) => p.y), ...referenceLines.map((r) => r.y)];
-  const xMin = Math.min(...allPoints.map((p) => p.x));
-  const xMax = Math.max(...allPoints.map((p) => p.x));
-  const yMin = Math.min(...allY);
-  const yMax = Math.max(...allY);
+  const { xMin, xMax, yMin, yMax } = useMemo(() => {
+    const allPoints = frames.flatMap((f) => f.series.flatMap((s) => s.points));
+    const allY = [...allPoints.map((p) => p.y), ...referenceLines.map((r) => r.y)];
+    return {
+      xMin: Math.min(...allPoints.map((p) => p.x)),
+      xMax: Math.max(...allPoints.map((p) => p.x)),
+      yMin: Math.min(...allY),
+      yMax: Math.max(...allY),
+    };
+  }, [frames, referenceLines]);
   const xSpan = xMax - xMin || 1;
   const ySpan = yMax - yMin || 1;
   const plotW = WIDTH - 2 * PAD;
@@ -68,7 +73,7 @@ export function ParametricCurve({
   return (
     <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
       <div className="overflow-x-auto">
-        <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
+        <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
           <line x1={PAD} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
           <line x1={PAD} y1={PAD} x2={PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
           {referenceLines.map((ref, i) => (
@@ -108,22 +113,14 @@ export function ParametricCurve({
       )}
 
       {frames.length > 1 && (
-        <div>
-          <label className="flex items-center justify-between text-xs font-medium text-foreground">
-            <span>{sliderLabel}</span>
-            <span className="font-mono text-muted-foreground">{frame.paramLabel}</span>
-          </label>
-          <input
-            type="range"
-            min={0}
-            max={frames.length - 1}
-            step={1}
-            value={index}
-            onChange={(e) => setIndex(Number(e.target.value))}
-            className="mt-2 w-full accent-brand"
-            aria-label={sliderLabel}
-          />
-        </div>
+        <FrameSlider
+          label={sliderLabel}
+          valueLabel={frame.paramLabel}
+          index={index}
+          max={frames.length - 1}
+          onChange={setIndex}
+          boxed={false}
+        />
       )}
     </div>
   );

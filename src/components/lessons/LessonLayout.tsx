@@ -2,8 +2,9 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
-import { PILLARS, getCourse } from "@/lib/content/curriculum";
+import { COURSES, PILLARS, getCourse } from "@/lib/content/curriculum";
 import type { Course, LessonMeta, LessonMetaWithSlug } from "@/lib/content/types";
+import { LessonCompleteToggle } from "./LessonCompleteToggle";
 
 const DIFFICULTY_LABEL: Record<LessonMeta["difficulty"], string> = {
   foundational: "Foundational",
@@ -17,6 +18,15 @@ function moduleIndex(course: Course | undefined, moduleSlug: string): number {
 
 function sortByCourseOrder(lessons: LessonMetaWithSlug[], course: Course | undefined) {
   return [...lessons].sort((a, b) => moduleIndex(course, a.module) - moduleIndex(course, b.module));
+}
+
+/** The lesson that corresponds to a course's first module, if one has been authored. */
+function firstLessonOf(targetCourse: Course, allLessons: LessonMetaWithSlug[]): LessonMetaWithSlug | undefined {
+  const firstModule = targetCourse.modules[0];
+  if (!firstModule) return undefined;
+  return allLessons.find(
+    (lesson) => lesson.course === targetCourse.slug && lesson.module === firstModule.slug,
+  );
 }
 
 export function LessonLayout({
@@ -50,6 +60,21 @@ export function LessonLayout({
   const prevLesson = currentPos > 0 ? orderedLessons[currentPos - 1] : null;
   const nextLesson =
     currentPos >= 0 && currentPos < orderedLessons.length - 1 ? orderedLessons[currentPos + 1] : null;
+
+  // When this is the last lesson of its course, surface real courses that list this
+  // course as a prerequisite (a genuine "what's next"), instead of silently omitting
+  // the "Next" card. Falls back to a pointer back into the catalog for terminal courses
+  // that nothing else builds on.
+  const isLastLessonOfCourse = currentPos >= 0 && currentPos === orderedLessons.length - 1;
+  const finishedCourse = isLastLessonOfCourse ? course : undefined;
+  const nextCourseSuggestions = finishedCourse
+    ? COURSES.filter((candidate) => candidate.prerequisites.includes(finishedCourse.slug))
+        .map((candidate) => ({ course: candidate, lesson: firstLessonOf(candidate, allLessons) }))
+        .filter(
+          (entry): entry is { course: Course; lesson: LessonMetaWithSlug } => Boolean(entry.lesson),
+        )
+        .slice(0, 3)
+    : [];
 
   const prerequisites = meta.prerequisites
     .map((prereqSlug) => allLessons.find((lesson) => lesson.slug === prereqSlug))
@@ -134,7 +159,11 @@ export function LessonLayout({
         {children}
       </div>
 
-      {prevLesson || nextLesson ? (
+      <div className="mt-10 max-w-3xl border-t border-border pt-8">
+        <LessonCompleteToggle slug={slug} />
+      </div>
+
+      {prevLesson || nextLesson || finishedCourse ? (
         <nav
           aria-label="Lesson navigation"
           className="mt-16 grid max-w-3xl gap-4 border-t border-border pt-8 sm:grid-cols-2"
@@ -162,6 +191,36 @@ export function LessonLayout({
               </span>
               <p className="mt-1 font-medium text-foreground group-hover:text-brand">{nextLesson.title}</p>
             </Link>
+          ) : finishedCourse ? (
+            <div className="rounded-xl border border-border p-4 text-right transition-colors hover:border-brand/40 hover:bg-surface-muted sm:col-start-2">
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Next →
+              </span>
+              <p className="mt-1 font-medium text-foreground">You finished {finishedCourse.title}</p>
+              {nextCourseSuggestions.length > 0 ? (
+                <ul className="mt-2 space-y-1">
+                  {nextCourseSuggestions.map(({ course: suggestedCourse, lesson }) => (
+                    <li key={suggestedCourse.slug}>
+                      <Link
+                        href={`/lessons/${lesson.slug}`}
+                        className="text-sm text-brand hover:underline"
+                      >
+                        Start {suggestedCourse.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm">
+                  <Link
+                    href={pillar ? `/learn#${pillar.slug}` : "/learn"}
+                    className="text-brand hover:underline"
+                  >
+                    Browse more courses
+                  </Link>
+                </p>
+              )}
+            </div>
           ) : (
             <div aria-hidden="true" />
           )}

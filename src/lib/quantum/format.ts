@@ -1,8 +1,10 @@
-import type { Complex } from "./complex";
 import type { Matrix } from "./matrix";
 
+/** Structurally satisfied by `Complex` and by any plain `{re, im}` data (e.g. after crossing a Server→Client boundary). */
+export type ComplexLike = { re: number; im: number };
+
 /** Formats a complex amplitude as a LaTeX-safe string, e.g. "0.71", "-0.50i", "0.50 + 0.50i". */
-export function formatAmplitudeLatex(value: Complex, digits = 2): string {
+export function formatAmplitudeLatex(value: ComplexLike, digits = 2): string {
   const re = value.re;
   const im = value.im;
   const epsilon = 5 * 10 ** -(digits + 1);

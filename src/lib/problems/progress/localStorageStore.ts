@@ -19,7 +19,17 @@ function readFromStorage(slug: string): ProblemProgress {
   let progress = EMPTY_PROGRESS;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY_PREFIX + slug);
-    if (raw) progress = { ...EMPTY_PROGRESS, ...(JSON.parse(raw) as ProblemProgress) };
+    if (raw) {
+      const parsed = { ...EMPTY_PROGRESS, ...(JSON.parse(raw) as ProblemProgress) };
+      // Guard against a corrupted or previous-schema record whose fields
+      // don't match this shape — e.g. `attempts` not being an array would
+      // otherwise throw downstream in recordAttempt's `[...current.attempts]`.
+      progress = {
+        ...parsed,
+        attempts: Array.isArray(parsed.attempts) ? parsed.attempts : EMPTY_PROGRESS.attempts,
+        hintsRevealed: typeof parsed.hintsRevealed === "number" ? parsed.hintsRevealed : EMPTY_PROGRESS.hintsRevealed,
+      };
+    }
   } catch {
     progress = EMPTY_PROGRESS;
   }

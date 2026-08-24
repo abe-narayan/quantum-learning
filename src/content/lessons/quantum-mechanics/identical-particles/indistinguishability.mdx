@@ -1,9 +1,40 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { tensorProduct, exchangeParticles } from "@/lib/quantum/identicalParticles";
+import { vectorToExchangeGrid } from "@/components/visualizations/ExchangeDiagram";
+import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/identical-particles/indistinguishability"
 ).map((problem) => problem.meta);
+
+export const basisDim = 3;
+export const e0 = [new Complex(1), new Complex(0), new Complex(0)];
+export const e1 = [new Complex(0), new Complex(1), new Complex(0)];
+export const e2 = [new Complex(0), new Complex(0), new Complex(1)];
+export const productState01 = tensorProduct(e0, e1);
+export const productState00 = tensorProduct(e0, e0);
+export const exchangePresets = [
+  {
+    label: "|0⟩ ⊗ |1⟩ (a ≠ b)",
+    before: vectorToExchangeGrid(productState01, basisDim),
+    after: vectorToExchangeGrid(exchangeParticles(productState01, basisDim, basisDim), basisDim),
+    beforeLabel: "ψ = |0⟩⊗|1⟩",
+    afterLabel: "P₁₂ψ = |1⟩⊗|0⟩",
+    basisLabels: ["0", "1", "2"],
+    verdict: "not-an-eigenstate"
+  },
+  {
+    label: "|0⟩ ⊗ |0⟩ (a = b)",
+    before: vectorToExchangeGrid(productState00, basisDim),
+    after: vectorToExchangeGrid(exchangeParticles(productState00, basisDim, basisDim), basisDim),
+    beforeLabel: "ψ = |0⟩⊗|0⟩",
+    afterLabel: "P₁₂ψ",
+    basisLabels: ["0", "1", "2"],
+    verdict: "symmetric"
+  }
+];
 
 export const lessonMeta = {
   title: "Indistinguishability",
@@ -91,6 +122,13 @@ its negative), confirming directly that a bare product state carries
 spurious, unphysical "which particle is where" information that a valid
 two-identical-particle state cannot have.
 
+<InteractiveSection title="See exactly which entry moves" description="Each grid's (row, column) entry is the amplitude for 'particle 1 in row-state, particle 2 in column-state'. Switch between a ≠ b (the worked example: exchange moves the 1 to a different cell entirely, not an eigenstate) and a = b (the 1 stays put, a genuine +1 eigenstate) — exactly practice question 3.">
+  <ExchangeDiagramExplorer
+    presets={exchangePresets}
+    ariaLabel="A two-particle product state's coefficient grid before and after the exchange operator swaps particle labels"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -138,6 +176,6 @@ special property that must be built in explicitly (next lesson).
 
 ## Further Exploration
 
-Next: **Bosons & Fermions**, which builds the actual $+1$ and $-1$
+Next: [Bosons & Fermions](/lessons/quantum-mechanics/identical-particles/bosons-and-fermions), which builds the actual $+1$ and $-1$
 eigenstates explicitly (symmetrization and antisymmetrization) and
 verifies their eigenvalues directly.

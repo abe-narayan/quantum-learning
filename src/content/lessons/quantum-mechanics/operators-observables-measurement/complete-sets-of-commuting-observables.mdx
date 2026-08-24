@@ -1,9 +1,35 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/complete-sets-of-commuting-observables"
 ).map((problem) => problem.meta);
+
+export const diag3 = (a, b, c) => new Matrix([
+  [new Complex(a), new Complex(0), new Complex(0)],
+  [new Complex(0), new Complex(b), new Complex(0)],
+  [new Complex(0), new Complex(0), new Complex(c)]
+]);
+export const opN = diag3(1, 1, 2);
+export const opM = diag3(5, -5, 7);
+export const opMPrime = diag3(3, -1, 9);
+export const commutingPreset = (label, mLabel, m) => ({
+  label,
+  panels: [
+    { label: "N", cells: matrixToCells(opN), highlightDiagonal: true },
+    { label: mLabel, cells: matrixToCells(m), highlightDiagonal: true },
+    { label: `N × ${mLabel}`, cells: matrixToCells(opN.mul(m)), highlightDiagonal: true },
+    { label: `${mLabel} × N`, cells: matrixToCells(m.mul(opN)), highlightDiagonal: true }
+  ]
+});
+export const commutingPresets = [
+  commutingPreset("M = diag(5,-5,7)", "M", opM),
+  commutingPreset("M' = diag(3,-1,9)", "M'", opMPrime)
+];
 
 export const lessonMeta = {
   title: "Complete Sets of Commuting Observables",
@@ -114,6 +140,13 @@ diagonal matrices, since multiplying diagonal matrices only ever
 multiplies matching diagonal entries, an operation that plainly doesn't
 care about order.
 
+<InteractiveSection title="Confirm NM = MN for two different choices of M" description="N from the worked example, paired with either M or the alternative M' from the practice questions. Switch between them and check every entry of N×M against N×M' — both resolve N's degeneracy, and both commute with N.">
+  <MatrixGridExplorer
+    presets={commutingPresets}
+    ariaLabel="Choose between two different diagonal matrices M and see that both commute with N by comparing the products in both orders"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -157,6 +190,6 @@ suffices for a fully nondegenerate spectrum, and real physical systems
 
 ## Further Exploration
 
-Next: **The Measurement Postulate, Generalized**, using this course's
+Next: [The Measurement Postulate, Generalized](/lessons/quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized), using this course's
 projectors to state Born's rule correctly for degenerate eigenvalues,
 where the earlier $|c_i|^2$ form silently assumed there wasn't any.

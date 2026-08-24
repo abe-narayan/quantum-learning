@@ -1,9 +1,46 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables"
 ).map((problem) => problem.meta);
+
+export const lhvOutcomeSettings = [
+  { A: 1, Ap: 1, B: 1, Bp: 1 },
+  { A: 1, Ap: 1, B: 1, Bp: -1 },
+  { A: 1, Ap: 1, B: -1, Bp: 1 },
+  { A: 1, Ap: 1, B: -1, Bp: -1 },
+  { A: 1, Ap: -1, B: 1, Bp: 1 },
+  { A: 1, Ap: -1, B: 1, Bp: -1 },
+  { A: 1, Ap: -1, B: -1, Bp: 1 },
+  { A: 1, Ap: -1, B: -1, Bp: -1 },
+  { A: -1, Ap: 1, B: 1, Bp: 1 },
+  { A: -1, Ap: 1, B: 1, Bp: -1 },
+  { A: -1, Ap: 1, B: -1, Bp: 1 },
+  { A: -1, Ap: 1, B: -1, Bp: -1 },
+  { A: -1, Ap: -1, B: 1, Bp: 1 },
+  { A: -1, Ap: -1, B: 1, Bp: -1 },
+  { A: -1, Ap: -1, B: -1, Bp: 1 },
+  { A: -1, Ap: -1, B: -1, Bp: -1 },
+];
+
+export const lhvSweepFrames = lhvOutcomeSettings.map(({ A, Ap, B, Bp }) => ({
+  paramLabel: `λ: A=${A > 0 ? "+1" : "-1"}, A'=${Ap > 0 ? "+1" : "-1"}, B=${B > 0 ? "+1" : "-1"}, B'=${Bp > 0 ? "+1" : "-1"}`,
+  bars: [
+    { label: "A(a)B(b)", value: A * B, caption: A * B > 0 ? `+${A * B}` : `${A * B}` },
+    { label: "A(a)B(b')", value: A * Bp, caption: A * Bp > 0 ? `+${A * Bp}` : `${A * Bp}` },
+    { label: "A(a')B(b)", value: Ap * B, caption: Ap * B > 0 ? `+${Ap * B}` : `${Ap * B}` },
+    { label: "-A(a')B(b')", value: -Ap * Bp, caption: -Ap * Bp > 0 ? `+${-Ap * Bp}` : `${-Ap * Bp}` },
+    {
+      label: "S(λ)",
+      value: A * B + A * Bp + Ap * B - Ap * Bp,
+      caption: A * B + A * Bp + Ap * B - Ap * Bp > 0 ? `+${A * B + A * Bp + Ap * B - Ap * Bp}` : `${A * B + A * Bp + Ap * B - Ap * Bp}`,
+      highlight: true,
+    },
+  ],
+}));
 
 export const lessonMeta = {
   title: "Bell's Theorem and Local Hidden Variables",
@@ -87,6 +124,22 @@ $$
 not merely "at most 2": for any *one* fixed $\lambda$, this
 combination is always exactly $\pm2$, since every outcome is
 deterministic once $\lambda$ is fixed.
+
+There are exactly $2^4=16$ ways to assign $\pm1$ to
+$A(a,\lambda),A(a',\lambda),B(b,\lambda),B(b',\lambda)$ (one full
+"deterministic hidden variable"). Step through all 16 below and watch
+the four correlation terms and their combination $S(\lambda)$: every
+single one lands at exactly $+2$ or $-2$, never anything in between and
+never anything outside that pair of values.
+
+<InteractiveSection title="Every deterministic λ, all 16 of them" description="Every possible assignment of ±1 to A(a),A(a'),B(b),B(b') for a fixed λ. Step through all 16 and check S(λ) is always exactly +2 or -2, matching the algebraic argument above exactly.">
+  <BarChartExplorer
+    frames={lhvSweepFrames}
+    sliderLabel="λ (deterministic assignment)"
+    ariaLabel="The four CHSH correlation terms and their combination S for a fixed lambda, stepping through all 16 possible plus-or-minus-one outcome assignments; S is always exactly plus 2 or minus 2"
+    maxValue={2}
+  />
+</InteractiveSection>
 
 ### Averaging over λ gives the CHSH inequality
 
@@ -207,6 +260,6 @@ outside the range of the values being averaged), never more.
 
 ## Further Exploration
 
-Next: **The CHSH Inequality and Quantum Violation**, which computes $S$
+Next: [The CHSH Inequality and Quantum Violation](/lessons/quantum-computing/entanglement-and-measurement/the-chsh-inequality), which computes $S$
 for an actual entangled quantum state using the real density-matrix
 engine, and finds a value that breaks the bound just proven.

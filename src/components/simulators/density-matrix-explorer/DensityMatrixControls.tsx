@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 import type { BlochAngles } from "@/lib/quantum/bloch";
 import { STATE_PRESETS } from "../bloch-sphere/presets";
 import { MIXTURE_PRESETS } from "./presets";
@@ -102,16 +103,25 @@ export function DensityMatrixControls({
         <h3 id="mixture-presets-heading" className="text-sm font-semibold text-foreground">
           Mixture presets
         </h3>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div role="radiogroup" aria-label="Mixture presets" className="mt-3 flex flex-wrap gap-2">
           {MIXTURE_PRESETS.map((preset) => (
-            <Button
+            <button
               key={preset.id}
-              variant={activePresetId === preset.id ? "primary" : "secondary"}
-              size="sm"
+              type="button"
+              role="radio"
+              aria-checked={activePresetId === preset.id}
               onClick={() => onApplyMixturePreset(preset.id)}
+              className={cn(
+                "inline-flex items-center justify-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "disabled:pointer-events-none disabled:opacity-50",
+                activePresetId === preset.id
+                  ? "bg-brand text-brand-foreground hover:opacity-90"
+                  : "border border-border bg-surface text-foreground hover:bg-surface-muted"
+              )}
             >
               {preset.label}
-            </Button>
+            </button>
           ))}
         </div>
       </section>

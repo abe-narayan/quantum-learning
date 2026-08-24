@@ -16,6 +16,25 @@ export const petE0 = petH0diag[0];
 export const petE1 = petE0 + firstOrderEnergyCorrection(petH0diag, petHprime, 0);
 export const petE2 = petE1 + secondOrderEnergyCorrection(petH0diag, petHprime, 0);
 
+export const petLambdaValues = [0.002, 0.005, 0.01, 0.02, 0.05, 0.1];
+
+export const petFirstOrderForLambda = (lambda) => firstOrderEnergyCorrection(petH0diag, petX4.scale(lambda), 0);
+export const petSecondOrderForLambda = (lambda) => secondOrderEnergyCorrection(petH0diag, petX4.scale(lambda), 0);
+
+export const petBarsForLambda = (lambda) => [
+  { label: "E₀⁽¹⁾", value: petFirstOrderForLambda(lambda), caption: petFirstOrderForLambda(lambda).toFixed(4) },
+  { label: "E₀⁽²⁾", value: petSecondOrderForLambda(lambda), highlight: true, caption: petSecondOrderForLambda(lambda).toFixed(4) }
+];
+
+export const petMaxAbsCorrection = Math.max(
+  ...petLambdaValues.flatMap((lambda) => [Math.abs(petFirstOrderForLambda(lambda)), Math.abs(petSecondOrderForLambda(lambda))])
+);
+
+export const petLambdaFrames = petLambdaValues.map((lambda) => ({
+  paramLabel: `λ = ${lambda}`,
+  bars: petBarsForLambda(lambda)
+}));
+
 export const lessonMeta = {
   title: "Time-Independent Perturbation Theory",
   description:
@@ -137,6 +156,23 @@ the ground state); the second-order step pulls it back down slightly, the
 same sign pattern Practice Question 2 asks you to justify from the
 formula itself.
 
+Both corrections above used a single fixed $\lambda=0.01$. Recomputing
+them from the exact same $H_0$ and $x^4$ matrices, only varying
+$\lambda$, shows how each correction's size actually scales with the
+perturbation strength:
+
+<InteractiveSection
+  title="Slide λ until second order stops being small"
+  description="Slide λ from 0.002 up to 0.1 and watch both correction terms recomputed live from the same H0 and x⁴ matrices as the worked example above, only λ changes. The first-order term grows linearly in λ. The second-order term grows faster, and by λ=0.1 it is no longer a small correction next to the first-order term, a direct, numeric look at where H′ small stops being a safe assumption."
+>
+  <BarChartExplorer
+    frames={petLambdaFrames}
+    sliderLabel="Coupling strength λ"
+    ariaLabel="First- and second-order ground-state energy corrections for the quartic anharmonic oscillator, as the coupling strength λ varies"
+    maxValue={petMaxAbsCorrection}
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -184,6 +220,6 @@ deliberately throws rather than silently returning $\pm\infty$ or NaN).
 
 ## Further Exploration
 
-Next: **The Variational Method**, a completely different approximation
+Next: [The Variational Method](/lessons/quantum-mechanics/approximation-methods/the-variational-method), a completely different approximation
 strategy, one that needs no small parameter at all, only a guessed
 trial wavefunction.

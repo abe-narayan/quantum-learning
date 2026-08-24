@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map"
@@ -96,6 +97,17 @@ physical qubits $n$ per logical qubit $k$, exactly the resource-overhead
 question the capstone returns to with concrete numbers for real
 fault-tolerant architectures.
 
+## Interactive Experiment
+
+The four-step recovery procedure above is exactly what the platform's
+real `runBitFlipCorrectionCycle` executes: measure every generator,
+decode the syndrome, apply the correction. Step through it yourself on
+the same $[[3,1,3]]$ bit-flip code this lesson's parameters describe.
+
+<InteractiveSection title="Run the general recovery procedure" description="Inject a single-qubit X error on qubit 0, 1, or 2 and read off the syndrome (s1, s2). Confirm it matches Lesson 2's decode table (non-(0,0) means an error was found), then check the recovered state's amplitude table against the uncorrupted encoded state: step 4's guarantee, exact recovery, holds for every qubit you try, not just one.">
+  <LazySyndromeExplorer mode="bit-flip" />
+</InteractiveSection>
+
 ## Worked Example
 
 **Confirm the bit-flip code's distance is exactly 3, not less, by
@@ -172,7 +184,7 @@ here as a real, active area this platform doesn't build).
 
 ## Further Exploration
 
-Next: **Surface Codes: A Conceptual Introduction**, the family of codes
+Next: [Surface Codes: A Conceptual Introduction](/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction), the family of codes
 real quantum hardware roadmaps actually build toward: higher distance,
 much better qubit efficiency, at the cost of substantially more complex
 syndrome decoding.

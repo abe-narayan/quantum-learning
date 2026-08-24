@@ -1,5 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { QuantumCircuit, runCircuit, sampleMeasurements } from "@/lib/quantum/circuitBuilder";
+
+export const sdkSampleCircuit = new QuantumCircuit(2).h(0).cnot(0, 1);
+export const sdkSampleState = runCircuit(sdkSampleCircuit);
+export const sdkSampleCounts = sampleMeasurements(sdkSampleState, 1000);
+export const sdkCount00 = sdkSampleCounts["00"] || 0;
+export const sdkCount11 = sdkSampleCounts["11"] || 0;
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/programming-quantum-computers/quantum-sdks-overview"
@@ -74,6 +81,34 @@ the exact same three boxes:
   ]}
 />
 
+### How this looks in real Qiskit
+
+This platform's `QuantumCircuit` is deliberately minimal, so it's worth
+seeing, once, what the SAME Bell-state circuit built above
+(`h(0).cnot(0,1)`) actually looks like in a real SDK. Here it is in
+Qiskit, IBM's SDK, using only the small, stable core of its API
+(circuit construction and gates, not a specific execution/backend
+call, which has changed across Qiskit versions):
+
+```python
+# This is real Qiskit syntax, shown here as a static comparison only —
+# it is not run by this platform's own simulator above.
+from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(2)   # 2-qubit circuit, same as new QuantumCircuit(2)
+qc.h(0)                  # Hadamard on qubit 0, same as .h(0)
+qc.cx(0, 1)               # CNOT with control 0, target 1, same as .cnot(0, 1)
+qc.measure_all()          # measure both qubits
+```
+
+Structurally, this is the exact same three-line build this lesson's
+`sdkSampleCircuit` performs: a Hadamard to create superposition, then a
+controlled-NOT to entangle it into a Bell state. `.h()` and `.cx()` are
+long-stable, core parts of Qiskit's `QuantumCircuit` API; only the
+"backend" step (choosing a simulator or real device, and what to call
+to execute it) changes meaningfully across SDK versions, which is
+exactly the abstraction the next section names.
+
 ### What a backend abstracts over
 
 A "backend" is exactly the abstraction that lets identical circuit code
@@ -84,6 +119,36 @@ Quantum Systems' noise-simulation lesson), or real hardware
 & Scaling's real error sources). The circuit itself doesn't need to know
 or care which backend it's targeting, a genuine, valuable separation of
 concerns.
+
+The SAME Bell circuit (`h(0).cnot(0,1)`), run against two different
+backends this platform's own engine actually implements, makes this
+concrete: an exact backend returns the ideal amplitudes directly; a
+shot-sampled backend, standing in for what any real or noisy backend
+must ultimately report, hands back finite-shot counts instead.
+
+<InteractiveSection title="Same circuit, two backends" description="Backend 1 is the exact simulator: runCircuit gives the Bell state's ideal 50/50 amplitudes directly. Backend 2 is a shot-sampled backend: this page's own live sampleMeasurements call, 1000 shots against that exact same circuit object. Slide between them and notice the circuit never changed, only which backend executed it.">
+  <BarChartExplorer
+    sliderLabel="Backend"
+    ariaLabel="Bell-state circuit results from two backends: exact simulator amplitudes versus 1000-shot sampled counts"
+    maxValue={0.6}
+    frames={[
+      {
+        paramLabel: "Exact simulator",
+        bars: [
+          { label: "00", value: 0.5 },
+          { label: "11", value: 0.5, highlight: true },
+        ],
+      },
+      {
+        paramLabel: "1000-shot sampled",
+        bars: [
+          { label: "00", value: sdkCount00 / 1000 },
+          { label: "11", value: sdkCount11 / 1000, highlight: true },
+        ],
+      },
+    ]}
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 
@@ -150,5 +215,5 @@ compilation, and much more).
 
 ## Further Exploration
 
-Next: **Writing Your First Circuit**, a hands-on walkthrough building and
+Next: [Writing Your First Circuit](/lessons/quantum-software/programming-quantum-computers/writing-your-first-circuit), a hands-on walkthrough building and
 running a complete circuit using this platform's own `QuantumCircuit`.

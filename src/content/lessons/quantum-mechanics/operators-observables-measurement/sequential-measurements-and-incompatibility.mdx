@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, applySingleQubitGate } from "@/lib/quantum/gates";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility"
@@ -55,8 +56,9 @@ certainty. No surprise, and the state doesn't change.
 ### Step 2: measure $X$
 
 Rewrite $|0\rangle$ in the $X$-eigenbasis:
-$|0\rangle=\tfrac{1}{\sqrt2}(|+\rangle+|-\rangle)$ (from the Global Phase
-lesson's basis-change machinery). Using the generalized Born rule from
+$|0\rangle=\tfrac{1}{\sqrt2}(|+\rangle+|-\rangle)$ (from the Measurement
+lesson's $|\pm\rangle=\tfrac{1}{\sqrt2}(|0\rangle\pm|1\rangle)$
+X-basis definition). Using the generalized Born rule from
 last lesson with the rank-1 projectors $P_+=|+\rangle\langle+|$,
 $P_-=|-\rangle\langle-|$:
 
@@ -115,6 +117,10 @@ at once:
 Both paths through the $X$ branch land on the same $50/50$ split at the
 final $Z$ measurement, exactly the "doesn't matter which $X$ outcome
 occurred" fact proven below.
+
+<InteractiveSection title="Run the sequence yourself" description="Start at |0⟩, apply H (the X-basis change), and measure a few times: watch the Z-outcome go from 100% predictable to a genuine coin flip, live, on the real state — the exact three-step sequence worked out above, not a scripted animation.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ## Physical Interpretation
 
@@ -183,6 +189,6 @@ probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
 
 ## Further Exploration
 
-Next: **The Energy-Time Uncertainty Relation**, deriving a different kind
+Next: [The Energy-Time Uncertainty Relation](/lessons/quantum-mechanics/operators-observables-measurement/the-energy-time-uncertainty-relation), deriving a different kind
 of uncertainty bound, one that doesn't come from a commutator between
 two operators, since time isn't an operator at all.

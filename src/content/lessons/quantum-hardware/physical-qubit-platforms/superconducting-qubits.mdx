@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/superconducting-qubits"
@@ -108,6 +109,10 @@ reused directly for real hardware). A full population transfer
 $t=\pi/(2\Omega)$, a genuine, computable gate time from a given drive
 strength $\Omega$ (the Rabi frequency), not a hardcoded number.
 
+<InteractiveSection title="Drive the transmon's two-level subspace" description="Set detuning to zero and vary the coupling strength V, playing the role of this platform's microwave drive strength Ω: watch the population climb to 1 exactly at t_π=π/(2V), the same π-pulse formula this section just derived, and the Bloch vector sweep from the north pole to the south pole and back. Then move detuning away from zero and watch the population's ceiling drop below 1: this is what happens when the microwave tone isn't exactly resonant with the anharmonic 0-1 gap.">
+  <LazyRabiExplorer />
+</InteractiveSection>
+
 ## Worked Example
 
 **A superconducting qubit is driven at Rabi frequency
@@ -166,5 +171,5 @@ not either number in isolation.
 
 ## Further Exploration
 
-Next: **Trapped Ions**, a completely different physical platform, with
+Next: [Trapped Ions](/lessons/quantum-hardware/physical-qubit-platforms/trapped-ions), a completely different physical platform, with
 the opposite speed/coherence tradeoff.

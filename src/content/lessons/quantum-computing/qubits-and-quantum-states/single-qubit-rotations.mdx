@@ -114,17 +114,9 @@ standard vocabulary; the rotation formula is the whole language.
 
 ## Interactive Experiment
 
-<LazyBlochSphereExplorer />
-
-- Set $\theta$ and $\varphi$ to something away from the poles (e.g. via
-  the $|+\rangle$ preset), then apply $R_z$ at a few different angles.
-  Watch the state panel: $\theta$ should stay exactly fixed while
-  $\varphi$ changes. Confirm this numerically, not just visually.
-- From the same starting state, try $R_x$ and $R_y$ instead. Unlike
-  $R_z$, these generally move *both* $\theta$ and $\varphi$.
-- Prepare $|0\rangle$ (a pole) and apply $R_z$ at any angle. Nothing
-  moves: $|0\rangle$ sits exactly on the $z$-axis, the rotation's own
-  axis.
+<InteractiveSection title="Rz vs. Rx/Ry, and a fixed point" description={`Set θ and φ to something away from the poles (e.g. via the |+⟩ preset), then apply Rz at a few different angles. Watch the state panel: θ should stay exactly fixed while φ changes. Confirm this numerically, not just visually. From the same starting state, try Rx and Ry instead. Unlike Rz, these generally move both θ and φ. Prepare |0⟩ (a pole) and apply Rz at any angle. Nothing moves: |0⟩ sits exactly on the z-axis, the rotation's own axis.`}>
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ## Worked Example
 
@@ -181,7 +173,7 @@ check the convention before assuming an arithmetic error.
 
 ## Further Exploration
 
-Next: **Global Phase vs. Relative Phase**, which finally proves, rather
+Next: [Global Phase vs. Relative Phase](/lessons/quantum-computing/qubits-and-quantum-states/global-and-relative-phase), which finally proves, rather
 than just asserts, that an overall phase factor changes nothing
 physical, while a *relative* phase between $\alpha$ and $\beta$ changes
 everything about how a state behaves once other qubits or later

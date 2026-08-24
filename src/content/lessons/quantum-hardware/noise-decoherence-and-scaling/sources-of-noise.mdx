@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/sources-of-noise"
@@ -100,6 +101,18 @@ Control line noise and crosstalk aren't shown above since, as the
 catalog notes, which branch they fall into depends on their specific
 origin rather than being fixed in advance.
 
+Two of the incoherent sources in the catalog above,
+`amplitudeDampingChannel` and `dephasingChannel`, are directly steppable
+below. Unlike a coherent miscalibration (a deterministic, reversible
+rotation by the wrong angle), watch how each incoherent channel instead
+pulls the Bloch vector toward a fixed point it can never rotate back
+from on its own, exactly the irreversibility that makes "just
+recalibrate it" the wrong fix for this branch of the catalog:
+
+<InteractiveSection title="Watch an incoherent channel act" description="Pick amplitude damping or dephasing, pick a starting state, and step through applications. Amplitude damping pulls everything toward |0⟩; dephasing shrinks x and y toward zero while leaving z untouched. Neither motion is a rotation a later, better-calibrated pulse could undo, which is exactly why these sit in the incoherent branch of the tree above.">
+  <LazyNoiseExplorer />
+</InteractiveSection>
+
 ### Why the classification matters for mitigation
 
 A coherent miscalibration error is fixed by better/more frequent
@@ -180,7 +193,7 @@ improvements or active error correction instead.
 
 ## Further Exploration
 
-Next: **T1 & T2 Decoherence**, which quantifies the two specific
+Next: [T1 & T2 Decoherence](/lessons/quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence), which quantifies the two specific
 incoherent error channels (amplitude damping, dephasing) this lesson
 named, connecting Advanced Topics in Quantum Mechanics' discrete Kraus
 channels directly to the continuous decay times real hardware datasheets

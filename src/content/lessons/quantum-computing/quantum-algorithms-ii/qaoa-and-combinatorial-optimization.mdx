@@ -1,9 +1,27 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { uniformSuperposition, applyCostUnitary, applyMixerUnitary, expectedCutSize } from "@/lib/quantum/qaoa";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/qaoa-and-combinatorial-optimization"
 ).map((problem) => problem.meta);
+
+export const mixerDemoEdges = [[0, 1], [0, 2], [1, 2]];
+export const mixerDemoGamma = Math.PI / 4;
+export const mixerDemoBetas = [0, Math.PI / 8, Math.PI / 4, (3 * Math.PI) / 8, Math.PI / 2, (5 * Math.PI) / 8, (3 * Math.PI) / 4, (7 * Math.PI) / 8, Math.PI];
+export const mixerDemoBitLabel = (index) => index.toString(2).padStart(3, "0");
+export const mixerDemoStates = mixerDemoBetas.map((beta) => applyMixerUnitary(applyCostUnitary(uniformSuperposition(3), mixerDemoEdges, mixerDemoGamma), beta));
+export const mixerDemoFrames = mixerDemoStates.map((state, i) => ({
+  paramLabel: `β = ${mixerDemoBetas[i].toFixed(3)}, ⟨cut⟩ = ${expectedCutSize(state, mixerDemoEdges).toFixed(3)}`,
+  bars: state.probabilities().map((p, idx) => ({
+    label: mixerDemoBitLabel(idx),
+    value: p,
+    highlight: idx !== 0 && idx !== 7
+  }))
+}));
+export const mixerDemoMaxProb = Math.max(...mixerDemoFrames.flatMap((f) => f.bars.map((b) => b.value)));
 
 export const lessonMeta = {
   title: "QAOA and Combinatorial Optimization",
@@ -99,6 +117,15 @@ $U_B$ for $p$ layers, starting from the uniform superposition
 (`qaoaCircuit`), is the full QAOA circuit; $p=1$ is the smallest
 nontrivial case this course's worked example uses.
 
+<InteractiveSection title="The mixer moves weight toward good cuts" description="Slide β from 0 to π. At β=0 the mixer is the identity, so the state is exactly the cost-phased uniform superposition: still perfectly flat, 1/8 on every basis state, ⟨cut⟩ locked at the checkable baseline 1.5. As β grows, the mixer starts moving real amplitude toward the six 1-vs-2 split colorings (highlighted, each cutting 2 of the 3 edges) and away from the two uncut colorings 000 and 111.">
+  <BarChartExplorer
+    frames={mixerDemoFrames}
+    sliderLabel="mixer angle β (γ fixed at π/4)"
+    ariaLabel="Measurement probability over all 8 triangle colorings after one cost layer (fixed γ=π/4) and one mixer layer, as the mixer angle β varies"
+    maxValue={mixerDemoMaxProb}
+  />
+</InteractiveSection>
+
 ### A checkable baseline
 
 Before running any optimization, check the *starting point*: the uniform
@@ -175,6 +202,6 @@ convergence.
 
 ## Further Exploration
 
-Next: **QAOA: A Worked Max-Cut Example**, running $p=1$ QAOA on a
+Next: [QAOA: A Worked Max-Cut Example](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example), running $p=1$ QAOA on a
 triangle graph and a single edge, both reaching within a few percent of
 the true optimum.

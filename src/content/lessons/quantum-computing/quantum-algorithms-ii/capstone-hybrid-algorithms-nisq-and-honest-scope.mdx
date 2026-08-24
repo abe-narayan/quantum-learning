@@ -1,10 +1,39 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { qaoaCircuit, expectedCutSize, bruteForceMaxCut } from "@/lib/quantum/qaoa";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope"
 ).map((problem) => problem.meta);
 
+export const depthEdges = [[0, 1], [1, 2], [0, 2]];
+export const depthTrueMax = bruteForceMaxCut(3, depthEdges);
+export const depthBaseline = 1.5;
+export const depthParamPairs = [
+  { gamma: 0.6, beta: 0.3, label: "γ=0.60, β=0.30 (triangle-tuned at p=1)" },
+  { gamma: 1.55, beta: 0.4, label: "γ=1.55, β=0.40 (single-edge-tuned at p=1)" },
+  { gamma: 0.3, beta: 0.6, label: "γ=0.30, β=0.60 (swapped)" },
+  { gamma: 1.0, beta: 1.0, label: "γ=1.00, β=1.00 (arbitrary)" }
+];
+export const depthLayerCounts = [1, 2, 3, 4, 5, 6];
+export const depthFrames = depthParamPairs.map((pair) => ({
+  paramLabel: pair.label,
+  series: [
+    {
+      label: "⟨cut⟩ repeating this (γ,β) at every layer",
+      color: "brand",
+      points: depthLayerCounts.map((p) => ({
+        x: p,
+        y: expectedCutSize(
+          qaoaCircuit(3, depthEdges, Array.from({ length: p }, () => pair.gamma), Array.from({ length: p }, () => pair.beta)),
+          depthEdges
+        )
+      }))
+    }
+  ]
+}));
 
 export const lessonMeta = {
   title: "Capstone: Hybrid Algorithms, NISQ, and Honest Scope",
@@ -50,6 +79,15 @@ few QAOA layers) run *many times*, with the classical optimizer able to
 partially average out or route around some kinds of noise. They aren't
 immune to it, but they're structurally more tolerant of imperfection than
 a single long, must-be-exactly-right circuit.
+
+<InteractiveSection title="More layers isn't automatically better" description="Slide between four fixed (γ,β) pairs and watch expectedCutSize on the triangle graph as the same pair is repeated across p=1..6 real QAOA layers. The pair tuned for p=1 (γ=0.60, β=0.30) does not simply keep climbing toward 2 as p grows — extra layers only help when their parameters are actually re-optimized for that depth, the real reason 'more layers' is a tradeoff, not a free improvement, per this capstone's practice questions.">
+  <ParametricCurve
+    frames={depthFrames}
+    sliderLabel="fixed (γ,β) pair repeated at every layer"
+    referenceLines={[{ y: depthTrueMax, label: "true max = 2" }, { y: depthBaseline, label: "baseline |E|/2 = 1.5" }]}
+    ariaLabel="Expected triangle cut size versus number of QAOA layers p, for four different fixed (gamma, beta) pairs repeated at every layer, showing that naive depth alone does not guarantee improvement"
+  />
+</InteractiveSection>
 
 ### The NISQ era, defined
 

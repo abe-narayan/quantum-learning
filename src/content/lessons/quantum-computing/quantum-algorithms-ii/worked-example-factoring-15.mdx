@@ -1,12 +1,30 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
-import { periodFindingMeasurementDistribution } from "@/lib/quantum/shor";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { periodFindingMeasurementDistribution, classicalOrder } from "@/lib/quantum/shor";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/worked-example-factoring-15"
 ).map((problem) => problem.meta);
 
 export const periodDistribution = periodFindingMeasurementDistribution(7, 15, 6);
+
+export const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+export const factorA = 7;
+export const factorN = 15;
+export const trueOrderR = classicalOrder(factorA, factorN);
+export const measuredOutcomes = [0, 16, 32, 48];
+export const measuredGcds = measuredOutcomes.map((k) => gcd(k, 64));
+export const measuredCandidateR = measuredOutcomes.map((k, i) => 64 / measuredGcds[i]);
+export const measuredReducedNum = measuredOutcomes.map((k, i) => k / measuredGcds[i]);
+export const measurementFrames = measuredOutcomes.map((k, i) => ({
+  paramLabel: `measured x = ${k}  →  x/64 = ${measuredReducedNum[i]}/${measuredCandidateR[i]} (reduced)`,
+  bars: [
+    { label: "candidate r (this measurement)", value: measuredCandidateR[i], highlight: measuredCandidateR[i] !== trueOrderR },
+    { label: "true r (classicalOrder)", value: trueOrderR, highlight: false }
+  ]
+}));
 
 export const lessonMeta = {
   title: "Worked Example: Factoring 15",
@@ -68,6 +86,15 @@ circuit several times and combine the results rather than trusting one
 shot. This
 platform's `classicalOrder(7, 15)` independently confirms the true
 period directly: $r=4$.
+
+<InteractiveSection title="Not every outcome recovers r cleanly" description="Slide through each of the 4 equally-likely measurement outcomes (0, 16, 32, 48) and watch what a naive fraction reduction of x/64 alone would conclude about r, compared against the true r=4 from classicalOrder. x=16 and x=48 recover r=4 correctly. x=32 reduces to 1/2 and undersells r as 2, the exact subtlety described above. x=0 reduces to 0/1 and gives no usable information at all — a real, non-hypothetical reason single-shot measurements aren't trusted alone.">
+  <BarChartExplorer
+    frames={measurementFrames}
+    sliderLabel="which peak was measured"
+    ariaLabel="Candidate order r inferred from a single measured outcome's reduced fraction, compared to the true order r=4, for each of the four possible period-finding measurement outcomes"
+    maxValue={trueOrderR}
+  />
+</InteractiveSection>
 
 ### Step 4: the classical reduction
 
@@ -159,7 +186,7 @@ and combining results, not by trusting one shot.
 
 ## Further Exploration
 
-Next: **The Variational Principle and Ansatz Circuits**, a completely
+Next: [The Variational Principle and Ansatz Circuits](/lessons/quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits), a completely
 different style of quantum algorithm, built for today's noisy, small
 quantum devices rather than the large fault-tolerant machines Shor's
 algorithm needs.

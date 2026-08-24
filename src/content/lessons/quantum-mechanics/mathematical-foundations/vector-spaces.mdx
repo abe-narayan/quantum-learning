@@ -1,9 +1,21 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/vector-spaces"
 ).map((problem) => problem.meta);
+
+export const rotatedBasisFrame = (thetaDeg) => ({
+  paramLabel: `θ = ${thetaDeg}°`,
+  vectors: [
+    { label: "e₁", x: 1, y: 0, color: "muted", dashed: true },
+    { label: "e₂", x: 0, y: 1, color: "muted", dashed: true },
+    { label: "v", x: 1.4, y: 0.6, color: "foreground" },
+    { label: "e₁′", x: Math.cos((thetaDeg * Math.PI) / 180), y: Math.sin((thetaDeg * Math.PI) / 180), color: "brand" },
+    { label: "e₂′", x: -Math.sin((thetaDeg * Math.PI) / 180), y: Math.cos((thetaDeg * Math.PI) / 180), color: "accent" }
+  ]
+});
 
 export const lessonMeta = {
   title: "Vector Spaces",
@@ -132,6 +144,14 @@ physical object versus its coordinates in a chosen basis, matters a great
 deal once operators enter the picture: a matrix representation always
 depends on a choice of basis, even though the underlying operator doesn't.
 
+<InteractiveSection title="Rotate the basis, not the vector" description="Drag the slider to rotate the basis {e1', e2'} (solid) away from the standard basis {e1, e2} (dashed). Watch v (gray) stay exactly where it is the whole time — only the axes you're describing it against move.">
+  <VectorDiagramExplorer
+    frames={Array.from({ length: 19 }, (_, i) => rotatedBasisFrame(i * 5))}
+    sliderLabel="Basis rotation angle θ"
+    ariaLabel="A fixed vector v shown against a rotating basis e1-prime, e2-prime, which sweeps away from the standard basis as theta increases"
+  />
+</InteractiveSection>
+
 ### Complex vector spaces, and a subtlety about dimension
 
 Everything above works verbatim with $F=\mathbb{C}$: $\mathbb{C}^n$ is a
@@ -228,6 +248,6 @@ problem is asking for.
 
 ## Further Exploration
 
-Next: **Inner Products and Orthogonality**, which adds the missing
+Next: [Inner Products and Orthogonality](/lessons/quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality), which adds the missing
 geometric structure (length and angle) that a bare vector space doesn't
 have on its own.

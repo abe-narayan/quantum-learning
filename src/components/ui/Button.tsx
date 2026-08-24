@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { MouseEventHandler, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, MouseEventHandler, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
@@ -20,16 +20,24 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
   lg: "px-5 py-2.5 text-base",
 };
 
-export type ButtonProps = {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  className?: string;
-  children: ReactNode;
-  href?: string;
-  type?: "button" | "submit" | "reset";
-  disabled?: boolean;
-  onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-};
+// Omit the props we redeclare below (with narrower/different types, e.g.
+// `type` and `onClick`) so the native HTML attribute types don't conflict
+// with them — everything else (aria-*, data-*, etc.) passes through as-is
+// and is spread onto the rendered element, not just accepted by the type.
+type NativeButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "disabled" | "onClick" | "className" | "children">;
+type NativeAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "onClick" | "className" | "children">;
+
+export type ButtonProps = NativeButtonProps &
+  NativeAnchorProps & {
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+    className?: string;
+    children: ReactNode;
+    href?: string;
+    type?: "button" | "submit" | "reset";
+    disabled?: boolean;
+    onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  };
 
 export function Button({
   variant = "primary",
@@ -40,19 +48,20 @@ export function Button({
   type,
   disabled,
   onClick,
+  ...rest
 }: ButtonProps) {
   const classes = cn(BASE_CLASSES, VARIANT_CLASSES[variant], SIZE_CLASSES[size], className);
 
   if (href) {
     return (
-      <Link href={href} className={classes} onClick={onClick}>
+      <Link href={href} className={classes} onClick={onClick} {...rest}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button type={type ?? "button"} disabled={disabled} className={classes} onClick={onClick}>
+    <button type={type ?? "button"} disabled={disabled} className={classes} onClick={onClick} {...rest}>
       {children}
     </button>
   );

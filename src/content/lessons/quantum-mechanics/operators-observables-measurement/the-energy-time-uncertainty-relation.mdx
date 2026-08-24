@@ -1,9 +1,21 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/the-energy-time-uncertainty-relation"
 ).map((problem) => problem.meta);
+
+export const boundFrame = (deltaEHalves) => ({
+  paramLabel: `ΔE = ${(deltaEHalves / 2).toFixed(2)}`,
+  series: [
+    {
+      label: "ΔE · Δt_A",
+      color: "brand",
+      points: Array.from({ length: 31 }, (_, i) => ({ x: (i / 30) * 3, y: (deltaEHalves / 2) * ((i / 30) * 3) }))
+    }
+  ]
+});
 
 export const lessonMeta = {
   title: "The Energy-Time Uncertainty Relation",
@@ -134,6 +146,15 @@ for every observable. The relation is a genuine constraint on what
 combinations of these quantities are physically possible, not just a
 computed check.
 
+<InteractiveSection title="Find the minimum allowed Δt_A for a given ΔE" description="Drag ΔE and watch the line ΔE · Δt_A sweep. The reference line marks ℏ/2 — everywhere the curve sits below it is physically forbidden, so the crossing point is exactly the minimum Δt_A this ΔE allows. A larger ΔE pushes that minimum smaller, matching this lesson's own practice question.">
+  <ParametricCurve
+    frames={Array.from({ length: 9 }, (_, i) => boundFrame(i + 1))}
+    sliderLabel="ΔE"
+    referenceLines={[{ y: 0.5, label: "ℏ/2 bound" }]}
+    ariaLabel="A line showing delta E times delta t sub A growing with delta t sub A, against a fixed reference line at h-bar over 2, with a slider controlling delta E"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -181,6 +202,6 @@ Ehrenfest's theorem instead.
 
 ## Further Exploration
 
-Next: **Degeneracy in Practice**, a single fully worked multi-qubit
+Next: [Degeneracy in Practice](/lessons/quantum-mechanics/operators-observables-measurement/degeneracy-in-practice), a single fully worked multi-qubit
 system pulling together spectral decomposition, compatible observables,
 and the generalized measurement postulate from earlier in this course.

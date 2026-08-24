@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/the-position-and-momentum-operators"
@@ -149,6 +150,18 @@ $$
 confirming the eigenvalue equation this whole derivation was built to
 satisfy, by direct substitution.
 
+A genuine plane wave isn't normalizable, but a broad Gaussian packet
+built with a definite central momentum approximates one closely, and
+this platform's simulator computes its momentum expectation value from a
+real Fourier transform, not a label:
+
+<InteractiveSection
+  title="Set the momentum, watch ⟨p⟩ track it"
+  description="Try the Free Gaussian Packet preset and change its Momentum parameter. Watch the ⟨p⟩ readout track the value you set — the eigenvalue relation derived above, checked live against a real computed expectation value."
+>
+  <LazyWavefunctionExplorer />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -192,7 +205,7 @@ $x$ times $\hat p\psi$.
 
 ## Further Exploration
 
-Next: **Momentum Space and the Fourier Transform**, the momentum-space
+Next: [Momentum Space and the Fourier Transform](/lessons/quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform), the momentum-space
 representation $\phi(k)$ this section's plane-wave eigenfunctions build
 toward, and the actual numerical machinery (a real FFT) this platform uses
 to compute it, explored live in the Wavefunction Explorer.

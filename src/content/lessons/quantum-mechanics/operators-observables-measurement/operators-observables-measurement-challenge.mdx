@@ -1,9 +1,34 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { PAULI_Z } from "@/lib/quantum/gates";
+import { projectorOntoSubspace } from "@/lib/quantum/projectors";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/operators-observables-measurement-challenge"
 ).map((problem) => problem.meta);
+
+export const degenerateEigvec1 = [new Complex(1), new Complex(0), new Complex(0)];
+export const degenerateEigvec2 = [new Complex(0), new Complex(1), new Complex(0)];
+export const synthesisP = projectorOntoSubspace([degenerateEigvec1, degenerateEigvec2]);
+export const synthesisPresets = [
+  {
+    label: "P (a projector): P vs P²",
+    panels: [
+      { label: "P", cells: matrixToCells(synthesisP), highlightDiagonal: true },
+      { label: "P²", cells: matrixToCells(synthesisP.mul(synthesisP)), highlightDiagonal: true }
+    ]
+  },
+  {
+    label: "Pauli-Z (Hermitian, not a projector): Z vs Z²",
+    panels: [
+      { label: "Z", cells: matrixToCells(PAULI_Z), highlightDiagonal: true },
+      { label: "Z²", cells: matrixToCells(PAULI_Z.mul(PAULI_Z)), highlightDiagonal: true }
+    ]
+  }
+];
 
 export const lessonMeta = {
   title: "Operators, Observables & Measurement Challenge",
@@ -78,6 +103,13 @@ $P(a_i\text{ again})=\langle\psi'|P_i|\psi'\rangle=1$. Repeated
 immediate measurement of the same observable never disturbs its own
 outcome. Only an *incompatible* observable measured in between can, as
 Sequential Measurements demonstrated.
+
+<InteractiveSection title="Idempotent versus merely Hermitian" description="Compare a genuine projector (P² = P, the property this example relies on) against Pauli-Z, which is Hermitian but not idempotent (Z² = I ≠ Z). Idempotence is a real, extra condition beyond Hermiticity, not automatic.">
+  <MatrixGridExplorer
+    presets={synthesisPresets}
+    ariaLabel="Choose between a projector and a merely-Hermitian operator to compare each one against its own square"
+  />
+</InteractiveSection>
 
 **3. Two observables $A$ and $B$ satisfy $[A,B]=0$. A student claims this
 means measuring $A$ then $B$ always gives the same result as measuring

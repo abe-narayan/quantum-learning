@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors"
@@ -128,6 +129,16 @@ measurable interference effects. Every one of those predictions has been
 confirmed experimentally. This is not a mathematical formalism chosen
 for elegance, it's the formalism that happens to match reality.
 
+## Interactive Experiment
+
+The bar chart above computed one specific case of destructive
+interference. Reproduce it yourself, live, instead of only reading the
+precomputed bars.
+
+<InteractiveSection title="Make interference happen yourself" description="Switch to Two Amplitudes (α, β) mode. Set α's magnitude to about 0.71 (≈√½) so both amplitudes start out equal-sized, then drag the relative-phase slider to 180°. Watch the Quantum |α+β|² bar drop to zero while the Classical |α|²+|β|² bar stays pinned at 1, the same two bars compared above, now produced live from sliders instead of only computed once.">
+  <LazyComplexAmplitudeExplorer />
+</InteractiveSection>
+
 ## Worked Example
 
 **Is $|\psi\rangle = \frac{1}{2}|0\rangle + \frac{\sqrt3}{2}i\,|1\rangle$ a valid quantum state?**
@@ -197,6 +208,6 @@ of the sum) before treating it as a physical state.
 
 ## Further Exploration
 
-Next: **The Bloch Sphere**, where those two real parameters become
+Next: [The Bloch Sphere](/lessons/quantum-computing/qubits-and-quantum-states/the-bloch-sphere), where those two real parameters become
 concrete angles $\theta$ and $\varphi$, and the abstract vector space of
 this lesson turns into an actual picture you can rotate.

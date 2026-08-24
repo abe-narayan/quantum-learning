@@ -12,6 +12,20 @@ export const oneState = new StateVector([Complex.ZERO, Complex.ONE]);
 export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
 export const plusZeroOverlap = plusState.innerProduct(zeroState).re;
 
+export const mixingAngles = [0, Math.PI / 8, Math.PI / 4, (3 * Math.PI) / 8, Math.PI / 2];
+
+export const mixingStates = mixingAngles.map(
+  (theta) => new StateVector([new Complex(Math.cos(theta)), new Complex(Math.sin(theta))])
+);
+
+export const mixingFrames = mixingStates.map((psi, i) => ({
+  paramLabel: `θ = ${Math.round((mixingAngles[i] * 180) / Math.PI)}°`,
+  bars: [
+    { label: "⟨0|ψ⟩", value: zeroState.innerProduct(psi).re, caption: zeroState.innerProduct(psi).re.toFixed(2) },
+    { label: "⟨1|ψ⟩", value: oneState.innerProduct(psi).re, caption: oneState.innerProduct(psi).re.toFixed(2) },
+  ],
+}));
+
 export const lessonMeta = {
   title: "Dirac Notation",
   description:
@@ -153,6 +167,21 @@ makes every other calculation in this course tractable: whenever a term
 like $\langle0|1\rangle$ appears, it's zero, and whenever $\langle0|0\rangle$
 appears, it's one.
 
+## Interactive Experiment
+
+The bar chart above showed four fixed overlap values. Sweep continuously
+between $|0\rangle$ and $|1\rangle$ and watch the "something in between"
+case fill in the whole range, not just one example of it.
+
+<InteractiveSection title="Sweep the overlap continuously" description="Drag the slider to sweep ψ = cos(θ)|0⟩ + sin(θ)|1⟩ from θ = 0 (exactly |0⟩) to θ = 90° (exactly |1⟩). Watch ⟨0|ψ⟩ shrink smoothly from 1 to 0 while ⟨1|ψ⟩ grows from 0 to 1, the full continuum of overlap values orthonormality only showed you the two endpoints of.">
+  <BarChartExplorer
+    frames={mixingFrames}
+    sliderLabel="Mixing angle θ"
+    ariaLabel="Inner products of the zero and one basis states with psi equals cosine theta zero plus sine theta one, as theta sweeps from 0 to 90 degrees"
+    maxValue={1}
+  />
+</InteractiveSection>
+
 ## Worked Example
 
 **Compute $\langle+|0\rangle$, where $|+\rangle = \frac{1}{\sqrt2}(|0\rangle+|1\rangle)$.**
@@ -213,7 +242,7 @@ product happens to be real.
 
 ## Further Exploration
 
-Next: **Quantum States and State Vectors**, where we use this notation to
+Next: [Quantum States and State Vectors](/lessons/quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors), where we use this notation to
 state the actual postulates governing which vectors count as physical
 qubit states, and derive exactly how many real numbers it takes to
 describe one.

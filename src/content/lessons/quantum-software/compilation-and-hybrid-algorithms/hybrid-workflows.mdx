@@ -89,6 +89,21 @@ the two, with the quantum device doing only the one piece (native
 quantum-mechanical evaluation) classical computers fundamentally cannot
 do efficiently.
 
+<InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. The per-iteration bar stays fixed at 6 SWAP gates, exactly this section's overhead figure, while the total-run bar grows as N times 6, the same multiplication the worked example below performs by hand for N=200.">
+  <BarChartExplorer
+    sliderLabel="Iterations (N)"
+    ariaLabel="Per-iteration SWAP overhead (fixed at 6) versus total SWAP gates across the full optimization run (6 times N), as iteration count N grows"
+    maxValue={1200}
+    frames={[1, 20, 50, 100, 150, 200].map((n) => ({
+      paramLabel: `N = ${n}`,
+      bars: [
+        { label: "Per iteration", value: 6, caption: "6" },
+        { label: "Total run (N×6)", value: 6 * n, caption: `${6 * n}`, highlight: true },
+      ],
+    }))}
+  />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 Recognizing this loop structure explains a real, practical fact about
@@ -160,7 +175,7 @@ optimization run needs.
 
 ## Further Exploration
 
-Next: **Variational Algorithm Implementation**, which builds this exact
+Next: [Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation), which builds this exact
 loop end to end using this platform's own `QuantumCircuit`, closing the
 gap between this course's software concepts and Quantum Algorithms II's
 physics.

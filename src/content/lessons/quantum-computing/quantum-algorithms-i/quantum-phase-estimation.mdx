@@ -3,6 +3,8 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { Complex } from "@/lib/quantum/complex";
 import { phaseGate } from "@/lib/quantum/gates";
 import { phaseEstimation } from "@/lib/quantum/qft";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/quantum-phase-estimation"
@@ -10,6 +12,22 @@ export const practiceProblems = getProblemsForLesson(
 
 export const qpeExactProbs = phaseEstimation(phaseGate(2 * Math.PI * (3 / 8)), [Complex.ZERO, Complex.ONE], 3).probabilities();
 export const qpeSmearedProbs = phaseEstimation(phaseGate(2 * Math.PI * (1 / 3)), [Complex.ZERO, Complex.ONE], 3).probabilities();
+
+export const qpeSweepK = [0, 1, 2, 3, 4, 5, 6, 7];
+
+export const qpeSweepProbs = qpeSweepK.map((k) =>
+  phaseEstimation(phaseGate(2 * Math.PI * (k / 8)), [Complex.ZERO, Complex.ONE], 3).probabilities()
+);
+
+export const qpeSweepFrames = qpeSweepK.map((k, i) => ({
+  paramLabel: `φ = ${k}/8`,
+  bars: [0, 1, 2, 3, 4, 5, 6, 7].map((x) => ({
+    label: String(x),
+    value: qpeSweepProbs[i][x * 2 + 1],
+    highlight: x === k,
+    caption: `${(qpeSweepProbs[i][x * 2 + 1] * 100).toFixed(1)}%`,
+  })),
+}));
 
 export const lessonMeta = {
   title: "Quantum Phase Estimation",
@@ -154,6 +172,30 @@ controls the *largest* power ($U^{2^{t-1}}$), not the smallest; swapping
 this convention silently reads out the phase's bits in the wrong order.
 </Callout>
 
+### Sweeping through every exactly-representable phase
+
+The $\varphi=3/8$ example above is one of exactly eight phases $k/8$
+($k=0,\dots,7$) that are exactly representable with $t=3$ precision bits.
+The same derivation predicts a certain spike at outcome $k$ for every one
+of them, not just $k=3$:
+
+<InteractiveSection
+  title="A certain spike at every one of eight phases"
+  description="Scrub k from 0 to 7 to change the target phase to k eighths, still with t=3 precision qubits. Every one of these eight phases is exactly representable in 3 bits, so phaseEstimation returns a certain spike at outcome k every time, the same derivation checked at every one of its eight possible answers instead of just one."
+>
+  <BarChartExplorer
+    frames={qpeSweepFrames}
+    sliderLabel="Target phase (k / 8)"
+    ariaLabel="Precision-register measurement probability distribution for phi = k/8 with t=3 precision qubits, as k sweeps from 0 to 7, showing a single certain spike at outcome k every time"
+    maxValue={1}
+  />
+</InteractiveSection>
+
+Every frame has exactly one bar at probability $1.0$ and seven bars at
+exactly $0$, with the spike tracking $k$ one-for-one: the same certainty
+this lesson derived algebraically, now checked at all eight exactly
+representable phases, not just the one worked out by hand above.
+
 ## Practice Questions
 
 1. Repeat the derivation's logic for $\varphi=1/4$ with $t=2$ precision
@@ -187,7 +229,7 @@ this convention silently reads out the phase's bits in the wrong order.
 
 ## Further Exploration
 
-Next: **Grover's Algorithm**, which returns to Deutsch-Jozsa's style of
+Next: [Grover's Algorithm](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion), which returns to Deutsch-Jozsa's style of
 problem (a search rather than a period) and gets a *quadratic*, not
 exponential, speedup, for reasons this course makes precise rather than
 hand-waves.

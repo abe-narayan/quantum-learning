@@ -60,15 +60,9 @@ is exactly the procedure a real lab runs, except with actual noisy
 hardware measurements standing in for this platform's exact engine
 calls.
 
-Try running a calibration scan yourself: pick a coupling strength $V$
-below, step through time, and find where P(1) first peaks. Recompute
-$\Omega$ from that peak time using $t_\pi=\pi/(2V)$, then compare it to
-the slider's actual $V$ value to check your recovered number. Then set a
-nonzero detuning and see why a calibration scan run at the wrong drive
-frequency would recover the wrong (and lower-than-true) Rabi frequency
-entirely.
-
-<LazyRabiExplorer />
+<InteractiveSection title="Recover Ω from a scan" description={`Try running a calibration scan yourself: pick a coupling strength V below, step through time, and find where P(1) first peaks. Recompute Ω from that peak time using t_π=π/(2V), then compare it to the slider's actual V value to check your recovered number. Then set a nonzero detuning and see why a calibration scan run at the wrong drive frequency would recover the wrong (and lower-than-true) Rabi frequency entirely.`}>
+  <LazyRabiExplorer />
+</InteractiveSection>
 
 ### Calibration must be repeated
 

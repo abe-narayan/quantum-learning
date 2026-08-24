@@ -1,9 +1,31 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, phaseGate } from "@/lib/quantum/gates";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/from-postulates-to-quantum-computing"
 ).map((problem) => problem.meta);
+
+export const qubitPlus = StateVector.zero(1).applyMatrix(HADAMARD);
+
+export const stateAfterPhase = (phiDeg) => qubitPlus.applyMatrix(phaseGate((phiDeg * Math.PI) / 180));
+
+export const zBasisProbabilities = (phiDeg) => stateAfterPhase(phiDeg).probabilities();
+
+export const xBasisProbabilities = (phiDeg) => stateAfterPhase(phiDeg).applyMatrix(HADAMARD).probabilities();
+
+export const phaseGateFrame = (phiDeg) => ({
+  paramLabel: `φ = ${phiDeg}°`,
+  bars: [
+    { label: "P(0), Z basis", value: zBasisProbabilities(phiDeg)[0] },
+    { label: "P(1), Z basis", value: zBasisProbabilities(phiDeg)[1] },
+    { label: "P(+), X basis", value: xBasisProbabilities(phiDeg)[0], highlight: true },
+    { label: "P(-), X basis", value: xBasisProbabilities(phiDeg)[1] },
+  ],
+});
+
+export const phaseGateFrames = Array.from({ length: 13 }, (_, i) => phaseGateFrame(i * 30));
 
 export const lessonMeta = {
   title: "From Postulates to Quantum Computing",
@@ -77,6 +99,15 @@ gate was applied beforehand. A phase gate changes $\varphi$, invisibly to
 a $\{|0\rangle,|1\rangle\}$-basis measurement, but a
 $\{|+\rangle,|-\rangle\}$-basis measurement reveals it immediately, via
 the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
+
+<InteractiveSection title="Slide φ, watch phase hide in one basis and appear in the other" description="Starting from H|0⟩ = |+⟩, a phase gate with angle φ is applied, then the qubit is measured in the {|0⟩,|1⟩} basis and, separately, in the {|+⟩,|-⟩} basis. Every bar below is computed by literally multiplying the platform's real Hadamard and phase-gate matrices, not typed in from the formula. Watch the Z-basis bars stay frozen at 0.5 for every φ, while the X-basis bars swing with it exactly as P(+) = (1+cos φ)/2 predicts.">
+  <BarChartExplorer
+    frames={phaseGateFrames}
+    sliderLabel="φ (degrees)"
+    ariaLabel="Measurement probabilities in the computational Z basis and the plus-minus X basis, recomputed live from the real Hadamard and phase gate matrices as phi varies from 0 to 360 degrees"
+    maxValue={1}
+  />
+</InteractiveSection>
 
 **3. Two qubits are combined via a tensor product. What guarantees the
 combined 4-dimensional state is automatically normalized, if each qubit

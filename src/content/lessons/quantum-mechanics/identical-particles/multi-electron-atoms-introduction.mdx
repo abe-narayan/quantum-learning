@@ -1,9 +1,30 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/identical-particles/multi-electron-atoms-introduction"
 ).map((problem) => problem.meta);
+
+export const shellCapacities = [2, 2, 6, 2, 6];
+export const shellLabels = ["1s", "2s", "2p", "3s", "3p"];
+export const shellFillCounts = (electronCount) =>
+  shellCapacities.reduce(
+    (acc, cap) => ({
+      remaining: acc.remaining - Math.max(0, Math.min(cap, acc.remaining)),
+      filled: [...acc.filled, Math.max(0, Math.min(cap, acc.remaining))]
+    }),
+    { remaining: electronCount, filled: [] }
+  ).filled;
+export const shellFillFrame = (electronCount) => ({
+  paramLabel: `${electronCount} electrons`,
+  bars: shellLabels.map((label, i) => ({
+    label,
+    value: shellFillCounts(electronCount)[i] / shellCapacities[i],
+    caption: `${shellFillCounts(electronCount)[i]}/${shellCapacities[i]}`,
+    highlight: shellFillCounts(electronCount)[i] > 0 && shellFillCounts(electronCount)[i] < shellCapacities[i]
+  }))
+});
 
 export const lessonMeta = {
   title: "Multi-Electron Atoms (Introduction)",
@@ -93,11 +114,11 @@ periodic table lookup required.
 
 <BarChart
   bars={[
-    { label: "1s", value: 2, caption: "2/2" },
-    { label: "2s", value: 2, caption: "2/2" },
-    { label: "2p", value: 2, caption: "2/6", highlight: true },
+    { label: "1s", value: 2 / 2, caption: "2/2" },
+    { label: "2s", value: 2 / 2, caption: "2/2" },
+    { label: "2p", value: 2 / 6, caption: "2/6", highlight: true },
   ]}
-  maxValue={6}
+  maxValue={1}
   ariaLabel="Carbon's electron configuration: 1s2 2s2 2p2, with 2p only partially filled"
 />
 
@@ -105,6 +126,15 @@ periodic table lookup required.
 times 2 for spin) holds only 2 of its 6 available slots, exactly why
 carbon's outer shell isn't closed and it forms 4 bonds rather than being
 chemically inert.
+
+<InteractiveSection title="Fill the shells for any element" description="Slide through electron counts and watch the shells fill in order. Land on 10 to check this lesson's own practice question 2 (neon), and notice 3s only starts filling once 2p is completely full at 10.">
+  <BarChartExplorer
+    frames={Array.from({ length: 19 }, (_, i) => shellFillFrame(i + 1))}
+    sliderLabel="Electron count"
+    ariaLabel="Electron shell filling recomputed live as the electron count increases, showing each subshell filling to capacity before the next begins"
+    maxValue={1}
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

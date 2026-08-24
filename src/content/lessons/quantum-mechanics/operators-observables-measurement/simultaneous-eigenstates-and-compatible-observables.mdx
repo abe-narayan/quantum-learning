@@ -1,9 +1,24 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PAULI_X, PAULI_Y, PAULI_Z } from "@/lib/quantum/gates";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/simultaneous-eigenstates-and-compatible-observables"
 ).map((problem) => problem.meta);
+
+export const commutatorPreset = (label, a, aLabel, b, bLabel) => ({
+  label,
+  panels: [
+    { label: `${aLabel}${bLabel}`, cells: matrixToCells(a.mul(b)) },
+    { label: `${bLabel}${aLabel}`, cells: matrixToCells(b.mul(a)) }
+  ]
+});
+export const incompatiblePresets = [
+  commutatorPreset("X and Z", PAULI_X, "X", PAULI_Z, "Z"),
+  commutatorPreset("X and Y", PAULI_X, "X", PAULI_Y, "Y")
+];
 
 export const lessonMeta = {
   title: "Simultaneous Eigenstates and Compatible Observables",
@@ -114,6 +129,13 @@ $\{|+\rangle,|-\rangle\}$, and neither $|0\rangle$ nor $|1\rangle$ is an
 eigenvector of $X$ (applying $X$ swaps them instead of rescaling either
 one).
 
+<InteractiveSection title="Check both orderings, for two different pairs" description="Switch between the X-Z pair and the X-Y pair. In both cases the two products differ — every distinct pair of Pauli matrices is mutually incompatible, not just the one pair worked out above.">
+  <MatrixGridExplorer
+    presets={incompatiblePresets}
+    ariaLabel="Choose a pair of Pauli operators to compare their product in both orders, confirming the two orders give different matrices"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -156,7 +178,7 @@ itself.
 
 ## Further Exploration
 
-Next: **Complete Sets of Commuting Observables**, using this lesson's
+Next: [Complete Sets of Commuting Observables](/lessons/quantum-mechanics/operators-observables-measurement/complete-sets-of-commuting-observables), using this lesson's
 degenerate-case tool to show how *multiple* compatible observables
 together can fully pin down a unique state, even when no single one of
 them can.

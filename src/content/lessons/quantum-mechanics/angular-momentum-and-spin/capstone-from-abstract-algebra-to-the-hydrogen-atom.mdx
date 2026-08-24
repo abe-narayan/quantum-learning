@@ -1,9 +1,22 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { angularMomentumZ, totalAngularMomentumSquared } from "@/lib/quantum/angularMomentum";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom"
 ).map((problem) => problem.meta);
+
+export const hydrogenPresetForL = (l) => ({
+  label: `l = ${l}  (${2 * l + 1} degenerate m-states)`,
+  panels: [
+    { label: "Lz (diagonal m·ħ eigenvalues)", cells: matrixToCells(angularMomentumZ(l)), highlightDiagonal: true },
+    { label: "L² = l(l+1)ħ²·I (same for every m)", cells: matrixToCells(totalAngularMomentumSquared(l)), highlightDiagonal: true }
+  ]
+});
+
+export const hydrogenLValues = [0, 1, 2, 3];
+export const hydrogenPresets = hydrogenLValues.map(hydrogenPresetForL);
 
 export const lessonMeta = {
   title: "Capstone: From Abstract Algebra to the Hydrogen Atom",
@@ -69,6 +82,21 @@ This is the single biggest reason this course had to come before the
 Hydrogen Atom course, not after: the angular part of the problem is
 *entirely solved already*, by Lesson 3's explicit functions, before any
 radial equation is even written down.
+
+Every $m$ value at a given $l$ shares the same $\vec L^{\,2}$ eigenvalue,
+$l(l+1)\hbar^2$ (Lesson 2's formula), which is exactly why they end up
+energy-degenerate for any central potential: $H$ only sees $\vec L^{\,2}$
+and $r$, never $L_z$ directly.
+
+<InteractiveSection
+  title="Step through l, watch L² ignore m entirely"
+  description="Step through l = 0, 1, 2, 3. L² (right panel) stays exactly l(l+1) times the identity, the same number regardless of m: this is exactly why every m-state at a given l is energy-degenerate for any central potential. Lz's diagonal (left panel) shows the 2l+1 distinct m eigenvalues those degenerate states actually carry."
+>
+  <MatrixGridExplorer
+    presets={hydrogenPresets}
+    ariaLabel="Lz and L-squared operator matrices for orbital angular momentum l=0 through l=3, showing 2l+1 distinct Lz eigenvalues all sharing the same L-squared eigenvalue"
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 

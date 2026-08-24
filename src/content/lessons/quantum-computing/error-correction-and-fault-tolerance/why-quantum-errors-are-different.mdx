@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/why-quantum-errors-are-different"
@@ -104,6 +105,18 @@ different scheme, built from entanglement and syndrome extraction, that
 happens to solve the same underlying problem (protect information from
 noise) using only what quantum mechanics actually allows.
 
+## Interactive Experiment
+
+Obstacle 3's fix, measure only a syndrome, is not a hypothetical. It is
+the real `runBitFlipCorrectionCycle` engine this platform actually runs.
+Try it directly: inject an error, watch the syndrome come out, and check
+that the corrected state's amplitudes still match the original encoding
+exactly, for the same $\alpha,\beta$ the lesson's text already claims.
+
+<InteractiveSection title="Watch a syndrome get measured without collapsing the data" description="Inject an X error on any of the three qubits. Read the syndrome (s1, s2), then check the corrected state's amplitude table against the original 0.6, 0.8 encoding it started from. The syndrome bits change with the injected error; the recovered logical amplitudes never do, exactly the no-collapse claim above, checked directly instead of only argued.">
+  <LazySyndromeExplorer mode="bit-flip" />
+</InteractiveSection>
+
 ## Worked Example
 
 **Confirm $Y=iXZ$ directly, connecting the $Y$-error case to $X$ and $Z$
@@ -165,5 +178,5 @@ not just a specific tested pair).
 
 ## Further Exploration
 
-Next: **The Three-Qubit Bit-Flip Code**, building and verifying the first
+Next: [The Three-Qubit Bit-Flip Code](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code), building and verifying the first
 concrete code, protecting against $X$ errors specifically, end to end.

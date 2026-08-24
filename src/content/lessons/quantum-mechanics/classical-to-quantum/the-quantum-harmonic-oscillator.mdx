@@ -1,12 +1,32 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
-import { harmonicOscillatorEnergyLevels } from "@/lib/quantum/harmonicOscillator";
+import { harmonicOscillatorEnergyLevels, creationOperator } from "@/lib/quantum/harmonicOscillator";
+import { Complex } from "@/lib/quantum/complex";
 
 export const oscillatorLevels = harmonicOscillatorEnergyLevels(6, 1);
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
 ).map((problem) => problem.meta);
+
+export const ladderDimension = 5;
+export const ladderOperator = creationOperator(ladderDimension);
+
+export const ladderResultVector = (n) =>
+  ladderOperator.apply(
+    Array.from({ length: ladderDimension }, (_, j) => (j === n ? new Complex(1) : Complex.ZERO))
+  );
+
+export const ladderFrame = (n) => ({
+  paramLabel: `a†|${n}⟩ in a 5-level truncation (ħω=1)`,
+  bars: ladderResultVector(n).map((amp, k) => ({
+    label: `|${k}⟩`,
+    value: amp.re,
+    highlight: k === n + 1,
+  })),
+});
+
+export const ladderFrames = Array.from({ length: ladderDimension }, (_, n) => ladderFrame(n));
 
 export const lessonMeta = {
   title: "The Quantum Harmonic Oscillator",
@@ -172,6 +192,15 @@ $a^\dagger|2\rangle = \sqrt{3}\,|3\rangle$, a state safely below the
 approximation. The energy is
 $E_2=\hbar\omega(2+\tfrac12)=1\cdot2.5=2.5$.
 
+<InteractiveSection title="Slide n, watch the raising operator act" description="Each bar shows the actual coefficients of a†|n⟩ in the |0⟩...|4⟩ Fock basis, computed by literally applying the platform's real creationOperator matrix, the same 5-level truncation as the worked example. n = 2 reproduces a†|2⟩ = √3|3⟩ exactly. Slide to n = 4, the top of this truncation, to see the honest truncation error from Practice Question 2: every bar drops to 0, since there is no |5⟩ left in this basis for a† to raise into.">
+  <BarChartExplorer
+    frames={ladderFrames}
+    sliderLabel="n"
+    ariaLabel="Coefficients of a-dagger acting on the Fock basis state n, recomputed live from the real creation operator matrix as n varies from 0 to 4, showing the raising rule and the truncation artifact at the top level"
+    maxValue={2}
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -217,7 +246,7 @@ is a specific linear function of $N$, not the same operator.
 
 ## Further Exploration
 
-Next: **Position and Momentum**, which introduces the continuous
+Next: [Position and Momentum](/lessons/quantum-mechanics/classical-to-quantum/position-and-momentum), which introduces the continuous
 observables the harmonic oscillator's true physical Hamiltonian is built
 from, and connects their commutation relation to the uncertainty
 principle derived earlier in this course.

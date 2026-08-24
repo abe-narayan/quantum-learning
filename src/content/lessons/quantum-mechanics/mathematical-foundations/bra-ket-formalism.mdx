@@ -1,9 +1,39 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/bra-ket-formalism"
 ).map((problem) => problem.meta);
+
+export const outerProduct = (u, v) => [
+  [{ re: u[0] * v[0], im: 0 }, { re: u[0] * v[1], im: 0 }],
+  [{ re: u[1] * v[0], im: 0 }, { re: u[1] * v[1], im: 0 }]
+];
+export const cellSum = (a, b) => [
+  [{ re: a[0][0].re + b[0][0].re, im: 0 }, { re: a[0][1].re + b[0][1].re, im: 0 }],
+  [{ re: a[1][0].re + b[1][0].re, im: 0 }, { re: a[1][1].re + b[1][1].re, im: 0 }]
+];
+export const standardBasisPreset = {
+  label: "Standard basis {|0⟩, |1⟩}",
+  panels: [
+    { label: "|0⟩⟨0|", cells: outerProduct([1, 0], [1, 0]) },
+    { label: "|1⟩⟨1|", cells: outerProduct([0, 1], [0, 1]) },
+    { label: "Sum", cells: cellSum(outerProduct([1, 0], [1, 0]), outerProduct([0, 1], [0, 1])), highlightDiagonal: true }
+  ]
+};
+export const hadamardBasisPreset = {
+  label: "Hadamard basis {|+⟩, |−⟩}",
+  panels: [
+    { label: "|+⟩⟨+|", cells: outerProduct([0.7071, 0.7071], [0.7071, 0.7071]) },
+    { label: "|−⟩⟨−|", cells: outerProduct([0.7071, -0.7071], [0.7071, -0.7071]) },
+    {
+      label: "Sum",
+      cells: cellSum(outerProduct([0.7071, 0.7071], [0.7071, 0.7071]), outerProduct([0.7071, -0.7071], [0.7071, -0.7071])),
+      highlightDiagonal: true
+    }
+  ]
+};
 
 export const lessonMeta = {
   title: "The Bra-Ket Formalism",
@@ -135,6 +165,13 @@ which is exactly $|\psi\rangle$ by how it was expanded in the first place.
 The completeness relation acts as the identity on *every* vector, so it
 equals the identity operator.
 
+<InteractiveSection title="Check completeness for a second basis" description="The standard basis {|0⟩, |1⟩} isn't special: switch to the Hadamard basis {|+⟩, |−⟩} and confirm the two projectors still sum to the identity, exactly as the derivation above promises for any orthonormal basis.">
+  <MatrixGridExplorer
+    presets={[standardBasisPreset, hadamardBasisPreset]}
+    ariaLabel="Choose a basis to see its two rank-one projectors and their sum, which equals the identity matrix in both cases"
+  />
+</InteractiveSection>
+
 ### Operator matrix elements
 
 For an operator $A$, the number $\langle i|A|j\rangle$ (a bra, then $A$,
@@ -220,6 +257,6 @@ itself.
 
 ## Further Exploration
 
-Next: **Linear Operators**, which develops matrix representation and
+Next: [Linear Operators](/lessons/quantum-mechanics/mathematical-foundations/linear-operators), which develops matrix representation and
 composition fully, including a derivation of matrix multiplication
 *from* the completeness relation just built here.

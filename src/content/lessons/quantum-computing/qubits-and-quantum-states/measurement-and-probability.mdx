@@ -113,19 +113,9 @@ measurement postulate says it's a fundamental feature of the theory.
 
 ## Interactive Experiment
 
-<LazyBlochSphereExplorer />
-
-- Prepare $|+\rangle$ using the preset, then click **Measure** several
-  times in a row (using Reset or the preset button to re-prepare $|+\rangle$
-  between clicks, since each measurement collapses the state). You should
-  see roughly even 0s and 1s.
-- The simulator's Measure button always measures in the computational
-  (Z) basis, but you can measure in the X-basis with the tools you
-  already have: apply **H**, *then* Measure. Try it from $|+\rangle$:
-  `H` sends $|+\rangle$ to $|0\rangle$ exactly (the next lesson derives
-  why), so measuring afterward is deterministic, a clean way to see that
-  "measure in the X basis" and "rotate then measure in Z" are the same
-  operation.
+<InteractiveSection title="Measure in Z, then fake an X-basis measurement" description={`Prepare |+⟩ using the preset, then click Measure several times in a row (using Reset or the preset button to re-prepare |+⟩ between clicks, since each measurement collapses the state). You should see roughly even 0s and 1s. The simulator's Measure button always measures in the computational (Z) basis, but you can measure in the X-basis with the tools you already have: apply H, then Measure. Try it from |+⟩: H sends |+⟩ to |0⟩ exactly (the next lesson derives why), so measuring afterward is deterministic, a clean way to see that "measure in the X basis" and "rotate then measure in Z" are the same operation.`}>
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ## Worked Example
 
@@ -192,6 +182,6 @@ directly.
 
 ## Further Exploration
 
-Next: **Quantum Gates**, where we finally define the $X,Y,Z,H,S,T$
+Next: [Quantum Gates](/lessons/quantum-computing/qubits-and-quantum-states/quantum-gates), where we finally define the $X,Y,Z,H,S,T$
 operators precisely, and connect each one to a specific rotation of the
 Bloch vector.

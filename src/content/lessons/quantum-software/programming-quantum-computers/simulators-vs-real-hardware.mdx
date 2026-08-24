@@ -1,5 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { stateVectorAmplitudeCount, stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
+
+export const formatMemoryBytes = (bytes) => (
+  bytes < 1e6 ? `${(bytes / 1e3).toFixed(1)} KB`
+  : bytes < 1e9 ? `${(bytes / 1e6).toFixed(1)} MB`
+  : bytes < 1e12 ? `${(bytes / 1e9).toFixed(1)} GB`
+  : bytes < 1e15 ? `${(bytes / 1e12).toFixed(1)} TB`
+  : `${(bytes / 1e15).toFixed(1)} PB`
+);
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/programming-quantum-computers/simulators-vs-real-hardware"
@@ -73,6 +82,21 @@ laptop handles this easily), already 17.2 GB at 30 qubits, and 18.0 PB
 at 50 qubits, beyond any existing classical system's storage. The wall
 isn't a rough estimate; it's an exact, computed curve.
 </Callout>
+
+<InteractiveSection title="Feel the exponential wall yourself" description="Slide n from 10 up to 50 qubits. Both bars are log10-scaled since they span many orders of magnitude, but the captions show the real numbers, computed live by this platform's own stateVectorAmplitudeCount and stateVectorMemoryBytes, the exact same functions behind the 16.8 MB, 17.2 GB, and 18.0 PB figures quoted above.">
+  <BarChartExplorer
+    sliderLabel="Qubit count (n)"
+    ariaLabel="State-vector amplitude count and memory required, both on a log10 scale, as qubit count n grows from 10 to 50"
+    maxValue={Math.log10(stateVectorMemoryBytes(50))}
+    frames={[10, 15, 20, 25, 30, 35, 40, 45, 50].map((n) => ({
+      paramLabel: `n = ${n}`,
+      bars: [
+        { label: "Amplitudes (2ⁿ)", value: Math.log10(stateVectorAmplitudeCount(n)), caption: stateVectorAmplitudeCount(n).toExponential(2) },
+        { label: "Memory", value: Math.log10(stateVectorMemoryBytes(n)), caption: formatMemoryBytes(stateVectorMemoryBytes(n)), highlight: true },
+      ],
+    }))}
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 

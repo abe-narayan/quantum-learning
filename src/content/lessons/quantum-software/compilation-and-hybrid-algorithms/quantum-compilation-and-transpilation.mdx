@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { swapOverheadForLinearChain } from "@/lib/quantum/transpilation";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation"
@@ -75,6 +76,83 @@ several more real gates that can fail.
 Distance 1 (already-adjacent qubits) needs zero SWAPs, exactly what the
 formula predicts; the highlighted bar at $d=5$ is the Worked Example
 below.
+
+Rather than reading a single fixed diagram, step through every distance
+from 1 to 5 below and watch the SWAP-walk grow (and the highlighted CNOT
+column shift right) exactly as $2(d-1)$ predicts:
+
+<InteractiveSection title="Step through the SWAP-network by distance" description="Slide across d=1 through d=5, control fixed at qubit 0. At d=1 the qubits are already adjacent, so it's a bare CNOT with zero SWAPs. Each increase in d adds one more SWAP each way, exactly the 2(d-1) overhead the bar chart above already counted.">
+  <CircuitDiagramExplorer
+    sliderLabel="Distance (d)"
+    frames={[
+      {
+        paramLabel: "d = 1",
+        numQubits: 6,
+        highlightColumn: 0,
+        ariaLabel: "SWAP-network CNOT(0,1) on a linear chain: 0 SWAP gates, already adjacent",
+        instructions: [
+          { gate: "CNOT", targets: [0, 1] }
+        ],
+      },
+      {
+        paramLabel: "d = 2",
+        numQubits: 6,
+        highlightColumn: 1,
+        ariaLabel: "SWAP-network CNOT(0,2) on a linear chain: 2 SWAP gates plus one CNOT",
+        instructions: [
+          { gate: "SWAP", targets: [0, 1] },
+          { gate: "CNOT", targets: [1, 2] },
+          { gate: "SWAP", targets: [0, 1] }
+        ],
+      },
+      {
+        paramLabel: "d = 3",
+        numQubits: 6,
+        highlightColumn: 2,
+        ariaLabel: "SWAP-network CNOT(0,3) on a linear chain: 4 SWAP gates plus one CNOT",
+        instructions: [
+          { gate: "SWAP", targets: [0, 1] },
+          { gate: "SWAP", targets: [1, 2] },
+          { gate: "CNOT", targets: [2, 3] },
+          { gate: "SWAP", targets: [1, 2] },
+          { gate: "SWAP", targets: [0, 1] }
+        ],
+      },
+      {
+        paramLabel: "d = 4",
+        numQubits: 6,
+        highlightColumn: 3,
+        ariaLabel: "SWAP-network CNOT(0,4) on a linear chain: 6 SWAP gates plus one CNOT",
+        instructions: [
+          { gate: "SWAP", targets: [0, 1] },
+          { gate: "SWAP", targets: [1, 2] },
+          { gate: "SWAP", targets: [2, 3] },
+          { gate: "CNOT", targets: [3, 4] },
+          { gate: "SWAP", targets: [2, 3] },
+          { gate: "SWAP", targets: [1, 2] },
+          { gate: "SWAP", targets: [0, 1] }
+        ],
+      },
+      {
+        paramLabel: "d = 5",
+        numQubits: 6,
+        highlightColumn: 4,
+        ariaLabel: "SWAP-network CNOT(0,5) on a linear chain: 8 SWAP gates plus one CNOT",
+        instructions: [
+          { gate: "SWAP", targets: [0, 1] },
+          { gate: "SWAP", targets: [1, 2] },
+          { gate: "SWAP", targets: [2, 3] },
+          { gate: "SWAP", targets: [3, 4] },
+          { gate: "CNOT", targets: [4, 5] },
+          { gate: "SWAP", targets: [3, 4] },
+          { gate: "SWAP", targets: [2, 3] },
+          { gate: "SWAP", targets: [1, 2] },
+          { gate: "SWAP", targets: [0, 1] }
+        ],
+      }
+    ]}
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 
@@ -171,7 +249,7 @@ the logical outcome.
 
 ## Further Exploration
 
-Next: **Gate Decomposition**, which covers the OTHER major compilation
+Next: [Gate Decomposition](/lessons/quantum-software/compilation-and-hybrid-algorithms/gate-decomposition), which covers the OTHER major compilation
 step: translating each individual gate into a specific hardware's native
 gate set, verified directly against several of this platform's own gate
 matrices.

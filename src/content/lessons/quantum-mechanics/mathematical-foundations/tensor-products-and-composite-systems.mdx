@@ -1,9 +1,31 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PAULI_X, IDENTITY } from "@/lib/quantum/gates";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/tensor-products-and-composite-systems"
 ).map((problem) => problem.meta);
+
+export const subsystemPresets = [
+  {
+    label: "X ⊗ I (gate on qubit 0 only)",
+    panels: [
+      { label: "X", cells: matrixToCells(PAULI_X) },
+      { label: "I", cells: matrixToCells(IDENTITY) },
+      { label: "X ⊗ I", cells: matrixToCells(PAULI_X.tensor(IDENTITY)) }
+    ]
+  },
+  {
+    label: "I ⊗ X (gate on qubit 1 only)",
+    panels: [
+      { label: "I", cells: matrixToCells(IDENTITY) },
+      { label: "X", cells: matrixToCells(PAULI_X) },
+      { label: "I ⊗ X", cells: matrixToCells(IDENTITY.tensor(PAULI_X)) }
+    ]
+  }
+];
 
 export const lessonMeta = {
   title: "Tensor Products and Composite Systems",
@@ -117,6 +139,13 @@ and extended linearly to the rest of the space. This is exactly what
 "apply a gate to qubit 0 only, leaving qubit 1 alone" means, if you've
 seen quantum circuits: $A\otimes I$ acting on the whole two-qubit space.
 
+<InteractiveSection title="See which qubit the gate actually hits" description="Toggle which qubit Pauli-X targets. X ⊗ I and I ⊗ X are both real 4×4 matrices built from the same two 2×2 pieces, but land in different positions entirely — the tensor-product ordering is exactly what encodes which subsystem a gate acts on.">
+  <MatrixGridExplorer
+    presets={subsystemPresets}
+    ariaLabel="Toggle which qubit a Pauli-X gate targets to see the resulting four by four tensor product matrix change"
+  />
+</InteractiveSection>
+
 ### Why not every vector is a simple product: a dimension count
 
 Here is the central fact this lesson has been building toward. A simple
@@ -203,7 +232,7 @@ system's index $1$, and so on.
 
 ## Further Exploration
 
-Next: **Probability and Quantum States**, which assembles every tool from
+Next: [Probability and Quantum States](/lessons/quantum-mechanics/mathematical-foundations/probability-and-quantum-states), which assembles every tool from
 this course, unit vectors, Hermitian observables, eigenvalues, the
 bra-ket formalism, into the actual postulates connecting the mathematics
 to physical predictions.

@@ -1,6 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
+export const readoutFidelities = [95, 96, 97, 98, 99];
+export const readoutFrames = readoutFidelities.map((pct) => ({
+  paramLabel: `${pct}% fidelity`,
+  bars: [
+    { label: "Correct", value: Math.round((1000 * pct) / 100), caption: `${Math.round((1000 * pct) / 100)} shots` },
+    { label: "Readout error", value: 1000 - Math.round((1000 * pct) / 100), caption: `${1000 - Math.round((1000 * pct) / 100)} shots`, highlight: true },
+  ],
+}));
+
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/control-and-readout/qubit-readout-techniques"
 ).map((problem) => problem.meta);
@@ -105,6 +114,21 @@ single run.
   ariaLabel="Out of 1000 shots at 97% readout fidelity, 970 report the correct bit and 30 report a readout error"
 />
 
+Representative current devices don't sit at exactly 97%. They sit
+anywhere in the 95-99% range this lesson already named. Sliding across
+that whole range shows the same $1000\times(1-\text{fidelity})$
+arithmetic the worked example just performed by hand, at every value in
+the stated range, not only the one case above:
+
+<InteractiveSection title="Explore the 95-99% fidelity range" description="Slide from 95% up to 99% fidelity. Both bars are computed the same way as the worked example above: correct shots = 1000 times fidelity, readout errors = 1000 times (1 minus fidelity). Notice even 99% fidelity, the best end of the stated range, still leaves a real 10-shot error count out of 1000.">
+  <BarChartExplorer
+    sliderLabel="Readout fidelity"
+    ariaLabel="Correct versus readout-error shot counts out of 1000, across readout fidelities from 95% to 99%"
+    maxValue={1000}
+    frames={readoutFrames}
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -149,7 +173,7 @@ error to ignore.
 
 ## Further Exploration
 
-Next: **Calibration**, which covers how a real device's actual pulse
+Next: [Calibration](/lessons/quantum-hardware/control-and-readout/calibration), which covers how a real device's actual pulse
 parameters (Rabi frequency, resonance frequency) are found and kept
 accurate over time, since none of this lesson's or the previous
 lesson's formulas work with parameters that drift uncalibrated.

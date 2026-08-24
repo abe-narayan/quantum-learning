@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { CourseProgressBadge } from "./CourseProgressBadge";
+import { LessonCompletionMark } from "./LessonCompletionMark";
 import type { Course, Difficulty, LessonMetaWithSlug } from "@/lib/content/types";
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
@@ -26,6 +28,9 @@ export function CourseList({
         const completedModules = course.modules.filter((module) => lessonByModule.has(module.slug)).length;
         const isComplete = completedModules === totalModules;
         const isStarted = completedModules > 0;
+        const authoredLessonSlugs = course.modules
+          .map((module) => lessonByModule.get(module.slug)?.slug)
+          .filter((slug): slug is string => Boolean(slug));
 
         return (
           <Card key={course.slug}>
@@ -40,6 +45,7 @@ export function CourseList({
                 <Badge tone={isComplete ? "accent" : isStarted ? "neutral" : "neutral"}>
                   {completedModules}/{totalModules} lessons{isComplete ? " · complete" : ""}
                 </Badge>
+                <CourseProgressBadge lessonSlugs={authoredLessonSlugs} />
               </div>
             </div>
 
@@ -55,12 +61,15 @@ export function CourseList({
                       {module.title}
                     </span>
                     {lesson ? (
-                      <Link
-                        href={`/lessons/${lesson.slug}`}
-                        className="shrink-0 text-xs font-medium text-brand hover:underline"
-                      >
-                        View →
-                      </Link>
+                      <span className="flex shrink-0 items-center gap-2">
+                        <LessonCompletionMark slug={lesson.slug} />
+                        <Link
+                          href={`/lessons/${lesson.slug}`}
+                          className="text-xs font-medium text-brand hover:underline"
+                        >
+                          View →
+                        </Link>
+                      </span>
                     ) : (
                       <Badge>Coming soon</Badge>
                     )}

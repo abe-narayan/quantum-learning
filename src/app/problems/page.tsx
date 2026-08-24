@@ -5,7 +5,7 @@ import { ProblemsCatalog } from "@/components/problems/ProblemsCatalog";
 import { getAllProblemMeta } from "@/lib/problems/registry";
 
 export const metadata: Metadata = {
-  title: "Problems & Quizzes",
+  title: "Problems",
   description: "Practice problems for checking your understanding of quantum computing, graded exactly against the real quantum engine.",
 };
 

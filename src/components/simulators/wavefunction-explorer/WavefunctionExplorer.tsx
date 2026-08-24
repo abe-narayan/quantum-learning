@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { PRESETS, defaultParamValues, type PresetId } from "./presets";
 import type { CanvasMode } from "./WavefunctionCanvas";
 import { PresetControls } from "./PresetControls";
@@ -54,21 +55,12 @@ export function WavefunctionExplorer() {
 
   return (
     <div className="not-prose rounded-3xl border border-border bg-surface p-6">
-      <div className="flex flex-wrap gap-2">
-        {PRESETS.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            onClick={() => handlePresetChange(p.id)}
-            className={
-              "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors " +
-              (p.id === presetId ? "bg-brand text-brand-foreground" : "border border-border bg-surface text-muted-foreground hover:bg-surface-muted")
-            }
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
+      <PresetToggle
+        options={PRESETS}
+        index={PRESETS.findIndex((p) => p.id === presetId)}
+        onChange={(index) => handlePresetChange(PRESETS[index].id)}
+        ariaLabel="Wavefunction presets"
+      />
       <p className="mt-3 text-sm text-muted-foreground">{preset.description}</p>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">

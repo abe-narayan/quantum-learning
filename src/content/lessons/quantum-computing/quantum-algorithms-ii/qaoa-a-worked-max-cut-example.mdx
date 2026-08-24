@@ -1,9 +1,31 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { qaoaCircuit, expectedCutSize, bruteForceMaxCut } from "@/lib/quantum/qaoa";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example"
 ).map((problem) => problem.meta);
+
+export const landscapeEdges = [[0, 1], [1, 2], [0, 2]];
+export const landscapeTrueMax = bruteForceMaxCut(3, landscapeEdges);
+export const landscapeBaseline = 1.5;
+export const landscapeBetas = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9];
+export const landscapeGammas = Array.from({ length: 41 }, (_, i) => (i / 40) * Math.PI);
+export const landscapeFrames = landscapeBetas.map((beta) => ({
+  paramLabel: `β = ${beta.toFixed(2)}`,
+  series: [
+    {
+      label: "⟨cut⟩(γ) at fixed β",
+      color: "brand",
+      points: landscapeGammas.map((gamma) => ({
+        x: gamma,
+        y: expectedCutSize(qaoaCircuit(3, landscapeEdges, [gamma], [beta]), landscapeEdges)
+      }))
+    }
+  ]
+}));
 
 export const lessonMeta = {
   title: "QAOA: A Worked Max-Cut Example",
@@ -81,6 +103,15 @@ represent a full classical optimizer implementation, but it does find
 genuinely good parameters via genuinely evaluating the same
 `qaoaCircuit`/`expectedCutSize` functions a real optimizer would call.
 
+<InteractiveSection title="A bumpy landscape, not a single peak" description="Slide β across the values a grid search would try. Each curve sweeps γ continuously at that fixed β, for the real triangle circuit. Notice the curve bumps up and down rather than having one obvious peak, and which β gives the best peak height changes as you slide, exactly why a 2D grid (not a single 1D formula) was needed. At β=0.30 the curve's peak sits right at the grid-searched γ≈0.6, brushing the true maximum (dashed line at 2), matching the ≈1.999 result quoted above.">
+  <ParametricCurve
+    frames={landscapeFrames}
+    sliderLabel="mixer angle β"
+    referenceLines={[{ y: landscapeTrueMax, label: "true max = 2" }, { y: landscapeBaseline, label: "baseline |E|/2 = 1.5" }]}
+    ariaLabel="Expected triangle cut size as a function of the cost angle γ, for several fixed mixer angles β, showing the QAOA cost landscape's bumpy, non-closed-form shape"
+  />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 Both results land close to, but not exactly at, the true maximum: the
@@ -150,6 +181,6 @@ each time.
 
 ## Further Exploration
 
-Next, the capstone: **Hybrid Algorithms, NISQ, and Honest Scope**, which
+Next, the capstone: [Hybrid Algorithms, NISQ, and Honest Scope](/lessons/quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope), which
 places Shor's algorithm and the VQE/QAOA family side by side against what
 today's actual quantum hardware can and can't do.

@@ -1,9 +1,36 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { PAULI_X, PAULI_Y } from "@/lib/quantum/gates";
+import { uncertainty, commutatorExpectation } from "@/lib/quantum/observables";
+import { Complex } from "@/lib/quantum/complex";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/expectation-values-and-uncertainty"
 ).map((problem) => problem.meta);
+
+export const uncertaintyStateAt = (thetaDeg) =>
+  new StateVector([
+    new Complex(Math.cos((thetaDeg * Math.PI) / 180)),
+    new Complex(Math.sin((thetaDeg * Math.PI) / 180)),
+  ]);
+
+export const uncertaintyFrame = (thetaDeg) => ({
+  paramLabel: `|ψ⟩ = cos(${thetaDeg}°)|0⟩ + sin(${thetaDeg}°)|1⟩`,
+  bars: [
+    {
+      label: "ΔX·ΔY",
+      value: uncertainty(uncertaintyStateAt(thetaDeg), PAULI_X) * uncertainty(uncertaintyStateAt(thetaDeg), PAULI_Y),
+      highlight: thetaDeg === 0,
+    },
+    {
+      label: "½|⟨[X,Y]⟩|",
+      value: 0.5 * commutatorExpectation(uncertaintyStateAt(thetaDeg), PAULI_X, PAULI_Y).magnitude(),
+    },
+  ],
+});
+
+export const uncertaintyFrames = Array.from({ length: 19 }, (_, i) => uncertaintyFrame(i * 5));
 
 export const lessonMeta = {
   title: "Expectation Values and Uncertainty",
@@ -166,6 +193,14 @@ merely satisfied. (This is expected: $|0\rangle$ is a special "minimum
 uncertainty" state for this pair, not a coincidence of the numbers
 chosen.)
 
+<InteractiveSection title="Slide θ, watch the bound track the product exactly" description="|ψ(θ)⟩ = cos θ|0⟩ + sin θ|1⟩ generalizes |0⟩ (θ = 0°, the worked example) to |+⟩ (θ = 45°, practice question 2). Both ΔX·ΔY and the bound ½|⟨[X,Y]⟩| are recomputed live by the platform's real expectation-value and commutator functions, not typed in by hand — watch them stay equal all the way from θ = 0° to 90°, including the θ = 45° point where both sides drop to exactly 0.">
+  <BarChartExplorer
+    frames={uncertaintyFrames}
+    sliderLabel="θ (degrees)"
+    ariaLabel="Delta X times Delta Y and the uncertainty relation's bound, both recomputed live from the real state vector and Pauli operators as theta varies from 0 to 90 degrees"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -211,6 +246,6 @@ any trade-off at all.
 
 ## Further Exploration
 
-Next: **Time Evolution and the Schrödinger Equation**, which uses
+Next: [Time Evolution and the Schrödinger Equation](/lessons/quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation), which uses
 Postulate 4 to derive exactly what $U(t)$ looks like, and works a genuine
 two-level example computed directly with the existing quantum engine.

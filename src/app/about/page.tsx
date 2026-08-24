@@ -1,31 +1,56 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
+import { COURSES } from "@/lib/content/curriculum";
+import { getAllLessonsMeta } from "@/lib/content/lessons";
+import { getAllProblemMeta } from "@/lib/problems/registry";
 
 export const metadata: Metadata = {
   title: "About",
   description: "What QuantumLearn is, and who it's built for.",
 };
 
-export default function AboutPage() {
+const SIMULATOR_COUNT = 10;
+
+export default async function AboutPage() {
+  const lessons = await getAllLessonsMeta();
+  const problemCount = getAllProblemMeta().length;
+
+  const stats = [
+    { label: "Lessons", value: lessons.length },
+    { label: "Practice problems", value: problemCount },
+    { label: "Courses", value: COURSES.length },
+    { label: "Simulators", value: SIMULATOR_COUNT },
+  ];
+
   return (
     <Container className="py-16">
       <PageHeader
         eyebrow="About"
         title="About QuantumLearn"
-        description="QuantumLearn is a platform for teaching real quantum computing to advanced high-school and early-college students."
+        description="QuantumLearn is a platform for teaching quantum mechanics and quantum computing to advanced high-school and early-college students, from the underlying math through real algorithms and a real atom."
       />
 
-      <div className="mt-12 grid gap-6 sm:grid-cols-2">
+      <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {stats.map((stat) => (
+          <Card key={stat.label} className="text-center">
+            <p className="text-3xl font-semibold tracking-tight text-foreground">{stat.value}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
+          </Card>
+        ))}
+      </div>
+
+      <div className="mt-6 grid gap-6 sm:grid-cols-2">
         <Card>
           <h3 className="text-lg font-semibold text-foreground">Our approach</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            We treat quantum computing as a serious subject, not a novelty.
-            Lessons build the underlying math and physics before introducing
-            algorithms, and every concept is paired with an interactive
-            simulator so intuition comes from direct experimentation, not
-            just reading.
+            We treat quantum mechanics and quantum computing as one connected
+            subject, not two separate ones. Lessons build the underlying math
+            and physics before introducing algorithms or hardware, and every
+            concept is paired with an interactive simulator so intuition
+            comes from direct experimentation, not just reading.
           </p>
         </Card>
         <Card>
@@ -33,10 +58,29 @@ export default function AboutPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Students with a solid grounding in algebra and an interest in
             physics or computer science — no prior quantum mechanics or
-            linear algebra required, though it helps.
+            linear algebra required, though it helps. The curriculum spans
+            four tracks: quantum mechanics, quantum computing, quantum
+            hardware, and quantum software.
           </p>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <h3 className="text-lg font-semibold text-foreground">How this is verified</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Every simulator on this platform (the Bloch sphere, the wavefunction
+          explorer, the density-matrix explorer, and the rest) is backed by
+          this platform&rsquo;s own tested quantum-physics engine — real
+          linear algebra, a real numerical Schrödinger-equation solver, real
+          Kraus-operator noise channels — not a scripted animation. Practice
+          problems are graded against exact, worked solutions rather than
+          approximate pattern matching. See{" "}
+          <Link href="/simulators" className="text-brand hover:underline">
+            the simulators
+          </Link>{" "}
+          directly.
+        </p>
+      </Card>
     </Container>
   );
 }

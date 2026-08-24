@@ -5,6 +5,25 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/classical-states-and-observables"
 ).map((problem) => problem.meta);
 
+export const oscillatorMass = 1;
+export const oscillatorK = 4;
+export const oscillatorX = 1;
+
+export const classicalEnergyFrame = (p) => ({
+  paramLabel: `x = 1, p = ${p.toFixed(1)} → E(x,p) = ${(p ** 2 / (2 * oscillatorMass) + 0.5 * oscillatorK * oscillatorX ** 2).toFixed(2)}`,
+  bars: [
+    { label: "Kinetic p²/2m", value: p ** 2 / (2 * oscillatorMass) },
+    { label: "Potential ½kx²", value: 0.5 * oscillatorK * oscillatorX ** 2 },
+    {
+      label: "Total E(x,p)",
+      value: p ** 2 / (2 * oscillatorMass) + 0.5 * oscillatorK * oscillatorX ** 2,
+      highlight: Math.abs(p - 2) < 0.05,
+    },
+  ],
+});
+
+export const classicalEnergyFrames = Array.from({ length: 21 }, (_, i) => classicalEnergyFrame(i * 0.2));
+
 export const lessonMeta = {
   title: "Classical States and Observables",
   description:
@@ -123,6 +142,14 @@ $$
 This value is exact and unambiguous. There is nothing probabilistic
 about evaluating a function at a known point.
 
+<InteractiveSection title="Slide p, watch E(x,p) respond deterministically" description="x is held fixed at 1. Drag p and watch the kinetic term, potential term, and total energy recompute instantly, with no spread and no probability distribution anywhere. p = 2 is marked, reproducing the worked example's E = 4 exactly.">
+  <BarChartExplorer
+    frames={classicalEnergyFrames}
+    sliderLabel="p (momentum)"
+    ariaLabel="Kinetic energy, potential energy, and total energy of the classical oscillator recomputed live as momentum p varies, with p equals 2 highlighted matching the worked example"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -163,6 +190,6 @@ same kind viewed at different scales.
 
 ## Further Exploration
 
-Next: **From Classical to Quantum Probability**, which introduces the
+Next: [From Classical to Quantum Probability](/lessons/quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability), which introduces the
 specific experimental fact, interference, that no epistemic probability
 distribution over any hidden classical state can reproduce.

@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both"
@@ -90,6 +91,22 @@ nesting idea, taken further (codes protecting codes protecting codes), is
 exactly how real fault-tolerant quantum computing scales, a theme the
 capstone returns to.
 
+## Interactive Experiment
+
+The Shor code nests two mechanisms this platform already simulates
+exactly, individually: the inner bit-flip code (protecting each group of
+3 against X errors) and the outer phase-flip code (protecting across the
+3 groups against Z errors). Explore both real syndrome-extraction
+engines side by side, the same two pieces the construction above nests
+together.
+
+<InteractiveSection title="Both nested mechanisms, run separately" description="Left: the inner bit-flip mechanism, protecting a single group of 3 physical qubits against X errors. Right: the outer phase-flip mechanism, protecting at the level of 3 logical groups against Z errors. Inject an error into each and confirm the syndrome and recovery. Concatenation nests exactly these two pieces; neither piece is new here.">
+  <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+    <LazySyndromeExplorer mode="bit-flip" />
+    <LazySyndromeExplorer mode="phase-flip" />
+  </div>
+</InteractiveSection>
+
 ## Worked Example
 
 **Trace what happens to a lone $Z$ error on one physical qubit within the
@@ -153,6 +170,6 @@ Lessons 2 and 3 already built.
 
 ## Further Exploration
 
-Next: **Stabilizer Formalism Basics**, which gives a compact, general
+Next: [Stabilizer Formalism Basics](/lessons/quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics), which gives a compact, general
 language for describing codes like these, using the two 3-qubit codes
 already built as the concrete worked examples.

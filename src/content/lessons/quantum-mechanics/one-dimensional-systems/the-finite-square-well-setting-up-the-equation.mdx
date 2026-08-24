@@ -1,7 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { createGrid } from "@/lib/quantum/wavefunction";
-import { finiteSquareWellPotential } from "@/lib/quantum/potentials";
+import { finiteSquareWellPotential, finiteSquareWellGroundStateEnergy } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/one-dimensional-systems/the-finite-square-well-setting-up-the-equation"
@@ -9,6 +9,30 @@ export const practiceProblems = getProblemsForLesson(
 
 export const finiteWellGrid = createGrid(256, 0.1);
 export const finiteWellShape = finiteSquareWellPotential(finiteWellGrid, 2, 4);
+
+export const finiteWellHalfWidths = [1, 2, 3];
+export const finiteWellDepths = Array.from({ length: 40 }, (_, i) => 0.5 + (i / 39) * 49);
+export const finiteWellKFrames = finiteWellHalfWidths.map((a) => ({
+  paramLabel: `a = ${a}`,
+  series: [
+    {
+      label: "k (ground state)",
+      color: "brand",
+      points: finiteWellDepths.map((v0) => ({
+        x: v0,
+        y: Math.sqrt(2 * (finiteSquareWellGroundStateEnergy(a, v0) + v0)),
+      })),
+    },
+    {
+      label: "π/(2a), infinite-well limit",
+      color: "muted",
+      points: [
+        { x: finiteWellDepths[0], y: Math.PI / (2 * a) },
+        { x: finiteWellDepths[finiteWellDepths.length - 1], y: Math.PI / (2 * a) },
+      ],
+    },
+  ],
+}));
 
 export const lessonMeta = {
   title: "The Finite Square Well: Setting Up the Equation",
@@ -157,6 +181,17 @@ exactly $n=1$, the ground state. The finite well's transcendental
 equation correctly reduces to the already-solved infinite-well result in
 the appropriate limit, a genuine consistency check.
 
+<InteractiveSection
+  title="Slide a, watch k bend toward the infinite-well line"
+  description="Slide the well's half-width a and watch the ground-state wavenumber k bend toward the dashed π/(2a) line as the well deepens — exactly the infinite-well limit this Worked Example derives, now checked directly against finiteSquareWellGroundStateEnergy for every depth along the curve."
+>
+  <ParametricCurve
+    frames={finiteWellKFrames}
+    sliderLabel="Half-width a"
+    ariaLabel="Ground-state wavenumber k versus well depth V0, for half-width a, approaching the infinite-well limit pi over 2a as V0 grows large"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -201,6 +236,6 @@ a different sign.
 
 ## Further Exploration
 
-Next: **Solving the Finite Well Numerically**, actually finding a bound
+Next: [Solving the Finite Well Numerically](/lessons/quantum-mechanics/one-dimensional-systems/solving-the-finite-well-numerically), actually finding a bound
 state's energy for specific well parameters, and comparing directly to
 the infinite-well limit.

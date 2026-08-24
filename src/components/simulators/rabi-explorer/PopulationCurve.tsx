@@ -9,10 +9,12 @@ export function PopulationCurve({
   samples,
   tMax,
   currentT,
+  currentP1,
 }: {
   samples: { t: number; p1: number }[];
   tMax: number;
   currentT: number;
+  currentP1: number;
 }) {
   const plotWidth = WIDTH - PAD_LEFT;
   const plotHeight = HEIGHT - PAD_TOP - PAD_BOTTOM;
@@ -36,7 +38,7 @@ export function PopulationCurve({
       ))}
       <path d={path} fill="none" className="stroke-brand" strokeWidth={2} />
       <line x1={xOf(currentT)} y1={PAD_TOP} x2={xOf(currentT)} y2={HEIGHT - PAD_BOTTOM} className="stroke-accent" strokeWidth={1.5} strokeDasharray="3 2" />
-      <circle cx={xOf(currentT)} cy={yOf(samples[samples.length - 1]?.p1 ?? 0)} r={4} className="fill-accent" />
+      <circle cx={xOf(currentT)} cy={yOf(currentP1)} r={4} className="fill-accent" />
       <text x={WIDTH - 4} y={HEIGHT - 4} textAnchor="end" className="fill-muted-foreground text-[9px] font-mono">
         t = {tMax.toFixed(1)}
       </text>

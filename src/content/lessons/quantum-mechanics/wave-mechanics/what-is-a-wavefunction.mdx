@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/what-is-a-wavefunction"
@@ -147,6 +148,13 @@ is ever a probability.
 interval width, compares two different kinds of quantities.
 </Callout>
 
+<InteractiveSection
+  title="Narrow σ, watch height rise but area hold at 1"
+  description="Try the Free Gaussian Packet preset and narrow its width σ. The curve's height changes, but the area underneath it — the actual probability, exactly the density-versus-probability distinction above — always stays exactly 1."
+>
+  <LazyWavefunctionExplorer />
+</InteractiveSection>
+
 ## Practice Questions
 
 1. Why must $c_i$ scale as $\sqrt{\Delta x}$, specifically, rather than as
@@ -171,6 +179,6 @@ interval width, compares two different kinds of quantities.
 
 ## Further Exploration
 
-Next: **Probability Density and Normalization**, making the Born-rule
+Next: [Probability Density and Normalization](/lessons/quantum-mechanics/wave-mechanics/probability-density-and-normalization), making the Born-rule
 reinterpretation above fully precise and connecting it to concrete
 expectation-value calculations.

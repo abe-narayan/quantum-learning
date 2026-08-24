@@ -1,5 +1,17 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+
+export const gateBudgetFrames = [
+  {
+    paramLabel: "Superconducting: ~10 ns gate, ~10 μs coherence",
+    bars: [{ label: "Gate budget (10^n gates)", value: 3, caption: "~10³ gates" }],
+  },
+  {
+    paramLabel: "Trapped ion: ~10 μs gate, ~1 s coherence",
+    bars: [{ label: "Gate budget (10^n gates)", value: 5, highlight: true, caption: "~10⁵ gates" }],
+  },
+];
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms"
@@ -89,6 +101,15 @@ worked example: $\sim10^5$ gates before decoherence dominates, versus
 $\sim10^3$ for a representative superconducting device), favoring
 platforms where coherence time, not raw gate speed, is the limiting
 resource for this specific priority.
+
+<InteractiveSection title="Toggle between the two gate budgets" description="Slide between the exact two data points computed above: a representative superconducting device's ~10 ns gate and ~10 μs coherence time give a gate budget of ~10³ operations, while a trapped ion's much slower ~10 μs gate paired with its ~1 s coherence time gives ~10⁵, a factor of 100 more room despite each individual gate being roughly 1000 times slower. The bar height is the base-10 exponent (3 or 5), not the raw count, so both fit on one readable scale.">
+  <BarChartExplorer
+    frames={gateBudgetFrames}
+    sliderLabel="Platform"
+    ariaLabel="Gate budget comparison: superconducting device at roughly 10 to the 3 gates versus trapped ion at roughly 10 to the 5 gates, from this lesson's worked example"
+    maxValue={5}
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

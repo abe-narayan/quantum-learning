@@ -65,6 +65,60 @@ export function applyPhaseOracle(state: StateVector, markedIndices: Iterable<num
   return new StateVector(amps);
 }
 
+/**
+ * Simon's oracle: |x⟩|y⟩ → |x⟩|y⊕f(x)⟩ on a register split into an
+ * `inputQubits`-qubit x register (first, most-significant) and an
+ * equally-sized y register (the rest), where f(x) = min(x, x⊕s) for a
+ * nonzero hidden string `s` (an integer bitmask over `inputQubits` bits).
+ *
+ * Unlike `balancedFunction` (merely balanced), f here satisfies Simon's
+ * genuine 2-to-1 promise: f(x) = f(x⊕s) for every x, and f(x) = f(x') only
+ * for x' ∈ {x, x⊕s}. This holds because XOR-by-s (s≠0) is a fixed-point-free
+ * involution on {0,1}^n, so it partitions the domain into exactly 2^(n-1)
+ * disjoint pairs {x, x⊕s}; taking the minimum of each pair as that pair's
+ * output value is constant within a pair (by definition) and distinct
+ * across different pairs (if two pairs shared their minimum they'd be the
+ * same pair). Implemented as the same "permute basis amplitudes directly"
+ * approach as `applyBitOracle`, generalized from a single output qubit to a
+ * full output register, since Simon's oracle (unlike Deutsch-Jozsa's) is
+ * not single-bit-valued.
+ */
+export function applySimonOracle(state: StateVector, inputQubits: number, hiddenString: number): StateVector {
+  if (hiddenString === 0) {
+    throw new Error("applySimonOracle requires a nonzero hidden string s (s=0 gives a 1-to-1 function, not Simon's 2-to-1 promise).");
+  }
+  const n = state.numQubits;
+  const outputQubits = n - inputQubits;
+  if (outputQubits !== inputQubits) {
+    throw new Error(
+      `applySimonOracle expects an output register the same width as the ${inputQubits}-qubit input register, got ${outputQubits} output qubits (${n} total).`
+    );
+  }
+
+  const xDim = 2 ** inputQubits;
+  const yDim = 2 ** outputQubits;
+  const amps = state.amplitudes;
+  const result = amps.slice();
+
+  for (let x = 0; x < xDim; x++) {
+    const fx = Math.min(x, x ^ hiddenString);
+    if (fx === 0) continue; // y unchanged for this x
+    for (let y = 0; y < yDim; y++) {
+      const yXorFx = y ^ fx;
+      if (yXorFx > y) {
+        // swap each {y, y⊕f(x)} pair exactly once
+        const i0 = x * yDim + y;
+        const i1 = x * yDim + yXorFx;
+        const tmp = result[i0];
+        result[i0] = result[i1];
+        result[i1] = tmp;
+      }
+    }
+  }
+
+  return new StateVector(result);
+}
+
 /** A constant function: f(x) = c for every x. One of Deutsch-Jozsa's two cases. */
 export function constantFunction(c: 0 | 1): (x: number) => 0 | 1 {
   return () => c;

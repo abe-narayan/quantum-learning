@@ -1,5 +1,8 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { classicalOrder } from "@/lib/quantum/shor";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding"
@@ -9,10 +12,35 @@ export const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
 
 export const shorN = 15;
 export const shorA = 7;
-export const shorR = 4; // the order of 7 mod 15, from classicalOrder(7, 15)
+export const shorR = classicalOrder(shorA, shorN);
 export const shorAHalfPower = shorA ** (shorR / 2) % shorN;
 export const shorGcdMinus = gcd(shorAHalfPower - 1, shorN);
 export const shorGcdPlus = gcd(shorAHalfPower + 1, shorN);
+
+export const reductionAValues = [2, 4, 7, 8, 11, 13, 14];
+export const reductionN = 15;
+export const modPow = (base, exp, mod) => Array.from({ length: exp }, () => base).reduce((acc, b) => (acc * b) % mod, 1);
+export const reductionOrders = reductionAValues.map((a) => classicalOrder(a, reductionN));
+export const reductionHalfPowers = reductionAValues.map((a, i) => (reductionOrders[i] % 2 === 0 ? modPow(a, reductionOrders[i] / 2, reductionN) : null));
+export const reductionGcdMinus = reductionHalfPowers.map((h) => (h === null ? null : gcd(h - 1, reductionN)));
+export const reductionGcdPlus = reductionHalfPowers.map((h) => (h === null ? null : gcd(h + 1, reductionN)));
+export const reductionFrames = reductionAValues.map((a, i) => ({
+  paramLabel: `a = ${a}, r = ${reductionOrders[i]}`,
+  bars: [
+    {
+      label: "gcd(a^(r/2)-1, 15)",
+      value: reductionGcdMinus[i] ?? 0,
+      caption: reductionGcdMinus[i] === null ? "r odd" : String(reductionGcdMinus[i]),
+      highlight: reductionGcdMinus[i] !== null && reductionGcdMinus[i] > 1 && reductionGcdMinus[i] < reductionN
+    },
+    {
+      label: "gcd(a^(r/2)+1, 15)",
+      value: reductionGcdPlus[i] ?? 0,
+      caption: reductionGcdPlus[i] === null ? "r odd" : String(reductionGcdPlus[i]),
+      highlight: reductionGcdPlus[i] !== null && reductionGcdPlus[i] > 1 && reductionGcdPlus[i] < reductionN
+    }
+  ]
+}));
 
 export const lessonMeta = {
   title: "Shor's Algorithm: Factoring via Period Finding",
@@ -82,6 +110,15 @@ with probability at least $1/2$, so a handful of random restarts succeeds
 with overwhelming probability. This platform doesn't prove that
 probability bound; it's cited as a known classical result the rest of the
 algorithm depends on, not derived from scratch.
+
+<InteractiveSection title="One base fails where the others succeed" description="Slide through every base a coprime to 15 (a=1 excluded as trivial). Most choices land on a nontrivial factor pair (3 and 5, bars lit up), computed the same way as the a=7 worked example above, straight from classicalOrder and two real gcd calls. Watch a=14 specifically: r=2 is even, but 14≡−1 (mod 15), so both gcd's come back trivial (1 and 15), exactly the second Common Mistake below, not a hypothetical.">
+  <BarChartExplorer
+    frames={reductionFrames}
+    sliderLabel="base a (coprime to 15)"
+    ariaLabel="The two gcd outputs of the classical reduction for each choice of base a coprime to 15, showing which choices yield nontrivial factors and which fail"
+    maxValue={reductionN}
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 
@@ -163,6 +200,6 @@ picking a new $a$, not for concluding $N$ is prime.
 
 ## Further Exploration
 
-Next: **The Quantum Period-Finding Circuit**, which builds $r$
+Next: [The Quantum Period-Finding Circuit](/lessons/quantum-computing/quantum-algorithms-ii/the-quantum-period-finding-circuit), which builds $r$
 quantum-mechanically using exactly the phase estimation machinery from
 Quantum Algorithms I.

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { PlaceholderCard } from "@/components/ui/PlaceholderCard";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
@@ -11,19 +10,14 @@ import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/Lazy
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
 import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
+import { LazyPeriodFindingExplorer } from "@/components/simulators/period-finding-explorer/LazyPeriodFindingExplorer";
+import { LazyQAOAExplorer } from "@/components/simulators/qaoa-explorer/LazyQAOAExplorer";
 
 export const metadata: Metadata = {
   title: "Simulators",
   description: "Interactive quantum simulators for building intuition about qubits and circuits.",
 };
-
-const COMING_SOON_SIMULATORS = [
-  {
-    title: "Interference playground",
-    description: "Explore how amplitude interference powers algorithms like Grover's.",
-    tag: "Coming soon",
-  },
-];
 
 export default function SimulatorsPage() {
   return (
@@ -140,20 +134,55 @@ export default function SimulatorsPage() {
             <LazyNoiseExplorer />
           </div>
         </section>
-      </div>
 
-      <div className="mt-16 border-t border-border pt-12">
-        <h2 className="text-xl font-semibold tracking-tight text-foreground">In development</h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {COMING_SOON_SIMULATORS.map((sim) => (
-            <PlaceholderCard
-              key={sim.title}
-              title={sim.title}
-              description={sim.description}
-              tag={sim.tag}
-            />
-          ))}
-        </div>
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Syndrome Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Inject a real X or Z error into a 3-qubit repetition code and watch the platform&rsquo;s actual
+            error-correction engine extract the syndrome via genuine ancilla CNOTs and partial measurement,
+            decode it, and apply the correction — the bit-flip code and its phase-flip dual, both live.
+          </p>
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground">Bit-flip code</h3>
+              <div className="mt-3">
+                <LazySyndromeExplorer mode="bit-flip" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground">Phase-flip code</h3>
+              <div className="mt-3">
+                <LazySyndromeExplorer mode="phase-flip" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Period-Finding Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Pick any small composite N, any base a coprime to it, and any number of counting qubits, then watch the
+            platform&rsquo;s real period-finding engine (the same QFT-based mechanism behind Shor&rsquo;s algorithm)
+            compute the actual measurement distribution and its peak spacing, not just the one fixed a=7, N=15
+            example shown inside the lessons.
+          </p>
+          <div className="mt-6">
+            <LazyPeriodFindingExplorer />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Max-Cut QAOA Explorer</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Drag the cost angle γ and mixer angle β across a real p=1 QAOA circuit on a few small graphs, and watch
+            the genuinely computed expected cut size chase (or miss) the real brute-force optimum live, generalizing
+            the QAOA lessons&rsquo; own grid-searched, single-graph worked examples into something you can explore
+            yourself.
+          </p>
+          <div className="mt-6">
+            <LazyQAOAExplorer />
+          </div>
+        </section>
       </div>
     </Container>
   );

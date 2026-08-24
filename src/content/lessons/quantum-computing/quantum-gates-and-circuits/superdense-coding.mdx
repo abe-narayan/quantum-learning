@@ -1,0 +1,294 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, applyCNOT, HADAMARD, PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
+
+export const lessonMeta = {
+  title: "Superdense Coding",
+  description:
+    "How a pre-shared Bell pair lets Alice send Bob two classical bits by sending only one qubit: the teleportation circuit, encoded forward and decoded in reverse.",
+  course: "quantum-gates-and-circuits",
+  module: "superdense-coding",
+  order: 1,
+  difficulty: "intermediate",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-computing/quantum-gates-and-circuits/quantum-teleportation"],
+  objectives: [
+    "Derive the four Bell states Alice's four possible gates produce from a shared pair",
+    "Explain why Bob's CNOT-then-H decode circuit is exactly the inverse of the Bell-pair preparation circuit",
+    "Explain why sending one qubit can carry two classical bits without violating any communication bound, since a second qubit was already spent distributing the pair",
+  ],
+};
+
+export const bellPair = applyCNOT(applySingleQubitGate(StateVector.zero(2), HADAMARD, 0), 0, 1);
+
+export const superdenseMessages = [
+  { label: "00", encode: (state) => state },
+  { label: "01", encode: (state) => applySingleQubitGate(state, PAULI_X, 0) },
+  { label: "10", encode: (state) => applySingleQubitGate(state, PAULI_Z, 0) },
+  { label: "11", encode: (state) => applySingleQubitGate(applySingleQubitGate(state, PAULI_Z, 0), PAULI_X, 0) },
+];
+
+export const encodedStates = superdenseMessages.map((msg) => msg.encode(bellPair));
+
+export const decode = (state) => applySingleQubitGate(applyCNOT(state, 0, 1), HADAMARD, 0);
+
+export const decodedStates = encodedStates.map(decode);
+
+export const noEntanglementStart = applySingleQubitGate(StateVector.zero(2), HADAMARD, 0);
+export const noEntanglementDecoded = decode(noEntanglementStart);
+
+export const superdenseFrames = [
+  ...superdenseMessages.map((msg, i) => ({
+    paramLabel: `Message ${msg.label} (entangled pair)`,
+    bars: decodedStates[i]
+      .probabilities()
+      .map((p, j) => ({ label: `|${decodedStates[i].basisLabel(j)}⟩`, value: p, caption: p.toFixed(2) })),
+  })),
+  {
+    paramLabel: "No entanglement (product state)",
+    bars: noEntanglementDecoded
+      .probabilities()
+      .map((p, j) => ({ label: `|${noEntanglementDecoded.basisLabel(j)}⟩`, value: p, caption: p.toFixed(2) })),
+  },
+];
+
+## Motivation
+
+Quantum Teleportation moved an unknown qubit state from Alice to Bob using
+a shared Bell pair, one CNOT, one Hadamard, two measurements, and two
+classical bits. This lesson runs almost the same circuit in the opposite
+direction, for the opposite purpose: instead of moving an unknown *quantum*
+state using entanglement plus two classical bits, Alice sends two
+*classical* bits Bob can recover exactly, by physically transmitting only
+one qubit. One qubit carrying two bits sounds like it should be impossible,
+and it would be, if not for a pre-shared entangled pair doing part of the
+work in advance.
+
+## Intuition
+
+Start from a Bell pair, held half by Alice and half by Bob. Alice's half,
+on its own, looks completely random no matter what she does to it, a fact
+this course established when computing reduced states of entangled
+systems. But the *joint* two-qubit state is one of exactly four
+mutually distinguishable possibilities depending on which of four fixed
+gates Alice applies to her one qubit. She picks the gate matching the two
+bits she wants to send, then physically mails Bob her single qubit. Bob,
+now holding both halves of the original pair, runs one circuit that reads
+off both bits from the joint state with certainty. Nothing here is
+approximate or probabilistic once Bob's qubit arrives: the four outcomes
+are perfectly distinguishable, the same way the four Bell states always
+have been.
+
+## Mathematical Development
+
+### The setup: a shared Bell pair
+
+Exactly as in Quantum Teleportation, Alice and Bob share a Bell pair
+prepared in advance, $H$ on qubit 0 then $\text{CNOT}(0,1)$:
+
+<QuantumStateDisplay state={bellPair} label="The shared pair, |Φ⁺⟩ = (|00⟩+|11⟩)/√2. Alice holds qubit 0, Bob holds qubit 1." />
+
+### Alice encodes two bits into her one qubit
+
+Alice wants to send two classical bits. She applies exactly one of four
+fixed gates to *her* qubit alone (qubit 0), chosen by the bits she wants to
+send, and nothing at all to Bob's:
+
+| Bits to send | Alice's gate | Resulting joint state |
+|---|---|---|
+| $00$ | $I$ (nothing) | $\vert\Phi^+\rangle$ |
+| $01$ | $X$ | $\vert\Psi^+\rangle$ |
+| $10$ | $Z$ | $\vert\Phi^-\rangle$ |
+| $11$ | $Z$ then $X$ | $-\vert\Psi^-\rangle$ |
+
+This is exactly the four-row table Quantum Teleportation used for *Bob's*
+correction, applied here by *Alice*, deliberately rather than as a
+correction for a random measurement outcome. Computing all four with the
+real engine:
+
+<div className="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <QuantumStateDisplay state={encodedStates[0]} label="00 → I" />
+  <QuantumStateDisplay state={encodedStates[1]} label="01 → X" />
+  <QuantumStateDisplay state={encodedStates[2]} label="10 → Z" />
+  <QuantumStateDisplay state={encodedStates[3]} label="11 → Z then X" />
+</div>
+
+All four are genuinely different, mutually orthogonal states (the fourth
+carries an overall $-1$ phase, unobservable on its own and irrelevant to
+what follows). Alice now sends Bob her one qubit, qubit 0, over an ordinary
+quantum channel. That's the entire transmission: **one qubit**, regardless
+of which of the four messages she's sending.
+
+### Bob decodes: the teleportation circuit, reversed
+
+Bob now holds both qubits. Quantum Teleportation's mid-protocol step
+applied $\text{CNOT}(0,1)$ then $H$ on qubit 0 to *disentangle* a message
+qubit from a Bell pair before measuring. Bob runs precisely that circuit
+here, and because $H$ and $\text{CNOT}$ are each their own inverse, this is
+exactly the adjoint of the $H$-then-$\text{CNOT}$ circuit that built the
+Bell pair in the first place:
+
+<div className="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <QuantumStateDisplay state={decodedStates[0]} label="Decoded 00" />
+  <QuantumStateDisplay state={decodedStates[1]} label="Decoded 01" />
+  <QuantumStateDisplay state={decodedStates[2]} label="Decoded 10" />
+  <QuantumStateDisplay state={decodedStates[3]} label="Decoded 11" />
+</div>
+
+Every one of the four decodes to the corresponding computational basis
+state with probability 1 (the $11$ case lands on $-\vert11\rangle$, same
+$100\%$ measurement probability, the global phase again unobservable). Bob
+measures both qubits and reads off exactly the two bits Alice sent, every
+time, with no ambiguity.
+
+### Why the pair has to actually be entangled
+
+This only works because Alice's gate acts on a qubit that starts
+*entangled* with Bob's, not merely in superposition. Replace the true Bell
+pair with the unentangled product state $\vert+\rangle\otimes\vert0\rangle$
+(same reduced state on qubit 0 alone, but qubit 1 no longer correlated with
+it), leave Alice's gate at $I$ (message $00$), and run Bob's identical
+decode circuit:
+
+<QuantumStateDisplay state={noEntanglementDecoded} label="Bob's decode circuit applied to a product state instead of a Bell pair" />
+
+Instead of landing on $\vert00\rangle$ with certainty, Bob gets a uniform
+$25\%$ chance of each of the four outcomes: no information survives.
+Superposition on Alice's qubit alone was never the resource; the
+entanglement between the two qubits is.
+
+<InteractiveSection title="Compare all four messages, and the entanglement-free failure case" description="Scrub through the four real messages Alice can send with a genuine shared Bell pair, each recovered by Bob with certainty, then the fifth frame: the identical decode circuit run on a qubit pair that was never entangled in the first place. Watch the sharp single-outcome bars collapse into a flat, uninformative 25 percent each.">
+  <BarChartExplorer
+    frames={superdenseFrames}
+    sliderLabel="Message / entanglement"
+    ariaLabel="Bob's decoded measurement probabilities over the four two-bit outcomes 00, 01, 10, 11, for each of Alice's four real messages sent over a genuine shared Bell pair, plus a fifth comparison case using an unentangled product state"
+    maxValue={1}
+  />
+</InteractiveSection>
+
+## Physical Interpretation
+
+No communication law is broken here. The Holevo bound limits how much
+classical information a *single* qubit can carry *on its own* to one bit;
+superdense coding respects it exactly, once the accounting includes both
+qubits actually used across the whole protocol. Distributing the Bell pair
+in the first place required sending one qubit (from whoever prepared it to
+whichever of Alice or Bob didn't), and sending the message afterward
+required a second qubit, Alice's. Two qubits of total quantum
+communication carried two classical bits: no more than one bit per qubit,
+on average, exactly as Holevo requires. What superdense coding actually
+buys is timing: the entanglement-distributing qubit can be sent long
+before Alice knows what she wants to say, so *at the moment of the
+message* only one additional qubit needs to move.
+
+## Interactive Experiment
+
+The comparison above already is this lesson's real experiment: every bar
+comes from the platform's own `applySingleQubitGate`, `applyCNOT`, and
+`.probabilities()`, run on Alice's four real encodings and Bob's real
+decode circuit, not a picture of what they're claimed to do. The final,
+flat frame is the same engine applied to a deliberately unentangled input,
+making the necessity of entanglement a computed result rather than an
+assertion.
+
+## Worked Example
+
+**Verify the $11$ row by hand: show that applying $Z$ then $X$ to Alice's
+half of $\vert\Phi^+\rangle=\frac{1}{\sqrt2}(\vert00\rangle+\vert11\rangle)$
+gives $-\vert\Psi^-\rangle$, and that Bob's decode circuit recovers
+$\vert11\rangle$.**
+
+Apply $Z$ to qubit 0 first: $Z\vert0\rangle=\vert0\rangle$ and
+$Z\vert1\rangle=-\vert1\rangle$, so
+$\frac{1}{\sqrt2}(\vert00\rangle+\vert11\rangle)\to\frac{1}{\sqrt2}(\vert00\rangle-\vert11\rangle)=\vert\Phi^-\rangle$.
+Then apply $X$ to qubit 0: $X\vert0\rangle=\vert1\rangle$ and
+$X\vert1\rangle=\vert0\rangle$, so
+$\frac{1}{\sqrt2}(\vert00\rangle-\vert11\rangle)\to\frac{1}{\sqrt2}(\vert10\rangle-\vert01\rangle)=-\frac{1}{\sqrt2}(\vert01\rangle-\vert10\rangle)=-\vert\Psi^-\rangle$,
+matching `encodedStates[3]` above exactly.
+
+For the decode, apply $\text{CNOT}(0,1)$ to
+$-\frac{1}{\sqrt2}(\vert01\rangle-\vert10\rangle)$: the $\vert01\rangle$
+term has control qubit $0$, so target qubit 1 is untouched, staying
+$\vert01\rangle$; the $\vert10\rangle$ term has control qubit $1$, so
+target flips, $\vert10\rangle\to\vert11\rangle$. Result:
+$-\frac{1}{\sqrt2}(\vert01\rangle-\vert11\rangle)$. Now apply $H$ to qubit
+0: on the $\vert0\rangle$-control terms, $H\vert0\rangle=\frac{1}{\sqrt2}(\vert0\rangle+\vert1\rangle)$
+contributes to $\vert01\rangle$; on the $\vert1\rangle$-control term,
+$H\vert1\rangle=\frac{1}{\sqrt2}(\vert0\rangle-\vert1\rangle)$ contributes
+to $-\vert11\rangle$. Collecting terms exactly cancels every amplitude
+except $-\vert11\rangle$, matching `decodedStates[3]` above: Bob measures
+$11$ with certainty, up to the unobservable overall minus sign.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**"Alice sends two qubits."** She sends exactly one: her own half of the
+pre-shared pair, after applying one of four single-qubit gates to it. Bob's
+qubit never travels; it was already in his possession.
+</Callout>
+
+<Callout type="mistake">
+**"This violates the Holevo bound, or lets Alice signal Bob
+instantaneously."** Neither. Holevo's bound is respected once the
+Bell-pair-distributing qubit is counted alongside Alice's message qubit,
+two qubits of quantum communication for two classical bits. And the
+message qubit still has to physically travel from Alice to Bob at ordinary
+speed; nothing about entanglement changes that.
+</Callout>
+
+<Callout type="mistake">
+**"Bob can decode by measuring his qubit alone, without waiting for
+Alice's."** Before Alice's qubit arrives, Bob holds only half of an
+entangled pair; measuring it alone gives a uniformly random bit no matter
+what gate Alice applied; see Bell States and Entanglement for why a
+reduced single-qubit state of an entangled pair carries no information on
+its own. The two bits only become readable once both qubits are back
+together for the joint decode circuit.
+</Callout>
+
+## Practice Questions
+
+1. Verify the $01$ row: show that applying $X$ to qubit 0 of
+   $\vert\Phi^+\rangle$ gives $\vert\Psi^+\rangle$, and that Bob's decode
+   circuit recovers $\vert01\rangle$.
+2. Why must Alice's four gates produce *mutually orthogonal* joint states
+   for this protocol to work at all? What would go wrong if two different
+   messages produced non-orthogonal (partially overlapping) states?
+3. Quantum Teleportation needs two classical bits sent over an ordinary
+   channel, on top of a quantum channel used only for the initial Bell
+   pair. Superdense coding needs one qubit sent over a quantum channel,
+   on top of a quantum channel used only for the initial Bell pair.
+   Compare what kind of "before you start" resource each protocol shares
+   in advance, and what each one is actually built to transmit later.
+4. In the entanglement-free comparison frame, every outcome has
+   probability exactly $0.25$. Using the general fact that measuring any
+   qubit prepared independently of another gives no information about it,
+   explain why $0.25 = 0.5 \times 0.5$ is exactly what you'd expect here.
+
+## Summary
+
+- Alice applies one of four fixed gates, $I$, $X$, $Z$, or $Z$ then $X$,
+  to her half of a pre-shared Bell pair, chosen by the two classical bits
+  she wants to send, and transmits only that one qubit.
+- The four resulting joint states are exactly the four Bell states (one up
+  to an unobservable global phase), computed directly and shown to be
+  mutually distinguishable.
+- Bob's decode circuit, $\text{CNOT}(0,1)$ then $H$ on qubit 0, is the
+  exact inverse of the $H$-then-$\text{CNOT}$ circuit that built the pair,
+  and recovers both bits with certainty.
+- Removing the entanglement (a product state with the same single-qubit
+  reduced state) collapses Bob's result to a flat, uninformative $25\%$
+  per outcome, a computed demonstration that entanglement, not mere
+  superposition, is the resource superdense coding spends.
+- No communication bound is violated: counting the Bell-pair-distributing
+  qubit alongside the message qubit, two qubits of quantum communication
+  carried two classical bits, exactly Holevo's limit.
+
+## Further Exploration
+
+A related protocol built from the same toolkit, single-qubit gates and
+measurement, but with no shared entanglement at all, is [BB84: Quantum
+Key Distribution](/lessons/quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution): where superdense coding uses one entangled pair to
+send twice the classical information a single qubit could otherwise carry,
+BB84 uses no entanglement to let two parties detect, rather than prevent,
+anyone trying to read their qubits in transit.

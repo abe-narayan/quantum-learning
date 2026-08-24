@@ -14,6 +14,8 @@ const PILLAR_OPTIONS: { id: PillarFilter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "quantum-mechanics", label: "Quantum Mechanics" },
   { id: "quantum-computing", label: "Quantum Computing" },
+  { id: "quantum-hardware", label: "Quantum Hardware" },
+  { id: "quantum-software", label: "Quantum Software" },
 ];
 
 const DIFFICULTY_OPTIONS: { id: DifficultyFilter; label: string }[] = [

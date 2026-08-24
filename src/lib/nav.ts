@@ -31,6 +31,16 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Practice problems and quizzes to check your understanding.",
   },
   {
+    label: "Mechanics",
+    href: "/mechanics",
+    description: "The mathematical and physical foundations of quantum theory.",
+  },
+  {
+    label: "Computing",
+    href: "/computing",
+    description: "Qubits, gates, circuits, and the algorithms that use them.",
+  },
+  {
     label: "Hardware",
     href: "/hardware",
     description: "How qubits are physically built, controlled, and scaled.",

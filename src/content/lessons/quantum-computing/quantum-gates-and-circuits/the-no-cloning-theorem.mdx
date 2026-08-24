@@ -1,9 +1,24 @@
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { StateVector } from "@/lib/quantum/state";
+import { Complex } from "@/lib/quantum/complex";
+import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem"
 ).map((problem) => problem.meta);
+
+export const plusSingle = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+
+export const actualCnotOutput = applyCNOT(
+  applySingleQubitGate(StateVector.zero(2), HADAMARD, 0),
+  0,
+  1
+);
+
+export const hypotheticalCloneOutput = plusSingle.tensor(plusSingle);
 
 export const lessonMeta = {
   title: "The No-Cloning Theorem",
@@ -89,6 +104,15 @@ $$
 |+\rangle\otimes|+\rangle = \frac12(|00\rangle+|01\rangle+|10\rangle+|11\rangle)
 $$
 
+Both sides are real, computable states, not just symbols; laying the
+engine's actual output for each side next to the other makes the
+mismatch impossible to miss:
+
+<div className="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <QuantumStateDisplay state={actualCnotOutput} label="What a real device (H then CNOT) actually produces" />
+  <QuantumStateDisplay state={hypotheticalCloneOutput} label="What cloning |+⟩ would require: |+⟩ ⊗ |+⟩" />
+</div>
+
 These are not the same state: $|\Phi^+\rangle$ has zero amplitude on
 $|01\rangle$ and $|10\rangle$; $|+\rangle\otimes|+\rangle$ doesn't.
 **Contradiction.** A $U$ that correctly clones $|0\rangle$ and $|1\rangle$
@@ -110,6 +134,17 @@ instantaneously, which basis someone light-years away chose to measure
 their half in: a faster-than-light signal. No-cloning isn't a
 restriction on quantum mechanics; it's a requirement for quantum
 mechanics to be a consistent theory at all.
+
+## Interactive Experiment
+
+The Common Mistakes section below addresses a specific, tempting
+objection: "CNOT copies bits, so cloning must be possible." Test it
+directly, on the platform's real two-qubit engine, using the exact
+H-then-CNOT sequence this lesson's contradiction step used.
+
+<InteractiveSection title="Try to clone |+⟩ with CNOT" description="Use the Create a Bell state guided walkthrough (H on qubit 0, then CNOT) — exactly this lesson's U(|+⟩⊗|0⟩) computation. Check the resulting state against two independent copies of |+⟩: it lands on the entangled Bell state instead, the same mismatch derived above, now produced by the platform's actual engine rather than only algebra.">
+  <LazyTwoQubitExplorer />
+</InteractiveSection>
 
 ## Worked Example
 
@@ -177,7 +212,7 @@ device correctly copying an *arbitrary, unknown* input.
 
 ## Further Exploration
 
-Next: **Quantum Teleportation**. You can't copy an unknown state, but
+Next: [Quantum Teleportation](/lessons/quantum-computing/quantum-gates-and-circuits/quantum-teleportation). You can't copy an unknown state, but
 you *can* move it, destroying the original in the process. The full
 protocol uses entanglement, CNOT, and partial measurement, all from this
 course, plus the fact you just proved.

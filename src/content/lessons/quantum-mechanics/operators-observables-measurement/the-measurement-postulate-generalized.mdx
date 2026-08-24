@@ -1,9 +1,18 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized"
 ).map((problem) => problem.meta);
+
+export const degenerateBornFrame = (phiDeg) => ({
+  paramLabel: `φ = ${phiDeg}°`,
+  bars: [
+    { label: "P(N=1)", value: Math.cos((phiDeg * Math.PI) / 180) ** 2 },
+    { label: "P(N=2)", value: Math.sin((phiDeg * Math.PI) / 180) ** 2 }
+  ]
+});
 
 export const lessonMeta = {
   title: "The Measurement Postulate, Generalized",
@@ -124,6 +133,15 @@ $$
 (A quick check: $P(N{=}2)=|1/\sqrt3|^2=\tfrac13$, and $\tfrac23+\tfrac13=1$,
 probabilities sum to 1, as they must.)
 
+<InteractiveSection title="Sweep the state, watch both probabilities move" description="A one-parameter family of normalized states, parameterized by φ, sweeping continuously between an eigenstate of N=1 and an eigenstate of N=2. The two bars always sum to exactly 1. Find the φ that reproduces the worked example's 2/3, 1/3 split.">
+  <BarChartExplorer
+    frames={Array.from({ length: 19 }, (_, i) => degenerateBornFrame(i * 5))}
+    sliderLabel="φ"
+    ariaLabel="P of N equals 1 and P of N equals 2 recomputed live as phi sweeps the state between the two eigenspaces, with the two probabilities always summing to 1"
+    maxValue={1}
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -167,6 +185,6 @@ outcomes). Dividing by $\|P_i|\psi\rangle\|$ is not optional.
 
 ## Further Exploration
 
-Next: **Sequential Measurements and Incompatibility**, making
+Next: [Sequential Measurements and Incompatibility](/lessons/quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility), making
 "measuring one observable disturbs another" completely concrete with a
 worked numeric example using operators you already know well.

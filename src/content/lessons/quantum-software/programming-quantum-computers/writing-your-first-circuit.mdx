@@ -53,11 +53,31 @@ Nothing has run yet. `circuit.instructions` holds three
 `GateInstruction` objects (Circuit Representation in Code), waiting to
 be executed.
 
-Build this exact circuit yourself below (H on q0, then CNOT(0,1), then
-CNOT(1,2) on 3 qubits) and confirm you get the same two-peak
-distribution before reading Step 2's exact numbers.
+<InteractiveSection title="Build the GHZ circuit yourself" description="Build this exact circuit yourself below (H on q0, then CNOT(0,1), then CNOT(1,2) on 3 qubits) and confirm you get the same two-peak distribution before reading Step 2's exact numbers.">
+  <LazyCircuitBuilder />
+</InteractiveSection>
 
-<LazyCircuitBuilder />
+### How this looks in Qiskit
+
+As a static comparison only (not run by this platform's own simulator),
+here's the exact same 3-qubit GHZ circuit built with real Qiskit syntax,
+IBM's SDK, using only its long-stable circuit-construction API:
+
+```python
+# Real Qiskit syntax, shown for comparison only.
+from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(3)   # same 3 qubits as new QuantumCircuit(3)
+qc.h(0)                  # same as circuit.h(0)
+qc.cx(0, 1)               # same as circuit.cnot(0, 1)
+qc.cx(1, 2)               # same as circuit.cnot(1, 2)
+qc.measure_all()          # add measurements, needed before sampling on a backend
+```
+
+Same three gates, same qubit indices, same resulting GHZ state
+$\frac1{\sqrt2}(|000\rangle+|111\rangle)$; only the method names
+(`.cx()` instead of `.cnot()`) and the explicit `measure_all()` call
+differ from this platform's own `QuantumCircuit`.
 
 ### Step 2: Run it exactly
 
@@ -172,6 +192,6 @@ results; only shot noise is present in this lesson's idealized
 
 ## Further Exploration
 
-Next: **Simulators vs. Real Hardware**, which adds genuine hardware
+Next: [Simulators vs. Real Hardware](/lessons/quantum-software/programming-quantum-computers/simulators-vs-real-hardware), which adds genuine hardware
 error on top of this lesson's pure shot noise, completing the picture of
 what a real device's output actually looks like.

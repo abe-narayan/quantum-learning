@@ -1,9 +1,25 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PAULI_Y, PAULI_Z, S_GATE } from "@/lib/quantum/gates";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/hermitian-operators"
 ).map((problem) => problem.meta);
+
+export const hermitianCheckPreset = (label, matrix) => ({
+  label,
+  panels: [
+    { label: "M", cells: matrixToCells(matrix) },
+    { label: "M†", cells: matrixToCells(matrix.dagger()) }
+  ]
+});
+export const hermitianPresets = [
+  hermitianCheckPreset("Pauli-Y", PAULI_Y),
+  hermitianCheckPreset("Pauli-Z", PAULI_Z),
+  hermitianCheckPreset("S gate", S_GATE)
+];
 
 export const lessonMeta = {
   title: "Hermitian Operators",
@@ -159,6 +175,13 @@ Hermitian.** A Hermitian matrix must have real entries on its diagonal
 (the $(i,i)$ entry has to equal its own conjugate), and $S$'s bottom-right
 entry, $i$, isn't real.
 
+<InteractiveSection title="Check M = M† for yourself" description="Switch between three real gates and compare M to M† entry by entry. Pauli-Y and Pauli-Z match exactly (Hermitian); the S gate's bottom-right entry flips sign under the dagger and never matches (not Hermitian).">
+  <MatrixGridExplorer
+    presets={hermitianPresets}
+    ariaLabel="Choose an operator to compare its matrix directly against its conjugate transpose, checking whether the two match entry by entry"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -209,6 +232,6 @@ It's the fastest way to rule out a candidate.
 
 ## Further Exploration
 
-Next: **Unitary Operators**, the other essential class: the ones that
+Next: [Unitary Operators](/lessons/quantum-mechanics/mathematical-foundations/unitary-operators), the other essential class: the ones that
 preserve norms, representing how quantum states evolve and transform
 between bases without losing probability.

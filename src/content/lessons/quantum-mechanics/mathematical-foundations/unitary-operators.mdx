@@ -1,9 +1,25 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { HADAMARD, S_GATE } from "@/lib/quantum/gates";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/unitary-operators"
 ).map((problem) => problem.meta);
+
+export const unitaryCheckPreset = (label, matrix) => ({
+  label,
+  panels: [
+    { label: "U", cells: matrixToCells(matrix) },
+    { label: "U†", cells: matrixToCells(matrix.dagger()) },
+    { label: "U†U", cells: matrixToCells(matrix.dagger().mul(matrix)), highlightDiagonal: true }
+  ]
+});
+export const unitaryPresets = [
+  unitaryCheckPreset("Hadamard", HADAMARD),
+  unitaryCheckPreset("S gate", S_GATE)
+];
 
 export const lessonMeta = {
   title: "Unitary Operators",
@@ -131,6 +147,13 @@ For $S$: $S^\dagger S = \begin{pmatrix}1&0\\0&-i\end{pmatrix}\begin{pmatrix}1&0\
 Hermitian**, direct proof that the two properties are independent of
 each other.
 
+<InteractiveSection title="Confirm U†U = I for yourself" description="Switch between the Hadamard gate and the S gate and check U†U directly. Both land on the identity matrix (both unitary), even though only one of the two was Hermitian in the last lesson.">
+  <MatrixGridExplorer
+    presets={unitaryPresets}
+    ariaLabel="Choose an operator to see U, its conjugate transpose, and their product, checking whether the product equals the identity matrix"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -172,7 +195,7 @@ plain transpose.
 
 ## Further Exploration
 
-Next: **Tensor Products and Composite Systems**, which builds the
+Next: [Tensor Products and Composite Systems](/lessons/quantum-mechanics/mathematical-foundations/tensor-products-and-composite-systems), which builds the
 mathematics for describing two or more quantum systems together, and
 shows, from pure dimension-counting, why entanglement is the generic case
 rather than a special one.

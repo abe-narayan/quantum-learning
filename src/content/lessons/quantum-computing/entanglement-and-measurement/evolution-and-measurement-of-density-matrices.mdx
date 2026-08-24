@@ -1,9 +1,48 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { IDENTITY, PAULI_X, PAULI_Y, PAULI_Z, HADAMARD } from "@/lib/quantum/gates";
+import { outerProduct } from "@/lib/quantum/projectors";
+import { evolveDensityMatrix, densityMatrixMeasurementProbability } from "@/lib/quantum/densityMatrix";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices"
 ).map((problem) => problem.meta);
+
+export const gateEvolutionRho = new Matrix([
+  [new Complex(0.75), Complex.ZERO],
+  [Complex.ZERO, new Complex(0.25)],
+]);
+
+export const projectorZeroForGateSweep = outerProduct([Complex.ONE, Complex.ZERO], [Complex.ONE, Complex.ZERO]);
+
+export const gateEvolutionCases = [
+  { name: "I", gate: IDENTITY },
+  { name: "X", gate: PAULI_X },
+  { name: "Y", gate: PAULI_Y },
+  { name: "Z", gate: PAULI_Z },
+  { name: "H", gate: HADAMARD },
+];
+
+export const gateEvolutionFrames = gateEvolutionCases.map(({ name, gate }) => ({
+  paramLabel: `U = ${name}`,
+  bars: [
+    {
+      label: "p(0) before",
+      value: densityMatrixMeasurementProbability(gateEvolutionRho, projectorZeroForGateSweep),
+      caption: densityMatrixMeasurementProbability(gateEvolutionRho, projectorZeroForGateSweep).toFixed(2),
+    },
+    {
+      label: `p(0) after ${name}`,
+      value: densityMatrixMeasurementProbability(evolveDensityMatrix(gateEvolutionRho, gate), projectorZeroForGateSweep),
+      caption: densityMatrixMeasurementProbability(evolveDensityMatrix(gateEvolutionRho, gate), projectorZeroForGateSweep).toFixed(2),
+      highlight: true,
+    },
+  ],
+}));
 
 export const lessonMeta = {
   title: "Unitary Evolution and Measurement of Density Matrices",
@@ -139,6 +178,22 @@ handful of steps, not a wall of algebra to re-derive every time:
   ariaLabel="Measurement pipeline: rho, measure P, collapse to PρP over p"
 />
 
+Practice Question 1 below asks what $X$ does to
+$\rho=\begin{pmatrix}0.75&0\\0&0.25\end{pmatrix}$; this is exactly that
+$\rho$, evolved by $\rho'=U\rho U^\dagger$ under five different gates and
+then measured with the generalized Born rule $p_0=\text{Tr}(P_0\rho')$,
+both computed live by this lesson's own `evolveDensityMatrix` and
+`densityMatrixMeasurementProbability` functions:
+
+<InteractiveSection title="Evolve, then measure, five different gates" description="The same mixed state ρ=diag(0.75,0.25) from the practice questions, evolved by ρ'=UρU† for each gate, then measured with p(0)=Tr(P₀ρ'). Z leaves the diagonal state alone; X and Y swap the 0.75/0.25 split; H produces something in between, since it mixes the basis instead of just permuting it.">
+  <BarChartExplorer
+    frames={gateEvolutionFrames}
+    sliderLabel="gate U"
+    ariaLabel="Probability of measuring outcome 0 before and after evolving rho equals diagonal 0.75, 0.25 by each of the gates I, X, Y, Z, H"
+    maxValue={1}
+  />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 Gates and measurement extend to density matrices with no new physical
@@ -207,7 +262,7 @@ example above meaningful.
 
 ## Further Exploration
 
-Next: **Bell's Theorem and Local Hidden Variables**, which returns to
+Next: [Bell's Theorem and Local Hidden Variables](/lessons/quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables), which returns to
 the question Bell States and Entanglement first raised (why entangled
 correlations can't be explained by any predetermined classical
 description) and proves it rigorously for the first time.

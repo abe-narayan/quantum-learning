@@ -1,6 +1,15 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
+export const ftRatios = [100, 500, 1000, 2000, 5000];
+export const ftFrames = ftRatios.map((ratio) => ({
+  paramLabel: `${ratio}:1`,
+  bars: [
+    { label: "Logical qubits", value: Math.log10(50), caption: "50" },
+    { label: "Physical qubits", value: Math.log10(50 * ratio), caption: (50 * ratio).toLocaleString(), highlight: true },
+  ],
+}));
+
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/roadmaps-to-fault-tolerance"
 ).map((problem) => problem.meta);
@@ -97,6 +106,21 @@ each count; the captions show the real numbers:
   ]}
   ariaLabel="50 logical qubits require roughly 50,000 physical qubits at a representative 1000-to-1 overhead ratio, shown on a log scale"
 />
+
+The Synthesis section above named a range, not a single number: "the low
+hundreds to several thousand physical qubits per logical qubit." Sliding
+across representative values from that range, still fixed at 50 logical
+qubits, shows how much the physical-qubit bill depends on exactly where
+in that honestly-wide range a real device lands:
+
+<InteractiveSection title="Explore the overhead-ratio range" description="Slide from a 100-to-1 ratio (the low end of the stated range) up to 5000-to-1 (several thousand, the high end). Logical qubits stay fixed at 50; the physical-qubit bar is 50 times the ratio, the same multiplication the worked example performs for the single 1000-to-1 case.">
+  <BarChartExplorer
+    sliderLabel="Physical-to-logical ratio"
+    ariaLabel="Physical qubits required for 50 logical qubits, across overhead ratios from 100:1 to 5000:1, shown on a log10 scale"
+    maxValue={Math.log10(50 * 5000)}
+    frames={ftFrames}
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

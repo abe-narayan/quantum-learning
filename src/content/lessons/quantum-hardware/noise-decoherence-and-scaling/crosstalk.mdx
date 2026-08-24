@@ -62,7 +62,7 @@ Confirmed directly via `applySingleQubitGate` and `rotationAboutAxis`
 composed on a 2-qubit `StateVector`, matching this closed form to
 machine precision for every tested $\epsilon$ (0.01 through 0.2 radians).
 
-<InteractiveSection description="Drag ε from 0 up toward 0.2 radians and watch fidelity fall away from 1, slowly at first (it's an even function of ε near 0) then more steeply. The marker's exact value always matches cos²(ε/2), computed fresh at every position, not read off a lookup table.">
+<InteractiveSection title="Drag the leak angle and watch fidelity fall" description="Drag ε from 0 up toward 0.2 radians and watch fidelity fall away from 1, slowly at first (it's an even function of ε near 0) then more steeply. The marker's exact value always matches cos²(ε/2), computed fresh at every position, not read off a lookup table.">
   <ParametricCurve
     frames={[0, 0.02, 0.05, 0.08, 0.1, 0.15, 0.2].map((epsilon) => ({
       paramLabel: `ε = ${epsilon.toFixed(2)} rad (F = ${IDEAL_STATE.innerProduct(applySingleQubitGate(IDEAL_STATE, rotationAboutAxis({ x: 1, y: 0, z: 0 }, epsilon), 1)).magnitudeSquared().toFixed(4)})`,
@@ -164,6 +164,6 @@ per-operation errors are exactly what error correction exists to manage.
 
 ## Further Exploration
 
-Next: **Scaling Challenges**, which puts T1/T2, crosstalk, and readout
+Next: [Scaling Challenges](/lessons/quantum-hardware/noise-decoherence-and-scaling/scaling-challenges), which puts T1/T2, crosstalk, and readout
 error together into the question of what it actually takes to build a
 much larger quantum device.

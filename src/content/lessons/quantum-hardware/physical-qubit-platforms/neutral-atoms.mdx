@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/neutral-atoms"
@@ -74,6 +75,16 @@ entangling two-qubit gate, conceptually similar in spirit to Quantum
 Algorithms I's controlled-phase gates, but arising from genuine atomic
 physics rather than an abstract circuit element.
 
+The excitation step itself, driving an atom from its ground state up to
+the Rydberg state, is a laser resonantly coupling two atomic levels: the
+same two-level Rabi problem every other platform in this course uses to
+implement a single-qubit gate, just aimed at a different pair of levels
+here:
+
+<InteractiveSection title="Drive the ground-to-Rydberg transition" description="Set detuning to zero and vary the coupling strength V, playing the role of the laser's Rabi frequency driving the ground state up to the Rydberg state: watch the population sweep from 0 to 1 and back at t_π=π/(2V), exactly the resonant excitation step Rydberg-blockade gates rely on. Move detuning away from zero and see the achievable population drop below 1, the atomic-physics analog of an off-resonant control pulse on any platform.">
+  <LazyRabiExplorer />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 Neutral atoms' central engineering advantage is genuinely different
@@ -142,5 +153,5 @@ light.
 
 ## Further Exploration
 
-Next: **Photonic Qubits**, a platform that doesn't trap anything at all.
+Next: [Photonic Qubits](/lessons/quantum-hardware/physical-qubit-platforms/photonic-qubits), a platform that doesn't trap anything at all.
 Information travels rather than sits still.

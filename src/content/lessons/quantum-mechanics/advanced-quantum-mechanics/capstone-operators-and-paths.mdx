@@ -1,9 +1,47 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
+import { amplitudeDampingChannel, dephasingChannel, applyChannelRepeatedly } from "@/lib/quantum/openSystems";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/capstone-operators-and-paths"
 ).map((problem) => problem.meta);
+
+export const capstonePlusRho = new Matrix([
+  [new Complex(0.5), new Complex(0.5)],
+  [new Complex(0.5), new Complex(0.5)]
+]);
+
+export const capstonePurity = (rho) => rho.mul(rho).trace().re;
+
+export const capstoneNSteps = [0, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30];
+
+export const capstoneDampingSeriesForEta = (eta) => ({
+  label: "Amplitude damping, purity",
+  color: "brand",
+  points: capstoneNSteps.map((n) => ({
+    x: n,
+    y: capstonePurity(applyChannelRepeatedly(capstonePlusRho, amplitudeDampingChannel(eta), n))
+  }))
+});
+
+export const capstoneDephasingSeriesForEta = (eta) => ({
+  label: "Dephasing, purity",
+  color: "accent",
+  points: capstoneNSteps.map((n) => ({
+    x: n,
+    y: capstonePurity(applyChannelRepeatedly(capstonePlusRho, dephasingChannel(eta), n))
+  }))
+});
+
+export const capstoneFrameForEta = (eta) => ({
+  paramLabel: `η = ${eta.toFixed(2)}`,
+  series: [capstoneDampingSeriesForEta(eta), capstoneDephasingSeriesForEta(eta)]
+});
+
+export const capstoneEtaValues = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7];
+export const capstoneFrames = capstoneEtaValues.map(capstoneFrameForEta);
 
 export const lessonMeta = {
   title: "Capstone: Operators, Paths, and What's Still Open",
@@ -43,6 +81,29 @@ generalize that to open systems, with unitary evolution as the special
 one-operator case. This isn't a contradiction of anything learned
 before. It's a strict extension, verified directly (trace-preservation
 condition) rather than assumed.
+
+Both decoherence channels this course built started from the very same
+$|+\rangle$ state, yet drive it toward genuinely different long-run
+fates. Watch what each one does to the SAME starting state as the
+coupling strength $\eta$ (used as both channel's parameter) changes:
+
+<InteractiveSection
+  title="Slide η, watch the two fates diverge"
+  description="Slide the coupling strength η and compare the two channels this course built, both applied repeatedly to the same starting state |+⟩. Dephasing's purity settles at 0.5, a fully mixed 50/50 state with no phase information left. Amplitude damping's purity climbs back to 1, because it decays toward a PURE state, |0⟩, not a mixed one. Same Kraus-operator machinery, two structurally different long-run outcomes."
+>
+  <ParametricCurve
+    frames={capstoneFrames}
+    sliderLabel="Coupling strength η"
+    ariaLabel="Purity of a qubit starting in |+> under repeated amplitude damping versus repeated dephasing, as the number of channel applications grows, for several coupling strengths"
+  />
+</InteractiveSection>
+
+Dephasing destroys phase only, so the state it settles into is a genuine
+statistical mixture (purity 0.5, exactly the maximally mixed state).
+Amplitude damping destroys phase AND drains population toward a specific
+pure state, so purity actually recovers to 1 in the long run, a real
+structural difference between the two channels, not just two examples of
+"decoherence" with the same eventual behavior.
 
 ### From operators to paths
 

@@ -1,9 +1,29 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { hydrogenEnergyLevel, RYDBERG_EV } from "@/lib/quantum/hydrogenAtom";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/fine-structure-introduction"
 ).map((problem) => problem.meta);
+
+export const fineStructureAlpha = 1 / 137;
+export const fineStructureScaleEV = fineStructureAlpha * fineStructureAlpha * RYDBERG_EV;
+export const fineStructureFrames = [1, 2, 3, 4].map((n) => ({
+  paramLabel: `n = ${n}`,
+  bars: [
+    {
+      label: `|E${n}|`,
+      value: Math.abs(hydrogenEnergyLevel(n)),
+      caption: `${Math.abs(hydrogenEnergyLevel(n)).toFixed(3)} eV`,
+    },
+    {
+      label: "fine structure",
+      value: fineStructureScaleEV,
+      highlight: true,
+      caption: `${fineStructureScaleEV.toFixed(6)} eV`,
+    },
+  ],
+}));
 
 export const lessonMeta = {
   title: "Fine Structure (Introduction)",
@@ -59,6 +79,18 @@ where $\alpha\approx1/137$ is the fine-structure constant, small enough
 that this course's $E_n=-13.6/n^2$ is an excellent approximation for most
 purposes, but large enough to be precisely measured spectroscopically
 (historically, this is exactly how fine structure was first discovered).
+
+<InteractiveSection
+  title="Slide n, size up the fine-structure gap"
+  description="Slide through n and compare the exact Eₙ this course derived to the ~α²×13.6 eV fine-structure scale. Watch the caption numbers, not just the bar heights, to see just how large that gap really is."
+>
+  <BarChartExplorer
+    frames={fineStructureFrames}
+    sliderLabel="Principal quantum number n"
+    ariaLabel="Bar chart comparing the magnitude of hydrogen energy level E_n to the order-of-magnitude fine-structure correction scale, for n from 1 to 4"
+  />
+</InteractiveSection>
+
 The specific result these corrections break is the exact
 $l$-independence of $E_n$ from Hydrogen Energy Levels: with fine
 structure, states of the same $n$ but different total angular momentum

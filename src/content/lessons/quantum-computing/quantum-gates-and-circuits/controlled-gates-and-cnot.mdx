@@ -1,6 +1,7 @@
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applyCNOT, applySwap } from "@/lib/quantum/gates";
+import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -145,6 +146,12 @@ produces a target whose value is now tied to the control's, in whatever
 proportion the control's amplitudes dictate. That's entanglement, built
 on demand, and it's exactly the next lesson's subject.
 
+## Interactive Experiment
+
+<InteractiveSection title="Confirm the truth table and the SWAP construction" description="Initialize each of |00⟩, |01⟩, |10⟩, |11⟩ in turn and press CNOT (control=qubit 0, target=qubit 1). Confirm all four truth-table rows this lesson derived: 00 to 00, 01 to 01, 10 to 11, 11 to 10. Then initialize |10⟩ again and press SWAP — the platform's real applySwap — and confirm the end state matches |01⟩, the same result the three-CNOT trace below reaches step by step.">
+  <LazyTwoQubitExplorer />
+</InteractiveSection>
+
 ## Worked Example: SWAP from three CNOTs
 
 The **SWAP** gate exchanges two qubits' values entirely:
@@ -223,5 +230,5 @@ the SWAP derivation above relies on directly.
 
 ## Further Exploration
 
-Next: **Bell States and Entanglement**, put a control qubit into
+Next: [Bell States and Entanglement](/lessons/quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement), put a control qubit into
 superposition *before* the CNOT, and watch what comes out.

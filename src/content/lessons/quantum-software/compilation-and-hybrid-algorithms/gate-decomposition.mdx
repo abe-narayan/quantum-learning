@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/gate-decomposition"
@@ -76,6 +77,55 @@ decompositions look like this:
     { gate: "RZ", targets: [0], param: Math.PI }
   ]}
 />
+
+Stepping through all five verified gates one at a time, rather than
+reading two fixed diagrams, makes the "how many native rotations does
+THIS gate need" question concrete for every gate this platform uses,
+not just the two multi-rotation ones drawn above:
+
+<InteractiveSection title="Step through all five decompositions" description="Slide across Z, S, T, H, and X. Notice the first three are a single Rz box (theta = pi, pi/2, pi/4 respectively); H and X are genuinely the two-rotation sequences drawn above. Every angle here is exactly the value this lesson already stated, just rendered as an actual circuit instead of a formula.">
+  <CircuitDiagramExplorer
+    sliderLabel="Gate"
+    frames={[
+      {
+        paramLabel: "Z = Rz(π)",
+        numQubits: 1,
+        ariaLabel: "Z decomposed into a single Rz(pi) rotation",
+        instructions: [{ gate: "RZ", targets: [0], param: Math.PI }],
+      },
+      {
+        paramLabel: "S = Rz(π/2)",
+        numQubits: 1,
+        ariaLabel: "S decomposed into a single Rz(pi/2) rotation",
+        instructions: [{ gate: "RZ", targets: [0], param: Math.PI / 2 }],
+      },
+      {
+        paramLabel: "T = Rz(π/4)",
+        numQubits: 1,
+        ariaLabel: "T decomposed into a single Rz(pi/4) rotation",
+        instructions: [{ gate: "RZ", targets: [0], param: Math.PI / 4 }],
+      },
+      {
+        paramLabel: "H = Ry(π/2)Rz(π)",
+        numQubits: 1,
+        ariaLabel: "H decomposed into Rz(pi) then Ry(pi/2)",
+        instructions: [
+          { gate: "RZ", targets: [0], param: Math.PI },
+          { gate: "RY", targets: [0], param: Math.PI / 2 }
+        ],
+      },
+      {
+        paramLabel: "X = Rz(π)Ry(π)",
+        numQubits: 1,
+        ariaLabel: "X decomposed into Ry(pi) then Rz(pi)",
+        instructions: [
+          { gate: "RY", targets: [0], param: Math.PI },
+          { gate: "RZ", targets: [0], param: Math.PI }
+        ],
+      }
+    ]}
+  />
+</InteractiveSection>
 
 ### Why "up to global phase" is the right check
 
@@ -170,6 +220,6 @@ requirement for every specific gate.
 
 ## Further Exploration
 
-Next: **Hybrid Quantum-Classical Workflows**, which shifts from
+Next: [Hybrid Quantum-Classical Workflows](/lessons/quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows), which shifts from
 single-circuit compilation to the repeated compile-run-optimize loop
 variational algorithms actually use.

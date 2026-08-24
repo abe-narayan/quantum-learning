@@ -3,6 +3,8 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { applyBitOracle, constantFunction, balancedFunction } from "@/lib/quantum/oracles";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"
@@ -24,6 +26,28 @@ export const deutschJozsaP00 = (f) =>
 
 export const p00Constant = deutschJozsaP00(constantFunction(1));
 export const p00Balanced = deutschJozsaP00(balancedFunction(3)); // parity of both bits = x1 XOR x2 (3 = 0b11)
+
+export const djOraclePresets = [
+  { label: "constant, f(x) = 0", f: constantFunction(0) },
+  { label: "constant, f(x) = 1", f: constantFunction(1) },
+  { label: "balanced, mask 001", f: balancedFunction(1) },
+  { label: "balanced, mask 010", f: balancedFunction(2) },
+  { label: "balanced, mask 011", f: balancedFunction(3) },
+  { label: "balanced, mask 100", f: balancedFunction(4) },
+  { label: "balanced, mask 101", f: balancedFunction(5) },
+  { label: "balanced, mask 110", f: balancedFunction(6) },
+  { label: "balanced, mask 111", f: balancedFunction(7) },
+];
+
+export const djOracleP00s = djOraclePresets.map((preset) => deutschJozsaP00(preset.f));
+
+export const djOracleFrames = djOraclePresets.map((preset, i) => ({
+  paramLabel: preset.label,
+  bars: [
+    { label: "P(000)", value: djOracleP00s[i], highlight: true, caption: `${(djOracleP00s[i] * 100).toFixed(0)}%` },
+    { label: "P(other)", value: 1 - djOracleP00s[i], caption: `${((1 - djOracleP00s[i]) * 100).toFixed(0)}%` },
+  ],
+}));
 
 export const lessonMeta = {
   title: "The Deutsch-Jozsa Algorithm",
@@ -118,6 +142,29 @@ ground" claim visible rather than just asserted:
 One bar sits at exactly 1, the other at exactly 0, nothing in between,
 for the same reason the algebra above gives exactly $\pm1$ or exactly $0$.
 
+This holds for every constant or balanced function on $n=3$ inputs, not
+just the one pair shown above. Nine real oracles, run through the exact
+same circuit:
+
+<InteractiveSection
+  title="Nine oracles, one clean split at P(000)"
+  description="Step through nine real oracles on n=3 inputs, both constant functions and every balanced parity mask from 001 through 111, run through the same circuit: three Hadamards, applyBitOracle, two Hadamards, then read off P(000). Every constant oracle lands exactly on 1, every balanced oracle lands exactly on 0, no matter which mask defines it."
+>
+  <BarChartExplorer
+    frames={djOracleFrames}
+    sliderLabel="Oracle f"
+    ariaLabel="Probability of measuring the all-zeros outcome versus any other outcome, for nine different oracles: two constant functions and seven balanced parity functions on 3 input qubits"
+    maxValue={1}
+  />
+</InteractiveSection>
+
+Every constant frame reads $P(000)=1$ exactly; every balanced frame, no
+matter which of the seven nonzero 3-bit masks defines it, reads
+$P(000)=0$ exactly. The promise, not the specific choice of $f$, is what
+forces this: any of these seven balanced masks gives a genuinely different
+function, yet all seven land on the identical amplitude-cancellation result
+the derivation predicted.
+
 ## Physical Interpretation
 
 The classical lower bound is about *worst-case adversarial inputs*; the
@@ -189,6 +236,6 @@ measurable probability difference.
 
 ## Further Exploration
 
-Next: **The Quantum Fourier Transform**, the generalization of the
+Next: [The Quantum Fourier Transform](/lessons/quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform), the generalization of the
 $H^{\otimes n}$-based interference trick used here to a much richer family
 of algorithms: phase estimation, and eventually Shor's algorithm.

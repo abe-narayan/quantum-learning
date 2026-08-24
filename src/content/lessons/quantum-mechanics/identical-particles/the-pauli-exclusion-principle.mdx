@@ -1,9 +1,39 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { tensorProduct, symmetrize } from "@/lib/quantum/identicalParticles";
+import { vectorToExchangeGrid } from "@/components/visualizations/ExchangeDiagram";
+import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/identical-particles/the-pauli-exclusion-principle"
 ).map((problem) => problem.meta);
+
+export const basisDim = 3;
+export const e0 = [new Complex(1), new Complex(0), new Complex(0)];
+export const productEE = tensorProduct(e0, e0);
+export const unnormalizedAntisymmetricEE = productEE.map((c) => c.sub(c));
+export const psiSAtAB = symmetrize(e0, e0);
+export const exclusionPresets = [
+  {
+    label: "Fermions: antisymmetrize(e0, e0)",
+    before: vectorToExchangeGrid(productEE, basisDim),
+    after: vectorToExchangeGrid(unnormalizedAntisymmetricEE, basisDim),
+    beforeLabel: "e0 ⊗ e0",
+    afterLabel: "e0⊗e0 − e0⊗e0 (before normalizing)",
+    basisLabels: ["0", "1", "2"],
+    verdict: "undefined-zero-vector"
+  },
+  {
+    label: "Bosons: symmetrize(e0, e0)",
+    before: vectorToExchangeGrid(productEE, basisDim),
+    after: vectorToExchangeGrid(psiSAtAB, basisDim),
+    beforeLabel: "e0 ⊗ e0",
+    afterLabel: "normalize(e0⊗e0 + e0⊗e0)",
+    basisLabels: ["0", "1", "2"],
+    verdict: "symmetric"
+  }
+];
 
 export const lessonMeta = {
   title: "The Pauli Exclusion Principle",
@@ -88,6 +118,13 @@ exist."` This platform's test suite confirms this exact throw occurs,
 matching the physical claim precisely: the state "two identical fermions,
 both in orbital $e_0$" does not exist.
 
+<InteractiveSection title="See the vanishing, and its absence for bosons" description="Fermions: the antisymmetric combination of e0 with itself is the zero vector, entry by entry — not approximately small, exactly zero. Switch to bosons: the symmetric combination of e0 with itself is very much nonzero and normalizes fine, exactly the asymmetry between the two particle types this lesson is about.">
+  <ExchangeDiagramExplorer
+    presets={exclusionPresets}
+    ariaLabel="Choose between the fermion and boson combinations of e0 with itself, showing the fermion case vanishes entirely while the boson case does not"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -134,6 +171,6 @@ boson exclusion principle.
 
 ## Further Exploration
 
-Next: **Multi-Electron Atoms (Introduction)**, which uses exclusion
+Next: [Multi-Electron Atoms (Introduction)](/lessons/quantum-mechanics/identical-particles/multi-electron-atoms-introduction), which uses exclusion
 directly to explain why electrons fill successive shells rather than all
 crowding into hydrogen's 1s orbital.

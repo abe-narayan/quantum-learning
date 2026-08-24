@@ -1,5 +1,20 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { QuantumCircuit, runCircuit, sampleMeasurements } from "@/lib/quantum/circuitBuilder";
+
+export const svsCircuit = new QuantumCircuit(2).h(0).cnot(0, 1);
+export const svsState = runCircuit(svsCircuit);
+export const svsShotCounts = [10, 50, 200, 1000, 5000];
+export const svsSamples = svsShotCounts.map((shots) => sampleMeasurements(svsState, shots));
+export const svsFrames = svsShotCounts.map((shots, i) => ({
+  paramLabel: `${shots} shots`,
+  bars: [
+    { label: "00 exact", value: 0.5 },
+    { label: "00 sampled", value: (svsSamples[i]["00"] || 0) / shots },
+    { label: "11 exact", value: 0.5 },
+    { label: "11 sampled", value: (svsSamples[i]["11"] || 0) / shots, highlight: true },
+  ],
+}));
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/simulating-quantum-systems/state-vector-simulation"
@@ -53,6 +68,24 @@ technique. This is fundamentally different from *sampling* (Writing
 Your First Circuit's `sampleMeasurements`), which only estimates
 probabilities statistically; a state-vector simulation, by contrast,
 computes those probabilities exactly.
+
+Watching both side by side on the same circuit makes the distinction
+concrete rather than just asserted: the "exact" bars below never move
+(they ARE the state-vector answer), while the "sampled" bars are this
+page's own live `sampleMeasurements` calls against that exact state,
+landing closer to 0.5 as shot count grows, exactly the statistical
+convergence Writing Your First Circuit already demonstrated once, here
+made explorable across five different shot counts on a fresh Bell
+circuit.
+
+<InteractiveSection title="Exact vs. sampled, side by side" description="Slide from 10 shots up to 5000. The exact bars are runCircuit's fixed output for this Bell circuit, computed once. The sampled bars are a fresh sampleMeasurements call at each shot count, this page's own live run, converging toward the exact bars as shots grow but never quite landing on them exactly.">
+  <BarChartExplorer
+    sliderLabel="Shots sampled"
+    ariaLabel="Exact 50/50 state-vector probabilities versus sampled counts for a Bell circuit, at shot counts from 10 to 5000"
+    maxValue={0.75}
+    frames={svsFrames}
+  />
+</InteractiveSection>
 
 ### Simulating vs. being
 
@@ -133,6 +166,6 @@ and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
 
 ## Further Exploration
 
-Next: **Computational Cost & Scaling**, which quantifies precisely what
+Next: [Computational Cost & Scaling](/lessons/quantum-software/simulating-quantum-systems/computational-cost-and-scaling), which quantifies precisely what
 this technique costs, the $2^n$ growth Simulators vs. Real Hardware
 already previewed, developed here in full.

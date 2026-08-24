@@ -11,7 +11,7 @@ export const lessonMeta = {
   description:
     "Why quantum computers need a new unit of information, and what a qubit actually is mathematically.",
   course: "qubits-and-quantum-states",
-  module: "classical-bit-vs-qubit",
+  module: "what-is-a-qubit",
   order: 1,
   difficulty: "foundational",
   estimatedMinutes: 20,
@@ -95,12 +95,9 @@ Every qubit state can be pictured as a point on the surface of a sphere, the
 **Bloch sphere**, where the north pole is $|0\rangle$, the south pole is
 $|1\rangle$, and every other point is some superposition of the two.
 
-Try it yourself: apply a gate below and watch $\alpha$, $\beta$, and the
-measurement probabilities update as the vector moves. Then hit **Measure** a
-few times from the same state and notice the outcomes are random, but always
-land on 0 or 1 with exactly the probabilities shown.
-
-<LazyBlochSphereExplorer />
+<InteractiveSection title="Apply a gate, then measure" description="Try it yourself: apply a gate below and watch α, β, and the measurement probabilities update as the vector moves. Then hit Measure a few times from the same state and notice the outcomes are random, but always land on 0 or 1 with exactly the probabilities shown.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ## Worked Example
 
@@ -167,7 +164,7 @@ and a 64% chance of measuring 1.
 
 We've been using $\alpha$ and $\beta$ as complex numbers without really using
 their complex structure yet: every example above could have used real
-numbers. That changes fast. Next in this course: **Complex Numbers for
-Quantum Mechanics**, which builds the machinery (polar form, Euler's
+numbers. That changes fast. Next in this course: [Complex Numbers for
+Quantum Mechanics](/lessons/quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics), which builds the machinery (polar form, Euler's
 formula) that phases like $e^{i\varphi}$ on the Bloch sphere actually need,
-followed by **Dirac Notation**, which makes the bra-ket formalism precise.
+followed by [Dirac Notation](/lessons/quantum-computing/qubits-and-quantum-states/dirac-notation), which makes the bra-ket formalism precise.

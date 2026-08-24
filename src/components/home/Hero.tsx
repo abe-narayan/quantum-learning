@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { BlochSpherePreview } from "@/components/simulators/bloch-sphere/BlochSpherePreview";
+import { LazyBlochSphereHeroExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereHeroExplorer";
+import { ContinueLearning } from "@/components/home/ContinueLearning";
 
 export function Hero() {
   return (
@@ -27,12 +28,14 @@ export function Hero() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-brand">QuantumLearn</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Learn quantum computing by experimenting with it.
+            Learn quantum mechanics and quantum computing by experimenting with them.
           </h1>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            Manipulate real qubit states, watch superposition and entanglement
-            unfold, and build the intuition no textbook alone can teach —
-            grounded in the math and physics that make it rigorous.
+            Solve the Schrödinger equation for a real wave packet, manipulate
+            qubit states, and watch superposition and entanglement unfold —
+            build the intuition no textbook alone can teach, grounded in the
+            math and physics that make it rigorous, whether you&rsquo;re here
+            for the atom or the algorithm.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button href="/learn" size="lg">
@@ -42,9 +45,11 @@ export function Hero() {
               Explore simulators
             </Button>
           </div>
+
+          <ContinueLearning />
         </div>
 
-        <BlochSpherePreview />
+        <LazyBlochSphereHeroExplorer />
       </Container>
     </section>
   );

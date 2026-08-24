@@ -144,8 +144,8 @@ anything with yet — see §9).
   Components and Turbopack out of the box, and needs no external CMS or
   database.
 - Lesson prose can embed real interactive components directly
-  (`<BlochSpherePreview />` today, `<CircuitBuilder />` etc. later) — this
-  is non-negotiable given "interactive experimentation" is a stated core
+  (`<BlochSphereExplorer />`, `<CircuitBuilder />`, etc.) — this is
+  non-negotiable given "interactive experimentation" is a stated core
   requirement, and plain Markdown can't do it.
 - Metadata lives as a JS export from the file itself
   (`export const lessonMeta = {...}`) rather than YAML frontmatter.
@@ -346,12 +346,16 @@ collapse) via a throwaway script — all seven passed. That script wasn't
 kept (see §9's testing recommendation for the durable version of this).
 
 **Rendering stays fully separate.** `src/components/simulators/bloch-sphere/`
-holds two things deliberately: `BlochSpherePreview` (a static, decorative
-SVG used only on the homepage hero — no `lib/quantum/` dependency at all)
-and `BlochSphereExplorer` (the real interactive simulator, which reads and
+holds `BlochSphereExplorer` (the real interactive simulator, which reads and
 writes `StateVector`s via `lib/quantum/` and renders the corresponding
-point on the sphere). Neither the gate math nor the circuit state is ever
-mixed into a rendering file. The convention going forward:
+point on the sphere) alongside `BlochSphereHeroExplorer`, a trimmed-down
+variant embedding the same real math for the homepage hero. (An earlier,
+purely decorative `BlochSpherePreview` — a static SVG with no `lib/quantum/`
+dependency — was replaced by `BlochSphereHeroExplorer` in a later polish
+pass once it became clear a homepage that opens on a labeled "static
+illustration" undercuts the whole "real interactive experiments" pitch; see
+the Session 13 entry below.) Neither the gate math nor the circuit state is
+ever mixed into a rendering file. The convention going forward:
 `src/components/simulators/<name>/` for rendering,
 `src/lib/quantum/` for math, never mixed in one file.
 
@@ -1822,3 +1826,118 @@ navbar if it grows further; ~~Hardware & Software pillar content
 entanglement visualizer, interference playground) — **still unbuilt
 after Session 11 too; see this section's Session 11 update above for
 current priority order.**
+
+### Session 13 — Fresh-review / repair sprint
+
+A different shape of session: instead of authoring new content, this pass
+ran a fresh-eyes quality audit (9 independent review agents, none of whom
+had written any of the material they were reviewing, covering QM content,
+QC content, Hardware+Software content, homepage first impressions,
+simulator quality, the problem bank, accessibility/mobile, architecture at
+3x scale, and SEO) followed by a repair pass (7 parallel agents fixing what
+the review surfaced, each scoped to a disjoint set of files to avoid
+conflicting edits).
+
+**A real, previously-unknown MDX hazard was found and fixed first, before
+the review wave.** Two new lessons (`bb84-quantum-key-distribution.mdx`,
+`superdense-coding.mdx`) were silently 404ing in production despite
+`next build` reporting success. Root cause, confirmed by temporarily
+instrumenting `loadLesson()`'s catch block: a `//` JS comment *anywhere* in
+an `.mdx` file's top-level export block corrupts MDX/acorn's parse such
+that `export const` statements declared after it become unbound —
+referencing them elsewhere in the same block throws a `ReferenceError` at
+module-evaluation time, which `loadLesson()`'s blanket `catch { return
+null }` silently turned into an ordinary-looking 404. The first hypothesis
+(that it was specifically Dirac bra-ket pipe characters like `|+⟩` inside
+the comments) was wrong — removing just the pipes didn't fix it; removing
+the `//` comments entirely did, confirmed by a clean rebuild with zero
+diagnostic errors. This is a stricter variant of the MDX/acorn hazards
+already documented in `AGENTS.md`: **never write a `//` comment inside an
+.mdx file's top-level export block**, full stop, regardless of content.
+
+**The review wave's most consequential finding:** the homepage hero's
+main visual was a static, non-interactive SVG that *literally said "This
+is a static illustration"* with a button linking away to `/simulators` —
+directly contradicting this platform's own "real interactive within 10
+seconds" principle. Fixed by building `BlochSphereHeroExplorer`, a
+trimmed-down (H/X/Z gates + Measure/Reset only) but genuinely real
+instance of the Bloch sphere engine, replacing `BlochSpherePreview`
+(deleted; see the updated §3/§6b notes above).
+
+**Other confirmed fixes from the repair wave:** a factual arithmetic slip
+in `multi-electron-atoms-introduction.mdx` (2p subshell fills at electron
+10, not 8) plus a chart-scaling bug in the same file that was silently
+undercutting its own pedagogical point (bars scaled to a shared
+`maxValue` regardless of each subshell's actual capacity, so a *full* 1s
+and a *2-of-6* 2p rendered at nearly the same height); a preset/prose
+mismatch in `addition-of-angular-momentum.mdx` (the lesson told students
+to "prepare |Ψ⁻⟩" via a preset that actually produces |Φ⁺⟩ — fixed with
+the explicit X-then-Z gate recipe, verified by hand against the real
+Pauli matrices); a broken plain-text (non-link) "Further Exploration"
+pointer; one mis-attributed cross-reference; excess em-dash density
+isolated to the newly-added `simons-algorithm.mdx`; thinner landing-page
+copy on `/hardware` and `/software` versus the richer `/mechanics` and
+`/computing` pages from an earlier session (extended to match, with every
+named lesson/simulator verified against the actual codebase, not
+invented); five accessibility fixes (a site-wide skip-to-content link; a
+KaTeX `.katex-display` overflow rule, since KaTeX itself ships no
+mobile-safe overflow handling and this is a math-dense site; darkened
+`--accent`/`--warning` CSS tokens, which failed WCAG AA contrast — 3.68:1
+and 3.19:1 respectively — while being used as real body/label text, not
+just backgrounds; a fix to `Button.tsx` silently dropping `aria-pressed`
+and other native attributes because `ButtonProps` didn't extend the DOM
+attribute types; and a missed `role="radiogroup"` retrofit on
+`WavefunctionExplorer`'s preset picker, the one simulator control group
+the earlier accessibility pass hadn't reached); and three simulator bugs
+(a Rabi Explorer population-curve marker dot that read the *last* sample
+instead of the currently-scrubbed one; a missing keyboard focus ring on
+Circuit Builder's two-qubit gate cells; an unclamped Complex Amplitude
+Explorer slider that could display a "probability" greater than 1 — fixed
+by conditionally relabeling rather than fighting the sliders' independent
+ranges with a joint clamp).
+
+**Architecture hardening, directly motivated by the MDX bug above.**
+`src/lib/content/lessons.ts`'s `getAllLessonsMeta()`/`loadLesson()` had no
+memoization at all — every one of ~7 catalog pages, plus the lesson page
+itself (called once per lesson, for prev/next nav), re-walked the
+filesystem and re-imported every lesson module, an O(N²) import cost that
+would compound badly well before reaching a hypothetical 500-lesson
+corpus. Fixed with plain module-level memoization (not React's `cache()`,
+which is scoped per-request/render-pass and wouldn't survive across the
+~155 separate static-generation passes this needs to persist through —
+confirmed against Next's own docs before choosing the simpler primitive).
+Separately, `loadLesson`'s blanket `catch { return null }` — the exact
+mechanism that hid the bb84/superdense bug — now only swallows errors for
+slugs *not* in the known-good set from `getAllLessonSlugs()`; since
+`dynamicParams = false` gates routing to only that known set anyway, an
+error on a known-good slug is always a real bug now and fails the build
+loudly instead of silently 404ing. A new integrity test
+(`src/lib/content/__tests__/lessons.test.ts`) asserts every lesson in the
+corpus loads successfully and that its `course`/`module` fields resolve in
+`curriculum.ts` — this is the automated guard against a repeat of exactly
+this bug class, and against the unrelated-but-structurally-identical
+"lesson frontmatter drifts from curriculum.ts" bug fixed in an earlier
+session. (Getting this test runnable under Vitest required a small
+`.mdx`-compiling transform plugin in `vitest.config.mts`, since Vite has
+no built-in MDX loader the way webpack/Turbopack does via
+`@mdx-js/loader`.)
+
+**Deliberately not attempted this session** (documented here rather than
+silently dropped): a codegen/auto-discovery replacement for
+`src/lib/problems/registry.ts`'s hand-maintained one-import-plus-one-entry
+pattern (872 lines today, flagged as a real but lower-urgency scaling risk
+at 3x problem count); consolidating all twelve `/simulators` page
+components onto the shared `PresetToggle`/`FrameSlider` primitives that
+already exist (every one of the twelve currently hand-rolls its own
+near-identical radiogroup/slider UI — a real, systemic consistency gap,
+just not a functional bug); adding JSON-LD structured data (`Course`,
+`BreadcrumbList`) for SEO; authoring practice problems for the three
+lessons that currently have written "Practice Questions" prose but no
+registered interactive problems (`bb84-quantum-key-distribution.mdx`,
+`superdense-coding.mdx`, `simons-algorithm.mdx`); and restructuring the
+now-10-item flat navbar (Learn/Lessons/Mechanics/Computing/Hardware/
+Software substantially overlap in content, per the homepage review) into
+something like a "Tracks" dropdown — a real UX finding, but a bigger
+structural navigation change than felt safe to make unreviewed across
+every one of the site's 580+ pages in the same pass as everything else
+above.

@@ -1,9 +1,38 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector, tensorStates } from "@/lib/quantum/state";
+import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
+import { applyBitOracle, balancedFunction } from "@/lib/quantum/oracles";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/phase-kickback"
 ).map((problem) => problem.meta);
+
+export const kickbackF = balancedFunction(1); // f(x) = x on a single input qubit: f(0)=0, f(1)=1
+
+export const kickbackXPlus = applySingleQubitGate(StateVector.basis(1, 0), HADAMARD, 0);
+
+export const kickbackAncillaPresets = [
+  { label: "ancilla = |0⟩", state: StateVector.basis(1, 0) },
+  { label: "ancilla = |1⟩", state: StateVector.basis(1, 1) },
+  { label: "ancilla = |+⟩", state: applySingleQubitGate(StateVector.basis(1, 0), HADAMARD, 0) },
+  { label: "ancilla = |−⟩", state: applySingleQubitGate(StateVector.basis(1, 1), HADAMARD, 0) },
+];
+
+export const kickbackResults = kickbackAncillaPresets.map((preset) =>
+  applyBitOracle(tensorStates([kickbackXPlus, preset.state]), kickbackF)
+);
+
+export const kickbackFrames = kickbackAncillaPresets.map((preset, i) => ({
+  paramLabel: preset.label,
+  bars: kickbackResults[i].amplitudes.map((amp, j) => ({
+    label: `|${kickbackResults[i].basisLabel(j)}⟩`,
+    value: amp.re,
+    caption: amp.re.toFixed(3),
+  })),
+}));
 
 export const lessonMeta = {
   title: "Phase Kickback",
@@ -80,6 +109,34 @@ directly in `oracles.test.ts` by preparing $|+\rangle|-\rangle$, applying
 `applyBitOracle`, and confirming the reduced state on the $x$ register
 matches `applyPhaseOracle` applied directly, to floating-point precision.
 
+### Seeing it directly: does the ancilla's preparation matter?
+
+Prepare the input register in $|+\rangle$ and apply the same oracle
+$f(x)=x$ used throughout this lesson (`balancedFunction(1)` on one input
+qubit), but scrub through four different ancilla preparations. Only one of
+them produces the clean phase pattern this lesson derived:
+
+<InteractiveSection
+  title="Only minus produces the sign pattern"
+  description="Step through four ancilla preparations applied to the real oracle Uf with f(x) = x, input register prepared in the plus state. Watch the real part of every output amplitude. Only the minus preparation produces the alternating plus, minus, minus, plus sign pattern phase kickback predicts; zero and one just relabel which ancilla value goes with which x, an ordinary bit flip, and plus is left completely alone."
+>
+  <BarChartExplorer
+    frames={kickbackFrames}
+    sliderLabel="Ancilla preparation"
+    ariaLabel="Real part of each output amplitude of the bit oracle applied to |+⟩ on the input register, for four different ancilla preparations: 0, 1, plus, and minus"
+    maxValue={0.75}
+  />
+</InteractiveSection>
+
+Only the $|-\rangle$ frame shows the alternating $+,-,-,+$ sign pattern
+(magnitude $0.5$ on every bar, sign flipped exactly on the two basis states
+where $x=1$): the actual, computed signature of phase kickback, not merely
+asserted. The $|0\rangle$ and $|1\rangle$ frames instead show an ordinary
+bit flip (amplitude moves to a different basis state entirely, no sign
+change), and the $|+\rangle$ frame is left completely unchanged, since
+$|+\rangle$ is the *other* eigenstate of the bit-flip-conditioned-on-$f(x)$
+operation, with eigenvalue $+1$ instead of $-1$.
+
 ## Physical Interpretation
 
 Phase kickback is the mechanism that turns "compute $f$" into "multiply
@@ -150,7 +207,7 @@ exactly what this derivation needs.
 
 ## Further Exploration
 
-Next: **The Deutsch-Jozsa Algorithm**, the first full algorithm built from
+Next: [The Deutsch-Jozsa Algorithm](/lessons/quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm), the first full algorithm built from
 this trick, determining whether $f$ is constant or balanced with exactly
 one query, where any classical algorithm needs exponentially many in the
 worst case.

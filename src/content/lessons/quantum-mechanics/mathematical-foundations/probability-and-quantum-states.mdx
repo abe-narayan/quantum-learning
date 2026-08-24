@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/probability-and-quantum-states"
@@ -9,6 +10,15 @@ export const workedExampleCPlus = 0.6;
 export const workedExampleCMinus = 0.8;
 export const workedExamplePPlus = workedExampleCPlus ** 2;
 export const workedExamplePMinus = workedExampleCMinus ** 2;
+
+export const bornRuleCMinus = (cPlusPercent) => Math.sqrt(1 - (cPlusPercent / 100) ** 2);
+export const bornRuleFrame = (cPlusPercent) => ({
+  paramLabel: `c₊ = ${(cPlusPercent / 100).toFixed(2)}, c₋ = ${bornRuleCMinus(cPlusPercent).toFixed(2)}`,
+  bars: [
+    { label: "P(+1)", value: (cPlusPercent / 100) ** 2 },
+    { label: "P(-1)", value: bornRuleCMinus(cPlusPercent) ** 2 }
+  ]
+});
 
 export const lessonMeta = {
   title: "Probability and Quantum States",
@@ -171,6 +181,15 @@ Born rule turns an overlap into a bar you can see, not just a number:
 
 Two bars, summing to exactly 1, visibly, not just algebraically.
 
+<InteractiveSection title="Slide c₊, watch normalization hold" description="Drag c₊ from 0 to 1. c₋ is set automatically to keep the state normalized (c₊² + c₋² = 1), and the two bars always sum to exactly 1 no matter where you leave the slider — normalization isn't a special property of the 0.6/0.8 example above, it holds everywhere along this whole family of states.">
+  <BarChartExplorer
+    frames={Array.from({ length: 21 }, (_, i) => bornRuleFrame(i * 5))}
+    sliderLabel="c₊ (as a percentage of its max value)"
+    ariaLabel="P(+1) and P(-1) recomputed live as c-plus varies, with c-minus set to keep the state normalized, showing the two bars always sum to 1"
+    maxValue={1}
+  />
+</InteractiveSection>
+
 $$
 \langle A\rangle = (+1)(0.36) + (-1)(0.64) = -0.28
 $$
@@ -235,8 +254,8 @@ superposition, not an overall phase on the whole state, is observable.
 
 ## Further Exploration
 
-This closes the course's core development. Next: **Mathematical
-Foundations Challenge**, a synthesis lesson connecting every tool built
+This closes the course's core development. Next: [Mathematical
+Foundations Challenge](/lessons/quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge), a synthesis lesson connecting every tool built
 here across multiple lessons at once, before the Quantum Mechanics pillar
 continues into **From Classical to Quantum**, which turns this
 mathematics into the actual postulates, dynamics, and physical

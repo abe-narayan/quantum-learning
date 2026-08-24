@@ -1,12 +1,26 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
-import { periodFindingMeasurementDistribution } from "@/lib/quantum/shor";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { periodFindingMeasurementDistribution, classicalOrder } from "@/lib/quantum/shor";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/the-quantum-period-finding-circuit"
 ).map((problem) => problem.meta);
 
 export const periodDistribution = periodFindingMeasurementDistribution(7, 15, 6);
+
+export const periodAValues = [2, 4, 7, 8, 11, 13, 14];
+export const periodOrders = periodAValues.map((a) => classicalOrder(a, 15));
+export const periodDistributions = periodAValues.map((a) => periodFindingMeasurementDistribution(a, 15, 6));
+export const periodFrames = periodAValues.map((a, i) => ({
+  paramLabel: `a = ${a}  (r = ${periodOrders[i]})`,
+  bars: Array.from({ length: 16 }, (_, k) => ({
+    label: String(k * 4),
+    value: periodDistributions[i][k * 4],
+    highlight: periodDistributions[i][k * 4] > 0
+  }))
+}));
 
 export const lessonMeta = {
   title: "The Quantum Period-Finding Circuit",
@@ -87,6 +101,15 @@ against a flat floor of genuine zeros, not a smoothly-decaying curve:
   bars={Array.from({ length: 16 }, (_, i) => ({ label: String(i * 4), value: periodDistribution[i * 4], highlight: periodDistribution[i * 4] > 0 }))}
   ariaLabel="Measurement probability at every fourth outcome of the period-finding distribution for a=7, N=15, t=6 counting qubits"
 />
+
+<InteractiveSection title="Peak count tracks the order r" description="Slide through every base a coprime to 15. The peak count and spacing change with r=classicalOrder(a,15): a=4, a=11, and a=14 all have order r=2, so probability concentrates into exactly 2 peaks (0 and 32) at 1/2 each; a=2, a=7, a=8, and a=13 all have order r=4, giving 4 peaks at 1/4 each, exactly the 'splits evenly across r peaks' claim above, now checked for six different bases, not just a=7.">
+  <BarChartExplorer
+    frames={periodFrames}
+    sliderLabel="base a (coprime to 15)"
+    ariaLabel="Measurement probability at every fourth outcome of the period-finding distribution for N=15, t=6 counting qubits, as the base a varies"
+    maxValue={0.5}
+  />
+</InteractiveSection>
 
 Measuring this
 distribution and dividing the observed outcome by $2^t$ gives a fraction
@@ -174,6 +197,6 @@ clean picture the sharp case suggests.
 
 ## Further Exploration
 
-Next: **Worked Example: Factoring 15**, running the complete pipeline,
+Next: [Worked Example: Factoring 15](/lessons/quantum-computing/quantum-algorithms-ii/worked-example-factoring-15), running the complete pipeline,
 period finding, the classical reduction, and gcd, on the smallest number
 that actually demonstrates Shor's algorithm end to end.

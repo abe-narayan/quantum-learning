@@ -1,9 +1,39 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { symmetrize, antisymmetrize, exchangeParticles } from "@/lib/quantum/identicalParticles";
+import { vectorToExchangeGrid } from "@/components/visualizations/ExchangeDiagram";
+import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/identical-particles/bosons-and-fermions"
 ).map((problem) => problem.meta);
+
+export const basisDim = 3;
+export const e0 = [new Complex(1), new Complex(0), new Complex(0)];
+export const e1 = [new Complex(0), new Complex(1), new Complex(0)];
+export const psiS = symmetrize(e0, e1);
+export const psiA = antisymmetrize(e0, e1);
+export const eigenstatePresets = [
+  {
+    label: "Symmetric (bosons)",
+    before: vectorToExchangeGrid(psiS, basisDim),
+    after: vectorToExchangeGrid(exchangeParticles(psiS, basisDim, basisDim), basisDim),
+    beforeLabel: "ψ_S = symmetrize(e0, e1)",
+    afterLabel: "P₁₂ψ_S",
+    basisLabels: ["0", "1", "2"],
+    verdict: "symmetric"
+  },
+  {
+    label: "Antisymmetric (fermions)",
+    before: vectorToExchangeGrid(psiA, basisDim),
+    after: vectorToExchangeGrid(exchangeParticles(psiA, basisDim, basisDim), basisDim),
+    beforeLabel: "ψ_A = antisymmetrize(e0, e1)",
+    afterLabel: "P₁₂ψ_A",
+    basisLabels: ["0", "1", "2"],
+    verdict: "antisymmetric"
+  }
+];
 
 export const lessonMeta = {
   title: "Bosons & Fermions",
@@ -92,6 +122,13 @@ input, matching to floating-point precision (`maxDiff` between
 is exactly 0 in this platform's test suite), a direct numerical
 confirmation of the $-1$ eigenvalue.
 
+<InteractiveSection title="Compare the two constructions directly" description="Switch between ψ_S and ψ_A, both built from the same e0, e1. Exchange leaves ψ_S's grid completely unchanged (+1); for ψ_A, every entry flips sign (−1) — read the numbers off the grid yourself rather than trusting the algebra alone.">
+  <ExchangeDiagramExplorer
+    presets={eigenstatePresets}
+    ariaLabel="Choose between the symmetric and antisymmetric combinations of e0 and e1 to see each one's coefficient grid before and after exchange"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -139,5 +176,5 @@ applied differently depending on the situation.
 
 ## Further Exploration
 
-Next: **The Pauli Exclusion Principle**, which takes the $a=b$
+Next: [The Pauli Exclusion Principle](/lessons/quantum-mechanics/identical-particles/the-pauli-exclusion-principle), which takes the $a=b$
 vanishing result seriously as physics, not just an edge case.

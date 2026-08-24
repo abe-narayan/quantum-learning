@@ -5,6 +5,26 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/position-and-momentum"
 ).map((problem) => problem.meta);
 
+export const HBAR = 1.055e-34;
+export const ELECTRON_MASS = 9.1e-31;
+
+export const positionMomentumFrame = (dxTimes1e10) => ({
+  paramLabel: `Δx = ${dxTimes1e10.toFixed(1)}×10⁻¹⁰ m`,
+  bars: [
+    {
+      label: "Δp_min (×10⁻²⁵ kg·m/s)",
+      value: (HBAR / (2 * dxTimes1e10 * 1e-10)) * 1e25,
+      highlight: Math.abs(dxTimes1e10 - 1) < 0.05,
+    },
+    {
+      label: "Δv_min, electron (×10⁵ m/s)",
+      value: (HBAR / (2 * dxTimes1e10 * 1e-10) / ELECTRON_MASS) * 1e-5,
+    },
+  ],
+});
+
+export const positionMomentumFrames = Array.from({ length: 21 }, (_, i) => positionMomentumFrame(0.5 + i * 0.1));
+
 export const lessonMeta = {
   title: "Position and Momentum",
   description:
@@ -151,6 +171,14 @@ all on an atomic scale, which is exactly why quantum effects dominate
 atomic physics but are undetectable for everyday (much more massive)
 objects.
 
+<InteractiveSection title="Slide Δx, watch the trade-off" description="Δp_min = ℏ/(2Δx) is recomputed live as Δx varies around an atomic radius; Δx = 1.0×10⁻¹⁰ m is marked, reproducing the worked example's Δp_min ≈ 5.3×10⁻²⁵ kg·m/s exactly. The second bar converts that same Δp_min to a minimum velocity uncertainty for an electron, the same conversion the worked example makes.">
+  <BarChartExplorer
+    frames={positionMomentumFrames}
+    sliderLabel="Δx (×10⁻¹⁰ m)"
+    ariaLabel="Minimum momentum uncertainty and the corresponding minimum electron velocity uncertainty, recomputed live from the Heisenberg bound as position uncertainty Delta x varies around one atomic radius"
+  />
+</InteractiveSection>
+
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -196,7 +224,7 @@ no need for a separate argument specific to position and momentum.
 
 ## Further Exploration
 
-Next: **Superposition, Interference, and Phase**, which returns to the
+Next: [Superposition, Interference, and Phase](/lessons/quantum-mechanics/classical-to-quantum/superposition-interference-and-phase), which returns to the
 amplitude-and-phase picture from earlier in this course and ties it
 together with everything built since, operators, evolution, and
 uncertainty, using the Complex Amplitude Explorer directly.

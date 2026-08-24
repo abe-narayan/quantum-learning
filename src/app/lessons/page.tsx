@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { CourseList } from "@/components/curriculum/CourseList";
-import { PILLARS, getCoursesByPillar } from "@/lib/content/curriculum";
+import { LessonSearch } from "@/components/curriculum/LessonSearch";
+import { COURSES, PILLARS, getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 
 export const metadata: Metadata = {
@@ -18,18 +19,22 @@ export default async function LessonsPage() {
       <PageHeader
         eyebrow="Lessons"
         title="Lesson catalog"
-        description="Every course across all four tracks, in one place — seven courses fully written so far (marked complete below), the rest mapped out as what's coming next."
+        description={`Every course across all four tracks, in one place — ${COURSES.length} courses and ${lessons.length} lessons, fully written and ready to work through.`}
       />
 
-      <div className="mt-14 space-y-16">
-        {PILLARS.map((pillar) => (
-          <section key={pillar.slug}>
-            <h2 className="text-xl font-semibold tracking-tight text-foreground">{pillar.title}</h2>
-            <div className="mt-4">
-              <CourseList courses={getCoursesByPillar(pillar.slug)} lessons={lessons} />
-            </div>
-          </section>
-        ))}
+      <div className="mt-10">
+        <LessonSearch lessons={lessons}>
+          <div className="space-y-16">
+            {PILLARS.map((pillar) => (
+              <section key={pillar.slug}>
+                <h2 className="text-xl font-semibold tracking-tight text-foreground">{pillar.title}</h2>
+                <div className="mt-4">
+                  <CourseList courses={getCoursesByPillar(pillar.slug)} lessons={lessons} />
+                </div>
+              </section>
+            ))}
+          </div>
+        </LessonSearch>
       </div>
     </Container>
   );

@@ -1,6 +1,9 @@
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -26,6 +29,24 @@ export const lessonMeta = {
 };
 
 export const twoQubitPlus = new StateVector([new Complex(0.5), new Complex(0.5), new Complex(0.5), new Complex(0.5)]);
+
+export const parallelismQubitCounts = [1, 2, 3, 4];
+
+export const parallelismStates = parallelismQubitCounts.map((n) =>
+  Array.from({ length: n }, (_, q) => q).reduce(
+    (s, q) => applySingleQubitGate(s, HADAMARD, q),
+    StateVector.zero(n)
+  )
+);
+
+export const parallelismFrames = parallelismQubitCounts.map((n, i) => ({
+  paramLabel: `n = ${n} qubit${n === 1 ? "" : "s"} (${2 ** n} branches)`,
+  bars: parallelismStates[i].probabilities().map((p, x) => ({
+    label: `|${parallelismStates[i].basisLabel(x)}⟩`,
+    value: p,
+    caption: `${(p * 100).toFixed(1)}%`,
+  })),
+}));
 
 ## Motivation
 
@@ -110,6 +131,28 @@ Only one of these four branches survives measurement. The other three
 values of $f$, still sitting in the pre-measurement superposition a moment
 earlier, are gone the instant you look.
 
+The $n=2$ case above is just one point on a pattern that holds for any
+register size: $H^{\otimes n}|0\rangle^{\otimes n}$ always spreads equally
+over $2^n$ branches, each with probability exactly $1/2^n$, real numbers
+from `applySingleQubitGate` applied $n$ times in a row, not just algebra:
+
+<InteractiveSection
+  title="2ⁿ branches, each shrinking as n grows"
+  description="Scrub n from 1 to 4 qubits and watch H applied to every qubit spread the state across exactly 2 to the n equally likely branches, each shrinking as n grows. This is the real probability distribution computed from applySingleQubitGate, not a picture: it is exactly why quantum parallelism alone is not a speedup, one measurement still reveals only one of these branches no matter how many there are."
+>
+  <BarChartExplorer
+    frames={parallelismFrames}
+    sliderLabel="Number of qubits (n)"
+    ariaLabel="Uniform superposition probability distribution over 2 to the n computational basis states, for n from 1 to 4 qubits, each outcome equally likely"
+    maxValue={1}
+  />
+</InteractiveSection>
+
+Every bar in every frame sits at exactly $1/2^n$: doubling $n$ halves each
+branch's share of the total probability, even as the number of branches
+doubles. Total probability always sums to $1$; only its distribution across
+an exponentially larger set of branches changes.
+
 The entire content of Deutsch-Jozsa, phase estimation, and Grover's algorithm
 is a specific way to make the *interference* between these $2^n$ branches
 concentrate the measurement probability onto an answer that reveals a
@@ -190,6 +233,6 @@ itself.
 
 ## Further Exploration
 
-Next: **Phase Kickback**, the single algebraic trick (encoding $f(x)$'s
+Next: [Phase Kickback](/lessons/quantum-computing/quantum-algorithms-i/phase-kickback), the single algebraic trick (encoding $f(x)$'s
 value as a phase rather than a separate qubit's value) that every algorithm
 in this course reuses.

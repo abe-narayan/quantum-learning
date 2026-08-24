@@ -41,11 +41,13 @@ export function OperationControls({
         <h3 id="presets-heading" className="text-sm font-semibold text-foreground">
           Guided walkthrough
         </h3>
-        <div className="mt-3 flex flex-col gap-2">
+        <div role="radiogroup" aria-label="Guided walkthrough" className="mt-3 flex flex-col gap-2">
           {GUIDED_PRESETS.map((preset) => (
             <button
               key={preset.id}
               type="button"
+              role="radio"
+              aria-checked={activePresetId === preset.id}
               disabled={disabled}
               onClick={() => onPreset(preset.id)}
               className={cn(

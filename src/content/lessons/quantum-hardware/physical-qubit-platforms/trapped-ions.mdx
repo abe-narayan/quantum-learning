@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/trapped-ions"
@@ -58,10 +59,18 @@ lithographically-fabricated superconducting circuit, identical for every
 ion of the same species and extremely well isolated from environmental
 noise. Nature already built a "device" whose levels don't drift.
 Trapped-ion coherence times routinely reach seconds, several orders of
-magnitude longer than superconducting qubits' microseconds. The cost is
-that gate speeds are much slower (often microseconds, not nanoseconds),
-since gates rely on laser pulses driving comparatively slow atomic
-transitions and shared mechanical (vibrational) motion.
+magnitude longer than superconducting qubits' microseconds. The cost
+falls mainly on **two-qubit** gate speed: these mediate the interaction
+through the ions' shared mechanical (vibrational) motion, which is slow
+compared to a superconducting circuit's direct capacitive coupling, often
+microseconds rather than nanoseconds. A single-qubit gate, driving one
+ion's internal transition directly with a laser and no shared motion
+involved, isn't bottlenecked the same way and can be considerably faster;
+it's the entangling step specifically that pays the speed cost.
+
+<InteractiveSection title="Drive an atomic transition resonantly" description="A single-qubit gate here works exactly like the superconducting-qubit lesson's microwave drive, just implemented with a laser tuned to the ion's internal transition instead: set detuning to zero and vary the coupling strength V (playing the role of the laser's Rabi frequency) to watch the population sweep from 0 to 1 and back at t_π=π/(2V), the same two-level Rabi physics driving any resonantly-controlled qubit, regardless of whether the drive is a laser or a microwave tone. Move detuning away from zero and see the achievable population drop below 1, exactly the penalty for imperfect resonance on any platform.">
+  <LazyRabiExplorer />
+</InteractiveSection>
 
 ### All-to-all connectivity via the shared motional mode
 
@@ -142,6 +151,6 @@ engineering constraint the Noise, Decoherence & Scaling course develops.
 
 ## Further Exploration
 
-Next: **Neutral Atoms**, a platform that keeps trapped ions' long
+Next: [Neutral Atoms](/lessons/quantum-hardware/physical-qubit-platforms/neutral-atoms), a platform that keeps trapped ions' long
 coherence times while addressing scalability differently, using light,
 not electric fields, for confinement.
