@@ -32,19 +32,37 @@ import createMDX from "@next/mdx";
 // - `'unsafe-eval'` is added for `script-src` only in development, per the
 //   docs ("React uses eval ... to reconstruct server-side error stacks in
 //   the browser"; not needed in production).
-// - No external origins are allow-listed: fonts are self-hosted via
-//   `next/font/google` (downloaded at build time, served from this origin —
-//   no fonts.googleapis.com/fonts.gstatic.com requests), KaTeX's CSS/fonts
-//   ship from the `katex` npm package via globals.css (no CDN), and the only
-//   runtime `fetch()` in the app (src/lib/search/fetchIndex.ts) requests the
-//   same-origin `/search-index.json`. There is no analytics/GTM script and
-//   no <iframe>/<form> usage anywhere in src/.
+// - No external origins are allow-listed for fonts/scripts/styles/fetch:
+//   fonts are self-hosted via `next/font/google` (downloaded at build time,
+//   served from this origin — no fonts.googleapis.com/fonts.gstatic.com
+//   requests), KaTeX's CSS/fonts ship from the `katex` npm package via
+//   globals.css (no CDN), and the only runtime `fetch()` in the app
+//   (src/lib/search/fetchIndex.ts) requests the same-origin
+//   `/search-index.json`. There is no analytics/GTM script and no
+//   <iframe>/<form> usage anywhere in src/.
+// - `img-src` DOES allow-list two external hosts: `ExternalFigure`
+//   (src/components/mdx/ExternalFigure.tsx) deliberately renders a plain
+//   `<img>` pointing at real external photos/illustrations (Wikimedia
+//   Commons for nearly every lesson, plus one NIST-hosted image), not
+//   next/image — see that file's own comment for why. A bare `img-src
+//   'self' data: blob:` (no external hosts) silently blocks every one of
+//   those images at the browser level: the request never reaches the
+//   network tab, `next build`/`tsc` see nothing wrong, and every affected
+//   lesson just shows the broken-image icon. Keep this list to the exact
+//   hosts actually in use (verified via `grep -roh 'src="https://[^/"]*'
+//   src/content/lessons` — currently upload.wikimedia.org and
+//   www.nist.gov) rather than opening `img-src` to `https:` generally.
+//   ExternalFigure.tsx has its own warning comment about this coupling, and
+//   src/lib/content/__tests__/lessonImages.test.ts enforces it via `npm
+//   test`: it parses this exact `img-src` directive back out of this file
+//   and fails if any lesson's <ExternalFigure src="..."> points at a host
+//   this list doesn't allow — update both together.
 const isDev = process.env.NODE_ENV === "development";
 const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""};
   style-src 'self' 'unsafe-inline';
-  img-src 'self' data: blob:;
+  img-src 'self' data: blob: https://upload.wikimedia.org https://www.nist.gov;
   font-src 'self';
   connect-src 'self';
   object-src 'none';
