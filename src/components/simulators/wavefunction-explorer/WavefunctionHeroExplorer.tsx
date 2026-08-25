@@ -6,17 +6,17 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { SplitOperatorEvolver } from "@/lib/quantum/timeEvolution";
 import type { Wavefunction1D } from "@/lib/quantum/wavefunction";
-import { PRESETS, defaultParamValues, type PresetId, type PresetSetup } from "./presets";
+import { defaultParamValues, getPreset, type PresetId, type PresetSetup } from "./presets";
 import { WavefunctionCanvas } from "./WavefunctionCanvas";
-import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
 
-const HERO_PRESET_IDS: readonly PresetId[] = ["free-gaussian", "tunneling", "harmonic-ground"];
+const HERO_PRESET_IDS: readonly PresetId[] = ["free-gaussian", "tunneling", "harmonic-superposition"];
 const HERO_PRESET_LABELS: Record<string, string> = {
   "free-gaussian": "Free particle",
   tunneling: "Tunnel through a barrier",
-  "harmonic-ground": "Harmonic oscillator",
+  "harmonic-superposition": "Harmonic oscillator",
 };
-const HERO_PRESETS = HERO_PRESET_IDS.map((id) => PRESETS.find((p) => p.id === id)!);
+const HERO_PRESETS = HERO_PRESET_IDS.map((id) => getPreset(id));
 
 /**
  * How many animation frames one autoplay run advances before pausing
@@ -134,7 +134,7 @@ export function WavefunctionHeroExplorer() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const [presetId, setPresetId] = useState<PresetId>(HERO_PRESETS[0].id);
-  const preset = useMemo(() => PRESETS.find((p) => p.id === presetId)!, [presetId]);
+  const preset = useMemo(() => getPreset(presetId), [presetId]);
   const setup = useMemo(() => preset.build(defaultParamValues(preset)), [preset]);
 
   return (

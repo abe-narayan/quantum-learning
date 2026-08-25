@@ -47,6 +47,15 @@ export default async function MechanicsPage() {
         className="mt-4"
       />
 
+      {/* CourseList (below) renders each course title as an <h3> — correct
+          when nested under /learn's per-pillar <h2>, but on this pillar page
+          the page's own heading is the <h1> above with nothing in between,
+          which would jump straight from h1 to h3. This sr-only h2 restores
+          a real (if visually silent) heading level so the hierarchy stays
+          valid for screen-reader users navigating by heading, without adding
+          a redundant visible "Courses" label the page doesn't need. */}
+      <h2 className="sr-only">Courses</h2>
+
       <div className="mt-12">
         <CourseTimeline courses={courses} lessons={lessons} />
       </div>

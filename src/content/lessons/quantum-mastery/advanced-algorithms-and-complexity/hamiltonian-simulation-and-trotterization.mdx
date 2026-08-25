@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { PAULI_X, PAULI_Z, IDENTITY } from "@/lib/quantum/gates";
@@ -106,6 +107,15 @@ other, which is essentially never true for anything physically
 interesting. Trotterization is the standard fix, and this lesson derives
 exactly how good the fix is, not just that it exists.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/06/Richard_Feynman_1959.png"
+  alt="Richard Feynman, 1959"
+  caption="Feynman's 1981-82 observation that simulating quantum mechanics seems to require exponential classical resources, and his proposal that a quantum system could simulate another quantum system directly, is the historical origin of the Hamiltonian-simulation problem this lesson turns into a derived, quantitative error bound."
+  credit="Unknown author, The Big T (Caltech yearbook) / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Richard_Feynman_1959.png"
+  license="Public domain"
+/>
+
 ## Mathematical Development
 
 ### The product formula
@@ -144,9 +154,13 @@ $$
 Subtracting term by term, every piece cancels except the asymmetric
 cross term:
 
+<TheoremBox title="First-order Trotter single-step error" provenance="derived">
+
 $$
 \boxed{e^{-iA\delta}e^{-iB\delta} - e^{-i(A+B)\delta} = -\frac{\delta^2}{2}[A,B] + O(\delta^3)}
 $$
+
+</TheoremBox>
 
 This is the entire mechanism in one line: the single-step Trotter error
 is governed *exactly* by how much $A$ and $B$ fail to commute, vanishing
@@ -161,9 +175,13 @@ Taylor-remainder estimate for bounded operators.
 To bound the error after $n$ repeated steps, not just one, use a short,
 fully general lemma:
 
-**Lemma.** If $U_1,\dots,U_n$ and $V_1,\dots,V_n$ are unitary with
+<TheoremBox title="Submultiplicativity lemma" provenance="derived">
+
+If $U_1,\dots,U_n$ and $V_1,\dots,V_n$ are unitary with
 $\|U_k-V_k\|\leq\varepsilon$ for every $k$, then $\|U_n\cdots
 U_1-V_n\cdots V_1\|\leq n\varepsilon$.
+
+</TheoremBox>
 
 **Proof.** Telescope the difference:
 
@@ -200,6 +218,15 @@ what Trotterization has to pay a price for approximating. Splitting into
 smaller steps doesn't remove the noncommutativity; it just makes each
 individual step's exposure to it smaller, at the cost of needing more
 steps: a real, quantified tradeoff, not a free lunch.
+
+This isn't only a textbook exercise: IBM's 127-qubit Eagle processor ran
+Trotterized time-evolution circuits, with up to 60 layers of two-qubit
+gates, of a 2D transverse-field ("kicked") Ising Hamiltonian in its
+widely cited 2023 Nature paper on quantum utility before fault
+tolerance, checking the results against state-of-the-art classical
+approximation methods. That's the same family of Hamiltonian, coupling
+term plus transverse field, this lesson's own worked example
+Trotterizes, just at a scale of 127 qubits instead of 2.
 
 ## Worked Example
 

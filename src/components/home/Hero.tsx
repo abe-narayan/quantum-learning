@@ -8,7 +8,7 @@ export function Hero() {
     <section className="relative overflow-hidden border-b border-border">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-20"
+        className="hero-glow pointer-events-none absolute inset-0 -z-20"
         style={{
           backgroundImage:
             "radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--brand) 11%, transparent), transparent 55%), radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 50%), linear-gradient(var(--surface-muted), var(--background))",
@@ -26,8 +26,8 @@ export function Hero() {
 
       <Container className="grid gap-16 py-24 sm:py-28 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:py-32">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand">QuantumLearn</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand">QuantumLearn</p>
+          <h1 className="mt-4 text-balance font-display text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Learn quantum mechanics and quantum computing by experimenting with them.
           </h1>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">

@@ -9,16 +9,19 @@ const FEATURED_SIMULATORS = [
     title: "Bloch sphere explorer",
     description: "Rotate a single qubit's state in real time and watch how gates move it across the sphere.",
     tag: "Qubits",
+    id: "bloch-sphere",
   },
   {
     title: "Wavefunction explorer",
     description: "A real 1D numerical simulator — an actual FFT and split-operator time evolution — for watching wave packets disperse and tunnel through barriers.",
     tag: "Wave mechanics",
+    id: "wavefunction-explorer",
   },
   {
     title: "Rabi / qubit dynamics explorer",
     description: "Drive a two-level system and watch population oscillate exactly, via direct numerical integration of the Schrödinger equation.",
     tag: "Dynamics",
+    id: "rabi-explorer",
   },
 ];
 
@@ -44,7 +47,7 @@ export function SimulatorsPreview() {
 
         <div className="mt-10 grid gap-6 sm:grid-cols-3">
           {FEATURED_SIMULATORS.map((sim) => (
-            <Link key={sim.title} href="/simulators" className="block">
+            <Link key={sim.title} href={`/simulators#${sim.id}`} className="block">
               <Card className="flex h-full flex-col gap-3 transition-colors hover:border-brand/40">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-base font-semibold text-foreground">{sim.title}</h3>

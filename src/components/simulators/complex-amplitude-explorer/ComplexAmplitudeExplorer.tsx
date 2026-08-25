@@ -65,7 +65,20 @@ function parseTwoAmplitude(params: {
  * render, so the two control pairs in `AmplitudeControls` can never drift
  * out of sync with each other.
  */
-export function ComplexAmplitudeExplorer() {
+export function ComplexAmplitudeExplorer({
+  twoAmplitudeVariant = "double-slit",
+}: {
+  /**
+   * Which reading the "two amplitudes" mode's bottom comparison panel
+   * shows — see `TwoAmplitudeMode` for the physics. Defaults to the
+   * unbounded double-slit `|α+β|²` reading the majority of lessons
+   * embedding this explorer rely on; `superposition-interference-and-
+   * phase.mdx` opts into `"basis-change"` instead, since it derives the
+   * normalized P(+) = |⟨+|ψ⟩|² directly from the Born rule and needs the
+   * widget to display that same bounded quantity.
+   */
+  twoAmplitudeVariant?: "double-slit" | "basis-change";
+} = {}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -206,6 +219,7 @@ export function ComplexAmplitudeExplorer() {
             alphaMagnitude={alphaMagnitude}
             alphaPhase={alphaPhase}
             betaPhase={betaPhase}
+            variant={twoAmplitudeVariant}
             onChange={(next) => {
               if (next.alphaMagnitude !== undefined) setAlphaMagnitude(next.alphaMagnitude);
               if (next.alphaPhase !== undefined) setAlphaPhase(next.alphaPhase);

@@ -48,13 +48,24 @@ export const bobFinal = applySingleQubitGate(bobAfterX, PAULI_Z, 2);
 
 ## Motivation
 
-The last lesson proved you can't copy an unknown qubit state. This lesson
-shows what you *can* do instead: move it. Alice can hand Bob a qubit in
-exactly the state $|\psi\rangle$ she has, without either of them ever
-learning what $\alpha$ and $\beta$ are, using only a pre-shared
-entangled pair and two classical bits sent over an ordinary channel.
-Nothing about this is a trick or an approximation; it's an exact,
-completely derivable protocol using only tools already in this course.
+Alice can put Bob in possession of a qubit in exactly the state
+$|\psi\rangle$ she started with, without that qubit ever traveling
+between them, without either of them learning what $\alpha$ and $\beta$
+are, and without violating the no-cloning theorem the last lesson just
+proved. That claim sounds like it must be a trick, an approximation, or
+a hidden shortcut through some loophole in "no cloning." It's none of
+those: it's an exact, completely derivable protocol, built entirely from
+tools already in this course, that uses only a pre-shared entangled pair
+and two classical bits sent over an ordinary channel.
+
+<ExternalFigure
+  src="https://www.nist.gov/sites/default/files/images/public_affairs/releases/nist_teleportation_iontrap-1.jpg"
+  alt="Close-up photograph of a gold-electrode ion trap deposited onto an alumina chip, the physical device inside which NIST's 2004 atomic-state teleportation took place"
+  caption="The actual ion trap NIST used for its 2004 demonstration of teleporting an atomic qubit's state — the trap area is the horizontal opening near the center. This is the real hardware, not a schematic, behind a protocol otherwise developed here purely on paper."
+  credit="NIST"
+  creditUrl="https://www.nist.gov/news-events/news/2004/06/nist-demonstrates-teleportation-atomic-states-quantum-computing"
+  license="Public Domain (U.S. Government work)"
+/>
 
 ## Intuition
 
@@ -236,10 +247,10 @@ consumed by her measurement; it does not survive alongside Bob's copy.
 
 ## Further Exploration
 
-Next: [Interference in Quantum Circuits](/lessons/quantum-computing/quantum-gates-and-circuits/interference-in-quantum-circuits), a shift in focus, from
-"correlate and measure" to "arrange phases so specific outcomes reinforce
-or cancel," the mechanism every quantum algorithm in later courses relies
-on.
+[Interference in Quantum Circuits](/lessons/quantum-computing/quantum-gates-and-circuits/interference-in-quantum-circuits)
+shifts focus from "correlate and measure" to "arrange phases so specific
+outcomes reinforce or cancel," the mechanism every quantum algorithm in
+later courses relies on.
 
 This protocol is re-derived entirely in the density-matrix/channel
 formalism, including an exact, computed answer for what happens when the

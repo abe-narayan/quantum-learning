@@ -6,7 +6,23 @@ import type { LessonMeta, LessonMetaWithSlug } from "./types";
 const LESSONS_ROOT = path.join(process.cwd(), "src/content/lessons");
 
 async function walk(dir: string, base = ""): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch (error) {
+    if (base === "" && (error as NodeJS.ErrnoException).code === "ENOENT") {
+      // The lessons root itself doesn't exist yet (e.g. a fresh checkout
+      // before any content has been authored). That's a legitimate "no
+      // lessons" state, not a bug, so an empty corpus is the honest answer.
+      return [];
+    }
+    // Any other failure (permissions, a transient FS error, or ENOENT on a
+    // nested directory that the top-level readdir just told us exists) is a
+    // genuine bug, not "no lessons". Propagate it so the build fails loudly
+    // instead of silently shipping a lesson-free site — mirroring how
+    // `loadLesson()` below refuses to swallow errors for known-good slugs.
+    throw error;
+  }
   const slugs: string[] = [];
 
   for (const entry of entries) {
@@ -37,7 +53,14 @@ let slugsPromise: Promise<string[]> | null = null;
 /** All authored lesson slugs, e.g. "quantum-computing/qubits-and-quantum-states/what-is-a-qubit". */
 export function getAllLessonSlugs(): Promise<string[]> {
   if (!slugsPromise) {
-    slugsPromise = walk(LESSONS_ROOT).catch(() => []);
+    // Deliberately not `.catch(() => [])`-ed: `walk()` already resolves a
+    // missing lessons root to `[]` (a legitimate empty corpus) and rejects
+    // for every other error. Swallowing that rejection here would turn any
+    // real filesystem failure into a silent empty corpus, which — since
+    // `generateStaticParams` and `dynamicParams = false` derive every
+    // `/lessons/*` route from this list — would let `next build` succeed
+    // while every lesson URL 404s. Let it throw and fail the build instead.
+    slugsPromise = walk(LESSONS_ROOT);
   }
   return slugsPromise;
 }

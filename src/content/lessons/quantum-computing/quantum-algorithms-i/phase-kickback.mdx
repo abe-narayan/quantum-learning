@@ -5,6 +5,7 @@ import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { applyBitOracle, balancedFunction } from "@/lib/quantum/oracles";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/phase-kickback"
@@ -59,6 +60,15 @@ but every algorithm from here on actually wants $f(x)$'s value somewhere
 else entirely: as a **phase** multiplying $|x\rangle$ directly, with no
 second qubit needed at all. This lesson derives exactly when and why that
 substitution is legitimate.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/3/32/Double-slit_experiment_results_Tanamura_4.jpg"
+  alt="Four panels from Tonomura's electron double-slit experiment, showing detected electron positions building up an interference pattern as the electron count grows from 11 to 200 to 6,000 to 140,000"
+  caption="Tonomura's real single-electron double-slit experiment: individual electron detections (left) accumulate into a genuine wave-interference pattern (right) as more electrons pass through. Phase kickback is what lets an algorithm turn a function's output into exactly this kind of interference term instead of a separately-stored bit."
+  credit="Dr. Tonomura / Wikimedia Commons (derivative by MikeRun)"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Double-slit_experiment_results_Tanamura_4.jpg"
+  license="CC BY-SA 3.0"
+/>
 
 ## Mathematical Development
 

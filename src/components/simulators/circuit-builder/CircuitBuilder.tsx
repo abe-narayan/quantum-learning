@@ -64,6 +64,12 @@ export function CircuitBuilder() {
     setStep(next.length);
   };
 
+  const handleApplyMeasurement = (target: number) => {
+    const next: GateInstruction[] = [...instructions, { gate: "MEASURE", targets: [target] }];
+    setInstructions(next);
+    setStep(next.length);
+  };
+
   const handleRemoveLast = () => {
     const next = instructions.slice(0, -1);
     setInstructions(next);
@@ -130,6 +136,7 @@ export function CircuitBuilder() {
         onTwoQubitTargetChange={setTwoQubitTarget}
         onApplySingleQubitGate={handleApplySingleQubitGate}
         onApplyTwoQubitGate={handleApplyTwoQubitGate}
+        onApplyMeasurement={handleApplyMeasurement}
         onRemoveLast={handleRemoveLast}
         onClear={handleClear}
         canRemove={instructions.length > 0}

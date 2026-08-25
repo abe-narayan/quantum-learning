@@ -101,6 +101,42 @@
     --warning: #fbbf24;
     --danger: #f87171;
   }
+
+  /* Lesson body copy (LessonLayout.tsx, `.prose prose-neutral`) runs through
+     @tailwindcss/typography's own `--tw-prose-*` variables, a separate
+     system from the tokens above. This is `prose-invert`'s own palette
+     (the plugin's designed dark complement to `prose-neutral`), just
+     applied here instead of via Tailwind's `dark:` variant — this app's
+     dark mode is `data-theme`-driven (see ThemeToggle.tsx) and there's no
+     `@custom-variant dark` in this file redefining `dark:` to match, so
+     `dark:prose-invert` would only track raw OS preference: invisible body
+     text when a visitor picks dark explicitly on a light-OS device, and
+     wrongly-inverted (light-on-light) text when they pick light explicitly
+     on a dark-OS device. Scoped to `.prose` so it can't leak into anything
+     else. `--tw-prose-pre-bg` is the one deliberate deviation from the
+     plugin's stock invert value (`rgb(0 0 0 / 50%)`, tuned for a
+     slate-900-ish dark bg) — against this app's near-black --background
+     (#0a0a0f) that's nearly invisible, so it uses --surface-muted instead,
+     matching the framing .katex-display already gets above. */
+  .prose {
+    --tw-prose-body: #d4d4d4;
+    --tw-prose-headings: #ffffff;
+    --tw-prose-lead: #a3a3a3;
+    --tw-prose-links: #ffffff;
+    --tw-prose-bold: #ffffff;
+    --tw-prose-counters: #a3a3a3;
+    --tw-prose-bullets: #525252;
+    --tw-prose-hr: #404040;
+    --tw-prose-quotes: #f5f5f5;
+    --tw-prose-quote-borders: #404040;
+    --tw-prose-captions: #a3a3a3;
+    --tw-prose-kbd: #ffffff;
+    --tw-prose-code: #ffffff;
+    --tw-prose-pre-code: #d4d4d4;
+    --tw-prose-pre-bg: var(--surface-muted);
+    --tw-prose-th-borders: #525252;
+    --tw-prose-td-borders: #404040;
+  }
 }
 
 :root[data-theme="dark"] {
@@ -122,9 +158,156 @@
   --danger: #f87171;
 }
 
+/* Explicit-dark counterpart to the media-query block's `.prose` override
+   above — see the comment there for why this can't just be
+   `dark:prose-invert`. Kept as a separate, identical block (rather than a
+   combined selector) to match how --background/--foreground/etc. are
+   already duplicated between the two selectors in this file. */
+:root[data-theme="dark"] .prose {
+  --tw-prose-body: #d4d4d4;
+  --tw-prose-headings: #ffffff;
+  --tw-prose-lead: #a3a3a3;
+  --tw-prose-links: #ffffff;
+  --tw-prose-bold: #ffffff;
+  --tw-prose-counters: #a3a3a3;
+  --tw-prose-bullets: #525252;
+  --tw-prose-hr: #404040;
+  --tw-prose-quotes: #f5f5f5;
+  --tw-prose-quote-borders: #404040;
+  --tw-prose-captions: #a3a3a3;
+  --tw-prose-kbd: #ffffff;
+  --tw-prose-code: #ffffff;
+  --tw-prose-pre-code: #d4d4d4;
+  --tw-prose-pre-bg: var(--surface-muted);
+  --tw-prose-th-borders: #525252;
+  --tw-prose-td-borders: #404040;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* ============================================================
+   Extended typographic system
+   ============================================================
+   Builds on the existing "loudest headings only" policy (see the Fraunces
+   comment in src/app/layout.tsx): `.prose h2` already gets the display face
+   via `prose-h2:font-display` in LessonLayout.tsx, and `.prose h3`
+   deliberately stays Geist Sans. Nothing here touches h3 — that would
+   contradict the documented intent. What follows extends the *same*
+   restrained system to a few places that were still plain body type:
+   physicist/historical/theorem blockquotes, a section-moment marker on h2,
+   and callout labels. Colors below all resolve through the theme tokens
+   defined above, so none of this needs its own dark-mode duplicate block —
+   only rules that hard-code a color need that.
+   ============================================================ */
+
+/* Physicist/historical quotes and theorem statements already use plain
+   markdown `>` blockquotes in several lessons (e.g.
+   universal-quantum-computation.mdx) with zero custom component — the
+   typography plugin's stock `.prose blockquote` (italic, quote-mark
+   pseudo-elements, muted border) is otherwise the only treatment they get.
+   Give them the display face for an editorial, "worth pausing on" feel
+   distinct from both body prose and the katex-display equation framing
+   above. `font-style: normal` deliberately overrides the plugin's default
+   italic: layout.tsx only loads Fraunces' normal style (no `style: "italic"`
+   in its `next/font/google` config), so a browser-synthesized oblique would
+   look worse than a well-set upright serif. Left border uses `--brand`
+   rather than `--accent` so a quote reads as a distinct kind of "pause"
+   from an equation block (which borders in `--accent` above) — a small,
+   already-theme-aware color contrast, not a new dark-mode rule. */
+.prose blockquote {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 1.1em;
+  line-height: 1.6;
+  border-left-color: var(--brand);
+}
+
+/* Section-moment marker: a short accent-colored rule above every `.prose`
+   h2, echoing the `--accent` treatment already used for display math above
+   so "new section" and "equation worth pausing on" read as the same visual
+   language. Purely decorative (no text, so nothing for a screen reader to
+   announce) and additive to the existing `prose-h2:font-display` treatment
+   in LessonLayout.tsx rather than a replacement for it. */
+.prose h2::before {
+  content: "";
+  display: block;
+  width: 2.25rem;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  margin-bottom: 0.85rem;
+}
+
+/* Callout severity labels (Callout.tsx: "Note" / "Careful" / "Common
+   mistake"), given more typographic distinction instead of relying on
+   color/border weight alone. Selected by the exact class combinations
+   Callout.tsx's STYLES map already assigns per type — the same "target
+   stable, already-unique structure instead of touching the component"
+   approach the print stylesheet below uses for InteractiveSection — so no
+   change to Callout.tsx or its call sites is needed. `> p:first-child`
+   is the label; the body text is Callout's second child (a div), so this
+   can't accidentally match it. Mirrors STYLES' own escalation: note/warning
+   just get uppercase tracking (a metadata voice), mistake — the type
+   students most need to notice — additionally switches to the display face,
+   matching how it's already the most heavily bordered of the three. */
+.border-l-4.border-brand.bg-brand\/5 > p:first-child,
+.border-2.border-warning\/40.bg-warning\/5 > p:first-child,
+.border-2.border-danger\/50.bg-danger\/5 > p:first-child {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.border-2.border-danger\/50.bg-danger\/5 > p:first-child {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* Simulator control-panel section labels: every controls component wires an
+   h3 to its <section> via `aria-labelledby="<x>-heading"` pointing at an id
+   ending in "-heading" on that h3 (BlochSphereControls.tsx, RabiControls.tsx,
+   NoiseControls.tsx, GroverControls.tsx, GateControls.tsx, and more — the
+   same convention repeated across every simulator's controls file). That
+   pre-existing, load-bearing (accessibility) naming convention doubles as a
+   free CSS hook: small-caps plus a touch of tracking gives every
+   control-panel section label a more refined, instrument-panel feel with no
+   component edits at all. Some of these headings interpolate math (Δ, θ,
+   φ) — small-caps only affects lowercase Latin letters, so those pass
+   through untouched. */
+h3[id$="-heading"] {
+  font-variant-caps: small-caps;
+  letter-spacing: 0.02em;
+}
+
+/* Hero background glow (Hero.tsx's `.hero-glow` radial-gradient layer):
+   a slow, low-amplitude opacity/scale breathe so the homepage's opening
+   moment doesn't feel static, without pulling in an animation library for
+   what's a single decorative `aria-hidden` layer. Disabled outright under
+   `prefers-reduced-motion: reduce` — this is pure CSS decoration (not the
+   `usePrefersReducedMotion` JS hook used elsewhere for canvas-driven
+   simulator motion), so the standard media query is the right tool here. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-glow {
+    animation: hero-glow-pulse 12s ease-in-out infinite;
+  }
+}
+
+@keyframes hero-glow-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.82;
+    transform: scale(1.04);
+  }
 }
 
 /* ============================================================

@@ -79,9 +79,21 @@ export function OrbitalShapePlot({ ariaLabel }: { ariaLabel: string }) {
   const target = useMemo(() => sampleShape({ l, m }), [l, m]);
 
   const [displayRadii, setDisplayRadii] = useState<number[]>(target.radii);
-  const prevRadiiRef = useRef<number[]>(target.radii);
+  // Mirrors `displayRadii` synchronously (unlike state, readable mid-tween
+  // without waiting for a re-render) so an interrupted tween's next `from`
+  // is wherever the shape actually is on screen, not a stale pre-interruption
+  // value — same live-ref pattern as `pointRef`/`setPointBoth` in
+  // useAnimatedBlochPoint.ts. Without this, rapidly clicking a second preset
+  // mid-tween snapped the shape backward to the *first* tween's start before
+  // animating onward, instead of continuing smoothly from where it visibly was.
+  const displayRadiiRef = useRef<number[]>(target.radii);
   const rafRef = useRef<number | null>(null);
   const isFirstRender = useRef(true);
+
+  const setDisplayRadiiBoth = useCallback((next: number[]) => {
+    displayRadiiRef.current = next;
+    setDisplayRadii(next);
+  }, []);
 
   // Kept as a separate callback (rather than inline in the effect below) so
   // the reduced-motion snap's setState call isn't lexically inside the
@@ -94,8 +106,7 @@ export function OrbitalShapePlot({ ariaLabel }: { ariaLabel: string }) {
       }
 
       if (prefersReducedMotion) {
-        setDisplayRadii(to);
-        prevRadiiRef.current = to;
+        setDisplayRadiiBoth(to);
         return;
       }
 
@@ -103,27 +114,26 @@ export function OrbitalShapePlot({ ariaLabel }: { ariaLabel: string }) {
       const frame = (now: number) => {
         const t = Math.min(1, (now - start) / TWEEN_MS);
         const eased = easeInOutCubic(t);
-        setDisplayRadii(from.map((r, i) => r + (to[i] - r) * eased));
+        setDisplayRadiiBoth(from.map((r, i) => r + (to[i] - r) * eased));
         if (t < 1) {
           rafRef.current = requestAnimationFrame(frame);
         } else {
           rafRef.current = null;
-          prevRadiiRef.current = to;
         }
       };
       rafRef.current = requestAnimationFrame(frame);
     },
-    [prefersReducedMotion]
+    [prefersReducedMotion, setDisplayRadiiBoth]
   );
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      prevRadiiRef.current = target.radii;
+      displayRadiiRef.current = target.radii;
       return;
     }
 
-    runTween(prevRadiiRef.current, target.radii);
+    runTween(displayRadiiRef.current, target.radii);
 
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);

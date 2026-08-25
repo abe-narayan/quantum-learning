@@ -14,6 +14,9 @@ const INITIAL_PITCH = 0.32;
 const MAX_PITCH = 1.45;
 const ROTATE_SENSITIVITY = 0.0085;
 const CIRCLE_SAMPLES = 56;
+/** Radians per arrow-key press — the keyboard equivalent of the pointer-drag rotation, since
+ * dragging the sphere has no keyboard counterpart otherwise. */
+const KEY_ROTATE_STEP = 0.12;
 
 function rotate({ x, y, z }: Point3, yaw: number, pitch: number): Point3 {
   const cosYaw = Math.cos(yaw);
@@ -101,23 +104,25 @@ function AxisLine({
   to: Point3;
   yaw: number;
   pitch: number;
-  label: string;
+  label?: string;
 }) {
   const a = project(from, yaw, pitch);
   const b = project(to, yaw, pitch);
   return (
     <g opacity={depthOpacity(b.depth)}>
       <line x1={a.sx} y1={a.sy} x2={b.sx} y2={b.sy} style={{ stroke: "var(--muted-foreground)" }} strokeWidth={1} />
-      <text
-        x={b.sx}
-        y={b.sy}
-        dy={b.sy > a.sy ? 14 : -8}
-        textAnchor="middle"
-        className="font-mono text-[11px]"
-        style={{ fill: "var(--muted-foreground)" }}
-      >
-        {label}
-      </text>
+      {label ? (
+        <text
+          x={b.sx}
+          y={b.sy}
+          dy={b.sy > a.sy ? 14 : -8}
+          textAnchor="middle"
+          className="font-mono text-[11px]"
+          style={{ fill: "var(--muted-foreground)" }}
+        >
+          {label}
+        </text>
+      ) : null}
     </g>
   );
 }
@@ -170,6 +175,32 @@ export function BlochSphereCanvas({
     }
   }, []);
 
+  // Keyboard equivalent of the pointer drag above — dragging only rotates the camera view
+  // (never the physical state), but it was previously mouse/touch-only with no way for a
+  // keyboard user to reach it at all.
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<SVGSVGElement>) => {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        setYaw((prev) => prev - KEY_ROTATE_STEP);
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        setYaw((prev) => prev + KEY_ROTATE_STEP);
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        setPitch((prev) => Math.min(MAX_PITCH, prev + KEY_ROTATE_STEP));
+        break;
+      case "ArrowDown":
+        event.preventDefault();
+        setPitch((prev) => Math.max(-MAX_PITCH, prev - KEY_ROTATE_STEP));
+        break;
+      default:
+        break;
+    }
+  }, []);
+
   const vector = project(blochPoint, yaw, pitch);
   const origin = project({ x: 0, y: 0, z: 0 }, yaw, pitch);
   const vectorLength = Math.hypot(vector.sx - origin.sx, vector.sy - origin.sy);
@@ -187,12 +218,18 @@ export function BlochSphereCanvas({
     <svg
       viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`}
       role="img"
-      aria-label={`Bloch sphere with the qubit state vector at approximately x=${blochPoint.x.toFixed(2)}, y=${blochPoint.y.toFixed(2)}, z=${blochPoint.z.toFixed(2)}. Drag to rotate the view.`}
-      className={cn("touch-none select-none", isDragging ? "cursor-grabbing" : "cursor-grab", className)}
+      tabIndex={0}
+      aria-label={`Bloch sphere with the qubit state vector at approximately x=${blochPoint.x.toFixed(2)}, y=${blochPoint.y.toFixed(2)}, z=${blochPoint.z.toFixed(2)}. Drag, or focus and use the arrow keys, to rotate the view.`}
+      className={cn(
+        "touch-none select-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        isDragging ? "cursor-grabbing" : "cursor-grab",
+        className
+      )}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
+      onKeyDown={handleKeyDown}
     >
       <defs>
         <linearGradient id="bloch-vector-live" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -209,20 +246,39 @@ export function BlochSphereCanvas({
 
       <AxisLine from={{ x: -1.28, y: 0, z: 0 }} to={{ x: 1.28, y: 0, z: 0 }} yaw={yaw} pitch={pitch} label="x" />
       <AxisLine from={{ x: 0, y: -1.28, z: 0 }} to={{ x: 0, y: 1.28, z: 0 }} yaw={yaw} pitch={pitch} label="y" />
-      <AxisLine from={{ x: 0, y: 0, z: -1.28 }} to={{ x: 0, y: 0, z: 1.28 }} yaw={yaw} pitch={pitch} label="|1⟩" />
+      <AxisLine from={{ x: 0, y: 0, z: -1.28 }} to={{ x: 0, y: 0, z: 1.28 }} yaw={yaw} pitch={pitch} />
 
       {(() => {
+        // θ=0 → z=+1 → |0⟩ (north pole); θ=π → z=-1 → |1⟩ (south pole). See src/lib/quantum/bloch.ts.
         const north = project({ x: 0, y: 0, z: 1.28 }, yaw, pitch);
+        const south = project({ x: 0, y: 0, z: -1.28 }, yaw, pitch);
+        // Near pitch=0 the poles sit at their most extreme projected height (the
+        // ±1.28 axis tip is ~189px from center vs. the ~200px half-height of the
+        // 400×400 viewBox), leaving only ~11px of headroom before the viewBox
+        // edge clips the label — so these offsets stay smaller than the old
+        // -8/+14 to keep both kets fully on-screen at low pitch, not just at the
+        // default/extreme pitch values where there's plenty of room.
         return (
-          <text
-            x={north.sx}
-            y={north.sy - 8}
-            textAnchor="middle"
-            className="font-mono text-[11px]"
-            style={{ fill: "var(--foreground)" }}
-          >
-            |0⟩
-          </text>
+          <>
+            <text
+              x={north.sx}
+              y={north.sy - 6}
+              textAnchor="middle"
+              className="font-mono text-[11px]"
+              style={{ fill: "var(--foreground)" }}
+            >
+              |0⟩
+            </text>
+            <text
+              x={south.sx}
+              y={south.sy + 11}
+              textAnchor="middle"
+              className="font-mono text-[11px]"
+              style={{ fill: "var(--foreground)" }}
+            >
+              |1⟩
+            </text>
+          </>
         );
       })()}
 

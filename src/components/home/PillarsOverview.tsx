@@ -95,7 +95,7 @@ export function PillarsOverview() {
         </div>
 
         <div className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {PILLARS.map((pillar, index) => {
+          {PILLARS.filter((pillar) => pillar.slug !== "quantum-mastery").map((pillar, index) => {
             const ruleColor = index % 2 === 0 ? "var(--brand)" : "var(--accent)";
             const courses = getCoursesByPillar(pillar.slug);
             const totalHours = courses.reduce((sum, course) => sum + course.estimatedHours, 0);

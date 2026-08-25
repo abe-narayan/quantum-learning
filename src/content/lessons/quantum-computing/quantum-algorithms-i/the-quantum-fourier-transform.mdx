@@ -5,6 +5,7 @@ import { quantumFourierTransform } from "@/lib/quantum/qft";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform"
@@ -65,6 +66,15 @@ natural generalization of that idea, the same "Hadamard trick," but general
 enough to extract not just a single yes/no bit but an entire *periodic
 pattern* out of a phase, which is exactly what phase estimation (next
 lesson) and, eventually, Shor's algorithm need.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Colourful_Spectrum_after_Diffraction_of_Helium_%28He%29_light_by_Diffraction_Grating.jpg"
+  alt="A photograph of helium light split into a colorful spectrum of discrete lines by a diffraction grating"
+  caption="A real diffraction grating decomposing helium light into its constituent frequencies, the classical, physical version of what a Fourier transform does mathematically. The QFT below is the same decomposition-into-frequencies idea, acting on qubit amplitudes instead of light."
+  credit="Souravdas1998, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Colourful_Spectrum_after_Diffraction_of_Helium_(He)_light_by_Diffraction_Grating.jpg"
+  license="CC BY-SA 4.0"
+/>
 
 ## Mathematical Development
 

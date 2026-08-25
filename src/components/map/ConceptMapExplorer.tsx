@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
 } from "react";
 import { buildConceptGraph, type ConceptGraph, type ConceptNode } from "@/lib/content/concepts";
 import { useCompletedLessonSlugs } from "@/lib/content/progress";
@@ -244,14 +243,25 @@ export function ConceptMapExplorer({ lessonTitles }: { lessonTitles: Record<stri
     }
   }
 
-  function handleWheel(event: ReactWheelEvent<HTMLDivElement>) {
-    event.preventDefault();
-    const delta = event.deltaY > 0 ? -0.08 : 0.08;
-    setTransform((prev) => ({
-      ...prev,
-      scale: Math.min(MAX_SCALE, Math.max(MIN_SCALE, prev.scale + delta)),
-    }));
-  }
+  // Attached as a native, non-passive listener (rather than JSX `onWheel`)
+  // because React registers wheel handlers passively by default — a
+  // passive listener's `event.preventDefault()` is a silent no-op (plus a
+  // console warning), so the JSX-prop version would zoom the map while
+  // also letting the page scroll underneath it.
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    function handleWheel(event: WheelEvent) {
+      event.preventDefault();
+      const delta = event.deltaY > 0 ? -0.08 : 0.08;
+      setTransform((prev) => ({
+        ...prev,
+        scale: Math.min(MAX_SCALE, Math.max(MIN_SCALE, prev.scale + delta)),
+      }));
+    }
+    viewport.addEventListener("wheel", handleWheel, { passive: false });
+    return () => viewport.removeEventListener("wheel", handleWheel);
+  }, []);
 
   function zoomBy(delta: number) {
     setTransform((prev) => ({ ...prev, scale: Math.min(MAX_SCALE, Math.max(MIN_SCALE, prev.scale + delta)) }));
@@ -309,7 +319,6 @@ export function ConceptMapExplorer({ lessonTitles }: { lessonTitles: Record<stri
           onPointerMove={handlePointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          onWheel={handleWheel}
           className={cn(
             "relative h-[420px] overflow-hidden rounded-b-2xl bg-surface-muted/30 touch-none sm:h-[560px]",
             isDragging ? "cursor-grabbing" : "cursor-grab"

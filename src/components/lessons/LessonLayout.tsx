@@ -10,6 +10,7 @@ import { CourseCheckpoint } from "@/components/problems/CourseCheckpoint";
 import { LessonCompleteToggle } from "./LessonCompleteToggle";
 import { ReadingProgressBar } from "./ReadingProgressBar";
 import { TableOfContentsDesktop, TableOfContentsMobile } from "./TableOfContents";
+import { RelatedCurrentQuantum } from "@/components/currentQuantum/RelatedCurrentQuantum";
 
 /** `id` of the prose container — shared by the ToC and reading-progress bar
  * so they can each find it via `document.getElementById` after mount. */
@@ -233,7 +234,17 @@ export function LessonLayout({
           <div
             id={LESSON_PROSE_ID}
             className={cn(
-              "prose prose-neutral max-w-3xl dark:prose-invert prose-a:text-brand",
+              // Dark-mode prose colors come from globals.css's `.prose`
+              // overrides inside the `[data-theme="dark"]` / dark-media
+              // blocks, not Tailwind's `dark:` variant: this app's dark mode
+              // is driven by the `data-theme` attribute (ThemeToggle), and
+              // Tailwind v4's `dark:` defaults to `@media
+              // (prefers-color-scheme: dark)` with no `@custom-variant dark`
+              // redefinition anywhere in this repo. `dark:prose-invert` here
+              // would only track the OS preference — invisible-on-toggle in
+              // the "explicit dark, OS light" case, and wrongly inverted in
+              // the "explicit light, OS dark" case. See globals.css.
+              "prose prose-neutral max-w-3xl prose-a:text-brand",
               // h2 = section-moment: display face, real weight/spacing, the
               // biggest thing in the prose body short of the page's own h1.
               "prose-h2:font-display prose-h2:mt-16 prose-h2:mb-4 prose-h2:text-3xl prose-h2:font-semibold prose-h2:tracking-tight",
@@ -249,6 +260,8 @@ export function LessonLayout({
           </div>
           <TableOfContentsDesktop containerId={LESSON_PROSE_ID} />
         </div>
+
+        <RelatedCurrentQuantum lessonSlug={slug} />
 
         <div className="mt-10 max-w-3xl border-t border-border pt-8">
           <LessonCompleteToggle slug={slug} />

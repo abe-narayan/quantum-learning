@@ -31,10 +31,20 @@ export const lessonMeta = {
 
 ## Motivation
 
-Every hardware datasheet reports T1 and T2. Physical Qubit
-Platforms and Advanced Topics in Quantum Mechanics already built
-everything needed to define them precisely and compute with them
-directly, rather than treating them as opaque spec-sheet numbers.
+Open any hardware datasheet and two numbers are listed for every qubit:
+T1 and T2. Physical Qubit Platforms and Advanced Topics in Quantum
+Mechanics already built everything needed to define them precisely and
+compute with them directly, rather than leaving them as opaque
+spec-sheet entries.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/f/f3/MRI_Scanner_Mark_One.jpg"
+  alt="The Mark One, the first MRI scanner ever used clinically, now on permanent display at Aberdeen Royal Infirmary"
+  caption="T1 and T2 weren't invented for qubits. Felix Bloch defined both time constants in 1946 for nuclear spin relaxation, and every MRI scan, including ones taken on this machine, the first ever used clinically, measures the same T1 and T2 this lesson computes, just for protons in tissue instead of a qubit's energy levels."
+  credit="AndyGaskell / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:MRI_Scanner_Mark_One.jpg"
+  license="CC BY-SA 4.0"
+/>
 
 ## Engineering Development
 
@@ -113,7 +123,7 @@ identifying and suppressing the extra dephasing source instead.
 **Assuming T1 and T2 are independent, unrelated numbers.** They're
 physically related via $T_2\leq2T_1$. Reported $T_2$ values exceeding
 this bound would indicate a measurement or definition error, not a
-genuinely better device.
+device that's actually better.
 </Callout>
 
 <Callout type="mistake">
@@ -122,7 +132,7 @@ merely a good approximation.** It's an EXACT identity, for any step
 count. The telescoping product
 $(1-\gamma)^N=(e^{-dt/T})^N=e^{-Ndt/T}$ has no approximation error at
 all, unlike (for example) the WKB approximation from Approximation
-Methods, which genuinely IS approximate.
+Methods, which actually is only approximate.
 </Callout>
 
 ## Practice Questions
@@ -151,7 +161,7 @@ Methods, which genuinely IS approximate.
 
 ## Further Exploration
 
-Next: [Crosstalk](/lessons/quantum-hardware/noise-decoherence-and-scaling/crosstalk), a genuinely two-qubit noise source this lesson's
+[Crosstalk](/lessons/quantum-hardware/noise-decoherence-and-scaling/crosstalk) is an inherently two-qubit noise source that this lesson's
 single-qubit T1/T2 picture doesn't capture.
 
 The $T_2\leq2T_1$ bound stated here as a physical fact is *derived*, from

@@ -30,11 +30,14 @@ import {
 export type SingleQubitGateName = "X" | "Y" | "Z" | "H" | "S" | "T";
 export type ParametrizedGateName = "RX" | "RY" | "RZ" | "P";
 export type TwoQubitGateName = "CNOT" | "CZ" | "SWAP";
+/** Not a unitary gate — a diagram/notation marker for "measure this wire here." See `applyInstruction` for why it doesn't touch the statevector. */
+export type MeasurementInstructionName = "MEASURE";
 
 export type GateInstruction =
   | { gate: SingleQubitGateName; targets: [number] }
   | { gate: ParametrizedGateName; targets: [number]; param: number }
-  | { gate: TwoQubitGateName; targets: [number, number] };
+  | { gate: TwoQubitGateName; targets: [number, number] }
+  | { gate: MeasurementInstructionName; targets: [number] };
 
 const SINGLE_QUBIT_MATRICES: Record<SingleQubitGateName, Matrix> = {
   X: PAULI_X,
@@ -130,8 +133,30 @@ export function runInstructions(numQubits: number, instructions: readonly GateIn
   return state;
 }
 
+/**
+ * Scope note on "MEASURE": this is a DIAGRAM-only marker (see CircuitDiagram
+ * / StaticCircuitDiagram for the meter-symbol rendering the notation lesson
+ * documents). It deliberately does NOT collapse the statevector here.
+ *
+ * Real projective collapse (see `measureQubit` in `./measurement.ts`) needs a
+ * random outcome, and `runInstructions` is called from `CircuitBuilder.tsx`
+ * on every step-slider move to replay an arbitrary PREFIX of the circuit
+ * (`instructions.slice(0, step)`) — scrubbing back and forth, or re-rendering,
+ * would re-sample a fresh random outcome each time, so the exact same prefix
+ * could show a different, inconsistent state on every render. Making that
+ * deterministic would mean storing a resolved outcome per placed instruction
+ * (new state, new UI for showing collapse, new interaction with the existing
+ * entanglement callouts) — a materially bigger change than this pass's scope
+ * of "let a circuit diagram depict a measurement." So MEASURE is treated as
+ * a no-op on the statevector: it acts as identity, exactly like a blank wire
+ * in the notation lesson's own convention. Wiring real mid-circuit collapse
+ * is a reasonable follow-up if the Circuit Builder UI grows to show sampled
+ * outcomes explicitly.
+ */
 function applyInstruction(state: StateVector, instr: GateInstruction): StateVector {
   switch (instr.gate) {
+    case "MEASURE":
+      return state;
     case "X":
     case "Y":
     case "Z":

@@ -48,16 +48,28 @@ export const lessonMeta = {
 Heat hydrogen gas and it doesn't glow across a smooth rainbow. It emits
 at a handful of exact, discrete wavelengths, cataloged by Balmer in 1885
 as pure empirical numerology, a formula that fit the data perfectly with
-no physical justification behind it for decades. This lesson derives the
-number underneath those lines from nothing but the Schrödinger equation
-and a boundary condition. Solving the radial equation from the previous
-lesson for hydrogen's specific Coulomb potential
-$V(r)=-e^2/4\pi\epsilon_0r$ (subject to the bound-state requirement that
-$u(r)\to0$ as $r\to\infty$) turns out to force $E$ to only a discrete,
-countable set of values, exactly the discreteness Balmer saw and couldn't
-explain. This lesson states that result and unpacks what it means
-physically; the next lesson uses the actual radial wavefunctions (already
-built and verified in this course's engine) to see the states themselves.
+no physical justification behind it for decades.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/2/21/Visible_spectrum_of_hydrogen.jpg"
+  alt="A photograph of the visible hydrogen emission spectrum, showing four discrete colored lines (Hα red, Hβ cyan, Hγ blue, Hδ violet) against a black background"
+  caption="The actual photographed Balmer series: four discrete visible lines, not a continuous rainbow, exactly the discreteness this lesson derives from Eₙ=−13.6 eV/n². The red line, Hα, is the n=3→2 transition computed in the Worked Example below."
+  credit="Wikimedia Commons / Jan Homann"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Visible_spectrum_of_hydrogen.jpg"
+  license="CC BY-SA 3.0"
+/>
+
+Balmer's numerology waited nearly three decades for an explanation. This
+lesson supplies it, deriving the number underneath those lines from
+nothing but the Schrödinger equation and a boundary condition: solving
+the radial equation from the previous lesson for hydrogen's specific
+Coulomb potential $V(r)=-e^2/4\pi\epsilon_0r$ (subject to the bound-state
+requirement that $u(r)\to0$ as $r\to\infty$) forces $E$ to only a
+discrete, countable set of values, exactly the discreteness Balmer saw
+and couldn't explain. This lesson states that result and unpacks what it
+means physically; the next lesson uses the actual radial wavefunctions
+(already built and verified in this course's engine) to see the states
+themselves.
 
 ## Intuition
 
@@ -193,7 +205,7 @@ implies.
 
 ## Further Exploration
 
-Next: [Orbitals & Quantum Numbers](/lessons/quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers), which combines the verified
-`radial1s`/`radial2s`/`radial2p` functions with Angular Momentum &
-Spin's $Y_l^m$ to build the actual 1s/2s/2p electron probability
-distributions.
+[Orbitals & Quantum Numbers](/lessons/quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers) picks up from here, combining the
+verified `radial1s`/`radial2s`/`radial2p` functions with Angular
+Momentum & Spin's $Y_l^m$ to build the actual 1s/2s/2p electron
+probability distributions.

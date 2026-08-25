@@ -33,6 +33,15 @@ rule, and it deserves to be stated as its own fact rather than left as a
 one-off curiosity: **different physical preparation procedures can be
 completely indistinguishable.**
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/8/8b/Willard_Gibbs.jpg"
+  alt="Portrait photograph of physicist Josiah Willard Gibbs"
+  caption="Josiah Willard Gibbs, who introduced the statistical ensemble into physics: the same idea this lesson formalizes as a convex combination of pure states weighted by probabilities p_i."
+  credit="Manuscripts & Archives, Yale University Library"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Willard_Gibbs.jpg"
+  license="Public domain"
+/>
+
 ## Mathematical Development
 
 ### The general mixture
@@ -123,6 +132,18 @@ Unlike the earlier examples, this one is *not* $I/2$: a nonuniform
 mixture of non-mutually-orthogonal states has no reason to collapse to
 the maximally mixed state, and it doesn't here (verified directly
 against `convexCombination`'s output).
+
+<PredictBeforeReveal
+  question="For the 50/50 mixture of |0⟩ and |1⟩ from above (ρ = I/2), what are its purity Tr(ρ²) and von Neumann entropy S(ρ)?"
+  options={[
+    { label: "Purity = 1, entropy = 0 (it behaves like a pure state)", value: "pure" },
+    { label: "Purity = 0.5, entropy = 1 bit (the extremes for a qubit)", value: "max-mixed" },
+    { label: "Purity = 0.75, entropy = 0.5 bits", value: "partial" },
+    { label: "Purity = 0, entropy is infinite", value: "zero" },
+  ]}
+  correctValue="max-mixed"
+  explanation="I/2's eigenvalues are both exactly 0.5, so Tr(ρ²) = 0.5²+0.5² = 0.5 — the lowest purity any single-qubit density matrix can have — and S(ρ) = -0.5log₂0.5 - 0.5log₂0.5 = 1 bit, the largest entropy a qubit can carry. That's confirmed directly from `purity` and `vonNeumannEntropy` in densityMatrix.ts applied to I/2. Contrast that with the non-orthogonal |0⟩/|+⟩ mixture you'll build in the explorer below: because the two components overlap instead of sitting orthogonal, that mixture's purity comes out well above 0.5 — mixed, but nowhere near as mixed as the maximally mixed case."
+/>
 
 <InteractiveSection title="Orthogonal vs. non-orthogonal mixtures, side by side" description="The density matrix explorer only mixes two components, so build the pieces of the worked example one pair at a time. First load the 'mix-0-1' preset (50/50, orthogonal) and note the point sits exactly at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this is non-orthogonal, off-center, and behaves nothing like the orthogonal case. That's the same reason the three-component worked example above lands away from I/2 too.">
   <LazyDensityMatrixExplorer />

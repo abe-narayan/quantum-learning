@@ -1,4 +1,5 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { LazySuperpositionJourney } from "@/components/visualizations/superposition-journey/LazySuperpositionJourney";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
@@ -36,6 +37,15 @@ photon's polarization, they found something a classical bit can't capture:
 the system can be in a combination of "0" and "1" at once, in a precise
 mathematical sense, not just "we don't know which one it is yet." A qubit is
 the unit of information built to describe this.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
+  alt="Google's Sycamore superconducting quantum processor chip, mounted with its array of individually wired qubits"
+  caption="A real physical qubit: Google's Sycamore superconducting processor. Each of its metallic loops is one qubit, cooled to near absolute zero, whose state is exactly the α|0⟩ + β|1⟩ this lesson describes mathematically."
+  credit="Google"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
+  license="CC BY 3.0"
+/>
 
 ## Intuition
 
@@ -89,6 +99,18 @@ classical outcome: the superposition **collapses**.
 This is why normalization matters physically, not just mathematically: it's
 exactly the statement that "probability of 0" plus "probability of 1" must
 equal 1.
+
+## See It Collapse
+
+The Born rule is the most important idea in this lesson, so before moving on,
+watch it happen. The tool below shows a single qubit's amplitudes turning
+into probabilities in real time, and lets you measure it for real: each click
+samples an outcome using exactly the probabilities shown, then snaps the
+state to a single definite ket.
+
+<InteractiveSection title="Amplitudes to probabilities to collapse" description="Set α with the slider — β is fixed by normalization. Then press Measure several times without touching the slider: you're re-preparing the same superposition each time, so the running tally shows just how random measurement really is, even though the probabilities never change.">
+  <LazySuperpositionJourney />
+</InteractiveSection>
 
 ## Interactive Visualization
 

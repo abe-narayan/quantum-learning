@@ -1,5 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { Complex } from "@/lib/quantum/complex";
 import { projectorOntoSubspace } from "@/lib/quantum/projectors";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
@@ -82,6 +84,15 @@ covers both cases at once, and, the actual payoff, shows the discrete
 formula was never a separate fact, just this general theorem evaluated
 on a spectrum with no continuous part.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/7/79/Hilbert.jpg"
+  alt="David Hilbert, photographed in 1912"
+  caption="The Hilbert space this entire course is built on, and the general spectral theory this lesson extends from matrices to unbounded operators, both trace directly to Hilbert's own work on integral equations and quadratic forms in infinitely many variables at Göttingen."
+  credit="Unknown author / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Hilbert.jpg"
+  license="Public domain"
+/>
+
 ## Intuition
 
 Replace "eigenvalue $\lambda_i$ with projector $P_i$" by "**every** real
@@ -99,6 +110,8 @@ and an ordinary integral (when $G$ is differentiable) into one notation.
 
 ### The projection-valued measure
 
+<DefinitionBox title="Projection-valued measure (PVM)">
+
 A PVM assigns to every (Borel) subset $\Delta\subseteq\mathbb R$ a
 projector $E(\Delta)$ on $\mathcal H$, satisfying $E(\mathbb R)=I$
 (**completeness**: the whole space, summed over the whole spectrum),
@@ -111,15 +124,21 @@ resolution of the identity**: $E(\lambda)$ projects onto "everything with
 spectral value at most $\lambda$," rising from the zero operator at
 $\lambda\to-\infty$ to $I$ at $\lambda\to+\infty$.
 
+</DefinitionBox>
+
 ### The theorem
 
-**Spectral theorem (PVM form).** Every self-adjoint operator $A$ on a
+<TheoremBox title="Spectral theorem (PVM form)" provenance="cited">
+
+Every self-adjoint operator $A$ on a
 Hilbert space $\mathcal H$ has a unique projection-valued measure $E$
 such that
 
 $$
 A=\int_{-\infty}^{\infty}\lambda\,dE(\lambda), \qquad D(A)=\left\{\psi\in\mathcal H:\int\lambda^2\,d\langle\psi|E(\lambda)\psi\rangle<\infty\right\}
 $$
+
+</TheoremBox>
 
 This is a genuinely deep theorem of functional analysis (the general
 proof, for the unbounded case, is due to von Neumann); it is **stated

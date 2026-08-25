@@ -119,6 +119,26 @@ hits the sample, a direct, practical response to the same dispersive
 spreading this lesson's formula predicts for any free wave packet,
 electron or otherwise.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/d/da/Professor_Vanacore_with_an_ultrafast_TEM.jpg"
+  alt="Professor Giovanni Maria Vanacore standing beside an ultrafast transmission electron microscope in the LUMES laboratory at EPFL"
+  caption="An ultrafast transmission electron microscope: its pulsed electron beams disperse in transit exactly as the sigma(t) formula above predicts, real engineering that RF compression cavities exist specifically to counteract."
+  credit="ASapozhnik"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Professor_Vanacore_with_an_ultrafast_TEM.jpg"
+  license="CC BY-SA 4.0"
+/>
+
+<PredictBeforeReveal
+  question="A free Gaussian wave packet starts with width σ₀ and is left alone (no potential). What happens to its width σ(t) as time passes?"
+  options={[
+    { label: "Stays exactly σ₀ forever", value: "same" },
+    { label: "Shrinks toward zero", value: "shrink" },
+    { label: "Grows, spreading out over time", value: "spread" },
+  ]}
+  correctValue="spread"
+  explanation="It spreads: σ(t)² = σ₀² + (ħt/(2mσ₀))², derived above from each momentum component's k-dependent phase e^{-iħk²t/(2m)}. The growth is quadratic in t for large t — exactly what the Worked Example below evaluates numerically (σ₀=1 grows to σ(5)≈2.69) and what timeEvolution.test.ts checks the platform's own split-operator simulator against."
+/>
+
 <InteractiveSection title="Spreading without leaking" description="Play the Free Gaussian Packet preset and watch the density curve visibly widen and flatten over time, even though the total probability (norm) stays exactly 1. Probability isn't lost, it's redistributed over a larger region, exactly as the formula above predicts.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>

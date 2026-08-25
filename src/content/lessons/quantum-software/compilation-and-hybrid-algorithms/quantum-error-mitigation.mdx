@@ -66,17 +66,28 @@ export const lessonMeta = {
 
 ## Motivation
 
-Quantum SDKs Overview said outright that a real production SDK's
-feature set includes "error mitigation" — one of the things this
-platform's own deliberately minimal `QuantumCircuit`/`runCircuit`
-pattern doesn't build. Nothing since has picked that thread back up.
-Quantum Error Correction & Fault Tolerance built a different,
-related idea (repairing the quantum state itself with extra qubits),
-and the NISQ capstone said a hybrid algorithm's classical loop can
-"partially compensate for imperfect quantum execution," without ever
-saying how. Both leave the same real, standard NISQ-era technique
-unnamed. This lesson names it, derives its core formula, and works a
-second technique numerically end to end.
+A noisy qubit gets measured, and somehow a classical optimizer ends up
+trusting the number that comes out of it. How? Quantum SDKs Overview
+said outright that a real production SDK's feature set includes "error
+mitigation," one of the things this platform's own deliberately minimal
+`QuantumCircuit`/`runCircuit` pattern doesn't build, and nothing since
+has picked that thread back up. Quantum Error Correction & Fault
+Tolerance built a different, related idea (repairing the quantum state
+itself with extra qubits), and the NISQ capstone said a hybrid
+algorithm's classical loop can "partially compensate for imperfect
+quantum execution," without ever saying how. Both leave the same real,
+standard NISQ-era technique unnamed. This lesson answers the opening
+question directly: it names the technique, derives its core formula, and
+works a second technique numerically end to end.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/a/ae/IBM_Q_System_One_%28Fraunhofer%29_installation.jpg"
+  alt="IBM Research engineers installing and working on an IBM Quantum System One"
+  caption="IBM Research engineers working on an IBM Quantum System One in Ehningen, Germany. Techniques like zero-noise extrapolation exist precisely because every individual run on hardware like this is genuinely noisy; mitigation corrects the statistics computed afterward, not the physical run itself."
+  credit="IBM Research / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_System_One_(Fraunhofer)_installation.jpg"
+  license="CC BY 2.0"
+/>
 
 ## Engineering Development
 
@@ -342,12 +353,17 @@ exact answer."
 
 ## Further Exploration
 
-This is the piece the NISQ capstone's "the classical loop can partially
-compensate for imperfect quantum execution" line left unnamed, and the
-feature Quantum SDKs Overview flagged this platform's own minimal
-`QuantumCircuit` pattern as missing. Variational Algorithm
-Implementation's grid-search VQE loop is exactly where a real
-deployment would plug zero-noise extrapolation in: run the ansatz
-circuit at several folded noise levels per optimizer iteration instead
-of once, and extrapolate before handing the cost function back to the
-classical optimizer.
+This closes **Quantum Software**, on the piece the NISQ capstone's "the
+classical loop can partially compensate for imperfect quantum
+execution" line left unnamed, and the feature Quantum SDKs Overview
+flagged this platform's own minimal `QuantumCircuit` pattern as missing.
+Variational Algorithm Implementation's grid-search VQE loop is exactly
+where a real deployment would plug zero-noise extrapolation in: run the
+ansatz circuit at several folded noise levels per optimizer iteration
+instead of once, and extrapolate before handing the cost function back
+to the classical optimizer.
+
+**Compilation & Hybrid Algorithms** is itself a direct prerequisite for
+**Quantum Mastery**'s algorithms course, which picks these same
+variational circuits back up to ask a harder question: whether they can
+be trained at scale at all once barren plateaus set in.

@@ -5,6 +5,22 @@ const COLUMN_WIDTH = 64;
 const LABEL_WIDTH = 40;
 
 /**
+ * The "meter" symbol the quantum-circuit-notation lesson documents for a
+ * measurement: a small gauge (dial arc + needle), drawn inside the same
+ * gate-box rect used for single-qubit gates below — matches
+ * `CircuitDiagram.tsx`'s interactive counterpart exactly.
+ */
+function MeasurementGlyph({ cx, cy }: { cx: number; cy: number }) {
+  return (
+    <g className="stroke-foreground" strokeWidth={1.5} strokeLinecap="round" fill="none">
+      <path d={`M ${cx - 9} ${cy + 6} A 9 9 0 0 1 ${cx + 9} ${cy + 6}`} />
+      <line x1={cx} y1={cy + 6} x2={cx + 6} y2={cy - 5} />
+      <circle cx={cx} cy={cy + 6} r={1.4} className="fill-foreground" stroke="none" />
+    </g>
+  );
+}
+
+/**
  * A fixed, non-interactive circuit diagram — the same SVG rendering
  * approach as the Circuit Builder simulator's `CircuitDiagram`, but for a
  * lesson that just wants to SHOW a specific circuit (e.g. "here is the
@@ -62,9 +78,13 @@ export function StaticCircuitDiagram({
             return (
               <g key={col} opacity={opacity}>
                 <rect x={cx - 18} y={rowY(q) - 18} width={36} height={36} rx={8} className="fill-surface stroke-brand" strokeWidth={1.5} />
-                <text x={cx} y={rowY(q) + 5} textAnchor="middle" className="fill-foreground text-sm font-semibold">
-                  {label}
-                </text>
+                {instr.gate === "MEASURE" ? (
+                  <MeasurementGlyph cx={cx} cy={rowY(q)} />
+                ) : (
+                  <text x={cx} y={rowY(q) + 5} textAnchor="middle" className="fill-foreground text-sm font-semibold">
+                    {label}
+                  </text>
+                )}
               </g>
             );
           }

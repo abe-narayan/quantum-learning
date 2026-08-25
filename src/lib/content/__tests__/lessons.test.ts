@@ -67,4 +67,71 @@ describe("lesson corpus integrity", () => {
     const mod = await loadLesson("this-lesson-does-not-exist/nope");
     expect(mod).toBeNull();
   });
+
+  it("every lesson's prerequisites and related lessons resolve to a real lesson slug", async () => {
+    // Guards against dangling references in lessonMeta.prerequisites / related
+    // (lesson slugs, not course/module slugs) — e.g. a lesson getting renamed
+    // or removed while other lessons still point at its old slug.
+    const slugs = await getAllLessonSlugs();
+    const knownSlugs = new Set(slugs);
+
+    for (const slug of slugs) {
+      const mod = await loadLesson(slug);
+      if (!mod) continue; // already asserted non-null above; skip to avoid double-failing
+
+      for (const prereqSlug of mod.lessonMeta.prerequisites) {
+        expect(
+          knownSlugs.has(prereqSlug),
+          `lesson "${slug}" lists unknown prerequisite "${prereqSlug}"`
+        ).toBe(true);
+      }
+
+      for (const related of mod.lessonMeta.related ?? []) {
+        expect(
+          knownSlugs.has(related.slug),
+          `lesson "${slug}" lists unknown related lesson "${related.slug}"`
+        ).toBe(true);
+      }
+    }
+  }, 120000);
+
+  it("the lesson prerequisite graph has no cycles", async () => {
+    // Guards against a prerequisite cycle (e.g. A requires B requires A),
+    // which would make a lesson's "what to read first" chain unsatisfiable.
+    const slugs = await getAllLessonSlugs();
+    const prerequisitesBySlug = new Map<string, string[]>();
+
+    for (const slug of slugs) {
+      const mod = await loadLesson(slug);
+      if (!mod) continue;
+      prerequisitesBySlug.set(slug, mod.lessonMeta.prerequisites);
+    }
+
+    const VISITING = 1;
+    const VISITED = 2;
+    const state = new Map<string, typeof VISITING | typeof VISITED>();
+
+    function visit(slug: string, path: string[]): void {
+      const status = state.get(slug);
+      if (status === VISITED) return;
+      if (status === VISITING) {
+        throw new Error(
+          `prerequisite cycle detected: ${[...path, slug].join(" -> ")}`
+        );
+      }
+
+      state.set(slug, VISITING);
+      for (const prereqSlug of prerequisitesBySlug.get(slug) ?? []) {
+        // Unknown prerequisites are covered by the dangling-reference test
+        // above; skip them here so this test only ever reports real cycles.
+        if (!prerequisitesBySlug.has(prereqSlug)) continue;
+        visit(prereqSlug, [...path, slug]);
+      }
+      state.set(slug, VISITED);
+    }
+
+    for (const slug of slugs) {
+      expect(() => visit(slug, [])).not.toThrow();
+    }
+  });
 });

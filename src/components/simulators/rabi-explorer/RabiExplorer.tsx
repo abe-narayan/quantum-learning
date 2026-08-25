@@ -125,6 +125,19 @@ export function RabiExplorer() {
     [driveStrength, detuning, tMax]
   );
 
+  // Toggling play back on after the trajectory already auto-completed (sampleIndex
+  // at SAMPLES, which is also what auto-paused it) would otherwise start the interval
+  // loop right back at the terminal sample — its very first tick immediately re-triggers
+  // the same "reached the end" auto-pause, so the Play button flips to "Pause" for one
+  // tick and silently flips back with nothing visibly animating. Restart from the
+  // beginning in that case, same as a fresh Play press would intuitively do.
+  const handleTogglePlay = () => {
+    if (!isPlaying && sampleIndex >= SAMPLES) {
+      setSampleIndex(0);
+    }
+    setIsPlaying((p) => !p);
+  };
+
   const handleDriveStrengthChange = (v: number) => {
     setDriveStrength(v);
     setSampleIndex(0);
@@ -241,7 +254,7 @@ export function RabiExplorer() {
               setSampleIndex(i);
             }}
             isPlaying={isPlaying}
-            onTogglePlay={() => setIsPlaying((p) => !p)}
+            onTogglePlay={handleTogglePlay}
             onReset={() => {
               setIsPlaying(false);
               setSampleIndex(0);

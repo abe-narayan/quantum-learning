@@ -29,6 +29,23 @@ const breadcrumbSchema = buildBreadcrumbSchema([
   { name: "Simulators", url: `${BASE_URL}/simulators` },
 ]);
 
+const SIMULATOR_INDEX: { id: string; label: string }[] = [
+  { id: "bloch-sphere", label: "Bloch Sphere Explorer" },
+  { id: "complex-amplitude-explorer", label: "Complex Plane & Amplitude Explorer" },
+  { id: "density-matrix-explorer", label: "Density Matrix Explorer" },
+  { id: "compare-states-explorer", label: "Cross-Simulator Comparison" },
+  { id: "two-qubit-explorer", label: "2-Qubit State Explorer" },
+  { id: "circuit-builder", label: "Circuit Builder" },
+  { id: "chsh-bell-test", label: "CHSH Bell Test" },
+  { id: "rabi-explorer", label: "Rabi / Qubit Dynamics Explorer" },
+  { id: "noise-explorer", label: "Noise & Decoherence Explorer" },
+  { id: "wavefunction-explorer", label: "Wavefunction Explorer" },
+  { id: "grover-explorer", label: "Grover's Algorithm Explorer" },
+  { id: "period-finding-explorer", label: "Period-Finding Explorer" },
+  { id: "qaoa-explorer", label: "Max-Cut QAOA Explorer" },
+  { id: "syndrome-explorer", label: "Syndrome Explorer" },
+];
+
 export default function SimulatorsPage() {
   return (
     <Container className="py-16">
@@ -41,6 +58,21 @@ export default function SimulatorsPage() {
         title="Interactive simulators"
         description="Hands-on tools for building real intuition about quantum states, grouped from single-qubit basics through algorithms and error correction."
       />
+
+      <nav aria-label="Jump to simulator" className="mt-10 rounded-2xl border border-border bg-surface p-6">
+        <p className="text-sm font-semibold text-foreground">Jump to a simulator</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {SIMULATOR_INDEX.map((sim) => (
+            <a
+              key={sim.id}
+              href={`#${sim.id}`}
+              className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-brand/40 hover:text-foreground"
+            >
+              {sim.label}
+            </a>
+          ))}
+        </div>
+      </nav>
 
       <div className="mt-14 space-y-20">
         <section id="single-qubit-fundamentals" className="scroll-mt-24">

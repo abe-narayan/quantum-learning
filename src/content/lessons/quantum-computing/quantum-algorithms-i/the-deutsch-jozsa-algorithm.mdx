@@ -6,6 +6,7 @@ import { applyBitOracle, constantFunction, balancedFunction } from "@/lib/quantu
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"
@@ -91,6 +92,15 @@ breaking the pattern.
 That's exactly what Deutsch-Jozsa achieves: exactly **one** query
 to $U_f$, using the phase-kickback trick from last lesson plus a second
 layer of Hadamards to turn phases back into a directly measurable answer.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/04/David_Deutsch.jpg"
+  alt="David Deutsch, the physicist who first formulated the Deutsch-Jozsa problem and is often called a father of quantum computing"
+  caption="David Deutsch, whose 1985 paper first framed quantum computation in terms of problems like the one this lesson solves; Richard Jozsa generalized his single-qubit version to the full multi-qubit algorithm derived below."
+  credit="Simon Benjamin, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:David_Deutsch.jpg"
+  license="CC BY 3.0"
+/>
 
 ## Mathematical Development
 

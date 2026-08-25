@@ -15,6 +15,15 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+// The one hover/focus/active convention every interactive element in this
+// file converges on: the same transition list + pressed-state scale used by
+// Button.tsx, and the same focus ring used by the skip-link in
+// src/app/layout.tsx (focus-visible:ring-2 ring-brand ring-offset-2
+// ring-offset-background) — kept identical everywhere rather than
+// reinvented per element.
+const INTERACTIVE_CLASSES =
+  "transition-[color,background-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 /** Desktop-only dropdown grouping the four track/pillar pages. */
 function TracksDropdown({ pathname }: { pathname: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,11 +76,12 @@ function TracksDropdown({ pathname }: { pathname: string }) {
       <button
         ref={buttonRef}
         type="button"
-        aria-haspopup="true"
         aria-expanded={isOpen}
+        aria-controls="tracks-dropdown-panel"
         onClick={() => setIsOpen((open) => !open)}
         className={cn(
-          "flex items-center gap-1 rounded-full px-2.5 py-2 text-sm font-medium transition-colors",
+          "flex items-center gap-1 rounded-full px-2.5 py-2 text-sm font-medium",
+          INTERACTIVE_CLASSES,
           isTrackActive || isOpen
             ? "bg-surface-muted text-foreground"
             : "text-muted-foreground hover:text-foreground"
@@ -91,18 +101,26 @@ function TracksDropdown({ pathname }: { pathname: string }) {
       </button>
 
       {isOpen ? (
+        // Plain nav links, not `role="menu"`/`"menuitem"` — those roles
+        // commit to the ARIA APG "menu" widget contract (arrow-key
+        // navigation between items, Tab closing the menu entirely), which
+        // this disclosure doesn't implement: it relies on ordinary Tab
+        // order through real links, closing on Escape/outside-click/blur
+        // instead. Announcing "menu" while behaving like a link list is
+        // its own bug — a screen-reader user who tries the arrow keys a
+        // real menu promises gets nothing.
         <div
-          role="menu"
+          id="tracks-dropdown-panel"
           className="absolute left-0 top-full z-50 mt-2 w-64 rounded-2xl border border-border bg-surface p-2 shadow-lg"
         >
           {TRACK_NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              role="menuitem"
               onClick={() => setIsOpen(false)}
               className={cn(
-                "block rounded-xl px-3 py-2 text-sm transition-colors",
+                "block rounded-xl px-3 py-2 text-sm",
+                INTERACTIVE_CLASSES,
                 isActive(pathname, item.href)
                   ? "bg-surface-muted text-foreground"
                   : "text-foreground hover:bg-surface-muted"
@@ -123,7 +141,8 @@ function DesktopNavLink({ item, pathname }: { item: (typeof NAV_ITEMS)[number]; 
     <Link
       href={item.href}
       className={cn(
-        "rounded-full px-2.5 py-2 text-sm font-medium transition-colors",
+        "rounded-full px-2.5 py-2 text-sm font-medium",
+        INTERACTIVE_CLASSES,
         isActive(pathname, item.href)
           ? "bg-surface-muted text-foreground"
           : "text-muted-foreground hover:text-foreground"
@@ -143,7 +162,10 @@ export function Navbar() {
       <Container className="flex h-16 items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-2 text-base font-semibold tracking-tight text-foreground"
+          className={cn(
+            "flex items-center gap-2 rounded-full text-base font-semibold tracking-tight text-foreground hover:opacity-80",
+            INTERACTIVE_CLASSES
+          )}
           onClick={() => setIsMenuOpen(false)}
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">
@@ -174,7 +196,10 @@ export function Navbar() {
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-surface-muted lg:hidden"
+          className={cn(
+            "inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-surface-muted lg:hidden",
+            INTERACTIVE_CLASSES
+          )}
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((open) => !open)}
@@ -205,7 +230,8 @@ export function Navbar() {
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg px-3 py-2 text-sm font-medium",
+                  INTERACTIVE_CLASSES,
                   isActive(pathname, item.href)
                     ? "bg-surface-muted text-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -222,7 +248,8 @@ export function Navbar() {
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg px-3 py-2 text-sm font-medium",
+                  INTERACTIVE_CLASSES,
                   isActive(pathname, item.href)
                     ? "bg-surface-muted text-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -238,7 +265,8 @@ export function Navbar() {
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg px-3 py-2 text-sm font-medium",
+                  INTERACTIVE_CLASSES,
                   isActive(pathname, item.href)
                     ? "bg-surface-muted text-foreground"
                     : "text-muted-foreground hover:text-foreground"

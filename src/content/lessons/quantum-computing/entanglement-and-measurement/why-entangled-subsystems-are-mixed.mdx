@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
+import { LazyEntanglementCorrelation } from "@/components/visualizations/entanglement-correlation/LazyEntanglementCorrelation";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed"
@@ -31,6 +32,15 @@ maximally mixed. Was that a coincidence of the specific example, or is
 there a real, provable connection between "how entangled the whole state
 is" and "how mixed each part is"? This lesson proves there is, and
 gets an exact formula out of the proof, not just a qualitative statement.
+
+<ExternalFigure
+  src="https://www.nist.gov/sites/default/files/images/2017/01/05/quantum_physics_quantum_computing_fourier_transform_beryllium_ions.jpg"
+  alt="Colorized fluorescence photograph of three trapped beryllium ions illuminated by an ultraviolet laser"
+  caption="Real trapped, laser-cooled ions glowing under UV illumination at NIST. When particles like these are entangled, each one's own state is provably mixed: the exact identity this lesson derives."
+  credit="NIST"
+  creditUrl="https://www.nist.gov/image/quantumphysicsquantumcomputingfouriertransformberylliumionsjpg"
+  license="Public domain (U.S. government work)"
+/>
 
 ## Mathematical Development
 
@@ -132,6 +142,22 @@ described*. This is the deepest sense in which entanglement is not
 classical correlation: even perfect, complete knowledge of the whole
 system does not give perfect knowledge of any one part of it, whenever
 that part is entangled with the rest.
+
+Seeing this "correlation with something outside the subsystem" as an actual
+correlation, not just an algebraic byproduct of the purity identity, is
+easiest with the maximally entangled case the last lesson used: the Bell
+state $|\Phi^+\rangle=\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$. Alice and
+Bob each hold one qubit; alone, each one's qubit is exactly the maximally
+mixed $\rho_A=\rho_B=I/2$ this section just derived. The interactive below
+samples one real joint measurement of that same shared state at a time,
+built with the platform's actual engine (`HADAMARD` then `applyCNOT`, the
+same construction the CHSH lesson uses) rather than a hand-picked 50/50
+coin flip — watch both glyphs, held far apart, snap to the same outcome
+every single time:
+
+<InteractiveSection title="Measure a shared entangled pair" description="Alice and Bob each hold one qubit of the same |Φ+⟩ state. Press Measure both to sample one real joint outcome and watch the running tally: only 00 and 11 ever occur, never 01 or 10, for this specific Bell state.">
+  <LazyEntanglementCorrelation />
+</InteractiveSection>
 
 ## Worked Example
 

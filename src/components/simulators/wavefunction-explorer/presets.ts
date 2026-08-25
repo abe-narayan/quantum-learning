@@ -17,6 +17,7 @@ export type PresetId =
   | "infinite-well-excited"
   | "harmonic-ground"
   | "harmonic-excited"
+  | "harmonic-superposition"
   | "superposition"
   | "tunneling";
 
@@ -187,6 +188,24 @@ const HARMONIC_EXCITED: PresetDefinition = {
   },
 };
 
+const HARMONIC_SUPERPOSITION: PresetDefinition = {
+  id: "harmonic-superposition",
+  label: "Harmonic Oscillator — Superposition",
+  description: "An equal superposition of the ground and first-excited harmonic-oscillator states is not itself an energy eigenstate — unlike either state alone, its probability density visibly sloshes back and forth at the classical oscillation frequency omega, a direct quantum echo of a classical mass on a spring.",
+  params: [{ key: "omega", label: "Angular frequency ω", min: 0.5, max: 3, step: 0.1, default: 1 }],
+  build: (p) => {
+    const grid = createGrid(512, 0.05);
+    const potential = harmonicOscillatorPotential(grid, p.omega);
+    const psi0Ground = harmonicOscillatorEigenstate(grid, 0, p.omega);
+    const psi1Excited = harmonicOscillatorEigenstate(grid, 1, p.omega);
+    const psi0 = Wavefunction1D.superposition([
+      { psi: psi0Ground, coefficient: new Complex(Math.SQRT1_2) },
+      { psi: psi1Excited, coefficient: new Complex(Math.SQRT1_2) },
+    ]);
+    return { grid, potential, psi0, dt: 0.005, stepsPerFrame: 8, isStationary: false };
+  },
+};
+
 const SUPERPOSITION: PresetDefinition = {
   id: "superposition",
   label: "Superposition of Two Eigenstates",
@@ -214,8 +233,16 @@ const TUNNELING: PresetDefinition = {
   label: "Tunneling Through a Barrier",
   description: "A wave packet aimed at a rectangular energy barrier. Classically, if the packet's energy is below the barrier height it could never cross — quantum mechanically, part of it always does.",
   params: [
-    { key: "momentum", label: "Momentum", min: 1, max: 6, step: 0.2, default: 3 },
-    { key: "barrierHeight", label: "Barrier height", min: 0.5, max: 8, step: 0.25, default: 2 },
+    // Default momentum=2, barrierHeight=3 keeps the packet's kinetic energy
+    // (p^2/2m = 2, hbar=m=1 as elsewhere in this file) below the barrier
+    // height by a clear margin on first load, so the preset actually shows
+    // sub-barrier tunneling out of the box rather than ordinary classical
+    // transmission (E > V). The slider ranges are untouched, so raising
+    // momentum or lowering barrier height still lets a user cross into the
+    // classical-transmission regime to contrast the two — see the "Try
+    // this" copy in WavefunctionExplorer.tsx.
+    { key: "momentum", label: "Momentum", min: 1, max: 6, step: 0.2, default: 2 },
+    { key: "barrierHeight", label: "Barrier height", min: 0.5, max: 8, step: 0.25, default: 3 },
     { key: "barrierHalfWidth", label: "Barrier half-width", min: 0.25, max: 3, step: 0.25, default: 1 },
   ],
   build: (p) => {
@@ -232,6 +259,7 @@ export const PRESETS: PresetDefinition[] = [
   INFINITE_WELL_EXCITED,
   HARMONIC_GROUND,
   HARMONIC_EXCITED,
+  HARMONIC_SUPERPOSITION,
   SUPERPOSITION,
   TUNNELING,
 ];

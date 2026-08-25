@@ -8,7 +8,7 @@ import { PRESETS, defaultParamValues, getPreset, type PresetDefinition, type Pre
 import type { CanvasMode } from "./WavefunctionCanvas";
 import { PresetControls } from "./PresetControls";
 import { WavefunctionSimulation } from "./WavefunctionSimulation";
-import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
 
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
@@ -76,7 +76,7 @@ export function WavefunctionExplorer() {
   const router = useRouter();
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const initialPreset = PRESETS.find((p) => p.id === "free-gaussian")!;
+  const initialPreset = getPreset("free-gaussian");
   const initialFromUrl = parseWavefunctionParams(searchParams);
   // presetId and paramValues are held as ONE state object, updated together
   // in a single setState call — never two separate calls a preset switch
@@ -91,7 +91,7 @@ export function WavefunctionExplorer() {
       : { presetId: initialPreset.id, paramValues: defaultParamValues(initialPreset) }
   );
   const { presetId, paramValues } = config;
-  const preset = useMemo(() => PRESETS.find((p) => p.id === presetId)!, [presetId]);
+  const preset = useMemo(() => getPreset(presetId), [presetId]);
   const [mode, setMode] = useState<CanvasMode>(() => initialFromUrl?.mode ?? "density");
   const [speed, setSpeed] = useState(1);
   const [copied, setCopied] = useState(false);
@@ -150,7 +150,7 @@ export function WavefunctionExplorer() {
   const configKey = preset.id + JSON.stringify(paramValues);
 
   function handlePresetChange(nextId: PresetId) {
-    const nextPreset = PRESETS.find((p) => p.id === nextId)!;
+    const nextPreset = getPreset(nextId);
     setConfig({ presetId: nextId, paramValues: defaultParamValues(nextPreset) });
   }
 
@@ -241,8 +241,9 @@ export function WavefunctionExplorer() {
           of Two Eigenstates and watch it visibly &quot;beat&quot; at a rate set by the energy gap.
         </p>
         <p>
-          In Tunneling, push barrier height above the packet&apos;s momentum-derived energy and confirm
-          probability still leaks through the far side.
+          Tunneling loads with the packet&apos;s momentum-derived energy already below the barrier height —
+          confirm a small but nonzero probability still leaks through, then raise momentum (or lower barrier
+          height) until energy exceeds it and watch ordinary classical transmission take over instead.
         </p>
       </div>
 

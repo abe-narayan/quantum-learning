@@ -76,19 +76,33 @@ export const lessonMeta = {
 
 ## Motivation
 
-In 1922, Otto Stern and Walther Gerlach sent silver atoms through a
-non-uniform magnetic field and looked at where they landed on a screen.
-Classically, if the atoms' magnetic moments pointed in random directions,
-the beam should smear into a continuous vertical band. It didn't. It
-split into **exactly two** distinct spots. In modern terms, this is the
-first direct experimental evidence of $S_z$'s quantized, two-valued
-spectrum, $\pm\hbar/2$, derived abstractly over the last three lessons.
-(Historically, Stern and Gerlach interpreted their own result via
-orbital angular momentum, the only quantized angular momentum anyone
-knew about in 1922; electron spin wasn't proposed until 1925, and the
-now-standard reading, that silver's outer electron has zero orbital
-angular momentum, so the splitting can only be spin, came only in
-hindsight.)
+In 1922, nothing in physics predicted what was about to happen. Otto
+Stern and Walther Gerlach sent a beam of silver atoms through a
+non-uniform magnetic field and let them land on a glass screen. If each
+atom's magnetic moment simply pointed in some random direction, as
+classical physics gave every reason to expect, the beam should have
+smeared into a continuous vertical band. It didn't. The atoms landed in
+**exactly two** distinct spots, with nothing in between.
+
+Stern and Gerlach had no framework yet for explaining what they'd
+recorded. Electron spin wasn't proposed for another three years, so they
+read their own result through orbital angular momentum, the only
+quantized angular momentum anyone knew about in 1922. The now-standard
+reading came only in hindsight, once spin entered the theory: silver's
+outer electron carries zero orbital angular momentum, so the splitting
+they photographed could only be spin. In today's terms, those two spots
+are the first direct experimental evidence of $S_z$'s quantized,
+two-valued spectrum, $\pm\hbar/2$, derived abstractly over the last three
+lessons.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/b/b0/SternGerlach2.jpg"
+  alt="A commemorative plaque at the Institute of Physics on Robert-Mayer-Straße in Frankfurt am Main, marking the building where Stern and Gerlach carried out their 1922 experiment"
+  caption="A plaque at the Frankfurt physics institute on Robert-Mayer-Straße, marking the actual site where Stern and Gerlach split a silver atom beam into two spots in February 1922, the historical event this lesson simulates with qubit machinery."
+  credit="Wikimedia Commons / Peng"
+  creditUrl="https://commons.wikimedia.org/wiki/File:SternGerlach2.jpg"
+  license="CC BY-SA 3.0"
+/>
 
 ## Mathematical Development
 
@@ -124,9 +138,9 @@ lessons' machinery).
 
 ### Why the third measurement erases the first
 
-The $x$-measurement is not merely "additional information" layered on
-top of the $z$-information. It actively **disturbs** it, because
-$S_x,S_z$ don't commute (Lesson 1). Measuring $S_x$ collapses the state
+The $x$-measurement actively **disturbs** the earlier $z$-information
+rather than simply adding to it, because $S_x,S_z$ don't commute (Lesson
+1). Measuring $S_x$ collapses the state
 into an $S_x$ eigenstate, which (having equal overlap with both $S_z$
 eigenstates) carries no memory of the original $S_z$ outcome at all. This
 is the same measurement-disturbance principle from Operators, Observables
@@ -137,8 +151,8 @@ rather than an abstract one.
 
 The two-spot result alone already proved quantization; the *sequential*
 experiment goes further, demonstrating that $S_x$ and $S_z$ are
-genuinely incompatible observables in a way no amount of classical
-imprecision could produce. A classical magnetic moment with some
+incompatible observables in a way no amount of classical imprecision
+could produce. A classical magnetic moment with some
 definite (if unknown) 3D direction would give a $z$-measurement result
 correlated with its history, not a fresh, uncorrelated $50/50$ coin flip
 every time a different axis is measured in between.
@@ -154,7 +168,7 @@ by symmetry). Given "$\uparrow$," $P(+\text{ second})=\tfrac12$ (computed
 above). Given "$+$," $P(\uparrow\text{ third})=\tfrac12$ (computed above,
 since the second measurement erased the correlation with the first). Net
 joint probability: $\tfrac12\times\tfrac12\times\tfrac12=\tfrac18$. Each
-stage is genuinely independent of the one before it, once an intervening
+stage is independent of the one before it, once an intervening
 incompatible measurement has occurred.
 
 The full branching structure makes this concrete: every path through the
@@ -174,7 +188,7 @@ Try the same sequence yourself, one measurement at a time:
     { label: "Only if the x-measurement gave '+'", value: "conditional" },
   ]}
   correctValue="5050"
-  explanation="After the x-measurement, the state is |+⟩ or |−⟩, an equal superposition of |↑⟩ and |↓⟩ either way, because Sx and Sz don't commute. The intervening x-measurement genuinely erases the earlier z-information — it's not extra information layered on top, it's a disturbance. So the third measurement gives a fresh 50/50 split, with no memory of the original 'up' result."
+  explanation="After the x-measurement, the state is |+⟩ or |−⟩, an equal superposition of |↑⟩ and |↓⟩ either way, because Sx and Sz don't commute. The intervening x-measurement is a disturbance: it erases the earlier z-information rather than layering on top of it. So the third measurement gives a fresh 50/50 split, with no memory of the original 'up' result."
 />
 
 <InteractiveSection description="Measure along Z, then X, then Z again. Watch the point re-randomize after the X measurement. The third Z outcome carries no memory of the first, exactly like every path in the tree above splitting 50/50 regardless of which branch you took to get there.">
@@ -186,8 +200,9 @@ Try the same sequence yourself, one measurement at a time:
 <Callout type="mistake">
 **Expecting the third measurement to reproduce the first with
 certainty.** It doesn't, because the intervening $x$-measurement actively
-randomizes the $z$-information. This isn't experimental imperfection,
-it's the Born rule applied correctly to the post-$x$-measurement state.
+randomizes the $z$-information. This is exactly what the Born rule
+predicts for the post-$x$-measurement state, not a sign of experimental
+imperfection.
 </Callout>
 
 <Callout type="mistake">
@@ -230,10 +245,10 @@ this picture; see the Physical Interpretation above.
 
 ## Further Exploration
 
-Next: [Addition of Angular Momentum](/lessons/quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum),
-combining two spin-$\tfrac12$
-particles, connecting directly to the Bell states this platform built
-in Quantum Gates & Circuits.
+The story continues, chronologically, in
+[Addition of Angular Momentum](/lessons/quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum):
+combining two spin-$\tfrac12$ particles, connecting directly to the Bell
+states this platform built in Quantum Gates & Circuits.
 
 The same spin-$\tfrac12$ states measured here along an arbitrary axis
 reappear, dragged slowly around a loop instead of measured once, in

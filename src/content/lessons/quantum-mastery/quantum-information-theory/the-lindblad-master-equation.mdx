@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { StateVector } from "@/lib/quantum/state";
@@ -85,7 +86,21 @@ Sudarshan, and Lindblad) is the continuous-time generator of exactly the
 kind of Markovian, completely-positive evolution this platform's Kraus
 channels already implement at discrete steps, and this lesson proves
 the two pictures aren't just analogous, they're the *same* dynamics,
-sampled at different resolutions.
+sampled at different resolutions. Primary sources: V. Gorini, A.
+Kossakowski, and E. C. G. Sudarshan, "Completely Positive Dynamical
+Semigroups of N-Level Systems," *J. Math. Phys.* **17**, 821 (1976),
+and G. Lindblad, "On the Generators of Quantum Dynamical Semigroups,"
+*Commun. Math. Phys.* **48**, 119–130 (1976), who derived the boxed
+generator's general form independently and in the same year.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Planar_Ion_Trap%3B_Magnesium_Ions_%285884514798%29.jpg"
+  alt="False-color fluorescence images of magnesium ions confined in NIST's planar ion trap, showing 1, 2, 3, 6, and 12 trapped ions"
+  caption="Real trapped-ion qubits like these are one of the physical platforms whose T1 (energy relaxation) and T2 (dephasing) times are measured directly against the Lindblad equation's predictions -- this lesson's amplitude-damping and dephasing generators are not abstractions, they describe exactly this kind of hardware."
+  credit="Signe Seidelin and John Chiaverini / NIST"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Planar_Ion_Trap;_Magnesium_Ions_(5884514798).jpg"
+  license="Public domain (U.S. government work)"
+/>
 
 ## Mathematical Development
 
@@ -102,12 +117,18 @@ argument on the Choi matrix of $\Lambda_t$ as $t\to0$, beyond this
 lesson's scope) states that *any* generator of a completely positive,
 trace-preserving Markovian semigroup necessarily has the form
 
+<TheoremBox title="GKLS (Lindblad) equation" provenance="cited">
+
 $$
 \boxed{\dot\rho = \mathcal L(\rho) = -i[H,\rho] + \sum_k\left(L_k\rho L_k^\dagger - \frac12\{L_k^\dagger L_k,\rho\}\right)}
 $$
 
 for some Hermitian $H$ (an effective Hamiltonian) and some set of
-**Lindblad (jump) operators** $\{L_k\}$. What *is* proved here directly
+**Lindblad (jump) operators** $\{L_k\}$.
+
+</TheoremBox>
+
+What *is* proved here directly
 is the converse, sufficiency direction: that this form genuinely
 generates valid CPTP dynamics, by connecting it explicitly to the
 discrete Kraus picture already built and trusted on this platform.
@@ -195,12 +216,18 @@ Because $\mathcal L$ is **linear** in its jump operators, running both
 processes together simply *adds* their individual contributions to
 $\dot\rho_{01}$:
 
+<TheoremBox title="The T2 ≤ 2T1 bound" provenance="derived">
+
 $$
 \dot\rho_{01} = -\Big(\tfrac{\Gamma}{2}+2\kappa\Big)\rho_{01} \qquad\Longrightarrow\qquad \frac1{T_2} = \frac1{2T_1} + \frac1{T_{2,\text{pure}}}
 $$
 
 Since $1/T_{2,\text{pure}}\geq0$ always, $1/T_2\geq1/(2T_1)$, i.e.
-$\boxed{T_2\leq2T_1}$, **derived** from the Lindblad generator's
+$\boxed{T_2\leq2T_1}$.
+
+</TheoremBox>
+
+This bound is **derived** from the Lindblad generator's
 structure, not merely stated as an empirical fact the way T1 & T2
 Decoherence introduced it. Equality holds exactly when
 $T_{2,\text{pure}}\to\infty$ (no pure dephasing at all, a "T1-limited"

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Complex } from "../complex";
 import {
   classicalSumProbability,
+  crossBasisProbability,
   interferenceProbability,
   normalizedTwoLevelAmplitudes,
 } from "../amplitude";
@@ -66,6 +67,39 @@ describe("interferenceProbability vs classicalSumProbability", () => {
       const a = new Complex(0.6, 0);
       const b = Complex.fromPolar(0.6, phase);
       expect(interferenceProbability(a, b)).toBeGreaterThanOrEqual(-1e-9);
+    }
+  });
+});
+
+describe("crossBasisProbability", () => {
+  it("reduces to (1+cos φ)/2 for the equal-magnitude state a=1/√2, b=e^{iφ}/√2", () => {
+    for (const phi of [0, Math.PI / 3, Math.PI / 2, 2 * Math.PI / 3, Math.PI, 1.234]) {
+      const a = new Complex(Math.SQRT1_2, 0);
+      const b = Complex.fromPolar(Math.SQRT1_2, phi);
+      expect(crossBasisProbability(a, b)).toBeCloseTo((1 + Math.cos(phi)) / 2, 9);
+    }
+  });
+
+  it("is exactly 1 at φ=0 (fully constructive) and 0 at φ=π (fully destructive)", () => {
+    const a = new Complex(Math.SQRT1_2, 0);
+    expect(crossBasisProbability(a, new Complex(Math.SQRT1_2, 0))).toBeCloseTo(1, 9);
+    expect(crossBasisProbability(a, new Complex(-Math.SQRT1_2, 0))).toBeCloseTo(0, 9);
+  });
+
+  it("is exactly half of interferenceProbability", () => {
+    const a = new Complex(0.6, 0.2);
+    const b = new Complex(-0.3, 0.4);
+    expect(crossBasisProbability(a, b)).toBeCloseTo(interferenceProbability(a, b) / 2, 9);
+  });
+
+  it("stays within [0, 1] for any normalized (|a|²+|b|²=1) pair, unlike the raw interferenceProbability it's derived from", () => {
+    for (const alphaMagnitude of [0, 0.2, 0.5, Math.SQRT1_2, 0.9, 1]) {
+      for (const phase of [0, 0.7, Math.PI / 2, 2, Math.PI, 4, 2 * Math.PI - 0.1]) {
+        const [a, b] = normalizedTwoLevelAmplitudes(alphaMagnitude, 0, phase);
+        const p = crossBasisProbability(a, b);
+        expect(p).toBeGreaterThanOrEqual(-1e-9);
+        expect(p).toBeLessThanOrEqual(1 + 1e-9);
+      }
     }
   });
 });

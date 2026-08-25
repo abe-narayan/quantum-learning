@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage"
@@ -35,6 +36,15 @@ side and asks the question neither individual lesson addressed: faster
 at what, compared to what, and under what assumptions, because the
 honest answer to each turns out to be far more specific than "quantum
 computers win."
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
+  alt="Google's Sycamore superconducting quantum processor, the 53-qubit chip used in Google's 2019 quantum supremacy/advantage experiment"
+  caption="Google's Sycamore processor, the real chip behind the 2019 quantum supremacy claim. It's a useful reminder that a real 'quantum advantage' result is about a specific task on specific hardware, not a blanket claim that quantum computers are simply faster."
+  credit="Google, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
+  license="CC BY 3.0"
+/>
 
 ## Mathematical Development
 
@@ -196,16 +206,17 @@ sidestepped by construction.
 
 ## Further Exploration
 
-The question this lesson opened with, faster at what, compared to what,
-under which assumptions, carries forward into every algorithm ahead.
-Shor's algorithm gets its exponential speedup from a different kind of
-structured promise (periodicity, not a constant-vs-balanced guarantee):
-it's worth asking the same three questions of it before taking
-"exponential" at face value again.
+Every algorithm ahead inherits the opening question, not the answer:
+faster at what, compared to what, under which assumptions. Shor's
+algorithm is the nearest test case. Its exponential speedup comes from a
+different kind of structured promise than Deutsch-Jozsa's (periodicity,
+not a constant-vs-balanced guarantee), and it's worth running the same
+three questions against it before taking "exponential" at face value
+again.
 
-This completes **Quantum Algorithms I: Foundations**. From here,
-**Quantum Algorithms II: Advanced** builds directly on the QFT and phase
-estimation machinery from this course: Shor's algorithm reuses phase
-estimation for period finding, and the variational algorithms (VQE, QAOA)
-introduce a fundamentally different, classically-assisted approach to
-quantum computation.
+**Quantum Algorithms I: Foundations** ends here. **Quantum Algorithms
+II: Advanced** reuses this course's machinery directly rather than
+starting over: Shor's algorithm applies phase estimation to period
+finding, and the variational algorithms, VQE and QAOA, introduce a
+fundamentally different, classically-assisted approach to quantum
+computation.

@@ -38,6 +38,11 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Practice problems and quizzes to check your understanding.",
   },
   {
+    label: "Current Quantum",
+    href: "/current-quantum",
+    description: "Real, recent developments in quantum computing and physics, connected back to the curriculum.",
+  },
+  {
     label: "About",
     href: "/about",
     description: "Who QuantumLearn is for, and what we're building.",

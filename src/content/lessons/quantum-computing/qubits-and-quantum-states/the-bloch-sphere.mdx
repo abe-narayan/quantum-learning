@@ -32,9 +32,19 @@ export const lessonMeta = {
 ## Motivation
 
 The last lesson ended with a claim: a qubit's physical state has exactly
-two real degrees of freedom. Two real numbers are exactly what you need to
-locate a point on a sphere. This lesson makes that connection precise, not
-by analogy, but by direct derivation from $\alpha|0\rangle+\beta|1\rangle$.
+two real degrees of freedom — and two real numbers are exactly what
+locates a point on a sphere. This lesson derives that connection directly
+from $\alpha|0\rangle+\beta|1\rangle$, rather than leaving it as an
+analogy.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Felix_Bloch%2C_Stanford_University.jpg"
+  alt="Photograph of physicist Felix Bloch at Stanford University, 1961"
+  caption="Felix Bloch (1905–1983), photographed in 1961 at Stanford, where his work on nuclear induction and spin precession gave the geometric picture derived in this lesson its name."
+  credit="Stanford University / Courtesy Stanford News Service / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Felix_Bloch,_Stanford_University.jpg"
+  license="CC BY 3.0"
+/>
 
 ## Intuition
 
@@ -100,9 +110,9 @@ the amplitude's $\theta/2$, mentally separate.
 
 The pair $(\theta,\varphi)$ are spherical coordinates for a point
 $(x,y,z)$ on a unit sphere, via the standard conversion
-$x=\sin\theta\cos\varphi$, $y=\sin\theta\sin\varphi$, $z=\cos\theta$. It's
-worth confirming this is exactly what falls out of the amplitudes
-directly, using the inner-product machinery from two lessons ago. Define:
+$x=\sin\theta\cos\varphi$, $y=\sin\theta\sin\varphi$, $z=\cos\theta$. The
+inner-product machinery from two lessons ago confirms this falls
+directly out of the amplitudes themselves. Define:
 
 $$
 x = \langle\psi|X|\psi\rangle, \quad y = \langle\psi|Y|\psi\rangle, \quad z = \langle\psi|Z|\psi\rangle
@@ -142,7 +152,7 @@ $$
 work directly from *any* $\alpha,\beta$. You never actually need to remove
 the global phase by hand first, because (as you can check) these three
 formulas don't change if you multiply $\alpha,\beta$ by a common phase.
-That cancellation is not an accident; it's the content of the next lesson.
+That cancellation is the content of the next lesson, not a coincidence.
 
 ### Reading the sphere
 
@@ -168,6 +178,18 @@ involved. Geometrically, latitude is "how much," longitude is "in what
 phase."
 
 ## Interactive Experiment
+
+<PredictBeforeReveal
+  question="Apply a Z rotation of π — the Z gate — to |+⟩, sitting at θ=π/2, φ=0 on the equator. Where does it end up?"
+  options={[
+    { label: "The same point — Z leaves it fixed", value: "same" },
+    { label: "The south pole, θ=π", value: "south" },
+    { label: "θ=π/2, φ=π — the point labeled |−⟩", value: "minus" },
+    { label: "θ=π/2, φ=π/2 — the point labeled |+i⟩", value: "plusi" },
+  ]}
+  correctValue="minus"
+  explanation="Z|0⟩=|0⟩ and Z|1⟩=−|1⟩ — the same relations used above to compute z=|α|²−|β|² — send |+⟩=1/√2(|0⟩+|1⟩) to 1/√2(|0⟩−|1⟩)=|−⟩, exactly the equatorial point at φ=π listed in 'Reading the sphere' above, at the same θ=π/2. That matches the geometry too: a π rotation about the vertical (Z) axis should swing an equatorial point exactly halfway around to the opposite longitude, leaving latitude untouched — x=sinθcosφ flips from +1 to −1 while z=cosθ stays at 0. Try it below: load the |+⟩ preset and apply the Z gate."
+/>
 
 <InteractiveSection title="Three checks against the sphere" description={`Try each of these directly in the simulator below, and check the numbers against what you just derived. Click through the six presets and read off θ and φ for each. Confirm they match the values listed in "Reading the sphere" above. Drag the θ slider from 0 to π with φ fixed at 0. Watch P(0) and P(1) trade off smoothly, and notice the vector stays in a single vertical half-plane the whole time. Now fix θ at 90° and sweep φ through a full turn. Notice P(0) and P(1) never change. The vector just sweeps around the equator at constant latitude, exactly as the formulas predict.`}>
   <LazyBlochSphereExplorer />
@@ -238,7 +260,7 @@ phase *relative to*.
 
 ## Further Exploration
 
-Next: [Measurement and Probability](/lessons/quantum-computing/qubits-and-quantum-states/measurement-and-probability), where $P(0)=\cos^2(\theta/2)$ and
-$P(1)=\sin^2(\theta/2)$ get derived properly from the measurement
-postulate, and where measuring in a basis *other* than $\{|0\rangle,|1\rangle\}$
-turns out to be just as natural.
+[Measurement and Probability](/lessons/quantum-computing/qubits-and-quantum-states/measurement-and-probability) derives $P(0)=\cos^2(\theta/2)$ and
+$P(1)=\sin^2(\theta/2)$ properly from the measurement postulate, and
+shows that measuring in a basis *other* than $\{|0\rangle,|1\rangle\}$
+is just as natural.

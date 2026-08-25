@@ -44,3 +44,22 @@ export function interferenceProbability(a: Complex, b: Complex): number {
 export function classicalSumProbability(a: Complex, b: Complex): number {
   return a.magnitudeSquared() + b.magnitudeSquared();
 }
+
+/**
+ * The probability of measuring a *normalized* two-level state
+ * a|0⟩ + b|1⟩ (|a|² + |b|² = 1) to be in the |+⟩ = (|0⟩+|1⟩)/√2 basis
+ * state: P(+) = |⟨+|ψ⟩|² = |a + b|²/2 — exactly half of
+ * `interferenceProbability`, but (unlike that quantity on its own,
+ * which is deliberately not renormalized, since it models a double-slit
+ * "probability at a point" that isn't bounded by 1) always confined to
+ * [0, 1], precisely because a and b are already probability-normalized.
+ *
+ * This is the quantity `superposition-interference-and-phase.mdx` derives
+ * directly from the Born rule (reducing to (1+cos φ)/2 for the equal-
+ * magnitude case a = 1/√2, b = e^{iφ}/√2). It must not be confused with
+ * `interferenceProbability`, which the double-slit lessons rely on being
+ * left unbounded.
+ */
+export function crossBasisProbability(a: Complex, b: Complex): number {
+  return interferenceProbability(a, b) / 2;
+}

@@ -19,6 +19,44 @@ function handleStepKeyDown(event: KeyboardEvent<SVGGElement>, onSelectStep: (ste
 }
 
 /**
+ * The "meter" symbol the notation lesson documents for a measurement: a
+ * small gauge (dial arc + needle), drawn inside the same gate-box rect used
+ * for single-qubit gates elsewhere in this file, so it reads as "a thing
+ * that happens on this wire" the same way an H or X box does.
+ */
+function MeasurementGlyph({ cx, cy }: { cx: number; cy: number }) {
+  return (
+    <g className="stroke-foreground" strokeWidth={1.5} strokeLinecap="round" fill="none">
+      <path d={`M ${cx - 9} ${cy + 6} A 9 9 0 0 1 ${cx + 9} ${cy + 6}`} />
+      <line x1={cx} y1={cy + 6} x2={cx + 6} y2={cy - 5} />
+      <circle cx={cx} cy={cy + 6} r={1.4} className="fill-foreground" stroke="none" />
+    </g>
+  );
+}
+
+/**
+ * Builds a descriptive default aria-label from the actual circuit content
+ * (qubit count, gate count, and which gates appear), replacing the old
+ * static "Circuit diagram" string that told screen reader users nothing
+ * about what was actually drawn.
+ */
+function summarizeCircuitForAria(numQubits: number, instructions: GateInstruction[]): string {
+  const qubitPhrase = `${numQubits} qubit${numQubits === 1 ? "" : "s"}`;
+  if (instructions.length === 0) {
+    return `Circuit diagram, ${qubitPhrase}, no gates placed yet.`;
+  }
+  const counts = new Map<string, number>();
+  for (const instr of instructions) {
+    counts.set(instr.gate, (counts.get(instr.gate) ?? 0) + 1);
+  }
+  const gateSummary = Array.from(counts.entries())
+    .map(([gate, count]) => `${count} ${gate}`)
+    .join(", ");
+  const gatePhrase = `${instructions.length} gate${instructions.length === 1 ? "" : "s"}`;
+  return `Circuit diagram, ${qubitPhrase}, ${gatePhrase}: ${gateSummary}.`;
+}
+
+/**
  * A minimal, educational circuit diagram: `numQubits` horizontal wires,
  * one column per instruction. Single-qubit gates draw a labeled box on
  * their target's wire; two-qubit gates draw a connecting vertical line
@@ -29,11 +67,14 @@ export function CircuitDiagram({
   instructions,
   step,
   onSelectStep,
+  ariaLabel,
 }: {
   numQubits: number;
   instructions: GateInstruction[];
   step: number;
   onSelectStep: (step: number) => void;
+  /** Optional override; defaults to a summary of qubit/gate counts generated from `instructions`. */
+  ariaLabel?: string;
 }) {
   const columns = instructions.length;
   const width = LABEL_WIDTH + (columns + 1) * COLUMN_WIDTH;
@@ -41,7 +82,13 @@ export function CircuitDiagram({
 
   return (
     <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
-      <svg width={width} height={height} role="img" aria-label="Circuit diagram" className="min-w-full">
+      <svg
+        width={width}
+        height={height}
+        role="img"
+        aria-label={ariaLabel ?? summarizeCircuitForAria(numQubits, instructions)}
+        className="min-w-full"
+      >
         {Array.from({ length: numQubits }, (_, q) => (
           <g key={`wire-${q}`}>
             <line
@@ -77,7 +124,11 @@ export function CircuitDiagram({
                 className="cursor-pointer rounded outline-none transition-opacity duration-200 motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
                 role="button"
                 tabIndex={0}
-                aria-label={`Jump to right after ${instructionLabel(instr)} on qubit ${q}`}
+                aria-label={
+                  instr.gate === "MEASURE"
+                    ? `Jump to right after measuring qubit ${q}`
+                    : `Jump to right after ${instructionLabel(instr)} on qubit ${q}`
+                }
                 onClick={() => onSelectStep(col + 1)}
                 onKeyDown={(event) => handleStepKeyDown(event, onSelectStep, col)}
               >
@@ -90,9 +141,13 @@ export function CircuitDiagram({
                   className={cn("stroke-brand", isDone ? "fill-brand/15" : "fill-surface")}
                   strokeWidth={1.5}
                 />
-                <text x={cx} y={rowY(q) + 5} textAnchor="middle" className="fill-foreground text-sm font-semibold">
-                  {instructionLabel(instr)}
-                </text>
+                {instr.gate === "MEASURE" ? (
+                  <MeasurementGlyph cx={cx} cy={rowY(q)} />
+                ) : (
+                  <text x={cx} y={rowY(q) + 5} textAnchor="middle" className="fill-foreground text-sm font-semibold">
+                    {instructionLabel(instr)}
+                  </text>
+                )}
               </g>
             );
           }

@@ -15,7 +15,7 @@ import { buildBreadcrumbSchema } from "@/lib/structuredData";
 export const metadata: Metadata = buildPageMetadata({
   title: "Learn",
   description:
-    "The QuantumLearn curriculum — Quantum Mechanics, Quantum Computing, Quantum Hardware, and Quantum Software, from strong high-school math through advanced undergraduate material.",
+    "The QuantumLearn curriculum — Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, and Quantum Mastery, from strong high-school math through graduate-level rigor.",
   path: "/learn",
 });
 
@@ -40,6 +40,15 @@ export default async function LearnPage() {
         .find((lesson) => lesson.module === rootCourse.modules[0]?.slug)
     : undefined;
 
+  // A second, beginner-friendly entry point alongside the prerequisite-graph
+  // root above. "What Is a Qubit?" needs no math background and leads with
+  // physical intuition (spinning-coin analogy, a live Bloch-sphere demo)
+  // before any formalism — a genuinely different, equally valid way in for a
+  // reader who wants the "why" before the "how."
+  const intuitionLesson = lessons.find(
+    (lesson) => lesson.slug === "quantum-computing/qubits-and-quantum-states/what-is-a-qubit"
+  );
+
   return (
     <Container className="py-16">
       <script
@@ -49,25 +58,53 @@ export default async function LearnPage() {
       <PageHeader
         eyebrow="Learn"
         title="The QuantumLearn curriculum"
-        description="Four tracks, each building on strong high-school math and physics toward advanced undergraduate quantum mechanics and computing."
+        description="Five tracks, each building on strong high-school math and physics, from first principles through graduate-level rigor in quantum mechanics and computing."
       />
 
       <ContinueLearning />
 
-      {rootCourse ? (
-        <Card className="mt-10 border-brand/30 bg-brand/5">
+      {rootCourse || intuitionLesson ? (
+        <div className="mt-10">
           <p className="text-xs font-semibold uppercase tracking-wide text-brand">Start here</p>
-          <p className="mt-2 text-foreground">
-            Every course on this platform traces back, directly or through its prerequisites, to{" "}
-            <strong className="font-semibold">{rootCourse.title}</strong> — it&rsquo;s the only course
-            here that needs nothing else first.
+          <p className="mt-2 max-w-2xl text-muted-foreground">
+            New to quantum, or ready to build the rigorous foundation? Both are legitimate ways in —
+            pick whichever matches how you learn best.
           </p>
-          {firstLesson ? (
-            <Button href={`/lessons/${firstLesson.slug}`} size="sm" className="mt-4">
-              Start with &ldquo;{firstLesson.title}&rdquo;
-            </Button>
-          ) : null}
-        </Card>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {intuitionLesson ? (
+              <Card className="border-brand/30 bg-brand/5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand">
+                  New to quantum? Start here
+                </p>
+                <p className="mt-2 text-foreground">
+                  Prefer physics intuition first?{" "}
+                  <strong className="font-semibold">{intuitionLesson.title}</strong> —{" "}
+                  {intuitionLesson.description}
+                </p>
+                <Button href={`/lessons/${intuitionLesson.slug}`} size="sm" className="mt-4">
+                  Start with &ldquo;{intuitionLesson.title}&rdquo;
+                </Button>
+              </Card>
+            ) : null}
+            {rootCourse ? (
+              <Card className="border-border">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Prefer the math foundation first? Start here
+                </p>
+                <p className="mt-2 text-foreground">
+                  Every course on this platform traces back, directly or through its prerequisites,
+                  to <strong className="font-semibold">{rootCourse.title}</strong> — it&rsquo;s the
+                  only course here that needs nothing else first.
+                </p>
+                {firstLesson ? (
+                  <Button href={`/lessons/${firstLesson.slug}`} size="sm" variant="secondary" className="mt-4">
+                    Start with &ldquo;{firstLesson.title}&rdquo;
+                  </Button>
+                ) : null}
+              </Card>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       <div className="mt-14">

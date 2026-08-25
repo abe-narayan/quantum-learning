@@ -179,13 +179,21 @@ export function DensityMatrixExplorer() {
   function handleComponent1Change(angles: BlochAngles) {
     setComponent1(angles);
     setActivePresetId(null);
-    setNarration("Adjusted component 1 — the density matrix updates live.");
+    setNarration(
+      weight === 0
+        ? "Adjusted component 1 — but the mixing weight is entirely on component 2 right now, so ρ hasn't changed. Move the weight slider to see it."
+        : "Adjusted component 1 — the density matrix updates live."
+    );
   }
 
   function handleComponent2Change(angles: BlochAngles) {
     setComponent2(angles);
     setActivePresetId(null);
-    setNarration("Adjusted component 2 — the density matrix updates live.");
+    setNarration(
+      weight === 1
+        ? "Adjusted component 2 — but the mixing weight is entirely on component 1 right now, so ρ hasn't changed. Move the weight slider to see it."
+        : "Adjusted component 2 — the density matrix updates live."
+    );
   }
 
   function handleWeightChange(nextWeight: number) {

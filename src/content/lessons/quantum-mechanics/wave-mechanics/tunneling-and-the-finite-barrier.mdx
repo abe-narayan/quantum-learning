@@ -4,6 +4,7 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { barrierPotential } from "@/lib/quantum/potentials";
+import { LazyTunnelingIntroVisual } from "@/components/visualizations/tunneling-intro/LazyTunnelingIntroVisual";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier"
@@ -31,12 +32,20 @@ export const lessonMeta = {
 
 ## Motivation
 
-Classically, a ball with less energy than a hill's height can never cross
-it. It rolls partway up and back down, full stop. Quantum mechanically,
-this is false: solve the Schrödinger equation honestly inside the
-"forbidden" region, and the wavefunction doesn't vanish there. It decays,
-smoothly and continuously, which is all that's needed for some amplitude
-to survive to the far side of a barrier that isn't infinitely thick.
+Picture a ball rolled at a hill it doesn't have enough energy to climb.
+Classically the outcome is never in doubt: the ball rises partway up the
+slope, stalls, and rolls back down, every time, no matter how many times
+it's tried. Give a quantum particle the same hill and the same shortfall
+in energy, and every so often it turns up on the far side anyway, having
+never had the energy to get over the top. No energy bookkeeping is
+violated to make this happen; what changes is what "can't get over"
+means for something described by a wavefunction instead of a trajectory.
+Solve the Schrödinger equation honestly inside the "forbidden" region,
+and the wavefunction doesn't vanish there. It decays, smoothly and
+continuously, which is all that's needed for some amplitude to survive
+to the far side of a barrier that isn't infinitely thick.
+
+<LazyTunnelingIntroVisual />
 
 ## Intuition
 
@@ -122,6 +131,15 @@ layer that traps charge on a memory cell can't be made arbitrarily thin,
 because past a certain point the stored charge tunnels back out on its
 own, one of the physical limits on how far that layer can be scaled down.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/5/5a/First_STM.jpg"
+  alt="Photograph of the original 1981 scanning tunneling microscope built by Binnig and Rohrer at IBM Zurich, on display at the Deutsches Museum"
+  caption="The original scanning tunneling microscope, built at IBM Zurich in 1981: it images individual atoms by measuring the tunneling current derived above, a current exponentially sensitive to the vacuum gap's width."
+  credit="J Brew (Flickr)"
+  creditUrl="https://commons.wikimedia.org/wiki/File:First_STM.jpg"
+  license="CC BY-SA 2.0"
+/>
+
 ## Interactive Experiment
 
 <PredictBeforeReveal
@@ -133,7 +151,7 @@ own, one of the physical limits on how far that layer can be scaled down.
     { label: "It depends only on momentum, not the barrier", value: "momentum-only" },
   ]}
   correctValue="nonzero"
-  explanation="Inside the barrier ψ decays exponentially (Ce^{κx}+De^{-κx}), but decaying isn't vanishing: continuity of ψ and ψ' forces a nonzero, if small, amplitude to survive to the far side, giving genuine transmission roughly ~e^(-2κa). That's exactly what the Explorer's Tunneling preset below shows: a nonzero P(transmitted), not zero, splitting the packet's probability between transmission and reflection."
+  explanation="Inside the barrier ψ decays exponentially (Ce^{κx}+De^{-κx}), but decaying isn't vanishing: continuity of ψ and ψ' forces a nonzero, if small, amplitude to survive to the far side, giving real transmission roughly ~e^(-2κa). That's exactly what the Explorer's Tunneling preset below shows: a nonzero P(transmitted), splitting the packet's probability between transmission and reflection."
 />
 
 <InteractiveSection title="Raise the barrier, watch it shrink" description="The Wavefunction Explorer's Tunneling Through a Barrier preset sends a Gaussian packet at a rectangular barrier. Play it forward past the interaction and check the comparison panel: P(transmitted) and P(reflected) should sum to almost exactly 1 (probability conservation, nothing is created or destroyed by the barrier), split between the two outcomes in a ratio that depends sharply on the barrier's height and width, exactly as e^(-2κa) predicts. Try raising the barrier height and watch the transmitted fraction shrink.">
@@ -165,8 +183,8 @@ distinction is the entire mechanism behind tunneling.
 **Expecting all-or-nothing transmission.** A real packet is a
 superposition (Free-Particle Wave Packets lesson) of many momenta, some
 above and some below the classical threshold. This course's tunneling
-preset genuinely splits into transmitted and reflected *parts*, not one
-outcome or the other, matching the correct probabilistic interpretation.
+preset splits into transmitted and reflected *parts*, not one outcome or
+the other, matching the correct probabilistic interpretation.
 </Callout>
 
 ## Practice Questions
@@ -189,7 +207,7 @@ outcome or the other, matching the correct probabilistic interpretation.
   exponential (not oscillatory) solutions. The wavefunction decays but
   does not vanish.
 - A barrier of finite width lets a nonzero (though possibly tiny)
-  amplitude survive to the far side, producing genuine, calculable
+  amplitude survive to the far side, producing real, calculable
   transmission.
 - Transmission falls off roughly as $e^{-2\kappa a}$, explaining why
   tunneling is significant at atomic scales and negligible at macroscopic
@@ -199,7 +217,7 @@ outcome or the other, matching the correct probabilistic interpretation.
 
 ## Further Exploration
 
-Next: [Numerically Evolving Quantum States](/lessons/quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states), a conceptual look at
-*how* this platform's simulator actually integrates the Schrödinger
-equation forward in time, tying together every numerical claim made in
-this course.
+[Numerically Evolving Quantum States](/lessons/quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states)
+turns to *how* this platform's simulator actually integrates the
+Schrödinger equation forward in time, tying together every numerical
+claim made in this course.

@@ -3,6 +3,7 @@
 import { useId } from "react";
 import { Button } from "@/components/ui/Button";
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
+import { cn } from "@/lib/utils";
 import type { BlochAngles } from "@/lib/quantum/bloch";
 import { STATE_PRESETS } from "../bloch-sphere/presets";
 import { MIXTURE_PRESETS } from "./presets";
@@ -49,14 +50,24 @@ function ComponentPicker({
   title,
   angles,
   onChange,
+  isInert,
 }: {
   title: string;
   angles: BlochAngles;
   onChange: (angles: BlochAngles) => void;
+  /** True when this component's mixing coefficient is currently exactly 0, so ρ = p·ρ₁ + (1−p)·ρ₂
+   * has zeroed out its contribution entirely — every slider/preset click here is a real, valid edit
+   * that nonetheless produces zero visible change until the weight is moved off that extreme. */
+  isInert: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-3">
+    <div className={cn("rounded-xl border border-border bg-surface p-3", isInert && "opacity-60")}>
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
+      {isInert && (
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          No visible effect right now — the mixing weight below is entirely on the other component.
+        </p>
+      )}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {STATE_PRESETS.map((preset) => (
           <Button key={preset.id} variant="secondary" size="sm" onClick={() => onChange(preset.angles)}>
@@ -121,8 +132,8 @@ export function DensityMatrixControls({
           ρ = p·ρ₁ + (1−p)·ρ₂, where ρ₁ and ρ₂ are the density matrices of these two pure states.
         </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <ComponentPicker title="Component 1 (ρ₁)" angles={component1} onChange={onComponent1Change} />
-          <ComponentPicker title="Component 2 (ρ₂)" angles={component2} onChange={onComponent2Change} />
+          <ComponentPicker title="Component 1 (ρ₁)" angles={component1} onChange={onComponent1Change} isInert={weight === 0} />
+          <ComponentPicker title="Component 2 (ρ₂)" angles={component2} onChange={onComponent2Change} isInert={weight === 1} />
         </div>
       </section>
 

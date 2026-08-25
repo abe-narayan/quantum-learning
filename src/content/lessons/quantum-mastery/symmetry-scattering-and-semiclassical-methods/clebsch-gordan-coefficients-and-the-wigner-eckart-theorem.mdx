@@ -1,5 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
 import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
@@ -100,6 +102,15 @@ coefficient for any $j_1\otimes j_2$, then a theorem, Wigner-Eckart, that
 turns "does this transition happen at all" into a question answerable
 from symmetry alone.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Wigner.jpg"
+  alt="Portrait photograph of physicist Eugene Wigner, taken in 1963, the year he won the Nobel Prize in Physics"
+  caption="Eugene Wigner, whose 1927 theorem this lesson proves: that any spherical tensor operator's matrix elements between angular-momentum eigenstates factor into a Clebsch-Gordan coefficient (all the angular dependence) times a single reduced matrix element (all the operator-specific physics)."
+  credit="Nobel Foundation, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Wigner.jpg"
+  license="Public domain"
+/>
+
 ## Mathematical Development
 
 ### The general recursion
@@ -196,12 +207,16 @@ basis $U$, here actually derived rather than borrowed.
 
 ### The Wigner-Eckart theorem
 
+<DefinitionBox title="Spherical tensor operator">
+
 A **spherical tensor operator** of rank $k$, $T^k_q$ ($q=-k,\ldots,k$), is
 defined by transforming under rotations exactly like $|k,q\rangle$ does:
 
 $$
 [J_z,T^k_q]=q\,T^k_q, \qquad [J_\pm,T^k_q]=\sqrt{k(k+1)-q(q\pm1)}\,T^k_{q\pm1}
 $$
+
+</DefinitionBox>
 
 These are *exactly* the same commutation relations $J_z,J_\pm$ satisfy
 with the angular-momentum basis kets $|k,q\rangle$ themselves. Sandwiching
@@ -214,6 +229,8 @@ and the same boundary conditions has (for fixed $j,j',k$) a
 one-dimensional solution space, so the two objects can only differ by an
 overall constant, independent of $m,m',q$:
 
+<TheoremBox title="Wigner–Eckart theorem" provenance="derived">
+
 $$
 \boxed{\;\langle j'm'|T^k_q|jm\rangle = \langle jm;kq|j'm'\rangle\,\langle j'\|T^k\|j\rangle\;}
 $$
@@ -222,6 +239,8 @@ $\langle j'\|T^k\|j\rangle$, the **reduced matrix element**, carries all
 the operator-specific physics (radial integrals, coupling strengths); the
 Clebsch-Gordan coefficient carries *all* of the angular dependence, for
 every $m,m',q$ at once.
+
+</TheoremBox>
 
 ### Selection rules for free
 

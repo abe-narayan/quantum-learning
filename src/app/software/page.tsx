@@ -55,6 +55,11 @@ export default async function SoftwarePage() {
         className="mt-4"
       />
 
+      {/* See src/app/mechanics/page.tsx for why this sr-only h2 exists:
+          CourseList's course titles render as <h3>, and without this the
+          page would jump straight from the <h1> above to those h3s. */}
+      <h2 className="sr-only">Courses</h2>
+
       <div className="mt-12">
         <CourseTimeline courses={courses} lessons={lessons} />
       </div>

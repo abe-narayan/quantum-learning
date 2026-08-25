@@ -5,6 +5,7 @@ import { phaseGate } from "@/lib/quantum/gates";
 import { phaseEstimation } from "@/lib/quantum/qft";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/quantum-phase-estimation"
@@ -59,6 +60,15 @@ for some phase $\varphi\in[0,1)$, a single real number encoding everything
 $U$ does to that eigenstate. **Quantum phase estimation (QPE)** reads
 $\varphi$ out into an ordinary qubit register, as a binary fraction, using
 nothing but controlled-$U$ applications and the inverse QFT.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
+  alt="A NIST ion-trap apparatus: a square gold chip surrounded by gold wire mesh, used to trap and manipulate individual beryllium ions for quantum information experiments"
+  caption="A real NIST ion-trap apparatus, used to hold individual ions in precisely controlled quantum states. Reading out a physical quantity this precisely, here an eigenphase to many bits of accuracy, is exactly the kind of measurement problem phase estimation is built to solve on qubit hardware."
+  credit="Y. Colombe / NIST"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
+  license="Public Domain (U.S. Government work)"
+/>
 
 ## Mathematical Development
 

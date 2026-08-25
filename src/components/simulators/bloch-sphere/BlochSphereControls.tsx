@@ -176,6 +176,7 @@ function AngleSlider({
         disabled={disabled}
         onChange={(event) => onChange(Number(event.target.value))}
         className="mt-2 w-full accent-[var(--brand)] disabled:opacity-50"
+        aria-valuetext={`${degrees}°`}
       />
       <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
     </div>
@@ -211,6 +212,7 @@ function RotationRow({
         disabled={disabled}
         onChange={(event) => setDegrees(Number(event.target.value))}
         className="w-32 flex-1 accent-[var(--brand)] disabled:opacity-50"
+        aria-valuetext={`${degrees}°`}
       />
       <span className="w-12 text-right font-mono text-xs text-muted-foreground">{degrees}°</span>
       <Button

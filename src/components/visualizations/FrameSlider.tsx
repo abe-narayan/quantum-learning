@@ -12,6 +12,12 @@
  * `ParametricCurve` nests it inside a box it already renders itself, so it
  * passes `boxed={false}` to avoid a double border.
  */
+// Safety-net fallback for callers that forget (or fail) to pass a real
+// `label` — an empty string would otherwise become an empty `aria-label`,
+// leaving the range input completely unlabeled for screen readers. Not as
+// good as a real, specific label, but strictly better than nothing.
+const FALLBACK_LABEL = "Animation frame selector";
+
 export function FrameSlider({
   label,
   valueLabel,
@@ -27,10 +33,12 @@ export function FrameSlider({
   onChange: (index: number) => void;
   boxed?: boolean;
 }) {
+  const effectiveLabel = label || FALLBACK_LABEL;
+
   return (
     <div className={boxed ? "rounded-xl border border-border bg-surface-muted/40 p-4" : undefined}>
       <label className="flex items-center justify-between text-xs font-medium text-foreground">
-        <span>{label}</span>
+        <span>{effectiveLabel}</span>
         <span className="font-mono text-muted-foreground">{valueLabel}</span>
       </label>
       <input
@@ -41,7 +49,12 @@ export function FrameSlider({
         value={index}
         onChange={(e) => onChange(Number(e.target.value))}
         className="mt-2 w-full accent-brand"
-        aria-label={label}
+        aria-label={effectiveLabel}
+        // `valueLabel` is already the caller's pre-formatted, humanized
+        // readout for the current frame (e.g. "θ = 30°", "η = 0.30") — wire
+        // it to aria-valuetext so screen readers announce that instead of
+        // the raw 0..max frame index.
+        aria-valuetext={valueLabel}
       />
     </div>
   );

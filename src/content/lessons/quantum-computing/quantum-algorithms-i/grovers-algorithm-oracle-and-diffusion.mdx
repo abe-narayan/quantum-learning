@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion"
@@ -26,10 +27,14 @@ export const lessonMeta = {
 
 ## Motivation
 
-Given a "black box" that marks one specific item among $N=2^n$ unsorted
-possibilities (no structure, no ordering, nothing to exploit), a classical
-algorithm needs $O(N)$ queries on average to find it: check items one at a
-time, no shortcut available.
+Suppose someone hands you a list of one million unsorted items and asks
+you to find the one that satisfies some hard-to-guess condition, checkable
+only by testing items one at a time. How many guesses should you expect
+to need? Classically, there's no way around it: with no structure to
+exploit, up to a million checks in the worst case, half a million on
+average. That's the general fact for a "black box" that marks one
+specific item among $N=2^n$ unsorted possibilities: a classical algorithm
+needs $O(N)$ queries on average, full stop.
 
 <PredictBeforeReveal
   question="How does the number of oracle queries Grover's algorithm needs to find the marked item scale with N, compared to the classical O(N)?"
@@ -47,6 +52,15 @@ time, no shortcut available.
 quadratic speedup, and it's the *best possible* for unstructured search
 (proven elsewhere, not claimed here), not an artifact of insufficient
 cleverness.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/IBM_Q_system_%28Fraunhofer_2%29.jpg/1280px-IBM_Q_system_%28Fraunhofer_2%29.jpg"
+  alt="An IBM Quantum System One installation at the Fraunhofer facility in Ehningen, Germany, showing the gold dilution-refrigerator enclosure that houses the superconducting processor"
+  caption="An IBM Quantum System One installed at the Fraunhofer facility in Ehningen, Germany. The oracle and diffusion operators derived below are exactly the kind of circuit compiled down to gate pulses and run on machines like this one."
+  credit="IBM Research, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_system_(Fraunhofer_2).jpg"
+  license="CC BY 2.0"
+/>
 
 ## Mathematical Development
 
@@ -173,6 +187,6 @@ what an outcome-only test cannot.
 
 ## Further Exploration
 
-Next: [Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification), which composes the
-oracle and diffusion operator into a rotation and derives the exact,
-closed-form optimal number of iterations.
+[Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification)
+composes the oracle and diffusion operator into a rotation and derives
+the exact, closed-form optimal number of iterations.

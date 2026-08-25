@@ -307,6 +307,130 @@ export const CONCEPT_NODES: ConceptNode[] = [
     ],
     prerequisiteIds: ["quantum-circuits", "quantum-circuit-simulation"],
   },
+
+  // ---------------------------------------------------------------------
+  // Quantum Mastery
+  // ---------------------------------------------------------------------
+  {
+    id: "self-adjoint-operator",
+    title: "Self-Adjoint Operators",
+    definition:
+      "An operator is self-adjoint only when its domain matches its adjoint's exactly, not merely when ⟨φ|Aψ⟩=⟨Aφ|ψ⟩ holds — a distinction invisible for finite-dimensional matrices but essential on the infinite-dimensional spaces quantum mechanics actually uses, since self-adjointness alone guarantees a genuine spectral decomposition and unitary time evolution.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness"],
+    prerequisiteIds: ["wave-mechanics"],
+  },
+  {
+    id: "spectral-theorem-pvm",
+    title: "Spectral Theorem (Projection-Valued Measures)",
+    definition:
+      "Every self-adjoint operator equals ∫λ dE(λ) for a unique projection-valued measure E — the general theorem that reduces to the familiar finite-dimensional A=Σλᵢ Pᵢ exactly when E happens to be a staircase, and extends Born's rule to a single statement covering both discrete and continuous spectra at once.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators",
+    ],
+    prerequisiteIds: ["self-adjoint-operator"],
+  },
+  {
+    id: "clebsch-gordan-wigner-eckart",
+    title: "Clebsch-Gordan Coefficients & the Wigner-Eckart Theorem",
+    definition:
+      "Clebsch-Gordan coefficients give the general recipe for coupling two angular momenta j₁⊗j₂ into total-j eigenstates; the Wigner-Eckart theorem then shows any spherical tensor operator's matrix elements factor into one of these coefficients (all the angular dependence) times a single reduced matrix element, yielding selection rules like Δl=±1 from symmetry alone.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem",
+    ],
+    prerequisiteIds: ["angular-momentum-spin"],
+  },
+  {
+    id: "adiabatic-theorem-berry-phase",
+    title: "Adiabatic Theorem & Berry Phase",
+    definition:
+      "A quantum system whose Hamiltonian changes slowly enough tracks its instantaneous eigenstate, up to a phase; that phase splits into an ordinary dynamical part and a geometric (Berry) part that depends only on the path traced through parameter space, not on how long the path takes — for a spin-1/2 dragged around a cone, exactly minus half the solid angle enclosed.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase",
+    ],
+    prerequisiteIds: ["qubit", "hamiltonians-time-evolution"],
+  },
+  {
+    id: "schmidt-decomposition",
+    title: "Schmidt Decomposition",
+    definition:
+      "Every bipartite pure state can be written as a single sum Σₖ√λₖ|uₖ⟩|wₖ⟩ over matched orthonormal bases of each subsystem, proved via the singular value decomposition of the state's amplitude matrix — the theorem that explains why a pure state's two reduced density matrices always share the same eigenvalues.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification"],
+    prerequisiteIds: ["entanglement", "density-matrices"],
+  },
+  {
+    id: "trace-distance-fidelity",
+    title: "Trace Distance & Fidelity",
+    definition:
+      "The two standard, non-equivalent ways to measure how close two quantum states are: trace distance is exactly twice the best possible measurement's power to tell them apart (Helstrom's formula), while fidelity measures their overlap via Uhlmann's theorem; the Fuchs–van de Graaf inequalities sandwich one between bounds built from the other.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-information-theory/trace-distance-and-fidelity"],
+    prerequisiteIds: ["schmidt-decomposition", "density-matrices"],
+  },
+  {
+    id: "lindblad-master-equation",
+    title: "Lindblad Master Equation",
+    definition:
+      "The most general continuous-time differential equation generating valid (completely positive, trace-preserving) Markovian open-system dynamics, dρ/dt=−i[H,ρ]+Σₖ(LₖρLₖ†−½{Lₖ†Lₖ,ρ}) — the generator underneath discrete noise channels like amplitude damping, from which the T2≤2T1 bound follows directly.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-information-theory/the-lindblad-master-equation"],
+    prerequisiteIds: ["noise-decoherence"],
+  },
+  {
+    id: "css-stabilizer-codes",
+    title: "CSS Codes & General Stabilizer Formalism",
+    definition:
+      "General [[n,k,d]] stabilizer codes, and the CSS construction that builds one directly from two nested classical linear codes — the machinery behind the Steane [[7,1,3]] code and every large-scale fault-tolerant proposal, including surface codes, extending the 3-qubit bit-flip code's syndrome idea to codes that correct arbitrary single-qubit errors.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism",
+    ],
+    prerequisiteIds: ["quantum-error-correction"],
+  },
+  {
+    id: "bqp-oracle-complexity",
+    title: "BQP & Oracle Complexity",
+    definition:
+      "BQP is the formal complexity class of decision problems solvable by a bounded-error, polynomial-time-uniform quantum circuit family; whether it equals classical BPP is open, and the oracle-relative query-complexity separations proved by Deutsch-Jozsa, Simon's, and Grover's algorithms are rigorous but strictly weaker statements, subject to the Baker-Gill-Solovay relativization barrier.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity"],
+    prerequisiteIds: ["grovers-algorithm"],
+  },
+  {
+    id: "hamiltonian-simulation-trotterization",
+    title: "Hamiltonian Simulation & Trotterization",
+    definition:
+      "Approximates e^{-iHt} for a Hamiltonian H=A+B whose pieces don't commute by alternating e^{-iAδ}e^{-iBδ} in n short steps; the total error is provably bounded by (t²/2n)‖[A,B]‖, shrinking as the number of Trotter steps grows.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization",
+    ],
+    prerequisiteIds: ["hamiltonians-time-evolution", "quantum-circuits"],
+  },
+  {
+    id: "quantum-walks",
+    title: "Quantum Walks",
+    definition:
+      "A coin-and-conditional-shift quantum analogue of a random walk that spreads ballistically (∝t) rather than diffusively (∝√t), a direct consequence of its momentum-space dispersion relation having a bounded, nonzero group velocity; continuous-time quantum walks on a graph are exactly Hamiltonian simulation of that graph's adjacency matrix.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/advanced-algorithms-and-complexity/quantum-walks"],
+    prerequisiteIds: ["hamiltonian-simulation-trotterization"],
+  },
+  {
+    id: "barren-plateaus",
+    title: "Barren Plateaus",
+    definition:
+      "A variational circuit's parameter-shift gradient has exactly zero mean everywhere, but for sufficiently deep, expressive ansätze measured against a global cost function, its variance shrinks exponentially in qubit count (a concentration-of-measure effect) — the reason gradient-based training of large variational circuits can stall even when nothing else is wrong.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability",
+    ],
+    prerequisiteIds: ["qaoa"],
+  },
 ];
 
 export type ConceptNodeLayout = ConceptNode & {

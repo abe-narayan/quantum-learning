@@ -1,4 +1,5 @@
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { LazyWaveInterference } from "@/components/visualizations/wave-interference/LazyWaveInterference";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
@@ -45,6 +46,15 @@ reshaping the outcome probabilities. Interference is what happens when
 you ask a question (a choice of measurement basis) that doesn't line up
 with the way a state happens to be written.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Thin_Film_Interference_Soap_Bubble.jpg"
+  alt="Close-up photograph of a soap bubble showing swirling, colorful thin-film interference patterns"
+  caption="Thin-film interference in a soap bubble: the color at each point is set by a continuously varying phase between reflected light waves, a visible, everyday instance of the same relative-phase dependence derived algebraically here."
+  credit="Pksois23 / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Thin_Film_Interference_Soap_Bubble.jpg"
+  license="CC BY-SA 4.0"
+/>
+
 ## Mathematical Development
 
 ### The superposition principle
@@ -88,6 +98,10 @@ physical paths to a screen. **The relative phase that was completely
 invisible when measuring in the $\{|0\rangle,|1\rangle\}$ basis is fully
 visible here.**
 
+<InteractiveSection title="Where the fringe shape comes from" description={`This "double-slit fringe shape" is not a metaphor — it's the literal intensity pattern of two coherent, classical wave sources. Below, S₁ and S₂ emit identical waves, and S₂'s wave carries an extra relative phase φ, the same kind of relative phase e^{iφ} sitting between the two terms of |ψ⟩ above. The central fringe's intensity is computed directly as the squared magnitude of the two waves' complex sum, and it traces out exactly the 4A²cos²(φ/2) curve — the same (1+cosφ)/2 shape, rescaled, as the P(+) formula just derived.`}>
+  <LazyWaveInterference />
+</InteractiveSection>
+
 ### The same formula, twice
 
 Compare $P(+)=\tfrac{1+\cos\varphi}{2}$ to the Time Evolution lesson's
@@ -122,11 +136,11 @@ bases.
     { label: "Only P(1) changes, P(0) stays fixed", value: "asymmetric" },
   ]}
   correctValue="fixed"
-  explanation="P(0)=|c₀|² and P(1)=|c₁|² depend only on the magnitudes of the amplitudes, and a relative phase e^{iφ} doesn't change either magnitude. So the bars stay exactly fixed no matter where you drag φ — that's the 'no interference in the natural basis' result derived above. It's only the quantum-vs-classical comparison beneath it, measuring in the {|+⟩,|−⟩} basis, that traces out the (1+cos φ)/2 curve as φ sweeps."
+  explanation="P(0)=|c₀|² and P(1)=|c₁|² depend only on the magnitudes of the amplitudes, and a relative phase e^{iφ} doesn't change either magnitude. So the bars stay exactly fixed no matter where you drag φ — that's the 'no interference in the natural basis' result derived above. It's only the P(+)/P(−) comparison beneath it, measuring in the {|+⟩,|−⟩} basis, that traces out the (1+cos φ)/2 curve as φ sweeps."
 />
 
-<InteractiveSection title="Same state, two bases" description={`Switch the explorer below to two-amplitude mode. The probability bars for P(0)=|α|² and P(1)=|β|² (measuring in the state's own basis) stay fixed as you drag the relative-phase slider, confirming the "no interference in the natural basis" result above directly. The "quantum vs. classical" comparison beneath it is exactly the {|+⟩,|-⟩}-style cross-basis measurement this lesson just derived: watch it trace out the same (1+cos φ)/2 shape as you sweep the slider through a full turn.`}>
-  <LazyComplexAmplitudeExplorer />
+<InteractiveSection title="Same state, two bases" description={`Switch the explorer below to two-amplitude mode. The probability bars for P(0)=|α|² and P(1)=|β|² (measuring in the state's own basis) stay fixed as you drag the relative-phase slider, confirming the "no interference in the natural basis" result above directly. The P(+) and P(−) bars beneath it are exactly the {|+⟩,|-⟩}-style cross-basis measurement this lesson just derived: watch P(+) trace out the same (1+cos φ)/2 shape as you sweep the slider through a full turn, with P(−) always filling in the rest so the two sum to 1.`}>
+  <LazyComplexAmplitudeExplorer twoAmplitudeVariant="basis-change" />
 </InteractiveSection>
 
 ## Worked Example

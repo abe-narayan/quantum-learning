@@ -1,7 +1,11 @@
+"use client";
+
+import { useMemo } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { getConcept, type ConceptNode, type SimulatorId } from "@/lib/content/concepts";
+import { getEntriesForLesson, type CurrentQuantumEntry } from "@/lib/content/currentQuantum/registry";
 
 const PILLAR_LABEL: Record<ConceptNode["pillar"], string> = {
   "quantum-mechanics": "Quantum Mechanics",
@@ -23,6 +27,23 @@ function simulatorHref(simulatorId: SimulatorId) {
   return `/simulators#${simulatorId}`;
 }
 
+/**
+ * Mirrors the date formatting in `CurrentQuantumCard.tsx` — entries may
+ * record only a year+month ("1994-11") when a more precise date isn't
+ * confirmable, so this keeps both that and a full "YYYY-MM-DD" readable.
+ */
+function formatCurrentQuantumDate(iso: string): string {
+  const parts = iso.split("-").map(Number);
+  const [year, month, day] = parts;
+  const date = new Date(Date.UTC(year, (month ?? 1) - 1, day ?? 1));
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: day ? "numeric" : undefined,
+    timeZone: "UTC",
+  });
+}
+
 export function ConceptDetailPanel({
   node,
   lessonTitles,
@@ -42,6 +63,23 @@ export function ConceptDetailPanel({
   const coveredIn = node.lessonSlugs
     .map((slug) => ({ slug, title: lessonTitles[slug] }))
     .filter((lesson): lesson is { slug: string; title: string } => Boolean(lesson.title));
+
+  // Reverse-lookup real "Current Quantum" entries that cite one of this
+  // concept's lessons, so the panel can surface up to 2 as mini-cards.
+  // `node` (and therefore `node.lessonSlugs`) is a referentially stable
+  // object per concept (see ConceptMapExplorer.tsx's memoized `graph`), so
+  // this only recomputes when the selected concept actually changes.
+  const relatedCurrentQuantumEntries: CurrentQuantumEntry[] = useMemo(() => {
+    const seen = new Map<string, CurrentQuantumEntry>();
+    for (const slug of node.lessonSlugs) {
+      for (const entry of getEntriesForLesson(slug)) {
+        if (!seen.has(entry.slug)) seen.set(entry.slug, entry);
+      }
+    }
+    return [...seen.values()]
+      .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
+      .slice(0, 2);
+  }, [node]);
 
   return (
     <div className="flex h-full flex-col overflow-y-auto p-5">
@@ -87,6 +125,34 @@ export function ConceptDetailPanel({
           <p className="mt-2 text-sm text-muted-foreground">No linked lesson found.</p>
         )}
       </div>
+
+      {relatedCurrentQuantumEntries.length > 0 ? (
+        <div className="mt-6">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Connected to real research
+          </h3>
+          <ul className="mt-2 space-y-2">
+            {relatedCurrentQuantumEntries.map((entry) => (
+              <li key={entry.slug}>
+                <Link
+                  href="/current-quantum"
+                  className="block rounded-lg border border-border bg-surface-muted/50 p-3 transition-colors hover:border-brand/40 hover:bg-surface-muted"
+                >
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      {formatCurrentQuantumDate(entry.date)}
+                    </span>
+                    <Badge tone="brand" className="capitalize">
+                      {entry.category}
+                    </Badge>
+                  </span>
+                  <span className="mt-1 block text-sm font-medium text-foreground">{entry.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="mt-6">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Prerequisites</h3>

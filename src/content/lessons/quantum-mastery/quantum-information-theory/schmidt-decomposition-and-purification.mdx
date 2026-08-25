@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
@@ -90,11 +91,23 @@ on one claimed fact, stated but never proved: for a pure bipartite state
 $|\psi\rangle_{AB}$, the reduced states $\rho_A=\text{Tr}_B(|\psi\rangle\langle\psi|)$
 and $\rho_B=\text{Tr}_A(|\psi\rangle\langle\psi|)$ always share the same
 nonzero eigenvalues, "a standard fact of the Schmidt decomposition." This
-lesson is that missing proof, and it delivers something stronger than
-just the eigenvalue-matching fact: a constructive theorem that writes
+lesson supplies that missing proof, delivering something stronger than
+the eigenvalue-matching fact alone: a constructive theorem that writes
 *any* bipartite pure state in an exceptionally simple canonical form,
 with purification (turning any mixed state into the reduced state of a
-pure state on a bigger system) falling out as an almost-free corollary.
+pure state on a bigger system) following as an almost-free corollary.
+For a modern, physics-oriented derivation along the same lines as this
+lesson's, see A. Ekert and P. L. Knight, "Entangled Quantum Systems and
+the Schmidt Decomposition," *Am. J. Phys.* **63**(5), 415–423 (1995).
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/1/16/Erhard_Schmidt.jpg"
+  alt="Portrait photograph of German mathematician Erhard Schmidt"
+  caption="Erhard Schmidt (1876-1959), whose 1907 work on integral equations and orthonormalization gives this lesson its name: the singular value decomposition used here to prove the Schmidt decomposition theorem traces directly back to his development of what is now called the Gram-Schmidt process."
+  credit="Konrad Jacobs / Oberwolfach Photo Collection, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Erhard_Schmidt.jpg"
+  license="CC BY-SA 2.0 DE"
+/>
 
 ## Mathematical Development
 
@@ -139,15 +152,21 @@ Define $|u_k\rangle_A=\sum_i U_{ik}|i\rangle_A$ (the $k$-th column of $U$,
 read as a state) and $|w_k\rangle_B=\sum_j \overline{V_{jk}}|j\rangle_B$
 (the $k$-th column of $V$, complex-conjugated). Because $U$ and $V$ are
 unitary, their columns are each orthonormal sets, so $\{|u_k\rangle_A\}$
-and $\{|w_k\rangle_B\}$ are genuine orthonormal bases (extended if
-$d_A\neq d_B$). This gives exactly the **Schmidt decomposition**:
+and $\{|w_k\rangle_B\}$ are orthonormal bases in their own right (extended
+if $d_A\neq d_B$). This gives exactly the **Schmidt decomposition**:
+
+<TheoremBox title="Schmidt decomposition" provenance="derived">
 
 $$
 \boxed{|\psi\rangle_{AB} = \sum_{k=0}^{r-1} \sqrt{\lambda_k}\,|u_k\rangle_A\,|w_k\rangle_B}, \qquad \lambda_k \equiv \sigma_k^2 \geq 0,\quad \sum_k\lambda_k=1
 $$
 
 where $r=\text{rank}(M)\leq\min(d_A,d_B)$ is the **Schmidt rank** and
-$\lambda_k$ are the **Schmidt coefficients**. This is a genuinely
+$\lambda_k$ are the **Schmidt coefficients**.
+
+</TheoremBox>
+
+This is a markedly
 different, far more restrictive statement than a generic bipartite
 expansion: an arbitrary state needs $d_Ad_B$ independent amplitudes, but
 this form needs only $r\leq\min(d_A,d_B)$ of them, because the *same*
@@ -203,7 +222,7 @@ to $\begin{pmatrix}0.45&0.334243\\0.334243&0.55\end{pmatrix}$ (shown
 above). Its eigenvalues, via `eigenvaluesHermitian2x2` (the platform's
 own closed-form $2\times2$ solver, exactly the tool
 "Entanglement Entropy for Pure Bipartite States" already trusted for the
-same matrix, now justified as computing genuine Schmidt coefficients):
+same matrix, now justified as actually computing Schmidt coefficients):
 
 $$
 \lambda_1 \approx 0.837962, \qquad \lambda_2 \approx 0.162038, \qquad \lambda_1+\lambda_2=1
@@ -218,7 +237,7 @@ $|w_1\rangle_B\approx(0.593342,\ 0.804951)$ and
 $|w_2\rangle_B\approx(0.804951,\ -0.593342)$. Direct substitution back
 into $\sqrt{\lambda_1}|u_1\rangle|w_1\rangle+\sqrt{\lambda_2}|u_2\rangle|w_2\rangle$
 reproduces $(a,b,c,d)=(0.6,0.3,0.2,0.714143)$ to numerical precision,
-computed directly, not merely claimed. The entanglement entropy is
+computed directly rather than taken on faith. The entanglement entropy is
 $S(\rho_A)=-\lambda_1\log_2\lambda_1-\lambda_2\log_2\lambda_2\approx0.639163$
 bits, matching `vonNeumannEntropy(rhoA)` exactly, and consistent with the
 earlier lesson's formula for the special case $b=c=0$ (there, $M$ is
@@ -227,9 +246,13 @@ vectors and $\lambda_k=\cos^2\theta,\sin^2\theta$).
 
 ### Purification: the direct corollary
 
-**Claim.** Every mixed state $\rho_A$ on system $A$ is the reduced state
+<TheoremBox title="Purification" provenance="derived">
+
+Every mixed state $\rho_A$ on system $A$ is the reduced state
 of some pure state $|\psi\rangle_{AB}$ on a larger system $AB$, a
 **purification** of $\rho_A$.
+
+</TheoremBox>
 
 **Proof.** Diagonalize $\rho_A=\sum_k\lambda_k|u_k\rangle\langle u_k|_A$
 (the spectral theorem, already used throughout this platform). Introduce
@@ -247,7 +270,7 @@ exactly, reproducing the target mixed state. $\blacksquare$
 
 The worked example above **already demonstrated this**, just read in
 reverse: $\rho_A=\begin{pmatrix}0.45&0.334243\\0.334243&0.55\end{pmatrix}$
-is a genuinely mixed single-qubit state (purity $<1$, since neither
+is a strictly mixed single-qubit state (purity $<1$, since neither
 eigenvalue is $0$ or $1$), and $|\psi\rangle_{AB}$ is a concrete,
 explicitly-verified pure state on two qubits whose partial trace over
 $B$ reproduces it exactly. Nothing further needs to be built:
@@ -291,7 +314,7 @@ case; for the real-amplitude worked example above, $\overline{u_k}=u_k$,
 so this is exactly the $M^\top u_k=\sqrt{\lambda_k}\,w_k$ used there);
 using $M$ directly instead of its transpose silently swaps which
 amplitude goes with which basis label, and the reconstructed state comes
-out wrong (a genuinely different state, not just a relabeling) even
+out wrong (a different state outright, not just a relabeling) even
 though every individual number involved looks plausible on its own.
 </Callout>
 
@@ -321,7 +344,7 @@ whenever a degeneracy occurs.
 4. Two purifications $|\psi\rangle_{AB}$ and $|\phi\rangle_{AB}$ of the
    same $\rho_A$ must be related by a unitary on $B$ alone. If
    $|\psi\rangle_{AB}=\sqrt{0.9}|00\rangle+\sqrt{0.1}|11\rangle$, write
-   down a second, genuinely different purification $|\phi\rangle_{AB}$ of
+   down a second, distinct purification $|\phi\rangle_{AB}$ of
    the same $\rho_A$, and identify the unitary $W_B$ relating them.
 
 <PracticeLinks problems={practiceProblems} />
@@ -345,7 +368,6 @@ whenever a degeneracy occurs.
 
 ## Further Exploration
 
-Next: [Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity),
-which uses the non-uniqueness of purification proved here as the key
-technical step in Uhlmann's theorem, the standard way to define fidelity
-between two *mixed* states.
+[Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity) uses the non-uniqueness of purification
+proved here as the key technical step in Uhlmann's theorem, the standard
+way to define fidelity between two *mixed* states.

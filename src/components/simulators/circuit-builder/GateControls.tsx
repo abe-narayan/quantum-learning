@@ -15,6 +15,7 @@ export function GateControls({
   onTwoQubitTargetChange,
   onApplySingleQubitGate,
   onApplyTwoQubitGate,
+  onApplyMeasurement,
   onRemoveLast,
   onClear,
   canRemove,
@@ -30,6 +31,7 @@ export function GateControls({
   onTwoQubitTargetChange: (q: number) => void;
   onApplySingleQubitGate: (gate: SingleQubitGateName, target: number) => void;
   onApplyTwoQubitGate: (gate: TwoQubitGateName, control: number, target: number) => void;
+  onApplyMeasurement: (target: number) => void;
   onRemoveLast: () => void;
   onClear: () => void;
   canRemove: boolean;
@@ -104,6 +106,18 @@ export function GateControls({
               {gate.label}
             </button>
           ))}
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={disabled}
+            title="Marks this wire as measured at this point in the circuit (a diagram annotation — it doesn't change the simulated state)."
+            onClick={() => onApplyMeasurement(targetQubit)}
+          >
+            Measure q{targetQubit}
+          </Button>
+          <p className="text-xs text-muted-foreground">Adds a measurement marker to the diagram.</p>
         </div>
       </section>
 

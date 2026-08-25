@@ -387,6 +387,120 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/mathematical-foundations/probability-and-quantum-states"],
   },
+
+  // ---------------------------------------------------------------------
+  // Quantum Mastery
+  // ---------------------------------------------------------------------
+  {
+    id: "rigged-hilbert-space",
+    title: "Rigged Hilbert Space (Gelfand Triple)",
+    definition:
+      "The nested structure Φ⊂H⊂Φ′ (a space of nice test functions, inside the ordinary Hilbert space, inside a space of generalized functions) that gives improper eigenstates like |p⟩ — which have infinite norm and so cannot belong to H itself — a fully rigorous home as generalized eigenvectors.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space"],
+  },
+  {
+    id: "greens-functions-resolvents",
+    title: "Green's Functions & Resolvents",
+    definition:
+      "The resolvent R(E)=(E−H)⁻¹ packages every bound state and scattering state of a Hamiltonian into a single analytic function of complex energy E: its poles land exactly on the discrete bound-state energies, and its branch cut marks the continuous spectrum, via the Sokhotski–Plemelji identity.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents"],
+  },
+  {
+    id: "sturm-liouville-theory",
+    title: "Sturm-Liouville Theory",
+    definition:
+      "The general eigenvalue-problem theorem, (py′)′−qy+λwy=0 with boundary conditions killing a specific boundary term, that guarantees real eigenvalues and orthogonal eigenfunctions for any such problem — proving once, from a single boundary-term identity, why the infinite well, the harmonic oscillator, and the hydrogen radial equation all come with the same guarantees.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory"],
+  },
+  {
+    id: "degenerate-perturbation-theory",
+    title: "Degenerate Perturbation Theory",
+    definition:
+      "When ordinary perturbation theory's energy-denominator formula would divide by zero because unperturbed states are degenerate, the correct zeroth-order states are instead the eigenvectors of the perturbation restricted to the degenerate subspace — the fix needed to actually compute hydrogen's 2p spin-orbit splitting from its L·S coupling.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/symmetry-scattering-and-semiclassical-methods/degenerate-perturbation-theory-and-fine-structure",
+    ],
+  },
+  {
+    id: "coherent-states",
+    title: "Coherent States",
+    definition:
+      "Eigenstates |α⟩ of the harmonic oscillator's (non-Hermitian) annihilation operator, â|α⟩=α|α⟩, with Poisson-distributed photon number and equal position/momentum uncertainty saturating the Heisenberg bound — the quantum states that most closely track a classical oscillator trajectory, and what real laser light approximates.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states"],
+  },
+  {
+    id: "squeezed-states",
+    title: "Squeezed States",
+    definition:
+      "Minimum-uncertainty harmonic-oscillator states with unequal position and momentum spread, Δx=e⁻ʳ/√2 and Δp=eʳ/√2 for squeeze parameter r, that still saturate ΔxΔp=½ exactly — used in real gravitational-wave detectors like LIGO to push measurement noise below what any coherent state could achieve on one quadrature.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states"],
+  },
+  {
+    id: "partial-wave-scattering-s-matrix",
+    title: "Partial-Wave Scattering & the S-Matrix",
+    definition:
+      "A central potential separates 3D scattering into independent angular-momentum channels, each carrying a single phase shift δₗ that encodes the potential's entire effect on that channel; every cross section is built from the {δₗ}, and the S-matrix Sₗ=e^(2iδₗ) has |Sₗ|=1 exactly whenever no absorption occurs.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix",
+    ],
+  },
+  {
+    id: "quantum-state-purification",
+    title: "Purification",
+    definition:
+      "Every mixed state ρ on a system can be written as the reduced state of some pure state on a larger system — a direct corollary of the Schmidt decomposition, and never unique, since any unitary acting only on the auxiliary system leaves the reduced state unchanged.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification"],
+  },
+  {
+    id: "choi-jamiolkowski-isomorphism",
+    title: "Choi-Jamiolkowski Isomorphism",
+    definition:
+      "Turns an entire quantum channel into a single ordinary matrix, J(E)=Σᵢⱼ|i⟩⟨j|⊗E(|i⟩⟨j|), such that the channel is completely positive exactly when J(E)≥0 and trace-preserving exactly when tracing out its output half gives the identity — reducing 'is this map physically valid' to an ordinary linear-algebra check.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi"],
+  },
+  {
+    id: "quantum-relative-entropy",
+    title: "Quantum Relative Entropy",
+    definition:
+      "S(ρ‖σ)=Tr(ρ log₂ρ)−Tr(ρ log₂σ), the quantum generalization of the classical Kullback-Leibler divergence, measuring how costly it is to mistake σ for the true state ρ; Klein's inequality guarantees it is never negative, and it vanishes only when ρ=σ exactly.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"],
+  },
+  {
+    id: "mixed-state-concurrence",
+    title: "Mixed-State Concurrence (Wootters Formula)",
+    definition:
+      "The general two-qubit entanglement measure C(ρ)=max(0, √μ₁−√μ₂−√μ₃−√μ₄), built from the eigenvalues of R=ρρ̃ for ρ̃=(σy⊗σy)ρ*(σy⊗σy), that reduces exactly to the pure-state formula 2|ad−bc| and equals the entanglement of formation — the tool needed once a state is no longer pure.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"],
+  },
+  {
+    id: "oracle-relativization-barrier",
+    title: "Relativization Barrier (Baker-Gill-Solovay)",
+    definition:
+      "Oracles exist relative to which P=NP, and other oracles relative to which P≠NP, so no proof technique that works identically for every oracle can settle such questions unconditionally — the reason Deutsch-Jozsa's and Simon's algorithms' oracle-relative speedups, however rigorous, say nothing unconditional about BPP versus BQP for ordinary, structured problems.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity"],
+  },
+  {
+    id: "quantum-phase-estimation-precision",
+    title: "Phase Estimation Precision & Approximate QFT",
+    definition:
+      "For a phase not exactly representable in a finite register, quantum phase estimation's measurement probability follows an exact closed form built from a geometric series, guaranteeing at least 4/π² success probability on the best t-bit estimate; dropping small-angle controlled-phase gates below a cutoff gives an approximate QFT with a provable, exponentially small error bound and far fewer gates.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
+    ],
+  },
 ];
 
 /** Every glossary term, alphabetically sorted by title. */

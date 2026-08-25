@@ -2,8 +2,8 @@
 
 This document is the product/engineering blueprint for QuantumLearn: a free,
 in-depth educational platform covering Quantum Mechanics, Quantum Computing,
-Quantum Hardware, and Quantum Software, taking a student from strong
-high-school math through advanced undergraduate material.
+Quantum Hardware, Quantum Software, and Quantum Mastery, taking a student
+from strong high-school math through advanced undergraduate material.
 
 It exists so that as hundreds of lessons and dozens of simulators get built
 over time, they get built *onto* a consistent structure instead of each
@@ -14,30 +14,34 @@ changes — it should stay the source of truth, not a snapshot.
 
 ## 1. Information Architecture
 
-**Top-level navigation:** Home · Learn · Lessons · Simulators · Problems ·
-Hardware · Software · About.
+**Top-level navigation (current, `src/lib/nav.ts` /
+`src/components/layout/Navbar.tsx`):** Learn · a grouped **Tracks** dropdown
+(Mechanics · Computing · Hardware · Software) · Simulators · Map · Glossary ·
+Problems · About. The logo itself links home, so a separate "Home" text link
+was dropped as pure duplication. `/map` (`src/components/map/`, an
+interactive concept-dependency map) and `/glossary` (an alphabetical
+term reference linked back into lessons) are both real, shipped pages not
+covered anywhere else in this document.
 
-These map to two different jobs, which is why both "Learn" and "Lessons"
-exist:
-
-- **Learn** (`/learn`) is the *guided* entry point — the four pillars
-  (Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software)
-  presented with framing, so a new visitor understands the shape of the
-  whole curriculum and where to start.
-- **Lessons** (`/lessons`) is the *complete catalog* — the same underlying
-  course/module data, presented densely for someone who already knows what
-  they're looking for.
-
-Both pages currently render from the same `CourseList` component and the
-same curriculum registry (`src/lib/content/curriculum.ts`), so they can
-never drift out of sync with each other — there is exactly one source of
-truth for "what courses exist."
+**`/lessons` no longer has its own UI.** `src/app/lessons/page.tsx` is now a
+5-line `permanentRedirect("/learn")` stub. The flat, catalog-style lesson
+detail route (`/lessons/<pillar-slug>/<course-slug>/<lesson-slug>`) still
+exists and is what lesson links resolve to — only the `/lessons` *index*
+page was collapsed into `/learn`, once having both stopped pulling their
+weight as two separate entry points into the same `CourseList` view. Learn
+(`/learn`) is now the single guided entry point — the five pillars (Quantum
+Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, Quantum
+Mastery) presented with framing, so a new visitor understands the
+shape of the whole curriculum and where to start — backed by the one
+curriculum registry (`src/lib/content/curriculum.ts`), so there remains
+exactly one source of truth for "what courses exist."
 
 **Hardware** and **Software** are full pillars in the curriculum registry
 (on equal footing with Mechanics and Computing), and also get their own
-top-level nav entries and routes (`/hardware`, `/software`) for direct
-linkability and SEO, since a student searching "how do superconducting
-qubits work" shouldn't have to go through `/learn` first.
+routes (`/hardware`, `/software`) for direct linkability and SEO, since a
+student searching "how do superconducting qubits work" shouldn't have to go
+through `/learn` first — reachable today via the Tracks dropdown rather than
+as flat top-level items (see below).
 
 Individual lessons live at a **flat, catalog-style URL**:
 `/lessons/<pillar-slug>/<course-slug>/<lesson-slug>`, e.g.

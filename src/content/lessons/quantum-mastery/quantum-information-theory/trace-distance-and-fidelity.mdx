@@ -102,14 +102,16 @@ export const fvgFrames = [
 
 ## Motivation
 
-"How close are two quantum states?" sounds like one question but this
-platform's engine already implicitly needs two different answers to it.
-Trace Distance and Fidelity are the two standard, non-equivalent answers,
-each with its own operational meaning, related to each other by a precise
-pair of inequalities (not merely "both go to zero together," but a
-provable quantitative sandwich). Applied to real channels already sitting
-in this codebase, they turn "amplitude damping disturbs a state" from a
-qualitative claim into an exact, computed number.
+Ask "how close are two quantum states?" and it sounds like a single
+question, but this platform's engine has quietly needed two different
+answers to it all along. Trace distance and fidelity are those two
+answers: standard, non-equivalent, each carrying its own operational
+meaning. A precise pair of inequalities pins down exactly how they
+relate, a provable quantitative sandwich, well beyond the loose
+observation that both simply vanish together. Run them on channels
+already sitting in this codebase, and "amplitude damping disturbs a
+state" stops being a qualitative claim and becomes an exact, computed
+number.
 
 ## Mathematical Development
 
@@ -145,10 +147,10 @@ $\text{Tr}[\Pi_+\Delta_+]=\text{Tr}[\Delta_+]$ since $\Delta_+$ already
 lives entirely inside $\Pi_+$'s range). So the maximum is exactly
 $\text{Tr}[\Delta_+]=D(\rho,\sigma)$. $\blacksquare$
 
-This gives trace distance a genuine operational meaning: it's exactly
-twice the maximum bias any single measurement can achieve in
-distinguishing $\rho$ from $\sigma$ (the **Holevo–Helstrom bound**), not
-just an abstract matrix-norm quantity.
+That result hands trace distance an operational meaning it wouldn't have
+as a bare matrix norm: it is exactly twice the largest bias any single
+measurement can achieve when distinguishing $\rho$ from $\sigma$ (the
+**Holevo–Helstrom bound**).
 
 ### The qubit closed form
 
@@ -182,10 +184,10 @@ is also pure, this further reduces to $F=|\langle\psi|\phi\rangle|$, the
 ordinary state-overlap fidelity used informally throughout this
 platform's earlier courses.
 
-**Uhlmann's theorem** (stated, not re-derived here; a genuinely deep
-result about optimizing over the space of all possible purifying systems
-built in general dimension, beyond what this lesson proves elsewhere)
-says $F(\rho,\sigma)=\max_{|\psi\rangle,|\phi\rangle}|\langle\psi|\phi\rangle|$,
+**Uhlmann's theorem**, stated here rather than re-derived, since a full
+proof means optimizing over the space of every possible purifying system
+in general dimension, machinery well beyond what this lesson builds
+elsewhere, says $F(\rho,\sigma)=\max_{|\psi\rangle,|\phi\rangle}|\langle\psi|\phi\rangle|$,
 the maximum taken over every purification $|\psi\rangle_{AB}$ of $\rho$
 and every purification $|\phi\rangle_{AB}$ of $\sigma$ on a common
 extension $B$. Schmidt Decomposition and Purification proved exactly the
@@ -255,16 +257,16 @@ $\blacksquare$
 
 ## Physical Interpretation
 
-Trace distance answers "how well can a single measurement tell these two
-states apart?" (Helstrom's formula makes this literal, not metaphorical).
-Fidelity answers a different question, "how much do these two states
-overlap as vectors/operators?", and via Uhlmann's theorem specifically,
-"how well could I have kept a purifying reference system entangled with
-both?" They agree on the coarse question (both are $0$ exactly for
-identical states, both saturate at their extreme value exactly for
-perfectly distinguishable states) but carry different fine-grained
-information, exactly why both are worth computing on the same pair of
-states rather than picking one.
+Trace distance answers one question, "how well can a single measurement
+tell these two states apart?", and Helstrom's formula makes that literal
+rather than metaphorical. Fidelity answers something else entirely: "how
+much do these two states overlap as vectors or operators?", or, by way
+of Uhlmann's theorem, "how well could a purifying reference system have
+stayed entangled with both?" The two agree at the extremes (both hit
+$0$ for identical states, both saturate at their extreme value for
+perfectly distinguishable ones) but carry different fine-grained
+information in between, which is exactly why a serious comparison
+computes both rather than settling for one.
 
 ## Worked Example
 
@@ -374,8 +376,8 @@ lower bound only in special cases.
 
 ## Further Exploration
 
-Next: [Quantum Channels: Kraus and Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi),
-which looks at these same two channels from a completely different
-angle: not how much they disturb one input state, but what structural
-property (complete positivity) makes them physically valid channels at
-all.
+[Quantum Channels: Kraus and Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi)
+returns to these same two channels from a different angle entirely: not
+how much they disturb one input state, but what structural property,
+complete positivity, makes them valid physical channels in the first
+place.

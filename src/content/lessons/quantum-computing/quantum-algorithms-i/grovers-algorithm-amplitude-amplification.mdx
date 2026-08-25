@@ -1,4 +1,5 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
@@ -30,7 +31,19 @@ The last lesson showed both Grover building blocks are reflections, and
 composing two reflections is a rotation. This lesson makes that rotation
 exact, turning "search gets faster" into a specific formula for the
 success probability after exactly $k$ iterations, and from that, the exact
-optimal number of iterations to run.
+optimal number of iterations to run. Primary source: L. K. Grover, "A
+Fast Quantum Mechanical Algorithm for Database Search," in *Proceedings
+of the 28th Annual ACM Symposium on Theory of Computing (STOC '96)*,
+pp. 212–219 (1996), also available as arXiv:quant-ph/9605043.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Measuring_a_qubit_leaves_no_room_for_error.jpg/1280px-Measuring_a_qubit_leaves_no_room_for_error.jpg"
+  alt="Engineers assembling the cryogenic dilution-refrigerator hardware used to cool and measure superconducting quantum processors, at the FMN Laboratory"
+  caption="Engineers assembling the cryogenic hardware that cools and measures a real superconducting qubit register. Every rotation this lesson derives algebraically corresponds to an actual sequence of microwave pulses applied to a physical chip cooled inside apparatus like this."
+  credit="Kushlevich Sergey / FMN Laboratory, Bauman Moscow State Technical University"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Measuring_a_qubit_leaves_no_room_for_error.jpg"
+  license="CC BY 4.0"
+/>
 
 ## Mathematical Development
 

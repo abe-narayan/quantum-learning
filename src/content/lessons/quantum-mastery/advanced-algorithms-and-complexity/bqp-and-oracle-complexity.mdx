@@ -1,5 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { optimalGroverIterations } from "@/lib/quantum/grover";
 
 export const practiceProblems = getProblemsForLesson(
@@ -71,11 +73,22 @@ unconditional **time complexity** separation between classical and quantum
 computation (the actual, still-open question of whether $\mathsf{BPP} =
 \mathsf{BQP}$).
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
+  alt="IBM Quantum System One, a real superconducting quantum computer in its glass-and-steel enclosure"
+  caption="BQP is formally defined over circuit families like the ones a real machine such as this one actually runs. The oracle-relative separations this lesson proves (Deutsch-Jozsa, Simon's, Grover's/BBBV) are a precise but distinct, weaker kind of statement about idealized black-box query access — not a claim about what hardware like this achieves on a concrete, structured problem."
+  credit="Onri Jay Benally (OJB Quantum) / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
+  license="CC BY 4.0"
+/>
+
 ## Mathematical Development
 
 ### Defining BQP formally
 
-$\mathsf{BQP}$ (Bounded-error Quantum Polynomial time) is the class of
+<DefinitionBox title="BQP (Bounded-error Quantum Polynomial time)">
+
+$\mathsf{BQP}$ is the class of
 decision problems (languages $L\subseteq\{0,1\}^*$) solvable as follows:
 there exists a polynomial-time-uniform family of quantum circuits
 $\{C_n\}$ — meaning a classical polynomial-time Turing machine outputs
@@ -85,6 +98,8 @@ universal gate set, such that for every input $x$ of length $n$, circuit
 $C_n$ acting on $|x\rangle|0\cdots0\rangle$ and measuring a designated
 output qubit outputs $1$ with probability $\geq2/3$ if $x\in L$, and
 $\leq1/3$ if $x\notin L$.
+
+</DefinitionBox>
 
 The constants $2/3,1/3$ are not fundamental: running $k$ independent
 copies of $C_n$ and taking the majority vote drives the failure
@@ -202,15 +217,23 @@ problems: the actual, still-open question.
 
 ### Grover's algorithm and the BBBV bound: optimal at what, exactly
 
-Bennett, Bernstein, Brassard, and Vazirani (1997) proved a matching
-**lower** bound for unstructured search: any quantum algorithm that
+<TheoremBox title="BBBV lower bound (Bennett–Bernstein–Brassard–Vazirani, 1997)" provenance="cited">
+
+Any quantum algorithm that
 finds a single marked item among $N$ possibilities using only black-box
 queries to a marking oracle needs $\Omega(\sqrt N)$ queries to succeed
-with probability $\geq2/3$, for *every* possible oracle. Combined with
+with probability $\geq2/3$, for *every* possible oracle.
+
+</TheoremBox>
+
+Combined with
 Grover's algorithm's constructive $O(\sqrt N)$ upper bound (derived,
 gate by gate, in Quantum Algorithms I), this makes Grover's algorithm
 **query-optimal for black-box search**, not merely "the best known": a
-genuine theorem with a matching upper and lower bound.
+genuine theorem with a matching upper and lower bound. Primary source:
+C. H. Bennett, E. Bernstein, G. Brassard, and U. Vazirani, "Strengths
+and Weaknesses of Quantum Computing," *SIAM J. Comput.* **26**(5),
+1510–1523 (1997), also available as arXiv:quant-ph/9701001.
 
 *Sketch of the lower bound's mechanism (the "hybrid" method, cited from
 BBBV rather than fully reproduced; the full proof is a serious piece of

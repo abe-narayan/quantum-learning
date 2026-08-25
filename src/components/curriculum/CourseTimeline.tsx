@@ -51,7 +51,7 @@ export function CourseTimeline({
         earlier courses · Advanced = college-level rigor · Master =
         graduate-level, proofs not just results.
       </p>
-      <ol className="flex min-w-max flex-col sm:min-w-0 sm:flex-row sm:items-stretch">
+      <ol className="flex flex-col sm:min-w-max sm:flex-row sm:items-stretch">
         {courses.map((course, index) => {
           const lessonByModule = new Map(
             lessons
@@ -64,7 +64,11 @@ export function CourseTimeline({
           const authoredModules = course.modules.filter((module) =>
             lessonByModule.has(module.slug)
           ).length;
-          const contentComplete = authoredModules === totalModules;
+          // `totalModules > 0` guard matches `CourseList`'s identical
+          // completion math: without it, a course authored with zero modules
+          // (not currently in the data, but not impossible either) would read
+          // `0 === 0` and render as "0/0 lessons" tagged content-complete.
+          const contentComplete = totalModules > 0 && authoredModules === totalModules;
           const authoredLessonSlugs = course.modules
             .map((module) => lessonByModule.get(module.slug)?.slug)
             .filter((slug): slug is string => Boolean(slug));
@@ -99,7 +103,7 @@ export function CourseTimeline({
                   className={cn(
                     "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold",
                     isComplete
-                      ? "border-accent bg-accent text-white"
+                      ? "border-accent bg-accent text-accent-foreground"
                       : isStarted
                         ? "border-brand bg-brand/10 text-brand"
                         : "border-border bg-surface text-muted-foreground"
@@ -125,6 +129,15 @@ export function CourseTimeline({
               <div className="flex flex-col gap-2 py-2 pl-3 sm:items-start sm:gap-2 sm:pb-8 sm:pl-0 sm:pt-3">
                 <p className="text-sm font-semibold leading-snug text-foreground">
                   {course.title}
+                  {/* The station circle (✓ / number, ring color) is `aria-hidden`
+                      pure decoration — this is the only place a screen-reader
+                      user gets the visitor-progress status it conveys visually
+                      (the circle's own `title` attribute is unreachable once
+                      the element is aria-hidden, so it's not a real fallback). */}
+                  <span className="sr-only">
+                    {" — "}
+                    {isComplete ? "Complete" : isStarted ? "In progress" : "Not started"}
+                  </span>
                 </p>
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Badge tone="brand">{DIFFICULTY_LABEL[course.difficulty]}</Badge>

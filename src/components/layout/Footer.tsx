@@ -1,11 +1,18 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { NAV_ITEMS, TRACK_NAV_ITEMS } from "@/lib/nav";
+import { cn } from "@/lib/utils";
 
 // The navbar groups the four track pages under a "Tracks" dropdown to keep
 // its top-level item count sane, but the footer has no such pressure — it's
 // exactly where a complete, ungrouped site map belongs, so it lists both.
 const FOOTER_ITEMS = [...NAV_ITEMS, ...TRACK_NAV_ITEMS];
+
+// Same hover/focus/active convention as Navbar.tsx and Button.tsx: the
+// transition list + pressed-state scale from Button.tsx, and the focus ring
+// convention established by the skip-link in src/app/layout.tsx.
+const INTERACTIVE_CLASSES =
+  "transition-[color,background-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -31,7 +38,7 @@ export function Footer() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className={cn("rounded-sm text-muted-foreground hover:text-foreground", INTERACTIVE_CLASSES)}
             >
               {item.label}
             </Link>

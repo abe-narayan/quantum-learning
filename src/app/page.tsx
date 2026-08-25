@@ -1,4 +1,5 @@
 import { Hero } from "@/components/home/Hero";
+import { PhenomenaPreview } from "@/components/home/PhenomenaPreview";
 import { PillarsOverview } from "@/components/home/PillarsOverview";
 import { LazyWavefunctionHeroExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionHeroExplorer";
 import { HowItWorks } from "@/components/home/HowItWorks";
@@ -13,6 +14,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <PhenomenaPreview />
       <PillarsOverview />
       <section className="py-20 sm:py-24">
         <Container>

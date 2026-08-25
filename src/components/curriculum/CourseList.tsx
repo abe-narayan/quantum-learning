@@ -28,7 +28,11 @@ export function CourseList({
         );
         const totalModules = course.modules.length;
         const completedModules = course.modules.filter((module) => lessonByModule.has(module.slug)).length;
-        const isComplete = completedModules === totalModules;
+        // `totalModules > 0` guard matches `CourseTimeline`'s identical
+        // completion math: without it, a course authored with zero modules
+        // (not currently in the data, but not impossible either) would read
+        // `0 === 0` and render as "0/0 lessons · complete".
+        const isComplete = totalModules > 0 && completedModules === totalModules;
         const isStarted = completedModules > 0;
         const authoredLessonSlugs = course.modules
           .map((module) => lessonByModule.get(module.slug)?.slug)

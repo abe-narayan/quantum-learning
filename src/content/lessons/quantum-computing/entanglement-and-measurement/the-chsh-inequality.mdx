@@ -40,6 +40,15 @@ mechanics actually predicts for a specific entangled state and specific
 measurement choices, using the density-matrix machinery this course has
 built, and finds a number on the other side of that wall.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Alain-Aspect-ForMemRS.jpg"
+  alt="Portrait photograph of physicist Alain Aspect, a Foreign Member of the Royal Society recognized for his pioneering Bell-inequality experiments with entangled photons"
+  caption="Alain Aspect, whose 1982 experiments were among the first real laboratory tests of exactly this kind of inequality — repeated many times since, closing progressively more loopholes, and confirming the S=2√2 quantum violation this lesson derives by hand."
+  credit="The Royal Society"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Alain-Aspect-ForMemRS.jpg"
+  license="CC BY-SA 4.0"
+/>
+
 ## Mathematical Development
 
 ### The quantum correlation
@@ -132,7 +141,22 @@ the bound's tightness.
 
 Mix $|\Phi^+\rangle$ with the maximally mixed state (a Werner-state-style
 model, $\rho(\eta)=(1-\eta)\,\rho_{\Phi^+}+\eta\,(I/4)$) and recompute
-$S$ at the same fixed angles as $\eta$ (noise) increases:
+$S$ at the same fixed angles as $\eta$ (noise) increases. Before reading
+the numbers off, use the exact value already derived above,
+$S=2\sqrt2\approx2.828$ at $\eta=0$, to predict how much noise that
+margin over the classical bound of 2 can actually absorb.
+
+<PredictBeforeReveal
+  question="At η=0.3 — thirty percent of the state replaced by the maximally mixed state — does the S=2√2 violation survive, or has it already given out?"
+  options={[
+    { label: "Still comfortably above 2", value: "above" },
+    { label: "Still above 2, but only barely", value: "barely" },
+    { label: "Exactly 2, right at the boundary", value: "boundary" },
+    { label: "Already below 2 — no violation left", value: "below" },
+  ]}
+  correctValue="below"
+  explanation="S=1.980 at η=0.3, per the table below — already under the classical bound of 2, not just close to it. The actual crossing happens earlier, somewhere between η=0.2 (S=2.263) and η=0.3, so by η=0.3 the violation is already gone, not merely weakened. The 2.828 margin at η=0 looks generous, but it erodes fast: roughly a third of it is gone by η=0.1 alone. The ParametricCurve further down confirms this isn't an artifact of the five sampled points — at the standard angles, S decays smoothly through exactly this window."
+/>
 
 | $\eta$ | $S$ |
 |---|---|

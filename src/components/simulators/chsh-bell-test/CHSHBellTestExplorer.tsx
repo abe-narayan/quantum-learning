@@ -13,6 +13,7 @@ import {
 import { KatexMath } from "@/components/ui/KatexMath";
 import { cn } from "@/lib/utils";
 import { CHSHBellTestControls, type ChshAngles } from "./CHSHBellTestControls";
+import { CHSHComparisonPanel } from "./CHSHComparisonPanel";
 import { LabNotes } from "./LabNotes";
 
 const SQRT1_2 = Math.SQRT1_2;
@@ -70,6 +71,7 @@ function anglesEqual(x: ChshAngles, y: ChshAngles, tolerance = 1e-6): boolean {
  */
 export function CHSHBellTestExplorer() {
   const [angles, setAngles] = useState<ChshAngles>(ZERO_ANGLES);
+  const [showComparison, setShowComparison] = useState(false);
 
   const rho = useMemo(() => pureStateDensityMatrix(bellPhiPlus()), []);
 
@@ -120,6 +122,26 @@ export function CHSHBellTestExplorer() {
             tex={`S = E(a,b) + E(a,b') + E(a',b) - E(a',b') = ${sValue.toFixed(4)}`}
             display
           />
+        </div>
+
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowComparison((current) => !current)}
+            aria-expanded={showComparison}
+            aria-controls="chsh-comparison-panel"
+            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <span className="text-sm font-medium text-foreground">
+              Compare: classical bound vs. your quantum result vs. Tsirelson&rsquo;s bound
+            </span>
+            <span className="text-xs text-muted-foreground">{showComparison ? "Hide" : "Show"}</span>
+          </button>
+          {showComparison && (
+            <div id="chsh-comparison-panel" className="mt-3">
+              <CHSHComparisonPanel sValue={sValue} />
+            </div>
+          )}
         </div>
 
         <LabNotes

@@ -26,23 +26,40 @@ export const lessonMeta = {
 
 ## Motivation
 
+Take a single charged atom, an ion, and suspend it in empty space: no
+walls, no wires, nothing physically touching it. Now hold it steady
+enough, for long enough, that a laser can address its internal states
+one operation at a time, and entangle it with a neighbor on demand. A
+static electric field can't do this job alone; Earnshaw's theorem, a
+result from classical electrostatics, rules out trapping a charge in 3D
+with any static field configuration at all. So how does a trapped-ion
+quantum computer hold a single ion still enough to compute with it?
+
+That engineering problem, and its solution, define the whole platform.
 Where a superconducting qubit is an entirely artificial circuit, a
-trapped-ion qubit uses a real atom: specifically, a single ion (a
-charged atom, missing or carrying an extra electron) suspended in free
-space by electromagnetic fields, with the qubit encoded in two of its
+trapped-ion qubit uses a real atom, with the qubit encoded in two of its
 naturally-occurring internal energy levels. This is a fundamentally
 different engineering starting point, and it shows up directly in the
 platform's tradeoffs.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
+  alt="Two trapped beryllium ions held roughly 40 micrometers apart above a gold chip trap, surrounded by copper shielding and gold mesh, at NIST"
+  caption="Two real trapped beryllium ions at NIST, held above a gold chip trap and swapping energy back and forth. This is the actual apparatus behind this lesson's Paul trap: oscillating electric fields confining charged atoms in place for use as qubits."
+  credit="Y. Colombe / NIST"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
+  license="Public Domain (U.S. Government work)"
+/>
 
 ## Engineering Development
 
 ### The trap itself
 
-A **Paul trap** confines a charged ion using rapidly oscillating
-(radio-frequency) electric fields. No static field configuration alone
-can trap a charge in 3D (a consequence of Earnshaw's theorem, a classical
-electrostatics result), so the field must oscillate fast enough that the
-ion feels an effective, time-averaged confining potential. Multiple ions
+The answer to the Motivation section's puzzle is a **Paul trap**: it
+confines the ion using rapidly oscillating (radio-frequency) electric
+fields rather than a static one, exactly because Earnshaw's theorem rules
+the static option out. The field oscillates fast enough that the ion
+feels an effective, time-averaged confining potential. Multiple ions
 in the same trap arrange themselves in a line, held apart by mutual
 Coulomb repulsion balanced against the trap's confinement:
 
@@ -92,7 +109,7 @@ chain can oscillate together, like coupled pendulums). A two-qubit gate
 works by using one ion's internal state to briefly excite this shared
 motion, which the *other* ion's internal state can then sense, entangling
 them regardless of physical separation along the chain. This gives
-trapped ions a genuine engineering advantage over most solid-state
+trapped ions a real engineering advantage over most solid-state
 platforms: any ion can be entangled with any other in the same trap, not
 just its physical neighbors, a fundamentally different connectivity
 graph from superconducting qubits' typically nearest-neighbor layout.
@@ -130,7 +147,7 @@ gate speed alone, sets the realistic operation budget.
 
 <Callout type="mistake">
 **Thinking trapped-ion connectivity is unlimited for free.** All-to-all
-connectivity via the shared motional mode is a genuine architectural
+connectivity via the shared motional mode is a real architectural
 advantage, but it doesn't scale trivially: as more ions share one
 trap's vibrational modes, gate fidelity and speed both degrade, a real
 engineering constraint the Noise, Decoherence & Scaling course develops.
@@ -158,12 +175,12 @@ engineering constraint the Noise, Decoherence & Scaling course develops.
   superconducting circuits.
 - Coherence times reach seconds (vs. superconducting qubits' microseconds),
   at the cost of slower gates (microseconds, not nanoseconds).
-- The shared motional mode gives genuine all-to-all connectivity within
+- The shared motional mode gives real all-to-all connectivity within
   one trap, a real architectural advantage, though one that faces its
   own scaling limits.
 
 ## Further Exploration
 
-Next: [Neutral Atoms](/lessons/quantum-hardware/physical-qubit-platforms/neutral-atoms), a platform that keeps trapped ions' long
-coherence times while addressing scalability differently, using light,
-not electric fields, for confinement.
+[Neutral Atoms](/lessons/quantum-hardware/physical-qubit-platforms/neutral-atoms)
+keeps trapped ions' long coherence times while addressing scalability
+differently, using light, not electric fields, for confinement.

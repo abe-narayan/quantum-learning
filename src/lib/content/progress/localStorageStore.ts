@@ -8,20 +8,52 @@ const STORAGE_KEY_PREFIX = "quantumlearn:lesson-progress:";
  */
 const cache = new Map<string, LessonProgress>();
 
+/** Parses one raw `localStorage` value the same way regardless of whether it came from `getItem` (this tab) or a `storage` event's `newValue` (another tab) — shared so the two paths can't drift apart. */
+function parseProgress(raw: string | null): LessonProgress {
+  if (!raw) return EMPTY_LESSON_PROGRESS;
+  try {
+    return { ...EMPTY_LESSON_PROGRESS, ...(JSON.parse(raw) as LessonProgress) };
+  } catch {
+    return EMPTY_LESSON_PROGRESS;
+  }
+}
+
 function readFromStorage(slug: string): LessonProgress {
   const cached = cache.get(slug);
   if (cached) return cached;
 
-  let progress = EMPTY_LESSON_PROGRESS;
+  let progress: LessonProgress;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY_PREFIX + slug);
-    if (raw) progress = { ...EMPTY_LESSON_PROGRESS, ...(JSON.parse(raw) as LessonProgress) };
+    progress = parseProgress(window.localStorage.getItem(STORAGE_KEY_PREFIX + slug));
   } catch {
     progress = EMPTY_LESSON_PROGRESS;
   }
 
   cache.set(slug, progress);
   return progress;
+}
+
+/**
+ * Applies a native `storage` event (fired only in *other* tabs/windows that
+ * share this origin, never the tab that made the write) to this tab's
+ * module-level `cache`, keeping it from going stale when a lesson is
+ * completed elsewhere. Returns whether the event was actually relevant to
+ * this store, so the caller (`useLessonProgress`) only re-notifies React
+ * subscribers when something it owns actually changed.
+ */
+export function handleExternalStorageChange(event: StorageEvent): boolean {
+  if (event.key === null) {
+    // `localStorage.clear()` in another tab — nothing keyed is safe to assume anymore.
+    cache.clear();
+    invalidateCompletedLessonSlugsCache();
+    return true;
+  }
+  if (!event.key.startsWith(STORAGE_KEY_PREFIX)) return false;
+
+  const slug = event.key.slice(STORAGE_KEY_PREFIX.length);
+  cache.set(slug, parseProgress(event.newValue));
+  invalidateCompletedLessonSlugsCache();
+  return true;
 }
 
 function writeToStorage(slug: string, progress: LessonProgress) {

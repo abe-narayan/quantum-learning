@@ -1,5 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix"
@@ -71,6 +73,15 @@ distance from a center. The same matching *idea* survives entirely
 intact; what's new is genuinely new, not a cosmetic change of
 coordinates.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/9/97/Sir_Ernest_Rutherfords_laboratory%2C_early_20th_century._%289660575343%29.jpg"
+  alt="Photograph of Ernest Rutherford's experimental apparatus at the Cavendish Laboratory, Cambridge, early 20th century"
+  caption="Scattering theory, phase shifts, cross sections, and all, traces directly back to Rutherford's own laboratory: his 1911 analysis of alpha particles scattering off gold nuclei is the historical origin of describing a potential entirely through what it does to an incoming beam at infinity, exactly this lesson's partial-wave program."
+  credit="Science Museum London / Science and Society Picture Library, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Sir_Ernest_Rutherfords_laboratory,_early_20th_century._(9660575343).jpg"
+  license="CC BY-SA 2.0"
+/>
+
 ## Mathematical Development
 
 ### Separating the 3D problem into independent channels
@@ -130,6 +141,8 @@ construction from matching the partial-wave sum to the physical
 cited here rather than re-derived in full, the same convention Resonant
 Transmission Through a Barrier used for its own longer matching algebra):
 
+<TheoremBox title="Partial-wave cross-section formula" provenance="cited">
+
 $$
 f(\theta) = \frac1k\sum_{l=0}^\infty (2l+1)\,e^{i\delta_l}\sin\delta_l\,P_l(\cos\theta), \qquad
 \frac{d\sigma}{d\Omega}=|f(\theta)|^2
@@ -139,12 +152,21 @@ $$
 \boxed{\;\sigma = \frac{4\pi}{k^2}\sum_{l=0}^\infty (2l+1)\sin^2\delta_l\;}
 $$
 
+</TheoremBox>
+
 (the total cross section's sum-of-squares form, rather than a
 square-of-sums, follows from the Legendre polynomials' orthogonality
 killing every cross term upon integrating $|f(\theta)|^2$ over solid
-angle). The **$S$-matrix** in channel $l$ is defined as
+angle).
+
+<DefinitionBox title="S-matrix">
+
+The **$S$-matrix** in channel $l$ is defined as
 $S_l\equiv e^{2i\delta_l}$, the ratio of the outgoing to incoming
 spherical-wave coefficient hiding inside $\sin(kr-l\pi/2+\delta_l)=\frac1{2i}\left[e^{i(kr-l\pi/2+\delta_l)}-e^{-i(kr-l\pi/2+\delta_l)}\right]$.
+
+</DefinitionBox>
+
 For a real potential (no absorption), $\delta_l$ is real, so
 $|S_l|=|e^{2i\delta_l}|=1$ **exactly**: this is the direct 3D
 generalization of Scattering Off a Step Potential's $R+T=1$, now a

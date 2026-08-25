@@ -74,15 +74,34 @@ export const lessonMeta = {
 
 ## Motivation
 
-Two questions, one answer. First: if a quantum system's Hamiltonian
-changes over time, but *slowly*, does the system simply track along with
-the instantaneous ground state, the way a marble stays near the bottom of
-a slowly-tilting bowl? Second: if it does, is that all that happens, or
-does the system remember something about the *path* the Hamiltonian took,
-even after returning exactly to where it started? The first question is
-the **adiabatic theorem**. The second question's surprising answer, yes,
-it remembers, as a genuine, measurable phase, is **Berry's phase**, and
-both come out of the same four lines of algebra.
+Holonomic and topological quantum computing build logic gates out of
+exactly the phase this lesson derives: a control field is walked slowly
+around a loop in parameter space, and the qubit picks up a phase that
+depends only on the loop's shape, not on how fast or exactly how it was
+traversed. Gates built this way inherit that same insensitivity, which is
+part of why the geometric phase is treated as a serious resource for
+noise-resistant qubit control rather than a mathematical curiosity. Before
+any of that is usable, though, the phase itself has to be shown to exist,
+and that takes two questions and one answer.
+
+First: if a quantum system's Hamiltonian changes over time, but *slowly*,
+does the system simply track along with the instantaneous ground state,
+the way a marble stays near the bottom of a slowly-tilting bowl? Second:
+if it does, is that all that happens, or does the system remember
+something about the *path* the Hamiltonian took, even after returning
+exactly to where it started? The first question is the **adiabatic
+theorem**. The second question's answer, yes, it remembers, as a real,
+measurable phase, is **Berry's phase**, and both come out of the same
+four lines of algebra.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/1/10/Michael_Berry%2C_Yerevan_-_Ashtarak%2C_Armenia%2C_FOP-2014%2C_03.09.2014_%28cropped%29.jpg"
+  alt="Photograph of physicist Michael Berry at the International Advanced School on Frontiers in Optics and Photonics, Armenia, 2014"
+  caption="Sir Michael Berry, who discovered in 1984 that a slowly-cycled quantum system picks up a real, measurable geometric phase depending only on the path traced in parameter space -- exactly the phase this lesson derives and computes for a spin-1/2 dragged around a cone."
+  credit="Vahram Mekhitarian (photo), Jakob Gottfried (crop) / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Michael_Berry,_Yerevan_-_Ashtarak,_Armenia,_FOP-2014,_03.09.2014_(cropped).jpg"
+  license="CC BY-SA 4.0"
+/>
 
 ## Mathematical Development
 
@@ -129,7 +148,7 @@ $$
 
 This is the derivation's payoff: the coupling out of $|n(t)\rangle$ into
 any other level $m$ is small whenever $\hbar|\langle m|\dot
-H|n\rangle|\ll|E_n-E_m|^2$, the genuine **adiabaticity condition**
+H|n\rangle|\ll|E_n-E_m|^2$, the actual **adiabaticity condition**
 ("changes slowly" made precise: slow relative to the energy gap squared,
 not just slow in some vague sense). When this holds throughout the
 evolution, the $n\neq m$ sum above is negligible, and to excellent
@@ -144,8 +163,8 @@ stays in $|n(t)\rangle$ for all $t$, up to a phase, never mixing into any
 other level, provided the gap-squared condition above holds throughout. A
 fully rigorous bound (accounting for the *whole* history, not just the
 instantaneous rate) needs more care than this lesson gives; the mechanism
-above, the actual leakage rate and why it's suppressed, is the genuine
-content, cited honestly as a leading-order argument rather than a
+above, the actual leakage rate and why it's suppressed, is the substance
+of the argument, presented honestly as a leading-order case rather than a
 complete proof.
 
 ### The extra phase is geometric, not dynamical
@@ -155,7 +174,7 @@ $\langle n|n\rangle=1$ gives $\langle\dot n|n\rangle+\langle
 n|\dot n\rangle=0$, i.e. $\langle n|\dot n\rangle+\overline{\langle
 n|\dot n\rangle}=0$, so its real part vanishes. Write
 $\langle n|\dot n\rangle=i\dot\gamma_n(t)$ for a real function
-$\gamma_n$. Then $c_n(t)=c_n(0)\,e^{i\gamma_n(t)}$: a genuine phase, on
+$\gamma_n$. Then $c_n(t)=c_n(0)\,e^{i\gamma_n(t)}$: a real phase, on
 top of the dynamical phase $\theta_n$ already factored out. Crucially,
 $\gamma_n(t)=i\int_0^t\langle n(t')|\dot n(t')\rangle\,dt'=i\oint\langle
 n|\nabla_R n\rangle\cdot d\vec R$ (chain rule, $R$ the Hamiltonian's slow
@@ -178,7 +197,7 @@ Sphere's $|+,\hat n\rangle=\cos(\theta/2)|0\rangle+e^{i\phi}\sin(\theta/2)|1\ran
 this platform's own `blochStateFromAngles`.
 
 Computing $\gamma$ over one full loop ($\phi:0\to2\pi$ at fixed $\theta$)
-as a genuine discretized loop integral, summing the phase of
+as a real discretized loop integral, summing the phase of
 $\langle\psi(t_i)|\psi(t_{i+1})\rangle$ at each small step (a real,
 computed quantity, not read off a formula), and comparing directly to the
 famous closed-form prediction $\gamma=-\tfrac12\Omega$, minus half the
@@ -199,12 +218,13 @@ sphere of field directions:
 
 The geometric phase is real, not a computational artifact: interfering a
 spin (or a photon, where the analogous effect is well-measured) that took
-the loop against one that didn't produces an observable fringe shift.
-It's genuinely **not** a property of the endpoint (the loop returns
-exactly to its starting field direction, so the dynamical phase alone
-would predict no leftover phase distinguishing "went around the loop"
-from "stayed put"); it's a property of the *loop itself*, exactly the
-sense in which it's geometric rather than dynamical. The minus sign and
+the loop against one that didn't produces an observable fringe shift. The
+loop returns exactly to its starting field direction, so the dynamical
+phase alone would predict no leftover phase distinguishing "went around
+the loop" from "stayed put"; $\gamma$'s survival despite that shows it is
+a property of the *loop itself*, traced out in parameter space, rather
+than of either endpoint — exactly the sense in which it's geometric
+rather than dynamical. The minus sign and
 the factor of $\tfrac12$ both trace back to spin-$\tfrac12$'s specific
 $\cos(\theta/2),\sin(\theta/2)$ half-angle structure, not to any
 arbitrary convention.
@@ -218,8 +238,8 @@ $\Omega=2\pi(1-\cos60°)=2\pi(1-\tfrac12)=\pi$. So
 $\gamma=-\tfrac12\Omega=-\tfrac\pi2\approx-1.5708$, a clean, exactly
 checkable value. The platform's discretized loop integral at
 $\theta=60°$ gives $\gamma\approx-1.5708$ as well — matching to better
-than $10^{-4}$, a genuinely independent numerical confirmation of the
-closed-form geometric formula, not a restatement of it.
+than $10^{-4}$, an independent numerical confirmation of the closed-form
+geometric formula, not a restatement of it.
 
 ## Common Mistakes
 
@@ -272,13 +292,13 @@ tiny gap needs a much slower sweep than one with a large gap, at the
   time-dependent) phase $\gamma_n$: the geometric, or Berry, phase.
 - For spin-$\tfrac12$ dragged around a cone by a slowly rotating field,
   $\gamma=-\tfrac12\Omega$ ($\Omega$ the solid angle traced), verified
-  here as a genuine discretized loop integral over real Bloch-sphere
+  here as a real discretized loop integral over real Bloch-sphere
   states, matching the closed-form prediction to better than $10^{-4}$
   across every angle swept.
 
 ## Further Exploration
 
-Next: [Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states),
-leaving slow time-dependence behind for a different kind of "as classical
+[Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states)
+leaves slow time-dependence behind for a different kind of "as classical
 as quantum mechanics gets": the harmonic oscillator states that most
 closely track a classical trajectory.

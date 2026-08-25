@@ -1,5 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
@@ -94,15 +96,30 @@ on operators) into a single ordinary matrix that can be diagonalized with
 machinery this platform already has: the **Choi–Jamiolkowski
 isomorphism**.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
+  alt="A D-Wave Two 512-qubit superconducting quantum processor chip, mounted in its package and ready for cooling to near-absolute zero"
+  caption="A real physical qubit register like this one is never perfectly isolated: every uncontrolled coupling to its environment is exactly the kind of completely positive, trace-preserving map this lesson's Choi matrix machinery is built to characterize and validate."
+  credit="Steve Jurvetson / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
+  license="CC BY 2.0"
+/>
+
 ## Mathematical Development
 
 ### Complete positivity, precisely
+
+<DefinitionBox title="Complete positivity">
 
 A linear map $\mathcal E$ on $d\times d$ matrices is **positive** if
 $\rho\geq0\Rightarrow\mathcal E(\rho)\geq0$. It is **completely positive**
 (CP) if $\mathbb 1_n\otimes\mathcal E$ is positive for every $n$: acting
 on an arbitrary larger system while leaving an $n$-dimensional
-"spectator" subsystem alone must *still* produce a valid state. This is a
+"spectator" subsystem alone must *still* produce a valid state.
+
+</DefinitionBox>
+
+This is a
 strictly stronger requirement than positivity (there exist positive maps,
 like transposition, that are not completely positive), and it's the
 correct physical requirement: a subsystem's evolution must remain valid
@@ -170,9 +187,13 @@ full space of matrices, $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$ for
 
 ### Trace-preservation, restated on the Choi matrix
 
-**Claim.** $\mathcal E$ is trace-preserving if and only if
+<TheoremBox title="Trace-preservation on the Choi matrix" provenance="derived">
+
+$\mathcal E$ is trace-preserving if and only if
 $\text{Tr}_{\text{out}}\big(J(\mathcal E)\big)=I$ (tracing out the
 *second* tensor factor, the output copy).
+
+</TheoremBox>
 
 **Proof.** $\text{Tr}_{\text{out}}(J(\mathcal E))=\sum_{ij}|i\rangle\langle j|\,\text{Tr}\big(\mathcal E(|i\rangle\langle j|)\big)$.
 If $\mathcal E$ preserves trace, $\text{Tr}(\mathcal E(|i\rangle\langle j|))=\text{Tr}(|i\rangle\langle j|)=\delta_{ij}$,

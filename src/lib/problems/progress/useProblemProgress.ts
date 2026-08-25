@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useSyncExternalStore } from "react";
-import { getProgressStore } from "./localStorageStore";
+import { getProgressStore, handleExternalStorageChange } from "./localStorageStore";
 import { EMPTY_PROGRESS, type ProblemAttempt, type ProblemProgress } from "./types";
 
 const listeners = new Set<() => void>();
@@ -10,11 +10,27 @@ function notify() {
   listeners.forEach((listener) => listener());
 }
 
-function subscribe(listener: () => void) {
+/** Exported (beyond just being passed to `useSyncExternalStore` below) so tests can subscribe a spy directly. */
+export function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);
   };
+}
+
+if (typeof window !== "undefined") {
+  // The native `storage` event only fires in *other* tabs/windows on this
+  // origin — never the one that made the write — which is exactly the gap
+  // this closes: recording an attempt/hint/solution in tab A previously
+  // left tab B's `useProblemProgress`/`useProblemsProgress` snapshots stale
+  // until a manual reload, since `notify()` was only ever called from
+  // same-tab writes. Registered once for the lifetime of the page, so no
+  // corresponding `removeEventListener`/cleanup is needed.
+  window.addEventListener("storage", (event) => {
+    if (handleExternalStorageChange(event)) {
+      notify();
+    }
+  });
 }
 
 /**

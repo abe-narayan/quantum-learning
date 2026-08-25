@@ -1,6 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 import type { ComponentPropsWithoutRef } from "react";
 import { Callout } from "@/components/mdx/Callout";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { BarChart } from "@/components/visualizations/BarChart";
@@ -42,6 +43,7 @@ function Table(props: ComponentPropsWithoutRef<"table">) {
 const components: MDXComponents = {
   table: Table,
   Callout,
+  ExternalFigure,
   InteractiveSection,
   PredictBeforeReveal,
   BarChart,

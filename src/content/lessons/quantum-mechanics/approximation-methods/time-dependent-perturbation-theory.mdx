@@ -57,6 +57,15 @@ in state $|i\rangle$, with a perturbation $V$ switched on at $t=0$
 coupling it to a nearby state $|f\rangle$, what's the probability of
 finding it in $|f\rangle$ at time $t$?
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/b/ba/II_Rabi.jpg"
+  alt="Portrait photograph of physicist Isidor Isaac Rabi, taken in 1944"
+  caption="Isidor Isaac Rabi, whose name labels the exact 'Rabi-oscillating' exact-solution behavior this lesson's Worked Example uncovers once the perturbative approximation is checked against direct numerical integration of the two-level system."
+  credit="Nobel Foundation"
+  creditUrl="https://commons.wikimedia.org/wiki/File:II_Rabi.jpg"
+  license="Public domain"
+/>
+
 ## Mathematical Development
 
 ### The first-order transition probability
@@ -120,6 +129,18 @@ the *initial* rise, cannot see at all.
 
 Watching both curves over time, at several coupling strengths, makes the
 breakdown visible directly rather than only from the table's four rows:
+
+<PredictBeforeReveal
+  question="The bound above caps P_{i→f}(t) at 4|V_{fi}|²/(ħ²ω_{fi}²). With this lesson's convention (ħ=1, ω_{fi}=1), what happens to that cap once you push coupling strength V past 0.5?"
+  options={[
+    { label: "It stays at exactly 1 no matter how large V gets", value: "self-limits" },
+    { label: "It climbs above 1 — a 'probability' greater than 1", value: "exceeds-one" },
+    { label: "It falls back toward 0", value: "drops" },
+    { label: "It becomes negative", value: "negative" },
+  ]}
+  correctValue="exceeds-one"
+  explanation="With ħ=ω_{fi}=1, the cap is just 4V². At V=0.5 it lands on exactly 1; push V any further and the perturbative formula's own ceiling climbs past 1 — a probability greater than 1, which no real probability can be. That isn't a bug in the arithmetic, it's the formula announcing its own breakdown. Watch the curve below: past V≈0.5 the perturbative (accent) line keeps climbing while the exact (brand) line, genuinely bounded by unitarity, oscillates and falls back instead."
+/>
 
 <ParametricCurve
   frames={transitionCurveFrames}

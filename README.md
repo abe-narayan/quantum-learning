@@ -1,10 +1,11 @@
 # QuantumLearn
 
 QuantumLearn is a from-scratch quantum physics and quantum computing
-curriculum: 158 lessons across four pillars (Quantum Mechanics, Quantum
-Computing, Quantum Hardware, Quantum Software), 411 practice problems, and a
-dozen standalone interactive simulators — Bloch spheres, density matrices,
-circuit builders, wavefunction evolution, Grover's algorithm, and more.
+curriculum: 185 lessons across five pillars (Quantum Mechanics, Quantum
+Computing, Quantum Hardware, Quantum Software, Quantum Mastery) spanning 26
+courses, 479 practice problems, and 14 standalone interactive simulators —
+Bloch spheres, density matrices, circuit builders, wavefunction evolution,
+Grover's algorithm, and more.
 
 The defining constraint of the whole project: every number a visualization
 shows is *computed*, not decorative. A Bloch sphere point comes from a real
@@ -48,15 +49,24 @@ doesn't get one.
   with this file, or it silently falls out of navigation — an automated test
   (`src/lib/content/__tests__/lessons.test.ts`) now checks every lesson
   against it.
-- **`src/lib/problems/registry.ts`** — all 411 practice problems, registered
-  by hand (one import + one array entry per problem, mirroring
-  `src/content/problems/<pillar>/<course>/<problem>.ts`). Most numeric
-  problems compute their own correct answer by calling the real quantum
-  engine at module-load time rather than a hand-typed decimal.
+- **`src/lib/problems/registry.ts`** — all 479 practice problems. A thin
+  wrapper re-exporting `PROBLEMS` from the auto-generated
+  `src/lib/problems/registry.generated.ts`, which
+  `scripts/generate-problem-registry.mjs` produces by walking
+  `src/content/problems/<pillar>/<course>/<problem>.ts`, regex-matching
+  each file's single top-level `export const <name>: ...`, and failing
+  loudly if a file has no such export or two files export the same
+  identifier. Wired into the `predev`/`prebuild`/`pretest` npm lifecycle
+  hooks, so the registry regenerates automatically before `dev`/`build`/
+  `test` — a new problem just needs the file itself, no manual import or
+  array entry. Most numeric problems compute their own correct answer by
+  calling the real quantum engine at module-load time rather than a
+  hand-typed decimal.
 - **`src/components/simulators/`** — the standalone tools on `/simulators`
   (Bloch sphere, density matrix, two-qubit, circuit builder, Grover,
   wavefunction, Rabi, noise/decoherence, syndrome/error-correction, period
-  finding, QAOA, complex-amplitude explorers). Each ships a `Lazy*` wrapper
+  finding, QAOA, CHSH Bell test, cross-simulator comparison, and
+  complex-amplitude explorers). Each ships a `Lazy*` wrapper
   (`next/dynamic(..., { ssr: false })`) so the client-only canvas/quantum
   code stays out of pages that don't need it.
 - **`src/components/visualizations/`** — shared, reusable primitives
@@ -110,10 +120,17 @@ that built successfully and still 404'd).
 - **`curriculum.ts` is effectively append-only in normal use.** Reordering
   existing entries changes lesson numbering and prerequisite chains
   site-wide; add new courses/modules at the end of their array instead.
-- **`src/lib/problems/registry.ts` is manually registered, not
-  auto-discovered**, unlike lessons. A new problem file needs both an
-  import and an array entry, or it silently doesn't exist anywhere on the
-  site.
+- **`src/lib/problems/registry.ts` is now auto-discovered**, like lessons —
+  `scripts/generate-problem-registry.mjs` walks
+  `src/content/problems/**/*.ts` and regenerates
+  `src/lib/problems/registry.generated.ts` automatically before every
+  `dev`/`build`/`test` run (`predev`/`prebuild`/`pretest`). Unlike lessons,
+  this is *build-time* codegen rather than runtime discovery (150+ MDX
+  files call `getProblemsForLesson()` synchronously at module top level,
+  which rules out `import()`), so a new problem file just needs one
+  top-level `export const <name>: <ProblemVariant> = {...}` — a missing
+  export or a duplicate export identifier now fails the generator loudly
+  instead of silently dropping a problem.
 - No backend means no accounts, no server-side progress, no email, no
   payments — anything that needs one is out of scope by design, not an
   oversight.

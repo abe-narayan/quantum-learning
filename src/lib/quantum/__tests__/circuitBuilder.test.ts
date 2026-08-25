@@ -75,6 +75,28 @@ describe("QuantumCircuit: gate identities", () => {
   });
 });
 
+describe("runInstructions: MEASURE", () => {
+  it("is a no-op on the statevector (diagram-only marker, not a collapse)", () => {
+    const withoutMeasure = [
+      { gate: "H" as const, targets: [0] as [number] },
+      { gate: "CNOT" as const, targets: [0, 1] as [number, number] },
+    ];
+    const withMeasure = [
+      { gate: "H" as const, targets: [0] as [number] },
+      { gate: "MEASURE" as const, targets: [0] as [number] },
+      { gate: "CNOT" as const, targets: [0, 1] as [number, number] },
+    ];
+    const stateWithout = runInstructions(2, withoutMeasure);
+    const stateWith = runInstructions(2, withMeasure);
+    expect(stateWith.probabilities()).toEqual(stateWithout.probabilities());
+  });
+
+  it("leaves |0...0> unchanged when it's the only instruction", () => {
+    const state = runInstructions(2, [{ gate: "MEASURE" as const, targets: [0] as [number] }]);
+    expect(state.probabilities()[0]).toBeCloseTo(1, 9);
+  });
+});
+
 describe("QuantumCircuit: validation", () => {
   it("throws for an out-of-range target", () => {
     const circuit = new QuantumCircuit(2);

@@ -40,23 +40,35 @@ export function DecayCurve({
   // curve (teaching-relevant: it's what makes "this step" register as a
   // point moving through the decay, not a channel that teleports).
   const [markerPos, setMarkerPos] = useState({ x: targetX, y: targetY });
-  const prevPosRef = useRef({ x: targetX, y: targetY });
+  // Tracks the marker's actual on-screen position every frame (not just at
+  // tween completion) so an interrupted tween — e.g. dragging the steps
+  // slider fast enough that a new target arrives before the previous tween
+  // finishes — resumes from where the marker visually is, instead of
+  // snapping back to wherever the *previous* tween started. Mirrors
+  // `pointRef`/`setPointBoth` in useAnimatedBlochPoint.ts.
+  const posRef = useRef({ x: targetX, y: targetY });
   const rafRef = useRef<number | null>(null);
   const isFirstRender = useRef(true);
+
+  const setMarkerPosBoth = useCallback((next: { x: number; y: number }) => {
+    posRef.current = next;
+    setMarkerPos(next);
+  }, []);
 
   // Kept as a separate callback (rather than inline in the effect below) so
   // the reduced-motion snap's setState call isn't lexically inside the
   // effect body — same shape as `animateAlong` in useAnimatedBlochPoint.ts.
   const runTween = useCallback(
-    (from: { x: number; y: number }, to: { x: number; y: number }) => {
+    (to: { x: number; y: number }) => {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
 
+      const from = posRef.current;
+
       if (prefersReducedMotion) {
-        setMarkerPos(to);
-        prevPosRef.current = to;
+        setMarkerPosBoth(to);
         return;
       }
 
@@ -64,27 +76,26 @@ export function DecayCurve({
       const frame = (now: number) => {
         const t = Math.min(1, (now - start) / MARKER_TWEEN_MS);
         const eased = easeInOutCubic(t);
-        setMarkerPos({ x: from.x + (to.x - from.x) * eased, y: from.y + (to.y - from.y) * eased });
+        setMarkerPosBoth({ x: from.x + (to.x - from.x) * eased, y: from.y + (to.y - from.y) * eased });
         if (t < 1) {
           rafRef.current = requestAnimationFrame(frame);
         } else {
           rafRef.current = null;
-          prevPosRef.current = to;
         }
       };
       rafRef.current = requestAnimationFrame(frame);
     },
-    [prefersReducedMotion]
+    [prefersReducedMotion, setMarkerPosBoth]
   );
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      prevPosRef.current = { x: targetX, y: targetY };
+      posRef.current = { x: targetX, y: targetY };
       return;
     }
 
-    runTween(prevPosRef.current, { x: targetX, y: targetY });
+    runTween({ x: targetX, y: targetY });
 
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
