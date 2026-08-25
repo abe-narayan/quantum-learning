@@ -5,6 +5,7 @@ import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { applyBitOracle, constantFunction, balancedFunction } from "@/lib/quantum/oracles";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"
@@ -73,7 +74,21 @@ every input) or balanced (exactly half 0, half 1), never anything in
 between. Classically, distinguishing these with certainty needs
 $2^{n-1}+1$ queries in the worst case: check that many inputs, and if
 they're all equal, it could still be balanced with the very next query
-breaking the pattern. Deutsch-Jozsa solves this with exactly **one** query
+breaking the pattern.
+
+<PredictBeforeReveal
+  question="Deutsch-Jozsa gets to query U_f in superposition instead of one input at a time. How many queries does it need to determine constant-vs-balanced with certainty?"
+  options={[
+    { label: "Still needs many queries, just fewer than 2^(n-1)+1", value: "many-fewer" },
+    { label: "About half of 2^(n-1)+1", value: "half" },
+    { label: "Scales with n, but grows more slowly", value: "grows-with-n" },
+    { label: "Exactly one, always correct", value: "one" },
+  ]}
+  correctValue="one"
+  explanation="One query, full stop. Phase kickback marks every |x⟩ with (-1)^f(x) in a single call to U_f, and the second Hadamard layer converts that global phase pattern into an amplitude that lands on exactly ±1 (constant) or exactly 0 (balanced), derived below. There's no partial credit or repeated sampling involved: the promise itself guarantees a clean either/or answer from one query."
+/>
+
+That's exactly what Deutsch-Jozsa achieves: exactly **one** query
 to $U_f$, using the phase-kickback trick from last lesson plus a second
 layer of Hadamards to turn phases back into a directly measurable answer.
 

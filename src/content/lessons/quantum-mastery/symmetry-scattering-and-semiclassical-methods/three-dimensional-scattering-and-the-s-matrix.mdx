@@ -1,0 +1,256 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix"
+).map((problem) => problem.meta);
+
+export const hardSphereRadius = 1;
+
+export function sWavePhaseShift(ka) {
+  return -ka;
+}
+
+export function sWaveCrossSection(ka, a = hardSphereRadius) {
+  const k = ka / a;
+  const delta0 = sWavePhaseShift(ka);
+  return ((4 * Math.PI) / (k * k)) * Math.sin(delta0) ** 2;
+}
+
+export const crossSectionFrames = [
+  {
+    paramLabel: `hard-sphere s-wave cross section, a = ${hardSphereRadius}`,
+    series: [
+      {
+        label: "σ₀(ka) / (4πa²)",
+        color: "brand",
+        points: Array.from({ length: 200 }, (_, i) => {
+          const ka = 0.02 + (i / 199) * (4 - 0.02);
+          return { x: ka, y: sWaveCrossSection(ka) / (4 * Math.PI * hardSphereRadius ** 2) };
+        }),
+      },
+    ],
+  },
+];
+
+export const lessonMeta = {
+  title: "Three-Dimensional Scattering and the S-Matrix",
+  description:
+    "Scattering Off a Step Potential and Resonant Transmission Through a Barrier solved 1D scattering exactly. This lesson generalizes to a real 3D central potential: the partial-wave expansion, phase shifts δₗ, the cross-section formula built from them, and the S-matrix, worked explicitly for hard-sphere scattering with a closed-form δ₀=−ka and the famous σ→4πa² low-energy limit.",
+  course: "symmetry-scattering-and-semiclassical-methods",
+  module: "three-dimensional-scattering-and-the-s-matrix",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 35,
+  prerequisites: [
+    "quantum-mechanics/one-dimensional-systems/scattering-off-a-step-potential",
+    "quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier",
+    "quantum-mechanics/angular-momentum-and-spin/orbital-angular-momentum-and-spherical-harmonics",
+  ],
+  objectives: [
+    "Derive the partial-wave radial equation from separating a 3D central-potential Schrödinger equation, and identify the phase shift δₗ as the full content of the scattering information in each channel",
+    "State and apply the differential and total cross-section formulas built from the δₗ's, and define the S-matrix Sₗ=e^{2iδₗ}",
+    "Work hard-sphere scattering explicitly, deriving the exact s-wave phase shift δ₀=−ka and the low-energy limit σ→4πa²",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier",
+      note: "That lesson's two-boundary matching (continuity of ψ,ψ' at each edge) is exactly the technique this lesson reuses at r=a for hard-sphere scattering; the genuinely new ingredients are the centrifugal term and the discrete l-channel structure.",
+    },
+  ],
+};
+
+## Motivation
+
+Scattering Off a Step Potential and Resonant Transmission Through a
+Barrier solved 1D scattering completely: match $\psi,\psi'$ at each
+boundary, read off reflection and transmission. Real scattering
+experiments, a beam of particles off a nucleus, electrons off an atom,
+happen in three dimensions, off a potential $V(r)$ depending only on
+distance from a center. The same matching *idea* survives entirely
+intact; what's new is genuinely new, not a cosmetic change of
+coordinates.
+
+## Mathematical Development
+
+### Separating the 3D problem into independent channels
+
+For a central potential $V(r)$, $[H,\vec L^{\,2}]=[H,L_z]=0$ (rotational
+symmetry, the same fact Orbital Angular Momentum and Spherical Harmonics
+used to separate the hydrogen atom), so energy eigenstates can be built
+with definite $l$: $\psi(r,\theta)=\sum_lR_l(r)P_l(\cos\theta)$ (only
+$m=0$ needed, since an incident beam along a fixed axis and a central
+potential share no preferred azimuthal direction). Substituting
+$u_l(r)=rR_l(r)$ into the full 3D Schrödinger equation gives, for each
+$l$ separately:
+
+$$
+-\frac{\hbar^2}{2m}u_l''(r) + \left[V(r)+\frac{\hbar^2l(l+1)}{2mr^2}\right]u_l(r) = E\,u_l(r), \qquad u_l(0)=0
+$$
+
+This is **exactly a 1D Schrödinger equation** on the half-line $r\ge0$,
+the identical continuity-of-$\psi,\psi'$ matching technique from the 1D
+scattering lessons applies unchanged. Two things are genuinely new,
+neither cosmetic: (1) an extra **centrifugal barrier**
+$\hbar^2l(l+1)/2mr^2$, absent from any real 1D problem, pushing the
+particle away from $r=0$ for $l>0$; (2) the boundary condition
+$u_l(0)=0$ (needed for the actual 3D wavefunction $R_l(r)=u_l(r)/r$ to
+stay finite at the origin) replaces the 1D problem's free asymptotic
+condition on *both* sides. And because $l$ is conserved (a central
+potential cannot scatter a particle from one $l$ into another), the full
+3D problem splits into a **discrete, independent set of 1D-like
+scattering problems**, one per $l$, usually called **partial-wave
+channels**. This channel structure, not the boundary-matching mechanics
+itself, is the real qualitative difference from 1D.
+
+### Phase shifts: the entire content of the scattering information
+
+Beyond the potential's range, $u_l(r)$ solves the *free* radial equation,
+whose two independent solutions are the spherical Bessel functions
+$j_l(kr)$ and $n_l(kr)$ (cited here as the standard closed-form free
+solutions, the direct analogue of $\sin,\cos$ solving the free 1D
+equation). Any physical solution's large-$r$ behavior takes the universal
+form:
+
+$$
+u_l(r) \;\xrightarrow{r\to\infty}\; A_l\sin\!\left(kr - \frac{l\pi}2 + \delta_l\right)
+$$
+
+where $kr-l\pi/2$ is exactly the free-particle ($V=0$) asymptotic phase,
+and $\delta_l$, the **phase shift**, is the *only* place the potential
+still shows up at large $r$. Every observable in elastic scattering, the
+differential cross section, the total cross section, the $S$-matrix, is
+built entirely from the set $\{\delta_l\}$.
+
+### Cross section and the S-matrix
+
+The scattering amplitude and cross sections (a standard, longer algebraic
+construction from matching the partial-wave sum to the physical
+"incident plane wave plus outgoing spherical wave" boundary condition,
+cited here rather than re-derived in full, the same convention Resonant
+Transmission Through a Barrier used for its own longer matching algebra):
+
+$$
+f(\theta) = \frac1k\sum_{l=0}^\infty (2l+1)\,e^{i\delta_l}\sin\delta_l\,P_l(\cos\theta), \qquad
+\frac{d\sigma}{d\Omega}=|f(\theta)|^2
+$$
+
+$$
+\boxed{\;\sigma = \frac{4\pi}{k^2}\sum_{l=0}^\infty (2l+1)\sin^2\delta_l\;}
+$$
+
+(the total cross section's sum-of-squares form, rather than a
+square-of-sums, follows from the Legendre polynomials' orthogonality
+killing every cross term upon integrating $|f(\theta)|^2$ over solid
+angle). The **$S$-matrix** in channel $l$ is defined as
+$S_l\equiv e^{2i\delta_l}$, the ratio of the outgoing to incoming
+spherical-wave coefficient hiding inside $\sin(kr-l\pi/2+\delta_l)=\frac1{2i}\left[e^{i(kr-l\pi/2+\delta_l)}-e^{-i(kr-l\pi/2+\delta_l)}\right]$.
+For a real potential (no absorption), $\delta_l$ is real, so
+$|S_l|=|e^{2i\delta_l}|=1$ **exactly**: this is the direct 3D
+generalization of Scattering Off a Step Potential's $R+T=1$, now a
+per-channel statement (incoming flux in channel $l$ equals outgoing flux
+in that *same* channel $l$, since channels don't mix) rather than a
+single global balance between two channels.
+
+### Worked example: hard-sphere scattering
+
+A hard sphere of radius $a$ ($V=\infty$ for $r<a$, $V=0$ outside) forces
+$u_l(a)=0$ exactly (impenetrable wall). Outside, $u_l(r)\propto
+kr\left[\cos\delta_l\,j_l(kr)-\sin\delta_l\,n_l(kr)\right]$, the
+asymptotically-consistent combination; setting this to zero at $r=a$
+gives the general result $\tan\delta_l=j_l(ka)/n_l(ka)$ (cited for
+general $l$; worked exactly for $l=0$ below). Using the standard closed
+forms $j_0(x)=\sin(x)/x$, $n_0(x)=-\cos(x)/x$:
+
+$$
+\tan\delta_0 = \frac{j_0(ka)}{n_0(ka)} = \frac{\sin(ka)/ka}{-\cos(ka)/ka} = -\tan(ka)
+\;\Longrightarrow\; \boxed{\;\delta_0 = -ka\;}
+$$
+
+An exact, hand-checkable closed form, not an approximation. Substituting
+into the boxed cross-section formula (keeping only $l=0$, the dominant
+channel at low energy, since higher $l$'s are suppressed by the
+centrifugal barrier):
+
+$$
+\sigma_0(ka) = \frac{4\pi}{k^2}\sin^2(ka)
+$$
+
+<InteractiveSection
+  title="s-wave cross section, in units of 4πa²"
+  description="Plotted from the real closed-form δ₀=−ka above, no numbers hand-typed beyond a=1. As ka→0 the curve approaches exactly 1 (σ₀→4πa²), the famous 'four times the classical area' quantum result; it falls away as ka grows and the small-angle approximation sin(ka)≈ka stops holding."
+>
+  <ParametricCurve
+    frames={crossSectionFrames}
+    ariaLabel="Hard sphere s-wave cross section divided by 4 pi a squared, as a function of ka, approaching 1 as ka goes to zero"
+    referenceLines={[{ y: 1, label: "4πa² (low-energy limit)" }]}
+  />
+</InteractiveSection>
+
+## Physical Interpretation
+
+At low energy ($ka\ll1$), $\sin(ka)\approx ka$, so
+$\sigma_0\to(4\pi/k^2)(ka)^2=4\pi a^2$: **four times** the sphere's
+classical cross-sectional area $\pi a^2$. This is genuinely surprising
+and genuinely correct, not a paradox: a classical particle either hits
+the sphere (cross section $\pi a^2$) or misses entirely; a long-wavelength
+quantum wave diffracts around the whole sphere, and the wave nature of
+scattering, not the sphere's literal silhouette, sets the cross section.
+The plot above shows this limit isn't an asymptotic curiosity, it's
+approached smoothly and directly from the same closed form governing
+every $ka$.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Forgetting the centrifugal term when writing down the "radial
+Schrödinger equation."** Without $\hbar^2l(l+1)/2mr^2$, the equation
+describes a genuine 1D problem, not the $l$-th partial wave of a 3D one;
+this term is exactly what makes different $l$'s behave differently even
+for the *same* potential $V(r)$.
+</Callout>
+
+<Callout type="mistake">
+**Assuming $\delta_l$ alone (without the $(2l+1)$ weight) sets each
+channel's contribution to $\sigma$.** The boxed formula weights
+$\sin^2\delta_l$ by $(2l+1)$, the degeneracy of the $l$-th channel's $m$
+values; a small $\delta_l$ at large $l$ can still matter if $(2l+1)$ is
+large enough, though in practice the centrifugal barrier usually
+suppresses $\delta_l$ itself fast enough at low energy that $l=0$
+dominates, as used above.
+</Callout>
+
+## Practice Questions
+
+1. Using $\delta_0=-ka$, compute $\sigma_0$ for $ka=0.5$ (sphere radius
+   $a=1$), and express your answer as a multiple of $4\pi a^2$.
+2. Explain why $u_l(0)=0$ is required for *every* $l$, directly from
+   $R_l(r)=u_l(r)/r$ needing to stay finite (not blow up) as $r\to0$.
+3. Why can a central potential never scatter an incident $l=0$ wave into
+   an outgoing $l=1$ wave, in terms of a conserved quantity from
+   Orbital Angular Momentum and Spherical Harmonics?
+4. If $|S_l|<1$ for some channel, what would that imply physically about
+   the potential, given the derivation above connected $|S_l|=1$ directly
+   to $\delta_l$ being real?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A central potential separates 3D scattering into independent $l$
+  channels, each an effective 1D problem with an extra centrifugal term
+  $\hbar^2l(l+1)/2mr^2$ and the boundary condition $u_l(0)=0$.
+- Every observable is built from the phase shifts $\delta_l$:
+  $\sigma=(4\pi/k^2)\sum_l(2l+1)\sin^2\delta_l$, and the $S$-matrix
+  $S_l=e^{2i\delta_l}$ satisfies $|S_l|=1$ exactly, the 3D generalization
+  of 1D scattering's $R+T=1$.
+- Hard-sphere scattering gives the exact closed form $\delta_0=-ka$, and
+  the low-energy limit $\sigma_0\to4\pi a^2$, four times the classical
+  geometric cross section, computed here directly rather than merely
+  quoted.
+
+## Further Exploration
+
+Next: [Capstone: Symmetry and the Classical Limit](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/capstone-symmetry-and-the-classical-limit),
+tying phase shifts, Berry phase, and WKB together as three different
+routes to the same classical/geometric limit.

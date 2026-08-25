@@ -3,6 +3,7 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { classicalOrder } from "@/lib/quantum/shor";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding"
@@ -63,7 +64,21 @@ export const lessonMeta = {
 
 RSA encryption's security rests on factoring large numbers being hard: no
 known *classical* algorithm factors an $n$-digit number in time
-polynomial in $n$. Shor's algorithm factors in polynomial time on a
+polynomial in $n$.
+
+<PredictBeforeReveal
+  question="Shor's algorithm factors N on a quantum computer. Compared to the best known classical factoring algorithms, is the speedup a modest constant-factor improvement, or something bigger?"
+  options={[
+    { label: "A modest constant-factor speedup", value: "constant" },
+    { label: "Faster, but still not polynomial-time", value: "still-not-poly" },
+    { label: "Polynomial time in n — a different complexity class entirely", value: "polynomial" },
+    { label: "It doesn't actually speed up factoring", value: "none" },
+  ]}
+  correctValue="polynomial"
+  explanation="Shor's algorithm runs in time polynomial in n, the number of digits of N, while no known classical algorithm does. That's not a constant-factor or same-class improvement: it moves factoring from a problem with no known efficient classical solution to one solvable in polynomial time on a quantum computer, exactly why it threatens RSA's security assumption at large enough N."
+/>
+
+Shor's algorithm factors in polynomial time on a
 quantum computer, and the surprising part is *where* the quantum speedup
 actually enters. It's not in factoring directly, but in a narrower
 subroutine, finding the **order** of a number modulo $N$, that the rest

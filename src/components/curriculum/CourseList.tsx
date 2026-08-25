@@ -3,12 +3,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { CourseProgressBadge } from "./CourseProgressBadge";
 import { LessonCompletionMark } from "./LessonCompletionMark";
+import { getCourse } from "@/lib/content/curriculum";
 import type { Course, Difficulty, LessonMetaWithSlug } from "@/lib/content/types";
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   foundational: "Foundational",
   intermediate: "Intermediate",
   advanced: "Advanced",
+  master: "Master",
 };
 
 export function CourseList({
@@ -31,6 +33,9 @@ export function CourseList({
         const authoredLessonSlugs = course.modules
           .map((module) => lessonByModule.get(module.slug)?.slug)
           .filter((slug): slug is string => Boolean(slug));
+        const prerequisiteTitles = course.prerequisites
+          .map((slug) => getCourse(slug)?.title)
+          .filter((title): title is string => Boolean(title));
 
         return (
           <Card key={course.slug}>
@@ -39,13 +44,20 @@ export function CourseList({
                 <h3 className="text-lg font-semibold text-foreground">{course.title}</h3>
                 <p className="mt-1 max-w-xl text-sm text-muted-foreground">{course.description}</p>
               </div>
-              <div className="flex shrink-0 flex-wrap items-center gap-2">
-                <Badge tone="brand">{DIFFICULTY_LABEL[course.difficulty]}</Badge>
-                <Badge>{course.estimatedHours}h</Badge>
-                <Badge tone={isComplete ? "accent" : isStarted ? "neutral" : "neutral"}>
-                  {completedModules}/{totalModules} lessons{isComplete ? " · complete" : ""}
-                </Badge>
-                <CourseProgressBadge lessonSlugs={authoredLessonSlugs} />
+              <div className="flex shrink-0 flex-col items-end gap-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge tone="brand">{DIFFICULTY_LABEL[course.difficulty]}</Badge>
+                  <Badge>{course.estimatedHours}h</Badge>
+                  <Badge tone={isComplete ? "accent" : isStarted ? "neutral" : "neutral"}>
+                    {completedModules}/{totalModules} lessons{isComplete ? " · complete" : ""}
+                  </Badge>
+                  <CourseProgressBadge lessonSlugs={authoredLessonSlugs} />
+                </div>
+                {prerequisiteTitles.length > 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    Requires: {prerequisiteTitles.join(", ")}
+                  </p>
+                ) : null}
               </div>
             </div>
 

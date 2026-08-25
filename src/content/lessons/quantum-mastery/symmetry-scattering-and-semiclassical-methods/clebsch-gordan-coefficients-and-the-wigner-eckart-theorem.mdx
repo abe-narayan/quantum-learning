@@ -1,0 +1,324 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem"
+).map((problem) => problem.meta);
+
+export const j1 = 1;
+export const j2 = 0.5;
+export const Lx = angularMomentumX(j1);
+export const Ly = angularMomentumY(j1);
+export const Lz = angularMomentumZ(j1);
+export const Sx = angularMomentumX(j2);
+export const Sy = angularMomentumY(j2);
+export const Sz = angularMomentumZ(j2);
+export const I2 = Matrix.identity(2);
+export const I3 = Matrix.identity(3);
+
+export const Jx = Lx.tensor(I2).add(I3.tensor(Sx));
+export const Jy = Ly.tensor(I2).add(I3.tensor(Sy));
+export const Jz = Lz.tensor(I2).add(I3.tensor(Sz));
+export const Jsq = Jx.mul(Jx).add(Jy.mul(Jy)).add(Jz.mul(Jz));
+
+export const c = (x) => new Complex(x, 0);
+export const zero = Complex.ZERO;
+export const s13 = Math.sqrt(1 / 3);
+export const s23 = Math.sqrt(2 / 3);
+
+export const uncoupledLabels = ["|1,+½⟩", "|1,−½⟩", "|0,+½⟩", "|0,−½⟩", "|−1,+½⟩", "|−1,−½⟩"];
+
+export const coupledStates = {
+  "|3/2, +3/2⟩": [c(1), zero, zero, zero, zero, zero],
+  "|3/2, +1/2⟩": [zero, c(s13), c(s23), zero, zero, zero],
+  "|3/2, −1/2⟩": [zero, zero, zero, c(s23), c(s13), zero],
+  "|3/2, −3/2⟩": [zero, zero, zero, zero, zero, c(1)],
+  "|1/2, +1/2⟩": [zero, c(s23), c(-s13), zero, zero, zero],
+  "|1/2, −1/2⟩": [zero, zero, zero, c(s13), c(-s23), zero],
+};
+
+export const expectationReal = (op, vec) => {
+  const opv = op.apply(vec);
+  return vec.reduce((total, amp, i) => total.add(amp.conjugate().mul(opv[i])), Complex.ZERO).re;
+};
+
+export const cgVerificationTable = Object.entries(coupledStates).map(([label, vec]) => ({
+  label,
+  jSquaredEigenvalue: expectationReal(Jsq, vec),
+  jzEigenvalue: expectationReal(Jz, vec),
+}));
+
+export const cgBarFrames = Object.entries(coupledStates).map(([label, vec]) => ({
+  paramLabel: label,
+  bars: uncoupledLabels.map((uLabel, i) => ({
+    label: uLabel,
+    value: vec[i].re,
+    highlight: Math.abs(vec[i].re) > 1e-9,
+    caption: Math.abs(vec[i].re) > 1e-9 ? vec[i].re.toFixed(4) : "0",
+  })),
+}));
+
+export const lessonMeta = {
+  title: "Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem",
+  description:
+    "Addition of Angular Momentum solved the two-spin-1/2 case by inspection. This lesson derives the general j₁⊗j₂ Clebsch-Gordan recursion, verifies it explicitly for l=1⊗s=1/2 (the exact table Degenerate Perturbation Theory borrowed), then proves the Wigner-Eckart theorem and reads off selection rules from symmetry alone, no integral needed.",
+  course: "symmetry-scattering-and-semiclassical-methods",
+  module: "clebsch-gordan-coefficients-and-the-wigner-eckart-theorem",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 35,
+  prerequisites: [
+    "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum",
+    "quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum",
+    "quantum-mechanics/angular-momentum-and-spin/orbital-angular-momentum-and-spherical-harmonics",
+  ],
+  objectives: [
+    "Derive the general Clebsch-Gordan recursion relation for j₁⊗j₂ from the ladder operators alone, and explain the 'peel off the orthogonal state' step that generates each new j multiplet",
+    "Work the l=1⊗s=1/2 example explicitly, producing a full numeric CG table verified as exact J² and Jz eigenstates",
+    "State and justify the Wigner-Eckart theorem, and derive selection rules (Δm=q, the triangle rule) directly from Clebsch-Gordan vanishing conditions, without evaluating any integral",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/symmetry-scattering-and-semiclassical-methods/degenerate-perturbation-theory-and-fine-structure",
+      note: "That lesson used this exact l=1⊗s=1/2 coupled basis to diagonalize hydrogen's spin-orbit operator, borrowing the coefficients this lesson now actually derives.",
+    },
+  ],
+};
+
+## Motivation
+
+Addition of Angular Momentum combined two spin-$\tfrac12$ particles by
+direct inspection: four candidate states, checked by hand against $\vec
+J^{\,2}$ and $J_z$. That approach doesn't scale, real problems need $l=1$
+electrons coupled to spin, two different orbital angular momenta coupled
+to each other, arbitrary $j_1,j_2$. This lesson derives the **general**
+machinery: a recursion relation that generates every Clebsch-Gordan
+coefficient for any $j_1\otimes j_2$, then a theorem, Wigner-Eckart, that
+turns "does this transition happen at all" into a question answerable
+from symmetry alone.
+
+## Mathematical Development
+
+### The general recursion
+
+Let $|j,m\rangle=\sum_{m_1,m_2}C^{j,m}_{j_1m_1;j_2m_2}|j_1,m_1\rangle|j_2,m_2\rangle$
+(sum restricted to $m_1+m_2=m$, since $J_z=J_{1z}+J_{2z}$ forces this).
+Apply the total lowering operator $J_-=J_{1-}+J_{2-}$ to both sides. The
+left side uses the ordinary single-$j$ ladder formula (Ladder Operators
+and the Angular Momentum Spectrum); the right side distributes over the
+product states, each factor lowering independently:
+
+$$
+\sqrt{j(j+1)-m(m-1)}\;C^{j,m-1}_{j_1m_1;j_2m_2} =
+\sqrt{j_1(j_1+1)-m_1(m_1+1)}\;C^{j,m}_{j_1,m_1+1;j_2m_2} +
+\sqrt{j_2(j_2+1)-m_2(m_2+1)}\;C^{j,m}_{j_1m_1;j_2,m_2+1}
+$$
+
+(obtained by matching the coefficient of $|j_1,m_1\rangle|j_2,m_2\rangle$
+on both sides after the ladder action). This single relation, applied
+repeatedly, generates every coefficient within a fixed $j$ multiplet from
+one known starting point.
+
+### Where each multiplet starts
+
+The **top state** of the top multiplet is unique: $m=j_1+j_2$ has only one
+product state with that total, $|j_1,j_1\rangle|j_2,j_2\rangle$, so
+$|j_1+j_2,\,j_1+j_2\rangle=|j_1,j_1\rangle|j_2,j_2\rangle$ exactly, no
+recursion needed. Lowering it via the recursion above generates the
+entire $j=j_1+j_2$ multiplet. At the next value of $m$ down from the top,
+exactly **two** product states share that $m$; the $j=j_1+j_2$
+combination is already fixed by the ladder result, and the state
+**orthogonal** to it (within that 2-dimensional same-$m$ subspace) is, by
+construction, annihilated by lowering into anything outside its own
+multiplet, making it the top state of the *next* multiplet,
+$j=j_1+j_2-1$. Repeating, ladder down, peel off the orthogonal
+complement, start the next $j$, generates every multiplet down to
+$j=|j_1-j_2|$ (the triangle rule's lower bound, the same bound Addition
+of Angular Momentum found by exhaustive counting for $j_1=j_2=\tfrac12$).
+The one remaining freedom at each new top state (an overall phase) is
+fixed by the **Condon-Shortley convention**: the coefficient of the
+term with the largest $m_1$ is taken real and positive.
+
+### Worked example: l=1⊗s=1/2
+
+Apply this by hand to $j_1=1,j_2=\tfrac12$ (an orbital electron's $l=1$
+coupled to its spin, six total states). Top state:
+$|\tfrac32,\tfrac32\rangle=|1,1\rangle|\tfrac12,\tfrac12\rangle$.
+Lowering with $J_-=L_-+S_-$: the left side gives
+$\sqrt{\tfrac32\cdot\tfrac52-\tfrac32\cdot\tfrac12}=\sqrt3$; the right
+side gives $\sqrt{1\cdot2-1\cdot0}\,|1,0\rangle|\tfrac12,\tfrac12\rangle+\sqrt{\tfrac12\cdot\tfrac32-\tfrac12\cdot(-\tfrac12)}\,|1,1\rangle|\tfrac12,-\tfrac12\rangle=\sqrt2\,|1,0;\tfrac12,\tfrac12\rangle+|1,1;\tfrac12,-\tfrac12\rangle$.
+Dividing by $\sqrt3$:
+
+$$
+\left|\tfrac32,\tfrac12\right\rangle = \sqrt{\tfrac23}\,\left|1,0\right\rangle\left|\tfrac12,\tfrac12\right\rangle + \sqrt{\tfrac13}\,\left|1,1\right\rangle\left|\tfrac12,-\tfrac12\right\rangle
+$$
+
+The **orthogonal** combination of the same two product states
+($|1,1\rangle|\tfrac12,-\tfrac12\rangle$ and
+$|1,0\rangle|\tfrac12,\tfrac12\rangle$), with the largest-$m_1$ term
+($|1,1\rangle|\tfrac12,-\tfrac12\rangle$) taken positive, starts the
+$j=\tfrac12$ multiplet: $\left|\tfrac12,\tfrac12\right\rangle=\sqrt{\tfrac23}|1,1\rangle|\tfrac12,-\tfrac12\rangle-\sqrt{\tfrac13}|1,0\rangle|\tfrac12,\tfrac12\rangle$.
+Continuing the recursion on both multiplets generates all six states.
+Building all six as explicit vectors and checking them against this
+platform's own total $\vec J^{\,2}$ and $J_z$ (built from
+`angularMomentumX/Y/Z` at $j_1=1$ and $j_2=\tfrac12$, exactly the
+approach Addition of Angular Momentum used, generalized to unequal
+$j_1,j_2$) confirms every coefficient, to floating-point precision:
+
+| State | $\vec J^{\,2}$ eigenvalue | $J_z$ eigenvalue |
+|---|---|---|
+| $|3/2,+3/2\rangle$ | $3.75$ | $1.5$ |
+| $|3/2,+1/2\rangle$ | $3.75$ | $0.5$ |
+| $|3/2,-1/2\rangle$ | $3.75$ | $-0.5$ |
+| $|3/2,-3/2\rangle$ | $3.75$ | $-1.5$ |
+| $|1/2,+1/2\rangle$ | $0.75$ | $0.5$ |
+| $|1/2,-1/2\rangle$ | $0.75$ | $-0.5$ |
+
+$3.75=\tfrac32\cdot\tfrac52$, $0.75=\tfrac12\cdot\tfrac32$: both
+$j(j+1)$, exactly, not approximately. These are precisely the
+coefficients Degenerate Perturbation Theory used to build its coupled
+basis $U$, here actually derived rather than borrowed.
+
+<InteractiveSection
+  title="Step through each coupled state's CG decomposition"
+  description="Each frame is one |j,mj⟩ coupled state; the bars show its real, computed Clebsch-Gordan coefficients against the six uncoupled |mL,mS⟩ product states. Exactly two bars are nonzero for the interior states (a genuine superposition); exactly one for the stretched states |3/2,±3/2⟩, matching the 'unique top state' argument above."
+>
+  <BarChartExplorer
+    frames={cgBarFrames}
+    sliderLabel="Coupled state |j,mj⟩"
+    ariaLabel="Clebsch-Gordan coefficients of each l=1 tensor s=1/2 coupled state, decomposed over the six uncoupled product basis states"
+    maxValue={1}
+  />
+</InteractiveSection>
+
+### The Wigner-Eckart theorem
+
+A **spherical tensor operator** of rank $k$, $T^k_q$ ($q=-k,\ldots,k$), is
+defined by transforming under rotations exactly like $|k,q\rangle$ does:
+
+$$
+[J_z,T^k_q]=q\,T^k_q, \qquad [J_\pm,T^k_q]=\sqrt{k(k+1)-q(q\pm1)}\,T^k_{q\pm1}
+$$
+
+These are *exactly* the same commutation relations $J_z,J_\pm$ satisfy
+with the angular-momentum basis kets $|k,q\rangle$ themselves. Sandwiching
+$T^k_q$ between angular-momentum eigenstates,
+$\langle j'm'|T^k_q|jm\rangle$, and demanding consistency with these
+commutators as $m,m',q$ vary produces the *identical* recursion relation
+in $(m,m',q)$ derived above for Clebsch-Gordan coefficients
+$\langle jm;kq|j'm'\rangle$. A linear recursion with the same structure
+and the same boundary conditions has (for fixed $j,j',k$) a
+one-dimensional solution space, so the two objects can only differ by an
+overall constant, independent of $m,m',q$:
+
+$$
+\boxed{\;\langle j'm'|T^k_q|jm\rangle = \langle jm;kq|j'm'\rangle\,\langle j'\|T^k\|j\rangle\;}
+$$
+
+$\langle j'\|T^k\|j\rangle$, the **reduced matrix element**, carries all
+the operator-specific physics (radial integrals, coupling strengths); the
+Clebsch-Gordan coefficient carries *all* of the angular dependence, for
+every $m,m',q$ at once.
+
+### Selection rules for free
+
+$J_z$ conservation forces $\langle jm;kq|j'm'\rangle=0$ unless
+$m'=m+q$ (apply $J_z$ to $|jm\rangle|kq\rangle$ before coupling: it has
+eigenvalue $m+q$; the coupled $|j'm'\rangle$ has eigenvalue $m'$; these
+can only match if $m'=m+q$, a genuinely two-line argument). The triangle
+rule from the recursion's construction above forces
+$\langle jm;kq|j'm'\rangle=0$ unless $|j-k|\le j'\le j+k$. **Both
+conditions are entirely about which CG coefficient vanishes**, established
+above with no reference to any specific operator; by Wigner-Eckart, *any*
+rank-$k$ tensor operator's matrix element inherits both selection rules
+automatically, with zero additional calculation.
+
+## Physical Interpretation
+
+Hydrogen's electric dipole operator $\vec r$ has three spherical
+components that transform exactly as $Y_1^q$, i.e. as a rank-$1$ ($k=1$)
+tensor. Wigner-Eckart immediately gives $\Delta m=q\in\{0,\pm1\}$ and
+$|l-1|\le l'\le l+1$, i.e. $\Delta l\in\{-1,0,+1\}$, with zero integration.
+(Ruling out $\Delta l=0$ specifically needs one more, separate ingredient:
+parity. $Y_1^q$ is odd under $\vec r\to-\vec r$, and $Y_l^m$ has parity
+$(-1)^l$, so the full matrix element's integrand has parity
+$(-1)^{l+l'+1}$; it vanishes unless $l+l'$ is odd, which combined with the
+triangle rule above leaves exactly $\Delta l=\pm1$. This parity argument
+is genuinely separate from Wigner-Eckart itself, worth stating honestly
+rather than folding silently into "the selection rule.") This is exactly
+the electric-dipole selection rule underlying every atomic transition
+this platform's Hydrogen Atom course used, now derived from symmetry
+rather than asserted.
+
+## Worked Example
+
+**Confirm $\langle1,0;\tfrac12,-\tfrac12|\tfrac32,-\tfrac12\rangle=\sqrt{2/3}$
+directly from the $m$-conservation rule and the table above.**
+
+The table's $|3/2,-1/2\rangle$ row has nonzero coefficients only on
+$|0,-\tfrac12\rangle$ (coefficient $\sqrt{2/3}$) and
+$|{-1},\tfrac12\rangle$ (coefficient $\sqrt{1/3}$), the bar chart's
+fourth frame. Both satisfy $m_1+m_2=-\tfrac12$, as required. Reading off
+the $|1,0\rangle|\tfrac12,-\tfrac12\rangle$ coefficient directly:
+$\langle1,0;\tfrac12,-\tfrac12|\tfrac32,-\tfrac12\rangle=\sqrt{2/3}\approx0.8165$,
+matching the recursion's prediction exactly (Practice Question 1 asks for
+the recursion derivation itself).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming Wigner-Eckart says a matrix element equals the CG
+coefficient.** It says the matrix element is *proportional* to the CG
+coefficient, with an operator-and-$j,j'$-dependent (but
+$m,m',q$-independent) reduced matrix element absorbing everything else.
+Two different rank-$1$ operators between the same $j,j'$ have matrix
+elements in the *same ratios* across $m,m',q$, not identical values.
+</Callout>
+
+<Callout type="mistake">
+**Concluding $\Delta l=\pm1$ from Wigner-Eckart/CG alone.** The
+triangle rule alone permits $\Delta l\in\{-1,0,+1\}$ for a rank-1
+operator; excluding $\Delta l=0$ specifically requires the separate
+parity argument above, not an extra CG vanishing condition.
+</Callout>
+
+## Practice Questions
+
+1. Apply the recursion relation to $\left|\tfrac32,\tfrac12\right\rangle$
+   (derived in the worked example above) to derive
+   $\left|\tfrac32,-\tfrac12\right\rangle$, and confirm your result
+   matches the table.
+2. Using $m$-conservation alone, explain why
+   $\langle j'm'|T^1_1|jm\rangle$ must vanish unless $m'=m+1$, for *any*
+   rank-1 tensor operator $T^1$, not just the dipole operator.
+3. For $j_1=1,j_2=1$ (two $l=1$ systems combined, e.g. two p-electrons'
+   orbital angular momenta), what range of total $j$ does the triangle
+   rule permit? List every value.
+4. Why does the top state $|j_1+j_2,j_1+j_2\rangle$ need no recursion at
+   all, while every other state in every other multiplet does?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The general Clebsch-Gordan recursion,
+  $\sqrt{j(j+1)-m(m-1)}\,C^{j,m-1}=\sqrt{j_1(j_1+1)-m_1(m_1+1)}\,C^{j,m}_{m_1+1,m_2}+\sqrt{j_2(j_2+1)-m_2(m_2+1)}\,C^{j,m}_{m_1,m_2+1}$,
+  plus "peel off the orthogonal complement" to start each new multiplet,
+  generates every $j_1\otimes j_2$ coupling coefficient.
+- Worked explicitly for $l=1\otimes s=\tfrac12$, verified as exact $\vec
+  J^{\,2}$/$J_z$ eigenstates against this platform's own operators, not
+  merely quoted from a table.
+- Wigner-Eckart, $\langle j'm'|T^k_q|jm\rangle=\langle jm;kq|j'm'\rangle\langle
+  j'\|T^k\|j\rangle$, follows because tensor-operator matrix elements obey
+  the identical recursion CG coefficients do; selection rules ($\Delta
+  m=q$, the triangle rule) follow immediately, with no integral evaluated.
+
+## Further Exploration
+
+Next: [The Adiabatic Theorem and Berry Phase](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase),
+returning to the same spin-$\tfrac12$ machinery this course has used
+twice now, this time watching it evolve slowly in time rather than
+combine with another angular momentum.

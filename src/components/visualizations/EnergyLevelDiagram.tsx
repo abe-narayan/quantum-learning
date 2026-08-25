@@ -1,3 +1,9 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { easeInOutCubic } from "@/components/simulators/bloch-sphere/useAnimatedBlochPoint";
+
 export type EnergyLevel = {
   label: string;
   energy: number;
@@ -9,6 +15,8 @@ const LEVEL_WIDTH = 120;
 const PAD_TOP = 16;
 const PAD_BOTTOM = 28;
 const LABEL_X = LEVEL_WIDTH + 14;
+/** One full from->to->from cycle of the traveling transition dot. */
+const TRANSITION_PERIOD_MS = 1400;
 
 /**
  * A horizontal energy-level ladder: one line per level, vertically
@@ -44,6 +52,42 @@ export function EnergyLevelDiagram({
   const from = transition ? levels.find((l) => l.label === transition.fromLabel) : undefined;
   const to = transition ? levels.find((l) => l.label === transition.toLabel) : undefined;
 
+  const prefersReducedMotion = usePrefersReducedMotion();
+  // Position (0 = at `from`, 1 = at `to`) of the traveling dot, ping-ponging
+  // back and forth to read as an ongoing transition (e.g. photon
+  // absorption/emission) rather than a one-shot event.
+  const [dotT, setDotT] = useState(0);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!from || !to || prefersReducedMotion) {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      return;
+    }
+
+    const start = performance.now();
+    const frame = (now: number) => {
+      const elapsed = (now - start) % TRANSITION_PERIOD_MS;
+      const phase = (elapsed / TRANSITION_PERIOD_MS) * 2;
+      const linear = phase <= 1 ? phase : 2 - phase;
+      setDotT(easeInOutCubic(linear));
+      rafRef.current = requestAnimationFrame(frame);
+    };
+    rafRef.current = requestAnimationFrame(frame);
+
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [from, to, prefersReducedMotion]);
+
+  const dotY = from && to ? yOf(from.energy) + (yOf(to.energy) - yOf(from.energy)) * dotT : undefined;
+
   return (
     <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
       <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label={ariaLabel}>
@@ -73,10 +117,13 @@ export function EnergyLevelDiagram({
               y1={yOf(from.energy)}
               x2={LEVEL_WIDTH / 2}
               y2={yOf(to.energy)}
-              className="stroke-foreground"
+              className={prefersReducedMotion ? "stroke-foreground" : "stroke-foreground/40"}
               strokeWidth={1.5}
-              markerEnd="url(#energy-transition-arrow)"
+              markerEnd={prefersReducedMotion ? "url(#energy-transition-arrow)" : undefined}
             />
+            {!prefersReducedMotion && dotY !== undefined && (
+              <circle cx={LEVEL_WIDTH / 2} cy={dotY} r={3.5} className="fill-accent" />
+            )}
             {transition?.caption && (
               <text
                 x={LEVEL_WIDTH / 2 + 6}

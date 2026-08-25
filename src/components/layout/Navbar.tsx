@@ -153,11 +153,11 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-0.5 lg:flex">
-          {NAV_ITEMS.slice(0, 2).map((item) => (
+          {NAV_ITEMS.slice(0, 1).map((item) => (
             <DesktopNavLink key={item.href} item={item} pathname={pathname} />
           ))}
           <TracksDropdown pathname={pathname} />
-          {NAV_ITEMS.slice(2).map((item) => (
+          {NAV_ITEMS.slice(1).map((item) => (
             <DesktopNavLink key={item.href} item={item} pathname={pathname} />
           ))}
         </nav>
@@ -199,7 +199,7 @@ export function Navbar() {
       {isMenuOpen ? (
         <div className="border-t border-border lg:hidden">
           <Container className="flex flex-col gap-1 py-3">
-            {NAV_ITEMS.slice(0, 2).map((item) => (
+            {NAV_ITEMS.slice(0, 1).map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -232,7 +232,7 @@ export function Navbar() {
               </Link>
             ))}
 
-            {NAV_ITEMS.slice(2).map((item) => (
+            {NAV_ITEMS.slice(1).map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

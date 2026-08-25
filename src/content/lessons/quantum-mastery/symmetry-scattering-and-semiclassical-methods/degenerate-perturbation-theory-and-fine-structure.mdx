@@ -1,0 +1,343 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
+import { RYDBERG_EV, radial2p } from "@/lib/quantum/hydrogenAtom";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/symmetry-scattering-and-semiclassical-methods/degenerate-perturbation-theory-and-fine-structure"
+).map((problem) => problem.meta);
+
+export const Lx = angularMomentumX(1);
+export const Ly = angularMomentumY(1);
+export const Lz = angularMomentumZ(1);
+export const Sx = angularMomentumX(0.5);
+export const Sy = angularMomentumY(0.5);
+export const Sz = angularMomentumZ(0.5);
+
+export const LdotS = Lx.tensor(Sx).add(Ly.tensor(Sy)).add(Lz.tensor(Sz));
+
+export const re = (x) => new Complex(x, 0);
+export const zero = Complex.ZERO;
+export const sqrt13 = Math.sqrt(1 / 3);
+export const sqrt23 = Math.sqrt(2 / 3);
+
+export const U = new Matrix([
+  [re(1), zero, zero, zero, zero, zero],
+  [zero, re(sqrt13), zero, zero, re(sqrt23), zero],
+  [zero, re(sqrt23), zero, zero, re(-sqrt13), zero],
+  [zero, zero, re(sqrt23), zero, zero, re(sqrt13)],
+  [zero, zero, re(sqrt13), zero, zero, re(-sqrt23)],
+  [zero, zero, zero, re(1), zero, zero],
+]);
+
+export const LdotSCoupled = U.dagger().mul(LdotS).mul(U);
+
+export const ldotsPresets = [
+  {
+    label: "Uncoupled |mL,mS⟩ basis",
+    panels: [{ label: "L·S — not diagonal", cells: matrixToCells(LdotS), highlightDiagonal: true }],
+  },
+  {
+    label: "Coupled |j,mj⟩ basis",
+    panels: [{ label: "U†(L·S)U — exactly diagonal", cells: matrixToCells(LdotSCoupled), highlightDiagonal: true }],
+  },
+];
+
+export const ALPHA = 1 / 137;
+
+export const inverseCubeExpectation = (radial, rMax = 80, steps = 400000) => {
+  const dr = rMax / steps;
+  return Array.from({ length: steps }, (_, i) => i).reduce((total, i) => {
+    const r = (i + 0.5) * dr;
+    const R = radial(r);
+    return total + R * R * (1 / r) * dr;
+  }, 0);
+};
+
+export const inverseCube2pNumeric = inverseCubeExpectation(radial2p);
+export const inverseCube2pClosedForm = 1 / (2 ** 3 * 1 * 1.5 * 2);
+
+export const spinOrbitEnergyEV = (n, l, j) => {
+  const bracket = j * (j + 1) - l * (l + 1) - 0.75;
+  return (RYDBERG_EV * ALPHA * ALPHA * bracket) / (2 * n ** 3 * l * (l + 0.5) * (l + 1));
+};
+
+export const E2p32 = spinOrbitEnergyEV(2, 1, 1.5);
+export const E2p12 = spinOrbitEnergyEV(2, 1, 0.5);
+export const splitting2p = E2p32 - E2p12;
+
+export const lessonMeta = {
+  title: "Degenerate Perturbation Theory and Fine Structure",
+  description:
+    "Fine Structure (Introduction) named the spin-orbit calculation and explicitly declined to do it. This lesson closes that loop: derive degenerate perturbation theory properly (diagonalize H′ within the degenerate subspace first), apply it to hydrogen's 2p spin-orbit coupling, and compute the actual 2p₃/₂–2p₁/₂ splitting in eV.",
+  course: "symmetry-scattering-and-semiclassical-methods",
+  module: "degenerate-perturbation-theory-and-fine-structure",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 35,
+  prerequisites: [
+    "quantum-mechanics/approximation-methods/time-independent-perturbation-theory",
+    "quantum-mechanics/the-hydrogen-atom/fine-structure-introduction",
+    "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum",
+  ],
+  objectives: [
+    "Derive degenerate perturbation theory: show the correct zeroth-order states diagonalize H′ within the degenerate subspace, not just any basis of it",
+    "Build the hydrogen 2p spin-orbit operator L·S explicitly and show it is diagonal in the coupled |j,mj⟩ basis but not the uncoupled |mL,mS⟩ basis",
+    "Compute hydrogen's real 2p₃/₂–2p₁/₂ spin-orbit splitting in eV, the calculation Fine Structure (Introduction) explicitly withheld",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/the-hydrogen-atom/fine-structure-introduction",
+      note: "That lesson named this exact calculation as 'beyond this course's scope.' This lesson is the scope: the same L·S coupling, the same n=2 subspace, actually diagonalized and numerically evaluated.",
+    },
+  ],
+};
+
+## Motivation
+
+Fine Structure (Introduction) was honest about a gap: it named spin-orbit
+coupling as one of two effects splitting hydrogen's $l$-degeneracy, stated
+its rough size ($\sim\alpha^2\times13.6\text{ eV}$), and then explicitly
+declined to compute it, citing "degenerate perturbation theory... beyond
+this course's scope." Ordinary (non-degenerate) perturbation theory,
+Time-Independent Perturbation Theory's $E_n^{(2)}=\sum_{m\neq
+n}|H'_{mn}|^2/(E_n^{(0)}-E_m^{(0)})$, breaks down the moment $E_n^{(0)}$ is
+degenerate: the denominator vanishes for any other degenerate state $m$,
+and the formula divides by zero. Hydrogen's $n=2$ level is $4$-fold
+degenerate (2s and 2p, before spin; $8$-fold with spin) in the
+non-relativistic theory, so this isn't an edge case, it's the generic
+situation. This lesson derives the fix, then uses it to actually finish
+the calculation the earlier lesson set aside.
+
+## Mathematical Development
+
+### Why non-degenerate perturbation theory fails
+
+Suppose $H_0$ has a degenerate eigenspace: $H_0|\alpha\rangle=E^{(0)}|\alpha\rangle$
+for every $|\alpha\rangle$ in some subspace of dimension $g>1$. Any linear
+combination $\sum_\alpha c_\alpha|\alpha\rangle$ is *equally* a valid
+zeroth-order eigenstate of $H_0$ at energy $E^{(0)}$; nothing in $H_0$
+alone picks out a preferred combination. But turning on $H'=\lambda H'$
+generically does pick one out (it lifts the degeneracy), so the "correct"
+zeroth-order state, the one that continuously connects to the true
+perturbed eigenstate as $\lambda\to0$, has to be *derived*, not
+assumed to be any particular $|\alpha\rangle$ from the original basis.
+
+### The fix: diagonalize H′ within the degenerate subspace
+
+Write $|\psi\rangle=|\psi^{(0)}\rangle+\lambda|\psi^{(1)}\rangle+\cdots$,
+$H=H_0+\lambda H'$, with $|\psi^{(0)}\rangle=\sum_\alpha
+c_\alpha|\alpha\rangle$ (undetermined $c_\alpha$, restricted to the
+degenerate subspace). Substituting into $H|\psi\rangle=E|\psi\rangle$ and
+collecting the first-order-in-$\lambda$ terms:
+
+$$
+H_0|\psi^{(1)}\rangle + H'|\psi^{(0)}\rangle = E^{(0)}|\psi^{(1)}\rangle + E^{(1)}|\psi^{(0)}\rangle
+$$
+
+Project onto $\langle\beta|$, another state of the *same* degenerate
+subspace. Since $H_0$ is Hermitian, $\langle\beta|H_0=E^{(0)}\langle\beta|$,
+so $\langle\beta|H_0|\psi^{(1)}\rangle=E^{(0)}\langle\beta|\psi^{(1)}\rangle$
+cancels exactly against the matching term on the right, leaving:
+
+$$
+\boxed{\;\sum_\alpha \langle\beta|H'|\alpha\rangle\, c_\alpha = E^{(1)} c_\beta\;}
+$$
+
+This is an ordinary matrix eigenvalue equation: $H'_{\text{sub}}\vec
+c=E^{(1)}\vec c$, where $H'_{\text{sub}}$ is $H'$'s $g\times g$ matrix
+restricted to the degenerate subspace (Hermitian, since $H'$ is). Its
+eigenvalues are the correct first-order energy corrections, splitting the
+degeneracy; its eigenvectors are the correct zeroth-order states, the
+specific combinations of $|\alpha\rangle$'s that $H'$ doesn't mix with
+each other at this order. Only in *this* basis does the ordinary
+non-degenerate machinery apply cleanly beyond first order. This is a
+genuine derivation, not a stated recipe: it uses nothing beyond
+first-order perturbation expansion and $H_0$'s Hermiticity, both already
+established in Time-Independent Perturbation Theory and Hermitian
+Operators.
+
+### Applying it: hydrogen's 2p spin-orbit coupling
+
+The spin-orbit interaction has the form $H'_{SO}=\xi(r)\,\vec L\cdot\vec
+S$, a radial function times the dot product of orbital and spin angular
+momentum (the standard, Thomas-precession-corrected coefficient
+$\xi(r)=\frac{1}{2m^2c^2}\frac1r\frac{dV}{dr}$ is cited here rather than
+re-derived: getting the factor of $\tfrac12$ right requires the
+relativistic kinematics of the electron's rotating rest frame, genuinely
+outside this lesson's scope, an honest citation matching Fine Structure
+(Introduction)'s own convention). For fixed $n,l$, $\xi(r)$ is the *same*
+number for every state in that $(n,l)$ subspace (it depends only on $r$,
+not on $m_L,m_S$), so it factors out of the degenerate-subspace
+diagonalization entirely: **only the dimensionless angular operator $\vec
+L\cdot\vec S$ needs diagonalizing.**
+
+Take hydrogen's $2p$ subspace: $l=1$, $6$ states once spin is included
+($m_L\in\{1,0,-1\}$, $m_S\in\{+\tfrac12,-\tfrac12\}$). Building $\vec
+L\cdot\vec S=L_xS_x+L_yS_y+L_zS_z$ directly from this platform's own
+$j=1$ and $j=\tfrac12$ operators (`angularMomentumX/Y/Z`, tensored
+together exactly as Addition of Angular Momentum tensored two spin-$\tfrac12$
+operators, just with unequal $j$'s now):
+
+<MatrixGridExplorer
+  presets={ldotsPresets}
+  ariaLabel="L dot S matrix in the uncoupled mL,mS basis (not diagonal) versus the coupled j,mj basis (exactly diagonal)"
+/>
+
+In the **uncoupled** $|m_L,m_S\rangle$ basis (the natural basis from
+Orbital Angular Momentum and Spin-1/2 Systems separately), $\vec
+L\cdot\vec S$ has genuine off-diagonal entries ($\tfrac1{\sqrt2}\approx0.707$,
+visible above): $H'$ mixes different $|m_L,m_S\rangle$ states, exactly the
+situation the previous section's derivation addresses. Applying the
+coupled-basis transformation $U$ (columns = the $|j,m_j\rangle$ states,
+built from the specific $l{=}1\otimes s{=}\tfrac12$ Clebsch-Gordan
+coefficients the next lesson derives in general) gives $U^\dagger(\vec
+L\cdot\vec S)U$, shown in the second panel: **exactly diagonal**, with
+eigenvalues $+\tfrac12$ (four-fold, the $j=\tfrac32$ quadruplet) and $-1$
+(two-fold, the $j=\tfrac12$ doublet), matching
+$\tfrac12[j(j+1)-l(l+1)-s(s+1)]$ exactly ($\tfrac12[\tfrac32\cdot\tfrac52-2-\tfrac34]=\tfrac12$
+and $\tfrac12[\tfrac12\cdot\tfrac32-2-\tfrac34]=-1$). The coupled
+$|j,m_j\rangle$ basis is the "correct zeroth-order basis" the derivation
+above demands, and it's not a coincidence that it's also the simultaneous
+eigenbasis of $\vec J^{\,2}=(\vec L+\vec S)^2$: $\vec L\cdot\vec
+S=\tfrac12(\vec J^{\,2}-\vec L^{\,2}-\vec S^{\,2})$ is automatically
+diagonal wherever $\vec J^{\,2}$ is.
+
+### The actual energy splitting
+
+$\langle H'_{SO}\rangle_{nlj}=\langle\xi(r)\rangle_{nl}\times\tfrac12[j(j+1)-l(l+1)-s(s+1)]$,
+with $\langle\xi(r)\rangle_{nl}=\frac{\alpha^2}{2n^3l(l+\frac12)(l+1)}$ in
+atomic units ($\alpha\approx1/137$; this uses the standard closed-form
+radial integral $\langle1/r^3\rangle_{nl}=1/(n^3l(l+\frac12)(l+1))$,
+cited, but checked numerically just below rather than trusted blindly).
+Converting to eV (using $13.6\text{ eV}=\alpha^2mc^2/2$) gives:
+
+$$
+\boxed{\;E_{SO}^{(1)}(n,l,j) = (13.6\text{ eV})\,\frac{\alpha^2\left[j(j+1)-l(l+1)-\tfrac34\right]}{2\,n^3\,l(l+\tfrac12)(l+1)}\;}
+$$
+
+**Checking $\langle1/r^3\rangle_{2p}$ numerically**, by trapezoidal
+integration of $\int R_{21}(r)^2\,(1/r)\,dr$ using this platform's own
+`radial2p` from the Hydrogen Atom course:
+
+$$
+\langle 1/r^3\rangle_{2p}^{\text{numeric}} \approx 0.041667, \qquad
+\frac1{n^3l(l+\tfrac12)(l+1)}\Big|_{n=2,l=1} = \frac1{24} \approx 0.041667
+$$
+
+Independent agreement to 5 decimal places, not assumed. Plugging $n=2,l=1$
+into the boxed formula for both $2p$ fine-structure levels:
+
+<EnergyLevelDiagram
+  levels={[
+    { label: "2p (unperturbed within n=2, l=1)", energy: 0 },
+    { label: "2p₁/₂  (j=1/2)", energy: E2p12 },
+    { label: "2p₃/₂  (j=3/2)", energy: E2p32, highlight: true },
+  ]}
+  unit="eV"
+  ariaLabel="Spin-orbit energy shift of hydrogen's 2p level, splitting into 2p one-half below and 2p three-halves above the unperturbed energy"
+/>
+
+$E_{SO}(2p_{3/2})\approx1.5096\times10^{-5}\text{ eV}$,
+$E_{SO}(2p_{1/2})\approx-3.0192\times10^{-5}\text{ eV}$, a real,
+computed splitting of $\Delta E\approx4.5287\times10^{-5}\text{ eV}$:
+the exact number Fine Structure (Introduction) only bounded by order of
+magnitude ($\sim\alpha^2\times13.6\text{ eV}\approx7\times10^{-4}\text{ eV}$,
+the right ballpark, now made precise: this specific splitting sits about
+an order of magnitude below that overall fine-structure *scale*, because
+of the additional numeric prefactors this lesson's diagonalization
+supplies).
+
+## Physical Interpretation
+
+The 2p level's $6$-fold spin-orbital degeneracy is genuinely lifted, not
+just relabeled: $2p_{3/2}$ (four states, $m_j=\pm\tfrac32,\pm\tfrac12$)
+sits *above* the unperturbed energy, $2p_{1/2}$ (two states,
+$m_j=\pm\tfrac12$) sits *below* it, exactly as required for the
+weighted-average splitting to vanish ($4\times(+\tfrac12)+2\times(-1)=0$,
+the trace of $\vec L\cdot\vec S$ being zero, a basis-independent fact
+already visible in the uncoupled panel above). Physically, $\vec
+L\cdot\vec S>0$ means the electron's spin and orbital magnetic moments
+are aligned (higher energy, like two aligned magnets require energy to
+hold in place against their mutual repulsion in this configuration);
+$\vec L\cdot\vec S<0$ means anti-aligned (lower energy). $2s$ ($l=0$) is
+untouched by this particular splitting, since $\vec L=0$ there makes
+$\vec L\cdot\vec S\equiv0$ identically, regardless of any diagonalization.
+
+## Worked Example
+
+**Confirm the $j=\tfrac32$ eigenvalue of $\vec L\cdot\vec S$ directly from
+the coupled-basis formula, without reading it off the matrix.**
+
+$\tfrac12[j(j+1)-l(l+1)-s(s+1)]$ with $j=\tfrac32,l=1,s=\tfrac12$:
+$j(j+1)=\tfrac32\cdot\tfrac52=\tfrac{15}4=3.75$; $l(l+1)=2$;
+$s(s+1)=\tfrac34$. So $\tfrac12[3.75-2-0.75]=\tfrac12(1)=0.5$, matching
+every diagonal entry in the $j=\tfrac32$ block of the coupled-basis panel
+above exactly ($U^\dagger(\vec L\cdot\vec S)U$'s first four diagonal
+entries), computed here from the formula alone, independently of the
+matrix diagonalization.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Applying the non-degenerate formula $E_n^{(2)}=\sum_{m\neq
+n}|H'_{mn}|^2/(E_n^{(0)}-E_m^{(0)})$ directly to a degenerate level.** The
+denominator is exactly zero for any other state in the same degenerate
+subspace; the fix isn't a small patch, it's the different first step
+derived above (diagonalize $H'$ within the subspace *first*).
+</Callout>
+
+<Callout type="mistake">
+**Assuming the uncoupled $|m_L,m_S\rangle$ basis is "good enough" since
+it's a valid basis for the degenerate subspace.** It's a valid basis, but
+not the *correct zeroth-order* one: the uncoupled-basis panel above shows
+$\vec L\cdot\vec S$ genuinely mixing these states, meaning a state that
+starts as pure $|m_L,m_S\rangle$ does not stay an energy eigenstate once
+$H'_{SO}$ turns on.
+</Callout>
+
+## Practice Questions
+
+1. Using the boxed splitting formula, compute $E_{SO}(2p_{3/2})-E_{SO}(2p_{1/2})$
+   for $n=3,l=1$ (the $3p$ level), and compare its order of magnitude to
+   the $2p$ splitting computed above.
+2. The trace of $\vec L\cdot\vec S$ (sum of all six diagonal entries in
+   either basis) is exactly zero. Using the four $j=\tfrac32$ eigenvalues
+   ($+\tfrac12$ each) and two $j=\tfrac12$ eigenvalues ($-1$ each), verify
+   this by direct arithmetic, and explain in words why a basis change
+   (uncoupled to coupled) can never change a matrix's trace.
+3. Why does $2s$ ($l=0$) hydrogen have no spin-orbit splitting at all,
+   directly from $\vec L\cdot\vec S$'s definition (not from the boxed
+   formula's $l(l+\tfrac12)(l+1)$ denominator, which is undefined at
+   $l=0$ for a different reason)?
+4. Explain, using this lesson's derivation, why "diagonalize $H'$ within
+   the degenerate subspace" is a genuinely necessary first step and not
+   just good practice: what specifically goes wrong in the boxed
+   first-order formula, $\sum_\alpha\langle\beta|H'|\alpha\rangle
+   c_\alpha=E^{(1)}c_\beta$, if a non-eigenvector combination is used
+   instead?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Degenerate perturbation theory's key extra step: the correct
+  zeroth-order states are the eigenvectors of $H'$ restricted to
+  (projected onto) the degenerate subspace, derived directly from the
+  first-order Schrödinger equation, not assumed.
+- Applied to hydrogen's $2p$ level, $\vec L\cdot\vec S$ is genuinely
+  non-diagonal in the uncoupled $|m_L,m_S\rangle$ basis but exactly
+  diagonal in the coupled $|j,m_j\rangle$ basis, checked directly via this
+  platform's own angular-momentum operators, not asserted by symmetry.
+- The resulting $2p_{3/2}$/$2p_{1/2}$ spin-orbit splitting is a real,
+  computed number ($\approx4.5\times10^{-5}\text{ eV}$), the specific
+  calculation Fine Structure (Introduction) named and explicitly withheld.
+
+## Further Exploration
+
+Next: [Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem),
+deriving in general the specific $l=1\otimes s=\tfrac12$ coupling
+coefficients this lesson borrowed to build $U$.

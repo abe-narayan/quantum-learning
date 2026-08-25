@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { LazyBlochSphereHeroExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereHeroExplorer";
-import { ContinueLearning } from "@/components/home/ContinueLearning";
+import { ContinueLearning } from "@/components/curriculum/ContinueLearning";
 
 export function Hero() {
   return (
@@ -27,7 +27,7 @@ export function Hero() {
       <Container className="grid gap-16 py-24 sm:py-28 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:py-32">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-brand">QuantumLearn</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Learn quantum mechanics and quantum computing by experimenting with them.
           </h1>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">

@@ -32,6 +32,7 @@ const LESSON_DIFFICULTY_LABEL: Record<Difficulty, string> = {
   foundational: "Beginner",
   intermediate: "Intermediate",
   advanced: "Advanced",
+  master: "Graduate",
 };
 
 const PROBLEM_DIFFICULTY_LABEL: Record<ProblemDifficulty, string> = {
@@ -54,6 +55,7 @@ const PILLAR_PATH: Record<Pillar, string> = {
   "quantum-computing": "/computing",
   "quantum-hardware": "/hardware",
   "quantum-software": "/software",
+  "quantum-mastery": "/learn",
 };
 
 /** The real, canonical URL for a pillar's listing page. */

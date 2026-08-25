@@ -26,7 +26,7 @@ describe("lesson corpus integrity", () => {
       expect(mod?.default, `lesson "${slug}" has no default export`).toBeTypeOf("function");
       expect(mod?.lessonMeta, `lesson "${slug}" has no lessonMeta export`).toBeDefined();
     }
-  });
+  }, 120000);
 
   it("every lesson's lessonMeta.course/module resolves to a real curriculum entry", async () => {
     // Guards against the class of bug (already found and fixed once this

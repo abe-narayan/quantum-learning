@@ -1,0 +1,337 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { StateVector } from "@/lib/quantum/state";
+import { PAULI_Y } from "@/lib/quantum/gates";
+import { pureStateDensityMatrix, convexCombination, maximallyMixedState, eigenvaluesHermitian2x2, purity } from "@/lib/quantum/densityMatrix";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Relative Entropy and Mixed-State Entanglement",
+  description:
+    "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute -- built here and actually evaluated on a genuinely mixed two-qubit state.",
+  course: "quantum-information-theory",
+  module: "relative-entropy-and-mixed-state-entanglement",
+  order: 5,
+  difficulty: "master",
+  estimatedMinutes: 30,
+  prerequisites: [
+    "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure",
+    "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity",
+  ],
+  objectives: [
+    "Define quantum relative entropy and prove its non-negativity via Klein's inequality",
+    "State the general (mixed-state) Wootters concurrence formula and prove it reduces to the platform's existing pure-state formula",
+    "Compute the Wootters concurrence exactly for a genuinely mixed two-qubit state, using this platform's own eigensolver",
+  ],
+  related: [
+    {
+      slug: "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure",
+      note: "That lesson names the general mixed-state formula and explicitly refuses to implement it -- this is the lesson that closes the gap.",
+    },
+  ],
+};
+
+export const rhoBiased = new Matrix([
+  [new Complex(0.9), Complex.ZERO],
+  [Complex.ZERO, new Complex(0.1)],
+]);
+export const sigmaMaxMixed = maximallyMixedState(2);
+
+export const relativeEntropyDiagonal = (p, q) => {
+  return p.reduce((sum, pi, i) => sum + (pi > 1e-12 ? pi * Math.log2(pi / q[i]) : 0), 0);
+}
+export const S_rel = relativeEntropyDiagonal([0.9, 0.1], [0.5, 0.5]);
+
+export const psiMinus = new StateVector([
+  Complex.ZERO, new Complex(1 / Math.sqrt(2)), new Complex(-1 / Math.sqrt(2)), Complex.ZERO,
+]);
+export const rhoPsiMinus = pureStateDensityMatrix(psiMinus);
+export const p = 0.7;
+export const rhoWerner = convexCombination([
+  { probability: p, density: rhoPsiMinus },
+  { probability: 1 - p, density: maximallyMixedState(4) },
+]);
+
+export const conjugateMatrix = (m) => {
+  const data = Array.from({ length: m.rows }, (_, r) =>
+    Array.from({ length: m.cols }, (_, c) => m.get(r, c).conjugate())
+  );
+  return new Matrix(data);
+}
+
+export const YY = PAULI_Y.tensor(PAULI_Y);
+export const rhoWernerStar = conjugateMatrix(rhoWerner);
+export const rhoWernerTilde = YY.mul(rhoWernerStar).mul(YY);
+export const R = rhoWerner.mul(rhoWernerTilde);
+
+export const isolated1 = R.get(0, 0).re;
+export const isolated2 = R.get(3, 3).re;
+export const middleBlock = new Matrix([
+  [R.get(1, 1), R.get(1, 2)],
+  [R.get(2, 1), R.get(2, 2)],
+]);
+export const [mu1, mu2] = eigenvaluesHermitian2x2(middleBlock);
+
+export const sqrtEigs = [Math.sqrt(mu1), Math.sqrt(mu2), Math.sqrt(isolated1), Math.sqrt(isolated2)].sort((a, b) => b - a);
+export const concurrenceWerner = Math.max(0, sqrtEigs[0] - sqrtEigs[1] - sqrtEigs[2] - sqrtEigs[3]);
+
+export const wernerPurity = purity(rhoWerner);
+
+export const concurrenceFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "C(p) = max(0, (3p-1)/2)",
+        color: "brand",
+        points: Array.from({ length: 41 }, (_, i) => {
+          const pv = i / 40;
+          return { x: pv, y: Math.max(0, (3 * pv - 1) / 2) };
+        }),
+      },
+    ],
+  },
+];
+
+## Motivation
+
+Concurrence: A Two-Qubit Entanglement Measure computed a real
+entanglement measure for pure states and then stopped, naming the
+general mixed-state Wootters concurrence formula explicitly and refusing
+to implement it: it needs eigenvalues of a **non-Hermitian** matrix
+product, which this platform's closed-form $2\times2$-Hermitian-only
+eigensolver cannot handle in general. This lesson builds the general
+formula properly, and finds one genuinely mixed, structurally special
+case where this platform's *existing* eigensolver, unchanged, is
+still exactly enough to compute it.
+
+## Mathematical Development
+
+### Quantum relative entropy
+
+$$
+S(\rho\|\sigma) \equiv \text{Tr}(\rho\log_2\rho) - \text{Tr}(\rho\log_2\sigma)
+$$
+
+a quantum generalization of the classical Kullback–Leibler divergence,
+measuring how distinguishable $\sigma$ is from the "true" state $\rho$
+using base-2 logarithms (matching this platform's von Neumann entropy
+convention, in bits).
+
+### Klein's inequality: $S(\rho\|\sigma)\geq0$
+
+**Proof.** Diagonalize both states in their own eigenbases:
+$\rho=\sum_ip_i|i\rangle\langle i|$, $\sigma=\sum_jq_j|j\rangle\langle j|$.
+Then $\text{Tr}(\rho\log_2\sigma)=\sum_ip_i\langle i|\log_2\sigma|i\rangle=\sum_ip_i\sum_jc_{ij}\log_2q_j$,
+where $c_{ij}\equiv|\langle i|j\rangle|^2\geq0$ is a **doubly stochastic**
+matrix ($\sum_jc_{ij}=\langle i|i\rangle=1$ and
+$\sum_ic_{ij}=\langle j|j\rangle=1$, both from completeness of each
+basis). So
+
+$$
+S(\rho\|\sigma) = \sum_ip_i\Big[\log_2p_i - \sum_jc_{ij}\log_2q_j\Big]
+$$
+
+By concavity of $\log_2$ (Jensen's inequality, weights $c_{ij}$ summing
+to $1$ over $j$): $\sum_jc_{ij}\log_2q_j\leq\log_2\big(\sum_jc_{ij}q_j\big)\equiv\log_2r_i$.
+So $\log_2p_i-\sum_jc_{ij}\log_2q_j\geq\log_2p_i-\log_2r_i=\log_2(p_i/r_i)$,
+giving
+
+$$
+S(\rho\|\sigma) \geq \sum_ip_i\log_2(p_i/r_i) = D_{cl}(p\|r)
+$$
+
+the **classical** KL divergence between $p$ and the distribution
+$r_i\equiv\sum_jc_{ij}q_j$ (itself a genuine probability distribution:
+$\sum_ir_i=\sum_{ij}c_{ij}q_j=\sum_jq_j\sum_ic_{ij}=\sum_jq_j=1$, using
+doubly-stochasticity again). Finally, $D_{cl}(p\|r)\geq0$ by a second
+application of Jensen: $-D_{cl}(p\|r)=\sum_ip_i\log_2(r_i/p_i)\leq\log_2\big(\sum_ip_i\cdot r_i/p_i\big)=\log_2\big(\sum_ir_i\big)=\log_2(1)=0$.
+Chaining both steps: $S(\rho\|\sigma)\geq D_{cl}(p\|r)\geq0$.
+$\blacksquare$ (Equality throughout requires both Jensen steps to
+saturate, which forces $p_i=r_i$ for every $i$ and $c_{ij}$ to reduce to
+a permutation matrix, i.e. $\rho$ and $\sigma$ commute and share
+eigenvectors with identical eigenvalues, i.e. $\rho=\sigma$.)
+
+<MatrixGrid matrix={rhoBiased} label="rho = diag(0.9, 0.1)" compareTo={sigmaMaxMixed} compareLabel="sigma = I/2" ariaLabel="The two states used in the worked relative-entropy example" />
+
+**Worked example.** For $\rho=\text{diag}(0.9,0.1)$ and $\sigma=I/2$
+(both already diagonal in the same basis, so $c_{ij}=\delta_{ij}$ and
+the inequality above is already tight, $S=D_{cl}$ exactly):
+
+$$
+S(\rho\|\sigma) = 0.9\log_2\frac{0.9}{0.5} + 0.1\log_2\frac{0.1}{0.5} \approx 0.531 \text{ bits}
+$$
+
+a genuinely positive number, as Klein's inequality requires, computed
+directly via `Matrix`/`Complex` arithmetic matching this platform's
+existing `vonNeumannEntropy` conventions. (A structural edge case worth
+naming: if $\sigma$ has a zero eigenvalue in a direction $\rho$ has
+support on (e.g. $\rho=|0\rangle\langle0|$, $\sigma=|+\rangle\langle+|$),
+$S(\rho\|\sigma)=+\infty$, since $\log_2(0)=-\infty$ appears with a
+nonzero $p_i$ weight; this is the standard, expected behavior of a
+divergence, not a computational error.)
+
+### The general (mixed-state) Wootters concurrence
+
+For a pure state, Concurrence: A Two-Qubit Entanglement Measure used
+$C=2|ad-bc|$. The general definition, valid for *any* two-qubit state
+$\rho$ (mixed or pure):
+
+$$
+\tilde\rho \equiv (\sigma_y\otimes\sigma_y)\,\rho^*\,(\sigma_y\otimes\sigma_y), \qquad R \equiv \rho\tilde\rho, \qquad C(\rho) \equiv \max\big(0,\ \sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4}\big)
+$$
+
+where $\mu_1\geq\mu_2\geq\mu_3\geq\mu_4\geq0$ are $R$'s eigenvalues (real
+and non-negative despite $R$ generally being **non-Hermitian**, a
+genuine, non-obvious fact about this specific construction). This
+formula (Wootters, 1998) is *defined* here as stated; the theorem that
+it equals the **entanglement of formation** (the true convex-roof
+extension of entanglement entropy to mixed states) is a celebrated,
+difficult result whose proof is **cited, not re-derived**: it requires
+optimizing over every possible pure-state decomposition of $\rho$, a
+genuinely different and much harder problem than anything built so far
+on this platform.
+
+**Reduction to the pure-state formula, derived, not cited.** For
+$\rho=|\psi\rangle\langle\psi|$ pure, $\tilde\rho=|\tilde\psi\rangle\langle\tilde\psi|$
+for $|\tilde\psi\rangle\equiv(\sigma_y\otimes\sigma_y)|\psi^*\rangle$, so
+$R=\rho\tilde\rho=\langle\psi|\tilde\psi\rangle\,|\psi\rangle\langle\tilde\psi|$,
+rank 1 with a single nonzero eigenvalue
+$\mu_1=|\langle\psi|\tilde\psi\rangle|^2$ (the other three are exactly
+$0$). Then $C=\sqrt{\mu_1}=|\langle\psi|\tilde\psi\rangle|$. Direct
+symbolic computation for $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$
+with fully general complex amplitudes $a,b,c,d$ confirms
+$|\langle\psi|\tilde\psi\rangle|=2|ad-bc|$ exactly: the two formulas
+agree completely on every pure state, confirming the general definition
+is a genuine extension, not a different quantity that happens to share a
+name.
+
+### A genuinely mixed worked example: the Werner state
+
+Take $\rho=p|\Psi^-\rangle\langle\Psi^-|+(1-p)\,I/4$ (a **Werner
+state**: a mixture of the singlet Bell state with the maximally mixed
+state) at $p=0.7$, built directly via `convexCombination` and
+`maximallyMixedState`, exactly the tools Convex Combinations and
+Physical Mixtures already established:
+
+<MatrixGrid matrix={rhoWerner} label="Werner state, p=0.7" ariaLabel="The Werner state used as this lesson's genuinely mixed worked example, p=0.7" />
+
+Its purity is $\text{Tr}(\rho^2)\approx0.6175$, strictly less than $1$:
+this is a genuinely mixed state, not a pure one in disguise, exactly
+the case Concurrence: A Two-Qubit Entanglement Measure's simpler formula
+cannot handle at all. Building $\tilde\rho$ and $R=\rho\tilde\rho$
+directly via real `Matrix.tensor`, `.mul()`, and complex conjugation:
+
+<MatrixGrid matrix={R} label="R = rho * rho-tilde" ariaLabel="The R matrix for the Werner state, whose eigenvalues determine the mixed-state concurrence" />
+
+$R$ comes out **block-diagonal** for this particular family of states,
+a structural accident of the Werner state's symmetry, not something true
+of a general mixed two-qubit state, with two trivial $1\times1$ blocks
+(each exactly $0.005625$) and one genuinely $2\times2$ Hermitian block.
+Because that block happens to be Hermitian here,
+**`eigenvaluesHermitian2x2`, the exact same closed-form solver this
+platform has used since Entanglement, Mixed States & Bell Tests, is
+already enough**: no new eigensolver was built or needed:
+
+$$
+\text{block eigenvalues: } \{0.600625,\ 0.005625\}, \qquad \text{full spectrum: } \{0.600625,\ 0.005625,\ 0.005625,\ 0.005625\}
+$$
+
+$$
+\sqrt{\mu}: \{0.775,\ 0.075,\ 0.075,\ 0.075\} \qquad\Longrightarrow\qquad C(\rho) = \max(0,\ 0.775-0.075-0.075-0.075) = 0.55
+$$
+
+A concrete, nonzero, **computed** mixed-state concurrence — this Werner
+state at $p=0.7$ is genuinely entangled, verified via this exact
+number, not merely presumed. It matches the known closed form for
+Werner states, $C(p)=\max(0,(3p-1)/2)$, exactly ($(3\times0.7-1)/2=0.55$),
+across the whole family:
+
+<ParametricCurve
+  frames={concurrenceFrames}
+  ariaLabel="Werner-state concurrence C(p) = max(0, (3p-1)/2) plotted for p from 0 to 1, showing entanglement vanishing below p=1/3"
+/>
+
+Below $p=1/3$, $C(p)=0$: the Werner state becomes **separable**, not
+just weakly entangled, a genuinely different physical regime this
+formula detects sharply via the $\max(0,\cdot)$ clipping, not something
+the pure-state formula could ever have expressed (a pure state's
+concurrence is never forced to $0$ by a competing classical mixture,
+since a pure state has no classical mixture in it at all).
+
+## Physical Interpretation
+
+Relative entropy quantifies how costly it is to mistake $\sigma$ for the
+true state $\rho$ (Klein's inequality is exactly the statement that this
+cost is never negative: you cannot "profit" from using the wrong
+model). The general Wootters concurrence answers a structurally harder
+question than the pure-state formula did: a mixed state's uncertainty is
+an unavoidable mix of *quantum* correlation (entanglement) and *classical*
+ignorance (which pure state it actually is, averaged over), and this
+formula's convex-roof optimization (behind the cited theorem) is exactly
+what disentangles the two, returning a number that measures only the
+first.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming $R=\rho\tilde\rho$ is Hermitian in general, and that
+`eigenvaluesHermitian2x2` therefore always applies.** It happened to be
+block-Hermitian for this lesson's Werner-state example, a structural
+consequence of that state's high symmetry, not a general fact.
+Concurrence: A Two-Qubit Entanglement Measure's stated scope limitation
+(no general non-Hermitian eigensolver on this platform) still applies to
+an arbitrary mixed two-qubit state.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the $\max(0,\cdot)$ clipping in the concurrence formula.**
+Without it, $\sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4}$ can come
+out negative (it does for any Werner state with $p<1/3$): the clipping
+is not a numerical-safety afterthought, it's the formula correctly
+reporting zero entanglement for a genuinely separable state.
+</Callout>
+
+## Practice Questions
+
+1. Verify $S(\rho\|\rho)=0$ directly from the definition, for any valid
+   density matrix $\rho$.
+2. Using Klein's inequality's equality condition, explain why
+   $S(\rho\|\sigma)=0$ is only possible when $\rho=\sigma$ exactly, not
+   merely when they have the same eigenvalues.
+3. At exactly $p=1/3$, confirm $C(p)=0$ using the closed form
+   $C(p)=\max(0,(3p-1)/2)$, and explain physically why this is the exact
+   threshold where the Werner state stops being entangled.
+4. Explain why the pure-state reduction ($R$ rank 1, three of its four
+   eigenvalues exactly zero) makes the $\max(0,\cdot)$ clipping
+   automatically inactive for every pure state, i.e. why a pure state's
+   concurrence is never "clipped."
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Quantum relative entropy $S(\rho\|\sigma)=\text{Tr}(\rho\log_2\rho)-\text{Tr}(\rho\log_2\sigma)$
+  is non-negative (Klein's inequality), proved here via two applications
+  of Jensen's inequality reducing to a classical KL-divergence bound.
+- The general Wootters concurrence $C(\rho)=\max(0,\sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4})$,
+  built from $R=\rho\tilde\rho$, is proved to reduce exactly to the
+  pure-state formula $2|ad-bc|$ when $\rho$ is pure.
+- Computed on a genuinely mixed Werner state ($p=0.7$, purity
+  $\approx0.6175$): $C\approx0.55$, matching the known closed form
+  $(3p-1)/2$ exactly, using this platform's *existing* Hermitian
+  eigensolver on a structurally special (block-Hermitian) case, closing
+  the exact gap Concurrence: A Two-Qubit Entanglement Measure named and
+  left open.
+
+## Further Exploration
+
+Next: [Rigorous Teleportation and Superdense Coding](/lessons/quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding),
+returning to two protocols built with pure-state algebra alone, now
+re-derived with the density-matrix and channel machinery this course has
+built since.

@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/vector-spaces"
@@ -185,6 +186,20 @@ to both without modification.
 ## Worked Example
 
 **Is $\{(1,1,0), (0,1,1), (1,0,1)\}$ a basis for $\mathbb{C}^3$?**
+
+Before running the elimination, commit to a guess.
+
+<PredictBeforeReveal
+  question="Is {(1,1,0), (0,1,1), (1,0,1)} a basis for ℂ³?"
+  options={[
+    { label: "Yes, it's a basis", value: "yes" },
+    { label: "No, they're linearly dependent", value: "no" },
+    { label: "They span, but aren't independent", value: "span-only" },
+    { label: "Can't tell without more work", value: "unsure" },
+  ]}
+  correctValue="yes"
+  explanation="Setting a(1,1,0)+b(0,1,1)+c(1,0,1)=(0,0,0) and solving forces a=b=c=0, so the three vectors are independent. With exactly 3 = dim ℂ³ of them, independence alone is enough to guarantee they also span, so the set is a basis. The elimination below is exactly that check, worked out line by line."
+/>
 
 Three vectors in a 3-dimensional space form a basis exactly when they're
 linearly independent (independence plus the right count automatically

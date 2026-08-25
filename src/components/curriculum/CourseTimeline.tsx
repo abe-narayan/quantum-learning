@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/Badge";
-import { COURSES } from "@/lib/content/curriculum";
+import { COURSES, getCourse } from "@/lib/content/curriculum";
 import { useCompletedLessonSlugs } from "@/lib/content/progress";
 import { cn } from "@/lib/utils";
 import type { Course, Difficulty, LessonMetaWithSlug, Pillar } from "@/lib/content/types";
@@ -10,6 +10,7 @@ const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   foundational: "Foundational",
   intermediate: "Intermediate",
   advanced: "Advanced",
+  master: "Master",
 };
 
 const PILLAR_LABEL: Record<Pillar, string> = {
@@ -17,6 +18,7 @@ const PILLAR_LABEL: Record<Pillar, string> = {
   "quantum-computing": "Computing",
   "quantum-hardware": "Hardware",
   "quantum-software": "Software",
+  "quantum-mastery": "Mastery",
 };
 
 /**
@@ -44,6 +46,11 @@ export function CourseTimeline({
 
   return (
     <div className="overflow-x-auto">
+      <p className="mb-3 text-xs text-muted-foreground">
+        Foundational = no prior background needed · Intermediate = builds on
+        earlier courses · Advanced = college-level rigor · Master =
+        graduate-level, proofs not just results.
+      </p>
       <ol className="flex min-w-max flex-col sm:min-w-0 sm:flex-row sm:items-stretch">
         {courses.map((course, index) => {
           const lessonByModule = new Map(
@@ -69,6 +76,9 @@ export function CourseTimeline({
           const isComplete = authoredModules > 0 && visitorCompleted === authoredModules;
           const isStarted = visitorCompleted > 0 && !isComplete;
           const isLast = index === courses.length - 1;
+          const prerequisiteTitles = course.prerequisites
+            .map((slug) => getCourse(slug)?.title)
+            .filter((title): title is string => Boolean(title));
 
           // Cross-pillar courses (in other pillars) that list this course as
           // a prerequisite — surfaced as a small "-> Hardware" style badge.
@@ -127,6 +137,11 @@ export function CourseTimeline({
                     </Badge>
                   ))}
                 </div>
+                {prerequisiteTitles.length > 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    Requires: {prerequisiteTitles.join(", ")}
+                  </p>
+                ) : null}
               </div>
             </li>
           );

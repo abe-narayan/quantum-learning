@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion"
@@ -28,10 +29,24 @@ export const lessonMeta = {
 Given a "black box" that marks one specific item among $N=2^n$ unsorted
 possibilities (no structure, no ordering, nothing to exploit), a classical
 algorithm needs $O(N)$ queries on average to find it: check items one at a
-time, no shortcut available. **Grover's algorithm** finds it in
-$O(\sqrt N)$ queries, and this quadratic speedup is the *best possible*
-for unstructured search (proven elsewhere, not claimed here), not an
-artifact of insufficient cleverness.
+time, no shortcut available.
+
+<PredictBeforeReveal
+  question="How does the number of oracle queries Grover's algorithm needs to find the marked item scale with N, compared to the classical O(N)?"
+  options={[
+    { label: "Linearly in N, same as classical, just a smaller constant", value: "linear" },
+    { label: "Quadratically in N — worse than classical", value: "quadratic" },
+    { label: "As √N — a quadratic speedup over classical", value: "sqrt" },
+    { label: "As log N — exponentially fewer queries", value: "log" },
+  ]}
+  correctValue="sqrt"
+  explanation="Grover's algorithm needs O(√N) queries, not O(N). That's a quadratic speedup — for N=1,000,000 items, roughly 1,000 queries instead of up to a million. The next section derives the oracle and diffusion operator that make this scaling possible."
+/>
+
+**Grover's algorithm** finds it in $O(\sqrt N)$ queries, exactly that
+quadratic speedup, and it's the *best possible* for unstructured search
+(proven elsewhere, not claimed here), not an artifact of insufficient
+cleverness.
 
 ## Mathematical Development
 

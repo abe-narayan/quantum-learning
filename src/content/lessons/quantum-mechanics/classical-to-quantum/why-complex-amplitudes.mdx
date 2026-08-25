@@ -1,4 +1,5 @@
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -44,6 +45,21 @@ a continuously adjustable direction can, and that's exactly what a
 complex number's phase is.
 
 ## Mathematical Development
+
+Before formalizing the intuition above, pin down a prediction about the
+algebra itself.
+
+<PredictBeforeReveal
+  question="Two real signed amplitudes ψ1, ψ2 combine as (ψ1+ψ2)². By choosing signs and magnitudes alone, can you sweep their interference continuously from fully constructive through 'no effect' to fully destructive, using one continuous knob that leaves |ψ1| and |ψ2| unchanged?"
+  options={[
+    { label: "Yes, freely tunable to any value", value: "yes" },
+    { label: "No, only two outcomes are reachable", value: "no" },
+    { label: "Only if |ψ1| = |ψ2|", value: "equal-only" },
+    { label: "Only at specific magnitude ratios", value: "ratio" },
+  ]}
+  correctValue="no"
+  explanation="No such knob exists for real amplitudes. The cross term 2ψ1ψ2 has a fixed sign for any fixed pair of real numbers — you can change its size, but a sign flip jumps straight from fully constructive to fully destructive with nothing continuous in between. The derivation below makes this precise, and it's exactly why a complex phase, which supplies a genuinely continuous knob, turns out to be necessary rather than a bookkeeping convenience."
+/>
 
 ### Real amplitudes can't produce partial interference
 

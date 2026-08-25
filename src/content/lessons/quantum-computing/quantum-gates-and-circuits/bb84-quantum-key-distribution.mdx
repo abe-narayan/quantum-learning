@@ -3,6 +3,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution"
@@ -183,6 +184,18 @@ her to resend a state in the *wrong* basis relative to Alice and Bob's
 agreed one, and measuring a wrong-basis state is exactly the $50/50$ case
 derived above.
 
+<PredictBeforeReveal
+  question="Eve intercepts and resends every qubit, guessing her interception basis at random each time. What fraction of the sifted key (positions where Alice's and Bob's bases already matched) do you expect to come out wrong?"
+  options={[
+    { label: "0%", value: "0" },
+    { label: "12.5%", value: "12.5" },
+    { label: "25%", value: "25" },
+    { label: "50%", value: "50" },
+  ]}
+  correctValue="25"
+  explanation="Eve guesses the wrong basis with probability 1/2; conditioned on that, Bob's measurement (in the basis Alice actually used) disagrees with Alice's bit with probability 1/2, exactly the mismatch case derived above. Multiplying the two independent halves, 1/2 × 1/2 = 1/4, gives a 25% error rate on the sifted key, well above the 0% an untouched channel produces, which is exactly what makes Eve's presence detectable."
+/>
+
 ### The resulting error rate
 
 Combine two independent probabilities: Eve guesses the wrong basis with
@@ -203,6 +216,14 @@ attack gives a $25\%$ mismatch rate on the sample, unmistakably above
 noise. They discard the sample and, if the error rate is too high, discard
 the whole key and try again over a cleaner channel.
 
+The basis-combination sweep above is exactly where this $25\%$ comes from:
+it is the real engine, `HADAMARD` and `.probabilities()`, computing Bob's
+actual outcome distribution for all four basis combinations, not an
+illustration of it. Revisit it with this derivation in mind: the
+"mismatch" bars (Alice Z/Bob X and Alice X/Bob Z) are precisely the
+$50/50$ distribution Eve inflicts on a sifted bit whenever she guesses her
+interception basis wrong.
+
 ## Physical Interpretation
 
 Nothing about BB84 requires entanglement or anything exotic: every qubit
@@ -217,16 +238,6 @@ possible basis, and reconstruct the state exactly, all without ever
 touching the qubit Alice and Bob actually use. Because copying is
 impossible, Eve must gamble on a basis for the *one* real qubit in transit,
 and gambling wrong is what makes her detectable.
-
-## Interactive Experiment
-
-The sweep above already is this lesson's interactive core: it is the real
-engine, `HADAMARD` and `.probabilities()`, computing Bob's actual outcome
-distribution for all four basis combinations, not an illustration of it.
-Revisit it now with the eavesdropping derivation in mind: the "mismatch"
-bars (Alice Z/Bob X and Alice X/Bob Z) are precisely the $50/50$
-distribution Eve inflicts on a sifted bit when she guesses her interception
-basis wrong.
 
 ## Worked Example
 
@@ -288,7 +299,7 @@ detectable disturbance.
 3. Why does comparing a random public sample of the sifted key (and
    discarding it afterward) work to detect eavesdropping, rather than
    Alice and Bob needing to inspect the entire key?
-4. The Interactive Experiment shows exactly $50/50$ for both mismatch
+4. The basis-combination sweep shows exactly $50/50$ for both mismatch
    cases. Explain why this is also exactly Eve's own measurement
    probability when she guesses the wrong basis, and why that's not a
    coincidence.

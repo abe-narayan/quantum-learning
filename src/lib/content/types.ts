@@ -2,9 +2,10 @@ export type Pillar =
   | "quantum-mechanics"
   | "quantum-computing"
   | "quantum-hardware"
-  | "quantum-software";
+  | "quantum-software"
+  | "quantum-mastery";
 
-export type Difficulty = "foundational" | "intermediate" | "advanced";
+export type Difficulty = "foundational" | "intermediate" | "advanced" | "master";
 
 export type PillarInfo = {
   slug: Pillar;

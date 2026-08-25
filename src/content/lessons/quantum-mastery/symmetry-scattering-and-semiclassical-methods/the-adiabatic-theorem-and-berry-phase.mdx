@@ -1,0 +1,284 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { blochStateFromAngles } from "@/lib/quantum/bloch";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase"
+).map((problem) => problem.meta);
+
+export const berryLoopStates = (theta, steps) =>
+  Array.from({ length: steps + 1 }, (_, i) => blochStateFromAngles({ theta, phi: (2 * Math.PI * i) / steps }));
+
+export const berryPhaseNumeric = (theta, steps = 3000) => {
+  const states = berryLoopStates(theta, steps);
+  const accumulated = states.slice(1).reduce(
+    (acc, current) => {
+      const overlap = acc.previous.innerProduct(current);
+      return { previous: current, sum: acc.sum + Math.atan2(overlap.im, overlap.re) };
+    },
+    { previous: states[0], sum: 0 }
+  );
+  return -accumulated.sum;
+};
+
+export const berryPhaseFormula = (theta) => -Math.PI * (1 - Math.cos(theta));
+
+export const berryThetaDegrees = [10, 30, 60, 90, 120, 150, 170];
+
+export const berryCurveFrames = [
+  {
+    paramLabel: "Berry phase γ vs. cone half-angle θ",
+    series: [
+      {
+        label: "numeric (discretized loop integral)",
+        color: "brand",
+        points: berryThetaDegrees.map((deg) => ({ x: deg, y: berryPhaseNumeric((deg * Math.PI) / 180) })),
+      },
+      {
+        label: "−π(1−cosθ)  [= −Ω/2]",
+        color: "accent",
+        points: berryThetaDegrees.map((deg) => ({ x: deg, y: berryPhaseFormula((deg * Math.PI) / 180) })),
+      },
+    ],
+  },
+];
+
+export const berryPhaseAt60 = berryPhaseNumeric(Math.PI / 3);
+
+export const lessonMeta = {
+  title: "The Adiabatic Theorem and Berry Phase",
+  description:
+    "A Hamiltonian that changes slowly enough keeps a system in its instantaneous eigenstate — proved here directly from the time-dependent Schrödinger equation. Applied to a spin-1/2 dragged around a cone by a slowly rotating field, the same derivation produces Berry's famous geometric phase, computed here as a real discretized loop integral and matched to −½ the solid angle traced.",
+  course: "symmetry-scattering-and-semiclassical-methods",
+  module: "the-adiabatic-theorem-and-berry-phase",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 35,
+  prerequisites: [
+    "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment",
+    "quantum-computing/qubits-and-quantum-states/the-bloch-sphere",
+    "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation",
+  ],
+  objectives: [
+    "Derive the adiabatic theorem from the time-dependent Schrödinger equation, and state the actual slowness condition it requires",
+    "Identify the geometric (Berry) phase as the extra, non-dynamical phase term the adiabatic derivation itself produces",
+    "Compute the Berry phase for a spin-1/2 in a slowly rotating field explicitly, and verify it equals minus half the solid angle traced by the field direction",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment",
+      note: "That lesson's spin-1/2 states, measured along an arbitrary axis, are exactly the instantaneous eigenstates this lesson drags slowly around a loop; the Berry phase is a property of that same family of states this lesson didn't need yet.",
+    },
+  ],
+};
+
+## Motivation
+
+Two questions, one answer. First: if a quantum system's Hamiltonian
+changes over time, but *slowly*, does the system simply track along with
+the instantaneous ground state, the way a marble stays near the bottom of
+a slowly-tilting bowl? Second: if it does, is that all that happens, or
+does the system remember something about the *path* the Hamiltonian took,
+even after returning exactly to where it started? The first question is
+the **adiabatic theorem**. The second question's surprising answer, yes,
+it remembers, as a genuine, measurable phase, is **Berry's phase**, and
+both come out of the same four lines of algebra.
+
+## Mathematical Development
+
+### Setting up the adiabatic expansion
+
+Let $H(t)$ have instantaneous eigenstates $|n(t)\rangle$,
+$H(t)|n(t)\rangle=E_n(t)|n(t)\rangle$, at every fixed $t$ (a well-defined
+notion, since diagonalizing a Hermitian operator at one instant needs no
+information about how it changes). Expand the true state as
+
+$$
+|\psi(t)\rangle = \sum_n c_n(t)\,e^{i\theta_n(t)}\,|n(t)\rangle, \qquad
+\theta_n(t) = -\frac1\hbar\int_0^t E_n(t')\,dt'
+$$
+
+pulling out the ordinary **dynamical phase** $\theta_n$ explicitly, so
+$c_n(t)$ captures everything else. Substituting into
+$i\hbar\partial_t|\psi\rangle=H|\psi\rangle$ and using
+$H|n\rangle=E_n|n\rangle$, the $E_n$ terms cancel *exactly* against
+$\dot\theta_n=-E_n/\hbar$ (this is precisely why $\theta_n$ was defined
+that way), leaving:
+
+$$
+\sum_n \left[\dot c_n|n\rangle + c_n|\dot n\rangle\right]e^{i\theta_n} = 0
+$$
+
+Projecting onto $\langle m|e^{-i\theta_m}$ and separating the $n=m$ term
+from the rest:
+
+$$
+\dot c_m = -c_m\langle m|\dot m\rangle - \sum_{n\neq m} c_n\langle m|\dot n\rangle\, e^{i(\theta_n-\theta_m)}
+$$
+
+### The leakage rate between levels
+
+Differentiating the eigenvalue equation $H|n\rangle=E_n|n\rangle$ with
+respect to $t$ and projecting onto $\langle m|$ ($m\neq n$, using
+$\langle m|H=E_m\langle m|$) gives the rate at which the Hamiltonian's own
+change couples level $n$ into level $m$:
+
+$$
+\langle m|\dot n\rangle = \frac{\langle m|\dot H|n\rangle}{E_n-E_m}, \qquad m\neq n
+$$
+
+This is the derivation's payoff: the coupling out of $|n(t)\rangle$ into
+any other level $m$ is small whenever $\hbar|\langle m|\dot
+H|n\rangle|\ll|E_n-E_m|^2$, the genuine **adiabaticity condition**
+("changes slowly" made precise: slow relative to the energy gap squared,
+not just slow in some vague sense). When this holds throughout the
+evolution, the $n\neq m$ sum above is negligible, and to excellent
+approximation:
+
+$$
+\dot c_n = -c_n\langle n|\dot n\rangle \;\Longrightarrow\; c_n(t)=c_n(0)\exp\!\left[-\int_0^t\langle n(t')|\dot n(t')\rangle\,dt'\right]
+$$
+
+**This is the adiabatic theorem**: a system that starts in $|n(0)\rangle$
+stays in $|n(t)\rangle$ for all $t$, up to a phase, never mixing into any
+other level, provided the gap-squared condition above holds throughout. A
+fully rigorous bound (accounting for the *whole* history, not just the
+instantaneous rate) needs more care than this lesson gives; the mechanism
+above, the actual leakage rate and why it's suppressed, is the genuine
+content, cited honestly as a leading-order argument rather than a
+complete proof.
+
+### The extra phase is geometric, not dynamical
+
+$\langle n|\dot n\rangle$ is **purely imaginary**: differentiating
+$\langle n|n\rangle=1$ gives $\langle\dot n|n\rangle+\langle
+n|\dot n\rangle=0$, i.e. $\langle n|\dot n\rangle+\overline{\langle
+n|\dot n\rangle}=0$, so its real part vanishes. Write
+$\langle n|\dot n\rangle=i\dot\gamma_n(t)$ for a real function
+$\gamma_n$. Then $c_n(t)=c_n(0)\,e^{i\gamma_n(t)}$: a genuine phase, on
+top of the dynamical phase $\theta_n$ already factored out. Crucially,
+$\gamma_n(t)=i\int_0^t\langle n(t')|\dot n(t')\rangle\,dt'=i\oint\langle
+n|\nabla_R n\rangle\cdot d\vec R$ (chain rule, $R$ the Hamiltonian's slow
+parameters) depends only on the **path** $R(t)$ traces through parameter
+space, not on how fast it's traversed. This path-dependence, not
+time-dependence, is exactly what makes $\gamma_n$ **geometric**: this is
+**Berry's phase**.
+
+### Berry phase for spin-1/2 in a rotating field
+
+Take $H(t)=-\frac{\hbar\omega_0}2\,\hat n(t)\cdot\vec\sigma$ (a spin-$\tfrac12$
+in a field along a slowly-changing direction $\hat n(t)$, Stern-Gerlach
+and The Bloch Sphere's own machinery), with $\hat n(t)$ tracing a cone of
+fixed half-angle $\theta$ at azimuthal rate $\dot\phi=\omega\ll\omega_0$
+(the adiabaticity condition here: slow compared to the *constant* energy
+gap $\hbar\omega_0$ between the two instantaneous eigenstates, a
+particularly clean case of the general gap condition above). The
+"spin-up-along-the-field" instantaneous eigenstate is exactly The Bloch
+Sphere's $|+,\hat n\rangle=\cos(\theta/2)|0\rangle+e^{i\phi}\sin(\theta/2)|1\rangle$,
+this platform's own `blochStateFromAngles`.
+
+Computing $\gamma$ over one full loop ($\phi:0\to2\pi$ at fixed $\theta$)
+as a genuine discretized loop integral, summing the phase of
+$\langle\psi(t_i)|\psi(t_{i+1})\rangle$ at each small step (a real,
+computed quantity, not read off a formula), and comparing directly to the
+famous closed-form prediction $\gamma=-\tfrac12\Omega$, minus half the
+**solid angle** $\Omega=2\pi(1-\cos\theta)$ the loop encloses on the
+sphere of field directions:
+
+<InteractiveSection
+  title="Sweep the cone half-angle, watch geometry predict the phase"
+  description="Each point is a full 3000-step loop integral around the cone at that θ, computed directly from real Bloch-sphere states, no formula used in the computation itself. The accent curve is the independent closed-form prediction, −π(1−cosθ). The two curves overlap almost exactly at every θ swept."
+>
+  <ParametricCurve
+    frames={berryCurveFrames}
+    ariaLabel="Numerically computed Berry phase versus the closed-form minus one half solid angle formula, as the cone half-angle theta varies from 10 to 170 degrees, showing near-exact agreement"
+  />
+</InteractiveSection>
+
+## Physical Interpretation
+
+The geometric phase is real, not a computational artifact: interfering a
+spin (or a photon, where the analogous effect is well-measured) that took
+the loop against one that didn't produces an observable fringe shift.
+It's genuinely **not** a property of the endpoint (the loop returns
+exactly to its starting field direction, so the dynamical phase alone
+would predict no leftover phase distinguishing "went around the loop"
+from "stayed put"); it's a property of the *loop itself*, exactly the
+sense in which it's geometric rather than dynamical. The minus sign and
+the factor of $\tfrac12$ both trace back to spin-$\tfrac12$'s specific
+$\cos(\theta/2),\sin(\theta/2)$ half-angle structure, not to any
+arbitrary convention.
+
+## Worked Example
+
+**Compute the Berry phase for $\theta=60°$ by hand from the solid-angle
+formula, and compare to the computed loop integral.**
+
+$\Omega=2\pi(1-\cos60°)=2\pi(1-\tfrac12)=\pi$. So
+$\gamma=-\tfrac12\Omega=-\tfrac\pi2\approx-1.5708$, a clean, exactly
+checkable value. The platform's discretized loop integral at
+$\theta=60°$ gives $\gamma\approx-1.5708$ as well — matching to better
+than $10^{-4}$, a genuinely independent numerical confirmation of the
+closed-form geometric formula, not a restatement of it.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking the adiabatic theorem guarantees the system returns to
+*exactly* $|n(0)\rangle$ after a closed loop, with no leftover
+difference.** It returns to the same *ray* (state up to overall phase),
+but that phase, dynamical plus geometric, is real and physically
+detectable via interference; "same state" and "same state up to an
+observable relative phase" are different claims.
+</Callout>
+
+<Callout type="mistake">
+**Confusing the adiabaticity condition with "just go slowly."** The
+actual condition, $\hbar|\langle m|\dot H|n\rangle|\ll|E_n-E_m|^2$, is
+about the rate of change *relative to the energy gap*: a system with a
+tiny gap needs a much slower sweep than one with a large gap, at the
+*same* literal speed of change.
+</Callout>
+
+## Practice Questions
+
+1. Compute the solid angle $\Omega$ and the Berry phase $\gamma$ for
+   $\theta=90°$ (the field sweeping exactly along the equator), and
+   compare to the numeric value read off the plot above.
+2. Explain in one or two sentences why $\langle n|\dot n\rangle$ being
+   purely imaginary is essential to $\gamma_n$ coming out real (a
+   physically sensible phase), rather than some complex number.
+3. As $\theta\to0$ (a vanishingly small cone, the field barely moving off
+   the north pole), what does the solid-angle formula predict for
+   $\gamma$? Does this match physical intuition about a "loop" that
+   barely encloses any area?
+4. The adiabaticity condition here was $\omega\ll\omega_0$. Using the
+   leakage-rate formula $\langle m|\dot n\rangle=\langle m|\dot
+   H|n\rangle/(E_n-E_m)$, explain qualitatively why a *larger* field
+   strength (larger $\omega_0$) makes the adiabatic approximation *easier*
+   to satisfy at fixed sweep rate $\omega$.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The adiabatic theorem follows directly from expanding
+  $|\psi(t)\rangle=\sum_nc_n(t)e^{i\theta_n(t)}|n(t)\rangle$ in the
+  Schrödinger equation: inter-level coupling
+  $\langle m|\dot n\rangle=\langle m|\dot H|n\rangle/(E_n-E_m)$ is
+  suppressed whenever $\hbar|\langle m|\dot H|n\rangle|\ll|E_n-E_m|^2$.
+- The same derivation's $n=m$ term is a purely imaginary
+  $\langle n|\dot n\rangle$, giving a real, path-dependent (not
+  time-dependent) phase $\gamma_n$: the geometric, or Berry, phase.
+- For spin-$\tfrac12$ dragged around a cone by a slowly rotating field,
+  $\gamma=-\tfrac12\Omega$ ($\Omega$ the solid angle traced), verified
+  here as a genuine discretized loop integral over real Bloch-sphere
+  states, matching the closed-form prediction to better than $10^{-4}$
+  across every angle swept.
+
+## Further Exploration
+
+Next: [Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states),
+leaving slow time-dependence behind for a different kind of "as classical
+as quantum mechanics gets": the harmonic oscillator states that most
+closely track a classical trajectory.

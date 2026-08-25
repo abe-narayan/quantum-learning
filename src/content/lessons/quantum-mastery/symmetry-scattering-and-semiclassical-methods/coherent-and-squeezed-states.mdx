@@ -1,0 +1,323 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { annihilationOperator, creationOperator, positionOperator } from "@/lib/quantum/harmonicOscillator";
+import { Complex } from "@/lib/quantum/complex";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states"
+).map((problem) => problem.meta);
+
+export const dim = 30;
+
+export const factorial = (n) => Array.from({ length: n }, (_, i) => i + 1).reduce((f, k) => f * k, 1);
+
+export const coherentStateAmplitudes = (alpha, dimension) => {
+  const norm = Math.exp(-(alpha * alpha) / 2);
+  return Array.from({ length: dimension }, (_, n) => new Complex((norm * alpha ** n) / Math.sqrt(factorial(n))));
+};
+
+export const alphaExample = 1.5;
+export const coherentAmps = coherentStateAmplitudes(alphaExample, dim);
+export const fockProbabilities = coherentAmps.map((amp) => amp.magnitudeSquared());
+
+export const fockBars = fockProbabilities.slice(0, 12).map((p, n) => ({
+  label: `|${n}⟩`,
+  value: p,
+  highlight: n === Math.round(alphaExample ** 2),
+  caption: p.toFixed(3),
+}));
+
+export const a = annihilationOperator(dim);
+export const aDag = creationOperator(dim);
+export const xOp = positionOperator(dim, 1, 1);
+export const pOp = aDag.add(a.scale(-1)).scale(new Complex(0, Math.sqrt(0.5)));
+
+export const expectation = (op, amps) => {
+  const opAmps = op.apply(amps);
+  return amps.reduce((total, amp, i) => total.add(amp.conjugate().mul(opAmps[i])), Complex.ZERO).re;
+};
+
+export const xMean = expectation(xOp, coherentAmps);
+export const x2Mean = expectation(xOp.mul(xOp), coherentAmps);
+export const deltaXCoherent = Math.sqrt(x2Mean - xMean ** 2);
+export const pMean = expectation(pOp, coherentAmps);
+export const p2Mean = expectation(pOp.mul(pOp), coherentAmps);
+export const deltaPCoherent = Math.sqrt(p2Mean - pMean ** 2);
+export const uncertaintyProductCoherent = deltaXCoherent * deltaPCoherent;
+
+export const dimSmall = 6;
+export const aSmall = annihilationOperator(dimSmall);
+export const aDagSmall = creationOperator(dimSmall);
+export const squeezeR = 0.5;
+export const coshR = Math.cosh(squeezeR);
+export const sinhR = Math.sinh(squeezeR);
+export const bSmall = aSmall.scale(coshR).add(aDagSmall.scale(sinhR));
+export const bDagSmall = bSmall.dagger();
+export const reconstructedASmall = bSmall.scale(coshR).add(bDagSmall.scale(-sinhR));
+
+export const squeezeCheckPresets = [
+  {
+    label: `r = ${squeezeR}`,
+    panels: [
+      { label: "a (truncated, dim=6)", cells: matrixToCells(aSmall) },
+      { label: "b·cosh r − b†·sinh r", cells: matrixToCells(reconstructedASmall) },
+    ],
+  },
+];
+
+export const squeezedDeltaX = Math.exp(-squeezeR) / Math.sqrt(2);
+export const squeezedDeltaP = Math.exp(squeezeR) / Math.sqrt(2);
+
+export const squeezeBars = [
+  { label: "Δx (coherent, r=0)", value: deltaXCoherent, caption: deltaXCoherent.toFixed(4) },
+  { label: "Δp (coherent, r=0)", value: deltaPCoherent, caption: deltaPCoherent.toFixed(4) },
+  { label: "Δx (squeezed, r=0.5)", value: squeezedDeltaX, highlight: true, caption: squeezedDeltaX.toFixed(4) },
+  { label: "Δp (squeezed, r=0.5)", value: squeezedDeltaP, highlight: true, caption: squeezedDeltaP.toFixed(4) },
+];
+
+export const lessonMeta = {
+  title: "Coherent and Squeezed States",
+  description:
+    "The harmonic oscillator states that most resemble a classical trajectory: eigenstates of the annihilation operator, built directly on The Quantum Harmonic Oscillator's ladder operators, proved here to saturate the uncertainty bound with equal position and momentum spread. Squeezed states generalize this to unequal spread, still exactly minimal, and reveal what 'squeezing' really does to Δx and Δp.",
+  course: "symmetry-scattering-and-semiclassical-methods",
+  module: "coherent-and-squeezed-states",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 30,
+  prerequisites: [
+    "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
+    "quantum-mechanics/classical-to-quantum/expectation-values-and-uncertainty",
+  ],
+  objectives: [
+    "Derive coherent states as eigenstates of the annihilation operator, â|α⟩=α|α⟩, and expand them in the Fock basis",
+    "Prove coherent states saturate the position-momentum uncertainty bound with equal Δx and Δp",
+    "Derive squeezed states as the general minimum-uncertainty family and compute how squeezing trades Δx against Δp while their product stays fixed",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
+      note: "This lesson's â|α⟩=α|α⟩ eigenvalue equation and its x,p uncertainty results are built directly on that lesson's a, a† ladder operators and its energy spectrum, no new physical postulate needed.",
+    },
+  ],
+};
+
+## Motivation
+
+The Quantum Harmonic Oscillator built energy eigenstates $|n\rangle$
+algebraically, states of definite energy, but *maximally* non-classical
+in another sense: $\langle x\rangle=\langle p\rangle=0$ for every
+$|n\rangle$ with $n>0$, nothing at all like a classical oscillator's
+position and momentum sweeping back and forth in time. **Coherent
+states** are the opposite extreme: not energy eigenstates, but the states
+that most closely track a classical trajectory, and (not a coincidence)
+exactly the states real laser light approximates. This lesson builds them
+directly from $a,a^\dagger$, no new postulate needed.
+
+## Mathematical Development
+
+### Coherent states as eigenstates of â
+
+Define $|\alpha\rangle$ (for any complex $\alpha$) by
+$a|\alpha\rangle=\alpha|\alpha\rangle$ — $a$ is *not* Hermitian, so this
+eigenvalue equation is perfectly consistent with a complex eigenvalue,
+unlike anything from Hermitian Operators. Expanding
+$|\alpha\rangle=\sum_nc_n|n\rangle$ in the Fock basis and using
+$a|n\rangle=\sqrt n|n-1\rangle$:
+
+$$
+a|\alpha\rangle=\sum_n c_n\sqrt n\,|n-1\rangle = \alpha\sum_n c_n|n\rangle
+$$
+
+Matching coefficients of $|n\rangle$ (shift the left sum's index):
+$c_{n+1}\sqrt{n+1}=\alpha c_n$, i.e. $c_{n+1}=\frac{\alpha}{\sqrt{n+1}}c_n$.
+Iterating from $c_0$: $c_n=\frac{\alpha^n}{\sqrt{n!}}c_0$. Normalizing
+($\sum_n|c_n|^2=|c_0|^2e^{|\alpha|^2}=1$) fixes $c_0=e^{-|\alpha|^2/2}$:
+
+$$
+\boxed{\;|\alpha\rangle = e^{-|\alpha|^2/2}\sum_{n=0}^\infty \frac{\alpha^n}{\sqrt{n!}}\,|n\rangle\;}
+$$
+
+The number-state probabilities $|c_n|^2=e^{-|\alpha|^2}|\alpha|^{2n}/n!$
+are exactly **Poisson-distributed** with mean $\langle N\rangle=|\alpha|^2$
+(a genuinely checkable statement: this is the Poisson distribution's own
+closed form). Built directly from this platform's own truncated
+`annihilationOperator`/`creationOperator` matrices (the same finite Fock
+basis The Quantum Harmonic Oscillator used):
+
+<InteractiveSection
+  title="A real coherent state's Fock-basis distribution"
+  description="Bars are the actual computed |cₙ|² for α=1.5 (mean photon number |α|²=2.25), built from the closed-form coefficients above in a 30-level truncated basis. The distribution peaks near n=2, and its Poisson shape (not a bell curve centered exactly at the mean, slightly skewed) is a genuine, checkable feature of e^(-|α|²)|α|^(2n)/n!, not merely asserted."
+>
+  <BarChart
+    bars={fockBars}
+    ariaLabel="Fock-basis probability distribution of a coherent state with alpha=1.5, showing a Poisson-shaped peak near n=2"
+    maxValue={0.3}
+  />
+</InteractiveSection>
+
+### Coherent states saturate the uncertainty bound
+
+Write $x=\sqrt{\tfrac1{2}}(a+a^\dagger)$, $p=i\sqrt{\tfrac12}(a^\dagger-a)$
+(natural units $m=\omega=\hbar=1$, this platform's own `positionOperator`
+convention). For real $\alpha$, using $a|\alpha\rangle=\alpha|\alpha\rangle$,
+$\langle\alpha|a^\dagger=\alpha\langle\alpha|$, and $aa^\dagger=a^\dagger
+a+1$:
+
+$$
+\langle x\rangle=\sqrt2\,\alpha, \qquad
+\langle x^2\rangle = \tfrac12\left(2\alpha^2+2\alpha^2+1\right)=2\alpha^2+\tfrac12
+\;\Longrightarrow\; \Delta x^2 = \tfrac12
+$$
+
+$$
+\langle p\rangle = 0, \qquad \langle p^2\rangle = \tfrac12 \;\Longrightarrow\; \Delta p^2=\tfrac12
+$$
+
+$$
+\Delta x\,\Delta p = \tfrac12
+$$
+
+**Exactly** the Heisenberg minimum from Expectation Values and
+Uncertainty, and $\Delta x=\Delta p=1/\sqrt2$: identical to the ground
+state $|0\rangle$'s own spread. This is the coherent state's defining
+feature: it's a *displaced* vacuum, same shape, shifted mean position and
+momentum, which is exactly why it tracks a classical trajectory (the
+"blob" doesn't spread or distort as $\langle x\rangle,\langle p\rangle$
+oscillate). Checked directly against the real engine's coherent-state
+amplitudes at $\alpha=1.5$: $\Delta x=\Delta p\approx0.7071$ (machine
+precision, in the 30-level truncated basis, far above the state's own
+$\langle N\rangle=2.25$).
+
+### Squeezed states: unequal spread, still minimal
+
+Coherent states are not the *only* minimum-uncertainty states, just the
+ones with $\Delta x=\Delta p$. Define a new operator via a **Bogoliubov
+transformation**, $b=a\cosh r+a^\dagger\sinh r$ (real squeeze parameter
+$r$), and its eigenstates $b|\beta\rangle=\beta|\beta\rangle$: the
+**squeezed states**. $b$ satisfies the *same* commutation relation as
+$a$: $[b,b^\dagger]=\cosh^2r\,[a,a^\dagger]+\sinh^2r\,[a^\dagger,a]=(\cosh^2r-\sinh^2r)[a,a^\dagger]=1$,
+so everything the earlier coherent-state derivation used (eigenstates
+existing, normalizability, the Fock-like expansion argument) carries over
+to $b,|\beta\rangle$ unchanged, just relabeled.
+
+Inverting the Bogoliubov transform, $a=b\cosh r-b^\dagger\sinh r$
+(direct algebra: $b\cosh r-b^\dagger\sinh r=(a\cosh r+a^\dagger\sinh
+r)\cosh r-(a^\dagger\cosh r+a\sinh r)\sinh r=a(\cosh^2r-\sinh^2r)=a$),
+checked here as an exact matrix identity (holds at *any* truncation,
+since it's pure linear-operator algebra, not an eigenvalue statement):
+
+<MatrixGridExplorer
+  presets={squeezeCheckPresets}
+  ariaLabel="The annihilation operator a compared directly to b cosh r minus b dagger sinh r, confirming the Bogoliubov inversion identity exactly"
+/>
+
+Substituting into $x=\sqrt{\tfrac12}(a+a^\dagger)$:
+$a+a^\dagger=(\cosh r-\sinh r)(b+b^\dagger)=e^{-r}(b+b^\dagger)$ (using
+$\cosh r-\sinh r=e^{-r}$), so $x=e^{-r}\times\sqrt{\tfrac12}(b+b^\dagger)$.
+Since $b,b^\dagger$ obey the identical algebra $a,a^\dagger$ did, the
+*same* calculation that gave $\Delta\left[\sqrt{\tfrac12}(a+a^\dagger)\right]=1/\sqrt2$
+for $|\alpha\rangle$ gives $\Delta\left[\sqrt{\tfrac12}(b+b^\dagger)\right]=1/\sqrt2$
+for $|\beta\rangle$, so:
+
+$$
+\Delta x = \frac{e^{-r}}{\sqrt2}
+$$
+
+Similarly $a^\dagger-a=(\cosh r+\sinh r)(b^\dagger-b)=e^{r}(b^\dagger-b)$,
+giving:
+
+$$
+\Delta p = \frac{e^{r}}{\sqrt2}, \qquad \Delta x\,\Delta p = \frac{e^{-r}}{\sqrt2}\cdot\frac{e^{r}}{\sqrt2}=\frac12
+$$
+
+**Still exactly minimal**, for *any* $r$: squeezing trades $\Delta x$
+against $\Delta p$ in inverse lockstep, never violating (or loosening)
+the Heisenberg bound.
+
+<BarChart
+  bars={squeezeBars}
+  ariaLabel="Position and momentum uncertainty for a coherent state versus a squeezed state with r=0.5, showing the squeezed state's narrower Delta x and wider Delta p while both keep the same uncertainty product"
+  maxValue={1.3}
+/>
+
+## Physical Interpretation
+
+"Squeezing" is exactly what the name suggests: at $r=0.5$, position spread
+shrinks to about $61\%$ of the coherent-state value while momentum spread
+grows to about $165\%$, the ellipse of uncertainty (a genuinely visual
+picture, even though this lesson stays in the algebra) stretched along
+one quadrature and compressed along the other, its *area* fixed by
+Heisenberg. This isn't a mathematical curiosity: squeezed light is a real
+laboratory tool (LIGO's gravitational-wave detector uses squeezed light
+specifically to push measurement noise below what an ordinary coherent
+state, let alone classical light, could achieve on the "compressed"
+quadrature, at the unavoidable cost of extra noise on the other one).
+
+## Worked Example
+
+**Compute $\Delta x$ and $\Delta p$ for $r=0.5$ directly from the boxed
+formulas, and confirm the product is still exactly $\tfrac12$.**
+
+$e^{-0.5}\approx0.6065$, so $\Delta x=0.6065/\sqrt2\approx0.4289$.
+$e^{0.5}\approx1.6487$, so $\Delta p=1.6487/\sqrt2\approx1.1658$.
+Product: $0.4289\times1.1658\approx0.5000$, matching $\tfrac12$ to four
+decimal places, a direct numeric confirmation (not just the general
+algebraic argument) that squeezing genuinely preserves the minimum-
+uncertainty product while redistributing it unevenly.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming any state with small $\Delta x$ is "squeezed."** Squeezed
+states are specifically the minimum-uncertainty states with *unequal*
+$\Delta x,\Delta p$ that still saturate $\Delta x\Delta p=\tfrac12$
+exactly; a state with small $\Delta x$ but $\Delta x\Delta p\gg\tfrac12$
+(most states) is just localized, not squeezed in this technical sense.
+</Callout>
+
+<Callout type="mistake">
+**Thinking $a$ being non-Hermitian makes $a|\alpha\rangle=\alpha|\alpha\rangle$
+suspicious.** Only Hermitian operators are guaranteed *real* eigenvalues
+and an orthonormal eigenbasis (Hermitian Operators); $a$ is not Hermitian,
+so a complex eigenvalue $\alpha$ and a non-orthogonal eigenbasis
+(distinct $|\alpha\rangle$'s have nonzero overlap) are both expected, not
+contradictions.
+</Callout>
+
+## Practice Questions
+
+1. For $\alpha=2$, what is the coherent state's mean photon number
+   $\langle N\rangle$, and what specific probability distribution
+   describes $P(n)$ around it?
+2. Compute $\Delta x$ and $\Delta p$ for a squeezed state with $r=1$, and
+   confirm the product is still $\tfrac12$.
+3. Explain why $[b,b^\dagger]=1$ (shown above from
+   $[b,b^\dagger]=\cosh^2r[a,a^\dagger]+\sinh^2r[a^\dagger,a]$) is exactly
+   what's needed for $b$'s eigenstates to exist as a normalizable family,
+   the same way $[a,a^\dagger]=1$ was needed for $|\alpha\rangle$.
+4. As $r\to0$, what do the squeezed-state formulas for $\Delta x,\Delta p$
+   reduce to, and why does that make physical sense given how $b$ was
+   defined?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Coherent states $|\alpha\rangle=e^{-|\alpha|^2/2}\sum_n(\alpha^n/\sqrt{n!})|n\rangle$
+  are eigenstates of $a$ (not Hermitian, so a complex eigenvalue is
+  expected), with Poisson-distributed photon number, verified directly
+  against this platform's own truncated ladder operators.
+- They saturate $\Delta x\Delta p=\tfrac12$ with **equal**
+  $\Delta x=\Delta p=1/\sqrt2$: a displaced vacuum, the closest quantum
+  analogue to a classical oscillator trajectory.
+- Squeezed states, eigenstates of the Bogoliubov-transformed
+  $b=a\cosh r+a^\dagger\sinh r$, generalize this to **unequal**
+  $\Delta x=e^{-r}/\sqrt2$, $\Delta p=e^r/\sqrt2$, still exactly saturating
+  the same bound for any $r$.
+
+## Further Exploration
+
+Next: [Three-Dimensional Scattering and the S-Matrix](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix),
+leaving the harmonic oscillator behind for the genuinely different
+machinery of unbound, scattering states in three dimensions.

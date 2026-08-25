@@ -1,0 +1,353 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { createGrid } from "@/lib/quantum/wavefunction";
+import { harmonicOscillatorEigenstate } from "@/lib/quantum/potentials";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness"
+).map((problem) => problem.meta);
+
+export const decayGrid = createGrid(256, 16 / 256);
+export const groundState = harmonicOscillatorEigenstate(decayGrid, 0, 1);
+export const groundDensity = groundState.probabilityDensity();
+export const decayFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "|ψ₀(x)|² (ground harmonic oscillator state, ψ,ψ′ both genuinely in L²(ℝ))",
+        color: "brand",
+        points: decayGrid.x.map((x, i) => ({ x, y: groundDensity[i] })),
+      },
+    ],
+  },
+];
+
+export const halfLineXValues = Array(100).fill(0).map((_, i) => (i / 99) * 4);
+export const deficiencyFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "e^(−x): normalizable on (0,∞) — the n₊ deficiency solution",
+        color: "brand",
+        points: halfLineXValues.map((x) => ({ x, y: Math.exp(-x) })),
+      },
+      {
+        label: "e^(+x): NOT normalizable on (0,∞) — no n₋ partner",
+        color: "warning",
+        points: halfLineXValues.map((x) => ({ x, y: Math.min(Math.exp(x), 8) })),
+      },
+    ],
+  },
+];
+
+export const lessonMeta = {
+  title: "Hilbert Spaces and Self-Adjointness",
+  description:
+    "Every earlier course checked A = A† and called it a day. Here that check gets separated into two genuinely different conditions, symmetric versus self-adjoint, distinguished only by whether the operator's domain matches its adjoint's domain — and the momentum operator on a half-line is a real, worked example where they come apart entirely.",
+  course: "hilbert-space-and-spectral-theory",
+  module: "hilbert-spaces-and-self-adjointness",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 32,
+  prerequisites: [
+    "quantum-mechanics/wave-mechanics/the-position-and-momentum-operators",
+    "quantum-mechanics/mathematical-foundations/hermitian-operators",
+  ],
+  objectives: [
+    "State precisely what makes L²(ℝ) a Hilbert space (completeness, separability) and why both properties matter physically",
+    "Derive, not assert, that a function in the domain of p̂ = −iħd/dx on the whole line vanishes at ±∞",
+    "Distinguish a symmetric (formally Hermitian) operator from a genuinely self-adjoint one, and compute the deficiency-subspace calculation showing p̂ on a half-line has no self-adjoint extension at all",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/the-hydrogen-atom/the-radial-equation",
+      note: "The radial equation's boundary condition u(0)=0 is exactly a domain choice of the kind this lesson makes precise — the physically forced condition for the radial momentum-like operator to be self-adjoint on a half-line, not an ad hoc requirement.",
+    },
+  ],
+};
+
+## Motivation
+
+Hermitian Operators proved, correctly and completely, that $A=A^\dagger$
+forces real eigenvalues and orthogonal eigenvectors, for a **matrix**.
+Every later course reused that single check, $A=A^\dagger$, on operators
+like $\hat p=-i\hbar\,d/dx$ acting on functions, and it always worked.
+That's not a coincidence to wave away, but it's also not the whole
+story: on an infinite-dimensional space, $A=A^\dagger$ (checked by
+integration by parts) is a genuinely weaker statement than what "the
+eigenvalues are provably real and a complete eigenbasis provably exists"
+actually requires. This lesson isolates exactly what's missing, calls it
+by its real name (**self-adjointness**, not mere Hermiticity), and shows,
+with a fully worked example, a case where the missing piece breaks
+things outright.
+
+## Intuition
+
+In finite dimensions, "$A$ maps vectors to vectors, and $\langle
+u|Av\rangle=\langle Au|v\rangle$ for all $u,v$" is the whole story,
+because every linear operator is automatically defined on the *entire*
+space and there's only one reasonable domain to talk about. On an
+infinite-dimensional function space this stops being true: differential
+operators like $\hat p$ aren't defined on every element of $L^2(\mathbb
+R)$ (not every $L^2$ function is even differentiable), so *which
+functions the operator is allowed to act on*, its **domain** $D(A)$,
+becomes part of the operator's actual identity, not an afterthought.
+Self-adjointness asks a domain question finite dimensions never has to:
+does $A$'s domain match $A^\dagger$'s domain *exactly*, not just does
+the boundary-term calculation come out looking symmetric.
+
+## Mathematical Development
+
+### $L^2(\mathbb R)$ is a genuine Hilbert space
+
+$L^2(\mathbb R)=\{\psi:\mathbb R\to\mathbb C \mid \int|\psi(x)|^2dx<\infty\}$
+with inner product $\langle\phi|\psi\rangle=\int\phi^*(x)\psi(x)\,dx$ is a
+Hilbert space, meaning: it's an inner product space (immediate from the
+integral's linearity and conjugate symmetry), it's **complete** (every
+Cauchy sequence of $L^2$ functions converges to an $L^2$ function: the
+Riesz–Fischer theorem, a genuine, nontrivial real-analysis result **cited
+here, not proved**: proving completeness of $L^2$ requires the Lebesgue
+integral's convergence theorems, outside this course's scope), and it's
+**separable** (it has a countable orthonormal basis). Separability is
+concrete and checkable: the harmonic-oscillator eigenstates
+$\{\psi_n\}_{n=0}^\infty$ this platform already computes via
+`harmonicOscillatorEigenstate` are exactly such a countable orthonormal
+basis (Hermite functions), so separability isn't an abstract promise:
+it's the same basis Wave Mechanics already used to expand any state as
+$\sum_nc_n\psi_n$.
+
+Both properties are load-bearing, not decoration. Completeness is what
+guarantees a Cauchy sequence of approximate solutions (e.g. the
+numerical time-evolution steps Wave Mechanics computed) actually
+converges *to something in the space*, rather than to a "hole" outside
+it. Separability is what guarantees a countable eigenbasis can exist at
+all; without it, "expand $\psi$ in energy eigenstates" wouldn't even
+be the right *kind* of statement to make.
+
+### Formally Hermitian ("symmetric") vs. genuinely self-adjoint
+
+An operator $A$ with domain $D(A)\subset\mathcal H$ is **symmetric** if
+$\langle\phi|A\psi\rangle=\langle A\phi|\psi\rangle$ for all
+$\phi,\psi\in D(A)$, exactly the integration-by-parts check
+Position and Momentum Operators already did for $\hat p$. The **adjoint**
+$A^\dagger$ is a possibly *larger*-domain operator: $D(A^\dagger)$ is the
+set of $\phi$ for which *some* $\chi$ satisfies
+$\langle\phi|A\psi\rangle=\langle\chi|\psi\rangle$ for every
+$\psi\in D(A)$, and then $A^\dagger\phi\equiv\chi$. $A$ is
+**self-adjoint** only if $D(A)=D(A^\dagger)$ *exactly*, not merely
+$D(A)\subseteq D(A^\dagger)$, which is all "symmetric" guarantees. In
+finite dimensions $D(A)=D(A^\dagger)=\mathbb C^n$ automatically for any
+matrix, so this distinction is invisible; that's precisely why Hermitian
+Operators never needed to make it.
+
+### Deriving that $D(\hat p)$-functions vanish at infinity
+
+The domain that makes $\hat p=-i\hbar\,d/dx$ symmetric on the whole line
+is $D(\hat p)=H^1(\mathbb R)=\{\psi\in L^2(\mathbb R): \psi'\in
+L^2(\mathbb R)\}$ (both $\psi$ and its derivative square-integrable).
+Position and Momentum Operators asserted that the boundary term in
+integration by parts "vanishes for normalizable $\psi,\phi$, which go
+to zero at $\pm\infty$", true, but that vanishing is itself a fact that
+needs deriving, since $L^2$ membership alone does **not** imply a
+function tends to $0$ pointwise (a function can spike arbitrarily high
+on shrinking intervals and still have finite $\int|\psi|^2$). What
+actually forces the vanishing is $\psi'\in L^2$ *as well*:
+
+For $\psi\in H^1(\mathbb R)$, real or complex,
+$\dfrac{d}{dx}|\psi(x)|^2=\psi'(x)\psi^*(x)+\psi(x)\psi'^*(x)=2\,\mathrm{Re}\big(\psi'(x)\psi^*(x)\big)$.
+By the Cauchy–Schwarz inequality applied to $\psi,\psi'\in L^2(\mathbb
+R)$, the product $\psi'\psi^*$ is in $L^1(\mathbb R)$ (absolutely
+integrable):
+$\int|\psi'\psi^*|\,dx\le\|\psi'\|_{L^2}\|\psi\|_{L^2}<\infty$. So
+
+$$
+|\psi(x)|^2-|\psi(0)|^2=\int_0^x2\,\mathrm{Re}\big(\psi'\psi^*\big)\,dt
+$$
+
+is an integral of an absolutely-integrable function, hence it
+**converges to a finite limit as $x\to+\infty$** (and likewise
+$x\to-\infty$). So $|\psi(x)|^2$ tends to some limit $L\ge0$. But if
+$L>0$, then $|\psi(x)|^2$ stays bounded away from zero for all large
+$x$, making $\int|\psi|^2dx$ diverge, contradicting $\psi\in
+L^2(\mathbb R)$. So $L=0$: **$\psi(x)\to0$ as $x\to\pm\infty$ for every
+$\psi\in H^1(\mathbb R)$**, a genuine derivation from the two
+hypotheses $\psi,\psi'\in L^2$, not an assumption smuggled in by calling
+$\psi$ "well-behaved."
+
+With that lemma established, the boundary term in
+$\int\phi^*(-i\hbar\psi')dx=-i\hbar[\phi^*\psi]_{-\infty}^{\infty}+i\hbar\int\phi'^*\psi\,dx$
+genuinely vanishes (both $\phi,\psi\to0$), confirming $\hat p$ is
+symmetric on $H^1(\mathbb R)$.
+
+### Why the full-line $\hat p$ is actually self-adjoint, not just symmetric
+
+Symmetry alone leaves open whether $D(\hat p^\dagger)$ might be
+*strictly larger* than $H^1(\mathbb R)$. It isn't, and the cleanest way
+to see this uses the Fourier transform (Momentum Space and the Fourier
+Transform): $\hat p$ is unitarily equivalent, via the Fourier transform,
+to the operator "multiply by $\hbar k$" acting on $\phi(k)$. A
+multiplication-by-a-real-function operator is manifestly self-adjoint on
+its natural maximal domain $\{\phi\in L^2:\;k\phi(k)\in L^2\}$ (no
+integration by parts or boundary term is even needed: multiplication
+by a real number is its own adjoint entrywise), and that maximal domain
+transforms back, under the same unitary Fourier transform, to exactly
+$H^1(\mathbb R)$. So $D(\hat p)=D(\hat p^\dagger)=H^1(\mathbb R)$: the
+full-line momentum operator is genuinely self-adjoint, not merely
+symmetric; this is why every calculation built on $\hat p$ so far in
+this platform was safe, even though the domain question was never
+raised.
+
+### Where it breaks: momentum on a half-line
+
+Consider $\hat p=-i\,d/dx$ on $L^2(0,\infty)$ (natural units,
+$\hbar=1$), the operator that would represent "momentum toward the
+wall" for a particle confined to $x>0$ by a hard wall at $x=0$. Try the
+symmetric domain $D(\hat p)=\{\psi\in H^1(0,\infty):\psi(0)=0\}$
+(the natural guess: a Dirichlet condition at the one boundary point,
+directly mirroring the well-worn "wavefunction vanishes at a wall").
+Whether *any* choice of domain makes this operator self-adjoint is
+settled by von Neumann's **deficiency-index theorem** (cited here, a
+genuine and deep result of functional analysis not re-derived in full):
+count the dimensions of the solution spaces of
+$\hat p^\dagger\psi=+i\psi$ and $\hat p^\dagger\psi=-i\psi$ inside
+$L^2(0,\infty)$; call these dimensions $n_+,n_-$, the **deficiency
+indices**. A self-adjoint extension exists *only if* $n_+=n_-$.
+
+**Compute the deficiency indices directly.** $\hat p^\dagger\psi=\pm
+i\psi$ means $-i\psi'=\pm i\psi$, i.e. $\psi'=\mp\psi$, with solutions
+$\psi(x)=Ce^{\mp x}$. Which of these lie in $L^2(0,\infty)$?
+
+$$
+\int_0^\infty|e^{-x}|^2dx=\int_0^\infty e^{-2x}dx=\tfrac12<\infty \qquad(\text{normalizable})
+$$
+
+$$
+\int_0^\infty|e^{+x}|^2dx=\int_0^\infty e^{2x}dx=\infty \qquad(\text{not normalizable})
+$$
+
+<ParametricCurve
+  frames={deficiencyFrames}
+  ariaLabel="e to the minus x, normalizable on the half-line, versus e to the plus x, not normalizable — the two candidate deficiency-subspace solutions for momentum on a half-line"
+/>
+
+So the $\psi'=-\psi$ equation (eigenvalue $+i$) has exactly one
+$L^2(0,\infty)$ solution ($n_+=1$), while $\psi'=+\psi$ (eigenvalue
+$-i$) has none ($n_-=0$). **$n_+\ne n_-$**: by von Neumann's theorem,
+**no self-adjoint extension of $\hat p$ on the half-line exists at
+all**, not the Dirichlet choice above, not any other local boundary
+condition. Every domain choice leaves it merely symmetric at best.
+
+## Physical Interpretation
+
+Self-adjointness isn't a technicality kept separate from physics: it's
+exactly the hypothesis Stone's theorem needs to generate a genuinely
+unitary time evolution $e^{-iAt/\hbar}$ (cited, not proved here: Stone's
+theorem is itself a substantial functional-analysis result). A merely
+symmetric operator can fail to generate *any* consistent unitary
+evolution, meaning probability wouldn't reliably be conserved if you
+tried to use it as a Hamiltonian or a generator of translations. The
+half-line result above has a genuine physical reading: **there is no
+self-adjoint "momentum toward the wall" operator for a particle
+confined to a half-line by a hard, impenetrable wall.** This isn't a
+platform limitation to work around; it reflects that "momentum" as a
+*generator of translations* doesn't make sense on a space with an
+inaccessible edge on only one side (translating far enough in the
+$-x$ direction runs the particle straight through the wall, which
+isn't a symmetry of the half-line at all). Physically sensible momentum
+operators exist only on spaces without a one-sided edge: the whole
+line, or a *periodic* interval (both directions structurally
+equivalent), never a genuine half-line.
+
+## Worked Example
+
+**Confirm the vanishing-at-infinity lemma concretely for a real domain
+member.**
+
+The harmonic-oscillator ground state $\psi_0(x)=(1/\pi)^{1/4}e^{-x^2/2}$
+(natural units) satisfies both $\psi_0,\psi_0'\in L^2(\mathbb R)$ (a
+Gaussian and $-x\psi_0(x)$ are both manifestly square-integrable), so
+$\psi_0\in D(\hat p)=H^1(\mathbb R)$ genuinely, not just by inspection:
+
+<ParametricCurve
+  frames={decayFrames}
+  ariaLabel="Probability density of the harmonic oscillator ground state, a genuine H-1 function, computed by the platform's real engine and shown decaying to zero at both ends"
+/>
+
+$|\psi_0(x)|^2$, computed directly by this platform's
+`harmonicOscillatorEigenstate`, visibly decays to (numerically)
+indistinguishable from zero well before the grid's edge at $x=\pm8$,
+the concrete instance of the general lemma proved above, for a function
+that genuinely belongs to $\hat p$'s domain, not merely one chosen to
+look well-behaved.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating "$A=A^\dagger$ by integration by parts" as the complete
+self-adjointness check.** That calculation only ever shows $A$ is
+*symmetric* on whatever domain you assumed. Self-adjointness additionally
+requires $D(A)=D(A^\dagger)$ exactly, a domain question that's
+automatically settled (and hence invisible) in finite dimensions, but
+genuinely open on a function space, as the half-line example shows: a
+domain can be symmetric and still admit no self-adjoint extension at
+all.
+</Callout>
+
+<Callout type="mistake">
+**Assuming $L^2$ membership alone implies a function vanishes at
+infinity.** It doesn't: only the *combination* $\psi,\psi'\in L^2$
+(the actual hypothesis of $\hat p$'s domain) forces the vanishing, via
+the Cauchy–Schwarz argument derived above. A function can be square
+integrable while spiking arbitrarily high on ever-narrower intervals
+without tending to any limit at all.
+</Callout>
+
+## Practice Questions
+
+1. Redo the deficiency-index calculation for $\hat p=-i\,d/dx$ on
+   $L^2(-\infty,0)$ (a half-line extending the *other* direction).
+   Which of $n_+,n_-$ is now $1$, and which is $0$?
+2. Why does the argument that $D(\hat p)$-functions vanish at infinity
+   fail if only $\psi\in L^2(\mathbb R)$ is assumed, without also
+   assuming $\psi'\in L^2(\mathbb R)$? Identify exactly which step of the
+   derivation breaks.
+3. A periodic interval $[0,L]$ with the boundary condition
+   $\psi(0)=\psi(L)$ (not $\psi(0)=\psi(L)=0$) turns out to admit a
+   genuine one-parameter family of self-adjoint extensions of $\hat p$,
+   $\{\psi:\psi(L)=e^{i\theta}\psi(0)\}$ for each real $\theta$. Using
+   this lesson's boundary-term argument, explain in one sentence why
+   *this* boundary condition (unlike the half-line's) makes the term
+   $[\phi^*\psi]_0^L$ vanish.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $L^2(\mathbb R)$ is a genuine Hilbert space: complete (Riesz–Fischer,
+  cited) and separable (the Hermite/harmonic-oscillator basis, concrete).
+- A **symmetric** operator satisfies $\langle\phi|A\psi\rangle=\langle
+  A\phi|\psi\rangle$ on its domain $D(A)$; it's **self-adjoint** only if
+  $D(A)=D(A^\dagger)$ exactly, a strictly stronger condition invisible in
+  finite dimensions.
+- $\hat p=-i\hbar\,d/dx$ on the whole line is genuinely self-adjoint on
+  $D(\hat p)=H^1(\mathbb R)$, derivable via the Fourier-transform
+  equivalence to a self-adjoint multiplication operator; every $H^1$
+  function provably vanishes at $\pm\infty$, which is exactly what makes
+  the earlier boundary-term calculation legitimate rather than assumed.
+- $\hat p$ on a half-line has unequal deficiency indices ($n_+=1$,
+  $n_-=0$, computed directly), so by von Neumann's theorem it has **no**
+  self-adjoint extension at all, a genuine, worked case where the
+  informal "check $A=A^\dagger$" recipe would have missed a real
+  mathematical obstruction.
+
+## Further Exploration
+
+Next: [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators),
+which shows exactly why self-adjointness (not mere symmetry) is the
+hypothesis needed for a genuine spectral decomposition to exist at all,
+and derives how that general theorem reduces to Spectral Decomposition
+and Degeneracy's finite-dimensional $A=\sum_i\lambda_iP_i$ in the
+discrete-spectrum case.

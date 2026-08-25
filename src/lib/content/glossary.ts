@@ -283,6 +283,110 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"],
   },
+  {
+    id: "vector-space",
+    title: "Vector Space",
+    definition:
+      "A set of objects (vectors) closed under addition and scalar multiplication, satisfying axioms like associativity and distributivity — the abstract structure that quantum states live in, whether those vectors are arrows, functions, or columns of complex numbers.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/vector-spaces"],
+  },
+  {
+    id: "basis",
+    title: "Basis",
+    definition:
+      "A set of linearly independent vectors that spans an entire vector space, so every vector in that space can be written as a unique linear combination of them — the |0⟩, |1⟩ standard basis being the qubit's simplest example.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/vector-spaces"],
+  },
+  {
+    id: "span",
+    title: "Span",
+    definition:
+      "The set of every vector reachable as a linear combination of a given collection of vectors — a basis is simply a spanning set that's also linearly independent.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/vector-spaces"],
+  },
+  {
+    id: "linear-independence",
+    title: "Linear Independence",
+    definition:
+      "A set of vectors is linearly independent if none of them can be written as a linear combination of the others — equivalently, the only way to combine them into the zero vector is with every coefficient equal to zero.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/vector-spaces"],
+  },
+  {
+    id: "eigenvalue-eigenvector",
+    title: "Eigenvalue & Eigenvector",
+    definition:
+      "For an operator A, a nonzero vector v is an eigenvector with eigenvalue λ if Av = λv — applying A to v only rescales it. In quantum mechanics, an observable's eigenvalues are its possible measurement outcomes, and its eigenvectors are the states that produce them with certainty.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors"],
+  },
+  {
+    id: "hermitian-operator",
+    title: "Hermitian Operator",
+    definition:
+      "An operator equal to its own conjugate transpose (A = A†), guaranteeing real eigenvalues and orthogonal eigenvectors — the mathematical property that lets Hermitian operators represent physical observables, whose measured values must be real numbers.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/hermitian-operators"],
+  },
+  {
+    id: "unitary-operator",
+    title: "Unitary Operator",
+    definition:
+      "An operator U whose conjugate transpose is also its inverse (U†U = I), which preserves inner products and therefore vector length — the property that makes unitary operators the only ones that can represent valid quantum time evolution or quantum gates.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/unitary-operators"],
+  },
+  {
+    id: "inner-product",
+    title: "Inner Product",
+    definition:
+      "A generalization of the dot product, ⟨φ|ψ⟩, that takes two vectors and returns a (possibly complex) scalar measuring their overlap — the operation underlying norms, orthogonality, and the probabilities the Born rule predicts.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"],
+  },
+  {
+    id: "hilbert-space",
+    title: "Hilbert Space",
+    definition:
+      "A vector space equipped with an inner product and complete under the norm that inner product defines — the mathematical setting quantum states formally live in, generalizing familiar Euclidean space to complex, sometimes infinite dimensions.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"],
+  },
+  {
+    id: "cauchy-schwarz-inequality",
+    title: "Cauchy-Schwarz Inequality",
+    definition:
+      "States that the magnitude of an inner product between two vectors never exceeds the product of their individual norms, |⟨φ|ψ⟩| ≤ ‖φ‖‖ψ‖ — the inequality underlying the Heisenberg uncertainty principle's general derivation.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"],
+  },
+  {
+    id: "taylor-series",
+    title: "Taylor Series",
+    definition:
+      "Represents a smooth function as an infinite sum of terms built from its derivatives at a single point — the tool used to derive Euler's formula, e^(iθ) = cos θ + i sin θ, by comparing the series for e^x, sin x, and cos x term by term.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"],
+  },
+  {
+    id: "modulus",
+    title: "Modulus (of a Complex Number)",
+    definition:
+      "The distance |z| of a complex number z = a + bi from the origin, equal to √(a² + b²) — for a quantum amplitude, its squared modulus gives the Born-rule probability of the outcome it belongs to.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"],
+  },
+  {
+    id: "normalization",
+    title: "Normalization",
+    definition:
+      "The requirement that a quantum state's amplitudes have squared moduli summing (or integrating) to 1, so the total probability of all possible measurement outcomes is exactly 100%.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: ["quantum-mechanics/mathematical-foundations/probability-and-quantum-states"],
+  },
 ];
 
 /** Every glossary term, alphabetically sorted by title. */

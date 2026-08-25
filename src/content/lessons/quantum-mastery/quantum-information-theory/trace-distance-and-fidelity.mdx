@@ -1,0 +1,381 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, applySingleQubitGate } from "@/lib/quantum/gates";
+import { pureStateDensityMatrix, purity, eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
+import { amplitudeDampingChannel, dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Trace Distance and Fidelity",
+  description:
+    "The two standard ways to ask 'how close are two quantum states?', derived and proved related by the Fuchs–van de Graaf inequalities, then used to put an exact number on how well this platform's own amplitude-damping and dephasing channels preserve a state.",
+  course: "quantum-information-theory",
+  module: "trace-distance-and-fidelity",
+  order: 2,
+  difficulty: "master",
+  estimatedMinutes: 30,
+  prerequisites: [
+    "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification",
+    "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
+  ],
+  objectives: [
+    "Derive trace distance's variational (Helstrom) characterization and its closed form for qubits",
+    "Derive the Uhlmann fidelity's pure-state shortcut and state Uhlmann's theorem",
+    "Prove the Fuchs–van de Graaf inequalities relating trace distance and fidelity",
+    "Compute real trace-distance and fidelity numbers for this platform's amplitude-damping and dephasing channels",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
+      note: "The Choi matrix built there for these same two channels gives a second, independent way to see how much they disturb a state.",
+    },
+  ],
+};
+
+export const gamma = 0.3;
+export const lambda = 0.3;
+
+export const plus = applySingleQubitGate(StateVector.zero(1), HADAMARD, 0);
+export const rho0 = pureStateDensityMatrix(plus);
+
+export const rhoAD = applyKrausChannel(rho0, amplitudeDampingChannel(gamma));
+export const rhoDP = applyKrausChannel(rho0, dephasingChannel(lambda));
+
+export const traceDistance2x2 = (rhoMat, sigmaMat) => {
+  const diff = rhoMat.add(sigmaMat.scale(-1));
+  const [mu1, mu2] = eigenvaluesHermitian2x2(diff);
+  return 0.5 * (Math.abs(mu1) + Math.abs(mu2));
+}
+
+export const fidelityPureVsMixed = (state, sigmaMat) => {
+  const amps = state.amplitudes;
+  const value = amps.reduce(
+    (sum, ai, i) => sum.add(amps.reduce((rowSum, aj, j) => rowSum.add(ai.conjugate().mul(sigmaMat.get(i, j)).mul(aj)), Complex.ZERO)),
+    Complex.ZERO
+  );
+  return Math.sqrt(value.re);
+}
+
+export const D_AD = traceDistance2x2(rho0, rhoAD);
+export const D_DP = traceDistance2x2(rho0, rhoDP);
+export const F_AD = fidelityPureVsMixed(plus, rhoAD);
+export const F_DP = fidelityPureVsMixed(plus, rhoDP);
+export const purityAD = purity(rhoAD);
+export const purityDP = purity(rhoDP);
+
+export const DAD = (g) => {
+  return 0.5 * Math.sqrt(g * g + (1 - Math.sqrt(1 - g)) ** 2);
+}
+export const FAD = (g) => {
+  return Math.sqrt(0.5 * (1 + Math.sqrt(1 - g)));
+}
+
+export const fvgFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "D(gamma) — trace distance",
+        color: "brand",
+        points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: DAD(i / 40) })),
+      },
+      {
+        label: "1 - F(gamma) — lower bound",
+        color: "muted",
+        points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: 1 - FAD(i / 40) })),
+      },
+      {
+        label: "sqrt(1 - F(gamma)^2) — upper bound",
+        color: "accent",
+        points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: Math.sqrt(1 - FAD(i / 40) ** 2) })),
+      },
+    ],
+  },
+];
+
+## Motivation
+
+"How close are two quantum states?" sounds like one question but this
+platform's engine already implicitly needs two different answers to it.
+Trace Distance and Fidelity are the two standard, non-equivalent answers,
+each with its own operational meaning, related to each other by a precise
+pair of inequalities (not merely "both go to zero together," but a
+provable quantitative sandwich). Applied to real channels already sitting
+in this codebase, they turn "amplitude damping disturbs a state" from a
+qualitative claim into an exact, computed number.
+
+## Mathematical Development
+
+### Trace distance: definition and variational form
+
+$$
+D(\rho,\sigma) \equiv \frac12\text{Tr}|\rho-\sigma| = \frac12\sum_i|\mu_i|
+$$
+
+where $\mu_i$ are the eigenvalues of the Hermitian, traceless operator
+$\Delta\equiv\rho-\sigma$ (traceless since $\text{Tr}\rho=\text{Tr}\sigma=1$).
+Because $\Delta$ is Hermitian it has a spectral decomposition into a
+positive part $\Delta_+$ (projecting onto its non-negative eigenspace)
+and negative part $-\Delta_-$, with $\Delta=\Delta_+-\Delta_-$ and
+$|\Delta|=\Delta_++\Delta_-$. Tracelessness forces
+$\text{Tr}\,\Delta_+=\text{Tr}\,\Delta_-$, so
+$D(\rho,\sigma)=\text{Tr}\,\Delta_+$.
+
+**Claim (Helstrom's variational formula).**
+$D(\rho,\sigma)=\max_{0\leq P\leq I}\text{Tr}\big[P(\rho-\sigma)\big]$,
+the maximum taken over all measurement operators $P$ (Hermitian,
+eigenvalues in $[0,1]$).
+
+**Proof.** For any such $P$, write $P=P\Delta_+/\Delta_++P\Delta_-/\Delta_-$...
+more directly: decompose using the projector $\Pi_+$ onto $\Delta$'s
+non-negative eigenspace. $\text{Tr}[P\Delta]=\text{Tr}[P\Delta_+]-\text{Tr}[P\Delta_-]\leq\text{Tr}[P\Delta_+]\leq\text{Tr}[\Delta_+]$
+(the first inequality drops a non-negative term $\text{Tr}[P\Delta_-]\geq0$
+since $P,\Delta_-\geq0$; the second uses $P\leq I$ applied to the
+positive operator $\Delta_+$). Equality is achieved exactly at $P=\Pi_+$
+(then $\text{Tr}[P\Delta_-]=0$ since $\Delta_-$ lives entirely in $\Delta$'s
+negative eigenspace, orthogonal to $\Pi_+$'s range, and
+$\text{Tr}[\Pi_+\Delta_+]=\text{Tr}[\Delta_+]$ since $\Delta_+$ already
+lives entirely inside $\Pi_+$'s range). So the maximum is exactly
+$\text{Tr}[\Delta_+]=D(\rho,\sigma)$. $\blacksquare$
+
+This gives trace distance a genuine operational meaning: it's exactly
+twice the maximum bias any single measurement can achieve in
+distinguishing $\rho$ from $\sigma$ (the **Holevo–Helstrom bound**), not
+just an abstract matrix-norm quantity.
+
+### The qubit closed form
+
+For a single qubit, $\Delta=\rho-\sigma$ is a Hermitian $2\times2$
+matrix, so $D(\rho,\sigma)=\frac12(|\mu_1|+|\mu_2|)$ is computed directly
+by this platform's own `eigenvaluesHermitian2x2` applied to $\Delta$: no
+new numerical machinery beyond what "Pure States and Mixed States"
+already built.
+
+### Uhlmann fidelity
+
+$$
+F(\rho,\sigma) \equiv \text{Tr}\sqrt{\sqrt\rho\,\sigma\,\sqrt\rho}
+$$
+
+This looks opaque in general, but reduces immediately when $\rho=|\psi\rangle\langle\psi|$
+is pure: $\sqrt\rho=\rho$ (a rank-1 projector is its own square root), so
+$\sqrt\rho\,\sigma\,\sqrt\rho=|\psi\rangle\langle\psi|\sigma|\psi\rangle\langle\psi|=\big(\langle\psi|\sigma|\psi\rangle\big)|\psi\rangle\langle\psi|$,
+a positive multiple of a rank-1 projector, whose square root is
+$\sqrt{\langle\psi|\sigma|\psi\rangle}\,|\psi\rangle\langle\psi|$. Taking
+the trace:
+
+$$
+\boxed{F(|\psi\rangle,\sigma) = \sqrt{\langle\psi|\sigma|\psi\rangle}}
+$$
+
+a fully derived shortcut (not cited), and exactly the quantity this
+lesson's own worked example below computes directly from the engine. As
+a sanity check on the general definition: if $\sigma=|\phi\rangle\langle\phi|$
+is also pure, this further reduces to $F=|\langle\psi|\phi\rangle|$, the
+ordinary state-overlap fidelity used informally throughout this
+platform's earlier courses.
+
+**Uhlmann's theorem** (stated, not re-derived here; a genuinely deep
+result about optimizing over the space of all possible purifying systems
+built in general dimension, beyond what this lesson proves elsewhere)
+says $F(\rho,\sigma)=\max_{|\psi\rangle,|\phi\rangle}|\langle\psi|\phi\rangle|$,
+the maximum taken over every purification $|\psi\rangle_{AB}$ of $\rho$
+and every purification $|\phi\rangle_{AB}$ of $\sigma$ on a common
+extension $B$. Schmidt Decomposition and Purification proved exactly the
+freedom this maximization ranges over: every purification of a fixed
+$\rho$ differs from any other only by a unitary on $B$, so Uhlmann's
+theorem is precisely "maximize the overlap over that unitary freedom."
+This lesson uses Uhlmann's theorem only as a stated tool (for the proof
+below); the pure-state shortcut boxed above is the form actually used in
+every numerical computation that follows.
+
+### The Fuchs–van de Graaf inequalities
+
+**Claim.** $1-F(\rho,\sigma) \leq D(\rho,\sigma) \leq \sqrt{1-F(\rho,\sigma)^2}$.
+
+**Upper bound, full proof.** First, a pure-state identity: for
+normalized $|\psi\rangle,|\phi\rangle$,
+$D(|\psi\rangle,|\phi\rangle)=\sqrt{1-|\langle\psi|\phi\rangle|^2}$. Proof:
+$\text{Tr}\big[(|\psi\rangle\langle\psi|-|\phi\rangle\langle\phi|)^2\big]=\text{Tr}|\psi\rangle\langle\psi|+\text{Tr}|\phi\rangle\langle\phi|-2\text{Tr}(|\psi\rangle\langle\psi|\phi\rangle\langle\phi|)=2-2|\langle\psi|\phi\rangle|^2$
+(using $\text{Tr}(AB)=\text{Tr}(BA)$ and $\langle\psi|\psi\rangle=1$). The
+difference of two rank-1 projectors has eigenvalues $\{\mu,-\mu,0,0,\ldots\}$
+(traceless, rank $\leq2$), so $\text{Tr}[(\cdot)^2]=2\mu^2$, giving
+$\mu=\sqrt{1-|\langle\psi|\phi\rangle|^2}$ and
+$D=\frac12(\mu+\mu)=\mu$. Second, **contractivity**: for any
+completely-positive trace-preserving map $\Lambda$ (partial trace is one
+such map), $D(\Lambda(\rho),\Lambda(\sigma))\leq D(\rho,\sigma)$. Proof:
+for any measurement operator $P$ on $\Lambda$'s output, its Heisenberg
+dual $Q\equiv\Lambda^\dagger(P)$ satisfies $0\leq Q\leq I$ (complete
+positivity of $\Lambda$ makes $\Lambda^\dagger$ positive and
+order-preserving; trace-preservation of $\Lambda$ makes $\Lambda^\dagger(I)=I$,
+so $0\leq P\leq I$ maps to $0\leq Q\leq I$). Then
+$\text{Tr}[P\,\Lambda(\rho-\sigma)]=\text{Tr}[Q(\rho-\sigma)]\leq D(\rho,\sigma)$
+by Helstrom's formula; maximizing the left side over $P$ gives
+$D(\Lambda(\rho),\Lambda(\sigma))\leq D(\rho,\sigma)$. Now take Uhlmann-optimal
+purifications $|\psi\rangle_{AB},|\phi\rangle_{AB}$ with
+$|\langle\psi|\phi\rangle|=F(\rho,\sigma)$, and apply contractivity to
+$\Lambda=\text{Tr}_B$:
+
+$$
+D(\rho,\sigma) = D\big(\text{Tr}_B|\psi\rangle\langle\psi|,\,\text{Tr}_B|\phi\rangle\langle\phi|\big) \leq D(|\psi\rangle,|\phi\rangle) = \sqrt{1-F(\rho,\sigma)^2} \qquad\blacksquare
+$$
+
+**Lower bound: classical case proved in full; quantum case cites one
+lemma.** First, the fully elementary *classical* version: for
+probability distributions $p,q$, define
+$D_{cl}(p,q)=\frac12\sum_i|p_i-q_i|$ and $F_{cl}(p,q)=\sum_i\sqrt{p_iq_i}$.
+Since $\sqrt{p_iq_i}\geq\min(p_i,q_i)$ always (as
+$p_iq_i=\max(p_i,q_i)\min(p_i,q_i)\geq\min(p_i,q_i)^2$), summing gives
+$F_{cl}(p,q)\geq\sum_i\min(p_i,q_i)$. And
+$\sum_i\min(p_i,q_i)=1-D_{cl}(p,q)$ (from
+$\sum_i\max+\sum_i\min=\sum_i(p_i+q_i)=2$ and
+$\sum_i\max-\sum_i\min=\sum_i|p_i-q_i|=2D_{cl}$, solved together). So
+$F_{cl}(p,q)\geq1-D_{cl}(p,q)$, i.e. $1-F_{cl}(p,q)\leq D_{cl}(p,q)$,
+proved outright with no unproved steps. To lift this to the quantum
+case: measure both $\rho$ and $\sigma$ with the *same* optimal
+projective measurement $\{\Pi_+,I-\Pi_+\}$ from Helstrom's formula above,
+giving classical distributions $p=(\text{Tr}\,\Pi_+\rho,\,\text{Tr}(I-\Pi_+)\rho)$,
+$q=(\text{Tr}\,\Pi_+\sigma,\,\text{Tr}(I-\Pi_+)\sigma)$ with
+$D_{cl}(p,q)=D(\rho,\sigma)$ exactly, by construction. The one remaining
+step, that quantum fidelity never falls below the classical fidelity
+induced by *any* shared measurement, $F(\rho,\sigma)\geq F_{cl}(p,q)$,
+is a genuine theorem (provable via Uhlmann's theorem plus a
+Cauchy–Schwarz argument on the measurement's Kraus operators) that is
+**cited here, not re-derived**: proving it would require developing POVM
+formalism this platform's engine doesn't otherwise use. Granting it:
+$1-F(\rho,\sigma)\leq1-F_{cl}(p,q)\leq D_{cl}(p,q)=D(\rho,\sigma)$.
+$\blacksquare$
+
+## Physical Interpretation
+
+Trace distance answers "how well can a single measurement tell these two
+states apart?" (Helstrom's formula makes this literal, not metaphorical).
+Fidelity answers a different question, "how much do these two states
+overlap as vectors/operators?", and via Uhlmann's theorem specifically,
+"how well could I have kept a purifying reference system entangled with
+both?" They agree on the coarse question (both are $0$ exactly for
+identical states, both saturate at their extreme value exactly for
+perfectly distinguishable states) but carry different fine-grained
+information, exactly why both are worth computing on the same pair of
+states rather than picking one.
+
+## Worked Example
+
+**Quantify exactly how well this platform's own amplitude-damping and
+dephasing channels preserve $|+\rangle$.**
+
+<QuantumStateDisplay state={plus} label="Input state |+>" />
+
+Starting from $\rho_0=|+\rangle\langle+|$ (pure, $F=1$, $D=0$ trivially
+against itself), apply `amplitudeDampingChannel(0.3)` and
+`dephasingChannel(0.3)`, both already built and tested elsewhere in this
+platform:
+
+<MatrixGrid matrix={rhoAD} label="After amplitude damping, gamma=0.3" compareTo={rhoDP} compareLabel="After dephasing, lambda=0.3" ariaLabel="Density matrices after amplitude damping and after dephasing, both applied to |+> with strength 0.3" />
+
+Computed directly via `eigenvaluesHermitian2x2` on $\rho_0-\rho_{AD}$
+(trace distance) and the boxed pure-state fidelity shortcut:
+
+$$
+D(\rho_0,\rho_{AD}) \approx 0.1708, \qquad F(\rho_0,\rho_{AD}) \approx 0.9583, \qquad \text{Tr}(\rho_{AD}^2) \approx 0.895
+$$
+
+$$
+D(\rho_0,\rho_{DP}) \approx 0.1500, \qquad F(\rho_0,\rho_{DP}) \approx 0.9220, \qquad \text{Tr}(\rho_{DP}^2) \approx 0.745
+$$
+
+Both pairs satisfy Fuchs–van de Graaf exactly: for amplitude damping,
+$1-F\approx0.0417\leq D\approx0.1708\leq\sqrt{1-F^2}\approx0.2857$; for
+dephasing, $1-F\approx0.0780\leq D\approx0.1500\leq\sqrt{1-F^2}\approx0.3873$.
+Dephasing at $\lambda=0.3$ is a **worse** disturbance than amplitude
+damping at $\gamma=0.3$ by both measures simultaneously here ($D_{DP}<D_{AD}$
+but the purity drop $\text{Tr}(\rho_{DP}^2)=0.745$ is well below
+$\text{Tr}(\rho_{AD}^2)=0.895$): the two channels are not interchangeable
+just because they share a single strength parameter.
+
+Plotting $D(\gamma)$ against both Fuchs–van de Graaf bounds across every
+$\gamma$ (closed forms
+$D(\gamma)=\frac12\sqrt{\gamma^2+(1-\sqrt{1-\gamma})^2}$,
+$F(\gamma)=\sqrt{\tfrac12(1+\sqrt{1-\gamma})}$, derived directly from
+amplitude damping's Kraus operators applied to $|+\rangle\langle+|$, and
+matching the $\gamma=0.3$ numbers above exactly) shows the sandwich
+holding at every strength, not just the one value checked by hand:
+
+<ParametricCurve
+  frames={fvgFrames}
+  ariaLabel="Trace distance D(gamma) for amplitude damping applied to |+>, sandwiched between the Fuchs-van de Graaf lower bound 1-F(gamma) and upper bound sqrt(1-F(gamma)^2), plotted for gamma from 0 to 1"
+/>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Using $F(\rho,\sigma)=\sqrt{\langle\psi|\sigma|\psi\rangle}$ when
+*neither* state is pure.** The boxed shortcut requires $\rho$ (or by
+symmetry $\sigma$) to be pure; for two genuinely mixed states, the full
+definition $\text{Tr}\sqrt{\sqrt\rho\,\sigma\,\sqrt\rho}$ is needed, which
+this platform's engine cannot evaluate for a general mixed qubit pair
+(it would require a matrix square root the platform doesn't implement).
+</Callout>
+
+<Callout type="mistake">
+**Treating Fuchs–van de Graaf as an equality.** It's a two-sided bound,
+not an identity: the worked example's own numbers ($D\approx0.1708$
+strictly between $0.0417$ and $0.2857$ for amplitude damping) show real
+daylight on both sides for a generic channel; equality on the upper
+bound is only exact when both states are pure (proved above), and on the
+lower bound only in special cases.
+</Callout>
+
+## Practice Questions
+
+1. Verify $D(|\psi\rangle,|\phi\rangle)=\sqrt{1-|\langle\psi|\phi\rangle|^2}$
+   directly for $|\psi\rangle=|0\rangle$, $|\phi\rangle=|+\rangle$
+   (overlap $1/\sqrt2$), and confirm it matches $F=|\langle\psi|\phi\rangle|$
+   plugged into the pure-pure Fuchs–van de Graaf equality case.
+2. Using Helstrom's formula, explain why $D(\rho,\sigma)=0$ if and only
+   if $\rho=\sigma$ exactly (hint: what does $\Delta=0$ imply about every
+   possible measurement's bias?).
+3. For the amplitude-damping worked example, verify
+   $1-F(\rho_0,\rho_{AD})\approx0.0417$ using the boxed closed form
+   $F(\gamma)=\sqrt{\tfrac12(1+\sqrt{1-\gamma})}$ at $\gamma=0.3$.
+4. Explain physically why dephasing at $\lambda=0.3$ drops purity further
+   than amplitude damping at $\gamma=0.3$ despite giving a *smaller*
+   trace distance from $|+\rangle\langle+|$: are these two facts in
+   tension, or consistent?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Trace distance $D(\rho,\sigma)=\max_{0\leq P\leq I}\text{Tr}[P(\rho-\sigma)]$
+  (Helstrom's formula, proved from the spectral decomposition of
+  $\rho-\sigma$) is exactly twice the best possible measurement bias for
+  telling $\rho$ from $\sigma$ apart.
+- Fidelity $F(\rho,\sigma)=\text{Tr}\sqrt{\sqrt\rho\,\sigma\,\sqrt\rho}$
+  reduces to $\sqrt{\langle\psi|\sigma|\psi\rangle}$ when $\rho$ is pure
+  (derived, not cited) and is characterized in general by Uhlmann's
+  theorem as the maximum overlap between purifications.
+- $1-F\leq D\leq\sqrt{1-F^2}$ (Fuchs–van de Graaf): the upper bound is
+  proved in full via purification and contractivity; the lower bound's
+  classical version is proved in full, with only one measurement-monotonicity
+  lemma cited to lift it to the quantum case.
+- Applied to this platform's real channels: amplitude damping at
+  $\gamma=0.3$ gives $D\approx0.1708$, $F\approx0.9583$; dephasing at
+  $\lambda=0.3$ gives $D\approx0.1500$, $F\approx0.9220$; both satisfy
+  the derived inequalities exactly, checked numerically and across the
+  full range of $\gamma$.
+
+## Further Exploration
+
+Next: [Quantum Channels: Kraus and Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi),
+which looks at these same two channels from a completely different
+angle: not how much they disturb one input state, but what structural
+property (complete positivity) makes them physically valid channels at
+all.

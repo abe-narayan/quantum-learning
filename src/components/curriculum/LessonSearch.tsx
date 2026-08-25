@@ -11,6 +11,7 @@ const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   foundational: "Foundational",
   intermediate: "Intermediate",
   advanced: "Advanced",
+  master: "Master",
 };
 
 /**

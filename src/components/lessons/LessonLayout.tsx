@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { COURSES, PILLARS, getCourse } from "@/lib/content/curriculum";
@@ -7,11 +8,18 @@ import type { Course, LessonMeta, LessonMetaWithSlug } from "@/lib/content/types
 import { getCourseCheckpointProblems } from "@/lib/problems/registry";
 import { CourseCheckpoint } from "@/components/problems/CourseCheckpoint";
 import { LessonCompleteToggle } from "./LessonCompleteToggle";
+import { ReadingProgressBar } from "./ReadingProgressBar";
+import { TableOfContentsDesktop, TableOfContentsMobile } from "./TableOfContents";
+
+/** `id` of the prose container — shared by the ToC and reading-progress bar
+ * so they can each find it via `document.getElementById` after mount. */
+const LESSON_PROSE_ID = "lesson-prose";
 
 const DIFFICULTY_LABEL: Record<LessonMeta["difficulty"], string> = {
   foundational: "Foundational",
   intermediate: "Intermediate",
   advanced: "Advanced",
+  master: "Master",
 };
 
 function moduleIndex(course: Course | undefined, moduleSlug: string): number {
@@ -101,195 +109,221 @@ export function LessonLayout({
     .filter((entry): entry is { lesson: LessonMetaWithSlug; note: string } => Boolean(entry));
 
   return (
-    <Container className="py-16">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/learn" className="hover:text-foreground">
-          Learn
-        </Link>
-        {pillar ? (
-          <>
-            <span aria-hidden="true">/</span>
-            <Link href={`/learn#${pillar.slug}`} className="hover:text-foreground">
-              {pillar.title}
-            </Link>
-          </>
-        ) : null}
-        {course ? (
-          <>
-            <span aria-hidden="true">/</span>
-            <span className="text-foreground">{course.title}</span>
-          </>
-        ) : null}
-      </nav>
-
-      {course && position >= 0 ? (
-        <div className="mt-5 max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Lesson {position + 1} of {totalModules}
-          </p>
-          <div className="mt-1.5 h-1 w-full max-w-xs overflow-hidden rounded-full bg-surface-muted">
-            <div className="h-full rounded-full bg-brand" style={{ width: `${progressPercent}%` }} />
-          </div>
-        </div>
-      ) : null}
-
-      <div className="mt-5 max-w-3xl">
-        <div className="flex flex-wrap gap-2">
-          <Badge tone="brand">{DIFFICULTY_LABEL[meta.difficulty]}</Badge>
-          <Badge>{meta.estimatedMinutes} min</Badge>
-        </div>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-          {meta.title}
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">{meta.description}</p>
-
-        {prerequisites.length > 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Prerequisite{prerequisites.length > 1 ? "s" : ""}:{" "}
-            {prerequisites.map((lesson, i) => {
-              const prereqCourse = lesson.course !== meta.course ? getCourse(lesson.course) : undefined;
-              return (
-                <span key={lesson.slug}>
-                  {i > 0 ? ", " : ""}
-                  <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
-                    {lesson.title}
-                  </Link>
-                  {prereqCourse ? ` (${prereqCourse.title})` : ""}
-                </span>
-              );
-            })}
-          </p>
-        ) : null}
-
-        {resurfacesIn.length > 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">
-            This concept resurfaces in:{" "}
-            {resurfacesIn.map((lesson, i) => {
-              const resurfaceCourse = getCourse(lesson.course);
-              const resurfacePillar = resurfaceCourse
-                ? PILLARS.find((p) => p.slug === resurfaceCourse.pillar)
-                : undefined;
-              return (
-                <span key={lesson.slug}>
-                  {i > 0 ? ", " : ""}
-                  <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
-                    {lesson.title}
-                  </Link>
-                  {resurfacePillar ? ` (${resurfacePillar.title})` : ""}
-                </span>
-              );
-            })}
-          </p>
-        ) : null}
-
-        {relatedElsewhere.length > 0 ? (
-          <div className="mt-6 rounded-2xl border border-border bg-surface-muted/60 p-5">
-            <p className="text-sm font-semibold text-foreground">Related elsewhere</p>
-            <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
-              {relatedElsewhere.map(({ lesson, note }) => (
-                <li key={lesson.slug}>
-                  <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
-                    {lesson.title}
-                  </Link>
-                  {" — "}
-                  {note}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        {meta.objectives.length > 0 ? (
-          <div className="mt-6 rounded-2xl border border-border bg-surface-muted/60 p-5">
-            <p className="text-sm font-semibold text-foreground">
-              By the end of this lesson, you&rsquo;ll be able to:
-            </p>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-              {meta.objectives.map((objective) => (
-                <li key={objective}>{objective}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="prose prose-neutral mt-12 max-w-3xl dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-brand">
-        {children}
-      </div>
-
-      <div className="mt-10 max-w-3xl border-t border-border pt-8">
-        <LessonCompleteToggle slug={slug} />
-      </div>
-
-      {prevLesson || nextLesson || finishedCourse ? (
-        <nav
-          aria-label="Lesson navigation"
-          className="mt-16 grid max-w-3xl gap-4 border-t border-border pt-8 sm:grid-cols-2"
-        >
-          {prevLesson ? (
-            <Link
-              href={`/lessons/${prevLesson.slug}`}
-              className="group rounded-xl border border-border p-4 transition-colors hover:border-brand/40 hover:bg-surface-muted"
-            >
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                ← Previous
-              </span>
-              <p className="mt-1 font-medium text-foreground group-hover:text-brand">{prevLesson.title}</p>
-            </Link>
-          ) : (
-            <div aria-hidden="true" />
-          )}
-          {nextLesson ? (
-            <Link
-              href={`/lessons/${nextLesson.slug}`}
-              className="group rounded-xl border border-border p-4 text-right transition-colors hover:border-brand/40 hover:bg-surface-muted sm:col-start-2"
-            >
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Next →
-              </span>
-              <p className="mt-1 font-medium text-foreground group-hover:text-brand">{nextLesson.title}</p>
-            </Link>
-          ) : finishedCourse ? (
-            <div className="rounded-xl border border-border p-4 text-right transition-colors hover:border-brand/40 hover:bg-surface-muted sm:col-start-2">
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Next →
-              </span>
-              <p className="mt-1 font-medium text-foreground">You finished {finishedCourse.title}</p>
-              {nextCourseSuggestions.length > 0 ? (
-                <ul className="mt-2 space-y-1">
-                  {nextCourseSuggestions.map(({ course: suggestedCourse, lesson }) => (
-                    <li key={suggestedCourse.slug}>
-                      <Link
-                        href={`/lessons/${lesson.slug}`}
-                        className="text-sm text-brand hover:underline"
-                      >
-                        Start {suggestedCourse.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2 text-sm">
-                  <Link
-                    href={pillar ? `/learn#${pillar.slug}` : "/learn"}
-                    className="text-brand hover:underline"
-                  >
-                    Browse more courses
-                  </Link>
-                </p>
-              )}
-            </div>
-          ) : (
-            <div aria-hidden="true" />
-          )}
+    <>
+      <ReadingProgressBar containerId={LESSON_PROSE_ID} />
+      <Container className="py-16">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <Link href="/learn" className="hover:text-foreground">
+            Learn
+          </Link>
+          {pillar ? (
+            <>
+              <span aria-hidden="true">/</span>
+              <Link href={`/learn#${pillar.slug}`} className="hover:text-foreground">
+                {pillar.title}
+              </Link>
+            </>
+          ) : null}
+          {course ? (
+            <>
+              <span aria-hidden="true">/</span>
+              <span className="text-foreground">{course.title}</span>
+            </>
+          ) : null}
         </nav>
-      ) : null}
 
-      {finishedCourse && checkpointProblems.length > 0 ? (
-        <div className="max-w-3xl">
-          <CourseCheckpoint courseTitle={finishedCourse.title} problems={checkpointProblems} />
+        {course && position >= 0 ? (
+          <div className="mt-5 max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Lesson {position + 1} of {totalModules}
+            </p>
+            <div className="mt-1.5 h-1 w-full max-w-xs overflow-hidden rounded-full bg-surface-muted">
+              <div className="h-full rounded-full bg-brand" style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mt-5 max-w-3xl">
+          <div className="flex flex-wrap gap-2">
+            <Badge tone="brand">{DIFFICULTY_LABEL[meta.difficulty]}</Badge>
+            <Badge>{meta.estimatedMinutes} min</Badge>
+          </div>
+          <h1 className="mt-5 font-display text-5xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            {meta.title}
+          </h1>
+          <p className="mt-6 text-lg text-muted-foreground">{meta.description}</p>
+
+          {prerequisites.length > 0 ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Prerequisite{prerequisites.length > 1 ? "s" : ""}:{" "}
+              {prerequisites.map((lesson, i) => {
+                const prereqCourse = lesson.course !== meta.course ? getCourse(lesson.course) : undefined;
+                return (
+                  <span key={lesson.slug}>
+                    {i > 0 ? ", " : ""}
+                    <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
+                      {lesson.title}
+                    </Link>
+                    {prereqCourse ? ` (${prereqCourse.title})` : ""}
+                  </span>
+                );
+              })}
+            </p>
+          ) : null}
+
+          {resurfacesIn.length > 0 ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              This concept resurfaces in:{" "}
+              {resurfacesIn.map((lesson, i) => {
+                const resurfaceCourse = getCourse(lesson.course);
+                const resurfacePillar = resurfaceCourse
+                  ? PILLARS.find((p) => p.slug === resurfaceCourse.pillar)
+                  : undefined;
+                return (
+                  <span key={lesson.slug}>
+                    {i > 0 ? ", " : ""}
+                    <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
+                      {lesson.title}
+                    </Link>
+                    {resurfacePillar ? ` (${resurfacePillar.title})` : ""}
+                  </span>
+                );
+              })}
+            </p>
+          ) : null}
+
+          {relatedElsewhere.length > 0 ? (
+            <div className="mt-6 rounded-2xl border border-border bg-surface-muted/60 p-5">
+              <p className="text-sm font-semibold text-foreground">Related elsewhere</p>
+              <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                {relatedElsewhere.map(({ lesson, note }) => (
+                  <li key={lesson.slug}>
+                    <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
+                      {lesson.title}
+                    </Link>
+                    {" — "}
+                    {note}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {meta.objectives.length > 0 ? (
+            <div className="mt-6 rounded-2xl border border-border bg-surface-muted/60 p-5">
+              <p className="text-sm font-semibold text-foreground">
+                By the end of this lesson, you&rsquo;ll be able to:
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                {meta.objectives.map((objective) => (
+                  <li key={objective}>{objective}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
-      ) : null}
-    </Container>
+
+        <TableOfContentsMobile containerId={LESSON_PROSE_ID} />
+
+        {/* Two-column at `lg`: prose keeps its own `max-w-3xl` regardless of
+            which branch of `has-[nav:empty]` is active, so this grid switching
+            between one and two columns never reflows the reading column
+            itself — only whether the rail's space is reserved. */}
+        <div className="mt-12 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-10 lg:has-[nav:empty]:grid-cols-1">
+          <div
+            id={LESSON_PROSE_ID}
+            className={cn(
+              "prose prose-neutral max-w-3xl dark:prose-invert prose-a:text-brand",
+              // h2 = section-moment: display face, real weight/spacing, the
+              // biggest thing in the prose body short of the page's own h1.
+              "prose-h2:font-display prose-h2:mt-16 prose-h2:mb-4 prose-h2:text-3xl prose-h2:font-semibold prose-h2:tracking-tight",
+              // h3 stays Geist Sans (inherits body font) but genuinely bolder
+              // and more distinct from body copy than the plugin's default.
+              "prose-h3:mt-10 prose-h3:mb-3 prose-h3:text-xl prose-h3:font-bold prose-h3:tracking-tight",
+              // h4 = small-caps-style label, not "h3 but smaller": uppercase,
+              // tracking-wide, muted, small — a section label, not a heading.
+              "prose-h4:mt-8 prose-h4:mb-2 prose-h4:text-xs prose-h4:font-semibold prose-h4:uppercase prose-h4:tracking-wide prose-h4:text-muted-foreground"
+            )}
+          >
+            {children}
+          </div>
+          <TableOfContentsDesktop containerId={LESSON_PROSE_ID} />
+        </div>
+
+        <div className="mt-10 max-w-3xl border-t border-border pt-8">
+          <LessonCompleteToggle slug={slug} />
+        </div>
+
+        {prevLesson || nextLesson || finishedCourse ? (
+          <nav
+            aria-label="Lesson navigation"
+            className="mt-16 grid max-w-3xl gap-4 border-t border-border pt-8 sm:grid-cols-2"
+          >
+            {prevLesson ? (
+              <Link
+                href={`/lessons/${prevLesson.slug}`}
+                className="group rounded-xl border border-border p-4 transition-colors hover:border-brand/40 hover:bg-surface-muted"
+              >
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  ← Previous
+                </span>
+                <p className="mt-1 font-medium text-foreground group-hover:text-brand">{prevLesson.title}</p>
+              </Link>
+            ) : (
+              <div aria-hidden="true" />
+            )}
+            {nextLesson ? (
+              <Link
+                href={`/lessons/${nextLesson.slug}`}
+                className="group rounded-xl border border-border p-4 text-right transition-colors hover:border-brand/40 hover:bg-surface-muted sm:col-start-2"
+              >
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Next →
+                </span>
+                <p className="mt-1 font-medium text-foreground group-hover:text-brand">{nextLesson.title}</p>
+              </Link>
+            ) : finishedCourse ? (
+              <div className="rounded-xl border border-border p-4 text-right transition-colors hover:border-brand/40 hover:bg-surface-muted sm:col-start-2">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Next →
+                </span>
+                <p className="mt-1 font-medium text-foreground">You finished {finishedCourse.title}</p>
+                {nextCourseSuggestions.length > 0 ? (
+                  <ul className="mt-2 space-y-1">
+                    {nextCourseSuggestions.map(({ course: suggestedCourse, lesson }) => (
+                      <li key={suggestedCourse.slug}>
+                        <Link
+                          href={`/lessons/${lesson.slug}`}
+                          className="text-sm text-brand hover:underline"
+                        >
+                          Start {suggestedCourse.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-sm">
+                    <Link
+                      href={pillar ? `/learn#${pillar.slug}` : "/learn"}
+                      className="text-brand hover:underline"
+                    >
+                      Browse more courses
+                    </Link>
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div aria-hidden="true" />
+            )}
+          </nav>
+        ) : null}
+
+        {finishedCourse && checkpointProblems.length > 0 ? (
+          <div className="max-w-3xl">
+            <CourseCheckpoint courseTitle={finishedCourse.title} problems={checkpointProblems} />
+          </div>
+        ) : null}
+      </Container>
+    </>
   );
 }

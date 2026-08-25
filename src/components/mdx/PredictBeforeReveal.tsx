@@ -34,7 +34,13 @@ export function PredictBeforeReveal({
 
   return (
     <div className="not-prose my-8 rounded-2xl border border-brand/30 bg-brand/5 p-5 sm:p-6">
-      <p className="text-xs font-semibold uppercase tracking-wide text-brand">Predict before you reveal</p>
+      <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brand">
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="shrink-0 fill-none stroke-brand" strokeWidth="1.5">
+          <circle cx="6" cy="6" r="4.75" />
+          <circle cx="6" cy="6" r="1.25" className="fill-brand stroke-none" />
+        </svg>
+        Predict before you reveal
+      </p>
       <p className="mt-2 text-sm font-medium text-foreground">{question}</p>
 
       <div role="radiogroup" aria-label={question} className="mt-4 flex flex-wrap gap-2">

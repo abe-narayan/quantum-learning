@@ -1,0 +1,317 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
+import { amplitudeDampingChannel, dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Quantum Channels: Kraus and Choi",
+  description:
+    "Open Quantum Systems & Kraus Operators asserted that every physical channel has a Kraus form; this lesson proves it, via the Choi-Jamiolkowski isomorphism, then reconstructs amplitude damping's own K0 and K1 from nothing but its Choi matrix's eigenvectors.",
+  course: "quantum-information-theory",
+  module: "quantum-channels-kraus-and-choi",
+  order: 3,
+  difficulty: "master",
+  estimatedMinutes: 30,
+  prerequisites: [
+    "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
+    "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification",
+  ],
+  objectives: [
+    "Define the Choi matrix of a quantum channel and prove complete positivity is equivalent to Choi-matrix positive semi-definiteness",
+    "Prove trace-preservation corresponds to the Choi matrix's output-partial-trace equaling the identity",
+    "Reconstruct a channel's Kraus operators directly from its Choi matrix's eigendecomposition, verified against a real channel",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/the-lindblad-master-equation",
+      note: "The Lindblad equation generates a continuous family of CP maps; every snapshot of it has a Choi matrix obeying exactly this lesson's positivity condition.",
+    },
+  ],
+};
+
+export const gamma = 0.3;
+export const lambda = 0.3;
+
+export const basisMatrix = (i, j) => {
+  const data = [
+    [i === 0 && j === 0 ? Complex.ONE : Complex.ZERO, i === 0 && j === 1 ? Complex.ONE : Complex.ZERO],
+    [i === 1 && j === 0 ? Complex.ONE : Complex.ZERO, i === 1 && j === 1 ? Complex.ONE : Complex.ZERO],
+  ];
+  return new Matrix(data);
+}
+
+export const choiMatrix = (krausOps) => {
+  const pairs = [0, 1].flatMap((i) => [0, 1].map((j) => [i, j]));
+  return pairs.reduce((J, [i, j]) => {
+    const eij = basisMatrix(i, j);
+    const Eeij = applyKrausChannel(eij, krausOps);
+    return J.add(eij.tensor(Eeij));
+  }, Matrix.zeros(4, 4));
+}
+
+export const J_AD = choiMatrix(amplitudeDampingChannel(gamma));
+export const J_DP = choiMatrix(dephasingChannel(lambda));
+
+export const blockAD = new Matrix([
+  [J_AD.get(0, 0), J_AD.get(0, 3)],
+  [J_AD.get(3, 0), J_AD.get(3, 3)],
+]);
+export const blockDP = new Matrix([
+  [J_DP.get(0, 0), J_DP.get(0, 3)],
+  [J_DP.get(3, 0), J_DP.get(3, 3)],
+]);
+
+export const [muAD1, muAD2] = eigenvaluesHermitian2x2(blockAD);
+export const [muDP1, muDP2] = eigenvaluesHermitian2x2(blockDP);
+export const isolatedAD = J_AD.get(2, 2).re;
+export const isolatedDP1 = J_DP.get(1, 1).re;
+export const isolatedDP2 = J_DP.get(2, 2).re;
+
+export const partialTraceOutput = (J) => {
+  return new Matrix([
+    [J.get(0, 0).add(J.get(1, 1)), J.get(0, 2).add(J.get(1, 3))],
+    [J.get(2, 0).add(J.get(3, 1)), J.get(2, 2).add(J.get(3, 3))],
+  ]);
+}
+export const tracedOutAD = partialTraceOutput(J_AD);
+export const tracedOutDP = partialTraceOutput(J_DP);
+
+## Motivation
+
+Open Quantum Systems & Kraus Operators stated the Kraus sum
+representation $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$ as *the*
+general form of a physically valid channel, without proving that every
+completely positive, trace-preserving map actually has one. This lesson
+supplies that proof, via a tool that turns an entire *map* (an operator
+on operators) into a single ordinary matrix that can be diagonalized with
+machinery this platform already has: the **Choi–Jamiolkowski
+isomorphism**.
+
+## Mathematical Development
+
+### Complete positivity, precisely
+
+A linear map $\mathcal E$ on $d\times d$ matrices is **positive** if
+$\rho\geq0\Rightarrow\mathcal E(\rho)\geq0$. It is **completely positive**
+(CP) if $\mathbb 1_n\otimes\mathcal E$ is positive for every $n$: acting
+on an arbitrary larger system while leaving an $n$-dimensional
+"spectator" subsystem alone must *still* produce a valid state. This is a
+strictly stronger requirement than positivity (there exist positive maps,
+like transposition, that are not completely positive), and it's the
+correct physical requirement: a subsystem's evolution must remain valid
+even when it's entangled with something else, exactly the situation this
+platform's `partialTrace`-based reduced states are built to describe.
+
+### The Choi matrix
+
+$$
+J(\mathcal E) \equiv \sum_{i,j=0}^{d-1} |i\rangle\langle j|\otimes\mathcal E\big(|i\rangle\langle j|\big)
+$$
+
+a single $d^2\times d^2$ matrix built by feeding $\mathcal E$ every basis
+matrix $|i\rangle\langle j|$ (not just valid density matrices: $|i\rangle\langle j|$
+for $i\neq j$ isn't positive semi-definite, but $\mathcal E$ is still a
+well-defined *linear* map on it) and stacking the results. Equivalently,
+$J(\mathcal E)=d\,(\mathbb 1\otimes\mathcal E)(|\Omega^+\rangle\langle\Omega^+|)$
+for $|\Omega^+\rangle=\frac{1}{\sqrt d}\sum_i|i\rangle|i\rangle$, Schmidt
+Decomposition and Purification's maximally entangled purification of
+$I/d$, sent halfway through the channel. This is the isomorphism's
+physical content: $J(\mathcal E)$ is exactly what comes out of sending
+one half of a maximally entangled pair through $\mathcal E$ and leaving
+the other half alone.
+
+### Complete positivity $\Longleftrightarrow$ $J(\mathcal E)\geq0$
+
+**Easy direction.** If $\mathcal E$ has a Kraus form
+$\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$, first check
+$\mathbb1_n\otimes\mathcal E$ is positive for any $n$ (i.e. $\mathcal E$
+is CP, not just positive): $(\mathbb1_n\otimes\mathcal E)(\sigma)=\sum_k(\mathbb1_n\otimes K_k)\sigma(\mathbb1_n\otimes K_k)^\dagger$
+is manifestly a sum of terms of the form $A\sigma A^\dagger$, each
+positive semi-definite whenever $\sigma$ is (for any vector $|\phi\rangle$,
+$\langle\phi|A\sigma A^\dagger|\phi\rangle=\langle A^\dagger\phi|\sigma|A^\dagger\phi\rangle\geq0$
+since $\sigma\geq0$), so the whole sum is too. Then $J(\mathcal E)=d(\mathbb1\otimes\mathcal E)(|\Omega^+\rangle\langle\Omega^+|)$
+is the image of the positive operator $|\Omega^+\rangle\langle\Omega^+|$
+under the now-established-positive map $\mathbb1\otimes\mathcal E$,
+hence $J(\mathcal E)\geq0$.
+
+**Hard direction, the actual content of the theorem.** Suppose
+$J(\mathcal E)\geq0$. Diagonalize it (the spectral theorem, general
+finite dimensions):
+$J(\mathcal E)=\sum_k\mu_k|v_k\rangle\langle v_k|$, $\mu_k\geq0$, with
+each $|v_k\rangle=\sum_{i,\ell}(v_k)_{i\ell}|i\rangle|\ell\rangle$ an
+eigenvector of the $d^2$-dimensional Choi matrix, indexed by the same
+$(i,\ell)$ pair the definition of $J$ used. Define, for each $k$, the
+$d\times d$ matrix $K_k$ by **reshaping** $|v_k\rangle$:
+
+$$
+(K_k)_{\ell i} \equiv \sqrt{\mu_k}\,(v_k)_{i\ell}
+$$
+
+(output index $\ell$ becomes the matrix row, input index $i$ the
+column, the same index that labelled which $|i\rangle\langle j|$ was
+fed into $\mathcal E$ when $J$ was built). This reshaping directly
+inverts the "vectorize $K_k$" map used in the easy direction: one checks
+term by term that $\sum_ij|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=|v_k\rangle\langle v_k|\cdot\mu_k/\mu_k=\mu_k|v_k\rangle\langle v_k|$
+reproduces exactly the $k$-th term of the eigendecomposition (the worked
+example below verifies this identity numerically rather than leaving it
+purely symbolic). Summing over $k$: $\sum_k\sum_{ij}|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=J(\mathcal E)$,
+matching term-by-term against the *definition* $J(\mathcal E)=\sum_{ij}|i\rangle\langle j|\otimes\mathcal E(|i\rangle\langle j|)$
+forces $\mathcal E(|i\rangle\langle j|)=\sum_kK_k|i\rangle\langle j|K_k^\dagger$
+for every basis matrix $|i\rangle\langle j|$, and since these span the
+full space of matrices, $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$ for
+*every* $\rho$, by linearity. $\mathcal E$ has a Kraus form. $\blacksquare$
+
+### Trace-preservation, restated on the Choi matrix
+
+**Claim.** $\mathcal E$ is trace-preserving if and only if
+$\text{Tr}_{\text{out}}\big(J(\mathcal E)\big)=I$ (tracing out the
+*second* tensor factor, the output copy).
+
+**Proof.** $\text{Tr}_{\text{out}}(J(\mathcal E))=\sum_{ij}|i\rangle\langle j|\,\text{Tr}\big(\mathcal E(|i\rangle\langle j|)\big)$.
+If $\mathcal E$ preserves trace, $\text{Tr}(\mathcal E(|i\rangle\langle j|))=\text{Tr}(|i\rangle\langle j|)=\delta_{ij}$,
+so the sum collapses to $\sum_i|i\rangle\langle i|=I$. Conversely, if
+$\text{Tr}_{\text{out}}(J(\mathcal E))=I$, matching coefficients of
+$|i\rangle\langle j|$ forces $\text{Tr}(\mathcal E(|i\rangle\langle j|))=\delta_{ij}=\text{Tr}(|i\rangle\langle j|)$
+on the whole spanning set, hence on every $\rho$ by linearity.
+$\blacksquare$
+
+## Worked Example
+
+**Build the Choi matrices for this platform's own amplitude-damping
+($\gamma=0.3$) and dephasing ($\lambda=0.3$) channels, verify complete
+positivity directly, and reconstruct amplitude damping's Kraus operators
+from nothing but $J$'s eigenvectors.**
+
+<MatrixGridExplorer
+  presets={[
+    { label: "Amplitude damping, gamma=0.3", panels: [{ label: "J(E)", cells: matrixToCells(J_AD), highlightDiagonal: true }] },
+    { label: "Dephasing, lambda=0.3", panels: [{ label: "J(E)", cells: matrixToCells(J_DP), highlightDiagonal: true }] },
+  ]}
+  ariaLabel="Choi matrices for the amplitude damping and dephasing channels, gamma and lambda both 0.3"
+/>
+
+Both channels' Choi matrices are block-diagonal: a nontrivial $2\times2$
+block on the $\{(0,0),(1,1)\}$ indices plus one or two isolated diagonal
+entries. `eigenvaluesHermitian2x2`, the same closed-form solver used
+throughout this course, applied directly to each $2\times2$ block gives:
+
+$$
+\text{Amplitude damping: block eigenvalues } \{1.7,\ 0\}, \quad \text{isolated entry } 0.3 \qquad\Longrightarrow\quad \text{full spectrum } \{1.7,\ 0.3,\ 0,\ 0\}
+$$
+
+$$
+\text{Dephasing: block eigenvalues } \{1.7,\ 0.3\}, \quad \text{isolated entries } 0,\ 0 \qquad\Longrightarrow\quad \text{full spectrum } \{1.7,\ 0.3,\ 0,\ 0\}
+$$
+
+Every eigenvalue is $\geq0$ for both channels (confirming complete
+positivity directly from the theorem above, not merely from already
+knowing these are physical channels), and both spectra sum to $2=d$,
+consistent with trace-preservation ($\text{Tr}J(\mathcal E)=\text{Tr}(\text{Tr}_{\text{out}}J(\mathcal E))=\text{Tr}(I)=d$,
+checked directly: `partialTraceOutput` applied to both $J_{AD}$ and
+$J_{DP}$ returns exactly $I$).
+
+Now the hard direction's actual content: reshape the amplitude-damping
+block's top eigenvector (eigenvalue $\mu_1=1.7$, eigenvector
+$\approx(0.7670,0.6417)$ in the $\{(0,0),(1,1)\}$ block basis) via
+$(K_1)_{\ell i}=\sqrt{\mu_1}\,(v_1)_{i\ell}$:
+
+$$
+K_1^{\text{reconstructed}} = \sqrt{1.7}\begin{pmatrix}0.7670 & 0\\0 & 0.6417\end{pmatrix} = \begin{pmatrix}1 & 0\\0 & 0.8367\end{pmatrix}
+$$
+
+**exactly $K_0$**, amplitude damping's own original first Kraus operator
+(from Open Quantum Systems & Kraus Operators), reconstructed with no
+input except $J$'s eigenvectors. The isolated entry (eigenvalue $0.3$)
+reshapes the same way to
+$\begin{pmatrix}0&\sqrt{0.3}\\0&0\end{pmatrix}\approx\begin{pmatrix}0&0.5477\\0&0\end{pmatrix}$,
+**exactly $K_1$**. The block's second eigenvalue is numerically $0$
+(confirming the Choi matrix's rank, hence this channel's minimal Kraus
+rank, is exactly $2$, matching the two Kraus operators already used
+throughout this course, not a coincidence). Applying these
+Choi-reconstructed operators to $\rho_0=|+\rangle\langle+|$ via
+`applyKrausChannel` reproduces
+Trace Distance and Fidelity's $\rho_{AD}=\begin{pmatrix}0.65&0.4183\\0.4183&0.35\end{pmatrix}$
+to full numerical precision, the concrete, verified instance of the
+term-by-term identity claimed in the proof above.
+
+## Physical Interpretation
+
+The Choi–Jamiolkowski isomorphism says a channel and a bipartite quantum
+state carry exactly the same information, related by "send half of a
+maximally entangled pair through it." This is why checking a proposed
+channel's validity reduces to checking a single matrix's positive
+semi-definiteness (an ordinary, checkable linear-algebra condition, not
+a fact about *every* possible input state and *every* possible larger
+system it might be entangled with, which complete positivity's original
+definition would otherwise demand quantifying over).
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Checking only that $\mathcal E$ is positive, not completely positive.**
+Positivity alone permits maps (like matrix transposition) that fail
+badly once the input is entangled with an untouched spectator system;
+the Choi matrix test given here checks *complete* positivity directly,
+which is the physically required condition.
+</Callout>
+
+<Callout type="mistake">
+**Forgetting the $\text{Tr}_{\text{out}}(J(\mathcal E))=I$ condition.**
+Positive semi-definiteness of $J(\mathcal E)$ alone only guarantees
+*complete positivity*; a completely positive map that shrinks or grows
+total probability (not trace-preserving) still has $J(\mathcal E)\geq0$
+but fails this second, independent condition. Both must hold for
+$\mathcal E$ to be a physically valid channel.
+</Callout>
+
+## Practice Questions
+
+1. Verify by direct computation that $\text{Tr}(J(\mathcal E))=2$ for
+   both the amplitude-damping and dephasing Choi matrices above, and
+   explain why this number must always equal $d$ for any single-qubit
+   trace-preserving channel.
+2. The dephasing channel's Choi block has eigenvalues $\{1.7,0.3\}$,
+   *both* nonzero (unlike amplitude damping's $\{1.7,0\}$). What does
+   this say about dephasing's minimal Kraus rank compared to amplitude
+   damping's?
+3. A single unitary channel $\mathcal E(\rho)=U\rho U^\dagger$ has Choi
+   matrix $J(\mathcal E)=|v\rangle\langle v|$ for
+   $|v\rangle=\sum_i|i\rangle\otimes U|i\rangle$, rank exactly $1$.
+   Explain why this matches the fact that a unitary channel needs only
+   one Kraus operator.
+4. Using the trace-preservation identity, explain why a channel with
+   $J(\mathcal E)\geq0$ but $\text{Tr}_{\text{out}}(J(\mathcal E))\neq I$
+   could still be a valid *sub-normalized* quantum operation (used to
+   describe one branch of a measurement) even though it isn't a complete
+   channel.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The Choi matrix $J(\mathcal E)=\sum_{ij}|i\rangle\langle j|\otimes\mathcal E(|i\rangle\langle j|)$
+  turns a channel into a single ordinary matrix.
+- $\mathcal E$ is completely positive if and only if $J(\mathcal E)\geq0$,
+  proved in both directions, with the hard direction's reshaping
+  argument reconstructing genuine Kraus operators from $J$'s
+  eigendecomposition.
+- $\mathcal E$ is trace-preserving if and only if
+  $\text{Tr}_{\text{out}}(J(\mathcal E))=I$.
+- Reconstructing amplitude damping's own $K_0,K_1$ from nothing but its
+  Choi matrix's eigenvectors, verified to reproduce
+  Trace Distance and Fidelity's exact numerical output, is this lesson's
+  concrete proof that the theorem isn't just symbolic bookkeeping.
+
+## Further Exploration
+
+Next: [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation),
+which asks a different question about the same channels: not "is this
+map physically valid as a single snapshot" but "what continuous-time
+generator produces it as time passes."

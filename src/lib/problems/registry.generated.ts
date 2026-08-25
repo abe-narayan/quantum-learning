@@ -229,6 +229,56 @@ import { whyJosephsonJunctionNeeded } from "@/content/problems/quantum-hardware/
 import { whyOpticalTweezersWorkForNeutralAtoms } from "@/content/problems/quantum-hardware/physical-qubit-platforms/why-optical-tweezers-work-for-neutral-atoms";
 import { whyPhotonPhotonGatesAreHard } from "@/content/problems/quantum-hardware/physical-qubit-platforms/why-photon-photon-gates-are-hard";
 import { whyStaticFieldsCantTrap } from "@/content/problems/quantum-hardware/physical-qubit-platforms/why-static-fields-cant-trap";
+import { bbbvScopeMultipleChoice } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/bbbv-scope-multiple-choice";
+import { classicalVarianceIndependenceMc } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/classical-variance-independence-mc";
+import { commutingTermsZeroError } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/commuting-terms-zero-error";
+import { djClassicalQueriesN12 } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/dj-classical-queries-n12";
+import { gradientVarianceAtN4Recall } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/gradient-variance-at-n4-recall";
+import { qpeBestEstimateProbabilityPhi15 } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/qpe-best-estimate-probability-phi-1-5";
+import { qpeTailBoundAtJ5 } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/qpe-tail-bound-at-j5";
+import { quantumWalkDisplacementAt10000 } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/quantum-walk-displacement-at-10000";
+import { threeWallsClassificationMc } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/three-walls-classification-mc";
+import { trotterStepsForTargetError } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/trotter-steps-for-target-error";
+import { whyShorsEvadesWallOne } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/why-shors-evades-wall-one";
+import { zeroMeanNotSufficientMc } from "@/content/problems/quantum-mastery/advanced-algorithms-and-complexity/zero-mean-not-sufficient-mc";
+import { dirichletKernelPeakHeight } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/dirichlet-kernel-peak-height";
+import { fourthRungOfTheLadder } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/fourth-rung-of-the-ladder";
+import { freeParticleGreensFunctionMagnitude } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/free-particle-greens-function-magnitude";
+import { halfLineDeficiencyNormalization } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/half-line-deficiency-normalization";
+import { infiniteWellOrthogonalityCheck } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/infinite-well-orthogonality-check";
+import { infiniteWellPoleLocation } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/infinite-well-pole-location";
+import { pvmOutcomeProbability } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/pvm-outcome-probability";
+import { symmetricVersusSelfAdjoint } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/symmetric-versus-self-adjoint";
+import { whyPPDiverges } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/why-p-p-diverges";
+import { whyStaircaseGivesASum } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/why-staircase-gives-a-sum";
+import { whyTheShortcutsNeverFailed } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/why-the-shortcuts-never-failed";
+import { whyUZeroKillsTheBoundaryTerm } from "@/content/problems/quantum-mastery/hilbert-space-and-spectral-theory/why-u-zero-kills-the-boundary-term";
+import { averageTeleportationFidelity } from "@/content/problems/quantum-mastery/quantum-information-theory/average-teleportation-fidelity";
+import { choiBlockEigenvalueAtGamma } from "@/content/problems/quantum-mastery/quantum-information-theory/choi-block-eigenvalue-at-gamma";
+import { coherenceDecayRateHalfPopulation } from "@/content/problems/quantum-mastery/quantum-information-theory/coherence-decay-rate-half-population";
+import { combinedT2FromTwoProcesses } from "@/content/problems/quantum-mastery/quantum-information-theory/combined-t2-from-two-processes";
+import { cssCommutationCondition } from "@/content/problems/quantum-mastery/quantum-information-theory/css-commutation-condition";
+import { fuchsVanDeGraafPureEquality } from "@/content/problems/quantum-mastery/quantum-information-theory/fuchs-van-de-graaf-pure-equality";
+import { purificationUnitaryFreedom } from "@/content/problems/quantum-mastery/quantum-information-theory/purification-unitary-freedom";
+import { relativeEntropyNearPure } from "@/content/problems/quantum-mastery/quantum-information-theory/relative-entropy-near-pure";
+import { schmidtCoefficientsToEntropy } from "@/content/problems/quantum-mastery/quantum-information-theory/schmidt-coefficients-to-entropy";
+import { steaneCodespaceDimension } from "@/content/problems/quantum-mastery/quantum-information-theory/steane-codespace-dimension";
+import { superdenseLambdaForTargetSuccess } from "@/content/problems/quantum-mastery/quantum-information-theory/superdense-lambda-for-target-success";
+import { traceDistanceAtHalfDamping } from "@/content/problems/quantum-mastery/quantum-information-theory/trace-distance-at-half-damping";
+import { wernerConcurrenceAtHalf } from "@/content/problems/quantum-mastery/quantum-information-theory/werner-concurrence-at-half";
+import { zeroEigenvalueStillCp } from "@/content/problems/quantum-mastery/quantum-information-theory/zero-eigenvalue-still-cp";
+import { twoPToThreePSplittingRatio } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/2p-to-3p-splitting-ratio";
+import { threePSpinOrbitSplitting } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/3p-spin-orbit-splitting";
+import { berryPhaseAt90Degrees } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/berry-phase-at-90-degrees";
+import { cgCoefficientValue } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/cg-coefficient-value";
+import { coherentStateMeanPhotonNumber } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-state-mean-photon-number";
+import { crossSectionRatioAtKa1 } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/cross-section-ratio-at-ka-1";
+import { dynamicalEqualsGeometricPhaseDuration } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/dynamical-equals-geometric-phase-duration";
+import { hardSphereCrossSectionAtKaHalf } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/hard-sphere-cross-section-at-ka-half";
+import { j1j1TopMultipletSize } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/j1-j1-top-multiplet-size";
+import { squeezedStateDeltaXAtR1 } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/squeezed-state-delta-x-at-r-1";
+import { whyBerryPhaseIsRateIndependent } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/why-berry-phase-is-rate-independent";
+import { wkbAsQuantizedAdiabaticInvariant } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/wkb-as-quantized-adiabatic-invariant";
 import { amplitudeDampingTraceCheck } from "@/content/problems/quantum-mechanics/advanced-quantum-mechanics/amplitude-damping-trace-check";
 import { channelsReusedInHardwarePillar } from "@/content/problems/quantum-mechanics/advanced-quantum-mechanics/channels-reused-in-hardware-pillar";
 import { compositionLawRelativeError } from "@/content/problems/quantum-mechanics/advanced-quantum-mechanics/composition-law-relative-error";
@@ -660,6 +710,56 @@ export const PROBLEMS: Problem[] = [
   whyOpticalTweezersWorkForNeutralAtoms,
   whyPhotonPhotonGatesAreHard,
   whyStaticFieldsCantTrap,
+  bbbvScopeMultipleChoice,
+  classicalVarianceIndependenceMc,
+  commutingTermsZeroError,
+  djClassicalQueriesN12,
+  gradientVarianceAtN4Recall,
+  qpeBestEstimateProbabilityPhi15,
+  qpeTailBoundAtJ5,
+  quantumWalkDisplacementAt10000,
+  threeWallsClassificationMc,
+  trotterStepsForTargetError,
+  whyShorsEvadesWallOne,
+  zeroMeanNotSufficientMc,
+  dirichletKernelPeakHeight,
+  fourthRungOfTheLadder,
+  freeParticleGreensFunctionMagnitude,
+  halfLineDeficiencyNormalization,
+  infiniteWellOrthogonalityCheck,
+  infiniteWellPoleLocation,
+  pvmOutcomeProbability,
+  symmetricVersusSelfAdjoint,
+  whyPPDiverges,
+  whyStaircaseGivesASum,
+  whyTheShortcutsNeverFailed,
+  whyUZeroKillsTheBoundaryTerm,
+  averageTeleportationFidelity,
+  choiBlockEigenvalueAtGamma,
+  coherenceDecayRateHalfPopulation,
+  combinedT2FromTwoProcesses,
+  cssCommutationCondition,
+  fuchsVanDeGraafPureEquality,
+  purificationUnitaryFreedom,
+  relativeEntropyNearPure,
+  schmidtCoefficientsToEntropy,
+  steaneCodespaceDimension,
+  superdenseLambdaForTargetSuccess,
+  traceDistanceAtHalfDamping,
+  wernerConcurrenceAtHalf,
+  zeroEigenvalueStillCp,
+  twoPToThreePSplittingRatio,
+  threePSpinOrbitSplitting,
+  berryPhaseAt90Degrees,
+  cgCoefficientValue,
+  coherentStateMeanPhotonNumber,
+  crossSectionRatioAtKa1,
+  dynamicalEqualsGeometricPhaseDuration,
+  hardSphereCrossSectionAtKaHalf,
+  j1j1TopMultipletSize,
+  squeezedStateDeltaXAtR1,
+  whyBerryPhaseIsRateIndependent,
+  wkbAsQuantizedAdiabaticInvariant,
   amplitudeDampingTraceCheck,
   channelsReusedInHardwarePillar,
   compositionLawRelativeError,

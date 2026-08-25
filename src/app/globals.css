@@ -9,6 +9,15 @@
 .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
+  /* Frame block equations as a visual moment rather than flush-in-prose
+     text: a muted fill + left accent border, matching the weight of a
+     Callout/InteractiveSection so display math reads as "worth pausing
+     on." Tokens are theme-aware (redefined under dark mode and
+     `[data-theme="dark"]` below), so this adapts automatically. */
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--surface-muted);
+  border-left: 3px solid var(--accent);
 }
 
 :root {
@@ -57,6 +66,7 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
 }
 
 /* Dark palette, shared by two selectors below:

@@ -116,6 +116,16 @@ uncertainty). This platform's `finiteSquareWellGroundStateEnergy`
 function implements exactly this, tested directly against the
 quantization condition it's supposed to solve.
 
+There isn't a dedicated preset for this well in the Wavefunction
+Explorer, and deliberately so: without a general numerical eigensolver
+(this platform's documented, honest limitation), there's no closed-form
+eigenstate to hand the simulator the way the infinite well and harmonic
+oscillator presets do. Bisection is a different, complementary numerical
+technique, the same one the graphical crossing above already showed you
+by hand: it solves one transcendental equation for a single number
+rather than evolving a full wavefunction, and it's exactly as legitimate
+a piece of numerical physics for that narrower job.
+
 ### A worked well
 
 Take $a=1$, $V_0=5$ (natural units). Running the bisection (100
@@ -151,18 +161,6 @@ into the classically forbidden region on both sides, effectively
 that isn't perfectly rigid always costs a little less zero-point energy
 than confinement that is, a real, general trend, not specific to this
 one example.
-
-## Interactive Experiment
-
-There isn't a dedicated preset for this in the Wavefunction Explorer,
-and deliberately so: without a general numerical eigensolver (this
-platform's documented, honest limitation), there's no closed-form
-eigenstate to hand the simulator the way the infinite well and harmonic
-oscillator presets do. The bisection method here is a different,
-complementary numerical technique. It solves one transcendental
-equation for a single number rather than evolving a full wavefunction,
-and it's exactly as legitimate a piece of numerical physics for that
-narrower job.
 
 ## Worked Example
 
@@ -231,3 +229,10 @@ Next: [Scattering Off a Step Potential](/lessons/quantum-mechanics/one-dimension
 *unbound* ones, and a genuinely surprising result: quantum particles
 partially reflect off a step even when they have more than enough energy
 to classically sail over it.
+
+For the general theorem behind why boundary-matching problems like this
+one always come with guaranteed real eigenvalues and orthogonal
+eigenfunctions — proving it once for the whole class of problem rather
+than case by case — see
+[Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
+in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.

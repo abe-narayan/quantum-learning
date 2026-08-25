@@ -1,0 +1,335 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { applySingleQubitGate, applyCNOT, rotationY, rotationZ, PAULI_Z } from "@/lib/quantum/gates";
+import { expectationValue } from "@/lib/quantum/observables";
+import { tensorAll } from "@/lib/quantum/matrix";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability"
+).map((problem) => problem.meta);
+
+export function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function scaledAnsatz(n, layers, params) {
+  let s = StateVector.zero(n);
+  let idx = 0;
+  for (let l = 0; l < layers; l++) {
+    for (let q = 0; q < n; q++) {
+      s = applySingleQubitGate(s, rotationY(params[idx++]), q);
+      s = applySingleQubitGate(s, rotationZ(params[idx++]), q);
+    }
+    if (n > 1) {
+      for (let q = 0; q < n; q++) s = applyCNOT(s, q, (q + 1) % n);
+    }
+  }
+  return s;
+}
+
+export function numParams(n, layers) {
+  return n * layers * 2;
+}
+
+export function scaledCost(n, layers, params, H) {
+  return expectationValue(scaledAnsatz(n, layers, params), H).re;
+}
+
+export function gradientVarianceForN(n, samples, seed) {
+  const layers = 4 * n;
+  const P = numParams(n, layers);
+  const H = tensorAll(Array.from({ length: n }, () => PAULI_Z));
+  const rng = mulberry32(seed);
+  const grads = [];
+  for (let s = 0; s < samples; s++) {
+    const params = Array.from({ length: P }, () => rng() * 2 * Math.PI);
+    const paramsPlus = params.slice();
+    const paramsMinus = params.slice();
+    paramsPlus[0] += Math.PI / 2;
+    paramsMinus[0] -= Math.PI / 2;
+    const cPlus = scaledCost(n, layers, paramsPlus, H);
+    const cMinus = scaledCost(n, layers, paramsMinus, H);
+    grads.push((cPlus - cMinus) / 2);
+  }
+  const mean = grads.reduce((a, b) => a + b, 0) / grads.length;
+  const variance = grads.reduce((a, b) => a + (b - mean) ** 2, 0) / grads.length;
+  return { layers, numParams: P, mean, variance };
+}
+
+export const barrenNValues = [2, 3, 4, 5, 6];
+export const barrenSamples = 300;
+export const barrenResults = barrenNValues.map((n) => ({ n, ...gradientVarianceForN(n, barrenSamples, 1234 + n) }));
+
+export const barrenCurveFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "log₁₀(gradient variance)",
+        color: "brand",
+        points: barrenResults.map((r) => ({ x: r.n, y: Math.log10(r.variance) })),
+      },
+    ],
+  },
+];
+
+export const barrenBars = barrenResults.map((r) => ({
+  label: `n=${r.n}`,
+  value: r.variance,
+  caption: r.variance.toExponential(2),
+}));
+
+export const lessonMeta = {
+  title: "Barren Plateaus and Variational Trainability",
+  description:
+    "Deriving why a variational circuit's parameter-shift gradient has exactly zero mean, then motivating why its variance shrinks exponentially in qubit count via the concentration-of-measure argument, verified numerically by scaling VQE's own single-qubit ansatz pattern up to 2, 3, 4, 5, and 6 qubits and measuring real gradient variance at each size.",
+  course: "advanced-algorithms-and-complexity",
+  module: "barren-plateaus-and-variational-trainability",
+  order: 5,
+  difficulty: "master",
+  estimatedMinutes: 45,
+  prerequisites: [
+    "quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example",
+    "quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits",
+  ],
+  objectives: [
+    "Derive that a variational circuit's parameter-shift gradient has exactly zero mean over uniformly random parameters",
+    "State and motivate the concentration-of-measure argument for why gradient variance shrinks exponentially in qubit count",
+    "Verify the exponential shrinkage numerically by scaling a real multi-qubit ansatz from 2 to 6 qubits and measuring actual gradient variance at each size",
+  ],
+};
+
+## Motivation
+
+VQE's worked toy example converged beautifully: 80 pattern-search
+iterations, monotonic descent, agreement with the exact answer to
+$10^{-12}$. That example used exactly one qubit. This lesson asks the
+question the toy example was too small to expose: what happens to that
+same training process as the ansatz scales up to real problem sizes?
+The answer is one of the most important, and most numerically verifiable,
+results in variational quantum computing: gradients don't just get
+harder to find, they vanish, exponentially fast in the number of qubits.
+
+## Mathematical Development
+
+### The parameter-shift rule, derived
+
+For a gate $U(\theta)=e^{-i\theta P/2}$ with $P$ Hermitian and
+$P^2=I$ (true for every Pauli, hence for $R_y,R_z$), Taylor expansion of
+the matrix exponential gives the exact identity $U(\theta)=\cos(\theta/2)
+I-i\sin(\theta/2)P$. Any expectation value $C(\theta)=\langle\psi|
+U(\theta)^\dagger HU(\theta)|\psi\rangle$ built from this gate expands,
+via the double-angle identities, into a pure single-frequency trig
+polynomial:
+
+$$
+C(\theta) = a + b\cos\theta + c\sin\theta
+$$
+
+for constants $a,b,c$ depending on everything *except* $\theta$. A short
+direct check confirms the **parameter-shift rule**:
+
+$$
+\frac{C(\theta+\pi/2)-C(\theta-\pi/2)}2 = \frac{[b(-\sin\theta)+c\cos\theta]-[b\sin\theta-c\cos\theta]}2 = -b\sin\theta+c\cos\theta = C'(\theta)
+$$
+
+an **exact** gradient formula (not a finite-difference approximation)
+using only two extra circuit evaluations, exactly the tool this lesson's
+numerics use below.
+
+### The gradient's mean is exactly zero
+
+If $\theta_i$ (the parameter being differentiated) is drawn uniformly
+over a full period, $\theta_i\sim\text{Unif}[0,2\pi)$, independent of
+every other parameter, then since $C'(\theta_i)=-b\sin\theta_i+c\cos
+\theta_i$ with $b,c$ depending only on the *other* parameters:
+
+$$
+\mathbb E[C'(\theta_i)] = \mathbb E_{\text{others}}\Big[\mathbb E_{\theta_i}[-b\sin\theta_i+c\cos\theta_i \mid b,c]\Big] = \mathbb E_{\text{others}}\Big[-b\!\!\underbrace{\int_0^{2\pi}\!\!\sin\theta_i\,\frac{d\theta_i}{2\pi}}_{=0}\!\!+c\!\!\underbrace{\int_0^{2\pi}\!\!\cos\theta_i\,\frac{d\theta_i}{2\pi}}_{=0}\Big] = 0
+$$
+
+**exactly zero**, by the law of total expectation and the elementary
+fact that $\sin$ and $\cos$ each integrate to zero over a full period,
+for *any* joint distribution of the other parameters, no genuinely deep
+theory required. This is the fully rigorous, elementary half of the
+barren plateau story: on average, the gradient doesn't point anywhere.
+
+### Why the variance also vanishes: exponentially in qubit count
+
+Zero mean alone is not yet a problem: that's true even for a
+perfectly well-behaved, easily trainable cost landscape (a bowl-shaped
+function's gradient also averages to zero over a symmetric domain). The
+real obstruction is that the gradient's *typical size* (its standard
+deviation) shrinks toward zero as the number of qubits grows, so
+gradient-based optimization has nothing to work with even locally. The
+mechanism (McClean, Boixo, Smelyanskiy, Babbush & Neven 2018, cited
+here rather than fully re-derived; the complete argument uses
+Weingarten calculus over the Haar measure, genuinely graduate-level
+technical machinery) is **concentration of measure**: a sufficiently
+deep, sufficiently expressive parametrized circuit behaves, statistically,
+like a Haar-random unitary applied to the initial state. For a
+Haar-random pure state $|\psi\rangle$ in a $2^n$-dimensional Hilbert
+space and a fixed traceless observable $H$ (a global Pauli string like
+$Z^{\otimes n}$ is exactly this kind of observable), Lévy's lemma (a
+standard concentration-of-measure theorem for Lipschitz functions on a
+high-dimensional sphere, itself a citable, standard result) gives
+
+$$
+\text{Var}_\psi[\langle\psi|H|\psi\rangle] = O\!\left(\frac1{2^n}\right)
+$$
+
+and because the parameter-shift gradient is itself a difference of two
+such expectation values at nearby parameter points, its variance
+inherits the same $O(2^{-n})$ scaling. **This is the barren plateau**:
+not merely that the average gradient is zero (derived exactly above, and
+true even for well-behaved landscapes), but that its *typical
+fluctuation size* collapses exponentially, so a random or naively-chosen
+starting point is, with overwhelming probability, sitting on a
+region so flat that no local optimizer can find a direction of descent
+within any reasonable numerical precision.
+
+## Physical Interpretation
+
+The single-qubit VQE toy example converged so easily precisely because
+$2^1=2$ is nowhere near large enough for concentration of measure to
+bite: the whole point of that lesson's ansatz being "fully expressive"
+(reaching every point on the Bloch sphere) meant the cost landscape had
+genuine, findable structure everywhere. Concentration of measure is a
+*high-dimensional* phenomenon: it's the same reason a random point on a
+high-dimensional sphere is, with overwhelming probability, very close
+to the equator, no matter which "pole" you call zero. A random
+parameter setting on a large, expressive enough variational circuit is,
+in exactly this sense, always "near the equator" of the cost landscape,
+nowhere near a useful gradient, for purely geometric reasons that have
+nothing to do with how good the classical optimizer is.
+
+## Worked Example
+
+**Scale VQE's own $R_y$-then-$R_z$ ansatz pattern up to $n=2,3,4,5,6$
+qubits (4 layers per qubit, entangling CNOT ring between layers, a
+standard hardware-efficient ansatz), measure the parameter-shift
+gradient of $\langle Z^{\otimes n}\rangle$ with respect to the first
+parameter at $300$ random parameter settings per size (a seeded,
+deterministic pseudorandom generator is used instead of `Math.random()`
+so this lesson's numbers are exactly reproducible on every rebuild, the
+same reproducibility discipline this platform's own problem-sampling
+code already follows), and compute the sample variance at each $n$.**
+
+<ParametricCurve
+  frames={barrenCurveFrames}
+  ariaLabel="log10 of measured gradient variance plotted against number of qubits n, for a real multi-qubit variational ansatz built from this platform's actual gate and expectation-value engine"
+/>
+
+| $n$ | layers | parameters | mean gradient | gradient variance |
+|---|---|---|---|---|
+| $2$ | $8$ | $32$ | $-1.31\times10^{-2}$ | $1.301\times10^{-1}$ |
+| $3$ | $12$ | $72$ | $-6.06\times10^{-3}$ | $6.909\times10^{-2}$ |
+| $4$ | $16$ | $128$ | $-8.13\times10^{-3}$ | $2.707\times10^{-2}$ |
+| $5$ | $20$ | $200$ | $-5.90\times10^{-3}$ | $1.682\times10^{-2}$ |
+| $6$ | $24$ | $288$ | $-1.23\times10^{-3}$ | $7.557\times10^{-3}$ |
+
+Every mean gradient is small relative to its own variance's square root
+(the standard deviation), consistent with the exactly-zero-mean result
+derived above (the small nonzero sample means are exactly the
+statistical noise expected from averaging $300$ finite samples, not a
+violation of the exact identity). The variance itself drops by roughly
+half at each additional qubit ($0.130\to0.069\to0.027\to0.017\to0.0076$,
+ratios of $0.53,0.39,0.62,0.45$, noisy from finite sampling, but
+consistently well below $1$, and consistent with the cited $O(2^{-n})$
+scaling, not with any slower decay), a genuine factor of roughly
+$17\times$ shrinkage from $n=2$ to $n=6$, measured directly, not merely
+asserted.
+
+<BarChart
+  bars={barrenBars}
+  ariaLabel="Measured gradient variance for a real multi-qubit variational ansatz at n=2 through 6 qubits, showing clear shrinkage as qubit count grows"
+/>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Expecting the exponential shrinkage to show up cleanly at *any*
+circuit depth.** This lesson's own verification process ran into this
+directly: using only $n$ layers (rather than the $4n$ layers used
+above), the measured variance at $n=2\to3$ *increased* before
+decreasing, a real, reproducible finding, not a mistake to hide. The
+concentration-of-measure argument requires the circuit to be
+"sufficiently random," which in practice means sufficiently *deep*; a
+shallow ansatz hasn't yet scrambled enough to approximate a Haar-random
+unitary, so the asymptotic trend can be genuinely non-monotonic at small
+$n$ and shallow depth, only becoming clean once the depth scales
+appropriately with $n$, as it does in the deeper ($4n$-layer) numbers
+used above.
+</Callout>
+
+<Callout type="mistake">
+**Concluding that VQE is therefore useless at any real qubit count.**
+Barren plateaus specifically afflict circuits that are *both* deep
+enough to be "sufficiently random" *and* trained against a *global*
+cost function like $Z^{\otimes n}$. Shallower, problem-tailored ansätze
+(not generic random circuits) and *local* cost functions (built from
+few-qubit terms rather than an all-qubit observable) are active,
+partially effective mitigation strategies in real research; the
+phenomenon derived here is a genuine obstacle for the generic case, not
+a no-go theorem for every possible variational circuit design.
+</Callout>
+
+## Practice Questions
+
+1. Using the exact identity $C(\theta)=a+b\cos\theta+c\sin\theta$,
+   verify directly (by substitution) that $C(\theta+\pi/2)-C(\theta-\pi/2)$
+   equals $-2b\sin\theta+2c\cos\theta$, confirming the parameter-shift
+   rule's derivation above.
+2. Explain why the zero-mean gradient result derived in this lesson
+   requires *no* assumption about circuit depth or qubit count, while
+   the vanishing-variance result specifically requires both "sufficiently
+   deep" and "sufficiently many qubits."
+3. From the measured variance ratios ($n=2\to6$), estimate (order of
+   magnitude) what the gradient variance might be at $n=20$ qubits if
+   the same roughly-halving-per-qubit trend continued, and explain why
+   this makes gradient-based training essentially hopeless at that scale
+   without a fundamentally different ansatz or cost function design.
+4. Why does using a *global* observable like $Z^{\otimes n}$ (rather
+   than, say, just $Z$ on one qubit) make the barren plateau problem
+   worse? (Hint: think about how many of the $2^n$ computational basis
+   states have a given eigenvalue under each observable.)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The parameter-shift rule gives an *exact* gradient formula for
+  $R_y$/$R_z$-based ansätze, derived directly from the single-frequency
+  trig-polynomial structure of $C(\theta)$.
+- The gradient's mean is exactly zero over uniformly random parameters,
+  a short, fully elementary, rigorous derivation requiring no deep
+  theory.
+- The gradient's *variance* shrinks as $O(2^{-n})$ for sufficiently deep,
+  sufficiently random ansätze and global cost functions, via
+  concentration of measure (Lévy's lemma / McClean et al. 2018, cited
+  rather than fully re-derived); this, not the zero mean, is the real
+  barren plateau.
+- Verified directly: scaling VQE's own ansatz pattern from $2$ to $6$
+  qubits (using this platform's real gate and expectation-value engine,
+  a deterministic seeded random generator, and the exact parameter-shift
+  formula derived above) shows measured gradient variance shrinking by
+  roughly half at each additional qubit, a genuine $\sim17\times$ drop
+  from $n=2$ to $n=6$, and, honestly reported, the trend is only clean
+  once the ansatz is deep enough, exactly as the "sufficiently random"
+  precondition predicts.
+
+## Further Exploration
+
+Next, the capstone: [What Scale Actually Requires](/lessons/quantum-mastery/advanced-algorithms-and-complexity/capstone-what-scale-actually-requires),
+synthesizing this lesson's exponential trainability wall together with
+BQP's oracle-relative separations and Trotterization's error bounds into
+one account of what genuinely separates this platform's toy-scale
+results from real quantum advantage.

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 // Direct links to the entry points a lost visitor is most likely to want,
 // pulled from the same NAV_ITEMS the Navbar renders so this list can't drift
 // out of sync with the site's actual top-level routes.
-const QUICK_LINKS = ["/learn", "/lessons", "/simulators", "/glossary"]
+const QUICK_LINKS = ["/learn", "/problems", "/simulators", "/glossary"]
   .map((href) => NAV_ITEMS.find((item) => item.href === href))
   .filter((item): item is (typeof NAV_ITEMS)[number] => item !== undefined);
 

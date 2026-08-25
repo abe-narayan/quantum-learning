@@ -1,0 +1,226 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/symmetry-scattering-and-semiclassical-methods/capstone-symmetry-and-the-classical-limit"
+).map((problem) => problem.meta);
+
+export const omega0 = 1;
+export const coneTheta = Math.PI / 3;
+
+export function dynamicalPhaseMagnitude(loopDuration) {
+  return (omega0 * loopDuration) / 2;
+}
+
+export function berryPhaseMagnitude(theta) {
+  return Math.PI * (1 - Math.cos(theta));
+}
+
+export const fixedGeometricPhase = berryPhaseMagnitude(coneTheta);
+
+export const phaseComparisonFrames = [
+  {
+    paramLabel: "Dynamical phase (unbounded) vs. geometric phase (fixed), θ=60°",
+    series: [
+      {
+        label: "|dynamical phase| = ω₀T/2",
+        color: "brand",
+        points: Array.from({ length: 100 }, (_, i) => {
+          const T = 1 + (i / 99) * (40 - 1);
+          return { x: T, y: dynamicalPhaseMagnitude(T) };
+        }),
+      },
+      {
+        label: "|Berry phase| = π(1−cosθ)/2 (constant)",
+        color: "accent",
+        points: [
+          { x: 1, y: fixedGeometricPhase },
+          { x: 40, y: fixedGeometricPhase },
+        ],
+      },
+    ],
+  },
+];
+
+export const lessonMeta = {
+  title: "Capstone: Symmetry and the Classical Limit",
+  description:
+    "Berry phase, the adiabatic theorem, and WKB, three seemingly separate topics, are three convergent routes to the same place: the classical/geometric structure hiding inside quantum phase. This capstone makes the convergence explicit, with a real computed comparison of an unbounded dynamical phase against a fixed geometric one.",
+  course: "symmetry-scattering-and-semiclassical-methods",
+  module: "capstone-symmetry-and-the-classical-limit",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 25,
+  prerequisites: [
+    "quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase",
+    "quantum-mechanics/approximation-methods/the-wkb-approximation",
+  ],
+  objectives: [
+    "Explain why WKB's action phase and the adiabatic theorem's dynamical phase both diverge in their respective classical limits, while a geometric residue (quantized action, Berry phase) survives",
+    "State the connection between WKB's Bohr-Sommerfeld quantization and classical adiabatic invariance of the action variable",
+    "Identify Berry phase's classical shadow (the Hannay angle) as the same geometric idea appearing one level down, in classical mechanics itself",
+  ],
+};
+
+## Motivation
+
+Three lessons, seemingly about different things: The WKB Approximation
+turned a rapidly-oscillating quantum phase into a classical trajectory.
+The Adiabatic Theorem and Berry Phase showed a slowly-driven quantum state
+tracking its instantaneous eigenstate, picking up a geometric phase along
+the way. Neither, on its own, looks like it's about *symmetry* in the way
+Clebsch-Gordan and Wigner-Eckart obviously are. But both are instances of
+exactly the same underlying phenomenon: a quantum phase splitting into a
+part that **blows up** in the classical limit (carrying no new
+information, since it's just counting oscillations faster and faster) and
+a part that stays **exactly finite**, purely geometric, and survives into
+the classical limit as a real, physical effect. This capstone makes that
+convergence explicit.
+
+## Mathematical Development
+
+### Two kinds of phase, two kinds of limit
+
+WKB's quantization condition, $\int_{x_1}^{x_2}p(x)\,dx=(n+\tfrac12)\pi\hbar$,
+says the classical action integral (in units of $\hbar$) is quantized. As
+$\hbar\to0$ at fixed classical action, $n\to\infty$: the *same* classical
+trajectory corresponds to an enormous, and enormously precise, quantum
+number. The WKB phase $\frac1\hbar\int p\,dx$ diverges in this limit,
+accumulating an unbounded number of oscillations, exactly the sense in
+which "the wave nature stops mattering for gross features" and a sharp
+classical trajectory emerges.
+
+The adiabatic theorem's dynamical phase, $\theta_n(t)=-\frac1\hbar\int_0^t
+E_n(t')\,dt'$, behaves identically: the *slower* a loop is traversed
+(deeper into the regime where the adiabatic theorem itself is valid), the
+larger $\theta_n$ grows, unboundedly. But the Berry (geometric) phase
+$\gamma_n$ derived alongside it does **not** grow with the loop's
+duration at all, it depends only on the path's shape in parameter space.
+This is the exact same split WKB exhibits: an unbounded, "counts how much
+classical time/action has passed" piece, and a bounded, purely geometric
+residue.
+
+<InteractiveSection
+  title="Watch one grow, one stay fixed"
+  description="Both curves use The Adiabatic Theorem and Berry Phase's own θ=60° example (ω₀=ħ=1). The dynamical phase (brand) grows linearly as the loop is traversed more slowly, exactly the divergence WKB's action phase also exhibits as ħ→0. The Berry phase (accent) sits at a fixed π/2 for every duration shown, precisely because it depends only on the loop's shape, never on how long that loop takes."
+>
+  <ParametricCurve
+    frames={phaseComparisonFrames}
+    ariaLabel="Dynamical phase magnitude growing linearly with loop duration, compared to a constant Berry phase magnitude of pi over 2, for cone half angle 60 degrees"
+  />
+</InteractiveSection>
+
+### The classical shadow: adiabatic invariance and the Hannay angle
+
+WKB's quantization condition is not a purely quantum invention: it is the
+direct descendant of a genuinely **classical** fact, that the action
+variable $I=\frac1{2\pi}\oint p\,dx$ is an **adiabatic invariant**,
+staying constant under a slowly-varying classical Hamiltonian (a
+classical theorem, cited here rather than re-derived, from Hamiltonian
+mechanics rather than quantum theory). Old quantum theory's Bohr-Sommerfeld
+rule simply quantized this classical invariant in units of $\hbar$; WKB
+derives the *same* condition properly, as the leading semiclassical
+approximation to the true Schrödinger equation, exactly matching what
+The WKB Approximation built.
+
+Berry phase has an equally direct classical shadow: **Hannay's angle**,
+a purely classical geometric phase shift picked up by the *angle*
+variable conjugate to $I$, when the same slow, closed loop in parameter
+space is traversed classically instead of quantum mechanically (cited
+here as the classical analogue, genuinely beyond this course's scope to
+derive, but the existence of a classical counterpart is itself the
+point: Berry phase is not an artifact of quantization, it is a geometric
+fact about slowly-varied systems that quantum mechanics inherits, not
+invents).
+
+## Physical Interpretation
+
+Three lessons, one convergent picture: **WKB** shows a classical
+trajectory crystallizing out of a rapidly-oscillating quantum phase as
+$\hbar\to0$. **The adiabatic theorem** shows a quantum state tracking a
+classical-like path through parameter space as changes slow down. **Berry
+phase** shows that even in that classical-tracking limit, a genuinely
+geometric, non-classical-looking quantity survives, and turns out to have
+its own classical shadow anyway (Hannay's angle), closing the loop
+between "quantum phase" and "classical geometry" completely. Symmetry
+enters at the foundation of all three: WKB's quantization condition
+counts states via a symmetry of the classical phase space (Liouville's
+theorem, area preservation under Hamiltonian flow, cited); Berry's phase
+is literally defined by parallel transport around a loop, a statement
+about the *geometry* (symmetry of parallel transport) of the space of
+quantum states themselves.
+
+## Worked Example
+
+**At what loop duration $T$ does the dynamical phase from the plot above
+first reach a full $2\pi$, and how does this compare to the fixed
+geometric phase at that same $T$?**
+
+$\theta_{\rm dyn}(T)=\omega_0T/2=2\pi\Rightarrow T=4\pi/\omega_0\approx12.566$
+(natural units, $\omega_0=1$). At that duration, the geometric phase is
+still exactly $\pi/2$, unchanged from its value at $T=1$: the dynamical
+phase has by then wound around the full unit circle **four times** further
+than the geometric phase's fixed $\pi/2$, a concrete numeric picture of
+"one piece keeps growing, the other doesn't move at all."
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking Berry phase is a purely quantum phenomenon with no classical
+meaning.** Hannay's angle is its direct classical shadow, in the action-
+angle formalism; the quantum and classical pictures aren't in tension,
+they're two levels of the same geometric statement about slowly-varied
+systems.
+</Callout>
+
+<Callout type="mistake">
+**Treating WKB's semiclassical limit and the adiabatic theorem's slow-driving
+limit as unrelated approximation schemes that happen to share the word
+"classical."** Both are the same kind of limit: a phase built from
+integrating something (momentum in space, for WKB; energy in time, for the
+adiabatic theorem) diverges, while a geometric residue built from a closed
+loop or quantized action survives, exactly the pattern this capstone's
+plot makes explicit.
+</Callout>
+
+## Practice Questions
+
+1. Using the same $\omega_0=1$ convention, find the loop duration $T$ at
+   which the dynamical phase equals $10\pi$.
+2. Explain in your own words why the Berry phase curve in the plot above
+   is exactly flat, using the path-dependence (not time-dependence)
+   argument from The Adiabatic Theorem and Berry Phase.
+3. WKB's quantization condition and the classical adiabatic invariance of
+   $I=\frac1{2\pi}\oint p\,dx$ are described here as "the same statement,"
+   one classical and one quantized. What specifically gets added going
+   from the classical statement to the WKB one?
+4. Name, in one sentence each, the "unbounded" phase and the "fixed,
+   geometric" phase in all three of: WKB, the adiabatic theorem applied
+   to a general slow loop, and the spin-$\tfrac12$-in-a-rotating-field
+   example specifically.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- WKB's action phase and the adiabatic theorem's dynamical phase both
+  diverge in their respective classical/slow limits; a geometric residue
+  (quantized action for WKB, Berry phase for the adiabatic theorem)
+  stays exactly fixed, the same split appearing in both settings.
+- WKB's Bohr-Sommerfeld condition is the quantization of a genuinely
+  classical adiabatic invariant, $I=\frac1{2\pi}\oint p\,dx$; Berry's
+  phase has an equally real classical shadow, Hannay's angle.
+- Computed directly for this course's own spin-$\tfrac12$ example: the
+  dynamical phase grows without bound as the loop slows down, while the
+  Berry phase sits at a fixed $\pi/2$ throughout, a concrete instance of
+  the general pattern this capstone unifies.
+
+## Further Exploration
+
+This closes **Symmetry, Scattering & Semiclassical Methods**, and with
+it, the Quantum Mastery pillar's mathematical-physics thread that began
+with Hilbert Space & Spectral Theory's rigorous foundations. Together,
+the two courses turn every "cited, not derived" gap the core curriculum
+was honest about, degenerate perturbation theory, general angular-momentum
+coupling, geometric phases, squeezed light, three-dimensional scattering,
+into genuine, checked derivations.

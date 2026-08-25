@@ -4,6 +4,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { quantumFourierTransform } from "@/lib/quantum/qft";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform"
@@ -118,15 +119,27 @@ of an inverse, not just a name.
 ## Physical Interpretation
 
 The QFT is a change of basis: from "which computational basis state" to
-"which frequency of phase oscillation across computational basis states,"
-implemented as a genuinely efficient quantum circuit for a transform that
-would need exponentially many operations classically applied element by
-element (though classically computing the *same* transform via the
-classical FFT is itself efficient, $O(N\log N)$; the QFT's advantage is
-specifically that it acts on $n=\log_2N$ *qubits* in $O(n^2)$ gates, a
-different resource entirely from a classical array of size $N$). The point
-of the next several lessons is what this change of basis buys you when a
-phase already encodes something you want to know.
+"which frequency of phase oscillation across computational basis states."
+The circuit above needs only $O(n^2)$ gates on $n$ qubits to do it, versus
+the $O(N^2)$ cost of the direct $N\times N$ DFT matrix derived above.
+
+<PredictBeforeReveal
+  question="The classical FFT computes the identical discrete Fourier transform on a 2^n-element array in O(n·2^n) operations. How does the QFT's O(n^2)-gate circuit compare, for the same n?"
+  options={[
+    { label: "No real advantage — same scaling", value: "same" },
+    { label: "A modest constant-factor speedup", value: "constant" },
+    { label: "Exponentially fewer gates than the FFT's operation count", value: "exponential" },
+    { label: "It's slower than the FFT", value: "slower" },
+  ]}
+  correctValue="exponential"
+  explanation="O(n^2) versus O(n·2^n): exponentially fewer, for the same n. But it isn't a same-resource comparison — the QFT's O(n^2) count is gates acting on n qubits held in superposition, not operations over a classical array of size N=2^n. Classically computing the same transform via the FFT is itself efficient, O(N log N); the QFT's advantage is specifically that it trades a classical array of size N for n qubits, a different resource entirely."
+/>
+
+Getting the transformed values back out of that quantum state still
+requires a specific measurement strategy, not a printout, exactly what
+phase estimation (next lesson) builds. The point of the next several
+lessons is what this change of basis buys you when a phase already
+encodes something you want to know.
 
 ## Worked Example
 

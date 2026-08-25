@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { CourseList } from "@/components/curriculum/CourseList";
 import { CourseTimeline } from "@/components/curriculum/CourseTimeline";
+import { ContinueLearning } from "@/components/curriculum/ContinueLearning";
+import { LessonSearch } from "@/components/curriculum/LessonSearch";
 import { PILLARS, COURSES, getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
@@ -50,6 +52,8 @@ export default async function LearnPage() {
         description="Four tracks, each building on strong high-school math and physics toward advanced undergraduate quantum mechanics and computing."
       />
 
+      <ContinueLearning />
+
       {rootCourse ? (
         <Card className="mt-10 border-brand/30 bg-brand/5">
           <p className="text-xs font-semibold uppercase tracking-wide text-brand">Start here</p>
@@ -66,22 +70,26 @@ export default async function LearnPage() {
         </Card>
       ) : null}
 
-      <div className="mt-14 space-y-16">
-        {PILLARS.map((pillar) => {
-          const pillarCourses = getCoursesByPillar(pillar.slug);
-          return (
-            <section key={pillar.slug} id={pillar.slug} className="scroll-mt-24">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">{pillar.title}</h2>
-              <p className="mt-2 max-w-2xl text-muted-foreground">{pillar.description}</p>
-              <div className="mt-6">
-                <CourseTimeline courses={pillarCourses} lessons={lessons} />
-              </div>
-              <div className="mt-6">
-                <CourseList courses={pillarCourses} lessons={lessons} />
-              </div>
-            </section>
-          );
-        })}
+      <div className="mt-14">
+        <LessonSearch lessons={lessons}>
+          <div className="space-y-16">
+            {PILLARS.map((pillar) => {
+              const pillarCourses = getCoursesByPillar(pillar.slug);
+              return (
+                <section key={pillar.slug} id={pillar.slug} className="scroll-mt-24">
+                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">{pillar.title}</h2>
+                  <p className="mt-2 max-w-2xl text-muted-foreground">{pillar.description}</p>
+                  <div className="mt-6">
+                    <CourseTimeline courses={pillarCourses} lessons={lessons} />
+                  </div>
+                  <div className="mt-6">
+                    <CourseList courses={pillarCourses} lessons={lessons} />
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        </LessonSearch>
       </div>
     </Container>
   );

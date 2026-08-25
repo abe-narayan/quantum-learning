@@ -11,7 +11,6 @@ const STATIC_ROUTES = [
   "",
   "/about",
   "/learn",
-  "/lessons",
   "/simulators",
   "/problems",
   "/hardware",

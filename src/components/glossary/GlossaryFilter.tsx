@@ -11,13 +11,15 @@ const PILLAR_LABEL: Record<GlossaryTerm["pillar"], string> = {
   "quantum-computing": "Quantum Computing",
   "quantum-hardware": "Quantum Hardware",
   "quantum-software": "Quantum Software",
+  "quantum-mastery": "Quantum Mastery",
 };
 
-const PILLAR_TONE: Record<GlossaryTerm["pillar"], "brand" | "accent" | "neutral" | "warning"> = {
+const PILLAR_TONE: Record<GlossaryTerm["pillar"], "brand" | "accent" | "neutral" | "warning" | "danger"> = {
   "quantum-mechanics": "brand",
   "quantum-computing": "accent",
   "quantum-hardware": "warning",
   "quantum-software": "neutral",
+  "quantum-mastery": "danger",
 };
 
 function simulatorHref(simulatorId: NonNullable<GlossaryTerm["simulatorId"]>) {

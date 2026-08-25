@@ -85,7 +85,13 @@ const withMDX = createMDX({
     // Plugins are passed as strings (rather than imported) so they can be
     // used with Turbopack, which can't serialize JS functions.
     remarkPlugins: ["remark-gfm", "remark-math"],
-    rehypePlugins: [["rehype-katex", { strict: false }]],
+    // rehype-slug adds a stable `id` (github-slugger) to every heading node
+    // it visits, which the ToC/reading-progress work needs to `<a href="#...">`
+    // + `IntersectionObserver` into. It only mutates heading nodes' hast
+    // properties, so it doesn't need to run before or after rehype-katex —
+    // katex output lives inside heading *children*, not on the heading
+    // element itself, so the two plugins don't touch the same properties.
+    rehypePlugins: ["rehype-slug", ["rehype-katex", { strict: false }]],
   },
 });
 

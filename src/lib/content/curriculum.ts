@@ -25,6 +25,12 @@ export const PILLARS: PillarInfo[] = [
     description:
       "The simulators, compilers, and SDKs used to program, test, and run quantum algorithms.",
   },
+  {
+    slug: "quantum-mastery",
+    title: "Quantum Mastery",
+    description:
+      "Graduate-level mathematical physics and rigorous quantum information theory for those who've completed the core curriculum — proofs, not just results, drawing on and extending every earlier pillar.",
+  },
 ];
 
 export const COURSES: Course[] = [
@@ -268,6 +274,7 @@ export const COURSES: Course[] = [
       { slug: "building-quantum-circuits", title: "Building Quantum Circuits" },
       { slug: "bb84-quantum-key-distribution", title: "BB84: Quantum Key Distribution" },
       { slug: "superdense-coding", title: "Superdense Coding" },
+      { slug: "universal-quantum-computation", title: "Universal Quantum Computation" },
     ],
   },
   {
@@ -460,6 +467,89 @@ export const COURSES: Course[] = [
       { slug: "gate-decomposition", title: "Gate Decomposition" },
       { slug: "hybrid-workflows", title: "Hybrid Quantum-Classical Workflows" },
       { slug: "variational-algorithm-implementation", title: "Variational Algorithm Implementation" },
+      { slug: "quantum-error-mitigation", title: "Quantum Error Mitigation" },
+    ],
+  },
+  // ---------------------------------------------------------------------
+  // Quantum Mastery (graduate-level mathematical physics and rigorous
+  // quantum information theory, extending both the Mechanics and Computing
+  // pillars — each course below genuinely needs prerequisites from both,
+  // which is why this is its own pillar rather than folded into one of
+  // the four existing ones. See the per-lesson design notes embedded in
+  // each course's description for what makes each module genuinely
+  // "master" level: real derivations/proofs, not renamed intro material.)
+  // ---------------------------------------------------------------------
+  {
+    slug: "hilbert-space-and-spectral-theory",
+    pillar: "quantum-mastery",
+    title: "Hilbert Space & Spectral Theory",
+    description:
+      "Making rigorous everything Wave Mechanics and Operators, Observables & Measurement did heuristically: self-adjointness (not just formal Hermiticity), the spectral theorem for unbounded operators, rigged Hilbert space for continuous spectra, Green's functions and resolvents, and the general Sturm-Liouville theorem that quietly unifies every solvable potential taught earlier in the curriculum.",
+    difficulty: "master",
+    estimatedHours: 11,
+    prerequisites: ["operators-observables-measurement", "one-dimensional-systems"],
+    modules: [
+      { slug: "hilbert-spaces-and-self-adjointness", title: "Hilbert Spaces and Self-Adjointness" },
+      { slug: "the-spectral-theorem-for-unbounded-operators", title: "The Spectral Theorem for Unbounded Operators" },
+      { slug: "continuous-spectra-and-rigged-hilbert-space", title: "Continuous Spectra and Rigged Hilbert Space" },
+      { slug: "greens-functions-and-resolvents", title: "Green's Functions and Resolvents" },
+      { slug: "sturm-liouville-theory", title: "Sturm-Liouville Theory" },
+      { slug: "capstone-what-rigor-buys-you", title: "Capstone: What Rigor Buys You" },
+    ],
+  },
+  {
+    slug: "symmetry-scattering-and-semiclassical-methods",
+    pillar: "quantum-mastery",
+    title: "Symmetry, Scattering & Semiclassical Methods",
+    description:
+      "Finishing the derivation Fine Structure explicitly declined to do: degenerate perturbation theory applied to real spin-orbit splitting, the general Clebsch-Gordan coefficients and the Wigner-Eckart theorem, the adiabatic theorem and Berry's geometric phase, coherent and squeezed states, and a genuine three-dimensional partial-wave scattering treatment with a real S-matrix.",
+    difficulty: "master",
+    estimatedHours: 11,
+    prerequisites: ["approximation-methods"],
+    modules: [
+      { slug: "degenerate-perturbation-theory-and-fine-structure", title: "Degenerate Perturbation Theory and Fine Structure" },
+      { slug: "clebsch-gordan-coefficients-and-the-wigner-eckart-theorem", title: "Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem" },
+      { slug: "the-adiabatic-theorem-and-berry-phase", title: "The Adiabatic Theorem and Berry Phase" },
+      { slug: "coherent-and-squeezed-states", title: "Coherent and Squeezed States" },
+      { slug: "three-dimensional-scattering-and-the-s-matrix", title: "Three-Dimensional Scattering and the S-Matrix" },
+      { slug: "capstone-symmetry-and-the-classical-limit", title: "Capstone: Symmetry and the Classical Limit" },
+    ],
+  },
+  {
+    slug: "quantum-information-theory",
+    pillar: "quantum-mastery",
+    title: "Rigorous Quantum Information Theory",
+    description:
+      "The density-matrix formalism made exact: the Schmidt decomposition theorem (asserted but never proved in Entanglement, Mixed States & Bell Tests), trace distance and fidelity, the Choi-Jamiolkowski isomorphism, the Lindblad master equation as the genuine continuous-time origin of T1/T2 decay, mixed-state entanglement measures, and a general stabilizer/CSS-code treatment beyond the three-qubit codes taught earlier.",
+    difficulty: "master",
+    estimatedHours: 12,
+    prerequisites: ["advanced-quantum-mechanics", "error-correction-and-fault-tolerance"],
+    modules: [
+      { slug: "schmidt-decomposition-and-purification", title: "Schmidt Decomposition and Purification" },
+      { slug: "trace-distance-and-fidelity", title: "Trace Distance and Fidelity" },
+      { slug: "quantum-channels-kraus-and-choi", title: "Quantum Channels: Kraus and Choi" },
+      { slug: "the-lindblad-master-equation", title: "The Lindblad Master Equation" },
+      { slug: "relative-entropy-and-mixed-state-entanglement", title: "Relative Entropy and Mixed-State Entanglement" },
+      { slug: "rigorous-teleportation-and-superdense-coding", title: "Rigorous Teleportation and Superdense Coding" },
+      { slug: "css-codes-and-the-general-stabilizer-formalism", title: "CSS Codes and the General Stabilizer Formalism" },
+    ],
+  },
+  {
+    slug: "advanced-algorithms-and-complexity",
+    pillar: "quantum-mastery",
+    title: "Quantum Algorithms, Complexity & Simulation at Scale",
+    description:
+      "What the Quantum Algorithms II capstone's honesty table leaves open: a formal definition of BQP and exactly what oracle separations do and don't prove, the Trotter-Suzuki product formula with a real error bound, discrete-time quantum walks and their ballistic spreading, the full precision/depth tradeoff of phase estimation, and why variational circuits' gradients vanish exponentially as they scale.",
+    difficulty: "master",
+    estimatedHours: 11,
+    prerequisites: ["quantum-algorithms-ii", "compilation-and-hybrid-algorithms"],
+    modules: [
+      { slug: "bqp-and-oracle-complexity", title: "BQP and Oracle Complexity" },
+      { slug: "hamiltonian-simulation-and-trotterization", title: "Hamiltonian Simulation and Trotterization" },
+      { slug: "quantum-walks", title: "Quantum Walks" },
+      { slug: "phase-estimation-precision-and-qft-depth", title: "Phase Estimation Precision and QFT Depth" },
+      { slug: "barren-plateaus-and-variational-trainability", title: "Barren Plateaus and Variational Trainability" },
+      { slug: "capstone-what-scale-actually-requires", title: "Capstone: What Scale Actually Requires" },
     ],
   },
 ];

@@ -116,6 +116,9 @@ const PILLAR_HREF: Record<Pillar, string> = {
   "quantum-computing": "/computing",
   "quantum-hardware": "/hardware",
   "quantum-software": "/software",
+  // No dedicated pillar landing page — Quantum Mastery courses are surfaced
+  // from within /learn rather than their own top-level route.
+  "quantum-mastery": "/learn",
 };
 
 function titleCase(value: string): string {

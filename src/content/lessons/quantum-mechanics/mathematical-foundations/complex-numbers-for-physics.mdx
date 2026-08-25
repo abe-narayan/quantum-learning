@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"
@@ -111,11 +112,27 @@ $$
 z = a+bi = r(\cos\theta + i\sin\theta), \qquad r = |z|
 $$
 
+The next section derives a famously tidy relationship between this polar
+form and the exponential function. Before seeing the derivation, predict
+what kind of relationship it is.
+
+<PredictBeforeReveal
+  question="Is e^{iθ} = cos θ + i sin θ an exact identity for every real θ, or just a convenient approximation?"
+  options={[
+    { label: "Exact for every real θ", value: "exact" },
+    { label: "An approximation, good for small θ", value: "approx" },
+    { label: "Exact only at θ = 0", value: "trivial" },
+    { label: "It depends on whether the series converges", value: "conditional" },
+  ]}
+  correctValue="exact"
+  explanation="It's exact, for every real θ, with no approximation anywhere. Substituting x=iθ into the Taylor series for e^x and separating real from imaginary terms reproduces the Maclaurin series for cos θ and sin θ term by term, not approximately. A direct consequence: |e^{iθ}|=1 for every θ, exactly, no matter how large θ gets — multiplying by e^{iθ} only ever rotates a number, never stretches it."
+/>
+
 ### Deriving Euler's formula
 
 The expression $\cos\theta + i\sin\theta$ turns out to equal a single
 exponential, $e^{i\theta}$: this is **Euler's formula**. It's worth deriving,
-not just accepting. The Taylor series for $e^x$ converges for complex
+not just accepting, given the prediction above. The Taylor series for $e^x$ converges for complex
 inputs too, so substitute $x = i\theta$:
 
 $$

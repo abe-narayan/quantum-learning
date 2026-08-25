@@ -32,7 +32,7 @@ export default function LessonsError({
 
       <div className="mt-10 flex flex-wrap gap-3">
         <Button onClick={() => retry()}>Try again</Button>
-        <Button href="/lessons" variant="secondary">
+        <Button href="/learn" variant="secondary">
           Back to all lessons
         </Button>
       </div>

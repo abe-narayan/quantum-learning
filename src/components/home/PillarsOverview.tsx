@@ -9,6 +9,12 @@ const PILLAR_ROUTES: Record<Pillar, string> = {
   "quantum-computing": "/computing",
   "quantum-hardware": "/hardware",
   "quantum-software": "/software",
+  // Quantum Mastery has no dedicated pillar landing page — it's a deeper
+  // track surfaced from within /learn once a visitor has progressed, not a
+  // fifth beginner-facing tile in this "four pillars" homepage section (see
+  // the PILLARS.filter below), so this route only matters if some other
+  // caller ever iterates PILLAR_ROUTES directly.
+  "quantum-mastery": "/learn",
 };
 
 /**
@@ -64,6 +70,13 @@ const PILLAR_GLYPHS: Record<Pillar, (props: { className?: string }) => ReactElem
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  ),
+  // Not rendered in this section today (see the PILLARS.filter below) but
+  // required for Record<Pillar, ...> exhaustiveness.
+  "quantum-mastery": ({ className }) => (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
+      <path d="M20 4 L24 16 L36 20 L24 24 L20 36 L16 24 L4 20 L16 16 Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
     </svg>
   ),
 };

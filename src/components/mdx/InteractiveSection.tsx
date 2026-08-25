@@ -18,8 +18,13 @@ export function InteractiveSection({
   children: ReactNode;
 }) {
   return (
-    <div className="not-prose my-8 rounded-xl border border-accent/30 bg-accent/5 p-6">
-      <p className="text-xs font-semibold uppercase tracking-wide text-accent">{title}</p>
+    <div className="not-prose my-8 rounded-2xl border border-accent/30 bg-accent/5 p-6">
+      <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="shrink-0 fill-accent">
+          <path d="M2.5 1.5 L10 6 L2.5 10.5 Z" />
+        </svg>
+        {title}
+      </p>
       <p className="mt-2 text-sm text-foreground">{description}</p>
       <div className="mt-4">{children}</div>
     </div>

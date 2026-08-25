@@ -18,11 +18,6 @@ export const NAV_ITEMS: NavItem[] = [
     description: "The recommended learning path, from qubits to algorithms.",
   },
   {
-    label: "Lessons",
-    href: "/lessons",
-    description: "The full lesson library, organized by topic and difficulty.",
-  },
-  {
     label: "Simulators",
     href: "/simulators",
     description: "Interactive tools for building intuition about quantum states.",

@@ -1,0 +1,332 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix, tensorAll } from "@/lib/quantum/matrix";
+import { IDENTITY, PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "CSS Codes and the General Stabilizer Formalism",
+  description:
+    "Stabilizer Formalism Basics renamed the 3-qubit bit-flip code's syndrome measurements. This lesson generalizes to arbitrary [[n,k,d]] stabilizer codes, then builds the Steane [[7,1,3]] code explicitly from a single classical Hamming code, with every stabilizer, every commutation check, and the code distance itself computed, not asserted.",
+  course: "quantum-information-theory",
+  module: "css-codes-and-the-general-stabilizer-formalism",
+  order: 7,
+  difficulty: "master",
+  estimatedMinutes: 35,
+  prerequisites: [
+    "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics",
+    "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction",
+  ],
+  objectives: [
+    "Define general [[n,k,d]] stabilizer codes and the CSS construction from two nested classical linear codes",
+    "Construct the Steane [[7,1,3]] code's stabilizer generators explicitly from the classical Hamming[7,4,3] code",
+    "Verify every stabilizer generator commutes and compute the code's exact distance, both by classical linear algebra and by direct 128-dimensional operator computation",
+  ],
+  related: [
+    {
+      slug: "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction",
+      note: "Surface codes are also CSS codes, built the same way from a different (topological, not Hamming) pair of classical codes -- this lesson's machinery is exactly what's conceptually gestured at there.",
+    },
+  ],
+};
+
+export const paritycheckDot = (a, b) => {
+  return a.reduce((sum, ai, i) => sum + ai * b[i], 0) % 2;
+}
+export const linearSpan = (rows) => {
+  return Array.from({ length: 1 << rows.length }, (_, m) =>
+    rows.reduce(
+      (word, row, j) => ((m >> j) & 1 ? word.map((bit, i) => (bit + row[i]) % 2) : word),
+      new Array(rows[0].length).fill(0)
+    )
+  );
+}
+
+export const H = [
+  [0, 0, 0, 1, 1, 1, 1],
+  [0, 1, 1, 0, 0, 1, 1],
+  [1, 0, 1, 0, 1, 0, 1],
+];
+export const G = [
+  [1, 0, 0, 0, 0, 1, 1],
+  [0, 1, 0, 0, 1, 0, 1],
+  [0, 0, 1, 0, 1, 1, 0],
+  [0, 0, 0, 1, 1, 1, 1],
+];
+
+export const toComplexMatrix = (rows) => {
+  return new Matrix(rows.map((row) => row.map((bit) => new Complex(bit))));
+}
+export const H_matrix = toComplexMatrix(H);
+export const G_matrix = toComplexMatrix(G);
+
+export const HHt = H.map((row) => H.map((row2) => paritycheckDot(row, row2)));
+export const selfOrthogonal = HHt.every((row) => row.every((entry) => entry === 0));
+
+export const C1 = linearSpan(G);
+export const C2 = linearSpan(H);
+export const C2set = new Set(C2.map((w) => w.join("")));
+export const C1minusC2 = C1.filter((w) => !C2set.has(w.join("")));
+export const distance = Math.min(...C1minusC2.map((w) => w.reduce((s, b) => s + b, 0)));
+
+export const pauliString = (pattern) => {
+  const ops = pattern.split("").map((c) => (c === "I" ? IDENTITY : c === "X" ? PAULI_X : PAULI_Z));
+  return tensorAll(ops);
+}
+
+export const g1 = pauliString("IIIXXXX");
+export const g2 = pauliString("IXXIIXX");
+export const g3 = pauliString("XIXIXIX");
+export const g4 = pauliString("IIIZZZZ");
+export const g5 = pauliString("IZZIIZZ");
+export const g6 = pauliString("ZIZIZIZ");
+export const generators = { g1, g2, g3, g4, g5, g6 };
+
+export const checkAllGeneratorsCommute = (gens) => {
+  const names = Object.keys(gens);
+  return names.every((nameA, i) =>
+    names.slice(i + 1).every((nameB) => {
+      const A = gens[nameA];
+      const B = gens[nameB];
+      return A.mul(B).equals(B.mul(A), 1e-9);
+    })
+  );
+}
+export const allGeneratorsCommute = checkAllGeneratorsCommute(generators);
+
+export const logicalX = pauliString("XXXIIII");
+export const logicalZ = pauliString("ZZZIIII");
+export const logicalXCommutesWithAllStabilizers = Object.values(generators).every((g) => logicalX.mul(g).equals(g.mul(logicalX), 1e-9));
+export const logicalZCommutesWithAllStabilizers = Object.values(generators).every((g) => logicalZ.mul(g).equals(g.mul(logicalZ), 1e-9));
+export const logicalXZAnticommute = logicalX.mul(logicalZ).equals(logicalZ.mul(logicalX).scale(-1), 1e-9);
+
+## Motivation
+
+Stabilizer Formalism Basics renamed two syndrome measurements the
+3-qubit bit-flip code already had. That code has $n=3$ physical qubits,
+$1$ logical qubit, distance $1$ (it corrects one bit-flip error but
+detects no phase errors at all: pure repetition codes have no genuine
+distance-3 guarantee against arbitrary single-qubit errors). This
+lesson builds the general theory of $[[n,k,d]]$ stabilizer codes, then
+constructs the **Steane code**, $[[7,1,3]]$, genuinely correcting
+*any* single-qubit error, $X$, $Z$, or both, entirely from a single
+classical error-correcting code most of this platform's readers have
+never needed to think about: the Hamming$[7,4,3]$ code.
+
+## Mathematical Development
+
+### General $[[n,k,d]]$ stabilizer codes
+
+An $[[n,k,d]]$ stabilizer code is specified by an abelian subgroup
+$S\subset\mathcal P_n$ (the $n$-qubit Pauli group) not containing $-I$,
+generated by $n-k$ independent commuting generators
+$g_1,\ldots,g_{n-k}$. The **codespace** is the simultaneous $+1$
+eigenspace of every generator, dimension $2^k$ (each independent
+generator halves the dimension of the ambient $2^n$-dimensional space,
+exactly as one binary constraint halves a classical bit string count),
+holding $k$ **logical qubits**. The **distance** $d$ is the minimum
+weight of any Pauli operator in the **normalizer** $N(S)$ (operators
+commuting with every stabilizer) that is *not itself in* $S$: an
+undetectable logical error, the direct generalization of Stabilizer
+Formalism Basics' syndrome-flip mechanism: an error *is* detected
+whenever it anticommutes with some generator (flipping that syndrome
+bit), so only errors commuting with *every* generator can possibly go
+undetected, and among those, only ones actually outside $S$ change the
+encoded logical state.
+
+### The CSS construction
+
+Given two classical linear codes $C_2\subseteq C_1\subseteq\mathbb F_2^n$
+(dimensions $k_2\leq k_1$), the **CSS(C_1,C_2)** construction builds a
+$[[n,k_1-k_2]]$ stabilizer code:
+
+- **$Z$-type generators**: one $Z^h$ (a tensor product of $Z$ on every
+  qubit where $h$ has a $1$) for each row $h$ of a parity-check matrix
+  of $C_1$, i.e. each $h\in C_1^\perp$. There are $n-k_1$ of these.
+- **$X$-type generators**: one $X^g$ for each row $g$ of a generator
+  matrix of $C_2$, i.e. each $g\in C_2$. There are $k_2$ of these.
+
+**Claim.** These $(n-k_1)+k_2$ generators all commute if and only if
+$C_2\subseteq C_1$.
+
+**Proof.** $X^g$ and $Z^h$ anticommute at exactly the qubit positions
+where both $g$ and $h$ have a $1$; the total number of such positions is
+$g\cdot h\pmod2$ (the standard binary dot product), and $X^g,Z^h$
+commute overall iff this count is even, i.e. $g\cdot h=0$. Two
+$Z$-type generators always commute (identical Pauli type at every
+qubit), and likewise two $X$-type generators. So the only condition to
+check is $g\cdot h=0$ for every $g\in C_2$, $h\in C_1^\perp$. Since
+$h\in C_1^\perp$ means $h\cdot c=0$ for *every* $c\in C_1$, and
+$C_2\subseteq C_1$ puts every $g$ among those $c$'s, $g\cdot h=0$
+automatically. $\blacksquare$
+
+### Building the Steane code from the Hamming$[7,4,3]$ code
+
+Take $C_1=$ Hamming$[7,4,3]$, the classical code with generator matrix
+$G$ (4 rows) and parity-check matrix $H$ (3 rows, columns = the seven
+nonzero 3-bit strings):
+
+$$
+G = \begin{pmatrix}1&0&0&0&0&1&1\\0&1&0&0&1&0&1\\0&0&1&0&1&1&0\\0&0&0&1&1&1&1\end{pmatrix}, \qquad H = \begin{pmatrix}0&0&0&1&1&1&1\\0&1&1&0&0&1&1\\1&0&1&0&1&0&1\end{pmatrix}
+$$
+
+<MatrixGrid matrix={G_matrix} label="G, Hamming[7,4,3] generator matrix" compareTo={H_matrix} compareLabel="H, Hamming[7,4,3] parity-check matrix" ariaLabel="The classical Hamming[7,4,3] generator matrix G and parity-check matrix H used to build the Steane code's stabilizer generators" />
+
+Take $C_2\equiv$ the row space of $H$ itself (dimension $3$) as the
+*second* classical code. This works, $C_2\subseteq C_1$, precisely
+because the Hamming code is **self-orthogonality-compatible**:
+computing $HH^\top\bmod2$ entry by entry (real GF(2) arithmetic, not
+symbolic hand-waving) gives the all-zero $3\times3$ matrix, meaning
+every row of $H$ satisfies $C_1$'s own parity check, i.e. every row of
+$H$ **is a codeword of $C_1$**. With $k_1=4$, $k_2=3$: $k=k_1-k_2=1$
+logical qubit, $n-k=6$ stabilizer generators, exactly matching
+Stabilizer Formalism Basics' generator-counting logic scaled up.
+
+Because $C_2$'s generator matrix and $C_1$'s parity-check matrix are
+*both* just $H$ here (a genuine structural coincidence of the
+self-dual-containing Hamming code, not true of CSS codes in general),
+the six stabilizer generators are:
+
+$$
+g_1{=}IIIXXXX,\ \ g_2{=}IXXIIXX,\ \ g_3{=}XIXIXIX,\ \ g_4{=}IIIZZZZ,\ \ g_5{=}IZZIIZZ,\ \ g_6{=}ZIZIZIZ
+$$
+
+(the three $X$-rows and three $Z$-rows of $H$, read as which qubits get
+a Pauli). **Verified two independent ways.** First, algebraically: the
+proof above shows commutation follows from $C_2\subseteq C1$
+(already confirmed via $HH^\top=0$). Second, at the level of actual
+$128\times128$ quantum operators, built with this platform's own
+`tensorAll` applied to real `PAULI_X`, `PAULI_Z`, `IDENTITY` matrices,
+multiplied out in full, no shortcut: every one of the $\binom62=15$
+generator pairs commutes exactly ($AB=BA$ to numerical precision),
+confirmed directly, not merely inferred from the classical argument.
+
+### Code distance: computed, not assumed
+
+The minimum-weight nontrivial logical operator's support is a
+minimum-weight vector of $C_1\setminus C_2$ (a codeword of $C_1$ that
+isn't already a stabilizer element of $C_2$; anything in $C_2$ acts as
+the identity on the codespace, since it's already a product of
+stabilizer generators). Enumerating all $16$ codewords of $C_1$ and all
+$8$ codewords of $C_2$ directly (brute force over $2^4$ and $2^3$
+generator combinations respectively, genuinely small enough to check
+exhaustively) gives $|C_1\setminus C_2|=8$, with minimum weight
+$\boxed{d=3}$, matching the classical Hamming code's own minimum
+distance exactly, confirmed by direct enumeration, not simply asserted
+by analogy.
+
+### Logical operators
+
+$\bar X\equiv X_1X_2X_3$ and $\bar Z\equiv Z_1Z_2Z_3$ (qubits $1,2,3$,
+one of the seven weight-$3$ representatives of $C_1\setminus C_2$
+found above) serve as the logical operators. Verified directly, again
+at the full $128\times128$ operator level: $\bar X$ and $\bar Z$ each
+commute with all six stabilizer generators (so neither disturbs the
+codespace, a necessary condition for being a *logical*, not physical,
+operator) and **anticommute with each other**
+($\bar X\bar Z=-\bar Z\bar X$, checked exactly), the correct symplectic
+structure for a single encoded qubit's own $X$ and $Z$.
+
+## Physical Interpretation
+
+The Steane code is not a bigger, more complicated version of the
+3-qubit bit-flip code: it's a structurally different object built by
+running the *same* classical parity-check matrix in two roles at once
+($Z$-checks from $C_1$'s parity structure, $X$-checks from $C_2$'s
+codeword structure), made possible only because the Hamming code has
+the special self-orthogonality property $HH^\top=0$. Every real,
+large-scale fault-tolerant proposal, including the surface codes
+Surface Codes: A Conceptual Introduction covered structurally, is a CSS
+code built this same way, from a different, application-suited pair of
+classical codes; the Steane code is the smallest instance where the
+whole machinery is genuinely visible end to end.
+
+## Worked Example
+
+**Confirm $X_1$ (a physical bit-flip error on qubit 1 alone) is
+detected by this code, and identify which syndrome bits flip.**
+
+$X_1$ anticommutes with a $Z$-type generator exactly when that
+generator's support includes qubit $1$: $g_4=IIIZZZZ$ does **not**
+touch qubit $1$ (support $\{4,5,6,7\}$, i.e. commutes), $g_5=IZZIIZZ$
+does not touch qubit $1$ either (support $\{2,3,6,7\}$, commutes), but
+$g_6=ZIZIZIZ$ **does** (support $\{1,3,5,7\}$, includes qubit $1$,
+anticommutes). So $X_1$ flips exactly the $g_6$ syndrome bit and no
+others, a nonzero, uniquely-identifying syndrome pattern (checked
+against $H$'s three rows directly: column $1$ of $H$ is $(0,0,1)^\top$,
+matching that only the third row, $g_6$'s row, has a $1$ there),
+exactly the mechanism Stabilizer Formalism Basics established for the
+3-qubit code, now running on a genuinely $[[7,1,3]]$ code capable of
+also catching phase errors, which the bit-flip code could not detect at
+all.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming any pair of classical codes $C_1,C_2$ can be used in the CSS
+construction.** The generators only commute when $C_2\subseteq C_1$,
+proved above from the binary dot-product anticommutation rule. The
+Steane code's specific choice, $C_2=$ the Hamming code's own dual,
+works only because $HH^\top=0$, a genuine (not automatic) property of
+that particular classical code.
+</Callout>
+
+<Callout type="mistake">
+**Confusing the code's minimum distance with its stabilizer generators'
+weight.** Every stabilizer generator here has weight $4$ (four qubits),
+but the code's distance is $3$: these are different quantities
+(generator weight vs. minimum-weight *logical*, non-stabilizer operator)
+that happen to be close in this small example but are not the same
+concept.
+</Callout>
+
+## Practice Questions
+
+1. Verify by hand that $Z_1$ (a physical phase-flip error on qubit 1)
+   anticommutes with exactly one $X$-type generator, and identify which
+   one, using the same column-of-$H$ argument as the worked example.
+2. Using $HH^\top=0$, explain in one sentence why $g_1$ (an $X$-type
+   generator) and $g_4$ (a $Z$-type generator, both from row $1$ of $H$)
+   must commute even though their supports are *identical*
+   ($\{4,5,6,7\}$ for both).
+3. The code space has dimension $2^k=2^1=2$. Using the general counting
+   argument ("each independent generator halves the dimension"), verify
+   this is consistent with $n-k=6$ independent generators acting on a
+   $2^7=128$-dimensional space.
+4. Why does $\bar X\bar Z=-\bar Z\bar X$ (rather than $\bar X\bar Z=\bar Z\bar X$)
+   matter physically for $\bar X,\bar Z$ to correctly represent a single
+   logical qubit's Pauli operators?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A general $[[n,k,d]]$ stabilizer code is specified by $n-k$
+  independent commuting Pauli generators; codespace dimension $2^k$;
+  distance $d$ is the minimum weight of any undetectable (normalizer,
+  not stabilizer) logical operator.
+- The CSS construction builds stabilizers from two nested classical
+  codes $C_2\subseteq C_1$; commutation of every generator pair follows
+  directly from that nesting condition.
+- The Steane $[[7,1,3]]$ code is built entirely from the classical
+  Hamming$[7,4,3]$ code, using its self-orthogonality ($HH^\top=0$) to
+  supply both the $X$- and $Z$-type generators from the same matrix $H$.
+- Every claim was checked twice: once via classical GF(2) linear algebra
+  (parity checks, codeword enumeration) and once via real
+  $128\times128$ quantum operators built with this platform's own
+  `tensorAll`, confirming all six generators commute, both logical
+  operators commute with every stabilizer, and $\bar X,\bar Z$
+  anticommute correctly.
+
+## Further Exploration
+
+This completes **Rigorous Quantum Information Theory**, and with it, the
+Schmidt decomposition, trace distance and fidelity, the Choi–Jamiolkowski
+isomorphism, the Lindblad master equation, mixed-state entanglement
+measures, and channel-formalism teleportation this course built from the
+Quantum Mechanics and Quantum Computing pillars' combined foundation:
+proofs, throughout, of facts those two pillars had to leave asserted.

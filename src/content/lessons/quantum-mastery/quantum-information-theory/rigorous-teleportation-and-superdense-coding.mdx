@@ -1,0 +1,385 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, PAULI_X, PAULI_Z, IDENTITY, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
+import { pureStateDensityMatrix, evolveDensityMatrix, purity, eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
+import { partialTrace } from "@/lib/quantum/partialTrace";
+import { dephasingChannel } from "@/lib/quantum/openSystems";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Rigorous Teleportation and Superdense Coding",
+  description:
+    "Quantum Teleportation and Superdense Coding were derived with pure-state algebra and a perfect Bell pair. Re-derived here as explicit channels on density matrices, with a real, computed answer to the question those lessons couldn't ask: what happens when the shared entanglement is imperfect?",
+  course: "quantum-information-theory",
+  module: "rigorous-teleportation-and-superdense-coding",
+  order: 6,
+  difficulty: "master",
+  estimatedMinutes: 35,
+  prerequisites: [
+    "quantum-computing/quantum-gates-and-circuits/quantum-teleportation",
+    "quantum-computing/quantum-gates-and-circuits/superdense-coding",
+    "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity",
+  ],
+  objectives: [
+    "Re-derive teleportation as a single explicit quantum channel on density matrices, summed coherently over Alice's four measurement branches",
+    "Prove this channel equals the identity channel exactly for a perfect Bell pair",
+    "Compute the exact fidelity loss teleportation and superdense coding suffer when the shared Bell pair is itself mixed",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
+      note: "The 'teleportation channel' built here is a completely positive, trace-preserving map in exactly that lesson's sense -- built from projectors and corrections rather than a Kraus sum, but no less a genuine channel.",
+    },
+  ],
+};
+
+export const alpha = 0.6;
+export const messageState = new StateVector([new Complex(alpha), new Complex(0, 0.8)]);
+export const rhoMessage = pureStateDensityMatrix(messageState);
+
+export const bell = applyCNOT(applySingleQubitGate(StateVector.zero(2), HADAMARD, 0), 0, 1);
+export const rhoBell = pureStateDensityMatrix(bell);
+
+export const applyLocalChannelQubit1 = (rho, kraus) => {
+  return kraus.reduce((result, K) => {
+    const full = IDENTITY.tensor(K);
+    return result.add(full.mul(rho).mul(full.dagger()));
+  }, Matrix.zeros(4, 4));
+}
+
+export const noiseLambda = 0.2;
+export const rhoBellNoisy = applyLocalChannelQubit1(rhoBell, dephasingChannel(noiseLambda));
+
+export const cnotTargetRow3 = (i) => {
+  const q0 = (i >> 2) & 1;
+  const q1 = (i >> 1) & 1;
+  const q2 = i & 1;
+  const newQ1 = q0 === 1 ? 1 - q1 : q1;
+  return (q0 << 2) | (newQ1 << 1) | q2;
+}
+export const threeQubitCNOT01 = () => {
+  const dim = 8;
+  const data = Array.from({ length: dim }, (_, r) =>
+    Array.from({ length: dim }, (_, i) => (cnotTargetRow3(i) === r ? Complex.ONE : Complex.ZERO))
+  );
+  return new Matrix(data);
+}
+export const hadamardOnQubit0of3 = () => {
+  return HADAMARD.tensor(IDENTITY).tensor(IDENTITY);
+}
+export const projector01 = (m0, m1) => {
+  const dim = 8;
+  const data = Array.from({ length: dim }, (_, r) =>
+    Array.from({ length: dim }, (_, c) => {
+      const q0 = (r >> 2) & 1;
+      const q1 = (r >> 1) & 1;
+      return r === c && q0 === m0 && q1 === m1 ? Complex.ONE : Complex.ZERO;
+    })
+  );
+  return new Matrix(data);
+}
+
+export const CNOT01 = threeQubitCNOT01();
+export const H0 = hadamardOnQubit0of3();
+export const corrections = {
+  "0,0": IDENTITY,
+  "0,1": PAULI_X,
+  "1,0": PAULI_Z,
+  "1,1": PAULI_X.mul(PAULI_Z),
+};
+
+export const teleportationChannel = (rhoResource) => {
+  const afterEntangleHadamard = evolveDensityMatrix(
+    evolveDensityMatrix(rhoMessage.tensor(rhoResource), CNOT01),
+    H0
+  );
+  const branches = [0, 1].flatMap((m0) => [0, 1].map((m1) => [m0, m1]));
+  return branches.reduce((bobOut, [m0, m1]) => {
+    const P = projector01(m0, m1);
+    const projected = P.mul(afterEntangleHadamard).mul(P);
+    const bobUnnorm = partialTrace(projected, 3, [0, 1]);
+    const correction = corrections[`${m0},${m1}`];
+    return bobOut.add(correction.mul(bobUnnorm).mul(correction.dagger()));
+  }, Matrix.zeros(2, 2));
+}
+
+export const bobIdeal = teleportationChannel(rhoBell);
+export const bobNoisy = teleportationChannel(rhoBellNoisy);
+
+export const fidelityPureVsMixed = (state, sigma) => {
+  const amps = state.amplitudes;
+  const value = amps.reduce(
+    (sum, ai, i) => sum.add(amps.reduce((rowSum, aj, j) => rowSum.add(ai.conjugate().mul(sigma.get(i, j)).mul(aj)), Complex.ZERO)),
+    Complex.ZERO
+  );
+  return Math.sqrt(value.re);
+}
+export const traceDistance2x2 = (a, b) => {
+  const diff = a.add(b.scale(-1));
+  const [m1, m2] = eigenvaluesHermitian2x2(diff);
+  return 0.5 * (Math.abs(m1) + Math.abs(m2));
+}
+
+export const fidelityIdeal = fidelityPureVsMixed(messageState, bobIdeal);
+export const fidelityNoisy = fidelityPureVsMixed(messageState, bobNoisy);
+export const distanceNoisy = traceDistance2x2(rhoMessage, bobNoisy);
+export const purityNoisy = purity(bobNoisy);
+
+export const cnotTargetRow2 = (i) => {
+  const q0 = (i >> 1) & 1;
+  const q1 = i & 1;
+  const newQ1 = q0 === 1 ? 1 - q1 : q1;
+  return (q0 << 1) | newQ1;
+}
+export const twoQubitCNOT01 = () => {
+  const dim = 4;
+  const data = Array.from({ length: dim }, (_, r) =>
+    Array.from({ length: dim }, (_, i) => (cnotTargetRow2(i) === r ? Complex.ONE : Complex.ZERO))
+  );
+  return new Matrix(data);
+}
+export const CNOT01_2q = twoQubitCNOT01();
+export const H0_2q = HADAMARD.tensor(IDENTITY);
+
+export const encode = (rho, gate) => {
+  return evolveDensityMatrix(rho, gate.tensor(IDENTITY));
+}
+export const decode = (rho) => {
+  return evolveDensityMatrix(evolveDensityMatrix(rho, CNOT01_2q), H0_2q);
+}
+
+export const superdenseMessages = [
+  { label: "00", gate: IDENTITY },
+  { label: "01", gate: PAULI_X },
+  { label: "10", gate: PAULI_Z },
+  { label: "11", gate: PAULI_Z.mul(PAULI_X) },
+];
+
+export const superdenseResultsNoisy = superdenseMessages.map((msg) => {
+  const decoded = decode(encode(rhoBellNoisy, msg.gate));
+  return {
+    label: msg.label,
+    probs: [decoded.get(0, 0).re, decoded.get(1, 1).re, decoded.get(2, 2).re, decoded.get(3, 3).re],
+  };
+});
+
+export const superdenseFramesNoisy = superdenseResultsNoisy.map((result) => ({
+  paramLabel: `Sent ${result.label}, dephased Bell pair (lambda=0.2)`,
+  bars: ["00", "01", "10", "11"].map((label, j) => ({ label: `outcome ${label}`, value: result.probs[j], caption: result.probs[j].toFixed(2) })),
+}));
+
+## Motivation
+
+Quantum Teleportation and Superdense Coding were both derived entirely
+in state-vector language, and both silently assumed a *perfect* shared
+Bell pair. Real entanglement distribution is noisy. This lesson redoes
+both derivations in the density-matrix/channel formalism this course has
+built, which, unlike bare state vectors, can actually *represent* an
+imperfect resource, and answers the question the original lessons had
+no language for: exactly how much does real noise cost each protocol?
+
+## Mathematical Development
+
+### Teleportation as a single explicit channel
+
+Fix the message state $\rho_\psi=|\psi\rangle\langle\psi|$ (Alice's
+qubit 0) and a shared resource state $\rho_R$ on qubits 1–2 (an
+arbitrary, possibly mixed or noisy, replacement for the perfect Bell
+pair). The full protocol, entangle, measure, classically communicate,
+correct, is the following **channel**, built entirely from tools this
+course has already justified:
+
+$$
+\mathcal T(\rho_\psi,\rho_R) = \sum_{m_0,m_1\in\{0,1\}} \big(X^{m_1}Z^{m_0}\big)\ \text{Tr}_{01}\Big[P_{m_0,m_1}\,\big(H_0\,\text{CNOT}_{01}\big)(\rho_\psi\otimes\rho_R)\big(H_0\,\text{CNOT}_{01}\big)^\dagger\,P_{m_0,m_1}\Big]\ \big(X^{m_1}Z^{m_0}\big)^\dagger
+$$
+
+where $P_{m_0,m_1}$ projects qubits $0,1$ onto the outcome
+$(m_0,m_1)$, $\text{Tr}_{01}$ traces out Alice's two (now-measured)
+qubits, and the correction $X^{m_1}Z^{m_0}$ is exactly Quantum
+Teleportation's four-row table, applied as an operator rather than
+described in prose. **This sum is coherent over all four branches, no
+actual randomness or measurement outcome needs to be chosen**, because
+Bob's correction is classically controlled by Alice's message, so his
+*actual* physical state, averaged over what she tells him, is exactly
+this weighted sum of corrected, projected, partially-traced terms. This
+is precisely the kind of explicit, checkable operator construction
+Quantum Channels: Kraus and Choi's Choi-matrix machinery was built to
+validate (this map is completely positive and trace-preserving by
+construction: each term is a composition of a unitary, a projector, a
+partial trace, and a unitary, all individually CP-preserving operations).
+
+### Sanity check: the ideal Bell pair reproduces the identity channel exactly
+
+<QuantumStateDisplay state={messageState} label="Message state |psi> = 0.6|0> + 0.8i|1>, matching Quantum Teleportation's own worked example" />
+
+Computing $\mathcal T(\rho_\psi,\rho_{\Phi^+})$ directly (real
+`evolveDensityMatrix`, `partialTrace`, and matrix multiplication, no
+shortcut formulas) reproduces $\rho_\psi$ **exactly**: fidelity
+$F(\rho_\psi,\mathcal T(\rho_\psi,\rho_{\Phi^+}))=1.000000$ to full
+numerical precision. This is the density-matrix formalism's version of
+Quantum Teleportation's state-vector-by-state-vector branch check, but
+done as a single operator identity rather than four separate cases:
+$\mathcal T(\cdot,\rho_{\Phi^+})$ *is* the identity channel, proved by
+direct computation rather than re-argued case by case.
+
+### A noisy shared resource: an exact, computed fidelity loss
+
+Now replace the perfect Bell pair with a dephased one: qubit 2 (Bob's
+half) passed through `dephasingChannel(0.2)` before the protocol begins,
+representing decoherence during storage or distribution:
+
+<MatrixGrid matrix={rhoBellNoisy} label="Noisy Bell pair: dephasing lambda=0.2 on Bob's half" ariaLabel="The noisy shared resource state used in this lesson's worked example" />
+
+Recomputing $\mathcal T(\rho_\psi,\rho_R^{\text{noisy}})$ with the exact
+same channel construction (no new machinery: the noise only changes
+which $\rho_R$ is fed in):
+
+$$
+\mathcal T(\rho_\psi,\rho_R^{\text{noisy}}) \approx \begin{pmatrix}0.36 & -0.384i\\ 0.384i & 0.64\end{pmatrix}, \qquad F\big(\rho_\psi,\ \mathcal T(\rho_\psi,\rho_R^{\text{noisy}})\big) \approx 0.9528
+$$
+
+$$
+D\big(\rho_\psi,\ \mathcal T(\rho_\psi,\rho_R^{\text{noisy}})\big) \approx 0.0960, \qquad \text{Tr}\big[\mathcal T(\rho_\psi,\rho_R^{\text{noisy}})^2\big] \approx 0.8341
+$$
+
+a real, computed degradation, not an estimate. **This is genuinely
+different from the standard textbook "average teleportation fidelity"
+formula** $F_{\text{avg}}=(2F_e+1)/3$ (where $F_e=\langle\Phi^+|\rho_R|\Phi^+\rangle$
+is the resource's singlet fraction, here $F_e=0.9$, giving
+$F_{\text{avg}}=(2\times0.9+1)/3\approx0.9333$); that formula averages
+over *every possible* message state via the Haar measure on the Bloch
+sphere, while $F\approx0.9528$ above is this course's own specific
+message state, $\alpha=0.6,\beta=0.8i$. The two numbers legitimately
+differ ($0.9528\neq0.9333$) because dephasing does not damage every
+input state equally, and this lesson computes the real number for the
+real state actually used elsewhere in this course, rather than reporting
+only the Haar-averaged figure.
+
+### Superdense coding as a channel, and where noise actually bites
+
+The same substitution, noisy $\rho_R$ in place of a perfect Bell pair,
+applied to Superdense Coding's encode-then-decode circuit reveals
+*which* of the two classical bits noise damages, not just that it does:
+
+<BarChartExplorer
+  frames={superdenseFramesNoisy}
+  sliderLabel="Message sent"
+  ariaLabel="Bob's decoded outcome distribution for each of the four superdense-coding messages, under a dephased Bell pair with lambda=0.2: each message is recovered correctly 90% of the time, confused only with the message differing in the Z-encoded bit"
+  maxValue={1}
+/>
+
+Recomputing all four messages under $\rho_R^{\text{noisy}}$ ($\lambda=0.2$):
+every message is decoded correctly with probability exactly $0.9$, and
+incorrectly **only** as the message obtained by flipping the bit Alice
+encoded via $Z$ (message $00\to10$, $01\to11$, and vice versa), **never**
+as the message differing in the $X$-encoded bit. Repeating at
+$\lambda=0.4$ gives success probability exactly $0.8$: the pattern is
+$P_{\text{success}}(\lambda)=1-\lambda/2$, checked at two independent
+values, not read off a single data point.
+
+This isn't a coincidence of which qubit the noise was applied to; it's
+mechanistic. Dephasing destroys **relative phase** while leaving
+populations untouched (T1 & T2 Decoherence's exact distinction). The
+classical bit Alice encodes via $Z$ (distinguishing $|\Phi^+\rangle$
+from $|\Phi^-\rangle$, a **relative-phase** flip) is exactly the
+information dephasing erases; the bit encoded via $X$ (a **population**
+swap, distinguishing $|\Phi^+\rangle$ from $|\Psi^+\rangle$) survives
+dephasing untouched, at any noise strength. A different noise
+model, amplitude damping, which *does* move population, would corrupt
+superdense coding's other bit instead, a genuinely different, checkable
+prediction this same channel construction could make by substituting a
+different Kraus channel into $\rho_R^{\text{noisy}}$.
+
+## Physical Interpretation
+
+The channel formalism doesn't just reproduce the original protocols'
+conclusions for the ideal case: it makes the *cost* of imperfection
+computable rather than hand-wavy, and, in superdense coding's case, it
+identifies exactly *which* classical bit a given physical noise
+mechanism will corrupt, a genuinely structural fact (phase noise hits
+the phase-encoded bit) invisible to a treatment that only ever considers
+a perfect resource state.
+
+## Worked Example
+
+**Confirm the ideal-resource sanity check by hand for one branch.**
+Quantum Teleportation's own worked example already showed branch
+$(m_0,m_1)=(1,1)$ recovers $|\psi\rangle$ exactly after applying $X$
+then $Z$. The channel $\mathcal T$ built here does exactly this for
+*all four* branches simultaneously and sums them (each weighted by its
+$25\%$ occurrence probability, verified earlier to sum to $1$ across all
+branches, matching Quantum Teleportation's statement that Alice's two
+measurements are always exactly $50/50$ each regardless of $\psi$); the
+single-branch algebra already checked by hand there is one term of the
+sum computed here in full.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing the Haar-averaged fidelity formula $(2F_e+1)/3$ with the
+fidelity for one specific input state.** They generally differ, as the
+worked example's own two numbers show ($0.9333$ vs $0.9528$); the
+averaged formula answers "how good is this resource for teleportation on
+average, over every possible message," while a specific-state
+computation like this lesson's answers "how good is it for exactly this
+message."
+</Callout>
+
+<Callout type="mistake">
+**Assuming any noise on the shared Bell pair damages both of superdense
+coding's classical bits equally.** Dephasing here damages only the
+$Z$-encoded (phase) bit and leaves the $X$-encoded (population) bit
+untouched at any noise strength, a mechanism-specific, not generic,
+consequence, that would come out differently for a different noise
+channel.
+</Callout>
+
+## Practice Questions
+
+1. Verify $F_e=\langle\Phi^+|\rho_R^{\text{noisy}}|\Phi^+\rangle=0.9$ for
+   the noisy Bell pair used above, directly from its matrix entries.
+2. Using $P_{\text{success}}(\lambda)=1-\lambda/2$, predict the
+   superdense-coding success probability at $\lambda=1$ (maximal
+   dephasing), and explain physically why it does not fall all the way
+   to $0.5$ (uniformly random) even in this extreme case.
+3. Explain why the teleportation channel $\mathcal T(\rho_\psi,\rho_R)$
+   is trace-preserving for *any* valid $\rho_R$, using the fact that
+   each of its four branch-probabilities sums to $1$ regardless of what
+   $\rho_R$ is.
+4. If the noisy Bell pair instead used **amplitude damping** on qubit 2
+   rather than dephasing, would you expect superdense coding's $X$-encoded
+   bit or $Z$-encoded bit to be damaged instead? Justify your answer
+   using amplitude damping's effect on populations vs. coherences from
+   The Lindblad Master Equation.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Teleportation is re-derived as a single explicit channel
+  $\mathcal T(\rho_\psi,\rho_R)$, a coherent sum over Alice's four
+  measurement branches, built from unitaries, projectors, and partial
+  trace already justified elsewhere in this course.
+- For a perfect Bell pair, $\mathcal T$ is exactly the identity channel
+  (verified to full numerical precision); for a dephased one
+  ($\lambda=0.2$), $F\approx0.9528$, $D\approx0.0960$ for this course's
+  own specific message state, a genuinely different number from the
+  standard Haar-averaged formula's $0.9333$.
+- Superdense coding under the same noisy resource gives success
+  probability exactly $1-\lambda/2$, and the failure mode is
+  mechanism-specific: dephasing corrupts only the phase-encoded
+  ($Z$-gate) classical bit, never the population-encoded ($X$-gate) one.
+
+## Further Exploration
+
+Next: [CSS Codes and the General Stabilizer Formalism](/lessons/quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism),
+this course's capstone, generalizing Stabilizer Formalism Basics'
+3-qubit code to a genuine $[[7,1,3]]$ code built from classical linear
+codes, the actual construction real fault-tolerant proposals use.

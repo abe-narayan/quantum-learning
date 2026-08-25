@@ -97,6 +97,25 @@ grid has the identical local pattern, just repeated:
   </svg>
 </div>
 
+### Try it: the vertex and face mechanisms, already simulated
+
+The two stabilizer types pictured above are not a new mechanism. The
+vertex stabilizer's all-Z pattern is exactly the Z-type parity check
+Lesson 2's 3-qubit bit-flip code already used to catch X errors; the
+face stabilizer's all-X pattern is exactly Lesson 3's phase-flip code
+catching Z errors, this platform's real `runBitFlipCorrectionCycle` and
+`runPhaseFlipCorrectionCycle` engine, unchanged, just relabeled as
+"vertex" and "face" once the qubits are laid out on a 2D grid instead of
+a line. Inject an error into each below and watch that same engine run,
+at the 3-qubit scale it actually simulates.
+
+<InteractiveSection title="The vertex and face mechanisms, already simulated" description="Left: the Z-type stabilizer mechanism the surface code's vertex stabilizers generalize, catching X errors. Right: the X-type mechanism the face stabilizers generalize, catching Z errors. Inject an error on each and confirm the syndrome and recovery, exactly the local, 4-qubit stabilizer idea above, running at the scale this platform actually builds and verifies.">
+  <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+    <LazySyndromeExplorer mode="bit-flip" />
+    <LazySyndromeExplorer mode="phase-flip" />
+  </div>
+</InteractiveSection>
+
 ### Distance scales with grid size
 
 A surface code's distance equals the grid's linear size (roughly, the
@@ -157,25 +176,6 @@ growing a surface code actually helps rather than adding more noise
 than it corrects, a milestone specifically because it confirmed the
 scaling behavior this lesson's "distance is a single tunable parameter"
 claim predicts, on real hardware, not just on paper.
-
-## Interactive Experiment
-
-The two stabilizer types pictured above are not a new mechanism. The
-vertex stabilizer's all-Z pattern is exactly the Z-type parity check
-Lesson 2's 3-qubit bit-flip code already used to catch X errors; the
-face stabilizer's all-X pattern is exactly Lesson 3's phase-flip code
-catching Z errors, this platform's real `runBitFlipCorrectionCycle` and
-`runPhaseFlipCorrectionCycle` engine, unchanged, just relabeled as
-"vertex" and "face" once the qubits are laid out on a 2D grid instead of
-a line. Inject an error into each below and watch that same engine run,
-at the 3-qubit scale it actually simulates.
-
-<InteractiveSection title="The vertex and face mechanisms, already simulated" description="Left: the Z-type stabilizer mechanism the surface code's vertex stabilizers generalize, catching X errors. Right: the X-type mechanism the face stabilizers generalize, catching Z errors. Inject an error on each and confirm the syndrome and recovery, exactly the local, 4-qubit stabilizer idea above, running at the scale this platform actually builds and verifies.">
-  <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-    <LazySyndromeExplorer mode="bit-flip" />
-    <LazySyndromeExplorer mode="phase-flip" />
-  </div>
-</InteractiveSection>
 
 ## Worked Example
 
@@ -251,3 +251,10 @@ Next, the capstone: [Fault-Tolerant Thresholds and Resource Overhead](/lessons/q
 which quantifies exactly how many physical qubits real roadmaps expect to
 need per logical qubit, tying this course's abstract distance parameter
 to concrete numbers.
+
+Surface codes are CSS codes, built the same way from a (topological
+rather than Hamming) pair of classical codes. [CSS Codes and the General Stabilizer Formalism](/lessons/quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism)
+builds that general machinery explicitly, on the smaller Steane
+$[[7,1,3]]$ code, where every stabilizer, commutation check, and the code
+distance itself can be verified directly rather than only described
+conceptually.

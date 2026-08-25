@@ -72,11 +72,11 @@ export default async function AboutPage() {
         <Card>
           <h3 className="text-lg font-semibold text-foreground">Who it&rsquo;s for</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Students with a solid grounding in algebra and an interest in
-            physics or computer science — no prior quantum mechanics or
-            linear algebra required, though it helps. The curriculum spans
-            four tracks: quantum mechanics, quantum computing, quantum
-            hardware, and quantum software.
+            Students with a solid grounding in algebra and basic calculus and
+            an interest in physics or computer science — no prior quantum
+            mechanics or linear algebra required, though it helps. The
+            curriculum spans four tracks: quantum mechanics, quantum
+            computing, quantum hardware, and quantum software.
           </p>
         </Card>
       </div>

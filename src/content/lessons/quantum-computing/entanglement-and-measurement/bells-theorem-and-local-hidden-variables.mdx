@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables"
@@ -125,6 +126,20 @@ Define, for one fixed value of $\lambda$:
 $$
 S(\lambda) = A(a,\lambda)B(b,\lambda) + A(a,\lambda)B(b',\lambda) + A(a',\lambda)B(b,\lambda) - A(a',\lambda)B(b',\lambda)
 $$
+
+Before factoring this expression, predict how constrained it actually is.
+
+<PredictBeforeReveal
+  question="For one fixed deterministic λ, what values can S(λ) take?"
+  options={[
+    { label: "Anything between -4 and +4", value: "range" },
+    { label: "Always exactly 0", value: "zero" },
+    { label: "Always exactly ±2", value: "pm2" },
+    { label: "Depends on the measurement settings chosen", value: "depends" },
+  ]}
+  correctValue="pm2"
+  explanation="For any single fixed λ, S(λ) is always exactly +2 or -2, never anything in between and never anything outside that pair. That's a much tighter constraint than 'bounded by 4' — it's a hard, discrete fact about every deterministic hidden variable. The factoring below shows why: since every outcome is ±1, one of the two grouped terms always vanishes identically. This is precisely what makes the later result striking — a real entangled qubit pair, checked in the next lesson, produces S=2√2≈2.828, a value no fixed λ, and no averaging over any distribution of them, could ever reach."
+/>
 
 Factor by grouping the two terms that share $A(a,\lambda)$ and the two
 that share $A(a',\lambda)$:

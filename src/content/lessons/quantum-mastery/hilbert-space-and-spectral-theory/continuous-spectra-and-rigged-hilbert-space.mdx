@@ -1,0 +1,275 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space"
+).map((problem) => problem.meta);
+
+export const dirichletKernel = (q, L) => (Math.abs(q) < 1e-9 ? L / Math.PI : Math.sin(q * L) / (Math.PI * q));
+export const qValues = Array(241).fill(0).map((_, i) => -6 + (i / 240) * 12);
+export const sincLValues = [5, 20, 80];
+export const sincFrames = sincLValues.map((L) => ({
+  paramLabel: `L = ${L}`,
+  series: [
+    {
+      label: "D_L(q) = sin(qL)/(πq)",
+      color: "brand",
+      points: qValues.map((q) => ({ x: q, y: Math.min(dirichletKernel(q, L), 26) })),
+    },
+  ],
+}));
+
+export const lessonMeta = {
+  title: "Continuous Spectra and Rigged Hilbert Space",
+  description:
+    "Momentum Space and the Fourier Transform used |p⟩ constantly and correctly, but ⟨p|p⟩ literally diverges: |p⟩ is not, and cannot be, a vector in L²(ℝ). Building the Gelfand triple Φ ⊂ H ⊂ Φ′ is what makes every one of those earlier calculations rigorous rather than a useful fiction.",
+  course: "hilbert-space-and-spectral-theory",
+  module: "continuous-spectra-and-rigged-hilbert-space",
+  order: 3,
+  difficulty: "master",
+  estimatedMinutes: 30,
+  prerequisites: [
+    "quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators",
+    "quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform",
+  ],
+  objectives: [
+    "Derive directly that the momentum eigenfunction φ_p(x)=e^{ipx/ħ} has infinite L² norm, hence is not a Hilbert-space vector",
+    "Build the Gelfand triple Φ ⊂ H ⊂ Φ′ and state precisely what kind of object |p⟩ actually is",
+    "Verify ⟨p|p′⟩=δ(p−p′) as a genuine delta-sequence limit, not an asserted identity",
+  ],
+  related: [
+    {
+      slug: "quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform",
+      note: "Every plane-wave manipulation in that lesson is made rigorous here: the Gelfand triple is precisely what |p⟩ and ∫|p⟩⟨p|dp=I mean, once 'vector in H' is no longer available as the reading.",
+    },
+  ],
+};
+
+## Motivation
+
+Momentum Space and the Fourier Transform used $\phi_p(x)=e^{ipx/\hbar}$
+as "the momentum eigenstate," expanded arbitrary states in it, and
+relied on completeness, $\int|p\rangle\langle p|\,dp=I$, without a second
+thought, and every physical prediction that came out of it was correct.
+But $|p\rangle$ is not, and cannot be, an element of $L^2(\mathbb R)$:
+its own overlap with itself, $\langle p|p\rangle$, is formally
+$\delta(0)$, and $\delta(0)$ is not a number. This lesson doesn't patch
+over that; it builds the precise mathematical structure, the **rigged
+Hilbert space**, in which $|p\rangle$ is a fully legitimate object of a
+*different* kind, and shows exactly what breaks (and why) if you try to
+force it into $\mathcal H$ itself.
+
+## Intuition
+
+Picture three nested spaces instead of one: a small, extremely
+well-behaved space $\Phi$ of "nice" test functions (smooth, rapidly
+decaying) sitting inside the ordinary Hilbert space $\mathcal
+H=L^2(\mathbb R)$, which itself sits inside a much larger space $\Phi'$
+of **generalized functions** (distributions) that only need to pair
+sensibly against the nice functions in $\Phi$, not be square-integrable
+themselves. $|p\rangle$ lives in the outermost space $\Phi'$: too rough
+around the edges (never decaying) to belong to $\mathcal H$, but
+perfectly well-defined as a linear functional acting on the nice
+functions in $\Phi$.
+
+## Mathematical Development
+
+### $|p\rangle$ is not in $L^2(\mathbb R)$
+
+The (unnormalizable) plane wave $\phi_p(x)=e^{ipx/\hbar}$ has
+$|\phi_p(x)|^2=1$ everywhere, so
+
+$$
+\int_{-\infty}^{\infty}|\phi_p(x)|^2\,dx=\int_{-\infty}^{\infty}1\,dx=\infty
+$$
+
+a direct, one-line computation, not a subtle one: $\phi_p\notin
+L^2(\mathbb R)$, full stop. This is genuinely different from (and a
+harder problem than) the vanishing-at-infinity issue Hilbert Spaces and
+Self-Adjointness dealt with: $\phi_p$ doesn't even decay, let alone
+vanish; $|\phi_p|^2$ is a nonzero constant everywhere on the line.
+
+### $\langle p|p'\rangle=\delta(p-p')$, derived as a genuine limit
+
+The standard identity $\langle p|p'\rangle=\delta(p-p')$ (using
+normalization $\phi_p(x)=e^{ipx/\hbar}/\sqrt{2\pi\hbar}$) isn't an
+assertion; it's the limit of a genuine, hand-computable sequence.
+Truncate the overlap integral to a finite box $[-L,L]$ (natural units
+$\hbar=1$):
+
+$$
+\int_{-L}^{L}\frac{1}{2\pi}e^{i(p-p')x}\,dx=\frac{1}{2\pi}\left[\frac{e^{i(p-p')x}}{i(p-p')}\right]_{-L}^{L}=\frac{\sin\big((p-p')L\big)}{\pi(p-p')}\equiv D_L(p-p')
+$$
+
+a fully elementary antiderivative computation. $D_L(q)\equiv\sin(qL)/(\pi
+q)$ (with $D_L(0)=L/\pi$, the removable-singularity value) is the
+**Dirichlet kernel**, and it is a genuine delta-sequence: $\int_{-\infty}^\infty
+D_L(q)\,dq=1$ for *every* $L$ (a standard, exact identity, cited here),
+while its peak height $L/\pi$ grows and its main lobe's width shrinks
+like $1/L$ as $L\to\infty$, concentrating all its area into an
+ever-narrower spike at $q=0$:
+
+<ParametricCurve
+  frames={sincFrames}
+  sliderLabel="Truncation half-width L"
+  ariaLabel="The Dirichlet kernel sin(qL) over pi q, sharpening into a delta function as the truncation half-width L grows"
+/>
+
+This platform's own numerical integration of $D_L(q)$ over the range
+plotted above confirms $\int D_L\,dq\approx1$ to within $0.4\%$ at every
+one of $L=5,20,80$ shown above, while the peak height visibly grows as
+$L/\pi\approx1.6,6.4,25.5$ respectively: the concrete, checked
+delta-sequence convergence $D_L\to\delta$ as $L\to\infty$, exactly what
+makes $\langle p|p'\rangle=\delta(p-p')$ a genuine (if formal) limit
+statement, not a hand-wave.
+
+### The Schwartz space $\Phi$
+
+Let $\Phi=\mathcal S(\mathbb R)$, the **Schwartz space**: smooth
+functions all of whose derivatives decay faster than any power of $x$
+(cited definition, standard in analysis). Two facts about $\mathcal S$
+make it exactly the right "nice" space (cited, standard results of
+Fourier analysis): it's dense in $L^2(\mathbb R)$ (so nothing physical is
+lost by restricting to it), and it's invariant under both the Fourier
+transform and multiplication/differentiation by polynomials, meaning
+$\hat x,\hat p$, and every polynomial combination of them, map $\mathcal
+S$ back into $\mathcal S$. That closure property is exactly what a
+"space of test functions" needs to be useful.
+
+### The dual space $\Phi'$ and the Gelfand triple
+
+$\Phi'$, the **continuous dual** of $\Phi$, is the space of continuous
+linear functionals $F:\Phi\to\mathbb C$: objects defined not by having
+their own norm, but by how they *pair* against every nice test function.
+Every $\mathcal H$-vector $\chi$ gives one such functional via
+$F_\chi(\psi)=\langle\chi|\psi\rangle$, so $\mathcal H\subset\Phi'$
+naturally, and combined with $\Phi\subset\mathcal H$ (Schwartz functions
+are certainly square-integrable) this gives the **Gelfand triple**
+(rigged Hilbert space):
+
+$$
+\Phi\subset\mathcal H\subset\Phi'
+$$
+
+$|p\rangle$ is defined as the element of $\Phi'$ acting by
+$\langle p|\psi\rangle\equiv\int\phi_p^*(x)\psi(x)\,dx=\tilde\psi(p)$
+(the Fourier transform of $\psi$, evaluated at $p$) for every
+$\psi\in\Phi$, a perfectly well-defined, finite number for every nice
+$\psi$ (the defining integral converges because $\psi$ is Schwartz,
+decaying faster than $\phi_p$'s constant magnitude needs), even though
+$\langle p|p\rangle$ itself (pairing $|p\rangle$ against itself, which
+isn't in $\Phi$) is not defined this way at all. This is precisely how
+$|p\rangle$ can be used constantly and rigorously against physical
+states $\psi$, while never being a vector of $\mathcal H$ itself.
+
+### The Gelfand–Maurin theorem
+
+**Theorem (cited, not proved here; a substantial 20th-century result
+building directly on von Neumann's spectral theorem).** For any
+self-adjoint operator $A$ on $\mathcal H$ with $\Phi\subset D(A)$
+invariant under $A$, there exists a complete set of generalized
+eigenvectors in $\Phi'$ with eigenvalues filling exactly $A$'s spectrum,
+and every $\psi\in\Phi$ decomposes as
+$\psi=\int d\lambda\,\langle\lambda|\psi\rangle|\lambda\rangle$, an
+equality that holds in the $\Phi,\Phi'$ pairing sense (both sides,
+paired against any test function, agree), not as an ordinary
+$\mathcal H$-norm-convergent sum. This is the fully rigorous version of
+"$\int|p\rangle\langle p|\,dp=I$."
+
+## Physical Interpretation
+
+Insisting $|p\rangle\in\mathcal H$ leads to a direct contradiction, not
+just an inconvenience: normalization in $\mathcal H$ would require
+$\langle p|p\rangle=1$ (finite), but the honest computation above gives
+$\delta(0)$, undefined/infinite. There is no consistent way to patch
+this within $\mathcal H$ itself: the resolution has to be the different
+kind of object built here, not a rescaled or regularized version of the
+same kind of object. Physically this is exactly right: no real
+measurement apparatus resolves momentum to infinite precision. What gets
+measured is always a wave packet, built by integrating $|p\rangle$
+against a genuine, nice (Schwartz, or at least $L^2$) weighting function,
+landing back in $\mathcal H$ every time. $|p\rangle$ itself is the
+idealized limit those packets approach, never a state any real
+experiment prepares.
+
+## Worked Example
+
+**Confirm the Dirichlet kernel's total area is exactly $1$ for every
+$L$, directly.**
+
+$$
+\int_{-\infty}^\infty D_L(q)\,dq=\int_{-\infty}^\infty\frac{\sin(qL)}{\pi q}\,dq=\frac{1}{\pi}\int_{-\infty}^\infty\frac{\sin(u)}{u}\,du=\frac1\pi\cdot\pi=1
+$$
+
+using the substitution $u=qL$ (so $dq=du/L$, and the $L$'s cancel
+exactly, independent of $L$) and the standard Dirichlet integral
+$\int_{-\infty}^\infty\mathrm{sinc}(u)\,du=\pi$ (cited, a classical
+result usually proved by contour integration, outside this course's
+scope). This is exactly why the numerical check above found
+$\approx1$ at every tested $L$: it's not converging *to* $1$ as $L$
+grows, it's *exactly* $1$ for every finite $L$ already; only the
+kernel's *shape* (narrowing, sharpening) changes with $L$, not its total
+area, which is the precise mathematical content of "$D_L\to\delta$."
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Saying "$|p\rangle$ is in $\mathcal H$, just with infinite norm."**
+That's a contradiction in terms: $\mathcal H$'s defining condition is
+finite norm; an object with undefined/infinite norm is not a
+lower-quality $\mathcal H$-vector, it's a different *kind* of object
+entirely (an element of $\Phi'$), and needs the different mathematical
+treatment this lesson builds.
+</Callout>
+
+<Callout type="mistake">
+**Treating $\int|p\rangle\langle p|\,dp=I$ as an ordinary
+$\mathcal H$-completeness relation**, the direct continuum analogue of
+$\sum_i|e_i\rangle\langle e_i|=I$. It's genuinely the same idea, but the
+equality only makes sense in the $\Phi,\Phi'$ pairing sense (both sides
+tested against a nice $\psi\in\Phi$): the Gelfand–Maurin theorem, not a
+finite- or even infinite-dimensional Hilbert-space identity by itself.
+</Callout>
+
+## Practice Questions
+
+1. Explain, using the definition $\int_{-L}^{L}$, why truncating the
+   momentum-eigenstate overlap integral to a finite box is what turns an
+   undefined (divergent) expression into a well-defined function
+   $D_L(q)$ of $L$ and $q$.
+2. The Schwartz space $\mathcal S(\mathbb R)$ is closed under both the
+   Fourier transform and multiplication by $x$. Why is *both* of these
+   properties necessary for $\Phi$ to be a sensible "test function"
+   space for a theory that uses both $\hat x$ and $\hat p$?
+3. A physically prepared wave packet $\psi(x)=\int c(p)\phi_p(x)\,dp$
+   with $c(p)$ a smooth, compactly-supported function is a genuine
+   $L^2(\mathbb R)$ vector, even though each individual $\phi_p$ isn't.
+   Explain, in terms of the Dirichlet-kernel worked example, why
+   integrating over many $|p\rangle$'s can land back in $\mathcal H$ even
+   though no single one of them does.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- $\phi_p(x)=e^{ipx/\hbar}$ has $\int|\phi_p|^2dx=\infty$: a one-line
+  derivation that $|p\rangle\notin L^2(\mathbb R)$.
+- $\langle p|p'\rangle=\delta(p-p')$ is the $L\to\infty$ limit of the
+  truncated overlap $D_L(p-p')=\sin((p-p')L)/(\pi(p-p'))$, a genuine
+  delta-sequence: total area exactly $1$ for every $L$, sharpening
+  toward a spike as $L$ grows.
+- The Gelfand triple $\Phi\subset\mathcal H\subset\Phi'$ (Schwartz
+  functions inside $L^2$ inside distributions) is where $|p\rangle$
+  genuinely lives, a well-defined linear functional on $\Phi$, never a
+  vector of $\mathcal H$ itself.
+- The Gelfand–Maurin theorem (cited) makes
+  $\int|p\rangle\langle p|\,dp=I$ fully rigorous, as a $\Phi,\Phi'$
+  pairing identity.
+
+## Further Exploration
+
+Next: [Green's Functions and Resolvents](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents),
+which puts the position operator's continuous spectrum to direct
+computational use: encoding every bound state and scattering state of a
+Hamiltonian in a single analytic object, the resolvent $(E-H)^{-1}$.

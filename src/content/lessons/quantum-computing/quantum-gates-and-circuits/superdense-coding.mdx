@@ -3,6 +3,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD, PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/superdense-coding"
@@ -125,6 +126,18 @@ what follows). Alice now sends Bob her one qubit, qubit 0, over an ordinary
 quantum channel. That's the entire transmission: **one qubit**, regardless
 of which of the four messages she's sending.
 
+<PredictBeforeReveal
+  question="Alice wants to send the bits 11, so she applies Z then X to her qubit (the bottom row of the table above) before mailing it to Bob. When Bob runs his decode circuit on both qubits, what two bits will he measure?"
+  options={[
+    { label: "00", value: "00" },
+    { label: "01", value: "01" },
+    { label: "10", value: "10" },
+    { label: "11", value: "11" },
+  ]}
+  correctValue="11"
+  explanation="Bob's decode circuit is built as the exact inverse of the circuit that prepared the Bell pair, so it undoes whichever of the four gates Alice applied and lands on the matching computational basis state with certainty. For message 11, that's |11⟩ (up to an unobservable global phase) — Bob reads 11 with probability 1, exactly the bits Alice intended to send."
+/>
+
 ### Bob decodes: the teleportation circuit, reversed
 
 Bob now holds both qubits. Quantum Teleportation's mid-protocol step
@@ -172,6 +185,13 @@ entanglement between the two qubits is.
   />
 </InteractiveSection>
 
+Every bar above comes from the platform's own `applySingleQubitGate`,
+`applyCNOT`, and `.probabilities()`, run on Alice's four real encodings
+and Bob's real decode circuit, not a picture of what they're claimed to
+do. The final, flat frame is the same engine applied to a deliberately
+unentangled input, making the necessity of entanglement a computed result
+rather than an assertion.
+
 ## Physical Interpretation
 
 No communication law is broken here. The Holevo bound limits how much
@@ -186,16 +206,6 @@ on average, exactly as Holevo requires. What superdense coding actually
 buys is timing: the entanglement-distributing qubit can be sent long
 before Alice knows what she wants to say, so *at the moment of the
 message* only one additional qubit needs to move.
-
-## Interactive Experiment
-
-The comparison above already is this lesson's real experiment: every bar
-comes from the platform's own `applySingleQubitGate`, `applyCNOT`, and
-`.probabilities()`, run on Alice's four real encodings and Bob's real
-decode circuit, not a picture of what they're claimed to do. The final,
-flat frame is the same engine applied to a deliberately unentangled input,
-making the necessity of entanglement a computed result rather than an
-assertion.
 
 ## Worked Example
 
@@ -300,3 +310,7 @@ Key Distribution](/lessons/quantum-computing/quantum-gates-and-circuits/bb84-qua
 send twice the classical information a single qubit could otherwise carry,
 BB84 uses no entanglement to let two parties detect, rather than prevent,
 anyone trying to read their qubits in transit.
+
+This protocol is re-derived in the density-matrix/channel formalism,
+including an exact, computed success-probability formula for a dephased
+shared Bell pair, in [Rigorous Teleportation and Superdense Coding](/lessons/quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding).
