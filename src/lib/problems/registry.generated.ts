@@ -19,6 +19,62 @@
  */
 import type { Problem } from "./types";
 
+import { amplitudeEstimationGroverIterateProbability } from "@/content/problems/apex/algorithmic-frontiers/amplitude-estimation-grover-iterate-probability";
+import { amplitudeEstimationQpeFreeScalingMc } from "@/content/problems/apex/algorithmic-frontiers/amplitude-estimation-qpe-free-scaling-mc";
+import { capstoneToolboxHonestUnificationMc } from "@/content/problems/apex/algorithmic-frontiers/capstone-toolbox-honest-unification-mc";
+import { capstoneToolboxTrotterStepsT10 } from "@/content/problems/apex/algorithmic-frontiers/capstone-toolbox-trotter-steps-t10";
+import { lcuPrepareRegisterSize } from "@/content/problems/apex/algorithmic-frontiers/lcu-prepare-register-size";
+import { lcuSuccessProbabilityPlusState } from "@/content/problems/apex/algorithmic-frontiers/lcu-success-probability-plus-state";
+import { linearSystemsPolynomialDegreeForTargetEpsilon } from "@/content/problems/apex/algorithmic-frontiers/linear-systems-polynomial-degree-for-target-epsilon";
+import { linearSystemsReadoutVsFullVector } from "@/content/problems/apex/algorithmic-frontiers/linear-systems-readout-vs-full-vector";
+import { qspD1PhaseSumRealPart } from "@/content/problems/apex/algorithmic-frontiers/qsp-d1-phase-sum-real-part";
+import { qspD2DegreeCollapseImaginaryPart } from "@/content/problems/apex/algorithmic-frontiers/qsp-d2-degree-collapse-imaginary-part";
+import { qsvtPolynomialValueAtASingularValue } from "@/content/problems/apex/algorithmic-frontiers/qsvt-polynomial-value-at-a-singular-value";
+import { qsvtVersusTrotterAsymptoticClaim } from "@/content/problems/apex/algorithmic-frontiers/qsvt-versus-trotter-asymptotic-claim";
+import { decodingDefectPairForABoundaryQubit } from "@/content/problems/apex/fault-tolerance-frontiers/decoding-defect-pair-for-a-boundary-qubit";
+import { decodingThresholdScalingRatio } from "@/content/problems/apex/fault-tolerance-frontiers/decoding-threshold-scaling-ratio";
+import { latticeSurgeryCnotMergeCount } from "@/content/problems/apex/fault-tolerance-frontiers/lattice-surgery-cnot-merge-count";
+import { latticeSurgeryTransversalGateFailure } from "@/content/problems/apex/fault-tolerance-frontiers/lattice-surgery-transversal-gate-failure";
+import { magicStateDistillationRoundsNeeded } from "@/content/problems/apex/fault-tolerance-frontiers/magic-state-distillation-rounds-needed";
+import { magicStateEastinKnillTransversalGates } from "@/content/problems/apex/fault-tolerance-frontiers/magic-state-eastin-knill-transversal-gates";
+import { resourceEstimationCodeDistanceForTighterBudget } from "@/content/problems/apex/fault-tolerance-frontiers/resource-estimation-code-distance-for-tighter-budget";
+import { resourceEstimationFactoryShareWithNineLogicalQubits } from "@/content/problems/apex/fault-tolerance-frontiers/resource-estimation-factory-share-with-nine-logical-qubits";
+import { surfaceCodeGeneratorCountAtDistance5 } from "@/content/problems/apex/fault-tolerance-frontiers/surface-code-generator-count-at-distance-5";
+import { thresholdConcatenationTwoLevels } from "@/content/problems/apex/fault-tolerance-frontiers/threshold-concatenation-two-levels";
+import { thresholdDifferingValuesNotContradiction } from "@/content/problems/apex/fault-tolerance-frontiers/threshold-differing-values-not-contradiction";
+import { whyStabilizerOverlapsAreAlwaysEven } from "@/content/problems/apex/fault-tolerance-frontiers/why-stabilizer-overlaps-are-always-even";
+import { capstoneClassifyRcsClaimMc } from "@/content/problems/apex/quantum-complexity-theory/capstone-classify-rcs-claim-mc";
+import { capstoneNpNotSubsetBqpConjecture } from "@/content/problems/apex/quantum-complexity-theory/capstone-np-not-subset-bqp-conjecture";
+import { evaluatingAWorstCaseNpCompleteClaimMc } from "@/content/problems/apex/quantum-complexity-theory/evaluating-a-worst-case-np-complete-claim-mc";
+import { localHamiltonianPropagationTermNullSpaceMc } from "@/content/problems/apex/quantum-complexity-theory/local-hamiltonian-propagation-term-null-space-mc";
+import { localHamiltonianVerificationPrecisionUnionBound } from "@/content/problems/apex/quantum-complexity-theory/local-hamiltonian-verification-precision-union-bound";
+import { qmaAmplificationThreshold5Percent } from "@/content/problems/apex/quantum-complexity-theory/qma-amplification-threshold-5-percent";
+import { qmaSoundnessQuantifierMc } from "@/content/problems/apex/quantum-complexity-theory/qma-soundness-quantifier-mc";
+import { queryComplexityAdversaryBoundN64 } from "@/content/problems/apex/quantum-complexity-theory/query-complexity-adversary-bound-n64";
+import { shorsAlgorithmDoesNotProvePNeqBqp } from "@/content/problems/apex/quantum-complexity-theory/shors-algorithm-does-not-prove-p-neq-bqp";
+import { twoIndependentProofsOfGroverOptimalityMc } from "@/content/problems/apex/quantum-complexity-theory/two-independent-proofs-of-grover-optimality-mc";
+import { capstoneLandscapeHardwareClaimClassification } from "@/content/problems/apex/research-methods-and-synthesis/capstone-landscape-hardware-claim-classification";
+import { capstoneLandscapeTimelinePredictionEvaluation } from "@/content/problems/apex/research-methods-and-synthesis/capstone-landscape-timeline-prediction-evaluation";
+import { classifyingTheOracleSpeedupAbstractMc } from "@/content/problems/apex/research-methods-and-synthesis/classifying-the-oracle-speedup-abstract-mc";
+import { explainingTheOracleModelGap } from "@/content/problems/apex/research-methods-and-synthesis/explaining-the-oracle-model-gap";
+import { quantumAdvantageHardVsUsefulTwoAxes } from "@/content/problems/apex/research-methods-and-synthesis/quantum-advantage-hard-vs-useful-two-axes";
+import { quantumAdvantageWeakClassicalBaselineMc } from "@/content/problems/apex/research-methods-and-synthesis/quantum-advantage-weak-classical-baseline-mc";
+import { reproducibilityComponentsMissingMc } from "@/content/problems/apex/research-methods-and-synthesis/reproducibility-components-missing-mc";
+import { shotNoiseStandardErrorP75N300 } from "@/content/problems/apex/research-methods-and-synthesis/shot-noise-standard-error-p75-n300";
+import { theoremVsHeuristicClassifySurfaceCodeThreshold } from "@/content/problems/apex/research-methods-and-synthesis/theorem-vs-heuristic-classify-surface-code-threshold";
+import { theoremVsHeuristicQaoaVsGroverMc } from "@/content/problems/apex/research-methods-and-synthesis/theorem-vs-heuristic-qaoa-vs-grover-mc";
+import { areaLawMinimumBondDimension } from "@/content/problems/apex/simulation-and-compilation-frontiers/area-law-minimum-bond-dimension";
+import { capstonePipelineRoutedGateCountFewerSteps } from "@/content/problems/apex/simulation-and-compilation-frontiers/capstone-pipeline-routed-gate-count-fewer-steps";
+import { capstonePipelineWhichStagesAreSettled } from "@/content/problems/apex/simulation-and-compilation-frontiers/capstone-pipeline-which-stages-are-settled";
+import { classicalSimulationBellPairBondDimension } from "@/content/problems/apex/simulation-and-compilation-frontiers/classical-simulation-bell-pair-bond-dimension";
+import { classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc } from "@/content/problems/apex/simulation-and-compilation-frontiers/classical-simulation-clifford-vs-nonclifford-advantage-candidate-mc";
+import { cliffordTRossSelingerTCountForEpsilon } from "@/content/problems/apex/simulation-and-compilation-frontiers/clifford-t-ross-selinger-tcount-for-epsilon";
+import { cliffordTSolovayKitaevVersusOptimalMc } from "@/content/problems/apex/simulation-and-compilation-frontiers/clifford-t-solovay-kitaev-versus-optimal-mc";
+import { molecularSimulationElectronConfigurationCount } from "@/content/problems/apex/simulation-and-compilation-frontiers/molecular-simulation-electron-configuration-count";
+import { molecularSimulationPhaseEstimationOverlapCaveat } from "@/content/problems/apex/simulation-and-compilation-frontiers/molecular-simulation-phase-estimation-overlap-caveat";
+import { noiseAwareCompilationSuccessProbabilityMc } from "@/content/problems/apex/simulation-and-compilation-frontiers/noise-aware-compilation-success-probability-mc";
+import { noiseAwareCompilationSwapOverheadAlternateRouting } from "@/content/problems/apex/simulation-and-compilation-frontiers/noise-aware-compilation-swap-overhead-alternate-routing";
+import { wStateEntropyAndBondDimension } from "@/content/problems/apex/simulation-and-compilation-frontiers/w-state-entropy-and-bond-dimension";
 import { biasedMixturePurity } from "@/content/problems/quantum-computing/entanglement-and-measurement/biased-mixture-purity";
 import { definingRequirementXCheck } from "@/content/problems/quantum-computing/entanglement-and-measurement/defining-requirement-x-check";
 import { deterministicLhvChshValue } from "@/content/problems/quantum-computing/entanglement-and-measurement/deterministic-lhv-chsh-value";
@@ -267,6 +323,18 @@ import { superdenseLambdaForTargetSuccess } from "@/content/problems/quantum-mas
 import { traceDistanceAtHalfDamping } from "@/content/problems/quantum-mastery/quantum-information-theory/trace-distance-at-half-damping";
 import { wernerConcurrenceAtHalf } from "@/content/problems/quantum-mastery/quantum-information-theory/werner-concurrence-at-half";
 import { zeroEigenvalueStillCp } from "@/content/problems/quantum-mastery/quantum-information-theory/zero-eigenvalue-still-cp";
+import { capacityEntanglementBreakingThreshold } from "@/content/problems/quantum-mastery/quantum-shannon-theory/capacity-entanglement-breaking-threshold";
+import { dataProcessingLoccEntanglement } from "@/content/problems/quantum-mastery/quantum-shannon-theory/data-processing-locc-entanglement";
+import { dataProcessingMutualInformationAtLambda } from "@/content/problems/quantum-mastery/quantum-shannon-theory/data-processing-mutual-information-at-lambda";
+import { distillationRateFromEntanglementEntropy } from "@/content/problems/quantum-mastery/quantum-shannon-theory/distillation-rate-from-entanglement-entropy";
+import { holevoChiBb84AtP } from "@/content/problems/quantum-mastery/quantum-shannon-theory/holevo-chi-bb84-at-p";
+import { mutualInformationClassicalCorrelation } from "@/content/problems/quantum-mastery/quantum-shannon-theory/mutual-information-classical-correlation";
+import { negativeConditionalEntropyExplanation } from "@/content/problems/quantum-mastery/quantum-shannon-theory/negative-conditional-entropy-explanation";
+import { normalizingAFourOutcomeQubitPovm } from "@/content/problems/quantum-mastery/quantum-shannon-theory/normalizing-a-four-outcome-qubit-povm";
+import { stinespringEnvironmentOutcomeProbability } from "@/content/problems/quantum-mastery/quantum-shannon-theory/stinespring-environment-outcome-probability";
+import { stinespringKrausNonuniquenessEntry } from "@/content/problems/quantum-mastery/quantum-shannon-theory/stinespring-kraus-nonuniqueness-entry";
+import { typicalSubspaceProbabilityMass } from "@/content/problems/quantum-mastery/quantum-shannon-theory/typical-subspace-probability-mass";
+import { unambiguousDiscriminationSuccessProbability } from "@/content/problems/quantum-mastery/quantum-shannon-theory/unambiguous-discrimination-success-probability";
 import { twoPToThreePSplittingRatio } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/2p-to-3p-splitting-ratio";
 import { threePSpinOrbitSplitting } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/3p-spin-orbit-splitting";
 import { berryPhaseAt90Degrees } from "@/content/problems/quantum-mastery/symmetry-scattering-and-semiclassical-methods/berry-phase-at-90-degrees";
@@ -500,6 +568,62 @@ import { why2nIsFundamental } from "@/content/problems/quantum-software/simulati
 import { whySingleQubitScope } from "@/content/problems/quantum-software/simulating-quantum-systems/why-single-qubit-scope";
 
 export const PROBLEMS: Problem[] = [
+  amplitudeEstimationGroverIterateProbability,
+  amplitudeEstimationQpeFreeScalingMc,
+  capstoneToolboxHonestUnificationMc,
+  capstoneToolboxTrotterStepsT10,
+  lcuPrepareRegisterSize,
+  lcuSuccessProbabilityPlusState,
+  linearSystemsPolynomialDegreeForTargetEpsilon,
+  linearSystemsReadoutVsFullVector,
+  qspD1PhaseSumRealPart,
+  qspD2DegreeCollapseImaginaryPart,
+  qsvtPolynomialValueAtASingularValue,
+  qsvtVersusTrotterAsymptoticClaim,
+  decodingDefectPairForABoundaryQubit,
+  decodingThresholdScalingRatio,
+  latticeSurgeryCnotMergeCount,
+  latticeSurgeryTransversalGateFailure,
+  magicStateDistillationRoundsNeeded,
+  magicStateEastinKnillTransversalGates,
+  resourceEstimationCodeDistanceForTighterBudget,
+  resourceEstimationFactoryShareWithNineLogicalQubits,
+  surfaceCodeGeneratorCountAtDistance5,
+  thresholdConcatenationTwoLevels,
+  thresholdDifferingValuesNotContradiction,
+  whyStabilizerOverlapsAreAlwaysEven,
+  capstoneClassifyRcsClaimMc,
+  capstoneNpNotSubsetBqpConjecture,
+  evaluatingAWorstCaseNpCompleteClaimMc,
+  localHamiltonianPropagationTermNullSpaceMc,
+  localHamiltonianVerificationPrecisionUnionBound,
+  qmaAmplificationThreshold5Percent,
+  qmaSoundnessQuantifierMc,
+  queryComplexityAdversaryBoundN64,
+  shorsAlgorithmDoesNotProvePNeqBqp,
+  twoIndependentProofsOfGroverOptimalityMc,
+  capstoneLandscapeHardwareClaimClassification,
+  capstoneLandscapeTimelinePredictionEvaluation,
+  classifyingTheOracleSpeedupAbstractMc,
+  explainingTheOracleModelGap,
+  quantumAdvantageHardVsUsefulTwoAxes,
+  quantumAdvantageWeakClassicalBaselineMc,
+  reproducibilityComponentsMissingMc,
+  shotNoiseStandardErrorP75N300,
+  theoremVsHeuristicClassifySurfaceCodeThreshold,
+  theoremVsHeuristicQaoaVsGroverMc,
+  areaLawMinimumBondDimension,
+  capstonePipelineRoutedGateCountFewerSteps,
+  capstonePipelineWhichStagesAreSettled,
+  classicalSimulationBellPairBondDimension,
+  classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc,
+  cliffordTRossSelingerTCountForEpsilon,
+  cliffordTSolovayKitaevVersusOptimalMc,
+  molecularSimulationElectronConfigurationCount,
+  molecularSimulationPhaseEstimationOverlapCaveat,
+  noiseAwareCompilationSuccessProbabilityMc,
+  noiseAwareCompilationSwapOverheadAlternateRouting,
+  wStateEntropyAndBondDimension,
   biasedMixturePurity,
   definingRequirementXCheck,
   deterministicLhvChshValue,
@@ -748,6 +872,18 @@ export const PROBLEMS: Problem[] = [
   traceDistanceAtHalfDamping,
   wernerConcurrenceAtHalf,
   zeroEigenvalueStillCp,
+  capacityEntanglementBreakingThreshold,
+  dataProcessingLoccEntanglement,
+  dataProcessingMutualInformationAtLambda,
+  distillationRateFromEntanglementEntropy,
+  holevoChiBb84AtP,
+  mutualInformationClassicalCorrelation,
+  negativeConditionalEntropyExplanation,
+  normalizingAFourOutcomeQubitPovm,
+  stinespringEnvironmentOutcomeProbability,
+  stinespringKrausNonuniquenessEntry,
+  typicalSubspaceProbabilityMass,
+  unambiguousDiscriminationSuccessProbability,
   twoPToThreePSplittingRatio,
   threePSpinOrbitSplitting,
   berryPhaseAt90Degrees,

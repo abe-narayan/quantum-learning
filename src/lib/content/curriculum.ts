@@ -31,6 +31,12 @@ export const PILLARS: PillarInfo[] = [
     description:
       "Graduate-level mathematical physics and rigorous quantum information theory for those who've completed the core curriculum — proofs, not just results, drawing on and extending every earlier pillar.",
   },
+  {
+    slug: "apex",
+    title: "Apex",
+    description:
+      "The summit of QuantumLearn: research-depth algorithms, fault tolerance, complexity theory, large-scale simulation and compilation, and a final course in reading and evaluating real quantum-computing research — the point where a motivated student can approach the literature without being lost.",
+  },
 ];
 
 export const COURSES: Course[] = [
@@ -550,6 +556,121 @@ export const COURSES: Course[] = [
       { slug: "phase-estimation-precision-and-qft-depth", title: "Phase Estimation Precision and QFT Depth" },
       { slug: "barren-plateaus-and-variational-trainability", title: "Barren Plateaus and Variational Trainability" },
       { slug: "capstone-what-scale-actually-requires", title: "Capstone: What Scale Actually Requires" },
+    ],
+  },
+  {
+    slug: "quantum-shannon-theory",
+    pillar: "quantum-mastery",
+    title: "Quantum Shannon Theory",
+    description:
+      "The measurement postulate and Kraus-channel picture, made complete and quantitative: POVMs and Naimark's theorem for why every generalized measurement is a projective one on a bigger space, Stinespring dilation for why every channel is a unitary on a bigger space, von Neumann entropy and quantum mutual/conditional information (which can go negative), the data-processing inequality as the real content behind 'information can't increase', entanglement distillation and the typical-subspace idea, and the channel capacities that say exactly how much can be sent through a given noisy channel.",
+    difficulty: "master",
+    estimatedHours: 11,
+    prerequisites: ["quantum-information-theory"],
+    modules: [
+      { slug: "povms-and-generalized-measurement", title: "POVMs and Generalized Measurement" },
+      { slug: "stinespring-dilation-and-channel-purification", title: "Stinespring Dilation and Channel Purification" },
+      { slug: "quantum-entropy-and-information-measures", title: "Quantum Entropy and Information Measures" },
+      { slug: "the-data-processing-inequality", title: "The Data-Processing Inequality" },
+      { slug: "entanglement-distillation-and-typical-subspaces", title: "Entanglement Distillation and Typical Subspaces" },
+      { slug: "capstone-what-can-be-sent-through-noise", title: "Capstone: What Can Be Sent Through Noise" },
+    ],
+  },
+  // ---------------------------------------------------------------------
+  // Apex — the summit of the curriculum. Five courses, each extending a
+  // specific Quantum Mastery / Quantum Software thread to research depth:
+  // algorithms (QSVT), fault tolerance (surface codes to resource counts),
+  // complexity theory (QMA, Local Hamiltonian), simulation & compilation at
+  // scale, and finally research methods — reading and evaluating real
+  // quantum-computing claims. Every prerequisite below is a real course
+  // slug defined above in this same file.
+  // ---------------------------------------------------------------------
+  {
+    slug: "algorithmic-frontiers",
+    pillar: "apex",
+    title: "Algorithmic Frontiers",
+    description:
+      "The framework that quietly absorbed most of quantum algorithms research since 2016: block encodings and linear combinations of unitaries for turning a matrix into a circuit, quantum signal processing for applying an arbitrary polynomial to a single qubit, the quantum singular value transformation that unifies Grover's algorithm, Hamiltonian simulation, and linear-systems solving as one construction, and modern amplitude estimation that gets Grover's quadratic speedup for estimation without ever calling phase estimation.",
+    difficulty: "master",
+    estimatedHours: 10,
+    prerequisites: ["advanced-algorithms-and-complexity"],
+    modules: [
+      { slug: "block-encodings-and-linear-combinations-of-unitaries", title: "Block Encodings and Linear Combinations of Unitaries" },
+      { slug: "quantum-signal-processing", title: "Quantum Signal Processing" },
+      { slug: "the-quantum-singular-value-transformation", title: "The Quantum Singular Value Transformation" },
+      { slug: "amplitude-estimation-without-phase-estimation", title: "Amplitude Estimation Without Phase Estimation" },
+      { slug: "applications-eigenvalues-and-linear-systems", title: "Applications: Eigenvalues and Linear Systems" },
+      { slug: "capstone-the-toolbox-that-ate-quantum-algorithms", title: "Capstone: The Toolbox That Ate Quantum Algorithms" },
+    ],
+  },
+  {
+    slug: "fault-tolerance-frontiers",
+    pillar: "apex",
+    title: "Fault Tolerance Frontiers",
+    description:
+      "What Error Correction & Fault Tolerance's conceptual surface-code introduction and this pillar's own general stabilizer formalism build toward: the real 2D surface-code lattice and its logical operators, how a decoder actually turns a syndrome into a correction and why logical error rate falls exponentially with code distance below threshold, lattice surgery as the real mechanism for logical two-qubit gates, magic-state distillation as the unavoidable cost of a universal gate set, the threshold theorem's proof strategy, and a full worked resource estimate for running one real algorithm fault-tolerantly.",
+    difficulty: "master",
+    estimatedHours: 11,
+    prerequisites: ["quantum-information-theory"],
+    modules: [
+      { slug: "surface-codes-in-depth", title: "Surface Codes in Depth" },
+      { slug: "decoding-surface-codes", title: "Decoding Surface Codes" },
+      { slug: "lattice-surgery", title: "Lattice Surgery" },
+      { slug: "magic-states-and-distillation", title: "Magic States and Distillation" },
+      { slug: "the-threshold-theorem", title: "The Threshold Theorem" },
+      { slug: "capstone-resource-estimation-for-a-real-algorithm", title: "Capstone: Resource Estimation for a Real Algorithm" },
+    ],
+  },
+  {
+    slug: "quantum-complexity-theory",
+    pillar: "apex",
+    title: "Quantum Complexity Theory",
+    description:
+      "BQP and Oracle Complexity's formal definitions extended to where the real open questions live: QMA as the quantum generalization of NP-verification, the Local Hamiltonian problem and why it is QMA-complete (Kitaev's theorem), the query-complexity lower-bound techniques that prove Grover's quadratic speedup is optimal, and an honest, current map of exactly what is proven, what is conjectured, and what remains open about quantum advantage.",
+    difficulty: "master",
+    estimatedHours: 9,
+    prerequisites: ["advanced-algorithms-and-complexity"],
+    modules: [
+      { slug: "complexity-classes-p-np-and-bqp", title: "Complexity Classes: P, NP, and BQP" },
+      { slug: "qma-and-quantum-verification", title: "QMA and Quantum Verification" },
+      { slug: "the-local-hamiltonian-problem", title: "The Local Hamiltonian Problem" },
+      { slug: "query-complexity-and-lower-bounds", title: "Query Complexity and Lower Bounds" },
+      { slug: "capstone-what-we-know-and-dont", title: "Capstone: What We Know and Don't" },
+    ],
+  },
+  {
+    slug: "simulation-and-compilation-frontiers",
+    pillar: "apex",
+    title: "Simulation & Compilation Frontiers",
+    description:
+      "Tensor-Network Methods and Quantum Compilation & Transpilation extended to the questions that decide whether a quantum computer is worth building for a given task: matrix product states and how bond dimension quantifies entanglement, exactly which circuits a classical computer can simulate efficiently (and why that boundary is the real definition of quantum advantage), Clifford+T synthesis and T-count as the currency fault-tolerant algorithms actually spend, noise-aware compilation and resource estimation for real hardware graphs, and quantum chemistry as the flagship application connecting a real molecule to a qubit count.",
+    difficulty: "master",
+    estimatedHours: 10,
+    prerequisites: ["advanced-algorithms-and-complexity", "compilation-and-hybrid-algorithms"],
+    modules: [
+      { slug: "tensor-networks-and-matrix-product-states", title: "Tensor Networks and Matrix Product States" },
+      { slug: "when-classical-simulation-works", title: "When Classical Simulation Works" },
+      { slug: "clifford-t-synthesis-and-resource-counting", title: "Clifford+T Synthesis and Resource Counting" },
+      { slug: "noise-aware-compilation-and-resource-estimation", title: "Noise-Aware Compilation and Resource Estimation" },
+      { slug: "quantum-simulation-of-molecules", title: "Quantum Simulation of Molecules" },
+      { slug: "capstone-from-algorithm-to-qubit-count", title: "Capstone: From Algorithm to Qubit Count" },
+    ],
+  },
+  {
+    slug: "research-methods-and-synthesis",
+    pillar: "apex",
+    title: "Research Methods and Synthesis",
+    description:
+      "The final course of QuantumLearn: not new physics, but the skill of reading, evaluating, and designing real quantum-computing research after having built the machinery to actually check it — how to read a paper's claims against its assumptions, how to tell a theorem from a heuristic from a numerical experiment, how to catch a misleading 'quantum advantage' claim against a weak classical baseline, what a reproducible benchmark actually requires, and a capstone synthesis of the entire QuantumLearn journey from 'what is a qubit' to the present research frontier.",
+    difficulty: "master",
+    estimatedHours: 8,
+    prerequisites: ["algorithmic-frontiers", "fault-tolerance-frontiers", "quantum-complexity-theory", "simulation-and-compilation-frontiers"],
+    modules: [
+      { slug: "how-to-read-a-quantum-computing-paper", title: "How to Read a Quantum Computing Paper" },
+      { slug: "distinguishing-theorem-from-heuristic", title: "Distinguishing Theorem from Heuristic" },
+      { slug: "evaluating-quantum-advantage-claims", title: "Evaluating Quantum Advantage Claims" },
+      { slug: "reproducing-and-designing-experiments", title: "Reproducing and Designing Experiments" },
+      { slug: "capstone-the-quantum-computing-landscape-today", title: "Capstone: The Quantum Computing Landscape Today" },
     ],
   },
 ];

@@ -1,0 +1,390 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/fault-tolerance-frontiers/lattice-surgery"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Lattice Surgery",
+  description:
+    "Two separate surface-code patches have no natural transversal two-qubit gate between them—this lesson derives the real fix, lattice surgery's merge and split operations, and shows how a sequence of them, plus an ancilla patch and classically-controlled Pauli corrections, assembles a full logical CNOT from nothing but the same local stabilizer measurements the code already needs for error correction.",
+  course: "fault-tolerance-frontiers",
+  module: "lattice-surgery",
+  order: 3,
+  difficulty: "master",
+  estimatedMinutes: 27,
+  prerequisites: ["apex/fault-tolerance-frontiers/surface-codes-in-depth"],
+  objectives: [
+    "Explain why applying a transversal (physical-qubit-by-physical-qubit) two-qubit gate between two separate surface-code patches is NOT generally possible, motivating an alternative logical two-qubit gate mechanism",
+    "Describe the lattice-surgery MERGE operation: temporarily measuring a new set of joint stabilizers along the boundary between two patches to fuse them into one larger patch, and the corresponding SPLIT operation to separate them again",
+    "Explain concretely how a sequence of merge/split operations between two logical qubits' patches implements a logical two-qubit measurement (e.g. a logical ZZ measurement), and how this can be composed with single-qubit operations to realize a full logical CNOT",
+  ],
+  related: [
+    {
+      slug: "apex/fault-tolerance-frontiers/surface-codes-in-depth",
+      note: "This lesson reuses that lesson's exact lattice convention—vertex (Z-type) and face (X-type) stabilizers, plus the rough/smooth boundary classification where X_L and Z_L strings terminate—and does nothing more exotic than adding or removing stabilizers along one of those boundaries.",
+    },
+    {
+      slug: "quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding",
+      note: "The logical CNOT built here from an ancilla patch, two joint measurements, and classically-controlled Pauli corrections is structurally the same gate-teleportation gadget that lesson made rigorous at the single-qubit level, just running one level up, on entire code patches instead of bare physical qubits.",
+    },
+  ],
+};
+
+## Motivation
+
+The fastest route to a fault-tolerant logical gate is a **transversal**
+one: apply the identical physical gate to each corresponding physical
+qubit of one or more code blocks, so that a single physical fault
+touches only one physical qubit of the operation and can never spread
+uncontrollably across it. Surface Codes in Depth already used exactly
+this trick for *single*-qubit logical gates within *one* patch: the
+logical $X_L$ and $Z_L$ operators are nothing but a physical Pauli
+string, applied qubit-by-qubit along a path connecting two opposite
+boundaries of that same patch—a transversal logical operation in the
+sense that it acts identically, physical qubit by physical qubit, and
+a single physical error still only ever hits the string in one place.
+
+A logical **two**-qubit gate between **two separate** patches is a
+genuinely different problem. The textbook reason transversal *two*-block
+gates work at all (e.g. a transversal CNOT between two blocks of the
+same CSS code) is that both blocks share the exact same stabilizer
+index structure: conjugating physical qubit $i$ of block 1 and physical
+qubit $i$ of block 2 through a CNOT sends an $X$-type stabilizer on some
+qubit set $S$ of block 1 to that same stabilizer on block 1 **times**
+the identical-looking operator on set $S$ of block 2—which is only a
+valid stabilizer of the joint system because block 2 independently has
+that same operator on set $S$ in its own stabilizer group. Two surface
+code patches placed side by side on a 2D chip do not have this. Setting
+geometry aside for a moment, there is no reason the two patches'
+stabilizer generators, as index sets over physical qubits, should line
+up qubit-for-qubit at all—and geometry makes the deeper point
+undeniable: two patches occupying disjoint regions of a chip have, at
+best, only their **touching boundary** qubits physically adjacent to
+each other. Every interior data qubit of patch 1 simply has no nearby
+partner qubit in patch 2 for a two-qubit gate to act on. A "transversal"
+operation, by definition, needs a partner for *every* qubit across the
+whole patch, not just the handful sitting at the seam—so a genuine
+local transversal two-patch gate is not just algebraically awkward here,
+it is not even physically realizable with nearest-neighbor coupling on
+a 2D layout. Fault-tolerant two-qubit logical gates between separate
+surface-code patches need a mechanism that only ever touches that seam.
+That mechanism is **lattice surgery**.
+
+## Mathematical Development
+
+### The convention this lesson reuses
+
+Recall the lattice: physical qubits sit on the edges of a 2D grid, a
+**vertex stabilizer** is the $Z$-type product over the (up to 4) qubits
+touching a vertex, and a **face stabilizer** is the $X$-type product
+over the (up to 4) qubits bordering a face. A finite patch has two kinds
+of boundary. Where the plaquette structure is cut short so that a face
+stabilizer near the edge drops to weight 2, the edge is called
+**rough**; the logical $X_L$ operator is a string of physical $X$'s
+running between a patch's two rough boundaries. Where the vertex
+structure is cut short so that a vertex stabilizer near the edge drops
+to weight 2, the edge is called **smooth**; the logical $Z_L$ operator
+is a string of physical $Z$'s running between a patch's two smooth
+boundaries. Take patch $L_1$ and patch $L_2$ to be rectangular, each
+with smooth boundaries on its left and right edges and rough boundaries
+on top and bottom, placed side by side on the chip so that $L_1$'s right
+(smooth) edge faces $L_2$'s left (smooth) edge across a small physical
+gap. $Z_{L_1}$ is then a horizontal string spanning $L_1$'s full width;
+$Z_{L_2}$ spans $L_2$'s width the same way; $X_{L_1}$ and $X_{L_2}$ are
+each vertical strings running top-to-bottom through their own patch.
+
+### MERGE: measuring a joint stabilizer along the boundary
+
+To merge $L_1$ and $L_2$, add one new column of physical qubits in the
+gap between them—concretely, a qubit on the new edge connecting
+$L_1$'s top-right vertex to $L_2$'s top-left vertex, and another
+connecting $L_1$'s bottom-right vertex to $L_2$'s bottom-left vertex —
+and turn on the new **vertex stabilizers** these bridge qubits complete.
+Before the merge, $L_1$'s top-right vertex was a smooth-boundary corner
+with a weight-2 $Z$-stabilizer (its top-edge qubit and its right-edge
+qubit); the new bridge qubit extends it to weight 3, now touching a
+physical qubit that belongs to $L_2$'s side of the seam. This is exactly
+the same operation Syndrome Measurement and the Recovery Map already
+justified—**measure a stabilizer, project onto the corresponding
+eigenspace**—applied here to a stabilizer that spans two formerly
+separate code blocks rather than sitting entirely inside one. Before the
+merge, the two-patch system encodes 2 logical qubits (a 4-dimensional
+code space, over and above the enormous physical Hilbert space): $X_{L_1}$,
+$Z_{L_1}$, $X_{L_2}$, $Z_{L_2}$ are all independent logical operators.
+Measuring the new seam stabilizers for the first time adds new
+generators to the stabilizer group, and each new generator halves the
+remaining code space exactly as any newly-measured stabilizer does.
+Once the whole seam is bridged, the two patches have become one larger
+rectangular patch with **one** pair of logical operators left over:
+
+- $X_L^{\text{merged}}$: any top-to-bottom vertical string in the new,
+  wider patch is an equally valid representative (they are all related
+  by multiplying by face stabilizers), which forces
+  $X_{L_1}=X_{L_2}$ as operators of the merged code—merging
+  *identifies* the two patches' $X$ logical operators with each other.
+- $Z_L^{\text{merged}}$: a left-to-right string spanning the full merged
+  width, which can be shrunk (multiplying by the new bulk vertex
+  stabilizers at the seam) back down to $L_1$'s original horizontal
+  string through $L_1$ times $L_2$'s original horizontal string through
+  $L_2$—i.e. $Z_L^{\text{merged}} = Z_{L_1}Z_{L_2}$, up to the
+  stabilizer group.
+
+So the very act of measuring the new seam stabilizers **is** a
+projective measurement of $Z_{L_1}Z_{L_2}$: its outcome is the product
+of the two eigenvalues the merge just fixed, while each patch's
+*individual* $Z_{L_1}$ and $Z_{L_2}$ eigenvalues are generically
+disturbed (exactly as measuring $Z\otimes Z$ on two ordinary qubits
+fixes their product without leaving either qubit's own $Z$
+well-defined). Bringing two patches into contact and turning on new
+local checks along the seam is nothing but ordinary syndrome extraction,
+run once across a boundary instead of inside a single patch.
+
+### SPLIT: reintroducing the individual boundary
+
+To split the merged patch back into two logical qubits, stop measuring
+the seam's joint vertex stabilizers and instead measure the *individual*
+weight-2 stabilizers each patch used to have at its own smooth boundary
+(equivalently, measure the two boundary-column qubits directly and
+discard them). This adds back a generator that anticommutes with the
+now-shared $\bar X=X_{L_1}=X_{L_2}$, splitting the 1-logical-qubit code
+back into 2. The two new individual logical operators $Z_{L_1}'$,
+$Z_{L_2}'$ satisfy $Z_{L_1}'Z_{L_2}'=Z_L^{\text{merged}}$, the value the
+merge already fixed, but each carries its own fresh, generically random
+bit from the split measurement itself—the same structure as
+teleportation, where Bob's corrected state is only recovered *after*
+combining a random local outcome with a previously-fixed joint one.
+
+### From one ZZ measurement to a full logical CNOT
+
+A single merge-then-split gives one logical two-qubit **measurement**
+($Z_{L_1}Z_{L_2}$, or $X_{L_1}X_{L_2}$ using a rough-boundary merge
+instead), not yet a unitary gate. The standard construction assembles a
+full logical CNOT (control patch $C$, target patch $T$) from two such
+measurements and a disposable ancilla patch $A$, structurally identical
+to Rigorous Teleportation and Superdense Coding's gate-teleportation
+gadget one level up:
+
+1. Prepare ancilla $A$ in $|+\rangle_L$ (an $X_A=+1$ eigenstate).
+2. Merge $C$ and $A$ along their smooth boundaries, measuring
+   $Z_CZ_A$ (outcome $m_1$), then split them apart again.
+3. Merge $A$ and $T$ along their rough boundaries, measuring
+   $X_AX_T$ (outcome $m_2$), then split them apart again.
+4. Measure $A$ directly, in the $X$ basis (a single-patch logical
+   measurement, no further merge needed), outcome $m_3$.
+5. Apply a Pauli correction to $C$ and $T$—some deterministic
+   function of $(m_1,m_2,m_3)$, worked out by propagating the three
+   measurement outcomes through the circuit exactly the way
+   teleportation's $X^{m_1}Z^{m_0}$ table was derived, just from three
+   classical bits instead of two.
+
+After the correction, $(C,T)$ carries $\text{CNOT}_{C\to T}$ applied to
+whatever states they held going in, and $A$ is fully consumed. Every
+step is either a merge/split (local stabilizer measurements along one
+seam) or a single-patch measurement—**no step ever asks for a
+transversal gate reaching all the way across two disjoint patches.**
+This is the same teleportation-based-gate idea Rigorous Teleportation
+already made precise: a joint measurement plus classically-controlled
+correction stands in for a gate that has no direct, local
+implementation, now running on entire code patches rather than bare
+qubits.
+
+## Physical Interpretation
+
+Lattice surgery is not a theoretical curiosity standing in for
+something better—it is the real, dominant mechanism essentially
+every serious 2D-superconducting (and comparable) surface-code
+fault-tolerant architecture proposal actually uses for logical two-qubit
+gates. The reason ties directly back to Surface Codes in Depth's own
+"why locality matters" point: a merge or split is built entirely from
+the same local, nearest-neighbor stabilizer measurements the code
+already has to perform continuously just to correct errors. It
+introduces no new gate type, no long-range coupling, and no requirement
+that hardware ever connect a qubit deep inside one patch to a qubit deep
+inside another. "How do two logical qubits interact" and "how does the
+code detect an error" turn out to be the same hardware primitive,
+applied along a different boundary—which is exactly why lattice
+surgery, not some exotic inter-patch gate, is what real roadmaps build
+around.
+
+## Worked Example
+
+**Confirm the ZZ-merge's back-action concretely, in two contrasting
+cases.**
+
+*Case 1—both patches already in $Z$ eigenstates.* Prepare $L_1$ in
+$|0\rangle_L$ ($Z_{L_1}=+1$) and $L_2$ in $|1\rangle_L$ ($Z_{L_2}=-1$).
+Merging measures $Z_{L_1}Z_{L_2}$, but this operator's value is already
+fixed: $Z_{L_1}Z_{L_2}=(+1)(-1)=-1$ with certainty, before the merge
+even happens. The merge reports $m=-1$ every time, and disturbs
+nothing, exactly as measuring an operator a state is already an
+eigenstate of should.
+
+*Case 2—one patch in a superposition.* Prepare $L_1$ in $|+\rangle_L$
+(equal superposition of $Z_{L_1}=\pm1$) and $L_2$ in $|0\rangle_L$
+($Z_{L_2}=+1$). Writing this out, $|+\rangle_{L_1}|0\rangle_{L_2}
+=\tfrac1{\sqrt2}\big(|0\rangle_{L_1}|0\rangle_{L_2}+|1\rangle_{L_1}|0\rangle_{L_2}\big)$.
+Measuring $Z_{L_1}Z_{L_2}$ projects onto one of its two terms with
+50/50 probability: outcome $m=+1$ leaves $|0\rangle_{L_1}|0\rangle_{L_2}$,
+outcome $m=-1$ leaves $|1\rangle_{L_1}|0\rangle_{L_2}$. Either way, $L_1$
+has been forced out of its original $X_{L_1}$-definite superposition and
+into a definite $Z_{L_1}$ eigenstate—the genuine back-action a joint
+$ZZ$ measurement has on a state that was not already one of its
+eigenstates, and precisely the disturbance the Mathematical
+Development section described in the abstract, now checked by hand on
+the smallest case that shows it.
+
+## Visualizing Merge and Split
+
+<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+  <svg width={780} height={320} viewBox="0 0 780 320" className="w-full" role="img" aria-label="Three panels showing lattice surgery on two small surface-code patches, each a single face with vertices on its four corners and qubits on its four edges. Left panel, before merge: patch L1 and patch L2 separated by a physical gap, each with its own smooth boundary facing the other, and each showing its own horizontal logical Z string. Middle panel, during merge: two new bridge qubits fill the gap, a highlighted loop shows the seam vertex stabilizer now extended onto the bridge qubit, and a single continuous logical Z string spans both patches, representing the product Z L1 Z L2. Right panel, after split: the gap and separate logical Z strings are restored, with the bridge qubits removed, showing two independent logical qubits again.">
+    <text x={130} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">Before: two independent patches</text>
+    <text x={385} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">During: joint Z stabilizers measured</text>
+    <text x={655} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">After: split apart again</text>
+
+    <g>
+      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      <rect x={140} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      <line x1={100} y1={100} x2={100} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
+      <line x1={140} y1={100} x2={140} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
+      {[[40,90],[100,90],[40,210],[100,210],[140,90],[200,90],[140,210],[200,210]].map(([cx,cy]) => (
+        <circle key={`v1-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
+      ))}
+      {[[70,90],[70,210],[40,150],[170,90],[170,210],[200,150]].map(([qx,qy]) => (
+        <rect key={`q1-${qx}-${qy}`} x={qx-7} y={qy-7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
+      ))}
+      <rect x={93} y={143} width={14} height={14} rx={3} className="fill-brand/20 stroke-brand" strokeWidth={1.5} />
+      <rect x={133} y={143} width={14} height={14} rx={3} className="fill-brand/20 stroke-brand" strokeWidth={1.5} />
+      <line x1={40} y1={150} x2={100} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
+      <line x1={140} y1={150} x2={200} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
+      <text x={70} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L1</text>
+      <text x={170} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L2</text>
+      <text x={120} y={255} textAnchor="middle" className="fill-accent text-[9px] font-medium">smooth boundaries face each other</text>
+      <text x={120} y={272} textAnchor="middle" className="fill-muted-foreground text-[9px]">gap: no shared stabilizers</text>
+    </g>
+
+    <g transform="translate(260,0)">
+      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      <rect x={140} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      {[[40,90],[100,90],[40,210],[100,210],[140,90],[200,90],[140,210],[200,210]].map(([cx,cy]) => (
+        <circle key={`v2-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
+      ))}
+      {[[70,90],[70,210],[40,150],[170,90],[170,210],[200,150]].map(([qx,qy]) => (
+        <rect key={`q2-${qx}-${qy}`} x={qx-7} y={qy-7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
+      ))}
+      <rect x={113} y={83} width={14} height={14} rx={3} className="fill-brand/70 stroke-brand" strokeWidth={1.5} />
+      <rect x={113} y={203} width={14} height={14} rx={3} className="fill-brand/70 stroke-brand" strokeWidth={1.5} />
+      <rect x={60} y={78} width={72} height={30} rx={6} className="fill-brand/15 stroke-brand" strokeWidth={2} />
+      <line x1={40} y1={150} x2={200} y2={150} className="stroke-brand" strokeWidth={2.5} strokeDasharray="6 3" />
+      <text x={120} y={238} textAnchor="middle" className="fill-brand text-[9.5px] font-medium">Z_L(merged) = Z_L1 . Z_L2</text>
+      <text x={120} y={64} textAnchor="middle" className="fill-brand text-[9px] font-medium">seam vertex gains the bridge qubit</text>
+      <text x={120} y={272} textAnchor="middle" className="fill-muted-foreground text-[9px]">1 logical qubit, 1 code space</text>
+    </g>
+
+    <g transform="translate(520,0)">
+      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      <rect x={140} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      <line x1={100} y1={100} x2={100} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
+      <line x1={140} y1={100} x2={140} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
+      {[[40,90],[100,90],[40,210],[100,210],[140,90],[200,90],[140,210],[200,210]].map(([cx,cy]) => (
+        <circle key={`v3-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
+      ))}
+      {[[70,90],[70,210],[40,150],[170,90],[170,210],[200,150]].map(([qx,qy]) => (
+        <rect key={`q3-${qx}-${qy}`} x={qx-7} y={qy-7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
+      ))}
+      <rect x={93} y={143} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} strokeDasharray="3 2" />
+      <rect x={133} y={143} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} strokeDasharray="3 2" />
+      <line x1={40} y1={150} x2={100} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
+      <line x1={140} y1={150} x2={200} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
+      <text x={70} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L1'</text>
+      <text x={170} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L2'</text>
+      <text x={120} y={255} textAnchor="middle" className="fill-accent text-[9px] font-medium">bridge qubits removed</text>
+      <text x={120} y={272} textAnchor="middle" className="fill-muted-foreground text-[9px]">Z_L1' . Z_L2' = the merge's outcome</text>
+    </g>
+  </svg>
+</div>
+
+Each small square patch above is drawn at the smallest possible size (a
+single face) purely for legibility; the mechanism—a weight-2
+boundary vertex stabilizer gaining a bridge qubit during merge, and
+losing it again during split—is identical at any patch size,
+exactly as Surface Codes in Depth already established for the
+bulk vertex and face pattern itself.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking single-patch transversal logical operators contradict this
+lesson's claim that transversal gates don't work here.** They don't:
+a single patch's $X_L$/$Z_L$ string is a transversal *single-qubit*
+operation on *one* code block. The claim this lesson makes is narrower
+and different—there is no natural transversal *two*-qubit gate
+*between two separate patches*, because their physical qubits have no
+qubit-by-qubit correspondence (and, away from the shared boundary, are
+not even physically adjacent).
+</Callout>
+
+<Callout type="mistake">
+**Assuming a merge reveals $Z_{L_1}$ and $Z_{L_2}$ individually.** It
+only ever fixes their *product*, $Z_{L_1}Z_{L_2}$; the Worked Example's
+second case shows this explicitly—the individual patches' $Z$
+eigenvalues are generically randomized by the same measurement that
+pins down their product, exactly like measuring $Z\otimes Z$ on two
+ordinary qubits.
+</Callout>
+
+## Practice Questions
+
+1. Why does merging two patches along their **rough** (rather than
+   smooth) shared boundary measure $X_{L_1}X_{L_2}$ instead of
+   $Z_{L_1}Z_{L_2}$?
+2. In the logical-CNOT protocol above, why must the ancilla $A$ be
+   discarded (measured out) rather than reused directly as one of the
+   two output logical qubits?
+3. Explain why a merge followed immediately by a split, with no other
+   operation in between, still has a physical effect on the two patches
+   even though they end up separate again—tie your answer to the
+   Worked Example's Case 2.
+4. Surface Codes in Depth argued that surface codes are hardware-friendly
+   because every stabilizer is local. Explain precisely why lattice
+   surgery inherits that same property, rather than reintroducing a
+   long-range requirement through the back door.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A transversal two-qubit gate needs a physical-qubit-by-physical-qubit
+  correspondence between two code blocks; two separate surface-code
+  patches on a 2D chip have no such correspondence away from their
+  shared boundary, ruling out a direct transversal two-patch gate.
+- **MERGE** brings two patches into contact and turns on new joint
+  stabilizers along the seam—ordinary syndrome-style stabilizer
+  measurement, just spanning two formerly independent patches—which
+  fuses them into one patch and projectively measures the product of
+  their logical operators (e.g. $Z_{L_1}Z_{L_2}$). **SPLIT** reverses
+  this by reintroducing each patch's own individual boundary
+  stabilizers.
+- A disposable ancilla patch, a $ZZ$ merge/split, an $XX$ merge/split,
+  a final single-patch measurement, and classically-controlled Pauli
+  corrections compose into a full logical CNOT—the same
+  gate-teleportation structure as ordinary qubit teleportation, one
+  level up, at the code-patch level.
+- This is the real, dominant mechanism proposed for logical two-qubit
+  gates in 2D surface-code architectures precisely because it needs no
+  hardware primitive beyond the local stabilizer measurements the code
+  already performs for error correction.
+
+## Further Exploration
+
+Next: [Magic States and Distillation](/lessons/apex/fault-tolerance-frontiers/magic-states-and-distillation),
+which tackles the gate lattice surgery still can't reach—a
+non-Clifford gate like $T$—and the distillation protocol that
+manufactures one fault-tolerantly from many noisy copies.
+
+The "measure a stabilizer, project onto its eigenspace" idea this
+lesson reused across a patch boundary is the same general machinery
+[CSS Codes and the General Stabilizer Formalism](/lessons/quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism)
+develops in full generality on the smaller Steane code, where every
+stabilizer and logical operator can be checked by hand.

@@ -1,0 +1,394 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Matrix } from "@/lib/quantum/matrix";
+import { PAULI_X, PAULI_Z, IDENTITY } from "@/lib/quantum/gates";
+import { commutator } from "@/lib/quantum/observables";
+import { optimalGroverIterations } from "@/lib/quantum/grover";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms"
+).map((problem) => problem.meta);
+
+export const toolboxFrobeniusNorm = (M) => {
+  let sum = 0;
+  for (let r = 0; r < M.rows; r++) {
+    for (let c = 0; c < M.cols; c++) {
+      sum += M.get(r, c).magnitudeSquared();
+    }
+  }
+  return Math.sqrt(sum);
+};
+
+export const toolboxHamA = PAULI_Z.tensor(PAULI_Z);
+export const toolboxHamB = PAULI_X.tensor(IDENTITY).add(IDENTITY.tensor(PAULI_X));
+export const toolboxHamH = toolboxHamA.add(toolboxHamB);
+export const toolboxCommutator = commutator(toolboxHamA, toolboxHamB);
+export const toolboxCommNorm = toolboxFrobeniusNorm(toolboxCommutator);
+export const toolboxHNorm = toolboxFrobeniusNorm(toolboxHamH);
+
+export const trotterStepsFirstOrder = (t, epsilon) => Math.ceil((t * t * toolboxCommNorm) / (2 * epsilon));
+
+export const qsvtStepsProxy = (t, epsilon) => Math.ceil(t * toolboxHNorm + Math.log2(1 / epsilon));
+
+export const toolboxEpsilon = 0.001;
+export const toolboxTValuesSmall = 5;
+export const toolboxTValuesLarge = 50;
+
+export const toolboxTrotterSmall = trotterStepsFirstOrder(toolboxTValuesSmall, toolboxEpsilon);
+export const toolboxTrotterLarge = trotterStepsFirstOrder(toolboxTValuesLarge, toolboxEpsilon);
+export const toolboxQsvtSmall = qsvtStepsProxy(toolboxTValuesSmall, toolboxEpsilon);
+export const toolboxQsvtLarge = qsvtStepsProxy(toolboxTValuesLarge, toolboxEpsilon);
+
+export const toolboxGroverN = 10;
+export const toolboxGroverClassical = 2 ** toolboxGroverN;
+export const toolboxGroverQuantum = optimalGroverIterations(toolboxGroverN);
+
+export const toolboxGroverBars = [
+  { label: `classical, N=${toolboxGroverClassical}`, value: toolboxGroverClassical, highlight: false },
+  { label: `Grover/QSVT, N=${toolboxGroverClassical}`, value: toolboxGroverQuantum, highlight: true },
+];
+
+export const toolboxHamiltonianBars = [
+  { label: `Trotter, t=${toolboxTValuesSmall}`, value: toolboxTrotterSmall, highlight: false, caption: String(toolboxTrotterSmall) },
+  { label: `QSVT-proxy, t=${toolboxTValuesSmall}`, value: toolboxQsvtSmall, highlight: true, caption: String(toolboxQsvtSmall) },
+  { label: `Trotter, t=${toolboxTValuesLarge}`, value: toolboxTrotterLarge, highlight: false, caption: String(toolboxTrotterLarge) },
+  { label: `QSVT-proxy, t=${toolboxTValuesLarge}`, value: toolboxQsvtLarge, highlight: true, caption: String(toolboxQsvtLarge) },
+];
+
+export const toolboxGroverDegree = 2 * optimalGroverIterations(toolboxGroverN) + 1;
+
+export const lessonMeta = {
+  title: "Capstone: The Toolbox That Ate Quantum Algorithms",
+  description:
+    "Block encodings, quantum signal processing, and the quantum singular value transformation collapse into one framework whose only tunable ingredient is a polynomial — and Grover's algorithm, amplitude estimation, Hamiltonian simulation, and linear-systems solving turn out to be three honest special cases of it, not three coincidences.",
+  course: "algorithmic-frontiers",
+  module: "capstone-the-toolbox-that-ate-quantum-algorithms",
+  order: 6,
+  difficulty: "master",
+  estimatedMinutes: 24,
+  prerequisites: [
+    "apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems",
+    "apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation",
+  ],
+  objectives: [
+    "Synthesize the whole course: block encodings, QSP, and QSVT as one unified construction, and Grover's algorithm, amplitude estimation, Hamiltonian simulation, and linear-systems solving as its special cases",
+    "Evaluate honestly which of these unifications are exact equivalences, which are asymptotic-scaling matches, and where real, still-open algorithmic questions remain",
+    "Explain what kind of NEW algorithmic problem a researcher would now approach by first asking 'what polynomial do I need, and can I find/apply it via QSVT', as this course's practical takeaway skill",
+  ],
+  related: [
+    {
+      slug: "apex/algorithmic-frontiers/the-quantum-singular-value-transformation",
+      note: "That lesson derives the QSVT machinery itself, one polynomial applied to every singular value of a block-encoded matrix at once; this capstone's whole job is showing that machinery, unmodified, is what Grover's algorithm, Hamiltonian simulation, and linear-systems solving each turn out to already be doing.",
+    },
+  ],
+};
+
+## Motivation
+
+Five lessons, one machine. It's worth saying that plainly before
+recapping any of them, because the payoff of this capstone isn't a new
+derivation — it's realizing that no new derivation is needed. **Block
+encodings** (Module 1) gave a universal way to embed an arbitrary matrix
+$A$, not necessarily unitary, not necessarily square, into the corner of
+a larger unitary $U_A$ that any quantum circuit can run. **Quantum
+signal processing** (Module 2) showed that a single qubit, repeatedly
+rotated by a fixed signal angle and interleaved with tunable phases, can
+realize an arbitrary polynomial $P(x)$ of that signal, subject only to
+mild, checkable feasibility conditions on $P$. **QSVT** (Module 3) lifted
+that one-qubit trick to act on every singular value of a whole
+block-encoded matrix simultaneously, so that $U_A$ becomes a circuit for
+(an encoding of) $P(A)$. **Amplitude estimation** (Module 4) showed how
+to read a number back out of this machinery, a probability or an
+amplitude, without paying for a full coherent phase-estimation register.
+And **linear-systems solving** (Module 5) cashed all of it in on a real,
+if conditionally scoped, application: $P(x)\approx 1/x$, plugged into
+the same QSVT circuit, solves $A\vec x=\vec b$.
+
+This lesson doesn't add a sixth idea. It puts the other five in one
+frame and asks the two questions a working researcher actually needs
+answered: which parts of "it's all QSVT" are literally true, and which
+parts are doing real, honest work papering over real, remaining
+difficulty.
+
+## Mathematical Development
+
+### The recap, restated as one throughline
+
+A block encoding turns "I have a matrix" into "I have a circuit with
+that matrix sitting in a submatrix of its unitary action" — the
+translation step every later lesson in this course depends on, since
+none of QSP, QSVT, or amplitude estimation know what a "matrix" is; they
+only know what a circuit is. QSP then answers a narrower, purely
+single-qubit question completely: given a single tunable rotation angle
+$x$ (the "signal"), how much freedom do you have to sculpt an arbitrary
+target function of $x$ by sandwiching that rotation between $d$ tunable
+phases? The answer — any polynomial of degree $\le d$ satisfying parity
+and boundedness constraints, and no more — is a complete characterization,
+not a heuristic. QSVT's move is to notice that a block encoding's
+singular value decomposition puts exactly this same one-qubit signal
+structure inside *every* singular subspace of $A$ at once, so the same
+phase sequence that realizes $P(x)$ for one qubit realizes $P(A)$ (in
+the appropriate corner of the resulting unitary) for the whole matrix,
+with no per-singular-value bookkeeping required. Amplitude estimation
+then shows that if what you actually want out of this machinery is a
+single number, not a full quantum state, you can get it by iterating
+amplitude amplification (itself a QSVT special case — see below) at
+geometrically increasing depths and combining the results, achieving the
+same Heisenberg-limited $O(1/\epsilon)$ scaling phase estimation gives,
+without ever building a phase-estimation register. Linear-systems
+solving is simply the instance where the function of interest is
+$P(x)\approx1/x$: run it through the same QSVT circuit as any other
+polynomial, no new hardware primitive required.
+
+### The table: one framework, different polynomial
+
+This is the single most useful object this course produces. Every row
+below is the *same* QSVT circuit — same block encoding, same
+phase-sequence machinery — with only $P(x)$ changed.
+
+| Algorithm | Polynomial $P(x)$ applied to each singular value | What it achieves |
+|---|---|---|
+| Grover's algorithm / amplitude amplification | A near-step-function polynomial (a bounded-degree approximation to $\mathrm{sign}(x)$, steepening as degree grows) | Rotates a small marked-subspace amplitude $a$ toward $1$ in $\Theta(1/a)$ applications of the block encoding — Grover's $\Theta(\sqrt N)$ unstructured-search count is the case $a=1/\sqrt N$ |
+| Amplitude estimation | The same near-step polynomial, applied at several geometrically increasing degrees and combined statistically (no new polynomial family — reuses the row above) | Extracts $a$ itself to additive error $\epsilon$ in $O(1/\epsilon)$ total applications, matching phase estimation's scaling without a phase register |
+| Hamiltonian simulation | A truncated Jacobi-Anger / Chebyshev expansion approximating $e^{-ixt}$ (as a real cosine part and an imaginary sine part, since QSP only ever produces real-coefficient polynomials directly) | Implements $e^{-iHt}$ to accuracy $\epsilon$ from a block encoding of $H$, with query count scaling like $O(t\lVert H\rVert+\log(1/\epsilon))$ |
+| Linear systems (QSVT-based HHL) | An odd polynomial approximating $1/x$, regularized away from $x=0$, degree scaling like $O(\kappa\log(1/\epsilon))$ | Applies (a normalized) $A^{-1}$ to a block-encoded $\vec b$, producing a state proportional to the solution $\vec x$, at a cost set by the condition number $\kappa$ |
+
+Read across any single row and the pattern is the whole course: pick the
+function you actually need, find a polynomial that approximates it well
+enough, and QSVT turns that polynomial into a circuit. Read down the
+"what it achieves" column and four superficially unrelated algorithms —
+one from the 1990s, one from a 2019-and-later framework, one dating to
+Trotter and Lie, one named for its three 2009 authors — turn out to
+differ only in which function of $x$ they asked for.
+
+### What kind of unification this actually is
+
+It would overclaim to say QSVT makes Grover's original diffusion-operator
+construction, the original Trotter-Suzuki product formulas, or the
+original HHL circuit *wrong*, or obsolete in the sense of "no one should
+ever look at them again." None of that is true. What QSVT actually does,
+precisely, is:
+
+- **Explain** each of them as an instance of one construction, rather
+  than as unrelated tricks that happen to work.
+- **Match or improve** several of their asymptotic query complexities —
+  QSVT-based Hamiltonian simulation's $O(t\lVert H\rVert+\log(1/\epsilon))$
+  beats first-order Trotter's derived $O(t^2\lVert[A,B]\rVert/\epsilon)$
+  scaling (see the worked visualization below), while Grover-via-QSVT
+  reproduces, rather than beats, the original's already-optimal
+  $\Theta(\sqrt N)$.
+- **Offer a more composable design methodology**: once a target function
+  and its polynomial approximation are in hand, the circuit that
+  realizes it is close to mechanical, rather than requiring a bespoke
+  argument invented from scratch for that one problem, the way the
+  original diffusion operator, product formula, and phase-estimation-based
+  HHL circuit each were.
+
+None of that is the same claim as "QSVT makes algorithm design trivial."
+It doesn't. It relocates the hard part.
+
+## Physical Interpretation and Why This Matters
+
+### Where the hard part actually moved
+
+QSVT is best understood as an **organizing principle** and a
+**practical design tool**, not a solved-forever result. Two genuinely
+hard, problem-specific research questions remain exactly as hard as they
+were before this framework existed:
+
+1. **Finding a good block encoding.** Not every matrix of interest has
+   an efficient one sitting around. For a sparse matrix, a Pauli-sum
+   Hamiltonian, or a matrix with known structure, constructing an
+   efficient block encoding is itself a real piece of algorithm design —
+   the framework tells you what to do *once you have one*, not how to
+   build one for an arbitrary matrix you care about.
+2. **Finding a good polynomial.** QSP guarantees that a feasible
+   polynomial can be realized; it does not hand you the polynomial. For
+   a genuinely new target function, finding a bounded-degree polynomial
+   approximation with the accuracy and parity properties QSP needs can
+   be a real approximation-theory research question in its own right,
+   not a lookup-table exercise.
+
+### What is genuinely still open
+
+Calibrated honesty, not hype: as of this writing, (a) efficient block
+encodings are not automatic for every matrix of interest, and finding
+one is sometimes *the* hard part of a new application; (b) QSVT's
+classical phase-finding subroutine (computing the phase sequence for a
+target polynomial) is polynomial-time and well-studied, but real
+numerical-stability considerations arise for very high-degree
+polynomials, where naive phase-finding can become ill-conditioned; and
+(c) whether QSVT-style methods will produce genuinely *new*, provable
+exponential speedups for problems outside the already-known algorithm
+families — versus re-deriving and tightening constant factors on results
+already known by other means — is an active, unresolved research
+question, not a settled one.
+
+### Why this matters: a durable reading skill
+
+Here is this course's real payoff, stated directly. If you now open a
+quantum algorithms paper from roughly 2019 onward and see the phrase
+"block encoding," "quantum signal processing," or "quantum singular
+value transformation," you should be able to parse the *construction*
+being proposed — what matrix is being encoded, what function is being
+applied to it, and roughly what that buys in query complexity — even
+when the specific application is one you've never seen before. That is
+a genuine, durable research-reading skill, not a party trick, and it is
+exactly the skill the APEX pillar's own later course, **Research Methods
+and Synthesis**, takes as its explicit subject: reading, and honestly
+evaluating, real papers rather than only pre-digested lessons.
+
+## Worked Example
+
+**Connect Grover's algorithm, as this platform's own engine computes it,
+to the QSVT polynomial-degree picture directly.**
+
+This course's `optimalGroverIterations` function, reused unmodified from
+the Quantum Mastery pillar, gives the real optimal iteration count for
+unstructured search over $N=2^n$ items:
+
+$$
+\texttt{optimalGroverIterations}(10) = \boxed{25}
+$$
+
+for $N=2^{10}=1024$ items. In the qubitization/QSVT picture, each Grover
+iteration corresponds to one application of the block-encoded oracle-plus-
+diffusion "quantum walk" step, and the polynomial being realized after
+$m$ iterations is (up to normalization) the Chebyshev polynomial of
+degree $2m+1$ — one factor of $2$ per iteration, since each iteration
+uses the block encoding and its inverse once, plus one for the initial
+state preparation. So Grover's algorithm at $N=1024$, viewed through
+this course's QSVT lens, is realizing a degree-
+
+$$
+2\times25+1=\boxed{51}
+$$
+
+polynomial approximation to a step function — a genuinely different-looking
+description of the *exact same* $25$-iteration circuit this course's own
+Grover engine runs, which is precisely the sense in which this
+unification is real: not a metaphor, a literal restatement of the same
+gate sequence in the language this course's later lessons built.
+
+## Interactive: Query Complexity, Old Framing vs. QSVT Framing
+
+The clearest way to see "one framework, different polynomial" pay off in
+actual numbers is to compare query counts for two of this course's
+applications: unstructured search, and Hamiltonian simulation. Both bar
+pairs below use real formulas established in this course (Grover's own
+`optimalGroverIterations`, and the exact Trotter error bound derived in
+the prerequisite Mastery course's Hamiltonian-simulation lesson, applied
+here to the same $2$-qubit Ising Hamiltonian $H=Z\otimes Z+X\otimes
+I+I\otimes X$); the QSVT-based Hamiltonian-simulation numbers use the
+well-known asymptotic form $O(t\lVert H\rVert+\log(1/\epsilon))$ as an
+**illustrative order-of-magnitude proxy** (implied constant $1$, using
+this Hamiltonian's own Frobenius norm as a stand-in for $\lVert
+H\rVert$) — not a literal circuit-level gate count from a specific
+compiled implementation.
+
+<BarChart
+  bars={toolboxGroverBars}
+  ariaLabel={`Unstructured search at N=${toolboxGroverClassical}: classical worst case is ${toolboxGroverClassical} queries, while Grover's optimal iteration count (identical whether built the original way or via a QSVT near-step polynomial) is only ${toolboxGroverQuantum}`}
+/>
+
+Grover's bar doesn't change at all depending on which construction built
+it — the whole point of stating this honestly is that QSVT *reproduces*
+this number, it doesn't beat it, because BBBV's bound already proved
+$\Theta(\sqrt N)$ optimal for unstructured search.
+
+<BarChart
+  bars={toolboxHamiltonianBars}
+  ariaLabel={`Hamiltonian simulation step counts at target error 0.001: first-order Trotter needs ${toolboxTrotterSmall} steps at t=5 and ${toolboxTrotterLarge} at t=50 (quadratic in t, this course's own derived bound); the QSVT-scaling proxy needs only ${toolboxQsvtSmall} at t=5 and ${toolboxQsvtLarge} at t=50 (illustrative, linear-plus-log in t)`}
+/>
+
+Here the two framings genuinely diverge, not just relabel the same
+number: increasing $t$ by $10\times$ (from $5$ to $50$) multiplies
+first-order Trotter's derived step count by almost exactly $100\times$
+($t^2$ scaling, real and derived), while the QSVT-scaling proxy grows by
+under $7\times$ (dominated by the linear-in-$t$ term at this scale) —
+the concrete, numeric shape of "QSVT-based simulation provably scales
+better than first-order Trotter for large $t$ or tight $\epsilon$,"
+computed from this course's own formulas rather than asserted.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**"QSVT proves Grover's original algorithm, Trotter's formula, or HHL's
+original circuit were wrong."** None of them were. QSVT *explains* each
+as one instance of a shared construction and, for some, matches or
+improves the asymptotic scaling with a more composable design
+methodology — it doesn't retroactively invalidate a single correct,
+already-published result.
+</Callout>
+
+<Callout type="mistake">
+**"Now that I know QSVT, any new algorithm problem is basically
+solved."** The framework only takes over once you already have an
+efficient block encoding of your matrix of interest *and* a
+good polynomial approximation to your target function. Both of those
+can still be genuinely hard, problem-specific research questions —
+QSVT is the mechanical middle step, not a replacement for either one.
+</Callout>
+
+<Callout type="mistake">
+**Treating "QSVT unifies these algorithms" as meaning they all now have
+identical query complexity.** They don't, and the table above says so
+directly: Grover-via-QSVT exactly reproduces $\Theta(\sqrt N)$ (no
+improvement, since it was already optimal), while QSVT-based Hamiltonian
+simulation provably beats naive first-order Trotterization's scaling.
+"Unified framework" describes the *construction*, not a claim that every
+instance's cost becomes the same.
+</Callout>
+
+## Practice Questions
+
+1. Using the table above, explain in your own words why amplitude
+   estimation's row doesn't need its own new polynomial family — what
+   exactly does it reuse from the amplitude-amplification row, and what
+   does it add on top?
+2. Name one thing that would have to be true for QSVT to give Grover's
+   algorithm an asymptotic advantage over its original $\Theta(\sqrt N)$
+   query count on genuinely unstructured search, and explain why BBBV's
+   bound (from the prerequisite Mastery course) rules it out.
+3. A researcher wants to apply this course's framework to a brand-new
+   problem. Name the two specific things they would still need to find
+   themselves, that QSVT does not hand them automatically.
+4. In your own words, distinguish "QSVT proves these algorithms are
+   secretly identical" from "QSVT proves these algorithms are all
+   instances of one construction, with different query-complexity
+   consequences." Which one is this capstone's actual claim?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Block encodings, QSP, and QSVT are one construction: embed a matrix
+  in a unitary, apply an arbitrary feasible polynomial to a signal
+  qubit, then lift that same polynomial to act on every singular value
+  of the block-encoded matrix at once.
+- Grover's algorithm/amplitude amplification, amplitude estimation,
+  Hamiltonian simulation, and linear-systems solving are each this
+  construction with a different $P(x)$: a near-step function, the same
+  reused at multiple depths, a Chebyshev approximation to $e^{-ixt}$, and
+  a regularized approximation to $1/x$, respectively.
+- This is an honest unification, not an overclaim: QSVT explains and, in
+  several cases, matches-or-improves the older constructions' scaling
+  with a more composable methodology, but it does not make block-encoding
+  construction or polynomial approximation automatically easy, and
+  whether it yields genuinely new exponential speedups beyond known
+  algorithm families remains an open research question.
+- The durable takeaway skill this course confers: recognizing a block
+  encoding, a QSP phase sequence, or a QSVT construction in a real paper,
+  and being able to parse what matrix and what polynomial it's actually
+  using, even for an application you've never seen before.
+
+## Further Exploration
+
+This completes **Algorithmic Frontiers**. The skill this capstone names
+directly, reading a real construction out of a real paper, is the
+explicit subject of a later APEX course: [How to Read a Quantum
+Computing
+Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper),
+which takes this course's "what polynomial, what block encoding" reading
+strategy and applies it to actual published claims, alongside the tools
+for telling a theorem from a heuristic from a numerical experiment.

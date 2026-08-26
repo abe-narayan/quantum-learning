@@ -1,0 +1,383 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation"
+).map((problem) => problem.meta);
+
+export const requiredInteractions = [
+  { from: 0, to: 1 },
+  { from: 1, to: 2 },
+  { from: 2, to: 3 },
+  { from: 0, to: 2 },
+  { from: 1, to: 3 },
+];
+
+export const swapOverheadForDistance = (d) => 2 * (d - 1);
+
+export const naiveMappingDistances = [1, 1, 1, 2, 2];
+
+export const totalSwapsInserted = naiveMappingDistances.reduce(
+  (sum, d) => sum + swapOverheadForDistance(d),
+  0
+);
+
+export const totalLogicalTwoQubitGates = requiredInteractions.length;
+
+export const cnotsPerSwap = 3;
+
+export const totalCnotEquivalentGates =
+  totalLogicalTwoQubitGates + totalSwapsInserted * cnotsPerSwap;
+
+export const badCouplerErrorRate = 0.03;
+export const midCouplerErrorRate = 0.01;
+export const goodCouplerErrorRate = 0.005;
+
+export const naiveOperationsByEdge = { p0p1: 7, p1p2: 8, p2p3: 2 };
+export const noiseAwareOperationsByEdge = { p0p1: 2, p1p2: 8, p2p3: 7 };
+
+export const naiveSuccessProbability =
+  Math.pow(1 - badCouplerErrorRate, naiveOperationsByEdge.p0p1) *
+  Math.pow(1 - midCouplerErrorRate, naiveOperationsByEdge.p1p2) *
+  Math.pow(1 - goodCouplerErrorRate, naiveOperationsByEdge.p2p3);
+
+export const noiseAwareSuccessProbability =
+  Math.pow(1 - badCouplerErrorRate, noiseAwareOperationsByEdge.p0p1) *
+  Math.pow(1 - midCouplerErrorRate, noiseAwareOperationsByEdge.p1p2) *
+  Math.pow(1 - goodCouplerErrorRate, noiseAwareOperationsByEdge.p2p3);
+
+export const successProbabilityGainPoints =
+  (noiseAwareSuccessProbability - naiveSuccessProbability) * 100;
+
+export const successProbabilityRelativeGainPercent =
+  ((noiseAwareSuccessProbability - naiveSuccessProbability) / naiveSuccessProbability) * 100;
+
+export const lessonMeta = {
+  title: "Noise-Aware Compilation and Resource Estimation",
+  description:
+    "Quantum Compilation & Transpilation counted SWAP overhead on a uniform, error-blind linear chain; this lesson adds the two pieces a real device forces onto that count — a genuine 4-logical-qubit routing example's exact SWAP total, and a noise-aware remapping that lifts the same 17-gate circuit's computed success probability from 73.8% to 83.8% purely by avoiding one known high-error coupler.",
+  course: "simulation-and-compilation-frontiers",
+  module: "noise-aware-compilation-and-resource-estimation",
+  order: 4,
+  difficulty: "master",
+  estimatedMinutes: 27,
+  prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation", "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"],
+  objectives: [
+    "Explain qubit routing and SWAP overhead precisely: mapping a circuit's logical two-qubit gates onto a real device's limited connectivity graph, and computing the SWAP-gate overhead for a specific concrete circuit and device topology",
+    "Explain why noise-aware compilation (choosing among multiple valid circuit compilations based on WHICH specific physical qubits/gates have the lowest measured error rates, not just gate count) can meaningfully change a circuit's expected success probability on real, non-uniform hardware",
+    "Combine gate count, routing overhead, and per-gate error rates into a single estimated circuit success probability for a concrete small example, synthesizing this course's compilation threads into one number a real experimentalist would actually care about",
+  ],
+  related: [
+    {
+      slug: "quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation",
+      note: "That lesson's swapOverheadForLinearChain formula, 2(d-1) per non-adjacent gate, is reused directly below for a real 4-logical-qubit routing problem; this lesson's new ingredient is combining that overhead with a device's non-uniform per-coupler error rates to get an actual success probability, not just a SWAP count.",
+    },
+  ],
+};
+
+## Motivation
+
+Quantum Compilation & Transpilation established the mechanics of
+SWAP-network routing on an idealized linear chain where every coupler
+was equally reliable, and the previous lesson, Clifford+T Synthesis and
+Resource Counting, established T-count as the currency a fault-tolerant
+compiler actually spends. Real devices force two more honest ingredients
+into the picture at once: a circuit with several two-qubit interactions
+rarely maps cleanly onto a small device's connectivity graph, so SWAP
+overhead compounds across many gates, not just one; and a real device's
+physical error rates are never uniform across its qubits and couplers.
+This lesson works both pieces through a single concrete example, then
+combines them into one number: an estimated circuit success probability,
+computed two different ways for the *same* gate count.
+
+## Mathematical Development
+
+### A concrete routing problem
+
+Take a small circuit needing two-qubit interactions between four logical
+qubits $q_0, q_1, q_2, q_3$, specifically these five pairs:
+
+$$
+(q_0,q_1),\ (q_1,q_2),\ (q_2,q_3),\ (q_0,q_2),\ (q_1,q_3).
+$$
+
+Compile it for a 4-qubit linear-chain device, physical qubits
+$P_0\!-\!P_1\!-\!P_2\!-\!P_3$, where only adjacent physical qubits share
+a coupler (Physical Qubit Platforms' nearest-neighbor connectivity
+graph, the same constraint Quantum Compilation & Transpilation
+introduced for a single pair). Start with the simplest valid mapping,
+the **identity mapping** $q_i \mapsto P_i$.
+
+Under this mapping, three of the five required interactions are already
+between physically adjacent qubits and need no SWAPs at all:
+$(q_0,q_1)\to(P_0,P_1)$, $(q_1,q_2)\to(P_1,P_2)$, and
+$(q_2,q_3)\to(P_2,P_3)$. The remaining two are not adjacent:
+$(q_0,q_2)$ sits at chain distance $d=2$ (one qubit, $P_1$, in between),
+and so does $(q_1,q_3)$ (with $P_2$ in between).
+
+### Counting the SWAP overhead
+
+Reusing Quantum Compilation & Transpilation's own result for a linear
+chain, bridging a gap of distance $d$ costs $\text{swapOverheadForDistance}(d) = 2(d-1)$
+SWAP gates: walk one qubit's data into adjacency, apply the two-qubit
+gate, walk it back. For $(q_0,q_2)$: SWAP $P_0\leftrightarrow P_1$
+(carrying $q_0$'s data to sit next to $q_2$ at $P_2$), apply the gate on
+$(P_1,P_2)$, then SWAP $P_0\leftrightarrow P_1$ back, restoring the
+mapping — $2(2-1)=2$ SWAPs. For $(q_1,q_3)$: SWAP $P_1\leftrightarrow
+P_2$ (carrying $q_1$ to sit next to $q_3$ at $P_3$), apply the gate on
+$(P_2,P_3)$, then SWAP $P_1\leftrightarrow P_2$ back — another $2$ SWAPs.
+
+$$
+\text{totalSwapsInserted} = \underbrace{0+0+0}_{\text{already adjacent}} + \underbrace{2+2}_{(q_0,q_2),\,(q_1,q_3)} = 4.
+$$
+
+`totalSwapsInserted` above evaluates to **{totalSwapsInserted}**. Each
+SWAP itself costs 3 CNOTs on real hardware (or is implemented as a
+native but still non-trivial-cost operation on some platforms — either
+way, it is never free), so the total two-qubit-gate-equivalent cost of
+this circuit is the 5 logical gates plus $4\times3=12$ CNOTs' worth of
+SWAP machinery:
+
+$$
+\text{totalCnotEquivalentGates} = 5 + 4\times 3 = 17,
+$$
+
+exactly `totalCnotEquivalentGates` = **{totalCnotEquivalentGates}** above.
+A circuit whose "textbook" gate count is 5 two-qubit interactions
+actually asks the device to execute 17 CNOT-equivalent operations once
+this specific, restricted connectivity is honestly accounted for.
+
+## Physical Interpretation: Why Noise-Aware Compilation Matters
+
+### Real couplers are not interchangeable
+
+Noise, Decoherence & Scaling's sources-of-noise catalog and Control &
+Readout's Calibration lesson both established that real devices are
+characterized qubit by qubit and coupler by coupler, not by one shared
+number: some couplers carry a stray two-level-system defect or sit
+further from resonance and measurably fail more often than their
+neighbors, and this is exactly what a device's published calibration
+data reports. A compiler that is blind to this, one that only counts
+gates and SWAPs, treats every coupler in the routing problem above as
+interchangeable. A **noise-aware compiler** instead consults the
+device's actual calibration data and chooses, among the mappings that
+achieve the *same* SWAP count, the one that routes the most heavily used
+operations through the *better* couplers.
+
+In the routing example above, tally how many of the 17 CNOT-equivalent
+operations use each of the three physical couplers under the identity
+mapping: coupler $P_0\!-\!P_1$ carries the $(q_0,q_1)$ gate plus both
+SWAPs for $(q_0,q_2)$, for $1+2\times3=7$ operations; coupler
+$P_1\!-\!P_2$ carries $(q_1,q_2)$, the routed $(q_0,q_2)$ gate itself,
+and both SWAPs for $(q_1,q_3)$, for $1+1+2\times3=8$ operations;
+coupler $P_2\!-\!P_3$ carries only $(q_2,q_3)$ and the routed
+$(q_1,q_3)$ gate, for $1+1=2$ operations. These are exactly
+`naiveOperationsByEdge` above: **{naiveOperationsByEdge.p0p1}**,
+**{naiveOperationsByEdge.p1p2}**, and **{naiveOperationsByEdge.p2p3}**
+respectively (summing to the same 17 total).
+
+Suppose this device's calibration data flags $P_0\!-\!P_1$ as its worst
+coupler, a per-operation error rate of `badCouplerErrorRate` =
+**{(badCouplerErrorRate * 100).toFixed(1)}%**, against a typical
+`midCouplerErrorRate` = **{(midCouplerErrorRate * 100).toFixed(1)}%**
+for $P_1\!-\!P_2$ and a well-calibrated `goodCouplerErrorRate` =
+**{(goodCouplerErrorRate * 100).toFixed(1)}%** for $P_2\!-\!P_3$. The
+identity mapping, chosen with no regard for calibration, happens to run
+7 of its 17 operations across the *worst* coupler on the device.
+
+A noise-aware compiler can do better here without inserting a single
+extra SWAP: mirror the mapping, $q_0\mapsto P_3,\ q_1\mapsto P_2,\
+q_2\mapsto P_1,\ q_3\mapsto P_0$. Every distance in the routing problem
+is unchanged by this reflection (the chain looks the same read
+backwards), so the SWAP count is still exactly 4 and the total gate
+count is still exactly 17 — genuinely the same compiled circuit size.
+What changes is *which* coupler now carries the heavy $(q_0,q_1)$-plus-two-SWAPs
+load: under the mirror mapping that load sits between $q_3$ and $q_2$ at
+physical edge $P_2\!-\!P_3$ (the *good* coupler), while the bad coupler
+$P_0\!-\!P_1$ now carries only the light $(q_2,q_3)$-and-one-routed-gate
+load. This is `noiseAwareOperationsByEdge` above: **{noiseAwareOperationsByEdge.p0p1}**
+operations on the bad coupler (down from **{naiveOperationsByEdge.p0p1}**),
+**{noiseAwareOperationsByEdge.p1p2}** unchanged on the middle coupler
+(it sits on the chain's own mirror axis, so no mapping choice can move
+its load elsewhere), and **{noiseAwareOperationsByEdge.p2p3}** on the
+now-good coupler.
+
+## Worked Example
+
+**What is the estimated overall circuit success probability under each
+mapping?** Following the same union-bound-style reasoning Fault-Tolerance
+Frontiers' resource-estimation capstone used (the circuit succeeds only
+if *every* gate succeeds, so the overall success probability is the
+product of each gate's own success probability), and modeling each
+coupler's operations as independent:
+
+$$
+P_{\text{success}} = (1-p_{\text{bad}})^{n_{\text{bad}}}\,(1-p_{\text{mid}})^{n_{\text{mid}}}\,(1-p_{\text{good}})^{n_{\text{good}}}.
+$$
+
+**Naive (identity) mapping**, using `naiveOperationsByEdge`'s
+$(7,8,2)$ split:
+
+$$
+P_{\text{naive}} = (0.97)^7\,(0.99)^8\,(0.995)^2 \approx {naiveSuccessProbability.toFixed(4)},
+$$
+
+exactly `naiveSuccessProbability` above: **{(naiveSuccessProbability * 100).toFixed(2)}%**.
+
+**Noise-aware (mirrored) mapping**, using `noiseAwareOperationsByEdge`'s
+$(2,8,7)$ split — the same three exponents, only redistributed:
+
+$$
+P_{\text{noiseAware}} = (0.97)^2\,(0.99)^8\,(0.995)^7 \approx {noiseAwareSuccessProbability.toFixed(4)},
+$$
+
+exactly `noiseAwareSuccessProbability` above: **{(noiseAwareSuccessProbability * 100).toFixed(2)}%**.
+
+Both compilations run the exact same 17 CNOT-equivalent gates on the
+exact same device. The only difference is which physical coupler
+absorbs which share of that load. Yet the noise-aware choice reaches
+`successProbabilityGainPoints` = **{successProbabilityGainPoints.toFixed(1)}**
+percentage points higher success probability
+(**{successProbabilityRelativeGainPercent.toFixed(1)}%** relatively
+higher) than the naive one, purely from remapping. This is the entire
+point of noise-aware compilation stated as one comparable number: gate
+count held fixed, success probability moved by roughly a tenth just by
+respecting calibration data.
+
+## Interactive Visualization
+
+<div className="not-prose grid gap-4 sm:grid-cols-2">
+
+<div>
+<GraphDiagram
+  nodes={[
+    { id: "P0", label: "q0", x: 0.1, y: 0.5, group: 0 },
+    { id: "P1", label: "q1", x: 0.367, y: 0.5, group: 1 },
+    { id: "P2", label: "q2", x: 0.633, y: 0.5, group: 1 },
+    { id: "P3", label: "q3", x: 0.9, y: 0.5, group: 0 }
+  ]}
+  edges={[
+    { from: "P0", to: "P1", cut: true },
+    { from: "P1", to: "P2", cut: false },
+    { from: "P2", to: "P3", cut: false }
+  ]}
+  ariaLabel="Naive identity mapping on the 4-qubit linear chain: logical qubit qi sits on physical qubit Pi. The device's known worst coupler, P0-P1, highlighted, carries 7 of the circuit's 17 CNOT-equivalent operations"
+/>
+<p className="mt-1 text-center text-xs text-muted-foreground">
+  Naive mapping: the flagged worst coupler (P0–P1) carries {naiveOperationsByEdge.p0p1} of 17 operations
+</p>
+</div>
+
+<div>
+<GraphDiagram
+  nodes={[
+    { id: "P0", label: "q3", x: 0.1, y: 0.5, group: 0 },
+    { id: "P1", label: "q2", x: 0.367, y: 0.5, group: 1 },
+    { id: "P2", label: "q1", x: 0.633, y: 0.5, group: 1 },
+    { id: "P3", label: "q0", x: 0.9, y: 0.5, group: 0 }
+  ]}
+  edges={[
+    { from: "P0", to: "P1", cut: true },
+    { from: "P1", to: "P2", cut: false },
+    { from: "P2", to: "P3", cut: false }
+  ]}
+  ariaLabel="Noise-aware mirrored mapping on the same 4-qubit linear chain: logical qubits reversed onto the chain. The same flagged worst coupler, P0-P1, now carries only 2 of the circuit's 17 CNOT-equivalent operations"
+/>
+<p className="mt-1 text-center text-xs text-muted-foreground">
+  Noise-aware mapping: the same flagged coupler (P0–P1) now carries only {noiseAwareOperationsByEdge.p0p1} of 17 operations
+</p>
+</div>
+
+</div>
+
+Same chain, same flagged bad coupler (highlighted in both panels), same
+17-gate circuit. Only which logical qubits sit where changed, and with
+it, which coupler absorbs the heaviest load — exactly the {successProbabilityGainPoints.toFixed(1)}-point
+success-probability gap computed above.
+
+## Why This Matters
+
+SWAP overhead and noise-aware routing are not academic footnotes. They
+are exactly why a circuit's "ideal," textbook gate count — the 5
+two-qubit interactions this lesson started with — can dramatically
+understate what actually runs on near-term hardware, which turned out
+to be 17 CNOT-equivalent operations before a single error rate was even
+considered. Programming Quantum Computers' Simulators vs. Real Hardware
+lesson already flagged connectivity constraints as one of the practical
+gaps between a simulator and a real device; this lesson has now made
+that gap fully quantitative, and added the further fact that the *same*
+compiled circuit can perform meaningfully differently on two different
+real devices, or even on the same device at two different calibration
+times, purely because of which physical qubits a compiler happened to
+choose. Neither effect shows up if all anyone reports is a logical gate
+count. This course's own upcoming capstone, From Algorithm to Qubit
+Count, is where all three ingredients this course has now built —
+T-count (Clifford+T Synthesis and Resource Counting), routing overhead,
+and noise-aware success probability — finally get chained together into
+one end-to-end resource estimate for a real algorithm, the same kind of
+synthesis Fault-Tolerance Frontiers' own capstone already modeled for
+the fault-tolerant side of the pipeline.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming noise-aware compilation works by reducing gate count.** It
+doesn't, and this lesson's worked example is deliberately built to show
+that directly: both the naive and noise-aware mappings execute exactly
+17 CNOT-equivalent gates. The entire {successProbabilityGainPoints.toFixed(1)}-point
+success-probability gain comes from *which* physical coupler each
+operation lands on, not from doing less work.
+</Callout>
+
+<Callout type="mistake">
+**Treating a device's per-qubit or per-coupler error rate as roughly
+uniform.** Sources of Noise and Calibration both established that real
+devices are characterized component by component precisely because they
+are *not* uniform; some qubits or couplers can be several times worse
+than the device's median. A resource estimate that plugs in one average
+error rate for every gate, as Fault-Tolerance Frontiers' capstone
+explicitly did as a stated simplification, will systematically miss
+exactly the effect this lesson just computed.
+</Callout>
+
+## Practice Questions
+
+1. Under the identity mapping, why does coupler $P_1\!-\!P_2$ carry 8
+   operations regardless of whether the compiler is noise-aware or not?
+2. If a device's *middle* coupler ($P_1\!-\!P_2$ here) were the flagged
+   worst one instead of an end coupler, would mirroring the mapping help
+   at all? Explain why or why not using the chain's own symmetry.
+3. The noise-aware mapping above still runs 8 of its 17 operations
+   across the mid-error coupler. Explain why a compiler cannot always
+   route every heavy load onto the single best coupler on a device with
+   only three couplers to choose from.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Routing a circuit's logical two-qubit gates onto a device's limited
+  connectivity graph can multiply its real gate count substantially:
+  this lesson's 5-interaction, 4-logical-qubit circuit needed 4 inserted
+  SWAP gates (`totalSwapsInserted`), for 17 total CNOT-equivalent
+  operations (`totalCnotEquivalentGates`) on a 4-qubit linear chain.
+- Real devices have non-uniform, individually-calibrated error rates
+  across their qubits and couplers (Sources of Noise, Calibration). A
+  noise-aware compiler chooses among mappings with identical gate count
+  to favor the device's better-calibrated components for its
+  heaviest-used operations.
+- Computed directly for this lesson's example: the same 17-gate circuit
+  reaches {(naiveSuccessProbability * 100).toFixed(1)}% estimated success
+  probability under a naive, calibration-blind mapping, versus
+  {(noiseAwareSuccessProbability * 100).toFixed(1)}% under a noise-aware
+  one — a real, computed gap driven purely by which physical qubits were
+  chosen, not by any change in what the circuit computes or how many
+  gates it uses.
+
+## Further Exploration
+
+Next: [Quantum Simulation of Molecules](/lessons/apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules),
+this course's flagship application, which connects a real molecule's
+electronic structure to a concrete qubit count, the same
+gate-count-to-physical-cost habit of mind this lesson just built for
+routing and noise now applied to an entire chemistry problem.

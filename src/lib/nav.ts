@@ -49,7 +49,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-/** The four pillar/track pages, grouped under one "Tracks" nav dropdown. */
+/** The five pillar/track pages, grouped under one "Tracks" nav dropdown. */
 export const TRACK_NAV_ITEMS: NavItem[] = [
   {
     label: "Mechanics",
@@ -70,5 +70,10 @@ export const TRACK_NAV_ITEMS: NavItem[] = [
     label: "Software",
     href: "/software",
     description: "The simulators, compilers, and SDKs behind quantum programs.",
+  },
+  {
+    label: "Apex",
+    href: "/apex",
+    description: "The summit of the curriculum: research-depth algorithms, fault tolerance, and complexity theory.",
   },
 ];

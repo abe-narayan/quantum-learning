@@ -431,6 +431,250 @@ export const CONCEPT_NODES: ConceptNode[] = [
     ],
     prerequisiteIds: ["qaoa"],
   },
+  // -------------------------------------------------------------------
+  // Quantum Shannon Theory (quantum-mastery)
+  // -------------------------------------------------------------------
+  {
+    id: "povms-generalized-measurement",
+    title: "POVMs & Generalized Measurement",
+    definition:
+      "A POVM {E_i} generalizes projective measurement to any set of positive semi-definite operators summing to the identity, allowing more outcomes than the Hilbert space's dimension and provably optimal state discrimination that no projective measurement can match; Naimark's theorem shows every POVM is secretly a projective measurement on a larger system plus an ancilla.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/povms-and-generalized-measurement"],
+    prerequisiteIds: ["measurement", "density-matrices", "spectral-theorem-pvm"],
+  },
+  {
+    id: "stinespring-dilation",
+    title: "Stinespring Dilation",
+    definition:
+      "Every completely positive trace-preserving channel arises from a unitary on system-plus-environment followed by discarding the environment, E(ρ)=Tr_E[U(ρ⊗|0⟩⟨0|_E)U†]; Kraus operators are literally the blocks of that unitary, and Kraus-representation non-uniqueness is exactly the residual freedom to rotate the environment's readout basis.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification"],
+    prerequisiteIds: ["povms-generalized-measurement", "density-matrices", "schmidt-decomposition"],
+  },
+  {
+    id: "data-processing-inequality",
+    title: "Data-Processing Inequality",
+    definition:
+      "Quantum relative entropy can only shrink under any physical channel, S(N(ρ)‖N(σ)) ≤ S(ρ‖σ), forcing the corollary that mutual information between two systems can never increase when one side is processed by a channel, I(A:B) ≥ I(A:B'); this is the quantitative reason LOCC cannot increase entanglement and underlies QKD eavesdropper-information bounds.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/the-data-processing-inequality"],
+    prerequisiteIds: ["stinespring-dilation", "density-matrices"],
+  },
+  {
+    id: "entanglement-distillation-typical-subspaces",
+    title: "Entanglement Distillation & Typical Subspaces",
+    definition:
+      "Many copies of a partially-entangled pure state concentrate almost all their probability weight on a typical subspace of dimension ≈2^(nS(ρ)); projecting onto it and relabeling (entanglement concentration) distills ≈nS(ρ) near-perfect Bell pairs via LOCC alone, giving entanglement entropy an operational, protocol-defined meaning.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces"],
+    prerequisiteIds: ["schmidt-decomposition", "entanglement", "data-processing-inequality"],
+  },
+  {
+    id: "quantum-channel-capacity",
+    title: "Quantum Channel Capacity (Holevo, HSW & LSD)",
+    definition:
+      "A channel's classical capacity is the regularized Holevo quantity (HSW theorem) while its quantum capacity is the regularized coherent information (LSD theorem); the two can differ dramatically, letting a channel carry classical bits reliably long after its coherent information — and hence any ability to carry quantum information — has hit zero.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise"],
+    prerequisiteIds: [
+      "data-processing-inequality",
+      "entanglement-distillation-typical-subspaces",
+      "stinespring-dilation",
+    ],
+  },
+  // -------------------------------------------------------------------
+  // Apex — Algorithmic Frontiers
+  // -------------------------------------------------------------------
+  {
+    id: "block-encoding-lcu",
+    title: "Block Encoding & Linear Combination of Unitaries",
+    definition:
+      "Embeds an arbitrary matrix A (not necessarily unitary, ‖A‖≤1) as the top-left ancilla-|0⟩ sub-block of a larger unitary U; the LCU construction builds one explicitly for any A=Σᵢαᵢ Uᵢ via a PREPARE–SELECT–PREPARE† circuit, making it the modern universal input model for quantum linear algebra.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"],
+    prerequisiteIds: ["quantum-gates", "quantum-circuits", "hamiltonian-simulation-trotterization"],
+  },
+  {
+    id: "quantum-signal-processing",
+    title: "Quantum Signal Processing (QSP)",
+    definition:
+      "Alternates a fixed single-qubit signal rotation W(x) with tunable phase gates e^{iφZ}; the resulting unitary's top-left entry is a controllable polynomial P(x) of degree ≤d, and essentially any polynomial meeting degree/parity/boundedness conditions is achievable by choosing the phases alone.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/quantum-signal-processing"],
+    prerequisiteIds: ["block-encoding-lcu", "phase-interference"],
+  },
+  {
+    id: "quantum-singular-value-transformation",
+    title: "Quantum Singular Value Transformation (QSVT)",
+    definition:
+      "Generalizes quantum signal processing from a single signal qubit to an entire block-encoded matrix by alternating the block-encoding unitary with projector-controlled phase rotations, applying one chosen polynomial P simultaneously to every singular value of A; now understood to unify Grover's algorithm, Hamiltonian simulation, and linear-systems solving as special cases of one construction.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/the-quantum-singular-value-transformation"],
+    prerequisiteIds: ["quantum-signal-processing", "block-encoding-lcu", "hamiltonian-simulation-trotterization"],
+  },
+  {
+    id: "amplitude-estimation-qpe-free",
+    title: "Amplitude Estimation (QPE-Free)",
+    definition:
+      "Estimates a Grover-iterate amplitude to Heisenberg-limited O(1/ε) precision — quadratically better than classical Monte Carlo's O(1/ε²) — using only a classical schedule of plain Grover-iterate depths combined by maximum likelihood, matching the original phase-estimation-based algorithm's scaling without its wide coherent ancilla register or QFT.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation"],
+    prerequisiteIds: ["grovers-algorithm", "quantum-fourier-transform"],
+  },
+  {
+    id: "quantum-linear-systems-qsvt",
+    title: "Quantum Linear Systems via QSVT",
+    definition:
+      "Applies QSVT with a polynomial approximating 1/x (regularized away from the block encoding's smallest singular value) to produce a quantum state proportional to A⁻¹|b⟩, the modern successor to HHL; the speedup is real but conditional on A being well-conditioned, efficiently block-encodable, |b⟩ being efficiently preparable, and the desired output being a small readout rather than the full solution vector.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems"],
+    prerequisiteIds: ["quantum-singular-value-transformation"],
+  },
+  // -------------------------------------------------------------------
+  // Apex — Fault Tolerance Frontiers
+  // -------------------------------------------------------------------
+  {
+    id: "surface-code-lattice",
+    title: "Surface Codes (Explicit Lattice Construction)",
+    definition:
+      "A topological stabilizer code built by placing physical qubits on a 2D lattice with local vertex (Z-type) and face (X-type) stabilizers, so every check touches only a few physically-adjacent qubits; a distance-d patch encodes one logical qubit whose X̄/Z̄ operators are Pauli strings running between opposite lattice boundaries, with code distance equal to the shortest such string.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/surface-codes-in-depth",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+    ],
+    prerequisiteIds: ["css-stabilizer-codes"],
+  },
+  {
+    id: "mwpm-decoding",
+    title: "Syndrome Decoding & Minimum-Weight Matching",
+    definition:
+      "Reads a surface code's measured syndrome (which stabilizers flipped) and infers the most likely physical error by building a weighted graph of syndrome 'defects' and finding a minimum-weight perfect matching between them; below a threshold physical error rate p_th, the resulting logical error rate falls exponentially with code distance d, roughly as (p/p_th)^((d+1)/2).",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/decoding-surface-codes",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+    ],
+    prerequisiteIds: ["surface-code-lattice"],
+  },
+  {
+    id: "magic-state-distillation",
+    title: "Magic-State Distillation",
+    definition:
+      "Because the Eastin-Knill theorem forbids a fault-tolerant transversal T gate on any code that also corrects arbitrary single-qubit errors, universal fault-tolerant computation instead injects a non-Clifford 'magic state' via a Clifford-only teleportation-style circuit; distillation protocols (e.g. 15-to-1) consume many noisy copies to output fewer copies at cubically suppressed error, making the injected resource affordable.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/magic-states-and-distillation",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+    ],
+    prerequisiteIds: ["css-stabilizer-codes", "quantum-gates"],
+  },
+  {
+    id: "quantum-threshold-theorem",
+    title: "The Quantum Threshold Theorem",
+    definition:
+      "Proves that if the physical error rate per gate sits below a constant threshold p_th, recursively concatenating (or scaling up) a quantum error-correcting code drives the logical error rate arbitrarily close to zero at only polylogarithmic qubit overhead in the target precision — the theorem that turned fault-tolerant quantum computing from a theoretical possibility into a scalable engineering target.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/the-threshold-theorem",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+    ],
+    prerequisiteIds: ["mwpm-decoding", "magic-state-distillation"],
+  },
+  // -------------------------------------------------------------------
+  // Apex — Quantum Complexity Theory
+  // -------------------------------------------------------------------
+  {
+    id: "qma-quantum-verification",
+    title: "QMA & Quantum Verification",
+    definition:
+      "QMA (Quantum Merlin-Arthur) is the quantum analogue of NP: a language is in QMA if YES instances have some polynomial-size quantum witness accepted with probability ≥2/3 by a polynomial-time verifier circuit, while every possible witness for a NO instance is accepted with probability ≤1/3. Amplifying this gap requires sending multiple independent witness copies rather than reusing one classical certificate, since the no-cloning theorem forbids copying an unknown quantum state for free.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/qma-and-quantum-verification"],
+    prerequisiteIds: ["bqp-oracle-complexity"],
+  },
+  {
+    id: "local-hamiltonian-problem",
+    title: "The Local Hamiltonian Problem",
+    definition:
+      "The k-Local Hamiltonian problem asks whether a Hamiltonian built from polynomially many terms, each acting on at most a constant k qubits, has ground-state energy below one threshold or above another, given an inverse-polynomial promise gap. It is QMA-complete (Kitaev's theorem, via a 'history state' reduction), making it the quantum analogue of Cook-Levin's NP-completeness of 3-SAT, with hardness surviving down to 2-local terms and physically realistic 2D lattice models.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/the-local-hamiltonian-problem"],
+    prerequisiteIds: ["qma-quantum-verification", "hamiltonian-simulation-trotterization"],
+  },
+  {
+    id: "quantum-query-lower-bound-methods",
+    title: "Quantum Query Lower-Bound Methods",
+    definition:
+      "The quantum adversary method (Ambainis) and the polynomial method (Beals-Buhrman-Cleve-Mosca-de Wolf) are two structurally independent techniques for proving unconditional lower bounds on quantum query complexity — one tracking a distinguishability progress measure across hard instance pairs, the other showing a quantum algorithm's acceptance probability is a low-degree polynomial in the oracle bits — and both independently establish the identical Θ(√N) optimality bound for Grover's search.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/query-complexity-and-lower-bounds"],
+    prerequisiteIds: ["bqp-oracle-complexity", "grovers-algorithm"],
+  },
+  // -------------------------------------------------------------------
+  // Apex — Simulation and Compilation Frontiers
+  // -------------------------------------------------------------------
+  {
+    id: "matrix-product-states",
+    title: "Tensor Networks & Matrix Product States",
+    definition:
+      "Represents an n-qubit state exactly as a chain of small tensors linked by bond indices, built via repeated SVD across each cut; the bond dimension at a cut equals the Schmidt rank there, so an area-law state (entanglement entropy bounded independent of system size) admits an MPS whose bond dimension never has to grow, making it classically tractable.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states"],
+    prerequisiteIds: ["schmidt-decomposition", "entanglement"],
+  },
+  {
+    id: "classical-simulability-boundary",
+    title: "Classical Simulability Boundary (Gottesman-Knill & Bond Dimension)",
+    definition:
+      "Two independent sufficient conditions make a quantum circuit classically easy: the Gottesman-Knill theorem (stabilizer circuits simulate in polynomial time regardless of entanglement) and a bounded-bond-dimension criterion from tensor networks (regardless of gate set); a genuine hardness argument requires defeating both at once, which is why real quantum-advantage experiments use random, non-Clifford, fast-entangling circuits.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/when-classical-simulation-works"],
+    prerequisiteIds: ["matrix-product-states", "css-stabilizer-codes", "quantum-circuit-simulation"],
+  },
+  {
+    id: "clifford-t-synthesis",
+    title: "Clifford+T Synthesis & T-Count",
+    definition:
+      "Compiling an arbitrary single-qubit unitary into a finite Clifford+T sequence to precision ε costs a T-count that depends heavily on the synthesis algorithm: generic Solovay-Kitaev synthesis scales as O(log^c(1/ε)) for a construction-dependent constant c, while number-theoretic algorithms like Ross-Selinger exploit the ring ℤ[1/√2, i] to reach near-optimal, ~3-4·log₂(1/ε) T-count for the structured Rz(θ) family — a gap of orders of magnitude at realistic precision.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"],
+    prerequisiteIds: ["quantum-gates", "quantum-error-correction"],
+  },
+  {
+    id: "noise-aware-resource-estimation",
+    title: "Noise-Aware Compilation & Resource Estimation",
+    definition:
+      "Compiling a circuit for real hardware layers two costs onto its logical gate count: SWAP-network routing overhead from limited qubit connectivity, and a choice among equal-SWAP-count mappings that routes the heaviest gate load through a device's best-calibrated qubits and couplers — which can shift overall circuit success probability by several percentage points without changing the gate count at all.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation"],
+    prerequisiteIds: ["clifford-t-synthesis", "qubit-control", "noise-decoherence"],
+  },
+  {
+    id: "jordan-wigner-electronic-structure",
+    title: "Jordan-Wigner Mapping & Electronic Structure Simulation",
+    definition:
+      "Maps fermionic creation/annihilation operators onto qubit Pauli strings by prepending a 'Z-string' of Pauli-Z operators on all lower-indexed modes, converting qubits' natural commutation into the anticommutation the canonical fermionic algebra requires — the encoding step that turns a molecule's second-quantized electronic Hamiltonian into a circuit VQE or quantum phase estimation can act on.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"],
+    prerequisiteIds: ["hamiltonian-simulation-trotterization", "quantum-gates"],
+  },
+  // -------------------------------------------------------------------
+  // Apex — Research Methods and Synthesis
+  // -------------------------------------------------------------------
+  {
+    id: "quantum-advantage-claims",
+    title: "Evaluating Quantum Advantage Claims",
+    definition:
+      "A five-question checklist — the specific task, whether the classical comparison used the best known classical algorithm, whether the claimed classical hardness rests on an unconditional proof or an unproven complexity assumption, whether the task structurally avoids both known efficient-classical-simulation loopholes, and whether it is practically useful or merely engineered to be hard — for turning a 'quantum advantage/supremacy' headline into a set of separately checkable technical claims.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims",
+      "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today",
+    ],
+    prerequisiteIds: ["bqp-oracle-complexity", "quantum-circuit-simulation"],
+  },
 ];
 
 export type ConceptNodeLayout = ConceptNode & {

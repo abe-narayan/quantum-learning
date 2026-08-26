@@ -1,0 +1,543 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, T_GATE, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
+import { pureStateDensityMatrix, purity, vonNeumannEntropy, maximallyMixedState } from "@/lib/quantum/densityMatrix";
+import { partialTrace } from "@/lib/quantum/partialTrace";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/simulation-and-compilation-frontiers/when-classical-simulation-works"
+).map((problem) => problem.meta);
+
+export const allSixQubits = [0, 1, 2, 3, 4, 5];
+
+export function complementOf(kept) {
+  return allSixQubits.filter((q) => !kept.includes(q));
+}
+
+export function cutStats(rho, kept) {
+  const reduced = partialTrace(rho, 6, complementOf(kept));
+  const p = purity(reduced);
+  return { keptCount: kept.length, purity: p, renyiTwo: -Math.log2(p) };
+}
+
+export function maxEntryDifference(m1, m2) {
+  let maxDiff = 0;
+  for (let r = 0; r < m1.rows; r++) {
+    for (let col = 0; col < m1.cols; col++) {
+      const diff = m1.get(r, col).sub(m2.get(r, col)).magnitude();
+      if (diff > maxDiff) maxDiff = diff;
+    }
+  }
+  return maxDiff;
+}
+
+export function buildCliffordBellCrossCircuit() {
+  let s = StateVector.zero(6);
+  s = applySingleQubitGate(s, HADAMARD, 0);
+  s = applySingleQubitGate(s, HADAMARD, 1);
+  s = applySingleQubitGate(s, HADAMARD, 2);
+  s = applyCNOT(s, 0, 3);
+  s = applyCNOT(s, 1, 4);
+  s = applyCNOT(s, 2, 5);
+  return s;
+}
+
+export const cliffordCircuitState = buildCliffordBellCrossCircuit();
+export const cliffordCircuitRho = pureStateDensityMatrix(cliffordCircuitState);
+
+export const cliffordCuts = [[0], [0, 1], [0, 1, 2]].map((kept) => cutStats(cliffordCircuitRho, kept));
+
+export const cliffordMaxCutReduced = partialTrace(cliffordCircuitRho, 6, [3, 4, 5]);
+export const cliffordMaxMixedReference = maximallyMixedState(8);
+export const cliffordMaxCutDiffFromMaxMixed = maxEntryDifference(cliffordMaxCutReduced, cliffordMaxMixedReference);
+
+export const cliffordQubit0Reduced = partialTrace(cliffordCircuitRho, 6, [1, 2, 3, 4, 5]);
+export const cliffordQubit0Entropy = vonNeumannEntropy(cliffordQubit0Reduced);
+
+export function buildTGateShallowCircuit() {
+  let s = StateVector.zero(6);
+  s = applySingleQubitGate(s, HADAMARD, 0);
+  s = applySingleQubitGate(s, HADAMARD, 2);
+  s = applySingleQubitGate(s, HADAMARD, 4);
+  s = applySingleQubitGate(s, T_GATE, 0);
+  s = applyCNOT(s, 0, 1);
+  s = applyCNOT(s, 2, 3);
+  s = applyCNOT(s, 4, 5);
+  s = applyCNOT(s, 1, 2);
+  s = applyCNOT(s, 3, 4);
+  return s;
+}
+
+export const tGateCircuitState = buildTGateShallowCircuit();
+export const tGateCircuitRho = pureStateDensityMatrix(tGateCircuitState);
+
+export const tGateCuts = [[0], [0, 1], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3, 4]].map((kept) =>
+  cutStats(tGateCircuitRho, kept)
+);
+
+export const tGateQubit0Reduced = partialTrace(tGateCircuitRho, 6, [1, 2, 3, 4, 5]);
+export const tGateQubit0Entropy = vonNeumannEntropy(tGateQubit0Reduced);
+
+export const lessonMeta = {
+  title: "When Classical Simulation Works",
+  description:
+    "Two genuinely independent reasons a quantum circuit's output can be predicted on an ordinary computer -- the Gottesman-Knill theorem's stabilizer tableau, which does not care how entangled the state gets, and the tensor-network bond-dimension bound, which does not care which gates were used -- and why real quantum-advantage experiments are engineered specifically to defeat both at once.",
+  course: "simulation-and-compilation-frontiers",
+  module: "when-classical-simulation-works",
+  order: 2,
+  difficulty: "master",
+  estimatedMinutes: 27,
+  prerequisites: [
+    "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
+    "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics",
+  ],
+  objectives: [
+    "State the Gottesman-Knill theorem precisely: stabilizer circuits (Clifford gates + Pauli measurements, starting from a computational-basis state) admit an efficient classical simulation algorithm, polynomial in qubit count and circuit depth",
+    "Explain the low-entanglement/bounded-bond-dimension boundary for tensor-network-based classical simulation, using the area-law and bond-dimension ideas from the prerequisite lesson",
+    "Synthesize both boundaries into a precise statement of what makes a quantum circuit or state 'classically easy,' and why this is the operational definition researchers actually use when evaluating a claimed quantum advantage result",
+  ],
+  related: [
+    {
+      slug: "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
+      note: "That lesson defined bond dimension χ as the size of an MPS's virtual bond and showed the entanglement entropy across a cut is bounded by log2(χ); this lesson uses exactly that bound as its second classical-simulability criterion, and the worked example below computes χ explicitly (reaching the maximum possible value, then staying pinned at the minimum) for two concrete circuits using that same framework.",
+    },
+    {
+      slug: "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics",
+      note: "That lesson's n×2n binary tableau for a handful of stabilizer generators (there, the bit-flip code's 2 generators for a 3-qubit code) is exactly the same object this lesson scales up to a full n-generator tableau describing an entire n-qubit state, with the explicit Clifford-gate update rules and the deterministic/random measurement split that make Gottesman-Knill's efficient algorithm work in general, not just for that one code's two generators.",
+    },
+  ],
+};
+
+## Motivation
+
+The prerequisite lesson built matrix product states and showed that a
+state's entanglement, measured by the bond dimension $\chi$ needed at each
+cut, controls how expensive it is to simulate classically. The lesson
+before that, back in Error Correction and Fault Tolerance, built the
+stabilizer formalism as a compact way to describe certain highly
+structured quantum states and circuits. These two threads look unrelated —
+one is about entanglement, the other about gate sets — but they turn out
+to be the field's two genuinely different answers to the single question
+that decides whether building a quantum computer for a given task is
+worth it at all: **can a classical computer already do this efficiently?**
+
+This lesson proves both answers precisely, shows they are logically
+independent of each other (a fact with real teeth, not a technicality),
+and synthesizes them into the exact criterion researchers use, right now,
+to sanity-check a claimed "quantum advantage" result. By the end, a
+circuit either clearly falls into a classically-easy category for a
+reason you can name, or it doesn't — and you will see exactly why the
+circuits used in real quantum-supremacy-style experiments were designed,
+deliberately, to be the ones that don't.
+
+## Mathematical Development
+
+### Stabilizer circuits and the Gottesman-Knill theorem
+
+Recall from Stabilizer Formalism Basics: a stabilizer is a Pauli-string
+operator $g$ with $g|\psi\rangle=+|\psi\rangle$, and a handful of
+generators (there, $Z_0Z_1$ and $Z_1Z_2$, two generators for a 3-qubit
+*code*) pin down the whole stabilizer group. A **stabilizer state** on $n$
+qubits is the special case where there are exactly $n$ independent
+generators — enough to pin down a single, unique pure state (not a
+code with room for logical qubits). A **stabilizer circuit** is any
+circuit that starts from a computational basis state (itself a
+stabilizer state, stabilized by $Z_0,Z_1,\dots,Z_{n-1}$), applies only
+gates from the **Clifford group** ($H$, $S$, $\mathrm{CNOT}$, and
+whatever those generate), and measures only in Pauli bases.
+
+<TheoremBox title="Gottesman-Knill theorem" provenance="cited">
+
+Any stabilizer circuit on $n$ qubits with $m$ Clifford gates and $p$ Pauli
+measurements can be simulated on a classical computer in time polynomial
+in $n$, $m$, and $p$ — in particular, without ever constructing the full
+$2^n$-dimensional state vector. (Gottesman, 1997&ndash;98; the efficient
+tableau algorithm used below is due to Aaronson and Gottesman, "Improved
+Simulation of Stabilizer Circuits," *Physical Review A* **70**, 052328,
+2004.)
+
+</TheoremBox>
+
+### The stabilizer tableau
+
+The algorithm's trick is to never touch the $2^n$ amplitudes at all.
+Instead, track only the state's $n$ independent stabilizer generators,
+each written as a length-$2n$ bit string $(x_1,\dots,x_n\,|\,z_1,\dots,z_n)$
+plus one phase bit $r\in\{0,1\}$ (sign $+1$ if $r=0$, $-1$ if $r=1$). Qubit
+$i$'s pair $(x_i,z_i)$ names the Pauli acting there: $(0,0)=I$, $(1,0)=X$,
+$(0,1)=Z$, $(1,1)=Y$ (up to the phase bit), exactly generalizing the
+prerequisite lesson's $Z_0Z_1$ (in this notation: $z_0=z_1=1$ and every
+other bit $0$) to an arbitrary Pauli string on all $n$ qubits at once.
+Stacking all $n$ generators gives an $n\times 2n$ binary matrix plus an
+$n$-bit phase vector — **the tableau** — a complete description of the
+stabilizer state using $O(n^2)$ bits, not the $2^n$ complex amplitudes a
+brute-force simulator would need.
+
+Each Clifford gate updates every row of the tableau by a fixed, local
+rule — no linear-algebra solve, just bit operations on the $O(1)$ columns
+the gate touches:
+
+- **Hadamard on qubit $a$:** for every row, swap $x_a\leftrightarrow z_a$,
+  and flip the phase bit $r\mathrel{\oplus}=x_a z_a$ (matching $HXH=Z$,
+  $HZH=X$ from earlier lessons, restated as a bit-level rule).
+- **Phase gate $S$ on qubit $a$:** $r\mathrel{\oplus}=x_a z_a$, then
+  $z_a\mathrel{\oplus}=x_a$.
+- **$\mathrm{CNOT}$, control $a$, target $b$:** $r\mathrel{\oplus}=x_a z_b(x_b\oplus z_a\oplus1)$,
+  then $x_b\mathrel{\oplus}=x_a$ and $z_a\mathrel{\oplus}=z_b$.
+
+Every rule touches a fixed, small number of bits per row, so updating all
+$n$ rows for one gate costs $O(n)$ time; a circuit of $m$ gates costs
+$O(nm)$ total. Measuring a Pauli $P$ works by checking whether $P$
+commutes with every stabilizer generator (an $O(n)$ check per generator,
+via the same symplectic bit-overlap idea the prerequisite lesson used for
+$X_1$ against $Z_0Z_1,Z_1Z_2$, now over all $n$ generators at once —
+$O(n^2)$ total): if $P$ commutes with all of them, the outcome is
+**deterministic**, fixed by the current tableau; if $P$ anticommutes with
+at least one generator, the outcome is a **uniformly random** $\pm1$, and
+the tableau is updated by replacing an anticommuting row with $P$ itself
+(signed by the random outcome) — an $O(n^2)$ row update in the worst case.
+A circuit with $m$ gates and $p$ measurements therefore simulates in
+$O(nm+n^2p)$ time total: polynomial in every parameter, exactly as the
+theorem claims.
+
+<Callout type="note">
+This is the precise, technical content behind a fact you have already used
+without naming it: **this platform's own error-correction simulators have
+been running exactly this class of circuit the whole time.**
+`runBitFlipCorrectionCycle` encodes with $\mathrm{CNOT}$s, extracts a
+syndrome with more $\mathrm{CNOT}$s into ancillas, and measures — Clifford
+gates and Pauli measurements only, starting from a computational basis
+state, which is precisely a stabilizer circuit. At $n=5$ qubits this
+platform's actual implementation just brute-forces the full state vector,
+because $2^5=32$ amplitudes is nothing to worry about either way — but the
+*circuit itself* belongs to the class Gottesman-Knill guarantees stays
+efficient at any size, which is exactly why real error-correction research
+simulates surface-code patches with **thousands** of physical qubits on
+ordinary laptops via stabilizer tableaus, where a brute-force state vector
+($2^{1000}$ amplitudes) would be permanently impossible.
+</Callout>
+
+### Bond dimension and the tensor-network boundary
+
+The prerequisite lesson's second tool cares about something Gottesman-Knill
+never mentions: entanglement. Recall an MPS represents an $n$-qubit state
+as a chain of tensors joined by bond indices of dimension $\chi$, and the
+entanglement entropy $S$ across any cut satisfies $S\leq\log_2\chi$ (with
+equality exactly when the entanglement spectrum at that cut is flat) — so
+a state whose entropy across some cut is $S$ needs $\chi\geq2^S$ there,
+and standard MPS gate-application algorithms cost roughly
+$O(n\chi^3)$ per two-qubit gate applied. When $\chi$ stays polynomial in
+$n$ throughout a circuit, simulation is polynomial in $n$; when $\chi$
+must grow exponentially, it isn't.
+
+What controls $\chi$'s growth is the circuit's **entangling power**,
+not any single gate's identity. Two facts pin this down precisely:
+
+1. A gate acting entirely on one side of a fixed cut cannot change the
+   entanglement entropy across that cut at all — it's a local operation on
+   one party alone, and entanglement between two parties is, by
+   definition, insensitive to anything either party does purely to its
+   own share.
+2. A two-qubit gate that straddles the cut *can* increase the entropy
+   there, but only by a bounded amount. $\mathrm{CNOT}$ specifically has
+   maximum entangling power exactly $1$ ebit: applied to a product state
+   with the control balanced ($|+\rangle$) and the target in a
+   computational basis state, it produces a Bell pair (entropy $1$); it
+   can never do better than that from a product input, for any qubits it
+   acts on.
+
+(This is the same kind of light-cone accounting used throughout the
+area-law literature — see e.g. Eisert, Cramer & Plenio, "Colloquium: Area
+laws for the entanglement entropy," *Reviews of Modern Physics* **82**,
+277, 2010 — cited here rather than proved in full generality.)
+
+Combine the two facts: in a shallow, **local** circuit (nearest-neighbor
+gates on a 1D chain, say), a fixed cut is crossed by only a handful of
+gates over the whole circuit, so its entropy — and hence the $\chi$
+needed there — stays small and bounded, independent of how many qubits
+$n$ the chain has. A circuit engineered (or, for a random circuit, simply
+likely) to entangle *every* pair of qubits over its course crosses every
+cut many times, and its entropy can grow linearly with the size of the
+smaller side, forcing $\chi$ toward its absolute cap of
+$2^{\min(|A|,n-|A|)}$ — exponential in $n$ for a balanced cut.
+
+### Synthesizing two independent criteria
+
+<DefinitionBox title="Classically easy (operational)">
+
+A quantum computation is **classically easy** to simulate if **either**:
+
+**(a)** it is built entirely (or almost entirely) from Clifford gates and
+Pauli measurements — Gottesman-Knill applies, *regardless* of how
+entangled the resulting state gets; **or**
+
+**(b)** its entanglement, measured by the bond dimension needed at every
+cut throughout the circuit, stays bounded by something polynomial (or
+constant) in $n$ — tensor-network methods apply, *regardless* of which
+specific gates were used.
+
+These are two **genuinely different, logically independent** sufficient
+conditions. A circuit can satisfy (a) while being maximally entangled (a
+Clifford circuit reaching the largest possible bond dimension for its
+cut). A circuit can satisfy (b) while using gates far outside the
+Clifford group (a shallow, local, non-Clifford circuit whose entanglement
+never has the chance to grow). Satisfying *neither* is what a genuine
+classical-hardness argument for a specific circuit actually requires.
+
+</DefinitionBox>
+
+## Physical Interpretation
+
+Why does gate set alone — entirely independent of entanglement — decide
+efficient simulability for stabilizer circuits? Because stabilizer states
+are not just "some entangled states"; they have a special algebraic
+rigidity. Every reduced density matrix of a stabilizer state has a **flat**
+entanglement spectrum (its nonzero eigenvalues are all exactly equal —
+see Fattal, Cubitt, Yamamoto, Bravyi & Chuang, "Entanglement in the
+Stabilizer Formalism," 2004), so its entanglement is entirely captured by
+a single integer (the number of nonzero, equal eigenvalues) rather than a
+continuum of possible spectra. The tableau algorithm never has to
+represent that spectrum at all — it works with the generators directly,
+and the entanglement, however large, falls out as a consequence rather
+than a cost.
+
+The tensor-network boundary is the opposite kind of statement: it doesn't
+care what algebraic structure produced the state, only how much
+correlation crosses each cut. Entanglement entropy is, in this framing,
+the literal *exchange rate* between a quantum state and its cheapest
+possible classical description — an MPS pays for a cut's entropy $S$ with
+a bond of dimension $2^S$, full stop, regardless of whether that
+entanglement came from a Clifford circuit, a chemistry Hamiltonian, or
+anything else. The reason the two criteria can diverge so sharply (one
+ignoring entanglement entirely, the other ignoring gate set entirely) is
+that they are answering the same question — "can a compact classical
+representation be found?" — using two structurally unrelated kinds of
+compactness: algebraic (a short list of generators) versus tensor-rank
+(a small bond dimension).
+
+## Why This Matters
+
+This is the precise, technical content behind why every serious
+quantum-advantage experiment — from Google's 2019 random-circuit-sampling
+demonstration onward — uses **random** circuits, and why that choice is
+not aesthetic. A random circuit is deliberately built from arbitrary
+single-qubit rotations (essentially never landing exactly on a Clifford
+angle) interleaved with two-qubit entangling gates arranged so that
+essentially every cut of the system gets scrambled within a shallow depth.
+That design is engineered to violate **both** classical-simulability
+criteria from this lesson **simultaneously**: not Clifford, so
+Gottesman-Knill says nothing; fast, close-to-maximal entanglement growth,
+so tensor-network methods need exponential $\chi$. A circuit that only
+managed one of the two — maximally entangling but Clifford-only, or
+non-Clifford but shallow and local — would still fall to whichever
+criterion it failed to violate, and the "advantage" claim would evaporate
+the moment someone pointed out the applicable classical algorithm.
+
+This exact classically-easy/classically-hard framework is not a one-off
+tool for this lesson — it is the actual instrument this pillar uses later
+to evaluate real claims. The Quantum Complexity Theory course's capstone,
+*Capstone: What We Know and Don't*, and the Research Methods and
+Synthesis course's *Evaluating Quantum Advantage Claims* lesson both
+return to exactly this pair of criteria when assessing whether a specific
+published "quantum advantage" result actually resisted every known
+classical simulation strategy, or merely resisted the strategies its
+authors happened to try.
+
+## Worked Example
+
+**Two concrete 6-qubit circuits, classified against both criteria, with
+every entanglement number computed exactly using this platform's own
+`StateVector`, gate, and partial-trace functions — not asserted.**
+
+### Circuit A: Clifford-only, pushed to maximal entanglement
+
+Apply $H$ to qubits $0,1,2$, then $\mathrm{CNOT}(0,3)$,
+$\mathrm{CNOT}(1,4)$, $\mathrm{CNOT}(2,5)$: three independent Bell pairs,
+each straddling the $\{0,1,2\}\,|\,\{3,4,5\}$ cut. Every gate is Clifford
+($H$, $\mathrm{CNOT}$), so criterion (a) applies immediately, no matter
+how entangled the result is. Computing the actual entanglement (the
+second Rényi entropy $S_2=-\log_2\mathrm{Tr}(\rho^2)$, obtained directly
+from `purity`, which needs no eigensolver and is exact for any subsystem
+size) across growing subsets of $\{0,1,2\}$:
+
+| kept qubits | purity $\mathrm{Tr}(\rho^2)$ | $S_2$ (ebits) |
+|---|---|---|
+| $\{0\}$ | {cliffordCuts[0].purity.toFixed(6)} | {cliffordCuts[0].renyiTwo.toFixed(4)} |
+| $\{0,1\}$ | {cliffordCuts[1].purity.toFixed(6)} | {cliffordCuts[1].renyiTwo.toFixed(4)} |
+| $\{0,1,2\}$ | {cliffordCuts[2].purity.toFixed(6)} | {cliffordCuts[2].renyiTwo.toFixed(4)} |
+
+Entanglement grows by exactly $1$ ebit per additional qubit, reaching
+${cliffordCuts[2].renyiTwo.toFixed(0)}$ ebits at the balanced cut — and
+$3$ ebits is not just large, it is the **absolute maximum** possible for
+any state on a $3\,|\,3$ split of $6$ qubits ($\log_2\min(2^3,2^3)=3$).
+Because the three Bell pairs are mutually independent, the reduced state
+on $\{0,1,2\}$ is provably the tensor product of three maximally-mixed
+single qubits, $\rho_{012}=I/8$ — checked directly against
+`maximallyMixedState(8)` entrywise, agreeing to
+${cliffordMaxCutDiffFromMaxMixed.toExponential(2)}$ (floating-point-exact).
+A matrix that *is* $I/8$ has manifestly flat eigenvalues (all $1/8$, no
+eigensolver needed to see it), so the von Neumann entropy is also exactly
+$\log_2 8=3$ ebits, not merely bounded below by the Rényi-2 value. A
+single qubit's own marginal, cross-checked with this platform's exact
+$2\times2$ eigensolver, gives
+${cliffordQubit0Entropy.toFixed(4)}$ — exactly $1$ ebit, consistent with
+its own Bell pair. **This circuit is classically easy via (a) alone,
+despite being as entangled as a $6$-qubit state can possibly be.**
+
+### Circuit B: one T gate, entanglement kept provably bounded
+
+Apply $H$ to qubits $0,2,4$ (leaving $1,3,5$ at $|0\rangle$), then $T$ to
+qubit $0$ — the single non-Clifford gate in the circuit — then
+even-bond $\mathrm{CNOT}(0,1)$, $\mathrm{CNOT}(2,3)$, $\mathrm{CNOT}(4,5)$,
+then odd-bond $\mathrm{CNOT}(1,2)$, $\mathrm{CNOT}(3,4)$: a depth-2,
+nearest-neighbor "brickwork" on a line, with one non-Clifford single-qubit
+gate mixed in. Because a single-qubit gate never touches any cut it
+doesn't share both endpoints across, $T$ contributes nothing to any cut's
+entanglement — only the four $\mathrm{CNOT}$s can. And because this
+brickwork alternates even and odd bonds, **every one of the $5$ possible
+cuts along the line is crossed by exactly one $\mathrm{CNOT}$ in the
+entire circuit** — so each cut's entropy is bounded above by
+$\mathrm{CNOT}$'s maximum entangling power, $1$ ebit, by the argument
+above. Computing $S_2$ at all five cuts confirms it exactly:
+
+| cut (after qubit) | purity | $S_2$ (ebits) |
+|---|---|---|
+| $0$ | {tGateCuts[0].purity.toFixed(6)} | {tGateCuts[0].renyiTwo.toFixed(4)} |
+| $1$ | {tGateCuts[1].purity.toFixed(6)} | {tGateCuts[1].renyiTwo.toFixed(4)} |
+| $2$ | {tGateCuts[2].purity.toFixed(6)} | {tGateCuts[2].renyiTwo.toFixed(4)} |
+| $3$ | {tGateCuts[3].purity.toFixed(6)} | {tGateCuts[3].renyiTwo.toFixed(4)} |
+| $4$ | {tGateCuts[4].purity.toFixed(6)} | {tGateCuts[4].renyiTwo.toFixed(4)} |
+
+Every cut lands at exactly $1$ ebit — a computed *lower* bound on the true
+entropy (Rényi-2 never exceeds the von Neumann value) that exactly meets
+the cited *upper* bound of $1$ ebit per cut derived above, sandwiching the
+true entanglement entropy at precisely $1$ ebit everywhere, for every
+qubit count this depth-$2$ pattern could be extended to. Bond dimension
+$\chi=2$ suffices at every cut, forever, regardless of $n$ — nothing like
+Circuit A's linear climb to an exponential cap. The single-qubit marginal
+cross-check agrees: ${tGateQubit0Entropy.toFixed(4)}$ ebit, matching the
+table exactly. **This circuit is classically easy via (b) alone, despite
+containing a genuinely non-Clifford gate that removes Gottesman-Knill's
+guarantee entirely.**
+
+Two circuits, easy for two unrelated reasons — exactly the independence
+the Definition above claims, now verified rather than asserted.
+
+## Visualizing the Two Boundaries
+
+<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+  <svg width={480} height={380} viewBox="0 0 480 380" role="img" className="max-w-full" aria-label="A two-axis conceptual chart. The horizontal axis is labeled distance from Clifford/stabilizer gate set, from Clifford-only at the left to arbitrary gate sets such as random rotations at the right. The vertical axis is labeled entanglement or bond dimension chi, from low/bounded at the bottom to high/exponential at the top. A vertical band on the left (low x, any entanglement) is shaded and labeled easy via Gottesman-Knill: any entanglement. A horizontal band along the bottom (any gate set, low entanglement) is shaded a different color and labeled easy via bounded bond dimension: any gate set. The top-right region, outside both bands, is shaded a warning color and labeled hard: violates both known criteria. Three points are plotted: Circuit A (Clifford-only, maximally entangled, from this lesson's worked example) sits inside the left Clifford band near the top, illustrating that Gottesman-Knill does not care about entanglement. Circuit B (one T-gate, entanglement provably bounded, from this lesson's worked example) sits inside the bottom low-entanglement band on the right side, illustrating that the bond-dimension criterion does not care about gate set. A random quantum-advantage-style circuit sits in the top-right hard region, outside both bands, since it is neither Clifford nor low-entanglement.">
+    <rect x={160} y={30} width={280} height={200} className="fill-danger/10" />
+    <rect x={70} y={30} width={90} height={290} className="fill-brand/10" />
+    <rect x={70} y={230} width={370} height={90} className="fill-accent/10" />
+    <line x1={70} y1={30} x2={70} y2={320} strokeWidth={2} className="stroke-foreground/60" />
+    <line x1={70} y1={320} x2={440} y2={320} strokeWidth={2} className="stroke-foreground/60" />
+    <text x={255} y={358} textAnchor="middle" className="fill-foreground text-[11px] font-semibold">Distance from Clifford / stabilizer gate set →</text>
+    <text x={115} y={334} textAnchor="middle" className="fill-muted-foreground text-[10px]">Clifford-only</text>
+    <text x={400} y={334} textAnchor="middle" className="fill-muted-foreground text-[10px]">Arbitrary (e.g. random rotations)</text>
+    <text x={26} y={175} textAnchor="middle" transform="rotate(-90 26 175)" className="fill-foreground text-[11px] font-semibold">Entanglement / bond dimension χ</text>
+    <text x={78} y={46} textAnchor="start" className="fill-muted-foreground text-[10px]">High (χ ~ exponential)</text>
+    <text x={78} y={312} textAnchor="start" className="fill-muted-foreground text-[10px]">Low (bounded χ)</text>
+    <text x={115} y={190} textAnchor="middle" className="fill-brand text-[10px] font-semibold">Easy via</text>
+    <text x={115} y={202} textAnchor="middle" className="fill-brand text-[10px] font-semibold">Gottesman-Knill</text>
+    <text x={115} y={214} textAnchor="middle" className="fill-brand text-[10px] font-semibold">(any entanglement)</text>
+    <text x={385} y={300} textAnchor="middle" className="fill-accent text-[10px] font-semibold">Easy via bounded bond</text>
+    <text x={385} y={312} textAnchor="middle" className="fill-accent text-[10px] font-semibold">dimension (any gate set)</text>
+    <text x={300} y={58} textAnchor="middle" className="fill-danger text-[11px] font-bold">Hard: violates both</text>
+    <text x={300} y={70} textAnchor="middle" className="fill-danger text-[11px] font-bold">known criteria</text>
+    <circle cx={115} cy={70} r={7} className="fill-brand" />
+    <text x={115} y={95} textAnchor="middle" className="fill-brand text-[10px] font-semibold">A: Clifford,</text>
+    <text x={115} y={107} textAnchor="middle" className="fill-brand text-[10px] font-semibold">max-entangled</text>
+    <circle cx={200} cy={300} r={7} className="fill-accent" />
+    <text x={200} y={258} textAnchor="middle" className="fill-accent text-[10px] font-semibold">B: one T-gate,</text>
+    <text x={200} y={270} textAnchor="middle" className="fill-accent text-[10px] font-semibold">bounded entanglement</text>
+    <circle cx={410} cy={80} r={7} className="fill-danger" />
+    <text x={410} y={105} textAnchor="middle" className="fill-danger text-[10px] font-semibold">Random circuit</text>
+    <text x={410} y={117} textAnchor="middle" className="fill-danger text-[10px] font-semibold">(advantage attempt)</text>
+  </svg>
+</div>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming entanglement alone determines classical simulability.**
+Clifford-only circuits can be maximally entangled and still classically
+easy — entanglement alone doesn't determine classical simulability, gate
+*set* matters independently. Circuit A above reached the largest possible
+bond dimension for its cut while remaining trivially simulable, precisely
+because Gottesman-Knill's guarantee never once referenced how entangled
+the state was.
+</Callout>
+
+<Callout type="mistake">
+**Assuming a single non-Clifford gate makes a circuit "hard."** It removes
+*one* escape hatch (Gottesman-Knill), not both. Circuit B above contains a
+genuinely non-Clifford $T$ gate and is still classically easy, because
+its entanglement independently stays bounded via criterion (b). A circuit
+is only a genuine hardness candidate when it defeats *both* criteria
+simultaneously, which is exactly why real quantum-advantage circuits are
+built to be non-Clifford *and* fast-entangling at once, not merely one or
+the other.
+</Callout>
+
+## Practice Questions
+
+1. A circuit is built entirely from $H$, $S$, and $\mathrm{CNOT}$ gates,
+   arranged to entangle every qubit with every other qubit as thoroughly
+   as possible, then measured in the computational basis. Is it
+   classically easy to simulate? Which criterion applies, and does the
+   circuit's entanglement matter to your answer?
+2. A circuit applies a single-qubit rotation by an angle that is not a
+   multiple of $\pi/2$ to one qubit, and otherwise only ever applies
+   nearest-neighbor gates on a long 1D chain, with a fixed, small circuit
+   depth independent of the chain length. Explain, using this lesson's
+   $\mathrm{CNOT}$-counting argument, why the bond dimension needed stays
+   bounded as the chain grows arbitrarily long.
+3. Explain, in your own words, why a circuit that is *both* Clifford-only
+   *and* shallow/local would be a poor choice for a quantum-advantage
+   experiment even though it satisfies neither the "hard" conditions'
+   negation trivially — i.e., why satisfying *either* easy criterion,
+   let alone both, immediately disqualifies a circuit as a genuine
+   hardness demonstration.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The **Gottesman-Knill theorem** (Aaronson & Gottesman, 2004): any
+  stabilizer circuit (Clifford gates + Pauli measurements, from a
+  computational basis state) simulates in time polynomial in qubit count
+  and circuit size, via an $n\times2n$ binary tableau updated by simple,
+  local bit-operation rules per gate — independent of how entangled the
+  circuit's output is. This platform's own QEC syndrome-extraction
+  circuits are, structurally, exactly this class.
+- The **tensor-network boundary**: a circuit whose entanglement (bond
+  dimension $\chi$) stays polynomial (or constant) in $n$ at every cut
+  throughout is simulable in time polynomial in $n$ and $\chi$ via MPS
+  methods — independent of which gates were used, governed entirely by
+  how much entangling power the circuit's gate arrangement exercises
+  across each cut.
+- These are **two independent sufficient conditions for "classically
+  easy,"** verified exactly on two 6-qubit circuits: a Clifford-only
+  circuit reaching the maximum possible entanglement for its cut (easy
+  via gate set alone), and a circuit with one genuinely non-Clifford $T$
+  gate whose entanglement is provably capped at $1$ ebit per cut forever
+  (easy via bounded entanglement alone).
+- Real quantum-advantage circuits are random specifically because
+  randomness (over non-Clifford angles, arranged to entangle broadly and
+  quickly) is an efficient way to violate **both** criteria at once — the
+  exact framework this pillar's Quantum Complexity Theory capstone and
+  Research Methods and Synthesis course return to when evaluating real
+  quantum-advantage claims.
+
+## Further Exploration
+
+Next: [Clifford+T Synthesis and Resource Counting](/lessons/apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting),
+which takes this lesson's dividing line seriously from the *hardware*
+side: since Clifford gates alone are classically easy and therefore
+computationally inert, every fault-tolerant algorithm's real cost is
+measured in how many non-Clifford ($T$) gates it needs — turning this
+lesson's criterion (a) into the literal currency the next lesson counts.

@@ -501,6 +501,435 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
       "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
     ],
   },
+  // ---------------------------------------------------------------------
+  // Quantum Shannon Theory (quantum-mastery)
+  // ---------------------------------------------------------------------
+  {
+    id: "povm",
+    title: "POVM (Positive Operator-Valued Measure)",
+    definition:
+      "A set of positive semi-definite operators {E_i} summing to the identity, generalizing projective measurement so that outcome probabilities are still given by the Born rule P(i)=Tr(E_iρ) even when the E_i are not orthogonal projectors or outnumber the Hilbert space's dimension.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/povms-and-generalized-measurement"],
+  },
+  {
+    id: "naimark-dilation-theorem",
+    title: "Naimark's Dilation Theorem",
+    definition:
+      "The theorem that any POVM measurement on a system can be realized as an ordinary projective measurement on that system plus an ancilla, via a fixed unitary followed by measuring the enlarged system in an orthonormal basis.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/povms-and-generalized-measurement"],
+  },
+  {
+    id: "quantum-instrument",
+    title: "Quantum Instrument",
+    definition:
+      "A collection of completely positive maps, one per measurement outcome, that specifies both the outcome probabilities (via the induced POVM) and the actual post-measurement state — strictly more information than the POVM alone, since infinitely many instruments can induce the same POVM element while leaving different post-measurement states.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/povms-and-generalized-measurement"],
+  },
+  {
+    id: "kraus-operators-cptp-maps",
+    title: "Kraus Operators & CPTP Maps",
+    definition:
+      "The operators {K_i} satisfying ΣK_i†K_i=I that write any completely positive, trace-preserving (physical) quantum channel as E(ρ)=ΣK_iρK_i†; the Stinespring dilation theorem shows these operators are literally the blocks of a unitary acting on the system plus a fixed environment.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification"],
+  },
+  {
+    id: "quantum-mutual-information-conditional-entropy",
+    title: "Quantum Mutual Information & Conditional Entropy",
+    definition:
+      "I(A:B)=S(A)+S(B)-S(AB) measures total correlation between two quantum systems, while conditional entropy S(A|B)=S(AB)-S(B) measures the uncertainty about A remaining once B is known; unlike its classical counterpart, S(A|B) can be negative for entangled states, its magnitude equal to the qubit cost (or yield) of quantum state merging.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures"],
+  },
+  {
+    id: "coherent-information",
+    title: "Coherent Information",
+    definition:
+      "I(A>B)=-S(A|B)=S(ρ_B)-S(ρ_{AB}) for a channel with reference system A and output B; its regularized maximum over channel uses equals the channel's quantum capacity by the Lloyd-Shor-Devetak theorem, and it can be negative, signaling a channel through which no quantum information survives.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures",
+      "quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise",
+    ],
+  },
+  {
+    id: "holevo-quantity",
+    title: "Holevo Quantity & Holevo's Theorem",
+    definition:
+      "χ({p_i,ρ_i})=S(Σp_iρ_i)-Σp_iS(ρ_i) upper-bounds the classical information any single measurement can extract from an ensemble of quantum states (Holevo's theorem); its channel-optimized, regularized value equals the channel's classical capacity by the Holevo-Schumacher-Westmoreland theorem.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise"],
+  },
+  {
+    id: "entanglement-breaking-channel",
+    title: "Entanglement-Breaking Channel",
+    definition:
+      "A channel that, applied to half of any maximally entangled pair, always leaves a separable (unentangled) output; every entanglement-breaking channel has exactly zero quantum capacity, since no entanglement — and hence no quantum information — survives passage through it even in principle.",
+    pillar: "quantum-mastery",
+    lessonSlugs: ["quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise"],
+  },
+  // ---------------------------------------------------------------------
+  // Apex — Algorithmic Frontiers
+  // ---------------------------------------------------------------------
+  {
+    id: "block-encoding",
+    title: "Block Encoding",
+    definition:
+      "A unitary U on a system register plus ancilla such that (⟨0|_anc⊗I)U(|0⟩_anc⊗I) = A for a matrix A with ‖A‖≤1; running U and post-selecting the ancilla on |0⟩ applies A to a state with probability ‖A|ψ⟩‖².",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"],
+  },
+  {
+    id: "linear-combination-of-unitaries",
+    title: "Linear Combination of Unitaries (LCU)",
+    definition:
+      "A technique for block-encoding a matrix A=Σᵢαᵢ Uᵢ written as a weighted sum of unitaries, via a PREPARE (ancilla superposition weighted by √(αᵢ/‖α‖₁)), SELECT (apply Uᵢ conditioned on the ancilla), PREPARE† circuit.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"],
+  },
+  {
+    id: "signal-rotation",
+    title: "Signal Rotation W(x)",
+    definition:
+      "The fixed 2×2 unitary [[x, i√(1-x²)], [i√(1-x²), x]] = e^{i·arccos(x)·X} at the heart of quantum signal processing, whose interleaving with tunable phase gates produces a controllable polynomial in the signal x.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/quantum-signal-processing"],
+  },
+  {
+    id: "qsvt-polynomial",
+    title: "QSVT Polynomial P(A)",
+    definition:
+      "For a block-encoded matrix A=Σᵢσᵢ|uᵢ⟩⟨vᵢ| and a polynomial P realized via quantum signal processing, QSVT produces a block encoding of P(A):=Σᵢ P(σᵢ)|uᵢ⟩⟨vᵢ| — the same polynomial applied independently and simultaneously to every singular value of A.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/the-quantum-singular-value-transformation"],
+  },
+  {
+    id: "qubitization",
+    title: "Qubitization",
+    definition:
+      "Low and Chuang's technique (predating QSVT) of embedding a Hamiltonian's block encoding so that it decomposes into independent two-dimensional invariant subspaces, one per eigen/singular value, each behaving exactly like a single-qubit QSP signal rotation — the structural fact QSVT builds on and generalizes.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/the-quantum-singular-value-transformation"],
+  },
+  {
+    id: "maximum-likelihood-amplitude-estimation",
+    title: "Maximum-Likelihood Amplitude Estimation",
+    definition:
+      "A QPE-free amplitude estimation method that runs the Grover iterate at a classically-chosen, increasing schedule of depths, measures each directly, and combines the results with a classical maximum-likelihood estimator to reach the same Heisenberg-limited O(1/ε) scaling as phase-estimation-based amplitude estimation.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation"],
+  },
+  {
+    id: "condition-number-kappa",
+    title: "Condition Number (κ)",
+    definition:
+      "The ratio of a matrix's largest to smallest singular value, κ=σ_max/σ_min; it sets both the degree of the polynomial QSVT needs to approximate 1/x for quantum linear-systems solving and the cost of classical iterative solvers, making it the key resource cost — not just matrix dimension N — for how hard a linear system is to solve on either kind of computer.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems"],
+  },
+  {
+    id: "dequantization",
+    title: "Dequantization",
+    definition:
+      "The discovery (e.g. Ewin Tang's 2018 result) that, under a classical data-access model analogous to efficient quantum state preparation, a classical algorithm can sometimes match a quantum algorithm's polylogarithmic scaling for certain low-rank problems — a concrete caution against overclaiming exponential speedups for algorithms like quantum linear-systems solvers without checking every scope condition.",
+    pillar: "apex",
+    lessonSlugs: ["apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems"],
+  },
+  // ---------------------------------------------------------------------
+  // Apex — Fault Tolerance Frontiers
+  // ---------------------------------------------------------------------
+  {
+    id: "code-distance",
+    title: "Code Distance",
+    definition:
+      "The minimum weight of any nontrivial logical operator in a stabilizer code, determining how many physical errors it can correct; for the surface code it equals the length of the shortest Pauli string running between two opposite lattice boundaries.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/surface-codes-in-depth",
+      "apex/fault-tolerance-frontiers/decoding-surface-codes",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+    ],
+  },
+  {
+    id: "syndrome-defect-graph",
+    title: "Decoding Graph (Syndrome Defects)",
+    definition:
+      "The abstract graph a decoder builds each correction cycle, with one vertex per flipped stabilizer ('defect') and edge weights reflecting how plausible a physical error chain connecting two defects is; minimum-weight perfect matching on this graph is the standard surface-code decoding algorithm.",
+    pillar: "apex",
+    lessonSlugs: ["apex/fault-tolerance-frontiers/decoding-surface-codes"],
+  },
+  {
+    id: "logical-error-rate",
+    title: "Logical Error Rate",
+    definition:
+      "The probability that an error corrupts a code's encoded information beyond what it can catch and correct; for the surface code it scales exponentially with code distance below threshold, roughly as p_L ~ (p/p_th)^((d+1)/2).",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/decoding-surface-codes",
+      "apex/fault-tolerance-frontiers/the-threshold-theorem",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+    ],
+  },
+  {
+    id: "lattice-surgery-term",
+    title: "Lattice Surgery",
+    definition:
+      "Merging two adjacent surface-code patches by measuring new joint stabilizers along their shared boundary — fusing them into one code block that projectively measures the product of their logical operators — then splitting them apart again; the standard mechanism for implementing logical multi-qubit gates without any transversal or long-range operation.",
+    pillar: "apex",
+    lessonSlugs: ["apex/fault-tolerance-frontiers/lattice-surgery"],
+  },
+  {
+    id: "magic-state-factory",
+    title: "Magic-State Factory",
+    definition:
+      "A dedicated region of a fault-tolerant architecture continuously running magic-state distillation rounds to keep a supply of high-fidelity T-states flowing to the computation; in realistic resource estimates the factory typically dominates both total physical qubit count and runtime.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/magic-states-and-distillation",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+    ],
+  },
+  {
+    id: "eastin-knill-theorem",
+    title: "Eastin–Knill Theorem",
+    definition:
+      "A no-go result stating that no quantum error-correcting code can simultaneously have a universal set of transversal logical gates and the ability to correct arbitrary errors on any single physical qubit; for the surface code this forces Clifford gates to be transversal while the T gate provably cannot be.",
+    pillar: "apex",
+    lessonSlugs: ["apex/fault-tolerance-frontiers/magic-states-and-distillation"],
+  },
+  {
+    id: "gottesman-knill-theorem",
+    title: "Gottesman–Knill Theorem",
+    definition:
+      "Any stabilizer circuit — built from Clifford gates (H, S, CNOT) and Pauli measurements/preparations starting from a computational-basis state — simulates classically in time polynomial in qubit count and circuit size, via an n×2n binary tableau updated by simple per-gate bit rules, regardless of how entangled the resulting state becomes; for the surface code this is exactly why Clifford gates alone can never demonstrate quantum advantage, forcing the non-Clifford T gate to be injected via magic-state distillation instead.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
+      "apex/fault-tolerance-frontiers/magic-states-and-distillation",
+    ],
+  },
+  {
+    id: "rough-smooth-boundary",
+    title: "Rough & Smooth Boundaries",
+    definition:
+      "The two distinct edge types of a finite surface-code patch — 'rough' where face (X-type) stabilizers are truncated to weight 2, 'smooth' where vertex (Z-type) stabilizers are truncated — between which the logical X̄ and Z̄ operators respectively run as boundary-to-boundary Pauli strings.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/surface-codes-in-depth",
+      "apex/fault-tolerance-frontiers/lattice-surgery",
+    ],
+  },
+  // ---------------------------------------------------------------------
+  // Apex — Quantum Complexity Theory
+  // ---------------------------------------------------------------------
+  {
+    id: "qma-completeness",
+    title: "QMA-Completeness",
+    definition:
+      "A problem is QMA-complete if it is in QMA and every other QMA problem reduces to it in polynomial time, making it exactly as hard as any problem a quantum computer can efficiently verify — the quantum analogue of NP-completeness. The Local Hamiltonian problem was the first problem shown QMA-complete, via Kitaev's history-state reduction, playing the same role for QMA that 3-SAT plays for NP via Cook-Levin.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/quantum-complexity-theory/the-local-hamiltonian-problem",
+      "apex/quantum-complexity-theory/qma-and-quantum-verification",
+    ],
+  },
+  {
+    id: "quantum-adversary-method",
+    title: "Quantum Adversary Method",
+    definition:
+      "A technique (Ambainis, 2000-2002) for proving quantum query lower bounds by tracking a numerical distinguishability measure between an algorithm's states on a chosen hard pair of problem instances; because a single oracle query can only change that measure by a bounded amount, it yields an unconditional lower bound such as Ω(√N) for unstructured search.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/query-complexity-and-lower-bounds"],
+  },
+  {
+    id: "polynomial-method-query-lower-bounds",
+    title: "Polynomial Method (Query Lower Bounds)",
+    definition:
+      "A technique (Beals, Buhrman, Cleve, Mosca, and de Wolf, 1998) for proving quantum query lower bounds by showing a T-query algorithm's acceptance probability is a multilinear polynomial of degree at most 2T in the oracle's input bits, then invoking classical results on the approximate degree of Boolean functions to bound T from below.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/query-complexity-and-lower-bounds"],
+  },
+  {
+    id: "query-complexity-black-box-model",
+    title: "Query Complexity (Black-Box Model)",
+    definition:
+      "A cost model in which an algorithm accesses an unknown function only through oracle queries, with all other computation free and unlimited; a query lower bound of T queries proves no algorithm, however clever its free computation, can succeed with fewer than T queries against every oracle consistent with the problem's promise.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/query-complexity-and-lower-bounds"],
+  },
+  {
+    id: "history-state-kitaev",
+    title: "History State (Kitaev's Construction)",
+    definition:
+      "A superposition, tagged by an auxiliary clock register, over every intermediate snapshot of a verification circuit's execution on a witness; Kitaev's Local Hamiltonian construction penalizes deviations from a valid history state with local Hamiltonian terms, so the construction's ground-state energy is low exactly when some witness makes the original circuit accept.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/the-local-hamiltonian-problem"],
+  },
+  {
+    id: "p-np-bqp-containments",
+    title: "P, NP, and BQP Containments",
+    definition:
+      "The three proven containments among the classical complexity classes P and NP and the quantum class BQP — P⊆BQP, P⊆NP, and BQP⊆PSPACE — together with the three genuinely open questions about how BQP and NP otherwise relate (NP⊆BQP?, BQP⊆NP?, P=BQP?), which popular accounts routinely conflate with settled fact.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp"],
+  },
+  {
+    id: "random-circuit-sampling",
+    title: "Random Circuit Sampling",
+    definition:
+      "A computational task — sampling from the output distribution of a specific random quantum circuit — chosen because it is conjectured to be classically hard (under the assumption that the polynomial hierarchy does not collapse) while being efficient for a quantum computer. Google's 2019 Sycamore experiment used it as an empirical 'quantum supremacy' demonstration, though it establishes strong conjecture-level evidence for one narrow, practically-useless task, not an unconditional proof or a demonstration of advantage on useful problems.",
+    pillar: "apex",
+    lessonSlugs: ["apex/quantum-complexity-theory/capstone-what-we-know-and-dont"],
+  },
+  // ---------------------------------------------------------------------
+  // Apex — Simulation and Compilation Frontiers
+  // ---------------------------------------------------------------------
+  {
+    id: "matrix-product-state",
+    title: "Matrix Product State (MPS)",
+    definition:
+      "A representation of an n-qubit state as a chain of small tensors connected by bond indices, built by repeated singular value decomposition across each cut; keeping every nonzero singular value makes it an exact rewriting of the state, while truncating the smallest ones gives a controlled approximation.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states"],
+  },
+  {
+    id: "bond-dimension",
+    title: "Bond Dimension",
+    definition:
+      "The size χ of the shared index linking two adjacent tensors in a matrix product state, equal exactly to the Schmidt rank of the state across that cut; an area-law state needs bond dimension bounded by a constant independent of system size, while a volume-law state can require χ up to 2^(n/2).",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
+      "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
+    ],
+  },
+  {
+    id: "clifford-group",
+    title: "Clifford Group",
+    definition:
+      "The group of unitaries — generated by Hadamard, the phase gate S, and CNOT — that map Pauli operators to Pauli operators under conjugation; Clifford-only circuits are classically simulable by the Gottesman-Knill theorem no matter how entangled they get, which is exactly why a fault-tolerant algorithm's real cost is measured by its non-Clifford (T) gate count instead.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
+      "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting",
+    ],
+  },
+  {
+    id: "t-count-t-depth",
+    title: "T-Count & T-Depth",
+    definition:
+      "T-count is the total number of T gates in a compiled Clifford+T circuit, the direct measure of how many expensive magic states a fault-tolerant computation consumes; T-depth counts sequential layers of T gates after parallelizing independent ones, bounding wall-clock time against a magic-state factory's finite production rate.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting",
+      "apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count",
+    ],
+  },
+  {
+    id: "solovay-kitaev-theorem",
+    title: "Solovay-Kitaev Theorem",
+    definition:
+      "Guarantees that any single-qubit unitary can be approximated to precision ε by O(log^c(1/ε)) gates from a fixed universal gate set, found efficiently by a classical algorithm; it proves efficient synthesis is always possible but says nothing about whether the sequence found is the shortest possible for that specific target.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"],
+  },
+  {
+    id: "ross-selinger-synthesis",
+    title: "Ross-Selinger (Number-Theoretic) Synthesis",
+    definition:
+      "A synthesis algorithm that exploits the number-theoretic structure of the ring ℤ[1/√2, i] — every entry a Clifford+T circuit can produce — to find near-optimal T-count circuits, roughly 3-4·log₂(1/ε), for compiling single-qubit Rz(θ) rotations, dramatically beating generic Solovay-Kitaev synthesis for that structured gate family.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"],
+  },
+  {
+    id: "qubit-routing-swap-overhead",
+    title: "Qubit Routing & SWAP Overhead",
+    definition:
+      "Mapping a circuit's logical two-qubit gates onto a device's limited connectivity graph forces inserted SWAP gates for every non-adjacent interaction, at a cost of 2(d-1) SWAPs for chain distance d; a noise-aware compiler then chooses, among mappings with identical SWAP overhead, the one that routes the heaviest gate load through the device's best-calibrated qubits and couplers.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation"],
+  },
+  {
+    id: "jordan-wigner-transformation",
+    title: "Jordan-Wigner Transformation",
+    definition:
+      "Maps fermionic creation/annihilation operators to qubit Pauli operators via a_j = (Z_1⊗...⊗Z_{j-1})⊗σ⁻_j; the prepended 'Z-string' is what converts qubit operators' natural commutation into the anticommutation the canonical fermionic algebra requires, letting a molecular Hamiltonian run on a qubit-based quantum computer.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"],
+  },
+  {
+    id: "electronic-structure-problem",
+    title: "Electronic Structure Problem",
+    definition:
+      "Finding the ground-state energy of a molecule's electrons in the fixed Coulomb field of its nuclei (the Born-Oppenheimer approximation); reaching chemical accuracy (~1.6 milli-Hartree) for strongly correlated molecules like transition-metal catalysts is believed to require classical resources scaling exponentially, making it the most frequently cited candidate for a first practical fault-tolerant quantum advantage.",
+    pillar: "apex",
+    lessonSlugs: ["apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"],
+  },
+  // ---------------------------------------------------------------------
+  // Apex — Research Methods and Synthesis
+  // ---------------------------------------------------------------------
+  {
+    id: "quantum-advantage-supremacy",
+    title: "Quantum Advantage / Quantum Supremacy",
+    definition:
+      "The claim that a quantum device solved or sampled from some specific computational task faster than any known classical approach can; the term compresses a family of genuinely different sub-claims (which task, compared against which classical baseline, under which unproven hardness assumption) into a single headline word, which is exactly why it needs unpacking rather than a flat accept-or-reject read.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims",
+      "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today",
+    ],
+  },
+  {
+    id: "shot-noise-standard-error",
+    title: "Shot Noise & Standard Error",
+    definition:
+      "The unavoidable statistical scatter in a probability estimated from a finite number of circuit runs (shots); for an estimate p̂ = k/N the standard error √(p(1−p)/N) shrinks only as 1/√N, so a reported probability is not meaningful without also stating the shot count it came from.",
+    pillar: "apex",
+    lessonSlugs: ["apex/research-methods-and-synthesis/reproducing-and-designing-experiments"],
+  },
+  {
+    id: "reproducibility-four-components",
+    title: "Reproducibility Standard (Four Components)",
+    definition:
+      "A quantum-computing experimental claim counts as reproducible only when it specifies all four of: the exact circuit, the exact hardware or simulator (including a dated calibration snapshot for real hardware), the exact classical post-processing/error-mitigation pipeline, and the statistical uncertainty — shot count and confidence interval — behind any reported number.",
+    pillar: "apex",
+    lessonSlugs: ["apex/research-methods-and-synthesis/reproducing-and-designing-experiments"],
+  },
+  {
+    id: "theorem-heuristic-conjecture-open",
+    title: "Theorem / Heuristic / Conjecture / Genuinely Open (Claim Classification)",
+    definition:
+      "A four-question checklist for classifying any technical claim by its actual evidentiary status: a complete proof makes it a theorem, broad numerical support without a matching proof makes it a heuristic, a motivated-but-unverified theoretical argument makes it a conjecture, and none of these leaves it genuinely open — a single claim can even split across tiers depending on exactly which sub-statement is being evaluated.",
+    pillar: "apex",
+    lessonSlugs: ["apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic"],
+  },
+  {
+    id: "calibration-drift",
+    title: "Calibration Drift",
+    definition:
+      "The day-to-day change in a real quantum device's physical error rates — gate fidelities, T1/T2 coherence times, readout asymmetry — caused by temperature fluctuations and slow electronic drift, which is why a result reported without a dated calibration snapshot cannot be fully reproduced even on the identical physical device.",
+    pillar: "apex",
+    lessonSlugs: ["apex/research-methods-and-synthesis/reproducing-and-designing-experiments"],
+  },
+  {
+    id: "best-known-classical-baseline",
+    title: "Best-Known Classical Baseline",
+    definition:
+      "The strongest classical algorithm and hardware actually published at the time a quantum-advantage claim was made, which a fair comparison must be measured against rather than a weaker or naive classical method; because 'best known' is a moving target, a later, better classical algorithm narrowing the gap tests the original claim rather than invalidating it.",
+    pillar: "apex",
+    lessonSlugs: ["apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims"],
+  },
+  {
+    id: "popoviciu-inequality",
+    title: "Popoviciu's Inequality",
+    definition:
+      "A general bound on a bounded random variable's variance, Var(X) ≤ (max−min)²/4, used to compute a worst-case standard error for an experimental estimator (such as a measured cut value) even when its exact probability distribution isn't known in closed form.",
+    pillar: "apex",
+    lessonSlugs: ["apex/research-methods-and-synthesis/reproducing-and-designing-experiments"],
+  },
 ];
 
 /** Every glossary term, alphabetically sorted by title. */

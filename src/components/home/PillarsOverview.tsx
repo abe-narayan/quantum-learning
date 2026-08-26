@@ -15,6 +15,11 @@ const PILLAR_ROUTES: Record<Pillar, string> = {
   // the PILLARS.filter below), so this route only matters if some other
   // caller ever iterates PILLAR_ROUTES directly.
   "quantum-mastery": "/learn",
+  // Apex has its own dedicated landing page (unlike Mastery), but is still
+  // excluded from this "four pillars" beginner-facing grid below — it's the
+  // capstone destination reached via /learn or the Tracks nav, not a fifth
+  // entry-point tile.
+  apex: "/apex",
 };
 
 /**
@@ -79,6 +84,13 @@ const PILLAR_GLYPHS: Record<Pillar, (props: { className?: string }) => ReactElem
       <path d="M20 4 L24 16 L36 20 L24 24 L20 36 L16 24 L4 20 L16 16 Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
     </svg>
   ),
+  // Also not rendered in this section (see the PILLARS.filter below).
+  apex: ({ className }) => (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
+      <path d="M20 4 L34 32 L6 32 Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <line x1="20" y1="4" x2="20" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 export function PillarsOverview() {
@@ -95,7 +107,7 @@ export function PillarsOverview() {
         </div>
 
         <div className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {PILLARS.filter((pillar) => pillar.slug !== "quantum-mastery").map((pillar, index) => {
+          {PILLARS.filter((pillar) => pillar.slug !== "quantum-mastery" && pillar.slug !== "apex").map((pillar, index) => {
             const ruleColor = index % 2 === 0 ? "var(--brand)" : "var(--accent)";
             const courses = getCoursesByPillar(pillar.slug);
             const totalHours = courses.reduce((sum, course) => sum + course.estimatedHours, 0);

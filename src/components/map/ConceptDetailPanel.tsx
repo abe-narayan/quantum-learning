@@ -13,6 +13,7 @@ const PILLAR_LABEL: Record<ConceptNode["pillar"], string> = {
   "quantum-hardware": "Quantum Hardware",
   "quantum-software": "Quantum Software",
   "quantum-mastery": "Quantum Mastery",
+  apex: "Apex",
 };
 
 const PILLAR_TONE: Record<ConceptNode["pillar"], "brand" | "accent" | "neutral" | "warning" | "danger"> = {
@@ -21,6 +22,7 @@ const PILLAR_TONE: Record<ConceptNode["pillar"], "brand" | "accent" | "neutral" 
   "quantum-hardware": "warning",
   "quantum-software": "neutral",
   "quantum-mastery": "danger",
+  apex: "brand",
 };
 
 function simulatorHref(simulatorId: SimulatorId) {

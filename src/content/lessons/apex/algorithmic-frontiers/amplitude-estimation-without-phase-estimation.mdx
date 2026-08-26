@@ -1,0 +1,362 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { BarChart } from "@/components/visualizations/BarChart";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation"
+).map((problem) => problem.meta);
+
+export function groverIterateProb(theta, m) {
+  return Math.sin((2 * m + 1) * theta) ** 2;
+}
+
+export const aeTheta = Math.PI / 16;
+export const aeAmplitude = Math.sin(aeTheta) ** 2;
+export const aeContextM = [0, 1, 2, 3, 4, 5, 6, 7];
+export const aeSchedule = [0, 1, 2, 4];
+export const aeBars = aeContextM.map((m) => ({
+  label: `m=${m}`,
+  value: groverIterateProb(aeTheta, m),
+  highlight: aeSchedule.includes(m),
+  caption: `${(groverIterateProb(aeTheta, m) * 100).toFixed(1)}%`,
+}));
+
+export const aeWorkedTheta = Math.PI / 12;
+export const aeWorkedM = 2;
+export const aeWorkedProb = groverIterateProb(aeWorkedTheta, aeWorkedM);
+
+export const lessonMeta = {
+  title: "Amplitude Estimation Without Phase Estimation",
+  description:
+    "The original Grover-iterate-plus-QFT amplitude estimation algorithm hits the same O(1/epsilon) Heisenberg-limited scaling as a classically-scheduled sequence of plain Grover-iterate runs combined by maximum likelihood — a real, citable NISQ-era result, not a consolation prize for giving up the QFT.",
+  course: "algorithmic-frontiers",
+  module: "amplitude-estimation-without-phase-estimation",
+  order: 4,
+  difficulty: "master",
+  estimatedMinutes: 26,
+  prerequisites: [
+    "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
+    "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
+  ],
+  objectives: [
+    "Recall the original amplitude-estimation algorithm (Grover iteration + quantum phase estimation) and its query-vs-precision tradeoff, achieving Heisenberg-limited O(1/epsilon) scaling instead of the classical O(1/epsilon^2) Monte Carlo scaling",
+    "Explain modern 'QPE-free' amplitude estimation techniques (maximum-likelihood/iterative amplitude estimation) that achieve the same asymptotic O(1/epsilon) scaling using only Grover iterations and classical post-processing, without a QFT or large phase-estimation ancilla register",
+    "Compare circuit depth/ancilla-count/coherence-time requirements of the two approaches and explain why the QPE-free version matters for near-term (NISQ-era) hardware specifically",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
+      note: "That lesson derives QPE's exact closed-form measurement probability and the QFT's O(t^2) gate cost; this lesson is the concrete payoff of caring about that cost — an entire algorithm family built specifically to avoid paying it.",
+    },
+    {
+      slug: "quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification",
+      note: "This lesson's Grover iterate is exactly that lesson's rotation-by-2theta argument with the uniform-superposition state |s⟩ generalized to an arbitrary state-preparation unitary A|0⟩, and its success-probability formula sin²((2k+1)θ) reused without modification.",
+    },
+  ],
+};
+
+## Motivation
+
+The previous lesson pinned down exactly what quantum phase estimation
+costs: a precision register of $t$ qubits, an $O(t^2)$-gate QFT applied
+coherently at the end, and — easy to overlook, but the part that actually
+matters for hardware — every one of the $2^t-1$ controlled-Grover-iterate
+applications feeding that QFT has to stay coherent *simultaneously*,
+because QPE's whole trick is querying a superposition of iteration
+counts at once. That is a lot to ask of a noisy, near-term device. This
+lesson asks a pointed question: for the specific, high-value task of
+*estimating an amplitude* (not finding an eigenphase in general), is all
+of that machinery actually necessary? The honest, citable answer is no —
+and the "no" is a genuinely nontrivial, still-actively-used result, not
+a hand-wavy simplification.
+
+## Mathematical Development
+
+### The estimation problem, and classical Monte Carlo's O(1/ε²)
+
+Suppose a unitary $A$ prepares $A|0\rangle=|\psi\rangle=\sqrt{1-a}\,
+|0\rangle|\text{junk}_0\rangle+\sqrt a\,|1\rangle|\text{junk}_1\rangle$,
+and the goal is to estimate $a\in[0,1]$ — the probability that measuring
+the flag qubit returns $1$. Classically (or by simply running $A$ and
+measuring, with no quantum trick at all) this is a Bernoulli-sampling
+problem: each shot is a coin flip with bias $a$, and the sample-mean
+estimator $\hat a$ after $n$ shots has variance $a(1-a)/n$, so its
+standard deviation — the estimator's typical error — is
+$\sqrt{a(1-a)/n}=O(1/\sqrt n)$. Solving for the sample size needed to
+reach a target precision $\epsilon$:
+
+$$
+\epsilon \sim \frac1{\sqrt n} \quad\Longrightarrow\quad n = O\!\left(\frac1{\epsilon^2}\right)
+$$
+
+the familiar classical Monte Carlo scaling: halving the error requires
+*quadrupling* the number of samples. This is the baseline every
+amplitude-estimation algorithm below is measured against.
+
+### The original algorithm: Grover iterate + QPE (BHMT 2000)
+
+Brassard, Høyer, Mosca, and Tapp's amplitude estimation (2000) reuses
+this platform's own Grover derivation directly, with the search-specific
+pieces generalized. In place of $H^{\otimes n}$ preparing the uniform
+superposition $|s\rangle$, use the general state-preparation unitary $A$
+preparing $|\psi\rangle$; in place of the marked-item oracle, use
+$S_\chi$, the reflection that flips the sign of every basis state with
+flag qubit $=1$; in place of the search-specific diffusion operator
+$D=2|s\rangle\langle s|-I$, use $D=-AS_0A^{-1}$ ($S_0=2|0\rangle\langle
+0|-I$), which reflects about $|\psi\rangle=A|0\rangle$ exactly as $D$
+reflected about $|s\rangle=H^{\otimes n}|0\rangle$ before. The **Grover
+iterate** is $Q=DS_\chi$ — literally the same "compose two reflections in
+a 2D subspace" object the earlier lesson analyzed, with
+$|\alpha\rangle,|\beta\rangle$ relabeled as the orthogonal
+unmarked/marked components of $|\psi\rangle$ and $\theta$ now defined by
+$\sin^2\theta=a$ instead of $\sin^2\theta=1/N$. Every step of that
+derivation carries over unchanged, so after $k$ applications of $Q$ the
+success probability is exactly
+
+$$
+P(\text{flag}=1\mid k) = \sin^2\big((2k+1)\theta\big), \qquad \sin^2\theta=a
+$$
+
+reusing the earlier lesson's closed form with zero new derivation
+required. The key extra fact BHMT add: restricted to this 2D subspace,
+$Q$ is a rotation matrix by angle $2\theta$, whose eigenvalues are
+$e^{\pm2i\theta}$. Running **quantum phase estimation on $Q$** (a
+superposition of $Q^0,Q^1,Q^2,\dots,Q^{2^t-1}$, controlled by a $t$-qubit
+precision register, exactly as the QPE-precision lesson's register
+setup) reads out an estimate of $2\theta$ to $t$ bits, and hence of $a$.
+BHMT's Theorem 12 gives the precise bound: with $M=2^t$ Grover-iterate
+applications total,
+
+$$
+\big|\tilde a - a\big| \;\leq\; \frac{2\pi\sqrt{a(1-a)}}M + \frac{\pi^2}{M^2}, \qquad \text{with probability} \geq \frac8{\pi^2}\approx0.81
+$$
+
+so $\epsilon=O(1/M)$, i.e. $M=O(1/\epsilon)$ Grover-iterate applications
+suffice — the celebrated **quadratic speedup for estimation**,
+Heisenberg-limited $O(1/\epsilon)$ in place of classical Monte Carlo's
+$O(1/\epsilon^2)$. The cost: those $M=2^t$ applications of $Q$ are
+queried *in superposition*, so the entire circuit — every controlled-$Q$
+application plus the final inverse QFT on $t=O(\log(1/\epsilon))$ qubits
+— must run coherently before a single measurement is taken.
+
+### QPE-free amplitude estimation: the same iterate, a classical schedule
+
+The genuinely important modern development (Suzuki, Uno, Raymond,
+Tanaka, Onodera, and Yamamoto, "Amplitude Estimation without Phase
+Estimation," *Quantum Information Processing* **19**, 75 (2020); see
+also Grinko, Gacon, Zoufal, and Woerner, "Iterative Quantum Amplitude
+Estimation," *npj Quantum Information* **7**, 52 (2021)) keeps the exact
+same building block — the Grover iterate $Q$ above — and the exact same
+closed-form probability $\sin^2((2m+1)\theta)$, but discards both the
+controlled-$Q$ superposition and the QFT entirely. Instead:
+
+1. Choose a **classical, increasing sequence** of iteration counts
+   $m_1<m_2<\dots<m_K$ in advance (e.g. exponentially increasing,
+   $m_k=2^{k-1}$).
+2. For each $m_k$, run the circuit "$A$, then $Q$ applied $m_k$ times,
+   then measure the flag qubit" some number of times, exactly like an
+   ordinary Grover run — no ancilla register, no controlled-$Q$, no QFT.
+3. Feed the resulting $\{(m_k, \text{measured 1-counts})\}$ into a
+   **classical maximum-likelihood estimator** (or a related
+   confidence-interval-combining scheme), using the known closed form
+   $P(1\mid m_k)=\sin^2((2m_k+1)\theta)$ as the likelihood model for
+   every round simultaneously, to reconstruct $\theta$ (hence $a$).
+
+The precise, citable result: with the right choice of schedule (an
+exponentially increasing $\{m_k\}$ combined via maximum likelihood, or
+via Grinko et al.'s overlapping-confidence-interval combining rule),
+this still achieves $\epsilon=O(1/M_{\max})$ precision using a *total*
+Grover-iterate count across all rounds that is $O(1/\epsilon)$ — the same
+Heisenberg-limited asymptotic scaling as the QPE-based algorithm — with
+only state preparation, the Grover iterate, and measurement as building
+blocks, and only classical (not quantum) post-processing. The intuitive
+reason a handful of classically-chosen $m_k$ can pin down $\theta$ this
+precisely: differentiating the closed form,
+
+$$
+\frac{d}{d\theta}\sin^2\big((2m+1)\theta\big) = (2m+1)\sin\big(2(2m+1)\theta\big)
+$$
+
+so the *local sensitivity* of a measurement at iteration count $m$ to a
+small shift in $\theta$ is amplified by a factor of $(2m+1)$ relative to
+a single direct measurement ($m=0$). Larger $m$ rounds are far more
+informative per shot, at the cost of also being periodic (multiple
+$\theta$ values can produce the same $\sin^2$ reading at large $m$) —
+which is exactly why the combining step needs the *whole schedule*, not
+just the largest $m_k$ alone: the low-$m$ rounds resolve which
+period the high-$m$ rounds' precise-but-ambiguous reading falls in.
+
+## Physical Interpretation: Why the QPE-Free Version Matters
+
+Both algorithms above are asymptotically optimal in the same sense:
+$O(1/\epsilon)$ total Grover-iterate queries, quadratically better than
+classical Monte Carlo. Where they differ is entirely in *circuit
+structure*, and that difference is exactly the Quantum Hardware pillar's
+central constraint made concrete. QPE-based amplitude estimation needs a
+$t=O(\log(1/\epsilon))$-qubit ancilla register and, critically, every one
+of its controlled-$Q$ applications plus the final QFT must survive
+*coherently*, back to back, before any measurement collapses the state —
+exactly the long, uninterrupted coherence window that decoherence and
+gate error accumulate against on real, noisy hardware. The QPE-free
+version never asks for that: each round is state-prep, $m_k$ plain
+(uncontrolled) Grover iterates, and an immediate measurement — the same
+depth budget Grover's algorithm itself already needs, just repeated a
+handful of times with classical bookkeeping in between. The price is a
+modest, well-quantified constant-factor overhead in total query count
+relative to the QPE-based scheme's theoretical optimum (Suzuki et al.
+report this overhead explicitly) — not a change in scaling. This is a
+concrete, real instance of a pattern that shows up constantly in
+present-day quantum algorithm design: "provably query-optimal in
+principle" and "deployable on hardware with today's coherence times" are
+different questions, and a small, honest trade in the first can buy a
+large, practical win in the second.
+
+## Worked Example
+
+**For $\theta=\pi/12$ (so $a=\sin^2(\pi/12)\approx0.0670$), find the
+Grover-iterate success probability at $m=2$.**
+
+$\theta=\pi/12=15°$. At $m=2$: $(2\cdot2+1)\theta=5\theta=75°$, so
+$P(1\mid m=2)=\sin^2(75°)\approx0.9330$, matching
+`groverIterateProb(Math.PI/12, 2)`'s computed value of
+{aeWorkedProb.toFixed(4)} exactly. (For reference, $a=\sin^2(15°)
+\approx0.0670$ — a small amplitude, and already at just $m=2$ Grover
+iterates the success probability has been amplified to over $93\%$,
+the same amplitude-amplification effect the original Grover lesson
+derived, now serving estimation rather than search.)
+
+### The illustration schedule: $\theta=\pi/16$
+
+Now the actual amplitude-estimation illustration. Take
+$\theta=\pi/16=11.25°$, so $a=\sin^2(\pi/16)\approx{aeAmplitude.toFixed(4)}$
+— a small, exactly-computable amplitude, deliberately chosen to be
+non-trivial to estimate by eye. The closed form
+$P(1\mid m)=\sin^2((2m+1)\theta)$ gives, for $m=0,1,2,4$ (a small,
+exponentially-spaced schedule, the kind a QPE-free algorithm would
+actually query — note $m_0=0$ is just the ordinary, no-amplification
+direct measurement):
+
+| $m$ | $(2m+1)\theta$ | $P(1\mid m)$ |
+|---|---|---|
+| $0$ | $11.25°$ | $\approx0.0381$ |
+| $1$ | $33.75°$ | $\approx0.3087$ |
+| $2$ | $56.25°$ | $\approx0.6913$ |
+| $4$ | $101.25°$ | $\approx0.9619$ |
+
+Four numbers, four very different measured "1"-frequencies, all
+generated by the *same* underlying $\theta$. A single measurement at
+$m=0$ alone only tells you $a\approx0.038$ — a valid but low-sensitivity
+estimate. Looking at the *pattern* across all four (a value near
+$0.31$ at $m=1$ is only consistent with $\theta$ in a narrow band near
+$11.25°$, and the near-saturated $0.96$ at $m=4$ narrows that band
+further still, exactly as the $(2m+1)$-fold sensitivity amplification
+above predicts) is what lets a maximum-likelihood combination pin down
+$\theta$ far more tightly than any single $m$ could, without ever
+needing a superposition over these four values.
+
+## Visualizing the Schedule
+
+<BarChart
+  bars={aeBars}
+  ariaLabel={`Grover-iterate success probability sin squared of (2m+1) times theta, theta = pi/16, for m = 0 through 7, as a bar chart; bars at m = 0, 1, 2, and 4 are highlighted as the specific iteration counts a QPE-free schedule would actually query`}
+  maxValue={1}
+/>
+
+The full curve (all eight bars) rises from the bare amplitude
+$a\approx0.038$ at $m=0$ up to a near-saturated $\approx0.962$ around
+$m=3$–$4$, then falls back symmetrically — the same periodic rotation
+the original Grover lesson's vector-diagram explorer showed, just
+parameterized by an arbitrary $\theta$ instead of $\arcsin(1/\sqrt N)$.
+The four highlighted bars ($m=0,1,2,4$) are exactly the schedule used in
+the table above: a QPE-free algorithm queries only these few points —
+not the full curve, and never in superposition — and lets classical
+maximum-likelihood combination do the work of turning this handful of
+readings into a precise $\theta$ estimate.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating "QPE-free" as meaning worse scaling — a consolation prize for
+giving up the QFT.** It is not: the whole point of Suzuki et al.'s and
+Grinko et al.'s results is that the *same* $O(1/\epsilon)$
+Heisenberg-limited scaling survives without QPE, using only a classical
+schedule of Grover-iterate depths and classical maximum-likelihood
+combination. What changes is circuit *structure* (no wide ancilla
+register, no coherent controlled-$Q$ superposition, no QFT) and a modest
+constant-factor query overhead — not the asymptotic exponent. Confusing
+the two erases exactly the result that makes this line of work
+interesting.
+</Callout>
+
+<Callout type="mistake">
+**Assuming a QPE-free schedule could just measure at one large, cleverly
+chosen $m$ and skip the smaller ones.** A single large-$m$ measurement is
+*more* sensitive to $\theta$ (its slope is amplified by the $(2m+1)$
+factor derived above) but also more ambiguous, since $\sin^2((2m+1)
+\theta)$ is periodic and many $\theta$ values can match one large-$m$
+reading. The smaller-$m$ rounds in the schedule aren't redundant padding
+— they're what resolves *which* period the large-$m$ round's precise
+reading actually falls in.
+</Callout>
+
+## Practice Questions
+
+1. For $\theta=\pi/16$ (this lesson's illustration amplitude), use the
+   closed form to compute $P(1\mid m=3)$ by hand, and check it against
+   the value shown for $m=4$ in the worked-example table — explain, using
+   the symmetry of $\sin^2$ about $90°$, why they come out equal.
+2. Using the classical Monte Carlo scaling $n=O(1/\epsilon^2)$ and the
+   quantum $M=O(1/\epsilon)$ scaling, compute the ratio of classical
+   samples to quantum Grover-iterate queries needed as $\epsilon$ shrinks
+   from $0.01$ to $0.0001$ (a factor-of-$100$ tighter target precision) —
+   by what factor does each resource requirement grow?
+3. Explain, in your own words, why the QPE-free algorithm's per-round
+   circuit (state prep, $m_k$ Grover iterates, one measurement) has the
+   *same* depth character as plain Grover's algorithm itself, while the
+   QPE-based algorithm's circuit does not — tie your answer to which
+   specific step requires coherence across all $2^t$ iteration counts at
+   once.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Classical Monte Carlo estimates a Bernoulli bias $a$ to precision
+  $\epsilon$ using $O(1/\epsilon^2)$ samples, from the sample-mean
+  estimator's $O(1/\sqrt n)$ standard deviation.
+- The original (BHMT 2000) amplitude estimation algorithm reuses the
+  Grover iterate's exact rotation-by-$2\theta$ structure and success
+  formula $\sin^2((2k+1)\theta)$, then runs QPE on the iterate (whose
+  eigenvalues are $e^{\pm2i\theta}$) to reach $O(1/\epsilon)$
+  Heisenberg-limited scaling — at the cost of a wide ancilla register and
+  a fully coherent controlled-$Q$-superposition-plus-QFT circuit.
+- Modern QPE-free methods (maximum-likelihood / iterative amplitude
+  estimation, Suzuki et al. 2020, Grinko et al. 2021) reuse the *same*
+  Grover iterate and closed form, but query only a classical, increasing
+  schedule of iteration counts $m_k$ (e.g. $m_k=2^{k-1}$), each measured
+  directly, and combine the results via classical maximum likelihood —
+  still $O(1/\epsilon)$ total queries, now with no QFT and no wide
+  coherent ancilla register.
+- Verified directly on $\theta=\pi/16$: the schedule $m=0,1,2,4$ gives
+  measured probabilities $\approx0.038,0.309,0.691,0.962$ — a handful of
+  well-chosen points whose pattern (not any single point) pins down
+  $\theta$ precisely, exactly the mechanism the maximum-likelihood
+  combination step formalizes.
+- This is a genuine "provably optimal in theory" vs. "practically
+  deployable on noisy, near-term hardware" tradeoff: same asymptotic
+  query scaling, dramatically shallower and shorter-coherence circuit
+  structure.
+
+## Further Exploration
+
+The Grover iterate $Q=-AS_0A^{-1}S_\chi$ used throughout this lesson is
+itself a special case of the block-encoding machinery from the
+prerequisite lesson on [Block Encodings and Linear Combinations of
+Unitaries](/lessons/apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries) —
+the same reflect-and-compose pattern reappears, generalized far beyond
+amplitude estimation, throughout the modern quantum-algorithms
+literature (qubitization, quantum singular value transformation), a
+recurring theme worth watching for in later Algorithmic Frontiers
+lessons. For the coherence-time and gate-error numbers that make the
+NISQ-relevance argument above concrete on real devices, see the Quantum
+Hardware pillar's noise and decoherence material.

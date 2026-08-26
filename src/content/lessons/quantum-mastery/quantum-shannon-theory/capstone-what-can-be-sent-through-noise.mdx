@@ -1,0 +1,524 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
+import { outerProduct } from "@/lib/quantum/projectors";
+import { pureStateDensityMatrix, maximallyMixedState, convexCombination, vonNeumannEntropy, densityMatrixExpectationValue } from "@/lib/quantum/densityMatrix";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Capstone: What Can Be Sent Through Noise",
+  description:
+    "The whole course's throughline, generalized measurement, Stinespring dilation, entropy and information measures, data processing, entanglement distillation, converges on one computable question: exactly how many classical bits and how many quantum bits survive one use of a given noisy channel, and why those two numbers can be worlds apart.",
+  course: "quantum-shannon-theory",
+  module: "capstone-what-can-be-sent-through-noise",
+  order: 6,
+  difficulty: "master",
+  estimatedMinutes: 25,
+  prerequisites: [
+    "quantum-mastery/quantum-shannon-theory/the-data-processing-inequality",
+    "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces",
+  ],
+  objectives: [
+    "State the classical capacity of a quantum channel (Holevo-Schumacher-Westmoreland theorem, via the Holevo quantity) and the quantum capacity (via the coherent information, LSD theorem), and explain precisely what each one means operationally",
+    "Compute the Holevo quantity for a concrete ensemble sent through a real depolarizing/dephasing channel and compare it to the classical Shannon capacity intuition",
+    "Explain why quantum capacity can be zero even when classical capacity through the same channel is positive, and connect this to the whole course's throughline: what a channel destroys, and what survives",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
+      note: "This capstone's depolarizing channel is exactly the kind of completely positive, trace-preserving map that lesson's Choi-matrix machinery certifies as physical; this lesson reuses that same Choi-state construction, applied to a maximally entangled input, to prove the entanglement-breaking threshold below.",
+    },
+  ],
+};
+
+export const zeroState = StateVector.basis(1, 0);
+export const plusState = applySingleQubitGate(zeroState, HADAMARD, 0);
+export const oneState = StateVector.basis(1, 1);
+
+export const rho0 = pureStateDensityMatrix(zeroState);
+export const rhoPlus = pureStateDensityMatrix(plusState);
+export const rho1 = pureStateDensityMatrix(oneState);
+
+export const depolarizingChannel = (rho, p) =>
+  convexCombination([
+    { probability: 1 - p, density: rho },
+    { probability: p, density: maximallyMixedState(2) },
+  ]);
+
+export const holevoChi = (rhoA, rhoB, p) => {
+  const outA = depolarizingChannel(rhoA, p);
+  const outB = depolarizingChannel(rhoB, p);
+  const avg = convexCombination([
+    { probability: 0.5, density: outA },
+    { probability: 0.5, density: outB },
+  ]);
+  return vonNeumannEntropy(avg) - 0.5 * vonNeumannEntropy(outA) - 0.5 * vonNeumannEntropy(outB);
+};
+
+export const holevoChiBB84 = (p) => holevoChi(rho0, rhoPlus, p);
+export const holevoChiOrthogonal = (p) => holevoChi(rho0, rho1, p);
+export const classicalCapacity = (p) => 1 - vonNeumannEntropy(depolarizingChannel(rho0, p));
+
+export const depolarizingParams = Array.from({ length: 41 }, (_, i) => i / 40);
+export const chiBB84Samples = depolarizingParams.map((p) => holevoChiBB84(p));
+
+export const chiAt0 = holevoChiBB84(0);
+export const chiAt02 = holevoChiBB84(0.2);
+export const chiAt05 = holevoChiBB84(0.5);
+export const chiAt1 = holevoChiBB84(1);
+export const orthogonalChiAt0 = holevoChiOrthogonal(0);
+export const capacityAt02 = classicalCapacity(0.2);
+export const capacityAt05 = classicalCapacity(0.5);
+export const capacityAt08 = classicalCapacity(0.8);
+
+export const shannonEntropy = (probabilities) =>
+  probabilities.reduce((sum, p) => (p <= 1e-12 ? sum : sum - p * Math.log2(p)), 0);
+
+export const hashingBoundQ = (p) => {
+  const q = (3 * p) / 4;
+  return 1 - shannonEntropy([1 - q, q / 3, q / 3, q / 3]);
+};
+
+export const certifiedQuantumLowerBound = (p) => Math.max(hashingBoundQ(p), 0);
+export const quantumSamples = depolarizingParams.map((p) => certifiedQuantumLowerBound(p));
+
+export const hashingZeroCrossing = (() => {
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (hashingBoundQ(mid) > 0) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
+})();
+
+export const entanglementBreakingThreshold = 2 / 3;
+
+export const phiPlusState = applyCNOT(applySingleQubitGate(StateVector.basis(2, 0), HADAMARD, 0), 0, 1);
+export const psiMinusState = applyCNOT(applySingleQubitGate(StateVector.basis(2, 3), HADAMARD, 0), 0, 1);
+export const phiPlusDensity = pureStateDensityMatrix(phiPlusState);
+
+export const choiLikeState = (p) =>
+  convexCombination([
+    { probability: 1 - p, density: phiPlusDensity },
+    { probability: p, density: maximallyMixedState(4) },
+  ]);
+
+export const partialTransposeQubitB = (rho) => {
+  const idx = (a, b) => 2 * a + b;
+  const data = [
+    [Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO],
+    [Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO],
+    [Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO],
+    [Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO],
+  ];
+  for (let a = 0; a < 2; a++) {
+    for (let b = 0; b < 2; b++) {
+      for (let c = 0; c < 2; c++) {
+        for (let d = 0; d < 2; d++) {
+          data[idx(a, b)][idx(c, d)] = rho.get(idx(a, d), idx(c, b));
+        }
+      }
+    }
+  }
+  return new Matrix(data);
+};
+
+export const singletProjector = outerProduct(psiMinusState.amplitudes, psiMinusState.amplitudes);
+
+export const singletEigenvalue = (p) =>
+  densityMatrixExpectationValue(partialTransposeQubitB(choiLikeState(p)), singletProjector).re;
+
+export const singletEigenvalueAtThreshold = singletEigenvalue(entanglementBreakingThreshold);
+export const singletEigenvalueBelowThreshold = singletEigenvalue(0.5);
+
+export const capacityFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "Classical: Holevo chi(p), BB84 ensemble {|0>,|+>} (exact)",
+        color: "brand",
+        points: depolarizingParams.map((p, i) => ({ x: p, y: chiBB84Samples[i] })),
+      },
+      {
+        label: "Quantum: hashing-bound lower bound on Q(p) (exact formula, certified only, not proven tight)",
+        color: "accent",
+        points: depolarizingParams.map((p, i) => ({ x: p, y: quantumSamples[i] })),
+      },
+    ],
+  },
+];
+
+## Motivation
+
+Six modules in this course built one continuous vocabulary. POVMs and
+Naimark's theorem showed every generalized measurement is a projective
+one on a larger space. Stinespring dilation showed every physical
+channel is secretly a unitary on system-plus-environment. Von Neumann
+entropy, quantum mutual information, and conditional entropy (which,
+unlike its classical counterpart, can go *negative*) gave the
+vocabulary to quantify uncertainty and correlation. The data-processing
+inequality supplied the real content behind "a channel can't manufacture
+information," bounding what any physical process can do to correlations
+it didn't have a hand in creating. Entanglement distillation gave
+entanglement itself an operational price tag: how many near-perfect
+Bell pairs a noisy supply of them is actually worth. Every one of those
+results was a statement about a single quantum system or a single use
+of a resource. This capstone asks the question that was always waiting
+underneath all of them: hand me a noisy channel and let me use it as
+many times as I like, exactly how many classical bits, and separately,
+exactly how many quantum bits, can actually get through, per use, in
+the end? These are two different numbers, called the channel's
+**classical capacity** and **quantum capacity**, and the gap between
+them is this whole course's most dramatic single fact.
+
+## Mathematical Development
+
+### The Holevo quantity and Holevo's theorem
+
+<DefinitionBox title="Holevo quantity">
+
+For an ensemble $\{p_i,\rho_i\}$ of quantum states prepared with
+probabilities $p_i$, the **Holevo quantity** is
+
+$$
+\chi(\{p_i,\rho_i\}) \;=\; S\!\left(\sum_i p_i\rho_i\right) - \sum_i p_i\,S(\rho_i)
+$$
+
+the entropy of the average state minus the average entropy of the
+individual states.
+
+</DefinitionBox>
+
+<TheoremBox title="Holevo's theorem" provenance="cited">
+
+For any measurement (any POVM) performed on an ensemble
+$\{p_i,\rho_i\}$, the classical mutual information between the
+preparation label $i$ and the measurement outcome is at most
+$\chi(\{p_i,\rho_i\})$. This predates and stands independently of the
+full channel-capacity theory below: it is a statement about *one*
+ensemble and *any* single measurement on it, not yet about repeated
+channel uses at all.
+
+</TheoremBox>
+
+$\chi\geq 0$ always (a direct consequence of the concavity of von
+Neumann entropy, the same inequality Entropy and Mutual Information
+proved), and $\chi=0$ exactly when every $\rho_i$ is identical, no
+label-dependent signal survives at all.
+
+### The classical capacity: HSW
+
+Given a channel $\mathcal N$, define $\chi^*(\mathcal N)=\max_{\{p_i,\rho_i\}}\chi(\{p_i,\mathcal N(\rho_i)\})$,
+the largest Holevo quantity achievable by any input ensemble sent
+through $\mathcal N$ once.
+
+<TheoremBox title="Holevo-Schumacher-Westmoreland theorem" provenance="cited">
+
+The classical capacity of $\mathcal N$, the number of classical bits
+per channel use reliably transmittable in the limit of arbitrarily many
+uses with vanishing error, is
+
+$$
+C(\mathcal N) \;=\; \lim_{n\to\infty}\frac{1}{n}\,\chi^*(\mathcal N^{\otimes n})
+$$
+
+</TheoremBox>
+
+This is genuinely subtle: $\chi^*$ is **not** always additive
+($\chi^*(\mathcal N\otimes\mathcal M)$ is not always
+$\chi^*(\mathcal N)+\chi^*(\mathcal M)$ for arbitrary channels), so in
+general the formula above needs this *regularization*, optimizing over
+encodings that entangle inputs across many channel uses, and no general
+closed form for $C(\mathcal N)$ is known. Whether $\chi^*$ is additive
+for *every* channel was a famous open conjecture until Hastings
+constructed an explicit counterexample in 2009 disproving it in general.
+For specific, highly symmetric channels, including the depolarizing and
+dephasing channels this lesson uses, $\chi^*$ **is** known to be
+additive (a real theorem, not an assumption), so $C(\mathcal N)=\chi^*(\mathcal N)$
+single-letter, with no regularization needed. That special-case
+cleanliness is exactly what makes the worked example below an honest,
+checkable computation rather than a hand-wave.
+
+### The quantum capacity: LSD
+
+The quantum analogue replaces the Holevo quantity with the **coherent
+information**, first defined in Entropy and Mutual Information's
+extension of these ideas to channels:
+
+$$
+I_c(\rho,\mathcal N) \;=\; S(\mathcal N(\rho)) - S_e(\rho,\mathcal N)
+$$
+
+where $S_e$ is the entropy of the channel's *environment* after the
+interaction (the entropy exchange). This matches that earlier formula
+exactly, not just in spirit: purify the channel's action by coupling
+input to environment via a reference system $A$, so the joint
+reference-output-environment state is pure. In a pure global state, a
+subsystem and its complement always share the same entropy, so
+$S(\rho_{AB}) = S_e$ — meaning $I_c(\rho,\mathcal N) = S(\rho_B) -
+S(\rho_{AB}) = -S(A|B)$, precisely Entropy and Mutual Information's
+coherent information, just with $S_e$ standing in for $S(\rho_{AB})$
+because the environment is easier to reason about for a channel than an
+explicit reference system. Unlike $\chi$, $I_c$ can be negative, itself
+a real and meaningful fact from that earlier lesson.
+
+<TheoremBox title="Lloyd-Shor-Devetak (LSD) theorem" provenance="cited">
+
+The quantum capacity of $\mathcal N$, the number of qubits per channel
+use reliably transmittable (equivalently, the rate at which Bell pairs
+can be generated) in the many-uses limit, is
+
+$$
+Q(\mathcal N) \;=\; \lim_{n\to\infty}\frac{1}{n}\max_{\rho}I_c\!\left(\rho,\mathcal N^{\otimes n}\right)
+$$
+
+</TheoremBox>
+
+This regularization is not a technicality that specific theorems quietly
+resolve the way HSW's does for depolarizing and dephasing channels: for
+most channels, including the depolarizing channel used throughout this
+lesson, whether the single-letter coherent information already equals
+$Q(\mathcal N)$ is a genuinely open question. Some special channel
+classes (**degradable** channels, where the environment's state is
+recoverable from the output) are proven single-letter; the depolarizing
+channel is not known to be degradable, so its exact quantum capacity is
+not known in closed form at all, only bounded. Computing exact channel
+capacities in general is an actively researched, unresolved problem in
+quantum Shannon theory, not a solved textbook exercise, and this
+capstone is an honest place to say so plainly rather than paper over it.
+
+## Physical Interpretation: why this is the question that matters
+
+This is, in exact technical language, the question "how much can I
+trust this noisy qubit, fiber link, or gate to carry information
+reliably." $Q(\mathcal N)=0$ is not "error correction for this channel
+is hard": it is a proof that **no quantum error-correcting code, at any
+rate, run for any number of uses, can protect quantum information sent
+through $\mathcal N$**, the quantum analogue of the classical
+noisy-channel coding theorem says so directly. $Q(\mathcal N)>0$ is the
+converse promise: a good enough code exists in principle, even if
+nobody has built it yet. Every real hardware platform's fight against
+decoherence, and every quantum-repeater design for long-distance
+entanglement distribution, is a fight to keep some real physical
+channel's $Q$ strictly positive, phrased in exactly this vocabulary
+rather than only in a $T_1$/$T_2$ number. The worked example below shows
+why that fight is so much harder for quantum information than for
+classical information sent down the identical physical wire.
+
+## Worked Example
+
+**Send the BB84-style ensemble $\{\tfrac12,|0\rangle\langle0|;\ \tfrac12,|+\rangle\langle+|\}$
+(the same two conjugate-basis states BB84: Quantum Key Distribution
+encodes bit $1$ in) through the depolarizing channel
+$\mathcal N_p(\rho)=(1-p)\rho+p\,I/2$, compute the exact Holevo quantity
+$\chi(p)$, then find exactly where the channel's quantum capacity hits
+zero.**
+
+### The classical side: $\chi(p)$ for a real, non-orthogonal ensemble
+
+`vonNeumannEntropy`, `convexCombination`, and `maximallyMixedState`, all
+this platform's real density-matrix engine, give directly:
+
+$$
+\chi(0) = {chiAt0.toFixed(5)}\text{ bits}
+$$
+
+Notice this is **not** $1$ bit, even at zero noise. An *orthogonal*
+ensemble like $\{|0\rangle,|1\rangle\}$ does reach exactly the
+noiseless maximum, $\chi(0)={orthogonalChiAt0.toFixed(0)}$ bit, computed
+the identical way; BB84's whole security argument rests on using
+$|0\rangle$ and $|+\rangle$ precisely because they are **not**
+orthogonal ($|\langle0|+\rangle|^2=\tfrac12$), which is exactly why
+$\chi(0)\approx0.601$ here, strictly less than $1$. Holevo's bound is
+already doing real work on this ensemble before any channel noise is
+even added.
+
+Turning on the channel:
+
+$$
+\chi(0.2)={chiAt02.toFixed(5)},\qquad\chi(0.5)={chiAt05.toFixed(5)},\qquad\chi(1)={chiAt1.toFixed(5)}
+$$
+
+$\chi(p)\to0$ exactly at $p=1$: full depolarization erases every trace
+of which state was sent, so no measurement can recover any information,
+matching Holevo's theorem exactly at its own boundary case.
+
+This $\chi(p)$ is one specific ensemble's number, an honest, real
+computation, but by HSW's proven additivity for the depolarizing
+channel, the *actual* classical capacity $C(p)=\chi^*(p)$ is achieved
+by an **orthogonal** ensemble instead (a cited symmetry result, not
+re-derived here): $C(p)=1-S(\mathcal N_p(|0\rangle\langle0|))$, giving
+$C(0.2)={capacityAt02.toFixed(5)}$, $C(0.5)={capacityAt05.toFixed(5)}$,
+$C(0.8)={capacityAt08.toFixed(5)}$, strictly positive for every
+$p<1$, hitting exactly zero only at full depolarization $p=1$.
+
+### The quantum side: exactly where $Q(p)$ dies
+
+Two genuinely different, both rigorous, facts about this same channel's
+quantum capacity:
+
+**A certified lower bound.** Feeding the maximally mixed state into
+$\mathcal N_p$ and computing its coherent information gives the
+**hashing bound**, exactly the rate a one-way entanglement-distillation
+protocol (this course's own previous module) can certify:
+
+$$
+Q(p)\;\geq\;1-H_2\!\left(\tfrac{3p}{4}\right)-\tfrac{3p}{4}\log_2 3
+$$
+
+a real, closed-form, computed quantity (not a fit or an approximation),
+using $\mathcal N_p(I/2)=I/2$ exactly and the fact that, for a Pauli
+channel acting on the maximally mixed input, the environment ends up in
+a classical mixture over "which error happened," diagonal with exactly
+the Kraus probabilities. This bound is positive only for
+$p\lesssim{hashingZeroCrossing.toFixed(4)}$, and strictly negative (hence
+uninformative, clamped to $0$ in the figure below) beyond that.
+
+**An exact zero.** Separately, and completely rigorously: a channel is
+called **entanglement-breaking** if sending half of a maximally
+entangled pair through it always leaves a *separable* (unentangled)
+output, and every entanglement-breaking channel has $Q(\mathcal N)=0$
+exactly, since no entanglement, hence no quantum information, survives
+even in principle. Building the Choi-like state
+$(1-p)|\Phi^+\rangle\langle\Phi^+|+p\,I_4/4$ with this platform's real
+`convexCombination` and `maximallyMixedState(4)`, then taking the
+partial transpose over the channel's output qubit, gives (by the
+Peres-Horodecki criterion, exact for two qubits) eigenvalues
+$\tfrac12-\tfrac p4$ (three-fold) and $\tfrac{3p}4-\tfrac12$ (the
+singlet direction). The singlet eigenvalue, computed directly here via
+`densityMatrixExpectationValue` against the exact $|\Psi^-\rangle$
+projector, is
+
+$$
+\text{singlet eigenvalue}(p=0.5) = {singletEigenvalueBelowThreshold.toFixed(5)} \quad(\text{negative: entangled, not yet entanglement-breaking})
+$$
+
+$$
+\text{singlet eigenvalue}\!\left(p=\tfrac23\right) = {singletEigenvalueAtThreshold.toFixed(5)} \quad(\text{exactly zero, the threshold})
+$$
+
+so $Q(p)=0$ **exactly and provably** for every
+$p\geq\tfrac23\approx{entanglementBreakingThreshold.toFixed(4)}$.
+
+Put the two facts side by side: the certified achievable rate already
+hits $0$ by $p\approx0.25$, while classical capacity $C(p)$ computed
+above is still comfortably positive there ($C(0.2)\approx0.531$ bits,
+nowhere near zero). Between $p\approx0.25$ and $p=\tfrac23$, the *exact*
+value of $Q(p)$ is a genuinely open computation: known to be $\geq0$
+trivially and proven exactly $0$ only once entanglement-breaking sets
+in at $p=\tfrac23$. Nobody currently knows the exact depolarizing-channel
+quantum capacity curve in that gap, an honest, unresolved research
+question, not a gap in this lesson's derivation.
+
+<ParametricCurve
+  frames={capacityFrames}
+  referenceLines={[{ y: 0, label: "capacity = 0" }]}
+  ariaLabel="Classical Holevo chi(p) for the BB84 ensemble through a depolarizing channel, an exact computed curve decreasing from about 0.601 bits to 0 only at p=1, plotted against the hashing-bound certified lower bound on quantum capacity, which is also an exact closed-form quantity but only a lower bound, clamped to zero once it goes negative near p=0.25; the true quantum capacity is proven exactly zero only at the separately derived entanglement-breaking threshold p=2/3, well before the classical curve approaches zero"
+/>
+
+The quantum curve touches zero (as far as this bound can certify) at
+roughly a third of the way across the plot; the classical curve is
+still clearly positive there and only approaches zero as $p\to1$ at the
+plot's far right edge. That gap is this whole course's payoff in one
+picture: the same physical channel, at the same noise level, can still
+reliably carry classical bits long after it has stopped being able to
+carry any quantum information at all.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating $\chi(\{p_i,\rho_i\})$ itself as "the capacity."** $\chi$ is
+an upper bound on what *any single measurement* on *one* copy of the
+ensemble can extract (Holevo's theorem); the *channel's* classical
+capacity is the maximum of $\chi$ over input ensembles, in the
+many-uses limit, and HSW is the (nontrivial) theorem that this
+maximum is actually achievable, not merely an upper bound on it.
+</Callout>
+
+<Callout type="mistake">
+**Assuming every channel's capacity formula is single-letter, since the
+depolarizing and dephasing examples in this lesson are.** Both HSW's
+$\chi^*$ and LSD's coherent information can require genuine
+regularization for general channels; additivity failing in general
+(proven by Hastings for $\chi^*$) is precisely why this lesson's clean
+closed forms are special-case facts about *these particular* channels'
+symmetry, not evidence that every channel behaves this simply.
+</Callout>
+
+<Callout type="mistake">
+**Reading "the hashing bound is negative here" as "quantum capacity is
+zero here."** A negative or clamped-to-zero lower bound only means
+*that specific protocol* certifies nothing; it does not prove the true
+$Q(p)$ is zero. Only the separate entanglement-breaking argument above
+proves an exact zero, and only from $p=\tfrac23$ onward.
+</Callout>
+
+## Practice Questions
+
+1. Using this lesson's exact numbers, explain in your own words why
+   $\chi(0)\approx0.601$ bits for the BB84 ensemble $\{|0\rangle,|+\rangle\}$
+   rather than the full $1$ bit an orthogonal ensemble achieves, tying
+   the answer directly to $|\langle0|+\rangle|^2=\tfrac12$.
+2. The hashing bound goes negative for $p\gtrsim0.25$, but the channel
+   is only proven entanglement-breaking (hence $Q=0$ exactly) at
+   $p=\tfrac23$. In your own words, what would it take to close that
+   gap, either way, and why is doing so a genuinely hard problem rather
+   than a routine calculation?
+3. Explain why $Q(\mathcal N)=0$ is a much stronger, more final
+   statement about a channel than "error correction for this channel
+   would need a very high-rate code": connect your answer to the
+   quantum noisy-channel coding theorem's converse direction.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The **Holevo quantity** $\chi(\{p_i,\rho_i\})=S(\sum_ip_i\rho_i)-\sum_ip_iS(\rho_i)$
+  bounds what any single measurement extracts from an ensemble
+  (Holevo's theorem); the channel's **classical capacity** is HSW's
+  theorem that $\max_{\text{ensembles}}\chi$, regularized in general,
+  is exactly the many-uses-limit achievable rate, with depolarizing and
+  dephasing channels among the special cases proven single-letter.
+- The BB84 ensemble's exact computed $\chi(p)$ falls from
+  $\approx0.601$ bits at $p=0$ to exactly $0$ at $p=1$, using this
+  platform's real `vonNeumannEntropy` and `convexCombination`; the
+  orthogonal-basis classical capacity $C(p)$ stays strictly positive
+  for every $p<1$.
+- The **quantum capacity**, via LSD's regularized coherent information,
+  is far more fragile: a real, computed hashing-bound lower bound goes
+  to zero by $p\approx0.25$, and the depolarizing channel is proven
+  **exactly** zero-capacity from $p=\tfrac23$ onward via the
+  entanglement-breaking criterion, derived and numerically verified
+  above from this platform's own Choi-state and partial-transpose
+  machinery.
+- Exactly where $Q(p)$ truly reaches zero, versus merely where a known
+  bound stops certifying it, is an open computation for the depolarizing
+  channel, and computing exact channel capacities in general is an
+  active quantum Shannon theory research area, not a closed textbook
+  question, an honest note to end the course on.
+
+## Further Exploration
+
+This completes **Quantum Shannon Theory**. The classical-versus-quantum
+capacity gap derived here is the direct motivation for
+[Fault Tolerance Frontiers](/lessons/apex/fault-tolerance-frontiers/surface-codes-in-depth),
+which builds the actual codes that keep a real device's effective
+quantum capacity above zero, and for
+[Quantum Channels: Kraus and
+Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi),
+whose Choi-matrix machinery this lesson's entanglement-breaking proof
+reused directly.

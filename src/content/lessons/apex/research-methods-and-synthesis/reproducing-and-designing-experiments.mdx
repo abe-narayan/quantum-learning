@@ -1,0 +1,393 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/research-methods-and-synthesis/reproducing-and-designing-experiments"
+).map((problem) => problem.meta);
+
+export const seExampleP = 0.85;
+export const seExampleNSmall = 20;
+export const seExampleNLarge = 1000;
+export const seSmall = Math.sqrt((seExampleP * (1 - seExampleP)) / seExampleNSmall);
+export const seLarge = Math.sqrt((seExampleP * (1 - seExampleP)) / seExampleNLarge);
+export const ciZ95 = 1.96;
+export const seSmallCI95 = ciZ95 * seSmall;
+export const seLargeCI95 = ciZ95 * seLarge;
+export const seRatio = seSmall / seLarge;
+
+export const seCurveNValues = [5, 10, 20, 30, 50, 75, 100, 150, 200, 300, 400, 500, 700, 1000];
+export const seCurvePoints = seCurveNValues.map((n) => ({
+  x: n,
+  y: Math.sqrt((seExampleP * (1 - seExampleP)) / n),
+}));
+export const seMarkedPoints = [
+  { x: seExampleNSmall, y: seSmall },
+  { x: seExampleNLarge, y: seLarge },
+];
+export const seFrames = [
+  {
+    paramLabel: "p = 0.85 claimed probability",
+    series: [
+      { label: "Standard error SE(N) = sqrt(p(1-p)/N)", color: "muted", points: seCurvePoints },
+      { label: "Worked N = 20 and N = 1000", color: "brand", points: seMarkedPoints },
+    ],
+  },
+];
+
+export const qaoaTriangleTheoreticalCut = 1.999;
+export const qaoaTriangleTrueMax = 2;
+export const qaoaRandomBaseline = 1.5;
+export const qaoaDesignShots = 1000;
+export const qaoaCutRange = qaoaTriangleTrueMax;
+export const qaoaSigmaBound = qaoaCutRange / 2;
+export const qaoaSEBound = qaoaSigmaBound / Math.sqrt(qaoaDesignShots);
+export const qaoaGapToTheory = 2 * qaoaSEBound;
+export const qaoaGapToBaseline = qaoaTriangleTheoreticalCut - qaoaRandomBaseline;
+
+export const lessonMeta = {
+  title: "Reproducing and Designing Experiments",
+  description:
+    "Evaluating Quantum Advantage Claims asked whether a claim's classical baseline was fair; this lesson asks the complementary question of whether the claim is even reproducible in the first place — exact circuit, exact hardware or simulator with a calibration snapshot, the exact classical post-processing pipeline, and a shot count large enough that the reported number means anything statistically. Works a real standard-error calculation and designs a complete, decidable benchmark for a QAOA claim from this platform's own worked example.",
+  course: "research-methods-and-synthesis",
+  module: "reproducing-and-designing-experiments",
+  order: 4,
+  difficulty: "master",
+  estimatedMinutes: 24,
+  prerequisites: ["apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims"],
+  objectives: [
+    "Identify the components a real quantum-computing experimental claim needs to be genuinely reproducible: exact circuit specification, exact hardware/simulator and its calibration data, exact classical post-processing/error-mitigation pipeline, and honest statistical uncertainty reporting",
+    "Explain why statistical/sampling noise (shot noise) requires a stated number of circuit repetitions and confidence interval, not just a single reported number, and compute a concrete example",
+    "Design a small, well-specified benchmark experiment for a specific claim (reusing this platform's own simulator infrastructure conceptually) that would meaningfully test it, stating explicitly what result would confirm vs. refute the claim",
+  ],
+  related: [
+    {
+      slug: "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims",
+      note: "That lesson audited whether a claim's classical baseline was fair; this lesson audits whether the claim is reproducible and statistically well-supported at all — a claim needs to pass both checks before it's worth believing.",
+    },
+  ],
+};
+
+## Motivation
+
+A headline says a quantum computer measured a probability of $0.85$ for
+some outcome. Is that impressive? It depends entirely on information the
+headline just left out: which exact circuit, on which exact device (and
+how well-calibrated it was that day), after what classical
+post-processing, and — the question this lesson answers concretely —
+based on how many actual runs. Evaluating Quantum Advantage Claims built
+the habit of checking a claim's classical baseline. This lesson builds
+the other half of the same habit: knowing exactly what has to be
+specified for anyone else to check the result at all, and being able to
+tell, from the shot count alone, whether a reported number is even
+statistically meaningful. By the end, you'll design a complete,
+decidable benchmark experiment yourself, not just critique someone
+else's.
+
+## The Four Components of a Reproducible Claim
+
+A quantum-computing experimental claim is genuinely reproducible only if
+it specifies all four of the following. Missing any one of them means a
+second team, handed only the paper, cannot actually check the result.
+
+1. **The exact circuit.** Not "we ran a variational circuit" or "we used
+   QAOA" — the actual gate sequence, which qubits it acts on, and in
+   what order. QAOA: A Worked Max-Cut Example didn't just say "QAOA
+   finds good cuts"; it specified the exact graph, the exact number of
+   layers ($p=1$), and the exact angles ($\gamma\approx0.6,\
+   \beta\approx0.3$) a grid search found. Without that level of detail,
+   "we ran QAOA" describes a family of circuits, not one experiment.
+2. **The exact hardware or simulator, including calibration data if real
+   hardware was used.** Calibration established that a real device's
+   physical error rates — gate fidelities, $T_1$/$T_2$ times, readout
+   asymmetry — drift day to day from temperature fluctuations and slow
+   electronic drift, and that a calibration is only valid until the next
+   recalibration cycle. A result reported from "IBM's 127-qubit device"
+   with no calibration snapshot or date attached is not fully
+   reproducible: the *same physical device*, one week later, can
+   genuinely perform differently. A simulator claim needs the same
+   specificity in kind — which simulator, which noise model (if any),
+   which version.
+3. **The exact classical post-processing / error-mitigation pipeline.**
+   Quantum Error Mitigation showed that the *same* raw circuit
+   execution can report substantially different numbers depending on
+   what was done to it afterward — that lesson's own worked example
+   turned a raw $80\%$ measured $|1\rangle$ probability into a
+   readout-corrected $94\%$, a $14$-point swing from post-processing
+   alone, before zero-noise extrapolation is even considered. A claim
+   that doesn't state whether readout-error correction, zero-noise
+   extrapolation, or nothing at all was applied is comparing an unknown
+   quantity to whatever baseline you assume.
+4. **Honest statistical uncertainty reporting.** The subject of the rest
+   of this lesson: a single central number, with no shot count and no
+   confidence interval, doesn't say whether the result is a precise
+   measurement or a coin flip that happened to land favorably.
+
+<PredictBeforeReveal
+  question="Two papers report the identical measured probability, p = 0.85, for their circuit's target outcome. Paper A used 1000 shots; Paper B used 20 shots. Are the two claims equally well-supported?"
+  options={[
+    { label: "Yes — they reported the same number, so they're equally strong", value: "same" },
+    { label: "No — the same central value can carry very different amounts of statistical uncertainty depending on the shot count", value: "different" },
+  ]}
+  correctValue="different"
+  explanation="They are not equally well-supported, even though the central value is identical. The worked example below computes both standard errors explicitly: Paper A's estimate is precise (SE ≈ 0.011), while Paper B's identical-looking number carries roughly seven times the uncertainty (SE ≈ 0.080) — a swing wide enough to be consistent with a substantially different true probability. The reported number alone never tells you this; the shot count does."
+/>
+
+## Mathematical Development
+
+Suppose a circuit is run $N$ times ("shots") and a specific outcome is
+observed $k$ of those times. The natural estimate of that outcome's true
+probability is
+
+$$
+\hat p = \frac{k}{N}
+$$
+
+Each run is an independent Bernoulli trial (outcome happens or doesn't,
+with true probability $p$), so $k$ is binomially distributed,
+$k\sim\text{Binomial}(N,p)$, with mean $Np$ and variance $Np(1-p)$.
+Dividing by the constant $N$ to get $\hat p = k/N$ scales the variance by
+$1/N^2$:
+
+$$
+\text{Var}(\hat p) = \frac{\text{Var}(k)}{N^2} = \frac{Np(1-p)}{N^2} = \frac{p(1-p)}{N}
+$$
+
+so the **standard error** — the standard deviation of the estimator
+$\hat p$ itself, not of a single trial — is
+
+$$
+\text{SE}(\hat p) = \sqrt{\frac{p(1-p)}{N}}
+$$
+
+This is the single most important formula in this lesson: it says the
+uncertainty on an estimated probability shrinks as $1/\sqrt N$, not as
+$1/N$. Quadrupling the shot count only halves the uncertainty. For large
+$N$, the binomial distribution is well approximated by a normal
+distribution (central limit theorem), which justifies the standard
+**95% confidence interval** approximation
+
+$$
+\hat p \pm 1.96\,\text{SE}(\hat p)
+$$
+
+<Callout type="note">
+The $1.96$ factor is the two-sided 95% critical value of the standard
+normal distribution — nothing quantum-specific about it. The same
+formula applies to a poll, an A/B test, or a coin-flip experiment; the
+physics only enters in what $p$ *means* (a measured circuit outcome
+probability) and in what determines its true value ($p$ itself is a
+prediction of quantum mechanics, not a nuisance parameter).
+</Callout>
+
+## Physical Interpretation: Why This Matters
+
+None of this is bureaucratic box-checking. A scientific claim, as
+opposed to an anecdote, is exactly one that states enough about *how* a
+result was obtained that someone else could check it and would know how
+much to trust the number even without checking it themselves. The four
+components above are what "enough" means for a quantum-computing
+experiment specifically; the standard-error formula is what "how much to
+trust the number" means quantitatively. A student who can list what a
+reproducible claim needs, and can correctly reason from a shot count to
+a confidence interval, has a skill that transfers directly to reading
+*any* experimental claim — a new drug's effect size, a machine-learning
+benchmark, a poll result — not just quantum-computing papers. That
+transferability is precisely why this lesson exists as the second-to-last
+stop in the whole curriculum: the physics-specific machinery this
+platform built (circuits, noise, error mitigation) only becomes a
+*research skill* once it's paired with the discipline to report and
+question results honestly.
+
+## Worked Example
+
+### Shot noise: the same number, two very different claims
+
+**Two papers report a measured probability of $p=0.85$ for their
+circuit's target outcome. Paper A ran $N=1000$ shots; Paper B ran
+$N=20$ shots. Compute the standard error and 95% confidence interval for
+each, and compare.**
+
+Using $\text{SE}=\sqrt{p(1-p)/N}$ with $p=0.85$, so $p(1-p)=0.1275$:
+
+**Paper A ($N=1000$):**
+
+$$
+\text{SE}_A = \sqrt{\frac{0.1275}{1000}} = \sqrt{0.0001275} \approx 0.0113
+$$
+
+$$
+p = 0.85 \pm 0.0113\ (1\sigma), \qquad 95\%\ \text{CI} \approx 0.85 \pm 1.96(0.0113) \approx 0.85 \pm 0.022 \approx [0.828,\ 0.872]
+$$
+
+**Paper B ($N=20$):**
+
+$$
+\text{SE}_B = \sqrt{\frac{0.1275}{20}} = \sqrt{0.006375} \approx 0.0798
+$$
+
+$$
+p = 0.85 \pm 0.0798\ (1\sigma), \qquad 95\%\ \text{CI} \approx 0.85 \pm 1.96(0.0798) \approx 0.85 \pm 0.156 \approx [0.694,\ 1.006]
+$$
+
+Paper B's standard error is $\sqrt{1000/20}=\sqrt{50}\approx 7.07\times$
+larger than Paper A's — matching $0.0798/0.0113\approx 7.06$ exactly,
+since $\text{SE}\propto 1/\sqrt N$. Paper B's 95% interval even pokes
+slightly above $1$ (a reminder that the normal approximation underlying
+the $\pm1.96\,\text{SE}$ formula is itself only an approximation, least
+accurate near $p$ close to $0$ or $1$ with small $N$). The identical
+reported number, $p=0.85$, means something close to "we're confident
+it's between $0.83$ and $0.87$" in Paper A, and something closer to "it's
+probably somewhere between $0.7$ and $1$, we really can't say much more
+precisely" in Paper B. **The shot count is not a footnote; it determines
+whether the headline number means anything at all.**
+
+### Design exercise: a complete benchmark for a QAOA claim
+
+**Claim to test:** "$p=1$ QAOA, at the grid-searched angles
+$\gamma\approx0.6,\ \beta\approx0.3$, genuinely outperforms random
+guessing on triangle Max-Cut." QAOA: A Worked Max-Cut Example already
+computed the *theoretical* expectation value at those angles exactly,
+`expectedCutSize`$\,\approx 1.999$, against a random-guessing baseline of
+$|E|/2=1.5$ and a true maximum of $2$. A real experiment doesn't get to
+read off the theoretical expectation value directly — it has to *measure*
+it by sampling. Here is a complete design:
+
+1. **Circuit:** exactly the triangle-graph QAOA circuit from that lesson
+   ($p=1$, edges $(0,1),(1,2),(0,2)$, angles $\gamma\approx0.6,\
+   \beta\approx0.3$) — component 1 of a reproducible claim, already
+   satisfied by reusing a fully specified circuit rather than a vague
+   description.
+2. **Run it for $N=1000$ shots.** For each shot, record the measured
+   cut value $C_i\in\{0,1,2\}$ (a triangle can never have all 3 edges cut,
+   established by the pigeonhole argument in that lesson's worked
+   example). Compute the sample mean $\bar C = \frac1N\sum_i C_i$.
+3. **Compute the standard error of $\bar C$.** $C$ is no longer a
+   simple 0/1 Bernoulli outcome, so the exact variance of the cut-value
+   distribution would need the full measurement distribution to pin down
+   precisely — but a rigorous, computable-without-that bound is enough
+   to design the experiment: since $C$ is confined to $[0,2]$,
+   Popoviciu's inequality bounds its standard deviation by
+   $\sigma_C \le (\max-\min)/2 = 1$, so
+
+$$
+\text{SE}(\bar C) = \frac{\sigma_C}{\sqrt N} \le \frac{1}{\sqrt{1000}} \approx 0.0316
+$$
+
+   (the same $1/\sqrt N$ shrinkage as the Bernoulli case, generalized —
+   the worst-case standard error at $N=1000$ shots is at most about
+   $0.032$, regardless of the exact shape of the cut-value
+   distribution).
+4. **Decision rule, stated in advance:**
+   - **Confirms the claim** if $\bar C$ falls within about $2\,\text{SE}$
+     ($\approx 0.063$) of the theoretical prediction $1.999$ — i.e.
+     roughly $\bar C \gtrsim 1.94$ — **and** is unambiguously,
+     statistically significantly above the random baseline $1.5$ (the
+     gap between $1.999$ and $1.5$ is $0.499$, more than $15\times$ the
+     worst-case standard error, so any measured mean anywhere near the
+     theoretical value is trivially distinguishable from random
+     guessing).
+   - **Refutes or calls the claim into question** if $\bar C$ is not
+     significantly above $1.5$ (e.g. lands within a couple of standard
+     errors of the baseline), or if $\bar C$ differs from $1.999$ by far
+     more than the computed standard error bound would allow by chance
+     — either result would mean either the circuit wasn't actually
+     implementing the claimed angles, or the claimed theoretical value
+     doesn't describe what the hardware or simulator actually produced.
+   - **Inconclusive** if $N$ were too small for the standard error to
+     rule out either outcome — exactly the Paper-B failure mode above,
+     scaled to this experiment: a claim run at, say, $N=20$ shots here
+     would have a standard error bound of $1/\sqrt{20}\approx 0.224$,
+     wide enough that even $\bar C = 1.6$ (barely above baseline)
+     couldn't be confidently distinguished from the theoretical $1.999$.
+
+This is what "designing a benchmark," not just critiquing one, actually
+looks like: a fully specified circuit, a stated shot count with its
+resulting uncertainty computed *before* looking at the data, and an
+explicit rule for what counts as confirmation versus refutation — every
+one of the four components from this lesson's opening framework, used
+together.
+
+## Interactive Visualization
+
+<InteractiveSection title="Standard error shrinks as 1/sqrt(N), not 1/N" description="The curve is the exact standard error sqrt(p(1-p)/N) for the claimed probability p=0.85, as a function of shot count N. The two marked points are this lesson's worked comparison: N=20 (SE ≈ 0.080) and N=1000 (SE ≈ 0.011) — the same reported central value, two very different amounts of statistical confidence.">
+  <ParametricCurve
+    ariaLabel="Standard error of an estimated probability p=0.85 as a function of the number of shots N, showing a steeply decreasing curve, with N=20 and N=1000 marked as the two points this lesson's worked example compares"
+    frames={seFrames}
+  />
+</InteractiveSection>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating a single reported number, with no shot count or confidence
+interval, as a complete scientific claim — regardless of how impressive
+it sounds.** "We measured $p=0.85$" is not, by itself, a statement
+anyone can evaluate. As this lesson's worked example showed, the exact
+same central value can come from a precise measurement (SE $\approx
+0.011$ at $N=1000$) or from a measurement barely better than a guess
+about its own uncertainty (SE $\approx 0.080$ at $N=20$). A complete
+claim states the shot count and the resulting uncertainty every time,
+not just the number that looks good.
+</Callout>
+
+<Callout type="mistake">
+**Assuming "more decimal places" means "more precision."** Reporting
+$p=0.8534$ instead of $p=0.85$ says nothing about statistical confidence
+by itself — decimal places describe the *arithmetic* of $k/N$, not the
+*uncertainty* in the estimate. A number reported to four decimal places
+from $N=20$ shots is not more trustworthy than one reported to two
+decimal places from $N=10{,}000$ shots; if anything it's a mild red flag,
+since it suggests the reporter didn't think about (or hasn't computed)
+the actual standard error.
+</Callout>
+
+## Practice Questions
+
+1. A claim reports $p=0.6$ from $N=400$ shots. Compute $\text{SE}(\hat
+   p)$ and the 95% confidence interval. Is this claim's precision closer
+   to this lesson's $N=1000$ example or its $N=20$ example?
+2. Suppose you wanted to shrink the $N=20$ example's standard error
+   ($\approx 0.080$) down to match the $N=1000$ example's
+   ($\approx 0.011$) by increasing shots alone (keeping $p=0.85$ fixed).
+   Roughly how many shots would you need? (Use $\text{SE}\propto
+   1/\sqrt N$ — you don't need to solve exactly, an order-of-magnitude
+   estimate showing you understand the scaling is enough.)
+3. A paper claims its quantum circuit's target-outcome probability
+   "exceeds 90%," citing only that single number with no shot count.
+   List, in order, the four components from this lesson that are
+   missing or unverifiable from that sentence alone, and explain
+   concretely what additional information would need to be reported for
+   each.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A genuinely reproducible quantum-computing claim needs all four of:
+  the exact circuit, the exact hardware/simulator with calibration data
+  (Calibration established that real-device performance drifts day to
+  day), the exact classical post-processing/error-mitigation pipeline
+  (Quantum Error Mitigation), and honest statistical uncertainty
+  reporting.
+- Shot noise: estimating a probability from $N$ shots carries a standard
+  error $\text{SE}(\hat p)=\sqrt{p(1-p)/N}$, shrinking as $1/\sqrt N$.
+  Worked numerically: $p=0.85$ from $N=1000$ gives
+  $\text{SE}\approx0.011$; the identical $p=0.85$ from only $N=20$ gives
+  $\text{SE}\approx0.080$, about $7\times$ larger.
+- A complete benchmark design states the circuit, the shot count and its
+  resulting standard error computed in advance, and an explicit,
+  stated-before-the-fact rule for what result would confirm versus
+  refute the claim — illustrated end to end for a QAOA Max-Cut claim
+  above, including a Popoviciu-inequality bound generalizing the
+  standard-error formula beyond simple 0/1 outcomes.
+- "A single number with no shot count" is not a complete claim, no
+  matter how good the number looks.
+
+## Further Exploration
+
+This lesson's four-component framework and shot-noise arithmetic are the
+last new machinery in the entire QuantumLearn curriculum. Next, the
+[capstone: The Quantum Computing Landscape Today](/lessons/apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today)
+synthesizes the whole journey — from "what is a qubit" to reproducing a
+real experimental claim — into a single, honest picture of where the
+field actually stands.

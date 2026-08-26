@@ -1,0 +1,58 @@
+import type { NumericProblem } from "@/lib/problems/types";
+
+const swapOverheadForDistance = (d: number) => 2 * (d - 1);
+
+const distances = [1, 1, 1, 3, 2];
+const totalSwaps = distances.reduce((sum, d) => sum + swapOverheadForDistance(d), 0);
+const totalCnotEquivalent = 5 + totalSwaps * 3;
+
+export const noiseAwareCompilationSwapOverheadAlternateRouting: NumericProblem = {
+  meta: {
+    slug: "noise-aware-compilation-swap-overhead-alternate-routing",
+    title: "SWAP Overhead for a Different Set of Interactions",
+    course: "simulation-and-compilation-frontiers",
+    lesson: "apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation",
+    difficulty: "advanced",
+    estimatedMinutes: 7,
+    problemType: "numeric",
+    tags: ["compilation", "routing", "swap-overhead", "transpilation"],
+    prerequisites: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation"],
+  },
+  question: {
+    type: "numeric",
+    prompt:
+      "Same 4-qubit linear-chain device (P0-P1-P2-P3, adjacent-only couplers) and the same identity mapping q_i -> P_i as the lesson, but a circuit needing a different set of five interactions: (q0,q1), (q1,q2), (q2,q3), (q0,q3), (q1,q3). Using swapOverheadForDistance(d) = 2(d-1) for each non-adjacent pair, how many total SWAP gates must be inserted?",
+    inputHint: "an integer",
+  },
+  answer: {
+    type: "numeric",
+    value: totalSwaps,
+    tolerance: 0,
+    incorrectFeedback:
+      "First find each pair's chain distance under the identity mapping (|i-j| in physical index), then apply 2(d-1) only to the pairs that aren't already adjacent (d=1 needs zero SWAPs), and sum.",
+  },
+  hints: [
+    { text: "Three of the five pairs are already adjacent under the identity mapping: (q0,q1), (q1,q2), (q2,q3) all have distance 1, so they contribute 0 SWAPs each." },
+    { text: "(q0,q3) spans the entire chain: distance 3. (q1,q3) spans distance 2." },
+    { text: "Apply 2(d-1) to each of those two: 2(3-1)=4 for (q0,q3), and 2(2-1)=2 for (q1,q3), then add." },
+  ],
+  solution: {
+    steps: [
+      { description: "Distances under the identity mapping: d(0,1)=1, d(1,2)=1, d(2,3)=1, d(0,3)=3, d(1,3)=2." },
+      { description: "The three distance-1 pairs are already adjacent and need 2(1-1)=0 SWAPs each." },
+      { description: "(q0,q3) at d=3 needs 2(3-1)=4 SWAPs; (q1,q3) at d=2 needs 2(2-1)=2 SWAPs." },
+      { description: `Total: $0+0+0+4+2 = ${totalSwaps}$ SWAP gates (equivalent to $5 + ${totalSwaps}\\times3 = ${totalCnotEquivalent}$ CNOT-equivalent two-qubit operations once the 5 logical gates are included).` },
+    ],
+    finalAnswer: `${totalSwaps} SWAP gates`,
+  },
+  explanation: {
+    correctIdea:
+      "Only the pairs that are NOT already physically adjacent under the chosen mapping contribute SWAP overhead, and the amount each contributes depends purely on how far apart they sit on the chain, exactly the same 2(d-1) formula the lesson's own five-interaction example used.",
+    whyCorrect:
+      "This is the identical method the lesson applied, run on a different set of required interactions: (q0,q3) is the chain's worst-case pair (the two endpoints), so it dominates the total even though it's only one of five interactions.",
+    whyWrong: [
+      "Applying 2(d-1) to every pair, including the three already-adjacent ones, overcounts: distance-1 pairs need zero SWAPs, not 2(1-1) misapplied as some positive number.",
+      "Using d instead of d-1 in the formula (i.e. 2d) overstates the cost: bridging a gap of distance d only requires walking d-1 intermediate steps each way, not d.",
+    ],
+  },
+};

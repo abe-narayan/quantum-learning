@@ -1,0 +1,533 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/algorithmic-frontiers/the-quantum-singular-value-transformation"
+).map((problem) => problem.meta);
+
+export function qsvtDemoPolynomial(x) {
+  return 1 - (x * x) / 2 + (x * x * x * x) / 24;
+}
+
+export const qsvtDemoSigmas = [0.2, 0.6, 0.9];
+
+export const qsvtDemoResults = qsvtDemoSigmas.map((sigma) => ({
+  sigma,
+  exact: Math.cos(sigma),
+  approx: qsvtDemoPolynomial(sigma),
+  error: Math.abs(Math.cos(sigma) - qsvtDemoPolynomial(sigma)),
+}));
+
+export const qsvtCurveXValues = Array.from({ length: 41 }, (_, i) => -1 + i * 0.05);
+
+export const qsvtCurvePoints = qsvtCurveXValues.map((x) => ({ x, y: qsvtDemoPolynomial(x) }));
+
+export const qsvtCurveFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "P(x) = 1 - x^2/2 + x^4/24 (a degree-4 QSP/QSVT polynomial approximating cos x)",
+        color: "brand",
+        points: qsvtCurvePoints,
+      },
+    ],
+  },
+];
+
+export const qsvtReferenceLines = qsvtDemoResults.map((result) => ({
+  y: result.approx,
+  label: "P(" + result.sigma + ") ≈ " + result.approx.toFixed(3),
+}));
+
+export const lessonMeta = {
+  title: "The Quantum Singular Value Transformation",
+  description:
+    "How alternating a block-encoding unitary with ancilla-only phase rotations lifts single-qubit quantum signal processing onto the singular values of an arbitrary matrix — the single construction now understood to unify Grover's algorithm, Hamiltonian simulation, and linear-systems solving.",
+  course: "algorithmic-frontiers",
+  module: "the-quantum-singular-value-transformation",
+  order: 3,
+  difficulty: "master",
+  estimatedMinutes: 30,
+  prerequisites: ["apex/algorithmic-frontiers/quantum-signal-processing"],
+  objectives: [
+    "Explain how QSVT lifts single-qubit Quantum Signal Processing to act on the singular values of an arbitrary block-encoded matrix, by alternating the block-encoding unitary with projector-controlled phase rotations",
+    "State the key theorem: for a block-encoded matrix A with singular value decomposition A = sum_i sigma_i |u_i><v_i|, QSVT with the right phases produces a block encoding of P(A) := sum_i P(sigma_i) |u_i><v_i| for the same polynomial P realized in single-qubit QSP",
+    "Explain concretely how QSVT recovers, as SPECIAL CASES of one construction, Grover's amplitude amplification, Hamiltonian simulation, and (qualitatively) the HHL linear-systems algorithm",
+  ],
+  related: [
+    {
+      slug: "apex/algorithmic-frontiers/quantum-signal-processing",
+      note: "QSVT is literally that lesson's signal rotation W(x) and phase sequence, run independently inside one 2D subspace per singular value — same phases, same polynomial, same degree/parity constraints, just embedded in an ancilla-tagged subspace instead of applied by hand to a bare qubit.",
+    },
+    {
+      slug: "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
+      note: "The unitary U and ancilla register this lesson alternates with U-dagger and phase rotations are exactly that lesson's block encoding and its |0>-ancilla subspace — QSVT is what you can DO once a matrix is block-encoded, not a substitute for encoding it.",
+    },
+  ],
+};
+
+## Motivation
+
+Every earlier lesson in this course has been building toward a single
+moment, and this is it. Block encodings showed how to smuggle an arbitrary
+matrix $A$ into a single unitary, as long as you're willing to pay for it
+with an ancilla register and accept success only in a subspace. Quantum
+signal processing showed something that looks, at first, like a cute fact
+about one qubit: alternating a fixed "signal" rotation $W(x)$ with
+freely-chosen phase gates lets you apply *any* sufficiently well-behaved
+polynomial $P(x)$ to that single real number $x$, entirely by choice of
+phases. Neither result, on its own, looks like it should be the center of
+modern quantum algorithms.
+
+The quantum singular value transformation (QSVT) is the observation that
+these two results are not separate tricks — they are one machine. Feed a
+block encoding of $A$ into the QSP phase sequence, treating the
+block-encoding ancilla itself as the "signal qubit," and the *entire
+matrix* $A$ gets the same polynomial transformation, applied
+simultaneously and independently to every one of its singular values. This
+is the conceptual summit of the Algorithmic Frontiers course, and arguably
+of the whole APEX pillar: a single circuit template that, for the right
+choice of phases, IS Grover's algorithm, IS optimal Hamiltonian simulation,
+and IS (a modern replacement for) the HHL algorithm for linear systems.
+Nothing else in this curriculum compresses that much of the field into one
+idea.
+
+## Mathematical Development
+
+### Setup: what QSVT starts from
+
+Recall the two ingredients from the last two lessons, stated exactly as
+they'll be used here.
+
+A **block encoding** of an $n$-qubit matrix $A$ with $\|A\|\leq1$ is an
+$(a+n)$-qubit unitary $U$ satisfying
+
+$$
+(\langle0|^{\otimes a}\otimes I)\,U\,(|0\rangle^{\otimes a}\otimes I) = A
+$$
+
+Write $A$'s singular value decomposition as $A=\sum_i\sigma_i|u_i\rangle\langle v_i|$,
+with real $\sigma_i\in[0,1]$ (bounded by 1 because $\|A\|\leq1$), and
+$\{|u_i\rangle\}$, $\{|v_i\rangle\}$ each orthonormal.
+
+**Quantum signal processing** showed that alternating the single-qubit
+signal rotation $W(x)=\begin{pmatrix}x&i\sqrt{1-x^2}\\i\sqrt{1-x^2}&x\end{pmatrix}$
+with phase gates $S(\varphi)=e^{i\varphi Z}$ according to a sequence of
+phases $\Phi=(\varphi_0,\dots,\varphi_d)$ produces
+
+$$
+U_\Phi(x) = e^{i\varphi_0Z}\prod_{k=1}^{d}\Big[W(x)\,e^{i\varphi_kZ}\Big]
+= \begin{pmatrix}P(x)&\cdot\\\cdot&\cdot\end{pmatrix}
+$$
+
+whose top-left entry is a degree-$d$ polynomial $P(x)$, with parity fixed
+by $d\bmod2$, satisfying $|P(x)|\leq1$ on $[-1,1]$ — and essentially any
+polynomial obeying those constraints is reachable by some choice of $\Phi$.
+
+<TheoremBox title="Quantum Signal Processing (recap)" provenance="cited">
+
+For any degree-$d$ real polynomial $P$ with parity $d\bmod2$ and
+$|P(x)|\leq1$ on $[-1,1]$ (plus a mild boundary condition), there exists a
+phase sequence $\Phi=(\varphi_0,\dots,\varphi_d)$ such that the alternating
+sequence above realizes $P$ as $U_\Phi(x)$'s top-left entry, for every
+$x\in[-1,1]$ simultaneously. Proved in the prerequisite lesson; used here
+without re-derivation.
+
+</TheoremBox>
+
+### The projector-controlled phase rotation
+
+QSP's phase gate $e^{i\varphi Z}$ only makes sense because, in QSP, the
+"signal register" is the entire system — there's nothing else to act on.
+Once $A$ is block-encoded, that's no longer true: $U$ acts on $a+n$ qubits,
+and the phase gate has to single out the ancilla without touching the
+$n$-qubit register $A$ lives on. QSVT's fix is the direct generalization:
+let $\Pi_0=|0\rangle\langle0|^{\otimes a}\otimes I_n$ be the projector onto
+the "ancilla is $|0\rangle$" subspace (exactly the subspace the block
+encoding relation is defined on), and define
+
+$$
+\Pi_\varphi = e^{i\varphi(2\Pi_0-I)}
+$$
+
+On a single qubit, $2|0\rangle\langle0|-I=Z$, so $\Pi_\varphi$ collapses to
+the ordinary QSP phase gate $e^{i\varphi Z}$ exactly when $a=1$ and $n=0$.
+For general $a,n$, $\Pi_\varphi$ still only ever needs to know whether the
+ancilla is in $|0\rangle$ or not — it acts as $e^{i\varphi}$ on the
+ancilla-zero subspace and $e^{-i\varphi}$ on its orthogonal complement,
+never referencing the $n$-qubit register directly.
+
+A **QSVT sequence** alternates $U$ and $U^\dagger$ with these
+projector-controlled phases, in exact analogy with QSP's alternation of
+$W(x)$ with $e^{i\varphi Z}$:
+
+$$
+U_\Phi = e^{i\varphi_0(2\Pi_0-I)}\prod_{k=1}^{d}\Big[U^{(-1)^{k+1}}\,e^{i\varphi_k(2\Pi_0-I)}\Big]
+$$
+
+### The key leap: one matrix problem, many decoupled single-qubit problems
+
+Here is the fact that makes all of this work, and it deserves to be
+understood as a picture, not just an equation. Fix one singular pair
+$(\sigma_i,|u_i\rangle,|v_i\rangle)$, and look only at the state
+$|v_i^0\rangle:=|0\rangle^{\otimes a}|v_i\rangle$. By the block-encoding
+relation,
+
+$$
+\langle u_i|\langle0|^{\otimes a}\,U\,|0\rangle^{\otimes a}|v_i\rangle=\langle u_i|A|v_i\rangle=\sigma_i
+$$
+
+so $U$ sends $|v_i^0\rangle$ to a state with exactly $\sigma_i$ overlap on
+$|u_i^0\rangle:=|0\rangle^{\otimes a}|u_i\rangle$, and (since $U$ is
+unitary and $\sigma_i\leq1$) the rest of its amplitude, $\sqrt{1-\sigma_i^2}$,
+lands entirely *outside* the ancilla-zero subspace, in some normalized
+state $|u_i^\perp\rangle$ with $\Pi_0|u_i^\perp\rangle=0$:
+
+$$
+U|v_i^0\rangle = \sigma_i|u_i^0\rangle + \sqrt{1-\sigma_i^2}\,|u_i^\perp\rangle
+$$
+
+That one equation already fixes $U$'s action on the two-dimensional
+subspace $\mathcal H_i=\mathrm{span}\{|v_i^0\rangle,|u_i^\perp\rangle\}$ up
+to the phase convention chosen for $|u_i^\perp\rangle$. Fixing that phase
+the standard way — exactly as Gilyén, Su, Low & Wiebe's construction does,
+absorbing a factor of $i$ into $|u_i^\perp\rangle$'s definition — puts
+$U$'s restriction, in the ordered basis $\{|v_i^0\rangle,|u_i^\perp\rangle\}$,
+into *exactly* the QSP signal-rotation form evaluated at $x=\sigma_i$:
+
+$$
+U\big|_{\mathcal H_i} = \begin{pmatrix}\sigma_i&i\sqrt{1-\sigma_i^2}\\i\sqrt{1-\sigma_i^2}&\sigma_i\end{pmatrix} = W(\sigma_i)
+$$
+
+(the general theorem — proved in full in Gilyén, Su, Low & Wiebe's
+original construction, cited below rather than re-derived here — extends
+this to show $\mathcal H_i$ is invariant under the *whole* alternating
+sequence, not just one application of $U$, that $U^\dagger$ preserves
+$\mathcal H_i$ too, and that distinct $\mathcal
+H_i$'s are mutually orthogonal; fixing the exact phase convention that
+makes this identification precise is the real technical heart of that
+proof). And $\Pi_0$ restricted to $\mathcal H_i$
+is, by construction, exactly the projector onto $|v_i^0\rangle$ — the same
+role $|0\rangle\langle0|$ plays in bare single-qubit QSP — so
+$\Pi_\varphi$ restricted to $\mathcal H_i$ is *identical* to the
+single-qubit phase gate $e^{i\varphi Z}$ in that subspace's own local
+basis.
+
+The picture: the huge $(a+n)$-qubit Hilbert space splits into many
+independent two-dimensional "rooms," one per singular value $\sigma_i$,
+each of them running its own private copy of exactly the same QSP phase
+sequence, with $x=\sigma_i$ plugged in. No room's computation talks to any
+other room's. The phases $\Phi$ are chosen once, globally, from the
+*single-qubit* QSP theorem — and then, for free, every room applies them
+to its own $\sigma_i$ simultaneously.
+
+<TheoremBox title="The Quantum Singular Value Transformation" provenance="cited">
+
+Let $U$ be a block encoding of $A=\sum_i\sigma_i|u_i\rangle\langle v_i|$,
+and let $\Phi$ be phases realizing polynomial $P$ in single-qubit QSP (same
+degree/parity/boundedness constraints as above). Then the QSVT sequence
+$U_\Phi$ built from $U$, $U^\dagger$, and $\Pi_\varphi$ is a block encoding
+of
+
+$$
+\boxed{P(A) := \sum_i P(\sigma_i)\,|u_i\rangle\langle v_i|}
+$$
+
+i.e. $(\langle0|^{\otimes a}\otimes I)\,U_\Phi\,(|0\rangle^{\otimes a}\otimes I)=P(A)$,
+for the *same* $P$ QSP realizes on a single qubit. (Gilyén, Su, Low &
+Wiebe, 2019 — see "Why This Matters" below.)
+
+</TheoremBox>
+
+## Physical Interpretation
+
+### Special case 1: Grover's algorithm and amplitude amplification
+
+Suppose $A$'s relevant singular value $\sigma=\sqrt{p}$ is the amplitude of
+some target subspace under a state-preparation routine with success
+probability $p$ — small $p$ means the "good" outcome is a rare needle in a
+haystack. A polynomial $P$ that's steep and pushes small $\sigma$ sharply
+toward $1$ (a Chebyshev polynomial is the standard, near-optimal choice)
+applied via QSVT *is* amplitude amplification: it's the same reflection
+that classic Grover search performs, generalized from "reflect about the
+uniform superposition" to "reflect about whatever state-preparation
+circuit you actually have." In fact, a single query to the
+state-preparation/block-encoding unitary is literally the $d=1$ case of
+this construction: one QSP layer, alternating one block-encoding call with
+one specific, simple phase choice, rotates the 2D subspace spanned by
+"target" and "everything else" by a fixed angle, exactly as $W(\sigma)$
+rotates $\mathcal H_i$ above. A full Grover iterate — reflect about the
+marked state, then reflect about the initial superposition — spends two
+such queries and is therefore the $d=2$ case. Repeating that basic layer
+$d$ times is what higher-degree QSVT polynomials do all at once, with a
+phase sequence chosen to make the net rotation as steep as a single
+polynomial can be.
+
+### Special case 2: Hamiltonian simulation
+
+Let $A=H$ be a Hermitian matrix, block-encoded exactly as in the
+prerequisite lesson. A truncated Jacobi-Anger/Chebyshev expansion of
+$e^{-ixt}$ in the variable $x$ is a genuine polynomial of degree scaling
+with $t$ and the desired precision $\varepsilon$ — so QSP/QSVT can realize
+it directly. Applying that polynomial to $H$'s block encoding via QSVT
+reproduces $e^{-iHt}$ to accuracy $\varepsilon$, giving a completely
+different route to Hamiltonian simulation than the prerequisite Mastery
+course's Trotter-Suzuki product formulas.
+
+The comparison is worth stating precisely, because it's a genuinely
+important result, not folklore: first-order Trotterization is a
+first-principles product-formula approximation whose error per unit
+simulation scales like $t^2/n$ for $n$ steps (derived in full in that
+earlier lesson) — a *polynomial* dependence on $1/\varepsilon$. QSVT-based
+simulation instead achieves query complexity that is optimal, or
+near-optimal, in *all* of $t$, $1/\varepsilon$, and the block encoding's
+own cost, scaling like $t+\log(1/\varepsilon)/\log\log(1/\varepsilon)$ —
+matching, up to the log factor, the information-theoretic
+no-fast-forwarding lower bound of $\Omega(t)$. That "$\log(1/\varepsilon)$
+instead of $\mathrm{poly}(1/\varepsilon)$" gap is the real, citable
+headline of Low & Chuang's QSP-based Hamiltonian simulation result:
+provably near-optimal query complexity, not merely "another method."
+
+### Special case 3: linear systems (a preview)
+
+Let $A$ again be Hermitian and block-encoded, and suppose we want (a state
+proportional to) $A^{-1}|b\rangle$ — the quantum linear-systems problem
+HHL first solved. Exact $1/x$ isn't a bounded polynomial on $[-1,1]$ (it
+blows up at $x=0$), so no QSP phase sequence can realize it exactly; but a
+polynomial that closely approximates $1/x$ on $[-1,1]$ away from a small
+regularized region near $0$ *is* realizable, and applying it via QSVT to
+$H$'s block encoding produces (something proportional to) $H^{-1}|b\rangle$.
+This is the modern, QSVT-based approach to solving linear systems,
+superseding HHL's original, more specialized phase-estimation-based
+construction — and its full derivation, including exactly how the
+near-$0$ region is regularized and what that costs in condition number,
+belongs to this course's own later lesson,
+[Applications: Eigenvalues and Linear Systems](/lessons/apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems).
+This lesson only previews the shape of the idea: same construction, a
+different choice of $P$.
+
+### Why This Matters
+
+QSVT was introduced by Gilyén, Su, Low, and Wiebe in 2018-2019 (published
+at STOC 2019, "Quantum singular value transformation and beyond:
+exponential improvements for quantum matrix arithmetic"), building on Low
+and Chuang's earlier "qubitization" technique. It is now widely regarded —
+this is a real, well-cited claim in the research literature, not marketing
+— as a unifying framework subsuming most of the pre-2018 "zoo" of
+specialized quantum algorithms as special cases of a single construction:
+Grover's algorithm and amplitude estimation, essentially every variant of
+Hamiltonian simulation, and HHL-style linear-systems solving all fall out
+of "block-encode a matrix, then apply a polynomial to its singular
+values," for different choices of $P$. Martyn, Rossi, Tan, and Chuang's
+2021 review, pointedly titled "Grand Unification of Quantum Algorithms,"
+makes exactly this case at length. None of this is a claim that QSVT
+proves new physics or new complexity-theoretic results by itself — it's a
+claim about *organization*: an entire research area's separately-invented
+tricks turned out to be one trick, viewed correctly. That kind of
+unification is rare and genuinely significant in any field, and this is
+the platform's own explanation of that real, citable body of work, not a
+new result of its own.
+
+## Worked Example
+
+**Apply one polynomial to three different "singular values," and check its
+accuracy against the function it's meant to approximate.**
+
+Take the degree-4, even-parity polynomial $P(x)=1-\tfrac{x^2}{2}+\tfrac{x^4}{24}$
+— the first three terms of $\cos x$'s Taylor series, standing in here for
+the kind of truncated Jacobi-Anger/Chebyshev polynomial that special case
+2 above uses to approximate $e^{-ixt}$ (with $t=1$). Evaluate it, using
+this lesson's own `qsvtDemoPolynomial`, at three representative singular
+values a block-encoded Hermitian matrix might have:
+
+| $\sigma_i$ | $P(\sigma_i)$ (computed) | $\cos(\sigma_i)$ (exact) | absolute error |
+|---|---|---|---|
+| {qsvtDemoResults[0].sigma} | {qsvtDemoResults[0].approx.toFixed(6)} | {qsvtDemoResults[0].exact.toFixed(6)} | {qsvtDemoResults[0].error.toExponential(3)} |
+| {qsvtDemoResults[1].sigma} | {qsvtDemoResults[1].approx.toFixed(6)} | {qsvtDemoResults[1].exact.toFixed(6)} | {qsvtDemoResults[1].error.toExponential(3)} |
+| {qsvtDemoResults[2].sigma} | {qsvtDemoResults[2].approx.toFixed(6)} | {qsvtDemoResults[2].exact.toFixed(6)} | {qsvtDemoResults[2].error.toExponential(3)} |
+
+The same fixed polynomial — one choice of phases $\Phi$ in the underlying
+QSP sequence — is applied identically at every $\sigma_i$; there is no
+per-$\sigma_i$ retuning. QSVT would apply this exact polynomial
+simultaneously to *all three* singular values (and any others $A$ has) in
+a single circuit, because each lives in its own decoupled $\mathcal H_i$.
+Notice also the error column: it grows with $\sigma_i$, which is exactly
+the qualitative tradeoff special case 2 describes — a fixed-degree
+truncation is more accurate near $x=0$ and less accurate as $|x|$ grows, so
+approximating $e^{-iHt}$ well across $H$'s whole spectrum for larger $t$
+genuinely requires a higher-degree polynomial (and hence more QSVT
+layers), not a fixed one.
+
+<ParametricCurve
+  frames={qsvtCurveFrames}
+  referenceLines={qsvtReferenceLines}
+  ariaLabel="The polynomial P(x) = 1 - x^2/2 + x^4/24 plotted over x in [-1, 1], with three horizontal reference lines marking P evaluated at the three sample singular values 0.2, 0.6, and 0.9"
+/>
+
+Reading the curve at $x=0.2$, $x=0.6$, and $x=0.9$ against the three
+marked reference lines is the same statement as the table above, drawn
+instead of computed: one continuous polynomial, sampled at every singular
+value a real block-encoded matrix might have.
+
+## Visualizing the Decoupled Subspaces
+
+The picture behind the key leap above — one big alternating circuit that
+secretly decomposes into many independent 2D rotations — is worth drawing
+directly. Each row below is one invariant subspace $\mathcal H_i$, running
+its own private copy of the identical phase sequence; the polynomial
+values shown match the worked example's table exactly.
+
+<div role="img" aria-label="Three independent two-dimensional subspaces, one per singular value 0.2, 0.6, and 0.9, each showing the same alternating sequence of the block-encoding unitary U and projector-controlled phase rotations acting entirely within that subspace, converging to P evaluated at that subspace's own singular value" className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<svg viewBox="0 0 640 320" width="640" className="w-full">
+  <g>
+    <rect x="4" y="8" width="628" height="80" rx="10" fill="none" className="stroke-border" strokeWidth="1.5" strokeDasharray="5 4" />
+    <text x="16" y="26" className="fill-muted-foreground text-[10px] font-mono">H_1 (invariant subspace for sigma_1 = {qsvtDemoResults[0].sigma})</text>
+    <rect x="12" y="44" width="112" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="68" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0&gt;|v_1&gt;</text>
+    <text x="134" y="65" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="146" y="44" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="169" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U</text>
+    <text x="200" y="65" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="212" y="44" width="58" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="241" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">&#928;_&#966;</text>
+    <text x="278" y="65" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="290" y="44" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="313" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U&#8224;</text>
+    <text x="344" y="65" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="356" y="44" width="58" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="385" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">&#928;_&#966;</text>
+    <text x="422" y="65" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8943;</text>
+    <text x="446" y="65" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="458" y="44" width="168" height="34" rx="6" className="fill-accent/10 stroke-accent" strokeWidth="1.5" />
+    <text x="542" y="65" textAnchor="middle" className="fill-accent text-[10px] font-mono">P(sigma_1) &#8776; {qsvtDemoResults[0].approx.toFixed(3)}</text>
+  </g>
+  <g>
+    <rect x="4" y="98" width="628" height="80" rx="10" fill="none" className="stroke-border" strokeWidth="1.5" strokeDasharray="5 4" />
+    <text x="16" y="116" className="fill-muted-foreground text-[10px] font-mono">H_2 (invariant subspace for sigma_2 = {qsvtDemoResults[1].sigma})</text>
+    <rect x="12" y="134" width="112" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="68" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0&gt;|v_2&gt;</text>
+    <text x="134" y="155" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="146" y="134" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="169" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U</text>
+    <text x="200" y="155" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="212" y="134" width="58" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="241" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">&#928;_&#966;</text>
+    <text x="278" y="155" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="290" y="134" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="313" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U&#8224;</text>
+    <text x="344" y="155" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="356" y="134" width="58" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="385" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">&#928;_&#966;</text>
+    <text x="422" y="155" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8943;</text>
+    <text x="446" y="155" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="458" y="134" width="168" height="34" rx="6" className="fill-accent/10 stroke-accent" strokeWidth="1.5" />
+    <text x="542" y="155" textAnchor="middle" className="fill-accent text-[10px] font-mono">P(sigma_2) &#8776; {qsvtDemoResults[1].approx.toFixed(3)}</text>
+  </g>
+  <g>
+    <rect x="4" y="188" width="628" height="80" rx="10" fill="none" className="stroke-border" strokeWidth="1.5" strokeDasharray="5 4" />
+    <text x="16" y="206" className="fill-muted-foreground text-[10px] font-mono">H_3 (invariant subspace for sigma_3 = {qsvtDemoResults[2].sigma})</text>
+    <rect x="12" y="224" width="112" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="68" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0&gt;|v_3&gt;</text>
+    <text x="134" y="245" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="146" y="224" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="169" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U</text>
+    <text x="200" y="245" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="212" y="224" width="58" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="241" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">&#928;_&#966;</text>
+    <text x="278" y="245" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="290" y="224" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="313" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U&#8224;</text>
+    <text x="344" y="245" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="356" y="224" width="58" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
+    <text x="385" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">&#928;_&#966;</text>
+    <text x="422" y="245" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8943;</text>
+    <text x="446" y="245" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
+    <rect x="458" y="224" width="168" height="34" rx="6" className="fill-accent/10 stroke-accent" strokeWidth="1.5" />
+    <text x="542" y="245" textAnchor="middle" className="fill-accent text-[10px] font-mono">P(sigma_3) &#8776; {qsvtDemoResults[2].approx.toFixed(3)}</text>
+  </g>
+  <text x="320" y="298" textAnchor="middle" className="fill-foreground text-[11px] font-mono">P(A) = sum_i P(sigma_i) |u_i&gt;&lt;v_i|  (one polynomial, every subspace, at once)</text>
+</svg>
+</div>
+
+Each row is completely self-contained: nothing computed inside $\mathcal
+H_1$ ever touches $\mathcal H_2$ or $\mathcal H_3$. What makes QSVT a
+statement about the *whole matrix* $A$, rather than three separate
+one-qubit calculations, is that a single physical circuit — one sequence
+of $U$, $U^\dagger$, and $\Pi_\varphi$ gates, acting on the real
+$(a+n)$-qubit register — implements all three rows (and every other
+singular value $A$ has) simultaneously, simply because quantum mechanics
+lets a single unitary act linearly across every invariant subspace at
+once.
+
+<Callout type="mistake">
+**Thinking QSVT makes Hamiltonian simulation or Grover's algorithm
+obsolete.** It doesn't. QSVT *explains* why they work — as two of many
+possible choices of the polynomial $P$ inside one construction — and it
+can *sometimes* (as in Hamiltonian simulation's query complexity) give a
+genuine asymptotic improvement over the specialized method it
+generalizes. But "unifying framework" is not the same claim as "always
+strictly better in practice": a specialized algorithm can still have a
+smaller circuit, fewer ancillas, or simpler phase-finding for its
+particular case, and QSVT's asymptotic optimality says nothing about
+constant factors or near-term circuit depth for a fixed, modest problem
+size.
+</Callout>
+
+## Practice Questions
+
+1. For the polynomial $P(x)=1-\tfrac{x^2}{2}+\tfrac{x^4}{24}$ used in this
+   lesson's worked example, compute $P(\sigma)$ for $\sigma=0.5$ by hand,
+   and compare it to $\cos(0.5)$.
+2. In the decoupled-subspace argument, explain why
+   $\langle u_i|\langle0|^{\otimes a}\,U\,|0\rangle^{\otimes a}|v_i\rangle=\sigma_i$
+   follows directly from the block-encoding relation $(\langle0|^{\otimes
+   a}\otimes I)U(|0\rangle^{\otimes a}\otimes I)=A$ and the definition of
+   the singular value decomposition.
+3. A classmate argues that since QSVT-based Hamiltonian simulation has
+   better asymptotic scaling in $1/\varepsilon$ than first-order
+   Trotterization, Trotterization is now obsolete. Using this lesson's
+   "Common Mistake" above, explain precisely what's wrong with treating an
+   asymptotic query-complexity result as a universal practical
+   recommendation.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- QSVT alternates a block-encoding unitary $U$ (and $U^\dagger$) with
+  projector-controlled phase rotations $\Pi_\varphi=e^{i\varphi(2\Pi_0-I)}$
+  — the direct generalization of QSP's $e^{i\varphi Z}$ to an ancilla
+  register instead of a bare qubit.
+- The key structural fact: the big Hilbert space decomposes into
+  independent 2D invariant subspaces $\mathcal H_i$, one per singular
+  value $\sigma_i$ of $A$, in each of which $U$ acts exactly as the
+  single-qubit QSP rotation $W(\sigma_i)$ — so one globally-chosen phase
+  sequence $\Phi$ realizing polynomial $P$ in ordinary QSP produces a block
+  encoding of $P(A)=\sum_iP(\sigma_i)|u_i\rangle\langle v_i|$ for the whole
+  matrix at once.
+- Three special cases of one construction: a steep polynomial gives
+  Grover's algorithm and amplitude amplification (a single query is the
+  $d=1$ case; a full Grover iterate, two queries via its two reflections,
+  is $d=2$); a truncated Jacobi-Anger/Chebyshev approximation to
+  $e^{-ixt}$ gives Hamiltonian simulation with provably near-optimal query
+  complexity; a regularized approximation to $1/x$ previews the modern,
+  QSVT-based replacement for HHL.
+- Gilyén, Su, Low & Wiebe's 2018-2019 QSVT construction is now widely
+  regarded as the framework that unifies most of the pre-2018 "zoo" of
+  specialized quantum algorithms — a real, significant, and well-cited
+  organizing result in quantum algorithms research.
+
+## Further Exploration
+
+Next: [Amplitude Estimation Without Phase Estimation](/lessons/apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation),
+which pushes special case 1 above further: the same reflect-and-compose
+structure reappears there to get Grover's quadratic speedup for
+*estimating* a probability rather than just amplifying it, without ever
+calling the phase-estimation subroutine the original algorithm needed. For
+the full treatment of
+special case 3, see
+[Applications: Eigenvalues and Linear Systems](/lessons/apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems),
+which works out exactly how a regularized approximation to $1/x$ turns
+this lesson's $P(A)$ machinery into a modern quantum linear-systems solver.

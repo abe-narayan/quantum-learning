@@ -17,6 +17,7 @@ const STATIC_ROUTES = [
   "/software",
   "/mechanics",
   "/computing",
+  "/apex",
   "/glossary",
   "/map",
 ];

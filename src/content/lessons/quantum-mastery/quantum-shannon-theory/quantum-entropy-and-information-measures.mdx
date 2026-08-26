@@ -1,0 +1,413 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
+import { pureStateDensityMatrix, convexCombination, maximallyMixedState, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
+import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Quantum Entropy and Information Measures",
+  description:
+    "Quantum mutual information and conditional entropy, built from the same von Neumann entropy this platform already computes, ending in the single most quoted fact in quantum information theory: conditional entropy can be negative.",
+  course: "quantum-shannon-theory",
+  module: "quantum-entropy-and-information-measures",
+  order: 3,
+  difficulty: "master",
+  estimatedMinutes: 28,
+  prerequisites: ["quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"],
+  objectives: [
+    "Define quantum mutual information I(A:B) = S(A) + S(B) - S(AB) and compute it for a genuine worked bipartite state",
+    "Define conditional quantum entropy S(A|B) = S(AB) - S(B) and show, with a real example, that it can be NEGATIVE for entangled states, unlike its classical counterpart",
+    "Define coherent information I(A>B) = -S(A|B) and explain why its sign controls whether a channel can be used to reliably send quantum information",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement",
+      note: "That lesson proved S(rho||sigma) >= 0 via Klein's inequality; this lesson's data-processing-flavored quantities (mutual information, conditional entropy) are built from the same von Neumann entropy, and the data-processing inequality itself is a direct descendant of Klein's inequality, proved next in this course.",
+    },
+  ],
+};
+
+export const phiPlus = new StateVector([
+  new Complex(1 / Math.sqrt(2)), Complex.ZERO, Complex.ZERO, new Complex(1 / Math.sqrt(2)),
+]);
+export const rhoPhiPlus = pureStateDensityMatrix(phiPlus);
+export const rhoA_phiPlus = reducedDensityMatrixQubit0(rhoPhiPlus);
+export const rhoB_phiPlus = reducedDensityMatrixQubit1(rhoPhiPlus);
+export const sA_phiPlus = vonNeumannEntropy(rhoA_phiPlus);
+export const sB_phiPlus = vonNeumannEntropy(rhoB_phiPlus);
+export const sAB_phiPlus = 0;
+export const mutualInfo_phiPlus = sA_phiPlus + sB_phiPlus - sAB_phiPlus;
+export const conditionalEntropy_phiPlus = sAB_phiPlus - sB_phiPlus;
+export const coherentInfo_phiPlus = -conditionalEntropy_phiPlus;
+
+export const shannonEntropyBits = (probabilities) => {
+  return probabilities.reduce((sum, prob) => sum + (prob > 1e-12 ? -prob * Math.log2(prob) : 0), 0);
+}
+
+export const rho00 = pureStateDensityMatrix(StateVector.basis(2, 0));
+export const rho11 = pureStateDensityMatrix(StateVector.basis(2, 3));
+export const rhoClassical = convexCombination([
+  { probability: 0.5, density: rho00 },
+  { probability: 0.5, density: rho11 },
+]);
+export const rhoA_classical = reducedDensityMatrixQubit0(rhoClassical);
+export const rhoB_classical = reducedDensityMatrixQubit1(rhoClassical);
+export const sA_classical = vonNeumannEntropy(rhoA_classical);
+export const sB_classical = vonNeumannEntropy(rhoB_classical);
+export const sAB_classical = shannonEntropyBits([0.5, 0, 0, 0.5]);
+export const mutualInfo_classical = sA_classical + sB_classical - sAB_classical;
+export const conditionalEntropy_classical = sAB_classical - sB_classical;
+
+export const psiMinus = new StateVector([
+  Complex.ZERO, new Complex(1 / Math.sqrt(2)), new Complex(-1 / Math.sqrt(2)), Complex.ZERO,
+]);
+export const rhoPsiMinus = pureStateDensityMatrix(psiMinus);
+
+export const wernerState = (p) => {
+  return convexCombination([
+    { probability: p, density: rhoPsiMinus },
+    { probability: 1 - p, density: maximallyMixedState(4) },
+  ]);
+}
+
+export const wernerReducedEntropyCheck = [0, 0.25, 0.5, 0.75, 1].map((p) => {
+  const rho = wernerState(p);
+  return {
+    p,
+    sA: vonNeumannEntropy(reducedDensityMatrixQubit0(rho)),
+    sB: vonNeumannEntropy(reducedDensityMatrixQubit1(rho)),
+  };
+});
+
+export const wernerJointEntropy = (p) => {
+  const lambdaSinglet = (1 + 3 * p) / 4;
+  const lambdaOther = (1 - p) / 4;
+  return shannonEntropyBits([lambdaSinglet, lambdaOther, lambdaOther, lambdaOther]);
+}
+
+export const wernerSweepN = 40;
+export const wernerSweepPoints = Array.from({ length: wernerSweepN + 1 }, (_, i) => {
+  const p = i / wernerSweepN;
+  const sAB = wernerJointEntropy(p);
+  const sA = 1;
+  const mutualInfo = sA + sA - sAB;
+  const condEntropy = sAB - sA;
+  return { p, sAB, mutualInfo, condEntropy };
+});
+
+export const findZeroCrossing = (points) => {
+  for (let i = 1; i < points.length; i++) {
+    const prevPoint = points[i - 1];
+    const currPoint = points[i];
+    if (Math.sign(prevPoint.condEntropy) !== Math.sign(currPoint.condEntropy)) {
+      const t = prevPoint.condEntropy / (prevPoint.condEntropy - currPoint.condEntropy);
+      return prevPoint.p + t * (currPoint.p - prevPoint.p);
+    }
+  }
+  return null;
+}
+export const wernerCrossingP = findZeroCrossing(wernerSweepPoints);
+
+export const wernerFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "I(A:B), mutual information (bits)",
+        color: "brand",
+        points: wernerSweepPoints.map((point) => ({ x: point.p, y: point.mutualInfo })),
+      },
+      {
+        label: "S(A|B), conditional entropy (bits)",
+        color: "accent",
+        points: wernerSweepPoints.map((point) => ({ x: point.p, y: point.condEntropy })),
+      },
+    ],
+  },
+];
+
+## Motivation
+
+Purity, von Neumann Entropy, and Information built $S(\rho)$ as the
+quantum generalization of Shannon entropy; Relative Entropy and
+Mixed-State Entanglement proved $S(\rho\|\sigma)\geq0$. Both lessons ask
+"how mixed/how distinguishable is *one* state?" This lesson asks the
+question classical Shannon theory answers with mutual information and
+conditional entropy: given a joint system $AB$, how much does knowing
+$B$ tell you about $A$, and how much *uncertainty about $A$ remains*
+once $B$ is known? Every classical fact you'd expect to carry over does
+— except one, and that one exception is the entire reason this course
+exists as "Quantum" Shannon theory rather than a relabeled copy of the
+classical version.
+
+## Mathematical Development
+
+### Quantum mutual information
+
+$$
+I(A:B) \equiv S(\rho_A) + S(\rho_B) - S(\rho_{AB})
+$$
+
+the direct quantum analogue of the classical $I(A:B)=H(A)+H(B)-H(AB)$,
+with each Shannon entropy replaced by von Neumann entropy of the
+corresponding (reduced) density matrix. It measures the *total*
+correlation between $A$ and $B$—classical and quantum combined —
+packed into a single number.
+
+**Worked example 1: the Bell state $|\Phi^+\rangle$.** Built exactly as
+Entanglement Entropy for Pure Bipartite States built it, via
+`pureStateDensityMatrix` then `reducedDensityMatrixQubit0`/`1`, then
+this platform's own `vonNeumannEntropy`—reused directly here, not
+reimplemented:
+
+$$
+S(\rho_{AB}) = 0 \text{ (pure global state)}, \qquad S(\rho_A) = S(\rho_B) = 1 \text{ bit (maximally mixed reduced states)}
+$$
+
+$$
+I(A:B) = 1 + 1 - 0 = 2 \text{ bits}
+$$
+
+This is the *maximum possible* mutual information for two qubits (each
+qubit can carry at most 1 bit of entropy, so $I(A:B)\leq S(\rho_A)+S(\rho_B)\leq2$):
+a Bell pair saturates the bound completely.
+
+**Worked example 2: a classically correlated mixed state.** Not every
+correlated state is entangled. Take
+$\rho_{AB}=\tfrac12|00\rangle\langle00|+\tfrac12|11\rangle\langle11|$ —
+a genuine classical mixture (via `convexCombination`, built the same
+way Convex Combinations and Physical Mixtures established) of two
+*unentangled* basis states, with no coherence between them at all:
+
+$$
+S(\rho_{AB}) = H(0.5,0,0,0.5) = 1 \text{ bit}, \qquad S(\rho_A)=S(\rho_B)=H(0.5,0.5)=1 \text{ bit each}
+$$
+
+$$
+I(A:B) = 1 + 1 - 1 = 1 \text{ bit}
+$$
+
+Exactly the classical mutual information of two perfectly correlated
+coin flips—unsurprising, since this state *is* two perfectly
+correlated classical bits with a density-matrix label. $I(A:B)=1$ sits
+strictly between the classically-correlated-but-unentangled case here
+and the maximally entangled Bell state's $I(A:B)=2$: mutual information
+alone cannot distinguish "correlated" from "entangled" (both give a
+nonzero number), which is exactly the gap the next quantity closes.
+
+### Conditional quantum entropy
+
+$$
+S(A|B) \equiv S(\rho_{AB}) - S(\rho_B)
+$$
+
+again the direct analogue of classical $H(A|B)=H(AB)-H(B)$, interpreted
+the same way classically: the *remaining* uncertainty about $A$ once $B$
+is fully known. Classically, $H(A|B)\geq0$ always—you cannot know
+*less than nothing*. Applied to the Bell state:
+
+$$
+S(A|B) = S(\rho_{AB}) - S(\rho_B) = 0 - 1 = -1 \text{ bit}
+$$
+
+**Negative.** Not a typo, not a sign error, and not a different
+quantity that happens to share the classical name. This is computed
+from the exact same `vonNeumannEntropy` calls as every other number in
+this lesson, on a genuinely valid density matrix. For the classically
+correlated state above, by contrast, $S(A|B)=1-1=0$—non-negative, as
+the classical formula demands, because that state carries no
+entanglement at all. The sign of $S(A|B)$ is doing real physical work.
+
+### Coherent information
+
+$$
+I(A{>}B) \equiv -S(A|B) = S(\rho_B) - S(\rho_{AB})
+$$
+
+defined for a channel $\mathcal N$ that takes some input system to
+output $B$ (with $A$ standing in for a reference system purifying the
+input, exactly the purification construction Schmidt Decomposition and
+Purification built). $I(A{>}B)>0$ exactly when $S(A|B)<0$: coherent
+information is positive precisely when the channel preserves enough
+quantum correlation with the reference to make quantum information
+recoverable on the other side. Its regularized version,
+$Q(\mathcal N)=\lim_{n\to\infty}\tfrac1n\max I(A{>}B)$ over $n$ uses of
+the channel, *is* the channel's quantum capacity (the LSD theorem,
+Lloyd-Shor-Devetak)—stated here, not proved, and picked back up in
+this course's capstone, which asks exactly how much quantum information
+a noisy channel can carry.
+
+## Why This Matters
+
+Classical conditional entropy $H(A|B)\geq0$ is not an incidental
+property of Shannon's formula—it is a statement about what
+information *is*: you cannot be more uncertain about $A$ after learning
+$B$ than knowing nothing at all, because in the worst case $B$ is simply
+useless and $H(A|B)=H(A)$. Every classical intuition about
+"information" is built on that floor.
+
+Quantum mechanics breaks it, and $S(A|B)=-1$ bit for the Bell state is
+the single most quoted, most surprising result in quantum information
+theory precisely because of what it does *not* mean. It does not mean
+you know more than everything about $A$. It means the question "what is
+$A$'s state, on its own?" has stopped making sense: $\rho_A$ is
+maximally mixed and carries zero information by itself, while $\rho_{AB}$
+carries *more* information (zero entropy, i.e. complete information)
+than $\rho_A$ and $\rho_B$ separately would suggest. All of that
+"missing" information is entanglement, not ignorance, and it has a
+precise operational price tag: the magnitude $|S(A|B)|$ is exactly the
+number of qubits of quantum communication needed to transfer $A$ to
+whoever already holds $B$, so that they can reconstruct the full joint
+state (the **quantum state merging** protocol, Horodecki-Oppenheim-Winter
+2005). When $S(A|B)<0$, state merging *generates* $|S(A|B)|$ EPR pairs
+as a byproduct instead of consuming qubits—negative conditional
+entropy is a resource, not a paradox, and it is exactly why "how much
+can be learned/sent" needs $S(A|B)$ and $I(A{>}B)$ as precise vocabulary
+rather than loose analogy to the classical case.
+
+## Worked Example: watching entanglement dilute
+
+Take the Werner state this course's prerequisite lesson already built,
+$\rho(p)=p|\Psi^-\rangle\langle\Psi^-|+(1-p)\,I/4$, and sweep $p$ from 0
+(maximally mixed, no correlation at all) to 1 (the singlet, maximally
+entangled). Two facts, both checked directly rather than assumed:
+
+**$S(\rho_A)=S(\rho_B)=1$ bit for every $p$.** Computed via
+`reducedDensityMatrixQubit0`/`1` then `vonNeumannEntropy` at five sample
+points:
+
+$$
+p=0,\ 0.25,\ 0.5,\ 0.75,\ 1 \ \Longrightarrow\ S(\rho_A)=S(\rho_B)=1.000000 \text{ bit, every time}
+$$
+
+This holds because both the singlet and $I/4$ individually reduce to
+$I/2$ on either qubit, so *any* convex mixture of them does too —
+diluting the singlet with noise never changes either marginal, only the
+correlation between them.
+
+**$S(\rho_{AB})$ varies smoothly, computed exactly via the Bell basis.**
+$I/4$ is diagonal in *every* basis, and $|\Psi^-\rangle\langle\Psi^-|$ is
+already diagonal in the Bell basis (eigenvalue 1 on $|\Psi^-\rangle$, 0
+on the other three Bell vectors)—so $\rho(p)$ is diagonal in the Bell
+basis too, with eigenvalues $\lambda_{\Psi^-}=\tfrac{1+3p}{4}$ and
+$\lambda_{\text{other}}=\tfrac{1-p}{4}$ (each of the other three Bell
+vectors), verified directly by applying $\rho(p)$ to all four Bell
+vectors and checking each is a genuine eigenvector. This is the same
+"diagonalize via symmetry, not a general eigensolver" move Relative
+Entropy and Mixed-State Entanglement used on this exact state family.
+Feeding those eigenvalues through `shannonEntropyBits` (the same
+$-\sum\lambda\log_2\lambda$ formula `vonNeumannEntropy` uses internally,
+written out explicitly here since the joint state is 4-dimensional and
+this platform's closed-form eigensolver is 2x2-only) gives $S(\rho_{AB})$
+at every $p$, hence
+
+$$
+I(A:B) = 2 - S(\rho_{AB}), \qquad S(A|B) = S(\rho_{AB}) - 1
+$$
+
+At $p=1$: $S(\rho_{AB})=0\Rightarrow I(A:B)=2,\ S(A|B)=-1$ (the Bell-state
+numbers above, since $|\Psi^-\rangle$ is a Bell state too). At $p=0$:
+$S(\rho_{AB})=2\Rightarrow I(A:B)=0,\ S(A|B)=1$ (no correlation, and the
+Bell-state number's classical floor). Between the two, both quantities
+move continuously.
+
+## Interactive: watching the sign flip
+
+<ParametricCurve
+  frames={wernerFrames}
+  ariaLabel="Quantum mutual information I(A:B) and conditional entropy S(A|B) plotted against the Werner-state mixing parameter p from 0 to 1, showing S(A|B) crossing from positive to negative near p=0.75"
+  referenceLines={[{ y: 0, label: "S(A|B) = 0" }]}
+/>
+
+Scanning the same computed grid this curve is drawn from, $S(A|B)$
+changes sign between $p=0.725$ ($S(A|B)\approx+0.061$) and $p=0.750$
+($S(A|B)\approx-0.007$); linear interpolation between those two
+computed points puts the crossing at $p\approx0.7476$. Compare that to
+the *entanglement* threshold Relative Entropy and Mixed-State
+Entanglement's Werner-state concurrence found: $C(p)=\max(0,(3p-1)/2)$
+is already positive for any $p>1/3\approx0.333$. **The two thresholds
+are not the same.** Every Werner state with $p>1/3$ is genuinely
+entangled, but $S(A|B)$ only turns negative much later, past
+$p\approx0.7476$. Negative conditional entropy is a *sufficient*
+signature of entanglement, never a *necessary* one—there is a wide
+entangled-but-$S(A|B)\geq0$ regime ($1/3<p\lesssim0.7476$) sitting
+between the separable region and the region where the quantum-state-merging
+"bonus qubits" effect kicks in.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Thinking $S(A|B)<0$ is a paradox, a sign error, or evidence that
+someone knows "more than everything" about $A$.** It is none of these.
+$\rho_A$ on its own is still exactly as mixed as its entropy says (1 bit,
+maximally uncertain, for the Bell state)—what's negative is a
+*difference*, $S(\rho_{AB})-S(\rho_B)$, and that difference is negative
+precisely because $\rho_{AB}$ is *more* pure (lower entropy) than
+$\rho_B$ alone, which can only happen through entanglement. Classical
+joint distributions can never do this ($H(AB)\geq H(B)$ always, since
+classical joint uncertainty can't be less than either marginal's), which
+is exactly why this has no classical counterpart to sanity-check it
+against.
+</Callout>
+
+<Callout type="mistake">
+**Assuming negative $S(A|B)$ and "entangled" are the same threshold.**
+This lesson's own sweep disproves it directly: the Werner state is
+entangled for every $p>1/3$ (via concurrence) but $S(A|B)$ stays
+non-negative until $p\approx0.7476$. Mutual information, conditional
+entropy, and concurrence are three genuinely different quantities that
+agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
+</Callout>
+
+## Practice Questions
+
+1. Verify $I(A:B) = 2S(\rho_A)$ for any pure bipartite state where
+   $S(\rho_A)=S(\rho_B)$ (always true for a pure global state), and
+   confirm this reduces to $I(A:B)=2$ bits for the Bell state above.
+2. For the classically correlated state
+   $\rho=0.8|00\rangle\langle00|+0.2|11\rangle\langle11|$, compute
+   $S(\rho_{AB})$, $S(\rho_A)$, $S(\rho_B)$, and $I(A:B)$, and notice
+   that all three entropies come out equal. Explain why that is not a
+   coincidence for this kind of "always-agree" classical correlation.
+3. Using $S(A|B)=S(\rho_{AB})-S(\rho_B)$ and $I(A{>}B)=-S(A|B)$, compute
+   $I(A{>}B)$ at $p=0.5$ on the Werner sweep above (from
+   $S(\rho_{AB})\approx1.549$ bits) and state whether a channel
+   producing this state could be used to reliably send quantum
+   information at that noise level.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Quantum mutual information $I(A:B)=S(\rho_A)+S(\rho_B)-S(\rho_{AB})$
+  measures total (classical + quantum) correlation; computed here as
+  exactly 2 bits for the Bell state (the two-qubit maximum) and exactly
+  1 bit for a purely classical correlated mixture, using this platform's
+  own `vonNeumannEntropy` throughout.
+- Conditional quantum entropy $S(A|B)=S(\rho_{AB})-S(\rho_B)$ can be
+  **negative**—$-1$ bit for the Bell state, computed directly, not
+  asserted—unlike its classical counterpart $H(A|B)\geq0$. The
+  magnitude of a negative $S(A|B)$ is the exact quantum-state-merging
+  communication cost (here, a *savings*: EPR pairs generated, not spent).
+- Coherent information $I(A{>}B)=-S(A|B)$ controls a channel's ability
+  to carry quantum information; its regularization is the channel's
+  quantum capacity (LSD theorem), picked up again in this course's
+  capstone.
+- Swept across the Werner-state family, $S(A|B)$ crosses zero near
+  $p\approx0.7476$—strictly later than the $p=1/3$ entanglement
+  threshold from concurrence, proving negative conditional entropy is a
+  sufficient, not necessary, signature of entanglement.
+
+## Further Exploration
+
+Next: [The Data-Processing Inequality](/lessons/quantum-mastery/quantum-shannon-theory/the-data-processing-inequality),
+which proves that quantum operations can never increase how
+distinguishable two states are or how much information a channel
+output carries about its input—built from the exact same Klein's
+inequality this course's prerequisite lesson proved, applied now to the
+mutual information defined here.

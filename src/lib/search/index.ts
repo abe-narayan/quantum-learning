@@ -119,6 +119,7 @@ const PILLAR_HREF: Record<Pillar, string> = {
   // No dedicated pillar landing page — Quantum Mastery courses are surfaced
   // from within /learn rather than their own top-level route.
   "quantum-mastery": "/learn",
+  apex: "/apex",
 };
 
 function titleCase(value: string): string {

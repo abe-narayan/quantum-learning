@@ -1,0 +1,397 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { StateVector } from "@/lib/quantum/state";
+import { pureStateDensityMatrix, eigenvaluesHermitian2x2, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
+import { partialTrace } from "@/lib/quantum/partialTrace";
+import { TensorNetworkDiagram } from "@/components/visualizations/TensorNetworkDiagram";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Tensor Networks and Matrix Product States",
+  description:
+    "Tensor Network Methods introduced the picture in words; this lesson builds the actual matrix product state decomposition via repeated SVD, defines bond dimension exactly as the Schmidt rank it is, and works the GHZ state's decomposition by hand and in code.",
+  course: "simulation-and-compilation-frontiers",
+  module: "tensor-networks-and-matrix-product-states",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 29,
+  prerequisites: ["quantum-software/simulating-quantum-systems/tensor-network-methods"],
+  objectives: [
+    "Construct the matrix product state (MPS) decomposition of an n-qubit state explicitly via repeated singular value decomposition (SVD), and define bond dimension precisely as the number of singular values kept at each cut",
+    "Prove (via a genuine worked example) that a state's bond dimension across a given cut equals exactly the Schmidt rank of that bipartition, connecting directly to entanglement entropy across that cut",
+    "Explain the area law for ground states of gapped, local 1D Hamiltonians (entanglement entropy across any cut is bounded, NOT growing with system size) and why this is exactly what makes MPS representations with bounded, size-independent bond dimension possible for such states",
+  ],
+  related: [
+    {
+      slug: "quantum-software/simulating-quantum-systems/tensor-network-methods",
+      note: "That lesson asserted bond dimension controls how much entanglement a tensor network can capture without ever performing the SVD that defines it; this lesson supplies exactly that missing construction, and checks bond dimension 2 for GHZ by hand and against this platform's own partialTrace/eigenvaluesHermitian2x2 code, not merely a plausible-sounding number.",
+    },
+    {
+      slug: "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces",
+      note: "That lesson's typical-subspace argument runs the same bipartite Schmidt-decomposition machinery built here, applied to n identical copies of a state instead of n distinct sites, and its distillation rate is exactly the entanglement entropy per copy this lesson computes for GHZ across a single cut.",
+    },
+  ],
+};
+
+export const invSqrt2 = 1 / Math.sqrt(2);
+
+export const psiGHZ = new StateVector([
+  new Complex(invSqrt2), new Complex(0), new Complex(0), new Complex(0),
+  new Complex(0), new Complex(0), new Complex(0), new Complex(invSqrt2),
+]);
+
+export const rhoGHZ = pureStateDensityMatrix(psiGHZ);
+
+export const rhoQubit1 = partialTrace(rhoGHZ, 3, [1, 2]);
+export const rhoQubit3 = partialTrace(rhoGHZ, 3, [0, 1]);
+
+export const [lambda1Cut1, lambda2Cut1] = eigenvaluesHermitian2x2(rhoQubit1);
+export const [lambda1Cut2, lambda2Cut2] = eigenvaluesHermitian2x2(rhoQubit3);
+
+export const entropyCut1 = vonNeumannEntropy(rhoQubit1);
+export const entropyCut2 = vonNeumannEntropy(rhoQubit3);
+
+export const sigma1Cut1 = Math.sqrt(lambda1Cut1);
+export const sigma2Cut1 = Math.sqrt(lambda2Cut1);
+export const singularValuesEqualCut1 = Math.abs(sigma1Cut1 - sigma2Cut1) < 1e-9;
+
+export const bondDimensionCut1 = [lambda1Cut1, lambda2Cut1].filter((lambda) => lambda > 1e-9).length;
+export const bondDimensionCut2 = [lambda1Cut2, lambda2Cut2].filter((lambda) => lambda > 1e-9).length;
+
+export const amplitudeMatrixCut1 = new Matrix([
+  [new Complex(invSqrt2), new Complex(0), new Complex(0), new Complex(0)],
+  [new Complex(0), new Complex(0), new Complex(0), new Complex(invSqrt2)],
+]);
+
+export const amplitudeMatrixCut2 = new Matrix([
+  [new Complex(invSqrt2), new Complex(0)],
+  [new Complex(0), new Complex(0)],
+  [new Complex(0), new Complex(0)],
+  [new Complex(0), new Complex(invSqrt2)],
+]);
+
+export const rhoQubit1MatchesMM = amplitudeMatrixCut1.mul(amplitudeMatrixCut1.dagger()).equals(rhoQubit1);
+
+export const mpsSite1 = {
+  0: new Matrix([[new Complex(1), new Complex(0)]]),
+  1: new Matrix([[new Complex(0), new Complex(1)]]),
+};
+
+export const mpsSite2 = {
+  0: new Matrix([[new Complex(1), new Complex(0)], [new Complex(0), new Complex(0)]]),
+  1: new Matrix([[new Complex(0), new Complex(0)], [new Complex(0), new Complex(1)]]),
+};
+
+export const mpsSite3 = {
+  0: new Matrix([[new Complex(invSqrt2)], [new Complex(0)]]),
+  1: new Matrix([[new Complex(0)], [new Complex(invSqrt2)]]),
+};
+
+export const mpsAmplitude = (i1, i2, i3) =>
+  mpsSite1[i1].mul(mpsSite2[i2]).mul(mpsSite3[i3]).get(0, 0);
+
+export const mpsAmplitudesMatch = [0, 1, 2, 3, 4, 5, 6, 7].every((index) => {
+  const i1 = (index >> 2) & 1;
+  const i2 = (index >> 1) & 1;
+  const i3 = index & 1;
+  return mpsAmplitude(i1, i2, i3).equals(psiGHZ.amplitudes[index]);
+});
+
+export const pSkewed = 0.99;
+
+export const psiSkewedGHZ = new StateVector([
+  new Complex(Math.sqrt(pSkewed)), new Complex(0), new Complex(0), new Complex(0),
+  new Complex(0), new Complex(0), new Complex(0), new Complex(Math.sqrt(1 - pSkewed)),
+]);
+
+export const rhoSkewedQubit1 = partialTrace(pureStateDensityMatrix(psiSkewedGHZ), 3, [1, 2]);
+export const [lambda1Skewed, lambda2Skewed] = eigenvaluesHermitian2x2(rhoSkewedQubit1);
+export const entropySkewed = vonNeumannEntropy(rhoSkewedQubit1);
+export const bondDimensionSkewed = [lambda1Skewed, lambda2Skewed].filter((lambda) => lambda > 1e-9).length;
+
+## Motivation
+
+Tensor Network Methods made the qualitative case: a state with limited
+entanglement can be written as a chain of small tensors instead of one
+flat list of $2^n$ amplitudes, and the size of the "bond" connecting
+adjacent tensors controls how much entanglement the chain can hold. That
+lesson never showed where the chain comes from, and it used "bond
+dimension" as an intuitive knob rather than a precisely defined quantity.
+Going deeper means building the decomposition itself, from an actual
+$2^n$-amplitude tensor, via the one tool with the exact power to do it:
+singular value decomposition, the same tool Schmidt Decomposition and
+Purification used to prove the two-party Schmidt theorem. Here it gets
+applied repeatedly, once per cut, to a genuinely multi-party chain.
+
+## Mathematical Development
+
+### Reshaping: from amplitude tensor to matrix
+
+An $n$-qubit state is a rank-$n$ amplitude tensor $\psi_{i_1 i_2 \cdots i_n}$
+with $2^n$ complex entries, $i_k\in\{0,1\}$. Picking any cut after qubit
+$k$ splits the indices into two groups, $(i_1,\ldots,i_k)$ and
+$(i_{k+1},\ldots,i_n)$, and *reshaping* (not changing a single number,
+only regrouping which indices are rows and which are columns) turns
+$\psi$ into an ordinary $2^k\times 2^{n-k}$ matrix $\Psi^{(k)}$. This is
+exactly the amplitude-matrix move Schmidt Decomposition and Purification
+built for a single bipartition ($M_{ij}$ for a 2-qubit state); the only
+new idea is doing it at *every* cut, one after another.
+
+### The construction: SVD, cut by cut
+
+<TheoremBox title="Matrix product state decomposition" provenance="derived">
+
+Reshape $\psi$ into $\Psi^{(1)}$ (rows $i_1$, columns
+$(i_2,\ldots,i_n)$), an ordinary $2\times 2^{n-1}$ matrix, and take its
+SVD: $\Psi^{(1)}=U^{(1)}\Sigma^{(1)}V^{(1)\dagger}$. Define
+$A^{i_1}_{a_1}\equiv U^{(1)}_{i_1,a_1}$, a $1\times\chi_1$ row for each
+$i_1$, where $\chi_1$ is the number of nonzero singular values kept.
+Absorb the rest, $\Sigma^{(1)}V^{(1)\dagger}$, into a new tensor indexed
+by $(a_1,i_2,\ldots,i_n)$, reshape it into a $(2\chi_1)\times 2^{n-2}$
+matrix grouping $(a_1,i_2)$ as rows, and take *its* SVD to peel off
+$A^{i_2}_{a_1,a_2}$ (now a genuine $\chi_1\times\chi_2$ matrix for each
+$i_2$). Repeating through site $n-1$ leaves a final
+$\chi_{n-1}\times 2$ piece that is itself $A^{i_n}_{a_{n-1}}$ (a
+$\chi_{n-1}\times 1$ column for each $i_n$). The result is
+
+$$
+\boxed{\psi_{i_1 i_2\cdots i_n} = \sum_{a_1,\ldots,a_{n-1}} A^{i_1}_{1,a_1}\,A^{i_2}_{a_1,a_2}\cdots A^{i_n}_{a_{n-1},1}}
+$$
+
+exact for any state, with no approximation yet made.
+
+</TheoremBox>
+
+<DefinitionBox title="Bond dimension">
+
+The **bond dimension** $\chi_k$ at the cut between site $k$ and site
+$k+1$ is the number of singular values kept at that step, i.e. the size
+of the matrix index $a_k$ that $A^{i_k}$ and $A^{i_{k+1}}$ share. Since
+the SVD is exact when every nonzero singular value is kept, $\chi_k$
+computed this way is not a free choice, it is exactly the **Schmidt
+rank** of $\psi$ across that cut (the rank of $\Psi^{(k)}$): the two
+notions are the same number, seen from two directions (a linear-algebra
+rank versus a tensor-network index size). $\chi_k=1$ means the state
+factors across that cut (no entanglement there); a general $n$-qubit
+state can need $\chi_k$ as large as $2^{\min(k,n-k)}$.
+`eigenvaluesHermitian2x2`, already used for exactly this purpose in
+Schmidt Decomposition and Purification, is enough to certify $\chi_k$
+whenever the smaller side of a cut is a single qubit, which is every
+cut in the worked example below.
+
+</DefinitionBox>
+
+An *approximate* MPS truncates each SVD to keep only the largest $\chi$
+singular values, dropping the smallest ones (and the entanglement they
+represent). Nothing below does this: the GHZ construction that follows
+keeps every nonzero singular value, so it is an exact rewriting of the
+state, not a lossy compression.
+
+## Physical Interpretation
+
+### The area law
+
+<TheoremBox title="Area law for gapped, local 1D ground states" provenance="cited">
+
+For the ground state of a **gapped** (nonzero energy gap above the
+ground state), **local** 1D Hamiltonian, the entanglement entropy across
+any spatial cut is bounded by a constant that does **not** grow with
+system size $n$. This is a genuine, nontrivial theorem, not a heuristic:
+proved rigorously for 1D gapped systems building on Hastings' 2007 work
+(M. B. Hastings, "An area law for one-dimensional quantum systems,"
+*J. Stat. Mech.* (2007) P08024); the higher-dimensional generalization
+remains an important, harder, still-actively-researched question, well
+beyond this lesson's scope to derive.
+
+</TheoremBox>
+
+Contrast this with a **generic** (e.g. Haar-random) $n$-qubit state,
+whose entanglement entropy across a cut through the middle grows
+*linearly* with the smaller side's size, a **volume law**, requiring
+bond dimension up to $2^{n/2}$, exactly the exponential wall Tensor
+Network Methods started from. An area-law state, by contrast, needs a
+bond dimension bounded by a *constant* $\chi_{\max}$, independent of
+$n$, at every cut: doubling the system's length does not require a
+larger $\chi$, only a longer chain of same-size tensors. That is the
+entire mechanism behind why the MPS memory cost from Tensor Network
+Methods, $\sim 32n\chi^2$ bytes, stays *linear* in $n$ for an area-law
+state instead of climbing back toward $2^n$.
+
+### Why this matters: the boundary of classical simulability
+
+This is not a curiosity about GHZ states: it is the reason tensor
+networks are the primary classical numerical tool condensed-matter
+physicists actually use to simulate large 1D quantum many-body systems
+(and, via more sophisticated generalizations such as PEPS and MERA,
+higher-dimensional ones too) on ordinary classical computers. A gapped
+1D ground state's bounded, size-independent bond dimension is precisely
+what makes an exponentially large Hilbert space classically tractable in
+practice, and precisely what a highly-entangled algorithm output (this
+course's own eventual quantum circuits, or Tensor Network Methods' own
+Grover's-algorithm counterexample) does not have. Making that boundary
+*precise*, not just "large versus small entanglement" but an exact,
+checkable criterion for when a classical computer can and cannot keep up
+with a quantum one, is exactly the job of this course's next lesson,
+When Classical Simulation Works, and it reuses the bond-dimension and
+area-law machinery built here directly.
+
+## Worked Example
+
+**Construct the exact MPS decomposition of the GHZ state
+$|\text{GHZ}\rangle=\frac{1}{\sqrt2}(|000\rangle+|111\rangle)$, and
+verify its bond dimension is exactly 2 at both cuts.**
+
+$|\text{GHZ}\rangle$ has only two nonzero amplitudes,
+$\psi_{000}=\psi_{111}=1/\sqrt2$. Reshaping across the first cut (qubit
+1 versus qubits 2,3, rows $i_1$, columns $(i_2,i_3)$ in order
+$00,01,10,11$) gives the $2\times4$ amplitude matrix below.
+
+<MatrixGrid matrix={amplitudeMatrixCut1} label="Ψ⁽¹⁾ (qubit 1 | qubits 2,3)" ariaLabel="The 2 by 4 reshaped amplitude matrix for GHZ across the first cut, with entries 1/sqrt2 at positions (0,0) and (1,3), zero elsewhere" digits={3} />
+
+Its two rows are already orthogonal, each with norm $1/\sqrt2$, so its
+SVD is immediate: $U^{(1)}=I_2$ and the two nonzero **singular values**
+are both exactly $\sigma=1/\sqrt2\approx {sigma1Cut1.toFixed(6)}$
+(computed directly: `sigma1Cut1` = {sigma1Cut1.toFixed(6)},
+`sigma2Cut1` = {sigma2Cut1.toFixed(6)}, `singularValuesEqualCut1` =
+{String(singularValuesEqualCut1)}). Equivalently, via $\rho_A=MM^\dagger$
+(the identity Schmidt Decomposition and Purification proved in general):
+
+<MatrixGrid matrix={rhoQubit1} label="ρ (qubit 1) = Tr₂,₃(|GHZ⟩⟨GHZ|)" ariaLabel="The reduced density matrix of qubit 1 for GHZ, diag(0.5, 0.5)" highlightDiagonal digits={3} />
+
+computed here by this platform's own `partialTrace(rhoGHZ, 3, [1, 2])`,
+with `eigenvaluesHermitian2x2` returning $\lambda_1=$ {lambda1Cut1.toFixed(6)},
+$\lambda_2=$ {lambda2Cut1.toFixed(6)} — matching $\sigma^2$ exactly, and
+confirmed directly rather than assumed: `rhoQubit1MatchesMM` =
+{String(rhoQubit1MatchesMM)}. Both singular values are nonzero, so the
+**bond dimension across this cut is exactly 2**
+(`bondDimensionCut1` = {bondDimensionCut1}), matching the Schmidt rank,
+and `vonNeumannEntropy(rhoQubit1)` = {entropyCut1.toFixed(6)} bit, exactly
+the 1-bit answer Entanglement Entropy for Pure Bipartite States gets for
+any Bell-pair-like maximally-entangled cut.
+
+Repeating the procedure at the second cut (qubits 1,2 versus qubit 3,
+rows $(i_1,i_2)$ in order $00,01,10,11$, column $i_3$):
+
+<MatrixGrid matrix={amplitudeMatrixCut2} label="Ψ⁽²⁾ (qubits 1,2 | qubit 3)" ariaLabel="The 4 by 2 reshaped amplitude matrix for GHZ across the second cut, with entries 1/sqrt2 at positions (0,0) and (3,1), zero elsewhere" digits={3} />
+
+is the same story transposed: two orthogonal columns of norm $1/\sqrt2$,
+so the singular values are again both exactly $1/\sqrt2$. The Schmidt
+theorem (proved for general $d_A\times d_B$ in Schmidt Decomposition and
+Purification, not just the $2\times2$ case) guarantees the *same* nonzero
+eigenvalue set appears on whichever side is checked, so it suffices to
+check the 2-dimensional side (qubit 3) directly:
+
+<MatrixGrid matrix={rhoQubit3} label="ρ (qubit 3) = Tr₁,₂(|GHZ⟩⟨GHZ|)" ariaLabel="The reduced density matrix of qubit 3 for GHZ, diag(0.5, 0.5)" highlightDiagonal digits={3} />
+
+giving $\lambda_1=$ {lambda1Cut2.toFixed(6)}, $\lambda_2=$
+{lambda2Cut2.toFixed(6)}, entropy {entropyCut2.toFixed(6)} bit, and
+**bond dimension {bondDimensionCut2}** again (`bondDimensionCut2` =
+{bondDimensionCut2}). Both cuts of $|\text{GHZ}\rangle$ need $\chi=2$,
+never more, regardless of which cut is chosen — a clean, checkable fact
+about this particular (highly symmetric) state, not a general law about
+every state's cuts (see Common Mistakes).
+
+### The explicit tensors, and a direct check
+
+Collecting the per-site matrices ($A^{i_1}$ a $1\times2$ row,
+$A^{i_2}$ a genuine $2\times2$ matrix, $A^{i_3}$ a $2\times1$ column):
+
+$$
+A^{0}_{(1)}=\begin{pmatrix}1&0\end{pmatrix},\ A^{1}_{(1)}=\begin{pmatrix}0&1\end{pmatrix},\qquad
+A^{0}_{(2)}=\begin{pmatrix}1&0\\0&0\end{pmatrix},\ A^{1}_{(2)}=\begin{pmatrix}0&0\\0&1\end{pmatrix},\qquad
+A^{0}_{(3)}=\begin{pmatrix}1/\sqrt2\\0\end{pmatrix},\ A^{1}_{(3)}=\begin{pmatrix}0\\1/\sqrt2\end{pmatrix}
+$$
+
+built here as real `Matrix` instances (`mpsSite1`, `mpsSite2`,
+`mpsSite3`) and contracted with nothing but `Matrix.mul` and `.get(0,0)`
+(`mpsAmplitude(i1, i2, i3) = mpsSite1[i1].mul(mpsSite2[i2]).mul(mpsSite3[i3]).get(0, 0)`).
+Checking all 8 basis states against `psiGHZ` directly gives
+`mpsAmplitudesMatch` = {String(mpsAmplitudesMatch)}: the chain of small
+tensors reproduces $|\text{GHZ}\rangle$ exactly, not approximately, using
+$1\!\cdot\!2+4\!\cdot\!2+2\!\cdot\!1=14$ real numbers in place of GHZ's
+own (mostly-zero) 8 amplitudes — no saving at $n=3$, but the same
+$\chi=2$ tensors would tile out to any $n$ with the identical bond
+dimension, which is where the saving actually shows up.
+
+<InteractiveSection title="The MPS chain this example builds" description="A generic n-qubit state (left) treats all 2ⁿ amplitudes as independent. The chain on the right is exactly this lesson's GHZ construction's shape: three small tensors linked by bond dimension χ. The toggle defaults to χ=2 — this worked example's real, computed answer at both cuts — and lets you see what a larger χ (as a highly-entangled, non-area-law 3-qubit state would instead require) would cost; unlike the D=16 baseline in Tensor Network Methods, a 3-qubit chain's bond dimension can never physically exceed 2, so the diagram's larger toggle values are illustrative of the general n-qubit formula only, not achievable states at this size.">
+  <TensorNetworkDiagram
+    ariaLabel="The GHZ state's matrix product state chain: three tensors for qubits 1, 2, and 3, linked by bond dimension chi, defaulting to the worked example's exact value of 2"
+    n={3}
+  />
+</InteractiveSection>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming every cut of an MPS shares the same bond dimension.** GHZ's
+$\chi=2$ at both of its cuts is a special symmetry of that particular
+state, not a general fact: a generic state's Schmidt rank is a genuinely
+different number at each cut (often larger toward the middle of a chain,
+smaller near the ends, since $\chi_k\leq 2^{\min(k,n-k)}$ caps it
+differently at every $k$).
+</Callout>
+
+<Callout type="mistake">
+**Conflating bond dimension (an integer, the Schmidt rank) with
+entanglement entropy (a real number, in bits).** They are related but
+not the same quantity: $|\phi\rangle=\sqrt{0.99}|000\rangle+\sqrt{0.01}|111\rangle$
+has the identical bond dimension 2 at the first cut as GHZ
+(`bondDimensionSkewed` = {bondDimensionSkewed}, both nonzero
+eigenvalues {lambda1Skewed.toFixed(4)} and {lambda2Skewed.toFixed(4)}),
+yet its entropy is only {entropySkewed.toFixed(4)} bit, nowhere near
+GHZ's full 1 bit — the *rank* only counts how many Schmidt terms are
+present, not how evenly they're weighted.
+</Callout>
+
+## Practice Questions
+
+1. Why does keeping *every* nonzero singular value at each SVD step (as
+   this lesson's construction does) make the resulting MPS an *exact*
+   rewriting of the state rather than an approximation?
+2. For the product state $|000\rangle$, what is the bond dimension at
+   both cuts, and what does that say about the corresponding $A^{i_k}$
+   matrices' shapes?
+3. If a 1D gapped Hamiltonian's ground state has entanglement entropy
+   bounded by 3 bits across every cut no matter how large $n$ gets, what
+   does the area law say happens to the required bond dimension $\chi$
+   as $n\to\infty$, and why is that exactly the property that makes MPS
+   simulation of that ground state efficient?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- An $n$-qubit amplitude tensor can be rewritten exactly as a chain of
+  small tensors $A^{i_1}A^{i_2}\cdots A^{i_n}$ via repeated reshaping and
+  SVD, one cut at a time; keeping every nonzero singular value makes the
+  rewriting exact, not approximate.
+- **Bond dimension** $\chi_k$ at a cut is precisely the number of
+  singular values kept there, which is exactly the Schmidt rank of that
+  bipartition — verified directly for GHZ, $\chi=2$ at both cuts of a
+  3-qubit chain, using this platform's own `partialTrace` and
+  `eigenvaluesHermitian2x2`, and cross-checked by contracting the
+  explicit `Matrix` tensors back into the original state.
+- Bond dimension and entanglement entropy are related but distinct:
+  rank counts terms, entropy weighs them (GHZ vs. the skewed
+  $\sqrt{0.99}/\sqrt{0.01}$ state above).
+- The **area law** (cited, not derived here, per Hastings 2007) bounds a
+  gapped 1D ground state's entanglement entropy by a size-independent
+  constant, which is exactly why such ground states admit an MPS with
+  bond dimension that never has to grow with $n$ — the mechanism behind
+  tensor networks being classical physics' primary tool for large 1D
+  (and, via PEPS/MERA, higher-dimensional) many-body simulation.
+
+## Further Exploration
+
+Next: [When Classical Simulation Works](/lessons/apex/simulation-and-compilation-frontiers/when-classical-simulation-works), which
+takes the bond-dimension and area-law machinery built here and turns it
+into a precise, checkable boundary between what a classical computer can
+and cannot efficiently simulate — the actual technical definition of
+where quantum advantage can possibly live.

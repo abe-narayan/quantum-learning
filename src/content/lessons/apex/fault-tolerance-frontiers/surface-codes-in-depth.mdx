@@ -1,0 +1,393 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { SurfaceCodePatchExplorer } from "@/components/visualizations/SurfaceCodePatchExplorer";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/fault-tolerance-frontiers/surface-codes-in-depth"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Surface Codes in Depth",
+  description:
+    "Surface Codes: A Conceptual Introduction described a 2D lattice of local stabilizers in the abstract. This lesson builds one explicit distance-3 patch by hand—every qubit, every stabilizer, every commutation check, and both logical operators, computed rather than gestured at.",
+  course: "fault-tolerance-frontiers",
+  module: "surface-codes-in-depth",
+  order: 1,
+  difficulty: "master",
+  estimatedMinutes: 30,
+  prerequisites: ["quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism", "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction"],
+  objectives: [
+    "Construct the surface code's 2D qubit lattice explicitly: data qubits on edges (or vertices, pick one standard convention and be consistent), X-type stabilizers on vertices/plaquettes and Z-type stabilizers on the dual lattice, and verify a small patch's stabilizers all commute",
+    "Identify the code's logical X and Z operators as strings of Pauli operators running between opposite boundaries, and explain why the code distance equals the minimum such string length",
+    "Compute the exact number of physical qubits, stabilizer generators, and logical qubits for a small dxd surface-code patch, and state the general d-dependence",
+  ],
+  related: [
+    {
+      slug: "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction",
+      note: "That lesson's 3x3-vertex picture (Z on vertices, X on faces, both weight 4) is exactly the convention this lesson makes fully explicit, with real boundaries, real qubit labels, and every commutation check carried out by hand.",
+    },
+    {
+      slug: "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism",
+      note: "The surface code is a CSS code; this lesson's X/Z commutation check is the same g.h-mod-2 rule proved there, applied here to a genuine 2D lattice instead of the Hamming code's abstract parity-check rows.",
+    },
+  ],
+};
+
+## Motivation
+
+Surface Codes: A Conceptual Introduction earned its title honestly: it drew
+a $3\times3$-vertex patch, named the two stabilizer types, and stopped
+there, stating outright that a real construction was "out of scope." That
+was the right call for an introduction sitting right after syndrome
+measurement was first introduced. It is the wrong stopping point for a
+course called Fault Tolerance Frontiers.
+
+This lesson goes where that one didn't: an actual distance-3 surface-code
+patch, with 13 named data qubits, 12 named stabilizer generators, every
+one of their qubit memberships written down explicitly, a real
+commutation check carried out on a specific pair sharing exactly 2
+qubits (not asserted by analogy), and both logical operators identified
+by direct verification rather than by picture alone. Nothing here
+contradicts the conceptual introduction's picture—vertex stabilizers
+are still $Z$-type, face stabilizers are still $X$-type, stabilizers are
+still local—it just stops leaving the picture as a picture.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
+  alt="Google's Sycamore superconducting quantum processor, showing its 2D grid of qubits with nearest-neighbor couplers"
+  caption="Google's Sycamore processor: qubits arranged on a 2D chip with only nearest-neighbor couplers. The 'Why This Matters' section below explains exactly why a chip built like this can implement the lattice this lesson constructs, qubit for qubit, with no long-range wiring at all."
+  credit="Google, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
+  license="CC BY 3.0"
+/>
+
+## Mathematical Development
+
+### Choosing a convention: the unrotated surface code
+
+Two standard conventions build a distance-$d$ surface code. The
+**rotated** code places $d^2$ data qubits on a plain $d\times d$ grid,
+with stabilizers nestled in the gaps—more qubit-efficient, and the
+layout real hardware experiments (including the Sycamore and Willow
+chips) actually use. The **unrotated** code—the one the conceptual
+introduction already gestured at, with qubits "on the edges of a 2D
+grid" and separate vertex/face stabilizers—uses
+$n=2d^2-2d+1$ data qubits for the same distance $d$: more qubits, but a
+cleaner, more directly geometric match to that earlier lesson's own
+language.
+
+**This lesson uses the unrotated convention**, specifically so that
+"vertex stabilizer = $Z$-type" and "face stabilizer = $X$-type" carry
+over unchanged from the conceptual introduction, and so every claim below
+can be checked against that lesson's own picture rather than a
+relabeled one. The trade-off (roughly double the qubits of the rotated
+code at the same distance) is named explicitly, not hidden: Physical
+Interpretation returns to it.
+
+### An explicit distance-3 patch: coordinates, not just a picture
+
+Lay out a $5\times5$ coordinate grid, $(x,y)$ for $x,y\in\{0,1,2,3,4\}$
+— a $(2d-1)\times(2d-1)$ grid at $d=3$. Every site with $x+y$ **even**
+holds a **data qubit**; every site with $x+y$ **odd** holds a
+**stabilizer**. This is the same "qubits on edges, stabilizers on
+vertices and faces" lattice the conceptual introduction drew, just given
+real coordinates: an even-sum site is either a vertex of a coarser
+$3\times3$ grid (both coordinates even) or the center of one of its
+faces (both coordinates odd), and an odd-sum site is exactly the
+midpoint of an edge of that coarser grid—precisely where a physical
+qubit "on an edge" sits. Counting even-sum sites in a $5\times5$ grid
+directly: 3 per even row $\times$ 3 even rows, plus 2 per odd row
+$\times$ 2 odd rows, $=9+4=13$ data qubits—matching
+$2d^2-2d+1=2(9)-6+1=13$ exactly, not by coincidence: the same counting
+argument works for any $d$ (see "General $d$-dependence" below).
+
+Label the 13 data qubits $q_1,\ldots,q_{13}$ in reading order:
+
+$$
+\begin{array}{ccccc}
+q_1{=}(0,0) & & q_2{=}(2,0) & & q_3{=}(4,0)\\
+& q_4{=}(1,1) & & q_5{=}(3,1) & \\
+q_6{=}(0,2) & & q_7{=}(2,2) & & q_8{=}(4,2)\\
+& q_9{=}(1,3) & & q_{10}{=}(3,3) & \\
+q_{11}{=}(0,4) & & q_{12}{=}(2,4) & & q_{13}{=}(4,4)
+\end{array}
+$$
+
+Each odd-sum site is a stabilizer touching the (up to 4) data qubits at
+distance 1 along the grid axes—exactly the "4 edge-qubits around a
+vertex or face" rule the conceptual introduction stated, now applied at
+real coordinates. **Every stabilizer's qubit membership, computed
+directly from adjacency, no exceptions:**
+
+| $X$-stabilizer (face) | site | qubits | weight |
+|---|---|---|---|
+| $x_A$ | $(0,1)$ | $q_4,q_1,q_6$ | 3 (boundary) |
+| $x_B$ | $(2,1)$ | $q_4,q_5,q_2,q_7$ | 4 (bulk) |
+| $x_C$ | $(4,1)$ | $q_5,q_3,q_8$ | 3 (boundary) |
+| $x_D$ | $(0,3)$ | $q_9,q_6,q_{11}$ | 3 (boundary) |
+| $x_E$ | $(2,3)$ | $q_9,q_{10},q_7,q_{12}$ | 4 (bulk) |
+| $x_F$ | $(4,3)$ | $q_{10},q_8,q_{13}$ | 3 (boundary) |
+
+| $Z$-stabilizer (vertex) | site | qubits | weight |
+|---|---|---|---|
+| $z_A$ | $(1,0)$ | $q_1,q_2,q_4$ | 3 (boundary) |
+| $z_B$ | $(3,0)$ | $q_2,q_3,q_5$ | 3 (boundary) |
+| $z_C$ | $(1,2)$ | $q_6,q_7,q_4,q_9$ | 4 (bulk) |
+| $z_D$ | $(3,2)$ | $q_7,q_8,q_5,q_{10}$ | 4 (bulk) |
+| $z_E$ | $(1,4)$ | $q_{11},q_{12},q_9$ | 3 (boundary) |
+| $z_F$ | $(3,4)$ | $q_{12},q_{13},q_{10}$ | 3 (boundary) |
+
+The $X$-stabilizers sit at columns $x\in\{0,2,4\}$: the two extreme
+columns ($x=0,4$) each have only 3 in-bounds neighbors, giving the
+weight-3 boundary stabilizers along the **left/right edges**; the middle
+column ($x=2$) gives the two weight-4 bulk stabilizers. By the same
+logic on rows, the $Z$-stabilizers' weight-3 members sit along the
+**top/bottom edges**. Call left/right the **rough** boundary (where
+face/$X$-stabilizers are the truncated ones) and top/bottom the
+**smooth** boundary (where vertex/$Z$-stabilizers are truncated) —
+standard terminology, now tied to a real coordinate fact rather than
+asserted.
+
+### The commutation check, done on a real pair
+
+Objective 1 asks for exactly this: pick a representative $X$-stabilizer
+and $Z$-stabilizer and verify they commute. Take the two bulk generators
+$x_B$ (qubits $q_4,q_5,q_2,q_7$) and $z_C$ (qubits $q_6,q_7,q_4,q_9$).
+Their supports overlap at **exactly 2 qubits**, $q_4$ and $q_7$:
+
+$$
+x_B = X_4X_5X_2X_7, \qquad z_C = Z_6Z_7Z_4Z_9
+$$
+
+At $q_4$: $X$ and $Z$ anticommute (one sign flip). At $q_7$: $X$ and $Z$
+anticommute again (a second sign flip). Two sign flips cancel:
+$x_Bz_C=(-1)^2z_Cx_B=z_Cx_B$. This is the CSS Codes and the General
+Stabilizer Formalism rule ($X^g,Z^h$ commute iff $g\cdot h\equiv0\bmod2$,
+i.e. an even overlap) applied concretely: $g\cdot h=2\equiv0$. It is not
+a coincidence specific to this one pair—Practice Question 2 below asks
+for the geometric reason *every* $X$/$Z$ stabilizer pair in this lattice
+shares an even number of qubits (0 or 2, never 1 or 3).
+
+Two same-type generators always commute regardless of overlap (identical
+Pauli at every shared qubit), so checking every $X$/$Z$ pair is the only
+work needed. Doing so for all $6\times6=36$ pairs (each pair overlapping
+in 0 or 2 qubits, by the same boundary-loop argument) confirms **all 12
+generators commute**, so they generate a genuine stabilizer group.
+
+### Logical operators, verified by direct commutation
+
+A logical operator must commute with every stabilizer while not itself
+being a product of stabilizers. Try the horizontal string across the
+**middle row** ($y=2$): $\bar X\equiv X_6X_7X_8$ (qubits $q_6,q_7,q_8$,
+weight 3). Checking against every $Z$-stabilizer directly: $z_A,z_B$
+(top boundary) share 0 qubits with $\{q_6,q_7,q_8\}$ (commute
+trivially); $z_C$ shares $\{q_6,q_7\}$, 2 qubits (commutes); $z_D$
+shares $\{q_7,q_8\}$, 2 qubits (commutes); $z_E,z_F$ (bottom boundary)
+share 0 qubits (commute trivially). $\bar X$ commutes with every
+generator. It is also not a product of the six $X$-generators alone
+(the only way a pure-$X$ stabilizer-group element could arise): the
+product of *all six* $X$-generators works out to $\{q_1,q_2,q_3,q_{11},q_{12},q_{13}\}$
+(the top row and bottom row together, weight 6)—confirming $\bar X$
+(the middle row alone) is a genuinely different, nontrivial operator,
+equivalent to top-row-alone or bottom-row-alone (each also weight 3,
+differing from the middle row by a stabilizer) but not equivalent to the
+identity.
+
+$\bar X$ runs from $q_6$ (on the **left rough boundary**, $x=0$) through
+the center $q_7$ to $q_8$ (on the **right rough boundary**, $x=4$):
+literally a string connecting the two rough boundaries, exactly the
+"boundary-to-boundary string" the conceptual picture promised, now an
+explicit weight-3 operator.
+
+By the same check on the **middle column** ($x=2$): $\bar
+Z\equiv Z_2Z_7Z_{12}$ (qubits $q_2,q_7,q_{12}$, weight 3) commutes with
+every $X$-stabilizer by an identical argument, and runs from $q_2$ (top
+**smooth boundary**, $y=0$) through $q_7$ to $q_{12}$ (bottom smooth
+boundary, $y=4$).
+
+$\bar X$ and $\bar Z$ share **exactly one qubit**, $q_7$—the patch's
+center. One shared qubit means $X$ and $Z$ anticommute there, and
+nowhere else to cancel it: $\bar X\bar Z=-\bar Z\bar X$, exactly the
+symplectic structure a single logical qubit's own Pauli operators must
+have (the same check CSS Codes and the General Stabilizer Formalism ran
+on the Steane code's $\bar X,\bar Z$).
+
+### Why the distance is exactly 3
+
+**Distance** is the minimum weight of any logical (normalizer,
+non-stabilizer) operator. $\bar X$ and $\bar Z$ above both have weight
+3, so $d\leq3$. No weight-1 or weight-2 operator can be logical: a
+weight-1 $X$ error on any single qubit anticommutes with at least one
+$Z$-stabilizer (every data qubit touches at least one $Z$-generator,
+including the corners, e.g. $q_1$ touches $z_A$ alone), so it is
+*detected*, not an undetectable logical error; a similar check rules out
+every weight-2 combination reaching from one rough (or smooth) boundary
+to the other, since the $5\times5$ coordinate spacing forces at least 3
+qubits to bridge $x=0$ to $x=4$ (or $y=0$ to $y=4$) along the lattice.
+So $d=3$ exactly: the shortest boundary-to-boundary string *is* the
+code distance, verified by direct construction rather than asserted by
+the general topological argument alone.
+
+### General $d$-dependence
+
+The same coordinate-counting argument (even-sum sites in a
+$(2d-1)\times(2d-1)$ grid) generalizes cleanly:
+
+| Quantity | Formula | at $d=3$ |
+|---|---|---|
+| Data qubits | $2d^2-2d+1$ | $13$ |
+| $X$-stabilizers | $d(d-1)$ | $6$ |
+| $Z$-stabilizers | $d(d-1)$ | $6$ |
+| Independent generators | $2d(d-1)=n-1$ | $12$ |
+| Logical qubits | $1$ | $1$ |
+| Code distance | $d$ | $3$ |
+
+$13-12=1$: exactly one logical qubit, for any $d$, the same $n-(n-k)=k$
+counting Stabilizer Formalism Basics and CSS Codes and the General
+Stabilizer Formalism both used, verified again here on a genuinely 2D
+lattice.
+
+## Physical Interpretation: Why This Matters
+
+The conceptual introduction already named the punchline: local
+stabilizers matter because real hardware has local connectivity. This
+lesson's explicit lattice shows *exactly* why that isn't a vague
+gesture. Every one of the 12 stabilizers built above touches at most 4
+data qubits, and—this is the part a picture alone doesn't prove —
+every qubit a given stabilizer touches sits at grid-distance 1 from that
+stabilizer's own site. A two-qubit gate implementing part of $x_B$'s
+measurement, say between the ancilla at $(2,1)$ and data qubit $q_4$ at
+$(1,1)$, is a gate between *physically adjacent* sites on this exact
+coordinate grid, not an abstract index pair.
+
+That is precisely the layout Quantum Hardware's Physical Qubit
+Platforms course describes for superconducting qubits: a 2D chip with
+fixed nearest-neighbor couplers, no long-range wiring between distant
+qubits. The Sycamore chip pictured above is that hardware fact made
+literal—its qubits are arranged, and coupled, exactly the way this
+lattice needs its ancillas coupled to their 4 (or fewer, at a boundary)
+neighbors. A code whose stabilizers needed qubits at arbitrary distance
+(the Shor code's 9-qubit stabilizers, or worse, would need this on a
+chip with no long-range coupling) simply could not be measured on this
+hardware without expensive, error-prone SWAP chains to first bring
+distant qubits together. The surface code's stabilizers never need
+that: this is the concrete, geometric reason—not a hand-wave about
+"scalability"—that it became the dominant near-term fault-tolerance
+architecture candidate. Google's 2024 Willow demonstration (cited in the
+conceptual introduction) ran distance-3, -5, and -7 patches built from
+this same local-checking pattern on exactly this kind of chip—though
+Willow itself uses the more qubit-efficient rotated layout described
+above, not the unrotated lattice constructed in this lesson.
+
+## Worked Example
+
+**Confirm the boundary-weight claim directly: show $z_A$ (the
+$Z$-stabilizer at site $(1,0)$) has weight 3, and identify which
+qubit "would" complete it to weight 4 if the lattice extended further.**
+
+$z_A$ sits at $(1,0)$. Its four candidate neighbors at grid-distance 1
+are $(0,0)=q_1$, $(2,0)=q_2$, $(1,-1)$, and $(1,1)=q_4$. The site
+$(1,-1)$ has $y=-1$, outside the $[0,4]$ range the $d=3$ patch occupies
+— there is no qubit there. So $z_A=Z_1Z_2Z_4$, weight 3, exactly the
+"one fewer than 4" pattern the conceptual introduction's own picture
+allowed for ("4, or fewer at boundaries"). Extending the lattice one
+more row upward (a $d=4$-ish patch in that direction) would add a data
+qubit at $(1,-1)$ and promote $z_A$ to weight 4—concretely showing
+*why* boundary stabilizers are weight-3 here and not a fundamentally
+different kind of object: they are ordinary weight-4 vertex stabilizers
+with one neighbor simply absent because the patch ends there.
+
+<InteractiveSection
+  title="The distance-3 patch: stabilizers and logical operators, worked interactively"
+  description="Every qubit, stabilizer, and logical string above, laid out on the same coordinate grid. Pick a highlight to see one specific check at a time—the two bulk generators from the worked commutation check, or either logical operator's boundary-to-boundary path—with the full 13-qubit, 12-stabilizer lattice always visible for context."
+>
+  <SurfaceCodePatchExplorer ariaLabel="Interactive diagram of the distance-3 unrotated surface code patch: 13 data qubits and 12 stabilizers on a 5 by 5 coordinate grid, with a selector to highlight a bulk X-stabilizer, a bulk Z-stabilizer, their 2-qubit commutation check, or either weight-3 logical operator" />
+</InteractiveSection>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming all stabilizers have the same weight.** This patch's 8
+boundary generators are weight 3, not weight 4—a real geometric
+consequence of the patch ending somewhere, not an approximation or a
+simplification. Only the 4 bulk generators ($x_B,x_E,z_C,z_D$) reach the
+full weight-4 the conceptual introduction's "always 4 qubits" language
+described in the interior.
+</Callout>
+
+<Callout type="mistake">
+**Thinking the logical operator has to be the exact string drawn in one
+picture.** $\bar X=X_6X_7X_8$ (middle row) and $X_1X_2X_3$ (top row) are
+*the same logical operator*—they differ by exactly the product of
+$x_A,x_B,x_C$, a stabilizer element, so they act identically on the
+codespace. Distance asks for the *minimum* weight among all such
+equivalent representatives, not the weight of any single one you happen
+to draw.
+</Callout>
+
+<Callout type="mistake">
+**Confusing "rough" and "smooth" boundary labels with a universal
+convention.** Different papers assign these labels to opposite pairs of
+edges (and correspondingly swap which logical operator runs between
+them). This lesson fixed one explicit, internally consistent
+assignment—rough = left/right, where $X$-stabilizers truncate—and
+verified $\bar X$ actually runs between those two edges by direct
+computation. What must hold in any consistent convention is the
+computed fact, not the label.
+</Callout>
+
+## Practice Questions
+
+1. Verify by hand that $x_E$ (qubits $q_9,q_{10},q_7,q_{12}$) and $z_D$
+   (qubits $q_7,q_8,q_5,q_{10}$) share exactly 2 qubits, name them, and
+   confirm they commute using the same two-sign-flips argument as the
+   $x_B$/$z_C$ check above.
+2. The lesson's commutation check found $x_B$/$z_C$ sharing 2 qubits.
+   Using the fact that an $X$-stabilizer's qubits are exactly the edges
+   bounding one face while a $Z$-stabilizer's qubits are exactly the
+   edges meeting at one vertex, explain why *any* face and *any* vertex
+   in this lattice must share an even number of edges (0 or 2), never an
+   odd number.
+3. For a distance-5 patch (same convention), compute the exact number of
+   data qubits, $X$-stabilizers, $Z$-stabilizers, and independent
+   generators, and confirm the generator count is exactly one less than
+   the qubit count.
+4. Corner qubit $q_1=(0,0)$ is touched by only one $X$-stabilizer
+   ($x_A$) and one $Z$-stabilizer ($z_A$). Explain why a single-qubit
+   $Y$ error on $q_1$ (both an $X$ and a $Z$ error at once) is still
+   detected, even though $q_1$ has the lowest stabilizer-degree of any
+   qubit in the patch.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- This lesson chose the **unrotated** surface-code convention
+  ($n=2d^2-2d+1$ data qubits) specifically to extend the conceptual
+  introduction's own vertex/face language without relabeling it.
+- A genuine distance-3 patch was built explicitly: 13 data qubits, 6
+  $X$-stabilizers (face) and 6 $Z$-stabilizers (vertex), every one's
+  qubit membership computed from real coordinates, not drawn by
+  analogy.
+- A representative bulk $X$/$Z$ pair ($x_B$, $z_C$) was verified to
+  share exactly 2 qubits and therefore commute, the CSS commutation
+  rule applied concretely; the same even-overlap property holds for
+  every stabilizer pair in the lattice.
+- Logical $\bar X$ and $\bar Z$ are weight-3 strings running between
+  opposite boundaries (rough for $\bar X$, smooth for $\bar Z$),
+  sharing exactly the center qubit $q_7$ and anticommuting there, giving
+  code distance $d=3$, verified by direct construction.
+- Local, small-weight stabilizers on a 2D coordinate grid are directly
+  implementable on hardware with only nearest-neighbor connectivity
+  (superconducting chips like Sycamore, pictured above)—the concrete
+  engineering reason, not just a mathematical one, for the surface
+  code's dominance.
+
+## Further Exploration
+
+Next in this course: [Decoding Surface Codes](/lessons/apex/fault-tolerance-frontiers/decoding-surface-codes),
+which takes this lesson's 12 stabilizer generators and asks the question
+a real device must answer every measurement cycle—given a pattern of
+which stabilizers fired, which physical qubits most likely errored, and
+how a decoder answers that question fast enough to keep up with the
+hardware.

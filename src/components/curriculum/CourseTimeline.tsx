@@ -19,6 +19,7 @@ const PILLAR_LABEL: Record<Pillar, string> = {
   "quantum-hardware": "Hardware",
   "quantum-software": "Software",
   "quantum-mastery": "Mastery",
+  apex: "Apex",
 };
 
 /**

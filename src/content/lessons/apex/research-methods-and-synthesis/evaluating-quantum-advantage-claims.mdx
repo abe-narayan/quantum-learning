@@ -1,0 +1,400 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { Callout } from "@/components/mdx/Callout";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Evaluating Quantum Advantage Claims",
+  description:
+    "A five-question checklist, built directly on this course's own classically-easy criteria, for turning any 'quantum advantage' headline into a set of concrete, checkable claims about a specific task, a specific classical baseline, and a specific assumption.",
+  course: "research-methods-and-synthesis",
+  module: "evaluating-quantum-advantage-claims",
+  order: 3,
+  difficulty: "master",
+  estimatedMinutes: 25,
+  prerequisites: [
+    "apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic",
+    "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
+  ],
+  objectives: [
+    "Build an explicit checklist for evaluating a 'quantum advantage/supremacy' claim: what specific task was solved, what specific classical baseline was compared against, was that baseline actually the best known classical approach, and what complexity-theoretic assumption (if any) underlies the claimed classical hardness",
+    "Apply the checklist to the real, well-documented history of quantum advantage claims being challenged or narrowed by improved classical algorithms, correctly identifying what this pattern does and doesn't mean about the field's validity",
+    "Explain the crucial distinction between a quantum advantage claim for a specifically-engineered task versus for a genuinely useful computational problem, and why this distinction matters for evaluating real-world impact",
+  ],
+  related: [
+    {
+      slug: "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
+      note: "That lesson's two classical-simulability loopholes — Gottesman-Knill/stabilizer structure and bounded bond-dimension/entanglement growth — are the exact structural checks this lesson's checklist asks a claimed-hard task to survive.",
+    },
+  ],
+};
+
+## Motivation
+
+Distinguishing Theorem from Heuristic gave you the vocabulary to sort a
+result by its epistemic status — proven, conjectured, or merely observed to
+work. When Classical Simulation Works, from this pillar's simulation and
+compilation course, gave you something sharper and more structural: two
+specific, checkable reasons a quantum circuit might collapse to something a
+laptop can simulate efficiently — Gottesman-Knill/stabilizer structure, and
+bounded bond-dimension growth (low entanglement, simulable by a matrix
+product state). Put those two tools together and you already have almost
+everything you need to evaluate the single most publicly visible, most
+routinely overclaimed, and most routinely *under*-claimed kind of statement
+in the entire field: "quantum computer achieves quantum advantage."
+
+This lesson does not introduce new physics. It assembles a checklist —
+five questions, in a fixed order — that turns a vague headline into a set
+of claims you can actually check, and it applies that checklist honestly to
+the field's own real history, including the uncomfortable parts. That
+history is not a scandal. Read correctly, it is exactly what a healthy
+research field should look like from the outside, and knowing how to read
+it that way is the actual point of this lesson.
+
+## The Checklist
+
+Given any claim of the form "quantum computer X achieved quantum advantage
+(or supremacy) on task Y," ask these five questions, in this order. Each
+one either survives the claim or narrows exactly what it's actually saying.
+
+<DefinitionBox title="The five-question quantum advantage checklist">
+
+1. **What specific computational task was actually solved or sampled
+   from?** Not the press-release description — the literal input/output
+   specification. "Simulating a molecule" and "sampling from a specific
+   random circuit's output distribution" are different tasks with
+   completely different downstream implications, even if both get called
+   "quantum advantage."
+2. **What specific classical algorithm and hardware was it compared
+   against — and was that genuinely the *best known* classical approach at
+   the time, or a weaker baseline?** A claim compared against a naive
+   brute-force state-vector simulation is a much weaker claim than one
+   compared against the best classical algorithm anyone had published, run
+   on comparable hardware.
+3. **Does the claimed classical hardness rest on an unconditional proof,
+   or a plausible-but-unproven complexity-theoretic assumption?** As the
+   Complexity Theory capstone established, essentially every real
+   classical-hardness argument for a sampling task rests on something like
+   the polynomial hierarchy not collapsing — a real, citable, Tier 2
+   argument, not a Tier 1 theorem. Naming the assumption is not a weakness
+   in the claim; failing to name it is a weakness in how the claim is being
+   reported.
+4. **Using this course's own two classical-simulability criteria, does the
+   task structurally avoid *both* known efficient-simulation loopholes?**
+   Concretely: is the circuit provably far from Clifford/stabilizer
+   structure (Gottesman-Knill doesn't apply), and does its entanglement
+   genuinely grow with system size rather than staying bounded (no
+   efficient matrix-product-state representation)? A task that secretly
+   falls into either loophole is not hard to classically simulate at all —
+   it just hasn't been noticed yet.
+5. **Is the demonstrated task practically useful, or specifically
+   engineered to be hard for classical computers with no other purpose?**
+   This is a genuinely separate axis from every question above. A claim
+   can pass questions 1–4 cleanly and still be a demonstration of raw
+   hardware capability with no direct economic or scientific payoff on its
+   own — and that is worth knowing explicitly, not discovering later.
+
+</DefinitionBox>
+
+Notice what this checklist is not: it is not a way to debunk every claim,
+and it is not a way to declare every claim solid. It is a fixed set of
+questions that forces a headline to become five separate, checkable
+statements — and a claim that answers all five precisely is a genuinely
+strong claim, exactly as much as a claim that dodges two or three of them
+is a weak one.
+
+## Physical Interpretation: Why This Matters
+
+Every one of these five questions maps onto a real distinction that gets
+collapsed constantly in how quantum computing results reach the public,
+and the collapse runs in both directions.
+
+**The pro-quantum collapse.** A headline says "quantum computer solves in
+200 seconds what would take a classical supercomputer 10,000 years,"
+without naming the task, the specific classical algorithm the 10,000-year
+estimate came from, or the assumption behind the classical-hardness claim.
+Readers come away believing something like "quantum computers are now
+generally faster than classical ones" — a claim questions 1, 2, and 5
+above would immediately show is far too broad. The actual claim is almost
+always narrower: *for one specific, often practically-useless task*,
+*against one specific classical baseline*, *under one specific unproven
+assumption*.
+
+**The anti-quantum collapse.** A follow-up headline says "classical
+computer matches quantum supremacy claim, quantum advantage debunked,"
+treating an improved classical algorithm's narrowed margin as proof the
+entire field is overclaiming or worse. This skips question 3 entirely: the
+classical-hardness claim was never an unconditional proof to begin with,
+so an improved classical algorithm challenging it isn't a refutation of
+anything — it's the assumption being tested exactly the way an honest
+conjecture should be tested.
+
+**The most important single distinction — hard-to-simulate versus useful.**
+Question 5 deserves to be stated as its own principle, because conflating
+it with questions 1–4 is the single most common source of public confusion
+about what these results mean:
+
+<Callout type="note">
+**"Hard to classically simulate" and "practically useful" are two separate
+axes.** A task can be hard to simulate and useless (most random circuit
+sampling experiments), useful and easy to simulate for most real instances
+(many chemistry problems on small molecules), or — the genuinely valuable
+target — useful *and* hard to simulate for the instances that matter (the
+open goal of quantum simulation for classically-intractable molecules and
+materials). Treating "hard to simulate" as a synonym for "important" or
+vice versa produces exactly the whiplash between overclaiming and
+dismissiveness described above.
+</Callout>
+
+Random circuit sampling and boson-sampling-style demonstrations are
+**deliberately** chosen because they satisfy question 4 cleanly — they sit
+as far as possible from both Gottesman-Knill structure and bounded
+bond-dimension growth, which is exactly what makes them a clean test of
+raw quantum hardware capability and indirect evidence for a genuine
+quantum-classical complexity separation. That is real scientific value.
+But the task itself — sampling from one specific random circuit's output
+distribution — has essentially no direct economic or scientific use on its
+own; nobody wants that particular sample for its own sake.
+
+Contrast that with Simulation and Compilation Frontiers' molecular ground-
+state energy problem. Finding a molecule's ground-state energy is
+independently, practically valuable — to chemistry, to materials design, to
+drug discovery — regardless of whether that energy turns out to be
+classically easy or classically hard to compute for any specific molecule.
+Usefulness there doesn't depend on hardness at all; some molecules are
+classically tractable (weak entanglement growth, question 4 fails to
+apply) and still worth computing, and others are believed classically
+intractable and would be worth computing precisely because a quantum
+computer could reach them. The task's value and the task's hardness are
+answers to two different questions, and a claim that only answers one of
+them has told you only half of what you need to know.
+
+## Worked Example: Classifying a Real Pattern Honestly
+
+**Apply the checklist to the following, carefully honest statement: "A
+2019 superconducting-processor experiment claimed a large classical-runtime
+gap for a random-circuit-sampling task; subsequent classical algorithms
+have, more than once, narrowed or contested the classical-hardness margin
+for specific instances of this kind of experiment. Does this mean quantum
+advantage claims in this line of work are unreliable?"**
+
+**Question 1 — the specific task.** Sampling from the output distribution
+of one particular family of random quantum circuits on a fixed number of
+qubits and circuit depth — not a useful computation, a deliberately chosen
+sampling problem.
+
+**Question 2 — the classical baseline.** The original classical-runtime
+estimate was produced by the best classical simulation technique known and
+published *at that time*. That is the right way to make the comparison —
+but "best known at the time" is a moving target, not a permanent ceiling.
+
+**Question 3 — the assumption.** The classical-hardness argument for tasks
+like this rests on a real, citable complexity-theoretic argument tied to
+the polynomial hierarchy not collapsing — a Tier 2, strongly-evidenced-but-
+unproven assumption, not a Tier 1 theorem. This was true on day one, not a
+detail that emerged later.
+
+**Question 4 — the structural check.** Circuits in this family are
+constructed specifically to avoid both loopholes: they are built from
+gates outside the Clifford group (no Gottesman-Knill shortcut) and run deep
+enough that entanglement grows across the whole system (no efficient
+matrix-product-state description). That is exactly why they were chosen as
+the demonstration task in the first place.
+
+**Question 5 — usefulness.** None, directly. The sampling task has no
+independent economic or scientific application; its value is entirely as a
+capability benchmark and as empirical evidence bearing on question 3's
+underlying complexity assumption.
+
+**Now the actual question: does classical progress against these claims
+mean the line of work is unreliable?** No — and the reasoning matters more
+than the conclusion:
+
+- Improving classical algorithms *in direct response to* a quantum claim is
+  exactly the correct scientific process, provided the original claim was
+  appropriately careful about what it asserted at the time (question 2's
+  "best known at the time," not "best possible ever"). A conjecture that
+  invites attempts to break it, and gets tested by them, is a conjecture
+  behaving exactly as a conjecture should.
+- A narrowed margin is still often a real, if smaller, advantage — going
+  from "10,000 classical years" to "a few classical days" for a specific
+  instance is a massive change in the classical-hardness margin, but it
+  does not necessarily erase an advantage entirely, and each specific case
+  has to be checked on its own terms rather than treated as a uniform
+  "debunking."
+- Designing new demonstrations specifically harder for the improved
+  classical algorithms to catch is itself legitimate, valuable ongoing
+  research — an arms race dynamic that shows up constantly elsewhere in
+  algorithm design (cryptography's own history of proposed schemes and
+  subsequent attacks is the clearest classical parallel) and is not unique
+  to, or discrediting of, quantum computing specifically.
+
+The honest summary sentence: *this pattern — real, more than one
+documented instance, well known within the field's own literature — is the
+community's healthy self-correction process working in public, not a sign
+the underlying research program is broken.*
+
+## Interactive Visualization: The Two-Axis Map
+
+<div className="not-prose my-8 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+  <div className="grid min-w-[560px] grid-cols-[120px_1fr_1fr] gap-2">
+    <div />
+    <div className="rounded-lg px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+      Low practical usefulness
+    </div>
+    <div className="rounded-lg px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+      High practical usefulness
+    </div>
+
+    <div className="flex items-center justify-center rounded-lg px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+      Hard to<br />classically<br />simulate
+    </div>
+    <div className="rounded-lg border border-brand/40 bg-brand/5 p-4">
+      <p className="text-sm font-semibold text-brand">Random circuit sampling / boson sampling</p>
+      <p className="mt-2 text-sm leading-snug text-foreground">
+        Avoids both Gottesman-Knill and bounded-bond-dimension loopholes by
+        design. Genuine test of raw hardware capability and indirect
+        evidence for a quantum-classical complexity separation — but the
+        sampled distribution itself has no independent economic or
+        scientific use.
+      </p>
+    </div>
+    <div className="rounded-lg border border-accent/40 bg-accent/5 p-4">
+      <p className="text-sm font-semibold text-accent">Ground-state energy of a classically-intractable molecule</p>
+      <p className="mt-2 text-sm leading-snug text-foreground">
+        The genuinely valuable target: independently useful (chemistry,
+        materials, drug design) <em>and</em>, for the hard instances,
+        structurally resistant to both classical-simulability loopholes.
+        Whether any specific molecule lands here is the open, case-by-case
+        question quantum chemistry is built around.
+      </p>
+    </div>
+
+    <div className="flex items-center justify-center rounded-lg px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+      Classically<br />easy
+    </div>
+    <div className="rounded-lg border border-border bg-surface-muted/60 p-4">
+      <p className="text-sm font-semibold text-foreground">A Clifford-only or shallow, low-entanglement demonstration circuit</p>
+      <p className="mt-2 text-sm leading-snug text-foreground">
+        Falls into one of the prerequisite lesson's own loopholes
+        (Gottesman-Knill or bounded bond dimension), so it is efficiently
+        classically simulable regardless of how it's marketed — no genuine
+        advantage claim survives question 4 here.
+      </p>
+    </div>
+    <div className="rounded-lg border border-border bg-surface-muted/60 p-4">
+      <p className="text-sm font-semibold text-foreground">Ground-state energy of a small, weakly-entangled molecule</p>
+      <p className="mt-2 text-sm leading-snug text-foreground">
+        Practically useful to compute, but classically tractable for this
+        specific case — a legitimate quantum computation with no quantum
+        advantage claim attached, and none needed for it to be worth doing.
+      </p>
+    </div>
+  </div>
+</div>
+
+Read this grid as the visual form of question 5: the right column and the
+top row are answers to two genuinely independent questions. Random circuit
+sampling sits in the top-left because it was built to sit there. Molecular
+simulation's whole research program is aimed at reaching the top-right —
+and most of its actual, current results, being classically tractable
+today, sit in the bottom-right instead, which is not a failure, just an
+honest description of where the field currently stands.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating a narrowed quantum-advantage margin after improved classical
+algorithms as proof the original claim was fraudulent or the field is
+broken.** It means science is working correctly. The original claim rested
+on a stated, plausible-but-unproven assumption (question 3) and the best
+classical approach known *at the time* (question 2) — both explicitly
+provisional by their own nature. A later, better classical algorithm
+testing that provisional claim, and narrowing or contesting it for
+specific instances, is the field checking its own extraordinary claims
+exactly the way a healthy field should, provided the original researchers
+were appropriately careful about what they claimed. The failure mode would
+be an original claim asserting unconditional, permanent classical
+impossibility — that would be false regardless of what happened later, and
+that is not, in the well-documented cases, what careful original papers
+actually asserted.
+</Callout>
+
+<Callout type="mistake">
+**Treating "hard to classically simulate" and "practically useful" as the
+same axis, or assuming one implies the other.** A task engineered to be
+maximally hard for classical computers (question 4 passing cleanly) tells
+you nothing about question 5, and a practically important task (a real
+molecule, a real optimization problem) tells you nothing about question 4
+on its own — some useful instances are classically easy, some are hard,
+and which is which is often the entire open research question. Reporting
+that treats every "quantum advantage" demonstration as if it were also
+economically significant, or dismisses every useful-but-currently-easy
+quantum computation for lacking a supremacy claim, is making the same
+category error in opposite directions.
+</Callout>
+
+## Practice Questions
+
+1. A hypothetical claim: "A trapped-ion processor sampled from a random
+   circuit on 60 qubits at depth 20; the best classical tensor-network
+   simulation published in 2023 was estimated to need 3 classical years
+   to reproduce the same distribution." Apply Questions 1–3 of the
+   checklist explicitly: state the specific task in Question 1's terms,
+   evaluate whether "the best classical simulation published in 2023"
+   satisfies Question 2's "best known at the time" standard, and name the
+   specific complexity-theoretic status (per Question 3) of the
+   classical-hardness argument behind the 3-year estimate.
+2. Two years later, an improved classical algorithm reduces the
+   estimated classical runtime for that same circuit family from 3 years
+   to 3 weeks. Using this lesson's worked example and its Common Mistakes
+   callout, explain why this development alone does not mean the
+   original claim was "debunked," and state precisely what would have
+   had to be true about the *original* claim for that word to apply.
+3. A separate claim states: "our quantum processor computed the
+   ground-state energy of a 12-atom cluster relevant to battery-catalyst
+   design, a computation intractable for classical methods." Apply
+   Question 4 (this course's two classical-simulability loopholes) and
+   Question 5 (usefulness) to this claim: what specific structural
+   evidence would you need to see to confirm Question 4, and how does
+   this claim's position on the usefulness axis differ from the
+   random-circuit-sampling example worked through above?
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A "quantum advantage" claim decomposes into five checkable questions:
+  the specific task, the specific classical baseline (and whether it was
+  genuinely the best known), the specific assumption behind any claimed
+  classical hardness, whether the task structurally avoids both of this
+  course's classical-simulability loopholes (Gottesman-Knill structure and
+  bounded bond-dimension growth), and whether the task is practically
+  useful or specifically engineered to be hard.
+- The field's real, well-documented pattern of classical algorithms
+  subsequently narrowing or contesting specific classical-hardness margins
+  is healthy self-correction, not fraud or failure — provided the original
+  claims were honestly scoped to "best known classical approach at the
+  time" rather than an unconditional, permanent impossibility.
+- "Hard to classically simulate" and "practically useful" are two separate
+  axes. Random circuit sampling occupies hard-to-simulate/low-usefulness by
+  design; a molecule's ground-state energy is independently useful
+  regardless of where it lands on the hardness axis; conflating the two
+  axes is a common, real source of public confusion about what these
+  results mean.
+- The practical payoff: turning a vague, unevaluable headline into five
+  concrete, checkable questions is the single most useful skill for
+  assessing any current or future claim about quantum computing's
+  progress.
+
+## Further Exploration
+
+Continue to [Reproducing and Designing
+Experiments](/lessons/apex/research-methods-and-synthesis/reproducing-and-designing-experiments),
+which takes this lesson's checklist one step further: not just evaluating
+an existing claim, but what a reproducible benchmark and a well-designed
+new experiment actually require.

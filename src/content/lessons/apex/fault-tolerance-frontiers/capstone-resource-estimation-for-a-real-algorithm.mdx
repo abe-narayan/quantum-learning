@@ -1,0 +1,426 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm"
+).map((problem) => problem.meta);
+
+export function smallestOddAtLeast(x) {
+  let n = Math.ceil(x);
+  if (n % 2 === 0) n += 1;
+  return n;
+}
+
+export const toyNT = 100;
+export const toyN2 = 500;
+export const toyTotalGates = toyNT + toyN2;
+export const targetOverallFailure = 0.01;
+export const perGateBudget = targetOverallFailure / toyTotalGates;
+
+export const thresholdErrorRate = 0.01;
+export const physicalErrorRate = thresholdErrorRate / 10;
+export const errorRatio = physicalErrorRate / thresholdErrorRate;
+
+export const minCodeDistanceRaw = 2 * (Math.log(perGateBudget) / Math.log(errorRatio)) - 1;
+export const codeDistance = smallestOddAtLeast(minCodeDistanceRaw);
+export const achievedLogicalErrorRate = Math.pow(errorRatio, (codeDistance + 1) / 2);
+
+export const rawMagicStateErrorRate = physicalErrorRate;
+export const distillationInputStatesPerRound = 15;
+export const distillationOutputError = 35 * Math.pow(rawMagicStateErrorRate, 3);
+export const magicStateHeadroom = perGateBudget / distillationOutputError;
+
+export const dataQubitsPerPatch = codeDistance * codeDistance;
+export const ancillaQubitsPerPatch = codeDistance * codeDistance - 1;
+export const qubitsPerLogicalPatch = dataQubitsPerPatch + ancillaQubitsPerPatch;
+
+export const logicalQubitCount = 6;
+export const totalDataQubits = dataQubitsPerPatch * logicalQubitCount;
+export const totalAncillaQubits = ancillaQubitsPerPatch * logicalQubitCount;
+export const computeQubits = totalDataQubits + totalAncillaQubits;
+
+export const factoryQubits = distillationInputStatesPerRound * qubitsPerLogicalPatch;
+export const totalPhysicalQubits = totalDataQubits + totalAncillaQubits + factoryQubits;
+export const factoryShareOfTotal = factoryQubits / totalPhysicalQubits;
+
+export const altPhysicalErrorRate = thresholdErrorRate / 100;
+export const altErrorRatio = altPhysicalErrorRate / thresholdErrorRate;
+export const altMinCodeDistanceRaw = 2 * (Math.log(perGateBudget) / Math.log(altErrorRatio)) - 1;
+export const altCodeDistance = smallestOddAtLeast(altMinCodeDistanceRaw);
+export const altDataQubitsPerPatch = altCodeDistance * altCodeDistance;
+export const altAncillaQubitsPerPatch = altCodeDistance * altCodeDistance - 1;
+export const altQubitsPerLogicalPatch = altDataQubitsPerPatch + altAncillaQubitsPerPatch;
+export const altTotalDataQubits = altDataQubitsPerPatch * logicalQubitCount;
+export const altTotalAncillaQubits = altAncillaQubitsPerPatch * logicalQubitCount;
+export const altFactoryQubits = distillationInputStatesPerRound * altQubitsPerLogicalPatch;
+export const altTotalPhysicalQubits = altTotalDataQubits + altTotalAncillaQubits + altFactoryQubits;
+export const altFactoryShareOfTotal = altFactoryQubits / altTotalPhysicalQubits;
+
+export const resourceBars = [
+  { label: "Data qubits", value: totalDataQubits, caption: `${totalDataQubits}` },
+  { label: "Ancilla qubits", value: totalAncillaQubits, caption: `${totalAncillaQubits}` },
+  { label: "Magic-state factory", value: factoryQubits, highlight: true, caption: `${factoryQubits}` },
+];
+
+export const lessonMeta = {
+  title: "Capstone: Resource Estimation for a Real Algorithm",
+  description:
+    "Chains this course's code-distance scaling law, magic-state distillation cost, and lattice-surgery overhead into one complete, honestly-caveated physical-qubit estimate for a small toy circuit, then names exactly which parts of that pipeline are the same methodology real published estimates use.",
+  course: "fault-tolerance-frontiers",
+  module: "capstone-resource-estimation-for-a-real-algorithm",
+  order: 6,
+  difficulty: "master",
+  estimatedMinutes: 26,
+  prerequisites: ["apex/fault-tolerance-frontiers/lattice-surgery", "apex/fault-tolerance-frontiers/the-threshold-theorem"],
+  objectives: [
+    "Combine every ingredient of this course, code distance/logical error rate, magic-state distillation cost, and lattice-surgery gate overhead, into one complete physical-resource estimate for a small, concrete toy algorithm",
+    "Show explicitly how the required code distance depends on the algorithm's total gate count and target overall success probability",
+    "State honestly which parts of a real resource estimate (like those published for Shor's algorithm factoring cryptographically-relevant numbers) are well-established methodology versus which numbers are sensitive to architecture-specific assumptions",
+  ],
+  related: [
+    {
+      slug: "apex/fault-tolerance-frontiers/magic-states-and-distillation",
+      note: "This capstone reuses that lesson's 15-to-1 distillation output-error formula p_out = 35 p_in³ directly, and the arithmetic below shows its 'the factory dominates the qubit count' finding recurring here as an exact 5/7 share, not just a qualitative echo.",
+    },
+  ],
+};
+
+## Motivation
+
+Five lessons, one running argument: **Surface Codes in Depth** gave the
+2D lattice and its logical $X$/$Z$ operators, **Decoding Surface Codes**
+gave the exponential-in-distance suppression law that makes a bigger
+lattice actually pay for itself below threshold, **Lattice Surgery** gave
+the real mechanism for a logical two-qubit gate, **Magic States and
+Distillation** gave the unavoidable, non-Clifford cost of a universal
+gate set, and **The Threshold Theorem** proved that all of this composes
+into an arbitrarily low logical error rate, provided the physical error
+rate sits below $p_{\mathrm{th}}$. Every one of those lessons ended with
+a number. This capstone's only job is to chain those numbers together,
+for one small, fully computable toy circuit, into a single physical
+qubit count, and to be completely explicit about every assumption that
+number depends on.
+
+**The toy algorithm** (stated as a given, illustrative example, not a
+real published algorithm's actual gate count): a circuit requiring
+$N_T = 100$ T gates and $N_2 = 500$ two-qubit Clifford gates, which must
+complete with overall success probability at least $99\%$. Nothing about
+$100$ and $500$ is derived from any real compiled circuit; they're
+chosen purely to be small enough to compute by hand while still
+exercising every step this course built.
+
+## Mathematical Development
+
+### Step 1 — the per-gate logical error budget
+
+The circuit succeeds only if *every one* of its $N_T + N_2$ gates
+succeeds. A union bound turns that into a budget: if $p_L$ is each
+gate's logical error probability,
+
+$$
+P(\text{any gate fails}) \;\le\; \sum_{i=1}^{N_T+N_2} p_{L,i} \;\le\; (N_T+N_2)\, p_L,
+$$
+
+using the same $p_L$ for every gate as a simplifying (and conservative)
+choice. Requiring the overall failure probability to be at most $1\%$
+gives the per-gate target
+
+$$
+p_{L}^{\text{target}} \;\approx\; \frac{0.01}{N_T + N_2}.
+$$
+
+For this toy circuit, $N_T + N_2 = 100 + 500 = 600$
+(`toyTotalGates`), so
+
+$$
+p_L^{\text{target}} = \frac{0.01}{600} \approx 1.667\times 10^{-5}.
+$$
+
+That is `perGateBudget` computed directly above: **{perGateBudget.toExponential(3)}**.
+
+### Step 2 — solving for the code distance
+
+The Decoding Surface Codes lesson's scaling law is
+$p_L \sim (p/p_{\mathrm{th}})^{(d+1)/2}$ for a physical error rate $p$
+comfortably below threshold $p_{\mathrm{th}}$. Take the threshold value
+that lesson established, $p_{\mathrm{th}} = 1\%$, and operate at a
+standard "comfortably below threshold" point, $p = p_{\mathrm{th}}/10 =
+0.001$, so $p/p_{\mathrm{th}} = 0.1$. Setting the scaling law equal to
+the Step 1 target and solving for $d$:
+
+$$
+\left(\frac{p}{p_{\mathrm{th}}}\right)^{(d+1)/2} \le p_L^{\text{target}}
+\quad\Longrightarrow\quad
+\frac{d+1}{2}\ln\!\left(\frac{p}{p_{\mathrm{th}}}\right) \le \ln p_L^{\text{target}}.
+$$
+
+Since $\ln(p/p_{\mathrm{th}}) = \ln(0.1) < 0$, dividing by it flips the
+inequality:
+
+$$
+\frac{d+1}{2} \ge \frac{\ln p_L^{\text{target}}}{\ln(p/p_{\mathrm{th}})}
+\quad\Longrightarrow\quad
+d \ge 2\,\frac{\ln p_L^{\text{target}}}{\ln(p/p_{\mathrm{th}})} - 1.
+$$
+
+Plugging in $p_L^{\text{target}} \approx 1.667\times10^{-5}$ and
+$p/p_{\mathrm{th}} = 0.1$: `minCodeDistanceRaw` evaluates to
+**{minCodeDistanceRaw.toFixed(3)}**. Surface-code distance must be an
+odd integer (Surface Codes in Depth's convention, so the decoder's
+majority vote never ties), so the smallest admissible distance is the
+smallest odd integer at or above that raw value:
+
+$$
+d = 9.
+$$
+
+Checking the achieved rate against the target confirms the rounding was
+necessary and sufficient: at $d=9$, $(0.1)^{(9+1)/2} = 10^{-5}$
+(`achievedLogicalErrorRate` = **{achievedLogicalErrorRate.toExponential(3)}**),
+just under the {perGateBudget.toExponential(3)} target, while $d=7$
+would give $(0.1)^{4} = 10^{-4}$, an order of magnitude *over* budget.
+
+### Step 3 — magic-state cost
+
+The Magic States and Distillation lesson's 15-to-1 Bravyi-Kitaev protocol
+takes $15$ noisy input magic states at error rate $p_{\text{in}}$ and
+outputs $1$ state at error rate
+
+$$
+p_{\text{out}} \approx 35\, p_{\text{in}}^3.
+$$
+
+That formula is reused exactly as derived there; what's new here is
+applying it to this lesson's own $N_T$ and target budget rather than
+that lesson's worked numbers. Taking the raw injected magic-state error
+to be comparable to the operating physical error rate, $p_{\text{in}} =
+p = 0.001$:
+
+$$
+p_{\text{out}} = 35\,(0.001)^3 = 3.5\times10^{-8},
+$$
+
+which is `distillationOutputError` = **{distillationOutputError.toExponential(2)}**
+above. That single round already sits **{magicStateHeadroom.toFixed(0)}×**
+below the per-gate target of {perGateBudget.toExponential(3)}
+(`magicStateHeadroom`), so **one level of 15-to-1 distillation is
+sufficient** for this toy algorithm's $N_T = 100$ T gates — no second
+distillation level is needed, unlike a circuit whose T-count or error
+budget demanded far more suppression.
+
+Each of the $15$ input patches for that one factory round is modeled
+here, as a simplifying and conservative choice, at the same distance
+$d=9$ as the main computation (a real design can often run the factory
+at a smaller distance, since the cubic suppression already does most of
+the work — an optimization this toy estimate deliberately skips so the
+qubit-counting formula in Step 4 stays a single, reusable expression).
+
+### Step 4 — total physical qubit count
+
+A distance-$d$ rotated surface-code patch holds $d^2$ data qubits and
+$d^2-1$ ancilla (syndrome-measurement) qubits, using the more
+qubit-efficient rotated-code convention Surface Codes in Depth
+discussed but didn't build in full (that lesson constructed the
+unrotated lattice instead). At $d=9$: `dataQubitsPerPatch` =
+**{dataQubitsPerPatch}**, `ancillaQubitsPerPatch` =
+**{ancillaQubitsPerPatch}**, so one logical patch costs
+`qubitsPerLogicalPatch` = **{qubitsPerLogicalPatch}** physical qubits.
+
+Assume the toy algorithm needs `logicalQubitCount` = **{logicalQubitCount}**
+logical qubits (a small, stated assumption, well within this course's
+scope). The compute register then costs:
+
+$$
+\text{data} = 6 \times 81 = 486, \qquad \text{ancilla} = 6\times 80 = 480,
+$$
+
+`totalDataQubits` = **{totalDataQubits}**, `totalAncillaQubits` =
+**{totalAncillaQubits}**. The magic-state factory needs $15$ patches at
+the same distance:
+
+$$
+\text{factory} = 15 \times 161 = 2415,
+$$
+
+`factoryQubits` = **{factoryQubits}**. Summing all three:
+
+$$
+N_{\text{physical}} = 486 + 480 + 2415 = 3381,
+$$
+
+`totalPhysicalQubits` = **{totalPhysicalQubits}**. The factory alone is
+`factoryShareOfTotal` = **{(factoryShareOfTotal * 100).toFixed(1)}%** of
+the total — and that share is not a coincidence of these particular
+numbers. Because both the compute register's qubit cost ($6$ patches)
+and the factory's qubit cost ($15$ patches) scale with the *same*
+per-patch factor $2d^2-1$, the ratio collapses to
+$15/(15+6) = 5/7 \approx 71.4\%$ **for any code distance**, as long as
+the factory and the compute patches share that distance. Doubling $d$
+would more than triple the total qubit count without changing this
+ratio at all.
+
+## Physical Interpretation: what generalizes and what doesn't
+
+<Callout type="note">
+**This is genuinely how real resource estimates are built.** Published
+estimates for algorithmically significant problems, including the
+widely cited estimates for factoring cryptographically-relevant RSA
+moduli with Shor's algorithm, follow exactly these same four steps:
+(1) a union-bound (or tighter) error budget from the compiled circuit's
+total gate count and a target success probability, (2) the same
+threshold-theorem scaling law solved for the minimum code distance,
+(3) the same distillation error-suppression arithmetic scaled to
+however many T gates the real circuit needs, (4) the same
+data-plus-ancilla-plus-factory qubit sum. That methodology is not a
+simplification unique to this toy example — it is the real pipeline.
+</Callout>
+
+What real papers do differently is scale, not method: a cryptographically
+relevant factoring circuit needs millions of Toffoli/T gates rather than
+$100$, which pushes $d$, the factory count, and the runtime estimate
+into the thousands-of-qubits and days-to-weeks range those papers
+report. Real estimates also model complications this toy example
+deliberately dropped: **qubit connectivity and routing overhead** (real
+hardware isn't an idealized fully-connected lattice; moving logical
+information costs extra ancilla and time), **T-gate parallelization
+limits** (this lesson assumed one factory reused sequentially $100$
+times; a real circuit with a much larger T-count needs many factories
+running in parallel to keep up with the rate gates are consumed, which
+multiplies the factory qubit cost, not just the runtime), and **decoder
+speed constraints** (the classical decoder must keep up with the syndrome
+extraction rate in real time, or the whole computation stalls). None of
+those complications changes the four-step *structure* derived above —
+they change the *inputs* to Step 1 (gate count), Step 2 (achievable $p$),
+and Step 3 (parallel factory count). A reader should take away the
+structure of a real estimate, not treat any specific published qubit
+count as a universal constant.
+
+## Worked Example
+
+Putting all four steps together end to end, for this toy circuit:
+
+| Step | Quantity | Value |
+|---|---|---|
+| 1 | Total gates $N_T+N_2$ | {toyTotalGates} |
+| 1 | Per-gate error budget $p_L^{\text{target}}$ | {perGateBudget.toExponential(3)} |
+| 2 | Operating point $p/p_{\mathrm{th}}$ | {errorRatio} |
+| 2 | Minimum code distance $d$ | {codeDistance} |
+| 3 | Distillation output error $p_{\text{out}}$ | {distillationOutputError.toExponential(2)} |
+| 3 | Headroom over target | {magicStateHeadroom.toFixed(0)}× |
+| 4 | Data + ancilla qubits ({logicalQubitCount} logical qubits) | {computeQubits} |
+| 4 | Factory qubits | {factoryQubits} |
+| 4 | **Total physical qubits** | **{totalPhysicalQubits}** |
+
+A natural follow-up question this same pipeline answers immediately:
+*what if the physical error rate could be pushed an order of magnitude
+lower*, to $p = p_{\mathrm{th}}/100 = 0.0001$ instead of
+$p_{\mathrm{th}}/10$? Re-running Step 2 with `altErrorRatio` = 0.01
+gives `altMinCodeDistanceRaw` = **{altMinCodeDistanceRaw.toFixed(3)}**,
+so the smallest admissible distance drops to
+`altCodeDistance` = **{altCodeDistance}** — from $d=9$ to $d=5$. Re-running
+Step 4 at that smaller distance gives `altTotalPhysicalQubits` =
+**{altTotalPhysicalQubits}**, roughly a **third** of the original
+{totalPhysicalQubits}-qubit estimate, even though the *ratio* the
+factory occupies stays exactly `altFactoryShareOfTotal` =
+**{(altFactoryShareOfTotal * 100).toFixed(1)}%** — the same $5/7$ as
+before, because that ratio depends only on the $15$-to-$6$ patch count,
+not on $d$. One order of magnitude of hardware error-rate improvement
+here is worth roughly a factor of three in total physical qubits, at
+fixed factory-share overhead: exactly the kind of quantitative,
+checkable tradeoff this course's derivations, not intuition, can
+produce.
+
+<BarChart
+  bars={resourceBars}
+  ariaLabel={`Physical qubit breakdown for the toy resource estimate: ${totalDataQubits} data qubits, ${totalAncillaQubits} ancilla qubits, and ${factoryQubits} magic-state factory qubits, totaling ${totalPhysicalQubits} physical qubits, with the factory alone accounting for ${(factoryShareOfTotal * 100).toFixed(1)}% of the total`}
+/>
+
+The factory bar dominates the chart, exactly the finding the Magic
+States and Distillation lesson already flagged as the single most
+expensive part of a real fault-tolerant architecture: even a toy
+circuit needing only $100$ T gates spends most of its physical qubits
+manufacturing the states those gates consume, not running the logical
+computation itself.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Applying the per-gate budget to the whole circuit's error, not each
+gate's.** The union bound in Step 1 gives a *per-gate* target
+$p_L^{\text{target}} \approx 0.01/(N_T+N_2)$, not a single global
+$0.01$ applied once. Using $p_L = 0.01$ directly in Step 2's scaling law
+would drastically undershoot the actual code distance this circuit
+needs, since $600$ gates each contribute their own failure chance.
+</Callout>
+
+<Callout type="mistake">
+**Treating the {totalPhysicalQubits}-qubit total, or any other specific
+number in this lesson, as "the" cost of fault tolerance.** Every number
+in this worked example is downstream of stated toy choices: $N_T=100$,
+$N_2=500$, $6$ logical qubits, $p = p_{\mathrm{th}}/10$, one factory
+reused sequentially. Change any one of those (as the alternate-scenario
+calculation above does for $p$) and the total changes, sometimes by a
+large factor. What's stable across such changes is the four-step
+*method*, not any individual output number, which is exactly this
+lesson's Physical Interpretation point about published estimates too.
+</Callout>
+
+## Practice Questions
+
+1. This lesson chose $6$ logical qubits and got a factory share of
+   exactly $5/7 \approx 71.4\%$. If the toy algorithm instead needed
+   $9$ logical qubits (with $d=9$ and the same single-round, $15$-input
+   factory unchanged), what would the new factory share of the total be?
+   Use the same $15/(15+L)$ relationship derived in Step 4.
+2. Suppose a different toy circuit needed $N_T = 20$ and
+   $N_2 = 180$ gates at the same $99\%$ overall success target. Compute
+   its per-gate budget $p_L^{\text{target}}$, and state whether it is
+   larger or smaller than this lesson's $600$-gate circuit's budget, and
+   why that direction makes sense from the union bound.
+3. Using this lesson's Step 3 numbers, explain in your own words why a
+   single round of $15$-to-$1$ distillation was enough for $N_T=100$ T
+   gates here, but a circuit needing, say, $10^6$ T gates at a much
+   tighter per-gate budget might need a *second* distillation level
+   (recall $p_{\text{out}} \approx 35\,p_{\text{in}}^3$ applied twice,
+   once to the output of the first round).
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- A four-step pipeline turns a compiled circuit's gate counts into a
+  physical qubit count: (1) a union bound converts a target overall
+  success probability into a per-gate logical error budget,
+  (2) the surface code's threshold-theorem scaling law is solved for
+  the minimum code distance that budget requires, (3) the magic-state
+  distillation error-suppression formula determines how many
+  distillation rounds are needed to supply enough T gates at that
+  budget, (4) data, ancilla, and factory qubit counts at that distance
+  sum to a total.
+- For this lesson's toy circuit ($N_T=100$, $N_2=500$, $99\%$ overall
+  success, $6$ logical qubits, $p=p_{\mathrm{th}}/10$): a per-gate
+  budget of $1.667\times10^{-5}$ requires code distance $d=9$, one
+  round of $15$-to-$1$ distillation suffices with $476\times$ headroom,
+  and the total physical-qubit estimate is $3381$, of which the
+  magic-state factory alone is $2415$ qubits — $71.4\%$, exactly
+  $5/7$, of the total.
+- That factory-dominated ratio, and the four-step method that produced
+  it, is exactly the methodology real published resource estimates
+  (including cryptographically-relevant Shor's-algorithm factoring
+  estimates) use; what differs at real scale is the size of the inputs
+  and additional engineering complications (routing, parallelization,
+  decoder throughput) this toy example deliberately set aside, not the
+  underlying structure of the calculation.
+
+## Further Exploration
+
+Every number in this capstone came from a chosen toy circuit and a
+chosen set of simplifying assumptions, stated explicitly at each step.
+The next, and final, skill this pillar builds is knowing how to read a
+*real* resource-estimation paper critically: which of its numbers rest
+on the same solid methodology derived here, and which rest on
+architecture-specific assumptions worth questioning. That's exactly
+where [How to Read a Quantum Computing
+Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
+picks up.
+

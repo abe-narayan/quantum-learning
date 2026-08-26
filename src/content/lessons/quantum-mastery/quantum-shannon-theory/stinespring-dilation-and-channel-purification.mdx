@@ -1,0 +1,468 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { amplitudeDampingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
+import { computationalBasisDensityMatrix, evolveDensityMatrix } from "@/lib/quantum/densityMatrix";
+import { reducedDensityMatrixQubit0 } from "@/lib/quantum/partialTrace";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Stinespring Dilation and Channel Purification",
+  description:
+    "Quantum Channels: Kraus and Choi proved every CPTP map has a Kraus form but never said where the Kraus operators physically come from; this lesson derives their origin from scratch, building the explicit two-qubit unitary that reproduces amplitude damping's own K0 and K1 exactly, and showing a channel's dilation is just a purification of its Choi state.",
+  course: "quantum-shannon-theory",
+  module: "stinespring-dilation-and-channel-purification",
+  order: 2,
+  difficulty: "master",
+  estimatedMinutes: 26,
+  prerequisites: [
+    "quantum-mastery/quantum-shannon-theory/povms-and-generalized-measurement",
+    "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
+  ],
+  objectives: [
+    "State and prove the Stinespring dilation theorem: every CPTP channel arises from a unitary on a larger system followed by a partial trace",
+    "Construct the explicit ancilla-unitary realization of a given qubit channel's Kraus operators",
+    "Explain why the Kraus representation is not unique, but the Stinespring dilation is unique up to a unitary on the environment (isometric extension)",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
+      note: "That lesson proved every Kraus set is reconstructible from a Choi matrix; this one goes one physical layer deeper, deriving the actual joint system+environment unitary those Kraus operators secretly came from.",
+    },
+  ],
+};
+
+export const gamma = 0.3;
+
+export const [K0, K1] = amplitudeDampingChannel(gamma);
+
+export const stinespringUnitary = (g) => {
+  const c = Math.sqrt(1 - g);
+  const s = Math.sqrt(g);
+  return new Matrix([
+    [Complex.ONE, Complex.ZERO, Complex.ZERO, Complex.ZERO],
+    [Complex.ZERO, new Complex(c), new Complex(s), Complex.ZERO],
+    [Complex.ZERO, new Complex(-s), new Complex(c), Complex.ZERO],
+    [Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ONE],
+  ]);
+}
+
+export const U = stinespringUnitary(gamma);
+
+export const krausFromStinespring = (Umatrix, e) =>
+  new Matrix([
+    [Umatrix.get(e, 0), Umatrix.get(e, 2)],
+    [Umatrix.get(2 + e, 0), Umatrix.get(2 + e, 2)],
+  ]);
+
+export const K0Recovered = krausFromStinespring(U, 0);
+export const K1Recovered = krausFromStinespring(U, 1);
+
+export const rho0 = new Matrix([
+  [new Complex(0.5), new Complex(0.5)],
+  [new Complex(0.5), new Complex(0.5)],
+]);
+
+export const envZero = computationalBasisDensityMatrix(1, 0);
+export const jointInput = rho0.tensor(envZero);
+export const jointOutput = evolveDensityMatrix(jointInput, U);
+export const rhoViaStinespring = reducedDensityMatrixQubit0(jointOutput);
+export const rhoViaKraus = applyKrausChannel(rho0, [K0, K1]);
+
+export const Wenv = new Matrix([
+  [new Complex(1 / Math.sqrt(2)), new Complex(1 / Math.sqrt(2))],
+  [new Complex(1 / Math.sqrt(2)), new Complex(-1 / Math.sqrt(2))],
+]);
+export const K0alt = K0.scale(Wenv.get(0, 0)).add(K1.scale(Wenv.get(0, 1)));
+export const K1alt = K0.scale(Wenv.get(1, 0)).add(K1.scale(Wenv.get(1, 1)));
+export const rhoViaAltKraus = applyKrausChannel(rho0, [K0alt, K1alt]);
+
+export const dilationPipelineSteps = [
+  { label: "System \u03c1 \u2297 Environment |0\u27e9\u27e80|_E", detail: "joint initial state; environment fixed and pure" },
+  { label: "Joint unitary U", detail: "acts on system + environment together", highlight: true },
+  { label: "Trace out environment", detail: "Tr_E[ U(\u03c1\u2297|0\u27e9\u27e80|) U\u2020 ]" },
+  { label: "Channel output E(\u03c1)", detail: "exactly the Kraus sum \u03a3 K_i \u03c1 K_i\u2020" },
+];
+
+export const krausComparisonPresets = [
+  {
+    label: "Kraus operators: original vs. read off U",
+    panels: [
+      { label: "K0 (amplitude damping)", cells: matrixToCells(K0), highlightDiagonal: true },
+      { label: "K0 recovered from U", cells: matrixToCells(K0Recovered), highlightDiagonal: true },
+      { label: "K1 (amplitude damping)", cells: matrixToCells(K1) },
+      { label: "K1 recovered from U", cells: matrixToCells(K1Recovered) },
+    ],
+  },
+  {
+    label: "Channel output: Kraus formula vs. Stinespring partial trace",
+    panels: [
+      { label: "E(\u03c1) via \u03a3 K_i \u03c1 K_i\u2020", cells: matrixToCells(rhoViaKraus), highlightDiagonal: true },
+      { label: "E(\u03c1) via Tr_E[U(\u03c1\u2297|0\u27e90\u2297|)U\u2020]", cells: matrixToCells(rhoViaStinespring), highlightDiagonal: true },
+    ],
+  },
+  {
+    label: "Kraus non-uniqueness: Hadamard-mixed operators, same channel",
+    panels: [
+      { label: "E(\u03c1) via {K0, K1}", cells: matrixToCells(rhoViaKraus), highlightDiagonal: true },
+      { label: "E(\u03c1) via {K0', K1'}", cells: matrixToCells(rhoViaAltKraus), highlightDiagonal: true },
+    ],
+  },
+];
+
+## Motivation
+
+Quantum Channels: Kraus and Choi proved every completely positive,
+trace-preserving map $\mathcal E$ has a Kraus representation
+$\mathcal E(\rho)=\sum_iK_i\rho K_i^\dagger$, by diagonalizing its Choi
+matrix. That proof is a genuine theorem, but it is entirely about
+*matrices*: nowhere does it say what a Kraus operator physically *is*.
+Open Quantum Systems & Kraus Operators introduced the amplitude-damping
+$K_0,K_1$ as "the" description of spontaneous decay, without ever
+showing the unitary, closed-system process that decay is secretly built
+from. This lesson closes that gap: every Kraus channel, with no
+exception, comes from ordinary Schrödinger evolution on a *larger*,
+closed system, followed by simply not looking at part of it. That
+theorem is the **Stinespring dilation**, and building its qubit-scale
+realization explicitly is this lesson's payoff.
+
+## Mathematical Development
+
+### The isometry hiding inside a Kraus set
+
+Take any CPTP map $\mathcal E$ on a $d$-dimensional system $S$ with
+Kraus operators $\{K_i\}_{i=1}^r$, $\sum_iK_i^\dagger K_i=I_S$ (the
+prior lesson's Choi-rank argument already bounds $r\leq d^2$, since the
+Choi matrix is only $d^2\times d^2$ and has at most $d^2$ nonzero
+eigenvalues — that bound is exactly what pins the environment dimension
+below). Introduce an $r$-dimensional auxiliary system $E$ (the
+**environment**) with orthonormal basis $\{|i\rangle_E\}$, and define a
+linear map $V:\mathcal H_S\to\mathcal H_S\otimes\mathcal H_E$ by
+
+$$
+V|\psi\rangle_S \equiv \sum_{i=1}^r K_i|\psi\rangle_S\otimes|i\rangle_E
+$$
+
+**Claim: $V$ is an isometry**, i.e. $V^\dagger V=I_S$. Check directly on
+inner products: for any $|\phi\rangle,|\psi\rangle$,
+
+$$
+\langle\phi|V^\dagger V|\psi\rangle = \sum_{i,j}\langle\phi|K_i^\dagger K_j|\psi\rangle\langle i|j\rangle_E = \sum_i\langle\phi|K_i^\dagger K_i|\psi\rangle = \langle\phi|\Big(\sum_iK_i^\dagger K_i\Big)|\psi\rangle = \langle\phi|\psi\rangle
+$$
+
+using $\langle i|j\rangle=\delta_{ij}$ and the Kraus completeness
+relation in the last step. An isometry preserves every inner product, so
+$V$ genuinely embeds $\mathcal H_S$ inside the larger $\mathcal
+H_S\otimes\mathcal H_E$ without distortion — exactly what makes it
+extendable to a full unitary next.
+
+### Extending $V$ to a unitary, and recovering the channel
+
+$V$'s image is a $d$-dimensional subspace of the $d\cdot r$-dimensional
+joint space, isometric to $\mathcal H_S$ itself. Complete an orthonormal
+basis of that image's orthogonal complement, and map any fixed
+orthonormal basis of the "extra" domain onto it — the same
+completion-to-an-orthonormal-basis move Schmidt Decomposition and
+Purification used to extend $\{|u_k\rangle\}$ beyond a degenerate
+eigenspace. This produces a genuine unitary $U$ on $\mathcal
+H_S\otimes\mathcal H_E$ satisfying
+
+$$
+U\big(|\psi\rangle_S\otimes|0\rangle_E\big) = V|\psi\rangle_S = \sum_iK_i|\psi\rangle_S\otimes|i\rangle_E
+$$
+
+for the fixed reference state $|0\rangle_E$ (relabeling $V$'s domain
+basis vector as $|0\rangle_E$ costs nothing). Now compute what tracing
+out $E$ recovers. For a pure input $|\psi\rangle\langle\psi|_S$,
+
+$$
+U\big(|\psi\rangle\langle\psi|\otimes|0\rangle\langle0|_E\big)U^\dagger = V|\psi\rangle\langle\psi|V^\dagger = \sum_{i,j}K_i|\psi\rangle\langle\psi|K_j^\dagger\otimes|i\rangle\langle j|_E
+$$
+
+$$
+\text{Tr}_E\Big[\,U\big(|\psi\rangle\langle\psi|\otimes|0\rangle\langle0|_E\big)U^\dagger\Big] = \sum_{i,j}K_i|\psi\rangle\langle\psi|K_j^\dagger\,\text{Tr}(|i\rangle\langle j|_E) = \sum_iK_i|\psi\rangle\langle\psi|K_i^\dagger
+$$
+
+using $\text{Tr}(|i\rangle\langle j|)=\delta_{ij}$. This is exactly
+$\mathcal E(|\psi\rangle\langle\psi|)$, and extends to any mixed $\rho$
+by linearity (a density matrix is a convex combination of pure-state
+projectors, each traced through identically). This is the theorem:
+
+<TheoremBox title="Stinespring dilation" provenance="derived">
+
+Every CPTP map $\mathcal E$ on a $d$-dimensional system arises as
+
+$$
+\boxed{\mathcal E(\rho) = \text{Tr}_E\Big[\,U\big(\rho\otimes|0\rangle\langle0|_E\big)U^\dagger\,\Big]}
+$$
+
+for some unitary $U$ on system + environment and some fixed pure
+environment state $|0\rangle_E$, with environment dimension always
+achievable at $\leq d^2$.
+
+</TheoremBox>
+
+The Kraus proof and this proof are not independent facts stacked on top
+of each other: the Kraus operators $K_i$ are *literally* the blocks of
+$U$ that connect $|0\rangle_E$ to each $|i\rangle_E$ — the derivation
+above extracts them, it doesn't merely assert their existence.
+
+### The explicit qubit construction: amplitude damping
+
+Specialize to $d=2$, $r=2$ — this platform's own amplitude-damping
+channel, $K_0=\text{diag}(1,\sqrt{1-\gamma})$,
+$K_1=\begin{pmatrix}0&\sqrt\gamma\\0&0\end{pmatrix}$, one environment
+qubit. The isometry $V$ above becomes $V|0\rangle_S=|0\rangle_S|0\rangle_E$,
+$V|1\rangle_S=\sqrt{1-\gamma}\,|1\rangle_S|0\rangle_E+\sqrt\gamma\,|0\rangle_S|1\rangle_E$
+— exactly the two conditions the construction has to satisfy. Extending
+$V$ to a full unitary needs an image for the two remaining basis states
+$|0\rangle_S|1\rangle_E$ and $|1\rangle_S|1\rangle_E$; the simplest
+completion is a rotation confined entirely to the two-dimensional
+subspace $\{|0\rangle_S|1\rangle_E,\,|1\rangle_S|0\rangle_E\}$, leaving
+$|0\rangle_S|0\rangle_E$ and $|1\rangle_S|1\rangle_E$ as fixed points:
+
+$$
+U = \begin{pmatrix}
+1 & 0 & 0 & 0\\
+0 & \sqrt{1-\gamma} & \sqrt\gamma & 0\\
+0 & -\sqrt\gamma & \sqrt{1-\gamma} & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}
+\qquad \text{(basis order $|00\rangle,|01\rangle,|10\rangle,|11\rangle$, system qubit first)}
+$$
+
+One checks directly that its four columns are orthonormal (the middle
+$2\times2$ block is a genuine rotation, $c^2+s^2=1$ with
+$c=\sqrt{1-\gamma}$, $s=\sqrt\gamma$), so $U$ is unitary for every
+$\gamma\in[0,1]$, and by construction $U|1\rangle_S|0\rangle_E=\sqrt{1-\gamma}|1\rangle_S|0\rangle_E+\sqrt\gamma|0\rangle_S|1\rangle_E$
+— exactly the amplitude-damping realization the theorem promised: a
+qubit decaying to $|0\rangle$ while handing its excitation, coherently,
+to an environment qubit that starts in $|0\rangle_E$ and picks up
+$|1\rangle_E$ with amplitude $\sqrt\gamma$.
+
+### Kraus non-uniqueness *is* the residual freedom on the environment
+
+The Stinespring construction above made two choices beyond $\mathcal E$
+itself: the joint unitary $U$, and the reference state $|0\rangle_E$.
+Once those are fixed, exactly one freedom survives: which orthonormal
+basis $\{|i\rangle_E\}$ of the environment is used to *read out* the
+$K_i$. Rotating that basis by any unitary $W$ on $E$ alone,
+$|i\rangle_E\mapsto\sum_jW_{ij}|j\rangle_E$, reads the *same* physical
+joint state $U(\rho\otimes|0\rangle\langle0|_E)U^\dagger$ into a
+different-looking Kraus set
+
+$$
+K_i' = \sum_jW_{ij}K_j
+$$
+
+and $\text{Tr}_E$ is basis-independent, so $\sum_iK_i'\rho K_i'^\dagger=\sum_iK_i\rho K_i^\dagger$
+identically — the channel cannot tell which basis was used to describe
+its own environment. This is the *entire* content of Kraus
+non-uniqueness: it isn't a defect of the Kraus picture, it's the same
+"which orthonormal basis?" freedom that made purifications non-unique
+in Schmidt Decomposition and Purification, now applied to the
+environment side of a dilation instead of the purifying side of a mixed
+state. The worked example below verifies this with an explicit $W$
+(a Hadamard rotation on the environment basis), not just the general
+argument.
+
+### Dilation *is* purification, restated
+
+Quantum Channels: Kraus and Choi built the Choi matrix as
+$J(\mathcal E)=d\,(\mathbb 1\otimes\mathcal E)(|\Omega^+\rangle\langle\Omega^+|)$:
+send half of a maximally entangled pair through $\mathcal E$. Feed that
+same half through *this* lesson's $U$ instead of abstractly through
+$\mathcal E$, and keep the environment around rather than discarding it:
+
+$$
+|\Psi\rangle_{S'SE} \equiv (\mathbb 1_{S'}\otimes U)\big(|\Omega^+\rangle_{S'S}\otimes|0\rangle_E\big)
+$$
+
+is a pure state on three systems whose reduced state on $S'S$ (tracing
+out $E$) is exactly $J(\mathcal E)/d$ by the theorem just proved. In
+other words: **the Stinespring dilation's joint output state is a
+purification of the channel's own Choi state**, with the physical
+environment playing the role of the purifying system. "Every mixed
+state has a purification" and "every channel has a unitary dilation"
+are not two separate facts this course happens to cover back to back —
+they are the same fact about extending to a larger system, once applied
+to a state and once applied to a channel's Choi state.
+
+## Physical Interpretation: Why This Matters
+
+**"Decoherence is just entanglement with an unmonitored environment"**
+is usually stated as a slogan. The Stinespring theorem makes it a
+theorem: *any* physically valid noise process on a system, with no
+exception, is nothing but unitary (hence perfectly reversible,
+information-preserving) evolution on system+environment, with
+information genuinely leaking into correlations with $E$ that then get
+thrown away by $\text{Tr}_E$. Nothing is lost from the universe; it is
+lost from the system's own description the moment its correlated partner
+is inaccessible. The amplitude-damping construction above makes this
+completely literal: the "missing" excitation after decay didn't vanish,
+it is sitting in the environment qubit's $|1\rangle_E$ amplitude,
+$\sqrt\gamma$, exactly the number that used to be the qubit's own decay
+amplitude.
+
+This is also where **quantum error correction's entire framework**
+starts. In the amplitude-damping dilation, the environment's final state
+carries a record of *which* branch occurred: $\text{Tr}\big[K_1\rho
+K_1^\dagger\big]=\gamma\rho_{11}$ is exactly the probability the
+environment is found in $|1\rangle_E$, having "learned" that a decay
+happened. If that record depended on the *logical* information encoded
+in $\rho$ (not just on which error occurred), the environment would have
+learned something about the protected data itself — and by the same
+dilation argument, that leaked information shows up back on the system
+as decoherence of the encoded qubit. A working error-correcting code is
+built so the environment can learn only a *syndrome* (which error, if
+any) while remaining completely uncorrelated with the *encoded*
+quantum state — the precise condition later error-correction lessons
+build codes to satisfy.
+
+Finally, this is the **discrete-time seed of the Lindblad master
+equation** already covered in this pillar. Chop a continuous-time open
+evolution into many short steps of duration $dt$; each step is its own
+tiny Stinespring dilation against a *fresh*, never-before-touched patch
+of environment (the Markovian assumption). Amplitude damping's own
+$\gamma(dt)=1-e^{-dt/T_1}\approx dt/T_1$ for small $dt$ (from
+`decayProbabilityForTimestep`, used throughout this pillar) shows the
+pattern directly: $K_1(dt)=O(\sqrt{dt})$, $K_0(dt)=I+O(dt)$, and
+resumming infinitely many such small dilations is exactly what produces
+a first-order-in-$dt$ Lindblad generator in the continuum limit.
+
+## Worked Example
+
+**Take $\gamma=0.3$ and $\rho=|+\rangle\langle+|=\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}$
+(the same state and channel strength Quantum Channels: Kraus and Choi
+already used). Build the explicit Stinespring unitary, verify it
+reproduces the Kraus-sum output exactly, and verify Kraus
+non-uniqueness with an explicit environment rotation.**
+
+With $c=\sqrt{0.7}\approx0.836660$, $s=\sqrt{0.3}\approx0.547723$:
+
+$$
+U = \begin{pmatrix}1&0&0&0\\0&0.836660&0.547723&0\\0&-0.547723&0.836660&0\\0&0&0&1\end{pmatrix}
+$$
+
+Reading off $U$'s blocks connecting environment-input-$0$ to
+environment-output-$0$ and environment-output-$1$ (rows/columns
+$(0,2)$ for output-$0$, $(1,3)$ for output-$1$, restricted to input
+columns $0,2$) recovers
+
+$$
+K_0^{\text{recovered}} = \begin{pmatrix}1&0\\0&0.836660\end{pmatrix}, \qquad K_1^{\text{recovered}} = \begin{pmatrix}0&0.547723\\0&0\end{pmatrix}
+$$
+
+**identical** to `amplitudeDampingChannel(0.3)`'s own $K_0,K_1$ to full
+numerical precision — not approximately, since both come from the same
+$\sqrt\gamma,\sqrt{1-\gamma}$ values by construction. Applying $U$ to
+$\rho\otimes|0\rangle\langle0|_E$ and tracing out the environment
+(`reducedDensityMatrixQubit0` of `evolveDensityMatrix(jointInput, U)`)
+gives
+
+$$
+\text{Tr}_E\big[U(\rho\otimes|0\rangle\langle0|_E)U^\dagger\big] = \begin{pmatrix}0.65&0.418330\\0.418330&0.35\end{pmatrix} = K_0\rho K_0^\dagger + K_1\rho K_1^\dagger
+$$
+
+matching exactly — the concrete instance of the general theorem proved
+above, and the same numerical output Quantum Channels: Kraus and Choi
+already trusted for this channel and state.
+
+For non-uniqueness, mix the Kraus operators with the Hadamard-like
+environment rotation $W=\frac1{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}$:
+$K_0'=(K_0+K_1)/\sqrt2$, $K_1'=(K_0-K_1)/\sqrt2$. These are visibly
+*different* matrices from $K_0,K_1$, yet
+$K_0'\rho K_0'^\dagger+K_1'\rho K_1'^\dagger$ reproduces the identical
+$\begin{pmatrix}0.65&0.418330\\0.418330&0.35\end{pmatrix}$ — the same
+physical channel, read out through a rotated environment basis.
+
+<PipelineDiagram
+  steps={dilationPipelineSteps}
+  ariaLabel="The Stinespring dilation pipeline: system tensor environment in a fixed pure state, evolved by a joint unitary U, then the environment is traced out to give the channel output"
+/>
+
+<MatrixGridExplorer
+  presets={krausComparisonPresets}
+  ariaLabel="Three verifications of the Stinespring dilation for amplitude damping at gamma=0.3: Kraus operators recovered from U match the originals, the channel output via Kraus sum matches the output via partial trace of U, and a Hadamard-rotated Kraus pair reproduces the identical channel output"
+  digits={4}
+/>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Assuming the environment can start mixed or correlated with the
+system.** The Stinespring theorem specifically requires a *pure*,
+uncorrelated reference state $|0\rangle_E$; that purity is exactly what
+makes the resulting evolution unitary on the joint space in the first
+place. If the true physical environment starts mixed, it must first be
+purified against a *further*, larger system (Schmidt Decomposition and
+Purification's own construction) before this theorem's $U$ applies to
+it directly.
+</Callout>
+
+<Callout type="mistake">
+**Treating a different Kraus decomposition as a different physical
+process.** $\{K_i\}$ and $\{K_i'=\sum_jW_{ij}K_j\}$ for unitary $W$
+describe the exact same joint unitary $U$ and the exact same physical
+interaction with the exact same environment — only the orthonormal
+basis used to *label* the environment's outcomes changed, which is pure
+bookkeeping. Nothing about the system's reduced dynamics can depend on
+that labeling, which is precisely why $\text{Tr}_E$ erases it.
+</Callout>
+
+## Practice Questions
+
+1. Verify directly from $\sum_iK_i^\dagger K_i=I$ that
+   $V|\psi\rangle=\sum_iK_i|\psi\rangle\otimes|i\rangle_E$ satisfies
+   $V^\dagger V=I$, and explain in one sentence why that makes $V$
+   extendable to a unitary on the joint space.
+2. The dephasing channel has
+   $K_0=\sqrt{1-\lambda/2}\,I$, $K_1=\sqrt{\lambda/2}\,Z$. Following the
+   same pattern as this lesson's amplitude-damping construction, write
+   down its $4\times4$ Stinespring unitary $U_{\text{dephasing}}(\lambda)$
+   explicitly, and check it reduces to the identity at $\lambda=0$.
+3. Using the fact that a single qubit's Choi matrix is $4\times4$ (so
+   has minimal Kraus rank at most $4$), explain why *no* single-qubit
+   channel ever needs an environment larger than two qubits in its
+   Stinespring dilation.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Every Kraus set $\{K_i\}$ defines an isometry
+  $V|\psi\rangle=\sum_iK_i|\psi\rangle\otimes|i\rangle_E$, proved via
+  $V^\dagger V=\sum_iK_i^\dagger K_i=I$; extending $V$ to a unitary $U$
+  and computing $\text{Tr}_E[U(\rho\otimes|0\rangle\langle0|_E)U^\dagger]$
+  reproduces $\sum_iK_i\rho K_i^\dagger$ exactly — the Stinespring
+  dilation theorem.
+- Amplitude damping's own $K_0,K_1$ come from a concrete $4\times4$
+  qubit-environment unitary (a rotation on the $\{|01\rangle,|10\rangle\}$
+  subspace), verified numerically to reproduce the channel's output to
+  full precision.
+- Kraus non-uniqueness is exactly the residual freedom to rotate the
+  environment's readout basis after $U$ and $|0\rangle_E$ are fixed —
+  demonstrated explicitly with a Hadamard rotation reproducing the
+  identical channel output.
+- A channel's Stinespring dilation is a purification of its Choi state:
+  "every mixed state has a purification" and "every channel has a
+  unitary dilation" are the same fact about extending to a larger
+  system.
+- This is the rigorous content behind "decoherence is entanglement with
+  an environment," the starting point for how quantum error correction
+  frames what an error-correcting code must prevent an environment from
+  learning, and the discrete-time seed of the Lindblad master equation.
+
+## Further Exploration
+
+[The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation)
+develops the continuous-time limit this lesson's Physical Interpretation
+section only sketched: resumming infinitely many infinitesimal
+Stinespring dilations, one per timestep, into a single differential
+generator for open-system evolution.

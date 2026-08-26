@@ -3,7 +3,8 @@ export type Pillar =
   | "quantum-computing"
   | "quantum-hardware"
   | "quantum-software"
-  | "quantum-mastery";
+  | "quantum-mastery"
+  | "apex";
 
 export type Difficulty = "foundational" | "intermediate" | "advanced" | "master";
 

@@ -1,0 +1,489 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+
+export const practiceProblems = getProblemsForLesson(
+  "apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count"
+).map((problem) => problem.meta);
+
+export function smallestOddAtLeast(x) {
+  let n = Math.ceil(x);
+  if (n % 2 === 0) n += 1;
+  return n;
+}
+
+export const rawTwoQubitGatesPerStep = 50;
+export const rawTGatesPerStep = 30;
+export const trotterSteps = 20;
+
+export const toyQubitCount = 2;
+export const hilbertSpaceDimension = Math.pow(2, toyQubitCount);
+
+export const totalTwoQubitGates = rawTwoQubitGatesPerStep * trotterSteps;
+export const totalTGates = rawTGatesPerStep * trotterSteps;
+export const rawTotalGateCount = totalTwoQubitGates + totalTGates;
+
+export const swapOverheadMultiplier = 2.5;
+export const routedTwoQubitGates = Math.round(totalTwoQubitGates * swapOverheadMultiplier);
+export const routedTotalGateCount = routedTwoQubitGates + totalTGates;
+
+export const targetOverallFailure = 0.01;
+export const perGateBudget = targetOverallFailure / routedTotalGateCount;
+
+export const thresholdErrorRate = 0.01;
+export const physicalErrorRate = thresholdErrorRate / 10;
+export const errorRatio = physicalErrorRate / thresholdErrorRate;
+
+export const minCodeDistanceRaw = 2 * (Math.log(perGateBudget) / Math.log(errorRatio)) - 1;
+export const codeDistance = smallestOddAtLeast(minCodeDistanceRaw);
+export const achievedLogicalErrorRate = Math.pow(errorRatio, (codeDistance + 1) / 2);
+
+export const rawMagicStateErrorRate = physicalErrorRate;
+export const distillationInputStatesPerRound = 15;
+export const distillationOutputError = 35 * Math.pow(rawMagicStateErrorRate, 3);
+export const magicStateHeadroom = perGateBudget / distillationOutputError;
+
+export const dataQubitsPerPatch = codeDistance * codeDistance;
+export const ancillaQubitsPerPatch = codeDistance * codeDistance - 1;
+export const qubitsPerLogicalPatch = dataQubitsPerPatch + ancillaQubitsPerPatch;
+
+export const logicalQubitCount = toyQubitCount;
+export const totalDataQubits = dataQubitsPerPatch * logicalQubitCount;
+export const totalAncillaQubits = ancillaQubitsPerPatch * logicalQubitCount;
+export const computeQubits = totalDataQubits + totalAncillaQubits;
+
+export const factoryQubits = distillationInputStatesPerRound * qubitsPerLogicalPatch;
+export const totalPhysicalQubits = totalDataQubits + totalAncillaQubits + factoryQubits;
+export const factoryShareOfTotal = factoryQubits / totalPhysicalQubits;
+
+export const pipelineBars = [
+  { label: "Raw gates", value: rawTotalGateCount, caption: `${rawTotalGateCount}` },
+  { label: "T-count", value: totalTGates, caption: `${totalTGates}` },
+  { label: "Routed gates", value: routedTotalGateCount, caption: `${routedTotalGateCount}` },
+  { label: "Physical qubits", value: totalPhysicalQubits, highlight: true, caption: `${totalPhysicalQubits}` },
+];
+
+export const lessonMeta = {
+  title: "Capstone: From Algorithm to Qubit Count",
+  description:
+    "Chains every stage this course built, classical-simulability check, T-count synthesis, routing overhead, onto the Fault Tolerance Frontiers capstone's own four-step resource-estimation methodology, turning one toy molecular-simulation circuit into a single honestly-caveated physical-qubit estimate.",
+  course: "simulation-and-compilation-frontiers",
+  module: "capstone-from-algorithm-to-qubit-count",
+  order: 6,
+  difficulty: "master",
+  estimatedMinutes: 26,
+  prerequisites: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation", "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"],
+  objectives: [
+    "Combine every ingredient of this course (classical-simulability boundary, T-count synthesis, routing/noise-aware compilation) with the Fault Tolerance Frontiers course's own resource-estimation methodology into one complete, end-to-end pipeline",
+    "Walk a small toy molecular-simulation problem through every stage of this pipeline: algorithm gate count → T-count via synthesis → routing overhead → fault-tolerant physical-qubit estimate",
+    "State honestly which parts of this pipeline are well-established engineering practice versus where genuine, active research uncertainty remains",
+  ],
+  related: [
+    {
+      slug: "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules",
+      note: "This capstone takes that lesson's own toy Trotterized time-evolution circuit and, instead of stopping at 'here is the gate count,' pushes it the rest of the way through synthesis, routing, and fault tolerance to an actual qubit count.",
+    },
+    {
+      slug: "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
+      note: "The four-step error-budget → code-distance → distillation → qubit-count methodology derived and worked there is reused here verbatim, applied to this course's own gate counts instead of that lesson's stand-alone $N_T,N_2$ pair.",
+    },
+  ],
+};
+
+## Motivation
+
+Five lessons built one running capability: **Tensor Networks and Matrix
+Product States** gave a classical simulation method and a number, bond
+dimension, that measures how much entanglement it can afford; **When
+Classical Simulation Works** turned that into a sharp boundary, exactly
+which circuits a classical computer can already simulate efficiently, so
+that "build a quantum computer" is a conclusion, not a default; **Clifford+T
+Synthesis and Resource Counting** showed that once a circuit is past that
+boundary, what it actually costs is measured in T-count, not gate count in
+general; **Noise-Aware Compilation and Resource Estimation** showed that a
+real device's limited connectivity inflates that gate count further, via
+SWAP-heavy routing, before a single logical operation ever reaches
+hardware; and **Quantum Simulation of Molecules** supplied the flagship
+application, a Trotterized time-evolution circuit for a molecular
+Hamiltonian, whose gate count every earlier stage in this list can be
+applied to.
+
+This capstone's only job is to chain those stages together, then hand the
+result to the *other* capstone this pillar already built. **Capstone:
+Resource Estimation for a Real Algorithm**, the closing lesson of the
+Fault Tolerance Frontiers course, derived a complete four-step pipeline
+from "a circuit has $N_T$ T gates and $N_2$ two-qubit Clifford gates" to
+"here is how many physical qubits that costs." That pipeline needs
+$N_T$ and $N_2$ as inputs. This course's five lessons are exactly the
+machinery that produces them, honestly, from an actual algorithm. Put the
+two together and the result is the full, practical pipeline this whole
+APEX pillar has been building toward: **read about a quantum algorithm,
+and estimate whether it is realistically achievable, and at what qubit
+count.**
+
+**The toy example** (stated as a given, illustrative extension of the
+Quantum Simulation of Molecules lesson's own small circuit, not a real
+published result): a Trotterized time-evolution circuit for a toy
+$2$-qubit molecular Hamiltonian, needing `rawTwoQubitGatesPerStep` =
+**{rawTwoQubitGatesPerStep}** two-qubit gates and `rawTGatesPerStep` =
+**{rawTGatesPerStep}** T gates *per Trotter step*, run for
+`trotterSteps` = **{trotterSteps}** Trotter steps. Nothing about $50$,
+$30$, or $20$ is derived from a real compiled molecular circuit; they
+are chosen to be small enough to walk by hand while still exercising
+every stage this course and the fault-tolerance course together built.
+
+## Mathematical Development
+
+### Stage 1 — is this classically simulable at all?
+
+Before spending one more line of arithmetic on compiling this circuit,
+When Classical Simulation Works demands the first, often-skipped
+question: *can a classical computer already do this?* A state vector
+for `toyQubitCount` = **{toyQubitCount}** qubits has
+`hilbertSpaceDimension` = **{hilbertSpaceDimension}** complex amplitudes.
+That is not merely "efficiently simulable" in the asymptotic sense that
+lesson formalized — it is trivial, well within what a laptop simulates
+in microseconds, for any circuit depth. **A real quantum computer would
+be entirely the wrong tool for this exact toy circuit.** This is stated
+plainly, not glossed over: the point of an example this small is
+pedagogical, walking every downstream stage by hand, not a claim of
+quantum advantage. Quantum Simulation of Molecules' own real published
+estimates, for molecules with active spaces of dozens to hundreds of
+qubits, are what actually cross this boundary; this toy circuit is
+deliberately kept on the classically-trivial side of it so its numbers
+stay checkable by hand through every remaining stage.
+
+### Stage 2 — raw T-count via synthesis
+
+Treat the rest of this pipeline as a hypothetical: *if* this circuit's
+shape were scaled up to a regime past Stage 1's boundary, what would
+Clifford+T Synthesis and Resource Counting say its T-count costs? T
+gates are the resource that lesson identified as the one Clifford+T
+synthesis cannot make free, so the running total that matters most is
+built from them alone:
+
+$$
+N_T = (\text{T gates per step}) \times (\text{Trotter steps}) = 30 \times 20 = 600.
+$$
+
+That is `totalTGates` = **{totalTGates}**, a simple, explicit
+multiplication with no synthesis subtlety hidden in it: the per-step
+T-count was already stated as a given illustrative number, so Stage 2's
+whole job is just accounting for how many steps repeat it. The
+circuit's other gates are two-qubit Clifford gates, $50$ per step:
+
+$$
+N_2^{\text{raw}} = 50 \times 20 = 1000,
+$$
+
+`totalTwoQubitGates` = **{totalTwoQubitGates}**. Summing both gate
+types gives the circuit's raw, pre-compilation gate count,
+`rawTotalGateCount` = **{rawTotalGateCount}**.
+
+### Stage 3 — routing overhead
+
+Noise-Aware Compilation and Resource Estimation showed that a device's
+limited connectivity, not an idealized fully-connected graph, forces a
+compiler to insert extra SWAP gates before a logical two-qubit gate
+between non-adjacent qubits can execute. Reusing that lesson's own
+illustrative overhead magnitude, a `swapOverheadMultiplier` of
+**{swapOverheadMultiplier}×** applied to the two-qubit gate count (T
+gates are single-qubit non-Clifford rotations, unaffected by
+two-qubit routing) gives the actual, post-compilation two-qubit gate
+count a real device would need to execute:
+
+$$
+N_2^{\text{routed}} = N_2^{\text{raw}} \times 2.5 = 1000 \times 2.5 = 2500,
+$$
+
+`routedTwoQubitGates` = **{routedTwoQubitGates}**. Adding back the
+(routing-unaffected) T-count gives the routed total gate count that
+Stage 4 actually needs as input:
+
+$$
+N_{\text{routed}} = N_T + N_2^{\text{routed}} = 600 + 2500 = 3100,
+$$
+
+`routedTotalGateCount` = **{routedTotalGateCount}**. Routing alone
+nearly doubled the circuit's total gate count, from
+{rawTotalGateCount} to {routedTotalGateCount}, purely from the device's
+connectivity constraint, before a single fault-tolerance
+consideration has entered the calculation.
+
+### Stage 4 — the Fault Tolerance Frontiers capstone's own methodology, reused exactly
+
+This is the handoff. Capstone: Resource Estimation for a Real
+Algorithm derived a four-step pipeline from "$N_T$ T gates, $N_2$
+two-qubit gates, target overall success probability" to "total physical
+qubits," and nothing about that derivation was specific to its own toy
+$N_T=100$, $N_2=500$ pair. Plugging in *this* lesson's Stage 2/3 outputs
+instead — $N_T = 600$, $N_2 = N_2^{\text{routed}} = 2500$, so
+$N_T+N_2 = 3100$ — and the same $99\%$ overall-success target used
+there:
+
+**Step (a), per-gate error budget (union bound):**
+
+$$
+p_L^{\text{target}} = \frac{0.01}{3100} \approx 3.226\times10^{-6},
+$$
+
+`perGateBudget` = **{perGateBudget.toExponential(3)}** — noticeably
+tighter than the fault-tolerance capstone's own $1.667\times10^{-5}$,
+simply because this pipeline's routing overhead left more gates that
+all have to succeed.
+
+**Step (b), code distance from the threshold scaling law.** At the
+same operating point that capstone used, $p = p_{\mathrm{th}}/10$ so
+$p/p_{\mathrm{th}} = 0.1$:
+
+$$
+d \ge 2\,\frac{\ln p_L^{\text{target}}}{\ln(p/p_{\mathrm{th}})} - 1,
+$$
+
+`minCodeDistanceRaw` = **{minCodeDistanceRaw.toFixed(3)}**, so the
+smallest odd admissible distance is `codeDistance` =
+**{codeDistance}** (one step up from that capstone's $d=9$ — the
+tighter budget here costs two extra rows and columns of the lattice).
+Checking: `achievedLogicalErrorRate` =
+**{achievedLogicalErrorRate.toExponential(3)}**, comfortably under the
+{perGateBudget.toExponential(3)} target.
+
+**Step (c), magic-state factory sizing.** Magic States and
+Distillation's $35\,p_{\text{in}}^3$ formula, applied at
+$p_{\text{in}} = p = 0.001$ exactly as before:
+
+$$
+p_{\text{out}} = 35\,(0.001)^3 = 3.5\times10^{-8},
+$$
+
+`distillationOutputError` = **{distillationOutputError.toExponential(2)}**,
+still `magicStateHeadroom` = **{magicStateHeadroom.toFixed(0)}×** below
+the tighter {perGateBudget.toExponential(3)} target — smaller headroom
+than the fault-tolerance capstone's $476\times$, exactly because this
+pipeline's budget is tighter, but still enough that one level of
+$15$-to-$1$ distillation suffices; no second level is needed for this
+toy circuit's $600$ T gates.
+
+**Step (d), total physical qubit count.** A distance-$d$ patch costs
+`dataQubitsPerPatch` = **{dataQubitsPerPatch}** data qubits and
+`ancillaQubitsPerPatch` = **{ancillaQubitsPerPatch}** ancilla qubits,
+`qubitsPerLogicalPatch` = **{qubitsPerLogicalPatch}** total. This toy
+molecular circuit needs `logicalQubitCount` = **{logicalQubitCount}**
+logical qubits (Stage 1's own $2$-qubit toy Hamiltonian):
+
+$$
+\text{data} = 2\times121 = 242,\qquad \text{ancilla} = 2\times120=240,
+$$
+
+`totalDataQubits` = **{totalDataQubits}**, `totalAncillaQubits` =
+**{totalAncillaQubits}**, `computeQubits` = **{computeQubits}**. The
+factory needs $15$ patches at the same distance:
+
+$$
+\text{factory} = 15\times241 = 3615,
+$$
+
+`factoryQubits` = **{factoryQubits}**. Summing all three:
+
+$$
+N_{\text{physical}} = 242+240+3615 = 4097,
+$$
+
+`totalPhysicalQubits` = **{totalPhysicalQubits}** — the single number
+this entire five-lesson-plus-capstone pipeline was built to produce.
+The factory alone is `factoryShareOfTotal` =
+**{(factoryShareOfTotal * 100).toFixed(1)}%** of the total, an even
+larger share than the fault-tolerance capstone's own $71.4\%$, because
+this toy circuit's logical-qubit count ($2$) is smaller relative to the
+fixed $15$-patch factory than that capstone's ($6$) was — the same
+$15/(15+L)$ relationship derived there, just evaluated at a smaller
+$L$.
+
+## Physical Interpretation: what's solid, and what's still research
+
+<Callout type="note">
+**Not every stage of this pipeline carries the same epistemic weight,
+and pretending otherwise would misrepresent the field.** Stages 1
+through 3, checking classical simulability, counting T-count via
+Clifford+T synthesis, and estimating routing overhead from a device's
+connectivity graph, are well-established, routine engineering practice
+today. Real compiler toolchains (Qiskit's transpiler, tket, and others)
+run exactly these steps automatically for near-term circuits, on real
+hardware coupling graphs, every day. There is no open research question
+about *how* to compute a T-count from a decomposed circuit or *how* to
+estimate SWAP overhead from a device's connectivity; those are solved,
+implemented, engineering problems.
+</Callout>
+
+Stage 4 is a different kind of claim. The four-step
+error-budget/code-distance/distillation/qubit-count methodology itself
+is solid, real published estimates use exactly this structure. But the
+*numbers that methodology outputs* depend on assumptions that are still
+moving targets as the field's engineering matures: the achieved
+physical error rate $p$ a real device reaches (this lesson assumed
+$p_{\mathrm{th}}/10$ throughout, matching the fault-tolerance capstone,
+but real hardware roadmaps disagree on when and whether that specific
+ratio is achieved at scale), the real-time decoder's throughput and
+accuracy (a decoder too slow to keep up with syndrome extraction stalls
+the whole computation, regardless of what the code distance formula
+says on paper), and the specific code and architecture choice (surface
+codes are what this pillar derived, but qLDPC and other code families
+under active research promise substantially lower physical-to-logical
+qubit ratios, which would shrink every qubit count in Stage 4 without
+changing Stages 1 through 3 at all). A reader who takes away "physical
+qubit counts for fault-tolerant algorithms are precisely known" has
+misread this lesson; a reader who takes away "the *method* for
+estimating them is solid, and the inputs to that method are where the
+real uncertainty and the real research lives" has read it correctly.
+
+This full pipeline, Stages 1 through 4 together, is the APEX pillar's
+practical answer to a question popular accounts of quantum computing
+routinely skip: *given a quantum algorithm I've just read about, how
+would I actually estimate whether it's realistically achievable, and on
+what timescale?* Check classical simulability first. Count real
+T-gates. Account for real device connectivity. Then, and only then,
+apply fault-tolerance overhead, honestly labeling which of those four
+answers is engineering fact and which is a current best guess.
+
+## Worked Example
+
+The full pipeline, stage by stage, for this lesson's toy circuit:
+
+| Stage | Quantity | Value |
+|---|---|---|
+| 1 | Hilbert space dimension ({toyQubitCount} qubits) | {hilbertSpaceDimension} — classically trivial |
+| 2 | Two-qubit gates, raw | {totalTwoQubitGates} |
+| 2 | T-count $N_T$ | {totalTGates} |
+| 2 | Raw total gate count | {rawTotalGateCount} |
+| 3 | Two-qubit gates, routed ({swapOverheadMultiplier}× overhead) | {routedTwoQubitGates} |
+| 3 | Routed total gate count $N_T+N_2$ | {routedTotalGateCount} |
+| 4a | Per-gate error budget | {perGateBudget.toExponential(3)} |
+| 4b | Code distance $d$ | {codeDistance} |
+| 4c | Distillation headroom | {magicStateHeadroom.toFixed(0)}× |
+| 4d | Compute qubits ({logicalQubitCount} logical qubits) | {computeQubits} |
+| 4d | Factory qubits | {factoryQubits} |
+| 4d | **Total physical qubits** | **{totalPhysicalQubits}** |
+
+Watching the number transform stage by stage is the real content of
+this capstone: {rawTotalGateCount} raw gates become {totalTGates} T
+gates worth tracking separately, routing inflates the total to
+{routedTotalGateCount}, and the fault-tolerance methodology then
+expands that gate count into a {totalPhysicalQubits}-physical-qubit
+estimate, more than a thousand-fold growth from the original gate
+count, almost entirely driven by the magic-state factory's
+{(factoryShareOfTotal * 100).toFixed(1)}% share.
+
+<BarChart
+  bars={pipelineBars}
+  ariaLabel={`Pipeline funnel for the toy molecular-simulation circuit: ${rawTotalGateCount} raw gates, ${totalTGates} T-count, ${routedTotalGateCount} gates after routing overhead, growing to ${totalPhysicalQubits} total physical qubits after fault-tolerant compilation, of which the magic-state factory is ${(factoryShareOfTotal * 100).toFixed(1)}%`}
+/>
+
+Notice the shape: the first three bars move by small, explainable
+factors (routing added $2.5\times$ to the two-qubit count), while the
+jump to the last bar is enormous, over $1000\times$ the raw gate count.
+That asymmetry is itself the lesson's central quantitative point: the
+*compilation* side of this pipeline (Stages 1–3) costs modest,
+well-understood overhead, while the *fault-tolerance* side (Stage 4)
+costs orders of magnitude more, and is exactly the side where this
+lesson's honesty section says the real uncertainty concentrates.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Skipping Stage 1 and jumping straight to compiling.** It is tempting
+to treat "count the gates, then estimate qubits" as the whole pipeline.
+But a circuit that is already classically simulable, like this
+lesson's own $2$-qubit toy example, gains nothing from the remaining
+three stages except pedagogical value. When Classical Simulation
+Works exists precisely so this check happens *first*, before any
+compilation effort is spent on a circuit that never needed a quantum
+computer at all.
+</Callout>
+
+<Callout type="mistake">
+**Applying the routing multiplier to the T-count.** Stage 3's
+{swapOverheadMultiplier}× overhead comes from inserting SWAP gates to
+route two-qubit interactions across limited connectivity; it has
+nothing to do with T gates, which act on a single qubit and never need
+routing to a neighbor. Multiplying `totalTGates` by
+{swapOverheadMultiplier} instead of leaving it untouched would inflate
+$N_T$, and therefore the magic-state factory sizing in Stage 4c, for no
+physical reason.
+</Callout>
+
+<Callout type="mistake">
+**Treating the {totalPhysicalQubits}-qubit answer as equally certain
+across all four stages.** As the Physical Interpretation section
+argued, Stages 1–3 are routine engineering with essentially no
+methodological uncertainty; Stage 4's *method* is solid but its
+specific numeric inputs ($p$, decoder performance, code choice) are
+still evolving. Quoting {totalPhysicalQubits} as a hard, precise
+prediction misrepresents how much of that number rests on assumptions
+still under active research.
+</Callout>
+
+## Practice Questions
+
+1. Suppose this same toy circuit instead ran on a device with better
+   connectivity, needing only a $1.5\times$ SWAP-routing overhead
+   (Stage 3) instead of the lesson's $2.5\times$. Recompute the routed
+   two-qubit gate count, the routed total gate count $N_T + N_2$, and
+   the resulting per-gate error budget for the same $99\%$
+   overall-success target, and compare all three to the lesson's own
+   $2500$, $3100$, and $3.226\times10^{-6}$.
+2. Redo Stage 4a–4b using the lesson's own routed gate count of $3100$,
+   but a laxer overall-success target of $95\%$ (i.e. a $5\%$ allowed
+   overall failure) instead of $99\%$. Compute the new per-gate error
+   budget and the resulting minimum code distance $d$, and state
+   whether it comes out larger or smaller than the lesson's $d = 11$ —
+   and which of the two capstones' code distances it matches.
+3. If this toy circuit needed `logicalQubitCount` $= 6$ logical qubits
+   instead of $2$ (holding the code distance, patch size, and
+   $15$-patch factory fixed), recompute the compute qubits, the total
+   physical qubits, and the factory's share of the total. Which of the
+   two capstones' own reported factory-share percentages does your
+   answer land on, and why?
+4. The lesson's magic-state factory achieves a $\approx 92\times$
+   headroom below the per-gate budget by distilling at
+   $p_{\text{in}} = p_{\text{th}}/10 = 0.001$. Recompute
+   `distillationOutputError` and the resulting headroom if the device
+   can only reach $p_{\text{in}} = p_{\text{th}}/5 = 0.002$ instead, and
+   state whether a single round of $15$-to-$1$ distillation still
+   clears the lesson's per-gate budget of $3.226\times10^{-6}$.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- The full pipeline this capstone connects has four stages: (1) check
+  classical simulability first (When Classical Simulation Works) —
+  this lesson's own $2$-qubit toy circuit fails this check trivially,
+  by design; (2) count T-gates via Clifford+T synthesis, a simple
+  multiplication here giving $N_T=600$; (3) apply a device's
+  routing/SWAP overhead (Noise-Aware Compilation), inflating the
+  two-qubit gate count from {totalTwoQubitGates} to
+  {routedTwoQubitGates} and the total to {routedTotalGateCount}; (4)
+  hand $N_T$ and the routed $N_2$ to the Fault Tolerance Frontiers
+  capstone's own four-step methodology unchanged, producing a code
+  distance of {codeDistance} and a final estimate of
+  {totalPhysicalQubits} total physical qubits.
+- That last number is over a thousand times the circuit's raw gate
+  count, and the magic-state factory alone is
+  {(factoryShareOfTotal * 100).toFixed(1)}% of it — the same
+  factory-dominance finding the fault-tolerance capstone reached,
+  recurring here at a different logical-qubit count.
+- Stages 1–3 are solved, routine engineering practice; Stage 4's
+  *method* is equally solid, but its numeric inputs (achieved physical
+  error rate, decoder throughput, code/architecture choice) are still
+  active research, and an honest resource estimate says so explicitly
+  rather than presenting every stage as equally certain.
+
+## Further Exploration
+
+Every number in this pipeline, on both the compilation side and the
+fault-tolerance side, came from a chosen toy circuit and a chain of
+explicitly stated assumptions. The last remaining skill this pillar
+builds is knowing how to evaluate someone *else's* pipeline, run on a
+real algorithm, when the assumptions aren't handed to you as cleanly as
+they were here. That's exactly where [How to Read a Quantum Computing
+Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
+picks up.

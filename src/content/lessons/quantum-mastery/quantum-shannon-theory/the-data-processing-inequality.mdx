@@ -1,0 +1,392 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { StateVector } from "@/lib/quantum/state";
+import { IDENTITY } from "@/lib/quantum/gates";
+import { pureStateDensityMatrix, vonNeumannEntropy, eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
+import { partialTrace } from "@/lib/quantum/partialTrace";
+import { dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-shannon-theory/the-data-processing-inequality"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "The Data-Processing Inequality",
+  description:
+    "Quantum relative entropy can only shrink under a physical channel, S(N(rho)||N(sigma)) <= S(rho||sigma)—derived here as the exact reason correlated information can never be manufactured by processing, only lost, and checked numerically on a dephased Bell pair.",
+  course: "quantum-shannon-theory",
+  module: "the-data-processing-inequality",
+  order: 4,
+  difficulty: "master",
+  estimatedMinutes: 26,
+  prerequisites: [
+    "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures",
+    "quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification",
+  ],
+  objectives: [
+    "State the monotonicity of quantum relative entropy under CPTP maps: S(N(rho) || N(sigma)) <= S(rho || sigma)",
+    "Derive the data-processing inequality for mutual information, I(A:B) >= I(A:B') when B' = N(B) for any channel N, as a direct corollary",
+    "Explain concretely why this single inequality underlies 'you cannot gain information by processing data you already have', the impossibility of increasing entanglement by LOCC, and the security intuition behind quantum key distribution",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement",
+      note: "That lesson proves S(rho||sigma) >= 0 for a fixed pair of states via Klein's inequality; this lesson proves the strictly stronger, dynamical statement that any physical channel can only push that same quantity further toward zero, never away from it.",
+    },
+  ],
+};
+
+export const bellPhiPlus = new StateVector([
+  new Complex(1 / Math.sqrt(2)), Complex.ZERO, Complex.ZERO, new Complex(1 / Math.sqrt(2)),
+]);
+export const rhoBell = pureStateDensityMatrix(bellPhiPlus);
+
+export const binaryEntropyTerm = (lambda) => {
+  if (lambda <= 1e-12) return 0;
+  return -lambda * Math.log2(lambda);
+}
+
+export const jointEntropyOfDephasedBell = (rhoPrime) => {
+  const outerBlock = new Matrix([
+    [rhoPrime.get(0, 0), rhoPrime.get(0, 3)],
+    [rhoPrime.get(3, 0), rhoPrime.get(3, 3)],
+  ]);
+  const innerBlock = new Matrix([
+    [rhoPrime.get(1, 1), rhoPrime.get(1, 2)],
+    [rhoPrime.get(2, 1), rhoPrime.get(2, 2)],
+  ]);
+  const eigs = [...eigenvaluesHermitian2x2(outerBlock), ...eigenvaluesHermitian2x2(innerBlock)];
+  return eigs.reduce((sum, lam) => sum + binaryEntropyTerm(lam), 0);
+}
+
+export const mutualInformationAfterDephasingB = (lambda) => {
+  const krausOnB = dephasingChannel(lambda).map((K) => IDENTITY.tensor(K));
+  const rhoPrime = applyKrausChannel(rhoBell, krausOnB);
+  const rhoA = partialTrace(rhoPrime, 2, [1]);
+  const rhoBmarg = partialTrace(rhoPrime, 2, [0]);
+  const S_A = vonNeumannEntropy(rhoA);
+  const S_B = vonNeumannEntropy(rhoBmarg);
+  const S_AB = jointEntropyOfDephasedBell(rhoPrime);
+  return { S_A, S_B, S_AB, I: S_A + S_B - S_AB };
+}
+
+export const dephasingSweepLambdas = Array.from({ length: 41 }, (_, i) => i / 40);
+
+export const dephasingSweepResults = dephasingSweepLambdas.map((lambda) => ({
+  lambda,
+  ...mutualInformationAfterDephasingB(lambda),
+}));
+
+export const dataProcessingFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "I(A:B') under dephasing on B",
+        color: "brand",
+        points: dephasingSweepResults.map((r) => ({ x: r.lambda, y: r.I })),
+      },
+    ],
+  },
+];
+
+## Motivation
+
+Quantum Entropy and Information Measures defined quantum mutual
+information $I(A:B)=S(A)+S(B)-S(AB)$ and computed $I(A:B)=2$ bits for a
+Bell pair—the maximum two qubits can share. A natural next question:
+what happens to that shared information if $B$'s qubit is then sent
+down a noisy channel, or handed to an eavesdropper, or simply measured
+and forgotten? Intuition says it can only get worse—you cannot learn
+more about $A$ from a *processed* copy of $B$ than from $B$ itself. This
+lesson turns that intuition into an actual theorem, derives its most
+useful corollary in full, and checks it against a real, computed number.
+
+## Mathematical Development
+
+### The monotonicity theorem
+
+<TheoremBox title="Monotonicity of quantum relative entropy (data-processing for S(.||.))" provenance="cited">
+
+For any two density matrices $\rho,\sigma$ on a system, and any
+completely positive trace-preserving (CPTP) map $\mathcal N$ (any
+physical channel, in the Stinespring Dilation and Channel Purification
+sense: a unitary on a larger space followed by discarding an ancilla):
+
+$$
+S\big(\mathcal N(\rho)\,\big\|\,\mathcal N(\sigma)\big) \;\leq\; S(\rho\|\sigma)
+$$
+
+Since relative entropy measures how distinguishable $\sigma$ is from
+the true state $\rho$, this says: **no physical operation can ever make
+two states easier to tell apart than they already were.** Processing
+can only destroy distinguishing information, never create it.
+
+</TheoremBox>
+
+<Callout type="note">
+**This proof is genuinely out of scope here, and that is stated
+outright rather than glossed over.** Klein's inequality (Relative
+Entropy and Mixed-State Entanglement) proved $S(\rho\|\sigma)\geq0$ for
+a *fixed* pair of states using two applications of Jensen's inequality
+on scalars. The monotonicity theorem above is a different, harder
+statement—it compares $S(\rho\|\sigma)$ *before and after* a channel
+— and its standard proofs (Lindblad, 1975; Uhlmann, 1977) go through
+either strong subadditivity of von Neumann entropy or the joint
+convexity of relative entropy, both of which rest on **operator
+convexity** of $x\mapsto x\log x$ (a statement about matrix-valued, not
+scalar, convexity)—machinery this platform has not built. It is
+stated here as a real, precisely-quoted theorem, not derived. See
+Nielsen & Chuang, *Quantum Computation and Quantum Information*, §11.3,
+or Wilde, *Quantum Information Theory*, Ch. 11, for the full proof.
+</Callout>
+
+**Why it has to be true, physically.** A channel $\mathcal N$ is not an
+abstract map—it is *literally* something that can happen to a
+system: append an ancilla, evolve unitarily, discard part of the
+result. Suppose the inequality failed, so some channel existed that
+*increased* $S(\mathcal N(\rho)\|\mathcal N(\sigma))$ above
+$S(\rho\|\sigma)$. Chain enough copies of that channel together and the
+gap between two states that started only slightly different could be
+amplified without bound—enough, eventually, to reliably tell apart
+two non-orthogonal states with certainty, using nothing but ordinary
+physical evolution and no measurement postulate at all. That is exactly
+the kind of thing linearity forbids: it is the same structural fact
+behind no-cloning (no physical process can be built that reliably
+distinguishes or copies arbitrary non-orthogonal states). Monotonicity
+of relative entropy is the distinguishability-flavored statement of
+"you cannot get something for nothing" that no-cloning is the
+copying-flavored statement of.
+
+### The corollary: data processing for mutual information
+
+Take a bipartite state $\rho_{AB}$ and a channel $\mathcal N$ acting on
+$B$ alone, producing $B'=\mathcal N(B)$—a genuine Markov chain
+$A\to B\to B'$, since $B'$ is built from $B$ with no further access to
+$A$. Claim: $I(A:B)\geq I(A:B')$.
+
+**Step 1—mutual information is a relative entropy.** For any
+bipartite state, comparing $\rho_{AB}$ to the product of its own
+marginals $\rho_A\otimes\rho_B$:
+
+$$
+S(\rho_{AB}\,\|\,\rho_A\otimes\rho_B) = \text{Tr}(\rho_{AB}\log_2\rho_{AB}) - \text{Tr}\big(\rho_{AB}\log_2(\rho_A\otimes\rho_B)\big)
+$$
+
+Since $\log_2(\rho_A\otimes\rho_B)=\log_2\rho_A\otimes I + I\otimes\log_2\rho_B$ (true for any two operators on separate factors), the second term splits into
+$\text{Tr}_A(\rho_A\log_2\rho_A)+\text{Tr}_B(\rho_B\log_2\rho_B)=-S(A)-S(B)$,
+while the first term is $-S(AB)$ by definition. So
+
+$$
+S(\rho_{AB}\|\rho_A\otimes\rho_B) = S(A)+S(B)-S(AB) = I(A:B)
+$$
+
+mutual information *is* the relative entropy between the true joint
+state and the (wrong, but marginal-matching) product state.
+
+**Step 2—push both states through the same channel.** Apply
+$\text{id}_A\otimes\mathcal N$ to both sides. On the left,
+$(\text{id}_A\otimes\mathcal N)(\rho_{AB})=\rho_{AB'}$, the actual
+post-channel joint state. On the right,
+$(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)=\rho_A\otimes\mathcal N(\rho_B)=\rho_A\otimes\rho_{B'}$.
+Two facts about this new state, both immediate from $\mathcal N$
+touching only $B$: tracing any trace-preserving map out again reproduces
+the original trace, so $\rho_{AB'}$'s marginal on $A$ is still exactly
+$\rho_A$; and $\rho_{AB'}$'s marginal on $B'$ is exactly
+$\mathcal N(\rho_B)=\rho_{B'}$ by definition. So Step 1's identity
+applies again to the *primed* state without modification:
+$S(\rho_{AB'}\|\rho_A\otimes\rho_{B'}) = I(A:B')$.
+
+**Step 3—apply the theorem.** Monotonicity, applied to exactly this
+pair of states and this channel:
+
+$$
+S\big((\text{id}_A\otimes\mathcal N)(\rho_{AB})\,\big\|\,(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)\big) \leq S(\rho_{AB}\|\rho_A\otimes\rho_B)
+$$
+
+Substituting Steps 1 and 2 into the left and right sides directly gives
+
+$$
+\boxed{I(A:B') \leq I(A:B)}
+$$
+
+a genuine corollary, not a re-assertion of the same theorem under a new
+name: it required identifying the *specific* pair of states
+($\rho_{AB}$ and $\rho_A\otimes\rho_B$) for which the abstract
+monotonicity statement collapses exactly onto the mutual-information
+identity.
+
+## Physical Interpretation: Why This Matters
+
+- **LOCC cannot increase entanglement.** Any protocol built from local
+  operations and classical communication is, from $B$'s side alone, a
+  sequence of local channels applied to $B$'s share of an entangled
+  pair (plus classical messages, which do not touch the quantum state
+  at all). The data-processing inequality applied to each local step
+  says $A$'s correlation with $B$'s (evolving) share can only fall or
+  hold steady, never rise—the quantitative reason entanglement is a
+  resource that LOCC can spend but never manufacture.
+- **QKD security proofs are built directly on this inequality.** In a
+  protocol like BB84, an eavesdropper's information about the final key
+  is bounded by treating their interaction with the transmitted qubits
+  as exactly the channel $\mathcal N$ in the corollary above: whatever
+  correlation Eve's measurement device ends up holding with Alice's
+  bits is bounded by the correlation Alice and Bob's *un-eavesdropped*
+  qubits would have had, precisely because Eve's device is $B'$, one
+  more processing step downstream of $B$.
+- **This is the direct quantum generalization of the classical Data
+  Processing Inequality.** Classically, for a Markov chain
+  $X\to Y\to Z$ (i.e. $Z=g(Y)$ or more generally $Z$ depends on $Y$
+  alone), $I(X:Y)\geq I(X:Z)$—you cannot learn more about $X$ from
+  any function or noisy version of $Y$ than from $Y$ itself. The
+  derivation above is the exact same statement with classical
+  distributions replaced by density matrices and Shannon entropy
+  replaced by von Neumann entropy throughout.
+
+## Worked Example: dephasing one half of a Bell pair
+
+Start from $|\Phi^+\rangle=\tfrac1{\sqrt2}(|00\rangle+|11\rangle)$,
+built with this platform's own `StateVector` and
+`pureStateDensityMatrix`, exactly the state Quantum Entropy and
+Information Measures used for its $I(A:B)=2$ bits maximum. Apply the
+existing `dephasingChannel(lambda)` from Open Quantum Systems and
+Kraus Operators to qubit $B$ **only**, via
+`IDENTITY.tensor(K)` for each Kraus operator $K$, and
+`applyKrausChannel`.
+
+Because `dephasingChannel`'s Kraus operators are themselves diagonal in
+the computational basis ($K_0\propto I$, $K_1\propto\sigma_z$),
+$I\otimes K_0$ and $I\otimes K_1$ are diagonal too. Conjugating a matrix
+by diagonal matrices, $(D\rho D^\dagger)_{ij}=D_{ii}\,\rho_{ij}\,\overline{D_{jj}}$,
+can never move a zero entry off zero—so $\rho_{AB}'$ keeps exactly
+the same support as the original Bell state: nonzero only at the four
+corners $\{|00\rangle,|11\rangle\}\times\{|00\rangle,|11\rangle\}$. That
+is a real structural fact about diagonal channels, not a coincidence
+specific to this state, and it is exactly what makes the following
+computation land back on `eigenvaluesHermitian2x2` (this platform's
+$2\times2$-only closed-form eigensolver) despite the joint state living
+on four dimensions—the same "block-diagonal, structurally special
+case" pattern Relative Entropy and Mixed-State Entanglement used for
+the Werner state.
+
+Working it out (Klein-style diagonal conjugation, $\lambda\in[0,1]$):
+
+$$
+\rho_{AB}' = \begin{pmatrix} 0.5 & 0 & 0 & 0.5(1-\lambda) \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 0.5(1-\lambda) & 0 & 0 & 0.5 \end{pmatrix}
+$$
+
+The middle $2\times2$ block (the $\{|01\rangle,|10\rangle\}$ subspace)
+is identically zero, contributing two zero eigenvalues; the outer block
+$\begin{psmallmatrix}0.5 & 0.5(1-\lambda)\\ 0.5(1-\lambda) & 0.5\end{psmallmatrix}$
+has eigenvalues $1-\lambda/2$ and $\lambda/2$ by
+`eigenvaluesHermitian2x2`. So $S(AB')=-[(1-\tfrac\lambda2)\log_2(1-\tfrac\lambda2)+\tfrac\lambda2\log_2\tfrac\lambda2]$.
+Both reduced marginals stay exactly maximally mixed for every
+$\lambda$ (dephasing never touches populations, computed directly via
+`partialTrace` and confirmed at $S_A=S_B=1$ bit throughout), so
+
+$$
+I(A:B') = S_A+S_B-S_{AB}' = 2 - S_{AB}'(\lambda)
+$$
+
+Computed values (`mutualInformationAfterDephasingB`, exact, no
+rounding beyond display):
+
+| $\lambda$ | $S(AB')$ (bits) | $I(A:B')$ (bits) |
+|---|---|---|
+| 0.0 | 0.000000 | 2.000000 |
+| 0.2 | 0.468996 | 1.531004 |
+| 0.4 | 0.721928 | 1.278072 |
+| 0.8 | 0.970951 | 1.029049 |
+| 1.0 | 1.000000 | 1.000000 |
+
+Every single value satisfies $I(A:B')\leq2=I(A:B)$, strictly for any
+$\lambda>0$, exactly as the theorem requires—and note it never drops
+below $1$ bit even at maximal dephasing ($\lambda=1$): dephasing
+destroys *phase* coherence but never the fully classical (population)
+correlation the Bell pair also carries, so 1 of its 2 bits survives
+even total decoherence on one side.
+
+## Interactive: watching the inequality hold at every noise level
+
+<InteractiveSection
+  title="Scan the noise parameter"
+  description="Every point on this curve is I(A:B') computed after dephasing qubit B with strength lambda—the dashed line marks the noiseless value I(A:B)=2. The curve never crosses it.">
+  <ParametricCurve
+    frames={dataProcessingFrames}
+    ariaLabel="Quantum mutual information I(A:B') between qubit A and dephased qubit B', plotted against the dephasing strength lambda from 0 to 1, staying at or below the noiseless value of 2 bits and decreasing monotonically toward 1 bit"
+    referenceLines={[{ y: 2, label: "Noiseless I(A:B) = 2 bits" }]}
+  />
+</InteractiveSection>
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Confusing "channels can't increase distinguishability" with "channels
+can't increase entropy."** The theorem in this lesson is about
+*relative* entropy between two states (or, via the corollary, mutual
+information between two systems)—not the entropy $S(\rho)$ of a
+single state. $S(\rho)$ itself is **not** monotonic under a general
+channel: amplitude damping applied to a maximally mixed qubit *lowers*
+its entropy (it relaxes toward the pure ground state), and plenty of
+channels raise a low-entropy state's entropy. What never increases is
+the *relative* quantity—how distinguishable two states, or how
+correlated two systems, remain.
+</Callout>
+
+<Callout type="mistake">
+**Applying the mutual-information corollary to a channel that touches
+*both* $A$ and $B$.** The derivation above depends on
+$(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)=\rho_A\otimes\mathcal N(\rho_B)$
+in Step 2—true only because $\mathcal N$ leaves $A$'s factor alone.
+If the channel entangles or otherwise acts across both shares (not
+$\text{id}_A\otimes\mathcal N$ but some genuinely joint
+$\mathcal N_{AB}$), $A$'s own marginal changes too, Step 1's identity no
+longer reproduces $I(A:B')$ on the nose, and the clean corollary does
+not apply—only the more general (and less immediately useful) raw
+monotonicity statement does.
+</Callout>
+
+## Practice Questions
+
+1. Confirm from the theorem's equality condition (inherited from
+   Klein's inequality) that a **unitary** channel leaves
+   $S(\rho\|\sigma)$ exactly unchanged, and explain why this makes
+   sense given that a unitary is reversible.
+2. Using the worked example's formula $I(A:B')=2-S(AB')(\lambda)$,
+   compute $I(A:B')$ at $\lambda=0.6$ and confirm it lies strictly
+   between the $\lambda=0.4$ and $\lambda=0.8$ table values.
+3. Explain, in your own words, why the Markov-chain structure
+   $A\to B\to B'$ (not $A\to B'$ directly, and not a channel touching
+   $A$ too) is exactly the condition the corollary's derivation needs.
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- Quantum relative entropy is monotonic under any physical (CPTP)
+  channel, $S(\mathcal N(\rho)\|\mathcal N(\sigma))\leq S(\rho\|\sigma)$
+ —stated precisely and motivated physically here, with the full
+  proof explicitly cited (Nielsen & Chuang; Wilde) rather than
+  re-derived, since it needs operator-convexity machinery beyond this
+  platform's scope.
+- Applied to $\rho_{AB}$ vs. $\rho_A\otimes\rho_B$ pushed through
+  $\text{id}_A\otimes\mathcal N$, this yields the fully derived
+  corollary $I(A:B)\geq I(A:B')$ for any Markov chain $A\to B\to B'$.
+- Verified numerically: dephasing one half of a Bell pair
+  ($I(A:B)=2$ bits) drives $I(A:B')$ down monotonically to $1$ bit as
+  $\lambda\to1$, computed exactly via this platform's own
+  `dephasingChannel`, `partialTrace`, and `eigenvaluesHermitian2x2`,
+  never once violating the bound.
+- The same inequality is the quantitative backbone of LOCC entanglement
+  monotonicity, QKD eavesdropper-information bounds, and is the direct
+  quantum lift of the classical Data Processing Inequality.
+
+## Further Exploration
+
+Next: [Entanglement Distillation and Typical Subspaces](/lessons/quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces),
+which uses this exact monotonicity fact in the opposite direction —
+asking how much *pure* entanglement can be recovered from many noisy
+copies of a state, bounded by precisely the inequality proved here.

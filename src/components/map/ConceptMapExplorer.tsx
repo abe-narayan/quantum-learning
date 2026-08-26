@@ -20,6 +20,7 @@ const PILLAR_DOT: Record<ConceptNode["pillar"], string> = {
   "quantum-hardware": "bg-warning",
   "quantum-software": "bg-muted-foreground",
   "quantum-mastery": "bg-danger",
+  apex: "bg-brand",
 };
 
 const PILLAR_LABEL: Record<ConceptNode["pillar"], string> = {
@@ -28,6 +29,7 @@ const PILLAR_LABEL: Record<ConceptNode["pillar"], string> = {
   "quantum-hardware": "Quantum Hardware",
   "quantum-software": "Quantum Software",
   "quantum-mastery": "Quantum Mastery",
+  apex: "Apex",
 };
 
 const NODE_WIDTH = 152;

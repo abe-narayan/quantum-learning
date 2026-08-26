@@ -1,0 +1,470 @@
+import { PracticeLinks } from "@/components/problems/PracticeLinks";
+import { getProblemsForLesson } from "@/lib/problems/registry";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
+import { pureStateDensityMatrix, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
+import { reducedDensityMatrixQubit0 } from "@/lib/quantum/partialTrace";
+import { BarChart } from "@/components/visualizations/BarChart";
+
+export const practiceProblems = getProblemsForLesson(
+  "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces"
+).map((problem) => problem.meta);
+
+export const lessonMeta = {
+  title: "Entanglement Distillation and Typical Subspaces",
+  description:
+    "Turns Schmidt Decomposition and Purification's abstract entanglement entropy into an operational quantity: the typical-subspace argument behind entanglement concentration, computed concretely, that says exactly how many near-perfect Bell pairs n copies of a partially-entangled state actually yield.",
+  course: "quantum-shannon-theory",
+  module: "entanglement-distillation-and-typical-subspaces",
+  order: 5,
+  difficulty: "master",
+  estimatedMinutes: 27,
+  prerequisites: [
+    "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures",
+    "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification",
+  ],
+  objectives: [
+    "Explain entanglement distillation: converting many copies of a partially-entangled (or noisy) state into fewer, nearly-perfect Bell pairs using only LOCC",
+    "State the typical subspace idea: for many i.i.d. copies of a state, almost all of the probability weight concentrates on a subspace of dimension approximately 2^(n S(rho)), not the full 2^n-dimensional space",
+    "Connect the typical-subspace dimension directly to the distillable entanglement rate, and to Schumacher compression's classical analogue",
+  ],
+  related: [
+    {
+      slug: "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification",
+      note: "The n-copy joint Schmidt coefficients this lesson builds a typical subspace out of are exactly what that lesson's SVD-based theorem guarantees exist for any bipartite pure state, applied here to |psi>^⊗n itself.",
+    },
+  ],
+};
+
+export const pWorked = 0.9;
+
+export const psiWorked = new StateVector([
+  new Complex(Math.sqrt(pWorked)),
+  new Complex(0),
+  new Complex(0),
+  new Complex(Math.sqrt(1 - pWorked)),
+]);
+
+export const rhoAWorked = reducedDensityMatrixQubit0(pureStateDensityMatrix(psiWorked));
+export const entropyWorked = vonNeumannEntropy(rhoAWorked);
+
+export const binomialCoefficient = (n, k) => {
+  let result = 1;
+  for (let i = 0; i < k; i += 1) {
+    result = (result * (n - i)) / (i + 1);
+  }
+  return result;
+};
+
+export const schmidtTypeDistribution = (n, p) => {
+  const q = 1 - p;
+  return Array.from({ length: n + 1 }, (_, k) => {
+    const count = binomialCoefficient(n, k);
+    const probability = count * Math.pow(p, k) * Math.pow(q, n - k);
+    return { k, count, probability };
+  });
+};
+
+export const n6 = 6;
+export const dist6 = schmidtTypeDistribution(n6, pWorked);
+export const mean6 = n6 * pWorked;
+export const stdDev6 = Math.sqrt(n6 * pWorked * (1 - pWorked));
+export const typicalLower6 = mean6 - stdDev6;
+export const typicalUpper6 = mean6 + stdDev6;
+export const isTypical6 = (k) => k >= typicalLower6 && k <= typicalUpper6;
+export const typicalEntries6 = dist6.filter((entry) => isTypical6(entry.k));
+export const typicalMass6 = typicalEntries6.reduce((sum, entry) => sum + entry.probability, 0);
+export const complementMass6 = 1 - typicalMass6;
+export const typicalDimension6 = typicalEntries6.reduce((sum, entry) => sum + entry.count, 0);
+export const totalDimension6 = Math.pow(2, n6);
+export const predictedTypicalDimension6 = Math.pow(2, n6 * entropyWorked);
+
+export const individualLambdaAllZero6 = Math.pow(pWorked, n6);
+export const individualLambdaOneFlip6 = Math.pow(pWorked, n6 - 1) * (1 - pWorked);
+export const flatnessRatio6 = individualLambdaAllZero6 / individualLambdaOneFlip6;
+
+export const distillableBellPairsWorked = n6 * entropyWorked;
+
+export const distributionBars6 = dist6.map((entry) => ({
+  label: `k=${entry.k}`,
+  value: entry.probability,
+  highlight: isTypical6(entry.k),
+  caption: `${(entry.probability * 100).toFixed(2)}%`,
+}));
+
+## Motivation
+
+The Data-Processing Inequality treated von Neumann entropy and mutual
+information as abstract bookkeeping quantities: numbers a channel or a
+state carries, useful for proving inequalities. This lesson asks a much
+more physical question about entanglement specifically: if two parties,
+Alice and Bob, share $n$ copies of a *partially* entangled state, not a
+perfect Bell pair, can they use only **local operations and classical
+communication (LOCC)** — no direct interaction between them, exactly the
+restriction that makes entanglement a genuine resource rather than
+something either party could produce alone — to convert those $n$
+imperfect copies into a smaller number of *nearly perfect* Bell pairs?
+The answer is yes, the protocol is called **entanglement distillation**,
+and the reason it works at all is a single sharp idea, adapted directly
+from Schumacher's proof that quantum data can be compressed: for many
+identical copies of a state, almost all of the probability mass
+concentrates on a comparatively tiny **typical subspace**. This lesson
+derives that idea from scratch and checks it against real, computed
+numbers, not just the clean asymptotic formula.
+
+## Mathematical Development
+
+### Setup: $n$ copies and their joint Schmidt coefficients
+
+Take the partially entangled 2-qubit state
+
+$$
+|\psi\rangle = \sqrt{p}\,|00\rangle + \sqrt{1-p}\,|11\rangle, \qquad p\neq \tfrac12,
+$$
+
+already in Schmidt form (Schmidt Decomposition and Purification), with
+Schmidt coefficients $p$ and $1-p$ and entanglement entropy
+$S(\rho_A)=H(p)\equiv -p\log_2 p-(1-p)\log_2(1-p)$, the **binary Shannon
+entropy** — exactly the classical quantity this course's entropy lesson
+built, now reappearing because $\rho_A=\mathrm{diag}(p,1-p)$ is already
+diagonal, so its von Neumann entropy is *literally* a classical Shannon
+entropy with no further work.
+
+Now take $n$ independent copies, $|\psi\rangle^{\otimes n}$, still a
+single bipartite pure state (system $A$ = all $n$ of Alice's qubits,
+system $B$ = all $n$ of Bob's). Expanding the tensor power term by term,
+every one of the $2^n$ terms is fixed by choosing, independently for
+each of the $n$ copies, whether that copy landed in the $|00\rangle$
+branch (weight $\sqrt p$) or the $|11\rangle$ branch (weight $\sqrt{1-p}$).
+A term with exactly $k$ of its $n$ copies in the $|00\rangle$ branch
+(and $n-k$ in the $|11\rangle$ branch) contributes Schmidt coefficient
+
+$$
+\lambda_k = p^{\,k}(1-p)^{\,n-k}
+$$
+
+and $|\psi\rangle^{\otimes n}$ is *already* in Schmidt form over the
+$2^n$-dimensional computational basis on each side (every term is a
+distinct, orthogonal product basis state on each side, paired index for
+index, exactly the Schmidt structure Schmidt Decomposition and
+Purification proved holds for any bipartite pure state). There are
+$\binom{n}{k}$ terms of type $k$ (choosing which $k$ of the $n$ copies
+are the $|00\rangle$ ones), each carrying the same coefficient $\lambda_k$,
+so the *total* Schmidt weight at type $k$ is
+
+$$
+P(k) = \binom{n}{k}\,p^{k}(1-p)^{n-k}
+$$
+
+— exactly the **binomial distribution** $\mathrm{Binomial}(n,p)$
+evaluated at $k$, with mean $np$: since $p$ is the *larger* of the two
+branch weights whenever $p>\tfrac12$, the typical types cluster near
+$k\approx np$, i.e. near "almost all copies in the $|00\rangle$ branch,"
+exactly matching intuition.
+
+### The typical subspace
+
+<TheoremBox title="Typical subspace concentration (Schumacher)" provenance="cited">
+
+By the law of large numbers, as $n\to\infty$ the binomial distribution
+above concentrates its probability mass on types whose fraction of
+$|00\rangle$-branch copies, $k/n$, lies within any fixed $\epsilon>0$ of
+$p$ (equivalently, whose exponential rate $-\tfrac1n\log_2\lambda_k$ lies
+within $\epsilon$ of $H(p)$). Call this the **typical set** $T_\epsilon$. Its probability
+mass $\to 1$ as $n\to\infty$, while its *size* is only
+$|T_\epsilon|\approx 2^{nH(p)}$ — exponentially smaller than the full
+space of dimension $2^n$ whenever $H(p)<1$, i.e. whenever $|\psi\rangle$
+is not already maximally entangled.
+
+</TheoremBox>
+
+This is the same theorem, applied to Schmidt coefficients instead of
+classical letter probabilities, that Shannon's source coding theorem and
+its quantum analogue (Schumacher compression) both rest on: a source
+that looks like it needs $n$ bits (or qubits) to describe can actually
+be compressed into only $\approx nH$ of them, because only the typical
+outcomes ever really occur. Here the same counting argument says
+something about *entanglement* rather than compression: the typical
+subspace, restricted to just its $\approx 2^{nH(p)}$ dimensions, carries
+almost all of $|\psi\rangle^{\otimes n}$'s probability weight, and —
+crucially — its Schmidt coefficients are all *nearly equal* to
+$2^{-nH(p)}$ within that subspace (every typical type $k$ has
+$-\tfrac1n\log_2\lambda_k\approx H(p)$ by definition, so
+$\lambda_k\approx 2^{-nH(p)}$ for every one of them). A state whose
+nonzero Schmidt coefficients are all nearly equal is, by definition,
+nearly **maximally entangled** within that subspace.
+
+### Entanglement concentration: distilling Bell pairs from the typical subspace
+
+<DefinitionBox title="Entanglement concentration">
+
+Alice performs a local projective measurement onto the typical subspace
+(a real quantum operation: project her $n$ qubits onto the subspace
+spanned by typical strings, and discard the rare failure outcome). With
+probability $\to 1$ as $n\to\infty$, this succeeds, and the post-projection
+state is nearly maximally entangled across a space of dimension
+$\approx 2^{nH(p)}$. Relabeling that space's basis (a local unitary on
+each side, no communication needed beyond agreeing on the labeling in
+advance) turns it into $m\approx nH(p)$ ordinary qubits per side in a
+state extremely close to $m$ perfect Bell pairs $|\Phi^+\rangle^{\otimes m}$.
+
+</DefinitionBox>
+
+This protocol, due to Bennett, Bernstein, Popescu, and Schumacher (1996),
+is called **entanglement concentration**: it is the special, cleanest
+case of general distillation, restricted to *pure* partially-entangled
+states, and it is worth deriving explicitly because every step above is
+a real, checkable claim (a projection, a counting argument, a
+relabeling), not a black box. The achievable rate,
+$m/n\to H(p)=S(\rho_A)$ Bell pairs per copy, is also *optimal*: no LOCC
+protocol on pure states can do better, because entanglement entropy is
+exactly conserved on average under LOCC for pure bipartite states (a
+fact proved elsewhere in this course's entropy lesson via concavity, not
+re-derived here).
+
+### Beyond pure states: mixed states and coherent information
+
+Real shared entanglement is never a perfect, isolated pure state —
+transmission through fiber or free space adds noise, so Alice and Bob
+actually share $n$ copies of some *mixed* state $\rho_{AB}$. The typical
+subspace idea still applies (via the state's purification: distilling
+$\rho_{AB}^{\otimes n}$ is equivalent to distilling entanglement from a
+purification $|\psi\rangle_{ABE}$ against an inaccessible environment
+$E$), but the clean projective argument above is no longer literally
+enough by itself, because $E$ carries information that could be
+correlated with $A$ or $B$ in ways a single projection doesn't remove.
+General mixed-state distillation protocols — **entanglement pumping**
+(distill a smaller number of higher-fidelity pairs from many noisy ones,
+iterate) and **hashing** (use many copies' worth of local Clifford
+operations and classical syndrome measurements, structurally close to a
+quantum error-correcting code) — handle this at the cost of more
+involved LOCC. The achievable rate is bounded above by, and for
+important state classes (e.g. states arising from degradable channels)
+asymptotically equals, the **coherent information**
+$I_c(A\rangle B)=S(\rho_B)-S(\rho_{AB})$ from The Data-Processing
+Inequality: exactly the same quantity that lesson used to bound how much
+quantum information a noisy channel can carry, now reappearing as the
+bound on how much entanglement noisy channel *use* can generate. That
+coincidence is not an accident — it is the technical heart of this
+course's own capstone on channel capacities, which this lesson's typical
+subspace argument is the concrete, fully-worked special case of.
+
+## Physical Interpretation — Why This Matters
+
+Distillation is not a mathematical curiosity: it is the specific reason
+long-distance quantum communication is possible at all. A pair of
+entangled photons sent through real optical fiber picks up loss and
+decoherence over distance, so the entanglement Alice and Bob actually
+end up sharing is never a perfect Bell pair — it degrades roughly
+exponentially with distance. **Quantum repeaters** solve this by
+chaining shorter, higher-fidelity entangled links and periodically
+*distilling*: sacrificing some pairs' worth of noisy entanglement to
+purify the rest, exactly the entanglement-pumping idea above, before
+that entanglement is used for teleportation or quantum key distribution
+(QKD). Without distillation, entanglement-based QKD's security
+guarantees degrade along with the fidelity of the shared state; with it,
+a noisy channel can still support secure key generation, provided the
+noise is below distillation's threshold.
+
+Distillation also answers a question the Quantum Computing pillar's own
+[Entanglement Entropy for Pure Bipartite States](/lessons/quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states)
+lesson only ever *asserted*: why should entanglement entropy, a number
+computed from an abstract density matrix's eigenvalues, be *the*
+measure of "how entangled" a state is, rather than just one convenient
+choice among many? This lesson supplies the missing operational answer.
+**Distillable entanglement** — the asymptotic rate of perfect Bell pairs
+extractable per copy by LOCC — is a measure defined purely in terms of
+what a physical protocol can actually *do* with the state, with no
+reference to entropy at all. The fact that this operational quantity
+turns out to equal $S(\rho_A)$ exactly, for pure states, is what makes
+entanglement entropy more than an abstract formula: it is the honest
+exchange rate between raw partially-entangled resource and usable,
+near-perfect entanglement, provable rather than assumed.
+
+## Worked Example
+
+**Take $p=0.9$, so $|\psi\rangle=\sqrt{0.9}\,|00\rangle+\sqrt{0.1}\,|11\rangle$.
+Compute $H(0.9)$, then take $n=6$ copies (small enough to enumerate all
+$2^6=64$ Schmidt coefficients by type) and check how much of the
+probability mass the typical set actually captures.**
+
+`vonNeumannEntropy` applied to $\rho_A=\mathrm{diag}(0.9,0.1)$ (already
+diagonal, since $|\psi\rangle$'s off-diagonal amplitudes are zero) gives
+
+$$
+H(0.9) = -0.9\log_2(0.9) - 0.1\log_2(0.1) \approx 0.468996 \text{ bits}
+$$
+
+(`entropyWorked` above, built by feeding `psiWorked` through the same
+`pureStateDensityMatrix` $\to$ `reducedDensityMatrixQubit0` $\to$
+`vonNeumannEntropy` pipeline the Schmidt lesson used, agrees with this
+hand calculation to six decimal places, as it must, since both routes
+diagonalize the same $2\times2$ matrix).
+
+For $n=6$, recall $k$ counts how many of the six copies land in the
+$|00\rangle$ branch (weight $\sqrt{0.9}$ each), so the joint Schmidt
+coefficient at type $k$ is $\lambda_k=0.9^{k}\cdot0.1^{6-k}$, occurring
+with multiplicity $\binom{6}{k}$, giving type-probability
+$P(k)=\binom{6}{k}\,0.9^{k}\,0.1^{6-k}$:
+
+| $k$ | $\binom{6}{k}$ | $P(k)$ |
+|---|---|---|
+| 0 | 1 | 0.000001 |
+| 1 | 6 | 0.000054 |
+| 2 | 15 | 0.001215 |
+| 3 | 20 | 0.014580 |
+| 4 | 15 | 0.098415 |
+| 5 | 6 | 0.354294 |
+| 6 | 1 | 0.531441 |
+
+(`dist6` above, computed directly from `schmidtTypeDistribution`, not
+asserted; the seven values sum to exactly $1.000000$.) The mean type is
+$np=6\times0.9=5.4$, with standard deviation
+$\sigma=\sqrt{np(1-p)}\approx0.7348$. Defining the typical set here as
+types within one standard deviation of the mean, $k\in[4.665,\,6.135]$,
+gives exactly $k\in\{5,6\}$ — the two largest-$k$ types, since $p=0.9$
+means most copies are expected in the $|00\rangle$ branch. Their
+combined probability mass is
+
+$$
+P(k=5)+P(k=6) = 0.354294+0.531441 = 0.885735 \approx 88.57\%
+$$
+
+leaving only $\approx 11.43\%$ of the weight on the remaining, atypical
+types $k=0,\ldots,4$ — already, at $n=6$, the great majority of the
+probability sits on just two of the seven possible types. In terms of
+raw *dimension* (individual basis strings, not types): those two typical
+types together account for $\binom{6}{5}+\binom{6}{6}=6+1=7$ of the full
+$2^6=64$-dimensional space — only $10.9\%$ of the dimension, yet
+$88.6\%$ of the probability. The asymptotic prediction
+$2^{nH(p)}=2^{6\times0.468996}\approx7.03$ is already remarkably close
+to the exact count of $7$, even at this small, by-hand-checkable $n$.
+Entanglement concentration's target rate here is
+$m\approx nH(p)=6\times0.468996\approx2.81$ Bell pairs from six copies
+(`distillableBellPairsWorked` above) — consistent with the typical
+subspace's actual dimension of $7$ sitting between $2^2=4$ and $2^3=8$,
+i.e. embeddable in $3$ qubits per side with some residual imperfection,
+not a clean integer number of pairs at this small $n$. Only as
+$n\to\infty$ does $nH(p)$ round cleanly to a whole number of
+near-perfect Bell pairs per copy.
+
+<Callout type="note">
+This is a genuine, checkable trend toward the $n\to\infty$ theorem, not
+the theorem itself. The clean statements "$|T_\epsilon|\approx 2^{nH(p)}$"
+and "the typical subspace is nearly maximally entangled" are *limiting*
+claims. At $n=6$ they already point the right direction, as the numbers
+above show, but they are not yet sharp — see Common Mistakes below for
+exactly where this small-$n$ example still falls short of the limit.
+</Callout>
+
+## Interactive: the Typical Subspace, Concretely
+
+<BarChart
+  bars={distributionBars6}
+  ariaLabel="Bar chart of the binomial-weighted Schmidt coefficient probability P(k) for k=0 through 6, for n=6 copies of the partially entangled state with p=0.9, with k=5 and k=6 highlighted as the typical set, together carrying about 88.6 percent of the total probability"
+/>
+
+The two highlighted bars, $k=5$ and $k=6$, are the typical set computed
+above: together they already dominate the distribution. Notice that
+$k=6$ — all six copies landing in the $|00\rangle$ branch — is *both*
+the single most probable individual basis string (Schmidt coefficient
+$0.9^6\approx0.531$, larger than any other single string's) *and* part
+of the typical set; at this particular $p$ and $n$ the two notions
+happen to coincide, which is exactly the coincidence flagged in Common
+Mistakes below as something that stops holding for large $n$. The bars
+fall off sharply moving away from $k=6$, exactly the concentration the
+typical-subspace theorem predicts, well before $n$ is anywhere near
+asymptotically large.
+
+## Common Mistakes
+
+<Callout type="mistake">
+**Treating "individually most probable" and "typical" as the same
+thing.** At $n=6$, the individual Schmidt coefficient for the
+all-$|00\rangle$ string ($k=6$, weight $0.9^6=0.531441$) is exactly
+$9\times$ larger than any single $k=5$ string's coefficient
+($0.9^5\times0.1=0.059049$, the ratio computed directly as
+`flatnessRatio6` above). In this worked example $k=6$ happens to be both
+the single most probable individual string *and* inside the typical
+set — but that agreement is a small-$n$, large-$p$ coincidence, not a
+general fact. The typical-subspace theorem is a statement about
+concentration of the *empirical frequency* $k/n$ around $p$, not about
+which single string is most likely; for large $n$, the probability of
+the single all-$|00\rangle$ string, $p^n$, actually vanishes, even
+though it always remains the single most probable individual string.
+Only in the $n\to\infty$ limit do "typical" and "individually most
+probable" cleanly separate into visibly different sets.
+</Callout>
+
+<Callout type="mistake">
+**Assuming the typical subspace's Schmidt coefficients are already
+"nearly equal" at small $n$.** The theorem's claim that typical
+coefficients are all $\approx 2^{-nH(p)}$ is an $n\to\infty$ statement.
+Here at $n=6$, the two typical coefficients are $0.9^6\approx0.531$ and
+$0.9^5\times0.1\approx0.059$ (per string) — a factor of $9$ apart, not
+remotely flat. Reporting "the typical subspace is nearly maximally
+entangled" from this $n=6$ example alone, without the asymptotic
+caveat, overstates what six copies actually demonstrate; the honest
+claim is that the *trend* toward flatness (relative to the exponential
+scale $2^{-nH(p)}$) is visible, not that flatness has been reached.
+</Callout>
+
+## Practice Questions
+
+1. For $p=0.9$ and $n=4$ copies (small enough to enumerate directly),
+   find the mean and standard deviation of the type distribution, define
+   the typical set the same way as this lesson (within one standard
+   deviation of the mean), and compute the total probability mass it
+   captures.
+2. A source with $p=0.5$ (a *maximally* entangled state to begin with)
+   is fed into the same entanglement-concentration argument. What is
+   $H(0.5)$, and what does entanglement concentration have left to do in
+   this case? Explain in terms of the theorem's rate $m/n\to H(p)$.
+3. Explain, in your own words, why the coherent information
+   $I_c(A\rangle B)=S(\rho_B)-S(\rho_{AB})$ is the natural generalization
+   of this lesson's rate $H(p)=S(\rho_A)$ once the shared state is mixed
+   rather than pure. (Hint: what does $S(\rho_{AB})$ reduce to when
+   $\rho_{AB}$ is pure?)
+
+<PracticeLinks problems={practiceProblems} />
+
+## Summary
+
+- **Entanglement distillation** converts many copies of a partially
+  entangled or noisy shared state into fewer, nearly-perfect Bell pairs,
+  using only LOCC.
+- For $n$ copies of a pure partially-entangled state
+  $|\psi\rangle=\sqrt p|00\rangle+\sqrt{1-p}|11\rangle$, the joint
+  Schmidt coefficients are binomially weighted by type $k$; the **typical
+  subspace** of types near $k\approx pn$ has dimension
+  $\approx2^{nH(p)}$ and captures almost all the probability weight as
+  $n\to\infty$ — a real, verified trend even at the small, by-hand
+  $n=6,p=0.9$ example above, where two of seven types already carry
+  $\approx88.6\%$ of the weight.
+- Projecting onto the typical subspace and relabeling
+  (**entanglement concentration**, Bennett–Bernstein–Popescu–Schumacher)
+  distills $m\approx nH(p)=nS(\rho_A)$ near-perfect Bell pairs, the
+  optimal LOCC rate for pure states.
+- For mixed, noisy shared states, more involved LOCC protocols
+  (entanglement pumping, hashing) still work, with achievable rate
+  bounded by — and for some state classes asymptotically equal to — the
+  coherent information $I_c(A\rangle B)$, directly foreshadowing this
+  course's capstone on channel capacities.
+- Distillation is what makes quantum repeaters, and therefore
+  long-distance QKD and teleportation, physically possible over noisy
+  channels, and it is the operational justification for treating
+  entanglement entropy as *the* entanglement measure in the first place.
+
+## Further Exploration
+
+[Entanglement Entropy for Pure Bipartite States](/lessons/quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states)
+is the lesson this one makes operational: the entropy it only ever
+*asserted* as an entanglement measure is exactly the distillable
+entanglement rate derived here.
+
+[Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement)
+picks up where "Beyond pure states" above leaves off, with the
+mixed-state entanglement measures that general (non-pure-state)
+distillation protocols are ultimately judged against.

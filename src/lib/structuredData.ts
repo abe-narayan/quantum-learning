@@ -56,6 +56,7 @@ const PILLAR_PATH: Record<Pillar, string> = {
   "quantum-hardware": "/hardware",
   "quantum-software": "/software",
   "quantum-mastery": "/learn",
+  apex: "/apex",
 };
 
 /** The real, canonical URL for a pillar's listing page. */
