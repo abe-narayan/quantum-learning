@@ -6,7 +6,7 @@ export const qspD2DegreeCollapseImaginaryPart: NumericProblem = {
     title: "When a Degree-2 QSP Sequence Collapses to a Constant",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/quantum-signal-processing",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["quantum-signal-processing", "phase-sequence", "degree-bound"],

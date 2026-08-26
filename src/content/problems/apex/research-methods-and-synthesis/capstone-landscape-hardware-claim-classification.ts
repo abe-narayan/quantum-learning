@@ -6,7 +6,7 @@ export const capstoneLandscapeHardwareClaimClassification: ConceptualProblem = {
     title: "Classifying a 'Fault-Tolerant Quantum Computing Has Arrived' Claim",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 10,
     problemType: "conceptual",
     tags: ["state-of-the-field", "hardware", "fault-tolerance", "claim-evaluation", "synthesis"],

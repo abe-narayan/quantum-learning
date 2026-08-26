@@ -6,7 +6,7 @@ export const reproducibilityComponentsMissingMc: MultipleChoiceProblem = {
     title: "What's Missing From a Quantum-Computing Claim",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/reproducing-and-designing-experiments",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "multiple-choice",
     tags: ["reproducibility", "calibration", "error-mitigation", "statistics"],

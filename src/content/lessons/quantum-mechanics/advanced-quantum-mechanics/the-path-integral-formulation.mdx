@@ -44,14 +44,18 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Ask a quantum particle how it got from A to B, and Feynman's answer is
+  every way imaginable, all at once — including paths that zigzag
+  wildly, double back, and wander off before returning.
+</LessonHook>
+
 ## Motivation
 
-Ask a quantum particle how it got from A to B, and Feynman's answer is
-unsettling: every way imaginable, all at once. Not just the straight
+Not just the straight
 line, or whatever trajectory Newton's laws would single out. Literally
-every conceivable path between the two points counts, including ones
-that zigzag wildly, double back on themselves, or wander off and
-return, each contributing its own share to the final amplitude. Every
+every conceivable path between the two points counts, each
+contributing its own share to the final amplitude. Every
 lesson before this one, the Schrödinger equation, operators,
 eigenstates, was built on Hamiltonian language: how does the
 wavefunction evolve from one moment to the next? The path integral
@@ -230,7 +234,7 @@ classical one.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking this lesson's Euclidean-time example is "the real path integral,
 simplified."** It's a standard technique (Wick rotation) used throughout
 physics, not a dumbed-down substitute. It IS, however, a deliberately
@@ -279,7 +283,15 @@ $x_1$, not just the one lying on the classical straight-line trajectory.
 
 ## Further Exploration
 
-Next: **Capstone: Operators, Paths, and What's Still Open**, which
-closes this course by connecting the operator and path-integral
-perspectives and stating honestly what remains open in the foundations
-of quantum mechanics.
+<ChallengePrompt prompt="The composition law was checked here by splitting τ exactly at the midpoint (τ/2 and τ/2). Does the identity still have to hold if you split unevenly instead — say at τ/3 and 2τ/3 — or is the equal split doing something special?">
+  The Chapman-Kolmogorov identity is stated for *any* intermediate time,
+  not just the midpoint — check whether the two-Gaussian-convolution
+  structure this lesson derived actually depends on splitting evenly.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: **Capstone: Operators, Paths, and What's Still Open**, which
+  closes this course by connecting the operator and path-integral
+  perspectives and stating honestly what remains open in the foundations
+  of quantum mechanics.
+</NextDiscovery>

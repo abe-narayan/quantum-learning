@@ -6,7 +6,7 @@ export const cliffordTSolovayKitaevVersusOptimalMc: MultipleChoiceProblem = {
     title: "Does Solovay-Kitaev Already Give You the Best T-Count?",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["clifford-t", "solovay-kitaev", "ross-selinger", "t-count"],

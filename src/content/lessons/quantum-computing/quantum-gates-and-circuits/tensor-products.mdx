@@ -34,11 +34,13 @@ export const lessonMeta = {
 export const ketZeroOne = StateVector.zero(1).tensor(StateVector.basis(1, 1));
 export const ketOneZero = StateVector.basis(1, 1).tensor(StateVector.zero(1));
 
+<LessonHook eyebrow="Why this matters">
+Everything in the last course lived on one qubit's Bloch sphere. Real computation needs more than one qubit working together, but "more than one qubit" is not simply "do the single-qubit thing twice."
+</LessonHook>
+
 ## Motivation
 
-Everything in the last course lived on one qubit's Bloch sphere. Real
-computation needs more than one qubit working together, but "more than
-one qubit" is not simply "do the single-qubit thing twice." A classical
+A classical
 2-bit register needs 2 bits to describe: which one of $\{00,01,10,11\}$ it's
 in. A quantum 2-qubit register needs to describe a *superposition* over
 all four of those possibilities simultaneously, which turns out to
@@ -200,7 +202,7 @@ introduced yet).
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Multiplying probabilities instead of amplitudes.** It's tempting to
 combine "50% this, 50% that" intuitively and skip the amplitude algebra,
 but relative *phases* between terms only show up correctly if you
@@ -208,7 +210,7 @@ multiply amplitudes first and take $|\cdot|^2$ afterward, not the other
 way around. This matters enormously once gates introduce phases.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Getting the factor order backwards.** $|0\rangle\otimes|1\rangle=|01\rangle$
 is not the same state as $|1\rangle\otimes|0\rangle=|10\rangle$. Always
 track which ket is qubit 0.
@@ -240,7 +242,9 @@ track which ket is qubit 0.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Multi-Qubit State Vectors](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors), where we ask the sharper question
 this lesson set up: is every valid multi-qubit state actually *reachable*
 as a tensor product of single-qubit states? The answer is no, and the
 states that aren't are the entangled ones.
+</NextDiscovery>

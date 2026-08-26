@@ -49,14 +49,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Here is the strange fact the last lesson left sitting on the table: the 2-qubit state |Φ+⟩ is pure, completely specified, zero uncertainty about it whatsoever — and yet each of its two qubits, looked at on its own, is in the most uncertain single-qubit state there is.
+</LessonHook>
+
 ## Motivation
 
-Here is the strange fact the last lesson left sitting on the table: the
-2-qubit state $|\Phi^+\rangle$ is pure, completely specified, zero
-uncertainty about it whatsoever, and yet each of its two qubits, looked
-at on its own, is in the *most* uncertain single-qubit state there is,
-$\rho_A=I/2$. The whole is perfectly well-defined; either half alone is
-maximally undefined. That isn't a quirk of the specific 50/50 amplitudes
+That state's reduced density matrix works out to $\rho_A=I/2$: the whole
+is perfectly well-defined; either half alone is maximally undefined. That isn't a quirk of the specific 50/50 amplitudes
 in $|\Phi^+\rangle$. This lesson proves it's forced, for any 2-qubit pure
 state, by entanglement itself, and pins down an exact formula for how
 mixed a subsystem gets as a function of exactly how entangled the whole
@@ -235,14 +235,14 @@ the density matrix explorer builds directly:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking any nonzero purity loss means "maximal" entanglement.**
 $1-\text{Tr}(\rho_A^2)$ ranges continuously from 0 (product state) to
 0.5 (maximally entangled, at $|ad-bc|=0.5$, the largest a normalized
 state allows). It's a graded quantity, not a yes/no flag.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming this proof generalizes automatically to 3+ qubits, or to
 mixed global states.** It doesn't, without further work this platform
 doesn't undertake (see the Scope note above). Overclaiming this here
@@ -287,6 +287,8 @@ avoids elsewhere.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Purity, von Neumann Entropy, and Information](/lessons/quantum-computing/entanglement-and-measurement/purity-entropy-and-information), which puts
 today's purity-based reasoning on a more complete footing with the
 standard information-theoretic measure of mixedness.
+</NextDiscovery>

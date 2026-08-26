@@ -6,7 +6,7 @@ export const whyBerryPhaseIsRateIndependent: ConceptualProblem = {
     title: "Why the Berry Phase Doesn't Depend on How Fast the Loop Is Traversed",
     course: "symmetry-scattering-and-semiclassical-methods",
     lesson: "quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["berry-phase", "adiabatic-theorem", "conceptual"],

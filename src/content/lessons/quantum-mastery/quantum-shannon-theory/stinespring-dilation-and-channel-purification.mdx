@@ -116,6 +116,12 @@ export const krausComparisonPresets = [
   },
 ];
 
+<LessonHook eyebrow="Where does a Kraus operator actually come from?">
+  Every noisy quantum process — decay, dephasing, loss — is secretly
+  nothing but ordinary Schrödinger evolution on a bigger, closed system
+  that nobody is fully looking at.
+</LessonHook>
+
 ## Motivation
 
 Quantum Channels: Kraus and Choi proved every completely positive,
@@ -149,58 +155,54 @@ $$
 V|\psi\rangle_S \equiv \sum_{i=1}^r K_i|\psi\rangle_S\otimes|i\rangle_E
 $$
 
-**Claim: $V$ is an isometry**, i.e. $V^\dagger V=I_S$. Check directly on
-inner products: for any $|\phi\rangle,|\psi\rangle$,
-
-$$
-\langle\phi|V^\dagger V|\psi\rangle = \sum_{i,j}\langle\phi|K_i^\dagger K_j|\psi\rangle\langle i|j\rangle_E = \sum_i\langle\phi|K_i^\dagger K_i|\psi\rangle = \langle\phi|\Big(\sum_iK_i^\dagger K_i\Big)|\psi\rangle = \langle\phi|\psi\rangle
-$$
-
-using $\langle i|j\rangle=\delta_{ij}$ and the Kraus completeness
-relation in the last step. An isometry preserves every inner product, so
-$V$ genuinely embeds $\mathcal H_S$ inside the larger $\mathcal
-H_S\otimes\mathcal H_E$ without distortion — exactly what makes it
-extendable to a full unitary next.
+**Claim: $V$ is an isometry**, i.e. $V^\dagger V=I_S$ — which is exactly
+what makes it extendable to a full unitary, computed below.
 
 ### Extending $V$ to a unitary, and recovering the channel
 
-$V$'s image is a $d$-dimensional subspace of the $d\cdot r$-dimensional
-joint space, isometric to $\mathcal H_S$ itself. Complete an orthonormal
-basis of that image's orthogonal complement, and map any fixed
-orthonormal basis of the "extra" domain onto it — the same
-completion-to-an-orthonormal-basis move Schmidt Decomposition and
-Purification used to extend $\{|u_k\rangle\}$ beyond a degenerate
-eigenspace. This produces a genuine unitary $U$ on $\mathcal
-H_S\otimes\mathcal H_E$ satisfying
+<DerivationSteps>
+  <DerivationStep annotation="Check directly on inner products, using ⟨i|j⟩ = δ_ij and the Kraus completeness relation Σ K_i†K_i = I in the last step. An isometry preserves every inner product, so V genuinely embeds H_S inside the larger H_S ⊗ H_E without distortion.">
+    $$
+    \langle\phi|V^\dagger V|\psi\rangle = \sum_{i,j}\langle\phi|K_i^\dagger K_j|\psi\rangle\langle i|j\rangle_E = \sum_i\langle\phi|K_i^\dagger K_i|\psi\rangle = \langle\phi|\Big(\sum_iK_i^\dagger K_i\Big)|\psi\rangle = \langle\phi|\psi\rangle
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="V's image is a d-dimensional subspace of the d·r-dimensional joint space, isometric to H_S itself. Complete an orthonormal basis of that image's orthogonal complement, and map any fixed orthonormal basis of the 'extra' domain onto it — the same completion-to-an-orthonormal-basis move Schmidt Decomposition and Purification used to extend a basis beyond a degenerate eigenspace. This produces a genuine unitary U on H_S ⊗ H_E, for the fixed reference state |0⟩_E.">
+    $$
+    U\big(|\psi\rangle_S\otimes|0\rangle_E\big) = V|\psi\rangle_S = \sum_iK_i|\psi\rangle_S\otimes|i\rangle_E
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Now compute what tracing out E recovers, for a pure input |ψ⟩⟨ψ|_S, directly from the definition of V above.">
+    $$
+    U\big(|\psi\rangle\langle\psi|\otimes|0\rangle\langle0|_E\big)U^\dagger = V|\psi\rangle\langle\psi|V^\dagger = \sum_{i,j}K_i|\psi\rangle\langle\psi|K_j^\dagger\otimes|i\rangle\langle j|_E
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Using Tr(|i⟩⟨j|) = δ_ij. This is exactly E(|ψ⟩⟨ψ|), and extends to any mixed ρ by linearity — a density matrix is a convex combination of pure-state projectors, each traced through identically.">
+    $$
+    \text{Tr}_E\Big[\,U\big(|\psi\rangle\langle\psi|\otimes|0\rangle\langle0|_E\big)U^\dagger\Big] = \sum_{i,j}K_i|\psi\rangle\langle\psi|K_j^\dagger\,\text{Tr}(|i\rangle\langle j|_E) = \sum_iK_i|\psi\rangle\langle\psi|K_i^\dagger
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
-$$
-U\big(|\psi\rangle_S\otimes|0\rangle_E\big) = V|\psi\rangle_S = \sum_iK_i|\psi\rangle_S\otimes|i\rangle_E
-$$
-
-for the fixed reference state $|0\rangle_E$ (relabeling $V$'s domain
-basis vector as $|0\rangle_E$ costs nothing). Now compute what tracing
-out $E$ recovers. For a pure input $|\psi\rangle\langle\psi|_S$,
-
-$$
-U\big(|\psi\rangle\langle\psi|\otimes|0\rangle\langle0|_E\big)U^\dagger = V|\psi\rangle\langle\psi|V^\dagger = \sum_{i,j}K_i|\psi\rangle\langle\psi|K_j^\dagger\otimes|i\rangle\langle j|_E
-$$
-
-$$
-\text{Tr}_E\Big[\,U\big(|\psi\rangle\langle\psi|\otimes|0\rangle\langle0|_E\big)U^\dagger\Big] = \sum_{i,j}K_i|\psi\rangle\langle\psi|K_j^\dagger\,\text{Tr}(|i\rangle\langle j|_E) = \sum_iK_i|\psi\rangle\langle\psi|K_i^\dagger
-$$
-
-using $\text{Tr}(|i\rangle\langle j|)=\delta_{ij}$. This is exactly
-$\mathcal E(|\psi\rangle\langle\psi|)$, and extends to any mixed $\rho$
-by linearity (a density matrix is a convex combination of pure-state
-projectors, each traced through identically). This is the theorem:
+This is the theorem:
 
 <TheoremBox title="Stinespring dilation" provenance="derived">
 
 Every CPTP map $\mathcal E$ on a $d$-dimensional system arises as
 
+<EquationReveal
+  terms={[
+    { id: "E", symbol: "ℰ(ρ)", gloss: "The channel's output — the same CPTP map whose Kraus form was built in the prior lesson." },
+    { id: "U", symbol: "U", gloss: "A unitary acting on system + environment together — ordinary, reversible Schrödinger evolution." },
+    { id: "env", symbol: "|0⟩⟨0|_E", gloss: "A fixed, pure environment state — the ancilla the system is coupled to." },
+    { id: "TrE", symbol: "Tr_E[·]", gloss: "Partial trace over the environment — discarding (not measuring) it after the joint evolution." },
+  ]}
+>
+
 $$
 \boxed{\mathcal E(\rho) = \text{Tr}_E\Big[\,U\big(\rho\otimes|0\rangle\langle0|_E\big)U^\dagger\,\Big]}
 $$
+
+</EquationReveal>
 
 for some unitary $U$ on system + environment and some fixed pure
 environment state $|0\rangle_E$, with environment dimension always
@@ -295,6 +297,13 @@ they are the same fact about extending to a larger system, once applied
 to a state and once applied to a channel's Choi state.
 
 ## Physical Interpretation: Why This Matters
+
+<InsightBlock>
+  "Decoherence is entanglement with an unmonitored environment" is
+  usually stated as a slogan. The Stinespring theorem makes it a
+  literal, provable statement about every physical noise process, with
+  no exception.
+</InsightBlock>
 
 **"Decoherence is just entanglement with an unmonitored environment"**
 is usually stated as a slogan. The Stinespring theorem makes it a
@@ -408,7 +417,7 @@ physical channel, read out through a rotated environment basis.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming the environment can start mixed or correlated with the
 system.** The Stinespring theorem specifically requires a *pure*,
 uncorrelated reference state $|0\rangle_E$; that purity is exactly what
@@ -419,7 +428,7 @@ Purification's own construction) before this theorem's $U$ applies to
 it directly.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating a different Kraus decomposition as a different physical
 process.** $\{K_i\}$ and $\{K_i'=\sum_jW_{ij}K_j\}$ for unitary $W$
 describe the exact same joint unitary $U$ and the exact same physical
@@ -474,8 +483,10 @@ that labeling, which is precisely why $\text{Tr}_E$ erases it.
 
 ## Further Exploration
 
-[The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation)
-develops the continuous-time limit this lesson's Physical Interpretation
-section only sketched: resumming infinitely many infinitesimal
-Stinespring dilations, one per timestep, into a single differential
-generator for open-system evolution.
+<NextDiscovery>
+  [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation)
+  develops the continuous-time limit this lesson's Physical
+  Interpretation section only sketched: resumming infinitely many
+  infinitesimal Stinespring dilations, one per timestep, into a single
+  differential generator for open-system evolution.
+</NextDiscovery>

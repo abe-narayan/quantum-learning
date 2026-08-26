@@ -23,6 +23,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  The Schrödinger equation isn't a separate postulate to memorize. Demand
+  only that evolution stay unitary, and ordinary calculus forces it into
+  existence.
+</LessonHook>
+
 ## Motivation
 
 Postulate 4 said evolution is unitary, without saying which unitary
@@ -92,9 +98,17 @@ $$
 
 Rearranged, this is the **time-dependent Schrödinger equation**:
 
+<EquationReveal
+  terms={[
+    { id: "ihbar", symbol: "iħ d/dt", gloss: "The rate of change of the state, scaled by ħ and rotated a quarter-turn by i — this side is pure calculus, no physics input yet." },
+    { id: "psi", symbol: "|ψ(t)⟩", gloss: "The state vector at time t — everything knowable about the system at that instant." },
+    { id: "H", symbol: "H", gloss: "The Hamiltonian — the Hermitian generator of evolution, physically identified with total energy." },
+  ]}
+>
 $$
-\boxed{i\hbar\frac{d}{dt}|\psi(t)\rangle = H|\psi(t)\rangle}
+i\hbar\frac{d}{dt}|\psi(t)\rangle = H|\psi(t)\rangle
 $$
+</EquationReveal>
 
 $H$ is called the **Hamiltonian**, and it's physically identified with
 the system's total energy (the same identification that makes the
@@ -189,14 +203,14 @@ gate buttons already compute, one discrete step at a time:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating the Schrödinger equation as something separate from
 unitarity, to be additionally postulated.** As derived above, it follows
 directly from requiring the generator of unitary evolution to be
 Hermitian: the two are the same statement in different forms.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing $H$ (an operator) with $E$ (a number).** $H$'s *eigenvalues*
 are energies; $H$ itself acts on the whole Hilbert space, not just on
 one eigenstate.
@@ -228,6 +242,14 @@ one eigenstate.
 
 ## Further Exploration
 
-Next: [Stationary States](/lessons/quantum-mechanics/classical-to-quantum/stationary-states), which proves directly from $U(t)=e^{-iHt/\hbar}$
-that energy eigenstates never change their measurement statistics over
-time, only accumulate an overall phase.
+<ChallengePrompt prompt="For H = (ħω/2)X instead of Z (so n̂ = x̂), with the system starting in |0⟩, use the rotation formula to find |ψ(t)⟩.">
+  Same rotation formula as the worked example, $U(t)=\cos(\omega
+  t/2)I-i\sin(\omega t/2)X$ this time — apply it to $|0\rangle$ using
+  $X|0\rangle=|1\rangle$.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Stationary States](/lessons/quantum-mechanics/classical-to-quantum/stationary-states), which proves directly from $U(t)=e^{-iHt/\hbar}$
+  that energy eigenstates never change their measurement statistics over
+  time, only accumulate an overall phase.
+</NextDiscovery>

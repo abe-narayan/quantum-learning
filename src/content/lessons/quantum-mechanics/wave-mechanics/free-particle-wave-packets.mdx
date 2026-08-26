@@ -24,6 +24,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  A momentum eigenstate is a perfectly valid piece of mathematics and a
+  physically impossible state: it can never be normalized. A real
+  particle needs a superposition of many of them.
+</LessonHook>
+
 ## Motivation
 
 The plane wave $e^{ipx/\hbar}$ from two lessons ago is the momentum
@@ -77,6 +83,17 @@ plane wave carrying the average momentum $p_0=\hbar k_0$. This is exactly
 construction, generalized to an arbitrary center.
 
 ### Group velocity
+
+<PredictBeforeReveal
+  question="A wave packet is built from plane waves e^{ikx}, each with its own phase velocity ω/k. Does the packet's visible envelope move at that same phase velocity?"
+  options={[
+    { label: "Yes, the envelope moves at the phase velocity", value: "phase" },
+    { label: "No, the envelope moves at a different speed, the group velocity", value: "group" },
+    { label: "The envelope doesn't move at all", value: "stationary" },
+  ]}
+  correctValue="group"
+  explanation="No — the envelope moves at the group velocity dω/dk, not the phase velocity ω/k of any individual plane wave in the superposition. For a free particle these actually differ by a factor of 2 (a Common Mistake flagged below), and it's the group velocity that matches the classical particle velocity p0/m."
+/>
 
 The envelope's peak moves at the **group velocity**, not the phase
 velocity of the underlying plane wave. For the free-particle dispersion
@@ -144,14 +161,14 @@ formula numerically).
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Trying to normalize a bare plane wave.** It cannot be done. $\int
 1\,dx$ diverges no matter how you rescale. Plane waves are useful
 idealizations for defining momentum eigenstates, never themselves
 physical states.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing phase velocity and group velocity.** For matter waves these
 differ by a factor of 2 ($v_{\rm phase}=\hbar k/(2m)=v_g/2$ for a free
 particle). It's the *group* velocity, the envelope's speed, that matches
@@ -183,11 +200,18 @@ the classical particle velocity.
 
 ## Further Exploration
 
-Next: [The Infinite Square Well](/lessons/quantum-mechanics/wave-mechanics/the-infinite-square-well), the first bound (confined)
-system this course solves, deriving quantized energy levels from
-boundary conditions alone.
+<ChallengePrompt prompt="For p0=4, m=2 (ħ=1), find both the group velocity and the phase velocity of the underlying plane wave, and confirm they differ by exactly the factor of 2 the Common Mistakes note states.">
+  $v_g=p_0/m$ as derived above; $v_{\rm phase}=\hbar k_0/(2m)=v_g/2$, from
+  the Common Mistakes note — compute both directly.
+</ChallengePrompt>
 
-The [full Wavefunction Explorer](/simulators#wavefunction-explorer) has a
-Free Gaussian Packet preset with adjustable momentum, width, and starting
-position if you want to build packets beyond the ones fixed by this
-lesson's worked example.
+<NextDiscovery>
+  Next: [The Infinite Square Well](/lessons/quantum-mechanics/wave-mechanics/the-infinite-square-well), the first bound (confined)
+  system this course solves, deriving quantized energy levels from
+  boundary conditions alone.
+
+  The [full Wavefunction Explorer](/simulators#wavefunction-explorer) has a
+  Free Gaussian Packet preset with adjustable momentum, width, and starting
+  position if you want to build packets beyond the ones fixed by this
+  lesson's worked example.
+</NextDiscovery>

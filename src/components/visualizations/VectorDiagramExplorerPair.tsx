@@ -65,7 +65,7 @@ export function VectorDiagramExplorerPair({
       <div className="grid gap-6 sm:grid-cols-2">
         {panels.map((p, i) => (
           <div key={p.label} className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{p.label}</p>
+            <p className="tech-label">{p.label}</p>
             <VectorDiagram
               vectors={currentFrames[i].vectors}
               ariaLabel={p.ariaLabel}

@@ -6,7 +6,7 @@ export const thresholdConcatenationTwoLevels: NumericProblem = {
     title: "Two Levels of Concatenation Below Threshold",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/the-threshold-theorem",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["threshold-theorem", "concatenated-codes", "fault-tolerance"],

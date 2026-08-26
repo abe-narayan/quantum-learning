@@ -20,7 +20,7 @@ export const qpeBestEstimateProbabilityPhi15: NumericProblem = {
     title: "QPE Success Probability for φ=1/5, t=4",
     course: "advanced-algorithms-and-complexity",
     lesson: "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["phase-estimation", "closed-form"],

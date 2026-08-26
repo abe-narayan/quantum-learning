@@ -24,6 +24,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="The failure mode with no alarm">
+A gate computed from a stale Ω value silently implements the wrong rotation angle — no error message, no crash, just a systematic bias baked into every gate until the next recalibration catches it.
+</LessonHook>
+
 ## Motivation
 
 Control Electronics derived $t=\theta/(2\Omega)$ assuming $\Omega$ is
@@ -123,13 +127,13 @@ implement a systematically incorrect rotation angle until recalibrated.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating calibration as a one-time setup step.** Real hardware drifts;
 production systems recalibrate routinely, not just once when the device
 is first built.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a miscalibrated gate produces an obvious error.** It doesn't.
 It silently implements the wrong rotation angle, which can look like a
 subtle, hard-to-diagnose algorithm bug rather than an obviously "broken"
@@ -165,7 +169,9 @@ gate.
 
 ## Further Exploration
 
+<NextDiscovery>
 This closes **Control & Readout**. The next course, **Noise, Decoherence
 & Scaling**, quantifies the error sources this course has been
 identifying qualitatively (readout error, drift, decoherence) using
 Advanced Topics in Quantum Mechanics' Kraus-channel machinery directly.
+</NextDiscovery>

@@ -6,7 +6,7 @@ export const combinedT2FromTwoProcesses: NumericProblem = {
     title: "Combined T2 from Amplitude Damping and Pure Dephasing",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/the-lindblad-master-equation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["lindblad", "t1-t2"],

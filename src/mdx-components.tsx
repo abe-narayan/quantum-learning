@@ -1,9 +1,22 @@
 import type { MDXComponents } from "mdx/types";
 import type { ComponentPropsWithoutRef } from "react";
 import { Callout } from "@/components/mdx/Callout";
+import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { LessonHook } from "@/components/narrative/LessonHook";
+import { Question } from "@/components/narrative/Question";
+import { InsightBlock } from "@/components/narrative/InsightBlock";
+import { DerivationSteps, DerivationStep } from "@/components/narrative/DerivationSteps";
+import { EquationReveal } from "@/components/narrative/EquationReveal";
+import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
+import { ResearchConnection } from "@/components/narrative/ResearchConnection";
+import { HistoricalMoment } from "@/components/narrative/HistoricalMoment";
+import { ChallengePrompt } from "@/components/narrative/ChallengePrompt";
+import { NextDiscovery } from "@/components/narrative/NextDiscovery";
+import { ObservePredictExplain } from "@/components/narrative/ObservePredictExplain";
 import { BarChart } from "@/components/visualizations/BarChart";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { EnergyLevelDiagram } from "@/components/visualizations/EnergyLevelDiagram";
@@ -34,6 +47,24 @@ import { ExchangeDiagram } from "@/components/visualizations/ExchangeDiagram";
 import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
 import { ReadoutScatter } from "@/components/visualizations/ReadoutScatter";
 import { BB84RoundTable } from "@/components/visualizations/BB84RoundTable";
+import { ComplexityClassDiagram } from "@/components/visualizations/ComplexityClassDiagram";
+import { ClassicalSimulabilityMap } from "@/components/visualizations/ClassicalSimulabilityMap";
+import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
+import { DecoherenceBlochDecay } from "@/components/visualizations/DecoherenceBlochDecay";
+import { GroverAmplitudeSweep } from "@/components/visualizations/GroverAmplitudeSweep";
+import { SpinAxisMeasurement } from "@/components/visualizations/SpinAxisMeasurement";
+import { ErrorCorrectionCycle } from "@/components/visualizations/ErrorCorrectionCycle";
+import { TensorNetworkDiagram } from "@/components/visualizations/TensorNetworkDiagram";
+import { SurfaceCodePatchExplorer } from "@/components/visualizations/SurfaceCodePatchExplorer";
+import { StabilizerTable } from "@/components/visualizations/StabilizerTable";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
+import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
+import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
+import { ExpectationTrace } from "@/components/visualizations/ExpectationTrace";
+import { PartialTraceHighlight } from "@/components/visualizations/PartialTraceHighlight";
+import { UncertaintyEllipse } from "@/components/visualizations/UncertaintyEllipse";
+import { LinewidthDiagram } from "@/components/visualizations/LinewidthDiagram";
+import { LossVsDecoherence } from "@/components/visualizations/LossVsDecoherence";
 
 // Markdown tables (from remark-gfm) render as plain `<table>` elements with
 // no built-in overflow handling — a wide comparison table would otherwise
@@ -50,9 +81,23 @@ function Table(props: ComponentPropsWithoutRef<"table">) {
 const components: MDXComponents = {
   table: Table,
   Callout,
+  DefinitionBox,
+  TheoremBox,
   ExternalFigure,
   InteractiveSection,
   PredictBeforeReveal,
+  LessonHook,
+  Question,
+  InsightBlock,
+  DerivationSteps,
+  DerivationStep,
+  EquationReveal,
+  AnnotatedFigure,
+  ResearchConnection,
+  HistoricalMoment,
+  ChallengePrompt,
+  NextDiscovery,
+  ObservePredictExplain,
   BarChart,
   BarChartExplorer,
   EnergyLevelDiagram,
@@ -83,6 +128,24 @@ const components: MDXComponents = {
   ExchangeDiagramExplorer,
   ReadoutScatter,
   BB84RoundTable,
+  ComplexityClassDiagram,
+  ClassicalSimulabilityMap,
+  CircuitStateStepper,
+  DecoherenceBlochDecay,
+  GroverAmplitudeSweep,
+  SpinAxisMeasurement,
+  ErrorCorrectionCycle,
+  TensorNetworkDiagram,
+  SurfaceCodePatchExplorer,
+  StabilizerTable,
+  CircuitDiagramExplorer,
+  CostLandscapeHeatmap,
+  PhaseSpacePanel,
+  ExpectationTrace,
+  PartialTraceHighlight,
+  UncertaintyEllipse,
+  LinewidthDiagram,
+  LossVsDecoherence,
 };
 
 export function useMDXComponents(): MDXComponents {

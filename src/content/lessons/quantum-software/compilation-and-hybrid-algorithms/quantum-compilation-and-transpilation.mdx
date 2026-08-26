@@ -24,6 +24,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Not every gate can just run">
+CNOT(0, 3) is a single, free-floating logical operation — but on a linear-chain device where a qubit can only talk to its immediate neighbors, qubits 0 and 3 aren't even adjacent.
+</LessonHook>
+
 ## Motivation
 
 Every circuit this platform's `QuantumCircuit` has built (Programming
@@ -236,14 +240,14 @@ forced onto the circuit.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a logical circuit's gate count is what actually runs on
 hardware.** Transpilation can substantially inflate the real gate count.
 The worked example's single logical CNOT becomes 8 SWAPs (24 CNOTs)
 plus the original CNOT, a huge multiplier for a distant qubit pair.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking SWAP-network transpilation changes what the circuit
 COMPUTES.** It doesn't. This platform's own test suite confirms the
 SWAP-network version gives EXACTLY the same result as the idealized
@@ -278,7 +282,9 @@ the logical outcome.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Gate Decomposition](/lessons/quantum-software/compilation-and-hybrid-algorithms/gate-decomposition), which covers the OTHER major compilation
 step: translating each individual gate into a specific hardware's native
 gate set, verified directly against several of this platform's own gate
 matrices.
+</NextDiscovery>

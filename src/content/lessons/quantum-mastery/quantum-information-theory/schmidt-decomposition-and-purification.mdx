@@ -139,6 +139,13 @@ export const panelVectors = (v1, v1Label, v2, v2Label) => {
   ];
 };
 
+<LessonHook eyebrow="What this lesson finally proves">
+  A pure bipartite state's two reduced density matrices always share the
+  same nonzero eigenvalues — a fact the earlier course simply asserted.
+  Here it falls out, in three lines, of nothing more than the singular
+  value decomposition.
+</LessonHook>
+
 ## Motivation
 
 Entanglement Entropy for Pure Bipartite States built its entire theory
@@ -151,9 +158,15 @@ the eigenvalue-matching fact alone: a constructive theorem that writes
 *any* bipartite pure state in an exceptionally simple canonical form,
 with purification (turning any mixed state into the reduced state of a
 pure state on a bigger system) following as an almost-free corollary.
-For a modern, physics-oriented derivation along the same lines as this
-lesson's, see A. Ekert and P. L. Knight, "Entangled Quantum Systems and
-the Schmidt Decomposition," *Am. J. Phys.* **63**(5), 415–423 (1995).
+
+<ResearchConnection
+  title="Entangled Quantum Systems and the Schmidt Decomposition"
+  source="A. Ekert and P. L. Knight, Am. J. Phys. 63(5), 415–423 (1995)"
+  url="https://doi.org/10.1119/1.17904"
+>
+  A modern, physics-oriented derivation along the same lines as this
+  lesson's.
+</ResearchConnection>
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/1/16/Erhard_Schmidt.jpg"
@@ -197,18 +210,23 @@ otherwise); it is assumed here as prior linear algebra, exactly the same
 way this course's corpus assumes the spectral theorem for Hermitian
 matrices without re-proving it in every lesson that uses it.
 
-Substituting $M=U\Sigma V^\dagger$ into $|\psi\rangle_{AB}=\sum_{ij}M_{ij}|i\rangle_A|j\rangle_B$:
+Substituting $M=U\Sigma V^\dagger$ into $|\psi\rangle_{AB}=\sum_{ij}M_{ij}|i\rangle_A|j\rangle_B$
+gives the Schmidt decomposition in two steps:
 
-$$
-|\psi\rangle_{AB} = \sum_{i,j,k} U_{ik}\,\sigma_k\,\delta_{k\ell}\,\overline{V_{j\ell}}\,|i\rangle_A|j\rangle_B = \sum_k \sigma_k\left(\sum_i U_{ik}|i\rangle_A\right)\left(\sum_j \overline{V_{jk}}|j\rangle_B\right)
-$$
+<DerivationSteps>
+  <DerivationStep annotation="Expand the sum, using that Σ is diagonal (σ_k on the k-th entry, zero elsewhere) to collapse the double sum over i,j into a single sum over k.">
+    $$
+    |\psi\rangle_{AB} = \sum_{i,j,k} U_{ik}\,\sigma_k\,\delta_{k\ell}\,\overline{V_{j\ell}}\,|i\rangle_A|j\rangle_B = \sum_k \sigma_k\left(\sum_i U_{ik}|i\rangle_A\right)\left(\sum_j \overline{V_{jk}}|j\rangle_B\right)
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Define |u_k⟩_A as the k-th column of U and |w_k⟩_B as the k-th column of V, complex-conjugated. Because U and V are unitary, their columns are each orthonormal sets, so {|u_k⟩_A} and {|w_k⟩_B} are orthonormal bases in their own right (extended if d_A ≠ d_B).">
+    $$
+    |u_k\rangle_A \equiv \sum_i U_{ik}|i\rangle_A, \qquad |w_k\rangle_B \equiv \sum_j \overline{V_{jk}}|j\rangle_B
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
-Define $|u_k\rangle_A=\sum_i U_{ik}|i\rangle_A$ (the $k$-th column of $U$,
-read as a state) and $|w_k\rangle_B=\sum_j \overline{V_{jk}}|j\rangle_B$
-(the $k$-th column of $V$, complex-conjugated). Because $U$ and $V$ are
-unitary, their columns are each orthonormal sets, so $\{|u_k\rangle_A\}$
-and $\{|w_k\rangle_B\}$ are orthonormal bases in their own right (extended
-if $d_A\neq d_B$). This gives exactly the **Schmidt decomposition**:
+This gives exactly the **Schmidt decomposition**:
 
 <TheoremBox title="Schmidt decomposition" provenance="derived">
 
@@ -235,9 +253,21 @@ directly from the boxed form: cross terms $|u_j\rangle_A\langle u_k|\otimes\lang
 survive the partial trace only when $j=k$ (orthonormality of $\{|w_k\rangle\}$
 kills the rest), leaving
 
+<EquationReveal
+  terms={[
+    { id: "rhoA", symbol: "ρ_A", gloss: "The reduced state of subsystem A — what's left of |ψ⟩ after tracing out B." },
+    { id: "rhoB", symbol: "ρ_B", gloss: "The reduced state of subsystem B — what's left of |ψ⟩ after tracing out A." },
+    { id: "lambda", symbol: "λ_k", gloss: "The Schmidt coefficients — the same set for both ρ_A and ρ_B." },
+    { id: "uk", symbol: "|u_k⟩⟨u_k|", gloss: "A's Schmidt basis, in which ρ_A is automatically diagonal." },
+    { id: "wk", symbol: "|w_k⟩⟨w_k|", gloss: "B's Schmidt basis, in which ρ_B is automatically diagonal." },
+  ]}
+>
+
 $$
 \rho_A = \sum_k \lambda_k\,|u_k\rangle\langle u_k|_A, \qquad \rho_B = \sum_k \lambda_k\,|w_k\rangle\langle w_k|_B
 $$
+
+</EquationReveal>
 
 Both are already diagonal in their own Schmidt basis, with the **identical**
 set of eigenvalues $\{\lambda_k\}$: this is the fact
@@ -309,19 +339,27 @@ of some pure state $|\psi\rangle_{AB}$ on a larger system $AB$, a
 
 </TheoremBox>
 
-**Proof.** Diagonalize $\rho_A=\sum_k\lambda_k|u_k\rangle\langle u_k|_A$
-(the spectral theorem, already used throughout this platform). Introduce
-an auxiliary system $B$ of dimension at least as large as the number of
-nonzero $\lambda_k$, pick *any* orthonormal set $\{|w_k\rangle_B\}$ in
-it, and define
+**Proof.**
 
-$$
-|\psi\rangle_{AB} \equiv \sum_k \sqrt{\lambda_k}\,|u_k\rangle_A|w_k\rangle_B
-$$
+<DerivationSteps>
+  <DerivationStep annotation="Diagonalize ρ_A via the spectral theorem, already used throughout this platform.">
+    $$
+    \rho_A=\sum_k\lambda_k|u_k\rangle\langle u_k|_A
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Introduce an auxiliary system B of dimension at least as large as the number of nonzero λ_k, pick any orthonormal set {|w_k⟩_B} in it, and define |ψ⟩_AB from the same coefficients and A-side vectors.">
+    $$
+    |\psi\rangle_{AB} \equiv \sum_k \sqrt{\lambda_k}\,|u_k\rangle_A|w_k\rangle_B
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="This is manifestly already in Schmidt form by construction, so the theorem above applies directly and reproduces the target mixed state exactly.">
+    $$
+    \text{Tr}_B(|\psi\rangle\langle\psi|)=\sum_k\lambda_k|u_k\rangle\langle u_k|_A=\rho_A
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
-This is manifestly already in Schmidt form (by construction), so the
-theorem above applies directly: $\text{Tr}_B(|\psi\rangle\langle\psi|)=\sum_k\lambda_k|u_k\rangle\langle u_k|_A=\rho_A$
-exactly, reproducing the target mixed state. $\blacksquare$
+$\blacksquare$
 
 The worked example above **already demonstrated this**, just read in
 reverse: $\rho_A=\begin{pmatrix}0.45&0.334243\\0.334243&0.55\end{pmatrix}$
@@ -344,6 +382,14 @@ degree of freedom the next lesson's proof of Uhlmann's fidelity theorem
 optimizes over.
 
 ## Physical Interpretation
+
+<InsightBlock>
+  A bipartite pure state, however complicated its raw amplitudes look, is
+  secretly built from at most $\min(d_A,d_B)$ perfectly correlated pairs
+  of basis vectors — and any mixed state's uncertainty can always be
+  reinterpreted as entanglement with some larger, currently-inaccessible
+  system.
+</InsightBlock>
 
 The Schmidt decomposition says a bipartite pure state, however
 complicated its $d_Ad_B$ raw amplitudes look, is secretly built from at
@@ -377,47 +423,11 @@ to the matching $w_k$) is something to look at, not just read.
   explanation="Equal Schmidt coefficients mean rho_A is proportional to the identity, and every orthonormal basis diagonalizes the identity equally well — there's no preferred direction to find. This is exactly the same non-uniqueness ordinary degenerate eigenvectors have, and it's why the Bell-state panel below looks unrotated: the computational basis is just as valid a Schmidt basis as any other for this particular state, not because the state is somehow less entangled."
 />
 
-<div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose space-y-6 rounded-xl border border-border bg-surface-muted/40 p-4">
 
-<style>{`
-  #schmidt-basis-widget { position: relative; }
-  #schmidt-basis-widget input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
-  #schmidt-basis-widget label { display: inline-block; cursor: pointer; border-radius: 9999px; border: 1px solid var(--border); padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: var(--muted-foreground); background: var(--surface); transition: background-color 0.15s ease, color 0.15s ease; }
-  #schmidt-basis-product:checked ~ label[for="schmidt-basis-product"],
-  #schmidt-basis-bell:checked ~ label[for="schmidt-basis-bell"],
-  #schmidt-basis-worked:checked ~ label[for="schmidt-basis-worked"] {
-    background: var(--brand);
-    border-color: transparent;
-    color: var(--brand-foreground);
-  }
-  #schmidt-basis-product:focus-visible ~ label[for="schmidt-basis-product"],
-  #schmidt-basis-bell:focus-visible ~ label[for="schmidt-basis-bell"],
-  #schmidt-basis-worked:focus-visible ~ label[for="schmidt-basis-worked"] {
-    outline: 2px solid var(--brand);
-    outline-offset: 2px;
-  }
-  #schmidt-basis-panels > div { display: none; }
-  #schmidt-basis-widget:has(#schmidt-basis-product:checked) ~ #schmidt-basis-panels .schmidt-basis-panel-product,
-  #schmidt-basis-widget:has(#schmidt-basis-bell:checked) ~ #schmidt-basis-panels .schmidt-basis-panel-bell,
-  #schmidt-basis-widget:has(#schmidt-basis-worked:checked) ~ #schmidt-basis-panels .schmidt-basis-panel-worked { display: block; }
-`}</style>
-
-<div id="schmidt-basis-widget" role="radiogroup" aria-label="Choose a state to see its Schmidt basis rotation" className="flex flex-wrap items-center gap-2">
-
-<input type="radio" id="schmidt-basis-product" name="schmidt-basis-preset" defaultChecked />
-<label htmlFor="schmidt-basis-product">Product state |0⟩|0⟩</label>
-<input type="radio" id="schmidt-basis-bell" name="schmidt-basis-preset" />
-<label htmlFor="schmidt-basis-bell">Bell state |Φ⁺⟩</label>
-<input type="radio" id="schmidt-basis-worked" name="schmidt-basis-preset" />
-<label htmlFor="schmidt-basis-worked">Worked example above</label>
-
-</div>
-
-<div id="schmidt-basis-panels" className="w-full">
-
-<div className="schmidt-basis-panel-product">
+<div>
 <p className="mb-3 text-sm text-muted-foreground">
-Schmidt rank 1: $\lambda_1$ = {productPreset.lambda1.toFixed(3)}, $\lambda_2$ = {productPreset.lambda2.toFixed(3)}.
+Product state |0⟩|0⟩ — Schmidt rank 1: $\lambda_1$ = {productPreset.lambda1.toFixed(3)}, $\lambda_2$ = {productPreset.lambda2.toFixed(3)}.
 A product state carries no entanglement to rotate the bases away from
 the computational one, so $u_1,u_2$ and $w_1,w_2$ land exactly on
 $|0\rangle,|1\rangle$: no rotation at all.
@@ -442,7 +452,7 @@ $|0\rangle,|1\rangle$: no rotation at all.
 </div>
 </div>
 
-<div className="schmidt-basis-panel-bell">
+<div>
 <p className="mb-3 text-sm text-muted-foreground">
 Maximally entangled: $\lambda_1$ = {bellPreset.lambda1.toFixed(3)},
 $\lambda_2$ = {bellPreset.lambda2.toFixed(3)}, exactly equal. Because the two
@@ -472,7 +482,7 @@ state is more entangled than the worked example.
 </div>
 </div>
 
-<div className="schmidt-basis-panel-worked">
+<div>
 <p className="mb-3 text-sm text-muted-foreground">
 The lesson's own worked example: $\lambda_1$ = {workedPreset.lambda1.toFixed(3)},
 $\lambda_2$ = {workedPreset.lambda2.toFixed(3)}, genuinely unequal. Here
@@ -503,11 +513,9 @@ means geometrically, and why it is not the same instruction as
 
 </div>
 
-</div>
-
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Using $Mu_k$ instead of $M^\top u_k$ to find the $B$-side Schmidt
 vector.** The correct relation from $M=U\Sigma V^\dagger$ is
 $M^\top \overline{u_k}=\sqrt{\lambda_k}\,w_k$ (equivalently
@@ -520,7 +528,7 @@ out wrong (a different state outright, not just a relabeling) even
 though every individual number involved looks plausible on its own.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming the Schmidt basis is unique.** When two Schmidt coefficients
 are equal ($\lambda_j=\lambda_k$), any unitary rotation within that
 degenerate eigenspace produces an equally valid Schmidt basis, exactly
@@ -570,6 +578,8 @@ whenever a degeneracy occurs.
 
 ## Further Exploration
 
-[Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity) uses the non-uniqueness of purification
-proved here as the key technical step in Uhlmann's theorem, the standard
-way to define fidelity between two *mixed* states.
+<NextDiscovery>
+  Next: [Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity) uses the non-uniqueness of purification
+  proved here as the key technical step in Uhlmann's theorem, the standard
+  way to define fidelity between two *mixed* states.
+</NextDiscovery>

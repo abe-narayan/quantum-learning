@@ -112,6 +112,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Two escape hatches, defeated on purpose">
+  A quantum circuit can be maximally entangled and still trivial for a
+  laptop. It can use gates far outside any structured family and still
+  be trivial. Real quantum-advantage circuits are engineered to defeat
+  both escape hatches at once — deliberately, not by accident.
+</LessonHook>
+
 ## Motivation
 
 The prerequisite lesson built matrix product states and showed that a
@@ -213,7 +220,7 @@ A circuit with $m$ gates and $p$ measurements therefore simulates in
 $O(nm+n^2p)$ time total: polynomial in every parameter, exactly as the
 theorem claims.
 
-<Callout type="note">
+<Callout type="mistake">
 This is the precise, technical content behind a fact you have already used
 without naming it: **this platform's own error-correction simulators have
 been running exactly this class of circuit the whole time.**
@@ -300,6 +307,13 @@ classical-hardness argument for a specific circuit actually requires.
 </DefinitionBox>
 
 ## Physical Interpretation
+
+<InsightBlock>
+  Gate set and entanglement are two structurally unrelated routes to a
+  compact classical description — algebraic (a short list of stabilizer
+  generators) versus tensor-rank (a small bond dimension) — which is
+  exactly why defeating only one of them still leaves a circuit easy.
+</InsightBlock>
 
 Why does gate set alone — entirely independent of entanglement — decide
 efficient simulability for stabilizer circuits? Because stabilizer states
@@ -449,41 +463,19 @@ the Definition above claims, now verified rather than asserted.
 
 ## Visualizing the Two Boundaries
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
-  <svg width={480} height={380} viewBox="0 0 480 380" role="img" className="max-w-full" aria-label="A two-axis conceptual chart. The horizontal axis is labeled distance from Clifford/stabilizer gate set, from Clifford-only at the left to arbitrary gate sets such as random rotations at the right. The vertical axis is labeled entanglement or bond dimension chi, from low/bounded at the bottom to high/exponential at the top. A vertical band on the left (low x, any entanglement) is shaded and labeled easy via Gottesman-Knill: any entanglement. A horizontal band along the bottom (any gate set, low entanglement) is shaded a different color and labeled easy via bounded bond dimension: any gate set. The top-right region, outside both bands, is shaded a warning color and labeled hard: violates both known criteria. Three points are plotted: Circuit A (Clifford-only, maximally entangled, from this lesson's worked example) sits inside the left Clifford band near the top, illustrating that Gottesman-Knill does not care about entanglement. Circuit B (one T-gate, entanglement provably bounded, from this lesson's worked example) sits inside the bottom low-entanglement band on the right side, illustrating that the bond-dimension criterion does not care about gate set. A random quantum-advantage-style circuit sits in the top-right hard region, outside both bands, since it is neither Clifford nor low-entanglement.">
-    <rect x={160} y={30} width={280} height={200} className="fill-danger/10" />
-    <rect x={70} y={30} width={90} height={290} className="fill-brand/10" />
-    <rect x={70} y={230} width={370} height={90} className="fill-accent/10" />
-    <line x1={70} y1={30} x2={70} y2={320} strokeWidth={2} className="stroke-foreground/60" />
-    <line x1={70} y1={320} x2={440} y2={320} strokeWidth={2} className="stroke-foreground/60" />
-    <text x={255} y={358} textAnchor="middle" className="fill-foreground text-[11px] font-semibold">Distance from Clifford / stabilizer gate set →</text>
-    <text x={115} y={334} textAnchor="middle" className="fill-muted-foreground text-[10px]">Clifford-only</text>
-    <text x={400} y={334} textAnchor="middle" className="fill-muted-foreground text-[10px]">Arbitrary (e.g. random rotations)</text>
-    <text x={26} y={175} textAnchor="middle" transform="rotate(-90 26 175)" className="fill-foreground text-[11px] font-semibold">Entanglement / bond dimension χ</text>
-    <text x={78} y={46} textAnchor="start" className="fill-muted-foreground text-[10px]">High (χ ~ exponential)</text>
-    <text x={78} y={312} textAnchor="start" className="fill-muted-foreground text-[10px]">Low (bounded χ)</text>
-    <text x={115} y={190} textAnchor="middle" className="fill-brand text-[10px] font-semibold">Easy via</text>
-    <text x={115} y={202} textAnchor="middle" className="fill-brand text-[10px] font-semibold">Gottesman-Knill</text>
-    <text x={115} y={214} textAnchor="middle" className="fill-brand text-[10px] font-semibold">(any entanglement)</text>
-    <text x={385} y={300} textAnchor="middle" className="fill-accent text-[10px] font-semibold">Easy via bounded bond</text>
-    <text x={385} y={312} textAnchor="middle" className="fill-accent text-[10px] font-semibold">dimension (any gate set)</text>
-    <text x={300} y={58} textAnchor="middle" className="fill-danger text-[11px] font-bold">Hard: violates both</text>
-    <text x={300} y={70} textAnchor="middle" className="fill-danger text-[11px] font-bold">known criteria</text>
-    <circle cx={115} cy={70} r={7} className="fill-brand" />
-    <text x={115} y={95} textAnchor="middle" className="fill-brand text-[10px] font-semibold">A: Clifford,</text>
-    <text x={115} y={107} textAnchor="middle" className="fill-brand text-[10px] font-semibold">max-entangled</text>
-    <circle cx={200} cy={300} r={7} className="fill-accent" />
-    <text x={200} y={258} textAnchor="middle" className="fill-accent text-[10px] font-semibold">B: one T-gate,</text>
-    <text x={200} y={270} textAnchor="middle" className="fill-accent text-[10px] font-semibold">bounded entanglement</text>
-    <circle cx={410} cy={80} r={7} className="fill-danger" />
-    <text x={410} y={105} textAnchor="middle" className="fill-danger text-[10px] font-semibold">Random circuit</text>
-    <text x={410} y={117} textAnchor="middle" className="fill-danger text-[10px] font-semibold">(advantage attempt)</text>
-  </svg>
-</div>
+<ClassicalSimulabilityMap
+  maxEbits={3}
+  points={[
+    { label: "Circuit A", note: "Clifford, max-entangled", isClifford: true, entanglementEbits: cliffordCuts[2].renyiTwo },
+    { label: "Circuit B", note: "one T-gate, bounded entanglement", isClifford: false, entanglementEbits: tGateCuts[2].renyiTwo },
+    { label: "Random circuit", note: "advantage attempt", isClifford: false, entanglementEbits: 2.9, color: "danger" },
+  ]}
+  ariaLabel="A two-axis chart: gate set (Clifford-only to arbitrary) versus entanglement (low/bounded to high/exponential bond dimension). A left band shows 'easy via Gottesman-Knill' (any entanglement); a bottom band shows 'easy via bounded bond dimension' (any gate set); the top-right region outside both is 'hard: violates both known criteria.' Circuit A (Clifford-only, maximally entangled at 3 ebits, from this lesson's worked example) sits in the Gottesman-Knill band. Circuit B (one T-gate, entanglement bounded at 1 ebit, from this lesson's worked example) sits in the bounded-bond-dimension band. A random quantum-advantage-style circuit sits outside both bands, in the hard region."
+/>
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming entanglement alone determines classical simulability.**
 Clifford-only circuits can be maximally entangled and still classically
 easy — entanglement alone doesn't determine classical simulability, gate
@@ -493,7 +485,7 @@ because Gottesman-Knill's guarantee never once referenced how entangled
 the state was.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a single non-Clifford gate makes a circuit "hard."** It removes
 *one* escape hatch (Gottesman-Knill), not both. Circuit B above contains a
 non-Clifford $T$ gate and is still classically easy, because
@@ -556,9 +548,11 @@ the other.
 
 ## Further Exploration
 
-Next: [Clifford+T Synthesis and Resource Counting](/lessons/apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting),
-which takes this lesson's dividing line seriously from the *hardware*
-side: since Clifford gates alone are classically easy and therefore
-computationally inert, every fault-tolerant algorithm's real cost is
-measured in how many non-Clifford ($T$) gates it needs — turning this
-lesson's criterion (a) into the literal currency the next lesson counts.
+<NextDiscovery>
+  Next: [Clifford+T Synthesis and Resource Counting](/lessons/apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting)
+  takes this lesson's dividing line seriously from the *hardware* side:
+  since Clifford gates alone are classically easy and therefore
+  computationally inert, every fault-tolerant algorithm's real cost is
+  measured in how many non-Clifford ($T$) gates it needs — turning this
+  lesson's criterion (a) into the literal currency the next lesson counts.
+</NextDiscovery>

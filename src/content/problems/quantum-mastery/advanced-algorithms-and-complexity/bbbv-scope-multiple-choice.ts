@@ -6,7 +6,7 @@ export const bbbvScopeMultipleChoice: MultipleChoiceProblem = {
     title: "What the BBBV Bound Does and Doesn't Establish",
     course: "advanced-algorithms-and-complexity",
     lesson: "quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["bqp", "grover", "bbbv", "np"],

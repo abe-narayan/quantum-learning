@@ -29,12 +29,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Two numbers, one sphere">
+A qubit's physical state has exactly two real degrees of freedom — and two real numbers are exactly what it takes to locate a point on a sphere.
+</LessonHook>
+
 ## Motivation
 
-The last lesson ended with a claim: a qubit's physical state has exactly
-two real degrees of freedom, and two real numbers are exactly what locates
-a point on a sphere. This lesson derives that connection directly from
-$\alpha|0\rangle+\beta|1\rangle$, rather than leaving it as an analogy.
+The last lesson ended with that claim. This lesson derives the
+connection directly from $\alpha|0\rangle+\beta|1\rangle$, rather than
+leaving it as an analogy.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Felix_Bloch%2C_Stanford_University.jpg"
@@ -44,6 +47,10 @@ $\alpha|0\rangle+\beta|1\rangle$, rather than leaving it as an analogy.
   creditUrl="https://commons.wikimedia.org/wiki/File:Felix_Bloch,_Stanford_University.jpg"
   license="CC BY 3.0"
 />
+
+<HistoricalMoment date="1946" place="Stanford University">
+Felix Bloch's work on nuclear induction and spin precession gave the geometric picture derived in this lesson its name.
+</HistoricalMoment>
 
 ## Intuition
 
@@ -87,9 +94,18 @@ $|\beta'| = \sin(\theta/2)$ automatically, since
 $\cos^2(\theta/2)+\sin^2(\theta/2)=1$ is guaranteed regardless of $\theta$.
 Writing $\beta'$'s remaining phase as $\varphi$:
 
+<EquationReveal
+  terms={[
+    { id: "theta", symbol: "θ", gloss: "The latitude angle — controls how much |0⟩ versus |1⟩, i.e. the measurement probabilities." },
+    { id: "phi", symbol: "φ", gloss: "The longitude angle — carries the relative phase, invisible to a computational-basis measurement but physically real." },
+    { id: "zero", symbol: "|0⟩", gloss: "The north pole of the sphere." },
+    { id: "one", symbol: "|1⟩", gloss: "The south pole of the sphere." },
+  ]}
+>
 $$
 \boxed{|\psi\rangle = \cos\!\left(\frac{\theta}{2}\right)|0\rangle + e^{i\varphi}\sin\!\left(\frac{\theta}{2}\right)|1\rangle}
 $$
+</EquationReveal>
 
 This is the **canonical Bloch form**. Every normalized single-qubit state
 (up to the global phase we removed in Step 1) corresponds to exactly one
@@ -97,7 +113,7 @@ pair $(\theta,\varphi)$ with $\theta\in[0,\pi]$, $\varphi\in[0,2\pi)$, and
 every such pair corresponds to exactly one physical state. That's the
 "two real parameters" from the previous lesson, made concrete.
 
-<Callout type="mistake">
+<Callout type="warning">
 The **halved** angle $\theta/2$ inside the amplitudes is the single most
 common source of factor-of-two errors in this entire subject. The state
 rotates through angle $\theta$ on the *Bloch sphere*, but the amplitude
@@ -205,17 +221,23 @@ lesson defines them.
 
 **Find the state and Bloch point for $\theta=\pi/3$, $\varphi=\pi/2$.**
 
+<DerivationSteps>
+  <DerivationStep annotation="Plug θ=π/3, φ=π/2 directly into the canonical Bloch form.">
 $$
 \alpha = \cos\!\left(\frac{\pi}{6}\right) = \frac{\sqrt3}{2}, \qquad \beta = e^{i\pi/2}\sin\!\left(\frac{\pi}{6}\right) = i\cdot\frac12 = \frac{i}{2}
 $$
-
+  </DerivationStep>
+  <DerivationStep annotation="Use x = sinθ cosφ from the amplitude-to-coordinate conversion above.">
 $$
 x = \sin\!\left(\frac{\pi}{3}\right)\cos\!\left(\frac{\pi}{2}\right) = \frac{\sqrt3}{2}\cdot0 = 0
 $$
-
+  </DerivationStep>
+  <DerivationStep annotation="Use y = sinθ sinφ and z = cosθ from the same conversion.">
 $$
 y = \sin\!\left(\frac{\pi}{3}\right)\sin\!\left(\frac{\pi}{2}\right) = \frac{\sqrt3}{2}\cdot1 = \frac{\sqrt3}{2}, \qquad z = \cos\!\left(\frac{\pi}{3}\right) = \frac12
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 Set $\theta$ and $\varphi$ to these values in the simulator above (in
 degrees: $\theta=60°$, $\varphi=90°$) and confirm $\alpha \approx 0.87$,
@@ -224,14 +246,14 @@ $\frac12=0.50$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing the Bloch angle $\theta$ with a phase.** $\theta$ is a
 *probability* parameter (latitude), not a phase. Only $\varphi$ is a
 phase (longitude). Mixing these up is easy since both are angles measured
 in radians or degrees.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Expecting $\varphi$ to mean something at the poles.** At $\theta=0$ or
 $\theta=\pi$, the state is $|0\rangle$ or $|1\rangle$ exactly, and
 $\varphi$ has no effect: there's no second component for it to be a
@@ -266,7 +288,9 @@ phase *relative to*.
 
 ## Further Exploration
 
+<NextDiscovery>
 [Measurement and Probability](/lessons/quantum-computing/qubits-and-quantum-states/measurement-and-probability) derives $P(0)=\cos^2(\theta/2)$ and
 $P(1)=\sin^2(\theta/2)$ properly from the measurement postulate, and
 shows that measuring in a basis *other* than $\{|0\rangle,|1\rangle\}$
 is just as natural.
+</NextDiscovery>

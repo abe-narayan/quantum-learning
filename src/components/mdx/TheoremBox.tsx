@@ -1,7 +1,18 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { TechLabel } from "@/components/ui/Typography";
 
 type Provenance = "cited" | "derived";
+
+/**
+ * MDX usage:
+ * ```mdx
+ * <TheoremBox title="Stone's theorem" provenance="cited">
+ *   Every strongly continuous one-parameter unitary group $U(t)$ has the
+ *   form $U(t) = e^{-iAt}$ for a unique self-adjoint $A$.
+ * </TheoremBox>
+ * ```
+ */
 
 // Quantum Mastery lessons draw an explicit line between a result the lesson
 // proves in full and one it invokes from outside its own scope (e.g. this
@@ -39,12 +50,15 @@ export function TheoremBox({
   children: ReactNode;
 }) {
   return (
-    <div className={cn("not-prose my-8 rounded-lg border border-border bg-surface", className)}>
+    <div
+      className={cn(
+        "not-prose my-8 overflow-hidden rounded-[var(--radius-panel)] border border-border border-l-2 border-l-pillar-edge bg-surface",
+        className
+      )}
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5 border-b border-border bg-surface-muted px-5 py-3">
         <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">
-            Theorem
-          </span>
+          <TechLabel className="text-brand">Theorem</TechLabel>
           {title && (
             <span className="font-display text-base font-semibold text-foreground sm:text-lg">
               {title}

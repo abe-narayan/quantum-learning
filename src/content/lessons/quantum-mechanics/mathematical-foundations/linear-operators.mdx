@@ -62,6 +62,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Matrix multiplication isn't a rule someone invented for grids of
+  numbers. Insert the completeness relation between two composed
+  operators, and it falls out on its own.
+</LessonHook>
+
 ## Motivation
 
 Rotate a system, evolve it forward in time, apply a quantum gate: every
@@ -150,17 +156,27 @@ grid of numbers.
 
 Applying two operators in sequence, $A$ then $B$, written $(AB)|v\rangle
 := A(B|v\rangle)$, is itself linear, hence itself has matrix elements
-$(AB)_{ik}=\langle e_i|AB|e_k\rangle$. Insert the completeness relation
-$\sum_j|e_j\rangle\langle e_j|=I$ (from the last lesson) directly between
-$A$ and $B$, which is legal because inserting the identity operator never
-changes anything:
+$(AB)_{ik}=\langle e_i|AB|e_k\rangle$.
 
+<DerivationSteps>
+  <DerivationStep annotation="Insert the completeness relation Σⱼ|eⱼ⟩⟨eⱼ|=I (from the last lesson) directly between A and B — legal because inserting the identity operator never changes anything.">
 $$
-\langle e_i|AB|e_k\rangle = \langle e_i|A\Big(\sum_j|e_j\rangle\langle e_j|\Big)B|e_k\rangle = \sum_j \langle e_i|A|e_j\rangle\langle e_j|B|e_k\rangle = \sum_j A_{ij}B_{jk}
+\langle e_i|AB|e_k\rangle = \langle e_i|A\Big(\sum_j|e_j\rangle\langle e_j|\Big)B|e_k\rangle
 $$
+  </DerivationStep>
+  <DerivationStep annotation="Regroup: each term in the sum splits cleanly into a matrix element of A and a matrix element of B.">
+$$
+= \sum_j \langle e_i|A|e_j\rangle\langle e_j|B|e_k\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Both factors are just matrix elements by definition — this is exactly the ordinary matrix-multiplication formula.">
+$$
+= \sum_j A_{ij}B_{jk}
+$$
+  </DerivationStep>
+</DerivationSteps>
 
-That final expression is exactly the ordinary matrix-multiplication
-formula, and it fell out of nowhere but completeness: "compose two
+That final expression fell out of nowhere but completeness: "compose two
 operators" and "multiply their matrices" collapse into the same
 operation because inserting the identity was legal, not because matrix
 multiplication was defined to work out that way from the start.
@@ -220,7 +236,7 @@ matching the direct computation.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming $AB=BA$.** Operator composition generally does not commute:
 $AB$ and $BA$ can differ, sometimes drastically. (Whether two particular
 operators commute turns out to be physically important. Commuting
@@ -228,7 +244,7 @@ observables can be measured simultaneously, a topic the Operators,
 Observables & Measurement course develops fully.)
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming every operator is invertible.** A matrix fails to be invertible
 exactly when it sends some nonzero vector to zero.
 </Callout>
@@ -259,6 +275,14 @@ exactly when it sends some nonzero vector to zero.
 
 ## Further Exploration
 
-Next: [Eigenvalues and Eigenvectors](/lessons/quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors), the vectors an operator leaves
-"directionally unchanged," which turn out to be exactly the states with
-definite physical properties.
+<ChallengePrompt prompt="Is g(x,y) = (y,x) (swapping the two coordinates) linear? Justify using the definition, and if so, write down its matrix in the standard basis.">
+  Check $g(a\cdot u+b\cdot v)$ against $a\cdot g(u)+b\cdot g(v)$ directly,
+  the same test practice question 1 used — then read the matrix elements
+  off $g$'s action on the basis vectors $e_1,e_2$.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Eigenvalues and Eigenvectors](/lessons/quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors), the vectors an operator leaves
+  "directionally unchanged," which turn out to be exactly the states with
+  definite physical properties.
+</NextDiscovery>

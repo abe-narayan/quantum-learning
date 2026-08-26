@@ -17,9 +17,11 @@ const STATIC_ROUTES = [
   "/software",
   "/mechanics",
   "/computing",
+  "/mastery",
   "/apex",
   "/glossary",
   "/map",
+  "/current-quantum",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

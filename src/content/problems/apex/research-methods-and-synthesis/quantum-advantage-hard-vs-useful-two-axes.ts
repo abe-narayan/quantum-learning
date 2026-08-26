@@ -6,7 +6,7 @@ export const quantumAdvantageHardVsUsefulTwoAxes: ConceptualProblem = {
     title: "Hard to Simulate vs. Practically Useful: Two Separate Axes",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["quantum-advantage", "random-circuit-sampling", "quantum-chemistry", "claim-evaluation"],

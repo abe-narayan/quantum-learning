@@ -54,7 +54,7 @@ export function EntanglementCorrelationCanvas({
         y1={GLYPH_CENTER_Y}
         x2={RIGHT_CENTER_X - GLYPH_RADIUS - 4}
         y2={GLYPH_CENTER_Y}
-        style={{ stroke: "var(--muted-foreground)" }}
+        className="stroke-muted-foreground"
         strokeWidth={1}
         strokeDasharray="2 6"
         opacity={0.6}
@@ -130,7 +130,7 @@ function Glyph({
         cy={GLYPH_CENTER_Y}
         r={GLYPH_RADIUS}
         fill="none"
-        style={{ stroke: "var(--border)" }}
+        className="stroke-border"
         strokeWidth={1.5}
       />
       <line
@@ -138,7 +138,7 @@ function Glyph({
         y1={GLYPH_CENTER_Y - GLYPH_RADIUS}
         x2={centerX}
         y2={GLYPH_CENTER_Y + GLYPH_RADIUS}
-        style={{ stroke: "var(--border)" }}
+        className="stroke-border"
         strokeWidth={1}
         strokeDasharray="3 4"
       />

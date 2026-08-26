@@ -18,7 +18,7 @@ export const pvmOutcomeProbability: NumericProblem = {
     title: "P(outcome ≤ 1.5) from the Staircase PVM",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["spectral-theorem", "pvm", "born-rule"],

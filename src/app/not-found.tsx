@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow, Lede, Readouts, SectionTitle } from "@/components/ui/Typography";
+import { Panel, Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Reveal } from "@/components/motion/Reveal";
 import { NAV_ITEMS } from "@/lib/nav";
 
 export const metadata: Metadata = {
@@ -24,35 +25,51 @@ const QUICK_LINKS = ["/learn", "/problems", "/simulators", "/glossary"]
 
 export default function NotFound() {
   return (
-    <Container className="py-16 sm:py-24">
-      <PageHeader
-        eyebrow="404"
-        title="This state doesn't exist"
-        description="The page, lesson, or simulator you're looking for may have moved, been renamed, or never existed in the first place — much like measuring a qubit outside its basis. Try one of the destinations below, or press Ctrl K (Cmd K on Mac) to search."
-      />
+    <Section width="reading" className="pt-4 sm:pt-8">
+      <Reveal>
+        <Eyebrow>404 · Not found</Eyebrow>
+        <SectionTitle level={1} size="xl" className="mt-4">
+          This state doesn&rsquo;t exist
+        </SectionTitle>
+        <Lede className="mt-5 max-w-[42rem]">
+          The page, lesson, or simulator you&rsquo;re looking for may have moved, been renamed, or
+          never existed in the first place — much like measuring a qubit outside its basis. Try one
+          of the destinations below, or press Ctrl K (Cmd K on Mac) to search.
+        </Lede>
+      </Reveal>
 
-      <div className="mt-10 flex flex-wrap gap-3">
+      <Reveal delay={80} className="mt-8">
+        <Instrument label="Route readout" footnote="No amplitude, no page — the console falls back to what it knows exists.">
+          <Readouts
+            items={[
+              { label: "Requested state", value: "|ψ_target⟩" },
+              { label: "Amplitude", value: "0.000" },
+              { label: "Collapsed to", value: "404" },
+            ]}
+          />
+        </Instrument>
+      </Reveal>
+
+      <Reveal delay={120} className="mt-8 flex flex-wrap gap-3">
         <Button href="/">Back to home</Button>
         <Button href="/learn" variant="secondary">
           Start learning
         </Button>
-      </div>
+      </Reveal>
 
-      <div className="mt-12">
-        <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Or jump straight to
-        </p>
+      <Reveal delay={160} className="mt-12">
+        <p className="tech-label">Or jump straight to</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {QUICK_LINKS.map((item) => (
             <Link key={item.href} href={item.href} className="block">
-              <Card className="transition-colors hover:border-brand/40">
+              <Panel interactive className="p-5">
                 <span className="block text-base font-semibold text-foreground">{item.label}</span>
                 <span className="mt-1 block text-sm text-muted-foreground">{item.description}</span>
-              </Card>
+              </Panel>
             </Link>
           ))}
         </div>
-      </div>
-    </Container>
+      </Reveal>
+    </Section>
   );
 }

@@ -163,6 +163,13 @@ export const capacityFrames = [
   },
 ];
 
+<LessonHook eyebrow="Two different numbers">
+  Hand a noisy channel to two parties and let them use it as many times
+  as they like. Exactly how many classical bits, and separately, exactly
+  how many quantum bits, can actually get through per use? The gap
+  between those two numbers is this course's most dramatic single fact.
+</LessonHook>
+
 ## Motivation
 
 Six modules in this course built one continuous vocabulary. POVMs and
@@ -179,12 +186,8 @@ entanglement itself an operational price tag: how many near-perfect
 Bell pairs a noisy supply of them is actually worth. Every one of those
 results was a statement about a single quantum system or a single use
 of a resource. This capstone asks the question that was always waiting
-underneath all of them: hand me a noisy channel and let me use it as
-many times as I like, exactly how many classical bits, and separately,
-exactly how many quantum bits, can actually get through, per use, in
-the end? These are two different numbers, called the channel's
-**classical capacity** and **quantum capacity**, and the gap between
-them is this whole course's most dramatic single fact.
+underneath all of them, and names the two resulting numbers the
+channel's **classical capacity** and **quantum capacity**.
 
 ## Mathematical Development
 
@@ -470,7 +473,7 @@ many-uses limit, and HSW is the (nontrivial) theorem that this
 maximum is actually achievable, not merely an upper bound on it.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming every channel's capacity formula is single-letter, since the
 depolarizing and dephasing examples in this lesson are.** Both HSW's
 $\chi^*$ and LSD's coherent information can require genuine
@@ -480,7 +483,7 @@ closed forms are special-case facts about *these particular* channels'
 symmetry, not evidence that every channel behaves this simply.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Reading "the hashing bound is negative here" as "quantum capacity is
 zero here."** A negative or clamped-to-zero lower bound only means
 *that specific protocol* certifies nothing; it does not prove the true
@@ -543,3 +546,10 @@ quantum capacity above zero, and for
 Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi),
 whose Choi-matrix machinery this lesson's entanglement-breaking proof
 reused directly.
+
+<NextDiscovery>
+  This completes Quantum Shannon Theory. The classical-versus-quantum
+  capacity gap derived here is the direct motivation for Fault Tolerance
+  Frontiers, which builds the actual codes that keep a real device's
+  effective quantum capacity above zero.
+</NextDiscovery>

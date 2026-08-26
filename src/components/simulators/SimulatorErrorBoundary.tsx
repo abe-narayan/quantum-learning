@@ -52,8 +52,9 @@ export class SimulatorErrorBoundary extends Component<
       return (
         <div
           role="alert"
-          className="not-prose flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-surface-muted p-8 text-center"
+          className="not-prose flex flex-col items-center justify-center gap-3 rounded-[var(--radius-panel)] border border-danger/40 bg-danger/5 p-8 text-center"
         >
+          <p className="tech-label text-danger">Fault — instrument offline</p>
           <p className="text-sm font-medium text-foreground">This simulator failed to load.</p>
           <p className="max-w-sm text-sm text-muted-foreground">
             An unexpected error interrupted it — likely a bug in its numerical engine, not something you did.

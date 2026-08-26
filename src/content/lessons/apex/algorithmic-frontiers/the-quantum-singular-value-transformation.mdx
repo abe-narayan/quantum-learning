@@ -68,6 +68,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="The conceptual summit">
+  One circuit template that, for the right choice of phases, IS Grover's
+  algorithm, IS optimal Hamiltonian simulation, and IS a modern
+  replacement for the HHL linear-systems algorithm.
+</LessonHook>
+
 ## Motivation
 
 Every earlier lesson in this course has been building toward a single
@@ -88,11 +94,8 @@ block-encoding ancilla itself as the "signal qubit," and the *entire
 matrix* $A$ gets the same polynomial transformation, applied
 simultaneously and independently to every one of its singular values. This
 is the conceptual summit of the Algorithmic Frontiers course, and arguably
-of the whole APEX pillar: a single circuit template that, for the right
-choice of phases, IS Grover's algorithm, IS optimal Hamiltonian simulation,
-and IS (a modern replacement for) the HHL algorithm for linear systems.
-Nothing else in this curriculum compresses that much of the field into one
-idea.
+of the whole APEX pillar. Nothing else in this curriculum compresses that
+much of the field into one idea.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Singular_value_decomposition_visualisation.svg"
@@ -182,33 +185,25 @@ Here is the fact that makes all of this work, and it deserves to be
 understood as a picture, not just an equation. Fix one singular pair
 $(\sigma_i,|u_i\rangle,|v_i\rangle)$, and look only at the state
 $|v_i^0\rangle:=|0\rangle^{\otimes a}|v_i\rangle$. By the block-encoding
-relation,
+relation:
 
+<DerivationSteps>
+<DerivationStep annotation="This follows directly from the block-encoding relation and the definition of the singular value decomposition A = Σᵢ σᵢ|uᵢ⟩⟨vᵢ|.">
 $$
 \langle u_i|\langle0|^{\otimes a}\,U\,|0\rangle^{\otimes a}|v_i\rangle=\langle u_i|A|v_i\rangle=\sigma_i
 $$
-
-so $U$ sends $|v_i^0\rangle$ to a state with exactly $\sigma_i$ overlap on
-$|u_i^0\rangle:=|0\rangle^{\otimes a}|u_i\rangle$, and (since $U$ is
-unitary and $\sigma_i\leq1$) the rest of its amplitude, $\sqrt{1-\sigma_i^2}$,
-lands entirely *outside* the ancilla-zero subspace, in some normalized
-state $|u_i^\perp\rangle$ with $\Pi_0|u_i^\perp\rangle=0$:
-
+</DerivationStep>
+<DerivationStep annotation="U sends |v_i⁰⟩ to a state with exactly σᵢ overlap on |u_i⁰⟩ := |0⟩^⊗a|u_i⟩ (defined in parallel with |v_i⁰⟩ above); since U is unitary and σᵢ ≤ 1, the rest of the amplitude, √(1-σᵢ²), lands entirely outside the ancilla-zero subspace, in some normalized state |u_i⊥⟩ with Π₀|u_i⊥⟩ = 0.">
 $$
 U|v_i^0\rangle = \sigma_i|u_i^0\rangle + \sqrt{1-\sigma_i^2}\,|u_i^\perp\rangle
 $$
-
-That one equation already fixes $U$'s action on the two-dimensional
-subspace $\mathcal H_i=\mathrm{span}\{|v_i^0\rangle,|u_i^\perp\rangle\}$ up
-to the phase convention chosen for $|u_i^\perp\rangle$. Fixing that phase
-the standard way — exactly as Gilyén, Su, Low & Wiebe's construction does,
-absorbing a factor of $i$ into $|u_i^\perp\rangle$'s definition — puts
-$U$'s restriction, in the ordered basis $\{|v_i^0\rangle,|u_i^\perp\rangle\}$,
-into *exactly* the QSP signal-rotation form evaluated at $x=\sigma_i$:
-
+</DerivationStep>
+<DerivationStep annotation="That one equation already fixes U's action on the two-dimensional subspace H_i = span{|v_i⁰⟩, |u_i⊥⟩} up to the phase convention chosen for |u_i⊥⟩. Fixing that phase the standard way — as Gilyén, Su, Low & Wiebe's construction does, absorbing a factor of i into |u_i⊥⟩'s definition — puts U's restriction, in this ordered basis, into exactly the QSP signal-rotation form evaluated at x = σᵢ.">
 $$
 U\big|_{\mathcal H_i} = \begin{pmatrix}\sigma_i&i\sqrt{1-\sigma_i^2}\\i\sqrt{1-\sigma_i^2}&\sigma_i\end{pmatrix} = W(\sigma_i)
 $$
+</DerivationStep>
+</DerivationSteps>
 
 (the general theorem — proved in full in Gilyén, Su, Low & Wiebe's
 original construction, cited below rather than re-derived here — extends
@@ -223,6 +218,14 @@ role $|0\rangle\langle0|$ plays in bare single-qubit QSP — so
 $\Pi_\varphi$ restricted to $\mathcal H_i$ is *identical* to the
 single-qubit phase gate $e^{i\varphi Z}$ in that subspace's own local
 basis.
+
+<InsightBlock>
+  The huge $(a+n)$-qubit Hilbert space splits into many independent
+  two-dimensional "rooms," one per singular value $\sigma_i$, each
+  running its own private copy of the identical QSP phase sequence with
+  $x=\sigma_i$ plugged in — no room's computation talks to any other
+  room's.
+</InsightBlock>
 
 The picture: the huge $(a+n)$-qubit Hilbert space splits into many
 independent two-dimensional "rooms," one per singular value $\sigma_i$,
@@ -319,19 +322,31 @@ different choice of $P$.
 
 ### Why This Matters
 
-QSVT was introduced by Gilyén, Su, Low, and Wiebe in 2018-2019 (published
-at STOC 2019, "Quantum singular value transformation and beyond:
-exponential improvements for quantum matrix arithmetic"), building on Low
-and Chuang's earlier "qubitization" technique. It is now widely regarded —
-this is a real, well-cited claim in the research literature, not marketing
-— as a unifying framework subsuming most of the pre-2018 "zoo" of
-specialized quantum algorithms as special cases of a single construction:
-Grover's algorithm and amplitude estimation, essentially every variant of
-Hamiltonian simulation, and HHL-style linear-systems solving all fall out
-of "block-encode a matrix, then apply a polynomial to its singular
-values," for different choices of $P$. Martyn, Rossi, Tan, and Chuang's
-2021 review, pointedly titled "Grand Unification of Quantum Algorithms,"
-makes exactly this case at length. None of this is a claim that QSVT
+<ResearchConnection
+  title="Quantum singular value transformation and beyond"
+  source="Gilyén, Su, Low & Wiebe, 2018-2019 (STOC 2019)"
+  url="https://arxiv.org/abs/1806.01838"
+>
+  Building on Low and Chuang's earlier "qubitization" technique, this
+  paper is now widely regarded — a real, well-cited claim in the research
+  literature, not marketing — as a unifying framework subsuming most of
+  the pre-2018 "zoo" of specialized quantum algorithms as special cases
+  of a single construction: Grover's algorithm and amplitude estimation,
+  essentially every variant of Hamiltonian simulation, and HHL-style
+  linear-systems solving all fall out of "block-encode a matrix, then
+  apply a polynomial to its singular values," for different choices of
+  $P$.
+</ResearchConnection>
+
+<ResearchConnection
+  title="Grand Unification of Quantum Algorithms"
+  source="Martyn, Rossi, Tan & Chuang, 2021"
+  url="https://arxiv.org/abs/2105.02859"
+>
+  This review makes exactly the unification case above at length.
+</ResearchConnection>
+
+None of this is a claim that QSVT
 proves new physics or new complexity-theoretic results by itself — it's a
 claim about *organization*: an entire research area's separately-invented
 tricks turned out to be one trick, viewed correctly. That kind of
@@ -470,7 +485,7 @@ singular value $A$ has) simultaneously, simply because quantum mechanics
 lets a single unitary act linearly across every invariant subspace at
 once.
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking QSVT makes Hamiltonian simulation or Grover's algorithm
 obsolete.** It doesn't. QSVT *explains* why they work — as two of many
 possible choices of the polynomial $P$ inside one construction — and it
@@ -530,13 +545,15 @@ size.
 
 ## Further Exploration
 
-Next: [Amplitude Estimation Without Phase Estimation](/lessons/apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation),
-which pushes special case 1 above further: the same reflect-and-compose
-structure reappears there to get Grover's quadratic speedup for
-*estimating* a probability rather than just amplifying it, without ever
-calling the phase-estimation subroutine the original algorithm needed. For
-the full treatment of
-special case 3, see
-[Applications: Eigenvalues and Linear Systems](/lessons/apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems),
-which works out exactly how a regularized approximation to $1/x$ turns
-this lesson's $P(A)$ machinery into a modern quantum linear-systems solver.
+<NextDiscovery>
+  Next: [Amplitude Estimation Without Phase Estimation](/lessons/apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation),
+  which pushes special case 1 above further: the same reflect-and-compose
+  structure reappears there to get Grover's quadratic speedup for
+  *estimating* a probability rather than just amplifying it, without ever
+  calling the phase-estimation subroutine the original algorithm needed. For
+  the full treatment of
+  special case 3, see
+  [Applications: Eigenvalues and Linear Systems](/lessons/apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems),
+  which works out exactly how a regularized approximation to $1/x$ turns
+  this lesson's $P(A)$ machinery into a modern quantum linear-systems solver.
+</NextDiscovery>

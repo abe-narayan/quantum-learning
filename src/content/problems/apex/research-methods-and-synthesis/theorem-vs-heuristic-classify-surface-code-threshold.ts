@@ -6,7 +6,7 @@ export const theoremVsHeuristicClassifySurfaceCodeThreshold: ConceptualProblem =
     title: "Classifying the Surface Code's ~1% Threshold",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["research-methods", "theorem-vs-heuristic", "surface-codes", "error-correction"],

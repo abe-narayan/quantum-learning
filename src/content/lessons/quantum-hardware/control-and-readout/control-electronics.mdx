@@ -29,12 +29,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A circuit diagram is a wish list">
+Every gate this platform's Quantum Computing pillar has discussed — X, H, Rz(θ) — is, physically, implemented by a classical control system generating a precisely-shaped microwave pulse and sending it to the qubit.
+</LessonHook>
+
 ## Motivation
 
-Every gate this platform's Quantum Computing pillar has discussed,
-$X$, $H$, $R_z(\theta)$, is, physically, implemented by a classical
-control system generating a precisely-shaped microwave (or laser) pulse
-and sending it to the qubit. This lesson makes that translation
+The control pulse can equally be a laser pulse rather than a microwave
+one, depending on the platform. This lesson makes that translation
 concrete, reusing machinery already built and verified: Approximation
 Methods' exact two-level Rabi model.
 
@@ -131,14 +133,14 @@ rotation's expected population transfer exactly.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing rotation angle θ with the Rabi phase Ωt.** The relationship
 is $\Omega t=\theta/2$, not $\Omega t=\theta$. This factor of 2
 (already seen in Physical Qubit Platforms' $t_\pi=\pi/(2\Omega)$ formula
 for a full $\theta=\pi$ rotation) is easy to drop.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming pulse duration is the only way to control rotation angle.**
 Amplitude control (varying $\Omega$ at fixed duration) reaches the same
 physics. Real hardware uses whichever is more practical to control
@@ -171,5 +173,7 @@ precisely, not one universally "correct" method.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Qubit Readout Techniques](/lessons/quantum-hardware/control-and-readout/qubit-readout-techniques), which covers the reverse direction:
 extracting the qubit's state back out after gates have run.
+</NextDiscovery>

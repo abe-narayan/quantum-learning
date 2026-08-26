@@ -6,7 +6,7 @@ export const zeroMeanNotSufficientMc: MultipleChoiceProblem = {
     title: "Why Zero Mean Gradient Isn't the Barren Plateau",
     course: "advanced-algorithms-and-complexity",
     lesson: "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["barren-plateaus", "gradients"],

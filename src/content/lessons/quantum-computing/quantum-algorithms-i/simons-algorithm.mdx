@@ -62,14 +62,16 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Deutsch-Jozsa's speedup settles a somewhat contrived promise that a classical computer can still solve with a single query if you're willing to accept a small probability of error. Simon's problem doesn't have that escape hatch.
+</LessonHook>
+
 ## Motivation
 
-Deutsch-Jozsa's speedup, for all its cleanness, settles a somewhat
-contrived promise (constant vs. balanced) that a classical computer can
-still solve with a single query if you're willing to accept a small
-probability of error (guess a handful of random inputs; if $f$ were
-balanced, agreement across all of them is exponentially unlikely). Simon's
-problem doesn't have that escape hatch. Given $f:\{0,1\}^n\to\{0,1\}^n$
+That contrived promise is constant vs. balanced — the classical escape
+hatch is concrete: guess a handful of random inputs, and if $f$ were
+balanced, agreement across all of them would be exponentially unlikely.
+Given $f:\{0,1\}^n\to\{0,1\}^n$
 *promised* to satisfy $f(x)=f(x\oplus s)$ for exactly one nonzero hidden
 string $s$, a genuinely **2-to-1** function, not merely balanced, finding
 $s$ classically requires $\Theta(2^{n/2})$ queries even with randomization
@@ -256,7 +258,7 @@ useful run.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating Simon's separation as "the same kind of speedup as
 Deutsch-Jozsa, just bigger."** Deutsch-Jozsa's exact, single-query
 advantage disappears if the classical algorithm is allowed a small
@@ -267,7 +269,7 @@ usually credited as the first real hint that quantum computers could be
 exponentially more powerful.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting a single run to reveal $s$.** One run gives one linear
 constraint on $s$, not $s$ itself. It takes roughly $n-1$ independent
 (nonzero, linearly independent) runs plus a classical linear-algebra
@@ -322,9 +324,11 @@ doesn't hand you the answer directly.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next, in Quantum Algorithms II: [Shor's Algorithm: Factoring via Period
 Finding](/lessons/quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding), where the same "interference reveals a hidden algebraic
 structure, classical post-processing finishes the job" template
 reappears, generalized from Simon's finite hidden string over
 $\mathbb{F}_2^n$ to a genuine hidden period of $a^x\bmod N$ over the
 integers.
+</NextDiscovery>

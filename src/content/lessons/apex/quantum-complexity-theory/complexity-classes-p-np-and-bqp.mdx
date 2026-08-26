@@ -30,6 +30,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Proven, or merely believed?">
+  P, NP, and BQP have exactly three proven containments between them —
+  and exactly three questions about how they relate that nobody has
+  resolved either way, including whether quantum computers are more
+  powerful than classical ones at all.
+</LessonHook>
+
 ## Motivation
 
 BQP and Oracle Complexity did two things carefully: it gave BQP a formal
@@ -192,21 +199,15 @@ essentially universally believed, on the strength of Shor's algorithm —
 examined precisely below — but belief, however strong and however
 widely shared among experts, is not proof.
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
-  <svg width={440} height={320} viewBox="0 0 440 320" role="img" className="max-w-full" aria-label="A containment diagram: a solid outer rounded rectangle labeled PSPACE contains everything drawn. Inside it, two large dashed ellipses labeled BQP (left, indigo) and NP (right, teal) overlap substantially in the middle. A small solid circle labeled P sits inside the region where both ellipses overlap, since P is proven to be a subset of both BQP and NP. Above the P circle, still inside the overlap, a large question mark and the text 'NP subseteq BQP? / BQP subseteq NP?' mark that the true extent of overlap between BQP and NP -- whether one contains the other, they are equal, or they merely partly overlap as drawn -- is a genuinely open question; the dashed ellipse outlines signal that their boundaries relative to each other are illustrative only, not a claimed fact.">
-    <rect x={20} y={20} width={400} height={280} rx={28} className="fill-none stroke-foreground/70" strokeWidth={2.5} />
-    <text x={44} y={50} className="fill-foreground text-sm font-semibold">PSPACE</text>
-    <ellipse cx={175} cy={190} rx={130} ry={105} className="fill-brand/10 stroke-brand" strokeWidth={2.5} strokeDasharray="7 5" />
-    <ellipse cx={285} cy={190} rx={125} ry={105} className="fill-accent/10 stroke-accent" strokeWidth={2.5} strokeDasharray="7 5" />
-    <text x={100} y={130} textAnchor="middle" className="fill-brand text-base font-semibold">BQP</text>
-    <text x={368} y={130} textAnchor="middle" className="fill-accent text-base font-semibold">NP</text>
-    <text x={232} y={122} textAnchor="middle" className="fill-warning text-3xl font-bold">?</text>
-    <text x={232} y={152} textAnchor="middle" className="fill-warning text-[11px] font-medium">NP⊆BQP? / BQP⊆NP?</text>
-    <text x={232} y={166} textAnchor="middle" className="fill-warning text-[11px] font-medium">both open</text>
-    <circle cx={225} cy={225} r={48} className="fill-foreground/15 stroke-foreground" strokeWidth={2.5} />
-    <text x={225} y={231} textAnchor="middle" className="fill-foreground text-lg font-semibold">P</text>
-  </svg>
-</div>
+<ComplexityClassDiagram
+  outer={{ id: "PSPACE", label: "PSPACE" }}
+  lensA={{ id: "BQP", label: "BQP" }}
+  lensB={{ id: "NP", label: "NP" }}
+  core={{ id: "P", label: "P" }}
+  openLabel="NP⊆BQP? / BQP⊆NP?"
+  footnote="Both containments between BQP and NP are genuinely open — neither has been proven either way."
+  ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains everything drawn. Inside it, two dashed ellipses labeled BQP and NP overlap. A small solid circle labeled P sits inside the region where both ellipses overlap, since P is proven to be a subset of both BQP and NP. The open question NP⊆BQP? / BQP⊆NP? is marked in the overlap; the dashed ellipse outlines signal that their boundaries relative to each other are illustrative only, not a claimed fact."
+/>
 
 Everything solid in this diagram is a proven containment:
 $\mathsf{P}$'s circle sits solidly inside the overlap of the two dashed
@@ -287,6 +288,13 @@ sharpest worked instance.
 
 ## Physical Interpretation: why this precision matters
 
+<InsightBlock>
+  "Quantum computers are more powerful than classical ones" is not one
+  claim but several, and precisely which of P⊆BQP, NP⊆BQP, BQP⊆NP, and
+  P=BQP a given result actually bears on is exactly what separates a
+  checkable claim from an impressive-sounding one.
+</InsightBlock>
+
 Complexity theory can look like classification for its own sake —
 sorting problems into labeled boxes — but its actual job is supplying
 the only language precise enough to say what "quantum computers are
@@ -319,37 +327,23 @@ that something sounds too good to be true.
 **Claim under evaluation:** "Shor's algorithm proves quantum computers
 are fundamentally more powerful than classical computers."
 
-**Step 1 — What does Shor's algorithm actually establish?** A
-polynomial-size quantum circuit family decides integer factoring with
-bounded error: factoring $\in\mathsf{BQP}$. This part is an
-unconditional, proven fact.
-
-**Step 2 — Does this alone imply $\mathsf{P}\neq\mathsf{BQP}$?** Only
-if factoring $\notin\mathsf{P}$. Is that proven? No — it's the RSA
-security conjecture, unproven.
-
-**Step 3 — Does it at least imply $\mathsf{NP}\not\subseteq\mathsf{BQP}$
-is resolved, or that $\mathsf{NP}\subseteq\mathsf{BQP}$ is resolved?**
-Neither. Factoring is not known to be $\mathsf{NP}$-complete (it's in
-$\mathsf{NP}\cap\mathsf{coNP}$), so a result about factoring — even an
-unconditional one — doesn't transfer to $\mathsf{NP}$-complete problems
-in general.
-
-**Step 4 — So what is the precise, defensible conclusion?** *Conditional*
-on the widely-believed, unproven assumption that factoring has no
-classical polynomial algorithm, Shor's algorithm exhibits a specific
-problem separating $\mathsf{P}$ from $\mathsf{BQP}$. *Unconditionally*,
-all that's proven is that factoring is in $\mathsf{BQP}$ and that
-finding a classical polynomial algorithm for it has resisted decades of
-effort.
-
-**Step 5 — Restate the original claim precisely.** "Shor's algorithm
-proves quantum computers are fundamentally more powerful" should become:
-"Shor's algorithm gives strong conditional evidence — conditional on an
-assumption nobody has proven but which underlies real cryptographic
-infrastructure — that quantum computers are more powerful than
-classical ones for at least this one specific, practically important
-problem." Longer, and correct.
+<DerivationSteps>
+<DerivationStep annotation="Shor's algorithm gives a polynomial-size quantum circuit family that decides integer factoring with bounded error. This half is a proven theorem, not a conjecture.">
+What does Shor's algorithm actually establish? Factoring $\in\mathsf{BQP}$ — unconditionally.
+</DerivationStep>
+<DerivationStep annotation="A separation P ≠ BQP would additionally require factoring ∉ P — and that is exactly the unproven RSA security conjecture, not a theorem.">
+Does this alone imply $\mathsf{P}\neq\mathsf{BQP}$? Only if factoring $\notin\mathsf{P}$, which is not proven.
+</DerivationStep>
+<DerivationStep annotation="Factoring sits in NP ∩ coNP, not known to be NP-complete, so any result about it — even an unconditional one — does not transfer to NP-complete problems in general.">
+Does it resolve $\mathsf{NP}\subseteq\mathsf{BQP}$ or $\mathsf{BQP}\subseteq\mathsf{NP}$? Neither.
+</DerivationStep>
+<DerivationStep annotation="Separate the conditional claim (real, and strong) from the unconditional one (real, but weaker) instead of collapsing them into one.">
+The precise conclusion: *conditional* on factoring's classical hardness, Shor's algorithm separates $\mathsf{P}$ from $\mathsf{BQP}$; *unconditionally*, only factoring $\in\mathsf{BQP}$ plus decades of failed classical attempts is proven.
+</DerivationStep>
+<DerivationStep annotation="Longer, and correct — exactly the habit of precision this course's Research Methods material trains as a general skill.">
+Restated claim: Shor's algorithm gives strong conditional evidence — resting on an assumption nobody has proven but real cryptographic infrastructure depends on — that quantum computers are more powerful than classical ones for at least this one specific, practically important problem.
+</DerivationStep>
+</DerivationSteps>
 
 ## Common Mistakes
 
@@ -415,7 +409,9 @@ proof that it's false in the unrestricted, non-black-box setting.
 
 ## Further Exploration
 
-Next: [QMA and Quantum Verification](/lessons/apex/quantum-complexity-theory/qma-and-quantum-verification),
-which takes on open question (2) directly — building the class where a
-*quantum* certificate, not a classical one, is what a poly-time verifier
-checks, and asking exactly how that changes what's provable.
+<NextDiscovery>
+  Next: [QMA and Quantum Verification](/lessons/apex/quantum-complexity-theory/qma-and-quantum-verification)
+  takes on open question (2) directly — building the class where a
+  *quantum* certificate, not a classical one, is what a poly-time verifier
+  checks, and asking exactly how that changes what's provable.
+</NextDiscovery>

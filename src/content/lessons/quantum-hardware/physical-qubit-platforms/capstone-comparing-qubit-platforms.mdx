@@ -61,6 +61,10 @@ export const lessonMeta = {
   ],
 };
 
+<Question>
+Five separate lessons each made one platform's physics feel like the obvious choice, in isolation. Read side by side, does any of them actually dominate?
+</Question>
+
 ## Motivation
 
 Five separate lessons each made one platform's physics feel like the
@@ -70,10 +74,16 @@ qubits each trade something real for something else. This capstone adds
 no new physics. It puts all five in the same room, which is where the
 actual engineering decision-making happens in practice.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/9/91/IBM_Quantum_System_One.jpg"
   alt="IBM Quantum System One, a full quantum computing system, showing the golden dilution-refrigerator cryostat casing suspended in its glass-walled enclosure"
   caption="What five chapters of qubit physics have left out until now: the classical machine built around the chip. This particular system houses superconducting transmons, but every platform in this table needs its own version of this same infrastructure, cryogenics or vacuum optics, wiring, and control electronics, which is exactly where the Control & Readout course picks up."
+  pins={[
+    { id: "shell", x: 50, y: 8, label: "The outer vacuum shell enclosing the whole cryostat." },
+    { id: "braid", x: 28, y: 33, label: "Copper braided thermal straps, anchoring each stage to the one above it." },
+    { id: "stages", x: 30, y: 50, label: "Gold-plated stages, each colder than the last — the cryogenics this lesson's table folds into one word." },
+    { id: "wiring", x: 75, y: 70, label: "Coiled signal wiring, carrying control and readout lines down toward the chip." },
+  ]}
   credit="Onri Jay Benally / IBM"
   creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
   license="CC BY 4.0"
@@ -318,13 +328,13 @@ resource for this specific priority.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Looking for a single "best" platform.** This lesson's comparison table
 has no row that wins on every column. The right platform depends on
 which axis a specific application actually needs most.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating these numbers as fixed, permanent specifications.** Every
 platform's numbers have improved substantially over time and continue
 to; this table describes representative *orders of magnitude* and
@@ -361,6 +371,7 @@ qualitative tradeoffs, not a snapshot to memorize as timeless fact.
 
 ## Further Exploration
 
+<NextDiscovery>
 None of these five platforms has appeared, in this course, as anything
 more than the physics inside a vacuum chamber or a cryostat. **Control &
 Readout** is where that changes: cryogenics, control electronics, and
@@ -368,3 +379,4 @@ calibration, the classical engineering that actually drives and reads
 out the qubits described here, one layer deeper into whichever platform
 a reader is most drawn to. **Physical Qubit Platforms** closes on that
 note.
+</NextDiscovery>

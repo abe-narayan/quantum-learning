@@ -35,6 +35,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  A list of stock prices, a musical chord, and a quantum state have
+  nothing in common — except that you can add two of them and scale one
+  by a number. That's all it takes to be a vector.
+</LessonHook>
+
 ## Motivation
 
 An arrow in 3D space is a vector. So is a list of stock prices, a
@@ -144,9 +150,17 @@ $e_2'=(-\sin\theta,\cos\theta)$. A vector with standard coordinates
 $(x,y)$ has new coordinates $(x',y')$ found by solving
 $x e_1+y e_2 = x'e_1'+y'e_2'$ for $x',y'$, which works out to:
 
+<EquationReveal
+  terms={[
+    { id: "prime", symbol: "(x′, y′)", gloss: "The same vector's coordinates in the rotated basis {e1′, e2′} — a description, not a new vector." },
+    { id: "matrix", symbol: "rotation matrix", gloss: "Built entirely from θ, the angle between the two bases — this is where the change of description comes from." },
+    { id: "xy", symbol: "(x, y)", gloss: "The vector's coordinates in the original standard basis {e1, e2}." },
+  ]}
+>
 $$
 \begin{pmatrix}x'\\y'\end{pmatrix} = \begin{pmatrix}\cos\theta&\sin\theta\\-\sin\theta&\cos\theta\end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix}
 $$
+</EquationReveal>
 
 The vector itself hasn't moved. Only its *description* changed, because
 you changed the ruler you're measuring it against. This distinction,
@@ -225,13 +239,13 @@ exactly $3=\dim\mathbb{C}^3$ vectors, it's a basis.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing "spans the space" with "is a basis."** A spanning set can have
 *extra*, redundant vectors; a basis is the special case where there's no
 redundancy left to remove.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Checking independence over the wrong field.** $(1,0)$ and $(i,0)$ are
 dependent over $\mathbb{C}$ but would be treated as unrelated if you
 carelessly reasoned about them the way you would two real vectors that
@@ -272,6 +286,14 @@ problem is asking for.
 
 ## Further Exploration
 
-Next: [Inner Products and Orthogonality](/lessons/quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality), which adds the missing
-geometric structure (length and angle) that a bare vector space doesn't
-have on its own.
+<ChallengePrompt prompt="What is dim_ℂ(ℂ³) and dim_ℝ(ℂ³)? Then, applying the same two subtractions used for the qubit/Bloch-sphere count above (normalization, then overall phase), how many real parameters does a qutrit's (3-level system) physical state space have?">
+  Same recipe as the Bloch-sphere count: start from the real dimension,
+  subtract 1 for normalization, subtract 1 more for the phase that
+  carries no physical information.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Inner Products and Orthogonality](/lessons/quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality),
+  which adds the missing geometric structure (length and angle) that a
+  bare vector space doesn't have on its own.
+</NextDiscovery>

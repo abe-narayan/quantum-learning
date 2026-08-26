@@ -10,7 +10,7 @@ export const linearSystemsPolynomialDegreeForTargetEpsilon: NumericProblem = {
     title: "Polynomial Degree for a Target Inversion Accuracy",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["quantum-linear-systems", "qsvt", "condition-number", "hhl"],

@@ -24,11 +24,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Deutsch-Jozsa needs exactly one query, ever, no matter how large the problem grows. Grover needs roughly √N queries where a classical computer needs N. Both get called "quantum speedup." They're not the same kind.
+</LessonHook>
+
+<Question>
+Deutsch-Jozsa needs exactly one query, ever. Grover needs roughly √N where a classical computer needs N. Both get called "quantum speedup" — but are they the same kind of advantage, or something fundamentally different from each other?
+</Question>
+
 ## Motivation
 
-Deutsch-Jozsa needs exactly one query, ever, no matter how large the
-problem grows. Grover needs roughly $\sqrt N$ queries where a classical
-computer needs $N$. Both get called "quantum speedup." Are they the same
+Are they the same
 kind of advantage at different sizes, or something more fundamentally
 different from each other?
 
@@ -46,6 +52,10 @@ computers win."
   creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
   license="CC BY 3.0"
 />
+
+<HistoricalMoment date="2019">
+Google's 53-qubit Sycamore processor is used for the quantum supremacy claim: a specific task, on specific hardware, not a blanket claim that quantum computers are simply faster.
+</HistoricalMoment>
 
 ## Mathematical Development
 
@@ -209,7 +219,7 @@ provably optimal) and false in general: most problems have no known
 quantum speedup at all.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Equating query complexity with real-world speed.** Both results count
 oracle calls, not wall-clock time. A real speedup additionally requires an
 efficient way to actually build the oracle for the problem you care about:
@@ -249,6 +259,7 @@ sidestepped by construction.
 
 ## Further Exploration
 
+<NextDiscovery>
 Every algorithm ahead inherits the opening question, not the answer:
 faster at what, compared to what, under which assumptions. Shor's
 algorithm is the nearest test case. Its exponential speedup comes from a
@@ -263,3 +274,4 @@ starting over: Shor's algorithm applies phase estimation to period
 finding, and the variational algorithms, VQE and QAOA, introduce a
 fundamentally different, classically-assisted approach to quantum
 computation.
+</NextDiscovery>

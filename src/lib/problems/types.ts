@@ -8,11 +8,34 @@
  * `progress/types.ts` and each component's own React state are for.
  */
 
+import type { Difficulty } from "@/lib/content/types";
+
 /** Deliberately its own small vocabulary rather than reusing the site's
- * `Difficulty` ("foundational" | "intermediate" | "advanced"): problems are
- * individual exercises, not multi-hour courses, and "beginner" reads more
- * naturally at that grain than "foundational". */
-export type ProblemDifficulty = "beginner" | "intermediate" | "advanced";
+ * `Difficulty` type directly: problems are individual exercises, not
+ * multi-hour courses, and "beginner" reads more naturally at that grain than
+ * "foundational". Structurally it is the same four rungs as `Difficulty`
+ * though (see `PROBLEM_TO_DIFFICULTY` below), so the two are never rendered
+ * as differently-shaped ladders — see docs/UX_REVIEW.md P0-3. */
+export type ProblemDifficulty = "beginner" | "intermediate" | "advanced" | "master";
+
+/**
+ * The one place `ProblemDifficulty` is translated onto the curriculum's
+ * `Difficulty` — every renderer of problem difficulty (the tick ladder in
+ * `ProblemMetaMarks`, `structuredData.ts`'s JSON-LD) goes through this so a
+ * reader is never shown a three-tick ladder next to a four-tick one for the
+ * same idea. A straight 1:1 structural mapping, not a re-leveling: "beginner"
+ * stays the authored word (it's more natural at single-problem grain) but
+ * occupies the same rung, and reads as "Foundational" on screen like every
+ * other rung-one item on the site once passed through
+ * `DIFFICULTY_LABEL`. Lives here (rather than in a `components/` file)
+ * because `structuredData.ts`, a `lib/` module, needs it too.
+ */
+export const PROBLEM_TO_DIFFICULTY: Record<ProblemDifficulty, Difficulty> = {
+  beginner: "foundational",
+  intermediate: "intermediate",
+  advanced: "advanced",
+  master: "master",
+};
 
 /**
  * The set of problem types implemented so far. This is intentionally a

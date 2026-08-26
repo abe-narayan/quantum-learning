@@ -5,13 +5,22 @@ import { cn } from "@/lib/utils";
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
+// `rounded-full` (the previous shape) reads as a soft SaaS pill — the exact
+// generic look the instrument language avoids. A tight, near-rectangular
+// radius (the same `--radius-tight` every small control in the chrome now
+// uses) reads instead as a mechanical switch: precise corners, not a chip.
 const BASE_CLASSES =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-[color,background-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-[var(--radius-tight)] font-medium transition-[color,background-color,border-color,transform] duration-[--dur-fast] ease-[--ease-instrument] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: "bg-brand text-brand-foreground hover:opacity-90",
-  secondary: "border border-border bg-surface text-foreground hover:bg-surface-muted",
-  ghost: "text-foreground hover:bg-surface-muted",
+  // The inset highlight is the same "machined face catching light" move as
+  // `.panel` in globals.css (a top highlight via inset box-shadow), scaled
+  // down for a control this size — it's what keeps a flat brand-fill button
+  // from reading as a plain colored rectangle.
+  primary:
+    "border border-transparent bg-brand text-brand-foreground shadow-[inset_0_1px_0_color-mix(in_srgb,white_22%,transparent)] hover:opacity-90",
+  secondary: "border border-border-strong bg-surface text-foreground hover:border-pillar-edge hover:bg-surface-muted",
+  ghost: "border border-transparent text-foreground hover:border-border hover:bg-surface-muted",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

@@ -71,6 +71,12 @@ any dimension, and adds a general argument for why entanglement is
 unavoidable rather than a special feature of two-qubit systems.
 </Callout>
 
+<LessonHook eyebrow="Why this matters">
+  Entanglement isn't a delicate, rare effect physicists engineer with
+  difficulty. A pure dimension count shows it's the *generic* state of
+  any combined system — product states are the special case.
+</LessonHook>
+
 ## Motivation
 
 Two separate physical systems, two electrons, two qubits, a particle and
@@ -188,7 +194,16 @@ the whole space**, and a generic vector in $V\otimes W$ *cannot* be
 written as $|u\rangle\otimes|v\rangle$ for any single choice of $u,v$.
 That failure to factor is exactly what **entanglement** is: not a strange
 exception, but the mathematically generic situation, with product states
-as the special, measure-zero case. If you've seen the Bell state
+as the special, measure-zero case.
+
+<InsightBlock>
+  Entanglement isn't a fragile add-on quantum mechanics acquires under
+  special circumstances. Dimension counting alone shows it's what *most*
+  vectors in a composite space are — a product state is the exception
+  that requires a special coincidence, not the rule.
+</InsightBlock>
+
+If you've seen the Bell state
 $\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ proven non-factorizable by
 direct contradiction in the Quantum Computing track, this dimension count
 is the structural reason that kind of proof was always going to succeed:
@@ -249,7 +264,7 @@ simple product.** As just shown, most aren't; that's the entire content
 of entanglement.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Getting the Kronecker ordering backwards.** This course (matching the
 Quantum Computing track's convention) always lists the first system's
 index as the more significant one: all of the first system's
@@ -283,7 +298,14 @@ system's index $1$, and so on.
 
 ## Further Exploration
 
-Next: [Probability and Quantum States](/lessons/quantum-mechanics/mathematical-foundations/probability-and-quantum-states), which assembles every tool from
-this course, unit vectors, Hermitian observables, eigenvalues, the
-bra-ket formalism, into the actual postulates connecting the mathematics
-to physical predictions.
+<ChallengePrompt prompt="Is 0.6|00⟩+0.8|11⟩ (unequal-magnitude coefficients, unlike the worked example's equal 1/√2 split) a simple tensor? And in the limit where one coefficient shrinks to 0, does the answer change?">
+  Same coefficient-matching method as the worked example. For the limit,
+  think about what state is left over once one term vanishes entirely.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Probability and Quantum States](/lessons/quantum-mechanics/mathematical-foundations/probability-and-quantum-states), which assembles every tool from
+  this course, unit vectors, Hermitian observables, eigenvalues, the
+  bra-ket formalism, into the actual postulates connecting the mathematics
+  to physical predictions.
+</NextDiscovery>

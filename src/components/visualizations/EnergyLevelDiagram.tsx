@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { easeInOutCubic } from "@/components/simulators/bloch-sphere/useAnimatedBlochPoint";
 
 export type EnergyLevel = {
@@ -17,6 +17,10 @@ const PAD_BOTTOM = 28;
 const LABEL_X = LEVEL_WIDTH + 14;
 /** One full from->to->from cycle of the traveling transition dot. */
 const TRANSITION_PERIOD_MS = 1400;
+/** Cycles before the dot settles rather than ping-ponging forever — "brief,
+ *  not a loop," the same framing `TunnelingIntroVisual`'s autoplay uses:
+ *  nothing should animate indefinitely next to body text. */
+const MAX_TRANSITION_CYCLES = 3;
 /** Gap (px) below which two labels are considered visually colliding. */
 const LABEL_COLLISION_PX = 9;
 /** Spacing (px) enforced between labels once they're identified as a cluster. */
@@ -147,9 +151,18 @@ export function EnergyLevelDiagram({
     }
 
     const start = performance.now();
+    const totalDurationMs = TRANSITION_PERIOD_MS * MAX_TRANSITION_CYCLES;
     const frame = (now: number) => {
-      const elapsed = (now - start) % TRANSITION_PERIOD_MS;
-      const phase = (elapsed / TRANSITION_PERIOD_MS) * 2;
+      const elapsed = now - start;
+      if (elapsed >= totalDurationMs) {
+        // Settle at `to` — the transition has visibly completed — instead of
+        // ping-ponging forever beside the lesson's prose.
+        setDotT(1);
+        rafRef.current = null;
+        return;
+      }
+      const cycleElapsed = elapsed % TRANSITION_PERIOD_MS;
+      const phase = (cycleElapsed / TRANSITION_PERIOD_MS) * 2;
       const linear = phase <= 1 ? phase : 2 - phase;
       setDotT(easeInOutCubic(linear));
       rafRef.current = requestAnimationFrame(frame);
@@ -167,7 +180,7 @@ export function EnergyLevelDiagram({
   const dotY = from && to ? yOf(from.energy) + (yOf(to.energy) - yOf(from.energy)) * dotT : undefined;
 
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label={ariaLabel}>
         {levels.map((level, i) => {
           const y = yOf(level.energy);

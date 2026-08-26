@@ -14,7 +14,7 @@ export const amplitudeEstimationGroverIterateProbability: NumericProblem = {
     title: "Grover-Iterate Success Probability for θ=π/12, m=2",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["amplitude-estimation", "grover-iterate", "closed-form"],

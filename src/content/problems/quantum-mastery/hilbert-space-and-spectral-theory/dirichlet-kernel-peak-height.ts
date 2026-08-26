@@ -10,7 +10,7 @@ export const dirichletKernelPeakHeight: NumericProblem = {
     title: "How Tall Is the Delta-Sequence's Peak?",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["rigged-hilbert-space", "delta-function", "fourier"],

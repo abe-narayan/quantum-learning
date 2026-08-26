@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { sphericalHarmonic, type SphericalHarmonicIndex } from "@/lib/quantum/sphericalHarmonics";
-import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { easeInOutCubic } from "@/components/simulators/bloch-sphere/useAnimatedBlochPoint";
 
 const SUPPORTED: SphericalHarmonicIndex[] = [
@@ -150,7 +150,7 @@ export function OrbitalShapePlot({ ariaLabel }: { ariaLabel: string }) {
   const pathData = useMemo(() => pathFromRadii(displayRadii), [displayRadii]);
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={VIEW} height={VIEW} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img" aria-label={ariaLabel}>
           <line x1={CENTER} y1={10} x2={CENTER} y2={VIEW - 10} className="stroke-border" strokeWidth={1} strokeDasharray="2 3" />

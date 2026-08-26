@@ -51,6 +51,22 @@ export type CurrentQuantumEntry = {
   difficulty?: Difficulty;
   /** Optional — a genuinely reusable real image, rendered via `ExternalFigure`. */
   imageUrl?: string;
+  /**
+   * Alt text describing what the image itself actually shows (a person,
+   * apparatus, chip, etc.) — required alongside `imageUrl`. Deliberately a
+   * separate field from `title`: the card used to pass `entry.title` as the
+   * `<img alt>`, which describes the news event, not the picture, and is
+   * wrong for a screen reader announcing the image itself.
+   */
+  imageAlt?: string;
+  /**
+   * One sentence, rendered as the figure caption, saying what the image
+   * actually depicts and how (or whether) it relates to this entry — e.g.
+   * naming the real device/person shown and being explicit when it's a
+   * general/illustrative match rather than a photo of the specific
+   * experiment. Never a restatement of `title`.
+   */
+  imageCaption?: string;
   imageAttribution?: {
     credit: string;
     creditUrl?: string;

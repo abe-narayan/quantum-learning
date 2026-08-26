@@ -32,6 +32,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Two separate surface-code patches have no natural transversal two-qubit
+  gate between them — every logical two-qubit gate a real surface-code
+  architecture uses instead is built entirely from local stabilizer
+  measurements along a shared boundary.
+</LessonHook>
+
 ## Motivation
 
 The fastest route to a fault-tolerant logical gate is a **transversal**
@@ -131,15 +138,17 @@ rectangular patch with **one** pair of logical operators left over:
   $L_2$—i.e. $Z_L^{\text{merged}} = Z_{L_1}Z_{L_2}$, up to the
   stabilizer group.
 
-So the very act of measuring the new seam stabilizers **is** a
-projective measurement of $Z_{L_1}Z_{L_2}$: its outcome is the product
-of the two eigenvalues the merge just fixed, while each patch's
-*individual* $Z_{L_1}$ and $Z_{L_2}$ eigenvalues are generically
-disturbed (exactly as measuring $Z\otimes Z$ on two ordinary qubits
-fixes their product without leaving either qubit's own $Z$
-well-defined). Bringing two patches into contact and turning on new
-local checks along the seam is nothing but ordinary syndrome extraction,
-run once across a boundary instead of inside a single patch.
+<InsightBlock>
+  The very act of measuring the new seam stabilizers is a projective
+  measurement of $Z_{L_1}Z_{L_2}$: its outcome is the product of the two
+  eigenvalues the merge just fixed, while each patch's individual
+  $Z_{L_1}$ and $Z_{L_2}$ eigenvalues are generically disturbed — exactly
+  as measuring $Z\otimes Z$ on two ordinary qubits fixes their product
+  without leaving either qubit's own $Z$ well-defined. Bringing two
+  patches into contact and turning on new local checks along the seam is
+  nothing but ordinary syndrome extraction, run once across a boundary
+  instead of inside a single patch.
+</InsightBlock>
 
 ### SPLIT: reintroducing the individual boundary
 
@@ -166,18 +175,27 @@ measurements and a disposable ancilla patch $A$, structurally identical
 to Rigorous Teleportation and Superdense Coding's gate-teleportation
 gadget one level up:
 
-1. Prepare ancilla $A$ in $|+\rangle_L$ (an $X_A=+1$ eigenstate).
-2. Merge $C$ and $A$ along their smooth boundaries, measuring
-   $Z_CZ_A$ (outcome $m_1$), then split them apart again.
-3. Merge $A$ and $T$ along their rough boundaries, measuring
-   $X_AX_T$ (outcome $m_2$), then split them apart again.
-4. Measure $A$ directly, in the $X$ basis (a single-patch logical
-   measurement, no further merge needed), outcome $m_3$.
-5. Apply a Pauli correction to $C$ and $T$—some deterministic
-   function of $(m_1,m_2,m_3)$, worked out by propagating the three
-   measurement outcomes through the circuit exactly the way
-   teleportation's $X^{m_1}Z^{m_0}$ table was derived, just from three
-   classical bits instead of two.
+<DerivationSteps>
+  <DerivationStep annotation="The ancilla needs a definite X-value to later carry the control patch's information through the X-basis merge in step 3.">
+    Prepare ancilla $A$ in $|+\rangle_L$ (an $X_A=+1$ eigenstate).
+  </DerivationStep>
+  <DerivationStep annotation="A ZZ merge is exactly the local stabilizer-measurement mechanism the Mathematical Development section already justified — here applied between the control patch and the ancilla.">
+    Merge $C$ and $A$ along their smooth boundaries, measuring
+    $Z_CZ_A$ (outcome $m_1$), then split them apart again.
+  </DerivationStep>
+  <DerivationStep annotation="An XX merge along the rough boundary is the same mechanism with the complementary stabilizer type, now coupling the ancilla to the target.">
+    Merge $A$ and $T$ along their rough boundaries, measuring
+    $X_AX_T$ (outcome $m_2$), then split them apart again.
+  </DerivationStep>
+  <DerivationStep annotation="No further merge is needed — a single-patch logical measurement reads out the ancilla directly, exactly like the final measurement in ordinary qubit teleportation.">
+    Measure $A$ directly, in the $X$ basis (a single-patch logical
+    measurement, no further merge needed), outcome $m_3$.
+  </DerivationStep>
+  <DerivationStep annotation="Propagating the three measurement outcomes through the circuit gives a deterministic correction, the same way teleportation's X^m1 Z^m0 table was derived, just from three classical bits instead of two.">
+    Apply a Pauli correction to $C$ and $T$—some deterministic
+    function of $(m_1,m_2,m_3)$.
+  </DerivationStep>
+</DerivationSteps>
 
 After the correction, $(C,T)$ carries $\text{CNOT}_{C\to T}$ applied to
 whatever states they held going in, and $A$ is fully consumed. Every
@@ -191,6 +209,13 @@ implementation, now running on entire code patches rather than bare
 qubits.
 
 ## Physical Interpretation
+
+<InsightBlock>
+  Lattice surgery turns "how do two logical qubits interact" and "how
+  does the code detect an error" into the same hardware primitive — a
+  joint stabilizer measurement along a shared boundary — so a real
+  two-qubit gate needs no new mechanism at all.
+</InsightBlock>
 
 Lattice surgery is not a theoretical curiosity standing in for
 something better—it is the real, dominant mechanism essentially
@@ -247,73 +272,16 @@ the smallest case that shows it.
 
 ## Visualizing Merge and Split
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
-  <svg width={780} height={320} viewBox="0 0 780 320" className="w-full" role="img" aria-label="Three panels showing lattice surgery on two small surface-code patches, each a single face with vertices on its four corners and qubits on its four edges. Left panel, before merge: patch L1 and patch L2 separated by a physical gap, each with its own smooth boundary facing the other, and each showing its own horizontal logical Z string. Middle panel, during merge: two new bridge qubits fill the gap, a highlighted loop shows the seam vertex stabilizer now extended onto the bridge qubit, and a single continuous logical Z string spans both patches, representing the product Z L1 Z L2. Right panel, after split: the gap and separate logical Z strings are restored, with the bridge qubits removed, showing two independent logical qubits again.">
-    <text x={130} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">Before: two independent patches</text>
-    <text x={385} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">During: joint Z stabilizers measured</text>
-    <text x={655} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">After: split apart again</text>
-
-    <g>
-      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
-      <rect x={140} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
-      <line x1={100} y1={100} x2={100} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
-      <line x1={140} y1={100} x2={140} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
-      {[[40,90],[100,90],[40,210],[100,210],[140,90],[200,90],[140,210],[200,210]].map(([cx,cy]) => (
-        <circle key={`v1-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
-      ))}
-      {[[70,90],[70,210],[40,150],[170,90],[170,210],[200,150]].map(([qx,qy]) => (
-        <rect key={`q1-${qx}-${qy}`} x={qx-7} y={qy-7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
-      ))}
-      <rect x={93} y={143} width={14} height={14} rx={3} className="fill-brand/20 stroke-brand" strokeWidth={1.5} />
-      <rect x={133} y={143} width={14} height={14} rx={3} className="fill-brand/20 stroke-brand" strokeWidth={1.5} />
-      <line x1={40} y1={150} x2={100} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
-      <line x1={140} y1={150} x2={200} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
-      <text x={70} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L1</text>
-      <text x={170} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L2</text>
-      <text x={120} y={255} textAnchor="middle" className="fill-accent text-[9px] font-medium">smooth boundaries face each other</text>
-      <text x={120} y={272} textAnchor="middle" className="fill-muted-foreground text-[9px]">gap: no shared stabilizers</text>
-    </g>
-
-    <g transform="translate(260,0)">
-      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
-      <rect x={140} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
-      {[[40,90],[100,90],[40,210],[100,210],[140,90],[200,90],[140,210],[200,210]].map(([cx,cy]) => (
-        <circle key={`v2-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
-      ))}
-      {[[70,90],[70,210],[40,150],[170,90],[170,210],[200,150]].map(([qx,qy]) => (
-        <rect key={`q2-${qx}-${qy}`} x={qx-7} y={qy-7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
-      ))}
-      <rect x={113} y={83} width={14} height={14} rx={3} className="fill-brand/70 stroke-brand" strokeWidth={1.5} />
-      <rect x={113} y={203} width={14} height={14} rx={3} className="fill-brand/70 stroke-brand" strokeWidth={1.5} />
-      <rect x={60} y={78} width={72} height={30} rx={6} className="fill-brand/15 stroke-brand" strokeWidth={2} />
-      <line x1={40} y1={150} x2={200} y2={150} className="stroke-brand" strokeWidth={2.5} strokeDasharray="6 3" />
-      <text x={120} y={238} textAnchor="middle" className="fill-brand text-[9.5px] font-medium">Z_L(merged) = Z_L1 . Z_L2</text>
-      <text x={120} y={64} textAnchor="middle" className="fill-brand text-[9px] font-medium">seam vertex gains the bridge qubit</text>
-      <text x={120} y={272} textAnchor="middle" className="fill-muted-foreground text-[9px]">1 logical qubit, 1 code space</text>
-    </g>
-
-    <g transform="translate(520,0)">
-      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
-      <rect x={140} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
-      <line x1={100} y1={100} x2={100} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
-      <line x1={140} y1={100} x2={140} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
-      {[[40,90],[100,90],[40,210],[100,210],[140,90],[200,90],[140,210],[200,210]].map(([cx,cy]) => (
-        <circle key={`v3-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
-      ))}
-      {[[70,90],[70,210],[40,150],[170,90],[170,210],[200,150]].map(([qx,qy]) => (
-        <rect key={`q3-${qx}-${qy}`} x={qx-7} y={qy-7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
-      ))}
-      <rect x={93} y={143} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} strokeDasharray="3 2" />
-      <rect x={133} y={143} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} strokeDasharray="3 2" />
-      <line x1={40} y1={150} x2={100} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
-      <line x1={140} y1={150} x2={200} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
-      <text x={70} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L1'</text>
-      <text x={170} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">Z_L2'</text>
-      <text x={120} y={255} textAnchor="middle" className="fill-accent text-[9px] font-medium">bridge qubits removed</text>
-      <text x={120} y={272} textAnchor="middle" className="fill-muted-foreground text-[9px]">Z_L1' . Z_L2' = the merge's outcome</text>
-    </g>
-  </svg>
-</div>
+<InteractiveSection
+  title="Step through the merge, live"
+  description="Toggle Before / Merging / After over one shared lattice and watch the bridge qubits and the seam Z string appear and disappear, instead of reading three frozen panels."
+  mode="observe"
+>
+  <SurfaceCodePatchExplorer
+    variant="merge-split"
+    ariaLabel="Two small surface-code patches undergoing lattice surgery, toggling between Before (two independent patches with a physical gap and separate logical Z strings), Merging (bridge qubits fill the gap, the seam vertex stabilizer extends onto them, and a single logical Z string spans both patches), and After (the gap and separate logical Z strings are restored)."
+  />
+</InteractiveSection>
 
 Each small square patch above is drawn at the smallest possible size (a
 single face) purely for legibility; the mechanism—a weight-2
@@ -324,7 +292,7 @@ bulk vertex and face pattern itself.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Thinking single-patch transversal logical operators contradict this
 lesson's claim that transversal gates don't work here.** They don't:
 a single patch's $X_L$/$Z_L$ string is a transversal *single-qubit*
@@ -335,7 +303,7 @@ qubit-by-qubit correspondence (and, away from the shared boundary, are
 not even physically adjacent).
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a merge reveals $Z_{L_1}$ and $Z_{L_2}$ individually.** It
 only ever fixes their *product*, $Z_{L_1}Z_{L_2}$; the Worked Example's
 second case shows this explicitly—the individual patches' $Z$
@@ -388,10 +356,12 @@ ordinary qubits.
 
 ## Further Exploration
 
-Next: [Magic States and Distillation](/lessons/apex/fault-tolerance-frontiers/magic-states-and-distillation),
-which tackles the gate lattice surgery still can't reach—a
-non-Clifford gate like $T$—and the distillation protocol that
-manufactures one fault-tolerantly from many noisy copies.
+<NextDiscovery>
+  Next: [Magic States and Distillation](/lessons/apex/fault-tolerance-frontiers/magic-states-and-distillation)
+  tackles the gate lattice surgery still can't reach—a non-Clifford gate
+  like $T$—and the distillation protocol that manufactures one
+  fault-tolerantly from many noisy copies.
+</NextDiscovery>
 
 The "measure a stabilizer, project onto its eigenspace" idea this
 lesson reused across a patch boundary is the same general machinery

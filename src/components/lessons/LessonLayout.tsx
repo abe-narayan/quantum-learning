@@ -2,26 +2,24 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { COURSES, PILLARS, getCourse } from "@/lib/content/curriculum";
+import { SectionTitle, Lede, TechLabel, Readouts } from "@/components/ui/Typography";
+import { FadeRule } from "@/components/ui/Panel";
+import { PillarScope } from "@/components/field/PillarScope";
+import { COURSES, PILLARS } from "@/lib/content/curriculum";
 import type { Course, LessonMeta, LessonMetaWithSlug } from "@/lib/content/types";
 import { getCourseCheckpointProblems } from "@/lib/problems/registry";
 import { CourseCheckpoint } from "@/components/problems/CourseCheckpoint";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { LessonCompleteToggle } from "./LessonCompleteToggle";
 import { ReadingProgressBar } from "./ReadingProgressBar";
 import { TableOfContentsDesktop, TableOfContentsMobile } from "./TableOfContents";
+import { LessonMetaStrip } from "./LessonMetaStrip";
+import { LessonFooterNav } from "./LessonFooterNav";
 import { RelatedCurrentQuantum } from "@/components/currentQuantum/RelatedCurrentQuantum";
 
 /** `id` of the prose container — shared by the ToC and reading-progress bar
  * so they can each find it via `document.getElementById` after mount. */
 const LESSON_PROSE_ID = "lesson-prose";
-
-const DIFFICULTY_LABEL: Record<LessonMeta["difficulty"], string> = {
-  foundational: "Foundational",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-  master: "Master",
-};
 
 function moduleIndex(course: Course | undefined, moduleSlug: string): number {
   return course?.modules.findIndex((module) => module.slug === moduleSlug) ?? -1;
@@ -109,117 +107,100 @@ export function LessonLayout({
     })
     .filter((entry): entry is { lesson: LessonMetaWithSlug; note: string } => Boolean(entry));
 
+  // Difficulty is rendered separately via `DifficultyMark` (the tick ladder
+  // + label used everywhere else difficulty appears — courses, timeline,
+  // lesson search, problems) rather than as a plain-text item here, so a
+  // reader gets the same at-a-glance instrument before committing to a
+  // lesson that they'd get anywhere else on the site. See docs/UX_REVIEW.md
+  // P0-3.
+  const readoutItems = [
+    ...(course && position >= 0
+      ? [{ label: "Module", value: position + 1, unit: `/ ${totalModules}` }]
+      : []),
+    { label: "Duration", value: meta.estimatedMinutes, unit: "min" },
+  ];
+
   return (
-    <>
+    // Retints accents, focus rings, prose links, equation slabs and the
+    // background field to this lesson's course's pillar — see
+    // docs/DESIGN_SYSTEM.md §2. `course` (and therefore `pillar`) can be
+    // undefined for a lesson with no resolvable course; PillarScope's own
+    // `pillar` prop is optional for exactly this reason, and everything
+    // below reads pillar-tinted tokens that fall back to the default
+    // (brand-family) ramp when no `data-pillar` is set.
+    <PillarScope pillar={course?.pillar}>
       <ReadingProgressBar containerId={LESSON_PROSE_ID} />
-      <Container className="py-16">
-        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/learn" className="hover:text-foreground">
+      <Container className="pb-20 pt-10 sm:pt-14">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Link href="/learn" className="tech-label text-muted-foreground transition-colors hover:text-foreground">
             Learn
           </Link>
           {pillar ? (
             <>
-              <span aria-hidden="true">/</span>
-              <Link href={`/learn#${pillar.slug}`} className="hover:text-foreground">
+              <span aria-hidden="true" data-decorative="" className="tech-label text-subtle-foreground">
+                /
+              </span>
+              <Link
+                href={`/learn#${pillar.slug}`}
+                className="tech-label text-muted-foreground transition-colors hover:text-foreground"
+              >
                 {pillar.title}
               </Link>
             </>
           ) : null}
           {course ? (
             <>
-              <span aria-hidden="true">/</span>
-              <span className="text-foreground">{course.title}</span>
+              <span aria-hidden="true" data-decorative="" className="tech-label text-subtle-foreground">
+                /
+              </span>
+              <span className="tech-label text-pillar-text">{course.title}</span>
             </>
           ) : null}
         </nav>
 
-        {course && position >= 0 ? (
-          <div className="mt-5 max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Lesson {position + 1} of {totalModules}
-            </p>
-            <div className="mt-1.5 h-1 w-full max-w-xs overflow-hidden rounded-full bg-surface-muted">
-              <div className="h-full rounded-full bg-brand" style={{ width: `${progressPercent}%` }} />
-            </div>
-          </div>
-        ) : null}
-
-        <div className="mt-5 max-w-3xl">
-          <div className="flex flex-wrap gap-2">
-            <Badge tone="brand">{DIFFICULTY_LABEL[meta.difficulty]}</Badge>
-            <Badge>{meta.estimatedMinutes} min</Badge>
-          </div>
-          <h1 className="mt-5 font-display text-5xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+        {/* The title moment (see docs/UX_REVIEW.md P2-6). The title used to
+            arrive fourth — after a readouts row and a progress rule — so the
+            biggest, quietest thing on the page was preceded by two chrome
+            blocks instead of leading with it. Title and lede now come
+            immediately after the breadcrumb; the "how hard, how long, how
+            far into the course" instrument strip drops to a single compact
+            row right below the lede instead of gating the title. Nothing
+            here was removed, only reordered and tightened — see
+            LessonMetaStrip.tsx for where the heavier "Lineage" block (the
+            other half of the six-block wall the review flagged) went. */}
+        <div className="mt-6 max-w-3xl">
+          <SectionTitle level={1} size="xl">
             {meta.title}
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground">{meta.description}</p>
+          </SectionTitle>
+          <Lede className="mt-5">{meta.description}</Lede>
 
-          {prerequisites.length > 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground">
-              Prerequisite{prerequisites.length > 1 ? "s" : ""}:{" "}
-              {prerequisites.map((lesson, i) => {
-                const prereqCourse = lesson.course !== meta.course ? getCourse(lesson.course) : undefined;
-                return (
-                  <span key={lesson.slug}>
-                    {i > 0 ? ", " : ""}
-                    <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
-                      {lesson.title}
-                    </Link>
-                    {prereqCourse ? ` (${prereqCourse.title})` : ""}
-                  </span>
-                );
-              })}
-            </p>
-          ) : null}
+          <div className="mt-6 flex flex-wrap items-center gap-x-10 gap-y-4">
+            <DifficultyMark difficulty={meta.difficulty} />
+            <Readouts items={readoutItems} />
+          </div>
 
-          {resurfacesIn.length > 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground">
-              This concept resurfaces in:{" "}
-              {resurfacesIn.map((lesson, i) => {
-                const resurfaceCourse = getCourse(lesson.course);
-                const resurfacePillar = resurfaceCourse
-                  ? PILLARS.find((p) => p.slug === resurfaceCourse.pillar)
-                  : undefined;
-                return (
-                  <span key={lesson.slug}>
-                    {i > 0 ? ", " : ""}
-                    <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
-                      {lesson.title}
-                    </Link>
-                    {resurfacePillar ? ` (${resurfacePillar.title})` : ""}
-                  </span>
-                );
-              })}
-            </p>
-          ) : null}
-
-          {relatedElsewhere.length > 0 ? (
-            <div className="mt-6 rounded-2xl border border-border bg-surface-muted/60 p-5">
-              <p className="text-sm font-semibold text-foreground">Related elsewhere</p>
-              <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
-                {relatedElsewhere.map(({ lesson, note }) => (
-                  <li key={lesson.slug}>
-                    <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
-                      {lesson.title}
-                    </Link>
-                    {" — "}
-                    {note}
-                  </li>
-                ))}
-              </ul>
+          {course && position >= 0 ? (
+            <div
+              className="mt-3 h-px w-full max-w-[14rem] overflow-hidden rounded-full bg-surface-muted"
+              role="presentation"
+            >
+              <div className="h-full bg-pillar" style={{ width: `${progressPercent}%` }} />
             </div>
           ) : null}
 
           {meta.objectives.length > 0 ? (
-            <div className="mt-6 rounded-2xl border border-border bg-surface-muted/60 p-5">
-              <p className="text-sm font-semibold text-foreground">
-                By the end of this lesson, you&rsquo;ll be able to:
-              </p>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                {meta.objectives.map((objective) => (
-                  <li key={objective}>{objective}</li>
+            <div className="mt-7 border-l-2 border-pillar-edge pl-5">
+              <TechLabel>Objectives</TechLabel>
+              <ol className="mt-3 space-y-2.5">
+                {meta.objectives.map((objective, i) => (
+                  <li key={objective} className="flex gap-3 text-sm leading-relaxed text-foreground/90 sm:text-[0.95rem]">
+                    <span className="tech-value shrink-0 pt-px text-xs text-pillar-text">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span>{objective}</span>
+                  </li>
                 ))}
-              </ul>
+              </ol>
             </div>
           ) : null}
         </div>
@@ -234,17 +215,18 @@ export function LessonLayout({
           <div
             id={LESSON_PROSE_ID}
             className={cn(
-              // Dark-mode prose colors come from globals.css's `.prose`
-              // overrides inside the `[data-theme="dark"]` / dark-media
-              // blocks, not Tailwind's `dark:` variant: this app's dark mode
-              // is driven by the `data-theme` attribute (ThemeToggle), and
-              // Tailwind v4's `dark:` defaults to `@media
-              // (prefers-color-scheme: dark)` with no `@custom-variant dark`
-              // redefinition anywhere in this repo. `dark:prose-invert` here
-              // would only track the OS preference — invisible-on-toggle in
-              // the "explicit dark, OS light" case, and wrongly inverted in
-              // the "explicit light, OS dark" case. See globals.css.
-              "prose prose-neutral max-w-3xl prose-a:text-brand",
+              // Prose colors are theme-switched entirely in globals.css, not
+              // via Tailwind's `dark:` variant. The site is dark-first, so
+              // the bare `.prose` block there IS the dark ramp and the
+              // *light* values live under `[data-theme="light"]` /
+              // `prefers-color-scheme: light`. Either direction, `dark:` is
+              // the wrong tool: this app's theme is driven by the
+              // `data-theme` attribute (ThemeToggle), while Tailwind v4's
+              // `dark:` defaults to `@media (prefers-color-scheme: dark)`
+              // with no `@custom-variant dark` redefinition anywhere in this
+              // repo — so it would only ever track the OS preference and
+              // invert wrongly whenever an explicit choice disagrees with it.
+              "prose prose-neutral max-w-3xl prose-a:text-pillar-text",
               // h2 = section-moment: display face, real weight/spacing, the
               // biggest thing in the prose body short of the page's own h1.
               "prose-h2:font-display prose-h2:mt-16 prose-h2:mb-4 prose-h2:text-3xl prose-h2:font-semibold prose-h2:tracking-tight",
@@ -263,80 +245,40 @@ export function LessonLayout({
 
         <RelatedCurrentQuantum lessonSlug={slug} />
 
-        <div className="mt-10 max-w-3xl border-t border-border pt-8">
+        {/* Curriculum lineage (prerequisites / resurfaces-in / related
+            elsewhere) moves below the lesson body rather than sitting
+            between the title and the prose — see docs/UX_REVIEW.md P2-6 and
+            the comment in LessonMetaStrip.tsx. It's a collapsed `<details>`,
+            not deleted or hidden: a reader who wants it before starting can
+            still scroll down and open it in one glance at the summary line,
+            but it no longer taxes every reader on every lesson. */}
+        <LessonMetaStrip
+          currentCourseSlug={meta.course}
+          prerequisites={prerequisites}
+          resurfacesIn={resurfacesIn}
+          relatedElsewhere={relatedElsewhere}
+        />
+
+        <FadeRule className="mt-14 max-w-3xl" />
+
+        <div className="mt-10 max-w-3xl">
           <LessonCompleteToggle slug={slug} />
         </div>
 
-        {prevLesson || nextLesson || finishedCourse ? (
-          <nav
-            aria-label="Lesson navigation"
-            className="mt-16 grid max-w-3xl gap-4 border-t border-border pt-8 sm:grid-cols-2"
-          >
-            {prevLesson ? (
-              <Link
-                href={`/lessons/${prevLesson.slug}`}
-                className="group rounded-xl border border-border p-4 transition-colors hover:border-brand/40 hover:bg-surface-muted"
-              >
-                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  ← Previous
-                </span>
-                <p className="mt-1 font-medium text-foreground group-hover:text-brand">{prevLesson.title}</p>
-              </Link>
-            ) : (
-              <div aria-hidden="true" />
-            )}
-            {nextLesson ? (
-              <Link
-                href={`/lessons/${nextLesson.slug}`}
-                className="group rounded-xl border border-border p-4 text-right transition-colors hover:border-brand/40 hover:bg-surface-muted sm:col-start-2"
-              >
-                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Next →
-                </span>
-                <p className="mt-1 font-medium text-foreground group-hover:text-brand">{nextLesson.title}</p>
-              </Link>
-            ) : finishedCourse ? (
-              <div className="rounded-xl border border-border p-4 text-right transition-colors hover:border-brand/40 hover:bg-surface-muted sm:col-start-2">
-                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Next →
-                </span>
-                <p className="mt-1 font-medium text-foreground">You finished {finishedCourse.title}</p>
-                {nextCourseSuggestions.length > 0 ? (
-                  <ul className="mt-2 space-y-1">
-                    {nextCourseSuggestions.map(({ course: suggestedCourse, lesson }) => (
-                      <li key={suggestedCourse.slug}>
-                        <Link
-                          href={`/lessons/${lesson.slug}`}
-                          className="text-sm text-brand hover:underline"
-                        >
-                          Start {suggestedCourse.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-2 text-sm">
-                    <Link
-                      href={pillar ? `/learn#${pillar.slug}` : "/learn"}
-                      className="text-brand hover:underline"
-                    >
-                      Browse more courses
-                    </Link>
-                  </p>
-                )}
-              </div>
-            ) : (
-              <div aria-hidden="true" />
-            )}
-          </nav>
-        ) : null}
+        <LessonFooterNav
+          prevLesson={prevLesson}
+          nextLesson={nextLesson}
+          finishedCourse={finishedCourse}
+          nextCourseSuggestions={nextCourseSuggestions}
+          pillar={pillar}
+        />
 
         {finishedCourse && checkpointProblems.length > 0 ? (
-          <div className="max-w-3xl">
+          <div className="mt-10 max-w-3xl">
             <CourseCheckpoint courseTitle={finishedCourse.title} problems={checkpointProblems} />
           </div>
         ) : null}
       </Container>
-    </>
+    </PillarScope>
   );
 }

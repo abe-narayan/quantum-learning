@@ -6,7 +6,7 @@ export const holevoChiBb84AtP: NumericProblem = {
     title: "The Holevo Quantity for a Non-Orthogonal Ensemble Through Noise",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["holevo-quantity", "classical-capacity", "depolarizing-channel"],

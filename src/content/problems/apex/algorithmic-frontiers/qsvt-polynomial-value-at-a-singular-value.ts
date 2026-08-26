@@ -9,7 +9,7 @@ export const qsvtPolynomialValueAtASingularValue: NumericProblem = {
     title: "Evaluating a QSVT Polynomial at a Singular Value",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/the-quantum-singular-value-transformation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["qsvt", "quantum-signal-processing", "block-encoding"],

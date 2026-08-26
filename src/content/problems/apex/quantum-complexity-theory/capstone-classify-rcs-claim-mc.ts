@@ -6,7 +6,7 @@ export const capstoneClassifyRcsClaimMc: MultipleChoiceProblem = {
     title: "Classifying a Random Circuit Sampling Claim",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/capstone-what-we-know-and-dont",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "multiple-choice",
     tags: ["complexity-theory", "quantum-supremacy", "random-circuit-sampling", "claim-evaluation"],

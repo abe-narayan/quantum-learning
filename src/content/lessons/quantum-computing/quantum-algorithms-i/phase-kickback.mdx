@@ -72,14 +72,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+The last lesson's oracle writes f(x)'s value into a second qubit. That's the honest definition, but every algorithm from here on actually wants f(x)'s value somewhere else entirely: as a phase multiplying |x⟩ directly, with no second qubit needed at all.
+</LessonHook>
+
 ## Motivation
 
-The last lesson's oracle $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$
-writes $f(x)$'s value into a second qubit. That's the *honest* definition,
-but every algorithm from here on actually wants $f(x)$'s value somewhere
-else entirely: as a **phase** multiplying $|x\rangle$ directly, with no
-second qubit needed at all. This lesson derives exactly when and why that
-substitution is legitimate.
+The last lesson's oracle, $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$,
+is the *honest* definition. This lesson derives exactly when and why
+the phase substitution is legitimate.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/32/Double-slit_experiment_results_Tanamura_4.jpg"
@@ -247,7 +248,7 @@ eigenvalue $(-1)^{f(x)}$, and applying an operator to one of its own
 eigenstates never changes the state, only multiplies it by the eigenvalue.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming this trick works for *any* ancilla state, not just $|-\rangle$
 or $|0\rangle$.** Preparing the ancilla in $|0\rangle$ gives the ordinary
 bit-flip oracle from the last lesson; preparing it in, say, $|+\rangle$
@@ -283,7 +284,9 @@ exactly what this derivation needs.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Deutsch-Jozsa Algorithm](/lessons/quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm), the first full algorithm built from
 this trick, determining whether $f$ is constant or balanced with exactly
 one query, where any classical algorithm needs exponentially many in the
 worst case.
+</NextDiscovery>

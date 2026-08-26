@@ -23,6 +23,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Local stabilizers, arbitrarily large grids">
+The Shor code needs 9-qubit-wide stabilizers and no way to improve its distance without a redesign. The surface code fixes both: every stabilizer touches only 4 neighboring qubits, however large the grid grows.
+</LessonHook>
+
 ## Motivation
 
 The Shor code needs 9-qubit-wide stabilizers and offers no way to improve
@@ -218,7 +222,7 @@ scale, not a small-distance one.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming surface codes always use fewer qubits than the Shor code.**
 At small distance, the comparison is roughly even: the surface code's
 real advantage is in how its qubit count and stabilizer structure scale
@@ -226,7 +230,7 @@ to *larger* distances with a repeated, local pattern, not in beating the
 Shor code outright at distance 3.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Believing this platform's flexible any-qubit-to-any-qubit gates reflect
 real hardware.** They don't: this engine's gate functions accept any
 two qubit indices with no notion of physical distance, which is precisely
@@ -268,6 +272,7 @@ purposes.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next, the capstone: [Fault-Tolerant Thresholds and Resource Overhead](/lessons/quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead),
 which quantifies exactly how many physical qubits real roadmaps expect to
 need per logical qubit, tying this course's abstract distance parameter
@@ -279,3 +284,4 @@ builds that general machinery explicitly, on the smaller Steane
 $[[7,1,3]]$ code, where every stabilizer, commutation check, and the code
 distance itself can be verified directly rather than only described
 conceptually.
+</NextDiscovery>

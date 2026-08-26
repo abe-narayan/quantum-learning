@@ -29,11 +29,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Everything up to now has described qubit states: points on the sphere. This lesson introduces the operations: the tools that move a qubit from one point to another.
+</LessonHook>
+
 ## Motivation
 
-Everything up to now has described qubit *states*: points on the sphere.
-This lesson introduces the *operations*: the tools that move a qubit from
-one point to another. These are quantum gates, and every quantum circuit
+These are quantum gates, and every quantum circuit
 you'll ever see is just a sequence of them.
 
 <ExternalFigure
@@ -186,13 +188,13 @@ amplitudes: $i|1\rangle$ vs. plain $|1\rangle$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming every gate is its own inverse.** $X,Y,Z,H$ are (applying any
 of them twice gives back the identity), but $S$ and $T$ are not: $S$
 needs to be applied four times, $T$ needs eight, to return to identity.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Reading matrix-vector multiplication in the wrong order.** $U|\psi\rangle$
 means "apply $U$'s rows to $|\psi\rangle$'s column," the standard
 matrix-vector product. If your arithmetic keeps producing the wrong
@@ -227,7 +229,9 @@ answer, write out $|\psi\rangle$ as an explicit column vector first.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Single-Qubit Rotations](/lessons/quantum-computing/qubits-and-quantum-states/single-qubit-rotations), which generalizes every gate in this
 lesson into one formula, a rotation by *any* angle about *any* axis,
 and proves the claim that every single-qubit gate is secretly one of
 these.
+</NextDiscovery>

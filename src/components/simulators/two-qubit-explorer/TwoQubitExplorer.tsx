@@ -10,6 +10,8 @@ import { OperationControls, type InitId } from "./OperationControls";
 import { MeasurementPanel } from "./MeasurementPanel";
 import { SINGLE_QUBIT_GATES, type SingleQubitGateId } from "./gateDefinitions";
 import { GUIDED_PRESETS } from "./presets";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 
 const STEP_DELAY_MS = 700;
 
@@ -182,29 +184,32 @@ export function TwoQubitExplorer() {
   );
 
   return (
-    <div className="not-prose space-y-4">
-      <p className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">What we&apos;re studying: </span>
-        Whether two qubits act independently or become entangled — correlated in a way no classical coin pair
-        can be.
-      </p>
-
-      <div className="grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
-        <div className="space-y-6">
+    <SimulatorInstrument
+      label="Two-qubit states — entanglement"
+      footnote="Next: try building the same Bell state gate-by-gate in the Circuit Builder."
+      stageClassName="space-y-6"
+      stage={
+        <>
           <div
             aria-live="polite"
-            className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
+            className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
           >
             {narration}
             {lastMeasurement ? (
-              <span className="mt-1 block font-mono text-xs text-brand">{lastMeasurement}</span>
+              <span className="mt-1 block font-mono text-xs text-pillar">{lastMeasurement}</span>
             ) : null}
           </div>
 
           <StatePanel state={state} />
           <CorrelationView state={state} />
-        </div>
 
+          <SimulatorFraming
+            shows="Whether two qubits act independently or become entangled — correlated in a way no classical coin pair can be."
+            tryThis="Run the Bell-state guided preset, then measure qubit 0 — notice qubit 1's outcome is now fixed too, even though you never touched it."
+          />
+        </>
+      }
+      controls={
         <div className="space-y-8">
           <OperationControls
             disabled={disabled}
@@ -224,12 +229,7 @@ export function TwoQubitExplorer() {
             onReset={reset}
           />
         </div>
-      </div>
-
-      <p className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">What&apos;s next: </span>
-        Try building the same Bell state gate-by-gate in the Circuit Builder.
-      </p>
-    </div>
+      }
+    />
   );
 }

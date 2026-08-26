@@ -50,6 +50,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Squeeze a laser through a narrower slit and the light fans out wider,
+  not narrower. The same trade-off, made exact, is the single most famous
+  result in quantum mechanics.
+</LessonHook>
+
 ## Motivation
 
 Squeeze a laser beam through a narrower and narrower slit, and something
@@ -149,18 +155,20 @@ $$
 This deserves checking rather than taking on faith: compute $[\hat
 x,\hat p]$ using only $[a,a^\dagger]=1$ (the harmonic oscillator's
 defining relation from the last lesson) and bilinearity of the
-commutator:
+commutator.
 
+<DerivationSteps>
+  <DerivationStep annotation="Substitute the ladder-operator definitions of x̂ and p̂ and expand the commutator bilinearly into its four pieces.">
 $$
 [\hat x,\hat p] = i\sqrt{\tfrac{\hbar}{2m\omega}}\sqrt{\tfrac{\hbar m\omega}{2}}\,[a+a^\dagger,\ a^\dagger-a] = i\cdot\frac{\hbar}{2}\left([a,a^\dagger]-[a,a]+[a^\dagger,a^\dagger]-[a^\dagger,a]\right)
 $$
-
-The middle two commutators vanish (any operator commutes with itself),
-leaving $[a,a^\dagger]-[a^\dagger,a] = 1-(-1)=2$:
-
+  </DerivationStep>
+  <DerivationStep annotation="The middle two commutators vanish (any operator commutes with itself), leaving [a,a†]−[a†,a] = 1−(−1) = 2.">
 $$
 [\hat x,\hat p] = i\cdot\frac{\hbar}{2}\cdot2 = i\hbar \checkmark
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 The canonical commutation relation for $\hat x,\hat p$ isn't a separate
 fact from the harmonic oscillator's ladder algebra. It's a direct
@@ -228,14 +236,14 @@ objects.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating $\hat p$ as an ordinary number rather than an operator.** Every
 manipulation above used $[\hat x,\hat p]$ as an operator commutator, the
 same object type as $[X,Y]$ for the Pauli matrices, the physics is
 identical in kind, just on an infinite-dimensional space.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Re-deriving the uncertainty bound from scratch instead of reusing the
 general relation.** $\Delta x\Delta p\ge\hbar/2$ is a single substitution
 into the Expectation Values lesson's already-proven inequality, there's
@@ -271,7 +279,15 @@ no need for a separate argument specific to position and momentum.
 
 ## Further Exploration
 
-Next: [Superposition, Interference, and Phase](/lessons/quantum-mechanics/classical-to-quantum/superposition-interference-and-phase), which returns to the
-amplitude-and-phase picture from earlier in this course and ties it
-together with everything built since, operators, evolution, and
-uncertainty, using the Complex Amplitude Explorer directly.
+<ChallengePrompt prompt="For a particle confined to a proton-sized region (Δx ≈ 10⁻¹⁵ m, five orders of magnitude tighter than the worked example's atomic 10⁻¹⁰ m), what's the minimum Δp — and how many orders of magnitude larger is it than the worked example's result?">
+  Same formula, $\Delta p_{\min}=\hbar/(2\Delta x)$, just a different
+  $\Delta x$ — compare the exponents directly rather than only the
+  numbers.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Superposition, Interference, and Phase](/lessons/quantum-mechanics/classical-to-quantum/superposition-interference-and-phase), which returns to the
+  amplitude-and-phase picture from earlier in this course and ties it
+  together with everything built since, operators, evolution, and
+  uncertainty, using the Complex Amplitude Explorer directly.
+</NextDiscovery>

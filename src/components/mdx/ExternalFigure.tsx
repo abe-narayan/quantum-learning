@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { TechLabel } from "@/components/ui/Typography";
 
 type ExternalFigureProps = {
   src: string;
@@ -11,7 +12,48 @@ type ExternalFigureProps = {
   creditUrl?: string;
   license: string;
   className?: string;
+  /**
+   * Tailwind aspect-ratio class reserving the figure's space before the
+   * image loads — `"aspect-square"`, `"aspect-[4/3]"`, `"aspect-[3/4]"`, and
+   * so on. Defaults to `aspect-video` (16:9), which suits most landscape
+   * scientific photography.
+   *
+   * The reservation is not optional (see the render below for why); this prop
+   * only lets an author who knows the image's real proportions reserve *those*
+   * instead, so a portrait or square figure fills its box rather than
+   * letterboxing inside a 16:9 one. Existing call sites omit it and are
+   * unaffected.
+   */
+  aspect?: string;
+  /** Optional figure number (e.g. `3`) — renders as a "Fig. 3" tech-label
+   *  ahead of the caption. Omit for figures that don't need one; existing
+   *  call sites don't pass it and render exactly as before, minus the
+   *  numbering. */
+  number?: number;
+  /** Widens the figure beyond the reading column on large screens (a modest,
+   *  bounded negative margin — it never reaches the 2xl table-of-contents
+   *  rail, and does nothing below the `sm` breakpoint, so it cannot cause
+   *  horizontal overflow on narrow viewports). For a true edge-to-edge
+   *  figure, wrap in `<FullBleed>` (`src/components/ui/Section.tsx`) from
+   *  the surrounding page instead — that's a layout decision, not this
+   *  component's to make on its own. */
+  wide?: boolean;
 };
+
+/**
+ * MDX usage:
+ * ```mdx
+ * <ExternalFigure
+ *   src="https://upload.wikimedia.org/.../stern-gerlach.png"
+ *   alt="Schematic of the Stern–Gerlach apparatus"
+ *   caption="Silver atoms split into two discrete beams by an inhomogeneous field."
+ *   credit="Wikimedia Commons"
+ *   creditUrl="https://commons.wikimedia.org/wiki/File:..."
+ *   license="CC BY-SA 4.0"
+ *   number={2}
+ * />
+ * ```
+ */
 
 /**
  * ⚠️ CSP COUPLING — READ BEFORE POINTING `src` AT A NEW HOST ⚠️
@@ -53,12 +95,33 @@ type ExternalFigureProps = {
  * MDX component. It still renders the same markup at build/prerender time;
  * "use client" only changes how it hydrates, not its prop API or output for
  * any of its ~155 existing call sites in lesson content.
+ *
+ * Styling is the scientific-figure voice: a numbered, labelled caption and a
+ * credit/license line set in the technical (mono) voice, like a journal
+ * plate rather than a blog image.
  */
-export function ExternalFigure({ src, alt, caption, credit, creditUrl, license, className }: ExternalFigureProps) {
+export function ExternalFigure({
+  src,
+  alt,
+  caption,
+  credit,
+  creditUrl,
+  license,
+  className,
+  number,
+  wide = false,
+  aspect,
+}: ExternalFigureProps) {
   const [failed, setFailed] = useState(false);
 
   return (
-    <figure className={cn("not-prose my-6 overflow-hidden rounded-xl border border-border bg-surface-muted/40", className)}>
+    <figure
+      className={cn(
+        "not-prose my-6 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-surface-muted/40",
+        wide && "sm:mx-0 lg:-mx-6 xl:-mx-10",
+        className
+      )}
+    >
       {failed ? (
         // Screen readers get this via role="img" + aria-label rather than a
         // real broken <img>, so the alt text is still announced here, in the
@@ -72,28 +135,57 @@ export function ExternalFigure({ src, alt, caption, credit, creditUrl, license, 
           <span>{alt}</span>
         </div>
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={src}
-          alt={alt}
-          loading="lazy"
-          decoding="async"
-          onError={() => setFailed(true)}
-          className="h-auto w-full"
-        />
+        // The wrapper reserves the figure's space *before* the image arrives.
+        // Without it the `<img>` has no intrinsic size until it downloads —
+        // no width/height attributes, no aspect-ratio, and (being external)
+        // no build-time dimensions to infer — so it occupies zero height and
+        // then shoves the rest of the lesson down when it loads. With ~200
+        // figures across the corpus, all lazy-loaded and therefore arriving
+        // exactly as the reader scrolls to them, that is a jolt on almost
+        // every scroll through an illustrated lesson.
+        //
+        // `object-contain` inside a fixed ratio means the reserved box is
+        // always right, whatever the image's real proportions: a portrait
+        // figure letterboxes rather than overflowing or re-flowing. Authors
+        // who know the true shape can pass `aspect` to reserve it exactly and
+        // avoid the letterboxing — see the prop's own comment.
+        <div className={cn("w-full overflow-hidden", aspect ?? "aspect-video")}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={alt}
+            loading="lazy"
+            decoding="async"
+            onError={() => setFailed(true)}
+            className="h-full w-full object-contain"
+          />
+        </div>
       )}
-      <figcaption className="space-y-1 border-t border-border p-3 text-xs text-muted-foreground">
-        {caption && <p className="text-sm text-foreground">{caption}</p>}
-        <p>
-          {creditUrl ? (
-            <a href={creditUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
-              {credit}
-            </a>
-          ) : (
-            credit
-          )}
-          {" · "}
-          {license}
+      <figcaption className="space-y-1.5 border-t border-border p-3 sm:p-4">
+        {(number != null || caption) && (
+          <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            {number != null ? <TechLabel className="text-pillar">{`Fig. ${number}`}</TechLabel> : null}
+            {caption ? <span className="text-sm text-foreground">{caption}</span> : null}
+          </p>
+        )}
+        <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-subtle-foreground">
+          <TechLabel className="!text-[0.625rem] text-subtle-foreground">Source</TechLabel>
+          <span>
+            {creditUrl ? (
+              <a
+                href={creditUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-border underline-offset-2 hover:text-foreground"
+              >
+                {credit}
+              </a>
+            ) : (
+              credit
+            )}
+          </span>
+          <span aria-hidden="true">·</span>
+          <TechLabel className="!text-[0.625rem] text-subtle-foreground">{license}</TechLabel>
         </p>
       </figcaption>
     </figure>

@@ -90,10 +90,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Fixing the number, not the state">
+A noisy qubit gets measured, and somehow a classical optimizer ends up trusting the number that comes out of it. How, if the state itself is never made any cleaner?
+</LessonHook>
+
 ## Motivation
 
-A noisy qubit gets measured, and somehow a classical optimizer ends up
-trusting the number that comes out of it. How? Quantum SDKs Overview
+Quantum SDKs Overview
 said outright that a real production SDK's feature set includes "error
 mitigation," one of the things this platform's own deliberately minimal
 `QuantumCircuit`/`runCircuit` pattern doesn't build, and nothing since
@@ -318,7 +321,7 @@ computed from the raw (uncorrected) $80\%$ would be measurably biased.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating error mitigation as a cheaper substitute for error
 correction that happens to also work at scale.** It doesn't. The
 threshold theorem (Fault-Tolerant Thresholds) gives EXPONENTIAL error
@@ -334,7 +337,7 @@ Mitigation is a useful NISQ-era tool with no qubit overhead;
 it is not a scalable alternative to fault tolerance.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming the two-point extrapolation formula is exact.** It's the
 FIRST-ORDER (linear) approximation to a curve that's actually
 exponential, $(1-p)^\lambda$. This lesson's own numbers show a
@@ -390,6 +393,7 @@ exact answer."
 
 ## Further Exploration
 
+<NextDiscovery>
 This closes **Quantum Software**, on the piece the NISQ capstone's "the
 classical loop can partially compensate for imperfect quantum
 execution" line left unnamed, and the feature Quantum SDKs Overview
@@ -404,3 +408,4 @@ to the classical optimizer.
 **Quantum Mastery**'s algorithms course, which picks these same
 variational circuits back up to ask a harder question: whether they can
 be trained at scale at all once barren plateaus set in.
+</NextDiscovery>

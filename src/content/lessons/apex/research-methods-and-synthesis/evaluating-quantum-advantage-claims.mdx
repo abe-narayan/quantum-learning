@@ -33,6 +33,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Turning a headline into five checkable claims">
+  "Quantum computer achieves quantum advantage" is the single most
+  publicly visible, most routinely overclaimed, and most routinely
+  under-claimed sentence in the whole field — and it decomposes into
+  exactly five separate, checkable questions.
+</LessonHook>
+
 ## Motivation
 
 Distinguishing Theorem from Heuristic gave you the vocabulary to sort a
@@ -43,9 +50,8 @@ specific, checkable reasons a quantum circuit might collapse to something a
 laptop can simulate efficiently — Gottesman-Knill/stabilizer structure, and
 bounded bond-dimension growth (low entanglement, simulable by a matrix
 product state). Put those two tools together and you already have almost
-everything you need to evaluate the single most publicly visible, most
-routinely overclaimed, and most routinely *under*-claimed kind of statement
-in the entire field: "quantum computer achieves quantum advantage."
+everything you need to evaluate a claim of the form "quantum computer
+achieves quantum advantage."
 
 This lesson does not introduce new physics. It assembles a checklist —
 five questions, in a fixed order — that turns a vague headline into a set
@@ -126,6 +132,13 @@ is a weak one.
 
 ## Physical Interpretation: Why This Matters
 
+<InsightBlock>
+  "Hard to classically simulate" and "practically useful" are two
+  independent axes — a claim that answers one tells you nothing about
+  the other, and most public confusion about quantum advantage comes
+  from collapsing them into one.
+</InsightBlock>
+
 Every one of these five questions maps onto a real distinction that gets
 collapsed constantly in how quantum computing results reach the public,
 and the collapse runs in both directions.
@@ -199,33 +212,23 @@ have, more than once, narrowed or contested the classical-hardness margin
 for specific instances of this kind of experiment. Does this mean quantum
 advantage claims in this line of work are unreliable?"**
 
-**Question 1 — the specific task.** Sampling from the output distribution
-of one particular family of random quantum circuits on a fixed number of
-qubits and circuit depth — not a useful computation, a deliberately chosen
-sampling problem.
-
-**Question 2 — the classical baseline.** The original classical-runtime
-estimate was produced by the best classical simulation technique known and
-published *at that time*. That is the right way to make the comparison —
-but "best known at the time" is a moving target, not a permanent ceiling.
-
-**Question 3 — the assumption.** The classical-hardness argument for tasks
-like this rests on a real, citable complexity-theoretic argument tied to
-the polynomial hierarchy not collapsing — a Tier 2, strongly-evidenced-but-
-unproven assumption, not a Tier 1 theorem. This was true on day one, not a
-detail that emerged later.
-
-**Question 4 — the structural check.** Circuits in this family are
-constructed specifically to avoid both loopholes: they are built from
-gates outside the Clifford group (no Gottesman-Knill shortcut) and run deep
-enough that entanglement grows across the whole system (no efficient
-matrix-product-state description). That is exactly why they were chosen as
-the demonstration task in the first place.
-
-**Question 5 — usefulness.** None, directly. The sampling task has no
-independent economic or scientific application; its value is entirely as a
-capability benchmark and as empirical evidence bearing on question 3's
-underlying complexity assumption.
+<DerivationSteps>
+<DerivationStep annotation="Not a useful computation — a deliberately chosen sampling problem, exactly the level of specificity Question 1 demands.">
+**Question 1 — the specific task.** Sampling from the output distribution of one particular family of random quantum circuits on a fixed number of qubits and circuit depth.
+</DerivationStep>
+<DerivationStep annotation="'Best known at the time' is a moving target, not a permanent ceiling — that distinction is exactly what the rest of this reasoning turns on.">
+**Question 2 — the classical baseline.** The original classical-runtime estimate was produced by the best classical simulation technique known and published *at that time*.
+</DerivationStep>
+<DerivationStep annotation="This was true on day one, not a detail that emerged later — naming the assumption up front is what makes later classical progress a test, not a refutation.">
+**Question 3 — the assumption.** The classical-hardness argument rests on a real, citable complexity-theoretic argument tied to the polynomial hierarchy not collapsing — Tier 2, not Tier 1.
+</DerivationStep>
+<DerivationStep annotation="Exactly why circuits like this were chosen as the demonstration task in the first place.">
+**Question 4 — the structural check.** Built from gates outside the Clifford group (no Gottesman-Knill shortcut), run deep enough that entanglement grows across the whole system (no efficient matrix-product-state description).
+</DerivationStep>
+<DerivationStep annotation="Its value is entirely as a capability benchmark and as empirical evidence bearing on Question 3's underlying complexity assumption — not as a computation anyone wants for its own sake.">
+**Question 5 — usefulness.** None, directly. The sampling task has no independent economic or scientific application.
+</DerivationStep>
+</DerivationSteps>
 
 **Now the actual question: does classical progress against these claims
 mean the line of work is unreliable?** No — and the reasoning matters more
@@ -255,7 +258,7 @@ documented instance, well known within the field's own literature — is the
 community's healthy self-correction process working in public, not a sign
 the underlying research program is broken.*
 
-## Interactive Visualization: The Two-Axis Map
+## The Two-Axis Map
 
 <div className="not-prose my-8 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
   <div className="grid min-w-[560px] grid-cols-[120px_1fr_1fr] gap-2">
@@ -324,7 +327,7 @@ honest description of where the field currently stands.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating a narrowed quantum-advantage margin after improved classical
 algorithms as proof the original claim was fraudulent or the field is
 broken.** It means science is working correctly. The original claim rested
@@ -341,7 +344,7 @@ that is not, in the well-documented cases, what careful original papers
 actually asserted.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating "hard to classically simulate" and "practically useful" as the
 same axis, or assuming one implies the other.** A task engineered to be
 maximally hard for classical computers (question 4 passing cleanly) tells
@@ -410,8 +413,10 @@ category error in opposite directions.
 
 ## Further Exploration
 
-Continue to [Reproducing and Designing
-Experiments](/lessons/apex/research-methods-and-synthesis/reproducing-and-designing-experiments),
-which takes this lesson's checklist one step further: not just evaluating
-an existing claim, but what a reproducible benchmark and a well-designed
-new experiment actually require.
+<NextDiscovery>
+  Continue to [Reproducing and Designing
+  Experiments](/lessons/apex/research-methods-and-synthesis/reproducing-and-designing-experiments),
+  which takes this lesson's checklist one step further: not just evaluating
+  an existing claim, but what a reproducible benchmark and a well-designed
+  new experiment actually require.
+</NextDiscovery>

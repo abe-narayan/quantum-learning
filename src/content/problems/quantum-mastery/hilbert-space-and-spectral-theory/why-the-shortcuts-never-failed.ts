@@ -6,7 +6,7 @@ export const whyTheShortcutsNeverFailed: ConceptualProblem = {
     title: "Why the Earlier Curriculum's Shortcuts Never Produced a Wrong Answer",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/capstone-what-rigor-buys-you",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "conceptual",
     tags: ["capstone", "self-adjointness", "synthesis", "conceptual"],

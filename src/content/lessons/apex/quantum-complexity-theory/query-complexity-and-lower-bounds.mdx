@@ -68,6 +68,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Best known, or provably best possible?">
+  Nobody has found an unstructured-search algorithm faster than Grover's.
+  That is not the same claim as: nobody ever could. Two independent
+  proofs — sharing almost no machinery — close that gap for good.
+</LessonHook>
+
 ## Motivation
 
 BQP and Oracle Complexity proved the BBBV theorem — Grover's algorithm is
@@ -156,10 +162,19 @@ $\Gamma(x,y)=0$ whenever $f(x)=f(y)$, and let $D_i$ be the $0/1$ matrix
 with $D_i(x,y)=1$ exactly when instances $x$ and $y$ differ at input
 position $i$. Then the bounded-error quantum query complexity satisfies
 
+<EquationReveal
+  terms={[
+    { id: "Q2", symbol: "Q₂(f)", gloss: "The bounded-error quantum query complexity of f — the minimum number of oracle queries any algorithm needs." },
+    { id: "ADV", symbol: "ADV(f)", gloss: "The adversary bound: the best lower bound this method can certify, computed from any valid Γ." },
+    { id: "Gamma", symbol: "Γ", gloss: "A nonnegative matrix relating NO-instances to YES-instances, zero wherever the two sides agree on f's value — the 'hard distribution' the method picks." },
+    { id: "Di", symbol: "D_i", gloss: "A 0/1 matrix marking which instance pairs differ at input position i — how much a single query at position i can possibly reveal." },
+  ]}
+>
 $$
 Q_2(f) \;=\; \Omega\!\left(\mathrm{ADV}(f)\right), \qquad
 \mathrm{ADV}(f) = \max_\Gamma \frac{\lVert\Gamma\rVert}{\displaystyle\max_i \lVert \Gamma\circ D_i\rVert},
 $$
+</EquationReveal>
 
 where $\lVert\cdot\rVert$ is the spectral norm and $\circ$ is the
 entrywise (Hadamard) product. This spectral/matrix form — the one used
@@ -178,26 +193,27 @@ treatment reproduces from scratch).
 to the promise "exactly one bit is $1$" — precisely unstructured search
 for one marked item among $N$. There is exactly one NO-instance
 ($x=0^N$, nothing marked) and $N$ YES-instances ($y_k$, marked at
-position $k$, for $k=1,\dots,N$). Take $\Gamma$ to be the $1\times N$
-all-ones matrix — it relates the one NO-instance to every YES-instance,
-which is allowed since $f(x)\ne f(y_k)$ for every $k$. This $\Gamma$ is a
-single row vector of $N$ ones, so its spectral norm is its Euclidean
-norm:
+position $k$, for $k=1,\dots,N$).
 
-$$\lVert\Gamma\rVert = \sqrt{N}.$$
-
-For each input position $i\in\{1,\dots,N\}$, $D_i$ marks which
-YES-instances differ from the all-zero NO-instance at position $i$ —
-exactly $y_i$ (the string that is $1$ only at position $i$), and no
-other. So $\Gamma\circ D_i$ is a $1\times N$ matrix with a single $1$
-entry (at position $i$) and zeros elsewhere, and a matrix with one
-nonzero entry equal to $1$ has spectral norm exactly $1$:
-
-$$\max_i \lVert \Gamma\circ D_i\rVert = 1.$$
-
-Therefore
-
-$$\mathrm{ADV}(\mathrm{OR}_N) \;=\; \frac{\sqrt N}{1} \;=\; \sqrt N,$$
+<DerivationSteps>
+<DerivationStep annotation="Γ relates the one NO-instance to every YES-instance — allowed since f(x) ≠ f(y_k) for every k. A single row vector of N ones has spectral norm equal to its Euclidean norm.">
+Take $\Gamma$ to be the $1\times N$ all-ones matrix:
+$$
+\lVert\Gamma\rVert = \sqrt{N}.
+$$
+</DerivationStep>
+<DerivationStep annotation="D_i marks which YES-instances differ from the all-zero NO-instance at position i — exactly y_i, and no other. So Γ∘D_i has a single 1 entry, and a matrix with one nonzero entry equal to 1 has spectral norm exactly 1.">
+For each input position $i\in\{1,\dots,N\}$:
+$$
+\max_i \lVert \Gamma\circ D_i\rVert = 1.
+$$
+</DerivationStep>
+<DerivationStep annotation="Dividing the two quantities just computed gives the adversary bound for unstructured search, and the theorem above turns that number directly into a query lower bound.">
+$$
+\mathrm{ADV}(\mathrm{OR}_N) \;=\; \frac{\sqrt N}{1} \;=\; \sqrt N,
+$$
+</DerivationStep>
+</DerivationSteps>
 
 and by the theorem above, $Q_2(\mathrm{OR}_N) = \Omega(\sqrt N)$ — the
 adversary method's own, independently-derived confirmation of exactly
@@ -284,6 +300,13 @@ argument.
 | Polynomial method | The algorithm's acceptance probability as a real polynomial in the oracle bits | Degree $\le 2T$ after $T$ queries; $\widetilde{\deg}(\mathrm{OR}_N)=\Theta(\sqrt N)$ (Paturi 1992, building on Nisan–Szegedy 1994) | Beals, Buhrman, Cleve, Mosca, de Wolf (1998) |
 
 ## Why This Matters
+
+<InsightBlock>
+  Grover's optimality is not a belief with strong evidence behind it — it
+  is a genuinely, doubly-proven theorem: two arguments sharing almost no
+  machinery both land on exactly √N, which is a far stronger guarantee
+  than either proof alone would give.
+</InsightBlock>
 
 Contrast this lesson's situation with the previous lesson's honest
 scoping of $\mathsf{NP}\subseteq\mathsf{BQP}$: that question is **open**
@@ -391,7 +414,7 @@ suppressed constant.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating a query lower bound as a general circuit-complexity or
 time-complexity lower bound.** Both the adversary method and the
 polynomial method bound the number of calls to a black-box oracle — they
@@ -402,7 +425,7 @@ scope restriction BQP and Oracle Complexity attached to BBBV; it applies
 identically to both of this lesson's independent techniques.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Reading a computed bound like $\mathrm{ADV}(\mathrm{OR}_{16})=4$ as an
 exact minimal query count instead of an asymptotic order-of-growth
 statement.** The general theorem only guarantees $Q_2(f)\ge
@@ -457,7 +480,9 @@ for one specific $N$.
 
 ## Further Exploration
 
-Next: [Capstone: What We Know and Don't](/lessons/apex/quantum-complexity-theory/capstone-what-we-know-and-dont),
-which pulls together every proven containment, open question, and
-doubly-proven lower bound from this course into one honest map of
-quantum complexity theory's actual state of knowledge.
+<NextDiscovery>
+  Next: [Capstone: What We Know and Don't](/lessons/apex/quantum-complexity-theory/capstone-what-we-know-and-dont)
+  pulls together every proven containment, open question, and
+  doubly-proven lower bound from this course into one honest map of
+  quantum complexity theory's actual state of knowledge.
+</NextDiscovery>

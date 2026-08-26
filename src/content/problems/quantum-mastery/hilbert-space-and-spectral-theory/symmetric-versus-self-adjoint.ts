@@ -6,7 +6,7 @@ export const symmetricVersusSelfAdjoint: ConceptualProblem = {
     title: "What Exactly Is the Gap Between Symmetric and Self-Adjoint?",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["self-adjointness", "domains", "conceptual"],

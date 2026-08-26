@@ -6,7 +6,7 @@ export const dataProcessingLoccEntanglement: ConceptualProblem = {
     title: "Why LOCC Can Never Increase Entanglement",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/the-data-processing-inequality",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["data-processing-inequality", "locc", "entanglement-monotone"],

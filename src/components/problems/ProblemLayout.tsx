@@ -1,29 +1,23 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
+import { Section } from "@/components/ui/Section";
+import { SectionTitle } from "@/components/ui/Typography";
+import { FadeRule } from "@/components/ui/Panel";
+import { PillarScope } from "@/components/field/PillarScope";
 import { MathText } from "@/components/ui/MathText";
-import type { Problem, ProblemDifficulty, ProblemType } from "@/lib/problems/types";
+import { getCourse, getPillar } from "@/lib/content/curriculum";
+import { DifficultyScale, TypeMark } from "./ProblemMetaMarks";
+import type { Problem } from "@/lib/problems/types";
 import type { LessonMetaWithSlug } from "@/lib/content/types";
-
-const DIFFICULTY_LABEL: Record<ProblemDifficulty, string> = {
-  beginner: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-};
-
-const TYPE_LABEL: Record<ProblemType, string> = {
-  "multiple-choice": "Multiple Choice",
-  numeric: "Numeric Answer",
-  conceptual: "Short Answer",
-};
 
 /**
  * Everything about a problem page that doesn't need interactivity: the
- * breadcrumb, badges, title, prompt, prerequisite links, and a link back
+ * breadcrumb, metadata, title, prompt, prerequisite links, and a link back
  * to the home lesson. Server-rendered, same division of labor as
  * `LessonLayout` around an MDX lesson body — `children` is the one
- * interactive piece (`ProblemView`).
+ * interactive piece (`ProblemView`). Sets the problem's course's pillar via
+ * `PillarScope`, the same identity a student sees on the lesson this problem
+ * came from.
  */
 export function ProblemLayout({
   problem,
@@ -39,30 +33,45 @@ export function ProblemLayout({
     .map((slug) => allLessons.find((lesson) => lesson.slug === slug))
     .filter((lesson): lesson is LessonMetaWithSlug => Boolean(lesson));
 
-  return (
-    <Container className="py-16">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/problems" className="hover:text-foreground">
-          Problems
-        </Link>
-      </nav>
+  const course = getCourse(problem.meta.course);
+  const pillar = course ? getPillar(course.pillar) : undefined;
 
-      <div className="mt-5 max-w-3xl">
-        <div className="flex flex-wrap gap-2">
-          <Badge tone="brand">{DIFFICULTY_LABEL[problem.meta.difficulty]}</Badge>
-          <Badge>{problem.meta.estimatedMinutes} min</Badge>
-          <Badge tone="accent">{TYPE_LABEL[problem.meta.problemType]}</Badge>
+  return (
+    <PillarScope pillar={course?.pillar}>
+      <Section width="reading">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Link href="/problems" className="tech-label text-muted-foreground transition-colors hover:text-foreground">
+            Problems
+          </Link>
+          {pillar ? (
+            <>
+              <span aria-hidden="true" className="tech-label text-subtle-foreground">
+                /
+              </span>
+              <span className="tech-label text-pillar-text">{pillar.title}</span>
+            </>
+          ) : null}
+        </nav>
+
+        <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3">
+          <DifficultyScale difficulty={problem.meta.difficulty} />
+          <TypeMark type={problem.meta.problemType} />
+          <span className="tech-label">
+            <span className="tech-value text-foreground">{problem.meta.estimatedMinutes}</span> min
+          </span>
         </div>
 
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">{problem.meta.title}</h1>
+        <SectionTitle level={1} size="xl" className="mt-6">
+          {problem.meta.title}
+        </SectionTitle>
 
         {prerequisites.length > 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-4 text-sm text-muted-foreground">
             Builds on:{" "}
             {prerequisites.map((lesson, index) => (
               <span key={lesson.slug}>
                 {index > 0 ? ", " : ""}
-                <Link href={`/lessons/${lesson.slug}`} className="text-brand hover:underline">
+                <Link href={`/lessons/${lesson.slug}`} className="text-pillar-text hover:underline">
                   {lesson.title}
                 </Link>
               </span>
@@ -70,23 +79,23 @@ export function ProblemLayout({
           </p>
         ) : null}
 
-        <div className="mt-8 rounded-2xl border border-border bg-surface-muted/60 p-6">
+        <div className="mt-8 rounded-[--radius-panel] border border-border border-l-4 border-l-pillar-edge bg-surface-muted/60 p-6">
           <MathText text={problem.question.prompt} className="text-lg leading-relaxed text-foreground" />
         </div>
-      </div>
 
-      <div className="mt-8 max-w-3xl">{children}</div>
+        <div className="mt-8">{children}</div>
 
-      {homeLesson ? (
-        <div className="mt-12 max-w-3xl border-t border-border pt-8">
-          <Link
-            href={`/lessons/${homeLesson.slug}`}
-            className="text-sm font-medium text-brand hover:underline"
-          >
-            ← Back to &ldquo;{homeLesson.title}&rdquo;
-          </Link>
-        </div>
-      ) : null}
-    </Container>
+        {homeLesson ? (
+          <>
+            <FadeRule className="mt-14" />
+            <div className="mt-8">
+              <Link href={`/lessons/${homeLesson.slug}`} className="text-sm font-medium text-pillar-text hover:underline">
+                ← Back to &ldquo;{homeLesson.title}&rdquo;
+              </Link>
+            </div>
+          </>
+        ) : null}
+      </Section>
+    </PillarScope>
   );
 }

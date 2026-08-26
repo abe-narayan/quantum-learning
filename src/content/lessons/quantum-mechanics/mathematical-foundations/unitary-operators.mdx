@@ -68,6 +68,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Every quantum gate ever built, X, H, CNOT, and every step of time
+  evolution itself, obeys the exact same algebraic condition: $U^\dagger
+  U = I$.
+</LessonHook>
+
 ## Motivation
 
 A quantum state's norm is tied to total probability, the Probability and
@@ -235,7 +241,7 @@ each other.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming Hermitian and unitary are the same thing, or that one implies
 the other.** $S$ above is unitary but not Hermitian; a matrix like
 $\begin{pmatrix}2&0\\0&2\end{pmatrix}$ is Hermitian but not unitary (its
@@ -243,7 +249,7 @@ eigenvalues, both $2$, don't have modulus $1$). The Pauli matrices happen
 to be both, which is a special, not generic, coincidence.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to conjugate when checking unitarity of a complex matrix.**
 The real-matrix analogue of unitary is "orthogonal," $Q^TQ=I$; for
 complex matrices this must be $U^\dagger U=I$, conjugate transpose, not
@@ -274,7 +280,15 @@ plain transpose.
 
 ## Further Exploration
 
-Next: [Tensor Products and Composite Systems](/lessons/quantum-mechanics/mathematical-foundations/tensor-products-and-composite-systems), which builds the
-mathematics for describing two or more quantum systems together, and
-shows, from pure dimension-counting, why entanglement is the generic case
-rather than a special one.
+<ChallengePrompt prompt="Verify directly, not via the eigenvalue-modulus theorem, that the 2D rotation matrix R(θ)=[[cosθ,−sinθ],[sinθ,cosθ]] is unitary for any θ, by checking its columns are orthonormal.">
+  Same orthonormal-columns test as practice question 3 — but this time
+  work with $\cos\theta$ and $\sin\theta$ symbolically, using
+  $\cos^2\theta+\sin^2\theta=1$.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Tensor Products and Composite Systems](/lessons/quantum-mechanics/mathematical-foundations/tensor-products-and-composite-systems), which builds the
+  mathematics for describing two or more quantum systems together, and
+  shows, from pure dimension-counting, why entanglement is the generic case
+  rather than a special one.
+</NextDiscovery>

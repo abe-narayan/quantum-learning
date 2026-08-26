@@ -77,7 +77,7 @@ export function ProjectionShadow({
 
   return (
     <div className="not-prose space-y-3">
-      <div className="rounded-xl border border-border bg-surface-muted/40 p-4">
+      <div className="panel-inset p-4">
         <svg
           width={WIDTH}
           height={height}
@@ -196,7 +196,7 @@ export function ProjectionShadow({
         </svg>
       </div>
 
-      <div className="rounded-xl border border-border bg-surface-muted/40 p-4">
+      <div className="panel-inset p-4">
         <label className="flex items-center justify-between text-xs font-medium text-foreground">
           <span>Rotate v</span>
           <span className="font-mono text-muted-foreground">θ = {angleDeg}°</span>

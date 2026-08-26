@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { Container } from "@/components/ui/Container";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { Button } from "@/components/ui/Button";
 
 // Scoped to /simulators — every route here renders a heavy numeric explorer
@@ -24,12 +24,15 @@ export default function SimulatorsError({
   }, [error]);
 
   return (
-    <Container className="py-16 sm:py-24">
-      <PageHeader
-        eyebrow="Something went wrong"
-        title="This simulator crashed"
-        description="An unexpected error interrupted this simulator — likely a bug in its numerical engine, not something you did. You can try again, or head back to the simulator index."
-      />
+    <Section>
+      <Eyebrow>Something went wrong</Eyebrow>
+      <SectionTitle level={1} size="xl" className="mt-3 max-w-3xl">
+        This simulator crashed
+      </SectionTitle>
+      <Lede className="mt-4">
+        An unexpected error interrupted this simulator — likely a bug in its numerical engine, not
+        something you did. You can try again, or head back to the simulator index.
+      </Lede>
 
       <div className="mt-10 flex flex-wrap gap-3">
         <Button onClick={() => retry()}>Try again</Button>
@@ -43,6 +46,6 @@ export default function SimulatorsError({
           Error reference: <code className="font-mono">{error.digest}</code>
         </p>
       ) : null}
-    </Container>
+    </Section>
   );
 }

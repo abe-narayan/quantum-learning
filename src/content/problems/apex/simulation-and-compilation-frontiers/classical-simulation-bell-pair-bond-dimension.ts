@@ -9,7 +9,7 @@ export const classicalSimulationBellPairBondDimension: NumericProblem = {
     title: "Bond Dimension of a Maximally-Entangled Clifford Circuit",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["gottesman-knill", "stabilizer-circuits", "bond-dimension", "tensor-networks"],

@@ -1,11 +1,18 @@
 # QuantumLearn
 
 QuantumLearn is a from-scratch quantum physics and quantum computing
-curriculum: 185 lessons across five pillars (Quantum Mechanics, Quantum
-Computing, Quantum Hardware, Quantum Software, Quantum Mastery) spanning 26
-courses, 479 practice problems, and 14 standalone interactive simulators —
-Bloch spheres, density matrices, circuit builders, wavefunction evolution,
-Grover's algorithm, and more.
+curriculum: 219 lessons across six pillars (Quantum Mechanics, Quantum
+Computing, Quantum Hardware, Quantum Software, Quantum Mastery, and Apex)
+spanning 32 courses, 547 practice problems, and 14 standalone interactive
+simulators — Bloch spheres, density matrices, circuit builders, wavefunction
+evolution, Grover's algorithm, and more.
+
+Visually, the site is styled as a research console rather than a document —
+a persistent, scroll-driven background environment depicting the physics of
+whichever pillar you're in, a pillar-specific color identity, and a small set
+of shared layout/typography primitives. See
+[`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) ("The Instrument") before
+touching any visual code.
 
 The defining constraint of the whole project: every number a visualization
 shows is *computed*, not decorative. A Bloch sphere point comes from a real
@@ -26,10 +33,12 @@ doesn't get one.
   engine itself (`src/lib/quantum/`), which is plain typed math with no
   external linear-algebra dependency.
 - **Tailwind CSS v4**.
-- **Vitest** for the test suite (`src/lib/**/__tests__/`, ~590 tests) —
-  mostly correctness checks on the quantum engine and content-integrity
-  checks (every lesson loads, every problem resolves to a real lesson, no
-  duplicate slugs).
+- **Vitest** for the test suite (`src/**/__tests__/`, 880+ tests) — mostly
+  correctness checks on the quantum engine and content-integrity checks
+  (every lesson loads, every problem resolves to a real lesson, no duplicate
+  slugs), plus design-system guards: every pillar's color channel agrees
+  between `globals.css` and `src/lib/design/pillars.ts`, every pillar route
+  has a real page, and the shipped palette clears WCAG AA contrast.
 
 ## Architecture, briefly
 
@@ -49,7 +58,7 @@ doesn't get one.
   with this file, or it silently falls out of navigation — an automated test
   (`src/lib/content/__tests__/lessons.test.ts`) now checks every lesson
   against it.
-- **`src/lib/problems/registry.ts`** — all 479 practice problems. A thin
+- **`src/lib/problems/registry.ts`** — all 547 practice problems. A thin
   wrapper re-exporting `PROBLEMS` from the auto-generated
   `src/lib/problems/registry.generated.ts`, which
   `scripts/generate-problem-registry.mjs` produces by walking
@@ -76,10 +85,31 @@ doesn't get one.
   `src/lib/problems/progress/`) is `localStorage`-only, on purpose — there's
   no backend to put it in. It degrades gracefully to "no progress" for a
   first-time or private-browsing visitor.
+- **`src/lib/design/pillars.ts`** — the single source of truth for each
+  pillar's visual identity (an OKLCH hue/chroma pair, a background "regime,"
+  a route). Mirrored in `src/app/globals.css` §2 and pinned together by
+  `src/lib/design/__tests__/pillars.test.ts`. Setting `data-pillar="…"` on
+  any wrapper re-resolves an entire color ramp for that subtree.
+- **`src/components/field/`** — the persistent, scroll-driven canvas
+  background (`QuantumField.tsx`) that renders each pillar's own physics
+  environment (`regimes.ts`), declared per-page by the server component
+  `PillarScope.tsx`. Fully optional: disabled under reduced motion and
+  data-saver, and every page reads its colors from CSS tokens rather than
+  the canvas, so "no field" is a complete, correct render of any page.
+- **`src/components/motion/`** and **`src/components/ui/`** — one shared
+  scroll-reveal (`Reveal.tsx`), one coalesced scroll listener
+  (`useScrollProgress.ts`), and the layout/typography/surface primitives
+  (`Section.tsx`, `Typography.tsx`, `Panel.tsx`) the redesign is built from.
+- **`src/components/narrative/`** — MDX components for structuring a lesson
+  as a hook → question → derivation → challenge narrative rather than plain
+  prose; author-facing reference at
+  [`docs/NARRATIVE_COMPONENTS.md`](docs/NARRATIVE_COMPONENTS.md).
 
 For a much deeper, chronological account of how this was built — including
 design decisions and their reasoning, what was deliberately deferred, and
 session-by-session notes — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+For an index of every design standard, audit and the tests that enforce
+them, see [`docs/README.md`](docs/README.md).
 
 ## Dev workflow
 

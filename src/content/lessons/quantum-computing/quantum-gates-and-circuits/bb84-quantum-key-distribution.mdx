@@ -61,16 +61,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Detectable, not just secure">
+Can two people agree on a secret string of bits over a channel anyone might be listening to, in a way where listening in is provably detectable? BB84 answers yes — and the reason is exactly the no-cloning theorem.
+</LessonHook>
+
 ## Motivation
 
 The last lesson proved that an unknown qubit state can't be copied. That
-sounds like a purely mathematical curiosity until you ask a practical
-question: can two people, Alice and Bob, agree on a secret string of bits
-over a channel that anyone (Eve) might be listening to, in a way where
-listening in is *provably detectable*? BB84, the first quantum key
-distribution protocol, answers yes, and the reason it works is exactly the
-no-cloning theorem: Eve cannot silently make a copy of each qubit, keep one,
-and pass the other along undisturbed. Every real quantum channel primitive
+sounds like a purely mathematical curiosity until BB84, the first
+quantum key distribution protocol, puts it to work: Eve cannot silently
+make a copy of each qubit, keep one, and pass the other along
+undisturbed. Every real quantum channel primitive
 this needs, encoding a bit in a basis, changing basis with $H$, and
 measuring, is already in this course's engine.
 
@@ -275,40 +276,48 @@ and gambling wrong is what makes her detectable.
 basis match). Verify Bob recovers bit $0$ with certainty, then check what
 happens if Eve had intercepted and guessed the Z basis instead.**
 
-Alice's state: $X\text{-basis encode}(0) = H|0\rangle = |+\rangle$. Bob
-measures in X, i.e. applies $H$ first: $H|+\rangle = |0\rangle$, giving
-probabilities $[1,0]$: he reads $0$ with certainty, matching the
-matching-basis case derived above.
-
+<DerivationSteps>
+  <DerivationStep annotation="X-basis encoding of 0 is H|0⟩ by definition from the encoding section above.">
+Alice's state: $X\text{-basis encode}(0) = H|0\rangle = |+\rangle$.
+  </DerivationStep>
+  <DerivationStep annotation="Bob's basis matches Alice's, so applying H undoes the encoding exactly, as derived in the matching-basis case above.">
+Bob measures in X, i.e. applies $H$ first: $H|+\rangle = |0\rangle$, giving
+probabilities $[1,0]$: he reads $0$ with certainty.
+  </DerivationStep>
+  <DerivationStep annotation="Eve guessed the wrong basis, so her measurement is the mismatch case: a coin flip, uncorrelated with the bit Alice actually sent.">
 Now suppose Eve intercepted and guessed Z. She measures $|+\rangle$
 directly in the computational basis: probabilities $[0.5,0.5]$, a coin
-flip, and her own guessed basis disagrees with the encoding basis, exactly
-the mismatch case. Say she collapses to $|1\rangle$ and resends it
-unchanged (Z-basis encode of $1$). Bob, measuring in X as before, applies
+flip. Say she collapses to $|1\rangle$ and resends it unchanged (Z-basis
+encode of $1$).
+  </DerivationStep>
+  <DerivationStep annotation="Bob still applies H, believing his basis matches Alice's — but the qubit he receives was re-prepared by Eve in the wrong basis.">
+Bob, measuring in X as before, applies
 $H$ to $|1\rangle$: $H|1\rangle=|-\rangle$, probabilities $[0.5,0.5]$. Bob,
 who believes his basis matches Alice's, now has only even odds of reading
 back the $0$ Alice actually sent, exactly the $25\%$-on-average error
 mechanism derived above (here realized in one specific branch as a full
 $50\%$, since this particular branch of Eve's outcome was picked by hand
 rather than averaged).
+  </DerivationStep>
+</DerivationSteps>
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **"BB84 requires entanglement."** It doesn't. Every qubit Alice sends is a
 single, unentangled state in one of four fixed preparations
 ($|0\rangle,|1\rangle,|+\rangle,|-\rangle$). Entanglement-based variants of
 QKD exist, but BB84 itself is a prepare-and-measure protocol.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **"Revealing which basis was used leaks the bit."** It doesn't. The basis
 Alice or Bob picked was chosen independently of the bit value (a separate
 random coin flip), so announcing "I used Z" or "I used X" carries no
 information about whether the underlying bit was $0$ or $1$.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **"Eve can just copy the qubit, keep one, and resend the other
 untouched."** This is exactly what the no-cloning theorem forbids. Eve has
 no way to duplicate an unknown state; she must measure the one real qubit
@@ -352,8 +361,10 @@ detectable disturbance.
 
 ## Further Exploration
 
+<NextDiscovery>
 A related application built from the very same toolkit, a shared Bell
 pair, single-qubit gates, and measurement, is [Superdense Coding](/lessons/quantum-computing/quantum-gates-and-circuits/superdense-coding): where
 BB84 uses no entanglement at all to move classical bits securely,
 superdense coding uses one entangled pair to send *twice* as many classical
 bits per qubit as would otherwise be possible.
+</NextDiscovery>

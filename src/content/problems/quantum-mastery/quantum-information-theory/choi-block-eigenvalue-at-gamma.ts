@@ -6,7 +6,7 @@ export const choiBlockEigenvalueAtGamma: NumericProblem = {
     title: "Amplitude Damping's Choi-Matrix Block Eigenvalue",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["choi-matrix", "amplitude-damping"],

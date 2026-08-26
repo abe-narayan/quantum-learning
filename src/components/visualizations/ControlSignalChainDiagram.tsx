@@ -65,7 +65,7 @@ function Amp({ x, y }: { x: number; y: number }) {
  */
 export function ControlSignalChainDiagram({ ariaLabel }: { ariaLabel: string }) {
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
         {/* room-temperature drive electronics */}
         <Box x={20} y={16} w={80} h={34} label="AWG" />

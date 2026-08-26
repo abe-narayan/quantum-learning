@@ -48,13 +48,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Perturbation theory needs a small parameter; the variational method needs a good guessed shape. WKB takes a third, geometric route entirely: treat the wavefunction as a classical wave and demand it close consistently on itself.
+</LessonHook>
+
 ## Motivation
 
-Perturbation theory needs a small parameter; the variational method
-needs a good guessed shape. WKB (Wentzel-Kramers-Brillouin) takes a
-third, geometric route: treat the wavefunction as approximately a
+WKB (Wentzel-Kramers-Brillouin) treats the wavefunction as approximately a
 classical wave with a slowly-varying local wavelength set by the local
-classical momentum $p(x)=\sqrt{2m(E-V(x))}$, and demand that this wave
+classical momentum $p(x)=\sqrt{2m(E-V(x))}$, demanding that this wave
 close consistently on itself between the classical turning points.
 
 <ExternalFigure
@@ -180,7 +182,7 @@ again:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking WKB is always this accurate.** The harmonic oscillator's
 exactness is special (tied to its potential's specific quadratic shape).
 For a generic potential, WKB is an *approximation* that improves as $n$
@@ -190,7 +192,7 @@ matters for correctly interpreting the harmonic oscillator's near-perfect
 result here.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the $\frac12$ in $(n+\frac12)\pi\hbar$.** Omitting it
 (using $n\pi\hbar$ instead) is a common error that shifts every
 predicted energy level. The Maslov correction for two soft turning
@@ -229,7 +231,9 @@ points is not optional bookkeeping.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Time-Dependent Perturbation Theory](/lessons/quantum-mechanics/approximation-methods/time-dependent-perturbation-theory) leaves stationary states behind entirely and asks about
 transitions: switch on a small time-dependent coupling between two
 levels, and what's the probability of finding the system in the other
 one later?
+</NextDiscovery>

@@ -10,7 +10,7 @@ export const localHamiltonianVerificationPrecisionUnionBound: NumericProblem = {
     title: "Per-Term Precision for Local Hamiltonian Verification",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/the-local-hamiltonian-problem",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["local-hamiltonian", "qma-membership", "union-bound", "precision"],

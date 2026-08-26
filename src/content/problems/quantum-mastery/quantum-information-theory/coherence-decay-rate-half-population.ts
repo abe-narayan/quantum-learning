@@ -6,7 +6,7 @@ export const coherenceDecayRateHalfPopulation: ConceptualProblem = {
     title: "Why Amplitude Damping's Coherence Decays at Half the Population Rate",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/the-lindblad-master-equation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["lindblad", "amplitude-damping"],

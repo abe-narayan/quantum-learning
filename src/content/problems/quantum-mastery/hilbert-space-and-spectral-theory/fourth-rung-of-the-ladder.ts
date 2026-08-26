@@ -9,7 +9,7 @@ export const fourthRungOfTheLadder: NumericProblem = {
     title: "The Third Rung, From Any of the Four Directions",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/capstone-what-rigor-buys-you",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["capstone", "infinite-well", "synthesis"],

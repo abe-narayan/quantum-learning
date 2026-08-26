@@ -24,11 +24,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Build first, run later">
+Quantum Gates & Circuits taught the physics: apply this matrix, to this qubit, right now, and watch the state vector change immediately. Real software doesn't usually work this way.
+</LessonHook>
+
 ## Motivation
 
-Quantum Gates & Circuits taught the physics: apply this matrix, to this
-qubit, right now, and watch the state vector change immediately. Real
-software doesn't usually work this way. A quantum program is typically
+A quantum program is typically
 built as a *description* of a circuit first (a list of instructions),
 which is only later sent off to be executed (on a simulator or real
 hardware). This lesson covers that software-engineering pattern
@@ -149,6 +151,21 @@ matrix identity $HZH=X$ exactly, since underneath, `runCircuit` is doing
 nothing more than applying $H$, then $Z$, then $H$ in sequence, exactly
 as Quantum Gates & Circuits' direct approach would.
 
+The instruction list above is still just data — here's what happens once
+`runCircuit` actually dispatches it, the real $|{\text{amplitude}}|^2$ at
+each qubit after every gate, not an interpolated guess:
+
+<CircuitStateStepper
+  numQubits={1}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "Z", targets: [0] },
+    { gate: "H", targets: [0] },
+  ]}
+  markedIndex={1}
+  ariaLabel="Stepping through H, Z, H on qubit 0, one gate at a time, with the resulting measurement-probability bars recomputed fresh after each step, ending on |1⟩"
+/>
+
 The circuit builder below is the same tool Quantum Gates & Circuits
 used, so it works in terms of qubit wires rather than a bare
 `QuantumCircuit(1)` and always keeps at least two of them on the
@@ -165,13 +182,13 @@ than reading it as a claim about someone else's code:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming `circuit.h(0)` immediately changes some quantum state.** It
 only appends an instruction to a list. Nothing about any quantum state
 exists until `runCircuit` is actually called.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking this is a fundamentally different kind of quantum computing.**
 It's the identical physics (every instruction dispatches to Quantum
 Gates & Circuits' own functions). Only the software organization
@@ -208,6 +225,8 @@ Gates & Circuits' own functions). Only the software organization
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Quantum SDKs Overview](/lessons/quantum-software/programming-quantum-computers/quantum-sdks-overview), which surveys how real-world SDKs
 extend this basic pattern with additional structure (registers,
 backends, transpilation).
+</NextDiscovery>

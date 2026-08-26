@@ -6,7 +6,7 @@ export const quantumAdvantageWeakClassicalBaselineMc: MultipleChoiceProblem = {
     title: "A Quantum Advantage Claim Against the Wrong Baseline",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "multiple-choice",
     tags: ["quantum-advantage", "quantum-supremacy", "claim-evaluation", "classical-simulation"],

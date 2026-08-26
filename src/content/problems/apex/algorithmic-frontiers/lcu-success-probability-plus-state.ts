@@ -6,7 +6,7 @@ export const lcuSuccessProbabilityPlusState: NumericProblem = {
     title: "Block-Encoding Success Probability for |+⟩",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "numeric",
     tags: ["block-encoding", "lcu", "post-selection"],

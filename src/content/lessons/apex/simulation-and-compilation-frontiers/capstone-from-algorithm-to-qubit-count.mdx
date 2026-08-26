@@ -90,6 +90,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="One number, four stages">
+  Five lessons built one running capability, each answering a different
+  question about the same circuit. This capstone's only job is to chain
+  those stages together into a single final number: how many physical
+  qubits an algorithm actually costs.
+</LessonHook>
+
 ## Motivation
 
 Five lessons built one running capability: **Tensor Networks and Matrix
@@ -319,7 +326,7 @@ $L$.
 
 ## Physical Interpretation: what's solid, and what's still research
 
-<Callout type="note">
+<Callout type="warning">
 **Not every stage of this pipeline carries the same epistemic weight,
 and pretending otherwise would misrepresent the field.** Stages 1
 through 3, checking classical simulability, counting T-count via
@@ -424,7 +431,7 @@ remaining uncertainty this lesson flags below, actually lives.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Skipping Stage 1 and jumping straight to compiling.** It is tempting
 to treat "count the gates, then estimate qubits" as the whole pipeline.
 But a circuit that is already classically simulable, like this
@@ -435,7 +442,7 @@ compilation effort is spent on a circuit that never needed a quantum
 computer at all.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Applying the routing multiplier to the T-count.** Stage 3's
 {swapOverheadMultiplier}× overhead comes from inserting SWAP gates to
 route two-qubit interactions across limited connectivity; it has
@@ -446,7 +453,7 @@ $N_T$, and therefore the magic-state factory sizing in Stage 4c, for no
 physical reason.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating the {totalPhysicalQubits}-qubit answer as equally certain
 across all four stages.** As the Physical Interpretation section
 argued, Stages 1–3 are routine engineering with essentially no
@@ -523,3 +530,10 @@ real algorithm, when the assumptions aren't handed to you as cleanly as
 they were here. That's exactly where [How to Read a Quantum Computing
 Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
 picks up.
+
+<NextDiscovery>
+  Next: the last remaining skill this pillar builds is knowing how to
+  evaluate someone else's pipeline, run on a real algorithm, when the
+  assumptions aren't handed to you as cleanly as they were here — that's
+  exactly where How to Read a Quantum Computing Paper picks up.
+</NextDiscovery>

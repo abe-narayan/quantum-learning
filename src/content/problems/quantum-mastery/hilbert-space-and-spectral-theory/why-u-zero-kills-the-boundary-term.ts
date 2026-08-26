@@ -6,7 +6,7 @@ export const whyUZeroKillsTheBoundaryTerm: ConceptualProblem = {
     title: "Why u(0)=0 Is Enough at the Radial Equation's Singular Origin",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["sturm-liouville", "boundary-conditions", "conceptual"],

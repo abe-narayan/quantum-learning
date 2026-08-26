@@ -41,6 +41,18 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson derives the exact period-finding circuit Shor's algorithm depends on, the same construction that made this 1994 result a threat real enough to justify a new generation of cryptography.",
     difficulty: "advanced",
+    // Image verified via WebFetch on the Commons file page (author "International
+    // Centre for Theoretical Physics", license CC BY 3.0) and via `curl -sI` on
+    // the upload.wikimedia.org URL (200, image/png).
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ed/Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png",
+    imageAlt: "Peter Shor speaking at a lectern after receiving the 2017 Dirac Medal from the ICTP",
+    imageCaption:
+      "Peter Shor in 2017, more than two decades after the 1994 result this entry describes, receiving the ICTP's Dirac Medal for exactly that work.",
+    imageAttribution: {
+      credit: "International Centre for Theoretical Physics",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png",
+      license: "CC BY 3.0",
+    },
   },
   // Source: D. Bouwmeester et al., "Experimental quantum teleportation,"
   // Nature 390, 575-579 (11 Dec. 1997). https://www.nature.com/articles/37539
@@ -116,6 +128,18 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This capstone is explicit that 'quantum speedup' needs a precise, defensible comparison to a real classical algorithm — exactly the argument Google and IBM publicly disagreed about over Sycamore's claimed 10,000-year classical runtime, and exactly what the 2022 Pan-Chen-Zhang classical simulation later demonstrated concretely: the 'best classical algorithm' a quantum-advantage claim is measured against is a moving target, not a fixed constant.",
     difficulty: "advanced",
+    // Image verified via WebFetch on the Commons file page (author "Google",
+    // license CC BY 3.0, sourced from Google's own Oct. 2019 YouTube release)
+    // and via `curl -sI` on the upload.wikimedia.org URL (200, image/png).
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png",
+    imageAlt: "Close-up of Google's Sycamore superconducting quantum processor chip",
+    imageCaption:
+      "The Sycamore processor itself, from Google's own October 2019 release — the 53-qubit chip behind this entry's 10,000-year classical-runtime claim and its later challenge.",
+    imageAttribution: {
+      credit: "Google",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png",
+      license: "CC BY 3.0",
+    },
   },
   // Source: The Nobel Prize in Physics 2022, press release, NobelPrize.org
   // (4 Oct. 2022).
@@ -135,6 +159,20 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson proves the |S| ≤ 2 bound that every local hidden-variable theory must obey; Clauser, Aspect, and Zeilinger are the three physicists whose experiments actually measured real entangled particles violating it.",
     difficulty: "intermediate",
+    // Image verified via WebFetch on the Commons file page (author "Jacqueline
+    // Godany", license CC BY 4.0) and via `curl -sI` on the upload.wikimedia.org
+    // URL (200, image/jpeg). Only one of the three 2022 laureates is pictured —
+    // no free group photo of all three was found — so the caption names him
+    // specifically rather than implying the photo covers all three.
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8b/Anton_Zeilinger_2021_%28profile_cropped%29.jpg",
+    imageAlt: "Portrait of physicist Anton Zeilinger at the Institute for Quantum Optics and Quantum Information, Vienna",
+    imageCaption:
+      "Anton Zeilinger, photographed in 2021 — one of the three physicists, with John Clauser and Alain Aspect, who jointly won the 2022 Nobel Prize this entry describes.",
+    imageAttribution: {
+      credit: "Jacqueline Godany",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Anton_Zeilinger_2021_(profile_cropped).jpg",
+      license: "CC BY 4.0",
+    },
   },
   // Source: Y. Kim et al., "Evidence for the utility of quantum computing
   // before fault tolerance," Nature 618, 500-505 (14 June 2023).
@@ -154,6 +192,22 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson derives zero-noise extrapolation's linear-in-noise-level formula from scratch — the exact technique IBM's 2023 paper leaned on to get a checkable answer out of noisy hardware without full error correction. The Tindall et al. rebuttal that followed within months is the sharpest real instance of the 'compared to what classical algorithm' problem: IBM's utility claim rested on the best classical method available in mid-2023, and a better one arrived before the year was out.",
     difficulty: "advanced",
+    // Image verified via WebFetch on the Commons file page (author "Onri Jay
+    // Benally" / OJB Quantum, license CC BY 4.0) and via `curl -sI` on the
+    // upload.wikimedia.org URL (200, image/jpeg). This is a Quantum System One
+    // at IBM's own Yorktown Heights research center, not the specific machine
+    // this 2023 result ran on, but IBM's 127-qubit Eagle processor (used here)
+    // is exactly the kind of chip that housing was built for — the caption
+    // says so explicitly.
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/91/IBM_Quantum_System_One.jpg",
+    imageAlt: "An IBM Quantum System One installation, its qubit chip enclosed in a hexagonal glass-and-steel chandelier housing",
+    imageCaption:
+      "An IBM Quantum System One at IBM's Yorktown Heights research center — the same chandelier-style enclosure IBM's 127-qubit Eagle processor (used in this 2023 result) runs inside, though not this specific machine.",
+    imageAttribution: {
+      credit: "Onri Jay Benally (OJB Quantum)",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg",
+      license: "CC BY 4.0",
+    },
   },
   // Source: L. McCuller et al., "Broadband Quantum Enhancement of the LIGO
   // Detectors with Frequency-Dependent Squeezing," Phys. Rev. X 13, 041021
@@ -178,6 +232,20 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson derives exactly how a squeezed state trades a narrower Δx for a wider Δp while keeping their product at the Heisenberg minimum — the mechanism LIGO's 2023 upgrade uses in its interferometer to beat the ordinary quantum noise floor.",
     difficulty: "advanced",
+    // Image verified via WebFetch on the Commons file page (author "Umptanum",
+    // license CC BY-SA 3.0 / GFDL) and via `curl -sI` on the upload.wikimedia.org
+    // URL (200, image/jpeg).
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/4/43/Northern_leg_of_LIGO_interferometer_on_Hanford_Reservation.JPG",
+    imageAlt: "The vacuum tube of LIGO's northern interferometer arm extending across the Hanford, Washington site",
+    imageCaption:
+      "One arm of LIGO's Hanford interferometer — this entry's 2023 squeezed-light upgrade was installed into detectors exactly like this one, at both the Hanford and Livingston sites.",
+    imageAttribution: {
+      credit: "Umptanum",
+      creditUrl:
+        "https://commons.wikimedia.org/wiki/File:Northern_leg_of_LIGO_interferometer_on_Hanford_Reservation.JPG",
+      license: "CC BY-SA 3.0",
+    },
   },
   // Source: D. Bluvstein et al., "Logical quantum processor based on
   // reconfigurable atom arrays," Nature 626, 58-65 (6 Dec. 2023).
@@ -216,6 +284,22 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This is the direct policy response to the threat this lesson derives mathematically: because Shor's algorithm breaks RSA's factoring assumption, NIST standardized replacement algorithms built on problems it doesn't touch.",
     difficulty: "intermediate",
+    // Image verified via WebFetch on https://www.nist.gov/image/post-quantum-cryptography-algorithms
+    // (credit "N. Hanacek/NIST") and via `curl -sI` on the nist.gov URL itself
+    // (200, image/png) — hosted directly on www.nist.gov, an allow-listed CSP
+    // host. License per NIST's own copyright policy
+    // (https://www.nist.gov/oism/copyrights): NIST content is public
+    // information unless explicitly marked otherwise, and this image carries
+    // no such marking.
+    imageUrl: "https://www.nist.gov/sites/default/files/images/2022/04/05/Crypto-rev1.png",
+    imageAlt: "NIST illustration for its post-quantum cryptography program, depicting a branching tree alongside lattice imagery",
+    imageCaption:
+      "NIST's own illustration for its post-quantum cryptography program — the multi-year effort that produced the three standards this entry describes.",
+    imageAttribution: {
+      credit: "N. Hanacek/NIST",
+      creditUrl: "https://www.nist.gov/image/post-quantum-cryptography-algorithms",
+      license: "Public domain (U.S. government work)",
+    },
   },
   // Source: Google Quantum AI blog, "Meet Willow, our state-of-the-art
   // quantum chip" (9 Dec. 2024); underlying paper R. Acharya et al.,
@@ -294,6 +378,22 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson explains why trapped ions' shared vibrational mode lets any pair of ions interact directly; two-qubit gate fidelity on exactly that mechanism is the number IonQ pushed to a record 99.99% in 2025.",
     difficulty: "intermediate",
+    // Image verified via WebFetch on the Commons file page (credit "Y.
+    // Colombe/NIST", public domain as a US federal government work) and via
+    // `curl -sI` on the upload.wikimedia.org URL (200, image/jpeg). This is
+    // NIST's own beryllium-ion apparatus from 2011, not IonQ's hardware — the
+    // caption is explicit that it illustrates the trapped-ion platform in
+    // general, not this specific 2025 result.
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg",
+    imageAlt:
+      "A NIST trapped-ion apparatus with beryllium ions held roughly 40 micrometers above a gold-plated ion-trap chip, surrounded by copper shielding",
+    imageCaption:
+      "A NIST trapped-ion apparatus (2011) — not IonQ's own hardware, but the same general trapped-ion platform IonQ's 2025 fidelity record was set on.",
+    imageAttribution: {
+      credit: "Y. Colombe/NIST",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg",
+      license: "Public domain (U.S. government work)",
+    },
   },
   // Source: J. S. Bell, "On the Einstein Podolsky Rosen Paradox,"
   // Physics Physique Fizika 1, 195-200 (Nov. 1964).
@@ -313,6 +413,20 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson's |S| ≤ 2 bound for any local hidden-variable theory is the direct mathematical descendant of the inequality Bell first derived in this 1964 paper, years before Clauser, Aspect, or Zeilinger could actually test it in a lab.",
     difficulty: "advanced",
+    // Image verified via WebFetch on the Commons file page (credit "CERN",
+    // license CC BY 4.0) and via `curl -sI` on the upload.wikimedia.org URL
+    // (200, image/jpeg).
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/b/b9/John_Bell_commenting_the_famous_Bell%27s_inequalities_%288206241%29.jpg",
+    imageAlt: "John Stewart Bell photographed at CERN in June 1982, standing at a blackboard",
+    imageCaption:
+      "John Bell at CERN in 1982, where he worked as a theoretical physicist for most of his career, roughly eighteen years after deriving the inequality this entry describes.",
+    imageAttribution: {
+      credit: "CERN",
+      creditUrl:
+        "https://commons.wikimedia.org/wiki/File:John_Bell_commenting_the_famous_Bell%27s_inequalities_(8206241).jpg",
+      license: "CC BY 4.0",
+    },
   },
   // Source: R. P. Feynman, "Simulating Physics with Computers,"
   // International Journal of Theoretical Physics 21 (6/7), 467-488
@@ -333,6 +447,19 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson turns Feynman's 1981 observation, that classical computers need exponential resources to simulate quantum systems while a quantum system could simulate another one directly, into the exact, quantitative Trotter error bound derived here.",
     difficulty: "master",
+    // Image verified via WebFetch on the Commons file page (public domain,
+    // published in Caltech's "The Big T" yearbook 1931-1977 without a
+    // copyright notice) and via `curl -sI` on the upload.wikimedia.org URL
+    // (200, image/png).
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/06/Richard_Feynman_1959.png",
+    imageAlt: "Richard Feynman at a blackboard, photographed in 1959",
+    imageCaption:
+      "Richard Feynman in 1959, roughly two decades before the 1981 MIT talk this entry describes, in which he proposed quantum simulation.",
+    imageAttribution: {
+      credit: "Caltech (\"The Big T\" yearbook, via Wikimedia Commons)",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Richard_Feynman_1959.png",
+      license: "Public domain",
+    },
   },
   // Source: A. Kandala et al., "Hardware-efficient variational quantum
   // eigensolver for small molecules and quantum magnets," Nature 549,
@@ -595,5 +722,21 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     whyThisMatters:
       "This lesson explains that every gate is, physically, a classical control system generating a precisely-shaped pulse and sending it to the qubit; D-Wave's 2026 chip moves that pulse generation from room-temperature electronics onto a chip bonded right next to the qubits, the specific hardware bet aimed at the wiring bottleneck that lesson's control system faces at scale.",
     difficulty: "intermediate",
+    // Image verified via WebFetch on the Commons file page (credit "UCL
+    // Mathematical & Physical Sciences", photo by Pavlos Apostolidis at the
+    // London Centre for Nanotechnology, license CC BY 2.0) and via `curl -sI`
+    // on the upload.wikimedia.org URL (200, image/jpeg). This is a UCL
+    // dilution refrigerator, not D-Wave's own hardware — the caption is
+    // explicit that it illustrates the general wiring/cryostat problem this
+    // entry's chip targets, not a photo of D-Wave's device.
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d6/Dilution_Refrigerator_%2839016294284%29.jpg",
+    imageAlt: "The interior of a dilution refrigerator at the London Centre for Nanotechnology, showing its cryogenic wiring stages",
+    imageCaption:
+      "A dilution refrigerator at UCL's London Centre for Nanotechnology — not D-Wave's own hardware, but the kind of cryostat wiring this entry's on-chip control chip is designed to reduce.",
+    imageAttribution: {
+      credit: "UCL Mathematical & Physical Sciences (photo: Pavlos Apostolidis, London Centre for Nanotechnology)",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Dilution_Refrigerator_(39016294284).jpg",
+      license: "CC BY 2.0",
+    },
   },
 ];

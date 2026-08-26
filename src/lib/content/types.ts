@@ -8,6 +8,23 @@ export type Pillar =
 
 export type Difficulty = "foundational" | "intermediate" | "advanced" | "master";
 
+/**
+ * The one difficulty→label map for the whole site (course rows, the lesson
+ * timeline, lesson search, problem cards, the problem page, structured
+ * data — everywhere `Difficulty` or a value translated onto it is shown).
+ * Lives here rather than beside `DifficultyMark` (the component that
+ * renders it as a tick ladder) because `structuredData.ts` needs the text
+ * too and is a `lib/` module that must not import from `components/`. See
+ * docs/UX_REVIEW.md P1-1 — this used to be hand-copied into nine files;
+ * import it instead of redeclaring it.
+ */
+export const DIFFICULTY_LABEL: Record<Difficulty, string> = {
+  foundational: "Foundational",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+  master: "Master",
+};
+
 export type PillarInfo = {
   slug: Pillar;
   title: string;

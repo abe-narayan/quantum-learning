@@ -86,7 +86,7 @@ function WireCircle({ plane, dashed }: { plane: "xy" | "xz" | "yz"; dashed: bool
             y1={point.sy}
             x2={next.sx}
             y2={next.sy}
-            style={{ stroke: "var(--border)" }}
+            className="stroke-border"
             strokeWidth={1}
             strokeDasharray={dashed || isBack ? "3 4" : undefined}
             opacity={depthOpacity(avgDepth)}
@@ -181,10 +181,10 @@ export function BerryPhaseCone({ ariaLabel }: { ariaLabel: string }) {
   const axisTopExtended = project({ x: 0, y: 0, z: 1.18 });
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={VIEW_SIZE} height={VIEW_SIZE} viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`} role="img" aria-label={ariaLabel}>
-          <circle cx={CENTER.x} cy={CENTER.y} r={RADIUS} fill="none" style={{ stroke: "var(--border)" }} strokeWidth={1.5} />
+          <circle cx={CENTER.x} cy={CENTER.y} r={RADIUS} fill="none" className="stroke-border" strokeWidth={1.5} />
 
           <WireCircle plane="xy" dashed={false} />
           <WireCircle plane="xz" dashed />
@@ -195,15 +195,14 @@ export function BerryPhaseCone({ ariaLabel }: { ariaLabel: string }) {
             y1={axisBottom.sy}
             x2={axisTopExtended.sx}
             y2={axisTopExtended.sy}
-            style={{ stroke: "var(--muted-foreground)" }}
+            className="stroke-muted-foreground"
             strokeWidth={1}
           />
           <text
             x={axisTopExtended.sx}
             y={axisTopExtended.sy - 8}
             textAnchor="middle"
-            className="font-mono text-[11px]"
-            style={{ fill: "var(--foreground)" }}
+            className="fill-foreground font-mono text-[11px]"
           >
             axis
           </text>
@@ -212,14 +211,14 @@ export function BerryPhaseCone({ ariaLabel }: { ariaLabel: string }) {
             <polygon
               key={patch.key}
               points={patch.points}
-              style={{ fill: "var(--brand)" }}
+              className="fill-brand"
               opacity={0.14 + 0.4 * Math.min(1, Math.max(0, (patch.depth + 1) / 2))}
             />
           ))}
 
-          <path d={loopPath} fill="none" style={{ stroke: "var(--accent)" }} strokeWidth={2.25} />
-          <circle cx={startMarker.sx} cy={startMarker.sy} r={4} style={{ fill: "var(--accent)" }} />
-          <circle cx={axisTop.sx} cy={axisTop.sy} r={3} style={{ fill: "var(--muted-foreground)" }} />
+          <path d={loopPath} fill="none" className="stroke-accent" strokeWidth={2.25} />
+          <circle cx={startMarker.sx} cy={startMarker.sy} r={4} className="fill-accent" />
+          <circle cx={axisTop.sx} cy={axisTop.sy} r={3} className="fill-muted-foreground" />
         </svg>
       </div>
 

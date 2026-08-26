@@ -9,6 +9,8 @@ import type { CanvasMode } from "./WavefunctionCanvas";
 import { PresetControls } from "./PresetControls";
 import { WavefunctionSimulation } from "./WavefunctionSimulation";
 import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
@@ -170,96 +172,92 @@ export function WavefunctionExplorer({
   }
 
   return (
-    <div className="not-prose space-y-4">
-      <p className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">What we&apos;re studying: </span>
-        A real numerical solution to the time-dependent Schrödinger equation — watch which states stay frozen
-        in shape and which ones move, spread, or leak through barriers.
-      </p>
-
-      <div className="rounded-3xl border border-border bg-surface p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <PresetToggle
-            options={PRESETS}
-            index={PRESETS.findIndex((p) => p.id === presetId)}
-            onChange={(index) => handlePresetChange(PRESETS[index].id)}
-            ariaLabel="Wavefunction presets"
-          />
-          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
-        </div>
-        <p className="mt-3 text-sm text-muted-foreground">{preset.description}</p>
-
-        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="space-y-3">
-            <div role="tablist" aria-label="View mode" className="flex overflow-hidden rounded-full border border-border w-fit">
-              {(
-                [
-                  { id: "density", label: "|ψ(x)|²" },
-                  { id: "real-imaginary", label: "Re / Im" },
-                  { id: "momentum", label: "|φ(k)|²" },
-                ] as const
-              ).map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={mode === option.id}
-                  onClick={() => setMode(option.id)}
-                  className={
-                    "px-3 py-1 text-xs font-medium transition-colors " +
-                    (mode === option.id ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted")
-                  }
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-
-            <WavefunctionSimulation
-              key={configKey}
-              setup={setup}
-              mode={mode}
-              speed={speed}
-              onSpeedChange={setSpeed}
-              prefersReducedMotion={prefersReducedMotion}
-              showMeanSpreadOverlay={showMeanSpreadOverlay}
+    <SimulatorInstrument
+      label="Wavefunction — time-dependent Schrödinger equation"
+      footnote="Next: the harmonic oscillator's energy ladder was derived algebraically with operators earlier in the course — here it's the same states as real wavefunctions."
+      stageClassName="space-y-3"
+      stage={
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <PresetToggle
+              options={PRESETS}
+              index={PRESETS.findIndex((p) => p.id === presetId)}
+              onChange={(index) => handlePresetChange(PRESETS[index].id)}
+              ariaLabel="Wavefunction presets"
             />
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Parameters</p>
-              <div className="mt-2">
-                <PresetControls params={preset.params} values={paramValues} onChange={handleParamChange} />
-              </div>
-            </div>
-            <Button variant="secondary" size="sm" onClick={handleResetParams}>
-              Reset parameters to default
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground">{preset.description}</p>
+
+          <div role="tablist" aria-label="View mode" className="flex overflow-hidden rounded-full border border-border w-fit">
+            {(
+              [
+                { id: "density", label: "|ψ(x)|²" },
+                { id: "real-imaginary", label: "Re / Im" },
+                { id: "momentum", label: "|φ(k)|²" },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                role="tab"
+                aria-selected={mode === option.id}
+                onClick={() => setMode(option.id)}
+                className={
+                  "px-3 py-1 text-xs font-medium transition-colors " +
+                  (mode === option.id ? "bg-pillar text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted")
+                }
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          <WavefunctionSimulation
+            key={configKey}
+            setup={setup}
+            mode={mode}
+            speed={speed}
+            onSpeedChange={setSpeed}
+            prefersReducedMotion={prefersReducedMotion}
+            showMeanSpreadOverlay={showMeanSpreadOverlay}
+          />
+
+          <SimulatorFraming
+            shows="A real numerical solution to the time-dependent Schrödinger equation — watch which states stay frozen in shape and which ones move, spread, or leak through barriers."
+            tryThis={
+              <ul>
+                <li>
+                  Load Infinite Well — Ground State, confirm |ψ(x)|² never changes shape, then switch to
+                  Superposition of Two Eigenstates and watch it visibly &quot;beat&quot; at a rate set by the
+                  energy gap.
+                </li>
+                <li>
+                  Tunneling loads with the packet&apos;s momentum-derived energy already below the barrier
+                  height — confirm a small but nonzero probability still leaks through, then raise momentum
+                  (or lower barrier height) until energy exceeds it and watch ordinary classical transmission
+                  take over instead.
+                </li>
+              </ul>
+            }
+          />
+        </>
+      }
+      controls={
+        <div className="space-y-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Parameters</p>
+            <div className="mt-2">
+              <PresetControls params={preset.params} values={paramValues} onChange={handleParamChange} />
+            </div>
+          </div>
+          <Button variant="secondary" size="sm" onClick={handleResetParams}>
+            Reset parameters to default
+          </Button>
         </div>
-      </div>
-
-      <div className="space-y-1 text-sm text-muted-foreground">
-        <p>
-          <span className="font-semibold text-foreground">Try this: </span>
-          Load Infinite Well — Ground State, confirm |ψ(x)|² never changes shape, then switch to Superposition
-          of Two Eigenstates and watch it visibly &quot;beat&quot; at a rate set by the energy gap.
-        </p>
-        <p>
-          Tunneling loads with the packet&apos;s momentum-derived energy already below the barrier height —
-          confirm a small but nonzero probability still leaks through, then raise momentum (or lower barrier
-          height) until energy exceeds it and watch ordinary classical transmission take over instead.
-        </p>
-      </div>
-
-      <p className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">What&apos;s next: </span>
-        The harmonic oscillator&apos;s energy ladder was derived algebraically with operators earlier in the
-        course — here it&apos;s the same states as real wavefunctions.
-      </p>
-    </div>
+      }
+    />
   );
 }

@@ -13,7 +13,9 @@
  */
 
 import type { Course, Difficulty, Pillar } from "./content/types";
+import { DIFFICULTY_LABEL } from "./content/types";
 import type { ProblemDifficulty } from "./problems/types";
+import { PROBLEM_TO_DIFFICULTY } from "./problems/types";
 
 // Placeholder domain — no production domain is configured anywhere in this
 // repo. Matches the placeholder used in src/app/sitemap.ts, src/app/robots.ts,
@@ -24,22 +26,6 @@ export const BASE_URL = "https://quantumlearn.example";
 const SITE_NAME = "QuantumLearn";
 const SITE_DESCRIPTION =
   "An interactive platform for learning quantum mechanics and quantum computing — lessons, simulators, and problem sets for advanced high-school and early-college students.";
-
-// This site's internal difficulty vocabularies aren't schema.org enums —
-// `educationalLevel` expects free text describing the intended audience, so
-// these just map onto plain-language labels.
-const LESSON_DIFFICULTY_LABEL: Record<Difficulty, string> = {
-  foundational: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-  master: "Graduate",
-};
-
-const PROBLEM_DIFFICULTY_LABEL: Record<ProblemDifficulty, string> = {
-  beginner: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-};
 
 /** A JSON-LD document: always includes "@context" and "@type". */
 export type JsonLd = Record<string, unknown>;
@@ -55,7 +41,9 @@ const PILLAR_PATH: Record<Pillar, string> = {
   "quantum-computing": "/computing",
   "quantum-hardware": "/hardware",
   "quantum-software": "/software",
-  "quantum-mastery": "/learn",
+  // Quantum Mastery now has its own pillar landing page (src/app/mastery) —
+  // previously pointed at "/learn" because no dedicated page existed yet.
+  "quantum-mastery": "/mastery",
   apex: "/apex",
 };
 
@@ -130,7 +118,7 @@ export function buildLessonSchema(opts: {
     url,
     inLanguage: "en",
     learningResourceType: "Lesson",
-    educationalLevel: LESSON_DIFFICULTY_LABEL[opts.difficulty],
+    educationalLevel: DIFFICULTY_LABEL[opts.difficulty],
     isPartOf: {
       "@type": "Course",
       name: opts.courseTitle,
@@ -159,7 +147,7 @@ export function buildProblemSchema(opts: {
     url,
     inLanguage: "en",
     learningResourceType: "Practice Problem",
-    educationalLevel: PROBLEM_DIFFICULTY_LABEL[opts.difficulty],
+    educationalLevel: DIFFICULTY_LABEL[PROBLEM_TO_DIFFICULTY[opts.difficulty]],
     ...(opts.courseTitle
       ? {
           isPartOf: {
@@ -183,7 +171,7 @@ export function buildCourseSchema(course: Course, url: string): JsonLd {
     description: course.description,
     url,
     inLanguage: "en",
-    educationalLevel: LESSON_DIFFICULTY_LABEL[course.difficulty],
+    educationalLevel: DIFFICULTY_LABEL[course.difficulty],
     provider: { "@id": `${BASE_URL}/#organization` },
     ...(course.prerequisites.length > 0
       ? { coursePrerequisites: course.prerequisites.join(", ") }

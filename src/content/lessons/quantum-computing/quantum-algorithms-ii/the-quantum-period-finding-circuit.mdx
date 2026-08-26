@@ -42,12 +42,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Order-finding needs the period of the function f(x)=aˣ mod N, and periods are exactly what the QFT is built to extract from a phase pattern. This lesson connects the two.
+</LessonHook>
+
 ## Motivation
 
-Order-finding needs the period of the function $f(x)=a^x\bmod N$, and
-periods are exactly what the QFT (Quantum Algorithms I) is built to
-extract from a phase pattern. This lesson connects the two: build the
-right state, apply the QFT, and read off the period from where the output
+This lesson connects the two: build the
+right state, apply the QFT (Quantum Algorithms I), and read off the period from where the output
 amplitude concentrates.
 
 <ExternalFigure
@@ -184,14 +186,14 @@ approximately, to six decimal places.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming this platform runs a literal controlled-modular-multiplication
 circuit.** It doesn't. `periodFindingState` constructs the *exact output*
 of such a circuit directly from its closed-form amplitudes, an explicit
 and documented scope choice, not a hidden shortcut.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting exactly one sharp peak.** A periodic function with period $r$
 concentrates its amplitude near multiples of $2^t/r$, not into one single
 outcome. Order finding needs at least one of them, and the
@@ -242,6 +244,7 @@ clean picture the sharp case suggests.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Worked Example: Factoring 15](/lessons/quantum-computing/quantum-algorithms-ii/worked-example-factoring-15), running the complete pipeline,
 period finding, the classical reduction, and gcd, on the smallest number
 that actually demonstrates Shor's algorithm end to end.
@@ -251,3 +254,4 @@ Trotterization](/lessons/quantum-mastery/advanced-algorithms-and-complexity/hami
 picks up this lesson's controlled-$U^{2^k}$-style structure and derives
 a genuine, verified error bound for simulating time evolution under a
 general, non-commuting Hamiltonian.
+</NextDiscovery>

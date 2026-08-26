@@ -1,56 +1,58 @@
 import Link from "next/link";
+import { Eyebrow } from "@/components/ui/Typography";
 import { getEntriesForLesson } from "@/lib/content/currentQuantum/registry";
-
-/**
- * Entries may record only a year+month ("1994-11") when a more precise date
- * isn't confirmable; parsing as UTC and formatting with those two fields
- * keeps both "1994-11" and "2024-12-09" rendering sensibly. Mirrors
- * `formatDate` in `CurrentQuantumCard.tsx` — kept local rather than shared
- * since it's a small, self-contained formatting rule.
- */
-function formatDate(iso: string): string {
-  const parts = iso.split("-").map(Number);
-  const [year, month, day] = parts;
-  const date = new Date(Date.UTC(year, (month ?? 1) - 1, day ?? 1));
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: day ? "numeric" : undefined,
-    timeZone: "UTC",
-  });
-}
+import { CurrentQuantumCard } from "./CurrentQuantumCard";
 
 /**
  * Reverse link from a lesson to the "Current Quantum" entries that cite it
- * (see `getEntriesForLesson`). No authoring required on the lesson side —
- * this renders nothing for the ~170 lessons with zero matching entries, and
- * a compact card per match otherwise.
+ * (see `getEntriesForLesson`) — the moment a lesson stops being a closed
+ * document and becomes "here's what's happening with this, right now."
  *
- * `/current-quantum`'s entries have no stable per-entry DOM id (the catalog
- * is a client-filtered list, see `CurrentQuantumCatalog.tsx`), so links here
- * point at the catalog page itself rather than an unreliable anchor.
+ * Deliberately self-contained: this is embedded at the bottom of every
+ * lesson by `LessonLayout` (owned by another agent, currently mid-redesign
+ * itself), so it makes no assumptions about its surroundings beyond sitting
+ * in a normal content column — it renders nothing for the lessons with no
+ * matching entry, and doesn't wrap itself in `PillarScope` (that would paint
+ * a second atmosphere layer inside a page that already has one from the
+ * lesson's own pillar). Each entry still gets its own `data-pillar` — via
+ * the shared `CurrentQuantumCard` — for the curriculum area *that entry*
+ * connects to, which is usually but not always this lesson's own pillar.
+ *
+ * `lessonTitle` is passed as `undefined` to `CurrentQuantumCard`: every
+ * entry here is, by construction, already the one connected to *this*
+ * lesson, so the card's "explained in" link back to it would be a
+ * redundant self-link.
  */
 export function RelatedCurrentQuantum({ lessonSlug }: { lessonSlug: string }) {
   const entries = getEntriesForLesson(lessonSlug);
   if (entries.length === 0) return null;
 
   return (
-    <div className="mt-10 max-w-3xl border-t border-border pt-8">
-      <h2 className="text-sm font-semibold text-foreground">Connected to real research</h2>
-      <ul className="mt-4 space-y-3">
+    <section aria-labelledby="current-quantum-heading" className="mt-12 max-w-3xl border-t border-border pt-10">
+      <Eyebrow>Current Quantum</Eyebrow>
+      <h2
+        id="current-quantum-heading"
+        className="mt-3 font-display text-2xl font-semibold tracking-tight text-foreground"
+      >
+        Real research connected to this lesson
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+        {entries.length === 1
+          ? "One dated, sourced development that leans on exactly what this lesson explains."
+          : `${entries.length} dated, sourced developments that lean on exactly what this lesson explains.`}
+      </p>
+
+      <div className="mt-6 space-y-6">
         {entries.map((entry) => (
-          <li key={entry.slug} className="rounded-2xl border border-border bg-surface-muted/60 p-5">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {formatDate(entry.date)}
-            </p>
-            <p className="mt-1 text-sm font-semibold text-foreground">{entry.title}</p>
-            <p className="mt-2 text-sm text-muted-foreground">{entry.whyThisMatters}</p>
-            <Link href="/current-quantum" className="mt-2 inline-block text-sm text-brand hover:underline">
-              See {entry.title} in Current Quantum
-            </Link>
-          </li>
+          <CurrentQuantumCard key={entry.slug} entry={entry} lessonTitle={undefined} headingLevel={3} />
         ))}
-      </ul>
-    </div>
+      </div>
+
+      <p className="mt-5">
+        <Link href="/current-quantum" className="text-sm font-medium text-pillar-text hover:underline">
+          See every development in Current Quantum &rarr;
+        </Link>
+      </p>
+    </section>
   );
 }

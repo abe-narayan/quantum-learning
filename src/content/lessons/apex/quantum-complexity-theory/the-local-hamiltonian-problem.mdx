@@ -148,6 +148,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Quantum computing's Cook-Levin theorem">
+  Asking whether a physical system's lowest-energy state sits below some
+  threshold is a question condensed-matter physicists and chemists ask
+  every day. Phrased as a decision problem with one locality restriction,
+  it turns out to be exactly as hard as any problem a quantum computer
+  can verify.
+</LessonHook>
+
 ## Motivation
 
 The prerequisite lesson ended by pointing at a specific kind of witness: the
@@ -170,6 +178,15 @@ problem reduces to. Getting there requires two separate arguments — an
 easy direction (membership) and a genuinely deep one (hardness) — and this
 lesson gives both, being explicit about which one it derives in full and
 which one it only sketches the architecture of.
+
+<ComplexityClassDiagram
+  outer={{ id: "PSPACE", label: "PSPACE" }}
+  ring={{ id: "QMA", label: "QMA" }}
+  lensB={{ id: "NP", label: "NP" }}
+  markedPoint={{ label: "Local Hamiltonian", note: "QMA-complete" }}
+  footnote="NP ⊆ QMA ⊆ PSPACE were proven in the prerequisite lesson. This lesson's own theorem is the marked point: Local Hamiltonian sits right at QMA's boundary — every other QMA problem reduces to it."
+  ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains a solid ring labeled QMA, which contains NP. A marked point on QMA's boundary is labeled Local Hamiltonian, QMA-complete — this lesson's theorem, that Local Hamiltonian is exactly as hard as any problem QMA can verify."
+/>
 
 ## Mathematical Development
 
@@ -281,7 +298,19 @@ makes $U$ accept, by adding a **clock register** to track *which
 timestep* a superposition represents, and defining the **history
 state**
 
-$$|\eta\rangle = \frac{1}{\sqrt{T+1}} \sum_{t=0}^{T} |t\rangle_{\text{clock}} \otimes \big(U_t \cdots U_1 |\psi\rangle|0\cdots0\rangle\big)_{\text{computation}}.$$
+<EquationReveal
+  terms={[
+    { id: "eta", symbol: "|η⟩", gloss: "The history state — a single quantum state encoding every intermediate snapshot of the circuit's execution at once, in superposition." },
+    { id: "T", symbol: "T", gloss: "The total number of gates in the verification circuit U = U_T ⋯ U_1." },
+    { id: "clock", symbol: "|t⟩_clock", gloss: "The clock register: tags which timestep of the circuit's execution a given branch of the superposition represents." },
+    { id: "Ut", symbol: "Uₜ⋯U₁", gloss: "The circuit's first t gates applied in sequence — the computational register's actual state at time t." },
+    { id: "psi", symbol: "|ψ⟩", gloss: "The witness Merlin sends, occupying part of the computational register alongside the ancillas." },
+  ]}
+>
+$$
+|\eta\rangle = \frac{1}{\sqrt{T+1}} \sum_{t=0}^{T} |t\rangle_{\text{clock}} \otimes \big(U_t \cdots U_1 |\psi\rangle|0\cdots0\rangle\big)_{\text{computation}}.
+$$
+</EquationReveal>
 
 This is a single quantum state that is, in superposition, *every
 intermediate snapshot of the circuit's own execution at once* — the state
@@ -386,6 +415,13 @@ describe.
 
 ## Physical Interpretation: Why This Matters
 
+<InsightBlock>
+  Local Hamiltonian is QMA's Cook-Levin problem: the ground state is
+  always a natural, checkable witness, but Kitaev's history-state
+  construction is what shows that verifying it is also, in the worst
+  case, exactly as hard as anything QMA can express.
+</InsightBlock>
+
 Local Hamiltonian is $\mathsf{QMA}$'s canonical complete problem in
 *exactly* the sense that 3-SAT is $\mathsf{NP}$'s: it is the single
 problem every other problem in the class reduces to, so proving anything
@@ -467,7 +503,7 @@ case small enough to compute by hand: zero energy on a transition that
 correctly applies the circuit's next gate, and a real, positive penalty on
 one that does not.
 
-## Interactive Visualization
+## Visualizing the History State
 
 The diagram below lays out the clock register as a timeline
 $t = 0, 1, \ldots, T$, with the circuit's gates $U_1, \ldots, U_T$ sitting
@@ -549,7 +585,7 @@ from a witness the original verifier would have accepted.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating $\mathsf{QMA}$-completeness of Local Hamiltonian as a blanket
 statement that "quantum many-body physics is intractable."** It is a
 *worst-case* hardness result: it says there exist instances (adversarially
@@ -565,7 +601,7 @@ hardness identifies the ceiling on the general problem, not the floor on
 every instance a physicist actually cares about.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing "Local Hamiltonian is in $\mathsf{QMA}$" with "ground states
 are easy to find."** $\mathsf{QMA}$ membership only says the ground state
 is easy to *verify* once Merlin hands it over — exactly as $\mathsf{NP}$
@@ -632,8 +668,9 @@ $\mathsf{NP}$-complete problems have efficient classical ones.
 
 ## Further Exploration
 
-Next: [Query Complexity and Lower Bounds](/lessons/apex/quantum-complexity-theory/query-complexity-and-lower-bounds),
-where the same rigor is turned on the *other* direction of hardness —
-proving that certain quantum algorithms, Grover's foremost among them,
-cannot be improved upon, rather than proving a problem is hard to solve at
-all.
+<NextDiscovery>
+  Next: [Query Complexity and Lower Bounds](/lessons/apex/quantum-complexity-theory/query-complexity-and-lower-bounds)
+  turns the same rigor on the *other* direction of hardness — proving that
+  certain quantum algorithms, Grover's foremost among them, cannot be
+  improved upon, rather than proving a problem is hard to solve at all.
+</NextDiscovery>

@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/Button";
 import { PopulationCurve } from "./PopulationCurve";
 import { RabiControls } from "./RabiControls";
 import { KatexMath } from "@/components/ui/KatexMath";
-import { LabNotes } from "./LabNotes";
+import { Readout } from "@/components/ui/Typography";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 
 const SAMPLES = 240;
 const PLAY_INTERVAL_MS = 40;
@@ -182,87 +184,79 @@ export function RabiExplorer() {
   const maxPopulation = (4 * driveStrength * driveStrength) / (detuning * detuning + 4 * driveStrength * driveStrength);
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
-      <div className="space-y-6">
-        <div className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          {detuning === 0 ? (
-            <>On resonance: population fully transfers to |1⟩ and back, P(1) = sin²(Vt).</>
-          ) : (
-            <>
-              Off resonance: population never fully transfers. Maximum reachable P(1) ≈{" "}
-              {maxPopulation.toFixed(3)}, set by 4V²/(Δ²+4V²).
-            </>
-          )}
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div>
-            <p className="mb-2 text-xs font-medium text-muted-foreground">Population of |1⟩ over time</p>
-            <PopulationCurve samples={populationSamples} tMax={tMax} currentT={current.t} currentP1={p1} />
+    <SimulatorInstrument
+      label="Rabi driving — two-level system"
+      readout={<Readout label="P(1)" value={p1.toFixed(3)} />}
+      footnote="Next: real qubits also lose coherence while being driven — see that decay in the Noise & Decoherence Explorer."
+      stageClassName="space-y-6"
+      stage={
+        <>
+          <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+            {detuning === 0 ? (
+              <>On resonance: population fully transfers to |1⟩ and back, P(1) = sin²(Vt).</>
+            ) : (
+              <>
+                Off resonance: population never fully transfers. Maximum reachable P(1) ≈{" "}
+                {maxPopulation.toFixed(3)}, set by 4V²/(Δ²+4V²).
+              </>
+            )}
           </div>
-          <div>
-            <p className="mb-2 text-xs font-medium text-muted-foreground">Bloch-sphere trajectory (drag to rotate)</p>
-            <BlochSphereCanvas blochPoint={blochPoint} className="mx-auto w-full max-w-[220px]" />
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Population of |1⟩ over time</p>
+              <PopulationCurve samples={populationSamples} tMax={tMax} currentT={current.t} currentP1={p1} />
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Bloch-sphere trajectory (drag to rotate)</p>
+              <BlochSphereCanvas blochPoint={blochPoint} className="mx-auto w-full max-w-[220px]" />
+            </div>
           </div>
-        </div>
 
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
-          <KatexMath
-            tex={`P(1) = ${p1.toFixed(4)} \\qquad \\Omega_{\\text{eff}} = \\sqrt{\\Delta^2+4V^2} = ${omegaEff.toFixed(3)}`}
-            display
+          <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+            <KatexMath
+              tex={`P(1) = ${p1.toFixed(4)} \\qquad \\Omega_{\\text{eff}} = \\sqrt{\\Delta^2+4V^2} = ${omegaEff.toFixed(3)}`}
+              display
+            />
+          </div>
+
+          <SimulatorFraming
+            shows="Driving a qubit at its transition frequency swaps its state completely; drive off-resonance and something has to give."
+            tryThis="Set detuning to 0 and confirm population fully cycles 0→1→0. Then increase detuning until the Bloch trajectory visibly stops reaching the south pole, and check that the displayed max P(1) matches 4V²/(Δ²+4V²)."
           />
-        </div>
-
-        <LabNotes
-          notes={[
-            {
-              label: "What we're studying",
-              content:
-                "Driving a qubit at its transition frequency swaps its state completely; drive off-resonance and something has to give.",
-            },
-            {
-              label: "Try this",
-              content:
-                "Set detuning to 0 and confirm population fully cycles 0→1→0. Then increase detuning until the Bloch trajectory visibly stops reaching the south pole, and check that the displayed max P(1) matches 4V²/(Δ²+4V²).",
-            },
-            {
-              label: "What's next",
-              content:
-                "Next: real qubits also lose coherence while being driven — see that decay in the Noise & Decoherence Explorer.",
-            },
-          ]}
-        />
-      </div>
-
-      <div>
-        <div className="flex justify-end">
-          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
-        </div>
-        <div className="mt-4">
-          <RabiControls
-            driveStrength={driveStrength}
-            onDriveStrengthChange={handleDriveStrengthChange}
-            detuning={detuning}
-            onDetuningChange={handleDetuningChange}
-            sampleIndex={sampleIndex}
-            maxSampleIndex={SAMPLES}
-            currentTLabel={`t = ${current.t.toFixed(2)}`}
-            onSampleIndexChange={(i) => {
-              setIsPlaying(false);
-              setSampleIndex(i);
-            }}
-            isPlaying={isPlaying}
-            onTogglePlay={handleTogglePlay}
-            onReset={() => {
-              setIsPlaying(false);
-              setSampleIndex(0);
-            }}
-            prefersReducedMotion={prefersReducedMotion}
-          />
-        </div>
-      </div>
-    </div>
+        </>
+      }
+      controls={
+        <>
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+          <div className="mt-4">
+            <RabiControls
+              driveStrength={driveStrength}
+              onDriveStrengthChange={handleDriveStrengthChange}
+              detuning={detuning}
+              onDetuningChange={handleDetuningChange}
+              sampleIndex={sampleIndex}
+              maxSampleIndex={SAMPLES}
+              currentTLabel={`t = ${current.t.toFixed(2)}`}
+              onSampleIndexChange={(i) => {
+                setIsPlaying(false);
+                setSampleIndex(i);
+              }}
+              isPlaying={isPlaying}
+              onTogglePlay={handleTogglePlay}
+              onReset={() => {
+                setIsPlaying(false);
+                setSampleIndex(0);
+              }}
+              prefersReducedMotion={prefersReducedMotion}
+            />
+          </div>
+        </>
+      }
+    />
   );
 }

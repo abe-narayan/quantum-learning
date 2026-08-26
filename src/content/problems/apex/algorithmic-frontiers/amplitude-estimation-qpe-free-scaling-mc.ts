@@ -6,7 +6,7 @@ export const amplitudeEstimationQpeFreeScalingMc: MultipleChoiceProblem = {
     title: "What QPE-Free Amplitude Estimation Actually Achieves",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["amplitude-estimation", "qpe-free", "nisq", "maximum-likelihood"],

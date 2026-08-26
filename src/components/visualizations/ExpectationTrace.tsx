@@ -66,7 +66,7 @@ export function ExpectationTrace({
   const yOf = (v: number) => PAD + (1 - (v - yMin) / ySpan) * plotH;
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
           <line x1={PAD} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
@@ -108,7 +108,7 @@ export function ExpectationTrace({
       <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
         {series.map((s, i) => (
           <span key={i} className="flex items-center gap-1.5">
-            <svg width={16} height={4} className="shrink-0">
+            <svg width={16} height={4} className="shrink-0" aria-hidden="true">
               <line
                 x1={0}
                 y1={2}

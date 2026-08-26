@@ -6,7 +6,7 @@ export const whyStabilizerOverlapsAreAlwaysEven: ConceptualProblem = {
     title: "Why Every X/Z Stabilizer Pair Shares an Even Number of Qubits",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/surface-codes-in-depth",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "conceptual",
     tags: ["surface-codes", "css-codes", "commutation"],

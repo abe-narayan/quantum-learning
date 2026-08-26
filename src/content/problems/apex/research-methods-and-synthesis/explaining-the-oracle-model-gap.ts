@@ -6,7 +6,7 @@ export const explainingTheOracleModelGap: ConceptualProblem = {
     title: "Explaining Why the Speedup Claim Needs Two Caveats",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["paper-reading", "oracle-separation", "numerical-vs-proven", "claim-evaluation"],

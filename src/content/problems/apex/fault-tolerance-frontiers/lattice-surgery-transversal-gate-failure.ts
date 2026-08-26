@@ -6,7 +6,7 @@ export const latticeSurgeryTransversalGateFailure: MultipleChoiceProblem = {
     title: "Why No Transversal Gate Between Two Patches?",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/lattice-surgery",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["lattice-surgery", "surface-codes", "fault-tolerance"],

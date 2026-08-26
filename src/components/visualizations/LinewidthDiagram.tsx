@@ -68,7 +68,7 @@ export function LinewidthDiagram({
   const totalHeight = LEVEL_PANEL_HEIGHT + PANEL_GAP + CURVE_PANEL_HEIGHT;
 
   return (
-    <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-4 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg
           width={WIDTH}

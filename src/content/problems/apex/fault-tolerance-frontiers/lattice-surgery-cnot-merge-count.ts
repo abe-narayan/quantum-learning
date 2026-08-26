@@ -6,7 +6,7 @@ export const latticeSurgeryCnotMergeCount: NumericProblem = {
     title: "Counting Merges in the Lattice-Surgery CNOT",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/lattice-surgery",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 4,
     problemType: "numeric",
     tags: ["lattice-surgery", "cnot", "fault-tolerance"],

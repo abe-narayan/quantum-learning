@@ -43,6 +43,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Give a quantum particle more than enough energy to clear a step and it
+  still, some of the time, bounces back — a departure from classical
+  mechanics that never goes away, no matter how much energy it has.
+</LessonHook>
+
 ## Motivation
 
 A ball rolling toward a downhill (or gentle uphill, as long as it has
@@ -95,25 +101,30 @@ wave in region 2, since nothing is incident from the right.
 
 ### Matching at $x=0$
 
-Continuity of $\psi$ and $\psi'$ at $x=0$:
+Continuity of $\psi$ and $\psi'$ at $x=0$ gives two equations.
 
+<DerivationSteps>
+  <DerivationStep annotation="Continuity of ψ at x=0: both pieces must agree at the boundary.">
 $$
-1+r = t \qquad\text{(continuity of $\psi$)}
+1+r = t
 $$
-
+  </DerivationStep>
+  <DerivationStep annotation="Continuity of ψ′ at x=0: differentiate each region's plane waves and match, cancelling the shared factor of i.">
 $$
-ik_1(1-r) = ik_2t \;\Longrightarrow\; k_1(1-r)=k_2t \qquad\text{(continuity of $\psi'$)}
+ik_1(1-r) = ik_2t \;\Longrightarrow\; k_1(1-r)=k_2t
 $$
-
-Substituting $t=1+r$ into the second equation:
-
+  </DerivationStep>
+  <DerivationStep annotation="Substitute t=1+r from the first equation into the second, then collect terms in r.">
 $$
 k_1-k_1r = k_2(1+r) = k_2+k_2r \;\Longrightarrow\; k_1-k_2 = r(k_1+k_2)
 $$
-
+  </DerivationStep>
+  <DerivationStep annotation="Solve for r, then recover t from t=1+r.">
 $$
-\boxed{\;r = \frac{k_1-k_2}{k_1+k_2}, \qquad t = \frac{2k_1}{k_1+k_2}\;}
+r = \frac{k_1-k_2}{k_1+k_2}, \qquad t = \frac{2k_1}{k_1+k_2}
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 ### Reflection and transmission probabilities
 
@@ -225,13 +236,13 @@ and its test suite confirms sums to exactly 1 with $R$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the $k_2/k_1$ factor in $T$.** Probability flux, not
 amplitude-squared alone, is what must be conserved. $|t|^2$ alone
 doesn't equal the transmission probability unless $k_1=k_2$.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting classical behavior to reappear for large $E$.** $R\to0$ only
 in the limit $E\to\infty$ (where $k_2\to k_1$), never exactly at any
 finite energy. The reflection persists at every finite energy; it isn't
@@ -261,6 +272,13 @@ a small-energy artifact that a fast enough particle escapes.
 
 ## Further Exploration
 
-Next: [Resonant Transmission Through a Barrier](/lessons/quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier), extending this
-two-region result to a full barrier, with a striking consequence:
-special energies where a barrier becomes perfectly, exactly transparent.
+<ChallengePrompt prompt="Physical Interpretation showed R→0 only asymptotically as E/V0→∞. What happens to R in the OPPOSITE limit, as E approaches V0 from above (just barely enough energy to classically cross)?">
+  Take $k_2=\sqrt{2(E-V_0)}$ to zero in the boxed $R$ formula, with $k_1$
+  staying fixed at $\sqrt{2V_0}$ — no new derivation needed, just the limit.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Resonant Transmission Through a Barrier](/lessons/quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier), extending this
+  two-region result to a full barrier, with a striking consequence:
+  special energies where a barrier becomes perfectly, exactly transparent.
+</NextDiscovery>

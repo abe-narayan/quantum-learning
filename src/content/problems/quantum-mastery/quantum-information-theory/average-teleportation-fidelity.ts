@@ -6,7 +6,7 @@ export const averageTeleportationFidelity: NumericProblem = {
     title: "Average Teleportation Fidelity from Singlet Fraction",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["teleportation", "fidelity"],

@@ -14,7 +14,7 @@ export const infiniteWellOrthogonalityCheck: NumericProblem = {
     title: "Predict the Overlap of Two Different Eigenstates",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["sturm-liouville", "orthogonality"],

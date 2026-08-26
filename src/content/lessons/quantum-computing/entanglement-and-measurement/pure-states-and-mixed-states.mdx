@@ -31,14 +31,16 @@ export const zeroState = StateVector.zero(1);
 export const oneState = StateVector.basis(1, 1);
 export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
 
+<LessonHook eyebrow="Why this matters">
+The last lesson's ρ=|ψ⟩⟨ψ| agreed with |ψ⟩ on every prediction. That raises the natural next question: is ρ just decoration, or can it express something |ψ⟩ cannot? It can.
+</LessonHook>
+
 ## Motivation
 
 Lesson 1 built $\rho=|\psi\rangle\langle\psi|$ from a single known state
-vector, and it agreed with $|\psi\rangle$ on every prediction. That
-raises the natural next question: is $\rho$ just decoration, or can it
-express something $|\psi\rangle$ cannot?
+vector.
 
-It can. Suppose a qubit is prepared as $|0\rangle$ with probability 0.5
+Suppose a qubit is prepared as $|0\rangle$ with probability 0.5
 and $|1\rangle$ with probability 0.5: not a superposition, a *classical*
 coin flip deciding which pure state you actually got, with no
 superposition ever formed. There is no single ket for this: it isn't
@@ -194,7 +196,7 @@ physical state.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating $\tfrac12|0\rangle+\tfrac1{\sqrt2}|1\rangle$-style thinking as
 the same as a mixture.** A superposition $\alpha|0\rangle+\beta|1\rangle$
 is one specific pure ket. It has its own density matrix
@@ -203,7 +205,7 @@ mixture is a probability-weighted sum of *entire density matrices*, not
 a sum of kets: there is no ket for $\rho_{\text{mix}}$ at all.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming equal diagonal entries means equal states.** As shown above,
 $\rho_{|+\rangle}$ and $\rho_{\text{mix}}$ share every diagonal entry but
 are entirely different physical states, distinguishable by measuring in
@@ -243,7 +245,9 @@ a different basis (or, equivalently, by their different purity).
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Convex Combinations and Physical Mixtures](/lessons/quantum-computing/entanglement-and-measurement/convex-combinations-and-physical-mixtures), which generalizes
 today's 50/50 examples to arbitrary probability weights and arbitrary
 numbers of components, and pins down exactly which matrices can arise
 this way.
+</NextDiscovery>

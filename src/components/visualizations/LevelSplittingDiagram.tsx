@@ -36,7 +36,7 @@ export function LevelSplittingDiagram({
   const rightYs = [CENTER_Y - RIGHT_LEVEL_GAP / 2, CENTER_Y + RIGHT_LEVEL_GAP / 2];
 
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         <line
           x1={LEFT_X}

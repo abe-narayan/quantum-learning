@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Container } from "@/components/ui/Container";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { PillarScope } from "@/components/field/PillarScope";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { GlossaryFilter } from "@/components/glossary/GlossaryFilter";
 import { GLOSSARY_TERMS } from "@/lib/content/glossary";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
@@ -24,20 +25,29 @@ export default async function GlossaryPage() {
   const lessonTitles = Object.fromEntries(lessons.map((lesson) => [lesson.slug, lesson.title]));
 
   return (
-    <Container className="py-16">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <PageHeader
-        eyebrow="Glossary"
-        title="Glossary"
-        description={`${GLOSSARY_TERMS.length} quantum physics and quantum computing terms, alphabetically, each with a precise definition and a link to the real lesson that covers it in depth.`}
-      />
+    // No single pillar — the glossary spans all six, alphabetically — so a
+    // reader scrolling A to Z gets the calm `atlas` reference environment
+    // rather than the homepage's curriculum-order crossfade behind content
+    // that has nothing to do with it. See docs/UX_REVIEW.md P1-2.
+    <PillarScope regime="atlas">
+      <Section>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+        <Eyebrow>Glossary</Eyebrow>
+        <SectionTitle level={1} size="xl" className="mt-3">
+          Glossary
+        </SectionTitle>
+        <Lede className="mt-4">
+          {GLOSSARY_TERMS.length} quantum physics and quantum computing terms, alphabetically, each
+          with a precise definition and a link to the real lesson that covers it in depth.
+        </Lede>
 
-      <div className="mt-12 max-w-3xl">
-        <GlossaryFilter terms={GLOSSARY_TERMS} lessonTitles={lessonTitles} />
-      </div>
-    </Container>
+        <div className="mt-10">
+          <GlossaryFilter terms={GLOSSARY_TERMS} lessonTitles={lessonTitles} />
+        </div>
+      </Section>
+    </PillarScope>
   );
 }

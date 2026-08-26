@@ -29,6 +29,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="One family, not six gates">
+There's nothing physically special about rotating a qubit by exactly π/4 versus, say, 17° — the six named gates you've met so far are just convenient specific cases of one continuous family.
+</LessonHook>
+
 ## Motivation
 
 Six named gates is a start, but it's a strange place to stop. There's
@@ -61,9 +65,18 @@ the same three matrices, $X$, $Y$, $Z$, you already know.
 
 For a unit vector $\hat n = (n_x,n_y,n_z)$ and angle $\theta$, define:
 
+<EquationReveal
+  terms={[
+    { id: "Rn", symbol: "R_n̂(θ)", gloss: "The general single-qubit rotation, by angle θ, about axis n̂." },
+    { id: "n", symbol: "n̂ = (n_x,n_y,n_z)", gloss: "A unit vector picking out the rotation axis on the Bloch sphere." },
+    { id: "I", symbol: "I", gloss: "The identity matrix." },
+    { id: "XYZ", symbol: "X, Y, Z", gloss: "The Pauli matrices, combined here according to the chosen axis." },
+  ]}
+>
 $$
 R_{\hat n}(\theta) = \cos\!\left(\frac{\theta}{2}\right)I - i\sin\!\left(\frac{\theta}{2}\right)(n_xX+n_yY+n_zZ)
 $$
+</EquationReveal>
 
 This looks unmotivated until you notice its resemblance to Euler's
 formula, $e^{i\alpha}=\cos\alpha+i\sin\alpha$. That resemblance is exact:
@@ -127,6 +140,10 @@ covers every physically distinct single-qubit unitary (up to the global
 phase that was never physical anyway). Six gates were a convenient,
 standard vocabulary; the rotation formula is the whole language.
 
+<InsightBlock>
+Every possible single-qubit operation is a rotation of the Bloch sphere, full stop — there is no single-qubit gate that does something the rotation formula can't describe.
+</InsightBlock>
+
 ## Interactive Experiment
 
 <PredictBeforeReveal
@@ -164,13 +181,13 @@ by global phase, so they must agree on where the state lands): $S|+\rangle=|{+i}
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming any rotation changes both $\theta$ and $\varphi$.** Only true
 in general. $R_z$ specifically *never* changes $\theta$: it's a rotation
 about the very axis $\theta$ is measured from.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Mixing up rotation direction conventions.** Different textbooks and
 tools can define "positive angle" as clockwise or counterclockwise around
 a given axis. This course's convention matches the matrices given above.
@@ -208,8 +225,10 @@ check the convention before assuming an arithmetic error.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Global Phase vs. Relative Phase](/lessons/quantum-computing/qubits-and-quantum-states/global-and-relative-phase), which finally proves, rather
 than just asserts, that an overall phase factor changes nothing
 physical, while a *relative* phase between $\alpha$ and $\beta$ changes
 everything about how a state behaves once other qubits or later
 measurements get involved.
+</NextDiscovery>

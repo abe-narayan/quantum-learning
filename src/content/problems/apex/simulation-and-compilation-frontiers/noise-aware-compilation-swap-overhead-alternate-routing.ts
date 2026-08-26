@@ -12,7 +12,7 @@ export const noiseAwareCompilationSwapOverheadAlternateRouting: NumericProblem =
     title: "SWAP Overhead for a Different Set of Interactions",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["compilation", "routing", "swap-overhead", "transpilation"],

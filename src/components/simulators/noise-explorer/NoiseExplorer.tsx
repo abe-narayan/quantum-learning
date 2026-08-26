@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Readout } from "@/components/ui/Typography";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
+import { Predict } from "../shared/Predict";
 import { blochStateFromAngles, densityMatrixToBlochVector } from "@/lib/quantum/bloch";
 import { pureStateDensityMatrix, purity, vonNeumannEntropy, validateDensityMatrix } from "@/lib/quantum/densityMatrix";
 import { applyKrausChannel, amplitudeDampingChannel, dephasingChannel } from "@/lib/quantum/openSystems";
@@ -172,82 +175,85 @@ export function NoiseExplorer() {
           : `After ${clampedSteps} applications: purity Tr(ρ²) = ${purityValue.toFixed(3)}. Phase information (x, y) is randomizing away while z stays fixed.`;
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
-      <div className="space-y-6">
-        <div className="mx-auto max-w-sm">
-          <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
-        </div>
+    <SimulatorInstrument
+      label="Noise channel — open-system decoherence"
+      readout={<Readout label="Purity" value={purityValue.toFixed(3)} />}
+      footnote="Next: this is exactly the T1/T2 decay hardware engineers measure — see it framed that way in the Quantum Hardware lessons."
+      stageClassName="space-y-6"
+      stage={
+        <>
+          <div className="mx-auto max-w-sm">
+            <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
+          </div>
 
-        <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          {narration}
-        </div>
+          <div aria-live="polite" className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+            {narration}
+          </div>
 
-        <div>
-          <p className="mb-2 text-xs font-medium text-muted-foreground">Purity Tr(ρ²) over successive applications</p>
-          <DecayCurve samples={purityTrajectory} currentStep={clampedSteps} label="Purity over channel applications" />
-        </div>
-
-        <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
-
-        <div className="grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
           <div>
-            <Badge tone="brand" className="mb-1.5">
-              What we&rsquo;re studying
-            </Badge>
-            <p className="text-sm text-muted-foreground">
-              Real qubits leak information to their environment — this applies an actual Kraus-operator
-              noise channel step by step so you can watch a pure state decay toward the channel&rsquo;s fixed
-              point.
-            </p>
+            <p className="mb-2 text-xs font-medium text-muted-foreground">Purity Tr(ρ²) over successive applications</p>
+            <DecayCurve samples={purityTrajectory} currentStep={clampedSteps} label="Purity over channel applications" />
           </div>
-          <div>
-            <Badge tone="accent" className="mb-1.5">
-              What&rsquo;s next
-            </Badge>
-            <p className="text-sm text-muted-foreground">
-              Next: this is exactly the T1/T2 decay hardware engineers measure — see it framed that way in
-              the Quantum Hardware lessons.
-            </p>
-          </div>
-          <div className="sm:col-span-2">
-            <Badge tone="brand" className="mb-1.5">
-              Try this
-            </Badge>
-            <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
-              <li>
-                Start from |+⟩, choose Amplitude Damping, and step forward until purity nearly hits 1 again
-                at |0⟩. Then reset, pick Dephasing instead, and compare where the Bloch vector ends up.
-              </li>
-              <li>
-                Compare a low strength (0.05) against a high one (0.5) — same number of steps, very
-                different decay speed.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
 
-      <div>
-        <div className="flex justify-end">
-          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
-        </div>
-        <div className="mt-4">
-          <NoiseControls
-            presetId={presetId}
-            onPresetChange={handlePresetChange}
-            channel={channel}
-            onChannelChange={handleChannelChange}
-            strength={strength}
-            onStrengthChange={handleStrengthChange}
-            steps={clampedSteps}
-            maxSteps={MAX_STEPS}
-            onStepsChange={setSteps}
-            onReset={() => setSteps(0)}
+          <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
+
+          <Predict
+            key={`${presetId}-${channel}`}
+            question="Keep stepping this channel forward — where does the Bloch vector eventually settle?"
+            options={
+              channel === "amplitude-damping"
+                ? [
+                    { id: "fixed-point", label: "North pole (|0⟩)" },
+                    { id: "center", label: "Center of the sphere" },
+                  ]
+                : [
+                    { id: "fixed-point", label: "Its original point on the z-axis" },
+                    { id: "center", label: "Center of the sphere" },
+                  ]
+            }
+            outcomeId={clampedSteps >= MAX_STEPS ? "fixed-point" : null}
           />
-        </div>
-      </div>
-    </div>
+
+          <SimulatorFraming
+            shows="Real qubits leak information to their environment — this applies an actual Kraus-operator noise channel step by step so you can watch a pure state decay toward the channel&rsquo;s fixed point."
+            tryThis={
+              <ul>
+                <li>
+                  Start from |+⟩, choose Amplitude Damping, and step forward until purity nearly hits 1 again
+                  at |0⟩. Then reset, pick Dephasing instead, and compare where the Bloch vector ends up.
+                </li>
+                <li>
+                  Compare a low strength (0.05) against a high one (0.5) — same number of steps, very
+                  different decay speed.
+                </li>
+              </ul>
+            }
+          />
+        </>
+      }
+      controls={
+        <>
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+          <div className="mt-4">
+            <NoiseControls
+              presetId={presetId}
+              onPresetChange={handlePresetChange}
+              channel={channel}
+              onChannelChange={handleChannelChange}
+              strength={strength}
+              onStrengthChange={handleStrengthChange}
+              steps={clampedSteps}
+              maxSteps={MAX_STEPS}
+              onStepsChange={setSteps}
+              onReset={() => setSteps(0)}
+            />
+          </div>
+        </>
+      }
+    />
   );
 }

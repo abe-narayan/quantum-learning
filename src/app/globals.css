@@ -2,48 +2,216 @@
 @import "katex/dist/katex.min.css";
 @plugin "@tailwindcss/typography";
 
-/* KaTeX ships `.katex-display > .katex { white-space: nowrap }` with no
-   overflow handling, so display math wider than the viewport (common in
-   this math-heavy content) overflows with nothing to scroll it on narrow
-   screens. Give the display-math block its own horizontal scroll. */
-.katex-display {
-  overflow-x: auto;
-  overflow-y: hidden;
-  /* Frame block equations as a visual moment rather than flush-in-prose
-     text: a muted fill + left accent border, matching the weight of a
-     Callout/InteractiveSection so display math reads as "worth pausing
-     on." Tokens are theme-aware (redefined under dark mode and
-     `[data-theme="dark"]` below), so this adapts automatically. */
-  padding: 1rem 1.25rem;
-  border-radius: 0.75rem;
-  background: var(--surface-muted);
-  border-left: 3px solid var(--accent);
+/* ============================================================================
+   QuantumLearn design language — "The Instrument"
+   ============================================================================
+   The site is styled as a research console rather than a document: a deep,
+   layered laboratory ground; hairline-edged instrument panels; a persistent
+   scroll-driven background environment (src/components/field/); and four
+   distinct typographic voices (display / body / technical / mathematical).
+
+   The palette is DARK-FIRST. `:root` below *is* the dark theme, and the light
+   theme is the opt-in override — the inverse of the usual arrangement, and a
+   deliberate one: the visual identity is a deep-space lab, and the default
+   experience (visitor with no stored preference on a light-default OS) should
+   be that, not a white page. Light mode is still fully supported and is a
+   genuine second design ("laboratory notebook" — warm paper, ink, restrained
+   accents), not a de-tuned afterthought.
+
+   Three selectors drive the theme, in the same pattern this file used before
+   the dark-first flip, just mirrored:
+     - `:root`                                     -> dark (the default)
+     - `@media (prefers-color-scheme: light)
+          :root:not([data-theme="dark"])`          -> OS says light, no explicit
+                                                     choice stored
+     - `:root[data-theme="light"]`                 -> explicit light from
+                                                     ThemeToggle, wins over OS
+   `:not([data-theme="dark"])` keeps the media query from fighting an explicit
+   dark override on a light-preference OS. The no-flash script in
+   src/app/layout.tsx and ThemeToggle.tsx write only "light"/"dark"; the
+   absence of the attribute is "system".
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   1. Core tokens — dark (default)
+   ---------------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+
+  /* Ground. Not pure black: a deep blue-black reads as *space/depth* rather
+     than as an OLED power-saving mode, and gives the glows below something
+     to sit in. The four `--depth-*` steps are the elevation ladder every
+     panel/surface in the app snaps to, so "how raised is this?" is a choice
+     between four named values rather than an ad-hoc opacity. */
+  --depth-0: #05070c;
+  --depth-1: #0a0e17;
+  --depth-2: #10151f;
+  --depth-3: #171d29;
+
+  --background: var(--depth-0);
+  --foreground: #e6ebf4;
+
+  --surface: var(--depth-1);
+  --surface-muted: var(--depth-2);
+  --surface-raised: var(--depth-3);
+
+  /* ~6.9:1 on --depth-0 — comfortably past AA for the small metadata text
+     this is mostly used for, and past AAA for large text. */
+  --muted-foreground: #98a2b6;
+  /* Even quieter voice for de-emphasised technical metadata (units, source
+     ids, axis ticks). Still >= 4.5:1 on --depth-0. */
+  --subtle-foreground: #7b8598;
+
+  --border: #1e2634;
+  /* For edges that must actually read as a line rather than a suggestion:
+     table rules, active panel outlines, focus containers. */
+  --border-strong: #2d374a;
+
+  --brand: #818cf8;
+  --brand-foreground: #05070c;
+  --accent: #34d8e8;
+  --accent-foreground: #05070c;
+
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+
+  /* Default pillar channel (see section 2). Matches --brand's family so any
+     surface that opts into pillar tokens without declaring a pillar still
+     looks like QuantumLearn rather than like nothing. */
+  --pillar-hue: 268;
+  --pillar-chroma: 0.14;
+  --pillar-l-accent: 0.78;
+  --pillar-l-strong: 0.88;
+  --pillar-l-dim: 0.45;
+  --pillar-l-wash: 0.4;
+  --pillar-wash-alpha: 0.1;
+  --pillar-edge-alpha: 0.34;
+  --pillar-glow-alpha: 0.16;
+
+  /* Atmosphere: the fixed, per-pillar gradient PillarScope paints behind
+     everything (src/components/field/PillarScope.tsx). Tuned per theme
+     because "atmospheric haze" over black and over paper are different
+     effects, not the same color at two opacities. */
+  --atmosphere-strength: 1;
 }
 
+/* ----------------------------------------------------------------------------
+   2. Pillar identity channel
+   ----------------------------------------------------------------------------
+   Six curriculum pillars, six visual environments. Rather than six hard-coded
+   palettes, each pillar sets two numbers — an OKLCH hue and chroma — and the
+   full ramp below is derived from them. OKLCH (not HSL) because it is
+   perceptually uniform: the same lightness number reads as the same lightness
+   across all six hues, so a badge in Hardware amber and one in Mechanics cyan
+   have genuinely matched contrast instead of amber looking washed out.
+
+   The numeric values live in one place in TypeScript too —
+   src/lib/design/pillars.ts — because the background field needs them to draw
+   with; keep the two tables in sync (the hue/chroma pairs are identical).
+
+   Anything can opt in by setting `data-pillar` on a wrapper; `PillarScope`
+   (a server component, so no hydration flash) is the standard way. */
+[data-pillar="quantum-mechanics"] {
+  --pillar-hue: 195;
+  --pillar-chroma: 0.13;
+}
+[data-pillar="quantum-computing"] {
+  --pillar-hue: 268;
+  --pillar-chroma: 0.14;
+}
+[data-pillar="quantum-hardware"] {
+  --pillar-hue: 62;
+  --pillar-chroma: 0.13;
+}
+[data-pillar="quantum-software"] {
+  --pillar-hue: 152;
+  --pillar-chroma: 0.12;
+}
+[data-pillar="quantum-mastery"] {
+  --pillar-hue: 330;
+  --pillar-chroma: 0.12;
+}
+/* Apex is deliberately the LEAST saturated pillar, not the loudest. Its
+   distinction is contrast, density and structure — cold steel type on a
+   deeper ground — not a brighter color than everything before it. Making it
+   "black with purple accents" is exactly the cliche this avoids. */
+[data-pillar="apex"] {
+  --pillar-hue: 232;
+  --pillar-chroma: 0.045;
+  /* Apex also drops the whole surface ladder a step darker and pushes text
+     contrast up, so crossing into it *feels* like entering a different room
+     even before the background environment changes.
+
+     `--background`/`--surface`/... are re-declared here rather than left to
+     inherit, and that is load-bearing, not redundancy. Custom properties are
+     substituted at *computed-value* time: `--background: var(--depth-0)` on
+     `:root` computes to the literal `#05070c` there, and descendants inherit
+     that literal. Redefining `--depth-0` on this element would therefore
+     retint nothing — the alias was already resolved one level up. Any future
+     `[data-pillar]` block that overrides a depth step has to re-declare the
+     aliases that point at it for the same reason. */
+  --depth-0: #02040a;
+  --depth-1: #06090f;
+  --depth-2: #0b0f17;
+  --depth-3: #121722;
+  --background: var(--depth-0);
+  --surface: var(--depth-1);
+  --surface-muted: var(--depth-2);
+  --surface-raised: var(--depth-3);
+  --foreground: #f1f5fb;
+  --border: #1c2433;
+  --border-strong: #333e52;
+  --atmosphere-strength: 1.35;
+}
+
+:root,
+[data-pillar] {
+  /* The derived ramp. Every one of these resolves from --pillar-hue /
+     --pillar-chroma above, so a single attribute retints an entire subtree. */
+  --pillar-accent: oklch(var(--pillar-l-accent) var(--pillar-chroma) var(--pillar-hue));
+  --pillar-strong: oklch(var(--pillar-l-strong) var(--pillar-chroma) var(--pillar-hue));
+  --pillar-dim: oklch(var(--pillar-l-dim) calc(var(--pillar-chroma) * 0.8) var(--pillar-hue));
+  --pillar-edge: oklch(
+    var(--pillar-l-accent) var(--pillar-chroma) var(--pillar-hue) / var(--pillar-edge-alpha)
+  );
+  --pillar-wash: oklch(
+    var(--pillar-l-wash) calc(var(--pillar-chroma) * 0.7) var(--pillar-hue) / var(--pillar-wash-alpha)
+  );
+  --pillar-glow: oklch(
+    var(--pillar-l-accent) var(--pillar-chroma) var(--pillar-hue) / var(--pillar-glow-alpha)
+  );
+  /* Text-safe variant: on the dark ground the accent lightness is already
+     high enough to read as body-size text; light mode overrides it below. */
+  --pillar-text: var(--pillar-accent);
+}
+
+/* ----------------------------------------------------------------------------
+   3. Non-color tokens — motion, shape, rhythm
+   ----------------------------------------------------------------------------
+   Shared so that "how fast does something appear" and "how round is a panel"
+   are decisions made once, not re-improvised per component. */
 :root {
-  --background: #ffffff;
-  --foreground: #0f1115;
+  /* One easing curve for entrances (fast out of the gate, long settle — the
+     "instrument snapping into place" feel) and one symmetric curve for state
+     changes that should feel mechanical rather than bouncy. */
+  --ease-instrument: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mech: cubic-bezier(0.4, 0, 0.2, 1);
 
-  --surface: #ffffff;
-  --surface-muted: #f4f5f7;
-  --border: #e4e6eb;
-  --muted-foreground: #5b6270;
+  --dur-instant: 110ms;
+  --dur-fast: 190ms;
+  --dur-base: 340ms;
+  --dur-slow: 620ms;
+  --dur-scene: 1100ms;
 
-  --brand: #4f46e5;
-  --brand-foreground: #ffffff;
-  /* Darkened from #0891b2 (3.68:1 on white) to pass AA's 4.5:1 minimum for
-     normal text — this token is used as text color, not just backgrounds. */
-  --accent: #0e7490;
-  --accent-foreground: #ffffff;
+  --radius-tight: 6px;
+  --radius-panel: 14px;
+  --radius-slab: 20px;
 
-  /* Darkened from #16a34a (3.29:1 on white) to pass AA's 4.5:1 minimum for
-     normal text — this token is used as text color (Feedback.tsx), not just
-     backgrounds. */
-  --success: #15803d;
-  /* Darkened from #d97706 (3.19:1 on white) to pass AA's 4.5:1 minimum for
-     normal text — this token is used as text color, not just backgrounds. */
-  --warning: #b45309;
-  --danger: #dc2626;
+  /* Vertical rhythm for full-page sections. Sections are big — this is an
+     atlas, not a dashboard — but not arbitrary. */
+  --rhythm-section: clamp(4.5rem, 9vw, 8.5rem);
+  --rhythm-block: clamp(2rem, 4vw, 3.5rem);
 }
 
 @theme inline {
@@ -52,8 +220,11 @@
 
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
+  --color-surface-raised: var(--surface-raised);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
 
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
@@ -64,295 +235,691 @@
   --color-warning: var(--warning);
   --color-danger: var(--danger);
 
+  /* Pillar ramp exposed as Tailwind color utilities (text-pillar,
+     border-pillar-edge, bg-pillar-wash, ...) so components can use the
+     identity channel without dropping into inline `style` every time. */
+  --color-pillar: var(--pillar-accent);
+  --color-pillar-strong: var(--pillar-strong);
+  --color-pillar-dim: var(--pillar-dim);
+  --color-pillar-edge: var(--pillar-edge);
+  --color-pillar-wash: var(--pillar-wash);
+  --color-pillar-glow: var(--pillar-glow);
+  --color-pillar-text: var(--pillar-text);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
+  /* The "technical metadata" voice — readouts, units, source ids, difficulty
+     chips, figure numbers. Aliased to the mono face so call sites read as
+     intent ("this is instrument metadata") rather than as a font choice. */
+  --font-tech: var(--font-geist-mono);
+
+  --radius-panel: var(--radius-panel);
+  --radius-slab: var(--radius-slab);
+
+  --ease-instrument: var(--ease-instrument);
+  --ease-mech: var(--ease-mech);
 }
 
-/* Dark palette, shared by two selectors below:
-     - the media query is the default for visitors who haven't made an
-       explicit choice (`data-theme` unset) — it just follows the OS/browser.
-     - `[data-theme="dark"]` is the explicit override set by ThemeToggle
-       (src/components/layout/ThemeToggle.tsx) via `localStorage`, and wins
-       regardless of OS preference.
-   `:not([data-theme="light"])` keeps the media query from fighting an
-   explicit light override when the OS prefers dark. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --background: #0a0a0f;
-    --foreground: #e7e9ee;
+/* ----------------------------------------------------------------------------
+   4. Light theme — "laboratory notebook"
+   ----------------------------------------------------------------------------
+   Warm paper rather than pure white, ink rather than pure black, and pillar
+   accents pushed dark enough to pass AA as text on that paper (the dark
+   theme's lightness values would be invisible here, which is why
+   --pillar-l-* are tokens rather than literals in the ramp above).
+   Duplicated verbatim across the media query and the explicit override,
+   matching how this file has always handled the two theme selectors. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
 
-    --surface: #101218;
-    --surface-muted: #16181f;
-    --border: #23262f;
-    --muted-foreground: #9096a3;
+    --depth-0: #fbfbfd;
+    --depth-1: #ffffff;
+    --depth-2: #f2f4f8;
+    --depth-3: #e8ebf1;
 
-    --brand: #818cf8;
-    --brand-foreground: #0a0a0f;
-    --accent: #22d3ee;
-    --accent-foreground: #0a0a0f;
+    --background: var(--depth-0);
+    --foreground: #0d1017;
 
-    /* Brighter variants of the light-mode success/warning/danger hues —
-       each passes ~4.5:1 (in practice much higher) against the dark
-       --background, the same treatment --accent already gets above. Without
-       these, the light-mode colors (tuned for contrast on white) don't
-       reliably read against a dark background. */
-    --success: #4ade80;
-    --warning: #fbbf24;
-    --danger: #f87171;
+    --surface: var(--depth-1);
+    --surface-muted: var(--depth-2);
+    --surface-raised: var(--depth-3);
+
+    --muted-foreground: #566072;
+    --subtle-foreground: #6b7484;
+
+    --border: #e2e5ec;
+    --border-strong: #c6ccd8;
+
+    --brand: #4f46e5;
+    --brand-foreground: #ffffff;
+    --accent: #0e7490;
+    --accent-foreground: #ffffff;
+
+    --success: #15803d;
+    --warning: #b45309;
+    --danger: #dc2626;
+
+    /* Pillar ramp re-aimed for ink-on-paper: the accent is now a *dark*
+       lightness (readable as text), the "strong" step is darker still, and
+       wash/glow drop to a fraction of their dark-mode alpha — the same tint
+       that reads as atmospheric haze over black reads as a stain on paper. */
+    --pillar-l-accent: 0.52;
+    --pillar-l-strong: 0.4;
+    --pillar-l-dim: 0.72;
+    --pillar-l-wash: 0.7;
+    --pillar-wash-alpha: 0.09;
+    --pillar-edge-alpha: 0.4;
+    --pillar-glow-alpha: 0.1;
+    --atmosphere-strength: 0.55;
   }
 
-  /* Lesson body copy (LessonLayout.tsx, `.prose prose-neutral`) runs through
-     @tailwindcss/typography's own `--tw-prose-*` variables, a separate
-     system from the tokens above. This is `prose-invert`'s own palette
-     (the plugin's designed dark complement to `prose-neutral`), just
-     applied here instead of via Tailwind's `dark:` variant — this app's
-     dark mode is `data-theme`-driven (see ThemeToggle.tsx) and there's no
-     `@custom-variant dark` in this file redefining `dark:` to match, so
-     `dark:prose-invert` would only track raw OS preference: invisible body
-     text when a visitor picks dark explicitly on a light-OS device, and
-     wrongly-inverted (light-on-light) text when they pick light explicitly
-     on a dark-OS device. Scoped to `.prose` so it can't leak into anything
-     else. `--tw-prose-pre-bg` is the one deliberate deviation from the
-     plugin's stock invert value (`rgb(0 0 0 / 50%)`, tuned for a
-     slate-900-ish dark bg) — against this app's near-black --background
-     (#0a0a0f) that's nearly invisible, so it uses --surface-muted instead,
-     matching the framing .katex-display already gets above. */
-  .prose {
-    --tw-prose-body: #d4d4d4;
-    --tw-prose-headings: #ffffff;
-    --tw-prose-lead: #a3a3a3;
-    --tw-prose-links: #ffffff;
-    --tw-prose-bold: #ffffff;
-    --tw-prose-counters: #a3a3a3;
-    --tw-prose-bullets: #525252;
-    --tw-prose-hr: #404040;
-    --tw-prose-quotes: #f5f5f5;
-    --tw-prose-quote-borders: #404040;
-    --tw-prose-captions: #a3a3a3;
-    --tw-prose-kbd: #ffffff;
-    --tw-prose-code: #ffffff;
-    --tw-prose-pre-code: #d4d4d4;
-    --tw-prose-pre-bg: var(--surface-muted);
-    --tw-prose-th-borders: #525252;
-    --tw-prose-td-borders: #404040;
+  /* Apex in light mode: still the most severe pillar, but expressed as a
+     cooler, denser paper with heavier rules rather than as darkness. */
+  :root:not([data-theme="dark"]) [data-pillar="apex"] {
+    --depth-0: #f4f6fa;
+    --depth-1: #ffffff;
+    --depth-2: #eaedf3;
+    --depth-3: #dfe3eb;
+    --foreground: #080b12;
+    --border: #d3d8e2;
+    --border-strong: #a9b2c2;
+  }
+
+  /* @tailwindcss/typography drives lesson body copy through its own
+     `--tw-prose-*` variables — a separate system from the tokens above. The
+     dark values are the default now (section 5), so light mode is what has
+     to reset them, back to the plugin's stock `prose-neutral` ramp. */
+  :root:not([data-theme="dark"]) .prose {
+    --tw-prose-body: #404040;
+    --tw-prose-headings: #0d1017;
+    --tw-prose-lead: #525252;
+    --tw-prose-links: #0d1017;
+    --tw-prose-bold: #0d1017;
+    --tw-prose-counters: #737373;
+    --tw-prose-bullets: #d4d4d4;
+    --tw-prose-hr: var(--border);
+    --tw-prose-quotes: #171717;
+    --tw-prose-quote-borders: var(--border);
+    --tw-prose-captions: #737373;
+    --tw-prose-kbd: #171717;
+    --tw-prose-code: #171717;
+    --tw-prose-pre-code: #e5e5e5;
+    --tw-prose-pre-bg: #1c2230;
+    --tw-prose-th-borders: #d4d4d4;
+    --tw-prose-td-borders: var(--border);
   }
 }
 
-:root[data-theme="dark"] {
-  --background: #0a0a0f;
-  --foreground: #e7e9ee;
+:root[data-theme="light"] {
+  color-scheme: light;
 
-  --surface: #101218;
-  --surface-muted: #16181f;
-  --border: #23262f;
-  --muted-foreground: #9096a3;
+  --depth-0: #fbfbfd;
+  --depth-1: #ffffff;
+  --depth-2: #f2f4f8;
+  --depth-3: #e8ebf1;
 
-  --brand: #818cf8;
-  --brand-foreground: #0a0a0f;
-  --accent: #22d3ee;
-  --accent-foreground: #0a0a0f;
+  --background: var(--depth-0);
+  --foreground: #0d1017;
 
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --danger: #f87171;
+  --surface: var(--depth-1);
+  --surface-muted: var(--depth-2);
+  --surface-raised: var(--depth-3);
+
+  --muted-foreground: #566072;
+  --subtle-foreground: #6b7484;
+
+  --border: #e2e5ec;
+  --border-strong: #c6ccd8;
+
+  --brand: #4f46e5;
+  --brand-foreground: #ffffff;
+  --accent: #0e7490;
+  --accent-foreground: #ffffff;
+
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #dc2626;
+
+  --pillar-l-accent: 0.52;
+  --pillar-l-strong: 0.4;
+  --pillar-l-dim: 0.72;
+  --pillar-l-wash: 0.7;
+  --pillar-wash-alpha: 0.09;
+  --pillar-edge-alpha: 0.4;
+  --pillar-glow-alpha: 0.1;
+  --atmosphere-strength: 0.55;
 }
 
-/* Explicit-dark counterpart to the media-query block's `.prose` override
-   above — see the comment there for why this can't just be
-   `dark:prose-invert`. Kept as a separate, identical block (rather than a
-   combined selector) to match how --background/--foreground/etc. are
-   already duplicated between the two selectors in this file. */
-:root[data-theme="dark"] .prose {
-  --tw-prose-body: #d4d4d4;
-  --tw-prose-headings: #ffffff;
-  --tw-prose-lead: #a3a3a3;
-  --tw-prose-links: #ffffff;
-  --tw-prose-bold: #ffffff;
-  --tw-prose-counters: #a3a3a3;
-  --tw-prose-bullets: #525252;
-  --tw-prose-hr: #404040;
-  --tw-prose-quotes: #f5f5f5;
-  --tw-prose-quote-borders: #404040;
-  --tw-prose-captions: #a3a3a3;
-  --tw-prose-kbd: #ffffff;
-  --tw-prose-code: #ffffff;
-  --tw-prose-pre-code: #d4d4d4;
+:root[data-theme="light"] [data-pillar="apex"] {
+  --depth-0: #f4f6fa;
+  --depth-1: #ffffff;
+  --depth-2: #eaedf3;
+  --depth-3: #dfe3eb;
+  --foreground: #080b12;
+  --border: #d3d8e2;
+  --border-strong: #a9b2c2;
+}
+
+:root[data-theme="light"] .prose {
+  --tw-prose-body: #404040;
+  --tw-prose-headings: #0d1017;
+  --tw-prose-lead: #525252;
+  --tw-prose-links: #0d1017;
+  --tw-prose-bold: #0d1017;
+  --tw-prose-counters: #737373;
+  --tw-prose-bullets: #d4d4d4;
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: #171717;
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-captions: #737373;
+  --tw-prose-kbd: #171717;
+  --tw-prose-code: #171717;
+  --tw-prose-pre-code: #e5e5e5;
+  --tw-prose-pre-bg: #1c2230;
+  --tw-prose-th-borders: #d4d4d4;
+  --tw-prose-td-borders: var(--border);
+}
+
+/* ----------------------------------------------------------------------------
+   5. Prose defaults (dark) + base element styling
+   ---------------------------------------------------------------------------- */
+.prose {
+  --tw-prose-body: #cdd5e2;
+  --tw-prose-headings: #f4f7fc;
+  --tw-prose-lead: #a4aec0;
+  --tw-prose-links: var(--pillar-text);
+  --tw-prose-bold: #f4f7fc;
+  --tw-prose-counters: #9aa4b8;
+  --tw-prose-bullets: var(--pillar-dim);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: #eef2f8;
+  --tw-prose-quote-borders: var(--pillar-edge);
+  --tw-prose-captions: #8f99ad;
+  --tw-prose-kbd: #f4f7fc;
+  --tw-prose-code: #f4f7fc;
+  --tw-prose-pre-code: #cdd5e2;
   --tw-prose-pre-bg: var(--surface-muted);
-  --tw-prose-th-borders: #525252;
-  --tw-prose-td-borders: #404040;
+  --tw-prose-th-borders: var(--border-strong);
+  --tw-prose-td-borders: var(--border);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  /* Every scroll-linked effect in the app (the field environment, section
+     reveals, the reading-progress bar) assumes a normally-scrolling document.
+     Declaring the behavior here keeps in-page anchor jumps — the lesson ToC,
+     heading permalinks — from teleporting, while the reduced-motion section
+     turns it off outright. */
+  scroll-behavior: smooth;
 }
 
-/* ============================================================
-   Extended typographic system
-   ============================================================
-   Builds on the existing "loudest headings only" policy (see the Fraunces
-   comment in src/app/layout.tsx): `.prose h2` already gets the display face
-   via `prose-h2:font-display` in LessonLayout.tsx, and `.prose h3`
-   deliberately stays Geist Sans. Nothing here touches h3 — that would
-   contradict the documented intent. What follows extends the *same*
-   restrained system to a few places that were still plain body type:
-   physicist/historical/theorem blockquotes, a section-moment marker on h2,
-   and callout labels. Colors below all resolve through the theme tokens
-   defined above, so none of this needs its own dark-mode duplicate block —
-   only rules that hard-code a color need that.
-   ============================================================ */
+/* In-page anchors land under the sticky navbar without this. */
+[id] {
+  scroll-margin-top: 6rem;
+}
 
-/* Physicist/historical quotes and theorem statements already use plain
-   markdown `>` blockquotes in several lessons (e.g.
-   universal-quantum-computation.mdx) with zero custom component — the
-   typography plugin's stock `.prose blockquote` (italic, quote-mark
-   pseudo-elements, muted border) is otherwise the only treatment they get.
-   Give them the display face for an editorial, "worth pausing on" feel
-   distinct from both body prose and the katex-display equation framing
-   above. `font-style: normal` deliberately overrides the plugin's default
-   italic: layout.tsx only loads Fraunces' normal style (no `style: "italic"`
-   in its `next/font/google` config), so a browser-synthesized oblique would
-   look worse than a well-set upright serif. Left border uses `--brand`
-   rather than `--accent` so a quote reads as a distinct kind of "pause"
-   from an equation block (which borders in `--accent` above) — a small,
-   already-theme-aware color contrast, not a new dark-mode rule. */
+/* One focus treatment, defined once, for everything that doesn't opt into a
+   component-specific ring. Uses the pillar channel so the focus ring is
+   *also* part of the identity: a keyboard user in Hardware sees amber, in
+   Mechanics cyan. Always paired with an offset so it stays visible on top of
+   a busy background field. */
+:focus-visible {
+  outline: 2px solid var(--pillar-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--pillar-glow);
+  color: var(--foreground);
+}
+
+/* ----------------------------------------------------------------------------
+   6. Mathematical voice — KaTeX
+   ----------------------------------------------------------------------------
+   KaTeX ships `.katex-display > .katex { white-space: nowrap }` with no
+   overflow handling, so display math wider than the viewport (common in this
+   content) overflows with nothing to scroll it on narrow screens. Give the
+   block its own horizontal scroll, and frame it as a *slab* — a deliberate
+   pause in the reading column with the pillar's edge color, matching the
+   weight of an InteractiveSection so display math reads as "worth stopping
+   on" rather than as inline text that happened to get tall. */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1.1rem 1.35rem;
+  border-radius: var(--radius-panel);
+  background:
+    linear-gradient(var(--pillar-wash), var(--pillar-wash)),
+    var(--surface-muted);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--pillar-edge);
+  scrollbar-width: thin;
+}
+
+/* ----------------------------------------------------------------------------
+   7. Typographic system
+   ----------------------------------------------------------------------------
+   Four voices, each with a job:
+     display (Fraunces) — moments: page/lesson titles, section openings
+     body (Geist Sans)  — everything read at length
+     tech (Geist Mono)  — instrument metadata: labels, readouts, units, ids
+     math (KaTeX)       — section 6
+   The rules below are the *shared* half; component-level classes compose on
+   top. Nothing here touches `.prose h3`, which deliberately stays body-face
+   (see LessonLayout's own comment). */
+
+/* ----------------------------------------------------------------------------
+   Layered on purpose — see the note in section 8 on cascade layers. These
+   classes are routinely composed with a Tailwind utility that is meant to win
+   (`class="tech-label text-pillar-text"`, `class="tech-label
+   text-subtle-foreground"`), and unlayered CSS beats every layered rule, so
+   outside a layer `.tech-label`'s own `color` silently defeated all of them.
+   ---------------------------------------------------------------------------- */
+@layer components {
+  /* The technical voice, as a reusable class rather than five near-identical
+     Tailwind chains repeated across simulator panels, badges and captions. */
+  .tech-label {
+    font-family: var(--font-tech);
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    font-weight: 500;
+  }
+
+  .tech-value {
+    font-family: var(--font-tech);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+
+  /* Section eyebrow: the pillar-tinted "you are here" line above a section
+     heading. Distinct from .tech-label by carrying the identity color and a
+     leading rule. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-tech);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--pillar-text);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.7;
+    flex: none;
+  }
+}
+
+/* Physicist/historical quotes and theorem statements use plain markdown `>`
+   blockquotes in several lessons with no custom component. Give them the
+   display face for an editorial "worth pausing on" feel distinct from both
+   body prose and the equation slab above. `font-style: normal` deliberately
+   overrides the plugin's italic: layout.tsx loads only Fraunces' normal
+   style, so a browser-synthesised oblique would look worse than a well-set
+   upright serif. */
 .prose blockquote {
   font-family: var(--font-display);
   font-style: normal;
   font-weight: 500;
   font-size: 1.1em;
   line-height: 1.6;
-  border-left-color: var(--brand);
+  border-left-width: 2px;
+  padding-left: 1.25rem;
 }
 
-/* Section-moment marker: a short accent-colored rule above every `.prose`
-   h2, echoing the `--accent` treatment already used for display math above
-   so "new section" and "equation worth pausing on" read as the same visual
-   language. Purely decorative (no text, so nothing for a screen reader to
-   announce) and additive to the existing `prose-h2:font-display` treatment
-   in LessonLayout.tsx rather than a replacement for it. */
+/* Section-moment marker above every `.prose` h2 — pillar-tinted and drawn as
+   a two-tone rule (solid stub, fading tail) so it reads as an instrument
+   scale mark rather than a generic underline. Purely decorative, no text for
+   a screen reader to announce, and additive to the `prose-h2:font-display`
+   treatment LessonLayout applies. */
 .prose h2::before {
   content: "";
   display: block;
-  width: 2.25rem;
-  height: 3px;
+  width: 3.25rem;
+  height: 2px;
   border-radius: 999px;
-  background: var(--accent);
-  margin-bottom: 0.85rem;
+  background: linear-gradient(90deg, var(--pillar-accent) 0 40%, var(--pillar-edge) 100%);
+  margin-bottom: 0.9rem;
 }
 
 /* Callout severity labels (Callout.tsx: "Note" / "Careful" / "Common
-   mistake"), given more typographic distinction instead of relying on
-   color/border weight alone. Selected by the exact class combinations
-   Callout.tsx's STYLES map already assigns per type — the same "target
-   stable, already-unique structure instead of touching the component"
-   approach the print stylesheet below uses for InteractiveSection — so no
-   change to Callout.tsx or its call sites is needed. `> p:first-child`
-   is the label; the body text is Callout's second child (a div), so this
-   can't accidentally match it. Mirrors STYLES' own escalation: note/warning
-   just get uppercase tracking (a metadata voice), mistake — the type
-   students most need to notice — additionally switches to the display face,
-   matching how it's already the most heavily bordered of the three. */
-.border-l-4.border-brand.bg-brand\/5 > p:first-child,
-.border-2.border-warning\/40.bg-warning\/5 > p:first-child,
-.border-2.border-danger\/50.bg-danger\/5 > p:first-child {
+   mistake"), keyed off `data-callout` (set by Callout.tsx to its `type`
+   prop) rather than an exact Tailwind class combination — a restyle of the
+   component's borders/backgrounds can't silently break this the way a
+   class-string selector could. Mirrors Callout's own escalation: note/
+   warning get the technical voice; mistake — the one students most need to
+   notice — additionally switches to the display face. */
+[data-callout="note"] > p:first-child,
+[data-callout="warning"] > p:first-child {
+  font-family: var(--font-tech);
   text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
 }
 
-.border-2.border-danger\/50.bg-danger\/5 > p:first-child {
+[data-callout="mistake"] > p:first-child {
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.03em;
+  text-transform: none;
 }
 
-/* Simulator control-panel section labels: every controls component wires an
-   h3 to its <section> via `aria-labelledby="<x>-heading"` pointing at an id
-   ending in "-heading" on that h3 (BlochSphereControls.tsx, RabiControls.tsx,
-   NoiseControls.tsx, GroverControls.tsx, GateControls.tsx, and more — the
-   same convention repeated across every simulator's controls file). That
-   pre-existing, load-bearing (accessibility) naming convention doubles as a
-   free CSS hook: small-caps plus a touch of tracking gives every
-   control-panel section label a more refined, instrument-panel feel with no
-   component edits at all. Some of these headings interpolate math (Δ, θ,
-   φ) — small-caps only affects lowercase Latin letters, so those pass
-   through untouched. */
+/* Simulator control-panel section labels. Every controls component wires an
+   h3 to its <section> via `aria-labelledby` pointing at an id ending in
+   "-heading" — a pre-existing, load-bearing (accessibility) convention that
+   doubles as a free CSS hook, giving every control-panel label the
+   instrument voice with no component edits. Some of these headings
+   interpolate math; letter-spacing and case changes leave those glyphs
+   untouched. */
 h3[id$="-heading"] {
-  font-variant-caps: small-caps;
-  letter-spacing: 0.02em;
+  font-family: var(--font-tech);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
 }
 
-/* Hero background glow (Hero.tsx's `.hero-glow` radial-gradient layer):
-   a slow, low-amplitude opacity/scale breathe so the homepage's opening
-   moment doesn't feel static, without pulling in an animation library for
-   what's a single decorative `aria-hidden` layer. Disabled outright under
-   `prefers-reduced-motion: reduce` — this is pure CSS decoration (not the
-   `usePrefersReducedMotion` JS hook used elsewhere for canvas-driven
-   simulator motion), so the standard media query is the right tool here. */
-@media (prefers-reduced-motion: no-preference) {
-  .hero-glow {
-    animation: hero-glow-pulse 12s ease-in-out infinite;
+/* ----------------------------------------------------------------------------
+   Cascade layers — why these live in `@layer components`
+   ----------------------------------------------------------------------------
+   `@import "tailwindcss"` establishes `@layer theme, base, components,
+   utilities;`, and **unlayered CSS beats every layered rule** regardless of
+   specificity. A class defined outside any layer therefore silently defeats
+   every Tailwind utility composed with it — which is exactly how these are
+   used across the app:
+
+     class="panel border-l-2 border-l-pillar-edge"   (DefinitionBox, TheoremBox)
+     class="tech-label text-subtle-foreground"        (Footer, catalogs, ...)
+
+   Unlayered, `.panel`'s `border` and `.tech-label`'s `color` won those
+   contests and the accent overrides did nothing — a real, silent, site-wide
+   defect, invisible in review because the markup reads exactly right.
+
+   Putting them in `components` restores the intended order: base < these <
+   utilities. Deliberately NOT layered, each for a reason: `.katex-display`
+   (must beat KaTeX's own unlayered stylesheet), the `.prose` overrides (must
+   beat the typography plugin), `[data-reveal]`, `.atmosphere`/`.field-canvas`,
+   and everything under `@media print` / `prefers-reduced-motion` — all policy
+   that should win, not defaults that should yield.
+   ---------------------------------------------------------------------------- */
+@layer components {
+  /* ----------------------------------------------------------------------------
+     8. Instrument surfaces
+     ----------------------------------------------------------------------------
+     The panel is the app's fundamental container: a hairline edge, a barely-
+     raised fill, and a single top highlight so it reads as a machined face
+     catching light rather than as a rounded div. Deliberately NOT glassmorphism
+     — no blur, no translucency stack — because a hundred blurred layers over a
+     canvas is both a performance problem and the exact generic look this
+     redesign is avoiding. */
+  .panel {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    /* The highlight is an inset box-shadow rather than a pseudo-element so it
+       survives `overflow: hidden` children (canvases, scroll regions). */
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--foreground) 6%, transparent),
+      0 1px 2px rgb(0 0 0 / 0.25);
+  }
+
+  .panel-inset {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface-muted);
+    box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.28);
+  }
+
+  /* An "instrument face": the frame simulators and large diagrams sit in.
+     Adds the pillar edge and a faint corner-tick treatment so a canvas reads
+     as mounted in equipment. */
+  .instrument {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background:
+      linear-gradient(var(--pillar-wash), var(--pillar-wash)),
+      var(--surface);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--foreground) 7%, transparent),
+      0 2px 12px rgb(0 0 0 / 0.22);
+  }
+
+  .instrument::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* Four corner ticks, drawn as one layered gradient set: each is a short
+       line hugging one corner. Cheaper and more robust than four absolutely-
+       positioned children. */
+    background:
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 0 0 / 14px 1px no-repeat,
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 0 0 / 1px 14px no-repeat,
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 100% 0 / 14px 1px no-repeat,
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 100% 0 / 1px 14px no-repeat,
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 0 100% / 14px 1px no-repeat,
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 0 100% / 1px 14px no-repeat,
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 100% 100% / 14px 1px no-repeat,
+      linear-gradient(var(--pillar-edge), var(--pillar-edge)) 100% 100% / 1px 14px no-repeat;
+  }
+
+  /* A hairline that fades at both ends — used to separate full-bleed sections
+     without the hard "hr" look that would fight the atmospheric background. */
+  .rule-fade {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--border-strong) 22%,
+      var(--border-strong) 78%,
+      transparent
+    );
+  }
+
+  /* Engineering-paper grid, sized to the typographic rhythm. Used as a texture
+     behind hero/section compositions; masked by the caller. */
+  .grid-paper {
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--border) 78%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--border) 78%, transparent) 1px, transparent 1px);
+    background-size: 44px 44px;
   }
 }
 
-@keyframes hero-glow-pulse {
+/* ----------------------------------------------------------------------------
+   9. Motion primitives
+   ----------------------------------------------------------------------------
+   Reveal-on-scroll is implemented as CSS driven by a `data-revealed`
+   attribute that a shared IntersectionObserver flips
+   (src/components/motion/Reveal.tsx). Keeping the transition in CSS means the
+   animation costs no JavaScript per element, only the observer entry, and it
+   degrades to "always visible" if JS never runs — the content is in the HTML
+   either way, which is the accessibility-critical part. */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-y, 14px), 0);
+  transition:
+    opacity var(--dur-slow) var(--ease-instrument),
+    transform var(--dur-slow) var(--ease-instrument);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal][data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Slow atmospheric breathe for decorative glow layers. */
+@keyframes field-breathe {
   0%,
   100% {
     opacity: 1;
     transform: scale(1);
   }
   50% {
-    opacity: 0.82;
-    transform: scale(1.04);
+    opacity: 0.78;
+    transform: scale(1.045);
   }
 }
 
-/* ============================================================
-   Print styles
-   ============================================================
-   Lessons are long-form, math-heavy study material — printing (or
-   "print to PDF") one for offline reading is a real use case here, and
-   there was no @media print handling at all before this. Three jobs:
+/* The arrival of a panel that appears in response to a deliberate action —
+   PredictBeforeReveal's answer panel is the canonical case. Written as a
+   mount animation rather than a JS class flip on purpose: the element is
+   conditionally rendered, so it mounts fresh exactly when it should play,
+   which means no state, no effect, and no `setState` inside `useEffect`
+   (which the React Compiler's lint rightly rejects). Reduced motion needs no
+   special-casing — section 11 collapses every animation-duration to ~0, so
+   this degrades to an instant appearance. */
+@keyframes panel-arrive {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
-     1. Strip chrome that has no meaning on paper (sticky navbar, search
-        trigger, theme toggle, mobile menu button, footer's link list,
-        interactive-only controls with no static equivalent).
-     2. Force the light-mode palette regardless of the viewer's current
-        theme — dark mode's inverted colors have no business on a printed
-        page.
-     3. Keep wide content (KaTeX display math, tables, code) from being cut
-        off at the page edge, and avoid ugly mid-block page breaks.
+/* Layered with the other component classes (see the cascade-layer note in
+   section 8): this is a component *default*, so an `animate-*` utility on the
+   same element should be able to win. */
+@layer components {
+  .panel-arrive {
+    animation: panel-arrive var(--dur-slow) var(--ease-instrument) both;
+  }
+}
 
-   Done entirely here rather than as `print:` utilities scattered across
-   components, matching how this file already owns every other
-   cross-cutting, theme-like concern (dark mode above is CSS custom
-   properties + attribute/media selectors, not Tailwind `dark:` sprinkled
-   per component). Selectors below target stable structure (the app's one
-   `<header>`, `footer nav`, `aria-pressed`/`role` attributes, and class
-   combinations unique to a given MDX wrapper) so no component file needs
-   touching just to print correctly.
-   ============================================================ */
+/* A traveling highlight along a rule/trace — used sparingly for "signal
+   flowing" affordances (circuit rails, the Apex frontier line). */
+@keyframes trace-sweep {
+  from {
+    background-position: -40% 0;
+  }
+  to {
+    background-position: 140% 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .field-breathe {
+    animation: field-breathe 14s ease-in-out infinite;
+  }
+  .trace-sweep {
+    animation: trace-sweep 4.5s linear infinite;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   10. Scroll-driven environment plumbing
+   ----------------------------------------------------------------------------
+   The fixed layers behind the page. PillarScope paints `.atmosphere` (pure
+   CSS, server-rendered, no JS and no hydration flash); QuantumField paints
+   `.field-canvas` on top of it. Both are `pointer-events: none` and sit
+   behind content via negative z-index, so the whole background system can
+   fail to load, be disabled for reduced motion, or be dropped on a low-power
+   device, and the page still reads exactly the same. */
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  pointer-events: none;
+  opacity: var(--atmosphere-strength);
+}
+
+.field-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ----------------------------------------------------------------------------
+   11. Reduced motion
+   ----------------------------------------------------------------------------
+   Blanket policy, so a new animation can't ship without honoring it by
+   accident. Canvas-driven motion is handled separately in JS (the
+   usePrefersReducedMotion hook) because a media query can't stop a
+   requestAnimationFrame loop. */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Reveal-on-scroll must not leave content invisible when its transition is
+     neutered — show everything immediately instead. */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   12. Print styles
+   ----------------------------------------------------------------------------
+   Lessons are long-form, math-heavy study material; printing (or "print to
+   PDF") one for offline reading is a real use case. Three jobs: strip chrome
+   that has no meaning on paper, force the light palette regardless of the
+   viewer's theme, and keep wide content from being cut off. Done here rather
+   than as `print:` utilities scattered across components, matching how this
+   file already owns every other cross-cutting, theme-like concern.
+   ---------------------------------------------------------------------------- */
 @media print {
   @page {
     margin: 1.6cm;
   }
 
-  /* --- 2. Force light-mode colors even under a dark OS/theme preference.
-     Custom properties still respect the cascade, so `!important` is
-     needed to reliably beat both `[data-theme="dark"]` (higher-specificity
-     attribute selector, see above) and `@media (prefers-color-scheme:
-     dark)` — the latter isn't restricted to `screen`, so on a dark-mode OS
-     it matches `print` too. */
-  :root {
+  /* Custom properties respect the cascade, so `!important` is needed to beat
+     both `[data-theme="dark"]` (higher-specificity attribute selector) and
+     `:root` itself — and note that with the dark-first flip, `:root` *is* the
+     dark theme, so this reset matters more than it used to. */
+  :root,
+  :root[data-theme="dark"],
+  [data-pillar] {
+    --depth-0: #ffffff !important;
+    --depth-1: #ffffff !important;
+    --depth-2: #f4f5f7 !important;
+    --depth-3: #eceef2 !important;
     --background: #ffffff !important;
     --foreground: #0f1115 !important;
     --surface: #ffffff !important;
     --surface-muted: #f4f5f7 !important;
+    --surface-raised: #eceef2 !important;
     --border: #d7dae0 !important;
+    --border-strong: #b6bcc7 !important;
     --muted-foreground: #3f4451 !important;
+    --subtle-foreground: #4a5060 !important;
     --brand: #4f46e5 !important;
     --brand-foreground: #ffffff !important;
     --accent: #0e7490 !important;
@@ -360,6 +927,12 @@ h3[id$="-heading"] {
     --success: #15803d !important;
     --warning: #b45309 !important;
     --danger: #dc2626 !important;
+    --pillar-l-accent: 0.5 !important;
+    --pillar-l-strong: 0.38 !important;
+    --pillar-l-dim: 0.75 !important;
+    --pillar-wash-alpha: 0 !important;
+    --pillar-glow-alpha: 0 !important;
+    --atmosphere-strength: 0 !important;
   }
 
   body {
@@ -367,13 +940,6 @@ h3[id$="-heading"] {
     color: #0f1115 !important;
   }
 
-  /* `dark:prose-invert` (LessonLayout, src/components/lessons/LessonLayout.tsx)
-     drives lesson body copy through @tailwindcss/typography's own
-     `--tw-prose-*` variables — a completely separate system from
-     `--foreground` above, with the same "unscoped media query also
-     matches print" problem, so it needs its own reset back to the
-     plugin's `prose-neutral` (light) values (see
-     node_modules/@tailwindcss/typography/src/styles.js, the `neutral` key). */
   .prose {
     --tw-prose-body: #404040 !important;
     --tw-prose-headings: #171717 !important;
@@ -398,47 +964,98 @@ h3[id$="-heading"] {
     text-decoration: underline;
   }
 
-  /* --- 1. Chrome that has no meaning on paper --- */
+  /* Background environment and all decorative layers have no meaning on
+     paper — and a canvas would print as a grey box. */
+  .atmosphere,
+  .field-canvas,
+  [data-decorative] {
+    display: none !important;
+  }
 
-  /* The navbar (src/components/layout/Navbar.tsx) is the only <header> in
-     the app, and it contains the search trigger, theme toggle, mobile
-     menu button, and the "Start learning" CTA — hiding it removes all of
-     them in one shot, with no need to touch that file. */
+  /* Reveal-on-scroll never runs in a print context, so without this every
+     revealed section prints blank. */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* The navbar is the app's only <header>, and it contains the search
+     trigger, theme toggle, mobile menu button and CTA — hiding it removes
+     all of them at once with no component edits. */
   header {
     display: none !important;
   }
 
-  /* Keep the footer's copyright line; its link list is pure site
-     navigation, nothing a reader on paper can click through. */
+  /* Keep the footer's copyright line; its link list is pure navigation. */
   footer nav {
     display: none !important;
   }
 
   /* Toggle-style buttons expose their state via aria-pressed across this
-     codebase (LessonCompleteToggle's "Mark as complete", ProblemFilters,
-     WavefunctionHeroExplorer) — a reliable, non-invasive hook for "button
-     with no static equivalent" without touching any of those files. */
+     codebase — a reliable hook for "control with no static equivalent".
+     This now reaches well beyond the navbar (which is already gone via
+     `header` above): EquationReveal's term chips, catalog/problem filter
+     chips, ConceptMapExplorer's view toggle, and others all use it. That's
+     fine — every one of them is a live-state control with nothing useful to
+     do on paper — *provided* the information they expose is still reachable
+     some other way. EquationReveal is the case that matters here: its term
+     glosses live in a `<details>` glossary below the chip row, which the
+     `details:not([open])` rule further down forces open in print so hiding
+     the chips never means losing the glosses themselves. */
   button[aria-pressed] {
     display: none !important;
   }
 
-  /* "Predict before you reveal" (PredictBeforeReveal.tsx) — the option
-     buttons have no static equivalent. Leave the question (and the
-     reveal panel, if already open) printed; drop only the button group. */
+  /* Every `role="radiogroup"` on the site is an interactive selector with a
+     static current state visible elsewhere (PredictBeforeReveal's question
+     text, a visualization's default view, a simulator's control panel) —
+     not just PredictBeforeReveal's option buttons, though that remains the
+     canonical case: the question (and the reveal panel, if already open)
+     still print; only the control group goes. */
   [role="radiogroup"] {
     display: none !important;
   }
 
-  /* Every embedded simulator/visualization in a lesson is wrapped in
-     <InteractiveSection> (src/components/mdx/InteractiveSection.tsx) —
-     `border-accent/30` + `bg-accent/5` together is a class combination
-     unique to that wrapper. Its title/description are plain text and
-     still print fine; only the interactive embed itself (the `mt-4`
-     child holding the canvas/SVG/controls) is swapped for a short note. */
-  .border-accent\/30.bg-accent\/5 > .mt-4 {
+  /* Native `<details>` disclosures collapse their content by default (per
+     the HTML spec's own UA stylesheet: `details:not([open]) > *:not(summary)
+     { display: none }`), which is exactly backwards for a printed page —
+     nothing a reader would need is reachable by clicking a closed twisty on
+     paper. Two real cases depend on this: LessonMetaStrip's collapsed
+     "Lineage" strip (prerequisites/resurfaces-in/related-elsewhere — real
+     study information, not decoration) and EquationReveal's "Full term
+     glossary" (see the `button[aria-pressed]` note above — this is what
+     keeps the glosses from being silently lost once the chips that reveal
+     them one at a time are hidden). `!important` is needed to beat the UA
+     rule, which the spec defines at normal — not `!important` — weight. */
+  details:not([open]) > *:not(summary) {
+    display: block !important;
+  }
+
+  /* The sticky/collapsible "On this page" table of contents (both the
+     desktop rail and the mobile disclosure button+panel,
+     src/components/lessons/TableOfContents.tsx) is in-page navigation
+     chrome, not lesson content — the same category as `header` and
+     `footer nav` above. Its links point at anchors on the very page it sits
+     on, which conveys nothing on paper. Keyed off `aria-label`/`aria-controls`
+     rather than a class string, matching this file's stated preference. */
+  nav[aria-label="On this page"],
+  [aria-controls="lesson-toc-mobile-panel"],
+  #lesson-toc-mobile-panel {
     display: none !important;
   }
-  .border-accent\/30.bg-accent\/5::after {
+
+  /* Every embedded simulator/visualization in a lesson is wrapped in
+     <InteractiveSection>, rendered as an instrument mount tagged
+     `data-mdx="instrument-mount"` with its embed tagged
+     `data-mdx-slot="embed"`. Keyed off those data attributes rather than an
+     exact Tailwind class combination so a restyle of the component can't
+     silently break print output. Title/mode label/description are plain
+     text and still print fine — only the interactive embed is swapped for a
+     short note. */
+  [data-mdx="instrument-mount"] [data-mdx-slot="embed"] {
+    display: none !important;
+  }
+  [data-mdx="instrument-mount"]::after {
     content: "Interactive figure — view online to try it.";
     display: block;
     margin-top: 0.75rem;
@@ -447,20 +1064,43 @@ h3[id$="-heading"] {
     color: #3f4451;
   }
 
-  /* --- 3. Wide content shouldn't be cut off, and shouldn't split badly --- */
+  /* Simulators embedded *without* an <InteractiveSection> wrapper — about
+     162 lessons do this — have no instrument-mount to key off. Every Lazy*
+     wrapper loads via `next/dynamic(..., { ssr: false })`, so the
+     server-rendered output of those embeds is permanently
+     `SimulatorSkeleton`'s placeholder, and a printed lesson would otherwise
+     carry a row of "Initializing instrument" boxes where the figures belong.
+     Replace the box with the same note the wrapped case gets. */
+  [data-simulator-skeleton] > * {
+    display: none !important;
+  }
+  [data-simulator-skeleton] {
+    display: block !important;
+    aspect-ratio: auto !important;
+    border-style: dashed !important;
+    padding: 0.75rem !important;
+  }
+  [data-simulator-skeleton]::after {
+    content: "Interactive simulator — view online to run it.";
+    display: block;
+    font-size: 0.8em;
+    font-style: italic;
+    color: #3f4451;
+  }
+
+  .instrument::after {
+    display: none !important;
+  }
 
   .katex-display {
     overflow-x: visible !important;
+    background: #f4f5f7 !important;
   }
   .katex-display > .katex {
     max-width: 100% !important;
     white-space: normal !important;
   }
 
-  /* Every table (mdx-components.tsx wraps `<table>` in this) and every
-     hand-drawn SVG diagram (src/components/visualizations/*) uses this
-     same overflow-x-auto escape hatch for wide content — nothing should
-     force horizontal scrolling on a medium that can't scroll. */
   .overflow-x-auto {
     overflow-x: visible !important;
   }

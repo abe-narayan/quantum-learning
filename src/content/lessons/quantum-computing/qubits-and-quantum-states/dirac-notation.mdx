@@ -59,6 +59,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Making the notation precise">
+$\langle\phi|\psi\rangle$ looks like decoration, but it's a single number that plays the same role for quantum states that an ordinary dot product plays for vectors — and pinning it down now makes every later calculation faster and harder to get wrong.
+</LessonHook>
+
 ## Motivation
 
 We've been writing $|0\rangle$, $|1\rangle$, and
@@ -88,6 +92,10 @@ ordinary dot products play for real vectors.
   creditUrl="https://commons.wikimedia.org/wiki/File:Paul_Dirac,_1933.jpg"
   license="Public domain"
 />
+
+<HistoricalMoment date="1933">
+Paul Dirac, who invented the bra–ket notation this lesson is built around, shares the Nobel Prize in Physics for his foundational work in quantum mechanics.
+</HistoricalMoment>
 
 ## Mathematical Development
 
@@ -232,15 +240,18 @@ The bar heights above are exactly what "cosine of the angle between them" means 
 
 **Compute $\langle+|0\rangle$, where $|+\rangle = \frac{1}{\sqrt2}(|0\rangle+|1\rangle)$.**
 
+<DerivationSteps>
+  <DerivationStep annotation="Conjugate-transpose the ket to get its bra. Coefficients here are real, so conjugation doesn't change them.">
 $$
 \langle+| = \frac{1}{\sqrt2}(\langle0|+\langle1|)
 $$
-
-(coefficients here are real, so conjugation doesn't change them)
-
+  </DerivationStep>
+  <DerivationStep annotation="Distribute against |0⟩ and apply orthonormality: ⟨0|0⟩=1, ⟨1|0⟩=0.">
 $$
 \langle+|0\rangle = \frac{1}{\sqrt2}(\langle0|0\rangle + \langle1|0\rangle) = \frac{1}{\sqrt2}(1 + 0) = \frac{1}{\sqrt2}
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 This number, $\tfrac{1}{\sqrt2}$, will resurface directly in the
 Measurement lesson: it's the probability *amplitude* for measuring $|+\rangle$
@@ -248,14 +259,14 @@ and finding "0," and squaring it gives the actual probability, $\tfrac12$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to conjugate the bra's coefficients.** If $|\phi\rangle$ has a
 complex coefficient like $i$, the bra's corresponding entry is $-i$, not
 $i$. Skipping this silently flips signs in the imaginary part of your
 answer.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming $\langle\phi|\psi\rangle=\langle\psi|\phi\rangle$.** They're
 complex conjugates of each other. They're only equal when the inner
 product happens to be real.
@@ -288,7 +299,9 @@ product happens to be real.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Quantum States and State Vectors](/lessons/quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors), where we use this notation to
 state the actual postulates governing which vectors count as physical
 qubit states, and derive exactly how many real numbers it takes to
 describe one.
+</NextDiscovery>

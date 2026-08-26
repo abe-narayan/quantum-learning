@@ -16,7 +16,7 @@ export const threePSpinOrbitSplitting: NumericProblem = {
     title: "Spin-Orbit Splitting of the 3p Level",
     course: "symmetry-scattering-and-semiclassical-methods",
     lesson: "quantum-mastery/symmetry-scattering-and-semiclassical-methods/degenerate-perturbation-theory-and-fine-structure",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["fine-structure", "degenerate-perturbation-theory", "hydrogen"],

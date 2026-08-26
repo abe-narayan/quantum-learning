@@ -6,7 +6,7 @@ export const qsvtVersusTrotterAsymptoticClaim: ConceptualProblem = {
     title: "Does QSVT Make Trotterization Obsolete?",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/the-quantum-singular-value-transformation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["qsvt", "hamiltonian-simulation", "trotterization", "asymptotics"],

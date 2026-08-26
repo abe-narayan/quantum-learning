@@ -33,7 +33,7 @@ export const qmaAmplificationThreshold5Percent: NumericProblem = {
     title: "Witness Copies Needed for a 5% Failure Bound",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/qma-and-quantum-verification",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["qma", "amplification", "chernoff-bound", "no-cloning"],

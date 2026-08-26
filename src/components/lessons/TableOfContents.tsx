@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
+import { TechLabel } from "@/components/ui/Typography";
 
 type TocEntry = { id: string; text: string };
 
@@ -49,6 +50,93 @@ function useHeadings(containerId: string): TocEntry[] {
   return useSyncExternalStore(noopSubscribe, getSnapshot, getServerSnapshot);
 }
 
+/**
+ * ============================================================
+ * Shared active-heading observer
+ * ============================================================
+ * `LessonLayout` renders both `TableOfContentsDesktop` and
+ * `TableOfContentsMobile` on every lesson page — CSS-hidden at different
+ * breakpoints, but both genuinely mounted at once — and both need the same
+ * "which section is the reader in right now" answer for the same
+ * `containerId`. Each independently owning an `IntersectionObserver`
+ * watching the exact same headings was two observers doing one job.
+ *
+ * One `IntersectionObserver` per `containerId` instead, module-level and
+ * reference-counted by subscriber (same shape as `Reveal.tsx`'s shared
+ * observer): the first of the two consumers to mount creates it, the
+ * second just adds a listener to the existing one, and it's disconnected
+ * only once both have unmounted. Since desktop and mobile always share one
+ * `containerId` on a given lesson page, they always resolve to the same
+ * heading elements — sharing by `containerId` alone is exactly sharing by
+ * heading set here.
+ */
+type ActiveHeadingListener = (activeId: string | null) => void;
+
+type ActiveHeadingObservation = {
+  observer: IntersectionObserver;
+  listeners: Set<ActiveHeadingListener>;
+  activeId: string | null;
+};
+
+const activeHeadingObservations = new Map<string, ActiveHeadingObservation>();
+
+// Treat a heading as "current" once it's past the sticky navbar (~64px) and
+// the reading-progress bar, and stop counting a heading once it's more than
+// 70% of the way up the viewport — this keeps the highlighted entry
+// roughly matched to whatever section occupies the top of the reading
+// area, without needing scroll-position math of our own.
+const ACTIVE_HEADING_OBSERVER_OPTIONS: IntersectionObserverInit = {
+  rootMargin: "-96px 0px -70% 0px",
+  threshold: 0,
+};
+
+function subscribeActiveHeading(
+  containerId: string,
+  headingEls: HTMLElement[],
+  listener: ActiveHeadingListener
+): () => void {
+  let observation = activeHeadingObservations.get(containerId);
+
+  if (!observation) {
+    const listeners = new Set<ActiveHeadingListener>();
+    const created: ActiveHeadingObservation = {
+      // Placeholder — replaced synchronously below once `observer` exists,
+      // since the observer's own callback needs to reach back into
+      // `created.activeId`/`created.listeners`.
+      observer: null as unknown as IntersectionObserver,
+      listeners,
+      activeId: null,
+    };
+    created.observer = new IntersectionObserver((observerEntries) => {
+      const visible = observerEntries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) {
+        created.activeId = visible[0].target.id;
+        created.listeners.forEach((notify) => notify(created.activeId));
+      }
+    }, ACTIVE_HEADING_OBSERVER_OPTIONS);
+
+    headingEls.forEach((el) => created.observer.observe(el));
+
+    activeHeadingObservations.set(containerId, created);
+    observation = created;
+  }
+
+  observation.listeners.add(listener);
+  // Sync the new subscriber to whatever the observer already knows,
+  // rather than leaving it at `null` until the next intersection change.
+  listener(observation.activeId);
+
+  return () => {
+    observation!.listeners.delete(listener);
+    if (observation!.listeners.size === 0) {
+      observation!.observer.disconnect();
+      activeHeadingObservations.delete(containerId);
+    }
+  };
+}
+
 function useTocEntries(containerId: string) {
   const entries = useHeadings(containerId);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -60,29 +148,8 @@ function useTocEntries(containerId: string) {
       .filter((el): el is HTMLElement => Boolean(el));
     if (headingEls.length === 0) return undefined;
 
-    const observer = new IntersectionObserver(
-      (observerEntries) => {
-        const visible = observerEntries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) {
-          setActiveId(visible[0].target.id);
-        }
-      },
-      {
-        // Treat a heading as "current" once it's past the sticky navbar
-        // (~64px) and the reading-progress bar, and stop counting a
-        // heading once it's more than 70% of the way up the viewport —
-        // this keeps the highlighted entry roughly matched to whatever
-        // section occupies the top of the reading area, without needing
-        // scroll-position math of our own.
-        rootMargin: "-96px 0px -70% 0px",
-        threshold: 0,
-      }
-    );
-    headingEls.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [entries]);
+    return subscribeActiveHeading(containerId, headingEls, setActiveId);
+  }, [containerId, entries]);
 
   return { entries, activeId, hasEnoughHeadings: entries.length >= MIN_HEADINGS };
 }
@@ -102,77 +169,165 @@ export function TableOfContentsDesktop({ containerId }: { containerId: string })
     return <nav aria-hidden="true" className="hidden lg:block" />;
   }
 
+  const activeIndex = entries.findIndex((entry) => entry.id === activeId);
+  const positionLabel = `${String(Math.max(activeIndex, 0) + 1).padStart(2, "0")} / ${String(entries.length).padStart(2, "0")}`;
+
   return (
     <nav
       aria-label="On this page"
       className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
     >
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">On this page</p>
+      {/* An instrument readout, not a plain label: the section the reader is
+          currently in relative to the total is visible at a glance, and the
+          left rail is pillar-tinted so this rail visibly belongs to the
+          same identity as everything else PillarScope retints. */}
+      <div className="flex items-baseline justify-between gap-3 border-b border-border pb-2">
+        <TechLabel>On this page</TechLabel>
+        <span className="tech-value text-[0.65rem] text-subtle-foreground">{positionLabel}</span>
+      </div>
       <ul className="mt-3 space-y-1 border-l border-border text-sm">
-        {entries.map((entry) => (
-          <li key={entry.id}>
-            <a
-              href={`#${entry.id}`}
-              aria-current={activeId === entry.id ? "location" : undefined}
-              className={cn(
-                "-ml-px block border-l-2 py-1 pl-3 transition-colors",
-                activeId === entry.id
-                  ? "border-brand font-medium text-brand"
-                  : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-              )}
-            >
-              {entry.text}
-            </a>
-          </li>
-        ))}
+        {entries.map((entry, index) => {
+          const isActive = activeId === entry.id;
+          const isPast = activeIndex >= 0 && index < activeIndex;
+          return (
+            <li key={entry.id}>
+              <a
+                href={`#${entry.id}`}
+                aria-current={isActive ? "location" : undefined}
+                className={cn(
+                  "-ml-px flex items-baseline gap-2 border-l-2 py-1.5 pl-3 transition-colors",
+                  isActive
+                    ? "border-pillar-accent font-medium text-pillar-text"
+                    : isPast
+                      ? "border-pillar-dim/60 text-muted-foreground hover:text-foreground"
+                      : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  data-decorative=""
+                  className="tech-value shrink-0 text-[0.65rem] text-subtle-foreground"
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span>{entry.text}</span>
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
 }
 
-/** Mobile/tablet collapsible toggle, meant to sit just below the lesson header. */
+/**
+ * Mobile/tablet collapsible toggle, meant to sit just below the lesson
+ * header. Two changes from a plain disclosure make this "genuinely usable
+ * on a phone" rather than a shrunk desktop control:
+ *
+ * 1. The closed trigger names the *current* section (falling back to a
+ *    section count when nothing is active yet), so a reader glancing at it
+ *    mid-lesson gets their position for free without opening anything —
+ *    the same progress-awareness the desktop rail gets from its rung
+ *    indicator.
+ * 2. It closes on outside tap, Escape, and blur — the same disclosure
+ *    contract `Navbar`'s `TracksDropdown` implements — instead of only via
+ *    a second tap on the trigger, which is easy to miss on a touchscreen
+ *    once the list has scrolled the trigger off-screen.
+ */
 export function TableOfContentsMobile({ containerId }: { containerId: string }) {
   const { entries, activeId, hasEnoughHeadings } = useTocEntries(containerId);
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function handlePointerDown(event: PointerEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        if (containerRef.current?.contains(document.activeElement)) {
+          buttonRef.current?.focus();
+        }
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
 
   if (!hasEnoughHeadings) return null;
 
+  const activeIndex = entries.findIndex((entry) => entry.id === activeId);
+  const currentLabel =
+    activeIndex >= 0 ? entries[activeIndex].text : `${entries.length} sections`;
+
   return (
-    <div className="mt-8 max-w-3xl lg:hidden">
+    <div
+      ref={containerRef}
+      className="mt-8 max-w-3xl lg:hidden"
+      onBlur={(event) => {
+        if (!containerRef.current?.contains(event.relatedTarget as Node | null)) {
+          setIsOpen(false);
+        }
+      }}
+    >
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        className="flex w-full items-center justify-between rounded-xl border border-border bg-surface-muted/60 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-muted"
+        aria-controls="lesson-toc-mobile-panel"
+        className="flex w-full min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted/60 px-4 py-3 text-left text-sm transition-colors hover:bg-surface-muted"
       >
-        <span>Contents</span>
+        <span className="flex min-w-0 flex-col">
+          <span className="tech-label text-subtle-foreground">
+            {activeIndex >= 0 ? `Section ${activeIndex + 1} of ${entries.length}` : "Contents"}
+          </span>
+          <span className="mt-0.5 truncate font-medium text-foreground">{currentLabel}</span>
+        </span>
         <svg
           aria-hidden="true"
+          data-decorative=""
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
           strokeWidth={1.75}
-          className={cn("h-4 w-4 shrink-0 transition-transform", isOpen && "rotate-180")}
+          className={cn("h-4 w-4 shrink-0 text-pillar-text transition-transform", isOpen && "rotate-180")}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="m5 7.5 5 5 5-5" />
         </svg>
       </button>
       {isOpen ? (
-        <ul className="mt-2 space-y-1 rounded-xl border border-border p-3 text-sm">
-          {entries.map((entry) => (
+        <ul
+          id="lesson-toc-mobile-panel"
+          className="mt-2 space-y-0.5 rounded-xl border border-border bg-surface p-2 text-sm"
+        >
+          {entries.map((entry, index) => (
             <li key={entry.id}>
               <a
                 href={`#${entry.id}`}
                 onClick={() => setIsOpen(false)}
                 aria-current={activeId === entry.id ? "location" : undefined}
                 className={cn(
-                  "block rounded-lg px-3 py-1.5 transition-colors",
+                  "flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 transition-colors",
                   activeId === entry.id
-                    ? "font-medium text-brand"
+                    ? "bg-pillar-wash font-medium text-pillar-text"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                {entry.text}
+                <span aria-hidden="true" data-decorative="" className="tech-value text-[0.65rem] text-subtle-foreground">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span>{entry.text}</span>
               </a>
             </li>
           ))}

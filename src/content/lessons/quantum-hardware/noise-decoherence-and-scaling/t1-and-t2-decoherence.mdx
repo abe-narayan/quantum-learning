@@ -67,14 +67,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Beyond the spec-sheet line">
+Every hardware press release leads with T1 and T2, and it's easy to nod along without actually knowing what "T1 = 100 μs" commits a device to.
+</LessonHook>
+
 ## Motivation
 
 Every time a hardware company announces a new chip, the press release
 leads with two numbers: T1 and T2, usually in microseconds, sometimes
 now creeping into milliseconds for the best trapped-ion and
-neutral-atom systems. Reporters repeat them, competitors get compared
-by them, and it's easy to nod along without actually knowing what
-"T1 = 100 μs" commits a device to. Physical Qubit Platforms and Advanced
+neutral-atom systems. Reporters repeat them, and competitors get
+compared by them. Physical Qubit Platforms and Advanced
 Topics in Quantum Mechanics already built everything needed to define
 both numbers precisely and compute with them directly, so this lesson
 turns them from a spec-sheet line into something you can reason about
@@ -88,6 +91,10 @@ the moment you see it quoted.
   creditUrl="https://commons.wikimedia.org/wiki/File:MRI_Scanner_Mark_One.jpg"
   license="CC BY-SA 4.0"
 />
+
+<HistoricalMoment date="1946">
+Felix Bloch defines both T1 and T2 for nuclear spin relaxation — the same time constants every MRI scan measures for protons in tissue, and every qubit spec sheet measures for energy levels.
+</HistoricalMoment>
 
 ## Engineering Development
 
@@ -123,6 +130,14 @@ time, though it can decay much faster (if pure dephasing dominates)
 independent of T1. A device with $T_2$ close to $2T_1$ is described as
 "T1-limited" (dephasing is not the bottleneck); one with $T_2\ll2T_1$ is
 "T2-limited" (dephasing dominates).
+
+Watching both channels decay side by side, from the same starting point
+and at the same per-step strength, makes the asymmetry visible as two
+different directions of travel rather than two different formulas:
+
+<DecoherenceBlochDecay
+  ariaLabel="Two Bloch-circle panels comparing amplitude damping (T1) and dephasing (T2) decay from the same equatorial starting state: amplitude damping pulls the vector toward the north pole |0⟩, while dephasing shrinks it straight toward the center along z=0"
+/>
 
 <InteractiveSection title="Dephasing vs. amplitude damping" description="Compare the two channels directly: start from |+⟩ (equal parts |0⟩ and |1⟩, maximal initial coherence) and step through dephasing, watching only x and y shrink while z stays at 0. Then switch to amplitude damping from the same starting state and watch z move too, as the state gets pulled all the way to the north pole — the same T1-vs-T2 distinction just derived above, now visible qubit by qubit.">
   <LazyNoiseExplorer />
@@ -197,14 +212,14 @@ identifying and suppressing the extra dephasing source instead.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming T1 and T2 are independent, unrelated numbers.** They're
 physically related via $T_2\leq2T_1$. Reported $T_2$ values exceeding
 this bound would indicate a measurement or definition error, not a
 device that's actually better.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming decayProbabilityForTimestep's exact match to $e^{-t/T}$ is
 merely a good approximation.** It's an EXACT identity, for any step
 count. The telescoping product
@@ -242,6 +257,7 @@ Methods, which actually is only approximate.
 
 ## Further Exploration
 
+<NextDiscovery>
 [Crosstalk](/lessons/quantum-hardware/noise-decoherence-and-scaling/crosstalk) is an inherently two-qubit noise source that this lesson's
 single-qubit T1/T2 picture doesn't capture.
 
@@ -250,3 +266,4 @@ the Lindblad generator's structure, in [The Lindblad Master Equation](/lessons/q
 which also proves this lesson's discrete Kraus-channel picture and the
 continuous-time master equation are exactly the same physics, not two
 independent models that happen to agree.
+</NextDiscovery>

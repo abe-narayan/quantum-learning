@@ -24,11 +24,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+What happens when a single qubit suffers both an X error and a Z error at once, the two failure modes the last two lessons treated as entirely separate problems? Neither 3-qubit code alone handles it.
+</LessonHook>
+
 ## Motivation
 
-What happens when a single qubit suffers both an $X$ error and a $Z$
-error at once, the two failure modes the last two lessons treated as
-entirely separate problems? Neither 3-qubit code alone handles it: the
+Neither 3-qubit code alone handles it: the
 bit-flip code is blind to phase errors, the phase-flip code is blind to
 bit errors. Peter Shor's 1995 code answers this by **concatenating** the
 two constructions: nine physical qubits, protecting against an
@@ -165,7 +167,7 @@ group level.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming 9 qubits are needed because $3\times3=9$ is somehow a
 coincidence of the numbers.** It's structural: 3 groups (for the outer
 phase-flip code's 3 logical positions) of 3 qubits each (for each group's
@@ -173,7 +175,7 @@ own inner bit-flip protection). The concatenation, not arithmetic
 coincidence, produces exactly 9.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Believing this platform's engine could easily be extended to simulate
 the full Shor code with minor changes.** The syndrome extraction alone
 needs bookkeeping across two nested levels (within-group and
@@ -211,6 +213,8 @@ what Lessons 2 and 3 already built.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Stabilizer Formalism Basics](/lessons/quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics), which gives a compact, general
 language for describing codes like these, using the two 3-qubit codes
 already built as the concrete worked examples.
+</NextDiscovery>

@@ -12,7 +12,7 @@ export const decodingThresholdScalingRatio: NumericProblem = {
     title: "Comparing Logical Error Rates Across Code Distances",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/decoding-surface-codes",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["surface-codes", "decoding", "threshold-theorem"],

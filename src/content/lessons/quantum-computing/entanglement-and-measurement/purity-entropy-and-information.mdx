@@ -28,12 +28,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Purity, Tr(ρ²), has done real work in the last two lessons: detecting mixedness, and tying directly to entanglement. But it isn't the measure physicists actually reach for first.
+</LessonHook>
+
 ## Motivation
 
-Purity, $\text{Tr}(\rho^2)$, has done real work in the last two lessons:
-detecting mixedness, and (for 2-qubit pure states) tying directly to
-entanglement. But it isn't the measure physicists actually reach for
-first. The standard one is **von Neumann entropy**, and this lesson
+That tie to entanglement holds specifically for 2-qubit pure states.
+The standard measure physicists reach for first is **von Neumann
+entropy**, and this lesson
 builds it properly: not as a new formula to accept, but as the direct
 quantum generalization of an idea this platform already uses, Shannon
 entropy of a classical probability distribution.
@@ -221,14 +224,14 @@ than the maximally mixed qubit's 1 bit (since $0.75/0.25$ is less
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Reading entropy off ρ's diagonal entries directly.** As the
 $\rho_1$-vs-$\rho_2$ example shows, this is only valid when $\rho$ is
 already diagonal. In general, entropy needs $\rho$'s eigenvalues, which
 can differ substantially from its diagonal entries.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing $S(\rho)=0$ with "nothing is known."** It's the opposite:
 $S(\rho)=0$ means the state is known *completely* (a specific pure
 state): entropy measures residual uncertainty, so zero entropy is
@@ -270,7 +273,9 @@ maximal knowledge, not minimal.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Entanglement Entropy for Pure Bipartite States](/lessons/quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states), which applies
 today's entropy measure to a reduced density matrix specifically, and
 proves exactly when doing so is, and is not, a valid measure of
 entanglement.
+</NextDiscovery>

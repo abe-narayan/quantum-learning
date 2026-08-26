@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Instrument } from "@/components/ui/Panel";
 import type { Problem } from "@/lib/problems/types";
 import { validateAnswer } from "@/lib/problems/validators";
 import type { ValidationResult } from "@/lib/problems/validators/types";
@@ -30,7 +30,9 @@ export function ProblemView({ problem }: { problem: Problem }) {
 
   const solved = result?.status === "correct";
 
-  function handleSubmit() {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (solved) return;
     const validation = validateAnswer(problem, rawAnswer);
     setResult(validation);
     recordAttempt({ timestamp: Date.now(), submitted: rawAnswer, status: validation.status });
@@ -46,27 +48,32 @@ export function ProblemView({ problem }: { problem: Problem }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {progress.solved && !result ? (
-        <Badge tone="brand" className="w-fit">
+        <p className="inline-flex w-fit items-center gap-2 rounded-full border border-pillar-edge bg-pillar-wash px-3 py-1 text-xs font-medium text-pillar-text">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2 6.2 5 9l5-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
           You&rsquo;ve solved this before — try it again anytime
-        </Badge>
+        </p>
       ) : null}
 
-      <div className="space-y-4">
-        <AnswerInput problem={problem} value={rawAnswer} onChange={setRawAnswer} disabled={solved} />
+      <Instrument label="Your answer">
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <AnswerInput problem={problem} value={rawAnswer} onChange={setRawAnswer} disabled={solved} />
 
-        <div className="flex flex-wrap gap-3">
-          {!solved ? <Button onClick={handleSubmit}>Submit</Button> : null}
-          {result && !solved ? (
-            <Button variant="secondary" onClick={handleRetry}>
-              Try Again
-            </Button>
-          ) : null}
-        </div>
-      </div>
+          <div className="flex flex-wrap gap-3">
+            {!solved ? <Button type="submit">Submit</Button> : null}
+            {result && !solved ? (
+              <Button type="button" variant="secondary" onClick={handleRetry}>
+                Try Again
+              </Button>
+            ) : null}
+          </div>
 
-      {result ? <Feedback result={result} /> : null}
+          {result ? <Feedback result={result} /> : null}
+        </form>
+      </Instrument>
 
       <HintPanel hints={problem.hints} revealedCount={progress.hintsRevealed} onReveal={handleRevealHint} />
       <SolutionPanel

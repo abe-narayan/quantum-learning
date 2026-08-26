@@ -6,7 +6,7 @@ export const unambiguousDiscriminationSuccessProbability: NumericProblem = {
     title: "Success Probability of Optimal Unambiguous Discrimination",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/povms-and-generalized-measurement",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["povm", "unambiguous-state-discrimination", "naimark"],

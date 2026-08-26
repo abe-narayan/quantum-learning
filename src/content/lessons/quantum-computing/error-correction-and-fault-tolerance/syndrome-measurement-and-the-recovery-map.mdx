@@ -23,6 +23,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Bit-flip code, phase-flip code, Shor code: three different constructions this course has built, running the exact same four-step recovery loop underneath, just dressed differently each time.
+</LessonHook>
+
 ## Motivation
 
 Every code this course has built follows the same four-step procedure.
@@ -128,6 +132,15 @@ the same $[[3,1,3]]$ bit-flip code this lesson's parameters describe.
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 
+The four-step procedure is identical for the dual, phase-flip $[[3,1,3]]$
+code from Lesson 3, encode, inject, diagnose, correct, run here end to
+end on either code so the "any stabilizer code" claim above isn't only
+demonstrated for one of the two:
+
+<InteractiveSection title="The same four steps, either code" description="Switch between the bit-flip and phase-flip codes and step through encode → inject → diagnose → correct. The syndrome table and the correction step are structurally identical between the two, exactly the point Lesson 5's stabilizer formalism makes precise: this is one procedure, not two.">
+  <ErrorCorrectionCycle ariaLabel="A logical qubit encoded, hit with a real bit-flip or phase-flip error, and corrected via real syndrome extraction, for either the bit-flip or the phase-flip three-qubit code." />
+</InteractiveSection>
+
 <PredictBeforeReveal
   question="An X error hits two qubits at once, qubit 0 and qubit 1. The code is only rated to correct one-qubit errors. What happens when you run the standard recovery procedure on it anyway?"
   options={[
@@ -166,7 +179,7 @@ that leaves no trace in the syndrome at all, confirming $d=3$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing "detected" with "safely handled."** The worked example's
 weight-2 case *does* trigger a nonzero syndrome, but running the
 recovery procedure on it doesn't just fail to help, it actively converts
@@ -176,7 +189,7 @@ a weight-2 error can make things categorically worse, not merely
 "not better."
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming bigger n always means a better code.** $n$ is a *cost*
 (physical qubits spent), not a benefit. The meaningful comparison is the
 ratio of $d$ (or correctable error count) to $n$, which is what makes
@@ -216,7 +229,9 @@ here as a real, active area this platform doesn't build).
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Surface Codes: A Conceptual Introduction](/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction), the family of codes
 real quantum hardware roadmaps actually build toward: higher distance,
 much better qubit efficiency, at the cost of substantially more complex
 syndrome decoding.
+</NextDiscovery>

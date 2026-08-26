@@ -79,6 +79,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Two valid algorithms, wildly different bills">
+  Every T gate in a compiled circuit is a purchase from the magic-state
+  factory, so the length of the approximating sequence is the actual
+  price tag. Two different, both mathematically valid, compilation
+  algorithms can quote wildly different prices for the exact same gate.
+</LessonHook>
+
 ## Motivation
 
 Gate Decomposition showed that every gate this platform uses decomposes
@@ -94,13 +101,9 @@ to be *exactly* representable by a short native sequence. Most gates a
 real algorithm needs, especially arbitrary rotations $R_z(\theta)$ for a
 generic angle $\theta$, are **not** exactly representable by any finite
 Clifford+T sequence at all: they must be *approximated*, to some target
-precision $\epsilon$, by a finite sequence of Clifford+T gates. Since
-every T gate in that sequence is a purchase from the magic-state factory,
-the length of the sequence, and specifically how many of its gates are
-T gates, **is** the price tag. This lesson is about how that price tag is
-actually computed, and why two different, both mathematically valid,
-compilation algorithms can quote wildly different prices for the exact
-same target gate at the exact same precision.
+precision $\epsilon$, by a finite sequence of Clifford+T gates. This
+lesson works out exactly how that price tag gets computed, for a target
+gate and precision fixed in advance.
 
 Concretely, what either synthesis algorithm actually *hands back* is
 nothing more exotic than a short list of single-qubit gates, chained in
@@ -183,7 +186,7 @@ recursive step tighten this considerably. The qualitative content that
 in $1/\epsilon$, not polynomially, which is what makes arbitrarily precise
 single-qubit synthesis efficient at all.
 
-<Callout type="note">
+<Callout type="warning">
 **What Solovay-Kitaev guarantees, stated carefully.** It guarantees that
 efficient synthesis is *possible* for *any* target unitary, from *any*
 sufficiently rich fixed gate set, via *some* classical algorithm. It says
@@ -234,7 +237,7 @@ This lesson cites that scaling result and its attribution rather than
 re-deriving the ring-theoretic search algorithm itself, which is genuinely
 a lesson (and a paper) of its own.
 
-<Callout type="mistake">
+<Callout type="warning">
 **Solovay-Kitaev proves EFFICIENT synthesis is always possible; it does
 NOT mean every synthesis method achieves near-optimal T-count in
 practice.** "Efficient" here means polylogarithmic scaling with
@@ -342,7 +345,7 @@ without bound as $\epsilon\to0$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Solovay-Kitaev proves EFFICIENT synthesis is always possible, it does
 NOT mean every synthesis method achieves near-optimal T-count in
 practice.** The theorem's $O(\log^c(1/\epsilon))$ bound is a real,
@@ -355,7 +358,7 @@ gap between them can be several orders of magnitude for a common,
 structured gate family.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming the $35\epsilon_{\text{in}}^3$-style precision of the
 distillation formula from the prerequisite lesson transfers to T-count
 scaling here.** They are unrelated numbers answering unrelated questions:
@@ -415,3 +418,10 @@ Next: [Noise-Aware Compilation and Resource Estimation](/lessons/apex/simulation
 which takes T-count as one input among several (connectivity, native
 gate fidelities, decoder timing) needed to turn a compiled circuit into a
 full resource estimate for real hardware.
+
+<NextDiscovery>
+  Next: Noise-Aware Compilation and Resource Estimation takes T-count as
+  one input among several — connectivity, native gate fidelities,
+  decoder timing — needed to turn a compiled circuit into a full
+  resource estimate for real hardware.
+</NextDiscovery>

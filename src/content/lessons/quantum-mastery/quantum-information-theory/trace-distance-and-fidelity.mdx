@@ -100,6 +100,12 @@ export const fvgFrames = [
   },
 ];
 
+<LessonHook eyebrow="Two different meanings of 'close'">
+  A hardware datasheet's "99.5% fidelity" and a security proof's
+  "indistinguishable states" are answering two genuinely different
+  questions — and this platform has quietly needed both all along.
+</LessonHook>
+
 ## Motivation
 
 Ask "how close are two quantum states?" and it sounds like a single
@@ -135,13 +141,33 @@ lesson derives from first principles.
   license="CC BY-SA 4.0"
 />
 
+<ResearchConnection
+  title="Cross-entropy benchmarking and the 2019 quantum-supremacy claim"
+  source="Google Quantum AI, on the Sycamore processor (2019)"
+  url="https://www.nature.com/articles/s41586-019-1666-5"
+>
+  The claim rested on comparing a chip's actual output distribution
+  against the ideal circuit's predicted one — the same distinguishability
+  question Helstrom's formula answers below, just asked of an entire
+  circuit's output statistics instead of one qubit's state.
+</ResearchConnection>
+
 ## Mathematical Development
 
 ### Trace distance: definition and variational form
 
+<EquationReveal
+  terms={[
+    { id: "D", symbol: "D(ρ,σ)", gloss: "Trace distance — half the trace norm of the difference between two states." },
+    { id: "mu", symbol: "μ_i", gloss: "Eigenvalues of the Hermitian, traceless operator Δ ≡ ρ − σ." },
+  ]}
+>
+
 $$
 D(\rho,\sigma) \equiv \frac12\text{Tr}|\rho-\sigma| = \frac12\sum_i|\mu_i|
 $$
+
+</EquationReveal>
 
 where $\mu_i$ are the eigenvalues of the Hermitian, traceless operator
 $\Delta\equiv\rho-\sigma$ (traceless since $\text{Tr}\rho=\text{Tr}\sigma=1$).
@@ -157,17 +183,20 @@ $D(\rho,\sigma)=\max_{0\leq P\leq I}\text{Tr}\big[P(\rho-\sigma)\big]$,
 the maximum taken over all measurement operators $P$ (Hermitian,
 eigenvalues in $[0,1]$).
 
-**Proof.** For any such $P$, write $P=P\Delta_+/\Delta_++P\Delta_-/\Delta_-$...
-more directly: decompose using the projector $\Pi_+$ onto $\Delta$'s
-non-negative eigenspace. $\text{Tr}[P\Delta]=\text{Tr}[P\Delta_+]-\text{Tr}[P\Delta_-]\leq\text{Tr}[P\Delta_+]\leq\text{Tr}[\Delta_+]$
-(the first inequality drops a non-negative term $\text{Tr}[P\Delta_-]\geq0$
-since $P,\Delta_-\geq0$; the second uses $P\leq I$ applied to the
-positive operator $\Delta_+$). Equality is achieved exactly at $P=\Pi_+$
-(then $\text{Tr}[P\Delta_-]=0$ since $\Delta_-$ lives entirely in $\Delta$'s
-negative eigenspace, orthogonal to $\Pi_+$'s range, and
-$\text{Tr}[\Pi_+\Delta_+]=\text{Tr}[\Delta_+]$ since $\Delta_+$ already
-lives entirely inside $\Pi_+$'s range). So the maximum is exactly
-$\text{Tr}[\Delta_+]=D(\rho,\sigma)$. $\blacksquare$
+**Proof.** For any such $P$, decompose using the projector $\Pi_+$ onto
+$\Delta$'s non-negative eigenspace.
+
+<DerivationSteps>
+  <DerivationStep annotation="The first inequality drops a non-negative term Tr[PΔ₋] ≥ 0, since P, Δ₋ ≥ 0; the second uses P ≤ I applied to the positive operator Δ₊.">
+    $\text{Tr}[P\Delta]=\text{Tr}[P\Delta_+]-\text{Tr}[P\Delta_-]\leq\text{Tr}[P\Delta_+]\leq\text{Tr}[\Delta_+]$
+  </DerivationStep>
+  <DerivationStep annotation="Δ₋ lives entirely in Δ's negative eigenspace, orthogonal to Π₊'s range, so Tr[PΔ₋]=0 there; and Δ₊ already lives entirely inside Π₊'s range, so Tr[Π₊Δ₊]=Tr[Δ₊].">
+    Equality is achieved exactly at $P=\Pi_+$.
+  </DerivationStep>
+  <DerivationStep annotation="Combining the bound and the equality case identifies the maximum exactly.">
+    So the maximum is exactly $\text{Tr}[\Delta_+]=D(\rho,\sigma)$. $\blacksquare$
+  </DerivationStep>
+</DerivationSteps>
 
 That result hands trace distance an operational meaning it wouldn't have
 as a bare matrix norm: it is exactly twice the largest bias any single
@@ -184,9 +213,18 @@ already built.
 
 ### Uhlmann fidelity
 
+<EquationReveal
+  terms={[
+    { id: "F", symbol: "F(ρ,σ)", gloss: "Uhlmann fidelity — how much two states overlap, in general (possibly mixed) form." },
+    { id: "sqrtrho", symbol: "√ρ", gloss: "The matrix square root of ρ." },
+  ]}
+>
+
 $$
 F(\rho,\sigma) \equiv \text{Tr}\sqrt{\sqrt\rho\,\sigma\,\sqrt\rho}
 $$
+
+</EquationReveal>
 
 This looks opaque in general, but reduces immediately when $\rho=|\psi\rangle\langle\psi|$
 is pure: $\sqrt\rho=\rho$ (a rank-1 projector is its own square root), so
@@ -279,6 +317,12 @@ $\blacksquare$
 
 ## Physical Interpretation
 
+<InsightBlock>
+  Trace distance and fidelity agree at the extremes but track genuinely
+  different fine-grained information in between — which is exactly why
+  a serious comparison computes both rather than settling for one.
+</InsightBlock>
+
 Trace distance answers one question, "how well can a single measurement
 tell these two states apart?", and Helstrom's formula makes that literal
 rather than metaphorical. Fidelity answers something else entirely: "how
@@ -350,7 +394,7 @@ holding at every strength, not just the one value checked by hand:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Using $F(\rho,\sigma)=\sqrt{\langle\psi|\sigma|\psi\rangle}$ when
 *neither* state is pure.** The boxed shortcut requires $\rho$ (or by
 symmetry $\sigma$) to be pure; for two genuinely mixed states, the full
@@ -359,7 +403,7 @@ this platform's engine cannot evaluate for a general mixed qubit pair
 (it would require a matrix square root the platform doesn't implement).
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating Fuchs–van de Graaf as an equality.** It's a two-sided bound,
 not an identity: the worked example's own numbers ($D\approx0.1708$
 strictly between $0.0417$ and $0.2857$ for amplitude damping) show real
@@ -409,8 +453,10 @@ lower bound only in special cases.
 
 ## Further Exploration
 
-[Quantum Channels: Kraus and Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi)
-returns to these same two channels from a different angle entirely:
-instead of asking how much they disturb one input state, it asks what
-structural property, complete positivity, makes them valid physical
-channels in the first place.
+<NextDiscovery>
+  [Quantum Channels: Kraus and Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi)
+  returns to these same two channels from a different angle entirely:
+  instead of asking how much they disturb one input state, it asks what
+  structural property, complete positivity, makes them valid physical
+  channels in the first place.
+</NextDiscovery>

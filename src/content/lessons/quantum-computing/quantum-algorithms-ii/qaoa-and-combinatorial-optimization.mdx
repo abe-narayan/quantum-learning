@@ -40,14 +40,16 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Splitting a graph, one phase at a time">
+Max-Cut asks you to split a graph's vertices into two groups to maximize the number of edges crossing between them — an NP-hard problem QAOA attacks with the same hybrid loop VQE uses for ground energies.
+</LessonHook>
+
 ## Motivation
 
-**QAOA (the quantum approximate optimization algorithm)** applies the same
-hybrid loop as VQE, a parameterized circuit and a classically-optimized
-cost, to combinatorial optimization instead of finding a ground energy.
-The first, standard example is **Max-Cut**: split a graph's vertices into
-two groups to maximize the number of edges crossing between them, an
-NP-hard problem in general.
+**QAOA** — the quantum approximate optimization algorithm — is that
+same hybrid loop, a parameterized circuit and a classically-optimized
+cost, retargeted from finding a ground energy to combinatorial
+optimization. Max-Cut is the first, standard example.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/9/98/A_Wafer_of_the_Latest_D-Wave_Quantum_Computers_%2839188583425%29.jpg"
@@ -186,7 +188,7 @@ matching the general $|E|/2$ rule and the engine's direct output.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting the cost unitary alone to improve the measured cut size.**
 It's a pure phase operator. Measurement probabilities (and hence the
 expected cut size) are completely unchanged by $U_C$ on its own.
@@ -194,7 +196,7 @@ Improvement only happens once the mixer lets those phases turn into
 amplitude changes.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming QAOA always finds the exact maximum cut.** It's a heuristic,
 approximate algorithm. The next lesson's worked example shows $p=1$
 QAOA reaching *close to* but not exactly the true maximum, and more
@@ -228,6 +230,8 @@ convergence.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [QAOA: A Worked Max-Cut Example](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example), running $p=1$ QAOA on a
 triangle graph and a single edge, both reaching within a few percent of
 the true optimum.
+</NextDiscovery>

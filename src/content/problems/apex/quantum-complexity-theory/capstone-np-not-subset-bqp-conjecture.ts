@@ -6,7 +6,7 @@ export const capstoneNpNotSubsetBqpConjecture: ConceptualProblem = {
     title: "Why NP ⊄ BQP Is a Conjecture, Not a Theorem",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/capstone-what-we-know-and-dont",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["complexity-theory", "np", "bqp", "query-complexity", "claim-evaluation"],

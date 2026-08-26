@@ -24,14 +24,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+The last lesson derived ∫|ψ(x)|²dx = 1 from a continuum limit. This lesson treats that condition as a working tool: normalizing wavefunctions, computing region probabilities, and understanding why a correctly-evolving quantum state can never drift out of normalization.
+</LessonHook>
+
 ## Motivation
 
-The last lesson derived $\int|\psi(x)|^2\,dx = 1$ from a continuum limit.
-This lesson treats that condition as a working tool: normalizing
-wavefunctions, computing region probabilities, and understanding *why* a
-correctly-evolving quantum state can never drift out of normalization, a
-claim this platform's numerical engine can actually be checked against,
-not just asserted.
+That claim about normalization surviving evolution is one this
+platform's numerical engine can actually be checked against, not just
+asserted.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/32/Double-slit_experiment_results_Tanamura_4.jpg"
@@ -137,13 +138,13 @@ density rather than pulled from a statistics table.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to square before integrating.** Normalization uses
 $|\psi(x)|^2$, not $\psi(x)$. For a complex $\psi$, that's
 $\psi(x)^*\psi(x)$, not $\psi(x)^2$.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any function can be normalized.** If $\int|\psi|^2 dx$
 diverges (e.g. $\psi(x)=1$ for all $x$, a plane wave), no rescaling fixes
 it. Such states aren't literally normalizable and require special
@@ -175,5 +176,7 @@ handling (briefly touched on in the Free-Particle Wave Packets lesson).
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Expectation Values in Position Space](/lessons/quantum-mechanics/wave-mechanics/expectation-values-in-position-space), turning $|\psi(x)|^2$ into
 concrete predictions like $\langle x\rangle$ and $\langle x^2\rangle$.
+</NextDiscovery>

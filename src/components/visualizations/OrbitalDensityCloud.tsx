@@ -97,7 +97,7 @@ export function OrbitalDensityCloud({ ariaLabel }: { ariaLabel: string }) {
   const { cells, maxDensity } = useMemo(() => sampleGrid(preset), [preset]);
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={VIEW} height={VIEW} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img" aria-label={ariaLabel}>
           {cells.map((cell, i) => (

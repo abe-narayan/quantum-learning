@@ -25,12 +25,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Suppose someone hands you a list of one million unsorted items and asks you to find the one that satisfies some hard-to-guess condition, checkable only by testing items one at a time. Classically, there's no way around it: up to a million checks in the worst case.
+</LessonHook>
+
 ## Motivation
 
-Suppose someone hands you a list of one million unsorted items and asks
-you to find the one that satisfies some hard-to-guess condition, checkable
-only by testing items one at a time. How many guesses should you expect
-to need? Classically, there's no way around it: with no structure to
+How many guesses should you expect
+to need? With no structure to
 exploit, up to a million checks in the worst case, half a million on
 average. That's the general fact for a "black box" that marks one
 specific item among $N=2^n$ unsorted possibilities: a classical algorithm
@@ -139,7 +141,7 @@ sign flip.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Building the reflection by flipping $|0\rangle$'s sign instead of
 everything else's.** This is exactly the bug described above: the
 resulting operator is $-(2|0\rangle\langle0|-I)$, differing from the
@@ -147,7 +149,7 @@ correct diffusion operator by an unobservable-in-aggregate but
 structurally wrong global phase.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Testing only end-to-end success probability.** A global-phase bug can
 hide indefinitely behind measurement statistics that only ever depend on
 $|{\rm amplitude}|^2$. Testing an intermediate operator's exact action on
@@ -187,6 +189,8 @@ what an outcome-only test cannot.
 
 ## Further Exploration
 
+<NextDiscovery>
 [Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification)
 composes the oracle and diffusion operator into a rotation and derives
 the exact, closed-form optimal number of iterations.
+</NextDiscovery>

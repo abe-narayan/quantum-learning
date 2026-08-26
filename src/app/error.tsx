@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { Container } from "@/components/ui/Container";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow, Lede, SectionTitle } from "@/components/ui/Typography";
+import { Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 
 // Root-level error boundary. Catches any uncaught render-time exception
@@ -10,7 +11,10 @@ import { Button } from "@/components/ui/Button";
 // (e.g. a NaN slipping into a Bloch-sphere rotation, a malformed circuit
 // state) — anywhere that doesn't have a more specific error.tsx of its own.
 // Must be a Client Component: error boundaries can't be Server Components.
-export default function GlobalError({
+//
+// `retry` (not `reset`) is this modified Next.js's stable recovery prop —
+// see node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/error.md.
+export default function Error({
   error,
   retry,
 }: {
@@ -24,14 +28,17 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <Container className="py-16 sm:py-24">
-      <PageHeader
-        eyebrow="Something went wrong"
-        title="This calculation collapsed"
-        description="An unexpected error interrupted this page — likely a bug in one of the interactive simulators, not something you did. You can try again, or head back to a known-good state."
-      />
+    <Section width="reading" className="pt-4 sm:pt-8">
+      <Eyebrow>System fault</Eyebrow>
+      <SectionTitle level={1} size="xl" className="mt-4">
+        This calculation collapsed
+      </SectionTitle>
+      <Lede className="mt-5 max-w-[42rem]">
+        An unexpected error interrupted this page — likely a bug in one of the interactive
+        simulators, not something you did. You can try again, or head back to a known-good state.
+      </Lede>
 
-      <div className="mt-10 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap gap-3">
         <Button onClick={() => retry()}>Try again</Button>
         <Button href="/" variant="secondary">
           Back to home
@@ -39,10 +46,12 @@ export default function GlobalError({
       </div>
 
       {error.digest ? (
-        <p className="mt-8 text-xs text-muted-foreground">
-          Error reference: <code className="font-mono">{error.digest}</code>
-        </p>
+        <Instrument className="mt-8" label="Error readout">
+          <p className="text-xs text-muted-foreground">
+            Reference: <code className="font-tech text-foreground">{error.digest}</code>
+          </p>
+        </Instrument>
       ) : null}
-    </Container>
+    </Section>
   );
 }

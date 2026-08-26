@@ -6,7 +6,7 @@ export const surfaceCodeGeneratorCountAtDistance5: NumericProblem = {
     title: "Independent Stabilizer Generators at Distance 5",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/surface-codes-in-depth",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["surface-codes", "css-codes", "stabilizer-formalism"],

@@ -35,6 +35,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A menu of possible questions">
+The computational basis is just one choice of two special points on an entire sphere of possible states — "is this |+⟩ or |−⟩?" is an equally legitimate question to ask a qubit, with its own menu of answers.
+</LessonHook>
+
 ## Motivation
 
 The Born rule ($P(0)=|\alpha|^2$, $P(1)=|\beta|^2$) has been used
@@ -64,6 +68,10 @@ overlaps with each possible answer.
   license="CC BY-SA 4.0"
 />
 
+<HistoricalMoment date="1922">
+The Stern–Gerlach experiment sends a beam of silver atoms through an inhomogeneous magnetic field. It splits into two discrete spots on a detector, never a continuous smear — the historical prototype of a measurement always yielding one of two sharp outcomes.
+</HistoricalMoment>
+
 ## Mathematical Development
 
 ### The measurement postulate
@@ -73,9 +81,17 @@ of states with $\langle e_0|e_0\rangle=\langle e_1|e_1\rangle=1$ and
 $\langle e_0|e_1\rangle=0$, exactly the orthonormality property Dirac
 notation gave us. Measuring $|\psi\rangle$ "in this basis" means:
 
+<EquationReveal
+  terms={[
+    { id: "Pei", symbol: "P(e_i)", gloss: "The probability of getting outcome e_i when you measure." },
+    { id: "ei", symbol: "|e_i⟩", gloss: "One of the two basis states of the chosen measurement — the 'menu' of possible answers." },
+    { id: "psi", symbol: "|ψ⟩", gloss: "The state being measured, before collapse." },
+  ]}
+>
 $$
 P(e_i) = |\langle e_i|\psi\rangle|^2
 $$
+</EquationReveal>
 
 and afterward, the state has collapsed to exactly $|e_i\rangle$: every
 trace of the original superposition is gone. This is the general Born
@@ -158,9 +174,13 @@ Here $\alpha=\frac{1}{\sqrt2}$, $\beta=\frac{i}{\sqrt2}$, so
 $\alpha^*\beta = \frac{1}{\sqrt2}\cdot\frac{i}{\sqrt2} = \frac{i}{2}$, which
 is purely imaginary: $\operatorname{Re}(\alpha^*\beta)=0$.
 
+<DerivationSteps>
+  <DerivationStep annotation="Substitute Re(α*β)=0 into the P(+) formula derived above.">
 $$
 P(+) = \frac{1+2\operatorname{Re}(\alpha^*\beta)}{2} = \frac{1+0}{2} = \frac12
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 and by the same logic $P(-)=\frac12$ too. Even though $|{+i}\rangle$ sits
 on the equator just like $|+\rangle$, measuring it in the X-basis is
@@ -174,7 +194,7 @@ staying on the equator.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Believing a measurement "reveals" $\theta$ or $\varphi$.** A single
 measurement gives one bit (which outcome occurred), full stop. Only
 statistics over *many* identical preparations approximate a probability,
@@ -183,7 +203,7 @@ and $\varphi$-like information from a different basis, never both from
 one series of measurements in one basis.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Applying the computational-basis Born rule to a different basis by
 habit.** $P(0)=|\alpha|^2$ is specific to measuring in
 $\{|0\rangle,|1\rangle\}$. For any other basis, go back to
@@ -219,6 +239,8 @@ directly.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Quantum Gates](/lessons/quantum-computing/qubits-and-quantum-states/quantum-gates), where we finally define the $X,Y,Z,H,S,T$
 operators precisely, and connect each one to a specific rotation of the
 Bloch vector.
+</NextDiscovery>

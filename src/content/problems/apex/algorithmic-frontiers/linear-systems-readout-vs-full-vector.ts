@@ -6,7 +6,7 @@ export const linearSystemsReadoutVsFullVector: ConceptualProblem = {
     title: "Why a Small Readout Preserves the Speedup and Full Readout Doesn't",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "conceptual",
     tags: ["quantum-linear-systems", "hhl", "qsvt", "misleading-claims"],

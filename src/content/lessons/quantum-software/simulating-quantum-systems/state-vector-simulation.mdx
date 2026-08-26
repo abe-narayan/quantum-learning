@@ -43,14 +43,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A technique you already know">
+You've been simulating quantum systems since this platform's very first lesson. This opening lesson doesn't introduce new machinery — it stops and names the technique you've been using all along.
+</LessonHook>
+
 ## Motivation
 
-This course is called "Simulating Quantum Systems" — but you've already
-been simulating quantum systems since this platform's very first lesson.
-This opening lesson doesn't introduce new machinery. It stops and names
-the technique you've been using all along, pins down its specific
-guarantees and specific limits, and sets up the rest of this course's
-cost analysis.
+This course is called "Simulating Quantum Systems." This lesson pins
+down its specific guarantees and specific limits, and sets up the rest
+of this course's cost analysis.
 
 ## Engineering Development
 
@@ -150,7 +151,7 @@ same circuit, down to floating-point precision.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking "simulation" means "approximation."** State-vector simulation
 computes EXACT amplitudes (up to floating-point precision). The
 approximation, when it exists, is in techniques like Tensor Network
@@ -158,7 +159,7 @@ Methods (a later lesson in this course), not in the state-vector
 approach itself.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming this platform's engine is "not really" doing quantum
 mechanics because it runs on classical hardware.** The linear algebra is
 exact quantum mechanics; only the substrate executing it (classical bits
@@ -193,6 +194,8 @@ and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
 
 ## Further Exploration
 
+<NextDiscovery>
 [Computational Cost & Scaling](/lessons/quantum-software/simulating-quantum-systems/computational-cost-and-scaling) quantifies precisely what this
 technique costs — the $2^n$ growth Simulators vs. Real Hardware already
 previewed, developed here in full.
+</NextDiscovery>

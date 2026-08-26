@@ -45,12 +45,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Build it, run it, sample it">
+Every previous lesson discussed the pattern conceptually. This one does it: build a real circuit, run it, and watch the measured counts converge toward the exact probabilities, end to end.
+</LessonHook>
+
 ## Motivation
 
-Every previous lesson in this course discussed the pattern
-conceptually. This lesson does it: build a real circuit, run it, and
-look at both kinds of output this platform's engine can produce, exact
-amplitudes and shot-based samples, end to end.
+Both kinds of output this platform's engine can produce, exact
+amplitudes and shot-based samples, appear end to end below.
 
 ## Walkthrough
 
@@ -205,6 +207,10 @@ statistics accumulated over many runs, always with finite-shot noise on
 top of whatever hardware error (Noise, Decoherence & Scaling) is also
 present.
 
+<HistoricalMoment date="2016">
+IBM offers free cloud access to real superconducting quantum processors — a circuit built the same way as this lesson's GHZ circuit can be sent to run on actual hardware, not just a simulator.
+</HistoricalMoment>
+
 This isn't a hypothetical. IBM has offered free cloud access to real
 superconducting quantum processors since 2016, and cloud platforms like
 Amazon Braket now offer similar (generally paid, pay-per-shot) access
@@ -239,7 +245,7 @@ noiseless simulator and an exact 50/50 underlying probability.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting sampled counts to exactly match the underlying probabilities.**
 Even with a perfect, noiseless quantum state, finite-shot sampling
 always shows statistical fluctuation. The worked example's $\pm71$-count
@@ -247,7 +253,7 @@ range at 5000 shots is real and expected, not evidence of a broken
 circuit.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing shot noise (statistical, present even for a perfect
 simulator) with hardware error (physical, from Noise, Decoherence &
 Scaling's actual error sources).** Both contribute to real hardware
@@ -285,6 +291,8 @@ results; only shot noise is present in this lesson's idealized
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Simulators vs. Real Hardware](/lessons/quantum-software/programming-quantum-computers/simulators-vs-real-hardware), which adds actual hardware
 error on top of this lesson's pure shot noise, completing the picture of
 what a real device's output actually looks like.
+</NextDiscovery>

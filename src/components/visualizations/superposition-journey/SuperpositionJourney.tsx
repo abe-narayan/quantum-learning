@@ -8,8 +8,9 @@ import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { measure, measurementDistribution } from "@/lib/quantum/measurement";
 import { formatAmplitudeLatex } from "@/lib/quantum/format";
-import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { SuperpositionJourneyCanvas, type JourneyColumn } from "./SuperpositionJourneyCanvas";
+import { FigureReadouts } from "../FigureReadouts";
 
 const DEFAULT_ALPHA = Math.SQRT1_2;
 /** How long the "measuring…" suspense beat lasts before the result is revealed — long enough to
@@ -156,28 +157,19 @@ export function SuperpositionJourney() {
             prefersReducedMotion={prefersReducedMotion}
           />
 
-          <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+          <div className="mt-4 overflow-x-auto panel-inset px-4 py-3">
             <KatexMath tex={stateLatex} display />
           </div>
 
-          <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">α</dt>
-              <dd className="mt-0.5 font-mono text-foreground">{alpha.toFixed(3)}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">β</dt>
-              <dd className="mt-0.5 font-mono text-foreground">{beta.toFixed(3)}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">P(0) = |α|²</dt>
-              <dd className="mt-0.5 font-mono text-foreground">{distribution[0].probability.toFixed(3)}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">P(1) = |β|²</dt>
-              <dd className="mt-0.5 font-mono text-foreground">{distribution[1].probability.toFixed(3)}</dd>
-            </div>
-          </dl>
+          <FigureReadouts
+            className="mt-4"
+            items={[
+              { label: "α", value: alpha.toFixed(3) },
+              { label: "β", value: beta.toFixed(3) },
+              { label: "P(0) = |α|²", value: distribution[0].probability.toFixed(3) },
+              { label: "P(1) = |β|²", value: distribution[1].probability.toFixed(3) },
+            ]}
+          />
         </div>
 
         <div>
@@ -219,24 +211,18 @@ export function SuperpositionJourney() {
             {narration}
           </div>
 
-          <div className="mt-4 rounded-xl border border-border bg-surface-muted/60 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="mt-4 panel-inset p-4">
+            <p className="tech-label">
               Running tally ({tally.total} measurement{tally.total === 1 ? "" : "s"})
             </p>
-            <dl className="mt-2 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <dt className="text-xs text-muted-foreground">|0⟩</dt>
-                <dd className="font-mono text-foreground">
-                  {tally.counts[0]} / {tally.total} {tally.total > 0 ? `(${pct0}%)` : ""}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">|1⟩</dt>
-                <dd className="font-mono text-foreground">
-                  {tally.counts[1]} / {tally.total} {tally.total > 0 ? `(${pct1}%)` : ""}
-                </dd>
-              </div>
-            </dl>
+            <FigureReadouts
+              className="mt-2"
+              columns={2}
+              items={[
+                { label: "|0⟩", value: `${tally.counts[0]} / ${tally.total} ${tally.total > 0 ? `(${pct0}%)` : ""}`, plainLabel: true },
+                { label: "|1⟩", value: `${tally.counts[1]} / ${tally.total} ${tally.total > 0 ? `(${pct1}%)` : ""}`, plainLabel: true },
+              ]}
+            />
           </div>
         </div>
       </div>

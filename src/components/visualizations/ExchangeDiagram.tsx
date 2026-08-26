@@ -51,7 +51,7 @@ export function ExchangeDiagramContent({
     <>
       <div className="flex flex-wrap items-center gap-6">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{beforeLabel}</p>
+          <p className="tech-label">{beforeLabel}</p>
           <MatrixCellGrid cells={before} />
         </div>
         <div className="flex flex-col items-center gap-1 text-muted-foreground">
@@ -61,7 +61,7 @@ export function ExchangeDiagramContent({
           <span className="text-[10px] font-medium uppercase tracking-wide">exchange</span>
         </div>
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{afterLabel}</p>
+          <p className="tech-label">{afterLabel}</p>
           <MatrixCellGrid cells={after} />
         </div>
       </div>
@@ -106,7 +106,7 @@ export function ExchangeDiagram({
     <div
       role="img"
       aria-label={ariaLabel}
-      className="not-prose space-y-4 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4"
+      className="not-prose space-y-4 overflow-x-auto panel-inset p-4"
     >
       <ExchangeDiagramContent
         before={before}

@@ -6,7 +6,7 @@ export const capstoneLandscapeTimelinePredictionEvaluation: ConceptualProblem = 
     title: "Evaluating a Confident Quantum Computing Timeline Claim",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 10,
     problemType: "conceptual",
     tags: ["state-of-the-field", "timelines", "claim-evaluation", "synthesis", "calibration"],

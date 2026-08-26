@@ -108,7 +108,7 @@ function WavefunctionHeroSimulation({
             {isPlaying ? "Pause" : "Play"}
           </Button>
         )}
-        <Link href="/simulators" className="text-sm font-medium text-brand hover:underline">
+        <Link href="/simulators" className="text-sm font-medium text-pillar hover:underline">
           Full explorer →
         </Link>
       </div>
@@ -139,7 +139,7 @@ export function WavefunctionHeroExplorer() {
 
   return (
     <div className="rounded-xl border border-border bg-surface p-6 sm:p-8">
-      <p className="text-sm font-semibold uppercase tracking-wide text-brand">Wavefunction explorer</p>
+      <p className="text-sm font-semibold uppercase tracking-wide text-pillar">Wavefunction explorer</p>
       <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
         Watch the Schrödinger equation solve itself
       </h2>
@@ -153,7 +153,7 @@ export function WavefunctionHeroExplorer() {
             aria-pressed={p.id === presetId}
             className={
               p.id === presetId
-                ? "rounded-full bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors"
+                ? "rounded-full bg-pillar px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors"
                 : "rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted"
             }
           >

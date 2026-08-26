@@ -13,7 +13,7 @@ export const magicStateDistillationRoundsNeeded: NumericProblem = {
     title: "How Many 15-to-1 Distillation Rounds Reach a 10⁻¹⁰ Target?",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/magic-states-and-distillation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["magic-state-distillation", "resource-estimation", "cubic-suppression"],

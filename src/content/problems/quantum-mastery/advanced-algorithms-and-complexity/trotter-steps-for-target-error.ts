@@ -11,7 +11,7 @@ export const trotterStepsForTargetError: NumericProblem = {
     title: "Trotter Steps Needed for a Target Error",
     course: "advanced-algorithms-and-complexity",
     lesson: "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["trotterization", "error-bound", "hamiltonian-simulation"],

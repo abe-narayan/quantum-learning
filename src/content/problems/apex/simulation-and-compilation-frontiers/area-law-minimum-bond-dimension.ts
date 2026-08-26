@@ -6,7 +6,7 @@ export const areaLawMinimumBondDimension: NumericProblem = {
     title: "Minimum Bond Dimension From an Area-Law Entropy Bound",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["area-law", "bond-dimension", "matrix-product-states", "gapped-hamiltonians"],

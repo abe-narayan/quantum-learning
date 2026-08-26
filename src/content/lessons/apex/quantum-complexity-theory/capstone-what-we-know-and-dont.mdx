@@ -2,6 +2,12 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { LessonHook } from "@/components/narrative/LessonHook";
+import { InsightBlock } from "@/components/narrative/InsightBlock";
+import { DerivationSteps, DerivationStep } from "@/components/narrative/DerivationSteps";
+import { ResearchConnection } from "@/components/narrative/ResearchConnection";
+import { ChallengePrompt } from "@/components/narrative/ChallengePrompt";
+import { NextDiscovery } from "@/components/narrative/NextDiscovery";
 
 export const practiceProblems = getProblemsForLesson(
   "apex/quantum-complexity-theory/capstone-what-we-know-and-dont"
@@ -32,6 +38,14 @@ export const lessonMeta = {
     },
   ],
 };
+
+<LessonHook eyebrow="The question this capstone answers">
+  Every result in this course was proven, conjectured, or left open — and
+  the single most publicly famous claim in the field, a "quantum
+  supremacy" experiment, is a case study in exactly why conflating those
+  three is the most common way popular writing about quantum computing
+  goes wrong.
+</LessonHook>
 
 ## Motivation
 
@@ -104,6 +118,25 @@ about future algorithmic cleverness, faster hardware, or new experimental
 technique could ever overturn them. They are true the way the Pythagorean
 theorem is true.
 
+<ComplexityClassDiagram
+  outer={{ id: "PSPACE", label: "PSPACE" }}
+  ring={{ id: "QMA", label: "QMA" }}
+  lensA={{ id: "BQP", label: "BQP" }}
+  lensB={{ id: "NP", label: "NP" }}
+  core={{ id: "P", label: "P" }}
+  openLabel="NP⊆BQP? / BQP⊆NP?"
+  markedPoint={{ label: "Local Hamiltonian", note: "QMA-complete" }}
+  footnote="Solid boundaries (PSPACE, QMA, P) and the marked point are this course's Tier 1 theorems. The dashed BQP/NP lenses and the open-question label are Tier 3 — genuinely unresolved."
+  ariaLabel="The whole course's containment map in one diagram: PSPACE contains QMA (solid, proven), which contains NP; PSPACE also contains BQP, drawn as a dashed lens since how BQP and NP relate is open; P sits proven inside both BQP and NP; Local Hamiltonian is marked on QMA's boundary as QMA-complete."
+/>
+
+This is the single picture every result in Lessons 1–3 assembles into: two
+solid, proven chains up to $\mathsf{PSPACE}$ ($\mathsf{P}\subseteq
+\mathsf{BQP}$ and $\mathsf{P}\subseteq\mathsf{NP}\subseteq\mathsf{QMA}$),
+Local Hamiltonian pinned to $\mathsf{QMA}$'s own boundary as its complete
+problem, and the one relationship — how $\mathsf{BQP}$ and $\mathsf{NP}$
+themselves compare — still drawn dashed because it is still genuinely open.
+
 #### Tier 2 — Strongly-evidenced conjectures
 
 <DefinitionBox title="What makes a conjecture 'strongly evidenced' rather than merely 'popular'">
@@ -130,6 +163,13 @@ conjectured classical hardness — the fourth row is the load-bearing
 assumption underneath the second. Tier 2 conjectures can depend on each
 other this way; that is normal, and does not make either one weaker or
 stronger than its own evidence independently supports.
+
+<InsightBlock>
+  A result's tier is not about how confident the field is — Tier 2
+  conjectures like $\mathsf{P}\neq\mathsf{NP}$ are believed almost
+  universally. It's about whether a complete proof exists. No amount of
+  confidence promotes a conjecture to a theorem.
+</InsightBlock>
 
 #### Tier 3 — Genuinely open questions
 
@@ -166,6 +206,22 @@ stronger than its own evidence independently supports.
   into is frequently itself unresolved.
 
 ## Physical Interpretation: Random Circuit Sampling and What It Actually Shows
+
+<ResearchConnection
+  title="The Sycamore 'quantum supremacy' experiment"
+  source="Google, 2019 (Sycamore superconducting processor)"
+  url="https://www.nature.com/articles/s41586-019-1666-5"
+>
+  A quantum processor sampled from a specific random circuit's output
+  distribution in a way estimated, at the time, to take a then-best
+  classical supercomputer thousands of years, versus about 200 seconds on
+  the quantum hardware. IBM subsequently argued a cleverer classical
+  technique — trading disk space for the raw memory brute-force
+  state-vector simulation requires — could approximate the same sampling
+  task, narrowing the claimed classical-hardness margin, and similar
+  narrowing or contesting of specific instances has continued
+  industry-wide since.
+</ResearchConnection>
 
 Google's 2019 Sycamore experiment, already pictured elsewhere on this
 platform running the exact transmon hardware Quantum Hardware describes and
@@ -253,50 +309,59 @@ lesson exists.
 experiment proves quantum computers are more powerful than classical
 computers."**
 
-**Step 1 — What was actually demonstrated?** A quantum processor sampled
-from a specific random circuit's output distribution in a way estimated,
-at the time, to take a then-best classical supercomputer thousands of
-years, versus about 200 seconds on the quantum hardware.
+<DerivationSteps>
+  <DerivationStep annotation="Establish the bare empirical fact before attaching any theoretical interpretation to it.">
+    **What was actually demonstrated?** A quantum processor sampled
+    from a specific random circuit's output distribution in a way estimated,
+    at the time, to take a then-best classical supercomputer thousands of
+    years, versus about 200 seconds on the quantum hardware.
+  </DerivationStep>
+  <DerivationStep annotation="A mathematical proof of a complexity-class separation is the only thing that qualifies for Tier 1 — an experiment on specific hardware cannot be one.">
+    **Is this a Tier 1 proven theorem?** No. Nothing about it is a
+    mathematical proof of a complexity-class separation. It is an empirical,
+    experimental result about one specific circuit family run on one specific
+    piece of hardware.
+  </DerivationStep>
+  <DerivationStep annotation="Locate the actual theoretical claim the experiment bears on, and identify the unproven assumption it rests on.">
+    **What theoretical claim does it provide evidence for, and how
+    strong is that evidence?** It provides strong empirical evidence consistent
+    with a separation between efficient quantum and efficient classical
+    computation, *for this specific sampling task*, resting on the
+    plausible-but-unproven conjecture that the polynomial hierarchy does not
+    collapse. That places the underlying theoretical claim in Tier 2:
+    strongly evidenced, not proven.
+  </DerivationStep>
+  <DerivationStep annotation="Check the claim against every genuinely open question this course identified — none of them are touched by a result engineered for classical hardness rather than usefulness.">
+    **Does it resolve any Tier 3 question?** No. It says nothing
+    about $\mathsf{BQP}$ vs. $\mathsf{NP}$, nothing about whether any
+    $\mathsf{NP}$-complete problem has an efficient quantum algorithm, and
+    nothing about the achievable quantum advantage on a practically useful
+    problem — random circuit sampling was engineered to be classically hard,
+    not to be useful.
+  </DerivationStep>
+  <DerivationStep annotation="An honest classification has to account for how the evidence has moved since the original claim, not just the state at announcement.">
+    **Has the specific classical-hardness claim itself been static
+    and unchallenged?** No — and this matters for an honest classification.
+    IBM's subsequent disk-based classical simulation argument, and later
+    improved classical algorithms industry-wide, have contested or narrowed
+    the classical-hardness margin for specific instances. That is normal,
+    healthy scientific self-correction, not a retraction of the whole result.
+  </DerivationStep>
+  <DerivationStep annotation="Fold every prior step back into a single restatement that carries no more and no less confidence than the evidence supports.">
+    **Restate the original claim precisely.** "Google's Sycamore
+    experiment proves quantum computers are more powerful than classical
+    computers" should become: "Google's Sycamore experiment provided strong
+    empirical evidence, consistent with (but not a proof of) a quantum
+    advantage over classical computation, for one specific, carefully chosen,
+    practically-useless sampling task, resting on a plausible but unproven
+    theoretical assumption — and some of the specific classical-hardness
+    margins claimed have since been legitimately narrowed or contested by
+    improved classical methods, which is exactly how this kind of claim is
+    supposed to be checked." Longer, and correct.
+  </DerivationStep>
+</DerivationSteps>
 
-**Step 2 — Is this a Tier 1 proven theorem?** No. Nothing about it is a
-mathematical proof of a complexity-class separation. It is an empirical,
-experimental result about one specific circuit family run on one specific
-piece of hardware.
-
-**Step 3 — What theoretical claim does it provide evidence for, and how
-strong is that evidence?** It provides strong empirical evidence consistent
-with a separation between efficient quantum and efficient classical
-computation, *for this specific sampling task*, resting on the
-plausible-but-unproven conjecture that the polynomial hierarchy does not
-collapse. That places the underlying theoretical claim in Tier 2:
-strongly evidenced, not proven.
-
-**Step 4 — Does it resolve any Tier 3 question?** No. It says nothing
-about $\mathsf{BQP}$ vs. $\mathsf{NP}$, nothing about whether any
-$\mathsf{NP}$-complete problem has an efficient quantum algorithm, and
-nothing about the achievable quantum advantage on a practically useful
-problem — random circuit sampling was engineered to be classically hard,
-not to be useful.
-
-**Step 5 — Has the specific classical-hardness claim itself been static
-and unchallenged?** No — and this matters for an honest classification.
-IBM's subsequent disk-based classical simulation argument, and later
-improved classical algorithms industry-wide, have contested or narrowed
-the classical-hardness margin for specific instances. That is normal,
-healthy scientific self-correction, not a retraction of the whole result.
-
-**Step 6 — Restate the original claim precisely.** "Google's Sycamore
-experiment proves quantum computers are more powerful than classical
-computers" should become: "Google's Sycamore experiment provided strong
-empirical evidence, consistent with (but not a proof of) a quantum
-advantage over classical computation, for one specific, carefully chosen,
-practically-useless sampling task, resting on a plausible but unproven
-theoretical assumption — and some of the specific classical-hardness
-margins claimed have since been legitimately narrowed or contested by
-improved classical methods, which is exactly how this kind of claim is
-supposed to be checked." Longer, and correct.
-
-## Interactive Visualization
+## The Three-Tier Map
 
 <div className="not-prose my-8 grid gap-4 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4 sm:grid-cols-3">
   <div className="rounded-lg border border-brand/40 bg-brand/5 p-4">
@@ -354,7 +419,7 @@ empirical result consistent with a real theoretical conjecture is neither
 proof nor noise.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing "evidenced in a restricted model" with "proven in general."**
 $\mathsf{NP}\not\subseteq\mathsf{BQP}$'s evidence (BBBV, the adversary and
 polynomial methods) is real and rigorous — entirely within the black-box
@@ -421,3 +486,16 @@ opens **Research Methods and Synthesis**, the APEX pillar's final course,
 which turns this capstone's classification habit — proven, conjectured, or
 open, and under what assumption — into a formal, repeatable practice for
 reading real research.
+
+<ChallengePrompt prompt="Take the next quantum-computing headline you encounter — 'quantum advantage,' 'exponential speedup,' or similar — and run it through all six worked-example steps above.">
+  Identify what was actually demonstrated, whether it's Tier 1/2/3, what
+  assumption it rests on if any, and whether the claim as stated matches
+  what the six-step classification would actually support.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: **Research Methods and Synthesis** turns this exact classification
+  habit into a repeatable practice — starting with how to read a real
+  quantum computing paper's claims section without either over- or
+  under-crediting it.
+</NextDiscovery>

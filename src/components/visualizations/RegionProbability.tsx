@@ -80,7 +80,7 @@ export function RegionProbability() {
   }, [lo, hi]);
 
   return (
-    <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-4 panel-inset p-4">
       <svg
         width={WIDTH}
         height={HEIGHT}
@@ -136,7 +136,7 @@ export function RegionProbability() {
         </label>
       </div>
 
-      <p className="rounded-lg border border-border bg-surface px-4 py-3 font-mono text-sm text-foreground">
+      <p className="panel px-4 py-3 font-mono text-sm text-foreground">
         P({lo.toFixed(2)} {"≤"} x {"≤"} {hi.toFixed(2)}) {"≈"} {probability.toFixed(4)}
       </p>
     </div>

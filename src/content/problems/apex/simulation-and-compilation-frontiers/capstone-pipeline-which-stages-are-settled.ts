@@ -6,7 +6,7 @@ export const capstonePipelineWhichStagesAreSettled: ConceptualProblem = {
     title: "Which Pipeline Stages Are Settled, and Which Are Still Research",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["resource-estimation", "compilation-pipeline", "fault-tolerance", "research-calibration"],

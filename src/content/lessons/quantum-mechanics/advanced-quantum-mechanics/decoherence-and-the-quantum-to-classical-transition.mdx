@@ -74,12 +74,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Why don't we see cats in superpositions of alive and dead, or coins spinning in superpositions of heads and tails? Decoherence is the standard, well-established (if partial) answer: a macroscopic system is never truly isolated.
+</LessonHook>
+
 ## Motivation
 
-Why don't we see cats in superpositions of alive and dead, or coins
-spinning in superpositions of heads and tails? Decoherence is the
-standard, well-established (if partial) answer: a macroscopic system is
-never truly isolated, and the previous lesson's Kraus-channel machinery
+The previous lesson's Kraus-channel machinery
 shows exactly how contact with an environment destroys quantum
 coherence, even with no measurement, and no observer, involved at all.
 
@@ -159,6 +160,15 @@ didn't know which."
   <LazyNoiseExplorer />
 </InteractiveSection>
 
+The comparison the description above asks for, side by side instead of
+one channel at a time: the same $\lambda=0.3$ dephasing this lesson has
+tracked all along, next to amplitude damping at the same strength,
+both starting from $|+\rangle$ on the equator.
+
+<InteractiveSection title="Two channels, two different fates" description="Both panels start at |+⟩ and apply the same number of channel steps. Dephasing (right) shrinks straight toward the center, the vector's length dropping while it stays on the equator: phase lost, population untouched. Amplitude damping (left) shrinks toward the north pole instead: population itself relaxing toward |0⟩. Same starting point, same step count, structurally different decay.">
+  <DecoherenceBlochDecay gamma={0.3} lambda={0.3} maxSteps={16} ariaLabel="A qubit's Bloch vector, starting at |+⟩, shrinking under repeated amplitude damping toward the north pole versus repeated dephasing straight toward the center, at matched strength and step count." />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 This is decoherence's actual physical content: environmental interaction
@@ -197,7 +207,7 @@ selects one outcome upon measurement remains an open question in the
 foundations of quantum mechanics, not settled by decoherence alone.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking decoherence only matters for exotic macroscopic superpositions.**
 The same math applies to any qubit weakly coupled to any uncontrolled
 environment. This is precisely why real quantum computers need error
@@ -235,6 +245,7 @@ Quantum Computing's Error Correction and Noise/Decoherence courses).
 
 ## Further Exploration
 
+<NextDiscovery>
 Want to push past a single dephasing channel and mix in amplitude
 damping, different starting states, or your own coupling strengths? The
 full [Noise Explorer](/simulators#noise-explorer) simulator has the same
@@ -244,3 +255,4 @@ Next: [The Path Integral Formulation](/lessons/quantum-mechanics/advanced-quantu
 perspective: not decoherence or density matrices at all, but an
 entirely different (and equivalent) way of formulating quantum mechanics
 itself.
+</NextDiscovery>

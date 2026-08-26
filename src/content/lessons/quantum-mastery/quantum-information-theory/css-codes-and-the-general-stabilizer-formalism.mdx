@@ -114,6 +114,13 @@ export const logicalXCommutesWithAllStabilizers = Object.values(generators).ever
 export const logicalZCommutesWithAllStabilizers = Object.values(generators).every((g) => logicalZ.mul(g).equals(g.mul(logicalZ), 1e-9));
 export const logicalXZAnticommute = logicalX.mul(logicalZ).equals(logicalZ.mul(logicalX).scale(-1), 1e-9);
 
+<LessonHook eyebrow="A code that actually corrects everything">
+  The 3-qubit bit-flip code corrects one bit-flip error but detects no
+  phase errors at all. The Steane code, built here from a single
+  classical error-correcting code, corrects any single-qubit error — $X$,
+  $Z$, or both.
+</LessonHook>
+
 ## Motivation
 
 Stabilizer Formalism Basics renamed two syndrome measurements the
@@ -304,7 +311,7 @@ not looked up from a table of answers:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any pair of classical codes $C_1,C_2$ can be used in the CSS
 construction.** The generators only commute when $C_2\subseteq C_1$,
 proved above from the binary dot-product anticommutation rule. The
@@ -313,7 +320,7 @@ works only because $HH^\top=0$, a genuine (not automatic) property of
 that particular classical code.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing the code's minimum distance with its stabilizer generators'
 weight.** Every stabilizer generator here has weight $4$ (four qubits),
 but the code's distance is $3$: these are different quantities
@@ -368,3 +375,11 @@ isomorphism, the Lindblad master equation, mixed-state entanglement
 measures, and channel-formalism teleportation this course built from the
 Quantum Mechanics and Quantum Computing pillars' combined foundation:
 proofs, throughout, of facts those two pillars had to leave asserted.
+
+<NextDiscovery>
+  This completes Rigorous Quantum Information Theory — the Schmidt
+  decomposition, trace distance and fidelity, the Choi–Jamiolkowski
+  isomorphism, the Lindblad master equation, mixed-state entanglement
+  measures, and channel-formalism teleportation, all proofs of facts the
+  earlier pillars had to leave asserted.
+</NextDiscovery>

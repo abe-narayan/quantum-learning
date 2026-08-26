@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Readouts } from "@/components/ui/Typography";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, rotationAboutAxis, rotationX, rotationY, rotationZ, type Axis3 } from "@/lib/quantum/gates";
 import { measure } from "@/lib/quantum/measurement";
@@ -12,6 +12,8 @@ import { BlochSphereCanvas } from "./BlochSphereCanvas";
 import { BlochSphereControls } from "./BlochSphereControls";
 import { BlochSphereStatePanel } from "./BlochSphereStatePanel";
 import { STATE_PRESETS } from "./presets";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 import type { FixedGateDefinition, RotationAxisId } from "./gateDefinitions";
 import { useAnimatedBlochPoint, GATE_ROTATION_MS, COLLAPSE_MS } from "./useAnimatedBlochPoint";
 
@@ -238,88 +240,79 @@ export function BlochSphereExplorer() {
   }, []);
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
-      <div>
-        <div className="mx-auto max-w-sm">
-          <BlochSphereCanvas blochPoint={renderPoint} pulse={collapseFlash} className="mx-auto w-full" />
-        </div>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          Drag the sphere to rotate the view — the vector&rsquo;s position is the quantum state itself.
-        </p>
-
-        <div
-          aria-live="polite"
-          className="mt-4 rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
-        >
-          {narration}
-          {lastMeasurement !== null ? (
-            <span className="ml-1 font-mono text-brand">→ |{lastMeasurement}⟩</span>
-          ) : null}
-        </div>
-
-        <div className="mt-6">
-          <BlochSphereStatePanel state={state} angles={angles} />
-        </div>
-
-        <div className="mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
-          <div>
-            <Badge tone="brand" className="mb-1.5">
-              What we&rsquo;re studying
-            </Badge>
-            <p className="text-sm text-muted-foreground">
-              Every single-qubit state is a point on this sphere — gates are rotations of that point, and
-              measurement is a random snap to a pole.
-            </p>
+    <SimulatorInstrument
+      label="Bloch sphere — single qubit"
+      readout={
+        <Readouts
+          items={[
+            { label: "P(0)", value: Math.round(probabilities[0] * 100), unit: "%" },
+            { label: "P(1)", value: Math.round(probabilities[1] * 100), unit: "%" },
+          ]}
+        />
+      }
+      footnote="Drag the sphere, or focus it and use the arrow keys, to rotate the view — the vector&rsquo;s position is the quantum state itself."
+      stage={
+        <>
+          <div className="mx-auto max-w-sm">
+            <BlochSphereCanvas blochPoint={renderPoint} pulse={collapseFlash} className="mx-auto w-full" />
           </div>
-          <div>
-            <Badge tone="accent" className="mb-1.5">
-              What to notice
-            </Badge>
-            <p className="text-sm text-muted-foreground">
-              Rotations move the point smoothly; measurement is the only discontinuous jump you&rsquo;ll ever
-              see on this sphere.
-            </p>
-          </div>
-          <div className="sm:col-span-2">
-            <Badge tone="brand" className="mb-1.5">
-              Try this
-            </Badge>
-            <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
-              <li>
-                Apply H, then S, then H again — watch the state trace a path that never repeats a previous
-                point, then hit Measure and see it collapse anyway.
-              </li>
-              <li>
-                Drag θ and φ directly to the equator (θ=90°) and Measure ten times — notice the 50/50 split
-                even though nothing here is a coin flip.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
 
-      <div>
-        <div className="flex justify-end">
-          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
-        </div>
+          <div
+            aria-live="polite"
+            className="mt-4 rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+          >
+            {narration}
+            {lastMeasurement !== null ? (
+              <span className="ml-1 font-mono text-pillar">→ |{lastMeasurement}⟩</span>
+            ) : null}
+          </div>
 
-        <div className="mt-4">
-          <BlochSphereControls
-            angles={angles}
-            probabilities={probabilities}
-            disabled={isAnimating}
-            activePresetId={activePresetId}
-            onApplyPreset={applyPreset}
-            onManualAngles={applyManualAngles}
-            onApplyGate={applyGate}
-            onApplyRotation={applyRotation}
-            onMeasure={applyMeasurement}
-            onReset={reset}
+          <div className="mt-6">
+            <BlochSphereStatePanel state={state} angles={angles} />
+          </div>
+
+          <SimulatorFraming
+            shows="Every single-qubit state is a point on this sphere — gates are rotations of that point, and measurement is a random snap to a pole."
+            watchFor="Rotations move the point smoothly; measurement is the only discontinuous jump you&rsquo;ll ever see on this sphere."
+            tryThis={
+              <ul>
+                <li>
+                  Apply H, then S, then H again — watch the state trace a path that never repeats a previous
+                  point, then hit Measure and see it collapse anyway.
+                </li>
+                <li>
+                  Drag θ and φ directly to the equator (θ=90°) and Measure ten times — notice the 50/50 split
+                  even though nothing here is a coin flip.
+                </li>
+              </ul>
+            }
           />
-        </div>
-      </div>
-    </div>
+        </>
+      }
+      controls={
+        <>
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+
+          <div className="mt-4">
+            <BlochSphereControls
+              angles={angles}
+              probabilities={probabilities}
+              disabled={isAnimating}
+              activePresetId={activePresetId}
+              onApplyPreset={applyPreset}
+              onManualAngles={applyManualAngles}
+              onApplyGate={applyGate}
+              onApplyRotation={applyRotation}
+              onMeasure={applyMeasurement}
+              onReset={reset}
+            />
+          </div>
+        </>
+      }
+    />
   );
 }

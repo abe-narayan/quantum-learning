@@ -128,6 +128,13 @@ export const boundaryErrorSyndrome = syndromeFor(boundaryErrorQubits);
 export const boundaryTrueChainVertices = ["N10", "N11", "N12"];
 export const boundaryResidualIsLogical = !isFaceStabilizerCombo(boundaryErrorQubits);
 
+<LessonHook eyebrow="Why this matters">
+  A real syndrome is the union of every recent error's defect pair, with
+  no label attached saying which defect came from which error — decoding
+  is the problem of working backward from that raw list to the most
+  probable error, and it turns out to be exactly a graph-matching problem.
+</LessonHook>
+
 ## Motivation
 
 Surface Codes in Depth built an explicit $d\times d$ patch: physical
@@ -140,13 +147,9 @@ touches. That pair of flipped stabilizers is a **defect pair**.
 That lesson stopped at "here's what one error does to the syndrome."
 Real devices don't get one error at a time between rounds of correction:
 many qubits fail simultaneously, every measurement round, for as long as
-the computation runs. The syndrome a real decoder sees is the *union* of
-every defect pair every recent error produced, with no label attached
-saying which defects came from which error. **Decoding** is the problem
-of working backward from that raw list of flipped stabilizers to the
-most probable error that could have produced it — and, as this lesson
-shows by direct construction, that problem is exactly minimum-weight
-perfect matching on a graph.
+the computation runs. As this lesson shows by direct construction,
+decoding turns out to be exactly **minimum-weight perfect matching** on
+a graph.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/8/83/QuEra_Aquila_Magneto-Optical_Trap.jpg"
@@ -229,7 +232,19 @@ well-established empirical/theoretical relationship: **below** some
 threshold physical error rate $p_{th}$, the logical error rate $p_L$
 falls off *exponentially* with code distance $d$,
 
-$$p_L \sim A\left(\frac{p}{p_{th}}\right)^{(d+1)/2}$$
+<EquationReveal
+  terms={[
+    { id: "pL", symbol: "p_L", gloss: "Logical error rate — how often the decoder ends up applying the wrong correction." },
+    { id: "A", symbol: "A", gloss: "A roughly constant prefactor, not the interesting part of the scaling." },
+    { id: "p", symbol: "p", gloss: "The physical error rate per gate/qubit — the hardware's actual noise level." },
+    { id: "pth", symbol: "p_th", gloss: "The threshold: decoder- and noise-model-dependent, roughly percent-level in real work — not a universal constant." },
+    { id: "d", symbol: "d", gloss: "Code distance — roughly, the size of the surface-code patch." },
+  ]}
+>
+  $$
+  p_L \sim A\left(\frac{p}{p_{th}}\right)^{(d+1)/2}
+  $$
+</EquationReveal>
 
 for some roughly constant prefactor $A$. $p_{th}$ itself is genuinely
 decoder- and noise-model-dependent — cited in real work as roughly
@@ -239,12 +254,24 @@ applies to every code variant or every decoder equally. Deriving this
 exponent rigorously is a real, nontrivial statistical-mechanics
 calculation — the standard approach maps the decoding problem onto a
 **random-bond Ising model**, with $p_{th}$ corresponding to a genuine
-phase transition (the Nishimori point) in that model (Dennis, Kitaev,
-Landahl & Preskill, 2002) — well beyond this lesson's scope to
-re-derive, cited here as an established real result, not asserted from
-nothing.
+phase transition (the Nishimori point) in that model.
+
+<ResearchConnection title="Mapping decoding onto a statistical-mechanics phase transition" source="Dennis, Kitaev, Landahl & Preskill (2002)" url="https://arxiv.org/abs/quant-ph/0110143">
+  The rigorous derivation of the threshold exponent maps the decoding
+  problem onto a random-bond Ising model, with $p_{th}$ corresponding to
+  a genuine phase transition (the Nishimori point) in that model — well
+  beyond this lesson's scope to re-derive, cited here as an established
+  real result, not asserted from nothing.
+</ResearchConnection>
 
 ## Physical Interpretation
+
+<InsightBlock>
+  A decoder doesn't need to guess the true error — only a correction
+  that differs from it by a stabilizer, not a logical operator. That's
+  what turns "infer the error" into "find the cheapest matching," an
+  exact reduction, not an analogy.
+</InsightBlock>
 
 ### What threshold buys you, operationally
 
@@ -264,12 +291,14 @@ and every additional syndrome-extraction gate is one more chance to
 introduce an error, and above threshold, the corrections start
 introducing errors faster than they remove them.
 
-Google's Willow chip (December 2024) ran exactly this experiment on
-real hardware: distance-3, distance-5, and distance-7 patches of the
-same repeated stabilizer pattern, with the logical error rate dropping
-roughly in half at each larger distance — a real, direct demonstration
-that a real device was operating below its own threshold, not merely a
-simulation of the scaling law above.
+<HistoricalMoment date="December 2024" place="Google Quantum AI">
+  The Willow chip runs exactly this experiment on real hardware:
+  distance-3, distance-5, and distance-7 patches of the same repeated
+  stabilizer pattern, with the logical error rate dropping roughly in
+  half at each larger distance — a real, direct demonstration that a
+  real device was operating below its own threshold, not merely a
+  simulation of the scaling law above.
+</HistoricalMoment>
 
 ### Why this matters: decoding is a live engineering problem
 
@@ -479,7 +508,7 @@ the syndrome are no longer the same thing.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Thinking "threshold" means errors stop happening below $p_{th}$.**
 They don't — physical qubits keep failing at the same rate $p$ regardless
 of which side of threshold you're on. What changes is the *direction*
@@ -489,7 +518,7 @@ it exponentially **worse**, since the correction machinery itself is now
 failing often enough to out-error the errors it's meant to fix.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a decoder failure means the decoder made a mistake.** Case 3
 above is minimum-weight matching working *exactly as designed* — it
 truly did find the lowest-weight explanation of the observed syndrome.
@@ -540,8 +569,10 @@ cheaper alternative explanation.
 
 ## Further Exploration
 
-Next: [Lattice Surgery](/lessons/apex/fault-tolerance-frontiers/lattice-surgery),
-which asks the next honest question this lesson's single isolated patch
-sidesteps entirely — how do two separate logical qubits, each sitting in
-their own patch like the one decoded here, actually interact for a
-logical two-qubit gate?
+<NextDiscovery>
+  Next: [Lattice Surgery](/lessons/apex/fault-tolerance-frontiers/lattice-surgery)
+  asks the next honest question this lesson's single isolated patch
+  sidesteps entirely — how do two separate logical qubits, each sitting
+  in their own patch like the one decoded here, actually interact for a
+  logical two-qubit gate?
+</NextDiscovery>

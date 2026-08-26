@@ -95,6 +95,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Feynman's proposal, made precise">
+  A real Hamiltonian almost never lets its pieces be simulated one at a
+  time for free — Trotterization is the standard fix, and this lesson
+  derives exactly how good the fix is, not just that it exists.
+</LessonHook>
+
 ## Motivation
 
 Simulating $e^{-iHt}$ is the whole point of a quantum computer, in the
@@ -104,8 +110,7 @@ apply. But $H$ almost always decomposes as a sum of *local* pieces,
 $H=\sum_iH_i$, each individually easy to simulate; the trouble is that
 $e^{-iHt}\neq\prod_ie^{-iH_it}$ unless every $H_i$ commutes with every
 other, which is essentially never true for anything physically
-interesting. Trotterization is the standard fix, and this lesson derives
-exactly how good the fix is, not just that it exists.
+interesting.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/06/Richard_Feynman_1959.png"
@@ -309,7 +314,7 @@ tested, confirming the inequality itself, not just the scaling exponent.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming the Trotter error bound requires $A$ and $B$ to be small.**
 It doesn't: it requires $\delta=t/n$ (the *step size*) to be small. A
 large Hamiltonian norm just means more steps ($n$) are needed to make
@@ -318,7 +323,7 @@ no restriction on $\|A\|,\|B\|$ themselves, only on $\|[A,B]\|$ and how
 many pieces $t$ gets chopped into.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Expecting the operator-norm bound and the Frobenius-norm-based
 estimate used here to match exactly.** They don't have to: the Frobenius
 norm only ever *overestimates* the operator norm, so every bound in this
@@ -376,3 +381,12 @@ this lesson simulated, and shows its spreading is ballistic rather than
 diffusive, with the continuous-time version turning out to be nothing
 more than Hamiltonian simulation of a graph's adjacency matrix, this
 lesson's exact machinery applied to a new kind of $H$.
+
+<NextDiscovery>
+  Next: Quantum Walks derives the discrete-time analogue of the
+  continuous evolution this lesson simulated, and shows its spreading is
+  ballistic rather than diffusive — with the continuous-time version
+  turning out to be nothing more than Hamiltonian simulation of a
+  graph's adjacency matrix, this lesson's exact machinery applied to a
+  new kind of $H$.
+</NextDiscovery>

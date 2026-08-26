@@ -6,7 +6,7 @@ export const capacityEntanglementBreakingThreshold: NumericProblem = {
     title: "Where the Depolarizing Channel's Quantum Capacity Provably Hits Zero",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["quantum-capacity", "entanglement-breaking", "depolarizing-channel"],

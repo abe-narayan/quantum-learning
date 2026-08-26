@@ -50,14 +50,14 @@ export const parallelismFrames = parallelismQubitCounts.map((n, i) => ({
   })),
 }));
 
+<LessonHook eyebrow="Why this matters">
+Every algorithm in this course starts from the same trick: put a register into superposition over every possible input, apply some computation once, and somehow get useful information out at the end. Quantum parallelism sounds like it should give free exponential speedups. It does not.
+</LessonHook>
+
 ## Motivation
 
-Every algorithm in this course starts from the same trick: put a register into
-superposition over every possible input, apply some computation once, and
-somehow get useful information out at the end. The "somehow" is the entire
-subject: quantum parallelism sounds like it should give free exponential
-speedups, and it does not, for a reason worth understanding precisely before
-building anything on top of it.
+The "somehow" is the entire
+subject, worth understanding precisely before building anything on top of it.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/IBM_QC.jpg/1280px-IBM_QC.jpg"
@@ -219,7 +219,7 @@ speedups in this course come from clever interference *before* measurement,
 never from reading out multiple branches at once.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating the oracle model as free.** $U_f$ is assumed to exist as a given
 unitary; building one for a specific real-world $f$ can itself be
 expensive. Query complexity (how many calls to $U_f$ an algorithm needs) is
@@ -258,6 +258,8 @@ itself.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Phase Kickback](/lessons/quantum-computing/quantum-algorithms-i/phase-kickback), the single algebraic trick (encoding $f(x)$'s
 value as a phase rather than a separate qubit's value) that every algorithm
 in this course reuses.
+</NextDiscovery>

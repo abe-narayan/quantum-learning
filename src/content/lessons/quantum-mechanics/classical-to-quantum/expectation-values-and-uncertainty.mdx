@@ -63,6 +63,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Heisenberg's own 1927 argument for the uncertainty principle was a
+  thought experiment about a microscope disturbing a particle. It isn't a
+  proof — and it isn't why the principle is actually true.
+</LessonHook>
+
 ## Motivation
 
 Heisenberg's original 1927 argument for $\Delta x\,\Delta p\ge\hbar/2$
@@ -136,54 +142,57 @@ $\langle g|g\rangle=\operatorname{Var}(B)$.
 
 ### Applying Cauchy-Schwarz
 
+<PredictBeforeReveal
+  question="Does a lower bound like ΔA·ΔB ≥ (something) hold for any two Hermitian observables A, B — or is it special to position and momentum?"
+  options={[
+    { label: "Special to position and momentum only", value: "position-momentum-only" },
+    { label: "Holds generally, for any Hermitian A and B", value: "general" },
+    { label: "Only holds for operators with the same units", value: "units" },
+  ]}
+  correctValue="general"
+  explanation="It holds generally, for any two Hermitian observables, with the bound set by their commutator ⟨[A,B]⟩. Position-momentum is just the most famous special case, [x,p]=iħ. The derivation below never assumes anything about A and B beyond Hermiticity."
+/>
+
 By the Cauchy-Schwarz inequality (Inner Products lesson):
 
 $$
 |\langle f|g\rangle|^2 \le \langle f|f\rangle\langle g|g\rangle = \operatorname{Var}(A)\operatorname{Var}(B)
 $$
 
-Now examine $\langle f|g\rangle = \langle\psi|\tilde A\tilde B|\psi\rangle$
-more closely. Split $\tilde A\tilde B$ into symmetric and antisymmetric
-parts:
+Now examine $\langle f|g\rangle = \langle\psi|\tilde A\tilde B|\psi\rangle$ more closely.
 
+<DerivationSteps>
+  <DerivationStep annotation="Split the operator product into its symmetric and antisymmetric parts — an algebraic identity true for any two operators, nothing physical assumed yet.">
 $$
 \tilde A\tilde B = \tfrac12(\tilde A\tilde B+\tilde B\tilde A) + \tfrac12(\tilde A\tilde B-\tilde B\tilde A) = \tfrac12\{\tilde A,\tilde B\} + \tfrac12[\tilde A,\tilde B]
 $$
-
-where $\{\cdot,\cdot\}$ is the **anticommutator**. The first piece,
-$\{\tilde A,\tilde B\}$, is Hermitian (its adjoint is
-$\tilde B^\dagger\tilde A^\dagger+\tilde A^\dagger\tilde B^\dagger =
-\tilde B\tilde A+\tilde A\tilde B$, the same operator back again), so its
-expectation value is **real**. The second piece, $[\tilde A,\tilde B]$,
-is *anti*-Hermitian (its adjoint is $\tilde B\tilde A-\tilde A\tilde
-B=-[\tilde A,\tilde B]$), and an operator whose adjoint is its own
-negative always has a purely **imaginary** expectation value (the same
-kind of argument the Hermitian Operators lesson used, with a sign
-flipped).
-
-So $\langle f|g\rangle = (\text{real number}) + (\text{purely imaginary
-number})$, a genuine complex number with those exact real and imaginary
-parts. Its squared magnitude is the sum of the squares of those two parts,
-so dropping the non-negative real-part-squared term only makes the bound
-weaker, never wrong:
-
+  </DerivationStep>
+  <DerivationStep annotation="The anticommutator {Ã,B̃} is Hermitian (its adjoint reassembles to itself), so its expectation value is real; the commutator [Ã,B̃] is anti-Hermitian (its adjoint is its own negative), so its expectation value is purely imaginary — the same style of argument the Hermitian Operators lesson used, with a sign flipped.">
+$$
+\langle f|g\rangle = \underbrace{\tfrac12\langle\{\tilde A,\tilde B\}\rangle}_{\text{real}} + \underbrace{\tfrac12\langle[\tilde A,\tilde B]\rangle}_{\text{purely imaginary}}
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Squared magnitude of a real-plus-imaginary sum is the sum of the squares of each part; dropping the non-negative real-part-squared term only weakens the bound, never breaks it.">
 $$
 |\langle f|g\rangle|^2 = \left(\tfrac12\langle\{\tilde A,\tilde B\}\rangle\right)^2 + \left(\tfrac12\langle[\tilde A,\tilde B]\rangle/i\right)^2 \ge \left(\tfrac12|\langle[A,B]\rangle|\right)^2
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 ### The result
 
-Combining with the Cauchy-Schwarz step above:
-
+<DerivationSteps>
+  <DerivationStep annotation="Chain the Cauchy-Schwarz step from above together with the bound just derived.">
 $$
 \operatorname{Var}(A)\operatorname{Var}(B) \ge |\langle f|g\rangle|^2 \ge \left(\tfrac12|\langle[A,B]\rangle|\right)^2
 $$
-
-Taking square roots (everything here is non-negative):
-
+  </DerivationStep>
+  <DerivationStep annotation="Take square roots — every quantity here is non-negative, so this is legal in both directions.">
 $$
-\boxed{\Delta A\,\Delta B \ge \tfrac12\left|\langle[A,B]\rangle\right|}
+\Delta A\,\Delta B \ge \tfrac12\left|\langle[A,B]\rangle\right|
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 This is the **generalized uncertainty relation**. It's a genuine theorem,
 derived entirely from Cauchy-Schwarz and the definitions of Hermitian and
@@ -271,7 +280,7 @@ It's a property of the state and the two operators, true even for a
 single idealized measurement of each, considered separately.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming every pair of observables has a nontrivial trade-off.**
 Commuting observables ($[A,B]=0$) have no uncertainty relation forcing
 any trade-off at all.
@@ -307,6 +316,14 @@ any trade-off at all.
 
 ## Further Exploration
 
-Next: [Time Evolution and the Schrödinger Equation](/lessons/quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation), which uses
-Postulate 4 to derive exactly what $U(t)$ looks like, and works a genuine
-two-level example computed directly with the existing quantum engine.
+<ChallengePrompt prompt="The worked example computed the bound for A=X, B=Y in the state |0⟩. Redo it for |1⟩ instead — does the bound come out the same, or different?">
+  $\langle[X,Y]\rangle=2i\langle Z\rangle$ still holds; only
+  $\langle Z\rangle$ changes sign between $|0\rangle$ and $|1\rangle$ —
+  does that change the bound's magnitude?
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Time Evolution and the Schrödinger Equation](/lessons/quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation), which uses
+  Postulate 4 to derive exactly what $U(t)$ looks like, and works a genuine
+  two-level example computed directly with the existing quantum engine.
+</NextDiscovery>

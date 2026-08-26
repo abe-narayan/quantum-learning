@@ -114,11 +114,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A famous claim, made precise">
+  "Quantum computers can solve linear systems exponentially faster" is
+  one of the most repeated — and most routinely overstated — sentences
+  in popular writing about quantum computing.
+</LessonHook>
+
 ## Motivation
 
-"Quantum computers can solve linear systems exponentially faster" is one
-of the most repeated, and most routinely overstated, sentences in
-popular writing about quantum computing. The underlying result — first
+The underlying result — first
 Harrow, Hassidim, and Lloyd's 2009 algorithm (HHL), now more cleanly
 derived as one instance of QSVT — is real, important, and exactly as
 narrow as this lesson is about to make precise.
@@ -166,15 +170,22 @@ The prerequisite lesson's entire point was that QSVT lets you apply
 *any* polynomial $P$ (subject to a boundedness condition) to a
 block-encoded matrix's singular values, essentially for free once the
 signal-processing phases are found. The linear-systems problem is
-exactly the special case
+exactly the special case below, for a normalizing constant $c$ chosen so
+$|P(x)|\leq1$ on that range (QSVT's polynomials must stay bounded by 1
+to remain implementable as part of a unitary circuit).
 
+<EquationReveal
+  terms={[
+    { id: "P", symbol: "P(x)", gloss: "The QSVT polynomial being realized — here, chosen to approximate matrix inversion." },
+    { id: "c", symbol: "c", gloss: "A normalizing constant, chosen so |P(x)| stays ≤ 1 on the interval below — required for P to be implementable as part of a unitary circuit." },
+    { id: "x", symbol: "x", gloss: "A stand-in for one of A's singular values." },
+    { id: "kappa", symbol: "κ", gloss: "A's condition number, σ_max/σ_min — the interval [1/κ, 1] is exactly the range of singular values a block encoding of A can have." },
+  ]}
+>
 $$
 P(x)\approx \frac cx \quad\text{for } x\in[1/\kappa,\,1]
 $$
-
-for a normalizing constant $c$ chosen so $|P(x)|\leq1$ on that range
-(QSVT's polynomials must stay bounded by 1 to remain implementable as
-part of a unitary circuit).
+</EquationReveal>
 
 <TheoremBox title="Quantum linear systems via QSVT" provenance="cited">
 
@@ -233,9 +244,12 @@ $\kappa$-dependent quantum one.
 
 ## Physical Interpretation: What This Algorithm Actually Gives You
 
-This is the single most important, and most often glossed-over, fact
-about this entire algorithm family, so it is stated here as plainly as
-possible: **the output is a quantum state, not a vector of numbers.**
+<InsightBlock>
+  The output is a quantum state, not a vector of numbers — the single
+  most important, and most often glossed-over, fact about this entire
+  algorithm family.
+</InsightBlock>
+
 For an $N$-dimensional problem, $|x\rangle$ lives on $\log_2N$ qubits,
 and its $N$ amplitudes are *not* something you can read off by
 measuring once. Fully reading out an $N$-dimensional amplitude vector to
@@ -273,16 +287,26 @@ A claim of "exponential speedup for linear systems" that is silent on
 any of these four is incomplete at best. This is exactly the pattern
 the platform's later research-methods course teaches you to catch in
 real papers — and there is a second, independently real caution worth
-citing here: Ewin Tang's 2018 "quantum-inspired" classical algorithm
-(originally for a recommendation-systems problem building on this same
-HHL-style construction) showed that, under a specific classical
-data-access model analogous to efficient quantum state preparation, a
-classical algorithm can sometimes match the quantum algorithm's
-polylogarithmic scaling for certain low-rank problems — a real
-**dequantization** result, not a refutation of QSVT-based linear
-solvers in general, but a concrete demonstration that condition (2)–(3)
-style assumptions can sometimes be satisfied classically too, for
-specific problem structures. None of this makes the algorithm
+citing here.
+
+<ResearchConnection
+  title="A quantum-inspired classical dequantization"
+  source="Ewin Tang, 2018"
+  url="https://arxiv.org/abs/1807.04271"
+>
+  Tang's "quantum-inspired" classical algorithm (originally for a
+  recommendation-systems problem building on this same HHL-style
+  construction) showed that, under a specific classical data-access
+  model analogous to efficient quantum state preparation, a classical
+  algorithm can sometimes match the quantum algorithm's polylogarithmic
+  scaling for certain low-rank problems — a real **dequantization**
+  result, not a refutation of QSVT-based linear solvers in general, but
+  a concrete demonstration that condition (2)–(3) style assumptions can
+  sometimes be satisfied classically too, for specific problem
+  structures.
+</ResearchConnection>
+
+None of this makes the algorithm
 uninteresting; it makes precision about its actual, conditional scope
 the whole point, exactly as this lesson has tried to be.
 
@@ -397,7 +421,7 @@ needs the full vector $x$ back in classical memory, this
 algorithm is not the tool for that job, regardless of $\kappa$.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Quoting "$\mathrm{poly}(\log N)$" as if $\kappa$ were always small.**
 The query count is $\mathrm{poly}(\kappa,1/\epsilon,\log N)$, and
 $\kappa$ is doing real work in that expression. For many
@@ -454,8 +478,10 @@ ask what $\kappa$ does as the problem scales, not just what $N$ does.
 
 ## Further Exploration
 
-Next: [Capstone: The Toolbox That Ate Quantum Algorithms](/lessons/apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms),
-which ties block encodings, QSP, QSVT, amplitude estimation, and this
-lesson's linear-systems application together as one unified toolbox, and
-asks the same honesty question this lesson asked of one algorithm, of
-the whole framework at once.
+<NextDiscovery>
+  Next: [Capstone: The Toolbox That Ate Quantum Algorithms](/lessons/apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms),
+  which ties block encodings, QSP, QSVT, amplitude estimation, and this
+  lesson's linear-systems application together as one unified toolbox, and
+  asks the same honesty question this lesson asked of one algorithm, of
+  the whole framework at once.
+</NextDiscovery>

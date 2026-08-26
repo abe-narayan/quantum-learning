@@ -56,11 +56,17 @@ export function SternGerlachScreen({ ariaLabel }: { ariaLabel: string }) {
   const isActual = index === 1;
 
   return (
-    <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-4 panel-inset p-4">
       <PresetToggle options={modes} index={index} onChange={setIndex} ariaLabel={ariaLabel} />
 
-      <div role="img" aria-label={`${ariaLabel}: ${mode.label}. ${mode.caption}`} className="overflow-x-auto">
-        <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`}>
+      <div className="overflow-x-auto">
+        <svg
+          width={WIDTH}
+          height={HEIGHT}
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          role="img"
+          aria-label={`${ariaLabel}: ${mode.label}. ${mode.caption}`}
+        >
           <defs>
             <radialGradient id="sg-classical-smear" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="var(--brand)" stopOpacity={0.5} />

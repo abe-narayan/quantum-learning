@@ -29,11 +29,13 @@ export const lessonMeta = {
 export const afterH = applySingleQubitGate(StateVector.zero(2), HADAMARD, 0);
 export const afterCnot = applyCNOT(afterH, 0, 1);
 
+<LessonHook eyebrow="Why this matters">
+Every multi-qubit operation so far has been described in prose and equations. Real circuits, the ones you'll see in papers, textbooks, and every quantum SDK, are drawn as diagrams.
+</LessonHook>
+
 ## Motivation
 
-Every multi-qubit operation so far has been described in prose and
-equations. Real circuits, the ones you'll see in papers, textbooks, and
-every quantum SDK, are drawn as diagrams. Learning to read one fluently
+Learning to read one fluently
 is a small, mechanical skill; getting the *ordering convention* backwards
 is the single most common way people misread a circuit, so this lesson
 spends real time on that specifically.
@@ -164,13 +166,13 @@ here).
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Reading the operator product in diagram order.** The diagram reads left
 to right; the operator product, when you write it out, reads right to
 left. Confusing these flips which gate you think acted first.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the implicit identity on untouched wires.** A blank space on
 a wire during a column that has gates elsewhere is not "nothing" in the
 operator expression. It's an explicit $I$ factor in that column's tensor
@@ -206,6 +208,8 @@ product, needed to keep the dimensions consistent.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Controlled Gates and CNOT](/lessons/quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot), the dot-and-$\oplus$ notation
 introduced here, worked out completely: the matrix, the truth table, and
 why it's the standard building block for entangling circuits.
+</NextDiscovery>

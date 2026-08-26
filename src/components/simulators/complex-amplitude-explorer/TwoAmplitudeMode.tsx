@@ -7,6 +7,7 @@ import {
   normalizedTwoLevelAmplitudes,
 } from "@/lib/quantum/amplitude";
 import { ComplexPlaneCanvas } from "./ComplexPlaneCanvas";
+import { SimulatorSlider } from "../shared/controls";
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
@@ -35,7 +36,7 @@ function ProbabilityBar({
   tone: "brand" | "accent";
   unbounded?: boolean;
 }) {
-  const colorVar = tone === "brand" ? "var(--brand)" : "var(--accent)";
+  const colorVar = tone === "brand" ? "var(--pillar-accent)" : "var(--accent)";
   const displayValue = unbounded ? value : clamp01(value);
   return (
     <div>
@@ -119,64 +120,45 @@ export function TwoAmplitudeMode({
         </div>
       </div>
 
-      <div className="space-y-3">
-        <label className="block">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-foreground">α magnitude (β magnitude follows to keep |α|²+|β|²=1)</span>
-            <span className="font-mono text-xs text-muted-foreground">{alphaMagnitude.toFixed(2)}</span>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.01}
-            value={alphaMagnitude}
-            onChange={(event) => onChange({ alphaMagnitude: Number(event.target.value) })}
-            aria-label="alpha magnitude"
-            className="mt-1.5 w-full accent-brand"
-          />
-        </label>
+      <div className="space-y-4">
+        <SimulatorSlider
+          label="α magnitude (β magnitude follows to keep |α|²+|β|²=1)"
+          min={0}
+          max={1}
+          step={0.01}
+          value={alphaMagnitude}
+          formatValue={(v) => v.toFixed(2)}
+          onChange={(value) => onChange({ alphaMagnitude: value })}
+        />
         {variant === "global-vs-relative" ? (
-          <label className="block">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-foreground">Global phase (γ) — rotates α and β together</span>
-              <span className="font-mono text-xs text-muted-foreground">{globalPhaseDeg.toFixed(0)}°</span>
-            </div>
-            <input
-              type="range"
-              min={-180}
-              max={180}
-              step={1}
-              value={globalPhaseDeg}
-              onChange={(event) => {
-                const newGamma = (Number(event.target.value) * Math.PI) / 180;
-                const deltaGamma = newGamma - alphaPhase;
-                onChange({ alphaPhase: newGamma, betaPhase: betaPhase + deltaGamma });
-              }}
-              aria-label="global phase"
-              className="mt-1.5 w-full accent-accent"
-            />
-          </label>
-        ) : null}
-        <label className="block">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-foreground">Relative phase (β − α)</span>
-            <span className="font-mono text-xs text-muted-foreground">{relativePhaseDeg.toFixed(0)}°</span>
-          </div>
-          <input
-            type="range"
+          <SimulatorSlider
+            label="Global phase (γ) — rotates α and β together"
             min={-180}
             max={180}
             step={1}
-            value={relativePhaseDeg}
-            onChange={(event) => {
-              const newRelative = (Number(event.target.value) * Math.PI) / 180;
-              onChange({ betaPhase: alphaPhase + newRelative });
+            value={globalPhaseDeg}
+            formatValue={(v) => `${v.toFixed(0)}°`}
+            valueText={(v) => `${v.toFixed(0)} degrees`}
+            onChange={(value) => {
+              const newGamma = (value * Math.PI) / 180;
+              const deltaGamma = newGamma - alphaPhase;
+              onChange({ alphaPhase: newGamma, betaPhase: betaPhase + deltaGamma });
             }}
-            aria-label="relative phase"
-            className="mt-1.5 w-full accent-brand"
           />
-        </label>
+        ) : null}
+        <SimulatorSlider
+          label="Relative phase (β − α)"
+          min={-180}
+          max={180}
+          step={1}
+          value={relativePhaseDeg}
+          formatValue={(v) => `${v.toFixed(0)}°`}
+          valueText={(v) => `${v.toFixed(0)} degrees`}
+          onChange={(value) => {
+            const newRelative = (value * Math.PI) / 180;
+            onChange({ betaPhase: alphaPhase + newRelative });
+          }}
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

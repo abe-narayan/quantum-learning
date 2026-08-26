@@ -1,18 +1,97 @@
 import type { Metadata } from "next";
-import { Container } from "@/components/ui/Container";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { PillarScope } from "@/components/field/PillarScope";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow, SectionTitle, Lede, Readouts } from "@/components/ui/Typography";
+import { Instrument } from "@/components/ui/Panel";
+import { Reveal } from "@/components/motion/Reveal";
 import { CourseList } from "@/components/curriculum/CourseList";
-import { CourseTimeline } from "@/components/curriculum/CourseTimeline";
+import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
+import { swapOverheadForLinearChain } from "@/lib/quantum/transpilation";
+import { stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 import { BASE_URL, buildBreadcrumbSchema, buildCourseListSchema, pillarUrl } from "@/lib/structuredData";
 import { buildPageMetadata } from "@/lib/pageMetadata";
+import type { GateInstruction } from "@/lib/quantum/circuitBuilder";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Software",
   description: "The simulators, compilers, and SDKs used to program, test, and run quantum algorithms.",
   path: "/software",
 });
+
+const PIPELINE_STEPS = [
+  { label: "Circuit", detail: "Built as data — gates + qubit indices, exactly like a real SDK" },
+  { label: "Transpile", detail: "Decomposed into a native gate set for the target's real connectivity" },
+  { label: "Run", detail: "A state-vector simulator, or a real QPU" },
+  { label: "Bitstrings", detail: "Sampled measurement outcomes, ready to post-process" },
+] as const;
+
+/**
+ * A left-to-right flow strip: this pillar's own composition language,
+ * distinct from Mechanics' reading column, Computing's split, and
+ * Hardware's schematic. Deliberately hand-rolled rather than reusing the
+ * generic `PipelineDiagram` visualization component, which hard-codes the
+ * site-level `--accent` token — this stays in the pillar channel so it
+ * retints correctly under `data-pillar="quantum-software"`. Demoted to a
+ * caption beneath the live transpile/execute instrument below — the four
+ * static boxes name the stages; the instrument is what actually runs one.
+ */
+function CompilationPipeline() {
+  return (
+    <div
+      className="flex flex-nowrap items-center gap-3 overflow-x-auto pb-2 [mask-image:linear-gradient(to_right,black_88%,transparent)]"
+    >
+      {PIPELINE_STEPS.map((step, index) => (
+        <div key={step.label} className="flex shrink-0 items-center gap-3">
+          <div className="min-w-[10.5rem] rounded-lg border border-pillar-edge bg-pillar-wash px-4 py-3">
+            <p className="font-tech text-[0.65rem] uppercase tracking-[0.12em] text-pillar-text">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-foreground">{step.label}</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{step.detail}</p>
+          </div>
+          {index < PIPELINE_STEPS.length - 1 ? (
+            <span aria-hidden="true" data-decorative="" className="text-lg text-pillar-text">
+              →
+            </span>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The transpiled circuit an Instrument below actually runs: a logical
+ * H(q0) then CNOT(q0, q2), routed onto LINEAR-CHAIN hardware connectivity
+ * (qubit i can only interact with qubit i±1) the way
+ * `cnotOnLinearChain` in `src/lib/quantum/transpilation.ts` does it —
+ * swap the control into position next to the target, apply the real
+ * CNOT, then swap back. Written out explicitly here (rather than calling
+ * that function, which operates on a StateVector rather than emitting an
+ * instruction list) so `CircuitStateStepper` can step through it gate by
+ * gate; the SWAP count below matches `swapOverheadForLinearChain(0, 2)`
+ * exactly, so the two never drift apart.
+ */
+const TRANSPILED_INSTRUCTIONS: GateInstruction[] = [
+  { gate: "H", targets: [0] },
+  { gate: "SWAP", targets: [0, 1] },
+  { gate: "CNOT", targets: [1, 2] },
+  { gate: "SWAP", targets: [0, 1] },
+];
+
+/** Bytes → binary-prefix string, for the state-vector memory readouts. */
+function formatBytes(bytes: number): string {
+  const units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB"];
+  let value = bytes;
+  let unitIndex = 0;
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+  return `${value < 10 ? value.toFixed(1) : Math.round(value)} ${units[unitIndex]}`;
+}
 
 export default async function SoftwarePage() {
   const lessons = await getAllLessonsMeta();
@@ -23,50 +102,114 @@ export default async function SoftwarePage() {
     { name: "Home", url: BASE_URL },
     { name: "Software", url },
   ]);
+  const swapOverhead = swapOverheadForLinearChain(0, 2);
 
   return (
-    <Container className="py-16">
+    <PillarScope pillar="quantum-software">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([courseListSchema, breadcrumbSchema]) }}
       />
-      <svg viewBox="0 0 40 40" className="h-10 w-10 text-accent" aria-hidden="true">
-        <path
-          d="M17 7 C 11 7 13 15 8 17 C 13 19 11 27 17 27"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M23 7 C 29 7 27 15 32 17 C 27 19 29 27 23 27"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <PageHeader
-        eyebrow="Quantum Software"
-        title="The layer between your code and a real qubit"
-        description="Circuits as data before you ever run them, the state-vector engine underneath every simulator and the wall it hits around 30-50 qubits, and the compilation and hybrid quantum-classical loops that turn an abstract circuit into something real hardware can run. This is the SDK, simulation, and compilation stack — not the physics or the physical device, but the code and infrastructure layer that sits between them. Start with Programming Quantum Computers — it builds on Quantum Gates & Circuits. Build circuits gate by gate in the Circuit Builder (the same build-then-run model real SDKs use), and watch simulated noise act on a live qubit in the Noise & Decoherence Explorer."
-        className="mt-4"
-      />
 
-      {/* See src/app/mechanics/page.tsx for why this sr-only h2 exists:
-          CourseList's course titles render as <h3>, and without this the
-          page would jump straight from the <h1> above to those h3s. */}
-      <h2 className="sr-only">Courses</h2>
+      <Section width="reading">
+        <Reveal>
+          <Eyebrow>Quantum Software</Eyebrow>
+          <SectionTitle level={1} size="xl" className="mt-4">
+            The layer between your code and a real qubit
+          </SectionTitle>
+          <Lede className="mt-5">
+            Circuits as data before you ever run them, the state-vector engine underneath every
+            simulator and the wall it hits around 30-50 qubits, and the compilation and hybrid
+            quantum-classical loops that turn an abstract circuit into something real hardware
+            can run.
+          </Lede>
+          <p className="mt-4 max-w-[42rem] text-sm leading-relaxed text-muted-foreground">
+            This is the SDK, simulation, and compilation stack — not the physics or the physical
+            device, but the code and infrastructure layer that sits between them. Start with{" "}
+            <em>Programming Quantum Computers</em> — it builds on Quantum Gates &amp; Circuits.
+          </p>
+        </Reveal>
+        <Reveal delay={80}>
+          <p className="mt-8 tech-label">The state-vector wall, exactly</p>
+          <Readouts
+            className="mt-3"
+            items={[
+              { label: "30 qubits", value: formatBytes(stateVectorMemoryBytes(30)) },
+              { label: "40 qubits", value: formatBytes(stateVectorMemoryBytes(40)) },
+              { label: "50 qubits", value: formatBytes(stateVectorMemoryBytes(50)) },
+            ]}
+          />
+          <p className="mt-3 max-w-[42rem] text-xs leading-relaxed text-subtle-foreground">
+            Doubling with every added qubit, computed directly from{" "}
+            <code className="text-pillar-text">stateVectorMemoryBytes</code> — not a quoted
+            figure. This is why 30-50 qubits is where exact state-vector simulation stops being
+            practical on ordinary hardware.
+          </p>
+        </Reveal>
+      </Section>
 
-      <div className="mt-12">
-        <CourseTimeline courses={courses} lessons={lessons} />
-      </div>
+      <Section width="wide" aria-labelledby="software-instrument-heading">
+        <Reveal>
+          <Eyebrow>Live instrument</Eyebrow>
+          <SectionTitle level={2} size="lg" id="software-instrument-heading" className="mt-3">
+            A circuit, transpiled and executed
+          </SectionTitle>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            The logical circuit below calls for a Hadamard, then a CNOT directly between qubits 0
+            and 2. This hardware only allows adjacent qubits to interact, so the transpiler routes
+            the CNOT with a SWAP network first — the same linear-chain routing this platform&rsquo;s
+            own tested <code className="text-pillar-text">cnotOnLinearChain</code> implements. Step
+            or play through the compiled sequence; the bars are the real |amplitude|&sup2; of the
+            state after exactly the highlighted gates, not an animation standing in for one.
+          </p>
+        </Reveal>
 
-      <div className="mt-8">
-        <CourseList courses={courses} lessons={lessons} />
-      </div>
-    </Container>
+        <Reveal delay={80} y={20} className="mt-8 block">
+          <Instrument
+            label="Transpile & execute"
+            readout={
+              <span className="font-tech text-xs text-subtle-foreground">
+                {swapOverhead} SWAP{swapOverhead === 1 ? "" : "s"} inserted · linear-chain
+                connectivity
+              </span>
+            }
+            footnote="Qubits 0 and 2 end up entangled even though the compiled circuit never applies a gate directly between them — the SWAP network carries qubit 0's amplitude next to qubit 2, the CNOT entangles them there, and a SWAP carries it back. That routing overhead is exactly what Programming Quantum Computers' transpilation unit derives in full."
+          >
+            <CircuitStateStepper
+              numQubits={3}
+              instructions={TRANSPILED_INSTRUCTIONS}
+              ariaLabel="A logical Hadamard-then-CNOT circuit between qubits 0 and 2, transpiled onto linear-chain hardware connectivity with an inserted SWAP network, stepped gate by gate."
+            />
+          </Instrument>
+        </Reveal>
+
+        <Reveal delay={140} className="mt-8 block">
+          <p className="tech-label">Compiled stages</p>
+          <div className="mt-4">
+            <CompilationPipeline />
+          </div>
+        </Reveal>
+      </Section>
+
+      <Section width="wide" aria-labelledby="software-curriculum-heading">
+        <Reveal>
+          <Eyebrow>Curriculum</Eyebrow>
+          <SectionTitle level={2} size="lg" id="software-curriculum-heading" className="mt-3">
+            {courses.length} courses, source to hardware
+          </SectionTitle>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            Programming model first, then simulation and its real limits, then the compilation
+            pipeline that gets a circuit onto actual hardware.
+          </p>
+        </Reveal>
+
+        <Reveal delay={80} className="mt-10 block">
+          <p className="tech-label">$ courses --pillar quantum-software</p>
+          <div className="mt-4">
+            <CourseList courses={courses} lessons={lessons} />
+          </div>
+        </Reveal>
+      </Section>
+    </PillarScope>
   );
 }

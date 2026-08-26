@@ -72,14 +72,16 @@ export const swapCircuitFrames = [
   },
 ];
 
+<LessonHook eyebrow="Why this matters">
+Every gate mentioned so far still acts on one qubit independently of the others. Nothing yet lets one qubit's value affect what happens to another. Controlled gates are that missing ingredient, and CNOT is the single most important one in this course.
+</LessonHook>
+
 ## Motivation
 
 Tensor products build multi-qubit states; the last lesson's circuit
-notation showed how to draw operations on them. But every gate mentioned
-so far still acts on one qubit independently of the others. Nothing yet
-lets one qubit's value affect what happens to another. **Controlled
-gates** are that missing ingredient, and CNOT (controlled-NOT) is the
-single most important one in this course.
+notation showed how to draw operations on them. This lesson supplies
+the piece that's still missing: **CNOT** (controlled-NOT), the
+single most important two-qubit gate in this course.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/31/Diagram_of_the_Cirac-Zoller_CNOT_gate.svg"
@@ -238,14 +240,14 @@ but the CNOT you just derived, three times in a row.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming CNOT always entangles its inputs.** Applied to $|10\rangle$
 above, the output $|11\rangle$ is still a plain product state, no
 entanglement at all. CNOT only *creates* entanglement when its control
 qubit starts in superposition. The next lesson makes this precise.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing control and target.** $\text{CNOT}(0,1)$ (control=qubit 0)
 and $\text{CNOT}(1,0)$ (control=qubit 1) are different gates with
 different matrices. Swapping which qubit is which changes the result, as
@@ -278,5 +280,7 @@ the SWAP derivation above relies on directly.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Bell States and Entanglement](/lessons/quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement), put a control qubit into
 superposition *before* the CNOT, and watch what comes out.
+</NextDiscovery>

@@ -6,7 +6,7 @@ export const purificationUnitaryFreedom: ConceptualProblem = {
     title: "Why Purifications of the Same State Are Related by a Unitary on B Alone",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "conceptual",
     tags: ["purification", "non-uniqueness"],

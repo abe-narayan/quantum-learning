@@ -38,6 +38,10 @@ export const bellState = applyCNOT(afterH, 0, 1);
 
 export const afterHBoth = applySingleQubitGate(applySingleQubitGate(bellState, HADAMARD, 0), HADAMARD, 1);
 
+<LessonHook eyebrow="The most famous state in quantum computing">
+Two entangled qubits keep agreeing with each other even when you change how you measure them — a correlation no predetermined pair of classical coins could ever reproduce.
+</LessonHook>
+
 ## Motivation
 
 The last lesson ended with a promise: put CNOT's control qubit into
@@ -55,6 +59,10 @@ not just gesture at.
   creditUrl="https://commons.wikimedia.org/wiki/File:Alain_Aspect_experiment_1981_diagram.svg"
   license="CC BY 3.0"
 />
+
+<HistoricalMoment date="1981" place="Orsay, France">
+Alain Aspect's experiment sends pairs of entangled photons to polarizers set at independently-chosen angles, showing correlations that survive a change of measurement basis exactly the way this lesson's H⊗H calculation does — work that earned Aspect a share of the 2022 Nobel Prize in Physics.
+</HistoricalMoment>
 
 ## Intuition
 
@@ -96,6 +104,19 @@ $$
 |00\rangle \xrightarrow{H \text{ on } q_0} \frac{|00\rangle+|10\rangle}{\sqrt2} \xrightarrow{\text{CNOT}(0,1)} \frac{|00\rangle+|11\rangle}{\sqrt2} \equiv |\Phi^+\rangle
 $$
 
+The two `QuantumStateDisplay` panels above are two fixed snapshots; here
+is the same circuit as one steppable run, with the amplitude bars
+recomputed live after each gate instead of shown as separate panels:
+
+<CircuitStateStepper
+  numQubits={2}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+  ]}
+  ariaLabel="The Bell-pair preparation circuit, H on qubit 0 then CNOT(0,1), stepped gate by gate with live amplitude bars."
+/>
+
 This is the Bell state $|\Phi^+\rangle$, one of four (the other three,
 $|\Phi^-\rangle,|\Psi^+\rangle,|\Psi^-\rangle$, come from the same
 recipe starting at $|01\rangle,|10\rangle,|11\rangle$ instead; you'll
@@ -108,13 +129,21 @@ single-qubit $|a\rangle=a_0|0\rangle+a_1|1\rangle$,
 $|b\rangle=b_0|0\rangle+b_1|1\rangle$. Matching coefficients against
 $\frac{1}{\sqrt2}|00\rangle+0|01\rangle+0|10\rangle+\frac{1}{\sqrt2}|11\rangle$:
 
+<DerivationSteps>
+  <DerivationStep annotation="Equate each product-state coefficient a_ib_j to the corresponding Bell-state amplitude.">
 $$
 a_0b_0=\tfrac{1}{\sqrt2}, \qquad a_0b_1=0, \qquad a_1b_0=0, \qquad a_1b_1=\tfrac{1}{\sqrt2}
 $$
+  </DerivationStep>
+  <DerivationStep annotation="a_0b_1=0 forces a_0=0 or b_1=0 — a product of complex numbers is zero only if one factor is.">
+If $a_0=0$: then $a_0b_0=0\neq\frac{1}{\sqrt2}$, contradiction.
+  </DerivationStep>
+  <DerivationStep annotation="Check the other branch of the same either/or.">
+If $b_1=0$: then $a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction.
+  </DerivationStep>
+</DerivationSteps>
 
-From $a_0b_1=0$, either $a_0=0$ or $b_1=0$. If $a_0=0$: then
-$a_0b_0=0\neq\frac{1}{\sqrt2}$, contradiction. If $b_1=0$: then
-$a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction. No values of
+No values of
 $a_0,a_1,b_0,b_1$ satisfy all four equations simultaneously, so
 $|\Phi^+\rangle$ is **not** a product state. This is a complete proof, not
 an assertion: entanglement isn't a label we attach to this state, it's a
@@ -162,6 +191,10 @@ system with no independently well-defined parts, and that fact is what
 every later lesson in this course (measurement, teleportation, and the
 no-cloning theorem) builds on directly.
 
+<InsightBlock>
+Entanglement is real, provable structure in the state itself, not a statement about anyone's ignorance.
+</InsightBlock>
+
 <PredictBeforeReveal
   question="If you measure both qubits of |Φ+⟩ in the computational basis, many times, how often will the two outcomes agree (both 0 or both 1)?"
   options={[
@@ -197,7 +230,7 @@ worked out in the practice questions below.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **"Entangled" and "correlated" used as synonyms.** Classical variables can
 be correlated; only quantum states can be entangled in the sense proven
 above: correlated in every measurement basis simultaneously, not just
@@ -242,6 +275,8 @@ correlation.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Multi-Qubit Measurement](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement), which makes precise exactly what
 happens to the *rest* of an entangled state when you measure only part of
 it, the mechanism behind the perfect correlation you just derived.
+</NextDiscovery>

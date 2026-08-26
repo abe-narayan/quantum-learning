@@ -189,7 +189,7 @@ export function BlochSphereHeroExplorer() {
   }, [isAnimating, renderPoint, runAnimation, settleAt]);
 
   const controlButtonClasses =
-    "inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-border bg-surface px-3 text-sm font-semibold text-foreground transition-colors hover:border-brand/40 hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:pointer-events-none disabled:opacity-50";
+    "inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-border bg-surface px-3 text-sm font-semibold text-foreground transition-colors hover:border-pillar/40 hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar disabled:pointer-events-none disabled:opacity-50";
 
   return (
     <div className="relative mx-auto w-full max-w-sm">
@@ -198,7 +198,7 @@ export function BlochSphereHeroExplorer() {
         className="pointer-events-none absolute -inset-10 -z-10 rounded-full opacity-35 blur-2xl"
         style={{
           backgroundImage:
-            "radial-gradient(circle, color-mix(in srgb, var(--brand) 35%, transparent), transparent 70%)",
+            "radial-gradient(circle, color-mix(in srgb, var(--pillar-accent) 35%, transparent), transparent 70%)",
         }}
       />
 
@@ -208,7 +208,7 @@ export function BlochSphereHeroExplorer() {
         <p aria-live="polite" className="mt-4 min-h-[2.5rem] text-center text-xs text-muted-foreground">
           {narration}
           {lastMeasurement !== null ? (
-            <span className="ml-1 font-mono text-brand">→ |{lastMeasurement}⟩</span>
+            <span className="ml-1 font-mono text-pillar">→ |{lastMeasurement}⟩</span>
           ) : null}
         </p>
 
@@ -236,7 +236,7 @@ export function BlochSphereHeroExplorer() {
         <Link
           href="/simulators"
           className={cn(
-            "mt-6 flex items-center justify-between gap-3 border-t border-border pt-4 transition-colors hover:border-brand/40"
+            "mt-6 flex items-center justify-between gap-3 border-t border-border pt-4 transition-colors hover:border-pillar/40"
           )}
         >
           <div>

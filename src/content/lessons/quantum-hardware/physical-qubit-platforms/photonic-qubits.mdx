@@ -31,18 +31,26 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A qubit that doesn't sit still">
+Every other platform confines a qubit at a fixed location. A photonic qubit is different in kind: the qubit is a particle of light, traveling at the speed of light, and it doesn't sit anywhere.
+</LessonHook>
+
 ## Motivation
 
 Every platform so far, superconducting circuits, trapped ions, neutral
-atoms, encodes a qubit in something that sits still, confined at a
-fixed location. A photonic qubit is different in kind: the qubit *is* a
-particle of light, and it doesn't sit anywhere. It travels, typically
-through optical fiber or free space, at the speed of light.
+atoms, encodes a qubit in something that sits still. A photonic qubit
+travels instead, typically through optical fiber or free space.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f6/FMN_Lab_electro-optical_integrated_modulator.jpg"
   alt="A photonic integrated circuit chip, an electro-optical modulator, during wire bonding of its electrical contacts, showing the on-chip waveguides light travels through"
   caption="A real photonic integrated circuit: an electro-optical modulator chip, the kind of on-chip waveguide hardware that routes and manipulates a photon's path or phase, the same path-encoding this lesson describes as an alternative to polarization."
+  pins={[
+    { id: "pins", x: 3, y: 45, label: "Wire-bond pin array — the edge connector routing electrical signals onto the chip." },
+    { id: "waveguides", x: 35, y: 42, label: "The photonic chip itself, with on-chip waveguides etched as the visible traces — the light path this lesson calls path encoding." },
+    { id: "bondwires", x: 64, y: 48, label: "Bond wires linking the chip's contact pads to the electrical launcher." },
+    { id: "launcher", x: 80, y: 35, label: "Electrical launcher, delivering the modulator's driving signal to the chip." },
+  ]}
   credit="FMN Laboratory, Bauman Moscow State Technical University"
   creditUrl="https://commons.wikimedia.org/wiki/File:FMN_Lab_electro-optical_integrated_modulator.jpg"
   license="CC BY 4.0"
@@ -186,7 +194,7 @@ different mathematical character (binary survive/lost) than gradual
 $T_1$/$T_2$ decay.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming photonic two-qubit gates work the same way as matter-qubit
 gates, just with light instead.** The lack of a natural photon-photon
 interaction is a fundamentally different (and harder) engineering
@@ -224,6 +232,8 @@ problem than anything the other platforms in this course face.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Spin Qubits](/lessons/quantum-hardware/physical-qubit-platforms/spin-qubits), a solid-state platform that, unlike
 superconducting circuits, encodes its qubit directly in an atomic
 property: an electron or nuclear spin, embedded in a semiconductor.
+</NextDiscovery>

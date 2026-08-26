@@ -82,14 +82,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+The earlier measurement postulate, P(aᵢ)=|cᵢ|², is exactly right when aᵢ is nondegenerate — but it doesn't even typecheck when several eigenvectors share the same eigenvalue.
+</LessonHook>
+
 ## Motivation
 
-From Classical to Quantum's measurement postulate was stated as
-$P(a_i)=|c_i|^2$ for the coefficient $c_i=\langle a_i|\psi\rangle$ of a
-*single* eigenvector $|a_i\rangle$. That's exactly right when $a_i$ is
-nondegenerate, but it doesn't even typecheck when several eigenvectors
-share the eigenvalue $a_i$, since there's no single $|a_i\rangle$ to take
-a coefficient of. This lesson fixes that using last lesson's projectors.
+From Classical to Quantum's measurement postulate defined
+$c_i=\langle a_i|\psi\rangle$ for a
+*single* eigenvector $|a_i\rangle$ — there's no single $|a_i\rangle$ to take
+a coefficient of once several eigenvectors
+share an eigenvalue. This lesson fixes that using last lesson's projectors.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
@@ -256,7 +259,7 @@ project-then-renormalize mechanism itself unmistakable.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Collapsing to an arbitrarily chosen single eigenvector.** The correct
 post-measurement state is the *normalized projection*, which in general
 retains a superposition *within* the degenerate eigenspace. Only if the
@@ -264,7 +267,7 @@ pre-measurement state happened to already be a single eigenvector does
 collapse leave it looking "simple."
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to renormalize after applying the projector.** $P_i|\psi
 \rangle$ generally has norm less than 1 (some probability went to *other*
 outcomes). Dividing by $\|P_i|\psi\rangle\|$ is not optional.
@@ -297,6 +300,8 @@ outcomes). Dividing by $\|P_i|\psi\rangle\|$ is not optional.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Sequential Measurements and Incompatibility](/lessons/quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility), making
 "measuring one observable disturbs another" completely concrete with a
 worked numeric example using operators you already know well.
+</NextDiscovery>

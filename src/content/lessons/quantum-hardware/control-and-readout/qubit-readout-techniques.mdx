@@ -37,6 +37,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Measurement, less ideal than the textbook version">
+Real qubit readout is neither instantaneous nor perfect: it takes hundreds of nanoseconds, involves real noise, and has a real, measurable error rate — nothing like the idealized instantaneous projection the math postulates.
+</LessonHook>
+
 ## Motivation
 
 Measurement and Probability (Quantum Computing pillar) treats
@@ -98,16 +102,36 @@ Where does that error actually come from? Every single shot lands
 somewhere on the IQ plane, the 2D plane of the demodulated signal's
 in-phase (I) and quadrature (Q) components, as one point drawn from a
 noisy cloud centered near the "measured $|0\rangle$" location or the
-"measured $|1\rangle$" location. A threshold splits the plane into two
-bins. Noise is what gives each cloud its spread, and it's that spread,
-not the classifier, that lets some $|0\rangle$ shots land on the
-$|1\rangle$ side of the boundary (and vice versa): the single-shot
-physical origin of the error rate the bar chart below reports as a
-shot count.
+"measured $|1\rangle$" location.
 
-<InteractiveSection title="Drag the clouds apart and watch the error shrink" description="Drag the separation-to-noise ratio (SNR) slider, which sets how far apart the two point clouds sit relative to their own spread. Watch the two clouds slide together or apart, notice the overlap between them shrink or grow, and watch the live fidelity readout update as that overlap changes.">
-  <ReadoutScatter ariaLabel="IQ-plane scatter of single readout shots: two noisy point clouds, one centered at the measured zero location and one at the measured one location, separated by a dashed decision boundary. Dragging the separation-to-noise-ratio slider moves the clouds apart or together, shrinking or growing the overlap between them, with the resulting single-shot fidelity computed live from the two clusters' known Gaussian parameters." />
-</InteractiveSection>
+<ObservePredictExplain
+  observe={
+    <InteractiveSection title="Drag the clouds apart and watch the error shrink" description="Drag the separation-to-noise ratio (SNR) slider, which sets how far apart the two point clouds sit relative to their own spread. Watch the two clouds slide together or apart, and watch the live fidelity readout update as that happens." mode="observe">
+      <ReadoutScatter ariaLabel="IQ-plane scatter of single readout shots: two noisy point clouds, one centered at the measured zero location and one at the measured one location, separated by a dashed decision boundary. Dragging the separation-to-noise-ratio slider moves the clouds apart or together, shrinking or growing the overlap between them, with the resulting single-shot fidelity computed live from the two clusters' known Gaussian parameters." />
+    </InteractiveSection>
+  }
+  predict={
+    <PredictBeforeReveal
+      question="Drag the SNR slider higher, separating the two clouds further relative to their own spread. What happens to the overlap between them, and to the reported fidelity?"
+      options={[
+        { label: "Overlap shrinks; fidelity rises", value: "shrinks-rises" },
+        { label: "Overlap grows; fidelity drops", value: "grows-drops" },
+        { label: "Neither changes — SNR only relabels the axes", value: "no-change" },
+      ]}
+      correctValue="shrinks-rises"
+      explanation="Higher SNR means the two clusters sit farther apart relative to their own noise-driven spread, so less of each cloud crosses onto the other's side of the decision boundary — overlap shrinks and fidelity rises."
+    />
+  }
+  explain={
+    <p>
+      A threshold splits the IQ plane into two bins. Noise is what gives
+      each cloud its spread, and it's that spread, not the classifier,
+      that lets some $|0\rangle$ shots land on the $|1\rangle$ side of the
+      boundary (and vice versa): the single-shot physical origin of the
+      error rate the bar chart below reports as a shot count.
+    </p>
+  }
+/>
 
 ### Readout error joins the broader error budget
 
@@ -179,7 +203,7 @@ specifically designed to avoid the disturbance a direct qubit
 measurement would risk.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating readout fidelity as if it were 100%.** As the worked example
 shows, even a "good" 97% fidelity produces a real, non-negligible error
 rate on any single measurement, an important, quantifiable
@@ -214,7 +238,9 @@ error to ignore.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Calibration](/lessons/quantum-hardware/control-and-readout/calibration), which covers how a real device's actual pulse
 parameters (Rabi frequency, resonance frequency) are found and kept
 accurate over time, since none of this lesson's or the previous
 lesson's formulas work with parameters that drift uncalibrated.
+</NextDiscovery>

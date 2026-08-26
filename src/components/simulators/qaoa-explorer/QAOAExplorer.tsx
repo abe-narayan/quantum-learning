@@ -6,7 +6,10 @@ import { GraphDiagram, type GraphNode, type GraphEdge } from "@/components/visua
 import { KatexMath } from "@/components/ui/KatexMath";
 import { QAOAControls } from "./QAOAControls";
 import { QAOA_GRAPH_PRESETS } from "./presets";
-import { LabNotes } from "./LabNotes";
+import { Readout } from "@/components/ui/Typography";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
+import { Predict } from "../shared/Predict";
 
 /** Bit `node` of `index`, reading qubit 0 as the most-significant bit — the same convention `qaoaCircuit`'s own basis ordering and every gate in this engine use. */
 function bitAt(index: number, totalQubits: number, node: number): number {
@@ -35,6 +38,28 @@ export function QAOAExplorer() {
   const expected = useMemo(() => expectedCutSize(state, preset.edges), [state, preset]);
   const trueMax = useMemo(() => bruteForceMaxCut(preset.n, preset.edges), [preset]);
   const ratio = trueMax > 0 ? expected / trueMax : 1;
+
+  // Whether *some* (γ, β) at p=1 reaches the graph's true max-cut exactly —
+  // a fixed property of the graph, not of the currently-dragged sliders.
+  // Answered honestly via a real grid search over the same `qaoaCircuit` /
+  // `expectedCutSize` this explorer already uses live, not a hardcoded
+  // per-graph guess, so it stays correct if a preset is ever added or edited.
+  const bestAchievableRatio = useMemo(() => {
+    if (trueMax === 0) return 1;
+    const GRID = 24;
+    let best = 0;
+    for (let gi = 0; gi < GRID; gi++) {
+      const g = (gi / GRID) * 2 * Math.PI;
+      for (let bi = 0; bi < GRID; bi++) {
+        const b = (bi / GRID) * Math.PI;
+        const s = qaoaCircuit(preset.n, preset.edges, [g], [b]);
+        const cut = expectedCutSize(s, preset.edges);
+        if (cut > best) best = cut;
+      }
+    }
+    return best / trueMax;
+  }, [preset, trueMax]);
+  const reachesOptimumExactly = bestAchievableRatio >= 0.995;
   const ratioPercent = (ratio * 100).toFixed(1);
   const noticeText =
     ratio >= 0.995
@@ -63,17 +88,31 @@ export function QAOAExplorer() {
   }));
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-      <div className="space-y-6">
-        <GraphDiagram
-          nodes={nodes}
-          edges={edges}
-          ariaLabel={`${preset.label} colored by the most likely measurement outcome |${mostLikelyIndex
-            .toString(2)
-            .padStart(preset.n, "0")}⟩ at probability ${(mostLikelyProbability * 100).toFixed(0)}%, with cut edges dashed`}
-        />
+    <SimulatorInstrument
+      label="Max-Cut QAOA — p=1"
+      readout={<Readout label="Ratio" value={`${ratioPercent}%`} />}
+      footnote="Next: this p=1 circuit is the same one grid-searched by hand in the QAOA lesson — here you're doing that search yourself."
+      stageClassName="space-y-6"
+      stage={
+        <>
+        {/* GraphDiagram (src/components/visualizations/) renders a fixed
+            300px-wide SVG with no responsive className of its own — at a
+            320px viewport, after this instrument's own padding, the stage
+            has less room than that. `overflow-x-auto` contains the overflow
+            to this figure instead of the page, the same degrade pattern
+            already used for the circuit diagram and state-vector tables
+            elsewhere in these simulators. */}
+        <div className="overflow-x-auto">
+          <GraphDiagram
+            nodes={nodes}
+            edges={edges}
+            ariaLabel={`${preset.label} colored by the most likely measurement outcome |${mostLikelyIndex
+              .toString(2)
+              .padStart(preset.n, "0")}⟩ at probability ${(mostLikelyProbability * 100).toFixed(0)}%, with cut edges dashed`}
+          />
+        </div>
 
-        <div className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+        <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
           Most likely measured bitstring: |{mostLikelyIndex.toString(2).padStart(preset.n, "0")}⟩ at{" "}
           {(mostLikelyProbability * 100).toFixed(1)}% probability. Approximation ratio ⟨cut⟩ / true max ={" "}
           {(ratio * 100).toFixed(1)}%.
@@ -89,7 +128,7 @@ export function QAOAExplorer() {
         <div className="grid gap-3 rounded-xl border border-border bg-surface-muted/40 p-4 sm:grid-cols-2">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Expected cut ⟨C⟩</p>
-            <p className="mt-1 font-mono text-lg text-brand">{expected.toFixed(3)}</p>
+            <p className="mt-1 font-mono text-lg text-pillar">{expected.toFixed(3)}</p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Brute-force optimum</p>
@@ -97,46 +136,41 @@ export function QAOAExplorer() {
           </div>
         </div>
 
-        <LabNotes
-          notes={[
-            {
-              label: "What we're studying",
-              content:
-                "QAOA uses two angles — γ (how hard to reward good cuts) and β (how much to mix) — to bias measurement toward high-quality graph cuts, without ever brute-forcing every partition.",
-            },
-            {
-              label: "Try this",
-              content: (
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>
-                    On the Triangle graph, sweep γ and β and try to push the approximation ratio above 90% — the
-                    true max for a triangle can never be perfectly reached with p=1, so notice where it plateaus.
-                  </li>
-                  <li>Switch to the 4-cycle and see whether the same (γ, β) that worked well on the triangle still performs well here.</li>
-                </ul>
-              ),
-            },
-            {
-              label: "What to notice",
-              content: noticeText,
-            },
-            {
-              label: "What's next",
-              content:
-                "Next: this p=1 circuit is the same one grid-searched by hand in the QAOA lesson — here you're doing that search yourself.",
-            },
+        <Predict
+          key={preset.id}
+          question={`For ${preset.label}, is there any single (γ, β) at p=1 that reaches the graph's true max-cut exactly?`}
+          options={[
+            { id: "yes", label: "Yes — some (γ, β) reaches it" },
+            { id: "no", label: "No — it plateaus below" },
           ]}
+          outcomeId={reachesOptimumExactly ? "yes" : "no"}
         />
-      </div>
 
-      <QAOAControls
-        presetId={preset.id}
-        onPresetChange={setPresetId}
-        gamma={gamma}
-        onGammaChange={setGamma}
-        beta={beta}
-        onBetaChange={setBeta}
-      />
-    </div>
+        <SimulatorFraming
+          shows="QAOA uses two angles — γ (how hard to reward good cuts) and β (how much to mix) — to bias measurement toward high-quality graph cuts, without ever brute-forcing every partition."
+          watchFor={noticeText}
+          tryThis={
+            <ul>
+              <li>
+                On the Triangle graph, sweep γ and β and try to push the approximation ratio above 90% — the
+                true max for a triangle can never be perfectly reached with p=1, so notice where it plateaus.
+              </li>
+              <li>Switch to the 4-cycle and see whether the same (γ, β) that worked well on the triangle still performs well here.</li>
+            </ul>
+          }
+        />
+        </>
+      }
+      controls={
+        <QAOAControls
+          presetId={preset.id}
+          onPresetChange={setPresetId}
+          gamma={gamma}
+          onGammaChange={setGamma}
+          beta={beta}
+          onBetaChange={setBeta}
+        />
+      }
+    />
   );
 }

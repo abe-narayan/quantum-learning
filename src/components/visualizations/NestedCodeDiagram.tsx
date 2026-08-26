@@ -92,7 +92,7 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
   }, [groups]);
 
   return (
-    <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4 sm:p-5">
+    <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
           <text x={WIDTH / 2} y={16} textAnchor="middle" className="fill-muted-foreground text-[11px] font-mono">

@@ -36,7 +36,7 @@ export function PopulationCurve({
           </text>
         </g>
       ))}
-      <path d={path} fill="none" className="stroke-brand" strokeWidth={2} />
+      <path d={path} fill="none" className="stroke-pillar" strokeWidth={2} />
       <line x1={xOf(currentT)} y1={PAD_TOP} x2={xOf(currentT)} y2={HEIGHT - PAD_BOTTOM} className="stroke-accent" strokeWidth={1.5} strokeDasharray="3 2" />
       <circle cx={xOf(currentT)} cy={yOf(currentP1)} r={4} className="fill-accent" />
       <text x={WIDTH - 4} y={HEIGHT - 4} textAnchor="end" className="fill-muted-foreground text-[9px] font-mono">

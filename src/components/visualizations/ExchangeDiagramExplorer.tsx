@@ -27,7 +27,7 @@ export function ExchangeDiagramExplorer({ presets, ariaLabel }: { presets: Excha
   const { index, setIndex, frame: preset } = useFrameIndex(presets);
 
   return (
-    <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-4 panel-inset p-4">
       {presets.length > 1 && (
         <PresetToggle options={presets} index={index} onChange={setIndex} ariaLabel={ariaLabel} />
       )}

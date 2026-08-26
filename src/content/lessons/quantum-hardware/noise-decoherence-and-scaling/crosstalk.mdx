@@ -26,14 +26,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="No single-qubit version of this story">
+Driving a gate on one qubit unintentionally disturbs a different qubit sitting nearby — and past a handful of qubits, crosstalk, not T1/T2, is usually what limits real gate fidelity.
+</LessonHook>
+
 ## Motivation
 
 Ask a hardware team what limits their two-qubit gate fidelity and T1/T2
 usually isn't the first answer once the chip gets past a handful of
 qubits, crosstalk is. Every noise source this course has covered so
 far, T1, T2, lives on one qubit coupled to its own environment.
-Crosstalk breaks that picture: driving a gate on one qubit unintentionally
-disturbs a *different* qubit sitting nearby, and there's no single-qubit
+Crosstalk breaks that picture: there's no single-qubit
 version of that story to fall back on.
 
 <ExternalFigure
@@ -149,7 +152,7 @@ between neighbors, rather than shrugging off a fraction of a percent.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating crosstalk as just another form of T1/T2 decoherence.**
 It's structurally different: T1/T2 are properties of a single qubit's
 coupling to its environment; crosstalk is a multi-qubit effect tied to
@@ -159,7 +162,7 @@ here too: crosstalk from a fixed, deterministic leakage pattern is
 coherent, and can in principle be characterized and partially corrected).
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming crosstalk fidelity loss is negligible because $\epsilon$ is
 small.** As the worked example shows, even a modest per-gate loss
 compounds significantly across many gates in a real circuit; small
@@ -192,6 +195,8 @@ per-operation errors are exactly what error correction exists to manage.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Scaling Challenges](/lessons/quantum-hardware/noise-decoherence-and-scaling/scaling-challenges), which puts T1/T2, crosstalk, and readout
 error together into the question of what it actually takes to build a
 much larger quantum device.
+</NextDiscovery>

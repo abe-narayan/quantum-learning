@@ -1,71 +1,95 @@
-import { Container } from "@/components/ui/Container";
+import { Section, SplitFigure } from "@/components/ui/Section";
+import { Eyebrow, SectionTitle, Lede, Readouts } from "@/components/ui/Typography";
+import { Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
-import { LazyBlochSphereHeroExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereHeroExplorer";
+import { Reveal } from "@/components/motion/Reveal";
+import { LazyWavefunctionHeroExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionHeroExplorer";
 import { ContinueLearning } from "@/components/curriculum/ContinueLearning";
+import { getAllLessonsMeta } from "@/lib/content/lessons";
+import { getAllProblemMeta } from "@/lib/problems/registry";
+import { PILLARS } from "@/lib/content/curriculum";
 
-export function Hero() {
+/**
+ * 14 named tools on /simulators, plus the concept map and the density-matrix
+ * pillar's dedicated three-component mixture explorer — no single registry
+ * exports a live count today, so this is hand-counted rather than derived.
+ * Every other readout below (lessons, problems, pillars) comes straight from
+ * the same data the rest of the site reads.
+ */
+const SIMULATOR_COUNT = "16+";
+
+/**
+ * The homepage opener. Leads with a real, manipulable phenomenon — a live
+ * split-operator wavefunction simulation, the same engine every Wave
+ * Mechanics lesson uses — rather than a headline describing one. The
+ * headline and CTAs sit beside it, not above it, so the first thing a
+ * visitor's eye can *do* something with is the physics, not the copy.
+ *
+ * Async because it reads the real curriculum counts (lessons, problems,
+ * pillars) for the readout strip instead of hard-coding them — the same
+ * pattern `ContinueLearning` already uses one level down.
+ */
+export async function Hero() {
+  const lessons = await getAllLessonsMeta();
+  const problemCount = getAllProblemMeta().length;
+
   return (
     <section className="relative overflow-hidden border-b border-border">
       <div
         aria-hidden="true"
-        className="hero-glow pointer-events-none absolute inset-0 -z-20"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--brand) 11%, transparent), transparent 55%), radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 50%), linear-gradient(var(--surface-muted), var(--background))",
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 opacity-20 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
-        style={{
-          backgroundImage:
-            "linear-gradient(color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
+        data-decorative=""
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.32] [mask-image:radial-gradient(ellipse_at_top,black,transparent_72%)] grid-paper"
       />
 
-      <Container className="grid gap-16 py-24 sm:py-28 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:py-32">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand">QuantumLearn</p>
-          <h1 className="mt-4 text-balance font-display text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Learn quantum mechanics and quantum computing by experimenting with them.
-          </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            Solve the Schrödinger equation for a real wave packet, manipulate
-            qubit states, and watch superposition and entanglement unfold —
-            build the intuition no textbook alone can teach, grounded in the
-            math and physics that make it rigorous, whether you&rsquo;re here
-            for the atom or the algorithm.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button href="/learn" size="lg">
-              Start learning
-            </Button>
-            <Button href="/simulators" size="lg" variant="secondary">
-              Explore simulators
-            </Button>
-          </div>
-
-          <dl className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">
-            <div className="flex items-baseline gap-1.5">
-              <dt className="font-semibold text-foreground">219</dt>
-              <dd>lessons</dd>
+      <Section width="wide">
+        <SplitFigure
+          reverse
+          text={
+            <div>
+              <Eyebrow>QuantumLearn — a research console</Eyebrow>
+              <SectionTitle level={1} size="xl" className="mt-4">
+                This is a live quantum simulation. Not a diagram of one.
+              </SectionTitle>
+              <Lede className="mt-5">
+                Switch presets on the live simulation and watch a real wave packet — solved in
+                your browser by the same split-operator engine behind every Wave Mechanics
+                lesson — disperse, interfere with itself, and tunnel through a barrier it has
+                no classical business crossing.
+              </Lede>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Button href="/learn" size="lg">
+                  Start learning
+                </Button>
+                <Button href="/simulators" size="lg" variant="secondary">
+                  Explore simulators
+                </Button>
+              </div>
+              <ContinueLearning />
             </div>
-            <div className="flex items-baseline gap-1.5">
-              <dt className="font-semibold text-foreground">14</dt>
-              <dd>interactive simulators</dd>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <dt className="font-semibold text-foreground">6</dt>
-              <dd>pillars, ending at Apex</dd>
-            </div>
-          </dl>
+          }
+          figure={
+            <Reveal y={18}>
+              <Instrument
+                bodyClassName="p-0"
+                footnote="Real-time split-operator time evolution — an actual FFT, not a canned animation."
+              >
+                <LazyWavefunctionHeroExplorer />
+              </Instrument>
+            </Reveal>
+          }
+        />
 
-          <ContinueLearning />
-        </div>
-
-        <LazyBlochSphereHeroExplorer />
-      </Container>
+        <Reveal y={12} delay={80} className="mt-16 border-t border-border pt-8">
+          <Readouts
+            items={[
+              { label: "Lessons", value: lessons.length },
+              { label: "Problems", value: problemCount },
+              { label: "Simulators", value: SIMULATOR_COUNT },
+              { label: "Pillars", value: PILLARS.length, unit: "→ Apex" },
+            ]}
+          />
+        </Reveal>
+      </Section>
     </section>
   );
 }

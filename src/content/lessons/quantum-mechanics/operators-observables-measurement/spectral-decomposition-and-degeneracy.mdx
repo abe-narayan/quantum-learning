@@ -49,6 +49,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Knowing a system's exact energy doesn't always tell you its exact
+  state. When an eigenvalue is degenerate, that single number only
+  narrows things down to a whole subspace.
+</LessonHook>
+
 ## Motivation
 
 Mathematical Foundations stated the spectral decomposition
@@ -142,6 +148,17 @@ eigenvectors span the whole space).
 
 ## Physical Interpretation
 
+<PredictBeforeReveal
+  question="A measurement finds a system's energy is exactly Ei, and Ei happens to be a degenerate eigenvalue with a 2-dimensional eigenspace. Does that measurement pin down the system's exact state?"
+  options={[
+    { label: "Yes — one eigenvalue always means one exact state", value: "yes" },
+    { label: "No — the state could be anywhere in the 2-dimensional eigenspace", value: "no" },
+    { label: "Only if the two eigenvectors happen to be orthogonal", value: "orthogonal-only" },
+  ]}
+  correctValue="no"
+  explanation="No. Knowing the energy is Ei only tells you the state lives somewhere in that eigenvalue's eigenspace — for a degenerate Ei, that's a whole subspace, not a single ray. This is exactly why the projector Pi for a degenerate eigenvalue sums over every eigenvector in that eigenspace rather than picking out just one."
+/>
+
 Degeneracy means an eigenvalue alone doesn't fully identify a unique
 basis state. Knowing "the energy is $E_i$" only tells you the state
 lives *somewhere* in a $d$-dimensional eigenspace, not exactly where. The
@@ -187,7 +204,7 @@ directly.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Writing a separate term for every eigen*vector* instead of every
 eigen*value*.** With a degenerate eigenvalue, the correct decomposition
 groups all its eigenvectors into one projector $P_i$. Writing
@@ -198,7 +215,7 @@ one eigenspace, which matters for the measurement postulate two lessons
 ahead.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming $P^2=P$ for any Hermitian operator.** It's specific to
 projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
 *extra* condition beyond Hermiticity.
@@ -233,14 +250,22 @@ projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
 
 ## Further Exploration
 
-Next: [Simultaneous Eigenstates and Compatible Observables](/lessons/quantum-mechanics/operators-observables-measurement/simultaneous-eigenstates-and-compatible-observables), using
-projectors to prove exactly when two observables can share a common
-eigenbasis, and why that's the same condition as their commutator
-vanishing.
+<ChallengePrompt prompt="A Hermitian operator on a 5-dimensional space has exactly two distinct eigenvalues. Using completeness (the projectors' dimensions must sum to 5), what are the possible dimension splits between the two eigenspaces?">
+  Same reasoning as the worked example's $N=\mathrm{diag}(1,1,2)$: each
+  eigenspace's dimension is at least 1, and the two dimensions must add
+  to the total, 5.
+</ChallengePrompt>
 
-For a fully rigorous treatment of this lesson's $A=\sum_i\lambda_iP_i$
-formula — proving it as an exact special case of the general
-projection-valued-measure spectral theorem, the version that also
-correctly covers operators like $\hat x$ with a continuous spectrum —
-see [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators)
-in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+<NextDiscovery>
+  Next: [Simultaneous Eigenstates and Compatible Observables](/lessons/quantum-mechanics/operators-observables-measurement/simultaneous-eigenstates-and-compatible-observables), using
+  projectors to prove exactly when two observables can share a common
+  eigenbasis, and why that's the same condition as their commutator
+  vanishing.
+
+  For a fully rigorous treatment of this lesson's $A=\sum_i\lambda_iP_i$
+  formula — proving it as an exact special case of the general
+  projection-valued-measure spectral theorem, the version that also
+  correctly covers operators like $\hat x$ with a continuous spectrum —
+  see [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators)
+  in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+</NextDiscovery>

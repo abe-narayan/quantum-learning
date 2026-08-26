@@ -37,6 +37,11 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Nine lessons of pure linear algebra, and not one prediction about a
+  real experiment yet. This lesson is where that changes.
+</LessonHook>
+
 ## Motivation
 
 Nine lessons of linear algebra have built unit vectors, inner products,
@@ -89,23 +94,49 @@ Write $A$'s spectral decomposition $A = \sum_i\lambda_i|e_i\rangle\langle
 e_i|$ (Hermitian Operators lesson). If the system is in state
 $|\psi\rangle$, the probability of measuring outcome $\lambda_i$ is:
 
+<EquationReveal
+  terms={[
+    { id: "P", symbol: "P(λᵢ)", gloss: "The probability of measuring outcome λᵢ — a number between 0 and 1." },
+    { id: "e", symbol: "⟨eᵢ|ψ⟩", gloss: "The overlap between the state ψ and the eigenvector eᵢ for outcome λᵢ — how much of ψ 'points along' that outcome." },
+    { id: "mod", symbol: "| · |²", gloss: "Squared modulus — the step that turns a complex amplitude into a real, non-negative probability." },
+  ]}
+>
 $$
 P(\lambda_i) = |\langle e_i|\psi\rangle|^2
 $$
+</EquationReveal>
 
 This is a genuine postulate: nothing in this course, or anywhere else in
 physics, derives it from more basic principles. But it isn't an arbitrary
 choice either, it's the *unique* rule consistent with everything already
 built. Expand $|\psi\rangle=\sum_i c_i|e_i\rangle$
 where $c_i=\langle e_i|\psi\rangle$ (the completeness relation, Bra-Ket
-Formalism lesson). Total probability had better sum to $1$; check it does:
+Formalism lesson). Total probability had better sum to $1$; check it does.
 
+<DerivationSteps>
+  <DerivationStep annotation="Write out the sum of Born-rule probabilities and unfold |cᵢ|² as ⟨ψ|eᵢ⟩⟨eᵢ|ψ⟩.">
 $$
-\sum_i P(\lambda_i) = \sum_i |c_i|^2 = \sum_i \langle\psi|e_i\rangle\langle e_i|\psi\rangle = \langle\psi|\Big(\sum_i|e_i\rangle\langle e_i|\Big)|\psi\rangle = \langle\psi|I|\psi\rangle = \langle\psi|\psi\rangle = 1
+\sum_i P(\lambda_i) = \sum_i |c_i|^2 = \sum_i \langle\psi|e_i\rangle\langle e_i|\psi\rangle
 $$
+  </DerivationStep>
+  <DerivationStep annotation="Factor ⟨ψ| and |ψ⟩ out of the sum, leaving exactly the completeness relation in the middle.">
+$$
+\sum_i \langle\psi|e_i\rangle\langle e_i|\psi\rangle = \langle\psi|\Big(\sum_i|e_i\rangle\langle e_i|\Big)|\psi\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="The completeness relation (Bra-Ket Formalism lesson) says this sum equals the identity operator I.">
+$$
+\langle\psi|\Big(\sum_i|e_i\rangle\langle e_i|\Big)|\psi\rangle = \langle\psi|I|\psi\rangle = \langle\psi|\psi\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Postulate 1 requires ‖ψ‖=1, i.e. ⟨ψ|ψ⟩=1 — total probability comes out exactly right.">
+$$
+\langle\psi|\psi\rangle = 1
+$$
+  </DerivationStep>
+</DerivationSteps>
 
-using the completeness relation again in the second-to-last step, and
-$\|\psi\|=1$ (Postulate 1) in the last. Normalization, orthonormal
+Normalization, orthonormal
 eigenbases, and the completeness relation all conspire to make this
 come out exactly right: a real consistency check, not a coincidence.
 
@@ -227,7 +258,7 @@ Both routes agree, as the general derivation above guarantees they must.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Using the amplitude directly instead of its squared modulus.**
 $P(\lambda_i)=|\langle e_i|\psi\rangle|^2$, not $\langle
 e_i|\psi\rangle$ itself. This has been the single most common error
@@ -275,9 +306,17 @@ superposition, not an overall phase on the whole state, is observable.
 
 ## Further Exploration
 
-This closes the course's core development. Next: [Mathematical
-Foundations Challenge](/lessons/quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge), a synthesis lesson connecting every tool built
-here across multiple lessons at once, before the Quantum Mechanics pillar
-continues into **From Classical to Quantum**, which turns this
-mathematics into the actual postulates, dynamics, and physical
-predictions of quantum mechanics.
+<ChallengePrompt prompt="The worked example's observable A had eigenvalues ±1 and gave ⟨A⟩=-0.28. A different observable B has the same eigenvectors but eigenvalues ±2. What is ⟨B⟩ for the same state?">
+  Recompute directly from $\langle B\rangle=\sum_i\lambda_iP(\lambda_i)$
+  using $B$'s eigenvalues — the probabilities $P(+1),P(-1)$ haven't
+  changed since $B$ shares $A$'s eigenvectors.
+</ChallengePrompt>
+
+<NextDiscovery>
+  This closes the course's core development. Next: [Mathematical
+  Foundations Challenge](/lessons/quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge), a synthesis lesson connecting every tool built
+  here across multiple lessons at once, before the Quantum Mechanics pillar
+  continues into **From Classical to Quantum**, which turns this
+  mathematics into the actual postulates, dynamics, and physical
+  predictions of quantum mechanics.
+</NextDiscovery>

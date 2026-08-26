@@ -6,7 +6,7 @@ export const whyPPDiverges: ConceptualProblem = {
     title: "Why ⟨p|p⟩ Diverges, and Why That's Not a Problem",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["rigged-hilbert-space", "momentum-eigenstates", "conceptual"],

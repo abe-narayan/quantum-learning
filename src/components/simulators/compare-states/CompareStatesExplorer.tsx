@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { KatexMath } from "@/components/ui/KatexMath";
 import { BarChart, type BarChartEntry } from "@/components/visualizations/BarChart";
@@ -12,6 +11,9 @@ import { formatAmplitudeLatex } from "@/lib/quantum/format";
 import { BlochSphereCanvas } from "../bloch-sphere/BlochSphereCanvas";
 import { STATE_PRESETS } from "../bloch-sphere/presets";
 import { ComplexPlaneCanvas } from "../complex-amplitude-explorer/ComplexPlaneCanvas";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
+import { SimulatorSlider } from "../shared/controls";
 
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
@@ -130,17 +132,20 @@ export function CompareStatesExplorer() {
   ];
 
   return (
-    <div className="not-prose rounded-3xl border border-border bg-surface p-4 sm:p-6">
-      <Badge tone="brand" className="mb-1.5">
-        What we&rsquo;re studying
-      </Badge>
-      <p className="text-sm text-muted-foreground">
-        The same qubit state, shown three honest ways — a point on a sphere, a point in the
-        complex plane, and two probabilities. Changing the state moves all three together,
-        because they&rsquo;re the same number.
-      </p>
-
-      <div className="mt-6 flex justify-end">
+    <SimulatorInstrument
+      label="Cross-simulator comparison"
+      footnote="The same qubit state, shown three honest ways — changing it moves all three together, because they're the same number."
+      // `@container`: the three-panel comparison below queries this stage's
+      // own rendered width (see the `@[44rem]:` grid a few lines down), not
+      // the viewport — this stage has no controls rail (this simulator has
+      // no `controls` prop at all), so it always gets the instrument's full
+      // width, but that width still varies a lot: full lesson reading column
+      // on desktop, ~280px at a 320px viewport. A `lg:` viewport breakpoint
+      // can't see that difference.
+      stageClassName="@container"
+      stage={
+        <>
+      <div className="flex justify-end">
         <Button size="sm" variant="secondary" onClick={handleCopyLink} aria-live="polite">
           {copied ? "Copied!" : "Copy link"}
         </Button>
@@ -157,23 +162,40 @@ export function CompareStatesExplorer() {
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:gap-6">
-        <AngleSlider
+        <SimulatorSlider
           label="θ (polar angle)"
           value={angles.theta}
           min={0}
           max={Math.PI}
+          step={0.005}
+          formatValue={(v) => `${Math.round((v * 180) / Math.PI)}°`}
+          valueText={(v) => `${Math.round((v * 180) / Math.PI)} degrees`}
           onChange={(theta) => setAngles({ theta, phi: angles.phi })}
         />
-        <AngleSlider
+        <SimulatorSlider
           label="φ (azimuthal angle)"
           value={angles.phi}
           min={0}
           max={2 * Math.PI}
+          step={0.005}
+          formatValue={(v) => `${Math.round((v * 180) / Math.PI)}°`}
+          valueText={(v) => `${Math.round((v * 180) / Math.PI)} degrees`}
           onChange={(phi) => setAngles({ theta: angles.theta, phi })}
         />
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-3">
+      {/* Container query, not viewport: three ~200px-minimum panels need
+          about 700px of actual stage width to read well, which a wide
+          desktop *viewport* does not guarantee when this simulator is
+          embedded in a lesson's reading column (that column can be
+          narrower than this threshold even past the 1024px viewport
+          breakpoint `lg:` used to key off, and can just as easily be wide
+          enough well below it). This was very likely why this simulator —
+          alone among the 14 — had zero lesson embeds: authors who tried it
+          in-lesson would have hit three panels crammed into a ~350px
+          column, at desktop viewport widths where nothing looked wrong on
+          `/simulators` itself. */}
+      <div className="mt-8 grid gap-8 @[44rem]:grid-cols-3">
         <div className="flex flex-col items-center">
           <h3 className="text-sm font-semibold text-foreground">Bloch sphere</h3>
           <div className="mt-3 w-full max-w-[220px]">
@@ -212,14 +234,14 @@ export function CompareStatesExplorer() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl border border-accent/30 bg-accent/5 p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-accent">Try this</p>
-        <p className="mt-1.5 text-sm text-foreground">
-          Set the state to |+⟩ and notice: on the Bloch sphere it sits on the equator; in the
-          complex plane both amplitudes point along the real axis; the bar chart shows 50/50.
-        </p>
-      </div>
-    </div>
+      <SimulatorFraming
+        shows="One state, θ and φ, driving three different pictures of the same number at once — a point on a sphere, two points in the complex plane, and a pair of bar heights."
+        watchFor="Nothing here is three separate simulators kept in sync by hand — moving either slider recomputes all three views from the same StateVector, so they can never disagree with each other."
+        tryThis="Set the state to |+⟩ and notice: on the Bloch sphere it sits on the equator; in the complex plane both amplitudes point along the real axis; the bar chart shows 50/50."
+      />
+        </>
+      }
+    />
   );
 }
 
@@ -232,40 +254,4 @@ function normalizePhi(phi: number): number {
   if (normalized > Math.PI) normalized -= 2 * Math.PI;
   if (normalized < -Math.PI) normalized += 2 * Math.PI;
   return normalized;
-}
-
-function AngleSlider({
-  label,
-  value,
-  min,
-  max,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  onChange: (value: number) => void;
-}) {
-  const id = useId();
-  const degrees = Math.round((value * 180) / Math.PI);
-
-  return (
-    <label htmlFor={id} className="block">
-      <div className="flex items-baseline justify-between">
-        <span className="text-sm text-foreground">{label}</span>
-        <span className="font-mono text-xs text-muted-foreground">{degrees}°</span>
-      </div>
-      <input
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={0.005}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className="mt-2 w-full accent-[var(--brand)]"
-      />
-    </label>
-  );
 }

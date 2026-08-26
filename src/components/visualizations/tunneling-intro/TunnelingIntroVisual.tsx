@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { buildTunnelingTrajectory, TOTAL_FRAMES } from "./tunnelingTrajectory";
 import { TunnelingIntroCanvas } from "./TunnelingIntroCanvas";
 
@@ -67,17 +67,6 @@ export function TunnelingIntroVisual() {
     };
   }, [isPlaying, prefersReducedMotion]);
 
-  // Stop the interval the instant the last frame is reached, rather than
-  // waiting for the next tick to notice — avoids one extra redundant timer
-  // firing after the animation has visibly finished.
-  useEffect(() => {
-    if (frameIndex >= TOTAL_FRAMES && intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-      setIsPlaying(false);
-    }
-  }, [frameIndex]);
-
   function handleReplay() {
     setFrameIndex(0);
     setIsPlaying(true);
@@ -88,7 +77,7 @@ export function TunnelingIntroVisual() {
   const hasFinished = frameIndex >= TOTAL_FRAMES;
 
   return (
-    <div className="not-prose rounded-2xl border border-border bg-surface p-5">
+    <div className="not-prose panel p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <Badge tone="brand">What we&rsquo;re watching</Badge>
         {prefersReducedMotion ? (
@@ -100,7 +89,7 @@ export function TunnelingIntroVisual() {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border bg-surface-muted/40 p-3">
+      <div className="overflow-hidden panel-inset p-3">
         <TunnelingIntroCanvas
           grid={trajectory.grid}
           frame={frame}

@@ -47,7 +47,7 @@ export function StaticCircuitDiagram({
   const height = numQubits * ROW_HEIGHT;
 
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={ariaLabel ?? "Circuit diagram"} className="min-w-full">
         {Array.from({ length: numQubits }, (_, q) => (
           <g key={`wire-${q}`}>

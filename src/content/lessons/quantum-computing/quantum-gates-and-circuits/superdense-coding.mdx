@@ -89,6 +89,10 @@ export const superdenseFrames = [
   },
 ];
 
+<LessonHook eyebrow="The same circuit, run in reverse">
+One qubit carrying two classical bits sounds like it should be impossible — and it would be, if not for a pre-shared entangled pair doing part of the work in advance.
+</LessonHook>
+
 ## Motivation
 
 Quantum Teleportation moved an unknown qubit state from Alice to Bob using
@@ -97,9 +101,7 @@ classical bits. This lesson runs almost the same circuit in the opposite
 direction, for the opposite purpose: instead of moving an unknown *quantum*
 state using entanglement plus two classical bits, Alice sends two
 *classical* bits Bob can recover exactly, by physically transmitting only
-one qubit. One qubit carrying two bits sounds like it should be impossible,
-and it would be, if not for a pre-shared entangled pair doing part of the
-work in advance.
+one qubit.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/3d/NIST_Physicists_Boost_Entanglement_of_Atom_Pairs_%285940505535%29.jpg"
@@ -262,6 +264,10 @@ buys is timing: the entanglement-distributing qubit can be sent long
 before Alice knows what she wants to say, so *at the moment of the
 message* only one additional qubit needs to move.
 
+<InsightBlock>
+What superdense coding actually buys is timing: the entanglement-distributing qubit can be sent long before Alice knows what she wants to say, so at the moment of the message only one additional qubit needs to move.
+</InsightBlock>
+
 ## Worked Example
 
 **Verify the $11$ row by hand: show that applying $Z$ then $X$ to Alice's
@@ -292,13 +298,13 @@ $11$ with certainty, up to the unobservable overall minus sign.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **"Alice sends two qubits."** She sends exactly one: her own half of the
 pre-shared pair, after applying one of four single-qubit gates to it. Bob's
 qubit never travels; it was already in his possession.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **"This violates the Holevo bound, or lets Alice signal Bob
 instantaneously."** Neither. Holevo's bound is respected once the
 Bell-pair-distributing qubit is counted alongside Alice's message qubit,
@@ -307,7 +313,7 @@ message qubit still has to physically travel from Alice to Bob at ordinary
 speed; nothing about entanglement changes that.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **"Bob can decode by measuring his qubit alone, without waiting for
 Alice's."** Before Alice's qubit arrives, Bob holds only half of an
 entangled pair; measuring it alone gives a uniformly random bit no matter
@@ -359,6 +365,7 @@ together for the joint decode circuit.
 
 ## Further Exploration
 
+<NextDiscovery>
 A related protocol built from the same toolkit, single-qubit gates and
 measurement, but with no shared entanglement at all, is [BB84: Quantum
 Key Distribution](/lessons/quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution): where superdense coding uses one entangled pair to
@@ -369,3 +376,4 @@ anyone trying to read their qubits in transit.
 This protocol is re-derived in the density-matrix/channel formalism,
 including an exact, computed success-probability formula for a dephased
 shared Bell pair, in [Rigorous Teleportation and Superdense Coding](/lessons/quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding).
+</NextDiscovery>

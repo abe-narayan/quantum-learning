@@ -1,4 +1,5 @@
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
+import { ControlSection } from "../shared/controls";
 
 const N_PRESETS = [15, 21, 35];
 const X_BITS_OPTIONS = [4, 5, 6, 7];
@@ -39,27 +40,24 @@ export function PeriodFindingControls({
 }) {
   return (
     <div className="space-y-8">
-      <section aria-labelledby="pf-n-heading">
-        <h3 id="pf-n-heading" className="text-sm font-semibold text-foreground">
-          N (number to factor)
-        </h3>
+      <ControlSection id="pf-n" title="N (number to factor)" description="Changing N picks a fresh set of valid bases a.">
         <PresetToggle
           options={N_TOGGLE_OPTIONS}
           index={N_TOGGLE_OPTIONS.findIndex((o) => o.n === N)}
           onChange={(i) => onNChange(N_TOGGLE_OPTIONS[i].n)}
           ariaLabel="N"
         />
-        <p className="mt-1 text-xs text-muted-foreground">Changing N picks a fresh set of valid bases a.</p>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="pf-a-heading">
-        <h3 id="pf-a-heading" className="text-sm font-semibold text-foreground">
-          a (coprime to N)
-        </h3>
+      <ControlSection
+        id="pf-a"
+        title="a (coprime to N)"
+        description="Every listed value satisfies gcd(a, N) = 1, computed directly, not curated by hand."
+      >
         <select
           value={a}
           onChange={(e) => onAChange(Number(e.target.value))}
-          className="mt-3 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {validBases.map((base) => (
             <option key={base} value={base}>
@@ -67,25 +65,20 @@ export function PeriodFindingControls({
             </option>
           ))}
         </select>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Every listed value satisfies gcd(a, N) = 1, computed directly, not curated by hand.
-        </p>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="pf-t-heading">
-        <h3 id="pf-t-heading" className="text-sm font-semibold text-foreground">
-          Counting qubits t
-        </h3>
+      <ControlSection
+        id="pf-t"
+        title="Counting qubits t"
+        description="2^t outcomes in the counting register. More qubits sharpen the peaks but slow the computation down."
+      >
         <PresetToggle
           options={X_BITS_TOGGLE_OPTIONS}
           index={X_BITS_TOGGLE_OPTIONS.findIndex((o) => o.bits === xBits)}
           onChange={(i) => onXBitsChange(X_BITS_TOGGLE_OPTIONS[i].bits)}
           ariaLabel="Counting qubits"
         />
-        <p className="mt-1 text-xs text-muted-foreground">
-          2^t outcomes in the counting register. More qubits sharpen the peaks but slow the computation down.
-        </p>
-      </section>
+      </ControlSection>
     </div>
   );
 }

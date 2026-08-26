@@ -161,7 +161,7 @@ export function PathPhasorSum({
     `the resultant arrow carries ${amplitudePct} percent of the maximum possible amplitude — ${interferenceLabel} interference.`;
 
   return (
-    <div className={cn("not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4", className)}>
+    <div className={cn("not-prose space-y-4 panel-inset p-4", className)}>
       <div className="grid gap-4 sm:grid-cols-2" role="img" aria-label={ariaLabel}>
         <div>
           <p className="mb-1 text-center text-xs font-medium text-muted-foreground">Sample paths (colored by phase)</p>

@@ -30,7 +30,7 @@ export function LogicalQubitPatchDiagram({ ariaLabel }: { ariaLabel: string }) {
   );
 
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
         <text x={WIDTH / 2} y={18} textAnchor="middle" className="fill-muted-foreground text-[11px] font-mono">
           surface-code-style patch: many physical qubits make one logical qubit

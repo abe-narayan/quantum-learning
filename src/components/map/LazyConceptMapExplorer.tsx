@@ -7,11 +7,11 @@ const ConceptMapExplorer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div
-        className="not-prose flex h-[420px] items-center justify-center rounded-2xl border border-border bg-surface sm:h-[560px]"
-        aria-hidden="true"
-      >
-        <span className="text-sm text-muted-foreground">Loading concept map…</span>
+      <div className="not-prose grid gap-4 lg:grid-cols-[1fr_360px]" aria-hidden="true">
+        <div className="instrument flex h-[420px] items-center justify-center overflow-hidden sm:h-[560px]">
+          <span className="tech-label">Loading concept map…</span>
+        </div>
+        <div className="instrument hidden overflow-hidden lg:block lg:max-h-[652px]" />
       </div>
     ),
   }

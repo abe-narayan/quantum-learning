@@ -6,7 +6,7 @@ export const qspD1PhaseSumRealPart: NumericProblem = {
     title: "QSP Degree-1 Closed Form: Real Part of P(x)",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/quantum-signal-processing",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["quantum-signal-processing", "phase-sequence"],

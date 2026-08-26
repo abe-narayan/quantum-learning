@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { SimulatorErrorBoundary } from "@/components/simulators/SimulatorErrorBoundary";
 import { SimulatorSkeleton } from "@/components/simulators/SimulatorSkeleton";
+import { useDeferredMount } from "@/components/motion/useDeferredMount";
 import type { PresetId } from "./presets";
 
 const WavefunctionExplorer = dynamic(
@@ -13,6 +14,9 @@ const WavefunctionExplorer = dynamic(
   }
 );
 
+/** Visibility-gated so this embed's chunk doesn't fetch until it's actually
+ *  near-viewport — see `LazyBlochSphereExplorer`'s doc comment for why this
+ *  matters on a lesson page carrying several simulator embeds. */
 export function LazyWavefunctionExplorer({
   initialPresetId,
   showMeanSpreadOverlay,
@@ -21,9 +25,17 @@ export function LazyWavefunctionExplorer({
   /** Forwarded to WavefunctionCanvas — draws ⟨x⟩ and Δx on the density plot. */
   showMeanSpreadOverlay?: boolean;
 } = {}) {
+  const { ref, ready } = useDeferredMount<HTMLDivElement>();
+
   return (
-    <SimulatorErrorBoundary>
-      <WavefunctionExplorer initialPresetId={initialPresetId} showMeanSpreadOverlay={showMeanSpreadOverlay} />
-    </SimulatorErrorBoundary>
+    <div ref={ref}>
+      <SimulatorErrorBoundary>
+        {ready ? (
+          <WavefunctionExplorer initialPresetId={initialPresetId} showMeanSpreadOverlay={showMeanSpreadOverlay} />
+        ) : (
+          <SimulatorSkeleton variant="standard" />
+        )}
+      </SimulatorErrorBoundary>
+    </div>
   );
 }

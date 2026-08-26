@@ -120,7 +120,7 @@ export function DecayCurve({
           </text>
         </g>
       ))}
-      <path d={path} fill="none" className="stroke-brand" strokeWidth={2} />
+      <path d={path} fill="none" className="stroke-pillar" strokeWidth={2} />
       <line x1={markerPos.x} y1={PAD_TOP} x2={markerPos.x} y2={HEIGHT - PAD_BOTTOM} className="stroke-accent" strokeWidth={1.5} strokeDasharray="3 2" />
       <circle cx={markerPos.x} cy={markerPos.y} r={4} className="fill-accent" />
       <text x={WIDTH - 4} y={HEIGHT - 4} textAnchor="end" className="fill-muted-foreground text-[9px] font-mono">

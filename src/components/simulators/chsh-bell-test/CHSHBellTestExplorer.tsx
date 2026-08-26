@@ -11,10 +11,13 @@ import {
   CHSH_QUANTUM_BOUND,
 } from "@/lib/quantum/chsh";
 import { KatexMath } from "@/components/ui/KatexMath";
+import { Readout } from "@/components/ui/Typography";
 import { cn } from "@/lib/utils";
 import { CHSHBellTestControls, type ChshAngles } from "./CHSHBellTestControls";
 import { CHSHComparisonPanel } from "./CHSHComparisonPanel";
-import { LabNotes } from "./LabNotes";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
+import { Predict } from "../shared/Predict";
 
 const SQRT1_2 = Math.SQRT1_2;
 
@@ -86,15 +89,21 @@ export function CHSHBellTestExplorer() {
   }, [rho, angles]);
 
   const exceedsClassical = Math.abs(sValue) > CHSH_CLASSICAL_BOUND + CLASSICAL_BOUND_EPSILON;
+  const isZeroPreset = anglesEqual(angles, ZERO_ANGLES);
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
-      <div className="space-y-6">
+    <SimulatorInstrument
+      label="CHSH Bell test — entangled pair"
+      readout={<Readout label="S" value={sValue.toFixed(3)} />}
+      footnote="S > 2 rules out every local hidden-variable theory; 2√2 ≈ 2.83 (Tsirelson's bound) is the quantum limit."
+      stageClassName="space-y-6"
+      stage={
+        <>
         <div
           aria-live="polite"
           className={cn(
             "rounded-xl border px-4 py-3 text-sm text-foreground",
-            exceedsClassical ? "border-accent/40 bg-accent/10" : "border-brand/25 bg-brand/5"
+            exceedsClassical ? "border-accent/40 bg-accent/10" : "border-pillar/25 bg-pillar/5"
           )}
         >
           {exceedsClassical ? (
@@ -130,7 +139,7 @@ export function CHSHBellTestExplorer() {
             onClick={() => setShowComparison((current) => !current)}
             aria-expanded={showComparison}
             aria-controls="chsh-comparison-panel"
-            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <span className="text-sm font-medium text-foreground">
               Compare: classical bound vs. your quantum result vs. Tsirelson&rsquo;s bound
@@ -144,36 +153,33 @@ export function CHSHBellTestExplorer() {
           )}
         </div>
 
-        <LabNotes
-          notes={[
-            {
-              label: "What we're studying",
-              content:
-                "Whether any theory where each particle secretly “knows” its measurement outcome in advance (local hidden variables) can match what entangled qubits actually do. It can't — and this experiment shows you the number that proves it.",
-            },
-            {
-              label: "Try this",
-              content:
-                "Start with all four angles at 0° and confirm S stays inside the classical bound. Then load the quantum-optimal preset and watch S climb past 2, toward 2√2 ≈ 2.83.",
-            },
-            {
-              label: "What to notice",
-              content:
-                "Every angle combination a real classical theory could ever produce is capped at S=2. Only genuine quantum correlations can cross that line.",
-            },
+        <Predict
+          question="Right now, at all-zero angles, S sits exactly at the classical limit of 2. If you move any angle away from zero — by hand or via the quantum-optimal preset — can S cross above 2?"
+          options={[
+            { id: "yes", label: "Yes — it can exceed 2" },
+            { id: "no", label: "No — 2 is a hard ceiling" },
           ]}
+          outcomeId={isZeroPreset ? null : exceedsClassical ? "yes" : "no"}
         />
-      </div>
 
-      <CHSHBellTestControls
-        angles={angles}
-        onAnglesChange={setAngles}
-        onApplyZeroPreset={() => setAngles(ZERO_ANGLES)}
-        onApplyOptimalPreset={() => setAngles(OPTIMAL_ANGLES)}
-        isZeroPreset={anglesEqual(angles, ZERO_ANGLES)}
-        isOptimalPreset={anglesEqual(angles, OPTIMAL_ANGLES)}
-      />
-    </div>
+        <SimulatorFraming
+          shows="Whether any theory where each particle secretly “knows” its measurement outcome in advance (local hidden variables) can match what entangled qubits actually do. It can't — and this experiment shows you the number that proves it."
+          watchFor="Every angle combination a real classical theory could ever produce is capped at S=2. Only genuine quantum correlations can cross that line."
+          tryThis="Start with all four angles at 0° and confirm S stays inside the classical bound. Then load the quantum-optimal preset and watch S climb past 2, toward 2√2 ≈ 2.83."
+        />
+        </>
+      }
+      controls={
+        <CHSHBellTestControls
+          angles={angles}
+          onAnglesChange={setAngles}
+          onApplyZeroPreset={() => setAngles(ZERO_ANGLES)}
+          onApplyOptimalPreset={() => setAngles(OPTIMAL_ANGLES)}
+          isZeroPreset={anglesEqual(angles, ZERO_ANGLES)}
+          isOptimalPreset={anglesEqual(angles, OPTIMAL_ANGLES)}
+        />
+      }
+    />
   );
 }
 
@@ -206,7 +212,7 @@ function CHSHGauge({ sValue }: { sValue: number }) {
         <div
           className={cn(
             "absolute inset-y-0 rounded-full transition-[left,width] duration-200 ease-out motion-reduce:transition-none",
-            exceeds ? "bg-accent" : "bg-brand"
+            exceeds ? "bg-accent" : "bg-pillar"
           )}
           style={{ left: `${fillLeft}%`, width: `${fillWidth}%` }}
           aria-hidden="true"

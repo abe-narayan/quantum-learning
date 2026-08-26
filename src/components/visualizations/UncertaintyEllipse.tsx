@@ -87,7 +87,7 @@ export function UncertaintyEllipse({
   const product = frame.deltaX * frame.deltaP;
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
           <g className="stroke-border" strokeWidth={1}>

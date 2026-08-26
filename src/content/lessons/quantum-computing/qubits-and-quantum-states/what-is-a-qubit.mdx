@@ -25,6 +25,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+A qubit doesn't have a definite value sitting in reserve before you measure it — it can be in an actual combination of "0" and "1" at once, a precise mathematical fact about the system, not a polite way of saying "we don't know which one it is yet."
+</LessonHook>
+
 ## Motivation
 
 Right now, every bit in your phone or laptop has a definite value. Nobody
@@ -35,11 +39,8 @@ assumption at all.
 
 Shrink the question down to a single electron and the assumption breaks.
 Physicists studying things like an electron's spin or a photon's
-polarization found that these systems don't have a definite value sitting
-in reserve before you measure them. Instead they can be in an actual
-combination of "0" and "1" at once, a precise mathematical fact about the
-system rather than a polite way of saying "we don't know which one it is
-yet." A qubit is the unit of information built to describe exactly that.
+polarization found exactly that. A qubit is the unit of information
+built to describe it.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
@@ -76,9 +77,19 @@ written $|0\rangle$ and $|1\rangle$, corresponding to the classical bit
 values 0 and 1. A general qubit state $|\psi\rangle$ is a linear combination
 of these two:
 
+<EquationReveal
+  terms={[
+    { id: "psi", symbol: "|ψ⟩", gloss: "The qubit's state — everything there is to know about it." },
+    { id: "alpha", symbol: "α", gloss: "The amplitude on |0⟩ — a complex number, not a probability itself." },
+    { id: "zero", symbol: "|0⟩", gloss: "The basis state corresponding to the classical bit value 0." },
+    { id: "beta", symbol: "β", gloss: "The amplitude on |1⟩ — a complex number, not a probability itself." },
+    { id: "one", symbol: "|1⟩", gloss: "The basis state corresponding to the classical bit value 1." },
+  ]}
+>
 $$
 |\psi\rangle = \alpha|0\rangle + \beta|1\rangle
 $$
+</EquationReveal>
 
 where $\alpha$ and $\beta$ are complex numbers called **amplitudes**. For
 this to describe a physically valid state, the amplitudes must satisfy the
@@ -146,17 +157,18 @@ $$
 |\psi\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle
 $$
 
-**Check normalization:**
-
+<DerivationSteps>
+  <DerivationStep annotation="Both amplitudes are 1/√2, so squaring each and adding must give 1 for this to be a valid state.">
 $$
 \left|\frac{1}{\sqrt{2}}\right|^2 + \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2} + \frac{1}{2} = 1 \checkmark
 $$
-
-**Measurement probabilities:**
-
+  </DerivationStep>
+  <DerivationStep annotation="The Born rule turns each amplitude into a measurement probability by squaring its size.">
 $$
 P(0) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}, \qquad P(1) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 So this qubit, when measured, gives 0 or 1 with equal 50% probability: an
 **equal superposition**. This is exactly the state a Hadamard gate produces
@@ -164,7 +176,7 @@ from $|0\rangle$, which you'll meet in the next course.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to square the amplitude.** The probability of an outcome is
 $|\alpha|^2$, not $\alpha$ itself. For a real amplitude like $-\tfrac{1}{\sqrt2}$,
 the probability is still a positive $\tfrac12$. The sign disappears once you
@@ -172,7 +184,7 @@ square it, but it isn't irrelevant: it affects how this state interferes with
 others later on.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating superposition as "50/50 either way."** The coefficients don't have
 to be equal. $|\psi\rangle = 0.6|0\rangle + 0.8i|1\rangle$ is a valid,
 normalized qubit state ($0.6^2 + 0.8^2 = 1$) with a 36% chance of measuring 0
@@ -201,9 +213,11 @@ and a 64% chance of measuring 1.
 
 ## Further Exploration
 
+<NextDiscovery>
 We've been using $\alpha$ and $\beta$ as complex numbers without really using
 their complex structure yet: every example above could have used real
 numbers. That changes fast. Next in this course: [Complex Numbers for
 Quantum Mechanics](/lessons/quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics), which builds the machinery (polar form, Euler's
 formula) that phases like $e^{i\varphi}$ on the Bloch sphere actually need,
 followed by [Dirac Notation](/lessons/quantum-computing/qubits-and-quantum-states/dirac-notation), which makes the bra-ket formalism precise.
+</NextDiscovery>

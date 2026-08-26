@@ -11,7 +11,7 @@ export const freeParticleGreensFunctionMagnitude: NumericProblem = {
     title: "Magnitude of the Free-Particle Green's Function",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["greens-functions", "resolvent", "free-particle"],

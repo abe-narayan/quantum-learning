@@ -24,6 +24,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  A real bug found during this platform's own development: a simulated
+  state's norm held at exactly 1.0000 while its energy was wrong by
+  thousands of percent. Norm conservation and accuracy are not the same
+  guarantee.
+</LessonHook>
+
 ## Motivation
 
 Every numerical claim this course has made (norm staying at 1.0000,
@@ -60,22 +67,25 @@ method.
 
 For two operators $A,B$ that don't commute, compare
 $e^{(A+B)\Delta t}$ to $e^{A\Delta t}e^{B\Delta t}$ by Taylor-expanding
-both to second order in $\Delta t$:
+both to second order in $\Delta t$.
 
+<DerivationSteps>
+  <DerivationStep annotation="Taylor-expand the true, unsplit exponential to second order in Δt.">
 $$
-e^{(A+B)\Delta t} = I + (A+B)\Delta t + \frac{(A+B)^2}{2}\Delta t^2 + \cdots = I+(A+B)\Delta t+\frac{A^2+AB+BA+B^2}{2}\Delta t^2+\cdots
+e^{(A+B)\Delta t} = I+(A+B)\Delta t+\frac{A^2+AB+BA+B^2}{2}\Delta t^2+\cdots
 $$
-
+  </DerivationStep>
+  <DerivationStep annotation="Separately Taylor-expand each factor of the split product, then multiply the two series together and collect terms to second order.">
 $$
 e^{A\Delta t}e^{B\Delta t} = \left(I+A\Delta t+\frac{A^2}{2}\Delta t^2\right)\left(I+B\Delta t+\frac{B^2}{2}\Delta t^2\right) = I+(A+B)\Delta t+\frac{A^2+2AB+B^2}{2}\Delta t^2+\cdots
 $$
-
-Subtracting, the two expressions agree exactly through order
-$\Delta t^1$, and differ at order $\Delta t^2$ by
-
+  </DerivationStep>
+  <DerivationStep annotation="Subtract the two expressions: they agree exactly through order Δt¹, and differ at order Δt² by exactly the commutator, since AB and BA don't cancel unless they're equal.">
 $$
 \frac{AB-BA}{2}\Delta t^2 = \frac{[A,B]}{2}\Delta t^2
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 **The leading error is proportional to the commutator.** If $\hat T$ and
 $\hat V$ commuted, the split would be exact at every order. They don't
@@ -127,6 +137,17 @@ derived).
 
 ### Norm-preserving is not the same as accurate
 
+<PredictBeforeReveal
+  question="The split-operator method is unconditionally norm-preserving, exactly, for any time step Δt. Does that guarantee the energy expectation value ⟨H⟩ it computes is also accurate?"
+  options={[
+    { label: "Yes — exact norm implies accurate energy too", value: "implies" },
+    { label: "No — norm and accuracy are separate guarantees", value: "separate" },
+    { label: "Only for the infinite well specifically", value: "well-only" },
+  ]}
+  correctValue="separate"
+  explanation="No. Norm conservation comes from every factor in the split being a pure phase, which is true regardless of Δt. Accuracy comes from the commutator error derived above, which shrinks only as Δt shrinks. The two are independent guarantees — a real numerical issue in this platform's own development (below) hit exactly this gap: norm held at 1.0000 while energy drifted by thousands of percent."
+/>
+
 This distinction matters enough that this platform's own development
 surfaced it directly: a numerical experiment with the infinite well's
 tall-but-finite wall used a wall height and time step whose product was
@@ -171,7 +192,7 @@ substantial win for a $10\times$ smaller time step.)
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming norm conservation proves accuracy.** It doesn't. This
 lesson's own worked example (the infinite-well energy blowup) is a
 concrete, real case where norm was exact to 8 decimal places while energy
@@ -179,7 +200,7 @@ was off by a factor of 30. Different quantities can be sensitive to
 different kinds of numerical error.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking a smaller $\Delta t$ is "free."** It's more accurate per
 simulated time unit, but costs proportionally more computation to reach
 the same total time. The platform's presets balance this deliberately
@@ -217,11 +238,18 @@ for smooth, responsive animation.
 
 ## Further Exploration
 
-Next: the [Wave Mechanics Challenge](/lessons/quantum-mechanics/wave-mechanics/wave-mechanics-challenge), synthesizing every idea from this
-course, the wavefunction, momentum space, the Schrödinger equation, and
-the concrete solvable systems, into a single set of capstone questions.
+<ChallengePrompt prompt="The naive split has O(Δt²) error per step; the symmetric split has O(Δt³). For a fixed total simulated time T split into N steps (Δt=T/N), how does each method's total ACCUMULATED error scale with N?">
+  Total error ≈ $N\times$(per-step error). Substitute $\Delta t=T/N$
+  into each per-step scaling and simplify.
+</ChallengePrompt>
 
-The [full Wavefunction Explorer](/simulators#wavefunction-explorer) lets
-you flip between every preset's comparison panel, each built with its own
-$\Delta t$ and wall height tuned by exactly the commutator-error argument
-above, and watch the energy readout hold steady across all of them.
+<NextDiscovery>
+  Next: the [Wave Mechanics Challenge](/lessons/quantum-mechanics/wave-mechanics/wave-mechanics-challenge), synthesizing every idea from this
+  course, the wavefunction, momentum space, the Schrödinger equation, and
+  the concrete solvable systems, into a single set of capstone questions.
+
+  The [full Wavefunction Explorer](/simulators#wavefunction-explorer) lets
+  you flip between every preset's comparison panel, each built with its own
+  $\Delta t$ and wall height tuned by exactly the commutator-error argument
+  above, and watch the energy readout hold steady across all of them.
+</NextDiscovery>

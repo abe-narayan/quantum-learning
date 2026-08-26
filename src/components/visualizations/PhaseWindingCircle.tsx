@@ -96,7 +96,7 @@ export function PhaseWindingCircle({ ariaLabel }: { ariaLabel: string }) {
         : "Full lap complete: the marker does not return to the start point.";
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={VIEW} height={VIEW} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img" aria-label={ariaLabel}>
           <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" className="stroke-border" strokeWidth={1} strokeDasharray="2 3" />

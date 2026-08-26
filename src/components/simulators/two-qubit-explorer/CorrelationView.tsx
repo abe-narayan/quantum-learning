@@ -8,7 +8,7 @@ function Cell({ value }: { value: number }) {
       <span
         className="inline-block rounded-md px-2 py-0.5 font-mono text-xs"
         style={{
-          backgroundColor: `color-mix(in srgb, var(--brand) ${percent}%, transparent)`,
+          backgroundColor: `color-mix(in srgb, var(--pillar-accent) ${percent}%, transparent)`,
           color: percent > 45 ? "var(--brand-foreground)" : "var(--foreground)",
         }}
       >

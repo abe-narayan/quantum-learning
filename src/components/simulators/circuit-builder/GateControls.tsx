@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
 import { SINGLE_QUBIT_GATE_OPTIONS, TWO_QUBIT_GATE_OPTIONS } from "./gateDefinitions";
 import type { SingleQubitGateName, TwoQubitGateName } from "@/lib/quantum/circuitBuilder";
+import { ControlSection, PillGroup } from "../shared/controls";
 
 export function GateControls({
   disabled,
@@ -40,71 +40,42 @@ export function GateControls({
 
   return (
     <div className="space-y-8">
-      <section aria-labelledby="qubit-count-heading">
-        <h3 id="qubit-count-heading" className="text-sm font-semibold text-foreground">
-          Qubits
-        </h3>
-        <div role="radiogroup" aria-label="Number of qubits" className="mt-3 flex overflow-hidden rounded-full border border-border">
-          {[2, 3].map((n) => (
-            <button
-              key={n}
-              type="button"
-              role="radio"
-              aria-checked={numQubits === n}
-              disabled={disabled}
-              onClick={() => onNumQubitsChange(n)}
-              className={cn(
-                "flex-1 px-3 py-1.5 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
-                numQubits === n ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted"
-              )}
-            >
-              {n} qubits
-            </button>
-          ))}
-        </div>
-        <p className="mt-1 text-xs text-muted-foreground">Changing this clears the circuit.</p>
-      </section>
+      <ControlSection id="qubit-count" title="Qubits" description="Changing this clears the circuit.">
+        <PillGroup
+          label="Number of qubits"
+          value={String(numQubits)}
+          disabled={disabled}
+          options={[2, 3].map((n) => ({ id: String(n), label: `${n} qubits` }))}
+          onChange={(id) => onNumQubitsChange(Number(id))}
+        />
+      </ControlSection>
 
-      <section aria-labelledby="single-gate-heading">
-        <div className="flex items-center justify-between">
-          <h3 id="single-gate-heading" className="text-sm font-semibold text-foreground">
-            Single-qubit gate
-          </h3>
-          <div role="radiogroup" aria-label="Target qubit" className="flex overflow-hidden rounded-full border border-border">
-            {qubitIds.map((q) => (
-              <button
-                key={q}
-                type="button"
-                role="radio"
-                aria-checked={targetQubit === q}
-                disabled={disabled}
-                onClick={() => onTargetQubitChange(q)}
-                className={cn(
-                  "px-2.5 py-1 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
-                  targetQubit === q ? "bg-brand text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted"
-                )}
-              >
-                q{q}
-              </button>
-            ))}
-          </div>
+      <ControlSection id="single-gate" title="Single-qubit gate">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">Applies to the selected target</span>
+          <PillGroup
+            label="Target qubit"
+            value={String(targetQubit)}
+            disabled={disabled}
+            options={qubitIds.map((q) => ({ id: String(q), label: `q${q}` }))}
+            onChange={(id) => onTargetQubitChange(Number(id))}
+          />
         </div>
-        <div className="mt-3 grid grid-cols-6 gap-2">
+        {/* `@sm:` — container query on the controls rail's own box, not the
+            viewport; see SimulatorInstrument.tsx. */}
+        <div className="mt-3 grid grid-cols-4 gap-2 @sm:grid-cols-6">
           {SINGLE_QUBIT_GATE_OPTIONS.map((gate) => (
-            <button
+            <Button
               key={gate.id}
-              type="button"
+              variant="secondary"
+              size="sm"
               disabled={disabled}
               title={gate.explanation}
               onClick={() => onApplySingleQubitGate(gate.id, targetQubit)}
-              className={cn(
-                "flex h-10 items-center justify-center rounded-lg border border-border bg-surface text-sm font-semibold text-foreground transition-colors",
-                "hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
-                "disabled:pointer-events-none disabled:opacity-50"
-              )}
+              className="h-10"
             >
               {gate.label}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="mt-3 flex items-center gap-2">
@@ -119,20 +90,17 @@ export function GateControls({
           </Button>
           <p className="text-xs text-muted-foreground">Adds a measurement marker to the diagram.</p>
         </div>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="two-gate-heading">
-        <h3 id="two-gate-heading" className="text-sm font-semibold text-foreground">
-          Two-qubit gate
-        </h3>
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+      <ControlSection id="two-gate" title="Two-qubit gate">
+        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <label className="flex items-center gap-1.5">
             Control
             <select
               value={controlQubit}
               disabled={disabled}
               onChange={(e) => onControlQubitChange(Number(e.target.value))}
-              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {qubitIds.map((q) => (
                 <option key={q} value={q}>
@@ -147,7 +115,7 @@ export function GateControls({
               value={twoQubitTarget}
               disabled={disabled}
               onChange={(e) => onTwoQubitTargetChange(Number(e.target.value))}
-              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {qubitIds.map((q) => (
                 <option key={q} value={q}>
@@ -174,9 +142,12 @@ export function GateControls({
         {controlQubit === twoQubitTarget && (
           <p className="mt-1 text-xs text-warning">Control and target must be different qubits.</p>
         )}
-      </section>
+      </ControlSection>
 
       <section aria-labelledby="edit-heading" className="flex flex-wrap gap-2">
+        <h3 id="edit-heading" className="sr-only">
+          Edit circuit
+        </h3>
         <Button variant="secondary" size="sm" disabled={disabled || !canRemove} onClick={onRemoveLast}>
           Remove last gate
         </Button>

@@ -6,7 +6,7 @@ export const shorsAlgorithmDoesNotProvePNeqBqp: ConceptualProblem = {
     title: "Why Shor's Algorithm Does Not Prove P ≠ BQP",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["complexity-theory", "bqp", "shors-algorithm", "np-completeness"],

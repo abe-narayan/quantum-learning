@@ -9,7 +9,7 @@ export const halfLineDeficiencyNormalization: NumericProblem = {
     title: "Is the Deficiency Solution Normalizable?",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["self-adjointness", "deficiency-indices", "half-line"],

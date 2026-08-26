@@ -13,8 +13,12 @@ import {
 } from "@/lib/quantum/errorCorrection";
 import { StateInspector } from "@/components/simulators/circuit-builder/StateInspector";
 import { Button } from "@/components/ui/Button";
+import { Readout } from "@/components/ui/Typography";
 import { cn } from "@/lib/utils";
-import { LabNotes } from "./LabNotes";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
+import { Predict } from "../shared/Predict";
+import { ControlSection } from "../shared/controls";
 
 const INJECTABLE_QUBITS = [0, 1, 2] as const;
 
@@ -152,104 +156,111 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
   }
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-      <div className="space-y-6">
-        <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          {injected.length === 0
-            ? "No error injected. The encoded state is exactly the logical state, undisturbed."
-            : `${errorLabel} error${injected.length > 1 ? "s" : ""} injected on ${formatQubitList(injected)}. Syndrome (${result.syndrome[0]}, ${result.syndrome[1]}) decodes to ${
-                result.correctedQubit === null ? "no error" : `qubit ${result.correctedQubit}`
-              }${outcomeNote}.`}
-        </div>
-        <StateInspector state={result.corrected} />
-
-        <LabNotes
-          notes={[
-            {
-              label: "What we're studying",
-              content:
-                "Error correction detects and fixes a bit/phase flip without ever measuring — let alone disturbing — the encoded logical qubit.",
-            },
-            {
-              label: "Try this",
-              content: (
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>
-                    Check one qubit at a time — 0, then 1, then 2 — and confirm the decoded correction target
-                    always matches the qubit you picked — the logical state (top panel) never changes regardless.
-                  </li>
-                  <li>
-                    Now check two qubits at once (e.g. 0 and 1): the syndrome is still nonzero, but the decode
-                    table points at the third, uninjected qubit, so the standard recovery step actively converts
-                    the two-qubit error into a full logical {logicalErrorLabel} flip — checkable directly in the
-                    amplitude table above.
-                  </li>
-                  <li>
-                    Compare the two panels side by side: the bit-flip code&apos;s syndrome pattern is exactly the
-                    phase-flip code&apos;s, because one is the other conjugated by H.
-                  </li>
-                </ul>
-              ),
-            },
-            {
-              label: "What's next",
-              content:
-                "Next: real codes correct both error types at once — see why the repetition code alone can't in the Error Correction lesson.",
-            },
-          ]}
-        />
-      </div>
-
-      <div className="space-y-6">
-        <div className="flex justify-end">
-          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
-        </div>
-
-        <section aria-labelledby="syndrome-inject-heading">
-          <h3 id="syndrome-inject-heading" className="text-sm font-semibold text-foreground">
-            Inject {errorLabel} error(s)
-          </h3>
-          <p className="mt-1 text-xs text-muted-foreground">Check any combination of qubits — checking two or more drives a weight-2+ error.</p>
-          <div role="group" aria-label="Qubits to error" className="mt-3 flex flex-wrap gap-2">
-            {INJECTABLE_QUBITS.map((qubit) => {
-              const checked = injected.includes(qubit);
-              return (
-                <label
-                  key={qubit}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 focus-within:ring-offset-background",
-                    checked
-                      ? "bg-brand text-brand-foreground"
-                      : "border border-border bg-surface text-muted-foreground hover:bg-surface-muted"
-                  )}
-                >
-                  <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleQubit(qubit)} />
-                  Qubit {qubit}
-                </label>
-              );
-            })}
+    <SimulatorInstrument
+      label={`Syndrome extraction — ${mode === "bit-flip" ? "bit-flip" : "phase-flip"} code`}
+      readout={<Readout label="Syndrome" value={`(${result.syndrome[0]}, ${result.syndrome[1]})`} />}
+      footnote="Next: real codes correct both error types at once — see why the repetition code alone can't in the Error Correction lesson."
+      // StateInspector's amplitude table reads 8 basis-state rows across
+      // three columns; full-width stage instead of splitting against a
+      // 320px rail keeps it legible rather than merely non-overflowing.
+      layout="stacked"
+      stageClassName="space-y-6"
+      stage={
+        <>
+          <div aria-live="polite" className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+            {injected.length === 0
+              ? "No error injected. The encoded state is exactly the logical state, undisturbed."
+              : `${errorLabel} error${injected.length > 1 ? "s" : ""} injected on ${formatQubitList(injected)}. Syndrome (${result.syndrome[0]}, ${result.syndrome[1]}) decodes to ${
+                  result.correctedQubit === null ? "no error" : `qubit ${result.correctedQubit}`
+                }${outcomeNote}.`}
           </div>
-        </section>
+          <StateInspector state={result.corrected} />
 
-        <section aria-labelledby="syndrome-readout-heading">
-          <h3 id="syndrome-readout-heading" className="text-sm font-semibold text-foreground">
-            Syndrome
-          </h3>
-          <p className="mt-1 font-mono text-sm text-foreground">
-            ({result.syndrome[0]}, {result.syndrome[1]})
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Decoded correction:{" "}
-            {result.correctedQubit !== null
-              ? `apply ${errorLabel} to qubit ${result.correctedQubit}`
-              : injected.length > 0
-                ? "none applied — syndrome reads (0,0)"
-                : "none needed"}
-          </p>
-        </section>
-      </div>
-    </div>
+          <SimulatorFraming
+            shows="Error correction detects and fixes a bit/phase flip without ever measuring — let alone disturbing — the encoded logical qubit."
+            tryThis={
+              <ul>
+                <li>
+                  Check one qubit at a time — 0, then 1, then 2 — and confirm the decoded correction target
+                  always matches the qubit you picked — the logical state (top panel) never changes regardless.
+                </li>
+                <li>
+                  Now check two qubits at once (e.g. 0 and 1): the syndrome is still nonzero, but the decode
+                  table points at the third, uninjected qubit, so the standard recovery step actively converts
+                  the two-qubit error into a full logical {logicalErrorLabel} flip — checkable directly in the
+                  amplitude table above.
+                </li>
+                <li>
+                  Compare the two panels side by side: the bit-flip code&apos;s syndrome pattern is exactly the
+                  phase-flip code&apos;s, because one is the other conjugated by H.
+                </li>
+              </ul>
+            }
+          />
+        </>
+      }
+      controls={
+        <div className="space-y-6">
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+
+          <ControlSection
+            id="syndrome-inject"
+            title={`Inject ${errorLabel} error(s)`}
+            description="Check any combination of qubits — checking two or more drives a weight-2+ error."
+          >
+            <div role="group" aria-label="Qubits to error" className="flex flex-wrap gap-2">
+              {INJECTABLE_QUBITS.map((qubit) => {
+                const checked = injected.includes(qubit);
+                return (
+                  <label
+                    key={qubit}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-pillar focus-within:ring-offset-2 focus-within:ring-offset-background",
+                      checked
+                        ? "bg-pillar text-brand-foreground"
+                        : "border border-border bg-surface text-muted-foreground hover:bg-surface-muted"
+                    )}
+                  >
+                    <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleQubit(qubit)} />
+                    Qubit {qubit}
+                  </label>
+                );
+              })}
+            </div>
+          </ControlSection>
+
+          {injected.length === 1 ? (
+            <Predict
+              key={`${mode}-${injected.join(",")}`}
+              question={`Before checking below: which qubit will the decoder point the ${errorLabel} correction at?`}
+              options={[
+                { id: "0", label: "Qubit 0" },
+                { id: "1", label: "Qubit 1" },
+                { id: "2", label: "Qubit 2" },
+              ]}
+              outcomeId={result.correctedQubit !== null ? String(result.correctedQubit) : "none"}
+            />
+          ) : null}
+
+          <ControlSection id="syndrome-readout" title="Syndrome">
+            <p className="font-mono text-sm text-foreground">
+              ({result.syndrome[0]}, {result.syndrome[1]})
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Decoded correction:{" "}
+              {result.correctedQubit !== null
+                ? `apply ${errorLabel} to qubit ${result.correctedQubit}`
+                : injected.length > 0
+                  ? "none applied — syndrome reads (0,0)"
+                  : "none needed"}
+            </p>
+          </ControlSection>
+        </div>
+      }
+    />
   );
 }

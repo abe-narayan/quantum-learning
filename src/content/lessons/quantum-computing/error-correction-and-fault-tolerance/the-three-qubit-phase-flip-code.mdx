@@ -23,6 +23,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+A single algebraic identity does the entire job: surround every step of the bit-flip code with Hadamards, and get a phase-flip code for free — no new design needed.
+</LessonHook>
+
 ## Motivation
 
 Rather than design a second code from scratch, this lesson gets one for
@@ -114,7 +118,7 @@ forward one algebraically rather than recomputed from scratch.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming the phase-flip code needs an entirely separate derivation.**
 It doesn't. Every step (encoding, syndrome CNOTs, decode table) is
 identical to the bit-flip code's, conjugated by $H$. Rederiving it from
@@ -122,7 +126,7 @@ scratch would duplicate work the $HXH=Z$ identity already does in one
 line.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to un-Hadamard before running the ordinary bit-flip
 correction cycle.** `runPhaseFlipCorrectionCycle` explicitly applies $H$
 to every qubit *before* calling the bit-flip correction logic and again
@@ -162,7 +166,9 @@ a state still in the wrong basis.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Shor Code: Combining Both](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both), concatenating these two
 constructions to correct an arbitrary single-qubit error, introduced
 conceptually, since simulating its full 9-qubit circuit is beyond this
 course's engine.
+</NextDiscovery>

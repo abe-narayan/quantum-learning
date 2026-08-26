@@ -6,7 +6,7 @@ export const lcuPrepareRegisterSize: NumericProblem = {
     title: "Sizing the PREPARE Ancilla Register",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["lcu", "prepare", "ancilla-overhead"],

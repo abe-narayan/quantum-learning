@@ -24,15 +24,15 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Two lessons ago, Y|0⟩=i|1⟩ landed on exactly the same Bloch point as X|0⟩=|1⟩. Last lesson, Rz(2π)=−I turned out to do nothing physically despite the matrix having an unmistakable overall minus sign. This is where both facts finally get proven.
+</LessonHook>
+
 ## Motivation
 
-Two lessons ago, $Y|0\rangle=i|1\rangle$ landed on exactly the same Bloch
-point as $X|0\rangle=|1\rangle$. Last lesson, $R_z(2\pi)=-I$ turned out to
-do nothing physically despite the matrix having an unmistakable overall
-minus sign. Both facts have been used without being proven. This is where
-they finally get proven, and where the difference between "phase that
-doesn't matter" and "phase that matters enormously" gets made completely
-precise.
+Both facts have been used without being proven, until now — this is
+where the difference between "phase that doesn't matter" and "phase
+that matters enormously" gets made completely precise.
 
 ## Intuition
 
@@ -47,10 +47,16 @@ other: $\alpha|0\rangle+\beta|1\rangle \to \alpha|0\rangle+e^{i\delta}\beta|1\ra
 This is not a re-labeling. It rotates the state to a different point on the
 Bloch sphere (a different $\varphi$), and that rotation is measurable.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Mach-Zehnder_interferometer.svg"
-  alt="Schematic of a Mach-Zehnder interferometer, showing a light beam split into two paths by a beamsplitter, recombined at a second beamsplitter after picking up a relative phase"
+  alt="Schematic of a Mach-Zehnder interferometer, showing a light beam split into two paths by a beamsplitter, redirected by two mirrors, and recombined at a second beamsplitter after picking up a relative phase"
   caption="A Mach-Zehnder interferometer, the classic real-world device for making relative phase visible: a phase shift in one arm changes which detector the recombined beam lights up, exactly the kind of observable effect a relative-phase δ produces on a qubit."
+  pins={[
+    { id: "bs1", x: 24, y: 34, label: "First beamsplitter — splits the incoming beam into two paths." },
+    { id: "mirror-a", x: 73, y: 34, label: "Mirror — redirects one path toward the second beamsplitter." },
+    { id: "mirror-b", x: 24, y: 90, label: "Mirror — redirects the other path toward the second beamsplitter." },
+    { id: "bs2", x: 73, y: 90, label: "Second beamsplitter — recombines the two paths; which detector lights up depends on the relative phase between them." },
+  ]}
   credit="Ansgar Hellwig / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Mach-Zehnder_interferometer.svg"
   license="Public domain"
@@ -191,7 +197,7 @@ points on the equator.
 Always identify which kind you're looking at before dismissing it.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Judging global vs. relative by whether a $-1$ or $i$ "looks small."**
 The size or simplicity of a phase factor has nothing to do with whether
 it's global or relative. Only whether it multiplies *every* amplitude
@@ -229,7 +235,9 @@ equally (global) or only *some* of them (relative) determines that.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Putting It Together](/lessons/quantum-computing/qubits-and-quantum-states/building-qubit-circuits), the capstone lesson for this course, where
 states, gates, rotations, measurement, and phase all combine to analyze
 multi-gate sequences, including one useful identity you'll verify yourself
 in the simulator.
+</NextDiscovery>

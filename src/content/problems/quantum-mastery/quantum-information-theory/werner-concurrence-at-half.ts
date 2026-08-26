@@ -6,7 +6,7 @@ export const wernerConcurrenceAtHalf: NumericProblem = {
     title: "Werner-State Concurrence at p=0.5",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["concurrence", "werner-state"],

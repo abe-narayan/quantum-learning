@@ -75,6 +75,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Same gate count, two different odds">
+  A circuit's real physical error rates are never uniform across its
+  qubits and couplers. This lesson computes the same gate count's success
+  probability two different ways — naive versus noise-aware — and the
+  gap comes entirely from which physical qubits were chosen.
+</LessonHook>
+
 ## Motivation
 
 Quantum Compilation & Transpilation established the mechanics of
@@ -84,11 +91,10 @@ Resource Counting, established T-count as the currency a fault-tolerant
 compiler actually spends. Real devices force two more honest ingredients
 into the picture at once: a circuit with several two-qubit interactions
 rarely maps cleanly onto a small device's connectivity graph, so SWAP
-overhead compounds across many gates, not just one; and a real device's
-physical error rates are never uniform across its qubits and couplers.
+overhead compounds across many gates, not just one; and error rates
+vary qubit to qubit and coupler to coupler in the first place.
 This lesson works both pieces through a single concrete example, then
-combines them into one number: an estimated circuit success probability,
-computed two different ways for the *same* gate count.
+combines them into one estimated circuit success probability.
 
 ## Mathematical Development
 
@@ -333,7 +339,7 @@ the fault-tolerant side of the pipeline.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming noise-aware compilation works by reducing gate count.** It
 doesn't, and this lesson's worked example is deliberately built to show
 that directly: both the naive and noise-aware mappings execute exactly
@@ -394,3 +400,10 @@ this course's flagship application, which connects a real molecule's
 electronic structure to a concrete qubit count, the same
 gate-count-to-physical-cost habit of mind this lesson just built for
 routing and noise now applied to an entire chemistry problem.
+
+<NextDiscovery>
+  Next: Quantum Simulation of Molecules, this course's flagship
+  application, connects a real molecule's electronic structure to a
+  concrete qubit count — the same gate-count-to-physical-cost habit of
+  mind now applied to an entire chemistry problem.
+</NextDiscovery>

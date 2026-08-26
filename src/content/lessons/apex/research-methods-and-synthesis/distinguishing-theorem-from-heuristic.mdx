@@ -30,6 +30,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Four confident sentences, three different truths">
+  Grover's algorithm cannot be beaten. QAOA finds near-optimal cuts.
+  Factoring has no efficient classical algorithm. Barren plateaus make
+  variational circuits untrainable. All four sound equally certain.
+  Exactly one is a proven theorem.
+</LessonHook>
+
 ## Motivation
 
 How to Read a Quantum Computing Paper already told you where a paper's
@@ -183,6 +190,18 @@ general, which is exactly the claim under evaluation here, and exactly
 the kind of restricted-case-versus-general-case gap How to Read a
 Quantum Computing Paper's whole worked example was built to catch.
 
+<ResearchConnection
+  title="QAOA's original worst-case approximation guarantee"
+  source="Farhi, Goldstone & Gutmann (2014)"
+  url="https://arxiv.org/abs/1411.4028"
+>
+  The construction that introduced QAOA proves a specific worst-case
+  approximation ratio for $p=1$ QAOA, but only on a restricted graph
+  class — 3-regular, triangle-free graphs. It's a real Tier 1 theorem for
+  that exact scope, not a general performance guarantee for the
+  large, practical instances a headline claim usually means.
+</ResearchConnection>
+
 **Classification:** Tier 2, heuristic/empirical, for the claim as stated
 ("real-world performance on large, practical instances"), sitting
 alongside a genuine, narrower Tier 1 result for one specific $p=1$,
@@ -307,6 +326,18 @@ real content.
   Kitaev, Landahl & Preskill 2002) — real, citable theory, but it proves
   the *functional form* of the suppression, not the specific $\sim1\%$
   numerical value for any given decoder and noise model.
+
+  <ResearchConnection
+    title="The surface-code threshold's scaling law"
+    source="Dennis, Kitaev, Landahl & Preskill (2002)"
+    url="https://arxiv.org/abs/quant-ph/0110143"
+  >
+    Ties the logical-error suppression $p_L\sim A(p/p_{th})^{(d+1)/2}$ to
+    a genuine phase-transition argument at the Nishimori point of a
+    random-bond Ising model. Real, citable theory for the *shape* of the
+    curve — it does not by itself pin down the specific $\sim 1\%$
+    numerical threshold for any particular decoder and noise model.
+  </ResearchConnection>
 - **Step 5, classification:** Tier 2, heuristic/empirical, for the
   specific $\sim1\%$ figure — a real, well-supported, decoder-specific
   numerical estimate, resting on (but not equal to) a proven theoretical
@@ -351,7 +382,7 @@ open** — and open in the specific sense of "no decisive evidence in
 either direction for the general, structured setting," not "open because
 nobody has looked."
 
-## Interactive Visualization
+## The Classification Flowchart
 
 <div className="not-prose my-8 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
 <svg viewBox="0 0 760 580" width="760" className="w-full min-w-[560px]" role="img" aria-label="A flowchart classifying a quantum-computing claim. Start: a specific, precisely-stated claim. Question 1: is there a complete, checkable mathematical proof? If yes, branch right to THEOREM, containing Grover's optimality, the threshold theorem's existence, and the barren-plateau zero-mean gradient. If no, continue down to Question 2: is there strong numerical or simulation evidence across many cases without a general proof? If yes, branch right to HEURISTIC, containing QAOA's real-world performance, the surface code's numerical threshold, and barren-plateau variance decay. If no, continue down to Question 3: is there a plausible, motivated argument with some real evidence but genuinely unverified? If yes, branch right to CONJECTURE, containing factoring's classical hardness and random circuit sampling's classical hardness. If no, fall through to GENUINELY OPEN, containing whether BQP is a subset of NP. A dashed footer box below notes that at every tier, the same follow-up question applies: what specific additional result would move this claim up a tier?">
@@ -442,6 +473,13 @@ nobody has looked."
 
 ## Why This Matters
 
+<InsightBlock>
+  "Not yet proven" and "not worth trusting" are entirely different
+  claims — a well-supported heuristic sits in the same respectable
+  company as simulated annealing and industrial SAT solvers, not in some
+  lesser category invented for quantum algorithms.
+</InsightBlock>
+
 Being unable to tell "proven" from "well-supported heuristic" from
 "hopeful conjecture" is, honestly, one of the single most common sources
 of confusion and overclaiming in how quantum computing results get
@@ -474,7 +512,7 @@ confidence.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Reporting a well-supported heuristic as a proven theorem.** "QAOA
 solves Max-Cut" and "Grover's algorithm is provably optimal" are not the
 same kind of sentence, even though both sound equally confident. Before
@@ -482,7 +520,7 @@ repeating either claim, ask this lesson's Question 1: is there an actual
 proof, or is the confidence coming from broad numerical support instead?
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Dismissing a heuristic as unscientific or worthless because it isn't a
 proven theorem.** QAOA's lack of a general worst-case guarantee places it
 in exactly the same epistemic category as simulated annealing and most
@@ -549,10 +587,12 @@ is the mirror image of the first mistake above.
 
 ## Further Exploration
 
-Next, [Evaluating Quantum Advantage
-Claims](/lessons/apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims)
-takes this lesson's checklist and specializes it into a five-question
-framework built specifically for the most publicly visible kind of
-quantum-computing claim there is — turning "proven, heuristic, or
-conjecture?" into "proven, heuristic, or conjecture, against exactly
-which classical baseline, and under exactly which assumption?"
+<NextDiscovery>
+  Next, [Evaluating Quantum Advantage
+  Claims](/lessons/apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims)
+  takes this lesson's checklist and specializes it into a five-question
+  framework built specifically for the most publicly visible kind of
+  quantum-computing claim there is — turning "proven, heuristic, or
+  conjecture?" into "proven, heuristic, or conjecture, against exactly
+  which classical baseline, and under exactly which assumption?"
+</NextDiscovery>

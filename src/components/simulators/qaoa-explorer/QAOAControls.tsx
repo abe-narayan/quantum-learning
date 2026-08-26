@@ -1,5 +1,6 @@
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { QAOA_GRAPH_PRESETS } from "./presets";
+import { ControlSection, SimulatorSlider } from "../shared/controls";
 
 export function QAOAControls({
   presetId,
@@ -18,53 +19,46 @@ export function QAOAControls({
 }) {
   return (
     <div className="space-y-8">
-      <section aria-labelledby="qaoa-graph-heading">
-        <h3 id="qaoa-graph-heading" className="text-sm font-semibold text-foreground">
-          Graph
-        </h3>
+      <ControlSection id="qaoa-graph" title="Graph">
         <PresetToggle
           options={QAOA_GRAPH_PRESETS}
           index={QAOA_GRAPH_PRESETS.findIndex((p) => p.id === presetId)}
           onChange={(i) => onPresetChange(QAOA_GRAPH_PRESETS[i].id)}
           ariaLabel="Graph preset"
         />
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="qaoa-gamma-heading">
-        <h3 id="qaoa-gamma-heading" className="text-sm font-semibold text-foreground">
-          Cost angle γ
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">Controls the phase e^(-iγ·cut count) applied by the cost unitary.</p>
-        <input
-          type="range"
+      <ControlSection
+        id="qaoa-gamma"
+        title="Cost angle γ"
+        description="Controls the phase e^(-iγ·cut count) applied by the cost unitary."
+      >
+        <SimulatorSlider
+          label="γ"
+          value={gamma}
           min={0}
           max={2 * Math.PI}
           step={0.01}
-          value={gamma}
-          onChange={(e) => onGammaChange(Number(e.target.value))}
-          className="mt-3 w-full accent-brand"
-          aria-label="Cost angle gamma"
+          formatValue={(v) => v.toFixed(2)}
+          onChange={onGammaChange}
         />
-        <p className="mt-1 font-mono text-xs text-muted-foreground">γ = {gamma.toFixed(2)}</p>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="qaoa-beta-heading">
-        <h3 id="qaoa-beta-heading" className="text-sm font-semibold text-foreground">
-          Mixer angle β
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">Controls the Rx(2β) rotation applied to every qubit by the mixer unitary.</p>
-        <input
-          type="range"
+      <ControlSection
+        id="qaoa-beta"
+        title="Mixer angle β"
+        description="Controls the Rx(2β) rotation applied to every qubit by the mixer unitary."
+      >
+        <SimulatorSlider
+          label="β"
+          value={beta}
           min={0}
           max={Math.PI}
           step={0.01}
-          value={beta}
-          onChange={(e) => onBetaChange(Number(e.target.value))}
-          className="mt-3 w-full accent-accent"
-          aria-label="Mixer angle beta"
+          formatValue={(v) => v.toFixed(2)}
+          onChange={onBetaChange}
         />
-        <p className="mt-1 font-mono text-xs text-muted-foreground">β = {beta.toFixed(2)}</p>
-      </section>
+      </ControlSection>
     </div>
   );
 }

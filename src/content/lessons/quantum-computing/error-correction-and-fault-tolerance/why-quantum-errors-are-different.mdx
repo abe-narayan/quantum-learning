@@ -23,13 +23,16 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A recipe that fails at every step">
+Classical error correction protects a bit by copying it. Every part of that strategy fails for a qubit — and the reasons are concrete, not exotic: no-cloning, continuous state space, and measurement collapse.
+</LessonHook>
+
 ## Motivation
 
-Classical error correction protects a bit by copying it: store $0$ as
-$000$, and if noise flips one copy, majority vote recovers the original.
-Every part of that strategy fails for a qubit, and the reasons are
-concrete, not exotic: no-cloning, continuous state space, and measurement
-collapse, three facts this platform has already proven, each block a
+Store $0$ as $000$, and if noise flips one copy, majority vote recovers
+the original — that's the classical strategy. Each of its steps fails
+for a qubit, for reasons this platform has already proven: no-cloning,
+continuous state space, and measurement collapse, each one blocking a
 specific step of the classical recipe.
 
 That skepticism was not hindsight: before 1995, it was a widely held
@@ -39,6 +42,14 @@ no-cloning theorem and the continuum of possible errors described below.
 Peter Shor's nine-qubit code (1995) and Andrew Steane's seven-qubit code
 (1996) were the first concrete constructions to show the three obstacles
 below actually have a solution.
+
+<HistoricalMoment date="1995">
+Peter Shor's nine-qubit code is the first concrete construction to show that quantum error correction is actually possible, despite no-cloning and a continuum of possible errors.
+</HistoricalMoment>
+
+<HistoricalMoment date="1996">
+Andrew Steane's seven-qubit code follows, a second, independent construction confirming quantum information really can be protected.
+</HistoricalMoment>
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sycamore_Quantum_Chip.jpg/1280px-Sycamore_Quantum_Chip.jpg"
@@ -174,7 +185,7 @@ corrects $Y$ errors too, with no separate machinery needed.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming quantum error correction needs infinitely many distinct
 correction procedures for infinitely many possible errors.** It doesn't.
 Correcting against $X$ and $Z$ specifically is provably enough for
@@ -182,7 +193,7 @@ Correcting against $X$ and $Z$ specifically is provably enough for
 combination of $I,X,Y,Z$.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking syndrome measurement is "cheating" past the no-collapse
 requirement.** It doesn't collapse the encoded logical information at
 all. It's specifically designed to extract only error-location
@@ -221,5 +232,7 @@ not one hand-picked pair.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Three-Qubit Bit-Flip Code](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code), building and verifying the first
 concrete code, protecting against $X$ errors specifically, end to end.
+</NextDiscovery>

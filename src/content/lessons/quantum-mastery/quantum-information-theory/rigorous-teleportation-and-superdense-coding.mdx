@@ -206,23 +206,36 @@ export const noiseSweepFrames = [
   },
 ];
 
+<LessonHook eyebrow="What imperfect entanglement actually costs">
+  Teleportation and superdense coding were both derived assuming a
+  perfect shared Bell pair. Real entanglement distribution is noisy —
+  this lesson answers exactly how much that noise costs each protocol.
+</LessonHook>
+
 ## Motivation
 
 Quantum Teleportation and Superdense Coding were both derived entirely
 in state-vector language, and both silently assumed a *perfect* shared
-Bell pair. Real entanglement distribution is noisy. This lesson redoes
+Bell pair. This lesson redoes
 both derivations in the density-matrix/channel formalism this course has
 built, which, unlike bare state vectors, can actually *represent* an
-imperfect resource, and answers the question the original lessons had
-no language for: exactly how much does real noise cost each protocol?
+imperfect resource — the question the original lessons had
+no language to even pose.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Conditional_quantum_teleportation_of_photon_polarization.png"
   alt="Schematic of a real conditional quantum teleportation experiment: an entangled-photon source S, Alice's Bell-state-measurement apparatus on the left, and Bob's receiving station on the right, connected by a classical communication channel"
   caption="The layout of an actual photon-polarization teleportation experiment: a real entangled source, a real joint measurement, and a real classical channel carrying Alice's outcome to Bob -- exactly the physical ingredients this lesson's channel formalism models as one operator, now with an imperfect (mixed) resource state in place of the ideal Bell pair."
   credit="JozumBjada / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Conditional_quantum_teleportation_of_photon_polarization.png"
   license="CC BY-SA 4.0"
+  pins={[
+    { id: "source", x: 21, y: 64, label: "S — the entangled-photon source, pumped by a violet laser, producing the two orange photon beams this experiment runs." },
+    { id: "beam-splitter", x: 40, y: 19, label: "The beam splitter inside Alice's station, where the incoming photon and Alice's half of the entangled pair are combined for the joint measurement." },
+    { id: "coincidence-detector", x: 57, y: 17, label: "The coincidence-logic detector (marked '&') that reads out Alice's joint Bell-basis measurement outcome." },
+    { id: "classical-channel", x: 77, y: 42, label: "The classical channel carrying Alice's measurement outcome to Bob — the classical bit this lesson's channel formalism treats as part of the protocol, not an afterthought." },
+    { id: "bob", x: 74, y: 88, label: "Bob's station, receiving the photon and Alice's classical outcome, applying the correction that completes the teleportation." },
+  ]}
 />
 
 ## Mathematical Development
@@ -392,7 +405,7 @@ sum computed here in full.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing the Haar-averaged fidelity formula $(2F_e+1)/3$ with the
 fidelity for one specific input state.** They generally differ, as the
 worked example's own two numbers show ($0.9333$ vs $0.9528$); the
@@ -402,7 +415,7 @@ computation like this lesson's answers "how good is it for exactly this
 message."
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any noise on the shared Bell pair damages both of superdense
 coding's classical bits equally.** Dephasing here damages only the
 $Z$-encoded (phase) bit and leaves the $X$-encoded (population) bit
@@ -454,3 +467,9 @@ Next: [CSS Codes and the General Stabilizer Formalism](/lessons/quantum-mastery/
 this course's capstone, generalizing Stabilizer Formalism Basics'
 3-qubit code to a genuine $[[7,1,3]]$ code built from classical linear
 codes, the actual construction real fault-tolerant proposals use.
+
+<NextDiscovery>
+  Next: this course's capstone generalizes Stabilizer Formalism Basics'
+  3-qubit code to a genuine $[[7,1,3]]$ code built from classical linear
+  codes — the actual construction real fault-tolerant proposals use.
+</NextDiscovery>

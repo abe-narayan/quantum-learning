@@ -6,7 +6,7 @@ export const shotNoiseStandardErrorP75N300: NumericProblem = {
     title: "Standard Error of an Estimated Probability from Shot Count",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/reproducing-and-designing-experiments",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["shot-noise", "standard-error", "reproducibility", "statistics"],

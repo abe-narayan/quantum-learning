@@ -11,7 +11,7 @@ export const capstoneToolboxTrotterStepsT10: NumericProblem = {
     title: "First-Order Trotter Steps at t=10",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["capstone", "synthesis", "hamiltonian-simulation", "trotterization"],

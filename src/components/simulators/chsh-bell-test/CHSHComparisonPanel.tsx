@@ -87,8 +87,8 @@ export function CHSHComparisonPanel({ sValue }: { sValue: number }) {
                   "h-full rounded-full",
                   !prefersReducedMotion && "transition-[width] duration-200 ease-out",
                   row.tone === "classical" && "bg-border",
-                  row.tone === "tsirelson" && "bg-brand/60",
-                  row.tone === "quantum" && (exceedsClassical ? "bg-accent" : "bg-brand")
+                  row.tone === "tsirelson" && "bg-pillar/60",
+                  row.tone === "quantum" && (exceedsClassical ? "bg-accent" : "bg-pillar")
                 )}
                 style={{ width: `${Math.min(100, (row.barValue / quantumBound) * 100)}%` }}
               />

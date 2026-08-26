@@ -28,6 +28,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="No more graded answer keys">
+  Every lesson on this platform ended with a right answer to check
+  against. Your career won't. What comes next is a continuous stream of
+  papers, preprints, and press releases, each making a claim — and only
+  you to check it.
+</LessonHook>
+
 ## Motivation
 
 Every earlier lesson on this platform ended with a right answer. A
@@ -155,7 +162,7 @@ the author happened to title their section headings.
 
 ## Worked Example: An Abstract That Oversells Its Own Theorem
 
-<Callout type="note">
+<Callout type="warning">
 The abstract and theorem below are **illustrative, not a quotation of
 any real paper.** They are built to be typical in *style* of how this
 kind of result is often written and, occasionally, oversold — not to
@@ -230,6 +237,12 @@ looked good" with "therefore the exponential speedup is broader than
 the theorem states" is exactly the numerical-vs-proven misreading
 flagged above, stacked on top of the abstract-vs-theorem misreading.
 
+<InsightBlock>
+  An abstract's job is compression, not precision — its strong words are
+  pointers to go verify against the numbered theorem, not the verified
+  content itself.
+</InsightBlock>
+
 None of this means the paper is bad, wrong, or dishonest — Theorem 4.2,
 as stated, is a legitimate, well-scoped, provable result, and framing a
 black-box separation in accessible language for an abstract is normal
@@ -237,7 +250,7 @@ scientific writing, not misconduct. The skill this lesson is teaching
 is not "distrust every abstract" — it's "always find the numbered
 theorem before you decide what was actually shown."
 
-## Interactive: Paper Anatomy at a Glance
+## Paper Anatomy at a Glance
 
 <div className="not-prose my-8 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
   <div className="grid grid-cols-[minmax(180px,240px)_1fr] gap-x-5 gap-y-4 min-w-[560px]">
@@ -316,7 +329,7 @@ before forming an opinion about what the paper shows.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Quoting an abstract's phrasing as if it were the paper's theorem.**
 "They proved an exponential speedup" is only a safe thing to say once
 you've found the numbered statement and checked what model it's proven
@@ -324,7 +337,7 @@ in. An abstract's job is compression, not precision — treat its strong
 claims as pointers to go verify, not as the verified content itself.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating an oracle/black-box separation as an unconditional one.**
 This is the single most common gap between an abstract and a theorem in
 quantum algorithms writing, precisely because "exponential speedup"
@@ -336,7 +349,7 @@ this distinction for Grover's optimality and for $\mathsf{NP}
 paper making a similarly-phrased claim.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Letting small-scale numerics "prove" an asymptotic claim.** A
 simulation at $n\le 20$ qubits consistent with a predicted scaling law
 is real, useful evidence — and it is not a proof that the scaling
@@ -347,7 +360,7 @@ the claim, which is worth knowing explicitly before repeating the claim
 yourself.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Skipping the discussion/limitations section because it "just" restates
 caveats.** It often contains the single clearest sentence in the whole
 paper about what was *not* shown — exactly the sentence that would have
@@ -414,9 +427,11 @@ read it.
 
 ## Further Exploration
 
-The next lesson in this course, [Distinguishing Theorem from
-Heuristic](/lessons/apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic),
-takes the proven-vs-numerical distinction from this lesson's anatomy and
-develops it into its own full subject: how to tell, from a paper's own
-language and evidence, whether a claimed result is a proof, a
-heuristic argument, or something in between.
+<NextDiscovery>
+  The next lesson in this course, [Distinguishing Theorem from
+  Heuristic](/lessons/apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic),
+  takes the proven-vs-numerical distinction from this lesson's anatomy and
+  develops it into its own full subject: how to tell, from a paper's own
+  language and evidence, whether a claimed result is a proof, a
+  heuristic argument, or something in between.
+</NextDiscovery>

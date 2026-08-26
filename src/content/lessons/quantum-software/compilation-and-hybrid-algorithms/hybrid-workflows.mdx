@@ -22,13 +22,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Paid once, or paid 200 times">
+Every time VQE's classical optimizer proposes a new parameter vector, the exact same ansatz circuit gets rebuilt, transpiled, and rerun from scratch. Pay that overhead once and it's a rounding error. Pay it 200 times, a realistic VQE run, and it becomes the dominant cost of the entire computation.
+</LessonHook>
+
 ## Motivation
 
-Every time VQE's classical optimizer proposes a new $\vec\theta$, the
-exact same ansatz circuit gets rebuilt, transpiled, and rerun from
-scratch. Pay that overhead once and it's a rounding error. Pay it 200
-times, a realistic VQE run, and it becomes the dominant cost of the
-entire computation. Quantum Algorithms II built VQE and QAOA as physics:
+Quantum Algorithms II built VQE and QAOA as physics:
 minimize $\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ over
 parameters $\vec\theta$. This lesson looks at the same algorithms from a
 software angle: what does actually running one look like, step by step,
@@ -168,7 +168,7 @@ for hybrid algorithms in particular.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating VQE/QAOA's classical optimizer as a minor implementation
 detail.** It's an equal partner in the algorithm's structure. The
 quantum device does ONE well-defined job (state preparation and
@@ -176,7 +176,7 @@ measurement); everything else, including the decision of what
 to try next, is ordinary classical computation.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Underestimating per-iteration overhead because a single iteration's
 cost looks small.** As the worked example shows, modest per-iteration
 overhead multiplies substantially across the many iterations a real
@@ -210,7 +210,9 @@ optimization run needs.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation), which builds this exact
 loop end to end using this platform's own `QuantumCircuit`, closing the
 gap between this course's software concepts and Quantum Algorithms II's
 physics.
+</NextDiscovery>

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { SimulatorSlider } from "../shared/controls";
 
 export function PlaybackControls({
   isPlaying,
@@ -40,20 +41,16 @@ export function PlaybackControls({
       <Button variant="ghost" size="sm" onClick={onReset}>
         Reset
       </Button>
-      <label className="ml-auto flex items-center gap-2 text-sm">
-        <span className="text-muted-foreground">Speed</span>
-        <input
-          type="range"
-          min={0.25}
-          max={3}
-          step={0.25}
-          value={speed}
-          onChange={(event) => onSpeedChange(Number(event.target.value))}
-          aria-label="Simulation speed"
-          className="w-28 accent-[var(--brand)]"
-        />
-        <span className="w-10 font-mono text-xs text-muted-foreground">{speed.toFixed(2)}×</span>
-      </label>
+      <SimulatorSlider
+        className="ml-auto w-40"
+        label="Speed"
+        value={speed}
+        min={0.25}
+        max={3}
+        step={0.25}
+        formatValue={(v) => `${v.toFixed(2)}×`}
+        onChange={onSpeedChange}
+      />
     </div>
   );
 }

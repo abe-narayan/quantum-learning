@@ -132,6 +132,12 @@ export const choiSpectrumFrames = [
   },
 ];
 
+<LessonHook eyebrow="Turning a map into a matrix">
+  An entire physical process — every possible input, every possible
+  output — can be checked for validity the same way you'd check a
+  single matrix: is it positive semi-definite?
+</LessonHook>
+
 ## Motivation
 
 Open Quantum Systems & Kraus Operators stated the Kraus sum
@@ -175,9 +181,19 @@ platform's `partialTrace`-based reduced states are built to describe.
 
 ### The Choi matrix
 
+<EquationReveal
+  terms={[
+    { id: "J", symbol: "J(ℰ)", gloss: "The Choi matrix — a single d²×d² matrix that encodes the entire channel ℰ." },
+    { id: "ij", symbol: "|i⟩⟨j|", gloss: "Every basis matrix, including non-positive-semi-definite ones (i≠j) — ℰ is still a well-defined linear map on them." },
+    { id: "Eij", symbol: "ℰ(|i⟩⟨j|)", gloss: "The channel's output when fed that basis matrix." },
+  ]}
+>
+
 $$
 J(\mathcal E) \equiv \sum_{i,j=0}^{d-1} |i\rangle\langle j|\otimes\mathcal E\big(|i\rangle\langle j|\big)
 $$
+
+</EquationReveal>
 
 a single $d^2\times d^2$ matrix built by feeding $\mathcal E$ every basis
 matrix $|i\rangle\langle j|$ (not just valid density matrices: $|i\rangle\langle j|$
@@ -206,31 +222,33 @@ under the now-established-positive map $\mathbb1\otimes\mathcal E$,
 hence $J(\mathcal E)\geq0$.
 
 **Hard direction, the actual content of the theorem.** Suppose
-$J(\mathcal E)\geq0$. Diagonalize it (the spectral theorem, general
-finite dimensions):
-$J(\mathcal E)=\sum_k\mu_k|v_k\rangle\langle v_k|$, $\mu_k\geq0$, with
-each $|v_k\rangle=\sum_{i,\ell}(v_k)_{i\ell}|i\rangle|\ell\rangle$ an
-eigenvector of the $d^2$-dimensional Choi matrix, indexed by the same
-$(i,\ell)$ pair the definition of $J$ used. Define, for each $k$, the
-$d\times d$ matrix $K_k$ by **reshaping** $|v_k\rangle$:
+$J(\mathcal E)\geq0$.
 
-$$
-(K_k)_{\ell i} \equiv \sqrt{\mu_k}\,(v_k)_{i\ell}
-$$
+<DerivationSteps>
+  <DerivationStep annotation="The spectral theorem, general finite dimensions. Each eigenvector is indexed by the same (i,ℓ) pair the definition of J used.">
+    $J(\mathcal E)=\sum_k\mu_k|v_k\rangle\langle v_k|$, $\mu_k\geq0$, with
+    each $|v_k\rangle=\sum_{i,\ell}(v_k)_{i\ell}|i\rangle|\ell\rangle$ an
+    eigenvector of the $d^2$-dimensional Choi matrix.
+  </DerivationStep>
+  <DerivationStep annotation="Output index ℓ becomes the matrix row, input index i the column — the same index that labelled which |i⟩⟨j| was fed into E when J was built. This reshaping directly inverts the 'vectorize K_k' map used in the easy direction.">
+    Define, for each $k$, the $d\times d$ matrix $K_k$ by
+    **reshaping** $|v_k\rangle$:
 
-(output index $\ell$ becomes the matrix row, input index $i$ the
-column, the same index that labelled which $|i\rangle\langle j|$ was
-fed into $\mathcal E$ when $J$ was built). This reshaping directly
-inverts the "vectorize $K_k$" map used in the easy direction: one checks
-term by term that $\sum_ij|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=|v_k\rangle\langle v_k|\cdot\mu_k/\mu_k=\mu_k|v_k\rangle\langle v_k|$
-reproduces exactly the $k$-th term of the eigendecomposition (the worked
-example below verifies this identity numerically rather than leaving it
-purely symbolic). Summing over $k$: $\sum_k\sum_{ij}|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=J(\mathcal E)$,
-matching term-by-term against the *definition* $J(\mathcal E)=\sum_{ij}|i\rangle\langle j|\otimes\mathcal E(|i\rangle\langle j|)$
-forces $\mathcal E(|i\rangle\langle j|)=\sum_kK_k|i\rangle\langle j|K_k^\dagger$
-for every basis matrix $|i\rangle\langle j|$, and since these span the
-full space of matrices, $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$ for
-*every* $\rho$, by linearity. $\mathcal E$ has a Kraus form. $\blacksquare$
+    $$
+    (K_k)_{\ell i} \equiv \sqrt{\mu_k}\,(v_k)_{i\ell}
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Checked term by term (the worked example below verifies this identity numerically rather than leaving it purely symbolic).">
+    $\sum_ij|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=|v_k\rangle\langle v_k|\cdot\mu_k/\mu_k=\mu_k|v_k\rangle\langle v_k|$
+    reproduces exactly the $k$-th term of the eigendecomposition.
+  </DerivationStep>
+  <DerivationStep annotation="Matching term-by-term against the definition J(E) = Σ_ij |i⟩⟨j| ⊗ E(|i⟩⟨j|) forces E(|i⟩⟨j|) = Σ_k K_k|i⟩⟨j|K_k† for every basis matrix. Since these span the full space of matrices, this extends to every ρ by linearity.">
+    Summing over $k$:
+    $\sum_k\sum_{ij}|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=J(\mathcal E)$,
+    so $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$ for *every* $\rho$.
+    $\mathcal E$ has a Kraus form. $\blacksquare$
+  </DerivationStep>
+</DerivationSteps>
 
 ### Trace-preservation, restated on the Choi matrix
 
@@ -348,6 +366,13 @@ term-by-term identity claimed in the proof above.
 
 ## Physical Interpretation
 
+<InsightBlock>
+  A channel and a bipartite quantum state carry exactly the same
+  information — related by "send half of a maximally entangled pair
+  through it." Checking whether a proposed channel is physically valid
+  reduces to checking whether one matrix is positive semi-definite.
+</InsightBlock>
+
 The Choi–Jamiolkowski isomorphism says a channel and a bipartite quantum
 state carry exactly the same information, related by "send half of a
 maximally entangled pair through it." This is why checking a proposed
@@ -367,7 +392,7 @@ the Choi matrix test given here checks *complete* positivity directly,
 which is the physically required condition.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the $\text{Tr}_{\text{out}}(J(\mathcal E))=I$ condition.**
 Positive semi-definiteness of $J(\mathcal E)$ alone only guarantees
 *complete positivity*; a completely positive map that shrinks or grows
@@ -416,7 +441,9 @@ $\mathcal E$ to be a physically valid channel.
 
 ## Further Exploration
 
-Next: [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation),
-which turns to a different question about these same channels: given
-that a map is physically valid at a single instant, what continuous-time
-generator would actually produce it as time unfolds?
+<NextDiscovery>
+  Next: [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation),
+  which turns to a different question about these same channels: given
+  that a map is physically valid at a single instant, what
+  continuous-time generator would actually produce it as time unfolds?
+</NextDiscovery>

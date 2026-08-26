@@ -47,6 +47,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Two quantum states being "perpendicular" isn't decoration borrowed from
+  geometry — it's exactly the condition for a single measurement to tell
+  them apart with certainty.
+</LessonHook>
+
 ## Motivation
 
 A vector space, as built in the last lesson, has no notion of length or
@@ -148,33 +154,40 @@ $$
   explanation="Never, for any u and v in any inner product space. Equality is achievable (when u and v are parallel), but the inequality never breaks in the other direction. The derivation below shows this falls out of nothing more exotic than positive-definiteness, applied to one specific, cleverly chosen vector."
 />
 
-Here's the derivation, worked from scratch. Assume $v\ne0$ (the inequality is trivial
-if $v=0$), and define $c = \langle v,u\rangle/\langle v,v\rangle$: this
-is the coefficient that makes $w = u - cv$ orthogonal to $v$:
+Here's the derivation, worked from scratch.
 
+<DerivationSteps>
+  <DerivationStep annotation="Assume v ≠ 0 (the inequality is trivial if v = 0), and define c as the coefficient that makes w = u − cv orthogonal to v.">
+$$
+c = \frac{\langle v,u\rangle}{\langle v,v\rangle}, \qquad w = u - cv
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Check the claim directly: substituting c's definition makes the two terms cancel.">
 $$
 \langle v,w\rangle = \langle v,u\rangle - c\langle v,v\rangle = \langle v,u\rangle - \langle v,u\rangle = 0
 $$
-
-By positive-definiteness, $\langle w,w\rangle\ge0$. Expand it out, using
-$\langle v,u\rangle=\langle u,v\rangle^*$ and the fact that $\langle
-v,v\rangle$ is real:
-
+  </DerivationStep>
+  <DerivationStep annotation="Positive-definiteness guarantees ⟨w,w⟩ ≥ 0 for any vector, including this particular w.">
+$$
+0 \le \langle w,w\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Expand using ⟨v,u⟩=⟨u,v⟩* and that ⟨v,v⟩ is real. All three of the last terms reduce to the same quantity — two subtract, one adds, leaving exactly one copy.">
 $$
 0 \le \langle w,w\rangle = \langle u,u\rangle - c\langle u,v\rangle - c^*\langle v,u\rangle + c^*c\langle v,v\rangle = \langle u,u\rangle - \frac{|\langle v,u\rangle|^2}{\langle v,v\rangle}
 $$
-
-(all three of the last terms reduce to $|\langle v,u\rangle|^2/\langle
-v,v\rangle$, and two of them subtract while one adds, leaving exactly one
-copy; working through the algebra term by term is a good self-check).
-Rearranging:
-
+  </DerivationStep>
+  <DerivationStep annotation="Rearrange: move the fraction to the other side.">
 $$
 |\langle v,u\rangle|^2 \le \langle u,u\rangle\langle v,v\rangle = \|u\|^2\|v\|^2
 $$
-
-Taking square roots, and using $|\langle v,u\rangle|=|\langle u,v\rangle|$
-(conjugating doesn't change modulus), gives Cauchy-Schwarz.
+  </DerivationStep>
+  <DerivationStep annotation="Take square roots. |⟨v,u⟩| = |⟨u,v⟩| since conjugating doesn't change modulus — this is Cauchy-Schwarz.">
+$$
+|\langle u,v\rangle| \le \|u\|\,\|v\|
+$$
+  </DerivationStep>
+</DerivationSteps>
 
 ### Geometric interpretation and Gram-Schmidt
 
@@ -228,13 +241,13 @@ like this $i$ never changes orthogonality, since $|\langle u, cv\rangle| =
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to conjugate.** $\langle u,v\rangle=\sum u_i^*v_i$, not $\sum
 u_iv_i$. Skipping the conjugate breaks positive-definiteness, as shown
 above.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming $\langle u,v\rangle=\langle v,u\rangle$.** They're complex
 conjugates of each other, equal only when both happen to be real.
 </Callout>
@@ -273,6 +286,13 @@ for the opposite convention when reading other sources.
 
 ## Further Exploration
 
-Next: [The Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism), which gives this exact inner-product
-structure a compact, standard notation: bras, kets, outer products, and
-the completeness relation, used throughout the rest of quantum mechanics.
+<ChallengePrompt prompt="The explanation above says Cauchy–Schwarz becomes an equality exactly when u and v are parallel. For v=(1,1), pick a nonzero u that makes it an equality, and verify |⟨u,v⟩|=‖u‖‖v‖ directly.">
+  Try $u$ as any scalar multiple of $v$ itself — then just plug both
+  sides into the inequality and check they come out equal.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [The Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism), which gives this exact inner-product
+  structure a compact, standard notation: bras, kets, outer products, and
+  the completeness relation, used throughout the rest of quantum mechanics.
+</NextDiscovery>

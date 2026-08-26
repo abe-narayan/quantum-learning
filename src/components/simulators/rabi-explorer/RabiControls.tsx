@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FrameSlider } from "@/components/visualizations/FrameSlider";
+import { ControlSection, SimulatorSlider } from "../shared/controls";
 
 export function RabiControls({
   driveStrength,
@@ -31,45 +32,33 @@ export function RabiControls({
 }) {
   return (
     <div className="space-y-8">
-      <section aria-labelledby="rabi-drive-heading">
-        <h3 id="rabi-drive-heading" className="text-sm font-semibold text-foreground">
-          Coupling strength V
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          The resonant Rabi frequency (Δ=0 gives P(1)=sin²(Vt)).
-        </p>
-        <input
-          type="range"
+      <ControlSection id="rabi-drive" title="Coupling strength V" description="The resonant Rabi frequency (Δ=0 gives P(1)=sin²(Vt)).">
+        <SimulatorSlider
+          label="V"
+          value={driveStrength}
           min={0.2}
           max={3}
           step={0.05}
-          value={driveStrength}
-          onChange={(e) => onDriveStrengthChange(Number(e.target.value))}
-          className="mt-3 w-full accent-brand"
-          aria-label="Coupling strength V"
+          formatValue={(v) => v.toFixed(2)}
+          onChange={onDriveStrengthChange}
         />
-        <p className="mt-1 font-mono text-xs text-muted-foreground">V = {driveStrength.toFixed(2)}</p>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="rabi-detuning-heading">
-        <h3 id="rabi-detuning-heading" className="text-sm font-semibold text-foreground">
-          Detuning Δ = E_f − E_i
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          How far the drive is from resonance. Larger |Δ| caps how much population ever transfers.
-        </p>
-        <input
-          type="range"
+      <ControlSection
+        id="rabi-detuning"
+        title="Detuning Δ = E_f − E_i"
+        description="How far the drive is from resonance. Larger |Δ| caps how much population ever transfers."
+      >
+        <SimulatorSlider
+          label="Δ"
+          value={detuning}
           min={-4}
           max={4}
           step={0.1}
-          value={detuning}
-          onChange={(e) => onDetuningChange(Number(e.target.value))}
-          className="mt-3 w-full accent-brand"
-          aria-label="Detuning Δ"
+          formatValue={(v) => v.toFixed(2)}
+          onChange={onDetuningChange}
         />
-        <p className="mt-1 font-mono text-xs text-muted-foreground">Δ = {detuning.toFixed(2)}</p>
-      </section>
+      </ControlSection>
 
       <section aria-label="Time">
         <FrameSlider

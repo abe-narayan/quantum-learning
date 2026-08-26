@@ -93,18 +93,26 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="As literal as a qubit gets">
+Spin qubits are the platform that uses spin-1/2's two-level structure as literally as possible: a single electron's actual spin, confined in a tiny region of semiconductor, encoding one qubit with no additional artificial circuit or atomic transition needed.
+</LessonHook>
+
 ## Motivation
 
 Angular Momentum & Spin built spin-1/2's two-level structure
 mathematically; spin qubits are the platform that uses it as literally
-as possible: a single electron's actual spin, confined in a tiny region
-of semiconductor, encoding one qubit with no additional artificial
-circuit or atomic transition needed.
+as possible.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Quantum_Bus_Device_%288116044085%29.jpg"
   alt="A micrograph of a real spin-qubit quantum bus device, showing seven gate electrodes converging on the quantum dots at its center, with a Princeton tiger logo shown for scale at 1 millimeter"
   caption="A real spin-qubit device: gate electrodes patterned on a chip converge to define the quantum dots at the center, exactly this lesson's confinement mechanism, fabricated with lithographic tooling much closer to a transistor's scale than a superconducting circuit's."
+  pins={[
+    { id: "dot", x: 22, y: 42, label: "The gate-defined quantum dot, wire-bonded to the seven electrode lines fanning out below — the electron confined here is the qubit." },
+    { id: "electrodes", x: 35, y: 58, label: "Seven separate gate electrodes, each independently voltage-tunable, whose combined field defines and confines the dot above." },
+    { id: "pad", x: 20, y: 73, label: "One of the seven macroscopic bond pads wired to the chip's fine gate electrodes." },
+    { id: "tiger", x: 84, y: 65, label: "Princeton tiger logo, included in the original micrograph for scale — about 1 millimeter across." },
+  ]}
   credit="K. Petersson / Princeton University, NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Bus_Device_(8116044085).jpg"
   license="Public Domain (U.S. Government work)"
@@ -267,6 +275,7 @@ challenges (uniform, reliable dot fabrication; addressing individual
 spins without disturbing neighbors) that remain active engineering
 problems.
 
+<ResearchConnection title="Betting a production fab line on spin qubits" source="Intel Components Research; academic groups at Delft, UNSW, and RIKEN">
 Intel is the clearest bet on this pitch: its Components Research group
 fabricates spin-qubit test chips (Tunnel Falls) on the same 300mm
 production line and tooling it uses for commercial transistors, and it
@@ -275,7 +284,10 @@ sit inside the refrigerator next to the qubits instead of routing every
 control line out to room-temperature electronics. Academic groups at
 Delft, UNSW, and RIKEN have pushed isotopically-purified silicon devices
 toward the multi-qubit, high-fidelity regime that would make this
-manufacturing argument pay off. Whether "the same fab line as classical
+manufacturing argument pay off.
+</ResearchConnection>
+
+Whether "the same fab line as classical
 chips" beats "atoms and photons that are identical by nature" is
 precisely the question the rest of this course's comparison turns on.
 
@@ -296,7 +308,7 @@ Mechanics already derived.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking "smaller" automatically means "easier to build at scale."**
 Small size gives a manufacturing-compatibility advantage, but
 spin qubits still face real, unresolved engineering challenges
@@ -304,7 +316,7 @@ spin qubits still face real, unresolved engineering challenges
 before that advantage translates into a working large-scale device.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing spin qubits with superconducting qubits because both are
 "solid-state."** The qubit itself is physically different: a
 single confined electron's spin, versus a collective circuit
@@ -344,5 +356,7 @@ coherence and control.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Capstone: Comparing Qubit Platforms](/lessons/quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms), which puts all five
 platforms side by side on the same axes, rather than one at a time.
+</NextDiscovery>

@@ -57,14 +57,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Picture splitting a graph's vertices into two teams so that as many edges as possible cross between them: that's Max-Cut. This lesson runs the actual circuit at good parameters and checks the result against the true brute-force answer.
+</LessonHook>
+
 ## Motivation
 
-Picture splitting a graph's vertices into two teams so that as many
-edges as possible cross between them: that's Max-Cut. The last lesson
+The last lesson
 built the mechanism (cost phases, then a mixer) that biases the
 circuit's measurement distribution toward good splits, starting from a
 baseline of no optimization at all (expected cut $=|E|/2$). This lesson
-runs the actual circuit at good parameters, on a triangle and on a
+runs it on a triangle and on a
 single edge, and checks the result against `bruteForceMaxCut`, the true
 answer, computable directly since these graphs are small enough to check
 every one of the $2^n$ colorings.
@@ -209,7 +212,7 @@ structural argument, not just by checking all 8 colorings by computer.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming QAOA's near-100% result here generalizes to larger, harder
 graphs.** Both worked examples are small and structurally simple. Real
 Max-Cut instances at meaningful scale are NP-hard, and QAOA's
@@ -217,7 +220,7 @@ approximation ratio in practice depends heavily on graph structure and
 circuit depth $p$, not guaranteed to stay this close to optimal.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating the grid-search parameters as universal.** $\gamma\approx0.6,
 \beta\approx0.3$ was good specifically for the triangle;
 $\gamma\approx1.55,\beta\approx0.4$ was good specifically for the single
@@ -255,6 +258,8 @@ each time.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next, the capstone: [Hybrid Algorithms, NISQ, and Honest Scope](/lessons/quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope), which
 places Shor's algorithm and the VQE/QAOA family side by side against what
 today's actual quantum hardware can and can't do.
+</NextDiscovery>

@@ -24,13 +24,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+The earlier Position and Momentum lesson stated [x̂,p̂]=iħ and moved on, promising the derivation once continuous position existed. This lesson is that promise kept: p̂ isn't asserted here, it's derived from a single physical requirement.
+</LessonHook>
+
 ## Motivation
 
 The "From Classical to Quantum" course's Position and Momentum lesson was
-explicit that it was a *preview*: it stated $[\hat x,\hat p]=i\hbar$ and
-moved on, promising the derivation once continuous position existed. This
-lesson is that promise kept. $\hat p$ isn't asserted here, it's *derived*
-from a single physical requirement.
+explicit that it was only a *preview*.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Bundesarchiv_Bild183-R57262%2C_Werner_Heisenberg.jpg"
@@ -186,13 +187,13 @@ actually running the Fourier transform, not by reading off a label:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Dropping the factor of $i$.** $\hat p = -\hbar\,d/dx$ (missing the $i$)
 is not Hermitian and gives an imaginary $[\hat x,\hat p]$. The $i$ is
 load-bearing, not decorative.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Applying $\hat x\hat p$ and $\hat p\hat x$ in the wrong order.**
 $\hat p\hat x\,\psi$ requires differentiating the *product* $x\psi(x)$
 (product rule, picking up the extra $\psi$ term). It is not the same as
@@ -227,7 +228,9 @@ $x$ times $\hat p\psi$.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Momentum Space and the Fourier Transform](/lessons/quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform), the momentum-space
 representation $\phi(k)$ this section's plane-wave eigenfunctions build
 toward, and the actual numerical machinery (a real FFT) this platform uses
 to compute it, explored live in the Wavefunction Explorer.
+</NextDiscovery>

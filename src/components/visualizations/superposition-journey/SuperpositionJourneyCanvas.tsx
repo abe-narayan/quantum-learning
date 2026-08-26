@@ -66,7 +66,7 @@ export function SuperpositionJourneyCanvas({
         y1={AMP_ZERO}
         x2={VIEW_WIDTH - 20}
         y2={AMP_ZERO}
-        style={{ stroke: "var(--border)" }}
+        className="stroke-border"
         strokeWidth={1}
         strokeDasharray="3 3"
       />
@@ -127,7 +127,7 @@ export function SuperpositionJourneyCanvas({
               y1={AMP_BOTTOM + 6}
               x2={colX}
               y2={PROB_TOP - 14}
-              style={{ stroke: "var(--muted-foreground)" }}
+              className="stroke-muted-foreground"
               strokeWidth={1}
               strokeDasharray="2 3"
             />

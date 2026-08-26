@@ -67,6 +67,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="The number that means nothing alone">
+  Two papers can report the exact same measured probability — and mean
+  two completely different things by it. The difference is never in the
+  number itself.
+</LessonHook>
+
 ## Motivation
 
 A headline says a quantum computer measured a probability of $0.85$ for
@@ -138,26 +144,28 @@ Suppose a circuit is run $N$ times ("shots") and a specific outcome is
 observed $k$ of those times. The natural estimate of that outcome's true
 probability is
 
+<DerivationSteps>
+<DerivationStep annotation="The natural estimate of the true probability, from k successes out of N shots.">
 $$
 \hat p = \frac{k}{N}
 $$
-
-Each run is an independent Bernoulli trial (outcome happens or doesn't,
-with true probability $p$), so $k$ is binomially distributed,
-$k\sim\text{Binomial}(N,p)$, with mean $Np$ and variance $Np(1-p)$.
-Dividing by the constant $N$ to get $\hat p = k/N$ scales the variance by
-$1/N^2$:
-
+</DerivationStep>
+<DerivationStep annotation="Each run is an independent Bernoulli trial with true probability p, so k is binomially distributed with mean Np and variance Np(1-p) — a standard fact about the binomial distribution, not derived here.">
+$$
+k\sim\text{Binomial}(N,p), \qquad \text{Var}(k) = Np(1-p)
+$$
+</DerivationStep>
+<DerivationStep annotation="Dividing by the constant N to get p̂ = k/N scales the variance by 1/N², since Var(cX) = c²Var(X) for a constant c.">
 $$
 \text{Var}(\hat p) = \frac{\text{Var}(k)}{N^2} = \frac{Np(1-p)}{N^2} = \frac{p(1-p)}{N}
 $$
-
-so the **standard error** — the standard deviation of the estimator
-$\hat p$ itself, not of a single trial — is
-
+</DerivationStep>
+<DerivationStep annotation="The standard error is the standard deviation of the estimator p̂ itself, not of a single trial — the square root of the variance just derived.">
 $$
 \text{SE}(\hat p) = \sqrt{\frac{p(1-p)}{N}}
 $$
+</DerivationStep>
+</DerivationSteps>
 
 This is the single most important formula in this lesson: it says the
 uncertainty on an estimated probability shrinks as $1/\sqrt N$, not as
@@ -170,7 +178,7 @@ $$
 \hat p \pm 1.96\,\text{SE}(\hat p)
 $$
 
-<Callout type="note">
+<Callout type="warning">
 The $1.96$ factor is the two-sided 95% critical value of the standard
 normal distribution — nothing quantum-specific about it. The same
 formula applies to a poll, an A/B test, or a coin-flip experiment; the
@@ -180,6 +188,13 @@ prediction of quantum mechanics, not a nuisance parameter).
 </Callout>
 
 ## Physical Interpretation: Why This Matters
+
+<InsightBlock>
+  A scientific claim, as opposed to an anecdote, states enough about how
+  a result was obtained that someone else could check it — and enough
+  about its statistical uncertainty that they'd know how much to trust
+  it even without checking.
+</InsightBlock>
 
 None of this is bureaucratic box-checking. A scientific claim, as
 opposed to an anecdote, is exactly one that states enough about *how* a
@@ -318,7 +333,7 @@ together.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating a single reported number, with no shot count or confidence
 interval, as a complete scientific claim — regardless of how impressive
 it sounds.** "We measured $p=0.85$" is not, by itself, a statement
@@ -330,7 +345,7 @@ claim states the shot count and the resulting uncertainty every time,
 not just the number that looks good.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming "more decimal places" means "more precision."** Reporting
 $p=0.8534$ instead of $p=0.85$ says nothing about statistical confidence
 by itself — decimal places describe the *arithmetic* of $k/N$, not the
@@ -385,9 +400,11 @@ the actual standard error.
 
 ## Further Exploration
 
-This lesson's four-component framework and shot-noise arithmetic are the
-last new machinery in the entire QuantumLearn curriculum. Next, the
-[capstone: The Quantum Computing Landscape Today](/lessons/apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today)
-synthesizes the whole journey — from "what is a qubit" to reproducing a
-real experimental claim — into a single, honest picture of where the
-field actually stands.
+<NextDiscovery>
+  This lesson's four-component framework and shot-noise arithmetic are the
+  last new machinery in the entire QuantumLearn curriculum. Next, the
+  [capstone: The Quantum Computing Landscape Today](/lessons/apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today)
+  synthesizes the whole journey — from "what is a qubit" to reproducing a
+  real experimental claim — into a single, honest picture of where the
+  field actually stands.
+</NextDiscovery>

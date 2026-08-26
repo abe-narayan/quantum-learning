@@ -6,7 +6,7 @@ export const stinespringEnvironmentOutcomeProbability: NumericProblem = {
     title: "Probability the Environment Learns a Decay Occurred",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["stinespring-dilation", "amplitude-damping", "kraus-operators"],

@@ -24,6 +24,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Leave a free wave packet alone and it doesn't just drift — it spreads,
+  inevitably, with no classical counterpart. This is exact unitary
+  quantum mechanics, not noise or decoherence.
+</LessonHook>
+
 ## Motivation
 
 The Free-Particle Wave Packets lesson asserted the packet's *average*
@@ -56,24 +62,30 @@ $$
 
 Apply this to $A=\hat x$ with $\hat H=\hat p^2/2m+V(x)$. Since $V(x)$
 commutes with $\hat x$ (both just multiply by functions of $x$), only the
-kinetic term contributes:
+kinetic term contributes.
 
+<DerivationSteps>
+  <DerivationStep annotation="V(x) commutes with x̂, so only the kinetic term p̂²/2m survives in the commutator with x̂.">
 $$
 [\hat H,\hat x] = \frac{1}{2m}[\hat p^2,\hat x]
 $$
-
-Using $[\hat p^2,\hat x] = \hat p[\hat p,\hat x]+[\hat p,\hat x]\hat p =
-\hat p(-i\hbar)+(-i\hbar)\hat p = -2i\hbar\hat p$ (from
-$[\hat p,\hat x]=-i\hbar$, the antisymmetric partner of the commutator
-derived two lessons ago):
-
+  </DerivationStep>
+  <DerivationStep annotation="Expand [p̂²,x̂] using the product rule for commutators, then substitute [p̂,x̂]=−iħ, the antisymmetric partner of the commutator derived two lessons ago.">
+$$
+[\hat p^2,\hat x] = \hat p[\hat p,\hat x]+[\hat p,\hat x]\hat p = \hat p(-i\hbar)+(-i\hbar)\hat p = -2i\hbar\hat p
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Substitute back into [H,x] and simplify.">
 $$
 [\hat H,\hat x] = \frac{-2i\hbar\hat p}{2m} = \frac{-i\hbar\hat p}{m}
 $$
-
+  </DerivationStep>
+  <DerivationStep annotation="Plug into the general Ehrenfest identity from above — the i and −i cancel, leaving the classical-looking result.">
 $$
 \frac{d\langle x\rangle}{dt} = \frac{i}{\hbar}\left(\frac{-i\hbar}{m}\right)\langle\hat p\rangle = \frac{\langle p\rangle}{m}
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 exactly the group-velocity result from two lessons ago, now derived
 from the general time-evolution machinery rather than assumed.
@@ -187,13 +199,13 @@ exactly.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Thinking dispersion means the wavefunction is losing probability.**
 Norm stays exactly 1 throughout. Dispersion redistributes probability
 over a wider region; it never destroys it.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting bound states to disperse too.** Energy eigenstates
 (infinite well, harmonic oscillator) are exactly stationary. Dispersion
 is specifically a free-particle (or more generally, non-eigenstate)
@@ -227,6 +239,14 @@ rates.
 
 ## Further Exploration
 
-Next: [Tunneling and the Finite Barrier](/lessons/quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier), an outright non-classical
-phenomenon, where part of a wave packet crosses a barrier it classically
-never could.
+<ChallengePrompt prompt="The position spread σ(t) grows without bound for a free packet. What about the momentum spread Δp — does it grow, shrink, or stay exactly constant over time?">
+  Reread the "Why a free packet spreads" derivation: each momentum
+  component's amplitude picks up only a phase, $e^{-i\hbar k^2t/(2m)}$ —
+  does a pure phase change $|\phi(k)|^2$?
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Tunneling and the Finite Barrier](/lessons/quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier), an outright non-classical
+  phenomenon, where part of a wave packet crosses a barrier it classically
+  never could.
+</NextDiscovery>

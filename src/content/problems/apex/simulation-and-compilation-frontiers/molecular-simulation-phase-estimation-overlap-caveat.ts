@@ -6,7 +6,7 @@ export const molecularSimulationPhaseEstimationOverlapCaveat: ConceptualProblem 
     title: "Is Quantum Phase Estimation's Efficiency Really Unconditional?",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 9,
     problemType: "conceptual",
     tags: ["quantum-phase-estimation", "vqe", "ground-state-overlap", "fault-tolerance", "honest-scope"],

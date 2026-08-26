@@ -6,7 +6,7 @@ export const capstoneToolboxHonestUnificationMc: MultipleChoiceProblem = {
     title: "What QSVT Does and Doesn't Prove",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "multiple-choice",
     tags: ["capstone", "synthesis", "qsvt", "block-encoding"],

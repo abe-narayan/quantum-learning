@@ -60,9 +60,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Before any quantum circuit enters the picture">
+RSA encryption's security rests on factoring large numbers being hard. Shor's algorithm starts by turning that problem into an entirely classical one: finding the order of a number, mod N.
+</LessonHook>
+
 ## Motivation
 
-RSA encryption's security rests on factoring large numbers being hard: no
+No
 known *classical* algorithm factors an $n$-digit number in time
 polynomial in $n$.
 
@@ -187,14 +191,14 @@ below:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Believing Shor's algorithm is "a quantum computer that factors
 directly."** It's a classical reduction (factoring → order-finding) plus
 one quantum subroutine (order-finding). The factoring step itself, once
 $r$ is known, is entirely classical gcd arithmetic.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to check $a^{r/2}\not\equiv-1\pmod N$.** Skipping this check
 can produce $\gcd(a^{r/2}+1,N)=N$, the trivial "factor" $N$ itself, not
 useful information. This is exactly why a failed attempt calls for
@@ -229,6 +233,8 @@ picking a new $a$, not for concluding $N$ is prime.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Quantum Period-Finding Circuit](/lessons/quantum-computing/quantum-algorithms-ii/the-quantum-period-finding-circuit), which builds $r$
 quantum-mechanically using exactly the phase estimation machinery from
 Quantum Algorithms I.
+</NextDiscovery>

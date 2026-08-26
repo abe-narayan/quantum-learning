@@ -25,11 +25,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A number that sounds bigger than it is">
+A press release announcing "1000 qubits" sounds like an order of magnitude more computer than one announcing "100 qubits." It might not be.
+</LessonHook>
+
 ## Motivation
 
-A press release announcing "1000 qubits" sounds like an order of
-magnitude more computer than one announcing "100 qubits." It might not
-be. Physical Qubit Platforms and this course's earlier lessons built up
+Physical Qubit Platforms and this course's earlier lessons built up
 individual error sources, T1/T2, crosstalk, readout error, one at a
 time, in isolation. This lesson asks the question that actually decides
 whether a device is useful: what happens when hundreds or thousands of
@@ -144,14 +146,14 @@ correction.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating "N qubits" as a complete description of a device's
 capability.** As this lesson's table shows, per-gate error rate matters
 at least as much as qubit count. A large, noisy device can be less
 useful than a smaller, cleaner one for a given task.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming error compounds additively (subtracting N×(1-p) from 1)
 rather than multiplicatively (p^N).** These give very different answers
 at large N. The multiplicative form is what unitarity/independent-trial
@@ -185,7 +187,9 @@ probability actually requires.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Roadmaps to Fault Tolerance](/lessons/quantum-hardware/noise-decoherence-and-scaling/roadmaps-to-fault-tolerance), which closes this course by
 connecting every error source covered so far to the concrete overhead
 numbers (physical qubits per logical qubit) that real fault-tolerant
 quantum computing roadmaps target.
+</NextDiscovery>

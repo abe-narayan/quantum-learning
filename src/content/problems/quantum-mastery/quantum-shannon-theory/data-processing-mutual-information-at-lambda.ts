@@ -6,7 +6,7 @@ export const dataProcessingMutualInformationAtLambda: NumericProblem = {
     title: "Mutual Information After Dephasing at lambda=0.6",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/the-data-processing-inequality",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["data-processing-inequality", "mutual-information", "dephasing-channel"],

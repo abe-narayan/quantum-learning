@@ -38,6 +38,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Nobody has ever measured 3+2i volts. That single fact about the real
+  world forces every observable in quantum mechanics into one narrow
+  class of operators.
+</LessonHook>
+
 ## Motivation
 
 A measurement outcome, the energy of an atom, the spin of an electron, is
@@ -82,26 +88,47 @@ $A$ is **Hermitian** (or self-adjoint) if $A = A^\dagger$.
 
 ### Theorem: Hermitian operators have real eigenvalues
 
-Let $A|v\rangle=\lambda|v\rangle$, $v\ne0$, $A$ Hermitian. Consider
-$\langle v|Av\rangle$. Using the adjoint definition with $u=v$:
+<PredictBeforeReveal
+  question="Is it guaranteed that a Hermitian operator's eigenvalues are real, or just typically the case for the ones physics happens to use?"
+  options={[
+    { label: "Guaranteed, for every Hermitian operator", value: "guaranteed" },
+    { label: "Just a common pattern, not a strict guarantee", value: "typical" },
+    { label: "Only for operators on real (not complex) vector spaces", value: "real-only" },
+  ]}
+  correctValue="guaranteed"
+  explanation="Strictly guaranteed, with no exceptions, for any Hermitian operator on any complex inner product space. The derivation below needs nothing beyond A=A† and the inner product axioms — it never assumes anything about the specific operator beyond Hermiticity."
+/>
 
+Let $A|v\rangle=\lambda|v\rangle$, $v\ne0$, $A$ Hermitian. Consider
+$\langle v|Av\rangle$.
+
+<DerivationSteps>
+  <DerivationStep annotation="Use the adjoint definition with u=v, then substitute A†=A.">
 $$
 \langle v|Av\rangle = \langle A^\dagger v|v\rangle = \langle Av|v\rangle
 $$
-
-(the middle step uses $A^\dagger=A$). But $\langle Av|v\rangle = \langle
-v|Av\rangle^*$ by conjugate symmetry of the inner product. So $\langle
-v|Av\rangle = \langle v|Av\rangle^*$: a complex number equal to its own
-conjugate, which forces it to be **real**. Now compute
-$\langle v|Av\rangle$ directly using the eigenvalue equation:
-
+  </DerivationStep>
+  <DerivationStep annotation="Conjugate symmetry of the inner product relates ⟨Av|v⟩ back to ⟨v|Av⟩.">
+$$
+\langle Av|v\rangle = \langle v|Av\rangle^*
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Combine the two: a complex number equal to its own conjugate is forced to be real.">
+$$
+\langle v|Av\rangle = \langle v|Av\rangle^* \quad\Longrightarrow\quad \langle v|Av\rangle \in \mathbb{R}
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Separately, compute ⟨v|Av⟩ directly using the eigenvalue equation.">
 $$
 \langle v|Av\rangle = \langle v|\lambda v\rangle = \lambda\langle v|v\rangle = \lambda\|v\|^2
 $$
-
-Since $\langle v|Av\rangle$ is real and $\|v\|^2$ is real and strictly
-positive ($v\ne0$), $\lambda = \langle v|Av\rangle / \|v\|^2$ must be
-real.
+  </DerivationStep>
+  <DerivationStep annotation="⟨v|Av⟩ is real (previous step) and ‖v‖² is real and strictly positive (v≠0), so λ itself must be real.">
+$$
+\lambda = \frac{\langle v|Av\rangle}{\|v\|^2} \in \mathbb{R}
+$$
+  </DerivationStep>
+</DerivationSteps>
 
 ### Theorem: eigenvectors of different eigenvalues are orthogonal
 
@@ -214,13 +241,13 @@ off-diagonal entries even matter.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing "Hermitian" with "real."** A Hermitian matrix can have complex
 off-diagonal entries (Pauli-$Y$ is a standard example). The requirement
 is $A=A^\dagger$, not that every entry is real.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming every operator has real eigenvalues.** This is a special
 property of Hermitian operators, not a general fact; plenty of
 non-Hermitian matrices have complex eigenvalues.
@@ -262,6 +289,13 @@ It's the fastest way to rule out a candidate.
 
 ## Further Exploration
 
-Next: [Unitary Operators](/lessons/quantum-mechanics/mathematical-foundations/unitary-operators), the other essential class: the ones that
-preserve norms, representing how quantum states evolve and transform
-between bases without losing probability.
+<ChallengePrompt prompt="Pauli-X's eigenvectors are |+⟩ (eigenvalue +1) and |−⟩ (eigenvalue −1) — established in the Eigenvalues and Eigenvectors lesson. Verify directly that ⟨+|−⟩=0, confirming the orthogonality theorem proved above for this specific pair.">
+  Just compute the inner product directly from $|+\rangle=(1,1)/\sqrt2$
+  and $|-\rangle=(1,-1)/\sqrt2$ — no need to redo the general proof.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Unitary Operators](/lessons/quantum-mechanics/mathematical-foundations/unitary-operators), the other essential class: the ones that
+  preserve norms, representing how quantum states evolve and transform
+  between bases without losing probability.
+</NextDiscovery>

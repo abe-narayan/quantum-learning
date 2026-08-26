@@ -37,15 +37,20 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+This course's distance-3 codes correct up to 1 error, but real hardware makes errors continuously, at some physical rate per gate. Does adding more error correction always help? The threshold theorem answers precisely: only sometimes.
+</LessonHook>
+
+<Question>
+Does adding more error correction always help a noisy quantum computer?
+</Question>
+
 ## Motivation
 
-This course's distance-3 codes correct up to 1 error, but real hardware
-makes errors continuously, at some physical rate per gate. Does adding
-more error correction always help? The **threshold theorem** answers
-precisely: only sometimes, and understanding why closes the loop back to
-Quantum Algorithms II's Shor's-algorithm capstone, which flagged
-fault-tolerant hardware as the missing ingredient for factoring at
-cryptographic scale.
+The **threshold theorem** answers precisely, and understanding why
+closes the loop back to Quantum Algorithms II's Shor's-algorithm
+capstone, which flagged fault-tolerant hardware as the missing
+ingredient for factoring at cryptographic scale.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Full_wafer_of_Intel_quantum_computers.jpg"
@@ -169,14 +174,14 @@ the many-error, above-threshold regime.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming more error correction is always better.** Above threshold,
 it's actively worse: the qualitative argument above, and Lesson 6's
 concrete weight-2-error example, both show why adding correction
 machinery can introduce more error than it removes.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating the cited $p_{\text{th}}$ and qubit-overhead figures as this
 platform's own derived results.** They aren't: this course's own
 simulated codes are distance-3, far too small to derive a threshold or a
@@ -220,6 +225,8 @@ something this platform computed.
 
 ## Further Exploration
 
+<NextDiscovery>
 This completes **Quantum Error Correction & Fault Tolerance**, and with
 it, the full Quantum Computing pillar sequence from single qubits through
 fault-tolerant hardware requirements.
+</NextDiscovery>

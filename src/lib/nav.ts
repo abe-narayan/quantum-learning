@@ -5,7 +5,7 @@ export type NavItem = {
 };
 
 // The logo already links home, so "Home" as a text link was pure duplication
-// — dropped rather than kept for symmetry. The four pillar pages moved into
+// — dropped rather than kept for symmetry. The pillar pages moved into
 // `TRACK_NAV_ITEMS` (rendered as a grouped "Tracks" dropdown by Navbar.tsx)
 // since a flat 11-item bar was flagged repeatedly this session as real,
 // user-facing redundancy: Learn/Lessons/Mechanics/Computing/Hardware/Software
@@ -49,7 +49,8 @@ export const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-/** The five pillar/track pages, grouped under one "Tracks" nav dropdown. */
+/** The six pillar/track pages, grouped under one "Tracks" nav dropdown, in
+ *  curriculum order (see `PILLAR_ORDER` in `src/lib/design/pillars.ts`). */
 export const TRACK_NAV_ITEMS: NavItem[] = [
   {
     label: "Mechanics",
@@ -70,6 +71,11 @@ export const TRACK_NAV_ITEMS: NavItem[] = [
     label: "Software",
     href: "/software",
     description: "The simulators, compilers, and SDKs behind quantum programs.",
+  },
+  {
+    label: "Mastery",
+    href: "/mastery",
+    description: "Graduate-level rigor: spectral theory, quantum information theory, and advanced algorithms.",
   },
   {
     label: "Apex",

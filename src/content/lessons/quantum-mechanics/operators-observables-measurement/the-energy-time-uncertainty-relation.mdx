@@ -38,6 +38,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Energy-time uncertainty gets quoted constantly, but it can't come from
+  a commutator the way position-momentum does — there is no time
+  operator to commute with anything.
+</LessonHook>
+
 ## Motivation
 
 Every uncertainty relation built so far, $\Delta x\Delta p\ge\hbar/2$,
@@ -84,34 +90,28 @@ a small one means it's changing fast.
 
 ### Applying the general uncertainty bound to $H$ and $A$
 
-The general relation from Expectation Values and Uncertainty, applied to
-$H$ and this same $A$:
-
+<DerivationSteps>
+  <DerivationStep annotation="Apply the general operator uncertainty relation from Expectation Values and Uncertainty to H and this same A.">
 $$
 \Delta E\,\Delta A \ge \frac12\big|\langle[H,A]\rangle\big|
 $$
-
-### Bringing in Ehrenfest's theorem
-
-Ehrenfest's theorem (derived in Wave Packet Dynamics and Dispersion, for
-*any* observable with no explicit time dependence) states
-
+  </DerivationStep>
+  <DerivationStep annotation="Ehrenfest's theorem (Wave Packet Dynamics and Dispersion) relates the same commutator directly to A's rate of change, for any observable with no explicit time dependence.">
 $$
 \frac{d\langle A\rangle}{dt} = \frac{i}{\hbar}\langle[H,A]\rangle \quad\Longrightarrow\quad \big|\langle[H,A]\rangle\big| = \hbar\left|\frac{d\langle A\rangle}{dt}\right|
 $$
-
-Substituting into the uncertainty bound:
-
+  </DerivationStep>
+  <DerivationStep annotation="Substitute this into the uncertainty bound from the first step.">
 $$
 \Delta E\,\Delta A \ge \frac{\hbar}{2}\left|\frac{d\langle A\rangle}{dt}\right|
 $$
-
-Dividing both sides by $|d\langle A\rangle/dt|$ and recognizing the
-definition of $\Delta t_A$:
-
+  </DerivationStep>
+  <DerivationStep annotation="Divide both sides by |d⟨A⟩/dt| and recognize the definition of Δt_A from above.">
 $$
-\boxed{\;\Delta E\,\Delta t_A \ge \frac{\hbar}{2}\;}
+\Delta E\,\Delta t_A \ge \frac{\hbar}{2}
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 Derived, not asserted, and honest about what $\Delta t$ actually means:
 not an uncertainty in a measured time, but the shortest timescale on
@@ -175,7 +175,7 @@ computed check.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating $\Delta t$ as "the uncertainty in a measured time," the way
 $\Delta x$ is the uncertainty in a measured position.** Time is never a
 measurement outcome with a probability distribution in this framework.
@@ -183,7 +183,7 @@ $\Delta t_A$ is a *timescale derived from* $A$'s dynamics, a
 fundamentally different kind of quantity.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Trying to derive this the same way as $\Delta x\Delta p\ge\hbar/2$,
 via $[\hat E,\hat t]$.** There is no $\hat t$ operator to commute with
 anything in ordinary (non-relativistic, fixed-Hamiltonian) quantum
@@ -220,6 +220,14 @@ Ehrenfest's theorem instead.
 
 ## Further Exploration
 
-Next: [Degeneracy in Practice](/lessons/quantum-mechanics/operators-observables-measurement/degeneracy-in-practice), a single fully worked multi-qubit
-system pulling together spectral decomposition, compatible observables,
-and the generalized measurement postulate from earlier in this course.
+<ChallengePrompt prompt="Two different states have ΔE₁ = 1 and ΔE₂ = 4. Which one is guaranteed to have the shorter minimum Δt_A, and by what factor?">
+  Same rearranged bound as before, $\Delta t_A\ge\hbar/(2\Delta E)$, but
+  compare two $\Delta E$ values directly instead of computing one
+  $\Delta t_A$ in isolation.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Degeneracy in Practice](/lessons/quantum-mechanics/operators-observables-measurement/degeneracy-in-practice), a single fully worked multi-qubit
+  system pulling together spectral decomposition, compatible observables,
+  and the generalized measurement postulate from earlier in this course.
+</NextDiscovery>

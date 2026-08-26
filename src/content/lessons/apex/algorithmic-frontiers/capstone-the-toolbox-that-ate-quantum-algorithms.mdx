@@ -83,9 +83,16 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Five lessons, one machine">
+  Grover's algorithm, amplitude estimation, Hamiltonian simulation, and
+  linear-systems solving — four algorithms discovered decades apart, by
+  different people, for different problems — turn out to be the same
+  circuit, with one number changed.
+</LessonHook>
+
 ## Motivation
 
-Five lessons, one machine. It's worth saying that plainly before
+It's worth saying that plainly before
 recapping any of them, because the payoff of this capstone isn't a new
 derivation — it's realizing that no new derivation is needed. **Block
 encodings** (Module 1) gave a universal way to embed an arbitrary matrix
@@ -152,6 +159,12 @@ phase-sequence machinery — with only $P(x)$ changed.
 | Amplitude estimation | The same near-step polynomial, applied at several geometrically increasing degrees and combined statistically (no new polynomial family — reuses the row above) | Extracts $a$ itself to additive error $\epsilon$ in $O(1/\epsilon)$ total applications, matching phase estimation's scaling without a phase register |
 | Hamiltonian simulation | A truncated Jacobi-Anger / Chebyshev expansion approximating $e^{-ixt}$ (as a real cosine part and an imaginary sine part, since QSP only ever produces real-coefficient polynomials directly) | Implements $e^{-iHt}$ to accuracy $\epsilon$ from a block encoding of $H$, with query count scaling like $O(t\lVert H\rVert+\log(1/\epsilon))$ |
 | Linear systems (QSVT-based HHL) | An odd polynomial approximating $1/x$, regularized away from $x=0$, degree scaling like $O(\kappa\log(1/\epsilon))$ | Applies (a normalized) $A^{-1}$ to a block-encoded $\vec b$, producing a state proportional to the solution $\vec x$, at a cost set by the condition number $\kappa$ |
+
+<InsightBlock>
+  One polynomial now produces four algorithms: pick the function you
+  actually need, find a polynomial that approximates it well enough, and
+  QSVT turns that polynomial into a circuit.
+</InsightBlock>
 
 Read across any single row and the pattern is the whole course: pick the
 function you actually need, find a polynomial that approximates it well
@@ -324,7 +337,7 @@ computed from this course's own formulas rather than asserted.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **"QSVT proves Grover's original algorithm, Trotter's formula, or HHL's
 original circuit were wrong."** None of them were. QSVT *explains* each
 as one instance of a shared construction and, for some, matches or
@@ -333,7 +346,7 @@ methodology — it doesn't retroactively invalidate a single correct,
 already-published result.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **"Now that I know QSVT, any new algorithm problem is basically
 solved."** The framework only takes over once you already have an
 efficient block encoding of your matrix of interest *and* a
@@ -342,7 +355,7 @@ can still be hard, problem-specific research questions —
 QSVT is the mechanical middle step, not a replacement for either one.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating "QSVT unifies these algorithms" as meaning they all now have
 identical query complexity.** They don't, and the table above says so
 directly: Grover-via-QSVT exactly reproduces $\Theta(\sqrt N)$ (no
@@ -351,6 +364,12 @@ simulation provably beats naive first-order Trotterization's scaling.
 "Unified framework" describes the *construction*, not a claim that every
 instance's cost becomes the same.
 </Callout>
+
+<ChallengePrompt prompt="Pick a quantum algorithms paper you haven't read before that mentions 'block encoding,' 'quantum signal processing,' or 'quantum singular value transformation.' Identify the matrix being encoded and the polynomial being applied.">
+  You now have every piece needed to parse that construction: what
+  matrix, what block encoding, and what function of its singular values —
+  even for an application you've never seen before.
+</ChallengePrompt>
 
 ## Practice Questions
 
@@ -396,11 +415,13 @@ instance's cost becomes the same.
 
 ## Further Exploration
 
-This completes **Algorithmic Frontiers**. The skill this capstone names
-directly, reading a real construction out of a real paper, is the
-explicit subject of a later APEX course: [How to Read a Quantum
-Computing
-Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper),
-which takes this course's "what polynomial, what block encoding" reading
-strategy and applies it to actual published claims, alongside the tools
-for telling a theorem from a heuristic from a numerical experiment.
+<NextDiscovery>
+  This completes **Algorithmic Frontiers**. The skill this capstone names
+  directly, reading a real construction out of a real paper, is the
+  explicit subject of a later APEX course: [How to Read a Quantum
+  Computing
+  Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper),
+  which takes this course's "what polynomial, what block encoding" reading
+  strategy and applies it to actual published claims, alongside the tools
+  for telling a theorem from a heuristic from a numerical experiment.
+</NextDiscovery>

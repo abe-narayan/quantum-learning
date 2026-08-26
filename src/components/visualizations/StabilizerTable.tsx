@@ -79,11 +79,11 @@ export function StabilizerTable({
     <div
       role="group"
       aria-label={ariaLabel}
-      className="not-prose space-y-4 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4"
+      className="not-prose space-y-4 overflow-x-auto panel-inset p-4"
     >
       <div className="flex flex-wrap items-start gap-6">
         <section aria-labelledby="stabilizer-qubit-heading">
-          <h3 id="stabilizer-qubit-heading" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 id="stabilizer-qubit-heading" className="tech-label">
             Qubit
           </h3>
           <div role="group" aria-label="Qubit to error" className="mt-2 flex flex-wrap gap-1.5">
@@ -110,7 +110,7 @@ export function StabilizerTable({
         </section>
 
         <section aria-labelledby="stabilizer-error-heading">
-          <h3 id="stabilizer-error-heading" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 id="stabilizer-error-heading" className="tech-label">
             Error type
           </h3>
           <div role="group" aria-label="Error type" className="mt-2 flex gap-1.5">

@@ -163,14 +163,19 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Diffusive versus ballistic">
+  A classical random walker spreads as $O(\sqrt T)$. A quantum walker,
+  on the exact same line with the exact same step size, spreads
+  ballistically — $O(T)$, quadratically farther.
+</LessonHook>
+
 ## Motivation
 
 A classical random walker on a line diffuses: after $T$ steps its
 typical displacement is $O(\sqrt T)$, the signature of a sum of
-independent random steps (the central limit theorem). A quantum walker,
-run on the exact same line with the exact same step size, spreads
-*ballistically*: typical displacement $O(T)$, quadratically farther.
-This isn't a vague claim about "quantum speedup": it's a precise,
+independent random steps (the central limit theorem). The quantum
+walker's ballistic spread is not a vague claim about "quantum
+speedup": it's a precise,
 derivable fact about interference between paths that a classical walk's
 independent, memoryless steps can never produce, and it's the mechanism
 behind quantum walk search algorithms achieving the same quadratic
@@ -414,7 +419,7 @@ this lesson's own real simulation, not merely quoted from a textbook.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any quantum evolution on a line automatically spreads
 ballistically.** It's specifically the *bounded, nonzero* group velocity
 from the dispersion relation that forces ballistic spreading. A trivial
@@ -424,7 +429,7 @@ Hadamard walk's ballistic scaling is a genuine derived consequence of
 *this* dispersion relation, not a generic fact about "being quantum."
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing the light cone's edge (at $|x|\approx T/\sqrt2$, from the
 maximum group velocity) with the variance prefactor ($1-1/\sqrt2$, from
 the full limiting density).** They're related but numerically distinct
@@ -433,7 +438,7 @@ variance integrates the actual (highly non-uniform, in fact peaked near
 the edges, as the $T=4$ worked example already shows) density within it.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Expecting the horn peak to shrink *monotonically* at every step.**
 This lesson's own explorer above shows otherwise: computed directly
 with the same `hadamardWalk` function driving the frames, the peak
@@ -504,3 +509,10 @@ returning to a component this lesson's dispersion-relation analysis
 resembles in spirit (extracting a continuous parameter from an
 interference pattern), now for phases that aren't exactly representable
 in any finite register.
+
+<NextDiscovery>
+  Next: Phase Estimation Precision and QFT Depth returns to a component
+  this lesson's dispersion-relation analysis resembles in spirit —
+  extracting a continuous parameter from an interference pattern — now
+  for phases that aren't exactly representable in any finite register.
+</NextDiscovery>

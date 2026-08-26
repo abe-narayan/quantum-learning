@@ -111,14 +111,30 @@ const SIMULATOR_ENTRIES: SearchEntry[] = [
 ];
 
 /** The real pillar landing page each course is shown on (there's no per-course route). */
+// Every pillar has a real landing page now, Quantum Mastery included — it was
+// the last holdout and this table used to point it at /learn.
+//
+// This deliberately restates the routes rather than importing them from
+// `src/lib/design/pillars.ts`, which is where they actually live. The reason
+// is a hard constraint on this file, documented at length in
+// `scripts/generate-search-index.mjs`: that script imports this module
+// directly under plain Node (which strips types but resolves neither the
+// `@/...` path alias nor extension-less specifiers), so this file's only
+// *runtime* imports must be ones plain Node can follow. Every other import
+// here is `import type`, which is erased. A value import of PILLAR_VISUALS
+// breaks `npm run generate:search-index`, and therefore `predev`/`prebuild` —
+// which is exactly how this comment came to be written.
+//
+// The duplication is guarded instead of trusted:
+// `src/lib/design/__tests__/pillars.test.ts` asserts this map matches the
+// pillar-identity table entry for entry, and that every route in it is backed
+// by a real App Router page.
 const PILLAR_HREF: Record<Pillar, string> = {
   "quantum-mechanics": "/mechanics",
   "quantum-computing": "/computing",
   "quantum-hardware": "/hardware",
   "quantum-software": "/software",
-  // No dedicated pillar landing page — Quantum Mastery courses are surfaced
-  // from within /learn rather than their own top-level route.
-  "quantum-mastery": "/learn",
+  "quantum-mastery": "/mastery",
   apex: "/apex",
 };
 

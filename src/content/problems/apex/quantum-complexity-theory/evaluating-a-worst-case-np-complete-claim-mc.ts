@@ -6,7 +6,7 @@ export const evaluatingAWorstCaseNpCompleteClaimMc: MultipleChoiceProblem = {
     title: "Evaluating a Worst-Case NP-Complete Speedup Claim",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "multiple-choice",
     tags: ["complexity-theory", "np", "bqp", "quantum-advantage-claims"],

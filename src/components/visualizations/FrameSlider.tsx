@@ -36,7 +36,7 @@ export function FrameSlider({
   const effectiveLabel = label || FALLBACK_LABEL;
 
   return (
-    <div className={boxed ? "rounded-xl border border-border bg-surface-muted/40 p-4" : undefined}>
+    <div className={boxed ? "panel-inset p-4" : undefined}>
       <label className="flex items-center justify-between text-xs font-medium text-foreground">
         <span>{effectiveLabel}</span>
         <span className="font-mono text-muted-foreground">{valueLabel}</span>

@@ -36,6 +36,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Two different walls">
+A noiseless simulator strips away real hardware's physical error and access constraints — but it hits a very different wall of its own: exponential memory cost in qubit count.
+</LessonHook>
+
 ## Motivation
 
 Writing Your First Circuit showed shot noise alone, using a perfect,
@@ -192,14 +196,14 @@ conditions."
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming real hardware is always the "more real" or "better" choice.**
 For debugging circuit logic specifically, a noiseless simulator is
 strictly more useful: it isolates logic bugs from hardware noise
 entirely, something real hardware cannot do.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming simulators can scale to arbitrarily many qubits just by using
 a bigger classical computer.** The $2^n$ memory cost means even a
 substantial hardware upgrade buys only a few more qubits of simulation
@@ -236,7 +240,9 @@ increase.
 
 ## Further Exploration
 
+<NextDiscovery>
 This closes **Programming Quantum Computers**. The next course,
 **Simulating Quantum Systems**, develops the exponential-cost problem
 this lesson just introduced in full quantitative detail, and covers the
 techniques (tensor networks, noise simulation) that push past it.
+</NextDiscovery>

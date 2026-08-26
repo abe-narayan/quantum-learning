@@ -53,16 +53,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+A perfectly isolated system evolving unitarily forever is an idealization nobody has ever built in a lab. Every real system eventually interacts with something outside itself: stray photons, a measuring apparatus, thermal vibrations in the mounting hardware.
+</LessonHook>
+
 ## Motivation
 
 Entanglement, Mixed States & Bell Tests built density matrices and
-covered their unitary evolution, but a perfectly *isolated* system
-evolving unitarily forever is an idealization nobody has ever built in
-a lab. Every real system eventually interacts with something outside
-itself: stray photons, a measuring apparatus, thermal vibrations in the
-mounting hardware. This lesson introduces the mathematical language for
-that, **open quantum systems**, building directly on, and going beyond,
-the density-matrix foundation Entanglement already established.
+covered their unitary evolution. This lesson introduces the
+mathematical language for what's still missing, **open quantum
+systems**, building directly on, and going beyond, that density-matrix
+foundation.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/4/48/Basic_Science_%2854395491965%29.jpg"
@@ -182,7 +183,7 @@ something to take on faith from the LaTeX above.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any set of matrices can serve as Kraus operators.** The
 trace-preservation condition $\sum_kK_k^\dagger K_k=I$ is a real
 constraint. An arbitrarily chosen matrix set (like a single operator
@@ -190,7 +191,7 @@ scaled by 2, this lesson's counter-example) generally fails it and does
 not describe a physical channel.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking open-system evolution "violates" quantum mechanics' unitarity
 postulate.** It doesn't. The FULL system-plus-environment evolves
 unitarily; the Kraus representation is exactly what that global unitary
@@ -229,6 +230,7 @@ is being bent.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Decoherence & the Quantum-to-Classical Transition](/lessons/quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition), which uses
 these exact channels to watch coherence decay numerically, and asks what
 that decay means physically.
@@ -241,3 +243,4 @@ $K_0,K_1$ from nothing but a matrix eigendecomposition. [The Lindblad Master Equ
 builds the continuous-time differential equation underneath these
 discrete channels, explicitly deferred here, and proves it reproduces
 this platform's amplitude-damping channel exactly, not approximately.
+</NextDiscovery>

@@ -55,6 +55,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A quadratic speedup, without the coherence bill">
+  Grover's algorithm gets its quadratic speedup for estimation the same
+  way it gets it for search — but only if the whole circuit survives
+  coherently from the first query to the last. What if it didn't have to?
+</LessonHook>
+
 ## Motivation
 
 The previous lesson pinned down exactly what quantum phase estimation
@@ -63,12 +69,16 @@ coherently at the end, and — easy to overlook, but the part that actually
 matters for hardware — every one of the $2^t-1$ controlled-Grover-iterate
 applications feeding that QFT has to stay coherent *simultaneously*,
 because QPE's whole trick is querying a superposition of iteration
-counts at once. That is a lot to ask of a noisy, near-term device. This
-lesson asks a pointed question: for the specific, high-value task of
-*estimating an amplitude* (not finding an eigenphase in general), is all
-of that machinery actually necessary? The honest, citable answer is no —
-and the "no" rests on a nontrivial, still-actively-used result, not
-a hand-wavy simplification.
+counts at once. That is a lot to ask of a noisy, near-term device.
+
+<Question>
+  For the specific, high-value task of estimating an amplitude — not
+  finding an eigenphase in general — is all of that machinery actually
+  necessary?
+</Question>
+
+The honest, citable answer is no — and the "no" rests on a nontrivial,
+still-actively-used result, not a hand-wavy simplification.
 
 ## Mathematical Development
 
@@ -120,14 +130,23 @@ $|\alpha\rangle,|\beta\rangle$ relabeled as the orthogonal
 unmarked/marked components of $|\psi\rangle$ and $\theta$ now defined by
 $\sin^2\theta=a$ instead of $\sin^2\theta=1/N$. Every step of that
 derivation carries over unchanged, so after $k$ applications of $Q$ the
-success probability is exactly
+success probability is exactly the closed form below, reusing the
+earlier lesson's result with zero new derivation required.
 
+<EquationReveal
+  terms={[
+    { id: "P", symbol: "P(flag=1|k)", gloss: "The probability of measuring the flag qubit as 1 after k Grover-iterate applications — the quantity this whole algorithm is built to estimate precisely." },
+    { id: "k", symbol: "k", gloss: "The number of times the Grover iterate Q has been applied so far." },
+    { id: "theta", symbol: "θ", gloss: "The rotation angle defined by sin²θ = a, where a is the amplitude being estimated." },
+    { id: "a", symbol: "a", gloss: "The target amplitude: the probability that measuring the flag qubit of A|0⟩ returns 1." },
+  ]}
+>
 $$
 P(\text{flag}=1\mid k) = \sin^2\big((2k+1)\theta\big), \qquad \sin^2\theta=a
 $$
+</EquationReveal>
 
-reusing the earlier lesson's closed form with zero new derivation
-required. The key extra fact BHMT add: restricted to this 2D subspace,
+The key extra fact BHMT add: restricted to this 2D subspace,
 $Q$ is a rotation matrix by angle $2\theta$, whose eigenvalues are
 $e^{\pm2i\theta}$. Running **quantum phase estimation on $Q$** (a
 superposition of $Q^0,Q^1,Q^2,\dots,Q^{2^t-1}$, controlled by a $t$-qubit
@@ -150,14 +169,24 @@ application plus the final inverse QFT on $t=O(\log(1/\epsilon))$ qubits
 
 ### QPE-free amplitude estimation: the same iterate, a classical schedule
 
-The important modern development (Suzuki, Uno, Raymond,
-Tanaka, Onodera, and Yamamoto, "Amplitude Estimation without Phase
-Estimation," *Quantum Information Processing* **19**, 75 (2020); see
-also Grinko, Gacon, Zoufal, and Woerner, "Iterative Quantum Amplitude
-Estimation," *npj Quantum Information* **7**, 52 (2021)) keeps the exact
+The important modern development keeps the exact
 same building block — the Grover iterate $Q$ above — and the exact same
 closed-form probability $\sin^2((2m+1)\theta)$, but discards both the
-controlled-$Q$ superposition and the QFT entirely. Instead:
+controlled-$Q$ superposition and the QFT entirely.
+
+<ResearchConnection
+  title="Amplitude Estimation without Phase Estimation"
+  source="Suzuki, Uno, Raymond, Tanaka, Onodera & Yamamoto, Quantum Information Processing 19, 75 (2020)"
+  url="https://arxiv.org/abs/1904.10246"
+>
+  See also Grinko, Gacon, Zoufal & Woerner, "Iterative Quantum Amplitude
+  Estimation," *npj Quantum Information* **7**, 52 (2021). Both results
+  show that the Heisenberg-limited $O(1/\epsilon)$ scaling survives
+  without a phase-estimation register, using only a classical schedule
+  of Grover-iterate depths combined by maximum likelihood.
+</ResearchConnection>
+
+Instead:
 
 1. Choose a **classical, increasing sequence** of iteration counts
    $m_1<m_2<\dots<m_K$ in advance (e.g. exponentially increasing,
@@ -196,6 +225,12 @@ just the largest $m_k$ alone: the low-$m$ rounds resolve which
 period the high-$m$ rounds' precise-but-ambiguous reading falls in.
 
 ## Physical Interpretation: Why the QPE-Free Version Matters
+
+<InsightBlock>
+  Same asymptotic query scaling, radically different circuit structure —
+  QPE-free amplitude estimation buys hardware deployability without
+  giving up the quadratic speedup.
+</InsightBlock>
 
 Both algorithms above are asymptotically optimal in the same sense:
 $O(1/\epsilon)$ total Grover-iterate queries, quadratically better than
@@ -284,7 +319,7 @@ readings into a precise $\theta$ estimate.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating "QPE-free" as meaning worse scaling — a consolation prize for
 giving up the QFT.** It is not: the whole point of Suzuki et al.'s and
 Grinko et al.'s results is that the *same* $O(1/\epsilon)$
@@ -297,7 +332,7 @@ the two erases exactly the result that makes this line of work
 interesting.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a QPE-free schedule could just measure at one large, cleverly
 chosen $m$ and skip the smaller ones.** A single large-$m$ measurement is
 *more* sensitive to $\theta$ (its slope is amplified by the $(2m+1)$
@@ -358,14 +393,16 @@ reading actually falls in.
 
 ## Further Exploration
 
-The Grover iterate $Q=-AS_0A^{-1}S_\chi$ used throughout this lesson is
-itself a special case of the block-encoding machinery from the
-prerequisite lesson on [Block Encodings and Linear Combinations of
-Unitaries](/lessons/apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries) —
-the same reflect-and-compose pattern reappears, generalized far beyond
-amplitude estimation, throughout the modern quantum-algorithms
-literature (qubitization, quantum singular value transformation), a
-recurring theme worth watching for in later Algorithmic Frontiers
-lessons. For the coherence-time and gate-error numbers that make the
-NISQ-relevance argument above concrete on real devices, see the Quantum
-Hardware pillar's noise and decoherence material.
+<NextDiscovery>
+  The Grover iterate $Q=-AS_0A^{-1}S_\chi$ used throughout this lesson is
+  itself a special case of the block-encoding machinery from the
+  prerequisite lesson on [Block Encodings and Linear Combinations of
+  Unitaries](/lessons/apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries) —
+  the same reflect-and-compose pattern reappears, generalized far beyond
+  amplitude estimation, throughout the modern quantum-algorithms
+  literature (qubitization, quantum singular value transformation), a
+  recurring theme worth watching for in later Algorithmic Frontiers
+  lessons. For the coherence-time and gate-error numbers that make the
+  NISQ-relevance argument above concrete on real devices, see the Quantum
+  Hardware pillar's noise and decoherence material.
+</NextDiscovery>

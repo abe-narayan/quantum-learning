@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { runInstructions, type GateInstruction } from "@/lib/quantum/circuitBuilder";
 import type { SingleQubitGateName, TwoQubitGateName } from "@/lib/quantum/circuitBuilder";
-import { Badge } from "@/components/ui/Badge";
 import { FrameSlider } from "@/components/visualizations/FrameSlider";
+import { Readout } from "@/components/ui/Typography";
 import { CircuitDiagram } from "./CircuitDiagram";
 import { GateControls } from "./GateControls";
 import { StateInspector } from "./StateInspector";
 import { isFullyProductState } from "./separability";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 
 const DEFAULT_WHAT_TO_NOTICE =
   "Watch the StateInspector panel below — the moment the state stops being writable as a simple product of two separate qubits is the moment CNOT actually did something CNOT-specific.";
@@ -82,65 +84,68 @@ export function CircuitBuilder() {
   };
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
-      <div className="space-y-6">
-        <div>
-          <Badge tone="brand" className="mb-1.5">
-            What we&rsquo;re studying
-          </Badge>
-          <p className="text-sm text-muted-foreground">
-            The same build-then-run workflow real quantum SDKs use: stack gates, then scrub through the
-            step slider to see the state vector evolve one gate at a time.
-          </p>
-        </div>
+    <SimulatorInstrument
+      label="Circuit builder — build then run"
+      readout={<Readout label="Step" value={`${step} / ${instructions.length}`} />}
+      // The diagram widens with every qubit/gate added; splitting it against
+      // a 320px control rail (even once there's technically room per the
+      // container query) leaves less width for it than it can use. Full-width
+      // stage, controls in a band underneath — see SimulatorInstrument.tsx.
+      layout="stacked"
+      stageClassName="space-y-6"
+      stage={
+        <>
+          <CircuitDiagram numQubits={numQubits} instructions={instructions} step={step} onSelectStep={setStep} />
 
-        <CircuitDiagram numQubits={numQubits} instructions={instructions} step={step} onSelectStep={setStep} />
+          {instructions.length > 0 && (
+            <FrameSlider
+              label="Step"
+              valueLabel={`${step} / ${instructions.length}`}
+              index={step}
+              max={instructions.length}
+              onChange={setStep}
+            />
+          )}
 
-        {instructions.length > 0 && (
-          <FrameSlider
-            label="Step"
-            valueLabel={`${step} / ${instructions.length}`}
-            index={step}
-            max={instructions.length}
-            onChange={setStep}
+          <div aria-live="polite" className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+            {entanglementNote ?? DEFAULT_WHAT_TO_NOTICE}
+          </div>
+
+          <StateInspector state={state} />
+
+          <SimulatorFraming
+            shows="The same build-then-run workflow real quantum SDKs use: stack gates, then scrub through the step slider to see the state vector evolve one gate at a time."
+            tryThis={
+              <ul>
+                <li>
+                  On 2 qubits: add H to qubit 0, then CNOT(0→1) — scrub the step slider back and forth and
+                  watch the state go from a simple product state to an entangled one at the CNOT step.
+                </li>
+                <li>On 3 qubits, build a GHZ state: H on qubit 0, then CNOT(0→1), then CNOT(0→2).</li>
+              </ul>
+            }
           />
-        )}
-
-        <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          {entanglementNote ?? DEFAULT_WHAT_TO_NOTICE}
-        </div>
-
-        <StateInspector state={state} />
-
-        <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent">Try this</p>
-          <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-foreground">
-            <li>
-              On 2 qubits: add H to qubit 0, then CNOT(0→1) — scrub the step slider back and forth and
-              watch the state go from a simple product state to an entangled one at the CNOT step.
-            </li>
-            <li>On 3 qubits, build a GHZ state: H on qubit 0, then CNOT(0→1), then CNOT(0→2).</li>
-          </ul>
-        </div>
-      </div>
-
-      <GateControls
-        disabled={false}
-        numQubits={numQubits}
-        onNumQubitsChange={handleNumQubitsChange}
-        targetQubit={targetQubit}
-        onTargetQubitChange={setTargetQubit}
-        controlQubit={controlQubit}
-        onControlQubitChange={setControlQubit}
-        twoQubitTarget={twoQubitTarget}
-        onTwoQubitTargetChange={setTwoQubitTarget}
-        onApplySingleQubitGate={handleApplySingleQubitGate}
-        onApplyTwoQubitGate={handleApplyTwoQubitGate}
-        onApplyMeasurement={handleApplyMeasurement}
-        onRemoveLast={handleRemoveLast}
-        onClear={handleClear}
-        canRemove={instructions.length > 0}
-      />
-    </div>
+        </>
+      }
+      controls={
+        <GateControls
+          disabled={false}
+          numQubits={numQubits}
+          onNumQubitsChange={handleNumQubitsChange}
+          targetQubit={targetQubit}
+          onTargetQubitChange={setTargetQubit}
+          controlQubit={controlQubit}
+          onControlQubitChange={setControlQubit}
+          twoQubitTarget={twoQubitTarget}
+          onTwoQubitTargetChange={setTwoQubitTarget}
+          onApplySingleQubitGate={handleApplySingleQubitGate}
+          onApplyTwoQubitGate={handleApplyTwoQubitGate}
+          onApplyMeasurement={handleApplyMeasurement}
+          onRemoveLast={handleRemoveLast}
+          onClear={handleClear}
+          canRemove={instructions.length > 0}
+        />
+      }
+    />
   );
 }

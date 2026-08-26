@@ -6,7 +6,7 @@ export const localHamiltonianPropagationTermNullSpaceMc: MultipleChoiceProblem =
     title: "Which Slice Does the Propagation Term Accept?",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/the-local-hamiltonian-problem",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "multiple-choice",
     tags: ["local-hamiltonian", "kitaev-construction", "history-state", "propagation-term"],

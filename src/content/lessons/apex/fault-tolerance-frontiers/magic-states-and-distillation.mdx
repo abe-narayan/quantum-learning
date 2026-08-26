@@ -55,6 +55,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Clifford gates, no matter how perfectly and fault-tolerantly
+  implemented, can never be more than a classically-simulable subroutine
+  — universality needs a gate the surface code cannot make transversal,
+  and manufacturing it is expensive enough to dominate the entire
+  computation's resource budget.
+</LessonHook>
+
 ## Motivation
 
 The prerequisite lattice-surgery lesson showed the surface code implementing
@@ -62,12 +70,9 @@ H, S, and CNOT transversally and fault-tolerantly, essentially for free. It
 is tempting to assume the rest of a universal gate set follows the same
 way, just more lattice surgery. It does not, and the reason is not an
 engineering gap that better decoders or bigger codes will close: it is a
-theorem. **Clifford gates, no matter how perfectly and fault-tolerantly
-implemented, can never be more than a classically-simulable subroutine.**
-Universality needs an entirely different gate, the T gate, and the surface
-code has no transversal way to apply it. Magic-state distillation is the
-field's real, standard answer to that gap, and it is expensive enough that
-it usually dominates the resource budget of the entire computation.
+theorem. The missing piece is specifically the **T gate**, which the
+surface code has no transversal way to apply, and **magic-state
+distillation** is the field's real, standard answer to that gap.
 
 ## Mathematical Development
 
@@ -179,14 +184,34 @@ protocol is the **Bravyi-Kitaev 15-to-1 distillation protocol**, built
 from the quantum Reed-Muller $[[15,1,3]]$ code: it consumes 15 noisy
 $|T\rangle$ copies, each with independent error rate $\epsilon$, and
 outputs 1 copy with error rate
-$$
-\epsilon_{\text{out}} \approx 35\,\epsilon_{\text{in}}^3
-$$
+
+<EquationReveal
+  terms={[
+    { id: "eout", symbol: "ε_out", gloss: "Error rate of the single purified magic state that comes out of one distillation round." },
+    { id: "ein", symbol: "ε_in", gloss: "Error rate shared by each of the 15 noisy input copies." },
+    { id: "35", symbol: "35", gloss: "Leading-order coefficient specific to the [[15,1,3]] Reed-Muller-code-based protocol — not a universal constant." },
+  ]}
+>
+  $$
+  \epsilon_{\text{out}} \approx 35\,\epsilon_{\text{in}}^3
+  $$
+</EquationReveal>
+
 to leading order in small $\epsilon$, a genuine **cubic suppression**
 cited directly from the literature (Bravyi & Kitaev, and confirmed in
 later resource-estimation work on Reed-Muller-code-based factories); this
 platform cites the coefficient rather than re-deriving the full 15-qubit
-stabilizer circuit from scratch. Running a Clifford-only circuit on 15
+stabilizer circuit from scratch.
+
+<ResearchConnection title="The 15-to-1 magic-state distillation protocol" source="Bravyi & Kitaev, Phys. Rev. A 71, 022316 (2005)" url="https://arxiv.org/abs/quant-ph/0403025">
+  The cubic suppression cited above, and the [[15,1,3]] Reed-Muller-code
+  construction that produces it, is confirmed in later resource-estimation
+  work on Reed-Muller-code-based factories — the protocol most
+  fault-tolerant architecture proposals still budget T gates against
+  today.
+</ResearchConnection>
+
+Running a Clifford-only circuit on 15
 noisy inputs, with post-selection on a stabilizer-style check, to purify
 1 higher-fidelity output is exactly the same "detect, don't blindly trust"
 logic as every syndrome-measurement circuit elsewhere in this course,
@@ -255,6 +280,12 @@ going in and coming out is non-Clifford.
 
 ## Physical Interpretation: Why This Matters
 
+<InsightBlock>
+  Distillation doesn't make T gates free — it trades many noisy copies
+  for one clean enough to spend, and that trade is usually the single
+  largest cost in the entire fault-tolerant computation.
+</InsightBlock>
+
 Magic-state distillation is not a footnote. By wide consensus in the
 fault-tolerant-computing literature, it is the **single largest resource
 cost** in most realistic architecture proposals. A "magic-state factory,"
@@ -292,13 +323,18 @@ the first round's output.**
 
 Using $\epsilon_{\text{out}} \approx 35\,\epsilon_{\text{in}}^3$:
 
-$$
-\epsilon_1 = 35 \times (0.01)^3 = 35 \times 10^{-6} = 3.5\times10^{-5}
-$$
-
-$$
-\epsilon_2 = 35 \times (\epsilon_1)^3 = 35 \times (3.5\times10^{-5})^3 \approx 1.50\times10^{-12}
-$$
+<DerivationSteps>
+  <DerivationStep annotation="Apply the 15-to-1 output formula directly to the raw input error rate.">
+    $$
+    \epsilon_1 = 35 \times (0.01)^3 = 35 \times 10^{-6} = 3.5\times10^{-5}
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Feed round 1's output back into a second copy of the same protocol.">
+    $$
+    \epsilon_2 = 35 \times (\epsilon_1)^3 = 35 \times (3.5\times10^{-5})^3 \approx 1.50\times10^{-12}
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
 One round already takes a 1-in-100 error rate to roughly 1-in-30,000. A
 second round, feeding round 1's output back into the same protocol, takes
@@ -332,7 +368,7 @@ why an entirely different mechanism, magic-state injection fed by a
 distillation factory, is needed instead.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating the $35\epsilon^3$ coefficient as an exact, universal law.**
 It is the leading-order behavior of one specific, widely-used protocol
 (15-to-1 distillation via the $[[15,1,3]]$ Reed-Muller code) in the
@@ -380,6 +416,8 @@ to this protocol.
 
 ## Further Exploration
 
-Continue to [The Threshold Theorem](/lessons/apex/fault-tolerance-frontiers/the-threshold-theorem),
-which proves the qualitative below/above-threshold logic this pillar has
-relied on since Error Correction & Fault Tolerance's capstone.
+<NextDiscovery>
+  Next: [The Threshold Theorem](/lessons/apex/fault-tolerance-frontiers/the-threshold-theorem)
+  proves the qualitative below/above-threshold logic this pillar has
+  relied on since Error Correction & Fault Tolerance's capstone.
+</NextDiscovery>

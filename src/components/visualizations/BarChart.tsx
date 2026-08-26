@@ -41,7 +41,7 @@ export function BarChart({
     <div
       role="img"
       aria-label={ariaLabel}
-      className="not-prose flex gap-1 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4"
+      className="not-prose flex gap-1 overflow-x-auto panel-inset p-4"
       style={{ height }}
     >
       {bars.map((bar, index) => {

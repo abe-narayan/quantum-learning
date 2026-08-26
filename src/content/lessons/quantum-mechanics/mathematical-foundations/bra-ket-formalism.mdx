@@ -69,6 +69,12 @@ a general vector space, and goes further, into outer products and the
 completeness relation, which the rest of this course needs.
 </Callout>
 
+<LessonHook eyebrow="Why this matters">
+  A ket times a bra in the wrong order isn't a typo — swap $\langle
+  u|v\rangle$ for $|u\rangle\langle v|$ and a number turns into an
+  operator.
+</LessonHook>
+
 ## Motivation
 
 Every result from the last two lessons, inner products, norms,
@@ -195,19 +201,25 @@ $$
 
 Every remaining lesson in this course leans on this identity, so it's
 worth seeing where it actually comes from rather than filing it away as a
-rule. Apply the left side to an arbitrary $|\psi\rangle$, expanded in this
-basis as $|\psi\rangle=\sum_j c_j|e_j\rangle$:
+rule.
 
+<DerivationSteps>
+  <DerivationStep annotation="Apply the left side to an arbitrary |ψ⟩, expanded in this basis as |ψ⟩ = Σⱼ cⱼ|eⱼ⟩, and just move the sum's bra-ket around.">
 $$
 \left(\sum_i|e_i\rangle\langle e_i|\right)|\psi\rangle = \sum_i|e_i\rangle\langle e_i|\psi\rangle = \sum_i \langle e_i|\psi\rangle\,|e_i\rangle
 $$
-
-Since $\{e_i\}$ is orthonormal, $\langle e_i|\psi\rangle = \langle
-e_i|\sum_j c_j e_j\rangle = \sum_j c_j\langle e_i|e_j\rangle = c_i$ (every
-term but $j=i$ vanishes). So the sum becomes $\sum_i c_i|e_i\rangle$,
-which is exactly $|\psi\rangle$ by how it was expanded in the first place.
-The completeness relation acts as the identity on *every* vector, so it
-equals the identity operator.
+  </DerivationStep>
+  <DerivationStep annotation="Since {eᵢ} is orthonormal, ⟨eᵢ|ψ⟩ = ⟨eᵢ|Σⱼ cⱼeⱼ⟩ = Σⱼ cⱼ⟨eᵢ|eⱼ⟩ = cᵢ — every term but j=i vanishes.">
+$$
+\sum_i \langle e_i|\psi\rangle\,|e_i\rangle = \sum_i c_i|e_i\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="This is exactly |ψ⟩ by how it was expanded in the first place — the completeness relation acts as the identity on every vector, so it equals the identity operator.">
+$$
+\sum_i c_i|e_i\rangle = |\psi\rangle
+$$
+  </DerivationStep>
+</DerivationSteps>
 
 <InteractiveSection title="Check completeness for a second basis" description="The standard basis {|0⟩, |1⟩} isn't special: switch to the Hadamard basis {|+⟩, |−⟩} and confirm the two projectors still sum to the identity, exactly as the derivation above promises for any orthonormal basis.">
   <MatrixGridExplorer
@@ -263,13 +275,13 @@ above for this specific case.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing $|u\rangle\langle v|$ with $\langle u|v\rangle$.** The first is
 an operator (a matrix); the second is a number. Getting the order of bra
 and ket backwards changes what kind of object you even have.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the bra's conjugation when computing a matrix element.**
 $\langle i|A|j\rangle$ conjugates the entries of $\langle i|$, not $A$
 itself.
@@ -301,6 +313,13 @@ itself.
 
 ## Further Exploration
 
-Next: [Linear Operators](/lessons/quantum-mechanics/mathematical-foundations/linear-operators), which develops matrix representation and
-composition fully, including a derivation of matrix multiplication
-*from* the completeness relation just built here.
+<ChallengePrompt prompt="Compute (|0⟩⟨1|)† directly as an explicit 2×2 matrix (conjugate transpose), and confirm it equals |1⟩⟨0|.">
+  Write $|0\rangle\langle1|$ out as a matrix first (same method as the
+  worked example), then take its conjugate transpose entry by entry.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Linear Operators](/lessons/quantum-mechanics/mathematical-foundations/linear-operators), which develops matrix representation and
+  composition fully, including a derivation of matrix multiplication
+  *from* the completeness relation just built here.
+</NextDiscovery>

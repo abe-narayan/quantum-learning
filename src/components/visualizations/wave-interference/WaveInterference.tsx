@@ -4,8 +4,9 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { KatexMath } from "@/components/ui/KatexMath";
-import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { centerIntensity, MAX_INTENSITY, WaveInterferenceCanvas } from "./WaveInterferenceCanvas";
+import { FigureReadouts } from "../FigureReadouts";
 
 const TWO_PI = 2 * Math.PI;
 const PLAY_INTERVAL_MS = 50;
@@ -97,31 +98,22 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
 
       <WaveInterferenceCanvas phase={phase} />
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+      <div className="mt-4 overflow-x-auto panel-inset px-4 py-3">
         <KatexMath
           tex={`I(\\varphi) = 4A^2\\cos^2(\\varphi/2) = ${raw.toFixed(3)} \\qquad \\frac{I}{4A^2} = \\cos^2(\\varphi/2) = \\frac{1+\\cos\\varphi}{2} = ${normalized.toFixed(3)}`}
           display
         />
       </div>
 
-      <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">φ (rad)</dt>
-          <dd className="mt-0.5 font-mono text-foreground">{phase.toFixed(3)}</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">φ (× π)</dt>
-          <dd className="mt-0.5 font-mono text-foreground">{phaseOverPi.toFixed(3)}π</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">I(φ) = 4A²cos²(φ/2)</dt>
-          <dd className="mt-0.5 font-mono text-foreground">{raw.toFixed(3)}</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">I / 4A² = P(+)-shape</dt>
-          <dd className="mt-0.5 font-mono text-foreground">{normalized.toFixed(3)}</dd>
-        </div>
-      </dl>
+      <FigureReadouts
+        className="mt-4"
+        items={[
+          { label: "φ (rad)", value: phase.toFixed(3) },
+          { label: "φ (× π)", value: `${phaseOverPi.toFixed(3)}π` },
+          { label: "I(φ) = 4A²cos²(φ/2)", value: raw.toFixed(3) },
+          { label: "I / 4A² = P(+)-shape", value: normalized.toFixed(3) },
+        ]}
+      />
 
       <div className="mt-6">
         <label htmlFor={sliderId} className="block">

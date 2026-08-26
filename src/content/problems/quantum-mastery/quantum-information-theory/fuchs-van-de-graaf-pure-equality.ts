@@ -6,7 +6,7 @@ export const fuchsVanDeGraafPureEquality: ConceptualProblem = {
     title: "Why the Upper Fuchs-van de Graaf Bound Is Tight for Pure States",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["fuchs-van-de-graaf", "trace-distance", "fidelity"],

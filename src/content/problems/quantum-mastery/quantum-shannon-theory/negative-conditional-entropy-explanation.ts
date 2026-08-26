@@ -6,7 +6,7 @@ export const negativeConditionalEntropyExplanation: ConceptualProblem = {
     title: "Why S(A|B) = -1 Bit for the Bell State Is Not a Paradox",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["conditional-entropy", "entanglement", "state-merging"],

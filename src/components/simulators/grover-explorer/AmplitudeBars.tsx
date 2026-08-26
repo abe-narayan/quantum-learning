@@ -29,7 +29,7 @@ export function AmplitudeBars({ state, markedIndices }: { state: StateVector; ma
                 <div
                   className={cn(
                     "w-6 rounded-t-sm transition-[height] duration-500 ease-out motion-reduce:transition-none",
-                    isMarked ? "bg-accent" : amp < 0 ? "bg-muted-foreground/60" : "bg-brand/70"
+                    isMarked ? "bg-accent" : amp < 0 ? "bg-muted-foreground/60" : "bg-pillar/70"
                   )}
                   style={{ height: `${barHeight}%` }}
                 />

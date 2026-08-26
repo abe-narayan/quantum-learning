@@ -36,14 +36,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+The last three lessons built two specific codes from scratch, gate by gate. The stabilizer formalism is the general language every real quantum error-correcting code is described in — and this lesson's whole point is that it isn't new.
+</LessonHook>
+
 ## Motivation
 
-The last three lessons built two specific codes from scratch, gate by
-gate. The **stabilizer formalism** is the general language every real
-quantum error-correcting code is described in, and this lesson's whole
-point is that it isn't new: the two syndrome measurements already built
-for the bit-flip code *are* stabilizer measurements, just not named that
-way yet.
+The two syndrome measurements already built for the bit-flip code
+*are* stabilizer measurements — just not named that way yet.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/6/64/4_Qubit_Chip%2C_10.1103.PhysRevX.5.021027_%28A._Wallraff%2C_2015%29.png"
@@ -154,14 +154,14 @@ hand-derived cases the same way.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating the stabilizer formalism as unrelated new material.** Every
 stabilizer-language fact in this lesson ($Z_0Z_1,Z_1Z_2$ as generators;
 syndromes as eigenvalue flips) was already built, concretely, in Lesson
 2. This lesson only supplies the general vocabulary.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any two Pauli operators either always commute or always
 anticommute.** It depends on which qubits they act on and which specific
 Paulis: same-qubit $X$ and $Z$ anticommute; operators acting on entirely
@@ -197,6 +197,7 @@ $Z_0Z_1$ and $Z_0$ alone) commute.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Syndrome Measurement and the Recovery Map](/lessons/quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map), formalizing the
 full error-correction procedure (detect, decode, correct) in the language
 this lesson introduced.
@@ -205,3 +206,4 @@ This lesson's two-generator, 3-qubit picture is generalized to arbitrary
 $[[n,k,d]]$ stabilizer codes, and the $[[7,1,3]]$ Steane code is built
 explicitly from a classical Hamming code, in
 [CSS Codes and the General Stabilizer Formalism](/lessons/quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism).
+</NextDiscovery>

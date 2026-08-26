@@ -45,7 +45,7 @@ function Branch({ node }: { node: MeasurementTreeNode }) {
  */
 export function MeasurementTree({ root, ariaLabel }: { root: MeasurementTreeNode; ariaLabel: string }) {
   return (
-    <div role="img" aria-label={ariaLabel} className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-5">
+    <div role="img" aria-label={ariaLabel} className="not-prose overflow-x-auto panel-inset p-5">
       <Branch node={root} />
     </div>
   );

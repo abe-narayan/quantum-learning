@@ -99,8 +99,30 @@ function describeMode(mode: Mode): string {
  * weight-3 logical operators -- while the full lattice (all 12 stabilizers,
  * drawn at reduced opacity when not selected) stays visible throughout, so
  * the highlighted piece is always seen in the context of the whole patch.
+ *
+ * `variant="merge-split"` switches to a second, independent picture built
+ * on the same lattice-drawing convention (qubit = filled circle, stabilizer
+ * site = rounded square, brand = Z-type/vertical, accent = boundary): two
+ * small single-face patches undergoing lattice surgery, replacing
+ * `lattice-surgery.mdx`'s hand-rolled, non-interactive 3-panel `<svg>` with
+ * a real Before / Merging / After toggle over one lattice, not three frozen
+ * copies. Defaults to `"patch"` so every existing call site (currently just
+ * `surface-codes-in-depth.mdx`, which passes no `variant`) is unaffected.
  */
-export function SurfaceCodePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
+export function SurfaceCodePatchExplorer({
+  ariaLabel,
+  variant = "patch",
+}: {
+  ariaLabel: string;
+  variant?: "patch" | "merge-split";
+}) {
+  if (variant === "merge-split") {
+    return <MergeSplitPatchExplorer ariaLabel={ariaLabel} />;
+  }
+  return <SinglePatchExplorer ariaLabel={ariaLabel} />;
+}
+
+function SinglePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
   const [modeIndex, setModeIndex] = useState(2);
   const mode = MODES[modeIndex];
 
@@ -125,7 +147,7 @@ export function SurfaceCodePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
   }, []);
 
   return (
-    <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4 sm:p-5">
+    <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
           <text x={WIDTH / 2} y={16} textAnchor="middle" className="fill-muted-foreground text-[11px] font-mono">
@@ -250,6 +272,147 @@ export function SurfaceCodePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
 
       <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {describeMode(mode)}
+      </div>
+    </div>
+  );
+}
+
+// --- Lattice surgery: two small patches, merge/split ------------------
+
+type MergeStage = "before" | "merging" | "after";
+const MERGE_STAGE_OPTIONS: { label: string }[] = [{ label: "Before" }, { label: "Merging" }, { label: "After" }];
+const MERGE_STAGES: MergeStage[] = ["before", "merging", "after"];
+
+/** Same single-face-patch corner/edge layout as the lesson's own hand-drawn diagram, reused for both patches via a translate offset per patch. */
+const PATCH_CORNERS: [number, number][] = [
+  [40, 90],
+  [100, 90],
+  [40, 210],
+  [100, 210],
+];
+const PATCH_EDGE_QUBITS: [number, number][] = [
+  [70, 90],
+  [70, 210],
+  [40, 150],
+  [100, 150],
+];
+
+function describeMergeStage(stage: MergeStage): string {
+  switch (stage) {
+    case "before":
+      return "Two independent patches L1, L2: a physical gap separates them (their smooth boundaries face each other), each with its own weight-2 logical Z string and its own code space. No stabilizer spans both patches.";
+    case "merging":
+      return "Two bridge qubits fill the gap and the seam vertex stabilizer is extended onto them, so the joint operator Z_L1·Z_L2 becomes measurable. Measuring it projects the pair onto one definite eigenvalue, merging the two code spaces into one logical qubit with one logical string running through both patches.";
+    case "after":
+      return "The bridge qubits are removed and the gap is restored: two independent patches and two independent logical strings again, but the value of Z_L1·Z_L2 measured during the merge is now known — this is how lattice surgery reads out a joint parity without ever needing a transversal two-qubit gate.";
+  }
+}
+
+function LatticeSurgeryPatch({
+  offsetX,
+  logicalLabel,
+  showBridge,
+  bridgeFilled,
+}: {
+  offsetX: number;
+  logicalLabel: string;
+  /** Whether this patch's inner edge faces the seam (draws the seam-side bridge-qubit slots). */
+  showBridge: "left" | "right" | null;
+  bridgeFilled: boolean;
+}) {
+  return (
+    <g transform={`translate(${offsetX},0)`}>
+      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      {PATCH_CORNERS.map(([cx, cy]) => (
+        <circle key={`v-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
+      ))}
+      {PATCH_EDGE_QUBITS.map(([qx, qy]) => (
+        <rect key={`q-${qx}-${qy}`} x={qx - 7} y={qy - 7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
+      ))}
+      <line x1={40} y1={150} x2={100} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
+      <text x={70} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">
+        {logicalLabel}
+      </text>
+      {showBridge && (
+        <rect
+          x={(showBridge === "right" ? 100 : 40) - 7}
+          y={143}
+          width={14}
+          height={14}
+          rx={3}
+          className={bridgeFilled ? "fill-brand/70 stroke-brand" : "fill-none stroke-brand/40"}
+          strokeWidth={1.5}
+          strokeDasharray={bridgeFilled ? undefined : "3 2"}
+        />
+      )}
+    </g>
+  );
+}
+
+/**
+ * The merge/split lattice-surgery picture, driven by a real Before /
+ * Merging / After toggle over one shared lattice rather than three frozen
+ * panels: two small (single-face, weight-2-logical) surface-code patches
+ * with a gap between them, two bridge qubits that appear only in the
+ * "Merging" stage, and the seam Z string that spans both patches only
+ * while those bridge qubits are present. Geometry mirrors
+ * `surface-codes-in-depth.mdx`'s lattice convention (data qubit = filled
+ * square/circle, stabilizer/vertex = corner dot) at the smallest legible
+ * size, exactly as the lesson's own retired hand-drawn version did.
+ */
+function MergeSplitPatchExplorer({ ariaLabel }: { ariaLabel: string }) {
+  const [stageIndex, setStageIndex] = useState(0);
+  const stage = MERGE_STAGES[stageIndex];
+  const merging = stage === "merging";
+
+  return (
+    <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
+      <div className="overflow-x-auto">
+        <svg width={340} height={300} viewBox="0 0 340 300" className="mx-auto w-full max-w-md" role="img" aria-label={ariaLabel}>
+          <text x={170} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">
+            {stage === "before" ? "Two independent patches" : stage === "merging" ? "Joint Z stabilizer measured" : "Split apart again"}
+          </text>
+
+          {/* Seam gap markers — dashed accent lines showing the smooth boundaries facing each other, absent while merging. */}
+          {!merging && (
+            <>
+              <line x1={100} y1={100} x2={100} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
+              <line x1={140} y1={100} x2={140} y2={200} className="stroke-accent" strokeWidth={2} strokeDasharray="4 3" />
+            </>
+          )}
+
+          <LatticeSurgeryPatch offsetX={0} logicalLabel="Z_L1" showBridge="right" bridgeFilled={merging} />
+          <LatticeSurgeryPatch offsetX={100} logicalLabel="Z_L2" showBridge="left" bridgeFilled={merging} />
+
+          {/* The seam string spanning both patches, only while bridge qubits are present. */}
+          {merging && (
+            <>
+              <rect x={160} y={78} width={72} height={30} rx={6} className="fill-brand/15 stroke-brand" strokeWidth={2} />
+              <line x1={40} y1={150} x2={300} y2={150} className="stroke-brand" strokeWidth={2.5} strokeDasharray="6 3" />
+              <text x={170} y={64} textAnchor="middle" className="fill-brand text-[9px] font-medium">
+                seam vertex gains the bridge qubits
+              </text>
+              <text x={170} y={238} textAnchor="middle" className="fill-brand text-[9.5px] font-medium">
+                Z_L(merged) = Z_L1·Z_L2
+              </text>
+            </>
+          )}
+
+          <text x={170} y={266} textAnchor="middle" className="fill-muted-foreground text-[9px]">
+            {merging ? "1 logical qubit, 1 code space" : "2 independent patches, gap: no shared stabilizers"}
+          </text>
+        </svg>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-foreground">Stage</h3>
+        <div className="mt-2">
+          <PresetToggle options={MERGE_STAGE_OPTIONS} index={stageIndex} onChange={setStageIndex} ariaLabel="Lattice surgery stage" />
+        </div>
+      </div>
+
+      <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+        {describeMergeStage(stage)}
       </div>
     </div>
   );

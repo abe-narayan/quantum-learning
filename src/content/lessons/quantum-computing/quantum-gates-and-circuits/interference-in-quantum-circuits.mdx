@@ -32,15 +32,16 @@ export const afterFirstH = applySingleQubitGate(applySingleQubitGate(start, HADA
 export const afterPhase = applySingleQubitGate(afterFirstH, PAULI_Z, 1);
 export const afterSecondH = applySingleQubitGate(applySingleQubitGate(afterPhase, HADAMARD, 0), HADAMARD, 1);
 
+<LessonHook eyebrow="Why this matters">
+Back in the first course, H|+⟩=|0⟩ was a small, striking fact: two amplitudes that individually gave 50/50 probabilities combined, through a second H, into a completely definite outcome. This lesson asks whether the same trick scales up — and shows it does.
+</LessonHook>
+
 ## Motivation
 
-Back in the first course, $H|+\rangle=|0\rangle$ was a small, striking
-fact: two amplitudes that individually gave 50/50 probabilities combined,
-through a second $H$, into a completely definite outcome. That was
-interference on a single qubit. This lesson asks whether the same trick
-scales up, and shows, with a fully worked circuit, that it does: uniform
-randomness across *four* outcomes can be turned into one certain outcome,
-using nothing but Hadamards and a phase gate.
+That was interference on a single qubit. This lesson shows, with a
+fully worked circuit, that the same trick scales up: uniform
+randomness across *four* outcomes can be turned into one certain
+outcome, using nothing but Hadamards and a phase gate.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/6/69/Interference_electrons_double-slit_at_10cm.png"
@@ -178,14 +179,14 @@ was introduced on a different qubit.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming interference requires entanglement.** The main derivation in
 this lesson is a product state from start to finish, full interference,
 zero entanglement. They're independent concepts that can occur together
 or separately.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Measuring partway through and expecting the same result.** If you
 measured either qubit right after the $Z$ gate in the derivation above,
 you'd destroy the superposition needed for the second $H\otimes H$ to
@@ -219,6 +220,8 @@ guaranteed $|01\rangle$. Interference requires the amplitudes to stay
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Building Quantum Circuits](/lessons/quantum-computing/quantum-gates-and-circuits/building-quantum-circuits), the capstone for this course: every
 tool from tensor products through interference, combined to construct and
 analyze a genuine multi-qubit entangled state from scratch.
+</NextDiscovery>

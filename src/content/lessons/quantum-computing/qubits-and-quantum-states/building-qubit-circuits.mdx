@@ -26,11 +26,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Nine lessons have built, piece by piece, everything needed to describe a single qubit and everything that can happen to it. This lesson doesn't introduce anything new — it's where those pieces get used together.
+</LessonHook>
+
 ## Motivation
 
-Nine lessons have built, piece by piece, everything needed to describe a
-single qubit and everything that can happen to it. This lesson doesn't
-introduce anything new. It's where those pieces get used together,
+Those nine lessons' pieces get used together here,
 analyzing sequences of gates the way you'll do constantly once circuits
 with many qubits enter the picture in the next course.
 
@@ -166,14 +168,14 @@ it's applied to.)
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Applying gates left to right instead of right to left in the operator
 product.** $U_2U_1|\psi\rangle$ means $U_1$ acts first. If your final
 state doesn't match hand-simulating the circuit step by step, this is the
 first thing to check.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming gate sequences commute.** $HZ \neq ZH$ in general (check: you
 derived $HZH=X$ above; by contrast $ZHZ$ works out to a different matrix
 entirely, a good exercise). Order is meaningful.
@@ -209,6 +211,7 @@ entirely, a good exercise). Order is meaningful.
 
 ## Further Exploration
 
+<NextDiscovery>
 This completes **Qubits & Quantum States**: everything about a single
 qubit, what it is, how to describe it precisely, where it sits
 geometrically, how measurement works, and how to manipulate and compose
@@ -216,3 +219,4 @@ gates acting on it. The next course, **Quantum Gates & Circuits**, extends
 all of this to *multiple* qubits at once, starting with the tensor
 product needed to describe two qubits together, and building toward
 phenomena a single qubit can never exhibit on its own, like entanglement.
+</NextDiscovery>

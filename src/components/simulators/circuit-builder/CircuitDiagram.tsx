@@ -138,7 +138,7 @@ export function CircuitDiagram({
                   width={36}
                   height={36}
                   rx={8}
-                  className={cn("stroke-brand", isDone ? "fill-brand/15" : "fill-surface")}
+                  className={cn("stroke-pillar", isDone ? "fill-pillar/15" : "fill-surface")}
                   strokeWidth={1.5}
                 />
                 {instr.gate === "MEASURE" ? (
@@ -167,33 +167,33 @@ export function CircuitDiagram({
               onClick={() => onSelectStep(col + 1)}
               onKeyDown={(event) => handleStepKeyDown(event, onSelectStep, col)}
             >
-              <line x1={cx} y1={top} x2={cx} y2={bottom} className="stroke-brand" strokeWidth={2} />
+              <line x1={cx} y1={top} x2={cx} y2={bottom} className="stroke-pillar" strokeWidth={2} />
               {instr.gate === "CNOT" && (
                 <>
-                  <circle cx={cx} cy={rowY(a)} r={5} className="fill-brand" />
+                  <circle cx={cx} cy={rowY(a)} r={5} className="fill-pillar" />
                   <circle
                     cx={cx}
                     cy={rowY(b)}
                     r={12}
-                    className={cn("stroke-brand", isDone ? "fill-brand/15" : "fill-surface")}
+                    className={cn("stroke-pillar", isDone ? "fill-pillar/15" : "fill-surface")}
                     strokeWidth={1.5}
                   />
-                  <line x1={cx - 12} y1={rowY(b)} x2={cx + 12} y2={rowY(b)} className="stroke-brand" strokeWidth={1.5} />
-                  <line x1={cx} y1={rowY(b) - 12} x2={cx} y2={rowY(b) + 12} className="stroke-brand" strokeWidth={1.5} />
+                  <line x1={cx - 12} y1={rowY(b)} x2={cx + 12} y2={rowY(b)} className="stroke-pillar" strokeWidth={1.5} />
+                  <line x1={cx} y1={rowY(b) - 12} x2={cx} y2={rowY(b) + 12} className="stroke-pillar" strokeWidth={1.5} />
                 </>
               )}
               {instr.gate === "CZ" && (
                 <>
-                  <circle cx={cx} cy={rowY(a)} r={5} className="fill-brand" />
-                  <circle cx={cx} cy={rowY(b)} r={5} className="fill-brand" />
+                  <circle cx={cx} cy={rowY(a)} r={5} className="fill-pillar" />
+                  <circle cx={cx} cy={rowY(b)} r={5} className="fill-pillar" />
                 </>
               )}
               {instr.gate === "SWAP" && (
                 <>
-                  <text x={cx} y={rowY(a) + 5} textAnchor="middle" className="fill-brand text-base font-bold">
+                  <text x={cx} y={rowY(a) + 5} textAnchor="middle" className="fill-pillar text-base font-bold">
                     ×
                   </text>
-                  <text x={cx} y={rowY(b) + 5} textAnchor="middle" className="fill-brand text-base font-bold">
+                  <text x={cx} y={rowY(b) + 5} textAnchor="middle" className="fill-pillar text-base font-bold">
                     ×
                   </text>
                 </>

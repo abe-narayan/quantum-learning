@@ -7,6 +7,10 @@ import { AmplitudeBars } from "./AmplitudeBars";
 import { GroverControls } from "./GroverControls";
 import { KatexMath } from "@/components/ui/KatexMath";
 import { Button } from "@/components/ui/Button";
+import { Readout } from "@/components/ui/Typography";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
+import { Predict } from "../shared/Predict";
 
 const DEFAULT_NUM_QUBITS = 3;
 const DEFAULT_MARKED_INDEX = 5;
@@ -103,6 +107,23 @@ export function GroverExplorer() {
     }
   }, []);
 
+  // A running history of P(marked) at every iteration count from 0 up to the
+  // current one — the same `groverIteration` sequence `state` below already
+  // walks, just retained at each step instead of only the last. This is what
+  // lets the over-rotation Predict question (below) compare "probability the
+  // moment you reached the optimum" against "probability now" without
+  // re-deriving physics: it's a read of the same real trajectory, not a
+  // parallel computation.
+  const probabilityHistory = useMemo(() => {
+    let s = uniformSuperposition(numQubits);
+    const history = [s.probabilities()[markedIndex]];
+    for (let i = 0; i < iteration; i++) {
+      s = groverIteration(s, [markedIndex]);
+      history.push(s.probabilities()[markedIndex]);
+    }
+    return history;
+  }, [numQubits, markedIndex, iteration]);
+
   const state = useMemo(() => {
     let s = uniformSuperposition(numQubits);
     for (let i = 0; i < iteration; i++) s = groverIteration(s, [markedIndex]);
@@ -127,16 +148,14 @@ export function GroverExplorer() {
   const handleReset = () => setIteration(0);
 
   return (
-    <div className="not-prose space-y-4">
-      <p className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">What we&apos;re studying: </span>
-        Grover&apos;s algorithm concentrates probability onto a marked item faster than any classical search —
-        but only up to a point.
-      </p>
-
-      <div className="grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-        <div className="space-y-6">
-          <div className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+    <SimulatorInstrument
+      label="Grover&rsquo;s algorithm — amplitude amplification"
+      readout={<Readout label="P(marked)" value={(successProbability * 100).toFixed(1)} unit="%" />}
+      footnote="Next: see how the same-size search space collapses instantly in the Two-Qubit Explorer&rsquo;s measurement panel — no amplification needed classically."
+      stageClassName="space-y-6"
+      stage={
+        <>
+          <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {iteration === 0 ? (
               <>Starting in the uniform superposition: every basis state has the same amplitude and probability.</>
             ) : (
@@ -159,9 +178,42 @@ export function GroverExplorer() {
               display
             />
           </div>
-        </div>
 
-        <div>
+          {iteration >= optimal && optimal > 0 ? (
+            <Predict
+              key={`${numQubits}-${markedIndex}`}
+              question={`You've just reached the theoretical optimum (${optimal} iteration${optimal === 1 ? "" : "s"}). Step once more — does P(marked) keep climbing, or start falling?`}
+              options={[
+                { id: "climb", label: "Keeps climbing" },
+                { id: "fall", label: "Starts falling" },
+              ]}
+              outcomeId={
+                iteration > optimal
+                  ? probabilityHistory[iteration] > probabilityHistory[optimal] + 1e-9
+                    ? "climb"
+                    : "fall"
+                  : null
+              }
+            />
+          ) : null}
+
+          <SimulatorFraming
+            shows="Grover's algorithm concentrates probability onto a marked item faster than any classical search — but only up to a point."
+            watchFor="Success probability doesn't climb forever — past the optimal iteration count it overshoots and starts falling back down."
+            tryThis={
+              <ul>
+                <li>
+                  Set 3 qubits, mark index 5, and step past the optimal iteration count shown in the controls
+                  — watch P(marked) fall back down instead of climbing forever.
+                </li>
+                <li>Try 4 qubits (16 items) and compare how many iterations it takes versus 3 qubits (8 items).</li>
+              </ul>
+            }
+          />
+        </>
+      }
+      controls={
+        <>
           <div className="flex justify-end">
             <Button size="sm" variant="secondary" onClick={handleCopyLink}>
               {copied ? "Copied!" : "Copy link"}
@@ -180,23 +232,8 @@ export function GroverExplorer() {
               disabled={false}
             />
           </div>
-        </div>
-      </div>
-
-      <div className="space-y-1 text-sm text-muted-foreground">
-        <p>
-          <span className="font-semibold text-foreground">Try this: </span>
-          Set 3 qubits, mark index 5, and step past the optimal iteration count shown in the controls — watch
-          P(marked) fall back down instead of climbing forever.
-        </p>
-        <p>Try 4 qubits (16 items) and compare how many iterations it takes versus 3 qubits (8 items).</p>
-      </div>
-
-      <p className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">What&apos;s next: </span>
-        See how the same-size search space collapses instantly in the Two-Qubit Explorer&apos;s measurement
-        panel — no amplification needed classically.
-      </p>
-    </div>
+        </>
+      }
+    />
   );
 }

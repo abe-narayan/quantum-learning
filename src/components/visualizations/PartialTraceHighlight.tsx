@@ -99,7 +99,7 @@ export function PartialTraceHighlight({
     : "Click a cell of the reduced matrix to see which ρ_AB entries sum into it.";
 
   return (
-    <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-4 panel-inset p-4">
       {presets.length > 1 && (
         <PresetToggle options={presets} index={presetIndex} onChange={setPresetIndex} ariaLabel={ariaLabel} />
       )}
@@ -113,7 +113,7 @@ export function PartialTraceHighlight({
 
       <div className="flex flex-wrap items-start gap-6 overflow-x-auto" aria-label={`${ariaLabel}: ${preset.label}, ${frame.paramLabel}`}>
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">ρ_AB</p>
+          <p className="tech-label">ρ_AB</p>
           <BasisRow labels={BASIS_LABELS_4} />
           <div className="flex">
             <BasisColumn labels={BASIS_LABELS_4} />
@@ -153,7 +153,7 @@ export function PartialTraceHighlight({
         </div>
 
         <div className="space-y-1.5 pt-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{rhoALabel}</p>
+          <p className="tech-label">{rhoALabel}</p>
           <BasisRow labels={BASIS_LABELS_2} />
           <div className="flex">
             <BasisColumn labels={BASIS_LABELS_2} />
@@ -215,7 +215,7 @@ function BasisRow({ labels }: { labels: string[] }) {
   return (
     <div className="ml-[3.25rem] flex gap-px text-[10px] text-muted-foreground">
       {labels.map((label, i) => (
-        <span key={i} className="flex-1 text-center" style={{ minWidth: "3.25rem" }}>
+        <span key={i} className="min-w-[3.25rem] flex-1 text-center">
           {label}
         </span>
       ))}

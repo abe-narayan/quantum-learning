@@ -23,6 +23,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Hydrogen, a spherical well, and a 3D harmonic oscillator share nothing
+  as potentials — yet their angular wavefunctions are built from exactly
+  the same handful of functions. That's not a coincidence.
+</LessonHook>
+
 ## Motivation
 
 Hydrogen, the finite spherical well, and the 3D harmonic oscillator look
@@ -139,14 +145,14 @@ with any rotationally invariant quantity by definition.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming this separation works for *any* potential.** It specifically
 requires $V$ to depend only on $r$: a potential like $V(x,y,z)=xyz$ or
 even $V=x^2$ alone (not $x^2+y^2+z^2$) is *not* central, and $H$ would
 not commute with $L_z$ or $\vec L^{\,2}$ for such a potential.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking $[H,L_z]=0$ means $H$ and $L_z$ are the same operator, or that
 energy determines $m$.** It means they *can* be simultaneously
 diagonalized: energy eigenstates are highly degenerate in $m$ precisely
@@ -182,6 +188,13 @@ structure, not even on $l$) for the Coulomb potential specifically.
 
 ## Further Exploration
 
-Next: [The Radial Equation](/lessons/quantum-mechanics/the-hydrogen-atom/the-radial-equation), which uses this separation to reduce
-hydrogen's full 3D Schrödinger equation to a single ordinary differential
-equation in $r$ alone.
+<ChallengePrompt prompt="The Mathematical Development section proves [H,Lz]=0 using rotations about the z-axis specifically. Does the same argument show [H,Lx]=0 and [H,Ly]=0 too, or is z somehow special?">
+  Retrace the rotation argument with the rotation axis relabeled — does
+  anything in it actually depend on which axis was chosen?
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [The Radial Equation](/lessons/quantum-mechanics/the-hydrogen-atom/the-radial-equation), which uses this separation to reduce
+  hydrogen's full 3D Schrödinger equation to a single ordinary differential
+  equation in $r$ alone.
+</NextDiscovery>

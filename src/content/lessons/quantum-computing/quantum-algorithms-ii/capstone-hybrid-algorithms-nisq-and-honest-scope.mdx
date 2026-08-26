@@ -58,15 +58,16 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Two very different bets on hardware">
+A long, precise, fixed circuit needing everything to go right in one shot, versus short, repeated, error-tolerant circuits whose classical outer loop can partly compensate for imperfect hardware — Shor's algorithm and VQE/QAOA are betting on very different futures.
+</LessonHook>
+
 ## Motivation
 
 This course built two structurally different families of quantum
-algorithm: Shor's, a long, precise, fixed circuit needing everything to go
-right in one shot; VQE/QAOA, short, repeated, error-tolerant circuits
-whose classical outer loop can partly compensate for imperfect quantum
-hardware. This capstone makes the comparison explicit, and closes with a
-complete list of what this course actually built versus simulated
-versus left as a documented gap.
+algorithm, Shor's and VQE/QAOA. This capstone makes the comparison
+explicit, and closes with a complete list of what this course actually
+built versus simulated versus left as a documented gap.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/IBM_Q_system_%28Fraunhofer_2%29.jpg/1280px-IBM_Q_system_%28Fraunhofer_2%29.jpg"
@@ -199,7 +200,7 @@ not just the ones it ends up keeping.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Believing NISQ-era hardware can already run useful VQE/QAOA at scales
 that beat classical computers.** Whether NISQ-era VQE/QAOA achieves a
 genuine, practically useful quantum advantage on any real-world problem
@@ -208,7 +209,7 @@ examples demonstrate the *mechanism*, not a proven practical advantage at
 scale.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating "hybrid quantum-classical" as a stopgap until fault-tolerant
 hardware arrives.** Even in a future fault-tolerant era, classical
 computers remain far cheaper for many subroutines (the gcd computations in
@@ -250,6 +251,7 @@ a lasting design pattern, not just a NISQ-era workaround.
 
 ## Further Exploration
 
+<NextDiscovery>
 This completes **Quantum Algorithms II: Advanced**. From here, **Quantum
 Error Correction & Fault Tolerance** picks up exactly where this
 capstone left off: the hardware regime Shor's algorithm actually needs,
@@ -263,3 +265,4 @@ and this capstone's NISQ-friendliness argument gets a precise numerical
 account of exactly why VQE's cost-function gradients become hard to find
 at scale in [Barren Plateaus and Variational
 Trainability](/lessons/quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability).
+</NextDiscovery>

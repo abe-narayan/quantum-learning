@@ -97,8 +97,8 @@ export function WavefunctionCanvas({
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label="Real and imaginary parts of the wavefunction">
         <line x1={PADDING_X} y1={zeroY} x2={WIDTH - PADDING_X} y2={zeroY} stroke="currentColor" strokeOpacity={0.25} />
         <path d={pathFrom(xs, imYs)} fill="none" stroke="var(--accent)" strokeWidth={1.5} strokeOpacity={0.8} />
-        <path d={pathFrom(xs, reYs)} fill="none" stroke="var(--brand)" strokeWidth={2} />
-        <text x={PADDING_X} y={16} fontSize={11} fill="var(--brand)">— Re(ψ)</text>
+        <path d={pathFrom(xs, reYs)} fill="none" stroke="var(--pillar-accent)" strokeWidth={2} />
+        <text x={PADDING_X} y={16} fontSize={11} fill="var(--pillar-accent)">— Re(ψ)</text>
         <text x={PADDING_X + 70} y={16} fontSize={11} fill="var(--accent)">— Im(ψ)</text>
       </svg>
     );
@@ -163,13 +163,13 @@ export function WavefunctionCanvas({
 
       <path
         d={`${pathFrom(xs, ys)} L ${xs[xs.length - 1]} ${BASELINE_Y} L ${xs[0]} ${BASELINE_Y} Z`}
-        fill="var(--brand)"
+        fill="var(--pillar-accent)"
         fillOpacity={0.22}
-        stroke="var(--brand)"
+        stroke="var(--pillar-accent)"
         strokeWidth={2}
       />
 
-      <text x={PADDING_X} y={16} fontSize={11} fill="var(--brand)">|ψ(x)|² (numerical)</text>
+      <text x={PADDING_X} y={16} fontSize={11} fill="var(--pillar-accent)">|ψ(x)|² (numerical)</text>
       <text x={PADDING_X} y={30} fontSize={11} fill="currentColor" opacity={0.5}>- - - V(x) (schematic scale)</text>
       {analyticalDensity ? (
         <text x={PADDING_X} y={44} fontSize={11} fill="var(--warning)">- - - analytical |ψ(x)|²</text>

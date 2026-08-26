@@ -24,16 +24,21 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A real atom, not an artificial circuit">
+Suspend a single charged atom in empty space, no walls, no wires, nothing physically touching it, then hold it steady enough that a laser can address its internal states one operation at a time.
+</LessonHook>
+
 ## Motivation
 
-Take a single charged atom, an ion, and suspend it in empty space: no
-walls, no wires, nothing physically touching it. Now hold it steady
-enough, for long enough, that a laser can address its internal states
-one operation at a time, and entangle it with a neighbor on demand. A
-static electric field can't do this job alone; Earnshaw's theorem, a
-result from classical electrostatics, rules out trapping a charge in 3D
-with any static field configuration at all. So how does a trapped-ion
-quantum computer hold a single ion still enough to compute with it?
+Holding it steady, for long enough, to entangle it with a neighbor on
+demand, is the hard part. A static electric field can't do this job
+alone; Earnshaw's theorem, a result from classical electrostatics,
+rules out trapping a charge in 3D with any static field configuration
+at all.
+
+<Question>
+So how does a trapped-ion quantum computer hold a single ion still enough to compute with it?
+</Question>
 
 That engineering problem, and its solution, define the whole platform.
 Where a superconducting qubit is an entirely artificial circuit, a
@@ -42,10 +47,17 @@ naturally-occurring internal energy levels. This is a fundamentally
 different engineering starting point, and it shows up directly in the
 platform's tradeoffs.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
   alt="Two trapped beryllium ions held roughly 40 micrometers apart above a gold chip trap, surrounded by copper shielding and gold mesh, at NIST"
   caption="Two real trapped beryllium ions at NIST, held above a gold chip trap and swapping energy back and forth. This is the actual apparatus behind this lesson's Paul trap: oscillating electric fields confining charged atoms in place for use as qubits."
+  pins={[
+    { id: "trap", x: 50, y: 43, label: "The gold chip trap itself — the ions are held here, roughly 40 μm apart, by the Paul trap's oscillating RF field." },
+    { id: "clamp", x: 50, y: 8, label: "Copper mount, clamping and thermally anchoring the trap package in place." },
+    { id: "rf", x: 83, y: 23, label: "RF feedthrough, carrying the oscillating drive field into the vacuum chamber." },
+    { id: "traces", x: 30, y: 48, label: "Wire-bonded control lines routing RF and DC voltages to the trap electrodes." },
+    { id: "cables", x: 83, y: 78, label: "Bundled wiring exiting the chamber to room-temperature control electronics." },
+  ]}
   credit="Y. Colombe / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
   license="Public Domain (U.S. Government work)"
@@ -200,13 +212,13 @@ is a misleading platform comparison metric.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming faster gates always mean a "better" platform.** As the worked
 example shows directly, the ratio of coherence time to gate time, not
 gate speed alone, sets the realistic operation budget.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Thinking trapped-ion connectivity is unlimited for free.** All-to-all
 connectivity via the shared motional mode is a real architectural
 advantage, but it doesn't scale trivially: as more ions share one
@@ -242,6 +254,8 @@ engineering constraint the Noise, Decoherence & Scaling course develops.
 
 ## Further Exploration
 
+<NextDiscovery>
 [Neutral Atoms](/lessons/quantum-hardware/physical-qubit-platforms/neutral-atoms)
 keeps trapped ions' long coherence times while addressing scalability
 differently, using light, not electric fields, for confinement.
+</NextDiscovery>

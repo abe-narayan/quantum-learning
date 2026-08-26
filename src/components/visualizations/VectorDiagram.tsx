@@ -180,7 +180,7 @@ export function VectorDiagram({
   );
 
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} className="w-full" role="img" aria-label={ariaLabel}>
         {showGrid && (
           <g className="stroke-border" strokeWidth={1}>

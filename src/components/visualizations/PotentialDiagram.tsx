@@ -55,7 +55,7 @@ export function PotentialDiagram({
   const wavefunctionPath = wavefunction ? pathFor(xValues, wavefunction, xOf, yOf) : null;
 
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {shadedRegion && (
           <rect

@@ -6,7 +6,7 @@ export const schmidtCoefficientsToEntropy: NumericProblem = {
     title: "Entanglement Entropy from Schmidt Coefficients",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["schmidt-decomposition", "entanglement-entropy"],

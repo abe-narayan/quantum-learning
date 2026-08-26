@@ -50,13 +50,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Last lesson proved the angular part is already solved. This lesson does the actual reduction: substitute that fact into the full 3D Schrödinger equation and watch a full-blown partial differential equation in three variables collapse into a single ordinary differential equation in r alone.
+</LessonHook>
+
 ## Motivation
 
-Last lesson proved the angular part is already solved. This lesson does
-the actual reduction: substitute that fact into the full 3D Schrödinger
-equation and watch a full-blown partial differential equation in three
-variables collapse into a single ordinary differential equation in $r$
-alone, one this
+That single ordinary differential equation in $r$ is one this
 platform can then solve using the exact same machinery One-Dimensional
 Systems already built.
 
@@ -183,13 +183,13 @@ nucleus.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the centrifugal term for l>0 states.** Only $l=0$ ($s$
 states) have $V_{\text{eff}}=V(r)$ exactly; every $l>0$ state solves a
 *different* effective 1D problem, with its own centrifugal barrier.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing $R(r)$ and $u(r)=rR(r)$.** The boundary condition $u(0)=0$
 does *not* mean $R(0)=0$: for $l=0$, $R(0)$ can be (and is) nonzero,
 since $R(r)=u(r)/r$ can stay finite as $r\to0$ if $u(r)\to0$
@@ -253,5 +253,7 @@ $R$: nonzero ($R(0)=2$) for $l=0$, zero for $l=1$.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Hydrogen Energy Levels](/lessons/quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels), which solves this radial equation for
 the Coulomb potential specifically, deriving $E_n=-13.6\text{ eV}/n^2$.
+</NextDiscovery>

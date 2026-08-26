@@ -43,6 +43,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+This lesson doesn't just describe Shor's algorithm running — it runs it: N=15, worked by hand, step by step, through this platform's own engine.
+</LessonHook>
+
 ## Motivation
 
 $N=15$ is the standard first example for Shor's algorithm precisely
@@ -169,7 +173,7 @@ beyond both this course's toy engine and current quantum hardware. This
 worked example demonstrates the *mechanism*, not a practical attack.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a single measurement always gives the exact period directly.**
 Here it happened to reduce cleanly to $r/2$ instead of $r$ itself. Real
 implementations account for this by running the circuit multiple times
@@ -207,7 +211,9 @@ and combining results, not by trusting one shot.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Variational Principle and Ansatz Circuits](/lessons/quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits), a completely
 different style of quantum algorithm, built for today's noisy, small
 quantum devices rather than the large fault-tolerant machines Shor's
 algorithm needs.
+</NextDiscovery>

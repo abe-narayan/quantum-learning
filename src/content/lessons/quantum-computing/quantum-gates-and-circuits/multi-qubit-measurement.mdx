@@ -37,14 +37,15 @@ export const plusZero = new StateVector([new Complex(Math.SQRT1_2), new Complex(
 );
 export const plusZeroAfterMeasuringQubit1 = measureQubit(plusZero, 1, 0.5).collapsed;
 
+<LessonHook eyebrow="Why this matters">
+The last lesson showed that measuring either qubit of a Bell state always matches its partner. That claim was stated in terms of probabilities; this lesson derives it from the measurement postulate directly.
+</LessonHook>
+
 ## Motivation
 
-The last lesson showed that measuring either qubit of a Bell state always
-matches its partner. That claim was stated in terms of probabilities;
-this lesson derives it from the measurement postulate directly, and
-along the way builds the tool, measuring *part* of a multi-qubit state,
-that quantum teleportation is built entirely out of two lessons from
-now.
+Along the way, this lesson builds the tool, measuring *part* of a
+multi-qubit state, that quantum teleportation is built entirely out
+of, two lessons from now.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sycamore_Quantum_Chip.jpg/1280px-Sycamore_Quantum_Chip.jpg"
@@ -178,13 +179,13 @@ whatever superposition it already had.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming partial measurement always collapses the other qubits too.**
 Only entangled qubits get disturbed this way; the worked example and the
 $|+\rangle\otimes|0\rangle$ case above are both counterexamples.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting to renormalize after zeroing out inconsistent amplitudes.**
 The surviving amplitudes must be divided by $\sqrt{P(b)}$, not left as
 they were in the original state, otherwise the result isn't a valid,
@@ -221,7 +222,9 @@ normalized quantum state.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The No-Cloning Theorem](/lessons/quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem), a sharply counterintuitive consequence of
 the measurement and linearity rules from this course: no device can copy
 an unknown qubit state, and the proof follows directly from tools you
 already have.
+</NextDiscovery>

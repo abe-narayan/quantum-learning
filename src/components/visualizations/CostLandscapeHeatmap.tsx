@@ -82,7 +82,7 @@ export function CostLandscapeHeatmap({
   const bestLabel = goal === "max" ? "highest" : "lowest";
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div
         role="img"
         aria-label={ariaLabel}
@@ -129,17 +129,11 @@ export function CostLandscapeHeatmap({
 
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span
-            className="h-3 w-3 rounded-sm"
-            style={{ backgroundColor: "var(--success)" }}
-          />
+          <span className="h-3 w-3 rounded-sm bg-success" />
           {bestLabel} {valueLabel} in grid
         </span>
         <span className="flex items-center gap-1.5">
-          <span
-            className="h-3 w-3 rounded-sm"
-            style={{ backgroundColor: "var(--danger)" }}
-          />
+          <span className="h-3 w-3 rounded-sm bg-danger" />
           {worstLabel} {valueLabel} in grid
         </span>
         <span className="flex items-center gap-1.5">

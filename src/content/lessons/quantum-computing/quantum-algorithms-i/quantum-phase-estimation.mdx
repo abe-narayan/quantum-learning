@@ -54,6 +54,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Reading a phase off a qubit register">
+A single real number can encode everything a unitary does to one of its eigenstates. Quantum phase estimation reads that number out, bit by bit, using nothing but controlled-U applications and the inverse QFT.
+</LessonHook>
+
 ## Motivation
 
 Every eigenstate of a unitary $U$ satisfies $U|\psi\rangle=e^{2\pi i\varphi}|\psi\rangle$
@@ -213,7 +217,7 @@ is what "exactly representable" means in practice.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting an exact answer for a phase not representable in $t$ bits.**
 The derivation above assumed $\varphi N$ is an integer; for other phases,
 the precision register's state is a superposition peaked near the nearest
@@ -246,7 +250,7 @@ binary) at the same $t=3$ tests this directly:
   ariaLabel="Precision-register measurement probability for phi=1/3, t=3, showing probability smeared across several neighboring outcomes instead of one certain spike"
 />
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing which qubit controls which power of $U$.** Precision qubit $0$
 controls the *largest* power ($U^{2^{t-1}}$), not the smallest; swapping
 this convention silently reads out the phase's bits in the wrong order.
@@ -309,6 +313,7 @@ representable phases, not just the one worked out by hand above.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Grover's Algorithm](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion), which returns to Deutsch-Jozsa's style of
 problem (a search rather than a period) and gets a *quadratic*, not
 exponential, speedup, for reasons this course makes precise rather than
@@ -319,3 +324,4 @@ Depth](/lessons/quantum-mastery/advanced-algorithms-and-complexity/phase-estimat
 extends this lesson's exact-phase-only treatment to phases that aren't
 exactly representable in any finite register, deriving the resulting
 precision/error tradeoff exactly.
+</NextDiscovery>

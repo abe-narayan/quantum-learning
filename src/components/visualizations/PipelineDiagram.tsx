@@ -15,7 +15,7 @@ export type PipelineStep = {
  */
 export function PipelineDiagram({ steps, ariaLabel, loop = false }: { steps: PipelineStep[]; ariaLabel: string; loop?: boolean }) {
   return (
-    <div role="img" aria-label={ariaLabel} className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-5">
+    <div role="img" aria-label={ariaLabel} className="not-prose overflow-x-auto panel-inset p-5">
       <div className="flex flex-wrap items-center gap-2">
         {steps.map((step, i) => (
           <div key={i} className="flex items-center gap-2">

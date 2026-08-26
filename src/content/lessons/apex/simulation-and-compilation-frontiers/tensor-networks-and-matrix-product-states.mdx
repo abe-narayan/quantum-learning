@@ -117,6 +117,13 @@ export const [lambda1Skewed, lambda2Skewed] = eigenvaluesHermitian2x2(rhoSkewedQ
 export const entropySkewed = vonNeumannEntropy(rhoSkewedQubit1);
 export const bondDimensionSkewed = [lambda1Skewed, lambda2Skewed].filter((lambda) => lambda > 1e-9).length;
 
+<LessonHook eyebrow="Where the chain actually comes from">
+  The previous lesson treated bond dimension as an intuitive knob. Here
+  it becomes a hard number: repeated singular value decomposition, one
+  cut at a time, turning a $2^n$-amplitude tensor into an exact chain
+  of small tensors.
+</LessonHook>
+
 ## Motivation
 
 Tensor Network Methods made the qualitative case: a state with limited
@@ -350,7 +357,7 @@ dimension, which is where the saving actually shows up.
   explanation="Bond dimension is the Schmidt rank — a count of nonzero terms, with no reference to how they're weighted. Both amplitudes here are nonzero, so χ=2 exactly as for GHZ, even though the entanglement entropy (which does weigh them) drops far below GHZ's full 1 bit. The computation below confirms both numbers exactly."
 />
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming every cut of an MPS shares the same bond dimension.** GHZ's
 $\chi=2$ at both of its cuts is a special symmetry of that particular
 state, not a general fact: a generic state's Schmidt rank is a genuinely
@@ -359,7 +366,7 @@ smaller near the ends, since $\chi_k\leq 2^{\min(k,n-k)}$ caps it
 differently at every $k$).
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Conflating bond dimension (an integer, the Schmidt rank) with
 entanglement entropy (a real number, in bits).** They are related but
 not the same quantity: $|\phi\rangle=\sqrt{0.99}|000\rangle+\sqrt{0.01}|111\rangle$
@@ -416,3 +423,10 @@ takes the bond-dimension and area-law machinery built here and turns it
 into a precise, checkable boundary between what a classical computer can
 and cannot efficiently simulate — the actual technical definition of
 where quantum advantage can possibly live.
+
+<NextDiscovery>
+  Next: When Classical Simulation Works takes the bond-dimension and
+  area-law machinery built here and turns it into a precise, checkable
+  boundary between what a classical computer can and cannot efficiently
+  simulate.
+</NextDiscovery>

@@ -6,7 +6,7 @@ export const wkbAsQuantizedAdiabaticInvariant: ConceptualProblem = {
     title: "WKB Quantization as a Quantized Classical Adiabatic Invariant",
     course: "symmetry-scattering-and-semiclassical-methods",
     lesson: "quantum-mastery/symmetry-scattering-and-semiclassical-methods/capstone-symmetry-and-the-classical-limit",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["wkb", "adiabatic-invariance", "synthesis", "conceptual"],

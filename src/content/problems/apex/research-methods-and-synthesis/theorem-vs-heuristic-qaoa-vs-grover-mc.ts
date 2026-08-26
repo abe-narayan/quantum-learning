@@ -6,7 +6,7 @@ export const theoremVsHeuristicQaoaVsGroverMc: MultipleChoiceProblem = {
     title: "Why QAOA's Heuristic Status Doesn't Make It Worthless",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "multiple-choice",
     tags: ["research-methods", "theorem-vs-heuristic", "qaoa", "grovers-algorithm"],

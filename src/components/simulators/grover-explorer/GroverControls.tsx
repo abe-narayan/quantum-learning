@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
+import { ControlSection } from "../shared/controls";
 
 const QUBIT_OPTIONS = [2, 3, 4].map((n) => ({ n, label: `N=${2 ** n}` }));
 
@@ -28,10 +29,11 @@ export function GroverControls({
 
   return (
     <div className="space-y-8">
-      <section aria-labelledby="grover-qubits-heading">
-        <h3 id="grover-qubits-heading" className="text-sm font-semibold text-foreground">
-          Search space size
-        </h3>
+      <ControlSection
+        id="grover-qubits"
+        title="Search space size"
+        description={`${numQubits} qubits, N=${dimension} basis states. Changing this resets the search.`}
+      >
         <PresetToggle
           options={QUBIT_OPTIONS}
           index={QUBIT_OPTIONS.findIndex((o) => o.n === numQubits)}
@@ -39,18 +41,14 @@ export function GroverControls({
           ariaLabel="Number of qubits"
           disabled={disabled}
         />
-        <p className="mt-1 text-xs text-muted-foreground">{numQubits} qubits, N={dimension} basis states. Changing this resets the search.</p>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="grover-marked-heading">
-        <h3 id="grover-marked-heading" className="text-sm font-semibold text-foreground">
-          Marked item
-        </h3>
+      <ControlSection id="grover-marked" title="Marked item">
         <select
           value={markedIndex}
           disabled={disabled}
           onChange={(e) => onMarkedIndexChange(Number(e.target.value))}
-          className="mt-3 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {Array.from({ length: dimension }, (_, i) => (
             <option key={i} value={i}>
@@ -58,16 +56,14 @@ export function GroverControls({
             </option>
           ))}
         </select>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="grover-run-heading">
-        <h3 id="grover-run-heading" className="text-sm font-semibold text-foreground">
-          Run
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Iteration {iteration}. Theoretical optimum for this N and 1 marked item: {optimalIteration}.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
+      <ControlSection
+        id="grover-run"
+        title="Run"
+        description={`Iteration ${iteration}. Theoretical optimum for this N and 1 marked item: ${optimalIteration}.`}
+      >
+        <div className="flex flex-wrap gap-2">
           <Button variant="primary" size="sm" disabled={disabled} onClick={onStep}>
             Step (oracle + diffusion)
           </Button>
@@ -75,7 +71,7 @@ export function GroverControls({
             Reset
           </Button>
         </div>
-      </section>
+      </ControlSection>
     </div>
   );
 }

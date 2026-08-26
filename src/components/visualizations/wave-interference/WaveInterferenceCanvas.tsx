@@ -148,7 +148,8 @@ export function WaveInterferenceCanvas({ phase, className }: { phase: number; cl
           y={s.y - step / 2}
           width={STRIP_X1 - STRIP_X0}
           height={step + 0.6}
-          style={{ fill: "var(--brand)", opacity: s.normalized }}
+          className="fill-brand"
+          style={{ opacity: s.normalized }}
         />
       ))}
       <rect

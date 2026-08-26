@@ -6,7 +6,7 @@ export const whyStaircaseGivesASum: ConceptualProblem = {
     title: "Why a Staircase PVM Reduces the Integral to a Sum",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["spectral-theorem", "pvm", "conceptual"],

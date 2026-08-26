@@ -139,11 +139,11 @@ export function ComplexPlaneCanvas({ re, im }: { re: number; im: number }) {
         y1={CENTER}
         x2={point.x}
         y2={point.y}
-        stroke="var(--brand)"
+        stroke="var(--pillar-accent)"
         strokeWidth={2.5}
         strokeLinecap="round"
       />
-      <circle cx={point.x} cy={point.y} r={5} fill="var(--brand)" />
+      <circle cx={point.x} cy={point.y} r={5} fill="var(--pillar-accent)" />
       <circle cx={CENTER} cy={CENTER} r={2.5} fill="currentColor" opacity={0.4} />
     </svg>
   );

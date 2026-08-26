@@ -55,6 +55,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Guess any normalized wavefunction at all, however crude, and its energy
+  expectation value is guaranteed to sit at or above the true ground
+  energy. That single inequality is the entire method.
+</LessonHook>
+
 ## Motivation
 
 Perturbation theory needed $H=H_0+H'$ with $H'$ small, useless if no
@@ -83,12 +89,25 @@ $$
 \langle\psi_{\text{trial}}|H|\psi_{\text{trial}}\rangle \geq E_0
 $$
 
-where $E_0$ is the true ground-state energy. This holds because any
-normalized state can be expanded in $H$'s own (unknown) true
-eigenbasis, $|\psi_{\text{trial}}\rangle=\sum_nc_n|n\rangle$ with
-$\sum_n|c_n|^2=1$; then
-$\langle\psi_{\text{trial}}|H|\psi_{\text{trial}}\rangle=\sum_n|c_n|^2E_n\geq\sum_n|c_n|^2E_0=E_0$,
-since every $E_n\geq E_0$ by definition of $E_0$ being the smallest.
+where $E_0$ is the true ground-state energy.
+
+<DerivationSteps>
+  <DerivationStep annotation="Any normalized state can be expanded in H's own (unknown) true eigenbasis — this is legal for any normalized ψ_trial, not just an eigenstate.">
+$$
+|\psi_{\text{trial}}\rangle=\sum_nc_n|n\rangle, \qquad \sum_n|c_n|^2=1
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Sandwich H between this expansion — each eigenstate contributes its own eigenvalue Eₙ, weighted by |cₙ|².">
+$$
+\langle\psi_{\text{trial}}|H|\psi_{\text{trial}}\rangle=\sum_n|c_n|^2E_n
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Every Eₙ ≥ E₀ by definition of E₀ being the smallest eigenvalue, so replacing each Eₙ with E₀ can only lower (or keep equal) the weighted sum.">
+$$
+\sum_n|c_n|^2E_n\geq\sum_n|c_n|^2E_0=E_0
+$$
+  </DerivationStep>
+</DerivationSteps>
 
 ### Using it: minimize over trial parameters
 
@@ -174,7 +193,7 @@ direction (narrower or wider) and $E(\sigma)$ rises; it never dips below.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the trial wavefunction must be normalized before computing
 ⟨H⟩.** `gaussianPacket` normalizes automatically, but a hand-built trial
 function must be explicitly normalized first, or the $\langle H\rangle\geq E_0$
@@ -182,7 +201,7 @@ inequality doesn't hold as stated (it needs
 $\langle\psi_{\text{trial}}|\psi_{\text{trial}}\rangle=1$ specifically).
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming a lower ⟨H⟩ always means a "better" trial family in every
 sense.** It means a tighter upper bound on $E_0$ specifically. The
 theorem says nothing about how close the trial *wavefunction itself* is
@@ -218,6 +237,14 @@ to the true ground state, only about the energy expectation value.
 
 ## Further Exploration
 
-Next: **The WKB Approximation**, a semiclassical method that turns out
-to give the *exact* harmonic oscillator spectrum too, for a completely
-different mathematical reason.
+<ChallengePrompt prompt="As the trial width σ grows very large (a nearly-flat, very spread-out Gaussian), what happens to E(σ)? Does it diverge, approach a finite value, or something else — and is that still consistent with the variational theorem?">
+  Think about what a very wide Gaussian does to ⟨V⟩ specifically for the
+  harmonic oscillator's $\tfrac12m\omega^2x^2$ potential, since ⟨T⟩ only
+  shrinks as σ grows.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: **The WKB Approximation**, a semiclassical method that turns out
+  to give the *exact* harmonic oscillator spectrum too, for a completely
+  different mathematical reason.
+</NextDiscovery>

@@ -30,17 +30,18 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="An engineered artificial atom">
+A plain LC circuit is a quantum harmonic oscillator, and its evenly-spaced levels make a terrible qubit — a "0→1" drive pulse would just as happily drive "1→2," "2→3," and so on.
+</LessonHook>
+
 ## Motivation
 
 A superconducting qubit is, physically, a tiny electrical circuit: an
 inductor and capacitor, cooled in a dilution refrigerator to
 millikelvin temperatures (colder than deep space) so that thermal noise
 doesn't wash out the delicate quantum states. The engineering challenge
-this lesson opens with is that a plain LC circuit is a quantum harmonic
-oscillator (Approximation Methods' oscillator, revisited here as real
-hardware), and a harmonic oscillator's evenly-spaced levels make a
-*terrible* qubit, since a "0→1" drive pulse would just as happily drive
-"1→2," "2→3," and so on.
+this lesson opens with is Approximation Methods' oscillator, revisited
+here as real hardware.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
@@ -125,6 +126,10 @@ size. Neither result required inventing new physics; both are the same
 lithographic, wire-up-many-identical-circuits argument this section
 opened with, playing out at production scale.
 
+<HistoricalMoment date="2024">
+Google's Willow chip reports that its surface-code logical error rate keeps dropping as the code is scaled up — the first real evidence that error correction on this platform gets easier, not harder, with size.
+</HistoricalMoment>
+
 ### Gate time from the Rabi model
 
 A single-qubit gate is implemented by driving the qubit at its resonance
@@ -180,7 +185,7 @@ anharmonicity is what makes isolating a two-level subspace possible at
 all.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Comparing platforms by coherence time alone.** A short coherence time
 paired with proportionally fast gates can still allow many operations.
 It's the ratio (roughly, gate count before decoherence) that matters,
@@ -213,5 +218,7 @@ not either number in isolation.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Trapped Ions](/lessons/quantum-hardware/physical-qubit-platforms/trapped-ions), a completely different physical platform, with
 the opposite speed/coherence tradeoff.
+</NextDiscovery>

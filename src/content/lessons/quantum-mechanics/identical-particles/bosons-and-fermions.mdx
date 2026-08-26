@@ -52,12 +52,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Every particle in the universe belongs to one of exactly two families — and which family decides whether it can pile into a laser beam or a superfluid with a billion identical companions, or whether it insists on its own private quantum state the way electrons do.
+</LessonHook>
+
 ## Motivation
 
-Every particle in the universe turns out to belong to one of exactly two
-families, and which family decides whether it can pile up in a laser
-beam or a superfluid with a billion identical companions, or whether it
-insists on its own private quantum state the way electrons do. The
+The
 previous lesson showed a bare product state isn't a valid
 two-identical-particle state at all. Here we build the two combinations
 that are: the symmetric sum (bosons) and the antisymmetric difference
@@ -155,7 +156,7 @@ confirmation of the $-1$ eigenvalue.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the normalization step matters.** $|a\rangle\otimes|b\rangle\pm|b\rangle\otimes|a\rangle$
 is *not* automatically normalized even when $|a\rangle,|b\rangle$
 individually are (its norm depends on whether $a,b$ are orthogonal, and
@@ -163,7 +164,7 @@ whether $a=b$). `normalizeVector` handles this correctly in both cases,
 rather than assuming a fixed $1/\sqrt2$ factor.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking symmetrization/antisymmetrization is a choice experimenters
 make.** It's dictated entirely by the particle species (boson vs.
 fermion) via the spin-statistics connection, not a modeling choice
@@ -201,5 +202,7 @@ applied differently depending on the situation.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Pauli Exclusion Principle](/lessons/quantum-mechanics/identical-particles/the-pauli-exclusion-principle), which treats the $a=b$
 vanishing result as real physics rather than a mathematical curiosity.
+</NextDiscovery>

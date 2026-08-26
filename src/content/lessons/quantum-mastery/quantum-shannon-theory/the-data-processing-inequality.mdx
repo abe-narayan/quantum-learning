@@ -93,6 +93,13 @@ export const dataProcessingFrames = [
   },
 ];
 
+<LessonHook eyebrow="You cannot gain information by processing data you already have">
+  Send a qubit through any physical channel — noisy, lossy, or into the
+  hands of an eavesdropper — and one inequality guarantees the same
+  thing every time: whatever it shares with the rest of the world can
+  only look *less* correlated afterward, never more.
+</LessonHook>
+
 ## Motivation
 
 Quantum Entropy and Information Measures defined quantum mutual
@@ -125,9 +132,19 @@ completely positive trace-preserving (CPTP) map $\mathcal N$ (any
 physical channel, in the Stinespring Dilation and Channel Purification
 sense: a unitary on a larger space followed by discarding an ancilla):
 
+<EquationReveal
+  terms={[
+    { id: "N", symbol: "𝒩", gloss: "Any physical (CPTP) channel — a unitary on a larger space followed by discarding an ancilla." },
+    { id: "lhs", symbol: "S(𝒩(ρ)‖𝒩(σ))", gloss: "Relative entropy between the two states after both have gone through the same channel." },
+    { id: "rhs", symbol: "S(ρ‖σ)", gloss: "Relative entropy between the two original, unprocessed states." },
+  ]}
+>
+
 $$
 S\big(\mathcal N(\rho)\,\big\|\,\mathcal N(\sigma)\big) \;\leq\; S(\rho\|\sigma)
 $$
+
+</EquationReveal>
 
 Since relative entropy measures how distinguishable $\sigma$ is from
 the true state $\rho$, this says: **no physical operation can ever make
@@ -170,6 +187,12 @@ of relative entropy is the distinguishability-flavored statement of
 "you cannot get something for nothing" that no-cloning is the
 copying-flavored statement of.
 
+<InsightBlock>
+  Processing can only destroy distinguishing information, never create
+  it — the same "no free lunch" structure behind no-cloning, now stated
+  in the currency of relative entropy instead of copying.
+</InsightBlock>
+
 ### The corollary: data processing for mutual information
 
 Take a bipartite state $\rho_{AB}$ and a channel $\mathcal N$ acting on
@@ -177,52 +200,40 @@ $B$ alone, producing $B'=\mathcal N(B)$—a genuine Markov chain
 $A\to B\to B'$, since $B'$ is built from $B$ with no further access to
 $A$. Claim: $I(A:B)\geq I(A:B')$.
 
-**Step 1—mutual information is a relative entropy.** For any
-bipartite state, comparing $\rho_{AB}$ to the product of its own
-marginals $\rho_A\otimes\rho_B$:
+<DerivationSteps>
+  <DerivationStep annotation="For any bipartite state, compare rho_AB to the product of its own marginals rho_A ⊗ rho_B. Since log2(rho_A ⊗ rho_B) = log2(rho_A) ⊗ I + I ⊗ log2(rho_B) for operators on separate factors, the second trace term splits into -S(A)-S(B), while the first is -S(AB) by definition.">
+    $$
+    S(\rho_{AB}\,\|\,\rho_A\otimes\rho_B) = \text{Tr}(\rho_{AB}\log_2\rho_{AB}) - \text{Tr}\big(\rho_{AB}\log_2(\rho_A\otimes\rho_B)\big)
+    $$
 
-$$
-S(\rho_{AB}\,\|\,\rho_A\otimes\rho_B) = \text{Tr}(\rho_{AB}\log_2\rho_{AB}) - \text{Tr}\big(\rho_{AB}\log_2(\rho_A\otimes\rho_B)\big)
-$$
+    $$
+    S(\rho_{AB}\|\rho_A\otimes\rho_B) = S(A)+S(B)-S(AB) = I(A:B)
+    $$
 
-Since $\log_2(\rho_A\otimes\rho_B)=\log_2\rho_A\otimes I + I\otimes\log_2\rho_B$ (true for any two operators on separate factors), the second term splits into
-$\text{Tr}_A(\rho_A\log_2\rho_A)+\text{Tr}_B(\rho_B\log_2\rho_B)=-S(A)-S(B)$,
-while the first term is $-S(AB)$ by definition. So
+    Mutual information *is* the relative entropy between the true joint
+    state and the (wrong, but marginal-matching) product state.
+  </DerivationStep>
+  <DerivationStep annotation="Apply id_A ⊗ N to both sides. Tracing a trace-preserving map out again reproduces the original trace, so rho_AB'’s marginal on A is still exactly rho_A; its marginal on B' is N(rho_B) = rho_B' by definition. So Step 1's identity applies again to the primed state without modification.">
+    On the left, $(\text{id}_A\otimes\mathcal N)(\rho_{AB})=\rho_{AB'}$,
+    the actual post-channel joint state. On the right,
+    $(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)=\rho_A\otimes\mathcal N(\rho_B)=\rho_A\otimes\rho_{B'}$.
 
-$$
-S(\rho_{AB}\|\rho_A\otimes\rho_B) = S(A)+S(B)-S(AB) = I(A:B)
-$$
+    $$
+    S(\rho_{AB'}\|\rho_A\otimes\rho_{B'}) = I(A:B')
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Monotonicity, applied to exactly this pair of states and this channel, then substituting Steps 1 and 2 into the left and right sides directly.">
+    $$
+    S\big((\text{id}_A\otimes\mathcal N)(\rho_{AB})\,\big\|\,(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)\big) \leq S(\rho_{AB}\|\rho_A\otimes\rho_B)
+    $$
 
-mutual information *is* the relative entropy between the true joint
-state and the (wrong, but marginal-matching) product state.
+    $$
+    \boxed{I(A:B') \leq I(A:B)}
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
-**Step 2—push both states through the same channel.** Apply
-$\text{id}_A\otimes\mathcal N$ to both sides. On the left,
-$(\text{id}_A\otimes\mathcal N)(\rho_{AB})=\rho_{AB'}$, the actual
-post-channel joint state. On the right,
-$(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)=\rho_A\otimes\mathcal N(\rho_B)=\rho_A\otimes\rho_{B'}$.
-Two facts about this new state, both immediate from $\mathcal N$
-touching only $B$: tracing any trace-preserving map out again reproduces
-the original trace, so $\rho_{AB'}$'s marginal on $A$ is still exactly
-$\rho_A$; and $\rho_{AB'}$'s marginal on $B'$ is exactly
-$\mathcal N(\rho_B)=\rho_{B'}$ by definition. So Step 1's identity
-applies again to the *primed* state without modification:
-$S(\rho_{AB'}\|\rho_A\otimes\rho_{B'}) = I(A:B')$.
-
-**Step 3—apply the theorem.** Monotonicity, applied to exactly this
-pair of states and this channel:
-
-$$
-S\big((\text{id}_A\otimes\mathcal N)(\rho_{AB})\,\big\|\,(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)\big) \leq S(\rho_{AB}\|\rho_A\otimes\rho_B)
-$$
-
-Substituting Steps 1 and 2 into the left and right sides directly gives
-
-$$
-\boxed{I(A:B') \leq I(A:B)}
-$$
-
-a genuine corollary, not a re-assertion of the same theorem under a new
+A genuine corollary, not a re-assertion of the same theorem under a new
 name: it required identifying the *specific* pair of states
 ($\rho_{AB}$ and $\rho_A\otimes\rho_B$) for which the abstract
 monotonicity statement collapses exactly onto the mutual-information
@@ -343,7 +354,7 @@ even total decoherence on one side.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing "channels can't increase distinguishability" with "channels
 can't increase entropy."** The theorem in this lesson is about
 *relative* entropy between two states (or, via the corollary, mutual
@@ -356,7 +367,7 @@ the *relative* quantity—how distinguishable two states, or how
 correlated two systems, remain.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Applying the mutual-information corollary to a channel that touches
 *both* $A$ and $B$.** The derivation above depends on
 $(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)=\rho_A\otimes\mathcal N(\rho_B)$
@@ -406,7 +417,9 @@ monotonicity statement does.
 
 ## Further Exploration
 
-Next: [Entanglement Distillation and Typical Subspaces](/lessons/quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces),
-which uses this exact monotonicity fact in the opposite direction —
-asking how much *pure* entanglement can be recovered from many noisy
-copies of a state, bounded by precisely the inequality proved here.
+<NextDiscovery>
+  Next: [Entanglement Distillation and Typical Subspaces](/lessons/quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces),
+  which uses this exact monotonicity fact in the opposite direction —
+  asking how much *pure* entanglement can be recovered from many noisy
+  copies of a state, bounded by precisely the inequality proved here.
+</NextDiscovery>

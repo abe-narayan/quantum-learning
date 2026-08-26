@@ -103,6 +103,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="One theorem, not two">
+  The position operator has no eigenvalues in the ordinary sense at all —
+  its spectrum fills the real line continuously. The discrete formula
+  $A=\sum_i\lambda_iP_i$ was never the whole theorem; it's what the real
+  theorem below looks like when the spectrum happens to be a staircase.
+</LessonHook>
+
 ## Motivation
 
 Spectral Decomposition and Degeneracy wrote $A=\sum_i\lambda_iP_i$ and
@@ -209,22 +216,26 @@ is a **staircase**: constant except for a jump of size $P_i$ exactly at
 $\lambda=\lambda_i$.
 
 Now evaluate $\langle\psi|A|\psi\rangle=\int\lambda\,d\langle\psi|E(\lambda)\psi\rangle$
-for this staircase measure directly. $\langle\psi|E(\lambda)\psi\rangle=
-\sum_{i:\lambda_i\le\lambda}\langle\psi|P_i|\psi\rangle=\sum_{i:\lambda_i\le\lambda}\|P_i\psi\|^2$
-is itself a staircase function of $\lambda$, jumping by $\|P_i\psi\|^2$
-at each $\lambda_i$. A Riemann–Stieltjes integral against a pure
-staircase function is, by definition, exactly the sum of (integrand
-value at each jump) $\times$ (jump size):
+for this staircase measure directly:
 
-$$
-\int\lambda\,d\langle\psi|E(\lambda)\psi\rangle=\sum_i\lambda_i\|P_i\psi\|^2=\sum_i\lambda_i\langle\psi|P_i|\psi\rangle=\left\langle\psi\left|\sum_i\lambda_iP_i\right|\psi\right\rangle
-$$
-
-Since this holds for every $\psi$, the operators themselves agree:
-$A=\int\lambda\,dE(\lambda)=\sum_i\lambda_iP_i$, **exactly** Spectral
-Decomposition and Degeneracy's formula, now derived as the special case
-of the general theorem where the spectral measure happens to be a
-staircase, rather than stated as a separate fact.
+<DerivationSteps>
+  <DerivationStep annotation="⟨ψ|E(λ)ψ⟩ is itself a staircase function of λ, jumping by ‖P_iψ‖² at each λ_i — a direct readout of the E(λ) definition above.">
+    $$
+    \langle\psi|E(\lambda)\psi\rangle=
+    \sum_{i:\lambda_i\le\lambda}\langle\psi|P_i|\psi\rangle=\sum_{i:\lambda_i\le\lambda}\|P_i\psi\|^2
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="A Riemann–Stieltjes integral against a pure staircase function is, by definition, exactly the sum of (integrand value at each jump) × (jump size).">
+    $$
+    \int\lambda\,d\langle\psi|E(\lambda)\psi\rangle=\sum_i\lambda_i\|P_i\psi\|^2=\sum_i\lambda_i\langle\psi|P_i|\psi\rangle=\left\langle\psi\left|\sum_i\lambda_iP_i\right|\psi\right\rangle
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="This holds for every ψ, so the operators themselves agree — exactly Spectral Decomposition and Degeneracy's formula, now derived as the special case where the spectral measure happens to be a staircase.">
+    $$
+    A=\int\lambda\,dE(\lambda)=\sum_i\lambda_iP_i
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
 ### The measurement postulate, unified
 
@@ -235,9 +246,19 @@ different rules that earlier courses stated separately (one in
 Operators, Observables & Measurement, one in Wave Mechanics). In PVM
 language they are the **same single statement**:
 
+<EquationReveal
+  terms={[
+    { id: "P", symbol: "P(outcome ∈ Δ)", gloss: "The probability the measured value falls in the set Δ — discrete or continuous, same formula." },
+    { id: "psi", symbol: "ψ", gloss: "The quantum state being measured." },
+    { id: "E", symbol: "E(Δ)", gloss: "The PVM's projector for the set Δ — equals P_i for a discrete eigenvalue, or 'multiply by the indicator function' for a continuous set like position." },
+  ]}
+>
+
 $$
 P(\text{outcome}\in\Delta)=\langle\psi|E(\Delta)|\psi\rangle
 $$
+
+</EquationReveal>
 
 For a discrete spectrum, $E(\{\lambda_i\})=P_i$, recovering the familiar
 formula exactly. For the position operator, $E(\Delta)$ turns out to be
@@ -249,6 +270,14 @@ substitution), recovering the position postulate exactly. One theorem,
 two courses' separately-stated rules, now visibly the same fact.
 
 ## Physical Interpretation
+
+<InsightBlock>
+  "Discrete observable" and "continuous observable" were never two
+  different kinds of physics needing two different postulates — every
+  observable's measurement statistics come from one object, its PVM,
+  and whether it happens to be a staircase, absolutely continuous, or a
+  mix of both is a fact about the specific operator, not the postulate.
+</InsightBlock>
 
 The unification above is the whole point of doing this rigorously rather
 than treating "discrete observable" and "continuous observable" as two
@@ -329,7 +358,7 @@ example, not just abstractly.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking the PVM form of the spectral theorem is a *different, more
 advanced* result from the finite-dimensional one.** It's the same
 theorem at a more general level of generality; the finite-dimensional
@@ -337,7 +366,7 @@ $A=\sum\lambda_iP_i$ is derived above as an exact special case (a
 staircase-measure PVM), not replaced or superseded.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Applying $A=\sum_i\lambda_iP_i$ to an operator with continuous
 spectrum**, e.g. writing "$\hat x=\sum_x x|x\rangle\langle x|$" as an
 ordinary sum. There is no discrete sum to write for $\hat x$: the
@@ -377,7 +406,9 @@ in the next lesson.
 
 ## Further Exploration
 
-Next: [Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space),
-which works out the position and momentum operators' PVMs explicitly and
-confronts the question this lesson deferred: what kind of object is
-$|p\rangle$, if not a vector in $\mathcal H$?
+<NextDiscovery>
+  Next: [Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space),
+  which works out the position and momentum operators' PVMs explicitly and
+  confronts the question this lesson deferred: what kind of object is
+  $|p\rangle$, if not a vector in $\mathcal H$?
+</NextDiscovery>

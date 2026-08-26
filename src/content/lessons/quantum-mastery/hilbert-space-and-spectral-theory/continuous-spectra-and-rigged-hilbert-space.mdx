@@ -46,19 +46,23 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A state that isn't a vector">
+  $|p\rangle$ is not, and cannot be, an element of $L^2(\mathbb R)$ —
+  its overlap with itself is formally $\delta(0)$, and $\delta(0)$ is
+  not a number. This lesson builds the structure in which $|p\rangle$ is
+  a fully legitimate object anyway, of a different kind entirely.
+</LessonHook>
+
 ## Motivation
 
 Momentum Space and the Fourier Transform used $\phi_p(x)=e^{ipx/\hbar}$
 as "the momentum eigenstate," expanded arbitrary states in it, and
 relied on completeness, $\int|p\rangle\langle p|\,dp=I$, without a second
 thought, and every physical prediction that came out of it was correct.
-But $|p\rangle$ is not, and cannot be, an element of $L^2(\mathbb R)$:
-its own overlap with itself, $\langle p|p\rangle$, is formally
-$\delta(0)$, and $\delta(0)$ is not a number. This lesson doesn't patch
-over that; it builds the precise mathematical structure, the **rigged
-Hilbert space**, in which $|p\rangle$ is a fully legitimate object of a
-*different* kind, and shows exactly what breaks (and why) if you try to
-force it into $\mathcal H$ itself.
+This lesson doesn't patch over the resulting mathematical crack; it
+builds the precise structure, the **rigged Hilbert space**, and shows
+exactly what breaks (and why) if you try to force $|p\rangle$ into
+$\mathcal H$ itself.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Izrail_Gel%27Fand.jpg"
@@ -290,7 +294,7 @@ entirely (an element of $\Phi'$), and needs the different mathematical
 treatment this lesson builds.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating $\int|p\rangle\langle p|\,dp=I$ as an ordinary
 $\mathcal H$-completeness relation**, the direct continuum analogue of
 $\sum_i|e_i\rangle\langle e_i|=I$. It's genuinely the same idea, but the
@@ -340,3 +344,10 @@ Next: [Green's Functions and Resolvents](/lessons/quantum-mastery/hilbert-space-
 which puts the position operator's continuous spectrum to direct
 computational use: encoding every bound state and scattering state of a
 Hamiltonian in a single analytic object, the resolvent $(E-H)^{-1}$.
+
+<NextDiscovery>
+  Next: Green's Functions and Resolvents puts the continuous spectrum to
+  direct computational use — encoding every bound state and scattering
+  state of a Hamiltonian in a single analytic object, the resolvent
+  $(E-H)^{-1}$.
+</NextDiscovery>

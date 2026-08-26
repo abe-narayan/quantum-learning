@@ -6,7 +6,7 @@ export const twoIndependentProofsOfGroverOptimalityMc: MultipleChoiceProblem = {
     title: "What 'Two Independent Proofs' Actually Establishes",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/query-complexity-and-lower-bounds",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "multiple-choice",
     tags: ["adversary-method", "polynomial-method", "grover", "proof-technique", "complexity-theory"],

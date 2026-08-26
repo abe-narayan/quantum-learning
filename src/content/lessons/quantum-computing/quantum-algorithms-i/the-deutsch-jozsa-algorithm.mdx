@@ -68,6 +68,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="One query, always correct">
+Classically, distinguishing a constant function from a balanced one with certainty can take exponentially many queries in the worst case. Deutsch-Jozsa does it with exactly one.
+</LessonHook>
+
 ## Motivation
 
 $f:\{0,1\}^n\to\{0,1\}$ is *promised* to be either constant (same output on
@@ -102,6 +106,10 @@ layer of Hadamards to turn phases back into a directly measurable answer.
   license="CC BY 3.0"
 />
 
+<HistoricalMoment date="1985">
+David Deutsch's paper first frames quantum computation in terms of problems like the one this lesson solves; Richard Jozsa later generalizes his single-qubit version to the full multi-qubit algorithm derived below.
+</HistoricalMoment>
+
 ## Mathematical Development
 
 ### The circuit
@@ -130,9 +138,16 @@ $$
 The amplitude on $|z=0\rangle$ specifically: since $x\cdot0=0$ for every
 $x$, that factor is always $1$, leaving
 
+<EquationReveal
+  terms={[
+    { id: "n", symbol: "2^n", gloss: "The number of possible n-bit inputs — also the number of terms in the sum." },
+    { id: "sum", symbol: "Σ_x (-1)^f(x)", gloss: "A sum of +1s and -1s, one per input x, with sign set by f(x)." },
+  ]}
+>
 $$
 \boxed{\text{amplitude on }|0\rangle^{\otimes n} = \frac{1}{2^n}\sum_x(-1)^{f(x)}}
 $$
+</EquationReveal>
 
 ### Constant vs. balanced, resolved exactly
 
@@ -216,7 +231,7 @@ engine's output exactly.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Thinking Deutsch-Jozsa works for an arbitrary (non-promised) function.**
 It doesn't: a function that's neither constant nor balanced can land
 anywhere between amplitude $-1$ and $1$ on $|0\rangle^{\otimes n}$, giving
@@ -224,7 +239,7 @@ no reliable answer at all. The promise is what makes the two cases exactly
 $0$ and exactly $\pm1$, with nothing in between.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the second layer of Hadamards.** Phase kickback alone leaves
 the answer sitting as a *phase*, which no measurement can read directly;
 the second $H^{\otimes n}$ is what converts that phase pattern back into a
@@ -261,6 +276,8 @@ measurable probability difference.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Quantum Fourier Transform](/lessons/quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform), the generalization of the
 $H^{\otimes n}$-based interference trick used here to a much richer family
 of algorithms: phase estimation, and eventually Shor's algorithm.
+</NextDiscovery>

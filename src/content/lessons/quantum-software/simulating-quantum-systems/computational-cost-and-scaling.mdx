@@ -23,6 +23,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Nature isn't classical, dammit">
+"If you want to make a simulation of nature, you'd better make it quantum mechanical" — Feynman's 1981 diagnosis of why simulating an n-particle quantum system on an ordinary computer requires resources that grow like 2ⁿ, no matter how clever the algorithm.
+</LessonHook>
+
 ## Motivation
 
 In 1981, at a keynote co-organized by MIT and IBM, Feynman put his
@@ -158,15 +162,17 @@ memory cannot compress this information away for a generic state — the
 exact structural point Feynman was making in 1981, well before there
 was hardware capable of testing it directly.
 
-This is why Google's 2019 Sycamore experiment used 53 qubits
-specifically: that qubit count was chosen to sit just past what any
-existing supercomputer could feasibly state-vector-simulate directly, a
-concrete instance of the wall this lesson computes. IBM subsequently
-argued a cleverer classical technique (not brute-force state-vector
-storage) could approximate the same task using disk space instead of
-RAM, a real dispute that illustrates the point above from the other
-side: pushing past this specific wall means abandoning exact
-state-vector simulation entirely, not just buying a bigger machine.
+<ResearchConnection title="Choosing a qubit count to sit past the wall" source="Arute et al., Nature 574, 505-510 (2019)" url="https://www.nature.com/articles/s41586-019-1666-5">
+Google's 2019 Sycamore experiment used 53 qubits specifically: that
+qubit count was chosen to sit just past what any existing supercomputer
+could feasibly state-vector-simulate directly, a concrete instance of
+the wall this lesson computes. IBM subsequently argued a cleverer
+classical technique (not brute-force state-vector storage) could
+approximate the same task using disk space instead of RAM, a real
+dispute that illustrates the point above from the other side: pushing
+past this specific wall means abandoning exact state-vector simulation
+entirely, not just buying a bigger machine.
+</ResearchConnection>
 
 ## Worked Example
 
@@ -185,14 +191,14 @@ into serious computational cost.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating memory and time cost as separate concerns with different
 qubit-count thresholds.** Both scale as $2^n$ from the SAME underlying
 fact (every gate touches every amplitude). They cross into
 "impractical" territory together, not independently.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming better classical hardware (more RAM, faster CPUs) meaningfully
 pushes back the qubit-count wall.** Because the cost is exponential, a
 10× hardware improvement buys only $\log_2(10)\approx3.3$ additional
@@ -231,7 +237,9 @@ solution to it.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Tensor Network Methods](/lessons/quantum-software/simulating-quantum-systems/tensor-network-methods), which push past this wall for a
 specific, important class of circuits, not by cheating the $2^n$ fact,
 but by exploiting structure (limited entanglement) that a generic
 state-vector simulator ignores.
+</NextDiscovery>

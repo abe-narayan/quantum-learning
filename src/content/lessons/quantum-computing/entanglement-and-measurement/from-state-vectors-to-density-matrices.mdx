@@ -30,14 +30,14 @@ export const lessonMeta = {
 export const zeroState = StateVector.zero(1);
 export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
 
+<LessonHook eyebrow="Why this matters">
+For an entangled pair like the Bell state, "what is qubit 0's state, on its own?" has no good answer — there is no single-qubit ket that describes it. That's not a gap in notation to patch over; it's a sign the state vector is the wrong tool for the job.
+</LessonHook>
+
 ## Motivation
 
-Multi-Qubit State Vectors ended on an unanswered question: for an
-entangled pair like the Bell state, "what is qubit 0's state, on its
-own?" has no good answer: there is no single-qubit ket that describes
-it. That's not a gap in notation to patch over; it's a sign the state
-*vector* is the wrong tool for the job, and this course exists to build
-the right one.
+Multi-Qubit State Vectors ended on an unanswered question, and this
+course exists to build the right tool for answering it.
 
 The fix starts here, with a state vector's whole physical content
 repackaged into a different mathematical object: not a list of
@@ -187,7 +187,7 @@ since $|1\rangle$ is a $Z$-eigenstate.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Writing ρ as if it were a ket.** $\rho=|\psi\rangle\langle\psi|$ is a
 matrix (an operator), not a vector: it has a bra *and* a ket, multiplied
 as an outer product. $\langle\psi|\psi\rangle$ (inner product, a number)
@@ -233,6 +233,8 @@ pure and genuinely mixed states is the subject of the next lesson.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Pure States and Mixed States](/lessons/quantum-computing/entanglement-and-measurement/pure-states-and-mixed-states), where the density matrix finally
 does something a state vector cannot: describing a system prepared with
 classical uncertainty about *which* quantum state it's in.
+</NextDiscovery>

@@ -6,7 +6,7 @@ export const wStateEntropyAndBondDimension: NumericProblem = {
     title: "Entanglement Entropy and Bond Dimension for the W State",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "numeric",
     tags: ["matrix-product-states", "bond-dimension", "schmidt-rank", "entanglement-entropy"],

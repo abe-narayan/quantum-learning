@@ -46,9 +46,29 @@ export function WavefunctionSimulation({
   const [t, setT] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const psiRef = useRef(psi);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // A lesson can carry several of these embeds; nothing stops a reader from
+  // hitting Play, scrolling on, and leaving the stepper running indefinitely
+  // off-screen. This tracks visibility only — it doesn't touch `isPlaying`
+  // (the Play/Pause button keeps showing the reader's actual intent) so the
+  // loop silently resumes on scroll-back rather than needing a second click.
+  // Defaults `true` so an already-visible, already-playing instance never
+  // stalls waiting on the observer's first callback.
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    if (!isPlaying || prefersReducedMotion) return;
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), {
+      rootMargin: "150px",
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || prefersReducedMotion || !isVisible) return;
     let cancelled = false;
     let frameId: number;
 
@@ -67,7 +87,7 @@ export function WavefunctionSimulation({
       cancelled = true;
       cancelAnimationFrame(frameId);
     };
-  }, [isPlaying, evolver, setup.stepsPerFrame, setup.dt, speed, prefersReducedMotion]);
+  }, [isPlaying, isVisible, evolver, setup.stepsPerFrame, setup.dt, speed, prefersReducedMotion]);
 
   function handleStep() {
     const next = evolver.step(psiRef.current);
@@ -88,7 +108,7 @@ export function WavefunctionSimulation({
   const { meanMomentum, kineticEnergy } = useMemo(() => psi.momentumStatistics(1), [psi]);
 
   return (
-    <div className="space-y-3">
+    <div ref={containerRef} className="space-y-3">
       <WavefunctionCanvas
         grid={setup.grid}
         psi={psi}

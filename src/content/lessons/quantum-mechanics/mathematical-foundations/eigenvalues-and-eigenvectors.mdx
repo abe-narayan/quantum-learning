@@ -36,6 +36,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  On a real quantum computer, the bit a measurement reports back isn't an
+  abstraction — it's literally which eigenvalue the readout hardware
+  found.
+</LessonHook>
+
 ## Motivation
 
 Most vectors, hit with an operator, come out pointing in some new
@@ -219,13 +225,13 @@ $1\cdot3=3=\det(A)$ ✓.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Accepting $v=0$ as an eigenvector.** The eigenvalue equation is trivially
 true for the zero vector regardless of $\lambda$; it carries no
 information and is excluded by definition.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Sign errors in the characteristic polynomial.** Double-check with the
 trace/determinant shortcut: if your two eigenvalues don't sum to the
 trace, you've made an arithmetic error somewhere.
@@ -255,6 +261,14 @@ trace, you've made an arithmetic error somewhere.
 
 ## Further Exploration
 
-Next: [Hermitian Operators](/lessons/quantum-mechanics/mathematical-foundations/hermitian-operators), which proves eigenvalues are always real
-and eigenvectors from different eigenvalues are always orthogonal, for
-the specific class of operators representing physical observables.
+<ChallengePrompt prompt="A 2×2 matrix has determinant 10 and one eigenvalue is 5. What is the other eigenvalue, and what is the matrix's trace?">
+  Eigenvalues multiply to the determinant — the same trace/determinant
+  shortcut derived above, just its determinant half instead of its trace
+  half.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Hermitian Operators](/lessons/quantum-mechanics/mathematical-foundations/hermitian-operators), which proves eigenvalues are always real
+  and eigenvectors from different eigenvalues are always orthogonal, for
+  the specific class of operators representing physical observables.
+</NextDiscovery>

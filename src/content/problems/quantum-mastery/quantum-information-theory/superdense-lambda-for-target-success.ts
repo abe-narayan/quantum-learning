@@ -6,7 +6,7 @@ export const superdenseLambdaForTargetSuccess: NumericProblem = {
     title: "Dephasing Strength for a Target Superdense-Coding Success Rate",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["superdense-coding", "dephasing"],

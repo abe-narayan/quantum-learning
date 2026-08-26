@@ -6,7 +6,7 @@ export const traceDistanceAtHalfDamping: NumericProblem = {
     title: "Trace Distance for Amplitude Damping at gamma=0.5",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["trace-distance", "amplitude-damping"],

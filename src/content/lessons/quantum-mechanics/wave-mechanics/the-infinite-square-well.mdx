@@ -30,12 +30,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+This is the first potential this course solves completely and exactly. It's the cleanest possible illustration of a deep principle: confinement forces quantization.
+</LessonHook>
+
 ## Motivation
 
-This is the first potential this course solves completely and exactly:
-a particle strictly confined to $0 < x < L$ by walls of infinite
-potential energy. It's the cleanest possible illustration of a deep
-principle: confinement forces quantization, worked out with nothing
+A particle strictly confined to $0 < x < L$ by walls of infinite
+potential energy — worked out with nothing
 beyond the time-independent Schrödinger equation and two boundary
 conditions.
 
@@ -107,7 +109,7 @@ the visual signature of the $n^2$ scaling this section just derived.
 ### Normalized eigenstates
 
 $$
-\psi_n(x) = A\sin\!\left(\frac{n\pi x}{L}\right), \qquad 0<x<L
+\psi_n(x) = A\sin\!\left(\frac{n\pi x}{L}\right), \qquad 0 < x < L
 $$
 
 Normalizing: $\int_0^L A^2\sin^2(n\pi x/L)\,dx = A^2\cdot\dfrac L2 = 1$
@@ -186,14 +188,14 @@ defaults.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Including the cosine term.** $\psi(0)=0$ eliminates $B\cos(kx)$
 entirely. A common error is keeping both terms and applying boundary
 conditions incorrectly, or forgetting $n=0$ must be excluded (it isn't a
 valid state, not merely the "ground state with zero energy").
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming a literal infinite wall in a numerical simulation.** A
 literal infinity can't be represented on a computer or evolved with the
 periodic-boundary numerical method this course uses. The platform uses a
@@ -224,6 +226,7 @@ approximation (see the Numerically Evolving Quantum States lesson).
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Harmonic Oscillator in Position Space](/lessons/quantum-mechanics/wave-mechanics/the-harmonic-oscillator-in-position-space), reconnecting the
 purely algebraic energy spectrum from the last course to an explicit,
 position-space wavefunction, a strikingly different representation of the
@@ -233,3 +236,4 @@ The [full Wavefunction Explorer](/simulators#wavefunction-explorer) has
 ground- and excited-state infinite-well presets with an adjustable $n$: a
 faster way to see the node count and the $n^2$ energy scaling together
 than working through the formula alone.
+</NextDiscovery>

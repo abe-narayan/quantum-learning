@@ -32,7 +32,7 @@ export function SearchTrigger({ className }: { className?: string }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         className={cn(
-          "inline-flex h-10 items-center gap-2 rounded-full border border-border bg-surface px-3 text-sm text-muted-foreground transition-colors hover:text-foreground",
+          "inline-flex h-10 items-center gap-2 rounded-[var(--radius-tight)] border border-border bg-surface px-3 text-sm text-muted-foreground transition-[color,border-color] duration-[--dur-fast] ease-[--ease-instrument] hover:border-border-strong hover:text-foreground",
           className
         )}
       >
@@ -48,7 +48,7 @@ export function SearchTrigger({ className }: { className?: string }) {
           <path strokeLinecap="round" d="m20 20-3.5-3.5" />
         </svg>
         <span className="hidden sm:inline">Search</span>
-        <kbd className="hidden rounded border border-border bg-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground sm:inline">
+        <kbd className="hidden rounded-[calc(var(--radius-tight)-2px)] border border-border bg-surface-muted px-1.5 py-0.5 font-tech text-[10px] font-medium text-muted-foreground sm:inline">
           Ctrl K
         </kbd>
       </button>

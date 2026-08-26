@@ -19,7 +19,7 @@ export const molecularSimulationElectronConfigurationCount: NumericProblem = {
     title: "Counting Electron Configurations in a Small Active Space",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "numeric",
     tags: ["electronic-structure", "second-quantization", "combinatorics", "hilbert-space-scaling"],

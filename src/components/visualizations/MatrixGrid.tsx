@@ -76,16 +76,16 @@ export function MatrixGrid({
     <div
       role="img"
       aria-label={ariaLabel}
-      className="not-prose flex flex-wrap items-start gap-6 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4"
+      className="not-prose flex flex-wrap items-start gap-6 overflow-x-auto panel-inset p-4"
     >
       <div className="space-y-2">
-        {label ? <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p> : null}
+        {label ? <p className="tech-label">{label}</p> : null}
         <MatrixCellGrid cells={matrixToCells(matrix)} digits={digits} highlightDiagonal={highlightDiagonal} />
       </div>
       {compareTo ? (
         <div className="space-y-2">
           {compareLabel ? (
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{compareLabel}</p>
+            <p className="tech-label">{compareLabel}</p>
           ) : null}
           <MatrixCellGrid cells={matrixToCells(compareTo)} digits={digits} highlightDiagonal={highlightDiagonal} />
         </div>

@@ -171,6 +171,11 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Gradients don't just get harder to find as a variational circuit
+  scales up — they vanish, exponentially fast in the number of qubits.
+</LessonHook>
+
 ## Motivation
 
 VQE's worked toy example converged beautifully: 80 pattern-search
@@ -179,8 +184,7 @@ $10^{-12}$. That example used exactly one qubit. This lesson asks the
 question the toy example was too small to expose: what happens to that
 same training process as the ansatz scales up to real problem sizes?
 The answer is one of the most important, and most numerically verifiable,
-results in variational quantum computing: gradients don't just get
-harder to find, they vanish, exponentially fast in the number of qubits.
+results in variational quantum computing.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/IBM_Q_system_%28Fraunhofer_2%29.jpg/1280px-IBM_Q_system_%28Fraunhofer_2%29.jpg"
@@ -394,7 +398,7 @@ now visible as an actual loss of contrast in a picture, exactly what
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Expecting the exponential shrinkage to show up cleanly at *any*
 circuit depth.** This lesson's own verification process ran into this
 directly: using only $n$ layers (rather than the $4n$ layers used
@@ -409,7 +413,7 @@ appropriately with $n$, as it does in the deeper ($4n$-layer) numbers
 used above.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Concluding that VQE is therefore useless at any real qubit count.**
 Barren plateaus specifically afflict circuits that are *both* deep
 enough to be "sufficiently random" *and* trained against a *global*
@@ -472,3 +476,11 @@ synthesizing this lesson's exponential trainability wall together with
 BQP's oracle-relative separations and Trotterization's error bounds into
 one account of what genuinely separates this platform's toy-scale
 results from real quantum advantage.
+
+<NextDiscovery>
+  Next: the capstone synthesizes this lesson's exponential trainability
+  wall together with BQP's oracle-relative separations and
+  Trotterization's error bounds into one account of what genuinely
+  separates this platform's toy-scale results from real quantum
+  advantage.
+</NextDiscovery>

@@ -6,7 +6,7 @@ export const typicalSubspaceProbabilityMass: NumericProblem = {
     title: "How Much Probability Sits in the Typical Set?",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "numeric",
     tags: ["typical-subspace", "binomial-distribution", "entanglement-distillation"],

@@ -52,7 +52,7 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
     : `atom B is ${separation.toFixed(0)} units from atom A, outside the blockade radius of ${BLOCKADE_R}, so it excites to |r⟩ normally, unaffected by atom A`;
 
   return (
-    <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg
           width={WIDTH}

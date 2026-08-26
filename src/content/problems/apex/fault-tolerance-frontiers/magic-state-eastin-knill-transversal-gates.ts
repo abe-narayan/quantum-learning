@@ -6,7 +6,7 @@ export const magicStateEastinKnillTransversalGates: MultipleChoiceProblem = {
     title: "Which Gates Are Transversal on the Surface Code, and Why Not All of Them?",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/magic-states-and-distillation",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["eastin-knill", "gottesman-knill", "transversal-gates", "magic-states"],

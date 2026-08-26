@@ -10,8 +10,9 @@ import { measure } from "@/lib/quantum/measurement";
 import { pureStateDensityMatrix, purity } from "@/lib/quantum/densityMatrix";
 import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
 import { densityMatrixToBlochVector } from "@/lib/quantum/bloch";
-import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
+import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { EntanglementCorrelationCanvas, type GlyphState } from "./EntanglementCorrelationCanvas";
+import { FigureReadouts } from "../FigureReadouts";
 
 /** Matches SuperpositionJourney's suspense/collapse timings, for the same reason: long enough to
  * read as a distinct event, short enough not to feel like a loading spinner. */
@@ -169,32 +170,19 @@ export function EntanglementCorrelation() {
         prefersReducedMotion={prefersReducedMotion}
       />
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+      <div className="mt-4 overflow-x-auto panel-inset px-4 py-3">
         <KatexMath tex={stateLatex} display />
       </div>
 
-      <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Purity of ρ_A (Alice, alone)
-          </dt>
-          <dd className="mt-0.5 font-mono text-foreground">{purityA.toFixed(3)}</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Purity of ρ_B (Bob, alone)
-          </dt>
-          <dd className="mt-0.5 font-mono text-foreground">{purityB.toFixed(3)}</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">P(00)</dt>
-          <dd className="mt-0.5 font-mono text-foreground">0.500</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">P(11)</dt>
-          <dd className="mt-0.5 font-mono text-foreground">0.500</dd>
-        </div>
-      </dl>
+      <FigureReadouts
+        className="mt-4"
+        items={[
+          { label: "Purity of ρ_A (Alice, alone)", value: purityA.toFixed(3) },
+          { label: "Purity of ρ_B (Bob, alone)", value: purityB.toFixed(3) },
+          { label: "P(00)", value: "0.500" },
+          { label: "P(11)", value: "0.500" },
+        ]}
+      />
       <p className="mt-2 text-xs text-muted-foreground">
         Each reduced state&rsquo;s purity of 0.5 is exactly the maximally-mixed value this lesson&rsquo;s
         boxed identity predicts for a Bell state (|ad&minus;bc|=0.5) &mdash; computed here from the same
@@ -219,32 +207,19 @@ export function EntanglementCorrelation() {
         {narration}
       </div>
 
-      <div className="mt-4 rounded-xl border border-border bg-surface-muted/60 p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <div className="mt-4 panel-inset p-4">
+        <p className="tech-label">
           Running tally ({tally.total} joint measurement{tally.total === 1 ? "" : "s"})
         </p>
-        <dl className="mt-2 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <div>
-            <dt className="text-xs text-muted-foreground">00</dt>
-            <dd className="font-mono text-foreground">
-              {count00} / {tally.total} {tally.total > 0 ? `(${pct00}%)` : ""}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs text-muted-foreground">11</dt>
-            <dd className="font-mono text-foreground">
-              {count11} / {tally.total} {tally.total > 0 ? `(${pct11}%)` : ""}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs text-muted-foreground">01 (should stay 0)</dt>
-            <dd className="font-mono text-foreground">{count01}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-muted-foreground">10 (should stay 0)</dt>
-            <dd className="font-mono text-foreground">{count10}</dd>
-          </div>
-        </dl>
+        <FigureReadouts
+          className="mt-2"
+          items={[
+            { label: "00", value: `${count00} / ${tally.total} ${tally.total > 0 ? `(${pct00}%)` : ""}`, plainLabel: true },
+            { label: "11", value: `${count11} / ${tally.total} ${tally.total > 0 ? `(${pct11}%)` : ""}`, plainLabel: true },
+            { label: "01 (should stay 0)", value: count01, plainLabel: true },
+            { label: "10 (should stay 0)", value: count10, plainLabel: true },
+          ]}
+        />
       </div>
 
       <div className="mt-6 rounded-xl border border-warning/30 bg-warning/5 p-4">

@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Readout } from "@/components/ui/Typography";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 import { blochStateFromAngles, densityMatrixToBlochVector, type BlochAngles } from "@/lib/quantum/bloch";
 import { pureStateDensityMatrix, convexCombination, purity, vonNeumannEntropy, validateDensityMatrix } from "@/lib/quantum/densityMatrix";
 import { BlochSphereCanvas } from "../bloch-sphere/BlochSphereCanvas";
@@ -211,75 +213,61 @@ export function DensityMatrixExplorer() {
   }
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
-      <div>
-        <div className="mx-auto max-w-sm">
-          <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
-        </div>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          Drag to rotate the view. A mixed state&rsquo;s point sits strictly inside the sphere, not on its surface.
-        </p>
-
-        <div aria-live="polite" className="mt-4 rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          {narration}
-        </div>
-
-        <div className="mt-6">
-          <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
-        </div>
-
-        <div className="mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
-          <div>
-            <Badge tone="brand" className="mb-1.5">
-              Reading the sphere
-            </Badge>
-            <p className="text-sm text-muted-foreground">
-              The Bloch vector of a mixture is the probability-weighted average of its components&rsquo; own
-              vectors — that&rsquo;s why the point moves smoothly toward the center as the mixing weight
-              balances out, rather than jumping discontinuously.
-            </p>
+    <SimulatorInstrument
+      label="Density matrix — mixed states"
+      readout={<Readout label="Purity" value={purityValue.toFixed(3)} />}
+      footnote="Next: see what happens when a real noise channel — not a hand-picked mixture — pulls a pure state toward the center → try the Noise &amp; Decoherence Explorer."
+      stage={
+        <>
+          <div className="mx-auto max-w-sm">
+            <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
           </div>
-          <div>
-            <Badge tone="accent" className="mb-1.5">
-              Same center, different recipes
-            </Badge>
-            <p className="text-sm text-muted-foreground">
-              Try the two 50/50 presets — {"{"}|0⟩,|1⟩{"}"} and {"{"}|+⟩,|−⟩{"}"} — and check the density matrix
-              panel: both land on the exact same ρ = I/2, even though they mix completely different states.
-            </p>
-          </div>
-          <div className="sm:col-span-2">
-            <Badge tone="neutral" className="mb-1.5">
-              What&rsquo;s next
-            </Badge>
-            <p className="text-sm text-muted-foreground">
-              Next: see what happens when a real noise channel — not a hand-picked mixture — pulls a pure
-              state toward the center → try the Noise &amp; Decoherence Explorer.
-            </p>
-          </div>
-        </div>
-      </div>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Drag to rotate the view. A mixed state&rsquo;s point sits strictly inside the sphere, not on its surface.
+          </p>
 
-      <div>
-        <div className="flex justify-end">
-          <Button size="sm" variant="secondary" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
-        </div>
-        <div className="mt-4">
-          <DensityMatrixControls
-            component1={component1}
-            component2={component2}
-            weight={weight}
-            activePresetId={activePresetId}
-            onComponent1Change={handleComponent1Change}
-            onComponent2Change={handleComponent2Change}
-            onWeightChange={handleWeightChange}
-            onApplyMixturePreset={applyMixturePreset}
-            onReset={reset}
+          <div aria-live="polite" className="mt-4 rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+            {narration}
+          </div>
+
+          <div className="mt-6">
+            <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
+          </div>
+
+          <SimulatorFraming
+            shows="The Bloch vector of a mixture is the probability-weighted average of its components&rsquo; own vectors — that&rsquo;s why the point moves smoothly toward the center as the mixing weight balances out, rather than jumping discontinuously."
+            watchFor={
+              <>
+                Try the two 50/50 presets — {"{"}|0⟩,|1⟩{"}"} and {"{"}|+⟩,|−⟩{"}"} — and check the density
+                matrix panel: both land on the exact same ρ = I/2, even though they mix completely different
+                states.
+              </>
+            }
           />
-        </div>
-      </div>
-    </div>
+        </>
+      }
+      controls={
+        <>
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+          <div className="mt-4">
+            <DensityMatrixControls
+              component1={component1}
+              component2={component2}
+              weight={weight}
+              activePresetId={activePresetId}
+              onComponent1Change={handleComponent1Change}
+              onComponent2Change={handleComponent2Change}
+              onWeightChange={handleWeightChange}
+              onApplyMixturePreset={applyMixturePreset}
+              onReset={reset}
+            />
+          </div>
+        </>
+      }
+    />
   );
 }

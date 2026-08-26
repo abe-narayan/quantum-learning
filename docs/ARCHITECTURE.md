@@ -2,8 +2,9 @@
 
 This document is the product/engineering blueprint for QuantumLearn: a free,
 in-depth educational platform covering Quantum Mechanics, Quantum Computing,
-Quantum Hardware, Quantum Software, and Quantum Mastery, taking a student
-from strong high-school math through advanced undergraduate material.
+Quantum Hardware, Quantum Software, Quantum Mastery, and Apex, taking a
+student from strong high-school math through graduate-level, research-adjacent
+material.
 
 It exists so that as hundreds of lessons and dozens of simulators get built
 over time, they get built *onto* a consistent structure instead of each
@@ -16,12 +17,13 @@ changes — it should stay the source of truth, not a snapshot.
 
 **Top-level navigation (current, `src/lib/nav.ts` /
 `src/components/layout/Navbar.tsx`):** Learn · a grouped **Tracks** dropdown
-(Mechanics · Computing · Hardware · Software) · Simulators · Map · Glossary ·
-Problems · About. The logo itself links home, so a separate "Home" text link
-was dropped as pure duplication. `/map` (`src/components/map/`, an
-interactive concept-dependency map) and `/glossary` (an alphabetical
-term reference linked back into lessons) are both real, shipped pages not
-covered anywhere else in this document.
+(Mechanics · Computing · Hardware · Software · Mastery · Apex, in curriculum
+order) · Simulators · Map · Glossary · Problems · Current Quantum · About.
+The logo itself links home, so a separate "Home" text link was dropped as
+pure duplication. `/map` (`src/components/map/`, an interactive
+concept-dependency map) and `/glossary` (an alphabetical term reference
+linked back into lessons) are both real, shipped pages not covered anywhere
+else in this document.
 
 **`/lessons` no longer has its own UI.** `src/app/lessons/page.tsx` is now a
 5-line `permanentRedirect("/learn")` stub. The flat, catalog-style lesson
@@ -29,9 +31,9 @@ detail route (`/lessons/<pillar-slug>/<course-slug>/<lesson-slug>`) still
 exists and is what lesson links resolve to — only the `/lessons` *index*
 page was collapsed into `/learn`, once having both stopped pulling their
 weight as two separate entry points into the same `CourseList` view. Learn
-(`/learn`) is now the single guided entry point — the five pillars (Quantum
+(`/learn`) is now the single guided entry point — all six pillars (Quantum
 Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, Quantum
-Mastery) presented with framing, so a new visitor understands the
+Mastery, and Apex) presented with framing, so a new visitor understands the
 shape of the whole curriculum and where to start — backed by the one
 curriculum registry (`src/lib/content/curriculum.ts`), so there remains
 exactly one source of truth for "what courses exist."
@@ -41,7 +43,7 @@ exactly one source of truth for "what courses exist."
 routes (`/hardware`, `/software`) for direct linkability and SEO, since a
 student searching "how do superconducting qubits work" shouldn't have to go
 through `/learn` first — reachable today via the Tracks dropdown rather than
-as flat top-level items (see below).
+as flat top-level items.
 
 Individual lessons live at a **flat, catalog-style URL**:
 `/lessons/<pillar-slug>/<course-slug>/<lesson-slug>`, e.g.
@@ -51,16 +53,32 @@ and to avoid slug collisions across pillars), but the route itself is a
 single catch-all (`app/lessons/[...slug]/page.tsx`) — a lesson's URL is
 just wherever its `.mdx` file sits in `src/content/lessons/`.
 
-**A known tension, called out on purpose:** eight items is a lot for a flat
-navbar. It fits today (the navbar switches to a hamburger menu below the
-`lg` breakpoint, and item labels are short), but if the four pillars grow
-much further, or the nav needs more than a linear list, group them under a
-single "Curriculum" dropdown (Learn / Lessons / Hardware / Software) rather
-than keep adding flat items. Not doing that now, per the "keep it simple"
-brief — flagging it as the obvious next evolution.
+**The flat-navbar tension flagged in earlier revisions of this document is
+resolved.** The six pillar/track pages now live under one grouped **Tracks**
+dropdown (`TRACK_NAV_ITEMS` in `src/lib/nav.ts`, rendered by
+`Navbar.tsx`'s `TracksDropdown`) rather than as flat top-level items — the
+fix this section used to describe as "the obvious next evolution."
+`nav.ts`'s own comment records why: a flat bar mixing Learn/Lessons and four
+individually-named pillar pages was flagged repeatedly as real, user-facing
+redundancy, since a first-time visitor had no way to tell "Learn" from
+"Mechanics" from the labels alone. The dropdown renders as a two-column grid
+once there are six entries (an instrument-panel grid, not a scrolling list)
+and closes on Escape, outside click, and blur — see the long comment on
+`TracksDropdown` for the accessibility reasoning. The desktop nav still
+switches to a hamburger menu below the `lg` breakpoint; **Quantum Mastery**
+was, for a long stretch, the one pillar with no landing page of its own
+(the pillar-route table pointed it at `/learn` and the Tracks nav simply
+omitted it) — it now has a real page at `/mastery`, and
+`src/lib/design/__tests__/pillars.test.ts` asserts every pillar in
+`PILLAR_ORDER` both has a page file and appears in `TRACK_NAV_ITEMS`, so this
+particular drift can't recur silently.
 
-**Homepage** was explicitly kept untouched this round — no changes to
-`src/app/page.tsx` or `src/components/home/*`.
+**Homepage.** `src/app/page.tsx` is a `PillarScope`-wrapped descent through
+the curriculum: a real, manipulable hero simulation, then one section per
+pillar in learning order (`src/components/home/{Mechanics,Computing,
+Hardware,Software,Mastery,Apex}Section.tsx`), ending on Apex's closing call
+to action. See §7c for the background-field and motion architecture this
+composition is built on.
 
 ---
 
@@ -106,18 +124,25 @@ multipartite states, mixed states, Bell inequalities — rather than repeat
 it. See the changelog at the end of this document.
 
 **Modules are intentionally lean** (`{ slug, title }` only, no per-module
-description) — at ~100 modules across 22 courses, module-level prose would
-either be padding or drift out of sync with the actual lesson. Descriptions
-live at the course level (22 of them, one sentence each — genuinely useful
-copy) and at the lesson level (`LessonMeta.description`, written by whoever
-authors that lesson).
+description) — at 219 modules across 32 courses (platform-wide, once
+Quantum Mastery and Apex are counted — see §4b/§4c), module-level prose
+would either be padding or drift out of sync with the actual lesson.
+Descriptions live at the course level (32 of them, one sentence each —
+genuinely useful copy) and at the lesson level (`LessonMeta.description`,
+written by whoever authors that lesson).
 
 **Prerequisites are a graph, not a list position** — `Course.prerequisites`
 is an array of course slugs, so a course can require multiple prior courses,
 and courses from different pillars can reference each other (as
 `quantum-computing/qubits-and-quantum-states` does). This is what will
 eventually power "you're missing a prerequisite" warnings without any
-rewrite.
+rewrite. Quantum Mastery is where this graph structure stops being a
+convenience and becomes load-bearing: courses like
+`quantum-information-theory` (prerequisites: the *last* course of Quantum
+Mechanics **and** the *last* course of Quantum Computing) or
+`advanced-algorithms-and-complexity` (the last Quantum Computing algorithms
+course **and** the last Quantum Software course) genuinely cannot be
+expressed as a single list position in any one pillar — see §4b.
 
 ---
 
@@ -137,6 +162,156 @@ building a computing foundation, but nothing stops direct entry — the
 `/hardware` and `/software` pages work as standalone landing pages, prereqs
 are shown as information, not an access gate (there's no auth to gate
 anything with yet — see §9).
+
+---
+
+## 4b. Quantum Mastery in the Overall Platform
+
+Quantum Mastery is a **fifth full pillar** — same `Course`/`Module` shape,
+same `CourseList` rendering, same prerequisite-graph mechanism as every
+other pillar — sized between Hardware/Software and the two founding theory
+pillars: 5 courses, 31 modules, 56 estimated hours. It is also the first
+pillar to use `difficulty: "master"`, a tier that appears nowhere in
+Mechanics, Computing, Hardware, or Software, all of which top out at
+`"advanced"`.
+
+Its `PILLARS` entry describes it plainly: "Graduate-level mathematical
+physics and rigorous quantum information theory for those who've completed
+the core curriculum — proofs, not just results, drawing on and extending
+every earlier pillar." That "extending every earlier pillar" is the literal
+shape of its `prerequisites` arrays, not marketing copy. Unlike
+Mechanics/Computing/Hardware/Software, where all but each pillar's entry
+course chain linearly off one predecessor, Mastery's five courses reach
+back into specific, sometimes-plural completion points scattered across the
+whole prior curriculum rather than off each other:
+
+- `Hilbert Space & Spectral Theory` requires `Operators, Observables &
+  Measurement` and `One-Dimensional Quantum Systems` (courses 4 and 5 of
+  Quantum Mechanics's ten) — it opens as soon as those two are done, without
+  waiting for the rest of Mechanics.
+- `Symmetry, Scattering & Semiclassical Methods` requires only
+  `Approximation Methods` (course 8 of 10) — another early-entry course
+  relative to the rest of Mechanics.
+- `Rigorous Quantum Information Theory` requires `Advanced Topics in
+  Quantum Mechanics` **and** `Quantum Error Correction & Fault Tolerance` —
+  literally the last course of Mechanics and the last course of Computing,
+  so both entire theory pillars must be finished first.
+- `Quantum Algorithms, Complexity & Simulation at Scale` requires `Quantum
+  Algorithms II: Advanced` **and** `Compilation & Hybrid Algorithms` — the
+  last algorithms course of Computing plus the last course of Software.
+- `Quantum Shannon Theory` requires `Rigorous Quantum Information Theory` —
+  the only course-to-course edge that stays inside Mastery itself, making
+  it the pillar's genuine capstone course.
+
+So Mastery is not a single linear track the way Mechanics is: two courses
+open up mid-way through Mechanics and can run in parallel with the rest of
+the core curriculum, while three courses gate on nearly the entire
+four-pillar core being complete, ending in one course that gates on the
+pillar's own prior course. `/mastery` (§1) presents it as the graduate-level
+fifth pillar; nothing in the routing enforces this graph as an access gate
+(the same "prereqs as information, not access control" policy as the rest
+of this section).
+
+The lessons bear out the "proofs, not just results" framing rather than
+merely asserting it.
+`hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness.mdx`
+opens by showing that the momentum operator on a half-line passes the naive
+$A=A^\dagger$ Hermiticity check used throughout Wave Mechanics and
+Operators, Observables & Measurement, and still turns out to have no
+self-adjoint extension at all — a genuine deficiency-index calculation, not
+a rehash of earlier material under new vocabulary.
+`symmetry-scattering-and-semiclassical-methods` explicitly finishes work
+its own course description says Fine Structure (Introduction), in The
+Hydrogen Atom, "explicitly declined to do," carrying degenerate
+perturbation theory through to real spin-orbit splitting.
+`quantum-information-theory` proves the Schmidt decomposition that
+Entanglement, Mixed States & Bell Tests only asserted, and derives the
+Lindblad master equation as the actual continuous-time origin of the T1/T2
+decoherence rates Quantum Hardware's Noise, Decoherence & Scaling course
+used as given constants. `quantum-shannon-theory`'s capstone
+(`capstone-what-can-be-sent-through-noise.mdx`) computes both the classical
+(Holevo) and quantum (coherent-information) capacity of a concrete
+depolarizing channel and shows they can diverge — one positive, one zero —
+the kind of quantitative result the pillar's earlier lessons build toward
+rather than merely gesture at.
+
+Every module the registry declares for this pillar has a matching `.mdx`
+file under `src/content/lessons/quantum-mastery/` (31 files, one per
+module) and a matching problem set under
+`src/content/problems/quantum-mastery/` — there is no placeholder gap in
+this pillar the way Quantum Computing's `entanglement-and-measurement`
+course once had (§2 & 3).
+
+---
+
+## 4c. Apex in the Overall Platform
+
+Apex is the sixth and, per §7c, the curriculum's **terminal pillar**: 5
+courses, 28 modules, 48 estimated hours, every course again at the
+`"master"` difficulty tier. Its `PILLARS` description calls it "the summit
+of QuantumLearn: research-depth algorithms, fault tolerance, complexity
+theory, large-scale simulation and compilation, and a final course in
+reading and evaluating real quantum-computing research — the point where a
+motivated student can approach the literature without being lost."
+
+Structurally, Apex sits strictly after Quantum Mastery: every one of its
+five courses' `prerequisites` arrays resolves back into a Mastery course
+(never directly into Mechanics, Computing, Hardware, or Software), so there
+is no way to reach Apex without going through Mastery first:
+
+- `Algorithmic Frontiers` requires `Quantum Algorithms, Complexity &
+  Simulation at Scale`.
+- `Fault Tolerance Frontiers` requires `Rigorous Quantum Information
+  Theory`.
+- `Quantum Complexity Theory` requires `Quantum Algorithms, Complexity &
+  Simulation at Scale` (the same Mastery course as Algorithmic Frontiers —
+  the two can be taken in either order, or in parallel).
+- `Simulation & Compilation Frontiers` requires `Quantum Algorithms,
+  Complexity & Simulation at Scale` **and** `Compilation & Hybrid
+  Algorithms` — reaching one hop further back, into Software.
+- `Research Methods and Synthesis` requires all **four** other Apex courses
+  simultaneously — the only course in the entire 32-course curriculum with
+  four prerequisites, making it a genuine capstone-of-capstones rather than
+  another parallel track.
+
+That structure matches what each course actually teaches.
+`Algorithmic Frontiers` covers block encodings, quantum signal processing,
+and the quantum singular value transformation (QSVT) that, per its own
+course description, "unifies Grover's algorithm, Hamiltonian simulation,
+and linear-systems solving as one construction" — borne out in the lesson
+content itself, e.g. `the-quantum-singular-value-transformation.mdx`, which
+runs a concrete degree-4 QSP polynomial against $\cos x$ numerically rather
+than only stating the theorem. `Fault Tolerance Frontiers` goes past
+Quantum Error Correction & Fault Tolerance's conceptual introduction to
+surface codes into a real 2D lattice, decoding, lattice surgery, and
+magic-state distillation, ending in a worked resource estimate.
+`Quantum Complexity Theory` extends `advanced-algorithms-and-complexity`'s
+BQP/oracle-complexity material to QMA and the Local Hamiltonian problem —
+real complexity-theoretic machinery, not an algorithms course under a new
+name. `Simulation & Compilation Frontiers` picks up Quantum Software's
+tensor-network and transpilation material and pushes it to the question of
+exactly which circuits are classically simulable, and to a real
+molecule-to-qubit-count worked example.
+
+The final course, `Research Methods and Synthesis`, is deliberately not new
+physics — its own lesson content says so directly.
+`how-to-read-a-quantum-computing-paper.mdx` opens "Not a new law of
+physics, not a new algorithm — a reading strategy," and states plainly that
+"the final course of QuantumLearn opens not with new physics but with a
+practical skill." It teaches how to read a real paper's precise claim
+against its abstract's framing, how to distinguish a proven theorem from a
+numerical experiment from a heuristic, and how to spot a "quantum
+advantage" claim measured against a weak classical baseline — the explicit
+intent being that by the end, a motivated student "can approach the
+literature without being lost" (the pillar's own description, quoted
+above). Its capstone lesson,
+`capstone-the-quantum-computing-landscape-today.mdx`, is the platform's own
+closing synthesis, matching the homepage's "Apex's closing call to action"
+(§1).
+
+As with Mastery, every module the registry declares for Apex has a matching
+`.mdx` file under `src/content/lessons/apex/` and a matching problem set
+under `src/content/problems/apex/`.
 
 ---
 
@@ -905,6 +1080,145 @@ part of the lesson rather than an inserted widget.
 `getQuiz` in the registry) is architecture only this phase — the data
 model and lookup functions exist, `QUIZZES` is an empty array, and there
 is no quiz-taking UI. See §9.
+
+---
+
+## 7c. Visual & Motion System Architecture
+
+The platform's whole visual language — "The Instrument," a research-console
+aesthetic rather than a document/marketing-page one — is specified in
+[`docs/DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md), which is the source of truth
+for the visual *rules* (palette, type voices, surface vocabulary, layout
+primitives, accessibility requirements). This section covers only the
+architecture underneath those rules: why the pieces are shaped the way they
+are, not what they look like.
+
+**The pillar identity channel** (`src/lib/design/pillars.ts`) gives each of
+the six pillars a color identity derived from exactly two numbers — an OKLCH
+hue and chroma — rather than a hand-picked hex per surface. The same two
+numbers are declared a second time in `src/app/globals.css` §2 (CSS has to
+resolve the full ramp — `--pillar-accent`, `--pillar-edge`, `--pillar-wash`,
+`--pillar-glow`, `--pillar-text`, and more — for every element under a
+`[data-pillar="…"]` attribute, and can't read a TypeScript module to do it),
+so the value genuinely exists in two files. `src/lib/design/__tests__/
+pillars.test.ts` parses the shipped stylesheet back out and asserts it
+matches `pillars.ts` exactly, rather than trusting the two to stay in sync
+by convention — the kind of drift (one hue in a badge's text, a different
+one in its background) that would otherwise ship silently. The same test
+file pins `PILLAR_VISUALS` against `curriculum.ts`'s pillar list, asserts
+every pillar route resolves to a real `page.tsx` on disk, and asserts every
+pillar route appears in `TRACK_NAV_ITEMS` — the exact three-way drift
+(engine says a pillar exists, nav doesn't list it, no page backs its route)
+that left Quantum Mastery without a landing page for a long stretch (§1).
+Setting `data-pillar="…"` on any wrapper is the entire integration surface:
+every descendant token re-resolves, so a component never picks a pillar
+color by hand.
+
+**The background field** (`src/components/field/`) is a persistent,
+scroll-driven canvas behind the whole site, painting whichever "regime"
+(`regimes.ts`) the current pillar depicts — a dispersing wave packet for
+Mechanics, Bloch precession for Computing, a control-pulse lattice for
+Hardware, and so on; `journey` crossfades all six in curriculum order for
+the homepage. Three architectural choices make it safe to have running on
+every page of an otherwise almost entirely static, server-rendered site:
+
+- **A module-level store (`fieldStore.ts`), not React context.** Context
+  would require a client `Provider` wrapping the app in `src/app/layout.tsx`,
+  which would opt every page's subtree into being a client-component
+  boundary child — a real cost, paid on every route, for a decorative
+  feature most of those routes don't even customize. A plain module store
+  (`useSyncExternalStore`, the same shape as `ThemeToggle.tsx` and
+  `useLessonProgress.ts`) keeps the client surface to exactly two leaf
+  components: `<QuantumField>` (subscribes) and `<FieldRegimeSetter>`
+  (publishes) — a page declares its regime without becoming a client
+  component itself.
+- **`PillarScope` is a Server Component.** It sets `data-pillar` directly in
+  server-rendered HTML and paints a pure-CSS atmosphere layer, so there is
+  no flash of default-pillar color before hydration, under
+  `prefers-reduced-motion`, on a data-saver connection, or if JavaScript
+  fails entirely — Apex looks like Apex in the very first painted frame.
+  The canvas itself is strictly an enhancement on top of that: `PillarScope`
+  only delegates *declaring* the regime to a one-line client component
+  (`FieldRegimeSetter`), never the coloring itself.
+- **The field is fully optional, by construction, not by convention.** Every
+  page's actual colors come from CSS custom properties, never from the
+  canvas — so "the canvas doesn't render" is a complete, correct render of
+  any page, not a degraded one. `QuantumField` acts on this: it renders
+  nothing under reduced motion or `saveData`, is `aria-hidden` with a
+  separate `sr-only` text description of what it depicts, pauses its
+  `requestAnimationFrame` loop when the tab is hidden, and scales its
+  backing-store resolution and drawing detail down on small/low-core
+  devices. `src/components/field/__tests__/regimes.test.ts` runs every
+  regime's renderer against a recording canvas stub and asserts it never
+  emits a non-finite coordinate, never leaks `globalAlpha` into the next
+  frame, and never exceeds the alpha ceiling that keeps it from competing
+  with body text.
+
+**Motion infrastructure** (`src/components/motion/`) exists so that
+scroll-linked and entrance effects don't each reinvent their own listener.
+`Reveal.tsx` is the one shared entrance animation: one `IntersectionObserver`
+for the whole page (not one per revealed element — a long lesson can have
+60+), with the transition itself defined in CSS and only a `data-revealed`
+attribute flipped from JS, degrading to visible (never to hidden) if JS
+never runs. `useScrollProgress.ts` is one `rAF`-coalesced `scroll` listener
+shared by every scroll-linked consumer site-wide — `useScrollSubscription`
+for high-frequency consumers that write straight to a ref or canvas (the
+background field, in particular, must never route scroll through
+`useState`), `useScrollProgress` for the rare consumer that genuinely needs
+to re-render, quantised so a full-page scroll causes at most a few hundred
+re-renders instead of thousands. `usePrefersReducedMotion.ts` is now the
+canonical location for that hook (`useSyncExternalStore`, matching
+`ThemeToggle`'s pattern) — it originally lived under
+`components/simulators/bloch-sphere/`, fine when only simulators needed it,
+but the field, `Reveal`, and the narrative components all need it now; that
+original file still exists and re-exports this one, so its ~17 prior import
+sites keep working unmodified.
+
+**Layout and typography primitives** (`src/components/ui/Section.tsx`,
+`Typography.tsx`, `Panel.tsx`) give pages a composition vocabulary beyond
+"another grid of cards": `Section`/`FullBleed`/`SplitFigure`/`Marginalia`
+for alternating a measured reading column with full-bleed instruments and
+asymmetric splits, `Eyebrow`/`SectionTitle`/`Lede`/`TechLabel`/`TechValue`/
+`Readout(s)` for the four-voice typographic system, `Panel`/`Instrument`/
+`FadeRule` for the "machined face" surface treatment. These are additive to
+the pre-existing `Card`/`Button`/`Container`/`PageHeader` primitives from
+§7, not a replacement for them — `Card` is still the right choice for a
+plain, quiet box; `Instrument` is for anything containing a canvas,
+simulator, or large diagram. Full usage rules live in
+`docs/DESIGN_SYSTEM.md`.
+
+**Apex's bespoke presentation** (`src/components/apex/` — `ApexHero`,
+`ApexCourseIndex`, `ApexOpenProblems`, composed in `src/app/apex/page.tsx`)
+deliberately does not use the shared `CourseList`/`CourseTimeline` every
+other pillar page renders through. Apex is the curriculum's terminal pillar,
+and the brief for it was to read as *crossing a boundary* — a
+research-preprint title block instead of another instance of the standard
+pillar-page template — while still exposing everything `CourseList`/
+`CourseTimeline` do (title, description, difficulty, hours, prerequisites,
+module list, completion state). `ApexCourseIndex` gets that parity by
+importing `CourseProgressBadge`/`LessonCompletionMark` directly from the
+shared components rather than reimplementing completion logic, so there is
+still only one definition of "what counts as complete" anywhere on the
+site; only the surrounding chrome (a numbered table of contents with dotted
+leaders, hairline rules, no cards) is Apex-specific.
+
+**Narrative MDX components** (`src/components/narrative/`, registered
+globally in `src/mdx-components.tsx` alongside the pre-existing
+`Callout`/`DefinitionBox`/`TheoremBox`/`ExternalFigure`/
+`InteractiveSection`/`PredictBeforeReveal`) give lesson authors a vocabulary
+for structuring a lesson as an experience — hook → question →
+visualization → prediction → derivation → physical intuition → research
+connection → challenge → next discovery — rather than undifferentiated
+prose. `LessonHook`, `Question`, `InsightBlock`, `DerivationSteps`/
+`DerivationStep`, `EquationReveal`, `AnnotatedFigure`, `ResearchConnection`,
+`HistoricalMoment`, `ChallengePrompt`, and `NextDiscovery` are all plain,
+mostly presentational components with no shared state between them — an
+author opts into whichever beats a given lesson actually calls for. Full
+prop-level documentation and usage examples for every one of these (and the
+six pre-existing MDX shortcodes) live in
+[`docs/NARRATIVE_COMPONENTS.md`](NARRATIVE_COMPONENTS.md), which is the
+author-facing reference; this section only covers where they sit
+architecturally.
 
 ---
 
@@ -1823,8 +2137,10 @@ photoelectric effect, wave-particle duality — still has no home in the
 curriculum); progress & personalization *beyond* single-problem state
 (lesson completion, cross-problem streak-free progress summaries — still
 no auth/database, same `ProgressStore`-interface discipline
-`lib/problems/progress` already established); revisiting the 8-item flat
-navbar if it grows further; ~~Hardware & Software pillar content
+`lib/problems/progress` already established); ~~revisiting the 8-item flat
+navbar if it grows further~~ **done as of Session 14** — the six pillar
+pages now live under a grouped Tracks dropdown, see §1 and the Session 14
+changelog entry; ~~Hardware & Software pillar content
 (architecture-complete, purely a writing task)~~ **done as of Session
 11**; the still-unbuilt `/simulators` entries (circuit builder,
 entanglement visualizer, interference playground) — **still unbuilt
@@ -1945,3 +2261,79 @@ something like a "Tracks" dropdown — a real UX finding, but a bigger
 structural navigation change than felt safe to make unreviewed across
 every one of the site's 580+ pages in the same pass as everything else
 above.
+
+### Session 14 — Visual reinvention: "The Instrument"
+
+A large, mostly-parallel sprint that did what Session 13 flagged as a
+bigger-than-safe-for-one-pass change: it replaced the site's visual
+language wholesale rather than iterating on the prior one, and finally
+carried out the flat-navbar restructure Session 13 explicitly deferred.
+This entry documents the architecture that landed and was verified against
+the actual code while it was written; it is not a full account of every
+lesson/content edit made in the same sprint by other, parallel work.
+
+- **A real design system** now exists —
+  [`docs/DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md), "The Instrument." The
+  palette flipped **dark-first**: `:root` in `globals.css` is now the dark
+  theme, and light ("laboratory notebook") is the `prefers-color-scheme:
+  light` / `[data-theme="light"]` opt-in override — the inverse of the
+  palette's previous arrangement. A four-voice typographic system (display/
+  body/tech/math), a `--depth-0`…`--depth-3` elevation ladder, and
+  instrument surfaces (`.panel`, `.panel-inset`, `.instrument`) replace the
+  prior card-only vocabulary. See §7c for the architecture and
+  `docs/DESIGN_SYSTEM.md` for the rules.
+- **The pillar identity channel** (`src/lib/design/pillars.ts` +
+  `globals.css` §2, §7c) gives all six pillars — Mechanics, Computing,
+  Hardware, Software, Mastery, and Apex — a derived OKLCH color ramp,
+  applied via one `data-pillar` attribute. **Quantum Mastery gained its
+  first landing page**, `/mastery` — previously `PILLAR_VISUALS`
+  (née `PILLAR_ROUTES`), `src/lib/nav.ts`, `src/lib/structuredData.ts`, and
+  `src/lib/search/index.ts` all pointed it at `/learn` for lack of a
+  dedicated page. `src/lib/design/__tests__/pillars.test.ts` (new) pins the
+  CSS/TypeScript color tables together and checks every pillar route
+  against the filesystem and the nav, specifically to prevent a repeat of
+  that gap.
+- **A persistent, scroll-driven background environment**
+  (`src/components/field/` — `QuantumField.tsx`, `regimes.ts`,
+  `PillarScope.tsx`, `fieldStore.ts`/`FieldRegimeSetter.tsx`) now sits
+  behind the whole site, depicting each pillar's own physics. See §7c for
+  why it's a module store rather than context, why `PillarScope` is a
+  Server Component, and why the field is fully optional by construction.
+  `src/components/field/__tests__/regimes.test.ts` (new) guards every
+  regime's canvas output against non-finite coordinates, alpha leaks, and
+  the alpha ceiling that keeps it from competing with text.
+- **Shared motion infrastructure** (`src/components/motion/`) —
+  `Reveal.tsx` (one shared `IntersectionObserver` entrance animation, CSS-
+  driven), `useScrollProgress.ts` (one `rAF`-coalesced scroll listener
+  site-wide), and `usePrefersReducedMotion.ts` promoted to a canonical,
+  non-simulator-specific location (the original
+  `simulators/bloch-sphere/usePrefersReducedMotion.ts` now re-exports it,
+  so its ~17 prior import sites are untouched).
+- **New layout/typography primitives** — `src/components/ui/Section.tsx`
+  (`Section`, `FullBleed`, `SplitFigure`, `Marginalia`),
+  `Typography.tsx` (`Eyebrow`, `SectionTitle`, `Lede`, `TechLabel`,
+  `TechValue`, `Readout`/`Readouts`), and `Panel.tsx` (`Panel`,
+  `Instrument`, `FadeRule`) — additive to, not a replacement for, the
+  existing `Card`/`Button`/`Container`/`PageHeader` set from §7.
+- **The homepage was rebuilt** as a `PillarScope`-wrapped descent through
+  all six pillars in curriculum order (`src/app/page.tsx` +
+  `src/components/home/*Section.tsx`); the seven prior homepage sections
+  were removed in the same change. See §1.
+- **Apex gained a bespoke presentation** (`src/components/apex/` —
+  `ApexHero`, `ApexCourseIndex`, `ApexOpenProblems`) instead of the shared
+  `CourseList`/`CourseTimeline` every other pillar page uses — see §7c for
+  why, and how it still shares completion logic with the components it
+  replaces visually.
+- **New narrative MDX components** (`src/components/narrative/`, ten of
+  them, registered in `src/mdx-components.tsx` alongside the six
+  pre-existing MDX shortcodes) give lesson authors a hook →
+  question → derivation → challenge vocabulary. Author-facing reference:
+  [`docs/NARRATIVE_COMPONENTS.md`](NARRATIVE_COMPONENTS.md) (new).
+- **Navigation restructured**, finally carrying out what Session 13
+  deferred: the six pillar pages moved out of the flat navbar into a
+  grouped **Tracks** dropdown (`TRACK_NAV_ITEMS`, `TracksDropdown` in
+  `Navbar.tsx`), closing on Escape/outside-click/blur. See §1.
+- **New test coverage**: `src/lib/design/__tests__/pillars.test.ts`,
+  `src/lib/design/__tests__/contrast.test.ts` (a WCAG AA guard that parses
+  the real stylesheet rather than a restated fixture), and
+  `src/components/field/__tests__/regimes.test.ts`.

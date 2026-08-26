@@ -3,6 +3,7 @@ import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { cn } from "@/lib/utils";
 import { SINGLE_QUBIT_GATES, type SingleQubitGateId } from "./gateDefinitions";
 import { GUIDED_PRESETS } from "./presets";
+import { ControlSection } from "../shared/controls";
 
 const TARGET_QUBIT_OPTIONS = ([0, 1] as const).map((qubit) => ({ qubit, label: `q${qubit}` }));
 
@@ -40,19 +41,16 @@ export function OperationControls({
 }) {
   return (
     <div className="space-y-8">
-      <section aria-labelledby="presets-heading">
-        <h3 id="presets-heading" className="text-sm font-semibold text-foreground">
-          Guided walkthrough
-        </h3>
+      <ControlSection id="presets" title="Guided walkthrough">
         {/*
-          Hand-rolled rather than <PresetToggle>: selecting an option here doesn't just
+          Hand-rolled rather than <PillGroup>: selecting an option here doesn't just
           swap a value, it kicks off `runPreset`'s own async, cancellable, multi-step
           animation (see TwoQubitExplorer's `isRunning`/`cancelledRef`) that narrates and
-          disables the whole panel step-by-step. PresetToggle has no notion of a
+          disables the whole panel step-by-step. PillGroup has no notion of a
           disabled/in-progress option, so it can't represent "this preset is currently
           animating" or block re-selection while one runs.
         */}
-        <div role="radiogroup" aria-label="Guided walkthrough" className="mt-3 flex flex-col gap-2">
+        <div role="radiogroup" aria-label="Guided walkthrough" className="flex flex-col gap-2">
           {GUIDED_PRESETS.map((preset) => (
             <button
               key={preset.id}
@@ -63,10 +61,10 @@ export function OperationControls({
               onClick={() => onPreset(preset.id)}
               className={cn(
                 "rounded-lg border px-3 py-2 text-left text-sm transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar",
                 "disabled:pointer-events-none disabled:opacity-50",
                 activePresetId === preset.id
-                  ? "border-brand/40 bg-brand/5 text-foreground"
+                  ? "border-pillar/40 bg-pillar/5 text-foreground"
                   : "border-border bg-surface text-foreground hover:bg-surface-muted"
               )}
             >
@@ -74,13 +72,10 @@ export function OperationControls({
             </button>
           ))}
         </div>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="init-heading">
-        <h3 id="init-heading" className="text-sm font-semibold text-foreground">
-          Initialize
-        </h3>
-        <div className="mt-3 grid grid-cols-3 gap-2">
+      <ControlSection id="init" title="Initialize">
+        <div className="grid grid-cols-3 gap-2">
           {INIT_OPTIONS.map((option) => (
             <Button
               key={option.id}
@@ -93,13 +88,10 @@ export function OperationControls({
             </Button>
           ))}
         </div>
-      </section>
+      </ControlSection>
 
-      <section aria-labelledby="gates-heading">
-        <div className="flex items-center justify-between">
-          <h3 id="gates-heading" className="text-sm font-semibold text-foreground">
-            Apply a gate
-          </h3>
+      <ControlSection id="gates" title="Apply a gate" description="Single-qubit gates below apply to the selected target.">
+        <div className="flex items-center justify-end">
           <PresetToggle
             options={TARGET_QUBIT_OPTIONS}
             index={TARGET_QUBIT_OPTIONS.findIndex((option) => option.qubit === targetQubit)}
@@ -108,25 +100,21 @@ export function OperationControls({
             disabled={disabled}
           />
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Single-qubit gates below apply to the selected target.
-        </p>
-        <div className="mt-3 grid grid-cols-6 gap-2">
+        {/* `@sm:` — container query on the controls rail's own box, not the
+            viewport; see SimulatorInstrument.tsx. */}
+        <div className="mt-3 grid grid-cols-4 gap-2 @sm:grid-cols-6">
           {SINGLE_QUBIT_GATES.map((gate) => (
-            <button
+            <Button
               key={gate.id}
-              type="button"
+              variant="secondary"
+              size="sm"
               disabled={disabled}
               title={gate.explanation}
               onClick={() => onApplyGate(gate.id, targetQubit)}
-              className={cn(
-                "flex h-10 items-center justify-center rounded-lg border border-border bg-surface text-sm font-semibold text-foreground transition-colors",
-                "hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
-                "disabled:pointer-events-none disabled:opacity-50"
-              )}
+              className="h-10"
             >
               {gate.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -138,7 +126,7 @@ export function OperationControls({
             SWAP
           </Button>
         </div>
-      </section>
+      </ControlSection>
     </div>
   );
 }

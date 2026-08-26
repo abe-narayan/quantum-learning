@@ -67,17 +67,19 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Exactly solvable quantum systems are rare, prized specimens — nudge any of them even slightly and the exact solution disappears entirely. Perturbation theory asks a more modest question: if the easy version is already fully understood, can the answer to the almost-easy version be built as a correction, layered on top, order by order?
+</LessonHook>
+
 ## Motivation
 
-Exactly solvable quantum systems are rare, prized specimens: the free
+Take the free
 particle, the infinite well, the harmonic oscillator, hydrogen. Nudge any
 of them even slightly, a stray electric field, a whisper of anharmonicity,
-another electron's repulsion, and the exact solution disappears entirely;
+another electron's repulsion, and
 the Schrödinger equation for the nudged system generally has no
 closed-form answer at all. Perturbation theory doesn't try to solve the
-nudged problem from scratch. It asks a more modest question: if the easy
-version is already fully understood, can the answer to the almost-easy
-version be built as a correction, layered on top, order by order? Hydrogen
+nudged problem from scratch. Hydrogen
 solved $H=p^2/2m-e^2/4\pi\epsilon_0r$ exactly, but almost nothing else of
 physical interest can be. If $H=H_0+H'$ with $H_0$ exactly solvable and
 $H'$ "small," the true energies and states can be built as a correction
@@ -261,14 +263,14 @@ perturbation strength:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Using H′ in the wrong basis.** These formulas require $H'_{mn}$
 computed in $H_0$'s *own* eigenbasis, not an arbitrary basis (like the
 position basis directly): the matrix elements $\langle m^{(0)}|H'|n^{(0)}\rangle$
 depend on this specific choice.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Applying second-order perturbation theory to a degenerate $E_n^{(0)}$.**
 The $E_n^{(0)}-E_m^{(0)}$ denominator is exactly zero for a truly
 degenerate pair, and the formula breaks (this platform's engine
@@ -306,6 +308,8 @@ deliberately throws rather than silently returning $\pm\infty$ or NaN).
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [The Variational Method](/lessons/quantum-mechanics/approximation-methods/the-variational-method), a completely different approximation
 strategy, one that needs no small parameter at all, only a guessed
 trial wavefunction.
+</NextDiscovery>

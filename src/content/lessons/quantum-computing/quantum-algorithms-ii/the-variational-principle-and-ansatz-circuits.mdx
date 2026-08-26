@@ -35,6 +35,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+VQE and QAOA never run a fixed circuit once and stop the way Shor's algorithm does — they run a parameterized circuit again and again, with a classical optimizer steering the parameters between runs toward a better answer.
+</LessonHook>
+
 ## Motivation
 
 Shor's algorithm is a fixed sequence of gates, run once, with a classical
@@ -159,14 +163,14 @@ staying at or above $E_0$ everywhere, never dipping below it even once:
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Believing a lower measured energy is always more trustworthy.** The
 variational principle says the *true* minimum is a hard floor. If an
 implementation ever reports an energy below the Hamiltonian's actual
 smallest eigenvalue, that's evidence of a bug, not a better answer.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any ansatz can represent any Hamiltonian's ground state.**
 This platform's specific $R_z R_y$ single-qubit ansatz can (it spans the
 whole Bloch sphere), but a poorly chosen or insufficiently expressive
@@ -209,6 +213,8 @@ limitation of VQE in practice.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [VQE: A Worked Toy Example](/lessons/quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example), running the full hybrid optimization
 loop on two different Hamiltonians and confirming convergence to their
 exact ground-state energies.
+</NextDiscovery>

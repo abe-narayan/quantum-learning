@@ -82,6 +82,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Below one fixed physical error rate, a quantum computer can run an
+  arbitrarily long computation with arbitrarily small failure probability —
+  at only polylogarithmic cost. Above it, the identical machinery makes
+  things worse instead of better.
+</LessonHook>
+
 ## Motivation
 
 By the mid-1990s, Peter Shor's factoring algorithm had already shown that
@@ -97,11 +104,16 @@ quantum computation could ever be made robust against realistic,
 continuous noise at all — not as an engineering difficulty, but as a
 matter of principle.
 
-The **quantum threshold theorem**, proved independently (with different
-constructions and proof techniques) by several groups between roughly
-1996 and 1998 — Shor's own fault-tolerant constructions, Aharonov and
-Ben-Or, Kitaev, and Knill, Laflamme, and Zurek among them — answered the
-objection directly. It showed that continuous noise is not the problem
+The **quantum threshold theorem** answered the objection directly.
+
+<HistoricalMoment date="1996–1998">
+  Several groups prove the quantum threshold theorem independently, with
+  different constructions and proof techniques — Shor's own
+  fault-tolerant constructions, Aharonov and Ben-Or, Kitaev, and Knill,
+  Laflamme, and Zurek among them.
+</HistoricalMoment>
+
+It showed that continuous noise is not the problem
 it first appears to be: discretizing errors via syndrome measurement
 (the subject of this course's earlier lessons) combined with
 **concatenation** — nesting a code inside itself, recursively — can
@@ -163,28 +175,35 @@ logical qubit is now built from $7^2 = 49$ physical qubits. Crucially,
 the *inputs* to the level-2 correction gadget are no longer raw physical
 qubits with error rate $p$ — they are level-1 logical qubits, each
 already suppressed to error rate $p_1 \approx cp^2$. The same two-fault
-argument applies one level up, with $p_1$ standing in for $p$:
+argument applies one level up, with $p_1$ standing in for $p$, and
+iterating $L$ times gives the recursion that is the theorem's real
+engine — unrolled below to the closed-form suppression (or blowup) it
+produces:
 
-$$
-p_2 \approx c\,p_1^2 \approx c\,(cp^2)^2 = c^3 p^4
-$$
+<DerivationSteps>
+  <DerivationStep annotation="The same two-fault argument that gave p_1 ≈ c p² applies one level up, with the level-1 logical qubit's own error rate p_1 now standing in for the physical rate p.">
+    $$
+    p_2 \approx c\,p_1^2 \approx c\,(cp^2)^2 = c^3 p^4
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Generalizing the pattern across levels gives the recursion driving the whole theorem: each level's logical error rate depends on the previous level's the same way p_1 depended on p.">
+    $$
+    p_{k+1} \approx c\,p_k^2, \qquad p_0 \equiv p
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Unrolling: p_1 = c p_0², so c p_1 = (c p_0)². Then c p_2 = (c p_1)² = (c p_0)⁴, and by induction c p_k = (c p_0)^(2^k).">
+    $$
+    c\,p_k = (c\,p_0)^{2^k}
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Solving for p_L gives the double exponential the threshold theorem is named for.">
+    $$
+    p_L \;\approx\; \frac{1}{c}\left(c\,p_0\right)^{2^{L}}
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
-Iterating $L$ times gives the recursion that is the theorem's real
-engine:
-
-$$
-p_{k+1} \approx c\,p_k^2, \qquad p_0 \equiv p
-$$
-
-Unrolling it explicitly: $p_1 = cp_0^2$, so $cp_1 = (cp_0)^2$. Then
-$cp_2 = (cp_1)^2 = (cp_0)^4$, and by induction $cp_k = (cp_0)^{2^k}$.
-Solving for $p_L$:
-
-$$
-p_L \;\approx\; \frac{1}{c}\left(c\,p_0\right)^{2^{L}}
-$$
-
-This is the double exponential the threshold theorem is named for. Define
+Define
 $p_{\text{th}} := 1/c$ — the physical error rate at which $cp_0 = 1$, the
 recursion's fixed point. Two regimes fall out immediately:
 
@@ -218,9 +237,20 @@ code's own qubit overhead $n$ (here $n=7$ for Steane), so $L$ levels use
 $n^L$ physical qubits per logical qubit. Substituting $L$ from above and
 using $n^{\log_2 X} = X^{\log_2 n}$:
 
-$$
-N_L = n^{L} = \left(\frac{\ln(1/(c\varepsilon))}{\ln(1/r)}\right)^{\log_2 n}
-$$
+<EquationReveal
+  terms={[
+    { id: "NL", symbol: "N_L", gloss: "Physical qubits needed per logical qubit after L levels of concatenation." },
+    { id: "n", symbol: "n", gloss: "Physical qubits per encoded block for the code in use (n = 7 for the Steane code)." },
+    { id: "L", symbol: "L", gloss: "Number of concatenation levels." },
+    { id: "eps", symbol: "ε", gloss: "Target logical error rate the computation must reach." },
+    { id: "r", symbol: "r", gloss: "r = c·p₀, the physical error rate scaled by the threshold constant — r < 1 below threshold." },
+    { id: "log2n", symbol: "log₂ n", gloss: "The fixed exponent set by the code's own qubit overhead — for Steane, log₂7." },
+  ]}
+>
+  $$
+  N_L = n^{L} = \left(\frac{\ln(1/(c\varepsilon))}{\ln(1/r)}\right)^{\log_2 n}
+  $$
+</EquationReveal>
 
 The base of this power, $\ln(1/(c\varepsilon))$, grows only
 *logarithmically* in $1/\varepsilon$ — so $N_L$ grows like
@@ -232,6 +262,13 @@ only polylog overhead" — a qualitatively different, far stronger claim
 than a polynomial or exponential resource cost would be.
 
 ## Physical Interpretation: Why This Matters
+
+<InsightBlock>
+  Concatenation turns noise into a fixed point: below threshold, each
+  extra level of encoding squares the previous suppression rather than
+  just adding to it, so a handful of levels is enough to reach any target
+  reliability at only polylogarithmic qubit cost.
+</InsightBlock>
 
 The Quantum Hardware pillar's noise-and-scaling course asked a question
 it could not yet answer: as you scale up a device, do physical error
@@ -308,7 +345,7 @@ add a couple more levels, not double the qubit count.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating different threshold theorems' numerical threshold values as
 contradicting each other.** The original concatenated-code threshold
 theorems are typically *fully rigorous, adversarial-noise-model proofs*,
@@ -389,7 +426,9 @@ the same machinery drives the logical error rate *up*, not down.
 
 ## Further Exploration
 
-Continue to [Capstone: Resource Estimation for a Real Algorithm](/lessons/apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm),
-which takes this lesson's polylog-overhead formula out of the abstract
-and applies it to a full, concrete resource estimate for running one
-real algorithm fault-tolerantly.
+<NextDiscovery>
+  Next: [Capstone: Resource Estimation for a Real Algorithm](/lessons/apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm)
+  takes this lesson's polylog-overhead formula out of the abstract and
+  applies it to a full, concrete resource estimate for running one real
+  algorithm fault-tolerantly.
+</NextDiscovery>

@@ -30,6 +30,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="What a circuit diagram is hiding">
+Every circuit this platform has ever built — Bell states, Grover's algorithm, VQE ansatzes — is, underneath the convenient H/X/CNOT notation, ultimately a sequence of native rotations on real hardware.
+</LessonHook>
+
 ## Motivation
 
 Quantum Compilation & Transpilation covered WHICH qubits a gate can act
@@ -201,7 +205,7 @@ gives population 1 in $|1\rangle$, exactly matching $X|0\rangle=|1\rangle$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Requiring EXACT matrix equality (no phase tolerance) when checking a
 decomposition.** This is too strict, and physically wrong. Global
 phase is unobservable, so a decomposition that's correct up to phase IS
@@ -209,7 +213,7 @@ a correct decomposition, and demanding exact equality would incorrectly
 reject valid ones.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming every gate needs three native rotations.** As this lesson's
 $Z$, $S$, $T$ examples show, some gates need only ONE native rotation.
 The three-rotation Euler form is a general upper bound, not a
@@ -248,6 +252,8 @@ requirement for every specific gate.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Hybrid Quantum-Classical Workflows](/lessons/quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows), which shifts from
 single-circuit compilation to the repeated compile-run-optimize loop
 variational algorithms actually use.
+</NextDiscovery>

@@ -6,7 +6,7 @@ export const qmaSoundnessQuantifierMc: MultipleChoiceProblem = {
     title: "QMA's Soundness Condition, Stated Precisely",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/qma-and-quantum-verification",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["qma", "definitions", "soundness", "quantifiers"],

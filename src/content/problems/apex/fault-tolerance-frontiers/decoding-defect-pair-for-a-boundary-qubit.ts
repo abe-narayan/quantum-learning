@@ -6,7 +6,7 @@ export const decodingDefectPairForABoundaryQubit: MultipleChoiceProblem = {
     title: "Which Defect Pair Does a Boundary-Column Error Flip?",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/decoding-surface-codes",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["surface-codes", "decoding", "minimum-weight-perfect-matching"],

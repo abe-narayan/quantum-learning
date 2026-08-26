@@ -91,6 +91,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="The promise this course never cashed in">
+This platform's circuits use H, X, Y, Z, S, T, and CNOT throughout — is that an arbitrary shopping list, or does some small subset of it already suffice to build everything else?
+</LessonHook>
+
 ## Motivation
 
 Building Qubit Circuits computed $HZH=X$ and then said, in passing, that
@@ -101,13 +105,12 @@ the idea would return in the next course. It never did. Quantum Gates
 superdense coding, all without ever pinning down what "universal" means
 or why any small set deserves the name. This lesson keeps that promise.
 
-The question is basic enough that skipping it is a real gap: this
-platform's circuits use H, X, Y, Z, S, T, and CNOT throughout, plus
-arbitrary-angle rotations $R_x,R_y,R_z$. Is that an arbitrary shopping
-list, or does some small subset of it already suffice to build
-*everything* else, exactly or to any desired precision? And if so,
-which subset, and why does it need to include a distinctly non-obvious
-gate like $T$?
+The question is basic enough that skipping it is a real gap — and this
+platform's gate set also includes arbitrary-angle rotations
+$R_x,R_y,R_z$, not just the fixed set already listed. Any subset that
+suffices could do so exactly, or only to any desired precision — and if
+so, which subset, and why does it need to include a distinctly
+non-obvious gate like $T$?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/50/Quantum-computer-Chalmers_2017.jpg"
@@ -178,6 +181,10 @@ decomposition) says that's *exactly* what's missing:
 
 > Arbitrary single-qubit unitaries, together with CNOT alone, can
 > implement any unitary operation on any number of qubits.
+
+<ResearchConnection title="Elementary gates for quantum computation" source="Barenco et al., Physical Review A 52, 3457 (1995)" url="https://arxiv.org/abs/quant-ph/9503016">
+The result this lesson leans on: arbitrary single-qubit unitaries plus CNOT alone can implement any unitary operation on any number of qubits — the theorem that turns "H, X, Y, Z, S, T, CNOT" from an arbitrary list into a provably complete toolkit.
+</ResearchConnection>
 
 The plausibility argument, without the full constructive proof: every
 unitary $U(2^n)$ is generated, as a Lie group, by a Lie algebra of
@@ -413,7 +420,7 @@ tracked $|10\rangle$ through three explicit steps.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking "Clifford+T is universal" means any random discrete gate set
 is universal.** It isn't automatic. $\{H,S,\text{CNOT}\}$ alone (no
 $T$) is discrete, includes an entangling gate, and is still NOT
@@ -423,7 +430,7 @@ directly above — a property most "reasonable-looking" gates don't
 automatically have.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing "universal in principle" with "cheap in practice."**
 Clifford+T can reach any circuit to any accuracy, but that doesn't mean
 every gate costs the same. $T$ gates are dramatically more expensive
@@ -484,6 +491,7 @@ count.
 
 ## Further Exploration
 
+<NextDiscovery>
 The T-gate cost this lesson only names (magic-state distillation, and
 its role in the Fault-Tolerant Thresholds capstone's physical-to-logical
 qubit overhead) is a natural next question for anyone continuing past
@@ -492,3 +500,4 @@ Decomposition's continuous $R_z,R_y$ compilation and this lesson's
 discrete Clifford+T compilation are the two ends of the same real
 compiler-design question: which fixed target gate set should a circuit
 actually be compiled down to before it runs.
+</NextDiscovery>

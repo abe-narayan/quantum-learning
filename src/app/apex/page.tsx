@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Container } from "@/components/ui/Container";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { CourseList } from "@/components/curriculum/CourseList";
-import { CourseTimeline } from "@/components/curriculum/CourseTimeline";
+import { PillarScope } from "@/components/field/PillarScope";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
+import { ApexHero } from "@/components/apex/ApexHero";
+import { ApexOpenProblems } from "@/components/apex/ApexOpenProblems";
+import { ApexCourseIndex } from "@/components/apex/ApexCourseIndex";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { BASE_URL, buildBreadcrumbSchema, buildCourseListSchema, pillarUrl } from "@/lib/structuredData";
@@ -26,34 +28,45 @@ export default async function ApexPage() {
   ]);
 
   return (
-    <Container className="py-16">
+    <PillarScope pillar="apex">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([courseListSchema, breadcrumbSchema]) }}
       />
-      <svg viewBox="0 0 40 40" className="h-10 w-10 text-brand" aria-hidden="true">
-        <path d="M20 4 L34 32 L6 32 Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        <line x1="20" y1="4" x2="20" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-      <PageHeader
-        eyebrow="Apex"
-        title="The summit of the curriculum"
-        description="Everything earlier in QuantumLearn built toward this: the block-encoding framework that now underlies most quantum algorithms research, the real 2D surface-code lattice and its decoder (not just the conceptual 3-qubit codes), QMA and the Local Hamiltonian problem, tensor networks and the classical-simulation boundary that is the actual definition of quantum advantage, and a final course in reading and evaluating real quantum-computing papers. This is graduate-research-preparation material — dense, but built entirely on courses you've already completed. Start with Quantum Mastery's Quantum Algorithms, Complexity & Simulation at Scale course (or Rigorous Quantum Information Theory, if fault tolerance is your entry point) if BQP, Trotterization, and the general stabilizer formalism aren't yet second nature."
-        className="mt-4"
-      />
 
-      {/* See Mechanics/Computing/Hardware/Software's identical pattern: this
-          sr-only h2 keeps the heading hierarchy valid (h1 above, h3s inside
-          CourseList below) without an extra visible "Courses" label. */}
-      <h2 className="sr-only">Courses</h2>
+      <ApexHero courses={courses} />
 
-      <div className="mt-12">
-        <CourseTimeline courses={courses} lessons={lessons} />
-      </div>
+      <Section width="wide" aria-labelledby="open-problems-heading">
+        <Eyebrow>§ 01 — At the boundary of what&rsquo;s known</Eyebrow>
+        <SectionTitle id="open-problems-heading" level={2} size="lg" className="mt-3">
+          Open problems at the frontier
+        </SectionTitle>
+        <Lede className="mt-4">
+          Apex&rsquo;s five courses each extend a settled result from earlier in the
+          curriculum to the point where it meets a genuine open question or an
+          active research boundary. What follows is honest about where each
+          one currently stands.
+        </Lede>
+        <div className="mt-10">
+          <ApexOpenProblems courses={courses} lessons={lessons} />
+        </div>
+      </Section>
 
-      <div className="mt-8">
-        <CourseList courses={courses} lessons={lessons} />
-      </div>
-    </Container>
+      <Section width="wide" aria-labelledby="course-index-heading" tight>
+        <Eyebrow>§ 02 — Course index</Eyebrow>
+        <SectionTitle id="course-index-heading" level={2} size="lg" className="mt-3">
+          The five Apex courses
+        </SectionTitle>
+        <Lede className="mt-4">
+          Algorithmic Frontiers, Fault Tolerance Frontiers, Quantum Complexity
+          Theory, and Simulation &amp; Compilation Frontiers each extend a
+          different Mastery or Software thread independently; Research
+          Methods and Synthesis requires all four, and closes the platform.
+        </Lede>
+        <div className="mt-10">
+          <ApexCourseIndex courses={courses} lessons={lessons} />
+        </div>
+      </Section>
+    </PillarScope>
   );
 }

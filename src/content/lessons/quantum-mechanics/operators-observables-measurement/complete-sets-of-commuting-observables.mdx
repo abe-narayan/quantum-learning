@@ -48,6 +48,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Hydrogen's energy alone can't tell two different orbital shapes apart —
+  they share the same eigenvalue. Labeling a real quantum state honestly
+  takes more than one observable.
+</LessonHook>
+
 ## Motivation
 
 The very first worked example of this course used $N=\mathrm{diag}(1,1,2)$,
@@ -158,14 +164,14 @@ care about order.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming any second observable resolves a degeneracy.** It must both
 commute with the first *and* take different values on the degenerate
 eigenvectors. A compatible observable that happens to be constant across
 the whole degenerate eigenspace resolves nothing.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Thinking a CSCO must consist of exactly two observables.** The number
 needed depends entirely on how much degeneracy there is to resolve. One
 suffices for a fully nondegenerate spectrum, and real physical systems
@@ -199,6 +205,13 @@ suffices for a fully nondegenerate spectrum, and real physical systems
 
 ## Further Exploration
 
-Next: [The Measurement Postulate, Generalized](/lessons/quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized), using this course's
-projectors to state Born's rule correctly for degenerate eigenvalues,
-where the earlier $|c_i|^2$ form silently assumed there wasn't any.
+<ChallengePrompt prompt="Every M this lesson used happens to be diagonal in the same basis as N. Must a second observable that resolves N's degeneracy always be diagonal in this basis too, or could a non-diagonal (but still N-commuting) operator work as well?">
+  Think about what $[N,M]=0$ actually requires — does it force $M$ to be
+  diagonal, or just to preserve $N$'s eigenspaces?
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [The Measurement Postulate, Generalized](/lessons/quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized), using this course's
+  projectors to state Born's rule correctly for degenerate eigenvalues,
+  where the earlier $|c_i|^2$ form silently assumed there wasn't any.
+</NextDiscovery>

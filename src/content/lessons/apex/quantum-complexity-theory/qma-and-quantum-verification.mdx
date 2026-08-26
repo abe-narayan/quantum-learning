@@ -102,6 +102,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="A witness no classical string can be">
+  Some ground states of physical interest are believed to need
+  exponentially many classical bits to describe — yet a quantum computer
+  can hold one in a handful of qubits and check it. What happens to
+  "NP-style verification" when the certificate itself has to be quantum?
+</LessonHook>
+
 ## Motivation
 
 The prerequisite lesson defined $\mathsf{BQP}$ by direct analogy with
@@ -373,7 +380,25 @@ here, not re-derived — the full argument is a substantial piece of
 space-bounded linear algebra on its own). Combined with the previous
 section:
 
-$$\mathsf{NP} \subseteq \mathsf{QMA} \subseteq \mathsf{PSPACE}$$
+<EquationReveal
+  terms={[
+    { id: "NP", symbol: "NP", gloss: "Classical certificate, classical polynomial-time verifier." },
+    { id: "QMA", symbol: "QMA", gloss: "Quantum witness, quantum polynomial-time verifier — proven to contain NP, since a classical certificate is a valid computational-basis quantum witness." },
+    { id: "PSPACE", symbol: "PSPACE", gloss: "Everything decidable with polynomial workspace, however much time it takes — QMA's acceptance probability is a maximization that a space-efficient procedure can still evaluate piece by piece." },
+  ]}
+>
+$$
+\mathsf{NP} \subseteq \mathsf{QMA} \subseteq \mathsf{PSPACE}
+$$
+</EquationReveal>
+
+<ComplexityClassDiagram
+  outer={{ id: "PSPACE", label: "PSPACE" }}
+  ring={{ id: "QMA", label: "QMA" }}
+  lensB={{ id: "NP", label: "NP" }}
+  footnote="Both containments are proven: NP is a valid computational-basis QMA witness, and QMA's acceptance probability is a space-efficient maximization, exactly as BQP ⊆ PSPACE's path-sum argument was."
+  ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains a solid ring labeled QMA, which in turn contains a solid ellipse labeled NP — both containments proven, not conjectured."
+/>
 
 ### Could a quantum witness ever help? A concrete flavor
 
@@ -399,6 +424,13 @@ of this course's next lesson, where this intuition is made precise and the
 problem is shown to be $\mathsf{QMA}$-complete.
 
 ## Physical Interpretation: Why This Matters
+
+<InsightBlock>
+  QMA is what NP looks like once the certificate is allowed to be a
+  quantum state — and no-cloning means amplifying confidence in that
+  certificate costs real, additional copies of it, with no classical
+  free lunch.
+</InsightBlock>
 
 $\mathsf{QMA}$ is the natural target class for a question the quantum
 chemistry material elsewhere on this platform runs into directly: *does
@@ -510,7 +542,7 @@ Merlin to send $k$ separate copies of $|\psi\rangle$ up front — a concrete
 witness-size cost with no classical analogue.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Checking only the "intended" cheating witness instead of every possible
 quantum state.** $\mathsf{QMA}$'s soundness condition is a **universal**
 quantifier over every $p(n)$-qubit state Merlin might send for a NO
@@ -565,7 +597,9 @@ sub-verifications aren't automatically independent trials.
 
 ## Further Exploration
 
-Next: [The Local Hamiltonian Problem](/lessons/apex/quantum-complexity-theory/the-local-hamiltonian-problem),
-where the ground-state intuition sketched above is made precise, and the
-problem is shown to be $\mathsf{QMA}$-complete — the exact quantum
-analogue of a Cook-Levin-style completeness theorem.
+<NextDiscovery>
+  Next: [The Local Hamiltonian Problem](/lessons/apex/quantum-complexity-theory/the-local-hamiltonian-problem)
+  makes the ground-state intuition sketched above precise, and shows the
+  problem is $\mathsf{QMA}$-complete — the exact quantum analogue of a
+  Cook-Levin-style completeness theorem.
+</NextDiscovery>

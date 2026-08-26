@@ -6,7 +6,7 @@ export const threeWallsClassificationMc: MultipleChoiceProblem = {
     title: "Classifying the Course's Three Walls",
     course: "advanced-algorithms-and-complexity",
     lesson: "quantum-mastery/advanced-algorithms-and-complexity/capstone-what-scale-actually-requires",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "multiple-choice",
     tags: ["capstone", "synthesis"],

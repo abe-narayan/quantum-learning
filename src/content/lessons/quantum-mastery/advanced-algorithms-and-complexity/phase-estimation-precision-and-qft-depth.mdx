@@ -139,6 +139,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="What a real factoring circuit actually pays for">
+  Phase estimation is the subroutine that turns "find the period of a
+  modular exponential function" into "read off a phase" — the entire
+  mechanism behind Shor's algorithm. Every gate this lesson counts, and
+  every bit of precision its bounds guarantee, is a real resource cost.
+</LessonHook>
+
 ## Motivation
 
 Quantum Phase Estimation was derived, in Quantum Algorithms I, only for
@@ -151,14 +158,6 @@ what actually happens then, exactly, and separately asks the QFT's own
 circuit-engineering question: how much does the QFT actually cost to
 build, and what does an engineer get to trade away to build a cheaper
 approximation?
-
-Phase estimation isn't a side calculation here — it's the subroutine
-that turns "find the period of a modular exponential function" into
-"read off a phase," which is the entire mechanism behind Shor's
-algorithm. Every controlled-phase gate this lesson counts is a gate
-that a real factoring circuit has to pay for, and every bit of
-precision this lesson's bounds guarantee is a bit of confidence that
-the register didn't just round to the wrong period.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png"
@@ -180,25 +179,25 @@ $N=2^t$. Applying the inverse QFT and reading off the amplitude on
 outcome $m$ (using $\text{QFT}^\dagger|x\rangle=\frac1{\sqrt N}\sum_m
 e^{-2\pi imx/N}|m\rangle$):
 
-$$
-\text{amp}(m) = \frac1N\sum_{x=0}^{N-1}e^{2\pi ix(\varphi-m/N)} = \frac1N\sum_{x=0}^{N-1}e^{2\pi i\varepsilon x}, \qquad \varepsilon\equiv\varphi-\frac mN
-$$
+<DerivationSteps>
+  <DerivationStep annotation="Read off the amplitude on outcome m by applying the inverse QFT to the pre-measurement state; the resulting sum is a finite geometric series in x with ratio e^(2πiε).">
+    $$
+    \text{amp}(m) = \frac1N\sum_{x=0}^{N-1}e^{2\pi ix(\varphi-m/N)} = \frac1N\sum_{x=0}^{N-1}e^{2\pi i\varepsilon x}, \qquad \varepsilon\equiv\varphi-\frac mN
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Evaluate the geometric series in closed form, then apply the identity 1 − e^(iθ) = −2ie^(iθ/2)sin(θ/2) to both the numerator and denominator.">
+    $$
+    \text{amp}(m) = \frac1N\cdot\frac{1-e^{2\pi i\varepsilon N}}{1-e^{2\pi i\varepsilon}} = \frac1N\,e^{i\pi\varepsilon(N-1)}\,\frac{\sin(\pi\varepsilon N)}{\sin(\pi\varepsilon)}
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Square the amplitude's magnitude to get the measurement probability; the phase factor e^(iπε(N−1)) drops out.">
+    $$
+    P(m) = \frac1{N^2}\,\frac{\sin^2(\pi\varepsilon N)}{\sin^2(\pi\varepsilon)}, \qquad \varepsilon=\varphi-\frac mN
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
-a finite geometric series with ratio $r=e^{2\pi i\varepsilon}$. Using
-$1-e^{i\theta}=-2ie^{i\theta/2}\sin(\theta/2)$ on both the numerator
-$1-r^N$ and denominator $1-r$:
-
-$$
-\text{amp}(m) = \frac1N\cdot\frac{1-e^{2\pi i\varepsilon N}}{1-e^{2\pi i\varepsilon}} = \frac1N\,e^{i\pi\varepsilon(N-1)}\,\frac{\sin(\pi\varepsilon N)}{\sin(\pi\varepsilon)}
-$$
-
-so the exact measurement probability is
-
-$$
-\boxed{P(m) = \frac1{N^2}\,\frac{\sin^2(\pi\varepsilon N)}{\sin^2(\pi\varepsilon)}, \qquad \varepsilon=\varphi-\frac mN}
-$$
-
-a fully derived closed form, valid for *every* $\varphi$, exact or not
+This is a fully derived closed form, valid for *every* $\varphi$, exact or not
 (when $\varepsilon=0$ exactly, this reduces to $P=1$ by direct limit,
 recovering the earlier lesson's exact case). Checked directly against
 `phaseEstimation`, this platform's real engine, for $\varphi=1/3$ (not
@@ -212,22 +211,20 @@ Let $b=\text{round}(\varphi N)$ (the best $t$-bit estimate) and
 $\delta=\varphi N-b\in[-\tfrac12,\tfrac12]$ (so $\varepsilon=\delta/N$
 for $m=b$). Bound $P(b)$ from below using two elementary inequalities:
 $\sin x\leq x$ for the denominator (so $\sin^2(\pi\delta/N)\leq
-\pi^2\delta^2/N^2$), giving
+\pi^2\delta^2/N^2$):
 
-$$
-P(b) = \frac1{N^2}\frac{\sin^2(\pi\delta)}{\sin^2(\pi\delta/N)} \geq \frac{\sin^2(\pi\delta)}{\pi^2\delta^2} = \left(\frac{\sin(\pi\delta)}{\pi\delta}\right)^2
-$$
-
-The function $\text{sinc}(\delta)=\sin(\pi\delta)/(\pi\delta)$ is even
-and decreases monotonically on $\delta\in[0,\tfrac12]$ (a standard,
-easily-checked elementary-calculus fact, cited rather than re-derived
-here), so its minimum on $\delta\in[-\tfrac12,\tfrac12]$ occurs at
-$|\delta|=\tfrac12$: $\text{sinc}(\tfrac12)=\sin(\pi/2)/(\pi/2)=2/\pi$.
-Therefore
-
-$$
-\boxed{P(b) \geq \left(\frac2\pi\right)^2 = \frac4{\pi^2} \approx 0.4053}
-$$
+<DerivationSteps>
+  <DerivationStep annotation="Apply sin x ≤ x to the denominator sin²(πδ/N) ≤ π²δ²/N², which bounds P(b) below by the sinc function evaluated at δ.">
+    $$
+    P(b) = \frac1{N^2}\frac{\sin^2(\pi\delta)}{\sin^2(\pi\delta/N)} \geq \frac{\sin^2(\pi\delta)}{\pi^2\delta^2} = \left(\frac{\sin(\pi\delta)}{\pi\delta}\right)^2
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="sinc(δ) = sin(πδ)/(πδ) is even and decreases monotonically on δ ∈ [0, 1/2] (a standard elementary-calculus fact, cited rather than re-derived), so its minimum on δ ∈ [−1/2, 1/2] occurs at |δ| = 1/2, where sinc(1/2) = sin(π/2)/(π/2) = 2/π.">
+    $$
+    P(b) \geq \left(\frac2\pi\right)^2 = \frac4{\pi^2} \approx 0.4053
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
 **for every possible $\varphi$ and every $t$**, a genuine, derived
 worst-case guarantee, not an average-case or typical-case statement.
@@ -330,11 +327,22 @@ step by operator norm $\|\text{phaseGate}(\theta_k)-I\|=|e^{i\theta_k}-1|
 over every dropped gate (at most one per row per $k$, $t$ rows, $k$
 ranging over $m+1,\dots,t$) via the lemma:
 
+<EquationReveal
+  terms={[
+    { id: "norm", symbol: "‖QFT−AQFT_m‖", gloss: "The operator-norm distance between the exact QFT circuit and the approximate one that drops gates below the cutoff m." },
+    { id: "theta", symbol: "θ_k", gloss: "The rotation angle of the controlled-phase gate at distance k, 2π/2^k — exponentially small for large k." },
+    { id: "t", symbol: "t", gloss: "The number of precision qubits (rows) in the QFT circuit." },
+    { id: "m", symbol: "m", gloss: "The cutoff: every controlled-phase gate with k > m is dropped." },
+  ]}
+>
+
 $$
 \|\text{QFT}-\text{AQFT}_m\| \leq \sum_{\text{dropped gates}}\theta_k \leq t\sum_{k=m+1}^\infty\frac{2\pi}{2^k} = \frac{2\pi t}{2^m}
 $$
 
-a genuine derived bound, exponentially small in the cutoff $m$, so
+</EquationReveal>
+
+This is a genuine derived bound, exponentially small in the cutoff $m$, so
 $m=O(\log(t/\epsilon))$ suffices for total error $\leq\epsilon$, while
 the *gate count* drops from $O(t^2)$ to $O(tm)=O(t\log(t/\epsilon))$, a
 real, quantified engineering trade.
@@ -391,6 +399,12 @@ below the leading digit of the phase itself.
 
 ## Physical Interpretation
 
+<InsightBlock>
+  Both halves of this lesson are the same idea in different clothes:
+  finite resources always leave a controlled, quantifiable residue
+  rather than either "working perfectly" or "failing arbitrarily."
+</InsightBlock>
+
 Both halves of this lesson are the same idea in different clothes:
 finite resources (finite precision qubits; finite gate budgets) always
 leave a controlled, quantifiable residue rather than either "working
@@ -428,7 +442,7 @@ guaranteed.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating $P(b)\geq4/\pi^2$ as the *typical* success probability rather
 than a worst-case floor.** As the $\varphi=1/3$ examples above show
 (actual $P(b)\approx0.68$, well above $0.405$), most phases do
@@ -437,7 +451,7 @@ value at the single worst case $\delta=\pm\tfrac12$, derived as a
 guaranteed minimum, not a typical outcome.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming AQFT's error bound requires $m$ to scale with the *number of
 qubits being estimated* ($n$) rather than the *total register size*
 ($t$).** The derived bound is $2\pi t/2^m$: it depends on $t$ (through
@@ -485,7 +499,9 @@ a doubling) to maintain the same error bound.
 
 ## Further Exploration
 
-Next: [Barren Plateaus and Variational Trainability](/lessons/quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability),
-where the same "finite resources leave a quantifiable residue" theme
-reappears in a very different setting: how *training* a variational
-circuit, not just running one, degrades as qubit count grows.
+<NextDiscovery>
+  Next: [Barren Plateaus and Variational Trainability](/lessons/quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability),
+  where the same "finite resources leave a quantifiable residue" theme
+  reappears in a very different setting: how *training* a variational
+  circuit, not just running one, degrades as qubit count grows.
+</NextDiscovery>

@@ -6,7 +6,7 @@ export const classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc: Multi
     title: "Choosing a Quantum-Advantage Candidate Circuit",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "multiple-choice",
     tags: ["gottesman-knill", "quantum-advantage", "tensor-networks", "classical-simulability"],

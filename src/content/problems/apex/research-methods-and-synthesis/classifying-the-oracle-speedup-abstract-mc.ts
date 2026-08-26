@@ -6,7 +6,7 @@ export const classifyingTheOracleSpeedupAbstractMc: MultipleChoiceProblem = {
     title: "Classifying an 'Exponential Speedup' Abstract",
     course: "research-methods-and-synthesis",
     lesson: "apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "multiple-choice",
     tags: ["paper-reading", "oracle-separation", "abstract-vs-theorem", "claim-evaluation"],

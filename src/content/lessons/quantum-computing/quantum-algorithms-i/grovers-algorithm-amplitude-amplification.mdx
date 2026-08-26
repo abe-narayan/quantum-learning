@@ -43,6 +43,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="More iterations isn't always better">
+Grover's algorithm needs the right number of iterations, not simply "more" — run it past the optimum and the success probability doesn't plateau, it swings back down.
+</LessonHook>
+
 ## Motivation
 
 The last lesson showed both Grover building blocks are reflections, and
@@ -53,6 +57,10 @@ optimal number of iterations to run. Primary source: L. K. Grover, "A
 Fast Quantum Mechanical Algorithm for Database Search," in *Proceedings
 of the 28th Annual ACM Symposium on Theory of Computing (STOC '96)*,
 pp. 212–219 (1996), also available as arXiv:quant-ph/9605043.
+
+<ResearchConnection title="A Fast Quantum Mechanical Algorithm for Database Search" source="L. K. Grover, STOC '96 (1996)" url="https://arxiv.org/abs/quant-ph/9605043">
+The original paper deriving the algorithm this lesson turns into an exact closed-form success probability: quadratic speedup over classical unstructured search, from a fixed rotation angle applied once per query.
+</ResearchConnection>
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Measuring_a_qubit_leaves_no_room_for_error.jpg/1280px-Measuring_a_qubit_leaves_no_room_for_error.jpg"
@@ -96,9 +104,18 @@ Starting at $|s\rangle=\cos\theta|\alpha\rangle+\sin\theta|\beta\rangle$
 and rotating by $2\theta$ per iteration, after $k$ iterations the state is
 at angle $(2k+1)\theta$ from $|\alpha\rangle$:
 
+<EquationReveal
+  terms={[
+    { id: "k", symbol: "k", gloss: "The number of Grover iterations run so far." },
+    { id: "theta", symbol: "θ", gloss: "arcsin(1/√N) — the fixed angle each iteration rotates the state by (as 2θ)." },
+    { id: "alpha", symbol: "|α⟩", gloss: "The renormalized uniform superposition over all unmarked items." },
+    { id: "beta", symbol: "|β⟩", gloss: "The marked item being searched for." },
+  ]}
+>
 $$
 \boxed{\text{state after }k\text{ iterations} = \cos\big((2k+1)\theta\big)|\alpha\rangle + \sin\big((2k+1)\theta\big)|\beta\rangle}
 $$
+</EquationReveal>
 
 so the probability of measuring the marked item is exactly
 
@@ -160,6 +177,15 @@ needs the *right* number of iterations, not simply "more."
   <LazyGroverExplorer />
 </InteractiveSection>
 
+The rotation-plane view above and the full explorer both show the same
+overshoot; here is the third view, every basis state's own probability
+bar, swept past the optimal iteration count on purpose so the marked
+bar's rise and its fall are both visible in the same control:
+
+<InteractiveSection title="Watch the marked bar rise, peak, and fall" description="Step through real Grover iterations, several past the optimal count. The marked state's bar climbs toward its peak then swings back down — the same sin²((2k+1)θ) periodicity as the closed form, now read directly off a probability bar instead of a rotation angle.">
+  <GroverAmplitudeSweep n={4} markedIndices={[5]} ariaLabel="Grover amplitude amplification over iterations for N=16, showing the marked state's probability rise past its peak then fall back down as iterations continue past the optimum." />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 Grover's speedup comes entirely from geometry: a fixed rotation angle
@@ -183,7 +209,7 @@ exactly the continuous optimum for $N=16$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming Grover's algorithm always finds the marked item with
 certainty.** Only when the continuous optimum happens to land on an
 integer iteration count. In general there's a rounding gap, typically
@@ -191,7 +217,7 @@ leaving success probability in the mid-90s to high-90s percent rather than
 exactly 100%, still overwhelmingly likely, not guaranteed.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Running extra iterations "to be safe."** Past the optimum, success
 probability *decreases* (the rotation overshoots), not saturates: running
 significantly more iterations than optimal can make the algorithm
@@ -230,6 +256,7 @@ substantially worse, not better.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next, the capstone: [Comparing Quantum Advantage](/lessons/quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage), which places
 Deutsch-Jozsa's exponential separation and Grover's quadratic one side by
 side, with an honest look at what each does and doesn't prove.
@@ -240,3 +267,4 @@ proves exactly what this lesson's optimal iteration count establishes
 (and doesn't establish): the BBBV lower bound that makes Grover's
 algorithm provably optimal for unstructured black-box search
 specifically, not a blanket claim about quantum search in general.
+</NextDiscovery>

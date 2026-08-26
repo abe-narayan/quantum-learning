@@ -221,7 +221,7 @@ export function BlochSphereCanvas({
       tabIndex={0}
       aria-label={`Bloch sphere with the qubit state vector at approximately x=${blochPoint.x.toFixed(2)}, y=${blochPoint.y.toFixed(2)}, z=${blochPoint.z.toFixed(2)}. Drag, or focus and use the arrow keys, to rotate the view.`}
       className={cn(
-        "touch-none select-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "touch-none select-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         isDragging ? "cursor-grabbing" : "cursor-grab",
         className
       )}
@@ -233,7 +233,7 @@ export function BlochSphereCanvas({
     >
       <defs>
         <linearGradient id="bloch-vector-live" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" style={{ stopColor: "var(--brand)" }} />
+          <stop offset="0%" style={{ stopColor: "var(--pillar-accent)" }} />
           <stop offset="100%" style={{ stopColor: "var(--accent)" }} />
         </linearGradient>
       </defs>
@@ -302,7 +302,7 @@ export function BlochSphereCanvas({
           cy={vector.sy}
           r={7}
           className="animate-ping motion-reduce:animate-none"
-          style={{ fill: "var(--brand)" }}
+          style={{ fill: "var(--pillar-accent)" }}
           aria-hidden="true"
         />
       ) : null}

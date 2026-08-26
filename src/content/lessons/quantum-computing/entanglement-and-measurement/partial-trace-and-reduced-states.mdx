@@ -57,11 +57,13 @@ export const partialTracePresets = [
   { label: "ψ(θ) = cosθ|00⟩ + sinθ|11⟩", frames: psiThetaFrames, sliderLabel: "θ" },
 ];
 
+<LessonHook eyebrow="Why this matters">
+This is the payoff lesson for a question this course has been building toward since its very first paragraph: for a 2-qubit state, what is the state of qubit 0 alone?
+</LessonHook>
+
 ## Motivation
 
-This is the payoff lesson for a question this course has been building
-toward since its very first paragraph: for a 2-qubit state, what is the
-state of qubit 0 *alone*? Multi-Qubit State Vectors showed a state
+Multi-Qubit State Vectors showed a state
 vector has no answer whenever the qubits are entangled. The density
 matrix, unlike the state vector, can answer this, via an operation
 called the **partial trace**, which this lesson derives from a single,
@@ -233,14 +235,14 @@ maximally mixed, same as $|\Phi^+\rangle$'s reduced states.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Tracing out the wrong qubit.** `partialTrace(rho, 2, [1])` traces out
 qubit 1, leaving qubit 0's reduced state. The argument names *which
 qubit disappears*, not which one you keep. Mixing this up silently
 swaps $\rho_A$ and $\rho_B$ whenever the two aren't equal.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Expecting the partial trace to "reveal" a hidden pure state.** For an
 entangled global state, $\rho_A$ is genuinely mixed; there is no pure
 state it's secretly hiding. The mixedness is real, not a computational
@@ -281,7 +283,9 @@ artifact.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Why Entangled Subsystems Are Mixed](/lessons/quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed), which takes the striking
 fact from today's last example, a pure global state with a mixed
 local state, and proves it's not a special property of Bell states, but
 a necessary consequence of entanglement itself.
+</NextDiscovery>

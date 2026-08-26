@@ -13,7 +13,7 @@ const HEIGHT = 180;
  */
 export function HardwarePlatformSchematic({ variant, ariaLabel }: { variant: HardwarePlatformVariant; ariaLabel: string }) {
   return (
-    <div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {variant === "superconducting" && <SuperconductingSchematic />}
         {variant === "trapped-ion" && <TrappedIonSchematic />}

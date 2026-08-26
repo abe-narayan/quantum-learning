@@ -6,7 +6,7 @@ export const relativeEntropyNearPure: NumericProblem = {
     title: "Relative Entropy for a Nearly Pure State vs. the Maximally Mixed State",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["relative-entropy", "klein-inequality"],

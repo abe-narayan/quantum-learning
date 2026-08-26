@@ -13,7 +13,7 @@ export const resourceEstimationCodeDistanceForTighterBudget: NumericProblem = {
     title: "Code Distance for a Smaller Toy Circuit",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["resource-estimation", "code-distance", "surface-codes", "threshold-theorem"],

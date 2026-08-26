@@ -128,9 +128,16 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Welcome to Apex">
+  A quantum computer can only ever run unitary operations natively — yet
+  the algorithms that matter most want to apply projectors, inverses, and
+  Green's functions, none of which are unitary. One idea, from roughly
+  2016–2019, dissolves that entire obstruction at once.
+</LessonHook>
+
 ## Motivation
 
-Welcome to APEX. Every earlier pillar built toward a specific competence: Quantum Mechanics gave the postulates, Quantum Computing gave the gate model and its headline algorithms, Quantum Hardware and Quantum Software gave the physical and compilation realities underneath them, and Quantum Mastery gave the graduate mathematics — spectral theory, information theory, and, in the lesson directly before this one, a fully derived error bound for Trotterized Hamiltonian simulation. APEX is the summit: the research-frontier techniques that everything below it was actually building toward, starting with the single idea that has reorganized quantum algorithms research since roughly 2016–2019.
+Every earlier pillar built toward a specific competence: Quantum Mechanics gave the postulates, Quantum Computing gave the gate model and its headline algorithms, Quantum Hardware and Quantum Software gave the physical and compilation realities underneath them, and Quantum Mastery gave the graduate mathematics — spectral theory, information theory, and, in the lesson directly before this one, a fully derived error bound for Trotterized Hamiltonian simulation. APEX is the summit: the research-frontier techniques that everything below it was actually building toward, starting with the single idea that has reorganized quantum algorithms research since roughly 2016–2019.
 
 The immediately preceding lesson simulated $e^{-iHt}$ by chopping time into $n$ small steps and applying each local piece of $H$ in sequence, paying a quantified $O(1/n)$ price in accuracy for every noncommuting pair of terms. That construction is powerful, but narrow in a specific sense: it only ever produces a *unitary* — a time-evolution operator — because $e^{-iHt}$ is always unitary for Hermitian $H$. Enormous swaths of quantum algorithms, though, want to apply something that *isn't* unitary at all: a projector, a non-Hermitian matrix, a Green's function, a covariance matrix, the inverse $H^{-1}$ that a linear-systems solver needs. A quantum computer's native operations are all unitary, so none of these can be applied directly.
 
@@ -151,9 +158,18 @@ Block encoding is the general answer: embed an *arbitrary* matrix $A$ — not ne
 
 Let $A$ be an $s\times s$ matrix with operator norm $\|A\|\leq1$ (a normalization requirement explained below — it can always be arranged by rescaling $A$). A unitary $U$ acting on a "system" register (holding $A$'s $s$ dimensions) plus an "ancilla" register is a **block encoding of $A$** if
 
+<EquationReveal
+  terms={[
+    { id: "U", symbol: "U", gloss: "The unitary a quantum computer can actually run — acting on both the system register and an ancilla register." },
+    { id: "A", symbol: "A", gloss: "The target matrix, not necessarily unitary, being embedded inside U." },
+    { id: "anc", symbol: "|0⟩_anc", gloss: "The ancilla register, post-selected on the all-zero state — the condition under which U's action reduces to A." },
+    { id: "I", symbol: "I_sys", gloss: "The identity on the system register — A acts there, untouched by the ancilla projection." },
+  ]}
+>
 $$
 \big(\langle0|_{\text{anc}}\otimes I_{\text{sys}}\big)\,U\,\big(|0\rangle_{\text{anc}}\otimes I_{\text{sys}}\big) = A .
 $$
+</EquationReveal>
 
 Equivalently: write $U$ in block form, splitting its rows and columns according to whether the ancilla register is $|0\cdots0\rangle$ or anything else. Then $A$ is *exactly* the top-left block of that decomposition:
 
@@ -207,17 +223,25 @@ $$
 
 </TheoremBox>
 
-**Proof.** Track $|0\rangle_{\text{anc}}|\psi\rangle_{\text{sys}}$ through the three stages:
+**Proof.** Track $|0\rangle_{\text{anc}}|\psi\rangle_{\text{sys}}$ through the three stages.
 
+<DerivationSteps>
+<DerivationStep annotation="Apply PREPARE⊗I, then SELECT, to the input state.">
 $$
-|0\rangle_{\text{anc}}|\psi\rangle \xrightarrow{\ \text{PREPARE}\otimes I\ } \sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}|i\rangle|\psi\rangle \xrightarrow{\ \text{SELECT}\ } \sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}|i\rangle\big(U_i|\psi\rangle\big).
+|0\rangle_{\text{anc}}|\psi\rangle \xrightarrow{\ \text{PREPARE}\otimes I\ } \sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}|i\rangle|\psi\rangle \xrightarrow{\ \text{SELECT}\ } \sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}|i\rangle\big(U_i|\psi\rangle\big)
 $$
-
-Applying $\text{PREPARE}^\dagger\otimes I$ and projecting onto $\langle0|_{\text{anc}}$ picks out $\langle0|\text{PREPARE}^\dagger|i\rangle$ for each term. Since $\text{PREPARE}|0\rangle=\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,|j\rangle$, taking the adjoint gives $\langle0|\text{PREPARE}^\dagger=\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,\langle j|$, so $\langle0|\text{PREPARE}^\dagger|i\rangle=\sqrt{\alpha_i/\|\alpha\|_1}$ by orthonormality of the computational basis. The full amplitude is therefore
-
+</DerivationStep>
+<DerivationStep annotation="Apply PREPARE†⊗I and project onto ⟨0|_anc. Since PREPARE|0⟩ = Σⱼ√(αⱼ/‖α‖₁)|j⟩, the adjoint gives ⟨0|PREPARE† = Σⱼ√(αⱼ/‖α‖₁)⟨j|, so orthonormality of the computational basis picks out ⟨0|PREPARE†|i⟩ = √(αᵢ/‖α‖₁) — exactly one term per i, nothing mixed in from the others.">
 $$
-\sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\cdot\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\,U_i|\psi\rangle = \sum_i\frac{\alpha_i}{\|\alpha\|_1}U_i|\psi\rangle = \frac{A}{\|\alpha\|_1}|\psi\rangle. \qquad\blacksquare
+\langle0|\text{PREPARE}^\dagger|i\rangle=\sqrt{\alpha_i/\|\alpha\|_1}
 $$
+</DerivationStep>
+<DerivationStep annotation="Multiply the two square-root factors — one from PREPARE, one from PREPARE† — and sum over i. The result is exactly A/‖α‖₁ applied to |ψ⟩.">
+$$
+\sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\cdot\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\,U_i|\psi\rangle = \sum_i\frac{\alpha_i}{\|\alpha\|_1}U_i|\psi\rangle = \frac{A}{\|\alpha\|_1}|\psi\rangle
+$$
+</DerivationStep>
+</DerivationSteps>
 
 This is not merely close to a block encoding — it is one, exactly, by the definition above, of $A/\|\alpha\|_1$. When $\|\alpha\|_1=1$ (as in the worked example below), $U$ block-encodes $A$ itself with no extra rescaling.
 
@@ -226,6 +250,12 @@ This is not merely close to a block encoding — it is one, exactly, by the defi
 Nothing about SELECT or PREPARE "knows" what $A$ means physically — the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register actually ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is exactly what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
 
 ## Why This Matters
+
+<InsightBlock>
+  Block encodings turn "I have a matrix" into "I have a circuit" — the
+  translation step that every later Apex construction (QSP, QSVT,
+  amplitude estimation, linear-systems solving) is built on top of.
+</InsightBlock>
 
 Block encodings are now the standard *input model* underlying essentially the entire modern quantum-algorithms literature for linear-algebra-flavored problems. Rather than each paper inventing its own bespoke circuit for its own specific matrix, the field has converged on a two-step separation of concerns: (1) show that a block encoding of whatever operator you care about can be built (LCU is one way; there are others, like sparse-access oracles), then (2) invoke a *generic* algorithm — most importantly Quantum Signal Processing and its generalization, the Quantum Singular Value Transformation (QSVT) — that takes any block encoding as a black box and applies an essentially arbitrary polynomial transformation to the singular values of the encoded matrix. Hamiltonian simulation, quantum linear-systems solvers (HHL and its more modern QSVT-based successors), several quantum-machine-learning proposals, and Gibbs-state preparation are all, as of the mid-2020s, phrased as "assume a block encoding of $X$, then apply QSVT with polynomial $p$" rather than as separately engineered circuits. This lesson's PREPARE–SELECT–PREPARE$^\dagger$ construction is the concrete mechanism that step (1) most often reduces to, and is the direct prerequisite for this course's own upcoming *Quantum Signal Processing* lesson, which is step (2).
 
@@ -241,7 +271,7 @@ $$
 \lambda_\pm = \frac{a+d}{2}\pm\sqrt{\Big(\frac{a-d}{2}\Big)^2+b^2} = 0\pm\sqrt{0.5^2+0.5^2} = \pm\frac{1}{\sqrt2}\approx\pm0.707107,
 $$
 
-computed directly from $A$'s actual entries ($a=d=0$... more precisely $a=0.5,\,d=-0.5,\,b=0.5$ read off the matrix above), giving $\lambda_\pm\approx\pm0.707107$, both within $[-1,1]$, confirming $\|A\|=\max|\lambda_\pm|\approx0.707107\leq1$ as required.
+computed directly from $A$'s actual entries ($a=0.5,\,d=-0.5,\,b=0.5$ read off the matrix above), giving $\lambda_\pm\approx\pm0.707107$, both within $[-1,1]$, confirming $\|A\|=\max|\lambda_\pm|\approx0.707107\leq1$ as required.
 
 **PREPARE.** With $\alpha_0=\alpha_1=\tfrac12$, $\sqrt{\alpha_i/\|\alpha\|_1}=\sqrt{1/2}$ for both $i$, so PREPARE is exactly a single Hadamard on the one ancilla qubit ($\lceil\log_22\rceil=1$ qubit suffices): $H|0\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, matching the required amplitudes exactly.
 
@@ -282,11 +312,11 @@ Every input gives exactly $0.5$ — not a coincidence, but a consequence of this
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Thinking the success probability of a block encoding is generically $1/2$, because that's what this lesson's worked example gave.** It isn't. This example's constant $0.5$ success probability, for *every* input state, is a direct consequence of the specific algebraic fact $A^2=\tfrac12I$ (since $X$ and $Z$ anticommute) — verified directly above, not assumed. A generic block-encoded $A$ has a success probability $\|A|\psi\rangle\|^2$ that depends on $|\psi\rangle$ and can be arbitrarily close to $0$, which is exactly why amplitude amplification is a standard companion technique to block encodings in practice, not an optional add-on.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing the normalization $\|A\|\leq1$ requirement with $A$ needing to be a probability, a density matrix, or otherwise "already normalized" in some physical sense.** It's purely a linear-algebra requirement: a matrix can only sit as a sub-block of a unitary if its operator norm doesn't exceed $1$, since every entry (and more strongly every singular value) of a unitary matrix is bounded by $1$. If a matrix of interest has $\|A\|=c>1$, block-encode $A/c$ instead and remember to multiply results by $c$ afterward — a bookkeeping step, not evidence the technique doesn't apply.
 </Callout>
 
@@ -307,9 +337,11 @@ Every input gives exactly $0.5$ — not a coincidence, but a consequence of this
 
 ## Further Exploration
 
-Next: [Quantum Signal Processing](/lessons/apex/algorithmic-frontiers/quantum-signal-processing),
-which takes the block encoding built here as a black box and shows how a
-sequence of single-qubit rotations interleaved with calls to it can apply an
-essentially arbitrary polynomial transformation to $A$'s eigenvalues (or
-singular values, in the non-Hermitian case) — the generic engine that this
-lesson's "why this matters" section named as the field's second half.
+<NextDiscovery>
+  Next: [Quantum Signal Processing](/lessons/apex/algorithmic-frontiers/quantum-signal-processing),
+  which takes the block encoding built here as a black box and shows how a
+  sequence of single-qubit rotations interleaved with calls to it can apply an
+  essentially arbitrary polynomial transformation to $A$'s eigenvalues (or
+  singular values, in the non-Hermitian case) — the generic engine that this
+  lesson's "why this matters" section named as the field's second half.
+</NextDiscovery>

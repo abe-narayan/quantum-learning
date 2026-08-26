@@ -89,6 +89,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="From inspection to a theorem">
+  Whether a transition can happen at all — no integral computed — turns
+  out to be a question symmetry alone can answer, once the recursion
+  behind Clebsch-Gordan coefficients is generalized into the
+  Wigner-Eckart theorem.
+</LessonHook>
+
 ## Motivation
 
 Addition of Angular Momentum combined two spin-$\tfrac12$ particles by
@@ -110,6 +117,14 @@ from symmetry alone.
   license="Public domain"
 />
 
+<HistoricalMoment date="1927">
+  Eugene Wigner proves the theorem this lesson derives: that any
+  spherical tensor operator's matrix elements between angular-momentum
+  eigenstates factor into a Clebsch-Gordan coefficient carrying all the
+  angular dependence, times a single reduced matrix element carrying all
+  the operator-specific physics.
+</HistoricalMoment>
+
 ## Mathematical Development
 
 ### The general recursion
@@ -121,14 +136,31 @@ left side uses the ordinary single-$j$ ladder formula (Ladder Operators
 and the Angular Momentum Spectrum); the right side distributes over the
 product states, each factor lowering independently:
 
+<DerivationSteps>
+  <DerivationStep annotation="Apply J₋ = J₁₋ + J₂₋ to both sides of the coupling expansion. The left side reduces to the ordinary single-j ladder formula acting on the coupled state |j,m⟩ — the coefficient one step down in m.">
+
 $$
-\sqrt{j(j+1)-m(m-1)}\;C^{j,m-1}_{j_1m_1;j_2m_2} =
-\sqrt{j_1(j_1+1)-m_1(m_1+1)}\;C^{j,m}_{j_1,m_1+1;j_2m_2} +
-\sqrt{j_2(j_2+1)-m_2(m_2+1)}\;C^{j,m}_{j_1m_1;j_2,m_2+1}
+\sqrt{j(j+1)-m(m-1)}\;C^{j,m-1}_{j_1m_1;j_2m_2}
 $$
 
-(obtained by matching the coefficient of $|j_1,m_1\rangle|j_2,m_2\rangle$
-on both sides after the ladder action). This single relation, applied
+  </DerivationStep>
+  <DerivationStep annotation="On the right, J₁₋ lowers only the j1 factor of the product state. This term is the coupled-state coefficient before lowering, with j1's magnetic number one higher.">
+
+$$
+{}=\sqrt{j_1(j_1+1)-m_1(m_1+1)}\;C^{j,m}_{j_1,m_1+1;j_2m_2}
+$$
+
+  </DerivationStep>
+  <DerivationStep annotation="J₂₋ lowers only the j2 factor — the second right-hand term, with j2's magnetic number one higher, obtained by matching the coefficient of |j1,m1⟩|j2,m2⟩ on both sides after the ladder action.">
+
+$$
+{}+\sqrt{j_2(j_2+1)-m_2(m_2+1)}\;C^{j,m}_{j_1m_1;j_2,m_2+1}
+$$
+
+  </DerivationStep>
+</DerivationSteps>
+
+This single relation, applied
 repeatedly, generates every coefficient within a fixed $j$ multiplet from
 one known starting point.
 
@@ -155,16 +187,30 @@ term with the largest $m_1$ is taken real and positive.
 ### Worked example: l=1⊗s=1/2
 
 Apply this by hand to $j_1=1,j_2=\tfrac12$ (an orbital electron's $l=1$
-coupled to its spin, six total states). Top state:
-$|\tfrac32,\tfrac32\rangle=|1,1\rangle|\tfrac12,\tfrac12\rangle$.
-Lowering with $J_-=L_-+S_-$: the left side gives
-$\sqrt{\tfrac32\cdot\tfrac52-\tfrac32\cdot\tfrac12}=\sqrt3$; the right
-side gives $\sqrt{1\cdot2-1\cdot0}\,|1,0\rangle|\tfrac12,\tfrac12\rangle+\sqrt{\tfrac12\cdot\tfrac32-\tfrac12\cdot(-\tfrac12)}\,|1,1\rangle|\tfrac12,-\tfrac12\rangle=\sqrt2\,|1,0;\tfrac12,\tfrac12\rangle+|1,1;\tfrac12,-\tfrac12\rangle$.
-Dividing by $\sqrt3$:
+coupled to its spin, six total states).
 
-$$
-\left|\tfrac32,\tfrac12\right\rangle = \sqrt{\tfrac23}\,\left|1,0\right\rangle\left|\tfrac12,\tfrac12\right\rangle + \sqrt{\tfrac13}\,\left|1,1\right\rangle\left|\tfrac12,-\tfrac12\right\rangle
-$$
+<DerivationSteps>
+  <DerivationStep annotation="The top state is unique: only one product state has m = j1+j2, so no recursion is needed to identify it.">
+    $$
+    \left|\tfrac32,\tfrac32\right\rangle=\left|1,1\right\rangle\left|\tfrac12,\tfrac12\right\rangle
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Apply J₋ = L₋ + S₋. The left side uses the ordinary single-j ladder formula.">
+    $$
+    \sqrt{\tfrac32\cdot\tfrac52-\tfrac32\cdot\tfrac12}=\sqrt3
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="The right side distributes over the two product-state terms, each factor lowering independently.">
+    $$
+    \sqrt{1\cdot2-1\cdot0}\,\left|1,0\right\rangle\left|\tfrac12,\tfrac12\right\rangle+\sqrt{\tfrac12\cdot\tfrac32-\tfrac12\cdot(-\tfrac12)}\,\left|1,1\right\rangle\left|\tfrac12,-\tfrac12\right\rangle=\sqrt2\,\left|1,0;\tfrac12,\tfrac12\right\rangle+\left|1,1;\tfrac12,-\tfrac12\right\rangle
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Divide both sides by √3, the left-side ladder normalization from the previous step.">
+    $$
+    \left|\tfrac32,\tfrac12\right\rangle = \sqrt{\tfrac23}\,\left|1,0\right\rangle\left|\tfrac12,\tfrac12\right\rangle + \sqrt{\tfrac13}\,\left|1,1\right\rangle\left|\tfrac12,-\tfrac12\right\rangle
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
 The **orthogonal** combination of the same two product states
 ($|1,1\rangle|\tfrac12,-\tfrac12\rangle$ and
@@ -267,6 +313,12 @@ automatically, with zero additional calculation.
 
 ## Physical Interpretation
 
+<InsightBlock>
+  Whether a transition is allowed is a symmetry question, answerable from
+  Clebsch-Gordan vanishing conditions alone — no radial integral has to
+  be evaluated to know a transition is forbidden.
+</InsightBlock>
+
 Hydrogen's electric dipole operator $\vec r$ has three spherical
 components that transform exactly as $Y_1^q$, i.e. as a rank-$1$ ($k=1$)
 tensor. Wigner-Eckart immediately gives $\Delta m=q\in\{0,\pm1\}$ and
@@ -298,7 +350,7 @@ the recursion derivation itself).
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming Wigner-Eckart says a matrix element equals the CG
 coefficient.** It says the matrix element is *proportional* to the CG
 coefficient, with an operator-and-$j,j'$-dependent (but
@@ -307,7 +359,7 @@ Two different rank-$1$ operators between the same $j,j'$ have matrix
 elements in the *same ratios* across $m,m',q$, not identical values.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Concluding $\Delta l=\pm1$ from Wigner-Eckart/CG alone.** The
 triangle rule alone permits $\Delta l\in\{-1,0,+1\}$ for a rank-1
 operator; excluding $\Delta l=0$ specifically requires the separate
@@ -347,7 +399,9 @@ parity argument above, not an extra CG vanishing condition.
 
 ## Further Exploration
 
-Next: [The Adiabatic Theorem and Berry Phase](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase),
-returning to the same spin-$\tfrac12$ machinery this course has used
-twice now, this time watching it evolve slowly in time rather than
-combine with another angular momentum.
+<NextDiscovery>
+  Next: [The Adiabatic Theorem and Berry Phase](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase),
+  returning to the same spin-$\tfrac12$ machinery this course has used
+  twice now, this time watching it evolve slowly in time rather than
+  combine with another angular momentum.
+</NextDiscovery>

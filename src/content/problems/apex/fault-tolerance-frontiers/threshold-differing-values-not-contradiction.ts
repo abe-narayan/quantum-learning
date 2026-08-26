@@ -6,7 +6,7 @@ export const thresholdDifferingValuesNotContradiction: ConceptualProblem = {
     title: "Why Threshold Theorems Quote Different Numbers",
     course: "fault-tolerance-frontiers",
     lesson: "apex/fault-tolerance-frontiers/the-threshold-theorem",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "conceptual",
     tags: ["threshold-theorem", "surface-codes", "concatenated-codes"],

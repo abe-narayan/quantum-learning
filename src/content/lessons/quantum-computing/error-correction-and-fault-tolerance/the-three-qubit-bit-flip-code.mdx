@@ -30,14 +30,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="The smallest code that catches it">
+A stray interaction flips a qubit's |0⟩ to |1⟩ or back, and unless something catches it, everything computed downstream is simply wrong — using nothing beyond CNOT and partial measurement, this lesson builds a code that catches it.
+</LessonHook>
+
 ## Motivation
 
-Bit flips happen: a stray interaction flips a qubit's $|0\rangle$ to
-$|1\rangle$ or back, and unless something catches it, everything computed
-downstream is simply wrong. This lesson builds the smallest code that
+Bit flips happen. This lesson builds the smallest code that
 catches it: protection against a single $X$ (bit-flip) error on any one
-of three physical qubits, using nothing beyond CNOT and partial
-measurement, both already fully built and tested on this platform.
+of three physical qubits — CNOT and partial
+measurement, both already fully built and tested on this platform, are
+all it needs.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/4_Qubit_Chip%2C_10.1103.PhysRevX.5.021027_%28A._Wallraff%2C_2015%29.png/1280px-4_Qubit_Chip%2C_10.1103.PhysRevX.5.021027_%28A._Wallraff%2C_2015%29.png"
@@ -143,14 +146,14 @@ confirmed by direct engine computation to floating-point precision.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Measuring the data qubits directly to check for errors.** This would
 collapse $\alpha|000\rangle+\beta|111\rangle$ to either $|000\rangle$ or
 $|111\rangle$ outright, destroying the encoded superposition, exactly
 what syndrome extraction is built to avoid.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting this code to correct a phase-flip ($Z$) error.** It doesn't.
 A $Z$ error on any data qubit leaves every parity unchanged (the
 relative sign between $|000\rangle$ and $|111\rangle$ isn't something
@@ -188,6 +191,8 @@ exactly this case.
 
 ## Further Exploration
 
+<NextDiscovery>
 [The Three-Qubit Phase-Flip Code](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-phase-flip-code) is the dual construction: identical
 machinery, conjugated by Hadamard, protecting against exactly the error
 type this lesson's code misses.
+</NextDiscovery>

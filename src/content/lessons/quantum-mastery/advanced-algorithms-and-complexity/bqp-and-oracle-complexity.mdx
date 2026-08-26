@@ -60,6 +60,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Query complexity is not time complexity">
+  A quantum algorithm can be provably, exponentially faster at asking an
+  oracle questions and still leave open whether quantum computers are
+  faster at solving problems at all — $\mathsf{BPP} = \mathsf{BQP}$
+  remains unproven either way.
+</LessonHook>
+
 ## Motivation
 
 The Quantum Algorithms II capstone closed with a three-way taxonomy of
@@ -164,13 +171,15 @@ standard): query $f$ at $O(1)$ random points. If $f$ is constant, every
 query agrees. If $f$ is balanced, the probability all $k$ random queries
 happen to agree is $2^{-(k-1)}$, exponentially small in $k$, so a
 constant number of random queries already gives bounded-error success.
-**The exponential gap exists only in the exact query model and vanishes
-entirely once bounded error is allowed on the classical side.** This is
-the precise content behind this course's earlier label "promise-dependent
-exponential": it isn't just that the promise is contrived, it's that the
-entire separation is an artifact of demanding classical *certainty*,
-which quantum interference doesn't need any more of than randomization
-does.
+<InsightBlock>
+  The exponential gap exists only in the exact query model and vanishes
+  entirely once bounded error is allowed on the classical side. This is
+  the precise content behind this course's earlier label
+  "promise-dependent exponential": it isn't just that the promise is
+  contrived, it's that the entire separation is an artifact of demanding
+  classical *certainty*, which quantum interference doesn't need any
+  more of than randomization does.
+</InsightBlock>
 
 ### Simon's algorithm: a separation that survives randomization
 
@@ -204,16 +213,19 @@ world, and consistent with $\mathsf{BPP}\neq\mathsf{BQP}$. It doesn't
 resolve, or even provide direct evidence toward, either answer for
 concrete, explicitly-given problems.
 
-**What these results do establish, precisely:** a fully rigorous,
-unconditional fact about information-theoretic query complexity: that
-quantum interference can extract certain global properties of a
-black-box function using provably fewer queries than any classical
-strategy, randomized or not. That's real mathematics and the historical
-origin of confidence that quantum computers might be more powerful in
-general (Simon's result directly inspired Shor's algorithm's structure).
-**What they don't establish:** anything about $\mathsf{BPP}$ vs.
-$\mathsf{BQP}$ for ordinary, structured, explicitly-given computational
-problems: the actual, still-open question.
+<InsightBlock>
+  What these results do establish, precisely: a fully rigorous,
+  unconditional fact about information-theoretic query complexity —
+  that quantum interference can extract certain global properties of a
+  black-box function using provably fewer queries than any classical
+  strategy, randomized or not. That's real mathematics and the
+  historical origin of confidence that quantum computers might be more
+  powerful in general (Simon's result directly inspired Shor's
+  algorithm's structure). What they don't establish: anything about
+  $\mathsf{BPP}$ vs. $\mathsf{BQP}$ for ordinary, structured,
+  explicitly-given computational problems — the actual, still-open
+  question.
+</InsightBlock>
 
 ### Grover's algorithm and the BBBV bound: optimal at what, exactly
 
@@ -237,14 +249,29 @@ and Weaknesses of Quantum Computing," *SIAM J. Comput.* **26**(5),
 
 *Sketch of the lower bound's mechanism (the "hybrid" method, cited from
 BBBV rather than fully reproduced; the full proof is a serious piece of
-technical analysis on its own):* compare the algorithm's state after $T$
-queries when the oracle marks item $x$ against its state when the oracle
-marks nothing at all. Each individual query can only change this
-comparison by an amount bounded by the algorithm's amplitude on $|x\rangle$
-just before that query; averaging this bound over all $N$ choices of $x$
-(via Cauchy-Schwarz) and summing over $T$ queries shows the total
-distinguishing power after $T$ queries is $O(T/\sqrt N)$. Certainty
-requires this to be $\Omega(1)$, forcing $T=\Omega(\sqrt N)$.
+technical analysis on its own):*
+
+<DerivationSteps>
+  <DerivationStep annotation="Sets up the comparison the whole bound rests on.">
+    Compare the algorithm's state after $T$ queries when the oracle
+    marks item $x$ against its state when the oracle marks nothing at
+    all.
+  </DerivationStep>
+  <DerivationStep annotation="Bounds how much a single query can possibly help distinguish the two cases.">
+    Each individual query can only change this comparison by an amount
+    bounded by the algorithm's amplitude on $|x\rangle$ just before that
+    query.
+  </DerivationStep>
+  <DerivationStep annotation="Cauchy-Schwarz turns the per-query, per-x bound into one bound on the total distinguishing power.">
+    Averaging this bound over all $N$ choices of $x$ and summing over
+    $T$ queries shows the total distinguishing power after $T$ queries
+    is $O(T/\sqrt N)$.
+  </DerivationStep>
+  <DerivationStep annotation="Succeeding with bounded error needs that distinguishing power to be an actual constant, not something shrinking as $N$ grows.">
+    Certainty requires this to be $\Omega(1)$, forcing $T=\Omega(\sqrt
+    N)$.
+  </DerivationStep>
+</DerivationSteps>
 
 **What BBBV establishes:** no quantum algorithm, however clever, can
 search an *unstructured* $N$-item space (one where the only access to
@@ -341,7 +368,7 @@ quantum resource involved at all.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Treating an oracle separation as proof that $\mathsf{BPP}\neq\mathsf{BQP}$.**
 Simon's algorithm's gap is a genuine, rigorous, *unconditional* fact,
 but unconditional within the query-complexity model relative to a
@@ -350,7 +377,7 @@ means no argument of this shape can resolve the un-relativized question,
 which remains open.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Reading "Grover's algorithm is provably optimal" as "no quantum
 algorithm ever beats classical for search-like problems."** BBBV's bound
 is specific to *unstructured*, black-box search. Concrete, structured
@@ -406,3 +433,9 @@ Next: [Hamiltonian Simulation and Trotterization](/lessons/quantum-mastery/advan
 where the course turns from what's provably true about query complexity
 to what's provably true, with a real, derived error bound, about
 simulating physical time evolution itself.
+
+<NextDiscovery>
+  Next: the course turns from what's provably true about query
+  complexity to what's provably true, with a real, derived error bound,
+  about simulating physical time evolution itself.
+</NextDiscovery>

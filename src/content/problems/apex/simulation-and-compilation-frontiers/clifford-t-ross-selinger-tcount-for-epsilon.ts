@@ -12,7 +12,7 @@ export const cliffordTRossSelingerTCountForEpsilon: NumericProblem = {
     title: "Ross-Selinger-Style T-Count for ε = 10⁻⁶",
     course: "simulation-and-compilation-frontiers",
     lesson: "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["clifford-t", "t-count", "ross-selinger", "resource-estimation"],

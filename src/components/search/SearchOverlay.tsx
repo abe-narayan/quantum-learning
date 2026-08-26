@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import type { Pillar } from "@/lib/content/types";
+import { PILLAR_ORDER, PILLAR_VISUALS } from "@/lib/design/pillars";
 import { fetchSearchIndex } from "@/lib/search/fetchIndex";
 import type { SearchEntry, SearchEntryType } from "@/lib/search/types";
 import { cn } from "@/lib/utils";
@@ -16,6 +18,15 @@ const TYPE_LABELS: Record<SearchEntryType, string> = {
 
 const TYPE_ORDER: SearchEntryType[] = ["lesson", "problem", "simulator", "course"];
 const RESULTS_PER_GROUP = 6;
+
+// `null` stands for "no pillar" (most simulators, and any entry the index
+// doesn't tag) — its rank sorts after every real pillar so a kind group
+// reads curriculum-order-first, general-last.
+function pillarRank(pillar: Pillar | undefined): number {
+  if (!pillar) return PILLAR_ORDER.length;
+  const index = PILLAR_ORDER.indexOf(pillar);
+  return index === -1 ? PILLAR_ORDER.length : index;
+}
 
 type SearchOverlayProps = {
   onClose: () => void;
@@ -62,6 +73,13 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
     return Array.from(dialog.querySelectorAll<HTMLAnchorElement>("[data-search-result]"));
   }
 
+  // Two-level structure: grouped by kind (the primary split — a visitor
+  // searching mid-lesson almost always wants "Lessons" first), and within
+  // each kind, pillar-major ordered so the curriculum's own structure shows
+  // through rather than an arbitrary index order. `visible` is capped at
+  // RESULTS_PER_GROUP per kind (unchanged from before) so six pillars' worth
+  // of matches can't blow the panel out; `pillarBreaks` records which
+  // visible rows start a new pillar cluster, for the sub-headers below.
   const groups = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return [];
@@ -71,13 +89,29 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
           entry.type === type &&
           (entry.title.toLowerCase().includes(trimmed) || entry.description.toLowerCase().includes(trimmed))
       );
-      return { type, matches };
-    }).filter((group) => group.matches.length > 0);
+      if (matches.length === 0) return null;
+
+      const ordered = [...matches].sort((a, b) => pillarRank(a.pillar) - pillarRank(b.pillar));
+      const visible = ordered.slice(0, RESULTS_PER_GROUP);
+      const remaining = matches.length - visible.length;
+      const pillarBreaks = new Set<number>();
+      let previousPillar: Pillar | undefined;
+      visible.forEach((entry, i) => {
+        if (i === 0 || entry.pillar !== previousPillar) pillarBreaks.add(i);
+        previousPillar = entry.pillar;
+      });
+      // Only worth labelling sub-clusters when there's more than one pillar
+      // on screen — a single-pillar (or single "General") kind group reads
+      // fine as one flat list.
+      const showPillarLabels = pillarBreaks.size > 1;
+
+      return { type, visible, remaining, total: matches.length, pillarBreaks, showPillarLabels };
+    }).filter((group): group is NonNullable<typeof group> => group !== null);
   }, [index, query]);
 
   const hasQuery = query.trim().length > 0;
-  const hasResults = groups.some((group) => group.matches.length > 0);
-  const totalResults = groups.reduce((sum, group) => sum + group.matches.length, 0);
+  const hasResults = groups.length > 0;
+  const totalResults = groups.reduce((sum, group) => sum + group.total, 0);
 
   // Focus the input on open, restore focus to the trigger on close, and lock
   // background scroll while the overlay is up.
@@ -135,7 +169,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
       event.preventDefault();
       getResultLinks()[0]?.focus();
     } else if (event.key === "Enter") {
-      const firstMatch = groups[0]?.matches[0];
+      const firstMatch = groups[0]?.visible[0];
       if (firstMatch) {
         event.preventDefault();
         router.push(firstMatch.href);
@@ -172,7 +206,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Search QuantumLearn"
-        className="flex h-full w-full flex-col bg-surface sm:h-auto sm:max-h-[80vh] sm:max-w-xl sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
+        className="flex h-full w-full flex-col border-border bg-surface sm:h-auto sm:max-h-[80vh] sm:max-w-xl sm:rounded-[var(--radius-panel)] sm:border sm:shadow-2xl"
       >
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
           <svg
@@ -196,13 +230,13 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
             aria-label="Search lessons, problems, simulators, and courses"
             autoComplete="off"
             spellCheck={false}
-            className="min-w-0 flex-1 rounded-md bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand"
+            className="min-w-0 flex-1 rounded-[var(--radius-tight)] bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
           <button
             type="button"
             onClick={onClose}
             aria-label="Close search"
-            className="shrink-0 rounded-full px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-surface-muted hover:text-foreground"
+            className="shrink-0 rounded-[var(--radius-tight)] px-2 py-1 font-tech text-xs font-medium text-muted-foreground hover:bg-surface-muted hover:text-foreground"
           >
             Esc
           </button>
@@ -237,47 +271,78 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
             </p>
           ) : (
             <ul className="space-y-4">
-              {groups.map(({ type, matches }) => {
-                const visible = matches.slice(0, RESULTS_PER_GROUP);
-                const remaining = matches.length - visible.length;
-                return (
-                  <li key={type}>
-                    <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      {TYPE_LABELS[type]}
-                    </p>
-                    <ul>
-                      {visible.map((entry) => {
-                        return (
-                          <li key={`${entry.type}-${entry.href}-${entry.title}`}>
-                            <Link
-                              data-search-result
-                              href={entry.href}
-                              onClick={handleSelect}
-                              onKeyDown={handleResultKeyDown}
-                              className={cn(
-                                "block rounded-xl px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
-                                "hover:bg-surface-muted focus-visible:bg-surface-muted"
-                              )}
+              {groups.map(({ type, visible, remaining, total, pillarBreaks, showPillarLabels }) => (
+                <li key={type}>
+                  <p className="px-3 pb-1 font-tech text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                    {TYPE_LABELS[type]}
+                    <span className="ml-1.5 text-subtle-foreground">{total}</span>
+                  </p>
+                  <ul>
+                    {visible.map((entry, i) => {
+                      const visual = entry.pillar ? PILLAR_VISUALS[entry.pillar] : undefined;
+                      return (
+                        <li key={`${entry.type}-${entry.href}-${entry.title}`}>
+                          {showPillarLabels && pillarBreaks.has(i) ? (
+                            <p
+                              data-pillar={entry.pillar}
+                              className="px-3 pb-1 pt-2 font-tech text-[0.625rem] font-medium uppercase tracking-[0.1em] text-pillar-text first:pt-0"
                             >
+                              {visual?.short ?? "General"}
+                            </p>
+                          ) : null}
+                          <Link
+                            data-search-result
+                            href={entry.href}
+                            onClick={handleSelect}
+                            onKeyDown={handleResultKeyDown}
+                            className={cn(
+                              "flex items-start justify-between gap-3 rounded-[var(--radius-tight)] px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                              "hover:bg-surface-muted focus-visible:bg-surface-muted"
+                            )}
+                          >
+                            <span className="min-w-0">
                               <span className="block text-sm font-medium text-foreground">{entry.title}</span>
                               <span className="line-clamp-1 block text-xs text-muted-foreground">
                                 {entry.description}
                               </span>
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {remaining > 0 ? (
-                      <p className="px-3 pt-1 text-xs text-muted-foreground">
-                        +{remaining} more result{remaining === 1 ? "" : "s"}
-                      </p>
-                    ) : null}
-                  </li>
-                );
-              })}
+                            </span>
+                            {visual && !showPillarLabels ? (
+                              <span
+                                data-pillar={entry.pillar}
+                                className="mt-0.5 shrink-0 font-tech text-[0.625rem] font-medium uppercase tracking-[0.08em] text-pillar-text"
+                              >
+                                {visual.short}
+                              </span>
+                            ) : null}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {remaining > 0 ? (
+                    <p className="px-3 pt-1 text-xs text-muted-foreground">
+                      +{remaining} more result{remaining === 1 ? "" : "s"}
+                    </p>
+                  ) : null}
+                </li>
+              ))}
             </ul>
           )}
+        </div>
+
+        <div className="hidden items-center gap-4 border-t border-border px-4 py-2 font-tech text-[0.6875rem] uppercase tracking-[0.08em] text-subtle-foreground sm:flex">
+          <span className="flex items-center gap-1.5">
+            <kbd className="rounded-[calc(var(--radius-tight)-2px)] border border-border px-1.5 py-0.5">↑↓</kbd>
+            Navigate
+          </span>
+          <span className="flex items-center gap-1.5">
+            <kbd className="rounded-[calc(var(--radius-tight)-2px)] border border-border px-1.5 py-0.5">↵</kbd>
+            Open
+          </span>
+          <span className="flex items-center gap-1.5">
+            <kbd className="rounded-[calc(var(--radius-tight)-2px)] border border-border px-1.5 py-0.5">Esc</kbd>
+            Close
+          </span>
         </div>
       </div>
     </div>

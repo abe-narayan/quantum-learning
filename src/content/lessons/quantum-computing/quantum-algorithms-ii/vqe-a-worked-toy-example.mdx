@@ -40,15 +40,17 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+Proving an algorithm can't be wrong in one direction is one thing. Proving it actually lands close to the right answer is another. This lesson checks the other direction directly: run the real optimizer on a specific Hamiltonian and see how close it actually gets.
+</LessonHook>
+
 ## Motivation
 
-Proving an algorithm can't be wrong in one direction is one thing.
-Proving it actually lands close to the right answer is another. The
-last lesson showed VQE's cost function can never dip below the true
-ground energy, a real guarantee, but not yet a demonstration that the
-algorithm gets anywhere close to it. This lesson checks the other
-direction directly: run the real optimizer on a specific Hamiltonian,
-not a hand-picked success story, and see how close it actually gets.
+The last lesson showed VQE's cost function can never dip below the
+true ground energy — a real guarantee, but not yet a demonstration
+that the algorithm gets anywhere close to it. This lesson runs the
+real optimizer on a specific Hamiltonian, not a hand-picked success
+story.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/IQM_Quantum_Computer_Espoo_Finland.jpg/1280px-IQM_Quantum_Computer_Espoo_Finland.jpg"
@@ -189,7 +191,7 @@ $\lambda=\pm1$, exactly $E_0=-1$, matching both the shortcut formula and
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Expecting VQE to converge in one or two iterations.** Even for this
 simple, fully expressive single-qubit case, meaningful convergence took
 dozens of pattern-search steps. Larger, more realistic ansätze typically
@@ -198,7 +200,7 @@ regions of the cost landscape (an active, ongoing challenge in real VQE
 research this toy example is too simple to exhibit).
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming the found parameters $(\theta,\varphi)$ are unique.** Multiple
 parameter settings can give the same ground state (global phase, or
 different $\varphi$ values when $\theta=0$ or $\pi$ make the state
@@ -236,6 +238,7 @@ points.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [QAOA and Combinatorial Optimization](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-and-combinatorial-optimization), a structurally similar
 hybrid loop applied to an entirely different kind of problem: finding a
 good graph cut rather than a ground-state energy.
@@ -245,3 +248,4 @@ Trainability](/lessons/quantum-mastery/advanced-algorithms-and-complexity/barren
 scales this lesson's single-qubit ansatz pattern up to several qubits
 and shows, with real measured numbers, why training gets exponentially
 harder as it does.
+</NextDiscovery>

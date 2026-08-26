@@ -5,7 +5,9 @@ import { classicalOrder, periodFindingMeasurementDistribution } from "@/lib/quan
 import { BarChart } from "@/components/visualizations/BarChart";
 import { KatexMath } from "@/components/ui/KatexMath";
 import { PeriodFindingControls, coprimeBases } from "./PeriodFindingControls";
-import { LabNotes } from "./LabNotes";
+import { Readout } from "@/components/ui/Typography";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 
 /**
  * A freely-explorable version of the period-finding circuit only ever shown
@@ -49,66 +51,63 @@ export function PeriodFindingExplorer() {
   }));
 
   return (
-    <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-      <div className="space-y-6">
-        <div className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          a = {effectiveA}, N = {N}: classical order r = {order}
-          {spacingIsExact
-            ? `, so the ${peakCount} peaks below land exactly on multiples of 2^${xBits}/${order} = ${spacing}.`
-            : `. 2^${xBits}/${order} = ${spacing.toFixed(2)} isn't a whole number, so the peaks below smear across roughly 2r nearby outcomes instead of landing exactly on r sharp ones.`}
-        </div>
+    <SimulatorInstrument
+      label="Period finding — Shor&rsquo;s subroutine"
+      readout={<Readout label="r" value={order} />}
+      footnote="Next: this distribution is what Shor's algorithm classically post-processes (continued fractions) to recover r — see that step worked through in the lesson."
+      // Up to 2^7 = 128 bars at the highest counting-qubit count; splitting
+      // against a 320px rail leaves each bar too thin to read even when the
+      // container query says there's technically room. Full-width stage.
+      layout="stacked"
+      stageClassName="space-y-6"
+      stage={
+        <>
+          <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+            a = {effectiveA}, N = {N}: classical order r = {order}
+            {spacingIsExact
+              ? `, so the ${peakCount} peaks below land exactly on multiples of 2^${xBits}/${order} = ${spacing}.`
+              : `. 2^${xBits}/${order} = ${spacing.toFixed(2)} isn't a whole number, so the peaks below smear across roughly 2r nearby outcomes instead of landing exactly on r sharp ones.`}
+          </div>
 
-        <BarChart
-          bars={bars}
-          ariaLabel={`Measurement probability distribution over the ${dimension} counting-register outcomes for a=${effectiveA}, N=${N}, t=${xBits} counting qubits`}
-          maxValue={Math.max(0.05, ...distribution)}
-          height={220}
-        />
-
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
-          <KatexMath
-            tex={`r = ${order}, \\quad \\frac{2^{${xBits}}}{r} = ${Number.isInteger(spacing) ? spacing : spacing.toFixed(2)}`}
-            display
+          <BarChart
+            bars={bars}
+            ariaLabel={`Measurement probability distribution over the ${dimension} counting-register outcomes for a=${effectiveA}, N=${N}, t=${xBits} counting qubits`}
+            maxValue={Math.max(0.05, ...distribution)}
+            height={220}
           />
-        </div>
 
-        <LabNotes
-          notes={[
-            {
-              label: "What we're studying",
-              content:
-                "This is the actual quantum subroutine behind Shor's algorithm — measuring reveals a distribution whose peak spacing exposes the hidden period r, without ever computing r directly.",
-            },
-            {
-              label: "Try this",
-              content: (
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>
-                    Fix N=21, a=2 (see the smearing demo in the main lesson) and increase counting qubits from 4 to
-                    7 — watch the smeared peaks sharpen as 2^t/r gets closer to an integer.
-                  </li>
-                  <li>Try N=21 with a few different coprime bases and compare how many distinct peaks appear each time.</li>
-                </ul>
-              ),
-            },
-            {
-              label: "What's next",
-              content:
-                "Next: this distribution is what Shor's algorithm classically post-processes (continued fractions) to recover r — see that step worked through in the lesson.",
-            },
-          ]}
+          <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+            <KatexMath
+              tex={`r = ${order}, \\quad \\frac{2^{${xBits}}}{r} = ${Number.isInteger(spacing) ? spacing : spacing.toFixed(2)}`}
+              display
+            />
+          </div>
+
+          <SimulatorFraming
+            shows="This is the actual quantum subroutine behind Shor's algorithm — measuring reveals a distribution whose peak spacing exposes the hidden period r, without ever computing r directly."
+            tryThis={
+              <ul>
+                <li>
+                  Fix N=21, a=2 (see the smearing demo in the main lesson) and increase counting qubits from 4 to
+                  7 — watch the smeared peaks sharpen as 2^t/r gets closer to an integer.
+                </li>
+                <li>Try N=21 with a few different coprime bases and compare how many distinct peaks appear each time.</li>
+              </ul>
+            }
+          />
+        </>
+      }
+      controls={
+        <PeriodFindingControls
+          N={N}
+          onNChange={handleNChange}
+          a={effectiveA}
+          onAChange={setA}
+          validBases={validBases}
+          xBits={xBits}
+          onXBitsChange={setXBits}
         />
-      </div>
-
-      <PeriodFindingControls
-        N={N}
-        onNChange={handleNChange}
-        a={effectiveA}
-        onAChange={setA}
-        validBases={validBases}
-        xBits={xBits}
-        onXBitsChange={setXBits}
-      />
-    </div>
+      }
+    />
   );
 }

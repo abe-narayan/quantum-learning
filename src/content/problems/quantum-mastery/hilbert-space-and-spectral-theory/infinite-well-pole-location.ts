@@ -10,7 +10,7 @@ export const infiniteWellPoleLocation: NumericProblem = {
     title: "Where Is the First Pole for a Different Half-Width?",
     course: "hilbert-space-and-spectral-theory",
     lesson: "quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["greens-functions", "resolvent", "infinite-well"],

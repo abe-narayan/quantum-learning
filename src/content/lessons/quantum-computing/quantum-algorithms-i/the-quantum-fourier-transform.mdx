@@ -74,6 +74,10 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="From one bit to an entire pattern">
+Deutsch-Jozsa's Hadamard trick could extract a single yes/no bit from a phase. The quantum Fourier transform generalizes it to extract an entire periodic pattern.
+</LessonHook>
+
 ## Motivation
 
 Deutsch-Jozsa used $H^{\otimes n}$ as an interference step: turn phases into
@@ -98,9 +102,18 @@ lesson) and, eventually, Shor's algorithm need.
 
 For an $n$-qubit register ($N=2^n$), the QFT acts on basis states as:
 
+<EquationReveal
+  terms={[
+    { id: "j", symbol: "|j⟩", gloss: "The input basis state being transformed." },
+    { id: "N", symbol: "N = 2^n", gloss: "The number of basis states for an n-qubit register." },
+    { id: "phase", symbol: "e^(2πijk/N)", gloss: "A phase that winds faster around the unit circle as k increases, at a rate set by j." },
+    { id: "k", symbol: "|k⟩", gloss: "Each output basis state, summed over to build the transformed amplitude pattern." },
+  ]}
+>
 $$
 \text{QFT}|j\rangle = \frac{1}{\sqrt{N}}\sum_{k=0}^{N-1} e^{2\pi i jk/N}|k\rangle
 $$
+</EquationReveal>
 
 This is the ordinary discrete Fourier transform, applied directly to a
 state vector's amplitudes instead of a classical array, and it's the
@@ -296,7 +309,7 @@ $e^{2\pi ijk/4}$, evaluated at a different $j$, not four separate facts.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing the QFT with the classical FFT conceptually.** Both compute a
 discrete Fourier transform, but the QFT acts on $\log_2N$ qubits via
 $O(n^2)$ gates and outputs a *quantum state* you can't simply "read off":
@@ -304,7 +317,7 @@ extracting the transformed values back out requires a specific measurement
 strategy (exactly what phase estimation builds next), not a printout.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the final swap.** Without it, the circuit still computes a
 valid, invertible unitary, but not the QFT as conventionally defined
 (the amplitudes land on the *bit-reversed* index). `quantumFourierTransform`
@@ -338,5 +351,7 @@ this lesson's worked example relies on.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Quantum Phase Estimation](/lessons/quantum-computing/quantum-algorithms-i/quantum-phase-estimation), which uses the QFT's inverse as its
 final step to read a unitary's eigenphase directly out of a register.
+</NextDiscovery>

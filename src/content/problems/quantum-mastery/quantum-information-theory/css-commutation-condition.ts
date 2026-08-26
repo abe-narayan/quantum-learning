@@ -6,7 +6,7 @@ export const cssCommutationCondition: ConceptualProblem = {
     title: "Why CSS Stabilizer Generators Require C2 Contained in C1",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["css-codes", "stabilizer-formalism"],

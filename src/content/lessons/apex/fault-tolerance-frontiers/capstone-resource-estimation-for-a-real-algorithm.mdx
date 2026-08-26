@@ -85,6 +85,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Every ingredient this course built — code distance, distillation cost,
+  lattice-surgery overhead — chains into one number: how many physical
+  qubits a real fault-tolerant algorithm actually costs.
+</LessonHook>
+
 ## Motivation
 
 Five lessons, one running argument: **Surface Codes in Depth** gave the
@@ -148,20 +154,22 @@ standard "comfortably below threshold" point, $p = p_{\mathrm{th}}/10 =
 0.001$, so $p/p_{\mathrm{th}} = 0.1$. Setting the scaling law equal to
 the Step 1 target and solving for $d$:
 
-$$
-\left(\frac{p}{p_{\mathrm{th}}}\right)^{(d+1)/2} \le p_L^{\text{target}}
-\quad\Longrightarrow\quad
-\frac{d+1}{2}\ln\!\left(\frac{p}{p_{\mathrm{th}}}\right) \le \ln p_L^{\text{target}}.
-$$
-
-Since $\ln(p/p_{\mathrm{th}}) = \ln(0.1) < 0$, dividing by it flips the
-inequality:
-
-$$
-\frac{d+1}{2} \ge \frac{\ln p_L^{\text{target}}}{\ln(p/p_{\mathrm{th}})}
-\quad\Longrightarrow\quad
-d \ge 2\,\frac{\ln p_L^{\text{target}}}{\ln(p/p_{\mathrm{th}})} - 1.
-$$
+<DerivationSteps>
+  <DerivationStep annotation="Set the threshold-theorem scaling law equal to the Step 1 target and take the log of both sides.">
+    $$
+    \left(\frac{p}{p_{\mathrm{th}}}\right)^{(d+1)/2} \le p_L^{\text{target}}
+    \quad\Longrightarrow\quad
+    \frac{d+1}{2}\ln\!\left(\frac{p}{p_{\mathrm{th}}}\right) \le \ln p_L^{\text{target}}.
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="ln(p/p_th) = ln(0.1) is negative, so dividing by it flips the inequality direction.">
+    $$
+    \frac{d+1}{2} \ge \frac{\ln p_L^{\text{target}}}{\ln(p/p_{\mathrm{th}})}
+    \quad\Longrightarrow\quad
+    d \ge 2\,\frac{\ln p_L^{\text{target}}}{\ln(p/p_{\mathrm{th}})} - 1.
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
 Plugging in $p_L^{\text{target}} \approx 1.667\times10^{-5}$ and
 $p/p_{\mathrm{th}} = 0.1$: `minCodeDistanceRaw` evaluates to
@@ -272,6 +280,14 @@ ratio at all.
 
 ## Physical Interpretation: what generalizes and what doesn't
 
+<InsightBlock>
+  The four-step pipeline, not any single number it outputs, is the real
+  takeaway: a target success probability plus a compiled gate count
+  determines a code distance, a distillation depth, and a qubit total —
+  the same structure a real published estimate uses, just at larger
+  scale.
+</InsightBlock>
+
 <Callout type="note">
 **This is how real resource estimates actually get built, not a simplified stand-in for it.** Published
 estimates for algorithmically significant problems, including the
@@ -355,7 +371,7 @@ computation itself.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Applying the per-gate budget to the whole circuit's error, not each
 gate's.** The union bound in Step 1 gives a *per-gate* target
 $p_L^{\text{target}} \approx 0.01/(N_T+N_2)$, not a single global
@@ -364,7 +380,7 @@ would drastically undershoot the actual code distance this circuit
 needs, since $600$ gates each contribute their own failure chance.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating the {totalPhysicalQubits}-qubit total, or any other specific
 number in this lesson, as "the" cost of fault tolerance.** Every number
 in this worked example is downstream of stated toy choices: $N_T=100$,
@@ -425,13 +441,15 @@ lesson's Physical Interpretation point about published estimates too.
 
 ## Further Exploration
 
-Every number in this capstone came from a chosen toy circuit and a
-chosen set of simplifying assumptions, stated explicitly at each step.
-The next, and final, skill this pillar builds is knowing how to read a
-*real* resource-estimation paper critically: which of its numbers rest
-on the same solid methodology derived here, and which rest on
-architecture-specific assumptions worth questioning. That's exactly
-where [How to Read a Quantum Computing
-Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
-picks up.
+<NextDiscovery>
+  Every number in this capstone came from a chosen toy circuit and a
+  chosen set of simplifying assumptions, stated explicitly at each step.
+  The next, and final, skill this pillar builds is knowing how to read a
+  *real* resource-estimation paper critically: which of its numbers rest
+  on the same solid methodology derived here, and which rest on
+  architecture-specific assumptions worth questioning. That's exactly
+  where [How to Read a Quantum Computing
+  Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
+  picks up.
+</NextDiscovery>
 

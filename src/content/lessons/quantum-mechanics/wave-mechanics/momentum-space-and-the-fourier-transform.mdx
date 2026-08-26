@@ -38,6 +38,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  ψ(x) and φ(k) aren't two different things about a particle. They're the
+  same state, written in two different bases — exactly like |+⟩ and
+  |0⟩,|1⟩.
+</LessonHook>
+
 ## Motivation
 
 Mathematical Foundations proved that changing basis in a finite-dimensional
@@ -131,6 +137,17 @@ transforms (a signal concentrated in time has a broad frequency spectrum).
 The uncertainty principle derived abstractly in the last course, and
 re-derived from calculus two lessons ago, is *this* fact, restated.
 
+<PredictBeforeReveal
+  question="If you narrow a wave packet's spatial width σ (localize it more tightly in x), what happens to its momentum-space width?"
+  options={[
+    { label: "It narrows too — both get more localized", value: "narrows" },
+    { label: "It widens — position and momentum trade off", value: "widens" },
+    { label: "It's unaffected — the two are independent", value: "unaffected" },
+  ]}
+  correctValue="widens"
+  explanation="It widens. This isn't a separate physical principle bolted onto the Fourier transform — it's an ordinary mathematical fact about Fourier transforms themselves: a function narrow in one domain is necessarily broad in the transform domain. The worked example below makes it exact: Δx·Δp = 1/2 no matter how σ is chosen, so shrinking one side of the product always grows the other."
+/>
+
 <InteractiveSection title="Narrow one, widen the other" description="Switch the Wavefunction Explorer's view mode to |φ(k)|² on any preset. The free Gaussian packet's momentum-space view is a Gaussian too (the Fourier transform of a Gaussian is a Gaussian, verified numerically in this course's engine tests), centered exactly at the packet's momentum parameter. Try narrowing the packet's spatial width and watch its momentum-space width grow wider in direct proportion: the uncertainty principle, live.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
@@ -161,14 +178,14 @@ in the last course.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating $\phi(k)$ as a separate, unrelated function from $\psi(x)$.**
 They're the *same state* in two bases. Every physical prediction (energy,
 momentum statistics, etc.) computed from either must agree, and the
 platform's engine tests check exactly this kind of cross-consistency.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the normalization convention when comparing formulas from
 different textbooks.** Some references use $2\pi$ instead of $\sqrt{2\pi}$
 factors, or define $k$ vs. $p=\hbar k$ differently. The physics is
@@ -203,13 +220,20 @@ exactly as this lesson pins down the platform's.
 
 ## Further Exploration
 
-Next: [The Schrödinger Equation in Position Space](/lessons/quantum-mechanics/wave-mechanics/the-schrodinger-equation-in-position-space), which uses $\hat p$
-and $\hat x$ together to write down the equation governing how $\psi(x,t)$
-actually evolves.
+<ChallengePrompt prompt="The worked example's Gaussian saturates Δx·Δp = ħ/2 exactly, the minimum the uncertainty principle allows. For a non-Gaussian wavefunction (say, a flat top-hat), would you expect Δx·Δp to still equal exactly ħ/2, or something larger?">
+  The lesson calls the Gaussian "the minimum-uncertainty state" — think
+  about what that label implies for every other shape.
+</ChallengePrompt>
 
-This lesson used the momentum eigenstate $\phi_p(x)=e^{ipx/\hbar}$ freely,
-even though it isn't actually normalizable — a fully rigorous treatment
-of exactly what kind of object $|p\rangle$ is (and why every calculation
-built on it here was still valid) now exists in
-[Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space),
-part of the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+<NextDiscovery>
+  Next: [The Schrödinger Equation in Position Space](/lessons/quantum-mechanics/wave-mechanics/the-schrodinger-equation-in-position-space), which uses $\hat p$
+  and $\hat x$ together to write down the equation governing how $\psi(x,t)$
+  actually evolves.
+
+  This lesson used the momentum eigenstate $\phi_p(x)=e^{ipx/\hbar}$ freely,
+  even though it isn't actually normalizable — a fully rigorous treatment
+  of exactly what kind of object $|p\rangle$ is (and why every calculation
+  built on it here was still valid) now exists in
+  [Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space),
+  part of the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+</NextDiscovery>

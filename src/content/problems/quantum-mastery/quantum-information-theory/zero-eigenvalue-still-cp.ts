@@ -6,7 +6,7 @@ export const zeroEigenvalueStillCp: ConceptualProblem = {
     title: "A Zero Choi Eigenvalue Does Not Threaten Complete Positivity",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 5,
     problemType: "conceptual",
     tags: ["choi-matrix", "complete-positivity"],

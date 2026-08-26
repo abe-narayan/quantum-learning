@@ -11,7 +11,7 @@ export const queryComplexityAdversaryBoundN64: NumericProblem = {
     title: "Computing the Adversary Bound for N=64",
     course: "quantum-complexity-theory",
     lesson: "apex/quantum-complexity-theory/query-complexity-and-lower-bounds",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["adversary-method", "query-complexity", "ambainis", "grover"],

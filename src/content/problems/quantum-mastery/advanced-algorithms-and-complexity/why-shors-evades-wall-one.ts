@@ -6,7 +6,7 @@ export const whyShorsEvadesWallOne: ConceptualProblem = {
     title: "Why Shor's Algorithm Evades the Oracle-Separation Wall",
     course: "advanced-algorithms-and-complexity",
     lesson: "quantum-mastery/advanced-algorithms-and-complexity/capstone-what-scale-actually-requires",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "conceptual",
     tags: ["capstone", "synthesis", "shors-algorithm"],

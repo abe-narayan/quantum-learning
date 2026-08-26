@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { Complex } from "@/lib/quantum/complex";
 import { ComplexPlaneCanvas } from "./ComplexPlaneCanvas";
@@ -11,6 +10,8 @@ import { AmplitudeControls } from "./AmplitudeControls";
 import { StatePanel } from "./StatePanel";
 import { TwoAmplitudeMode, type TwoAmplitudeVariant } from "./TwoAmplitudeMode";
 import { AMPLITUDE_PRESETS } from "./presets";
+import { SimulatorInstrument } from "../shared/SimulatorInstrument";
+import { SimulatorFraming } from "../shared/Framing";
 
 type Mode = "single" | "two-amplitude";
 
@@ -181,17 +182,17 @@ export function ComplexAmplitudeExplorer({
   }
 
   return (
-    <div className="not-prose rounded-3xl border border-border bg-surface p-6">
-      <div className="mb-5">
-        <Badge tone="brand" className="mb-1.5">
-          What we&rsquo;re studying
-        </Badge>
-        <p className="text-sm text-muted-foreground">
-          An amplitude is a complex number, not a probability — this tool lets you see the difference
-          directly on the plane.
-        </p>
-      </div>
-
+    <SimulatorInstrument
+      label="Complex plane — amplitude"
+      footnote="An amplitude is a complex number, not a probability — only |z|² is ever a probability."
+      // `@container`: this simulator has no `controls` prop — the
+      // "single amplitude" mode below hand-rolls its own stage/controls
+      // split (same 320px rail idea as SimulatorInstrument itself) rather
+      // than using the shared one, so it needs the same container-query
+      // fix applied here directly. See SimulatorInstrument.tsx.
+      stageClassName="@container"
+      stage={
+        <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PresetToggle
           options={[{ label: "Single Amplitude" }, { label: "Two Amplitudes (α, β)" }]}
@@ -210,7 +211,11 @@ export function ComplexAmplitudeExplorer({
       </div>
 
       {mode === "single" ? (
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        // `@min-[42rem]:` (container query on the stage above, not `lg:`
+        // viewport) — matches SimulatorInstrument's own split threshold, so
+        // this hand-rolled rail collapses on the same logic the shared one
+        // does instead of opening inside a reading column too narrow for it.
+        <div className="mt-6 grid gap-6 @min-[42rem]:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-4">
             <div className="flex justify-center">
               <ComplexPlaneCanvas re={re} im={im} />
@@ -247,50 +252,33 @@ export function ComplexAmplitudeExplorer({
         </div>
       )}
 
-      <div className="mt-6 rounded-xl border border-accent/30 bg-accent/5 p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-accent">Try this</p>
-        <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-foreground">
-          <li>
-            Switch to Two Amplitudes, set both magnitudes equal, then slide β&rsquo;s phase from 0° to
-            180° — watch total probability swing between constructive and destructive interference.
-          </li>
-          <li>
-            In single mode, drag only the phase slider and confirm |z|² in the panel never moves.
-          </li>
-        </ul>
-      </div>
-
-      <div className="mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
-        <div>
-          <Badge tone="brand" className="mb-1.5">
-            Amplitude vs. probability
-          </Badge>
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">z</span> is the amplitude — a single complex
-            number with both a size and a direction. Only <span className="font-medium text-foreground">|z|²</span>{" "}
-            is ever a probability; the amplitude itself carries strictly more information than that one number.
-          </p>
-        </div>
-        <div>
-          <Badge tone="accent" className="mb-1.5">
-            Why global phase doesn&rsquo;t matter
-          </Badge>
-          <p className="text-sm text-muted-foreground">
-            Drag the phase slider alone (magnitude fixed) and watch |z|² in the state panel above —
-            it never moves. Multiplying an amplitude by a phase factor rotates it but never rescales
-            it, and probability only depends on the rescaling.
-          </p>
-        </div>
-        <div className="sm:col-span-2">
-          <Badge tone="neutral" className="mb-1.5">
-            Interference lives in relative phase
-          </Badge>
-          <p className="text-sm text-muted-foreground">
-            Interference lives entirely in relative phase — flip β&rsquo;s phase by 180° and the two
-            amplitudes that used to add now cancel.
-          </p>
-        </div>
-      </div>
-    </div>
+      <SimulatorFraming
+        shows={
+          <>
+            <span className="font-medium text-foreground">z</span> is the amplitude — a single complex number
+            with both a size and a direction. Only <span className="font-medium text-foreground">|z|²</span> is
+            ever a probability; the amplitude itself carries strictly more information than that one number.
+          </>
+        }
+        watchFor={
+          <>
+            Drag the phase slider alone (magnitude fixed) and watch |z|² in the state panel — it never moves.
+            Interference lives entirely in relative phase: flip β&rsquo;s phase by 180° and two amplitudes
+            that used to add now cancel.
+          </>
+        }
+        tryThis={
+          <ul>
+            <li>
+              Switch to Two Amplitudes, set both magnitudes equal, then slide β&rsquo;s phase from 0° to
+              180° — watch total probability swing between constructive and destructive interference.
+            </li>
+            <li>In single mode, drag only the phase slider and confirm |z|² in the panel never moves.</li>
+          </ul>
+        }
+      />
+        </>
+      }
+    />
   );
 }

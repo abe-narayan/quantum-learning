@@ -6,7 +6,7 @@ export const distillationRateFromEntanglementEntropy: NumericProblem = {
     title: "Distillable Bell Pairs from Entanglement Concentration",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 6,
     problemType: "numeric",
     tags: ["entanglement-distillation", "entanglement-concentration", "typical-subspace"],

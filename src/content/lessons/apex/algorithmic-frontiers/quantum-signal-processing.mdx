@@ -126,6 +126,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Access isn't shaping">
+  A block encoding lets you apply a matrix $A$ to a state. It says
+  nothing about applying $e^{-iHt}$, or $A^{-1}$, or any other function
+  of $A$'s eigenvalues — and almost every algorithm actually wants one of
+  those instead.
+</LessonHook>
+
 ## Motivation
 
 The previous lesson showed how to bury an arbitrary bounded operator $A$ inside a bigger unitary, as a block that a quantum computer can actually run. That solved *access*: given a block encoding, you can apply $A$ (probabilistically) to a state. It didn't solve *shaping*: Hamiltonian simulation wants $e^{-iHt}$, a linear-systems solver wants $H^{-1}$, an eigenvalue filter wants a step function, and none of these is $A$ itself — each is some *function of* $A$'s eigenvalues (or singular values). Block encoding alone gives you no lever for turning "access to $A$" into "access to $f(A)$" for a chosen $f$.
@@ -163,9 +170,18 @@ This second form is used below to get an exact closed form for an entire family 
 
 Fix an integer $d\geq0$ (the sequence length) and $d+1$ real **phases** $\phi_0,\dots,\phi_d$. Each phase gives a tunable Z-rotation $S(\phi)=e^{i\phi Z}=\mathrm{diag}(e^{i\phi},e^{-i\phi})$ — manifestly unitary, being diagonal with unit-modulus entries. The **QSP unitary** interleaves the fixed $W(x)$ with these tunable rotations:
 
+<EquationReveal
+  terms={[
+    { id: "U", symbol: "U_φ(x)", gloss: "The QSP unitary — the full alternating sequence, whose (0,0) entry is the achieved polynomial P(x)." },
+    { id: "phi", symbol: "φ_k", gloss: "The k-th tunable phase — the only knob in the whole construction; there are d+1 of them." },
+    { id: "W", symbol: "W(x)", gloss: "The fixed signal rotation — never changes, appears exactly d times for a length-d sequence." },
+    { id: "d", symbol: "d", gloss: "The sequence length — caps the degree of the achievable polynomial." },
+  ]}
+>
 $$
 U_{\vec\phi}(x)=e^{i\phi_0Z}\prod_{k=1}^{d}\Big[W(x)\,e^{i\phi_kZ}\Big].
 $$
+</EquationReveal>
 
 Since $W(x)$ and every $S(\phi_k)$ are unitary and a product of unitaries is unitary, $U_{\vec\phi}(x)$ is unitary for every choice of phases and every $x\in[-1,1]$ — a one-line consequence, but the source of the boundedness constraint derived next.
 
@@ -205,23 +221,25 @@ Given $(P,Q)$ satisfying this condition, there is a further, separately-solved c
 
 ### Worked derivation: $d=1$
 
-Take $d=1$: two phases $\phi_0,\phi_1$ sandwich one copy of $W(x)$,
+Take $d=1$: two phases $\phi_0,\phi_1$ sandwich one copy of $W(x)$.
 
+<DerivationSteps>
+<DerivationStep annotation="Write U as three matrix factors: the two tunable phase rotations sandwiching the fixed signal rotation W(x).">
 $$
-U_{\phi_0,\phi_1}(x)=e^{i\phi_0Z}\,W(x)\,e^{i\phi_1Z}=\begin{pmatrix}e^{i\phi_0}&0\\0&e^{-i\phi_0}\end{pmatrix}\begin{pmatrix}x&is\\is&x\end{pmatrix}\begin{pmatrix}e^{i\phi_1}&0\\0&e^{-i\phi_1}\end{pmatrix}.
+U_{\phi_0,\phi_1}(x)=e^{i\phi_0Z}\,W(x)\,e^{i\phi_1Z}=\begin{pmatrix}e^{i\phi_0}&0\\0&e^{-i\phi_0}\end{pmatrix}\begin{pmatrix}x&is\\is&x\end{pmatrix}\begin{pmatrix}e^{i\phi_1}&0\\0&e^{-i\phi_1}\end{pmatrix}
 $$
-
-Multiplying $W(x)$ by the right-hand diagonal factor first,
-
+</DerivationStep>
+<DerivationStep annotation="Multiply W(x) by the right-hand diagonal phase factor first.">
 $$
-W(x)\,e^{i\phi_1Z}=\begin{pmatrix}xe^{i\phi_1}&ise^{-i\phi_1}\\ise^{i\phi_1}&xe^{-i\phi_1}\end{pmatrix},
+W(x)\,e^{i\phi_1Z}=\begin{pmatrix}xe^{i\phi_1}&ise^{-i\phi_1}\\ise^{i\phi_1}&xe^{-i\phi_1}\end{pmatrix}
 $$
-
-then applying the left-hand diagonal factor,
-
+</DerivationStep>
+<DerivationStep annotation="Apply the left-hand diagonal phase factor to get the full product.">
 $$
-U_{\phi_0,\phi_1}(x)=\begin{pmatrix}xe^{i(\phi_0+\phi_1)}&ise^{i(\phi_0-\phi_1)}\\ise^{i(\phi_1-\phi_0)}&xe^{-i(\phi_0+\phi_1)}\end{pmatrix}.
+U_{\phi_0,\phi_1}(x)=\begin{pmatrix}xe^{i(\phi_0+\phi_1)}&ise^{i(\phi_0-\phi_1)}\\ise^{i(\phi_1-\phi_0)}&xe^{-i(\phi_0+\phi_1)}\end{pmatrix}
 $$
+</DerivationStep>
+</DerivationSteps>
 
 Reading off the $(0,0)$ entry:
 
@@ -268,6 +286,11 @@ so its $(0,0)$ entry is *exactly* $\cos(d\arccos x)=T_d(x)$, the degree-$d$ Cheb
 Every layer of QSP does the same two things: $W(x)$ is a "measurement" of the signal $x$ — the one place in the whole circuit where $x$ actually enters — and each $S(\phi_k)$ is a purely classical dial, contributing nothing about $x$ at all. Alternating them $d$ times lets the circuit "consult" $x$ exactly $d$ times, which is exactly why the resulting polynomial's degree is capped at $d$: no more information about $x$ can enter than the number of times $W(x)$ was called. The phases don't change how many times $x$ is consulted; they change how the results of those consultations interfere with each other — which is precisely the mechanism that turned $\phi_0=\phi_1=\pi/4$ into an overall phase multiplying $x$, and turned $\phi_1=\pi/2$ into total destructive interference of the entire $x^2$ term.
 
 ## Why This Matters
+
+<InsightBlock>
+  QSP turns "redesign a circuit for this new function" into "solve one
+  classical numerical problem for these new phases."
+</InsightBlock>
 
 A striking fraction of "what quantum algorithm solves problem $X$" questions in current research reduce to two separate sub-problems: (1) what polynomial (or, after the next lesson generalizes this to matrices, what function) approximates the operation you actually want — a truncated Jacobi–Anger/Chebyshev expansion approximates $e^{-iHt}$ for Hamiltonian simulation, a carefully shaped odd polynomial approximates $1/x$ for matrix inversion, a smoothed sign function approximates an eigenvalue filter — and (2) how to realize that exact polynomial via QSP. This lesson is entirely about why (2) has a clean answer: the achievability theorem above says that essentially any polynomial satisfying the stated degree/parity/boundedness/completeness conditions is realizable, exactly, by *some* phase sequence, turning "redesign a circuit for this new function" into "solve one classical numerical problem for these new phases." That reframing, more than any single algorithm built from it, is why QSP (and its full-matrix generalization, QSVT, next) is often described as the master key underlying modern quantum algorithms.
 
@@ -335,11 +358,11 @@ Every sampled point's imaginary part is at most ${maxChebyshevImaginaryResidual.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming the achieved polynomial always has degree *exactly* $d$.** It doesn't — only *at most* $d$. The degree-collapse example above, $(\phi_0,\phi_1,\phi_2)=(0,\pi/2,0)$, is a fully explicit, verified $d=2$ sequence whose achieved polynomial is the *constant* $i$: a genuine degree-$0$ result. The achievability theorem's degree bound is an upper bound, not an exact count, precisely because special phase choices can make the leading coefficient's two unit-modulus terms cancel.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming $P(x)$ comes out real just because $x$ itself is real.** The $d=1$ nontrivial example, $(\phi_0,\phi_1)=(\pi/4,\pi/4)$, gives the purely imaginary $P(x)=ix$ — verified directly above, not merely asserted. The derived closed form $P(x)=e^{i(\phi_0+\phi_1)}x$ is real if and only if $\phi_0+\phi_1$ is an integer multiple of $\pi$; generic phase choices give a properly complex-valued polynomial, and realizing a specifically *real* (or purely imaginary, or any other prescribed) target requires choosing phases that satisfy that condition, not just any phases that satisfy the degree/parity/boundedness constraints.
 </Callout>
 
@@ -360,9 +383,11 @@ Every sampled point's imaginary part is at most ${maxChebyshevImaginaryResidual.
 
 ## Further Exploration
 
-Next: [The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation),
-which generalizes this exact single-qubit machinery — the same alternating
-structure, the same achievability theorem — from a single signal $x$ to an
-entire block-encoded matrix's singular values at once, by combining this
-lesson directly with the block-encoding construction from the lesson before
-it.
+<NextDiscovery>
+  Next: [The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation),
+  which generalizes this exact single-qubit machinery — the same alternating
+  structure, the same achievability theorem — from a single signal $x$ to an
+  entire block-encoded matrix's singular values at once, by combining this
+  lesson directly with the block-encoding construction from the lesson before
+  it.
+</NextDiscovery>

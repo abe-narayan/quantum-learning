@@ -69,6 +69,13 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Where the finite-dimensional check quietly fails">
+  Momentum on a half-line passes the textbook Hermiticity check cleanly —
+  and still has no self-adjoint version at all, not with any boundary
+  condition. The gap between "symmetric" and "self-adjoint" is where that
+  happens.
+</LessonHook>
+
 ## Motivation
 
 Hermitian Operators proved that $A=A^\dagger$ forces real eigenvalues and
@@ -211,31 +218,47 @@ function tends to $0$ pointwise (a function can spike arbitrarily high
 on shrinking intervals and still have finite $\int|\psi|^2$). What
 actually forces the vanishing is $\psi'\in L^2$ *as well*:
 
-For $\psi\in H^1(\mathbb R)$, real or complex,
-$\dfrac{d}{dx}|\psi(x)|^2=\psi'(x)\psi^*(x)+\psi(x)\psi'^*(x)=2\,\mathrm{Re}\big(\psi'(x)\psi^*(x)\big)$.
-By the Cauchy–Schwarz inequality applied to $\psi,\psi'\in L^2(\mathbb
-R)$, the product $\psi'\psi^*$ is in $L^1(\mathbb R)$ (absolutely
-integrable):
-$\int|\psi'\psi^*|\,dx\le\|\psi'\|_{L^2}\|\psi\|_{L^2}<\infty$. So
+<DerivationSteps>
+  <DerivationStep annotation="Product rule for d/dx|ψ|², valid for any ψ regardless of domain — the identity holds for real or complex ψ.">
+    $$
+    \frac{d}{dx}|\psi(x)|^2=\psi'(x)\psi^*(x)+\psi(x)\psi'^*(x)=2\,\mathrm{Re}\big(\psi'(x)\psi^*(x)\big)
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Cauchy–Schwarz applied to ψ, ψ′ ∈ L²(ℝ) shows the product ψ′ψ* is absolutely integrable (in L¹).">
+    $$
+    \int|\psi'\psi^*|\,dx\le\|\psi'\|_{L^2}\|\psi\|_{L^2}<\infty
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Integrating the product rule from 0 to x expresses |ψ(x)|² − |ψ(0)|² as an integral of an absolutely-integrable function, so it converges to a finite limit as x → +∞ (and likewise x → −∞).">
+    $$
+    |\psi(x)|^2-|\psi(0)|^2=\int_0^x2\,\mathrm{Re}\big(\psi'\psi^*\big)\,dt
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="So |ψ(x)|² tends to some limit L ≥ 0. If L > 0, |ψ(x)|² would stay bounded away from zero for all large x, making ∫|ψ|²dx diverge — contradicting ψ ∈ L²(ℝ). So L = 0.">
+    $$
+    \psi(x)\to0 \ \text{ as } x\to\pm\infty, \qquad \text{for every } \psi\in H^1(\mathbb R)
+    $$
+  </DerivationStep>
+</DerivationSteps>
+
+This is a genuine derivation from the two hypotheses $\psi,\psi'\in L^2$, not an assumption smuggled in by calling $\psi$ "well-behaved."
+
+With that lemma established, the boundary term vanishes outright (both
+$\phi,\psi\to0$), confirming $\hat p$ is symmetric on $H^1(\mathbb R)$:
+
+<EquationReveal
+  terms={[
+    { id: "lhs", symbol: "∫φ*(−iℏψ′)dx", gloss: "The matrix element ⟨φ|p̂ψ⟩ — the left side of the symmetry check." },
+    { id: "boundary", symbol: "[φ*ψ]", gloss: "The boundary term from integration by parts — vanishes because both φ,ψ → 0 at ±∞, by the lemma just proved." },
+    { id: "rhs", symbol: "∫φ′*ψ dx", gloss: "The matrix element ⟨p̂φ|ψ⟩ — the right side, once the vanished boundary term is dropped." },
+  ]}
+>
 
 $$
-|\psi(x)|^2-|\psi(0)|^2=\int_0^x2\,\mathrm{Re}\big(\psi'\psi^*\big)\,dt
+\int\phi^*(-i\hbar\psi')dx=-i\hbar[\phi^*\psi]_{-\infty}^{\infty}+i\hbar\int\phi'^*\psi\,dx
 $$
 
-is an integral of an absolutely-integrable function, hence it
-**converges to a finite limit as $x\to+\infty$** (and likewise
-$x\to-\infty$). So $|\psi(x)|^2$ tends to some limit $L\ge0$. But if
-$L>0$, then $|\psi(x)|^2$ stays bounded away from zero for all large
-$x$, making $\int|\psi|^2dx$ diverge, contradicting $\psi\in
-L^2(\mathbb R)$. So $L=0$: **$\psi(x)\to0$ as $x\to\pm\infty$ for every
-$\psi\in H^1(\mathbb R)$**, a genuine derivation from the two
-hypotheses $\psi,\psi'\in L^2$, not an assumption smuggled in by calling
-$\psi$ "well-behaved."
-
-With that lemma established, the boundary term in
-$\int\phi^*(-i\hbar\psi')dx=-i\hbar[\phi^*\psi]_{-\infty}^{\infty}+i\hbar\int\phi'^*\psi\,dx$
-vanishes outright (both $\phi,\psi\to0$), confirming $\hat p$ is
-symmetric on $H^1(\mathbb R)$.
+</EquationReveal>
 
 ### Why the full-line $\hat p$ is actually self-adjoint, not just symmetric
 
@@ -281,17 +304,25 @@ indices**. A self-adjoint extension exists *only if* $n_+=n_-$.
   explanation="Symmetric only guarantees D(p̂)⊆D(p̂†); von Neumann's theorem needs the deficiency indices n₊,n₋ equal, and the computation below shows n₊=1, n₋=0 for this exact operator. No boundary condition fixes that mismatch — the half-line momentum operator has no self-adjoint extension at all."
 />
 
-**Compute the deficiency indices directly.** $\hat p^\dagger\psi=\pm
-i\psi$ means $-i\psi'=\pm i\psi$, i.e. $\psi'=\mp\psi$, with solutions
-$\psi(x)=Ce^{\mp x}$. Which of these lie in $L^2(0,\infty)$?
+**Compute the deficiency indices directly.**
 
-$$
-\int_0^\infty|e^{-x}|^2dx=\int_0^\infty e^{-2x}dx=\tfrac12<\infty \qquad(\text{normalizable})
-$$
-
-$$
-\int_0^\infty|e^{+x}|^2dx=\int_0^\infty e^{2x}dx=\infty \qquad(\text{not normalizable})
-$$
+<DerivationSteps>
+  <DerivationStep annotation="p̂†ψ = ±iψ means −iψ′ = ±iψ, i.e. ψ′ = ∓ψ, a first-order ODE with exponential solutions.">
+    $$
+    \hat p^\dagger\psi=\pm i\psi \ \Longrightarrow\ -i\psi'=\pm i\psi \ \Longrightarrow\ \psi'=\mp\psi, \qquad \psi(x)=Ce^{\mp x}
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Check whether e^(−x), the eigenvalue-+i solution, lies in L²(0,∞).">
+    $$
+    \int_0^\infty|e^{-x}|^2dx=\int_0^\infty e^{-2x}dx=\tfrac12<\infty \qquad(\text{normalizable})
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Check whether e^(+x), the eigenvalue-−i solution, lies in L²(0,∞).">
+    $$
+    \int_0^\infty|e^{+x}|^2dx=\int_0^\infty e^{2x}dx=\infty \qquad(\text{not normalizable})
+    $$
+  </DerivationStep>
+</DerivationSteps>
 
 <ParametricCurve
   frames={deficiencyFrames}
@@ -308,6 +339,14 @@ all**, not the Dirichlet choice above, not any other local boundary
 condition. Every domain choice leaves it merely symmetric at best.
 
 ## Physical Interpretation
+
+<InsightBlock>
+  Self-adjointness isn't a bookkeeping technicality — it's exactly the
+  hypothesis a Hamiltonian needs to generate a genuinely unitary time
+  evolution. There is no self-adjoint "momentum toward the wall" operator
+  for a particle confined by a hard, one-sided wall, and that's a real
+  mathematical obstruction, not a modeling choice to work around.
+</InsightBlock>
 
 Self-adjointness isn't a technicality kept separate from physics: it's
 exactly the hypothesis Stone's theorem needs to generate a properly
@@ -363,7 +402,7 @@ domain can be symmetric and still admit no self-adjoint extension at
 all.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Assuming $L^2$ membership alone implies a function vanishes at
 infinity.** It doesn't: only the *combination* $\psi,\psi'\in L^2$
 (the actual hypothesis of $\hat p$'s domain) forces the vanishing, via
@@ -412,9 +451,11 @@ without tending to any limit at all.
 
 ## Further Exploration
 
-Next: [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators),
-which shows exactly why self-adjointness (not mere symmetry) is the
-hypothesis needed for a genuine spectral decomposition to exist at all,
-and derives how that general theorem reduces to Spectral Decomposition
-and Degeneracy's finite-dimensional $A=\sum_i\lambda_iP_i$ in the
-discrete-spectrum case.
+<NextDiscovery>
+  Next: [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators),
+  which shows exactly why self-adjointness (not mere symmetry) is the
+  hypothesis needed for a genuine spectral decomposition to exist at all,
+  and derives how that general theorem reduces to Spectral Decomposition
+  and Degeneracy's finite-dimensional $A=\sum_i\lambda_iP_i$ in the
+  discrete-spectrum case.
+</NextDiscovery>

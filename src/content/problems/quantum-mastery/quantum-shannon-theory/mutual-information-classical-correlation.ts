@@ -6,7 +6,7 @@ export const mutualInformationClassicalCorrelation: NumericProblem = {
     title: "Mutual Information of an Asymmetric Classically Correlated State",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "numeric",
     tags: ["quantum-mutual-information", "von-neumann-entropy", "classical-correlation"],

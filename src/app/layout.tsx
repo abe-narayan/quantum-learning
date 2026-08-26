@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { QuantumField } from "@/components/field/QuantumField";
 import { buildOrganizationSchema, buildWebSiteSchema } from "@/lib/structuredData";
 import "./globals.css";
 
@@ -85,6 +86,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               '(function(){try{var t=localStorage.getItem("quantumlearn:theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
           }}
         />
+        {/* Scroll-reveal safety net. `[data-reveal]` starts at `opacity: 0`
+            in globals.css and is revealed by an IntersectionObserver
+            (src/components/motion/Reveal.tsx). With scripting disabled that
+            observer never runs, and every revealed section would be
+            permanently invisible — the worst possible failure mode for a
+            site whose content is the point. This is the one case a
+            `<noscript>` style block is the right tool: it applies only when
+            scripting is off, costs nothing otherwise, and needs no
+            JS-detection class on <html> that could itself be wrong.
+            (The reduced-motion and print cases are handled in globals.css;
+            the JS-enabled-but-hydration-failed case is handled by Reveal's
+            own `revealAfterMs` timer.) */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
       </head>
       <body className="flex min-h-full flex-col font-sans">
         <script
@@ -97,6 +113,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        {/* The persistent background environment. Sits behind everything at a
+            negative z-index, renders nothing before hydration, and nothing at
+            all under reduced motion or on a data-saver connection — the page
+            never depends on it for color or legibility (see
+            src/components/field/QuantumField.tsx). */}
+        <QuantumField />
         <Navbar />
         <main id="main-content" className="flex-1">
           {children}

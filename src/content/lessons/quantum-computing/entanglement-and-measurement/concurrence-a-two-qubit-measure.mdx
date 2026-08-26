@@ -48,12 +48,11 @@ export const lessonMeta = {
   ],
 };
 
-## Motivation
+<LessonHook eyebrow="Why this matters">
+Somewhere in this platform's existing code is a function that already computes a genuine entanglement measure, written long before this lesson, for what looks like an entirely unrelated purpose. Finding it, and proving why it works, is this lesson's actual subject.
+</LessonHook>
 
-Somewhere in this platform's existing code is a function that already
-computes a genuine entanglement measure, written long before this
-lesson, for what looks like an entirely unrelated purpose. Finding it,
-and proving why it works, is this lesson's actual subject.
+## Motivation
 
 Entanglement entropy needed an eigenvalue calculation, small for a
 $2\times2$ reduced state, but an entirely different kind of computation
@@ -237,7 +236,7 @@ below concurrence's maximum of 1.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Using $C=2|ad-bc|$ on a mixed 2-qubit density matrix.** This formula
 requires a pure state's amplitudes $a,b,c,d$ directly; it has no
 well-defined input for a mixed $\rho_{AB}$. The general mixed-state
@@ -245,7 +244,7 @@ Wootters concurrence is a different, more involved formula this platform
 does not implement (see the Scope note above).
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting $C(\theta)$ and $E(\theta)$ to be numerically equal.** They
 agree on the two endpoints ($0$ and maximal) and on ordering, but are
 different functions in between: check the worked example's
@@ -288,6 +287,7 @@ formula) comes out to a different number.
 
 ## Further Exploration
 
+<NextDiscovery>
 The `testSeparability`/`concurrenceOfPureState` connection is a good
 one to remember: two entanglement measures that look unrelated on
 paper, one from eigenvalues, one from a determinant of amplitudes, turn
@@ -307,3 +307,4 @@ The general mixed-state Wootters concurrence this lesson names and
 explicitly declines to implement is built and actually computed, on a
 state that's mixed at the global level, in [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement) —
 the exact gap this lesson leaves open.
+</NextDiscovery>

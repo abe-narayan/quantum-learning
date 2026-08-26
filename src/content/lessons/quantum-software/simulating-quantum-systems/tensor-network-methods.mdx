@@ -33,14 +33,14 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Not every state is generic">
+The 2^n wall assumes every amplitude is independent information that must be stored. Many physically important states aren't nearly this generic — their entanglement structure is limited, and tensor networks exploit exactly that.
+</LessonHook>
+
 ## Motivation
 
 Computational Cost & Scaling's exponential wall assumed nothing special
-about the state being simulated: every one of the $2^n$ amplitudes was
-treated as independent information that must be stored. Many physically
-important states, though, aren't nearly this generic. Their
-entanglement structure is limited, and tensor network methods are built
-specifically to exploit that.
+about the state being simulated.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Frontier_supercomputer_%2852291130197%29.jpg"
@@ -177,7 +177,7 @@ the entire purpose of using the technique.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating tensor networks as a general solution that makes the 2ⁿ wall
 obsolete.** They exploit a SPECIFIC structural property (limited
 entanglement) present in many, but far from all, physically interesting
@@ -185,7 +185,7 @@ states. Algorithm circuits specifically designed to generate
 entanglement are exactly the cases this technique doesn't help with.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Assuming "more advanced technique" always means "strictly better."**
 Tensor networks trade GENERALITY for efficiency on a specific class of
 problems. State-vector simulation remains the right, simpler choice
@@ -222,7 +222,9 @@ whenever the state's entanglement structure isn't known to be limited.
 
 ## Further Exploration
 
+<NextDiscovery>
 Next: [Noise Simulation](/lessons/quantum-software/simulating-quantum-systems/noise-simulation), which returns to state-vector-style
 simulation (density matrices, not tensor networks) to model what a
 NOISY circuit's output actually looks like, reusing Advanced Topics in
 Quantum Mechanics' Kraus-channel machinery directly.
+</NextDiscovery>

@@ -64,7 +64,7 @@ export function StatePanel({ state }: { state: StateVector }) {
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-16 overflow-hidden rounded-full bg-surface-muted">
                       <div
-                        className="h-full rounded-full bg-brand transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                        className="h-full rounded-full bg-pillar transition-[width] duration-300 ease-out motion-reduce:transition-none"
                         style={{ width: `${Math.round(probabilities[index] * 100)}%` }}
                       />
                     </div>

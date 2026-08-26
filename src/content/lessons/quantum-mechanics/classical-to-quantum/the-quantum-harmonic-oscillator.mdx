@@ -51,6 +51,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  A quantum harmonic oscillator, even in its coldest, lowest-energy
+  state, is never perfectly at rest — and pure algebra, no calculus at
+  all, proves it.
+</LessonHook>
+
 ## Motivation
 
 No solvable system in quantum mechanics gets used more than the harmonic
@@ -143,6 +149,17 @@ course.
 
 ### Energy levels
 
+<PredictBeforeReveal
+  question="The ladder's lowest rung is n = 0. What is the harmonic oscillator's lowest possible energy, E_0?"
+  options={[
+    { label: "Exactly 0", value: "zero" },
+    { label: "ħω/2, not zero", value: "half" },
+    { label: "ħω, the same spacing as every other rung", value: "full" },
+  ]}
+  correctValue="half"
+  explanation="ħω/2, not zero — the famous zero-point energy. Even in the lowest state a quantum oscillator can occupy, it's never perfectly at rest; the +1/2 in E_n = ħω(n+1/2) below is not a bookkeeping offset, it's a genuine, measurable minimum energy."
+/>
+
 The harmonic oscillator's Hamiltonian is $H = \hbar\omega\left(N +
 \tfrac12\right)$ (the connection between this $H$ and the physical
 potential $\tfrac12m\omega^2x^2$ is made precise once continuous position
@@ -230,13 +247,13 @@ $E_2=\hbar\omega(2+\tfrac12)=1\cdot2.5=2.5$.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="warning">
 **Forgetting the zero-point energy.** $E_n=\hbar\omega n$ (without the
 $+\tfrac12$) is a common slip: the ground state energy is
 $\hbar\omega/2$, not $0$.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Confusing $N$ (number operator, integer eigenvalues $0,1,2,\ldots$)
 with $H$ (energy operator, eigenvalues $\hbar\omega(n+\tfrac12)$).** $H$
 is a specific linear function of $N$, not the same operator.
@@ -273,13 +290,22 @@ is a specific linear function of $N$, not the same operator.
 
 ## Further Exploration
 
-[Position and Momentum](/lessons/quantum-mechanics/classical-to-quantum/position-and-momentum) introduces the continuous observables the harmonic
-oscillator's true physical Hamiltonian is built from, and connects their
-commutation relation to the uncertainty principle derived earlier in
-this course.
+<ChallengePrompt prompt="In a 6-level truncated representation, compute a|0⟩ and a†|5⟩ — the two opposite boundaries of the truncation. Are both simply the zero vector, or does only one of them carry a genuine truncation artifact?">
+  One of these two zero results is exactly what the true, untruncated
+  oscillator gives too; the other is an artifact of stopping the basis at
+  6 levels. Use the ladder rules and Practice Question 4's reasoning to
+  tell them apart.
+</ChallengePrompt>
 
-These same $a,a^\dagger$ ladder operators build the oscillator states
-that most resemble a classical trajectory: Quantum Mastery's
-[Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states)
-derives them as eigenstates of $a$ directly, and shows exactly what
-"squeezing" does to their position and momentum spread.
+<NextDiscovery>
+  [Position and Momentum](/lessons/quantum-mechanics/classical-to-quantum/position-and-momentum) introduces the continuous observables the harmonic
+  oscillator's true physical Hamiltonian is built from, and connects their
+  commutation relation to the uncertainty principle derived earlier in
+  this course.
+
+  These same $a,a^\dagger$ ladder operators build the oscillator states
+  that most resemble a classical trajectory: Quantum Mastery's
+  [Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states)
+  derives them as eigenstates of $a$ directly, and shows exactly what
+  "squeezing" does to their position and momentum spread.
+</NextDiscovery>

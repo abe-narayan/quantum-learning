@@ -6,7 +6,7 @@ export const steaneCodespaceDimension: NumericProblem = {
     title: "Steane Code Codespace Dimension from Generator Count",
     course: "quantum-information-theory",
     lesson: "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 4,
     problemType: "numeric",
     tags: ["stabilizer-formalism", "css-codes"],

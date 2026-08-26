@@ -41,6 +41,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Quantum mechanics isn't just easier with complex numbers — build the
+  theory with real numbers only and it predicts different, wrong physics.
+  Experiments have been done to check.
+</LessonHook>
+
 ## Motivation
 
 Real numbers can't solve $x^2 = -1$. For most of the history of mathematics
@@ -155,27 +161,25 @@ The expression $\cos\theta + i\sin\theta$ turns out to equal a single
 exponential, $e^{i\theta}$: this is **Euler's formula**. The prediction
 above claimed exact equality, not approximation, which is a strong enough
 claim to earn a real derivation rather than a citation. The Taylor series
-for $e^x$ converges for complex inputs too, so substitute $x = i\theta$:
+for $e^x$ converges for complex inputs too, so substitute $x = i\theta$.
 
+<DerivationSteps>
+  <DerivationStep annotation="Substitute x = iθ directly into the Taylor series for e^x.">
 $$
 e^{i\theta} = 1 + i\theta + \frac{(i\theta)^2}{2!} + \frac{(i\theta)^3}{3!} + \frac{(i\theta)^4}{4!} + \frac{(i\theta)^5}{5!} + \cdots
 $$
-
-Using $i^2=-1,\ i^3=-i,\ i^4=1,\ i^5=i,\ \ldots$ (the pattern repeats every
-four powers) and separating real terms (even powers of $i\theta$) from
-imaginary terms (odd powers):
-
+  </DerivationStep>
+  <DerivationStep annotation="Use i²=-1, i³=-i, i⁴=1, i⁵=i, … (the pattern repeats every four powers), and separate real terms (even powers of iθ) from imaginary terms (odd powers).">
 $$
 e^{i\theta} = \underbrace{\left(1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \cdots\right)}_{\text{this is }\cos\theta} \;+\; i\underbrace{\left(\theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \cdots\right)}_{\text{this is }\sin\theta}
 $$
-
-The two bracketed series are exactly the Maclaurin series for $\cos\theta$
-and $\sin\theta$, a fact you can look up independently and confirm
-matches term by term. So:
-
+  </DerivationStep>
+  <DerivationStep annotation="The two bracketed series are exactly the Maclaurin series for cos θ and sin θ, term by term — this is Euler's formula.">
 $$
 e^{i\theta} = \cos\theta + i\sin\theta \qquad\Longrightarrow\qquad z = re^{i\theta}
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 A useful immediate consequence: $|e^{i\theta}| = \sqrt{\cos^2\theta+\sin^2\theta} = 1$
 for every real $\theta$. Multiplying by $e^{i\theta}$ never changes a
@@ -292,13 +296,13 @@ You can verify $z_1^3=1$ directly: $z_1^3 = e^{2\pi i} = \cos(2\pi)+i\sin(2\pi)=
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating $i$ as an unknown to "solve for" instead of a fixed object with
 $i^2=-1$.** Once you accept the definition, every subsequent step is
 ordinary algebra: the only special rule you ever need is $i^2=-1$.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="note">
 **Confusing a complex number with its modulus.** $z$ carries both magnitude
 *and* phase; $|z|$ throws the phase away entirely. A quantum amplitude and
 its modulus are not interchangeable: the modulus alone can't reproduce
@@ -342,10 +346,18 @@ phase can sum to a modulus of zero.
 
 ## Further Exploration
 
-Next: [Vector Spaces](/lessons/quantum-mechanics/mathematical-foundations/vector-spaces), where the complex numbers you just built become
-the *scalars* a vector space is allowed to use, the first step toward
-describing a quantum state as a vector rather than a single number. If
-you've studied the Quantum Computing track already, its [Complex Numbers
-for Quantum Mechanics](/lessons/quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics) lesson covers the same arithmetic specialized to
-qubit amplitudes and phase gates; this lesson is the general-purpose
-version it's built on.
+<ChallengePrompt prompt="Using the 2×2 real-matrix representation from this lesson (a+bi ↔ [[a,−b],[b,a]]), represent z=2+3i as a matrix, then compute z² two ways: directly via complex multiplication, and via matrix multiplication. Do the two results match?">
+  Square the complex number the ordinary way first, then square the
+  matrix using the multiplication rule derived above, and compare
+  entries.
+</ChallengePrompt>
+
+<NextDiscovery>
+  Next: [Vector Spaces](/lessons/quantum-mechanics/mathematical-foundations/vector-spaces), where the complex numbers you just built become
+  the *scalars* a vector space is allowed to use, the first step toward
+  describing a quantum state as a vector rather than a single number. If
+  you've studied the Quantum Computing track already, its [Complex Numbers
+  for Quantum Mechanics](/lessons/quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics) lesson covers the same arithmetic specialized to
+  qubit amplitudes and phase gates; this lesson is the general-purpose
+  version it's built on.
+</NextDiscovery>

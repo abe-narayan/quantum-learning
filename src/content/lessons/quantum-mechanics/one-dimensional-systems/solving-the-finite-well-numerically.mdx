@@ -34,6 +34,12 @@ export const lessonMeta = {
   ],
 };
 
+<LessonHook eyebrow="Why this matters">
+  Some equations physics hands you have no algebraic way to isolate the
+  answer. That isn't a dead end — it's exactly the kind of problem
+  numerical methods were built for.
+</LessonHook>
+
 ## Motivation
 
 The last lesson derived a real physical result, $k\tan(ka)=\kappa$, with
@@ -184,14 +190,14 @@ the infinite well has.
 
 ## Common Mistakes
 
-<Callout type="mistake">
+<Callout type="note">
 **Treating bisection as an approximation to be distrusted.** For a
 continuous function with a confirmed sign change, bisection converges to
 the *exact* root to within any desired tolerance. It's not a heuristic,
 it's a rigorous, provably-convergent method.
 </Callout>
 
-<Callout type="mistake">
+<Callout type="warning">
 **Expecting the finite well's ground state to exceed the infinite well's
 (same width).** It's always the *opposite*: a finite well's confinement
 is always "gentler," giving a lower ground energy above its own floor,
@@ -227,14 +233,22 @@ never higher.
 
 ## Further Exploration
 
-Next: [Scattering Off a Step Potential](/lessons/quantum-mechanics/one-dimensional-systems/scattering-off-a-step-potential), moving from bound states to
-*unbound* ones, and a genuinely strange result: quantum particles
-partially reflect off a step even when they have more than enough energy
-to classically sail over it.
+<ChallengePrompt prompt="The interactive above varies V0 at fixed width a=1. Without recomputing anything, would WIDENING the well instead (larger a, same V0=5) push the ground-state k to a larger or smaller value?">
+  Same graphical picture: the quarter-circle κ=√(2V0−k²) doesn't depend
+  on $a$, but the tangent branch's divergence point, at $ka=\pi/2$, does —
+  track how that point moves as $a$ grows.
+</ChallengePrompt>
 
-For the general theorem behind why boundary-matching problems like this
-one always come with guaranteed real eigenvalues and orthogonal
-eigenfunctions — proving it once for the whole class of problem rather
-than case by case — see
-[Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
-in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+<NextDiscovery>
+  Next: [Scattering Off a Step Potential](/lessons/quantum-mechanics/one-dimensional-systems/scattering-off-a-step-potential), moving from bound states to
+  *unbound* ones, and a genuinely strange result: quantum particles
+  partially reflect off a step even when they have more than enough energy
+  to classically sail over it.
+
+  For the general theorem behind why boundary-matching problems like this
+  one always come with guaranteed real eigenvalues and orthogonal
+  eigenfunctions — proving it once for the whole class of problem rather
+  than case by case — see
+  [Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
+  in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+</NextDiscovery>

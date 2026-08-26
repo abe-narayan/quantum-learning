@@ -6,7 +6,7 @@ export const stinespringKrausNonuniquenessEntry: NumericProblem = {
     title: "A Rotated Kraus Operator from Environment-Basis Freedom",
     course: "quantum-shannon-theory",
     lesson: "quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification",
-    difficulty: "advanced",
+    difficulty: "master",
     estimatedMinutes: 8,
     problemType: "numeric",
     tags: ["stinespring-dilation", "kraus-nonuniqueness", "amplitude-damping"],
