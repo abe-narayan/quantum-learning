@@ -87,6 +87,30 @@ export const barrenBars = barrenResults.map((r) => ({
   caption: r.variance.toExponential(2),
 }));
 
+export function landscapeCurvesForN(n, seed) {
+  const layers = 4 * n;
+  const P = numParams(n, layers);
+  const H = tensorAll(Array.from({ length: n }, () => PAULI_Z));
+  const rng = mulberry32(seed);
+  const thetaSteps = 32;
+  const drawColors = ["brand", "accent", "muted", "warning"];
+  return drawColors.map((color, d) => {
+    const otherParams = Array.from({ length: P }, () => rng() * 2 * Math.PI);
+    const points = Array.from({ length: thetaSteps + 1 }, (_, k) => {
+      const theta = (k / thetaSteps) * 2 * Math.PI;
+      const params = otherParams.slice();
+      params[0] = theta;
+      return { x: theta, y: scaledCost(n, layers, params, H) };
+    });
+    return { label: `draw ${d + 1}`, color, points };
+  });
+}
+
+export const barrenLandscapeFrames = barrenNValues.map((n) => ({
+  paramLabel: `n = ${n}`,
+  series: landscapeCurvesForN(n, 100 + n),
+}));
+
 export const lessonMeta = {
   title: "Barren Plateaus and Variational Trainability",
   description:
@@ -260,6 +284,26 @@ asserted.
 <BarChart
   bars={barrenBars}
   ariaLabel="Measured gradient variance for a real multi-qubit variational ansatz at n=2 through 6 qubits, showing clear shrinkage as qubit count grows"
+/>
+
+### What the plateau actually looks like
+
+The variance numbers above summarize the plateau; this renders the object
+itself. Fix every parameter except the one being differentiated at a random
+draw, then sweep that one parameter $\theta$ over a full period — this
+traces out exactly the $C(\theta)=a+b\cos\theta+c\sin\theta$ curve derived
+above, computed with this lesson's own `scaledAnsatz`/`scaledCost` engine,
+not a stylized cartoon of it. Scrub $n$ from $2$ to $6$ below and watch
+several independent random draws at each size: at $n=2$ the curves swing
+across a sizable fraction of $Z^{\otimes n}$'s full $[-1,1]$ range, while by
+$n=6$ they've visibly collapsed toward flat, near-zero lines — the same
+$O(2^{-n})$ shrinkage as above, but seen directly in the shape of the cost
+landscape instead of inferred from its variance.
+
+<ParametricCurve
+  frames={barrenLandscapeFrames}
+  sliderLabel="qubits (n)"
+  ariaLabel="Cost function C(theta) plotted over a full period of theta, for four random draws of the other parameters, at each qubit count n from 2 to 6 — computed with this lesson's real multi-qubit ansatz and expectation-value engine, showing the curves visibly flattening toward zero as n grows"
 />
 
 ## Common Mistakes

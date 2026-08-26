@@ -1,13 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { EnergyLevelDiagram } from "@/components/visualizations/EnergyLevelDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/identical-particles/multi-electron-atoms-introduction"
 ).map((problem) => problem.meta);
 
-export const shellCapacities = [2, 2, 6, 2, 6];
-export const shellLabels = ["1s", "2s", "2p", "3s", "3p"];
+export const shellCapacities = [2, 2, 6, 2, 6, 2, 10];
+export const shellLabels = ["1s", "2s", "2p", "3s", "3p", "4s", "3d"];
 export const shellFillCounts = (electronCount) =>
   shellCapacities.reduce(
     (acc, cap) => ({
@@ -25,6 +26,20 @@ export const shellFillFrame = (electronCount) => ({
     highlight: shellFillCounts(electronCount)[i] > 0 && shellFillCounts(electronCount)[i] < shellCapacities[i]
   }))
 });
+
+export const hydrogenLikeLevels = [
+  { label: "3s", energy: -0.111 },
+  { label: "3p", energy: -0.111 },
+  { label: "3d", energy: -0.111 },
+  { label: "4s", energy: -0.0625 },
+];
+
+export const realAtomLevels = [
+  { label: "3s", energy: -0.3 },
+  { label: "3p", energy: -0.2 },
+  { label: "4s", energy: -0.12, highlight: true },
+  { label: "3d", energy: -0.08, highlight: true },
+];
 
 export const lessonMeta = {
   title: "Multi-Electron Atoms (Introduction)",
@@ -136,14 +151,55 @@ times 2 for spin) holds only 2 of its 6 available slots, exactly why
 carbon's outer shell isn't closed and it forms 4 bonds rather than being
 chemically inert.
 
-<InteractiveSection title="Fill the shells for any element" description="Slide through electron counts and watch the shells fill in order. Land on 10 to check this lesson's own practice question 2 (neon), and notice 3s only starts filling once 2p is completely full at 10.">
+<InteractiveSection title="Fill the shells for any element" description="Slide through electron counts and watch the shells fill in order. Land on 10 to check this lesson's own practice question 2 (neon), and notice 3s only starts filling once 2p is completely full at 10. Keep sliding past 18 (argon) to 20 (calcium) and 21 (scandium): 4s fills completely before 3d gets a single electron, the exact anomaly named in Common Mistakes below, happening live rather than just being asserted.">
   <BarChartExplorer
-    frames={Array.from({ length: 19 }, (_, i) => shellFillFrame(i + 1))}
+    frames={Array.from({ length: 21 }, (_, i) => shellFillFrame(i + 1))}
     sliderLabel="Electron count"
-    ariaLabel="Electron shell filling recomputed live as the electron count increases, showing each subshell filling to capacity before the next begins"
+    ariaLabel="Electron shell filling recomputed live as the electron count increases, showing each subshell filling to capacity before the next begins, including the 4s-before-3d crossover past argon"
     maxValue={1}
   />
 </InteractiveSection>
+
+### Why 4s slips under 3d
+
+The bar chart above shows *that* 4s fills before 3d; this diagram shows
+*why*, using the same screening argument from Mathematical Development.
+In a pure hydrogen-like potential, energy depends only on $n$, so 3s,
+3p, and 3d are exactly degenerate and 4s sits strictly above all three.
+Toggle to "Real multi-electron atom" to see screening split that
+degeneracy apart and drop 4s below 3d, letting the higher-$n$ 4s state
+fill first even though $n=4>3$.
+
+<div className="not-prose flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface-muted/40 p-4">
+  <input type="radio" id="mea-n3-preset-hlike" name="mea-n3-preset" defaultChecked className="peer/hlike sr-only" />
+  <label
+    htmlFor="mea-n3-preset-hlike"
+    className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/hlike:border-transparent peer-checked/hlike:bg-brand peer-checked/hlike:text-brand-foreground peer-focus-visible/hlike:outline-none peer-focus-visible/hlike:ring-2 peer-focus-visible/hlike:ring-brand peer-focus-visible/hlike:ring-offset-2 peer-focus-visible/hlike:ring-offset-background"
+  >
+    Hydrogen-like (l-degenerate)
+  </label>
+  <input type="radio" id="mea-n3-preset-real" name="mea-n3-preset" className="peer/real sr-only" />
+  <label
+    htmlFor="mea-n3-preset-real"
+    className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/real:border-transparent peer-checked/real:bg-brand peer-checked/real:text-brand-foreground peer-focus-visible/real:outline-none peer-focus-visible/real:ring-2 peer-focus-visible/real:ring-brand peer-focus-visible/real:ring-offset-2 peer-focus-visible/real:ring-offset-background"
+  >
+    Real multi-electron atom
+  </label>
+  <div className="hidden w-full peer-checked/hlike:block">
+    <EnergyLevelDiagram
+      levels={hydrogenLikeLevels}
+      unit="arb. units"
+      ariaLabel="Hydrogen-like n=3 and n=4 levels: 3s, 3p, and 3d exactly degenerate, with 4s strictly above all three"
+    />
+  </div>
+  <div className="hidden w-full peer-checked/real:block">
+    <EnergyLevelDiagram
+      levels={realAtomLevels}
+      unit="arb. units"
+      ariaLabel="Real multi-electron atom: 3s below 3p below 4s below 3d, screening having pushed 4s under 3d, both 4s and 3d highlighted"
+    />
+  </div>
+</div>
 
 ## Common Mistakes
 

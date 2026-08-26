@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { RegionProbability } from "@/components/visualizations/RegionProbability";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/probability-density-and-normalization"
@@ -127,6 +128,12 @@ standard deviation $\sigma/\sqrt2$, not $\sigma$, so integrating out to
 $\pm\sigma$ covers $\pm\sqrt2$ standard deviations rather than $\pm1$,
 here derived from a genuinely quantum probability
 density rather than assumed from statistics.
+
+<InteractiveSection
+  title="Drag the bounds, watch P(a ≤ x ≤ b) update"
+  description="Same normalized Gaussian as the worked example above (σ = 1). Set a = -1 and b = 1 to reproduce erf(1) ≈ 0.843, then drag either bound to see the region probability numerically integrate |ψ(x)|² live (trapezoidal rule).">
+  <RegionProbability />
+</InteractiveSection>
 
 ## Common Mistakes
 

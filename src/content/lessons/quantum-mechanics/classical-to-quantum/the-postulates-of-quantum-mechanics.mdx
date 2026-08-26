@@ -1,9 +1,30 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { PAULI_Z, S_GATE } from "@/lib/quantum/gates";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics"
 ).map((problem) => problem.meta);
+
+export const observablesPresets = [
+  {
+    label: "Pauli-Z (Hermitian)",
+    panels: [
+      { label: "Z", cells: matrixToCells(PAULI_Z) },
+      { label: "Z†", cells: matrixToCells(PAULI_Z.dagger()) },
+    ],
+  },
+  {
+    label: "S gate (not Hermitian)",
+    panels: [
+      { label: "S", cells: matrixToCells(S_GATE) },
+      { label: "S†", cells: matrixToCells(S_GATE.dagger()) },
+    ],
+  },
+];
 
 export const workedExamplePPlus = Math.cos(Math.PI / 6) ** 2;
 export const workedExamplePMinus = Math.sin(Math.PI / 6) ** 2;
@@ -99,6 +120,13 @@ condition guaranteeing real eigenvalues, and (for repeated identical
 measurements) that different outcomes correspond to orthogonal,
 perfectly-distinguishable states.
 
+<InteractiveSection title="Check M = M† for a real operator" description="Toggle between a Hermitian operator and a non-Hermitian one and compare each matrix directly against its own conjugate transpose, entry by entry.">
+  <MatrixGridExplorer
+    presets={observablesPresets}
+    ariaLabel="Choose an operator to compare its matrix directly against its conjugate transpose, checking whether the two match entry by entry"
+  />
+</InteractiveSection>
+
 ### Postulate 3 (the Born rule): Measurement
 
 If $A=\sum_i\lambda_i|e_i\rangle\langle e_i|$ (spectral decomposition),
@@ -124,6 +152,10 @@ has to keep $|\psi\rangle$ normalized (total probability can't drift away
 from $1$ just from time passing), and unitarity is the precise, necessary
 and sufficient condition for that. This course's Time Evolution and the
 Schrödinger Equation lesson makes $U(t)$ fully explicit.
+
+<InteractiveSection title="Watch U(t) act, one step at a time" description="Prepare a state and apply rotation gates repeatedly. The vector's length never changes, exactly the norm-preserving property that makes an operator unitary and qualifies it as valid time evolution under Postulate 4.">
+  <LazyBlochSphereExplorer />
+</InteractiveSection>
 
 ### The complete picture
 
@@ -168,8 +200,8 @@ $\langle A\rangle = (+1)(\tfrac34)+(-1)(\tfrac14)=\tfrac12$.
 
 <BarChart
   bars={[
-    { label: "P(+1)", value: workedExamplePPlus, highlight: true },
-    { label: "P(-1)", value: workedExamplePMinus },
+    { label: "P(+1)", value: workedExamplePPlus, highlight: true, caption: `${(workedExamplePPlus * 100).toFixed(0)}%` },
+    { label: "P(-1)", value: workedExamplePMinus, caption: `${(workedExamplePMinus * 100).toFixed(0)}%` },
   ]}
   ariaLabel="Bar chart of P(+1) and P(-1) for the two-level worked example"
 />

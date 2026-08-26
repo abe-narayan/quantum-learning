@@ -10,6 +10,24 @@ export const practiceProblems = getProblemsForLesson(
 export const finiteWellGrid = createGrid(256, 0.1);
 export const finiteWellShape = finiteSquareWellPotential(finiteWellGrid, 2, 4);
 
+export const finiteWellGroundEnergy = finiteSquareWellGroundStateEnergy(2, 4);
+export const finiteWellK = Math.sqrt(2 * (finiteWellGroundEnergy + 4));
+export const finiteWellKappa = Math.sqrt(-2 * finiteWellGroundEnergy);
+export const finiteWellAmplitudeB = Math.cos(finiteWellK * 2) * Math.exp(finiteWellKappa * 2);
+export const finiteWellRawWavefunction = finiteWellGrid.x.map((x) =>
+  Math.abs(x) <= 2 ? Math.cos(finiteWellK * x) : finiteWellAmplitudeB * Math.exp(-finiteWellKappa * Math.abs(x))
+);
+export const finiteWellNormSquared = finiteWellRawWavefunction.reduce(
+  (sum, psi) => sum + psi * psi * finiteWellGrid.dx,
+  0
+);
+export const finiteWellWavefunction = finiteWellRawWavefunction.map((psi) => psi / Math.sqrt(finiteWellNormSquared));
+export const finiteWellDepth = 4;
+export const finiteWellWavefunctionScale = finiteWellDepth / 4;
+export const finiteWellWavefunctionOverlay = finiteWellWavefunction.map(
+  (psi) => finiteWellGroundEnergy + psi * finiteWellWavefunctionScale
+);
+
 export const finiteWellHalfWidths = [1, 2, 3];
 export const finiteWellDepths = Array.from({ length: 40 }, (_, i) => 0.5 + (i / 39) * 49);
 export const finiteWellKFrames = finiteWellHalfWidths.map((a) => ({
@@ -94,8 +112,16 @@ for $a=2$, $V_0=4$:
 <PotentialDiagram
   xValues={[...finiteWellGrid.x]}
   potential={finiteWellShape}
-  ariaLabel="A finite square well of depth 4 and half-width 2, flat at V=0 outside and V=-4 inside"
+  wavefunction={finiteWellWavefunctionOverlay}
+  energyLine={finiteWellGroundEnergy}
+  ariaLabel="A finite square well of depth 4 and half-width 2, flat at V=0 outside and V=-4 inside, with the ground-state energy level and its wavefunction overlaid riding that level: a cosine bump inside the well smoothly meeting decaying exponential tails outside at x=-2 and x=2"
 />
+
+Solving the boxed transcendental equation below for this well's
+parameters gives a ground-state energy of $E_0\approx-3.778$ (in these
+natural units): only slightly above the well floor at $-4$, consistent
+with a state that is bound but leaks substantially into the classically
+forbidden region on either side.
 
 Unlike the infinite well's vertical walls, this dip has finite depth,
 which is exactly what makes the outside region merely *unlikely*, not

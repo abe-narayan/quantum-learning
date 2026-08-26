@@ -82,6 +82,53 @@ around the edges (never decaying) to belong to $\mathcal H$, but
 perfectly well-defined as a linear functional acting on the nice
 functions in $\Phi$.
 
+The picture below makes that nesting concrete, with one example object
+anchored in each of the three spaces, drawn directly from this lesson:
+a smooth, rapidly-decaying test function innermost in $\Phi$, the
+normalizable wave packet from the Worked Example in $\mathcal H$, and
+the plane wave $|p\rangle$ (together with $\delta(p-p')$ itself)
+outermost in $\Phi'$, too rough to ever join $\mathcal H$.
+
+<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+  <svg width={620} height={340} viewBox="0 0 620 340" className="w-full" role="img" aria-label="Three concentric regions showing the Gelfand triple. Outermost: Phi-prime, the space of distributions, containing the plane wave phi sub p of x equals e to the i p x over h-bar, that is the momentum eigenstate ket p, together with the delta function delta of p minus p-prime. Middle: the Hilbert space H equals L-two of the reals, containing the normalizable wave packet psi of x equals the integral of c of p times phi sub p of x d p, which has finite norm even though no single phi sub p does. Innermost: Phi, the Schwartz space of smooth, rapidly-decaying test functions.">
+    <text x={170} y={22} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">
+      The Gelfand triple: three nested spaces
+    </text>
+
+    <circle cx={170} cy={185} r={135} className="fill-muted-foreground/5 stroke-border" strokeWidth={1.5} strokeDasharray="7 5" />
+    <circle cx={170} cy={185} r={90} className="fill-accent/10 stroke-accent" strokeWidth={1.5} />
+    <circle cx={170} cy={185} r={42} className="fill-brand/15 stroke-brand" strokeWidth={2} />
+
+    <text x={170} y={185} textAnchor="middle" className="fill-brand text-[13px] font-semibold">Φ</text>
+    <text x={170} y={107} textAnchor="middle" className="fill-accent text-[13px] font-semibold">H</text>
+    <text x={170} y={62} textAnchor="middle" className="fill-muted-foreground text-[13px] font-semibold">Φ′</text>
+
+    <line x1={302} y1={72} x2={215} y2={90} className="stroke-muted-foreground" strokeWidth={1} />
+    <text x={310} y={68} className="fill-muted-foreground text-[11px] font-semibold">
+      Φ′ — distributions (generalized functions)
+    </text>
+    <text x={310} y={84} className="fill-foreground text-[9.5px] font-mono">
+      φ_p(x) = e^(ipx/ħ) ≡ |p⟩,  δ(p−p′)
+    </text>
+
+    <line x1={302} y1={135} x2={230} y2={140} className="stroke-accent" strokeWidth={1} />
+    <text x={310} y={131} className="fill-accent text-[11px] font-semibold">
+      H = L²(ℝ) — square-integrable functions
+    </text>
+    <text x={310} y={147} className="fill-foreground text-[9.5px] font-mono">
+      ψ(x) = ∫ c(p) φ_p(x) dp  (finite norm)
+    </text>
+
+    <line x1={302} y1={198} x2={200} y2={190} className="stroke-brand" strokeWidth={1} />
+    <text x={310} y={194} className="fill-brand text-[11px] font-semibold">
+      Φ — Schwartz space (test functions)
+    </text>
+    <text x={310} y={210} className="fill-foreground text-[9.5px] font-mono">
+      ψ: smooth, rapidly-decaying
+    </text>
+  </svg>
+</div>
+
 ## Mathematical Development
 
 ### $|p\rangle$ is not in $L^2(\mathbb R)$

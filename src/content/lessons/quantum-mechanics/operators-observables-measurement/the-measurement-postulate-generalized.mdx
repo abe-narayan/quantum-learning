@@ -1,6 +1,8 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { Complex } from "@/lib/quantum/complex";
+import { projectorOntoSubspace } from "@/lib/quantum/projectors";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized"
@@ -13,6 +15,46 @@ export const degenerateBornFrame = (phiDeg) => ({
     { label: "P(N=2)", value: Math.sin((phiDeg * Math.PI) / 180) ** 2 }
   ]
 });
+
+export const collapseE0 = [new Complex(1), new Complex(0), new Complex(0)];
+export const collapseE1 = [new Complex(0), new Complex(1), new Complex(0)];
+export const collapseE2 = [new Complex(0), new Complex(0), new Complex(1)];
+
+export const collapsePsi = [
+  new Complex(1 / Math.sqrt(3)),
+  new Complex(1 / Math.sqrt(3)),
+  new Complex(1 / Math.sqrt(3))
+];
+
+export const collapseP1 = projectorOntoSubspace([collapseE0, collapseE1]);
+export const collapseP2 = projectorOntoSubspace([collapseE2]);
+
+export const collapseProjectedOnto1 = collapseP1.apply(collapsePsi);
+export const collapseProjectedOnto2 = collapseP2.apply(collapsePsi);
+
+export const collapseNormOnto1 = Math.sqrt(
+  collapseProjectedOnto1.reduce((sum, amplitude) => sum + amplitude.magnitudeSquared(), 0)
+);
+export const collapseNormOnto2 = Math.sqrt(
+  collapseProjectedOnto2.reduce((sum, amplitude) => sum + amplitude.magnitudeSquared(), 0)
+);
+
+export const collapseRenormalized = collapseProjectedOnto1.map((amplitude) =>
+  amplitude.scale(1 / collapseNormOnto1)
+);
+
+export const collapseRenormalizedNormOnto1 = Math.sqrt(
+  collapseP1.apply(collapseRenormalized).reduce((sum, amplitude) => sum + amplitude.magnitudeSquared(), 0)
+);
+export const collapseRenormalizedNormOnto2 = Math.sqrt(
+  collapseP2.apply(collapseRenormalized).reduce((sum, amplitude) => sum + amplitude.magnitudeSquared(), 0)
+);
+
+export const collapseVectors = [
+  { label: "|ψ⟩", x: collapseNormOnto1, y: collapseNormOnto2, color: "muted" },
+  { label: "P₁|ψ⟩", x: collapseNormOnto1, y: 0, color: "brand", dashed: true },
+  { label: "|ψ'⟩", x: collapseRenormalizedNormOnto1, y: collapseRenormalizedNormOnto2, color: "accent" }
+];
 
 export const lessonMeta = {
   title: "The Measurement Postulate, Generalized",
@@ -147,6 +189,36 @@ $$
 
 (A quick check: $P(N{=}2)=|1/\sqrt3|^2=\tfrac13$, and $\tfrac23+\tfrac13=1$,
 probabilities sum to 1, as they must.)
+
+The bar chart below shows the *probabilities* that collapse produces,
+but not collapse itself: projecting and renormalizing are two distinct
+geometric steps, visible if instead of tracking all three components of
+$|\psi\rangle$ we track only how much of it lies in each eigenspace --
+$\|P_1|\psi\rangle\|$ against $\|P_2|\psi\rangle\|$, computed by this
+platform's own `projectorOntoSubspace` and `Matrix.apply`, not derived
+by hand. Since $N$'s two eigenspaces are orthogonal complements
+spanning the whole space, that pair is always a point on the unit
+circle.
+
+<VectorDiagram
+  vectors={collapseVectors}
+  ariaLabel="Vector diagram whose horizontal axis is the amplitude in the N equals 1 eigenspace and whose vertical axis is the amplitude in the N equals 2 eigenspace. Psi starts as a unit vector at coordinates root two thirds, root one third, about 0.816, 0.577. Projecting onto the N equals 1 eigenspace, labeled P sub 1 ket psi and drawn dashed, drops straight down onto the horizontal axis at 0.816, 0 -- the horizontal coordinate is unchanged, only the vertical one is deleted. Renormalizing then stretches that shortened vector back out to the unit circle, landing exactly on the horizontal axis at 1, 0, the post-measurement state psi prime."
+/>
+
+Notice what each step actually did. Projecting left the horizontal
+(eigenspace-1) coordinate exactly alone -- $P_1|\psi\rangle$ sits at
+$x=\sqrt{2/3}$, precisely $|\psi\rangle$'s own eigenspace-1 amplitude
+-- and only deleted the vertical (eigenspace-2) coordinate, which is
+why $P_1|\psi\rangle$ is *shorter* than $|\psi\rangle$: some of the
+vector's length belonged to an outcome that didn't happen. Only the
+second step, dividing by $\|P_1|\psi\rangle\|$, changes the horizontal
+coordinate itself, stretching the vector back out to unit length. These
+axes aren't the basis kets $|0\rangle,|1\rangle$ -- each tracks the
+*total* amplitude within one whole eigenspace, so this view deliberately
+hides $|\psi'\rangle$'s remaining internal superposition across
+$|0\rangle$ and $|1\rangle$ (the very thing the next Common Mistake
+callout warns against flattening away) while making the
+project-then-renormalize mechanism itself unmistakable.
 
 <InteractiveSection title="Sweep the state, watch both probabilities move" description="A one-parameter family of normalized states, parameterized by φ, sweeping continuously between an eigenstate of N=1 and an eigenstate of N=2. The two bars always sum to exactly 1. Find the φ that reproduces the worked example's 2/3, 1/3 split.">
   <BarChartExplorer

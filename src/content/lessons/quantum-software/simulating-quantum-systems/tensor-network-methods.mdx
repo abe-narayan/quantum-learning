@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
+import { TensorNetworkDiagram } from "@/components/visualizations/TensorNetworkDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/simulating-quantum-systems/tensor-network-methods"
@@ -76,6 +77,13 @@ the true entanglement is limited, a network with small bond dimensions
 can represent the state *exactly* (or to excellent approximation) using
 far fewer total numbers than $2^n$, sometimes only *linearly* many in
 $n$, not exponentially many.
+
+<InteractiveSection title="Structure, not just cost: what the network itself looks like" description="Left: a generic state vector, drawn as one fully-connected blob — every one of its 2ⁿ amplitudes is independent information, so nothing can be dropped. Right: a matrix-product-state tensor network, one small tensor per qubit, chained by bond indices of dimension D. Flip D and watch the chain's edges thicken and the 32·n·D² readout grow, tracing the same MPS memory formula the curve above plots as a function of qubit count instead.">
+  <TensorNetworkDiagram
+    ariaLabel="Structural comparison of a generic state vector versus a matrix-product-state tensor network, with an adjustable bond dimension D"
+    n={20}
+  />
+</InteractiveSection>
 
 ### The direct tradeoff: this is not a free lunch
 

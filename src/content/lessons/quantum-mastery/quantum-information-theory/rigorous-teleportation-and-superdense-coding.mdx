@@ -175,6 +175,37 @@ export const superdenseFramesNoisy = superdenseResultsNoisy.map((result) => ({
   bars: ["00", "01", "10", "11"].map((label, j) => ({ label: `outcome ${label}`, value: result.probs[j], caption: result.probs[j].toFixed(2) })),
 }));
 
+export const teleportationFidelityAtLambda = (lambda) => {
+  const rhoR = applyLocalChannelQubit1(rhoBell, dephasingChannel(lambda));
+  const bob = teleportationChannel(rhoR);
+  return fidelityPureVsMixed(messageState, bob);
+}
+
+export const superdenseSuccessAtLambda = (lambda) => {
+  return 1 - lambda / 2;
+}
+
+export const noiseSweepSteps = 21;
+export const noiseSweepLambdas = Array.from({ length: noiseSweepSteps }, (_, i) => i / (noiseSweepSteps - 1));
+
+export const noiseSweepFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "Teleportation fidelity F(lambda)",
+        color: "brand",
+        points: noiseSweepLambdas.map((lambda) => ({ x: lambda, y: teleportationFidelityAtLambda(lambda) })),
+      },
+      {
+        label: "Superdense success P(lambda) = 1 - lambda/2",
+        color: "accent",
+        points: noiseSweepLambdas.map((lambda) => ({ x: lambda, y: superdenseSuccessAtLambda(lambda) })),
+      },
+    ],
+  },
+];
+
 ## Motivation
 
 Quantum Teleportation and Superdense Coding were both derived entirely
@@ -293,6 +324,25 @@ $\lambda=0.4$ gives success probability exactly $0.8$: the pattern is
 $P_{\text{success}}(\lambda)=1-\lambda/2$, checked at two independent
 values, not read off a single data point.
 
+The Motivation opened by asking exactly how much real noise costs each
+protocol; the two hand-checked points above ($\lambda=0.2$ for
+teleportation, $\lambda=0.2,0.4$ for superdense coding) are still only
+samples. Sweeping $\lambda$ continuously from $0$ to $1$, using the
+exact same `teleportationChannel` and `fidelityPureVsMixed` machinery
+for teleportation and the closed form $P_{\text{success}}(\lambda)=1-\lambda/2$
+just derived for superdense coding, answers that question in full:
+
+<ParametricCurve
+  frames={noiseSweepFrames}
+  ariaLabel="Teleportation fidelity F(lambda) and superdense coding success probability P(lambda) = 1 - lambda/2, both plotted against dephasing strength lambda from 0 to 1: teleportation fidelity degrades more gently than superdense coding's success probability across the full noise range"
+/>
+
+Teleportation's fidelity curve stays above superdense coding's success
+curve for every $\lambda>0$: teleportation only needs Bob's *corrected*
+state to resemble $|\psi\rangle$, while superdense coding needs Alice's
+*exact* classical bit pair recovered, a strictly less forgiving
+requirement under the same dephased resource.
+
 This isn't a coincidence of which qubit the noise was applied to; it's
 mechanistic. Dephasing destroys **relative phase** while leaving
 populations untouched (T1 & T2 Decoherence's exact distinction). The
@@ -354,10 +404,11 @@ channel.
 
 1. Verify $F_e=\langle\Phi^+|\rho_R^{\text{noisy}}|\Phi^+\rangle=0.9$ for
    the noisy Bell pair used above, directly from its matrix entries.
-2. Using $P_{\text{success}}(\lambda)=1-\lambda/2$, predict the
+2. Using $P_{\text{success}}(\lambda)=1-\lambda/2$, compute the
    superdense-coding success probability at $\lambda=1$ (maximal
-   dephasing), and explain physically why it does not fall all the way
-   to $0.5$ (uniformly random) even in this extreme case.
+   dephasing), and explain physically why it lands at exactly $0.5$
+   rather than the $0.25$ a uniformly random guess among the four
+   possible 2-bit messages would give.
 3. Explain why the teleportation channel $\mathcal T(\rho_\psi,\rho_R)$
    is trace-preserving for *any* valid $\rho_R$, using the fact that
    each of its four branch-probabilities sums to $1$ regardless of what

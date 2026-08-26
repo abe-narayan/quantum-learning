@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { LossVsDecoherence } from "@/components/visualizations/LossVsDecoherence";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/photonic-qubits"
@@ -82,6 +83,14 @@ gradually. This is a genuinely different failure mode from every
 previous platform's gradual $T_1$/$T_2$ decay, and it demands different
 engineering solutions (the Noise, Decoherence & Scaling course develops
 loss as its own error channel).
+
+<LossVsDecoherence ariaLabel="Gradual decoherence versus binary photon loss, plotted over normalized time in transit" />
+
+The two curves above make the shape difference concrete: a $T_1$/$T_2$
+envelope fades continuously, with no single instant that counts as "the"
+error, while a lost photon stays fully present until one random moment,
+then is simply gone. Resample the loss event and only *when* the drop
+happens moves; *that* it's a discontinuous drop, never a fade, does not.
 
 ### Why two-photon gates are hard
 

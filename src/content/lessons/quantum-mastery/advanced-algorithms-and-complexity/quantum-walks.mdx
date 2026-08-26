@@ -93,6 +93,20 @@ export const classical4Bars = Array.from({ length: 9 }, (_, i) => ({
   caption: classical4.probs[i].toFixed(4),
 }));
 
+export const walkExplorerSteps = [0, 4, 8, 16, 24, 32, 40];
+export const walkExplorerFrames = walkExplorerSteps.map((steps) => {
+  const walk = hadamardWalk(steps);
+  const bars = [];
+  for (let i = 0; i < walk.probs.length; i += 2) {
+    bars.push({
+      label: String(i - walk.offset),
+      value: walk.probs[i],
+      caption: walk.probs[i].toFixed(4),
+    });
+  }
+  return { paramLabel: `T = ${steps}`, bars };
+});
+
 export const lessonMeta = {
   title: "Quantum Walks",
   description:
@@ -265,6 +279,31 @@ $x=\pm2$ (each at $0.375$) rather than concentrated at the center
 above pushing probability outward ballistically rather than letting it
 diffuse inward.
 
+**Watch the light cone open up: scrub $T$ from $0$ to $40$.**
+
+<BarChartExplorer
+  sliderLabel="Steps T"
+  ariaLabel="Quantum (Hadamard coin) walk position probability distribution, scrubbing the number of steps T from 0 to 40, showing the two horns pulling apart and the support widening at a constant, linear rate in T"
+  frames={walkExplorerFrames}
+  maxValue={1}
+/>
+
+At $T=0$ all the probability sits at the origin. As $T$ increases the
+distribution splits into the same bimodal horns seen above at $T=4$,
+and the horns march outward at a *constant rate*, the support spans
+roughly $[-T/\sqrt2,\,T/\sqrt2]$ at every frame, exactly the linearly
+growing light cone derived from the bounded group velocity above. Each
+horn's peak height *generally shrinks* as $T$ grows (the same total
+probability of $1$ spread over a linearly wider region), the opposite
+of a classical bell curve, which stays single-peaked at the center and
+widens only $\propto\sqrt T$, quadratically slower; the trend is not
+perfectly monotonic frame to frame (scrub from $T=32$ to $T=40$ and the
+peak ticks back up slightly, a genuine interference fringe near the
+light cone's edge, not a bug — see Common Mistakes below), but the
+overall envelope shrinking against the classical curve's fixed center
+height is unmistakable. Scrubbing $T$ makes that quadratic gap between
+the two spreading rates directly visible, not just asserted.
+
 **Scaling check across $T=10,20,40,80,160$:**
 
 <ParametricCurve
@@ -306,6 +345,23 @@ the full limiting density).** They're related but numerically distinct
 quantities: the light cone bounds where probability *can* be, while the
 variance integrates the actual (highly non-uniform, in fact peaked near
 the edges, as the $T=4$ worked example already shows) density within it.
+</Callout>
+
+<Callout type="mistake">
+**Expecting the horn peak to shrink *monotonically* at every step.**
+This lesson's own explorer above shows otherwise: computed directly
+with the same `hadamardWalk` function driving the frames, the peak
+height across $T=0,4,8,16,24,32,40$ is $1.000,\,0.375,\,0.2266,
+\,0.2105,\,0.1596,\,0.1156,\,0.1235$, a real, reproducible *increase*
+from $T=32$ to $T=40$, not a mistake to hide. The overall $1/\sqrt T$-
+style envelope (peak $\times$ light-cone width stays order-$1$, since
+probability is conserved) does shrink on average, but the exact density
+inside the light cone has genuine interference fringes near its edges,
+so the peak — which tracks whichever fringe happens to be tallest at a
+given $T$ — can tick up locally even while the envelope it rides on is
+trending down. This is the discrete-walk analog of the fringes in a
+diffraction pattern getting locally brighter or dimmer while the
+envelope narrows.
 </Callout>
 
 ## Practice Questions

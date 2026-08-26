@@ -4,7 +4,9 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
-import { reducedDensityMatrixQubit0 } from "@/lib/quantum/partialTrace";
+import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { PartialTraceHighlight } from "@/components/visualizations/PartialTraceHighlight";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/partial-trace-and-reduced-states"
@@ -31,6 +33,29 @@ export const plusZeroState = new StateVector([new Complex(Math.SQRT1_2), Complex
 
 export const psiThetaState = (theta) => new StateVector([new Complex(Math.cos(theta)), Complex.ZERO, Complex.ZERO, new Complex(Math.sin(theta))]);
 export const rhoADiagonal = (theta) => reducedDensityMatrixQubit0(pureStateDensityMatrix(psiThetaState(theta)));
+
+export const bellPhiPlusState = new StateVector([new Complex(Math.SQRT1_2), Complex.ZERO, Complex.ZERO, new Complex(Math.SQRT1_2)]);
+
+export const partialTracePanelsFor = (state) => {
+  const rhoAB = pureStateDensityMatrix(state);
+  return {
+    rhoAB: matrixToCells(rhoAB),
+    rhoA0: matrixToCells(reducedDensityMatrixQubit0(rhoAB)),
+    rhoA1: matrixToCells(reducedDensityMatrixQubit1(rhoAB)),
+  };
+};
+
+export const psiThetaFrames = Array.from({ length: 17 }, (_, i) => {
+  const theta = (i / 16) * (Math.PI / 2);
+  const degrees = Math.round((theta * 180) / Math.PI);
+  return { paramLabel: `θ = ${degrees}°`, ...partialTracePanelsFor(psiThetaState(theta)) };
+});
+
+export const partialTracePresets = [
+  { label: "|+0⟩ (product)", frames: [{ paramLabel: "|+0⟩", ...partialTracePanelsFor(plusZeroState) }] },
+  { label: "|Φ+⟩ (Bell)", frames: [{ paramLabel: "|Φ+⟩", ...partialTracePanelsFor(bellPhiPlusState) }] },
+  { label: "ψ(θ) = cosθ|00⟩ + sinθ|11⟩", frames: psiThetaFrames, sliderLabel: "θ" },
+];
 
 ## Motivation
 
@@ -99,6 +124,10 @@ this index sum (generalized to any number of qubits via bitmask
 indexing, not hardcoded to 2), matching the same qubit-0-is-MSB
 convention `gates.ts` established for every other multi-qubit operation
 on this platform.
+
+<InteractiveSection title="Click through the index-sum formula" description="Select a cell of the reduced matrix on the right to see exactly which ρ_AB entries the sum (ρ_A)_{i'i} = Σ_j (ρ_AB)_{i'j,ij} adds together. Every ρ_AB entry shown dimmed has mismatched traced-out-qubit indices, so it is excluded from every reduced entry, not just the one you didn't select. Toggle which qubit is traced out, and switch between the product state, the Bell state, and the ψ(θ) family used throughout this lesson.">
+  <PartialTraceHighlight presets={partialTracePresets} ariaLabel="Interactive partial trace: click a reduced-matrix cell to highlight the joint density matrix entries summed into it" />
+</InteractiveSection>
 
 ### A product state: the sanity check
 

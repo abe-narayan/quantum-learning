@@ -1,10 +1,55 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
+import { dephasingChannel, applyChannelRepeatedly } from "@/lib/quantum/openSystems";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"
 ).map((problem) => problem.meta);
+
+export const decoherenceLambda = 0.3;
+
+export const decoherencePlusRho = new Matrix([
+  [new Complex(0.5), new Complex(0.5)],
+  [new Complex(0.5), new Complex(0.5)]
+]);
+
+export const decoherencePurity = (rho) => rho.mul(rho).trace().re;
+
+export const decoherenceOffDiagonalMagnitude = (rho) => rho.get(0, 1).magnitude();
+
+export const decoherenceNSteps = [0, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30];
+
+export const decoherenceOffDiagonalSeries = {
+  label: "Off-diagonal magnitude",
+  color: "accent",
+  points: decoherenceNSteps.map((n) => ({
+    x: n,
+    y: decoherenceOffDiagonalMagnitude(
+      applyChannelRepeatedly(decoherencePlusRho, dephasingChannel(decoherenceLambda), n)
+    )
+  }))
+};
+
+export const decoherencePuritySeries = {
+  label: "Purity",
+  color: "brand",
+  points: decoherenceNSteps.map((n) => ({
+    x: n,
+    y: decoherencePurity(
+      applyChannelRepeatedly(decoherencePlusRho, dephasingChannel(decoherenceLambda), n)
+    )
+  }))
+};
+
+export const decoherenceFrames = [
+  {
+    paramLabel: `λ = ${decoherenceLambda.toFixed(2)}`,
+    series: [decoherenceOffDiagonalSeries, decoherencePuritySeries]
+  }
+];
 
 export const lessonMeta = {
   title: "Decoherence & the Quantum-to-Classical Transition",
@@ -69,6 +114,21 @@ Off-diagonal coherence decays geometrically toward exactly 0; purity
 decays toward exactly 0.5, the maximally mixed state for a single qubit.
 The state carries no phase information left at all, only classical
 (diagonal) probabilities.
+
+The table above gives six snapshots; here's the full curve, computed by
+the exact same `applyChannelRepeatedly` call at every step from 0 to 30,
+the same engine function (and the same two-quantity comparison) the
+course's capstone uses to plot purity under repeated channel application:
+
+<InteractiveSection
+  title="The same decay, plotted step by step"
+  description="Off-diagonal magnitude falls geometrically toward 0 while purity falls toward 0.5, the maximally mixed state, for the same dephasing channel (λ=0.3) and starting state |+⟩ as the table above, just computed at every n instead of six of them.">
+  <ParametricCurve
+    frames={decoherenceFrames}
+    ariaLabel="Off-diagonal magnitude and purity of a qubit starting in |+> under repeated dephasing with lambda=0.3, as the number of channel applications grows from 0 to 30"
+    referenceLines={[{ y: 0.5, label: "Maximally mixed (purity 0.5)" }]}
+  />
+</InteractiveSection>
 
 ### What survives: the diagonal
 

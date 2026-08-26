@@ -1,10 +1,49 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { infiniteSquareWellEigenstate, harmonicOscillatorEigenstate } from "@/lib/quantum/potentials";
+import { createGrid } from "@/lib/quantum/wavefunction";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/wave-mechanics-challenge"
 ).map((problem) => problem.meta);
+
+export const synthesisComparisonHalfWidth = 2.5;
+export const synthesisComparisonOmega = 0.16;
+export const synthesisComparisonGrid = createGrid(256, 16 / 256);
+export const synthesisWellGroundState = infiniteSquareWellEigenstate(
+  synthesisComparisonGrid,
+  1,
+  synthesisComparisonHalfWidth
+);
+export const synthesisOscillatorGroundState = harmonicOscillatorEigenstate(
+  synthesisComparisonGrid,
+  0,
+  synthesisComparisonOmega
+);
+export const synthesisComparisonFrames = [
+  {
+    paramLabel: "Ground states",
+    series: [
+      {
+        label: "Infinite well psi_1(x)",
+        color: "brand",
+        points: synthesisComparisonGrid.x.map((x, i) => ({
+          x,
+          y: synthesisWellGroundState.amplitudes[i].re,
+        })),
+      },
+      {
+        label: "Harmonic oscillator psi_0(x)",
+        color: "accent",
+        points: synthesisComparisonGrid.x.map((x, i) => ({
+          x,
+          y: synthesisOscillatorGroundState.amplitudes[i].re,
+        })),
+      },
+    ],
+  },
+];
 
 export const lessonMeta = {
   title: "Wave Mechanics Challenge",
@@ -85,6 +124,15 @@ approximately) infinite, so its "forbidden region" decay constant
 $\kappa\to\infty$, collapsing the tail to exactly zero. The well is the
 $V_0\to\infty$ limiting case of the same underlying physics.
 
+<InteractiveSection
+  title="The tail the well can't have"
+  description="The well's half-width and the oscillator's classical turning point are both set to x = 2.5 here, so the two curves share the same confinement scale. That isolates exactly the difference Example 2 describes: past x = ±2.5, the well's ground state is clipped to exactly zero while the oscillator's Gaussian tail is still visibly nonzero.">
+  <ParametricCurve
+    frames={synthesisComparisonFrames}
+    ariaLabel="Infinite well ground state and harmonic oscillator ground state wavefunctions plotted on the same axis, both scaled to a confinement region of half-width 2.5: the well's wavefunction is clipped to exactly zero beyond x=±2.5, while the oscillator's Gaussian tail remains visibly nonzero well past the same boundary"
+  />
+</InteractiveSection>
+
 **3. A superposition of two energy eigenstates is prepared. Using the
 Schrödinger equation in position space, explain why its probability
 density oscillates in time, while a single eigenstate's does not.**
@@ -101,7 +149,7 @@ oscillation survives.
 <InteractiveSection
   title="Watch two eigenstates beat against each other"
   description="Load the superposition preset and watch the beat frequency. Does it match (E2-E1)/ħ?">
-  <LazyWavefunctionExplorer />
+  <LazyWavefunctionExplorer initialPresetId="superposition" />
 </InteractiveSection>
 
 ## Common Mistakes, Revisited

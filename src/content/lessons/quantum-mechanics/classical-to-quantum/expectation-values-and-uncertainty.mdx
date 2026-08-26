@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { UncertaintyEllipse } from "@/components/visualizations/UncertaintyEllipse";
 import { StateVector } from "@/lib/quantum/state";
 import { PAULI_X, PAULI_Y } from "@/lib/quantum/gates";
 import { uncertainty, commutatorExpectation } from "@/lib/quantum/observables";
@@ -31,6 +32,18 @@ export const uncertaintyFrame = (thetaDeg) => ({
 });
 
 export const uncertaintyFrames = Array.from({ length: 19 }, (_, i) => uncertaintyFrame(i * 5));
+
+export const ellipseFrames = Array.from({ length: 19 }, (_, i) => {
+  const thetaDeg = i * 5;
+  const state = uncertaintyStateAt(thetaDeg);
+  return {
+    paramLabel: `θ = ${thetaDeg}°`,
+    deltaX: uncertainty(state, PAULI_X),
+    deltaP: uncertainty(state, PAULI_Y),
+  };
+});
+
+export const ellipseCenter = { x: 0, y: 0 };
 
 export const lessonMeta = {
   title: "Expectation Values and Uncertainty",
@@ -207,6 +220,25 @@ chosen.)
     frames={uncertaintyFrames}
     sliderLabel="θ (degrees)"
     ariaLabel="Delta X times Delta Y and the uncertainty relation's bound, both recomputed live from the real state vector and Pauli operators as theta varies from 0 to 90 degrees"
+  />
+</InteractiveSection>
+
+X and Y are themselves a pair of Cartesian axes (the equatorial plane of
+the Bloch sphere), so the same $\Delta X,\Delta Y$ pair drawn above as bar
+heights has a genuine geometric picture too: an ellipse of semi-axes
+$\Delta X,\Delta Y$. It's drawn centered at the origin, showing the
+*shape* of the trade-off rather than tracking $\langle X\rangle,\langle
+Y\rangle$ (which do drift as $|\psi(\theta)\rangle$ rotates):
+
+<InteractiveSection title="Same trade-off, drawn as a region instead of two bars" description="Semi-axes ΔX and ΔY of the ellipse are the exact values computed above for |ψ(θ)⟩. The dot marks (0, 0), a fixed reference origin — not ⟨X⟩, ⟨Y⟩, which do drift with θ as noted above. At θ = 0° and θ = 90° (the worked example and its mirror) the bound is saturated with ΔX = ΔY = 1, a circle. At θ = 45° (|+⟩, practice question 2) ΔX collapses to 0 while ΔY stays 1, so the ellipse degenerates to a vertical segment — the same product going to zero that the bar chart above shows.">
+  <UncertaintyEllipse
+    frames={ellipseFrames}
+    center={ellipseCenter}
+    xLabel="X"
+    pLabel="Y"
+    centerLabel="(0, 0), reference origin"
+    sliderLabel="θ (degrees)"
+    ariaLabel="Uncertainty ellipse with semi-axes Delta X and Delta Y for the Pauli X and Y operators, centered at the origin, morphing from a circle at theta = 0 degrees to a degenerate vertical segment at theta = 45 degrees and back to a circle at theta = 90 degrees"
   />
 </InteractiveSection>
 

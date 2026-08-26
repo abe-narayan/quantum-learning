@@ -13,6 +13,27 @@ const PLAY_INTERVAL_MS = 50;
 const PHASE_STEP_PER_TICK = TWO_PI / 130;
 
 /**
+ * Default third "Try this" bullet — written for
+ * superposition-interference-and-phase.mdx, whose own worked example
+ * computes P(+) = 1/4 at phi = 2*pi/3 using exactly this readout's
+ * normalized formula. A lesson with a different worked example (different
+ * phase, different numbers, no P(+) notation) should pass its own
+ * `tryThisHint` instead of relying on this default.
+ */
+const DEFAULT_TRY_THIS_HINT =
+  "Stop at φ = 2π/3 ≈ 2.094: the readout should show I/4A² = 0.250, matching this lesson’s worked example for P(+) at the same phase.";
+
+interface WaveInterferenceProps {
+  /**
+   * The third "Try this" bullet, tying the phase-sweep readout back to the
+   * embedding lesson's own worked example. Defaults to the phrasing that
+   * matches superposition-interference-and-phase.mdx; any other lesson
+   * embedding this component should supply a hint matching its own numbers.
+   */
+  tryThisHint?: string;
+}
+
+/**
  * Two coherent point sources interfering on a screen, with the relative
  * phase between them as the one control — the same relative phase, e^{i*phi},
  * that this lesson's own derivation carries between the two terms of a
@@ -21,7 +42,7 @@ const PHASE_STEP_PER_TICK = TWO_PI / 130;
  * 4*A^2*cos^2(phi/2) curve, i.e. (normalized) the same (1+cos(phi))/2 shape
  * derived above for P(+).
  */
-export function WaveInterference() {
+export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveInterferenceProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const sliderId = useId();
 
@@ -153,10 +174,7 @@ export function WaveInterference() {
             Drag to φ = π: the central fringe goes fully dark (0%) — the two waves are exactly out of
             step and cancel completely, I(φ) = 0.
           </li>
-          <li>
-            Stop at φ = 2π/3 ≈ 2.094: the readout should show I/4A² = 0.250, matching this lesson&rsquo;s
-            worked example for P(+) at the same phase.
-          </li>
+          <li>{tryThisHint}</li>
         </ul>
       </div>
     </div>

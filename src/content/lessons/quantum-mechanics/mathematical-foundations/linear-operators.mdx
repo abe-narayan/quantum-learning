@@ -4,6 +4,7 @@ import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/linear-operators"
@@ -11,6 +12,14 @@ export const practiceProblems = getProblemsForLesson(
 
 export const opA = new Matrix([[new Complex(2), new Complex(0)], [new Complex(0), new Complex(3)]]);
 export const opB = new Matrix([[new Complex(0), new Complex(1)], [new Complex(1), new Complex(0)]]);
+export const applyMatrix2x2 = (m, x, y) => ({
+  x: m.get(0, 0).re * x + m.get(0, 1).re * y,
+  y: m.get(1, 0).re * x + m.get(1, 1).re * y
+});
+export const linearityV = { x: 1, y: 1 };
+export const linearity2V = { x: 2, y: 2 };
+export const linearityAv = applyMatrix2x2(opA, linearityV.x, linearityV.y);
+export const linearityA2v = applyMatrix2x2(opA, linearity2V.x, linearity2V.y);
 export const compositionPresets = [
   {
     label: "AB (A after B)",
@@ -81,6 +90,32 @@ $a,b\in\mathbb{C}$:
 $$
 A(au+bv) = aA(u) + bA(v)
 $$
+
+<VectorDiagram
+  vectors={[
+    { label: "v", x: linearityV.x, y: linearityV.y, color: "muted" },
+    { label: "2v", x: linearity2V.x, y: linearity2V.y, color: "muted", dashed: true },
+    { label: "Av", x: linearityAv.x, y: linearityAv.y, color: "brand" },
+    { label: "A(2v) = 2Av", x: linearityA2v.x, y: linearityA2v.y, color: "accent", dashed: true }
+  ]}
+  ariaLabel="Vector diagram showing v and 2v lying on one line through the origin, and their images Av and A(2v) lying on a second line through the origin, with A(2v) exactly twice as far out as Av"
+/>
+
+$v=(1,1)$ and $2v=(2,2)$ sit on the same line through the origin, one
+exactly twice as far out as the other — that's what "scale the input by
+$2$" looks like geometrically. Feeding both through
+$A=\begin{pmatrix}2&0\\0&3\end{pmatrix}$ (this lesson's own worked-example
+matrix, below) lands them at $Av=(2,3)$ and $A(2v)=(4,6)$: still one
+shared line through the origin, still exactly a factor of $2$ apart. That
+proportionality surviving the map, exactly, is what $A(2v)=2A(v)$ means as
+a picture rather than as symbols.
+
+**Contrast.** A non-linear map need not preserve this. Take
+$h(x,y)=(x^2,y)$: it sends $v=(1,1)\mapsto h(v)=(1,1)$ but
+$2v=(2,2)\mapsto h(2v)=(4,2)$, while linearity would require
+$h(2v)=2h(v)=(2,2)$. Since $(4,2)\neq(2,2)$ — and the two images aren't
+even on the same line through the origin — squaring a coordinate breaks
+exactly the proportionality the diagram above shows $A$ preserving.
 
 ### Matrix representation
 

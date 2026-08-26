@@ -59,9 +59,11 @@ Both numbers in the "quantum queries" column were *derived* in this
 course, not quoted: Deutsch-Jozsa's single query from the exact $\pm1$/$0$
 amplitude split, Grover's $O(\sqrt N)$ from the exact rotation-angle
 formula. Neither is asymptotic hand-waving. Plotting Grover's actual
-$\frac{\pi}{4}\sqrt N$ formula against the classical $N$ makes the shape
-of "quadratic, not exponential" visible directly, rather than only as two
-entries in a table:
+$\frac{\pi}{4}\sqrt N$ formula against the classical $N$ on one shared
+linear axis makes the *size* of the gap vivid, but it also buries
+Grover's own curve: next to $2^n$, even genuine $\sqrt N$ growth reads as
+a flat line sitting on the axis, which would wrongly suggest Grover's
+query count barely grows at all.
 
 <ParametricCurve
   frames={[
@@ -80,10 +82,36 @@ entries in a table:
   ariaLabel="Classical query count versus Grover's quantum query count, as a function of n, for N = 2^n"
 />
 
-The gap widens fast: Grover's curve barely lifts off the axis while the
-classical curve rockets upward, but it never approaches Deutsch-Jozsa's
-flat, constant $1$ query. Two genuinely different shapes of advantage,
-not two versions of the same thing.
+The gap widens fast: on this shared scale, Grover's line is compressed
+into a sliver near $y=0$ well before $n$ reaches double digits, while the
+classical curve rockets upward. That's real, but it's a statement about
+*how much bigger* the classical curve is, not about Grover's own growth
+rate, which this axis cannot show. Rescaling to Grover's own range
+answers that separately:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        {
+          label: "Grover quantum (~π/4·√N)",
+          color: "accent",
+          points: Array.from({ length: 19 }, (_, i) => i + 2).map((n) => ({ x: n, y: (Math.PI / 4) * Math.sqrt(2 ** n) }))
+        }
+      ]
+    }
+  ]}
+  ariaLabel="Grover's quantum query count alone, as a function of n, showing its own square-root growth"
+/>
+
+Seen on its own scale, Grover's curve is visibly the concave, ever-slowing
+shape of a square root, not a flat line: it grows, just far more slowly
+than $2^n$ does, and it never approaches Deutsch-Jozsa's flat, constant
+$1$ query either. Two genuinely different shapes of advantage, not two
+versions of the same thing — and neither chart alone tells the whole
+story: the first shows how large the gap to classical is, the second
+shows that Grover's queries still grow rather than being negligible.
 
 ### Why Deutsch-Jozsa's exponential gap depends entirely on the promise
 
@@ -133,7 +161,7 @@ What differs between the two algorithms is how much structure the *problem
 itself* offers for interference to exploit: an engineered promise (total,
 exponential advantage) versus a genuinely unstructured search (partial,
 quadratic advantage, but provably the most available). That difference is
-exactly what the curve earlier in this lesson makes visible: Grover's line
+exactly what the charts earlier in this lesson make visible: Grover's line
 bends but never flattens the way Deutsch-Jozsa's constant, single-query
 line does, because unstructured search leaves interference less to work
 with, not because Grover's algorithm is doing anything wrong.
@@ -151,7 +179,7 @@ $\approx\frac{\pi}{4}\sqrt{1024}=\frac{\pi}{4}(32)\approx25$ queries,
 about a $20\times$ reduction, not the $513\times$ Deutsch-Jozsa achieves
 at the same $n$.
 
-$n=10$ sits near the left edge of the curve plotted earlier, where both
+$n=10$ sits near the left edge of the charts plotted earlier, where both
 algorithms' query counts are still small in absolute terms. Even here the
 gap between "exponential" and "quadratic" is not a small difference, and
 it only widens as $n$ grows further.

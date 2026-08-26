@@ -101,3 +101,20 @@ export function applyPhaseFlipError(state: StateVector, qubit: number): StateVec
 export function applyBitFlipError(state: StateVector, qubit: number): StateVector {
   return applySingleQubitGate(state, PAULI_X, qubit);
 }
+
+/**
+ * Applies a Z (phase-flip) error to every qubit in `qubits` — the weight-N
+ * generalization of `applyPhaseFlipError`, used to drive multi-qubit
+ * (e.g. weight-2) error scenarios like the one in the syndrome-measurement
+ * lesson's worked example. Single-qubit gates on distinct qubits commute,
+ * so applying them one at a time (in any order) is exactly equivalent to
+ * applying the simultaneous multi-qubit error.
+ */
+export function applyPhaseFlipErrors(state: StateVector, qubits: readonly number[]): StateVector {
+  return qubits.reduce((s, q) => applyPhaseFlipError(s, q), state);
+}
+
+/** Applies an X (bit-flip) error to every qubit in `qubits` — see `applyPhaseFlipErrors`. */
+export function applyBitFlipErrors(state: StateVector, qubits: readonly number[]): StateVector {
+  return qubits.reduce((s, q) => applyBitFlipError(s, q), state);
+}

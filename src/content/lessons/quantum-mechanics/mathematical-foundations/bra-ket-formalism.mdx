@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/bra-ket-formalism"
@@ -22,6 +23,8 @@ export const standardBasisPreset = {
     { label: "Sum", cells: cellSum(outerProduct([1, 0], [1, 0]), outerProduct([0, 1], [0, 1])), highlightDiagonal: true }
   ]
 };
+export const projectorZeroV = { x: 0.6, y: 0.8 };
+export const projectorZeroPv = { x: projectorZeroV.x, y: 0 };
 export const hadamardBasisPreset = {
   label: "Hadamard basis {|+⟩, |−⟩}",
   panels: [
@@ -154,6 +157,21 @@ which sends $|0\rangle\mapsto|0\rangle$ and $|1\rangle\mapsto0$: it
 **projects** onto $|0\rangle$. Projectors built from outer products are
 central to how measurement is described mathematically, developed in the
 Probability and Quantum States lesson.
+
+<VectorDiagram
+  vectors={[
+    { label: "v", x: projectorZeroV.x, y: projectorZeroV.y, color: "accent" },
+    { label: "|0⟩⟨0|v", x: projectorZeroPv.x, y: projectorZeroPv.y, color: "brand" },
+    { label: "", x: projectorZeroPv.x, y: projectorZeroPv.y, color: "muted", from: projectorZeroV, dashed: true }
+  ]}
+  ariaLabel="A general vector v dropping straight down onto the horizontal zero-ket axis under the projector zero-ket zero-bra, landing on the point that keeps only v's zero component and discards its one component"
+/>
+
+Geometrically, $|0\rangle\langle0|$ drops any vector straight onto the
+$|0\rangle$ axis: $v=(0.6,0.8)$ lands at $|0\rangle\langle0|v=(0.6,0)$,
+discarding whatever component $v$ had along $|1\rangle$ and keeping only
+the part already lying along $|0\rangle$ — the "shadow" $v$ casts on that
+axis.
 
 ### The completeness relation
 

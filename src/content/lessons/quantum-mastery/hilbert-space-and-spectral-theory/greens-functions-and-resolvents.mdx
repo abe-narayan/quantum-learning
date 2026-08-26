@@ -31,6 +31,20 @@ export const greenCurveFrames = [
   },
 ];
 
+export const lorentzianKernel = (x, eps) => eps / (x * x + eps * eps);
+export const lorentzXValues = Array(241).fill(0).map((_, i) => -4 + (i / 240) * 8);
+export const lorentzEpsValues = [1, 0.3, 0.1, 0.03];
+export const lorentzFrames = lorentzEpsValues.map((eps) => ({
+  paramLabel: `ε = ${eps}`,
+  series: [
+    {
+      label: "ε/(x²+ε²)",
+      color: "brand",
+      points: lorentzXValues.map((x) => ({ x, y: lorentzianKernel(x, eps) })),
+    },
+  ],
+}));
+
 export const lessonMeta = {
   title: "Green's Functions and Resolvents",
   description:
@@ -140,7 +154,20 @@ $$
 concentrates ever more sharply at $x=0$ as $\varepsilon\to0$ (its peak
 height $1/\varepsilon\to\infty$, its width $\sim\varepsilon\to0$),
 exactly the same delta-sequence structure as the last lesson's Dirichlet
-kernel, now for a Lorentzian instead of a sinc. So
+kernel, now for a Lorentzian instead of a sinc:
+
+<ParametricCurve
+  frames={lorentzFrames}
+  sliderLabel="Regularization ε"
+  ariaLabel="The Lorentzian epsilon over x squared plus epsilon squared, sharpening into a delta spike at x=0 as epsilon shrinks from 1 to 0.03"
+/>
+
+Exactly this delta-sequence behavior is visible directly: as $\varepsilon$
+shrinks from $1$ down to $0.03$, the curve's peak at $x=0$ grows toward
+$1/\varepsilon$ while its width collapses toward $x=0$, even though the
+total area underneath stays fixed at exactly $\pi$ for every one of
+these $\varepsilon$ values (the exact antiderivative computation just
+above, not a numerical approximation that merely gets close). So
 $\varepsilon/(x^2+\varepsilon^2)\to\pi\delta(x)$, giving the
 **Sokhotski–Plemelji relation**:
 
@@ -239,9 +266,9 @@ Summing the independent eigenfunction-expansion formula directly, using
 this platform's real, normalized `infiniteSquareWellEigenstate`
 wavefunctions and `infiniteSquareWellEnergyLevel` energies (not the
 closed-form boxed formula) over the first $200$ terms, gives
-$\approx0.76245$, agreement to within $0.2\%$ using only $200$ of the
-infinitely many terms in a series that converges like $1/n^2$ (so the
-remaining terms shrink the gap further); two genuinely different
+$\approx0.76096$, agreement to about $5$-$6$ significant figures using
+only $200$ of the infinitely many terms in a series that converges like
+$1/n^2$ (so the remaining terms shrink the gap further); two genuinely different
 derivations of the same object (one a boundary-value ODE solve, one a
 spectral sum over independently-known eigenfunctions) landing on the
 same number, exactly the kind of cross-check this platform's engine
@@ -296,7 +323,7 @@ points) but never *where* the poles are.
 - The well's Green's function poles land exactly on
   `infiniteSquareWellEnergyLevel`'s already-known spectrum, and its
   closed form agrees with an independent eigenfunction-expansion sum to
-  $0.2\%$ using 200 terms: two different derivations, same number.
+  $5$-$6$ significant figures using 200 terms: two different derivations, same number.
 
 ## Further Exploration
 

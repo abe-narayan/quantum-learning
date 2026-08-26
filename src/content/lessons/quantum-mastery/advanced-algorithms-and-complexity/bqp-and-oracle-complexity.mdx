@@ -20,14 +20,14 @@ export const groverCurveFrames = [
     paramLabel: "",
     series: [
       {
-        label: "classical worst case: N = 2ⁿ",
+        label: "log₁₀(classical worst case: N = 2ⁿ)",
         color: "muted",
-        points: groverNValues.map((n, i) => ({ x: n, y: groverClassicalWorstCase[i] })),
+        points: groverNValues.map((n, i) => ({ x: n, y: Math.log10(groverClassicalWorstCase[i]) })),
       },
       {
-        label: "quantum: optimalGroverIterations(n) (BBBV-optimal, Θ(√N))",
+        label: "log₁₀(quantum: optimalGroverIterations(n)) (BBBV-optimal, Θ(√N))",
         color: "brand",
-        points: groverNValues.map((n, i) => ({ x: n, y: groverQuantumIterations[i] })),
+        points: groverNValues.map((n, i) => ({ x: n, y: Math.log10(groverQuantumIterations[i]) })),
       },
     ],
   },
@@ -264,12 +264,21 @@ widely disbelieved without proof, as $\mathsf{P}=\mathsf{NP}$ itself).
 
 <ParametricCurve
   frames={groverCurveFrames}
-  ariaLabel="Classical worst-case query count N=2^n versus optimalGroverIterations(n), the real BBBV-matching query count computed by this platform's own Grover engine, for n from 2 to 20, showing the quadratic gap directly"
+  ariaLabel="log10 of classical worst-case query count N=2^n versus log10 of optimalGroverIterations(n), the real BBBV-matching query count computed by this platform's own Grover engine, plotted against n from 2 to 20 on a log y-axis, showing both curves as straight lines with the quantum line at exactly half the slope of the classical line"
 />
 
-Both curves above come from real arithmetic: the classical curve is
-$N=2^n$ exactly, and the quantum curve is `optimalGroverIterations(n)`,
-this platform's own engine, called directly. The visible gap is the
+Both curves above come from real arithmetic, log-transformed on the
+$y$-axis only (query count, not $n$): the classical curve is
+$\log_{10}(N)=\log_{10}(2^n)=n\log_{10}2$ exactly, and the quantum curve
+is $\log_{10}(\texttt{optimalGroverIterations}(n))$, this platform's own
+engine, called directly then logged. On a linear axis the quantum curve
+would look flattened near zero for the whole domain shown, since it
+never exceeds a few hundred while the classical curve exceeds a
+million; the log $y$-axis instead turns both into straight lines,
+making $\Theta(\sqrt N)$-vs-$\Theta(N)$ visible as a geometric fact
+rather than an optical illusion of scale: the quantum line's slope is
+exactly half the classical line's slope, since
+$\log_{10}(\sqrt N)=\tfrac12\log_{10}(N)$. That's the
 $\Theta(\sqrt N)$-vs-$\Theta(N)$ separation BBBV proves is the best
 *any* black-box quantum algorithm can ever do, not merely what this
 one algorithm happens to achieve.

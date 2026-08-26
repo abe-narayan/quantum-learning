@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, phaseGate } from "@/lib/quantum/gates";
+import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/from-postulates-to-quantum-computing"
@@ -116,6 +117,18 @@ the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
     ariaLabel="Measurement probabilities in the computational Z basis and the plus-minus X basis, recomputed live from the real Hadamard and phase gate matrices as phi varies from 0 to 360 degrees"
     maxValue={1}
   />
+</InteractiveSection>
+
+As the correspondence table above notes, this same $H|0\rangle\to|+\rangle$
+step, followed by a phase gate, is exactly a Bloch-sphere rotation
+computed by this platform's `rotationAboutAxis`. Reproduce it directly
+below: apply a Hadamard gate to send $|0\rangle$ to the equator, then
+apply a Z-axis rotation gate to play the role of the phase gate above,
+and watch the same $\varphi$-dependence appear as a literal rotation of
+the Bloch vector, not just a formula.
+
+<InteractiveSection title="Reproduce H|0⟩ then a phase gate, live" description="Prepare |0⟩ and apply a Hadamard gate to reach |+⟩ on the equator. Then apply a Z-axis rotation gate to play the role of the phase gate from Worked Example 2, and watch the Bloch vector sweep around the equator by the same angle φ that moved the bars above.">
+  <LazyBlochSphereExplorer />
 </InteractiveSection>
 
 **3. Two qubits are combined via a tensor product. What guarantees the

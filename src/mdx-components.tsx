@@ -7,8 +7,11 @@ import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { BarChart } from "@/components/visualizations/BarChart";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { EnergyLevelDiagram } from "@/components/visualizations/EnergyLevelDiagram";
+import { LevelSplittingDiagram } from "@/components/visualizations/LevelSplittingDiagram";
 import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
+import { ScatteringStandingWave } from "@/components/visualizations/ScatteringStandingWave";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { PathPhasorSum } from "@/components/visualizations/PathPhasorSum";
 import { StaticCircuitDiagram } from "@/components/visualizations/StaticCircuitDiagram";
 import { PipelineDiagram } from "@/components/visualizations/PipelineDiagram";
 import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
@@ -20,6 +23,8 @@ import { RydbergBlockadeDiagram } from "@/components/visualizations/RydbergBlock
 import { LogicalQubitPatchDiagram } from "@/components/visualizations/LogicalQubitPatchDiagram";
 import { CrosstalkDiagram } from "@/components/visualizations/CrosstalkDiagram";
 import { OrbitalShapePlot } from "@/components/visualizations/OrbitalShapePlot";
+import { PhaseWindingCircle } from "@/components/visualizations/PhaseWindingCircle";
+import { OrbitalDensityCloud } from "@/components/visualizations/OrbitalDensityCloud";
 import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 import { GraphDiagram } from "@/components/visualizations/GraphDiagram";
@@ -27,6 +32,8 @@ import { MatrixGrid } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 import { ExchangeDiagram } from "@/components/visualizations/ExchangeDiagram";
 import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
+import { ReadoutScatter } from "@/components/visualizations/ReadoutScatter";
+import { BB84RoundTable } from "@/components/visualizations/BB84RoundTable";
 
 // Markdown tables (from remark-gfm) render as plain `<table>` elements with
 // no built-in overflow handling — a wide comparison table would otherwise
@@ -49,8 +56,11 @@ const components: MDXComponents = {
   BarChart,
   BarChartExplorer,
   EnergyLevelDiagram,
+  LevelSplittingDiagram,
   PotentialDiagram,
+  ScatteringStandingWave,
   ParametricCurve,
+  PathPhasorSum,
   StaticCircuitDiagram,
   PipelineDiagram,
   MeasurementTree,
@@ -62,6 +72,8 @@ const components: MDXComponents = {
   LogicalQubitPatchDiagram,
   CrosstalkDiagram,
   OrbitalShapePlot,
+  PhaseWindingCircle,
+  OrbitalDensityCloud,
   VectorDiagram,
   VectorDiagramExplorer,
   GraphDiagram,
@@ -69,6 +81,8 @@ const components: MDXComponents = {
   MatrixGridExplorer,
   ExchangeDiagram,
   ExchangeDiagramExplorer,
+  ReadoutScatter,
+  BB84RoundTable,
 };
 
 export function useMDXComponents(): MDXComponents {

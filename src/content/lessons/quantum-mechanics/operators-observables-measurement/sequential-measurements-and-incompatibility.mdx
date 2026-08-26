@@ -10,9 +10,9 @@ export const practiceProblems = getProblemsForLesson(
 ).map((problem) => problem.meta);
 
 export const zero = StateVector.zero(1);
-export const xBasisProbs = applySingleQubitGate(zero, HADAMARD, 0).probabilities(); // [P(X=+1), P(X=-1)] for state |0>
-export const plusState = applySingleQubitGate(zero, HADAMARD, 0); // H|0> = |+>
-export const minusState = applySingleQubitGate(StateVector.basis(1, 1), HADAMARD, 0); // H|1> = |->
+export const xBasisProbs = applySingleQubitGate(zero, HADAMARD, 0).probabilities();
+export const plusState = applySingleQubitGate(zero, HADAMARD, 0);
+export const minusState = applySingleQubitGate(StateVector.basis(1, 1), HADAMARD, 0);
 export const zAfterPlus = plusState.probabilities();
 export const zAfterMinus = minusState.probabilities();
 

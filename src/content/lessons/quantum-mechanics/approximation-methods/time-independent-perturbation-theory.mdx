@@ -1,6 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
-import { firstOrderEnergyCorrection, secondOrderEnergyCorrection } from "@/lib/quantum/approximationMethods";
+import { firstOrderEnergyCorrection, firstOrderStateCorrection, secondOrderEnergyCorrection } from "@/lib/quantum/approximationMethods";
 import { harmonicOscillatorEnergyLevels, positionOperator } from "@/lib/quantum/harmonicOscillator";
 
 export const practiceProblems = getProblemsForLesson(
@@ -34,6 +34,21 @@ export const petLambdaFrames = petLambdaValues.map((lambda) => ({
   paramLabel: `λ = ${lambda}`,
   bars: petBarsForLambda(lambda)
 }));
+
+export const petStateCorrectionCoeffs = firstOrderStateCorrection(petH0diag, petHprime, 0);
+export const petStateCorrectionBars = petStateCorrectionCoeffs.slice(1).map((c, index) => {
+  const m = index + 1;
+  return {
+    label: `|${m}⁽⁰⁾⟩`,
+    value: c.magnitude(),
+    highlight: c.magnitude() === Math.max(...petStateCorrectionCoeffs.slice(1).map((coeff) => coeff.magnitude())),
+    caption: c.magnitude().toFixed(4)
+  };
+});
+
+export const petStateCorrectionFrames = [
+  { paramLabel: "λ = 0.01", bars: petStateCorrectionBars }
+];
 
 export const lessonMeta = {
   title: "Time-Independent Perturbation Theory",
@@ -128,6 +143,27 @@ coefficients built from the same matrix elements and energy gaps as
 above. By convention, the $|n^{(0)}\rangle$ component of this correction
 is taken to be exactly 0, fixing the overall normalization freedom at
 this order.
+
+For the quartic anharmonic oscillator's ground state, this sum is mostly
+empty. $x^4$ obeys a selection rule: it only connects states at most four
+levels apart and never connects states of opposite parity, so
+$H'=\lambda x^4$ only couples $|0^{(0)}\rangle$ to $|2^{(0)}\rangle$ and
+$|4^{(0)}\rangle$ among the 8 states in this course's truncated basis.
+`firstOrderStateCorrection(H0diag, Hprime, 0)`, computed here from the
+exact same $H_0$ and $H'=\lambda x^4$ matrices as the worked example
+above, makes that concrete: every coefficient $c_m$ for odd $m$, and for
+$m=6$, comes back exactly 0.
+
+<BarChartExplorer
+  frames={petStateCorrectionFrames}
+  ariaLabel="Magnitude of the first-order state correction mixing coefficient |c_m| for each basis state m=1 through 7 mixed into the perturbed ground state, for the quartic anharmonic oscillator at lambda=0.01"
+/>
+
+Only $|c_2|\approx0.0106$ and $|c_4|\approx0.0031$ are nonzero, and the
+closer neighbor wins by more than a factor of 3, the same "close,
+easily-perturbed neighbors matter far more than distant ones" pattern
+from the Intuition section above, now visible in an actual computed
+mixing coefficient rather than just asserted in words.
 
 ## Physical Interpretation
 

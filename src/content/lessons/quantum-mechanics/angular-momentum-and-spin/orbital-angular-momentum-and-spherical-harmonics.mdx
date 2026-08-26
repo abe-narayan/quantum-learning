@@ -70,6 +70,22 @@ give $e^{i\pi}=-1\neq1$, violating single-valuedness outright. Since $m$
 ranges over $-l,\dots,l$ in integer steps (last lesson), $m$ integer for
 every value forces $l$ itself to be an integer.
 
+Watch this happen directly: the marker below sits at angle $m\varphi$ on
+the unit circle and traces $e^{im\varphi}$ as $\varphi$ is scrubbed from
+$0$ to $2\pi$, the exact lap around the $z$-axis the argument above
+describes. Toggle $m$ between the integer and half-integer presets, drag
+the slider all the way to $\varphi=2\pi$, and read off where the marker
+actually lands.
+
+<PhaseWindingCircle ariaLabel="Marker at angle m times phi on the unit circle, tracing e^(i m phi) as phi sweeps from 0 to 2 pi" />
+
+For integer $m$ the marker lands back exactly on the start point: the
+same physical point in space, the same wavefunction value, no
+contradiction. For half-integer $m$ it lands on the exact opposite point
+of the circle, $e^{i\pi}=-1$, which is a different value at a point the
+wavefunction never actually left. That's the whole contradiction,
+visible directly rather than only algebraically.
+
 ### Why this argument doesn't apply to spin
 
 Spin has no position-space wavefunction to begin with. There's no
@@ -132,7 +148,7 @@ $$
 
 exactly $1$, confirming the coefficient $\sqrt{3/4\pi}$ was chosen
 correctly, matching `sphericalHarmonicNormSquared({l:1,m:0})`'s direct
-numerical output of $\approx1.0000548$ (the small residual is the grid
+numerical output of $\approx1.0000308$ (the small residual is the grid
 integration's own discretization error, not a flaw in the formula).
 
 ## Common Mistakes

@@ -4,6 +4,7 @@ import { Complex } from "@/lib/quantum/complex";
 import { projectorOntoSubspace } from "@/lib/quantum/projectors";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { ProjectionShadow } from "@/components/visualizations/ProjectionShadow";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/spectral-decomposition-and-degeneracy"
@@ -69,6 +70,16 @@ $|e_i\rangle\langle e_i|$ in the spectral decomposition is a projector
 onto the one-dimensional subspace spanned by $|e_i\rangle$; this lesson's
 only real extension is allowing that subspace to be bigger than one
 dimension.
+
+Drag $v$ around the plane below and watch its shadow $Pv$ fall onto a
+one-dimensional eigenspace (a line) versus a two-dimensional, degenerate
+eigenspace (the whole plane, where the shadow of $v$ is just $v$ itself).
+Either way, the dashed line dropping straight down from $v$ to $Pv$ is
+the "cast a shadow" step, and the small loop at $Pv$ is $P$ applied a
+second time landing on exactly the same point: idempotence, drawn rather
+than just proven.
+
+<ProjectionShadow ariaLabel="Drag a vector and see its shadow projected onto a one-dimensional or two-dimensional eigenspace" />
 
 ## Mathematical Development
 

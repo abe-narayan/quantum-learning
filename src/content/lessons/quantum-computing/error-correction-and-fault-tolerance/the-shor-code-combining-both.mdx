@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
+import { NestedCodeDiagram } from "@/components/visualizations/NestedCodeDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both"
@@ -96,6 +97,8 @@ A $Y$ error (both at once, on the same physical qubit) is caught by
 both mechanisms simultaneously, independently. The inner code doesn't
 care that an outer-level phase problem also exists, and vice versa.
 
+<NestedCodeDiagram ariaLabel="Nine qubits in three groups of three: each group boxed with a dashed inner bit-flip boundary, all three groups boxed with one larger dashed outer phase-flip boundary. A toggle for X, Z, or Y error and a target-qubit selector highlight which boundary fires: X lights the target's inner group boundary only, Z lights only the outer boundary, Y lights both at once." />
+
 ### Scope: conceptual, not simulated
 
 This platform simulates the two 3-qubit codes exactly, with real
@@ -126,8 +129,8 @@ exactly, individually: the inner bit-flip code (protecting each group of
 engines side by side, the same two pieces the construction above nests
 together.
 
-<InteractiveSection title="Both nested mechanisms, run separately" description="Left: the inner bit-flip mechanism, protecting a single group of 3 physical qubits against X errors. Right: the outer phase-flip mechanism, protecting at the level of 3 logical groups against Z errors. Inject an error into each and confirm the syndrome and recovery. Concatenation nests exactly these two pieces; neither piece is new here.">
-  <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+<InteractiveSection title="Both nested mechanisms, run separately" description="First: the inner bit-flip mechanism, protecting a single group of 3 physical qubits against X errors. Second: the outer phase-flip mechanism, protecting at the level of 3 logical groups against Z errors. Inject an error into each and confirm the syndrome and recovery. Concatenation nests exactly these two pieces; neither piece is new here.">
+  <div className="flex flex-col gap-6">
     <LazySyndromeExplorer mode="bit-flip" />
     <LazySyndromeExplorer mode="phase-flip" />
   </div>

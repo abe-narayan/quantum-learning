@@ -1,10 +1,42 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
+import { createGrid } from "@/lib/quantum/wavefunction";
+import { finiteSquareWellPotential, finiteSquareWellGroundStateEnergy } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/spin-qubits"
 ).map((problem) => problem.meta);
+
+export const dotGrid = createGrid(256, 0.1);
+export const dotHalfWidth = 1.5;
+export const dotDepth = 8;
+export const dotWellShape = finiteSquareWellPotential(dotGrid, dotHalfWidth, dotDepth);
+export const dotGroundEnergy = finiteSquareWellGroundStateEnergy(dotHalfWidth, dotDepth);
+export const dotGroundK = Math.sqrt(2 * (dotGroundEnergy + dotDepth));
+export const dotGroundKappa = Math.sqrt(-2 * dotGroundEnergy);
+export const dotEdgeAmplitude = Math.cos(dotGroundK * dotHalfWidth) * Math.exp(dotGroundKappa * dotHalfWidth);
+export const dotGroundWavefunctionRaw = dotGrid.x.map((x) =>
+  Math.abs(x) <= dotHalfWidth
+    ? Math.cos(dotGroundK * x)
+    : dotEdgeAmplitude * Math.exp(-dotGroundKappa * Math.abs(x))
+);
+export const dotGroundWavefunctionNormSquared = dotGroundWavefunctionRaw.reduce(
+  (sum, psi) => sum + psi * psi * dotGrid.dx,
+  0
+);
+export const dotGroundWavefunction = dotGroundWavefunctionRaw.map(
+  (psi) => psi / Math.sqrt(dotGroundWavefunctionNormSquared)
+);
+export const dotWavefunctionScale = dotDepth / 4;
+export const dotGroundWavefunctionOverlay = dotGroundWavefunction.map(
+  (psi) => dotGroundEnergy + psi * dotWavefunctionScale
+);
+export const dotKMax = Math.sqrt(2 * dotDepth);
+export const dotSchematicLevels = [1, 2, 3].map((n) => {
+  const k = Math.min(dotGroundK * n, dotKMax - 0.05);
+  return { n, energy: (k * k) / 2 - dotDepth };
+});
 
 export const lessonMeta = {
   title: "Spin Qubits",
@@ -64,6 +96,48 @@ electron's spin, up or down along some chosen axis, is the qubit,
 directly realizing spin-1/2's two states, $|\!\uparrow\rangle$ and
 $|\!\downarrow\rangle$.
 
+Modeling the dot's confining potential as a finite square well (half-width
+$1.5$, depth $8$, natural units, matching Wave Mechanics' own convention)
+makes that parallel visual rather than only verbal:
+
+<PotentialDiagram
+  xValues={[...dotGrid.x]}
+  potential={dotWellShape}
+  wavefunction={dotGroundWavefunctionOverlay}
+  energyLine={dotGroundEnergy}
+  markers={[{ x: -dotHalfWidth, label: "dot edge" }, { x: dotHalfWidth, label: "dot edge" }]}
+  ariaLabel="A gate-defined quantum dot modeled as a finite square well: flat V=0 outside, a depth-8 confining region of half-width 1.5 inside, with the confined electron's ground-state energy level and wavefunction overlaid, peaked inside the dot and decaying outside it"
+/>
+
+The dashed line marks the confined electron's ground-state energy, and
+the overlaid curve its ground-state wavefunction: peaked inside the dot,
+decaying into the classically forbidden region outside it, exactly the
+finite-well physics Wave Mechanics' Finite Square Well lesson already
+derived (the same $A\cos(kx)$ inside, $Be^{-\kappa|x|}$ outside
+construction, continuity-matched at the dot's edge), just now applied to
+a lithographically patterned confining region instead of an idealized 1D
+box. Like any finite well, a real dot supports more than one bound level;
+sketching the lowest three shows the same qualitative ladder (only the
+ground state's energy above is solved exactly, the way the Finite Square
+Well lesson does in full — the second and third levels below are
+illustrative spacings, not an exact excited-state calculation, since
+finding those requires the numerical eigensolver this platform
+deliberately doesn't implement, see the Wave Mechanics course):
+
+<PotentialDiagram
+  xValues={[...dotGrid.x]}
+  potential={dotWellShape}
+  energyLine={dotSchematicLevels[1].energy}
+  ariaLabel="The quantum dot's confining well with an illustrative second confined energy level, n=2, marked"
+/>
+
+<PotentialDiagram
+  xValues={[...dotGrid.x]}
+  potential={dotWellShape}
+  energyLine={dotSchematicLevels[2].energy}
+  ariaLabel="The quantum dot's confining well with an illustrative third confined energy level, n=3, marked"
+/>
+
 ### Why small size matters
 
 A quantum dot is dramatically smaller than a superconducting qubit's
@@ -96,6 +170,23 @@ laser rotates a trapped ion's internal state.
 <InteractiveSection title="Drive a spin at resonance" description="Set detuning to zero and vary the coupling strength V, playing the role of the driving field's Rabi frequency: watch the population sweep from spin-down to spin-up and back at t_π=π/(2V), the same spin-resonance physics that gives this platform its gates. Move detuning away from zero and see the achievable population drop below 1, exactly what happens when the drive frequency misses the spin's actual resonance.">
   <LazyRabiExplorer />
 </InteractiveSection>
+
+### Exchange coupling: how two-qubit gates work
+
+A single confined spin is only half the story: two-qubit gates need two
+spins to interact. Placing two quantum dots close together lets their
+electrons' wavefunctions overlap slightly, and that overlap produces an
+**exchange interaction** (Heisenberg exchange, strength $J$) that couples
+the two spins' states to each other. Critically, $J$ isn't fixed: raising
+or lowering the potential barrier between the dots, typically with a gate
+voltage, tunes the wavefunction overlap and switches the exchange
+coupling on or off on demand, which is what implements a two-qubit gate
+(a SWAP-like or CNOT-equivalent operation) between neighboring spins.
+Because this coupling comes from direct wavefunction overlap, it's
+inherently short-range: it only works between physically adjacent dots.
+That's why spin-qubit devices are laid out with nearest-neighbor,
+dot-to-dot connectivity rather than the all-to-all coupling a trapped-ion
+chain enjoys.
 
 ## Physical Interpretation
 

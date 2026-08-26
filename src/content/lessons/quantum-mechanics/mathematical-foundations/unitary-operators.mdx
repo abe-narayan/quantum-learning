@@ -1,8 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { HADAMARD, S_GATE } from "@/lib/quantum/gates";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { VectorDiagramExplorerPair } from "@/components/visualizations/VectorDiagramExplorerPair";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/unitary-operators"
@@ -20,6 +23,27 @@ export const unitaryPresets = [
   unitaryCheckPreset("Hadamard", HADAMARD),
   unitaryCheckPreset("S gate", S_GATE)
 ];
+
+export const applyRealMatrix = (matrix, x, y) => ({
+  x: matrix.get(0, 0).re * x + matrix.get(0, 1).re * y,
+  y: matrix.get(1, 0).re * x + matrix.get(1, 1).re * y
+});
+export const NON_UNITARY_STRETCH = new Matrix([
+  [new Complex(2, 0), new Complex(0, 0)],
+  [new Complex(0, 0), new Complex(1, 0)]
+]);
+export const rotationSweepFrame = (matrix, imageLabel, imageColor, angleDeg) => {
+  const ux = Math.cos((angleDeg * Math.PI) / 180);
+  const uy = Math.sin((angleDeg * Math.PI) / 180);
+  const image = applyRealMatrix(matrix, ux, uy);
+  return {
+    paramLabel: `u at ${angleDeg}°`,
+    vectors: [
+      { label: "u", x: ux, y: uy, color: "muted" },
+      { label: imageLabel, x: image.x, y: image.y, color: imageColor }
+    ]
+  };
+};
 
 export const lessonMeta = {
   title: "Unitary Operators",
@@ -72,6 +96,26 @@ rescales. Multiplying by $e^{i\theta}$ never changes a complex number's
 modulus (from the Complex Numbers lesson); a unitary operator is the
 higher-dimensional version of that same idea, never changing a vector's
 length.
+
+<InteractiveSection
+  title="Unitary vs. non-unitary: watch the arrow's length"
+  description="A unit vector u sweeps through every angle, driven by one shared slider. Left: Hu, u's image under the Hadamard matrix (this lesson's own worked example below), rotates right along with u but never changes length. Right: the same sweep through the non-unitary matrix diag(2,1) for contrast — its image visibly stretches and shrinks as it rotates, exactly the rescaling a unitary operator is forbidden from doing. Both panels move together so you can compare them at the same angle.">
+  <VectorDiagramExplorerPair
+    sliderLabel="Angle of u"
+    panels={[
+      {
+        label: "Unitary: H (Hadamard)",
+        frames: Array.from({ length: 36 }, (_, i) => rotationSweepFrame(HADAMARD, "Hu", "brand", i * 10)),
+        ariaLabel: "A unit vector u sweeping through every angle alongside its image Hu under the Hadamard matrix, with Hu staying the same length as u throughout"
+      },
+      {
+        label: "Non-unitary: diag(2, 1)",
+        frames: Array.from({ length: 36 }, (_, i) => rotationSweepFrame(NON_UNITARY_STRETCH, "Du", "accent", i * 10)),
+        ariaLabel: "The same unit vector u sweeping through every angle alongside its image under the non-unitary matrix diag(2,1), with the image visibly changing length as it rotates"
+      }
+    ]}
+  />
+</InteractiveSection>
 
 ## Mathematical Development
 

@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/classical-states-and-observables"
@@ -23,6 +24,12 @@ export const classicalEnergyFrame = (p) => ({
 });
 
 export const classicalEnergyFrames = Array.from({ length: 21 }, (_, i) => classicalEnergyFrame(i * 0.2));
+
+export const phaseSpaceFrames = classicalEnergyFrames.map((f, i) => ({
+  paramLabel: f.paramLabel,
+  x: oscillatorX,
+  p: i * 0.2,
+}));
 
 export const lessonMeta = {
   title: "Classical States and Observables",
@@ -78,6 +85,18 @@ set of all possible $(x,p)$ pairs is called **phase space**. A system with
 more degrees of freedom (three-dimensional motion, multiple particles)
 just needs more coordinates. Phase space grows, but the idea doesn't
 change: a state is a point, full stop.
+
+<InteractiveSection title="A state is a point in the (x, p) plane" description="The brand-colored curve is the fixed energy contour E(x,p) = 4 for the worked example's oscillator below (m = 1, k = 4). The marker is the state (x, p) = (1, p) as p slides from 0 to 4; it only lands on the contour when p = 2, exactly the worked example, because E(x,p) is a value the state has, not a value you choose separately.">
+  <PhaseSpacePanel
+    mode="ellipse"
+    frames={phaseSpaceFrames}
+    energy={4}
+    mass={oscillatorMass}
+    springK={oscillatorK}
+    sliderLabel="p (momentum)"
+    ariaLabel="Phase space plane showing the fixed energy-4 contour of the classical oscillator and a state point at x equals 1, p varying, that touches the contour only at p equals 2"
+  />
+</InteractiveSection>
 
 ### Observables are functions of the state
 

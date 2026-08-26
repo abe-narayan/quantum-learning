@@ -85,6 +85,53 @@ export const partialTraceOutput = (J) => {
 export const tracedOutAD = partialTraceOutput(J_AD);
 export const tracedOutDP = partialTraceOutput(J_DP);
 
+export const strengthSamples = Array.from({ length: 41 }, (_, i) => i / 40);
+
+export const choiStrengthSamples = strengthSamples.map((s) => {
+  const JADs = choiMatrix(amplitudeDampingChannel(s));
+  const blockADs = new Matrix([
+    [JADs.get(0, 0), JADs.get(0, 3)],
+    [JADs.get(3, 0), JADs.get(3, 3)],
+  ]);
+  const [mu1ADs, mu2ADs] = eigenvaluesHermitian2x2(blockADs);
+  const JDPs = choiMatrix(dephasingChannel(s));
+  return {
+    strength: s,
+    mu1AD: mu1ADs,
+    mu2AD: mu2ADs,
+    isolatedAD: JADs.get(2, 2).re,
+    isolatedDP: JDPs.get(1, 1).re,
+  };
+});
+
+export const choiSpectrumFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "AD: top block eigenvalue mu1 = 2 - gamma",
+        color: "brand",
+        points: choiStrengthSamples.map((p) => ({ x: p.strength, y: p.mu1AD })),
+      },
+      {
+        label: "AD: bottom block eigenvalue mu2 (identically 0)",
+        color: "muted",
+        points: choiStrengthSamples.map((p) => ({ x: p.strength, y: p.mu2AD })),
+      },
+      {
+        label: "AD: isolated diagonal entry J(2,2) = gamma",
+        color: "accent",
+        points: choiStrengthSamples.map((p) => ({ x: p.strength, y: p.isolatedAD })),
+      },
+      {
+        label: "Dephasing: isolated entries J(1,1) = J(2,2), pinned at 0",
+        color: "warning",
+        points: choiStrengthSamples.map((p) => ({ x: p.strength, y: p.isolatedDP })),
+      },
+    ],
+  },
+];
+
 ## Motivation
 
 Open Quantum Systems & Kraus Operators stated the Kraus sum
@@ -237,6 +284,33 @@ knowing these are physical channels), and both spectra sum to $2=d$,
 consistent with trace-preservation ($\text{Tr}J(\mathcal E)=\text{Tr}(\text{Tr}_{\text{out}}J(\mathcal E))=\text{Tr}(I)=d$,
 checked directly: `partialTraceOutput` applied to both $J_{AD}$ and
 $J_{DP}$ returns exactly $I$).
+
+### How the spectrum moves as the channel strengthens
+
+The presets above freeze $\gamma=\lambda=0.3$, which hides a fact the
+same `choiMatrix` construction reveals once it's swept over every
+strength $s\in[0,1]$: amplitude damping's *bottom* block eigenvalue
+$\mu_2$ isn't small because $\gamma=0.3$ happens to be small — it's
+$\equiv0$ for **every** $\gamma$, while the top one is the exact line
+$\mu_1(\gamma)=2-\gamma$. What actually carries $\gamma$-dependence is
+the *isolated* diagonal entry $J(2,2)=\gamma$, climbing linearly from
+$0$ to $1$. Since amplitude damping's minimal Kraus rank is the count
+of nonzero values among $\{\mu_1,\mu_2,J(2,2),J(1,1){=}0\}$, that makes
+the channel rank $1$ (the trivial identity map, no Kraus operator
+besides $K_0=I$ needed) only exactly at $\gamma=0$, and rank $2$ for
+*every* $\gamma\in(0,1]$, all the way through total decay at
+$\gamma=1$ — the rank never drops back down at that endpoint. Dephasing
+looks structurally different: its two isolated entries $J(1,1)$ and
+$J(2,2)$ stay pinned at exactly $0$ for every $\lambda$, so its rank is
+governed entirely by its *block*, whose own eigenvalues
+$\mu_1(\lambda)=2-\lambda$ and $\mu_2(\lambda)=\lambda$ are both
+nonzero throughout $(0,1)$ — dephasing never has a trivial isolated
+component to track, unlike amplitude damping.
+
+<ParametricCurve
+  frames={choiSpectrumFrames}
+  ariaLabel="Amplitude damping's two Choi block eigenvalues and isolated diagonal entry, plotted against channel strength from 0 to 1, alongside dephasing's isolated entries which stay at zero throughout"
+/>
 
 Now the hard direction's actual content: reshape the amplitude-damping
 block's top eigenvector (eigenvalue $\mu_1=1.7$, eigenvector

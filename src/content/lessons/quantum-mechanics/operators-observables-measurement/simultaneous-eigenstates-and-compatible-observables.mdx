@@ -1,8 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
-import { PAULI_X, PAULI_Y, PAULI_Z } from "@/lib/quantum/gates";
+import { PAULI_X, PAULI_Y, PAULI_Z, applySingleQubitGate, rotationX, rotationZ } from "@/lib/quantum/gates";
+import { blochStateFromAngles, stateToBlochVector } from "@/lib/quantum/bloch";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { BlochSphereCanvas } from "@/components/simulators/bloch-sphere/BlochSphereCanvas";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/simultaneous-eigenstates-and-compatible-observables"
@@ -19,6 +21,16 @@ export const incompatiblePresets = [
   commutatorPreset("X and Z", PAULI_X, "X", PAULI_Z, "Z"),
   commutatorPreset("X and Y", PAULI_X, "X", PAULI_Y, "Y")
 ];
+
+export const quarterTurnAngle = Math.PI / 2;
+export const quarterTurnStart = blochStateFromAngles({ theta: Math.PI / 2, phi: Math.PI / 2 });
+export const quarterTurnAfterZ = applySingleQubitGate(quarterTurnStart, rotationZ(quarterTurnAngle), 0);
+export const quarterTurnXZ = applySingleQubitGate(quarterTurnAfterZ, rotationX(quarterTurnAngle), 0);
+export const quarterTurnAfterX = applySingleQubitGate(quarterTurnStart, rotationX(quarterTurnAngle), 0);
+export const quarterTurnZX = applySingleQubitGate(quarterTurnAfterX, rotationZ(quarterTurnAngle), 0);
+export const quarterTurnStartBloch = stateToBlochVector(quarterTurnStart);
+export const quarterTurnXZBloch = stateToBlochVector(quarterTurnXZ);
+export const quarterTurnZXBloch = stateToBlochVector(quarterTurnZX);
 
 export const lessonMeta = {
   title: "Simultaneous Eigenstates and Compatible Observables",
@@ -140,6 +152,28 @@ one).
     presets={incompatiblePresets}
     ariaLabel="Choose a pair of Pauli operators to compare their product in both orders, confirming the two orders give different matrices"
   />
+</InteractiveSection>
+
+Non-commuting operators aren't just an algebraic curiosity, order changes
+the outcome physically. Start at $|\psi\rangle$ (an equal superposition on
+the equator), then apply a quarter-turn $X$-rotation and a quarter-turn
+$Z$-rotation to it, once in each order:
+
+<InteractiveSection title="Same two rotations, opposite order, different landing point" description="All three spheres are draggable to inspect from any angle. The start state is identical on the left. The middle sphere applies X-rotation then Z-rotation; the right sphere applies Z-rotation then X-rotation, the same two quarter-turns, reversed. They land in different places on the sphere, the geometric picture behind [X,Z] ≠ 0: X and Z rotations don't commute, so neither do the observables that generate them.">
+  <div className="not-prose grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="flex flex-col items-center gap-2">
+      <BlochSphereCanvas blochPoint={quarterTurnStartBloch} className="mx-auto w-full max-w-[180px]" />
+      <span className="text-center text-sm text-muted-foreground">Start: |ψ⟩</span>
+    </div>
+    <div className="flex flex-col items-center gap-2">
+      <BlochSphereCanvas blochPoint={quarterTurnZXBloch} className="mx-auto w-full max-w-[180px]" />
+      <span className="text-center text-sm text-muted-foreground">X then Z</span>
+    </div>
+    <div className="flex flex-col items-center gap-2">
+      <BlochSphereCanvas blochPoint={quarterTurnXZBloch} className="mx-auto w-full max-w-[180px]" />
+      <span className="text-center text-sm text-muted-foreground">Z then X</span>
+    </div>
+  </div>
 </InteractiveSection>
 
 ## Common Mistakes

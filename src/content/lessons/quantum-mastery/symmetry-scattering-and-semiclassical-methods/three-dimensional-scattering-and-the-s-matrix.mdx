@@ -35,6 +35,45 @@ export const crossSectionFrames = [
   },
 ];
 
+export const radialWaveRWindow = 6;
+
+export const radialWaveRMax = hardSphereRadius + radialWaveRWindow;
+
+export const radialWaveFrameCount = 60;
+
+export const radialWaveFrames = Array.from({ length: radialWaveFrameCount }, (_, i) => {
+  const ka = 0.02 + (i / (radialWaveFrameCount - 1)) * (4 - 0.02);
+  const k = ka / hardSphereRadius;
+  const delta0 = sWavePhaseShift(ka);
+  const rPoints = Array.from({ length: 150 }, (_, j) => (j / 149) * radialWaveRMax);
+  return {
+    paramLabel: `ka = ${ka.toFixed(2)}  (δ₀ = ${delta0.toFixed(2)} rad)`,
+    series: [
+      {
+        label: "free wave sin(kr − lπ/2)",
+        color: "muted",
+        points: rPoints.map((r) => ({ x: r, y: Math.sin(k * r) })),
+      },
+      {
+        label: "actual wave u₀(r) ∝ sin(kr + δ₀)",
+        color: "brand",
+        points: rPoints.map((r) => ({
+          x: r,
+          y: r < hardSphereRadius ? 0 : Math.sin(k * r + delta0),
+        })),
+      },
+      {
+        label: "hard wall (r = a)",
+        color: "warning",
+        points: [
+          { x: hardSphereRadius, y: -1.4 },
+          { x: hardSphereRadius, y: 1.4 },
+        ],
+      },
+    ],
+  };
+});
+
 export const lessonMeta = {
   title: "Three-Dimensional Scattering and the S-Matrix",
   description:
@@ -206,6 +245,23 @@ $$
     frames={crossSectionFrames}
     ariaLabel="Hard sphere s-wave cross section divided by 4 pi a squared, as a function of ka, approaching 1 as ka goes to zero"
     referenceLines={[{ y: 1, label: "4πa² (low-energy limit)" }]}
+  />
+</InteractiveSection>
+
+The "entire content of the scattering information" claim made algebraically
+above, that $\delta_l$ is the *only* thing distinguishing $u_l(r)$ from the
+free wave at large $r$, is easiest to see directly rather than just read off
+the formula: plot the free wave against the actual hard-sphere wave and
+watch the gap between them.
+
+<InteractiveSection
+  title="Free wave vs. actual wave: the phase shift made visible"
+  description="The free wave sin(kr−lπ/2) (l=0, no sphere) against the actual s-wave u₀(r)∝sin(kr+δ₀), both plotted past the hard wall at r=a. u₀ is forced to exactly zero inside the sphere (r<a, the wall), then rejoins the same frequency kr as the free wave but offset by exactly δ₀=−ka. Drag the slider: the wave is shifted outward by exactly one sphere radius at every energy — what visibly changes with ka is how many oscillations fit in the same window, making the shift more apparent, the same δ₀ that sets σ₀(ka) in the plot above."
+>
+  <ParametricCurve
+    frames={radialWaveFrames}
+    sliderLabel="ka"
+    ariaLabel="Free wave sin(kr) versus the actual hard-sphere s-wave u0(r) proportional to sin(kr plus delta0), plotted against radius r past the hard wall at r=a, with a slider over ka from 0.02 to 4 showing the horizontal offset delta0 equals minus ka growing as ka increases"
   />
 </InteractiveSection>
 

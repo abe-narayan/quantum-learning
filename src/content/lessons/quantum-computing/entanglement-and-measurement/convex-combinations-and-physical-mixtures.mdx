@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
+import { LazyThreeComponentMixtureExplorer } from "@/components/simulators/density-matrix-explorer/LazyThreeComponentMixtureExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/convex-combinations-and-physical-mixtures"
@@ -133,6 +134,10 @@ mixture of non-mutually-orthogonal states has no reason to collapse to
 the maximally mixed state, and it doesn't here (verified directly
 against `convexCombination`'s output).
 
+<InteractiveSection title="The worked example, live: a genuine three-component mixture" description="p₀ and p₁ are independent sliders; p₊ is always whatever probability is left over, so ρ = p₀|0⟩⟨0| + p₁|1⟩⟨1| + p₊|+⟩⟨+| is a valid mixture at every position. Start on the 'Worked example' preset to reproduce the ρ computed above, then drag a slider and watch the Bloch point respond to all three components moving at once — not two components mixed pairwise, but the real three-term sum.">
+  <LazyThreeComponentMixtureExplorer />
+</InteractiveSection>
+
 <PredictBeforeReveal
   question="For the 50/50 mixture of |0⟩ and |1⟩ from above (ρ = I/2), what are its purity Tr(ρ²) and von Neumann entropy S(ρ)?"
   options={[
@@ -145,7 +150,7 @@ against `convexCombination`'s output).
   explanation="I/2's eigenvalues are both exactly 0.5, so Tr(ρ²) = 0.5²+0.5² = 0.5 — the lowest purity any single-qubit density matrix can have — and S(ρ) = -0.5log₂0.5 - 0.5log₂0.5 = 1 bit, the largest entropy a qubit can carry. That's confirmed directly from `purity` and `vonNeumannEntropy` in densityMatrix.ts applied to I/2. Contrast that with the non-orthogonal |0⟩/|+⟩ mixture you'll build in the explorer below: because the two components overlap instead of sitting orthogonal, that mixture's purity comes out well above 0.5 — mixed, but nowhere near as mixed as the maximally mixed case."
 />
 
-<InteractiveSection title="Orthogonal vs. non-orthogonal mixtures, side by side" description="The density matrix explorer only mixes two components, so build the pieces of the worked example one pair at a time. First load the 'mix-0-1' preset (50/50, orthogonal) and note the point sits exactly at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this is non-orthogonal, off-center, and behaves nothing like the orthogonal case. That's the same reason the three-component worked example above lands away from I/2 too.">
+<InteractiveSection title="Orthogonal vs. non-orthogonal mixtures, side by side" description="This explorer mixes exactly two components — enough to isolate the orthogonality question on its own. First load the 'mix-0-1' preset (50/50, orthogonal) and note the point sits exactly at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this is non-orthogonal, off-center, and behaves nothing like the orthogonal case. That's the same reason the three-component worked example above lands away from I/2 too.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 

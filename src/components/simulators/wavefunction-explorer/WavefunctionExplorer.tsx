@@ -70,13 +70,20 @@ function parseWavefunctionParams(
  * keeps a preset switch from ever rendering an old wavefunction next to a
  * new grid.
  */
-export function WavefunctionExplorer() {
+export function WavefunctionExplorer({
+  initialPresetId,
+  showMeanSpreadOverlay = false,
+}: {
+  initialPresetId?: PresetId;
+  /** Forwarded to WavefunctionCanvas via WavefunctionSimulation — see its doc comment. */
+  showMeanSpreadOverlay?: boolean;
+} = {}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const initialPreset = getPreset("free-gaussian");
+  const initialPreset = getPreset(initialPresetId ?? "free-gaussian");
   const initialFromUrl = parseWavefunctionParams(searchParams);
   // presetId and paramValues are held as ONE state object, updated together
   // in a single setState call — never two separate calls a preset switch
@@ -217,6 +224,7 @@ export function WavefunctionExplorer() {
               speed={speed}
               onSpeedChange={setSpeed}
               prefersReducedMotion={prefersReducedMotion}
+              showMeanSpreadOverlay={showMeanSpreadOverlay}
             />
           </div>
 

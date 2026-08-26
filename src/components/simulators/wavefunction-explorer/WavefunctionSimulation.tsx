@@ -27,12 +27,15 @@ export function WavefunctionSimulation({
   speed,
   onSpeedChange,
   prefersReducedMotion,
+  showMeanSpreadOverlay = false,
 }: {
   setup: PresetSetup;
   mode: CanvasMode;
   speed: number;
   onSpeedChange: (speed: number) => void;
   prefersReducedMotion: boolean;
+  /** Forwarded to WavefunctionCanvas — see its doc comment. */
+  showMeanSpreadOverlay?: boolean;
 }) {
   const evolver = useMemo(
     () => new SplitOperatorEvolver(setup.grid, setup.potential, setup.dt, 1),
@@ -86,7 +89,13 @@ export function WavefunctionSimulation({
 
   return (
     <div className="space-y-3">
-      <WavefunctionCanvas grid={setup.grid} psi={psi} potential={setup.potential} mode={mode} />
+      <WavefunctionCanvas
+        grid={setup.grid}
+        psi={psi}
+        potential={setup.potential}
+        mode={mode}
+        showMeanSpreadOverlay={showMeanSpreadOverlay}
+      />
 
       <PlaybackControls
         isPlaying={isPlaying}

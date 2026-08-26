@@ -1,10 +1,30 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+import { amplitudeDampingChannel, dephasingChannel } from "@/lib/quantum/openSystems";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators"
 ).map((problem) => problem.meta);
+
+export const [K0_AD, K1_AD] = amplitudeDampingChannel(0.3);
+export const [K0_DP, K1_DP] = dephasingChannel(0.3);
+export const sumAD = K0_AD.dagger().mul(K0_AD).add(K1_AD.dagger().mul(K1_AD));
+export const sumDP = K0_DP.dagger().mul(K0_DP).add(K1_DP.dagger().mul(K1_DP));
+
+export const krausCheckPreset = (label, K0, K1, sum) => ({
+  label,
+  panels: [
+    { label: "K0", cells: matrixToCells(K0) },
+    { label: "K1", cells: matrixToCells(K1) },
+    { label: "K0†K0 + K1†K1", cells: matrixToCells(sum), highlightDiagonal: true },
+  ],
+});
+export const krausCheckPresets = [
+  krausCheckPreset("Amplitude damping (γ=0.3)", K0_AD, K1_AD, sumAD),
+  krausCheckPreset("Dephasing (λ=0.3)", K0_DP, K1_DP, sumDP),
+];
 
 export const lessonMeta = {
   title: "Open Quantum Systems & Kraus Operators",
@@ -130,6 +150,18 @@ $$
 confirmed for every $\gamma\in[0,1]$ by this platform's
 `isTracePreserving(amplitudeDampingChannel(gamma))`, which returns `true`
 across the full range.
+
+The same identity, seen rather than just algebraically derived: each
+preset below shows $K_0$, $K_1$, and $K_0^\dagger K_0+K_1^\dagger K_1$
+for a real channel this platform computes numerically
+(`amplitudeDampingChannel(0.3)` and `dephasingChannel(0.3)`), with the
+sum's diagonal highlighted to make "$=I$" visually immediate rather than
+something to take on faith from the LaTeX above.
+
+<MatrixGridExplorer
+  presets={krausCheckPresets}
+  ariaLabel="Kraus operators K0, K1, and their completeness sum K0-dagger K0 plus K1-dagger K1, for amplitude damping and dephasing at strength 0.3"
+/>
 
 ## Common Mistakes
 

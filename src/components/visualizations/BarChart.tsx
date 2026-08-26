@@ -45,7 +45,7 @@ export function BarChart({
       style={{ height }}
     >
       {bars.map((bar, index) => {
-        const barHeightPct = (Math.abs(bar.value) / effectiveMax) * 90;
+        const barHeightPct = Math.min(100, (Math.abs(bar.value) / effectiveMax) * 90);
         return (
           <div key={index} className="flex min-w-[2.25rem] flex-1 flex-col items-center justify-end gap-1">
             <span className="font-mono text-[10px] text-muted-foreground">{bar.caption ?? defaultFormat(bar.value)}</span>

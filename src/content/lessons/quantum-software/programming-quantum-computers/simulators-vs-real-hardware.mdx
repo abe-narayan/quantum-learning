@@ -11,6 +11,10 @@ export const formatMemoryBytes = (bytes) => (
   : `${(bytes / 1e15).toFixed(1)} PB`
 );
 
+export const stateVectorFrameQubitCounts = [10, 15, 20, 25, 30, 35, 40, 45, 50];
+
+export const linearScaleMaxValue = stateVectorMemoryBytes(30);
+
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/programming-quantum-computers/simulators-vs-real-hardware"
 ).map((problem) => problem.meta);
@@ -105,19 +109,59 @@ isn't a rough estimate; it's an exact, computed curve.
   explanation="17.2 GB at 30 qubits, already beyond a typical laptop's RAM. The curve climbs from 16.8 MB at n=20 to 18.0 PB at n=50, purely from the amplitude count doubling with every added qubit (2ⁿ). Slide the Explorer below up to n=30 and check its caption against this number."
 />
 
-<InteractiveSection title="Feel the exponential wall yourself" description="Slide n from 10 up to 50 qubits. Both bars are log10-scaled since they span many orders of magnitude, but the captions show the real numbers, computed live by this platform's own stateVectorAmplitudeCount and stateVectorMemoryBytes, the exact same functions behind the 16.8 MB, 17.2 GB, and 18.0 PB figures quoted above.">
-  <BarChartExplorer
-    sliderLabel="Qubit count (n)"
-    ariaLabel="State-vector amplitude count and memory required, both on a log10 scale, as qubit count n grows from 10 to 50"
-    maxValue={Math.log10(stateVectorMemoryBytes(50))}
-    frames={[10, 15, 20, 25, 30, 35, 40, 45, 50].map((n) => ({
-      paramLabel: `n = ${n}`,
-      bars: [
-        { label: "Amplitudes (2ⁿ)", value: Math.log10(stateVectorAmplitudeCount(n)), caption: stateVectorAmplitudeCount(n).toExponential(2) },
-        { label: "Memory", value: Math.log10(stateVectorMemoryBytes(n)), caption: formatMemoryBytes(stateVectorMemoryBytes(n)), highlight: true },
-      ],
-    }))}
-  />
+<InteractiveSection title="Feel the exponential wall yourself" description="Slide n from 10 up to 50 qubits, then toggle between a log10 scale (readable at every n, but smooths the climb into a gentle slope) and a linear scale (unreadable at large n, but the one that actually looks like a wall). Captions always show the real numbers, computed live by this platform's own stateVectorAmplitudeCount and stateVectorMemoryBytes, the exact same functions behind the 16.8 MB, 17.2 GB, and 18.0 PB figures quoted above.">
+  <div className="not-prose flex flex-wrap items-center gap-2">
+    <input type="radio" id="svh-scale-linear" name="svh-scale" className="peer/linear sr-only" />
+    <label
+      htmlFor="svh-scale-linear"
+      className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/linear:border-transparent peer-checked/linear:bg-brand peer-checked/linear:text-brand-foreground peer-focus-visible/linear:outline-none peer-focus-visible/linear:ring-2 peer-focus-visible/linear:ring-brand peer-focus-visible/linear:ring-offset-2 peer-focus-visible/linear:ring-offset-background"
+    >
+      Linear scale
+    </label>
+    <input type="radio" id="svh-scale-log" name="svh-scale" defaultChecked className="peer/log sr-only" />
+    <label
+      htmlFor="svh-scale-log"
+      className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/log:border-transparent peer-checked/log:bg-brand peer-checked/log:text-brand-foreground peer-focus-visible/log:outline-none peer-focus-visible/log:ring-2 peer-focus-visible/log:ring-brand peer-focus-visible/log:ring-offset-2 peer-focus-visible/log:ring-offset-background"
+    >
+      Log scale
+    </label>
+    <div className="hidden w-full peer-checked/linear:block">
+      <div className="not-prose overflow-hidden rounded-xl">
+        <BarChartExplorer
+          sliderLabel="Qubit count (n)"
+          ariaLabel="State-vector amplitude count and memory required, on a linear scale fixed to n=30's memory requirement, as qubit count n grows from 10 to 50; bars for n=35 and above run off the top of the chart"
+          maxValue={linearScaleMaxValue}
+          frames={stateVectorFrameQubitCounts.map((n) => ({
+            paramLabel: `n = ${n}`,
+            bars: [
+              { label: "Amplitudes (2ⁿ)", value: stateVectorAmplitudeCount(n), caption: stateVectorAmplitudeCount(n).toExponential(2) },
+              { label: "Memory", value: stateVectorMemoryBytes(n), caption: formatMemoryBytes(stateVectorMemoryBytes(n)), highlight: true },
+            ],
+          }))}
+        />
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Bars for n = 35 and above run off the top of this chart, clipped at
+        the border, that is the wall, not a rendering bug. The axis is fixed
+        to n = 30&apos;s memory requirement (about 17.2 GB) so nothing past
+        it fits on screen; fine, fine, fine, then gone.
+      </p>
+    </div>
+    <div className="hidden w-full peer-checked/log:block">
+      <BarChartExplorer
+        sliderLabel="Qubit count (n)"
+        ariaLabel="State-vector amplitude count and memory required, both on a log10 scale, as qubit count n grows from 10 to 50"
+        maxValue={Math.log10(stateVectorMemoryBytes(50))}
+        frames={stateVectorFrameQubitCounts.map((n) => ({
+          paramLabel: `n = ${n}`,
+          bars: [
+            { label: "Amplitudes (2ⁿ)", value: Math.log10(stateVectorAmplitudeCount(n)), caption: stateVectorAmplitudeCount(n).toExponential(2) },
+            { label: "Memory", value: Math.log10(stateVectorMemoryBytes(n)), caption: formatMemoryBytes(stateVectorMemoryBytes(n)), highlight: true },
+          ],
+        }))}
+      />
+    </div>
+  </div>
 </InteractiveSection>
 
 ## Physical Interpretation

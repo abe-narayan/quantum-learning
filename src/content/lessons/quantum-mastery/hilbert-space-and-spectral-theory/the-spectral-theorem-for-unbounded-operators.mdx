@@ -6,6 +6,8 @@ import { Complex } from "@/lib/quantum/complex";
 import { projectorOntoSubspace } from "@/lib/quantum/projectors";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { expectationValue } from "@/lib/quantum/observables";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators"
@@ -40,6 +42,37 @@ export const reconstructionPreset = [
     label: "∫λ dE(λ) reconstructs N",
     panels: [
       { label: "1·P₁ + 2·P₂", cells: matrixToCells(reconstructedN), highlightDiagonal: true },
+    ],
+  },
+];
+
+export const equalSuperpositionNorm = 1 / Math.sqrt(3);
+export const psiEqualSuperposition = {
+  amplitudes: [
+    new Complex(equalSuperpositionNorm),
+    new Complex(equalSuperpositionNorm),
+    new Complex(equalSuperpositionNorm),
+  ],
+};
+export const normSquaredOnP1 = expectationValue(psiEqualSuperposition, p1).re;
+export const normSquaredOnP2 = expectationValue(psiEqualSuperposition, p2).re;
+
+export const eOfLambdaFrames = [
+  {
+    paramLabel: "⟨ψ|E(λ)|ψ⟩ for ψ = (|0⟩+|1⟩+|2⟩)/√3",
+    series: [
+      {
+        label: "⟨ψ|E(λ)|ψ⟩",
+        color: "brand",
+        points: [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 1, y: normSquaredOnP1 },
+          { x: 2, y: normSquaredOnP1 },
+          { x: 2, y: normSquaredOnP1 + normSquaredOnP2 },
+          { x: 3, y: normSquaredOnP1 + normSquaredOnP2 },
+        ],
+      },
     ],
   },
 ];
@@ -248,7 +281,30 @@ values as $\lambda$ sweeps past both eigenvalues:
 </InteractiveSection>
 
 $E(\lambda)$ jumps by $P_1$ at $\lambda=1$ and by $P_2$ at $\lambda=2$,
-nowhere else. The Riemann–Stieltjes sum over exactly those two jumps,
+nowhere else. The matrix snapshots above show $E(\lambda)$ itself, as an
+operator, at three isolated values of $\lambda$; the claim that
+$E(\lambda)$ is *literally a staircase function of $\lambda$* is easier
+to see by collapsing the operator down to a single number. Fix a test
+state $\psi=(|0\rangle+|1\rangle+|2\rangle)/\sqrt3$ (equal superposition
+of all three eigenvectors) and plot the scalar $\langle\psi|E(\lambda)
+\psi\rangle$ against $\lambda$ directly, the actual quantity the
+Riemann–Stieltjes integral above integrates against:
+
+<ParametricCurve
+  frames={eOfLambdaFrames}
+  referenceLines={[
+    { y: normSquaredOnP1, label: "‖P₁ψ‖²" },
+    { y: normSquaredOnP1 + normSquaredOnP2, label: "‖P₁ψ‖² + ‖P₂ψ‖² = 1" },
+  ]}
+  ariaLabel="Step function plot of the expectation value of E(lambda) in the equal-superposition test state, flat at 0 below lambda=1, jumping to the norm-squared of P1 psi at lambda=1, then jumping to 1 at lambda=2"
+/>
+
+This is exactly the staircase from the definition
+$E(\lambda)=\sum_{\lambda_i\le\lambda}P_i$: flat at $0$ below every
+eigenvalue, a jump of $\|P_1\psi\|^2$ exactly at $\lambda=1$, flat again,
+then a jump of $\|P_2\psi\|^2$ exactly at $\lambda=2$ up to $1$
+(completeness, $E(\infty)=I$, so $\langle\psi|I|\psi\rangle=\|\psi\|^2=1$).
+The Riemann–Stieltjes sum over exactly those two jumps,
 weighted by $\lambda$, reconstructs $N$ directly:
 
 <MatrixGridExplorer

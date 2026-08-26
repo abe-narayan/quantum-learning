@@ -1,10 +1,17 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
+import { StabilizerTable } from "@/components/visualizations/StabilizerTable";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"
 ).map((problem) => problem.meta);
+
+export const generatorPatterns = {
+  g1: "ZZI",
+  g2: "IZZ",
+};
+export const generatorEntries = Object.entries(generatorPatterns).map((entry) => ({ label: entry[0], pattern: entry[1] }));
 
 export const lessonMeta = {
   title: "Stabilizer Formalism Basics",
@@ -116,6 +123,16 @@ $Z_1Z_2$ (also has $Z$ on qubit 1) contain a $Z$ on qubit 1, so $X_1$
 anticommutes with *both*, flipping both syndrome bits to $1$:
 $(1,1)$, exactly matching the decode table's qubit-1 entry from Lesson
 2, now derived from the operators' structure rather than just quoted.
+
+The grid below runs the same anticommutation check generally: $g_1=Z_0Z_1$
+and $g_2=Z_1Z_2$ as Pauli strings, labeled with this lesson's own
+0-indexed qubits, with a qubit and X/Z error-type selector that
+highlights live which generator(s) anticommute with the chosen
+single-qubit error. It opens on $X_1$, reproducing the $(1,1)$ result
+just derived by hand; try qubit $0$ or qubit $2$ to reproduce the
+lesson's other two hand-derived cases the same way.
+
+<StabilizerTable generators={generatorEntries} ariaLabel="Interactive table of the bit-flip code's two stabilizer generators g1 (Z0Z1) and g2 (Z1Z2) across qubits 0 through 2, with a qubit and X/Z error-type selector that highlights which generators anticommute with the chosen single-qubit error" defaultQubit={2} qubitLabelOffset={1} />
 
 <InteractiveSection title="Both stabilizers flip for the same error" description="Inject an X error on qubit 1. Watch which stabilizer's sign flips: the (1,1) syndrome you see is Z0Z1 AND Z1Z2 both anticommuting with X1, exactly as derived above, not a coincidence.">
   <LazySyndromeExplorer mode="bit-flip" />

@@ -8,7 +8,7 @@ export const practiceProblems = getProblemsForLesson(
 
 export const xF = 3;
 export const xI = -1;
-export const halfTau = 1; // tau/2, with tau=2
+export const halfTau = 1;
 export const x1Values = Array(100).fill(0).map((_, i) => -8 + (i / 99) * 16);
 
 export const pathIntegrandFrames = [
@@ -84,6 +84,23 @@ reinforce rather than cancel. That's the whole idea before any integral
 gets written down: probability comes from constructive interference
 among the paths near the classical one, and destructive interference
 washing out nearly everything else.
+
+The panels below make that clock-hand picture concrete, though only
+illustratively: the left panel draws a batch of sample paths between two
+fixed endpoints, each one's "wiggliness" standing in for how different it
+is from the straight classical path, and colors every path by its
+resulting phase. The right panel takes those same phases as unit-length
+clock hands and adds them tip to tail, with the resultant arrow's length
+read off as the total amplitude. Drag the effective-$\hbar$ slider down
+and each path's phase gets amplified, sending the wilder paths' hands
+spinning off in nearly random directions that cancel almost completely;
+drag it up and those phases compress back toward the classical path's,
+so the hands line up and the resultant arrow grows, the same
+classical-limit argument stated in words above. (This is a simplified
+stand-in for the metaphor, not the lesson's real Euclidean path-integral
+computation, which the Worked Example below plots directly.)
+
+<PathPhasorSum />
 
 ## Mathematical Development
 

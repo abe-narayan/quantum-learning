@@ -1,10 +1,27 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
+import { PAULI_X, PAULI_Y, PAULI_Z } from "@/lib/quantum/gates";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/angular-momentum-and-spin/spin-one-half-systems"
 ).map((problem) => problem.meta);
+
+export const spinPauliPresetForAxis = (axisLabel, spinOp, pauliOp) => ({
+  label: axisLabel,
+  panels: [
+    { label: `S${axisLabel.toLowerCase()} = angularMomentum${axisLabel}(0.5)`, cells: matrixToCells(spinOp) },
+    { label: `(ħ/2)${axisLabel} = PAULI_${axisLabel}.scale(0.5)`, cells: matrixToCells(pauliOp.scale(0.5)), highlightDiagonal: axisLabel === "Z" }
+  ]
+});
+
+export const spinPauliPresets = [
+  spinPauliPresetForAxis("X", angularMomentumX(0.5), PAULI_X),
+  spinPauliPresetForAxis("Y", angularMomentumY(0.5), PAULI_Y),
+  spinPauliPresetForAxis("Z", angularMomentumZ(0.5), PAULI_Z)
+];
 
 export const lessonMeta = {
   title: "Spin-1/2 Systems",
@@ -62,6 +79,17 @@ $$
 confirmed to match exactly (to floating-point precision) in this
 platform's own test suite, not a coincidence or an analogy, but the
 literal $j=\tfrac12$ instance of the general construction Lesson 2 built.
+
+<InteractiveSection
+  title="Sx, Sy, Sz against (ħ/2)X, (ħ/2)Y, (ħ/2)Z, entry by entry"
+  description="Pick an axis and compare the spin-1/2 operator, computed here as the actual j=1/2 case of the general ladder-operator construction (angularMomentumX/Y/Z), against (ħ/2) times the corresponding Pauli matrix used throughout this platform's qubit engine. They match exactly, entry by entry, on all three axes, not merely by analogy."
+>
+  <MatrixGridExplorer
+    presets={spinPauliPresets}
+    ariaLabel="Sx, Sy, and Sz, each shown beside (hbar/2) times the corresponding Pauli matrix X, Y, or Z, confirming the two are exactly equal entry by entry"
+  />
+</InteractiveSection>
+
 $S_z$'s eigenvalues are $\pm\hbar/2$ (i.e. $m=\pm\tfrac12$, exactly the
 "$-j$ to $j$ in integer steps" rule with $j=\tfrac12$ giving the two
 values $-\tfrac12,+\tfrac12$), and $\vec S^{\,2}$'s eigenvalue is

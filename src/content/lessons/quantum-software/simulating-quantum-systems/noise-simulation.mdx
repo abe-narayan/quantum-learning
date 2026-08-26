@@ -1,10 +1,41 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD } from "@/lib/quantum/gates";
+import { pureStateDensityMatrix, purity, densityMatrixMeasurementProbability } from "@/lib/quantum/densityMatrix";
+import { dephasingChannel } from "@/lib/quantum/openSystems";
+import { runNoisyCircuit } from "@/lib/quantum/noisyCircuitSimulation";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/simulating-quantum-systems/noise-simulation"
 ).map((problem) => problem.meta);
+
+export const noiseSimZero = new StateVector([Complex.ONE, Complex.ZERO]);
+export const noiseSimRho0 = pureStateDensityMatrix(noiseSimZero);
+export const noiseSimDephasing = dephasingChannel(0.2);
+export const noiseSimProjector0 = new Matrix([
+  [Complex.ONE, Complex.ZERO],
+  [Complex.ZERO, Complex.ZERO],
+]);
+export const noiseSimProjector1 = new Matrix([
+  [Complex.ZERO, Complex.ZERO],
+  [Complex.ZERO, Complex.ONE],
+]);
+export const noiseSimGateCounts = [1, 2, 3];
+export const noiseSimResults = noiseSimGateCounts.map((n) =>
+  runNoisyCircuit(noiseSimRho0, Array(n).fill(HADAMARD), noiseSimDephasing)
+);
+export const noiseSimFrames = noiseSimResults.map((result, i) => ({
+  paramLabel: `${noiseSimGateCounts[i]} noisy H gate${noiseSimGateCounts[i] === 1 ? "" : "s"}`,
+  bars: [
+    { label: "P(0)", value: densityMatrixMeasurementProbability(result, noiseSimProjector0) },
+    { label: "P(1)", value: densityMatrixMeasurementProbability(result, noiseSimProjector1) },
+    { label: "Purity", value: purity(result), highlight: true },
+  ],
+}));
 
 export const lessonMeta = {
   title: "Noise Simulation",
@@ -121,6 +152,15 @@ partially "undoes" the first's basis rotation relative to the noise's
 preferred axis), a genuine, checkable detail illustrating that noise
 accumulation isn't always simply monotonic step-by-step, even though it
 trends downward overall.
+
+<InteractiveSection title="Purity across the worked example, computed live" description="Each step re-runs this platform's own runNoisyCircuit from |0⟩ with 1, 2, or 3 noisy H gates (dephasing λ=0.2 interleaved after every gate, exactly as runNoisyCircuit's loop does). Slide across gate counts: purity drops from 1 to ≈0.82 after the first gate, stays at ≈0.82 after the second (the non-monotonic step this section asks about), then drops again to ≈0.70 after the third.">
+  <BarChartExplorer
+    sliderLabel="Noisy H gates applied"
+    ariaLabel="P(0), P(1), and purity after 1, 2, or 3 noisy H gates, showing purity flat between 1 and 2 gates then dropping at 3 gates"
+    maxValue={1}
+    frames={noiseSimFrames}
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { LazyQAOAExplorer } from "@/components/simulators/qaoa-explorer/LazyQAOAExplorer";
 import { qaoaCircuit, expectedCutSize, bruteForceMaxCut } from "@/lib/quantum/qaoa";
 
 export const practiceProblems = getProblemsForLesson(
@@ -129,6 +130,10 @@ genuinely good parameters via genuinely evaluating the same
     referenceLines={[{ y: landscapeTrueMax, label: "true max = 2" }, { y: landscapeBaseline, label: "baseline |E|/2 = 1.5" }]}
     ariaLabel="Expected triangle cut size as a function of the cost angle γ, for several fixed mixer angles β, showing the QAOA cost landscape's bumpy, non-closed-form shape"
   />
+</InteractiveSection>
+
+<InteractiveSection title="Search the full (γ,β) landscape yourself" description="The curves above only sliced the landscape at seven fixed β values. Here both γ and β are free — drag either slider and watch the triangle's most-likely measured coloring, expected cut ⟨C⟩, and approximation ratio update live against the real bruteForceMaxCut optimum. Try to find the γ≈0.6, β≈0.3 region quoted above by feel, then switch the preset to the single edge and see whether its own γ≈1.55, β≈0.40 optimum is easier or harder to land on.">
+  <LazyQAOAExplorer />
 </InteractiveSection>
 
 ## Physical Interpretation

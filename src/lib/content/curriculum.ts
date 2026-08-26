@@ -318,8 +318,8 @@ export const COURSES: Course[] = [
       { slug: "quantum-phase-estimation", title: "Quantum Phase Estimation" },
       { slug: "grovers-algorithm-oracle-and-diffusion", title: "Grover's Algorithm: Oracle and Diffusion" },
       { slug: "grovers-algorithm-amplitude-amplification", title: "Grover's Algorithm: Amplitude Amplification" },
-      { slug: "capstone-comparing-quantum-advantage", title: "Capstone: Comparing Quantum Advantage" },
       { slug: "simons-algorithm", title: "Simon's Algorithm" },
+      { slug: "capstone-comparing-quantum-advantage", title: "Capstone: Comparing Quantum Advantage" },
     ],
   },
   {

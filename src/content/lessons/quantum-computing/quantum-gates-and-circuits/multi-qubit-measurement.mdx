@@ -108,6 +108,21 @@ measurement, its value is **exactly determined**, with certainty. This is
 the full mechanism behind the correlation from the last lesson, not an
 approximation of it.
 
+The same two outcomes, drawn as the branching process they actually are:
+one 50/50 measurement, and qubit 1's fate fixed by which branch it lands
+in.
+
+<MeasurementTree
+  root={{
+    label: "Measure qubit 0 of |Φ+⟩",
+    children: [
+      { label: "outcome 0 → |00⟩, qubit 1 is |0⟩", probability: 0.5 },
+      { label: "outcome 1 → |11⟩, qubit 1 is |1⟩", probability: 0.5 },
+    ],
+  }}
+  ariaLabel="Measuring qubit 0 of the Bell state Phi-plus: two equally likely branches. Outcome 0 collapses to |00>, leaving qubit 1 exactly |0>. Outcome 1 collapses to |11>, leaving qubit 1 exactly |1>."
+/>
+
 ### Not every partial measurement does this
 
 Contrast with an unentangled example: $|+\rangle\otimes|0\rangle$, where

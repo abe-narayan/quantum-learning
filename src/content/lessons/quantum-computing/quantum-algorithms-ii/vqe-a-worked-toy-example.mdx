@@ -65,12 +65,17 @@ computed independently via `exactGroundStateEnergy`, not asserted.
 ### Running the optimizer
 
 `runVqe(H, 80)` starts at $(\theta,\varphi)=(\pi/2,0)$ (the state
-$|+\rangle$) and runs 80 pattern-search steps. The cost history decreases
-monotonically (proven structurally: the optimizer only ever accepts a
-strictly better candidate, checked directly in this course's tests) and
-converges to an energy within $10^{-12}$ of $-1$, far tighter than
-needed for any practical purpose, since the pattern search keeps halving
-its step size until it's negligibly small.
+$|+\rangle$) and allows *up to* 80 pattern-search steps, but 80 is only a
+ceiling, not a count of what actually runs: the loop has a second, real
+halting condition, stopping as soon as its step size shrinks to $10^{-6}$
+or below. For this Hamiltonian that threshold is hit after just 28
+iterations (`toyVqeResult.history.length - 1`), so the run exits fewer
+than halfway to its 80-step budget without ever coming close to using it.
+The cost history decreases monotonically (proven structurally: the
+optimizer only ever accepts a strictly better candidate, checked directly
+in this course's tests) and converges to an energy within $10^{-12}$ of
+$-1$, far tighter than needed for any practical purpose — and it's exactly
+that shrinking step size, not the iteration cap, that ends the run.
 
 This is the actual history array `runVqe` returned for this exact
 Hamiltonian, not a smoothed illustration:
@@ -166,8 +171,10 @@ points.
 
 - $H=0.6Z+0.8X$ has exact ground energy $-1$, confirmed independently via
   both the quadratic formula and this platform's closed-form eigensolver.
-- `runVqe` converges to within $10^{-12}$ of this exact value over 80
-  pattern-search iterations, with a monotonically decreasing cost history.
+- `runVqe` converges to within $10^{-12}$ of this exact value after just 28
+  pattern-search iterations, halted early by its step-size shrinking below
+  $10^{-6}$, well short of the 80-iteration budget it was allowed, with a
+  monotonically decreasing cost history throughout.
 - Shrinking step sizes are a direct signal of approaching a local (here,
   global) minimum of a smooth cost landscape.
 

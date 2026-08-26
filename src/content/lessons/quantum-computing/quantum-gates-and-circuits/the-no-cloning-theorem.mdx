@@ -116,7 +116,18 @@ $$
 
 Both sides are real, computable states, not just symbols; laying the
 engine's actual output for each side next to the other makes the
-mismatch impossible to miss:
+mismatch impossible to miss. Here's the attempted-cloning circuit itself,
+the same H-then-CNOT construction used in the Bell-state derivation two
+lessons ago:
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+  ]}
+  ariaLabel="A two-qubit circuit: H on qubit 0, then CNOT with qubit 0 as control and qubit 1 as target, an attempted cloning of |+⟩"
+/>
 
 <PredictBeforeReveal
   question="Apply H to qubit 0 (making it |+⟩), then CNOT(0,1) with qubit 1 as a blank |0⟩ — an attempt to 'copy' |+⟩. Does this circuit actually produce two independent copies, |+⟩ ⊗ |+⟩?"

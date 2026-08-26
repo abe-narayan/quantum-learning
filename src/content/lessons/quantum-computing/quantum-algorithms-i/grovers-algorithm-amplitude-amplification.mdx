@@ -3,10 +3,28 @@ import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
+import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification"
 ).map((problem) => problem.meta);
+
+export const groverRotationFrame = (k) => {
+  const n = 4;
+  const N = 2 ** n;
+  const theta = Math.asin(1 / Math.sqrt(N));
+  const angle = (2 * k + 1) * theta;
+  const probability = Math.sin(angle) ** 2;
+  return {
+    paramLabel: `k = ${k}  (P = ${(probability * 100).toFixed(1)}%)`,
+    vectors: [
+      { label: "|α⟩", x: 1, y: 0, color: "muted", dashed: true },
+      { label: "|β⟩", x: 0, y: 1, color: "muted", dashed: true },
+      { label: "|s⟩", x: Math.cos(theta), y: Math.sin(theta), color: "accent", dashed: true },
+      { label: `k=${k}`, x: Math.cos(angle), y: Math.sin(angle), color: "brand" },
+    ],
+  };
+};
 
 export const lessonMeta = {
   title: "Grover's Algorithm: Amplitude Amplification",
@@ -129,6 +147,14 @@ needs the *right* number of iterations, not simply "more."
   correctValue="oscillate"
   explanation="P(marked)=sin²((2k+1)θ) is periodic in k, exactly like an ordinary rotation that overshoots a target angle and comes back around. Running past the optimal iteration count doesn't lock in the peak — it oscillates back down, and later back up, exactly what the closed form predicts and what stepping past the peak below shows directly."
 />
+
+<InteractiveSection title="Watch the rotation itself, not just the bars" description="This is the geometry the derivation above is actually about: the plane spanned by |α⟩ (x-axis) and |β⟩ (y-axis). The dashed vector is the fixed starting state |s⟩ at angle θ. The solid vector is the state after k iterations, at angle (2k+1)θ, computed from the exact θ=arcsin(1/√N) for N=16 (matching the Worked Example below). Drag the slider through k and watch the solid vector sweep by a constant 2θ every step: it reaches closest to |β⟩ around the optimal k, then keeps going, overshoots, and swings back — the same periodicity as the closed form, seen as an actual rotation instead of a bar height.">
+  <VectorDiagramExplorer
+    frames={Array.from({ length: 13 }, (_, k) => groverRotationFrame(k))}
+    sliderLabel="Iterations k"
+    ariaLabel="A 2D plane with axes ket alpha and ket beta, showing the dashed starting vector ket s at angle theta and the solid current-state vector at angle two k plus one theta, sweeping by a constant angle each Grover iteration, overshooting past ket beta and swinging back as k increases"
+  />
+</InteractiveSection>
 
 <InteractiveSection title="Predict the peak, then overshoot it" description="Set N and the marked item below, then predict how many steps it will take to reach maximum probability before you click. Then keep stepping past that point and watch P(marked) fall back down exactly as the closed form predicts, not plateau at its peak.">
   <LazyGroverExplorer />

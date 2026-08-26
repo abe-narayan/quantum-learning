@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
+import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/qubits-and-quantum-states/dirac-notation"
@@ -23,6 +24,15 @@ export const mixingFrames = mixingStates.map((psi, i) => ({
   bars: [
     { label: "⟨0|ψ⟩", value: zeroState.innerProduct(psi).re, caption: zeroState.innerProduct(psi).re.toFixed(2) },
     { label: "⟨1|ψ⟩", value: oneState.innerProduct(psi).re, caption: oneState.innerProduct(psi).re.toFixed(2) },
+  ],
+}));
+
+export const mixingVectorFrames = mixingStates.map((psi, i) => ({
+  paramLabel: mixingFrames[i].paramLabel,
+  vectors: [
+    { label: "|0⟩", x: 1, y: 0, color: "muted" },
+    { label: "|1⟩", x: 0, y: 1, color: "muted" },
+    { label: "|ψ⟩", x: psi.amplitudes[0].re, y: psi.amplitudes[1].re, color: "brand" },
   ],
 }));
 
@@ -194,6 +204,16 @@ case fill in the whole range, not just one example of it.
     sliderLabel="Mixing angle θ"
     ariaLabel="Inner products of the zero and one basis states with psi equals cosine theta zero plus sine theta one, as theta sweeps from 0 to 90 degrees"
     maxValue={1}
+  />
+</InteractiveSection>
+
+The bar heights above are exactly what "cosine of the angle between them" means once you draw $|0\rangle$ and $|1\rangle$ as fixed perpendicular axes and $|\psi\rangle$ as a vector between them: $\langle0|\psi\rangle$ and $\langle1|\psi\rangle$ are just $|\psi\rangle$'s projections onto those two axes, the same $\theta$ at every step.
+
+<InteractiveSection title="The same sweep, drawn as a vector" description="Same θ, same five steps as the bar chart above. |0⟩ and |1⟩ sit fixed as perpendicular axes; |ψ⟩ swings between them as θ goes from 0 to 90°. Its projection onto the |0⟩ axis is ⟨0|ψ⟩ and its projection onto the |1⟩ axis is ⟨1|ψ⟩, the same numbers the bar chart plots, now visible as literal cosine and sine legs of the angle θ.">
+  <VectorDiagramExplorer
+    frames={mixingVectorFrames}
+    sliderLabel="Mixing angle θ"
+    ariaLabel="Vector psi swinging from the zero axis to the one axis as theta sweeps from 0 to 90 degrees, with its projections onto both fixed orthogonal axes"
   />
 </InteractiveSection>
 

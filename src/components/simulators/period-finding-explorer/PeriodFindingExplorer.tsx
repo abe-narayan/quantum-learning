@@ -84,8 +84,8 @@ export function PeriodFindingExplorer() {
               content: (
                 <ul className="list-disc space-y-1 pl-4">
                   <li>
-                    Fix N=15, a=7 (the lesson&apos;s example) and increase counting qubits from 4 to 8 — watch the
-                    smeared peaks sharpen into exact ones as 2^t/r becomes closer to an integer.
+                    Fix N=21, a=2 (see the smearing demo in the main lesson) and increase counting qubits from 4 to
+                    7 — watch the smeared peaks sharpen as 2^t/r gets closer to an integer.
                   </li>
                   <li>Try N=21 with a few different coprime bases and compare how many distinct peaks appear each time.</li>
                 </ul>

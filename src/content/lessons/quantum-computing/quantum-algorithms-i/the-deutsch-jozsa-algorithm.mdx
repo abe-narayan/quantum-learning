@@ -24,10 +24,10 @@ export const deutschJozsaP00 = (f) =>
     .reduce((s, step) => step(s), StateVector.basis(3, 1))
     .probabilities()
     .slice(0, 2)
-    .reduce((a, b) => a + b, 0); // input register = 00, ancilla marginalized out
+    .reduce((a, b) => a + b, 0);
 
 export const p00Constant = deutschJozsaP00(constantFunction(1));
-export const p00Balanced = deutschJozsaP00(balancedFunction(3)); // parity of both bits = x1 XOR x2 (3 = 0b11)
+export const p00Balanced = deutschJozsaP00(balancedFunction(3));
 
 export const djOraclePresets = [
   { label: "constant, f(x) = 0", f: constantFunction(0) },

@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/position-and-momentum"
@@ -24,6 +25,12 @@ export const positionMomentumFrame = (dxTimes1e10) => ({
 });
 
 export const positionMomentumFrames = Array.from({ length: 21 }, (_, i) => positionMomentumFrame(0.5 + i * 0.1));
+
+export const uncertaintyBoxFrames = positionMomentumFrames.map((f, i) => ({
+  paramLabel: f.paramLabel,
+  deltaX: 0.5 + i * 0.1,
+  deltaP: f.bars[0].value,
+}));
 
 export const lessonMeta = {
   title: "Position and Momentum",
@@ -185,6 +192,16 @@ objects.
     frames={positionMomentumFrames}
     sliderLabel="Δx (×10⁻¹⁰ m)"
     ariaLabel="Minimum momentum uncertainty and the corresponding minimum electron velocity uncertainty, recomputed live from the Heisenberg bound as position uncertainty Delta x varies around one atomic radius"
+  />
+</InteractiveSection>
+
+<InteractiveSection title="The uncertainty box: squeeze one side, the other stretches" description="A box of width Δx and height Δp = ħ/(2Δx), centered at the origin of the (x, p) plane. Drag the same Δx as above and watch the box narrow horizontally while it stretches vertically — its area Δx·Δp never changes, because it's pinned at ħ/2 by construction, not by coincidence. Because Δx here is in units of ×10⁻¹⁰ m and Δp in ×10⁻²⁵ kg·m/s, the readout's raw product (≈5.3) carries an implied ×10⁻³⁵ kg·m²/s — restoring it recovers the actual ħ/2 ≈ 5.3×10⁻³⁵ kg·m²/s.">
+  <PhaseSpacePanel
+    mode="box"
+    frames={uncertaintyBoxFrames}
+    sliderLabel="Δx (×10⁻¹⁰ m)"
+    ariaLabel="Rectangle in the x, p plane with width Delta x and height the minimum Delta p, shrinking in width and growing in height as Delta x decreases, with area held fixed at h-bar over 2"
+    productSuffix="(pinned — in these ×10⁻¹⁰ m / ×10⁻²⁵ kg·m/s units, this constant equals ħ/2 once the implied ×10⁻³⁵ kg·m²/s is restored)"
   />
 </InteractiveSection>
 

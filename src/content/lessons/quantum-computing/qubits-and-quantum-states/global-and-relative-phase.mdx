@@ -1,4 +1,5 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -86,6 +87,18 @@ of those combinations unchanged, since $(e^{i\gamma}\alpha)^*(e^{i\gamma}\beta)=
 Global phase moves nothing on the sphere. This is *why* the simulator you've
 been using has no "global phase" control: there is nothing for such a
 control to do.
+
+The Bloch sphere shows the *consequence* of that proof: nothing moves. The
+amplitude picture below shows the *mechanism*: drag γ and both arrows sweep
+around the plane together, in lockstep, while P(0), P(1), and the α*β
+cross-term underneath stay completely frozen. Drag δ instead and only β's
+arrow moves — that's the difference between "rotating the whole picture"
+and "rotating one part of it relative to the other" made visible amplitude
+by amplitude, not just point by point on the sphere.
+
+<InteractiveSection title="Two arrows, two kinds of rotation" description="Switch the explorer below to two-amplitude mode. Drag γ (global phase) and watch both α's and β's arrows sweep around the complex plane together — P(0), P(1), and α*β underneath never change. Then drag δ (relative phase) and watch only β's arrow move, while α*β rotates right along with it. That difference is the entire proof above, seen directly at the amplitude level instead of on the Bloch sphere.">
+  <LazyComplexAmplitudeExplorer twoAmplitudeVariant="global-vs-relative" />
+</InteractiveSection>
 
 ### Relative phase is observable
 

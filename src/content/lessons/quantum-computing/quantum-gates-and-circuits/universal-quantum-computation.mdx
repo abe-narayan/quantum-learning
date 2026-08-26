@@ -1,9 +1,58 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StateVector } from "@/lib/quantum/state";
+import { HADAMARD, T_GATE, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/universal-quantum-computation"
 ).map((problem) => problem.meta);
+
+export const toffoliCircuitInstructions = [
+  { gate: "H", targets: [2] },
+  { gate: "CNOT", targets: [1, 2] },
+  { gate: "P", targets: [2], param: -Math.PI / 4 },
+  { gate: "CNOT", targets: [0, 2] },
+  { gate: "T", targets: [2] },
+  { gate: "CNOT", targets: [1, 2] },
+  { gate: "P", targets: [2], param: -Math.PI / 4 },
+  { gate: "CNOT", targets: [0, 2] },
+  { gate: "T", targets: [1] },
+  { gate: "T", targets: [2] },
+  { gate: "CNOT", targets: [0, 1] },
+  { gate: "H", targets: [2] },
+  { gate: "T", targets: [0] },
+  { gate: "P", targets: [1], param: -Math.PI / 4 },
+  { gate: "CNOT", targets: [0, 1] }
+];
+
+export const runToffoliCircuit = (initialState) =>
+  toffoliCircuitInstructions.reduce((state, instruction) => {
+    if (instruction.gate === "H") return applySingleQubitGate(state, HADAMARD, instruction.targets[0]);
+    if (instruction.gate === "T") return applySingleQubitGate(state, T_GATE, instruction.targets[0]);
+    if (instruction.gate === "P") return applySingleQubitGate(state, T_GATE.dagger(), instruction.targets[0]);
+    return applyCNOT(state, instruction.targets[0], instruction.targets[1]);
+  }, initialState);
+
+export const toffoliExpectedOutputIndex = (inputIndex) =>
+  inputIndex === 6 ? 7 : inputIndex === 7 ? 6 : inputIndex;
+
+export const toffoliVerificationFrames = Array.from({ length: 8 }, (_, inputIndex) => {
+  const inputLabel = inputIndex.toString(2).padStart(3, "0");
+  const expectedIndex = toffoliExpectedOutputIndex(inputIndex);
+  const expectedLabel = expectedIndex.toString(2).padStart(3, "0");
+  const outputState = runToffoliCircuit(StateVector.basis(3, inputIndex));
+  const probabilities = outputState.probabilities();
+  return {
+    paramLabel: `Input |${inputLabel}⟩ (expected Toffoli output |${expectedLabel}⟩)`,
+    bars: probabilities.map((probability, outcomeIndex) => ({
+      label: `|${outcomeIndex.toString(2).padStart(3, "0")}⟩`,
+      value: probability,
+      highlight: outcomeIndex === expectedIndex,
+      caption: probability < 1e-6 ? "0" : probability.toFixed(3)
+    }))
+  };
+});
 
 export const lessonMeta = {
   title: "Universal Quantum Computation",
@@ -325,23 +374,7 @@ group:
 <StaticCircuitDiagram
   numQubits={3}
   ariaLabel="Toffoli gate built from H, CNOT, T, and T-dagger (drawn as P(-0.79), since this platform's static circuit diagram has no dedicated T-dagger glyph); qubits 0 and 1 are the two controls, qubit 2 is the target"
-  instructions={[
-    { gate: "H", targets: [2] },
-    { gate: "CNOT", targets: [1, 2] },
-    { gate: "P", targets: [2], param: -Math.PI / 4 },
-    { gate: "CNOT", targets: [0, 2] },
-    { gate: "T", targets: [2] },
-    { gate: "CNOT", targets: [1, 2] },
-    { gate: "P", targets: [2], param: -Math.PI / 4 },
-    { gate: "CNOT", targets: [0, 2] },
-    { gate: "T", targets: [1] },
-    { gate: "T", targets: [2] },
-    { gate: "CNOT", targets: [0, 1] },
-    { gate: "H", targets: [2] },
-    { gate: "T", targets: [0] },
-    { gate: "P", targets: [1], param: -Math.PI / 4 },
-    { gate: "CNOT", targets: [0, 1] },
-  ]}
+  instructions={toffoliCircuitInstructions}
 />
 
 (The two `P(-0.79)` boxes are $T^\dagger=\text{diag}(1,e^{-i\pi/4})$;
@@ -366,6 +399,18 @@ Running the 15 gates above on $|110\rangle$ (control qubits 0 and 1
 both $|1\rangle$) does exactly that, landing on $|111\rangle$ with unit
 probability, the same way the SWAP-from-three-CNOTs worked example
 tracked $|10\rangle$ through three explicit steps.
+
+<InteractiveSection
+  title="Verify it yourself"
+  description="Scrub through all 8 three-qubit basis states. Each frame runs the exact 15-gate circuit above, starting from that input, through this platform's applySingleQubitGate and applyCNOT. The highlighted bar is the Toffoli truth table's predicted output; every input lands there with probability 1 and zero leakage anywhere else, except |110⟩ and |111⟩, which swap."
+>
+  <BarChartExplorer
+    frames={toffoliVerificationFrames}
+    sliderLabel="Input basis state"
+    ariaLabel="Output probability distribution over the 8 three-qubit basis states after running the Clifford+T Toffoli circuit, for each of the 8 possible input basis states, with the Toffoli-predicted output highlighted"
+    maxValue={1}
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

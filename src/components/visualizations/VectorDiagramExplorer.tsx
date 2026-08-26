@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { VectorDiagram, type PlaneVector } from "./VectorDiagram";
 import { useFrameIndex } from "./useFrameIndex";
 import { FrameSlider } from "./FrameSlider";
@@ -33,9 +34,37 @@ export function VectorDiagramExplorer({
 }) {
   const { index, setIndex, frame } = useFrameIndex(frames);
 
+  // Compute one shared bounding box across every frame's vectors so the
+  // render scale stays constant as the slider swaps `frame.vectors` —
+  // otherwise each frame independently auto-fits to the plot area and a
+  // vector of constant true length visibly grows/shrinks across frames.
+  const bounds = useMemo(() => {
+    const xs = [0];
+    const ys = [0];
+    for (const f of frames) {
+      for (const v of f.vectors) {
+        const from = v.from ?? { x: 0, y: 0 };
+        xs.push(from.x, v.x);
+        ys.push(from.y, v.y);
+      }
+    }
+    return {
+      minX: Math.min(...xs),
+      maxX: Math.max(...xs),
+      minY: Math.min(...ys),
+      maxY: Math.max(...ys),
+    };
+  }, [frames]);
+
   return (
     <div className="not-prose space-y-3">
-      <VectorDiagram vectors={frame.vectors} ariaLabel={ariaLabel} showGrid={showGrid} height={height} />
+      <VectorDiagram
+        vectors={frame.vectors}
+        ariaLabel={ariaLabel}
+        showGrid={showGrid}
+        height={height}
+        bounds={bounds}
+      />
       {frames.length > 1 && (
         <FrameSlider
           label={sliderLabel}

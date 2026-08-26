@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { DiscretizationLimit } from "@/components/visualizations/DiscretizationLimit";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/what-is-a-wavefunction"
@@ -97,6 +98,13 @@ same construction, deliberately left at finite $\Delta x$**: `Grid1D`
 *is* $\{\psi(x_1),\ldots,\psi(x_N)\}$. The discretization this lesson
 derives as a limit is the platform's literal implementation strategy, not
 an unrelated approximation.
+
+<InteractiveSection
+  title="Watch the discrete bars become the continuous curve"
+  description="Each bar's height is |psi(x_i)|^2 and its width is Delta x, so the bar's AREA is |c_i|^2 — the quantity the Born rule actually needs to sum to 1. Drag the slider to refine the grid: the blocky bars at low N thin and fuse into the smooth |psi(x)|^2 curve, while the running sum beneath the plot stays pinned near 1 the entire time."
+>
+  <DiscretizationLimit ariaLabel="Histogram of discrete cell probabilities over a Gaussian, converging to the continuous probability density as the number of grid cells N increases via a slider" />
+</InteractiveSection>
 
 ### Why $\psi(x)$ is a density, not an amplitude
 

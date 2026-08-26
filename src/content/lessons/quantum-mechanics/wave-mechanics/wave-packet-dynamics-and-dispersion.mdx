@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { ExpectationTrace } from "@/components/visualizations/ExpectationTrace";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/wave-packet-dynamics-and-dispersion"
@@ -142,6 +143,31 @@ electron or otherwise.
 <InteractiveSection title="Spreading without leaking" description="Play the Free Gaussian Packet preset and watch the density curve visibly widen and flatten over time, even though the total probability (norm) stays exactly 1. Probability isn't lost, it's redistributed over a larger region, exactly as the formula above predicts.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
+
+<ExpectationTrace
+  yLabel="σ(t)², for σ0=1, ħ=m=1"
+  annotation="Solid: σ(t)² = σ₀² + (t/2)², quadratic in t. Dashed: the pure (t/2)² growth term alone, with the constant σ₀² offset dropped -- the solid curve is just that same parabola shifted up by σ₀² = 1. At t=5, σ(5)² = 1 + 6.25 = 7.25, so σ(5) ≈ 2.69, matching the Worked Example below."
+  ariaLabel="Plot of the wave packet's position-variance sigma squared growing quadratically in time, alongside a dashed pure-quadratic reference curve offset by the initial variance"
+  series={[
+    {
+      label: "σ(t)² = 1 + (t/2)²",
+      color: "brand",
+      points: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((t) => ({
+        t,
+        value: 1 + (t / 2) ** 2,
+      })),
+    },
+    {
+      label: "(t/2)² (quadratic term alone)",
+      color: "warning",
+      dashed: true,
+      points: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((t) => ({
+        t,
+        value: (t / 2) ** 2,
+      })),
+    },
+  ]}
+/>
 
 ## Worked Example
 

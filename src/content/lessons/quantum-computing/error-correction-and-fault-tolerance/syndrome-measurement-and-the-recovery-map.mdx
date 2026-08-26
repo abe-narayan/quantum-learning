@@ -124,7 +124,7 @@ real `runBitFlipCorrectionCycle` executes: measure every generator,
 decode the syndrome, apply the correction. Step through it yourself on
 the same $[[3,1,3]]$ bit-flip code this lesson's parameters describe.
 
-<InteractiveSection title="Run the general recovery procedure" description="Inject a single-qubit X error on qubit 0, 1, or 2 and read off the syndrome (s1, s2). Confirm it matches Lesson 2's decode table (non-(0,0) means an error was found), then check the recovered state's amplitude table against the uncorrupted encoded state: step 4's guarantee, exact recovery, holds for every qubit you try, not just one.">
+<InteractiveSection title="Run the general recovery procedure" description="Check a single qubit — 0, 1, or 2 — and read off the syndrome (s1, s2). Confirm it matches Lesson 2's decode table (non-(0,0) means an error was found), then check the recovered state's amplitude table against the uncorrupted encoded state: step 4's guarantee, exact recovery, holds for every qubit you try, not just one. Then check two qubits at once (e.g. 0 and 1) to drive the weight-2 scenario the Worked Example below derives by hand — watch the live amplitude table swap α and β exactly as predicted.">
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 

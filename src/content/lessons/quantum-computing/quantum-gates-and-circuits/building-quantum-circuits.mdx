@@ -35,7 +35,7 @@ export const ghzStep1 = applySingleQubitGate(ghzStep0, HADAMARD, 0);
 export const ghzStep2 = applyCNOT(ghzStep1, 0, 1);
 export const ghzStep3 = applyCNOT(ghzStep2, 0, 2);
 
-export const ghzMeasured = measureQubit(ghzStep3, 0, 0.9); // outcome 1
+export const ghzMeasured = measureQubit(ghzStep3, 0, 0.9);
 
 ## Motivation
 
@@ -72,6 +72,16 @@ brand-new circuit.
 
 Extend the Bell-state recipe by one qubit: $H$ on qubit 0, then
 $\text{CNOT}(0,1)$, then $\text{CNOT}(0,2)$.
+
+<StaticCircuitDiagram
+  numQubits={3}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "CNOT", targets: [0, 2] },
+  ]}
+  ariaLabel="A three-qubit circuit: H on qubit 0, then CNOT with qubit 0 as control and qubit 1 as target, then CNOT with qubit 0 as control and qubit 2 as target"
+/>
 
 <QuantumStateDisplay state={ghzStep0} label="Start: |000⟩" />
 <QuantumStateDisplay state={ghzStep1} label="After H on qubit 0" />

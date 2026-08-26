@@ -233,6 +233,27 @@ illustration of it. Revisit it with this derivation in mind: the
 $50/50$ distribution Eve inflicts on a sifted bit whenever she guesses her
 interception basis wrong.
 
+### Watching sifting and the error rate over a full round
+
+The single-qubit sweep above shows *one* qubit's four possible outcomes.
+The two claims that actually make BB84 work, sifting keeps roughly half
+the qubits, and Eve's presence shows up as an error rate on the *sifted*
+key, only become visible across many qubits at once. The table below runs
+a full round of $14$ simulated qubits through the real protocol above:
+Alice picks a random bit and basis for each one, Bob picks his own random
+basis, and, when the toggle is on, Eve intercepts every qubit with the
+same random-basis intercept-resend attack derived above. Click "New round"
+to draw a fresh batch and watch the kept count hover around half and the
+error rate on kept positions jump from about $0\%$ to about $25\%$ when
+Eve switches on.
+
+<InteractiveSection title="Simulate a full BB84 round" description="Each column is one qubit. The bottom row shows the sifted key: green means Bob's result matches Alice's bit, red means Eve's interference introduced an error, and grey means the position was discarded because Alice's and Bob's bases didn't match. Toggle Eve and generate new rounds to watch the ~50% keep rate and the ~0%-to-~25% error-rate jump happen live.">
+  <BB84RoundTable
+    numQubits={14}
+    ariaLabel="A simulated round of BB84 showing Alice's bit and basis, Bob's basis and result, and the resulting sifted key for each qubit."
+  />
+</InteractiveSection>
+
 ## Physical Interpretation
 
 Nothing about BB84 requires entanglement or anything exotic: every qubit

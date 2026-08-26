@@ -92,11 +92,11 @@ is paid 100 times over, not once. This is a real, often-dominant cost
 driver for hybrid algorithms specifically, distinct from a single-shot
 circuit's one-time compilation cost.
 
-<InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. The per-iteration bar stays fixed at 6 SWAP gates, exactly this section's overhead figure, while the total-run bar grows as N times 6, the same multiplication the worked example below performs by hand for N=200.">
+<InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. The per-iteration bar stays fixed at 6 SWAP gates, exactly this section's overhead figure, while the total-run bar grows as N times 6, the same multiplication the worked example below performs by hand for N=200. The chart's scale is fixed to keep the small per-iteration bar visible, so past a few iterations the total-run bar maxes out the chart; read its caption for the exact total.">
   <BarChartExplorer
     sliderLabel="Iterations (N)"
-    ariaLabel="Per-iteration SWAP overhead (fixed at 6) versus total SWAP gates across the full optimization run (6 times N), as iteration count N grows"
-    maxValue={1200}
+    ariaLabel="Per-iteration SWAP overhead (fixed at 6) versus total SWAP gates across the full optimization run (6 times N), as iteration count N grows. The chart's scale is fixed near the per-iteration value so the total-run bar clips at the top for larger N; see its caption for the exact total"
+    maxValue={24}
     frames={[1, 20, 50, 100, 150, 200].map((n) => ({
       paramLabel: `N = ${n}`,
       bars: [

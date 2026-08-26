@@ -9,7 +9,7 @@ import { Complex } from "@/lib/quantum/complex";
 import { ComplexPlaneCanvas } from "./ComplexPlaneCanvas";
 import { AmplitudeControls } from "./AmplitudeControls";
 import { StatePanel } from "./StatePanel";
-import { TwoAmplitudeMode } from "./TwoAmplitudeMode";
+import { TwoAmplitudeMode, type TwoAmplitudeVariant } from "./TwoAmplitudeMode";
 import { AMPLITUDE_PRESETS } from "./presets";
 
 type Mode = "single" | "two-amplitude";
@@ -23,13 +23,15 @@ const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 
 // Minimal shareable state is the mode plus that mode's amplitude value(s):
-// (re, im) for single mode, or (alphaMagnitude, betaPhase) for two-amplitude
-// mode — alphaPhase is never driven by any control (no UI sets it away from
-// 0), so it isn't part of the shareable state. Both slices are read and
-// written together regardless of which mode is active, so switching modes
-// after loading a shared link doesn't lose the other slice's restored value.
-// Params are prefixed (`amp_`) because this simulator shares `/simulators`
-// with other URL-stateful simulators.
+// (re, im) for single mode, or (alphaMagnitude, alphaPhase, betaPhase) for
+// two-amplitude mode. `amp_aphase` is optional on read (defaulting to 0) so
+// links shared before the `"global-vs-relative"` variant's γ control existed
+// — the only control that ever moves alphaPhase away from 0 — still parse
+// exactly as before. Both slices are read and written together regardless of
+// which mode is active, so switching modes after loading a shared link
+// doesn't lose the other slice's restored value. Params are prefixed
+// (`amp_`) because this simulator shares `/simulators` with other
+// URL-stateful simulators.
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -45,17 +47,29 @@ function parseSingleAmplitude(params: { get(key: string): string | null }): { re
   return { re: clamp(re, -RE_IM_BOUND, RE_IM_BOUND), im: clamp(im, -RE_IM_BOUND, RE_IM_BOUND) };
 }
 
-/** Reads and validates `?amp_mag=&amp_bphase=`. Null if either is absent or malformed. */
+/**
+ * Reads and validates `?amp_mag=&amp_bphase=` (required) and `?amp_aphase=`
+ * (optional, defaulting to 0 — see the shareable-state comment above). Null
+ * if either required param is absent or malformed.
+ */
 function parseTwoAmplitude(params: {
   get(key: string): string | null;
-}): { alphaMagnitude: number; betaPhase: number } | null {
+}): { alphaMagnitude: number; alphaPhase: number; betaPhase: number } | null {
   const rawMag = params.get("amp_mag");
   const rawPhase = params.get("amp_bphase");
   if (rawMag === null || rawPhase === null) return null;
   const mag = Number(rawMag);
   const phase = Number(rawPhase);
   if (!Number.isFinite(mag) || !Number.isFinite(phase)) return null;
-  return { alphaMagnitude: clamp(mag, 0, 1), betaPhase: clamp(phase, -Math.PI, Math.PI) };
+
+  const rawAlphaPhase = params.get("amp_aphase");
+  const alphaPhase = rawAlphaPhase === null ? 0 : Number(rawAlphaPhase);
+
+  return {
+    alphaMagnitude: clamp(mag, 0, 1),
+    alphaPhase: Number.isFinite(alphaPhase) ? clamp(alphaPhase, -Math.PI, Math.PI) : 0,
+    betaPhase: clamp(phase, -Math.PI, Math.PI),
+  };
 }
 
 /**
@@ -75,9 +89,12 @@ export function ComplexAmplitudeExplorer({
    * embedding this explorer rely on; `superposition-interference-and-
    * phase.mdx` opts into `"basis-change"` instead, since it derives the
    * normalized P(+) = |⟨+|ψ⟩|² directly from the Born rule and needs the
-   * widget to display that same bounded quantity.
+   * widget to display that same bounded quantity; `global-and-relative-
+   * phase.mdx` opts into `"global-vs-relative"` to add the γ slider and
+   * show that global phase leaves the cross-term (and both probabilities)
+   * untouched.
    */
-  twoAmplitudeVariant?: "double-slit" | "basis-change";
+  twoAmplitudeVariant?: TwoAmplitudeVariant;
 } = {}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -91,7 +108,7 @@ export function ComplexAmplitudeExplorer({
   const [im, setIm] = useState(() => initialSingle?.im ?? DEFAULT_IM);
 
   const [alphaMagnitude, setAlphaMagnitude] = useState(() => initialTwo?.alphaMagnitude ?? DEFAULT_ALPHA_MAGNITUDE);
-  const [alphaPhase, setAlphaPhase] = useState(0);
+  const [alphaPhase, setAlphaPhase] = useState(() => initialTwo?.alphaPhase ?? 0);
   const [betaPhase, setBetaPhase] = useState(() => initialTwo?.betaPhase ?? DEFAULT_BETA_PHASE);
   const [copied, setCopied] = useState(false);
 
@@ -122,6 +139,7 @@ export function ComplexAmplitudeExplorer({
       params.set("amp_re", re.toFixed(3));
       params.set("amp_im", im.toFixed(3));
       params.set("amp_mag", alphaMagnitude.toFixed(3));
+      params.set("amp_aphase", alphaPhase.toFixed(3));
       params.set("amp_bphase", betaPhase.toFixed(3));
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     }, URL_SYNC_DEBOUNCE_MS);
@@ -133,7 +151,7 @@ export function ComplexAmplitudeExplorer({
     // `window.location` (rather than depending on the `searchParams` hook)
     // avoids re-running this effect off of our own `replace` calls.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, re, im, alphaMagnitude, betaPhase]);
+  }, [mode, re, im, alphaMagnitude, alphaPhase, betaPhase]);
 
   const handleCopyLink = useCallback(async () => {
     try {

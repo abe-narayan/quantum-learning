@@ -4,6 +4,8 @@ import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
 import { pureStateDensityMatrix, convexCombination, maximallyMixedState } from "@/lib/quantum/densityMatrix";
 import { chshValue, spinObservableInXZPlane } from "@/lib/quantum/chsh";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { LazyCHSHBellTestExplorer } from "@/components/simulators/chsh-bell-test/LazyCHSHBellTestExplorer";
 
 export const bellPlus = applyCNOT(applySingleQubitGate(StateVector.zero(2), HADAMARD, 0), 0, 1);
 export const bellPlusRho = pureStateDensityMatrix(bellPlus);
@@ -124,6 +126,10 @@ $2\sqrt2$ to floating-point precision, and additionally confirmed (by a
 fine-grained numerical search over $\theta_b,\theta_{b'}$ with
 $\theta_a,\theta_{a'}$ held fixed) to be the true maximum reachable by
 *any* choice of $B,B'$ for this state, not merely a locally good guess.
+
+<InteractiveSection title="Run the experiment yourself" description="Four sliders, one live |Φ+⟩ pair, and the real chshValue engine computing S on every drag — nothing here is precomputed. First, set a=0°, a′=90°, b=45°, b′=−45° (the 'quantum-optimal' preset lands on exactly this) and confirm the gauge reads S=2.8284, matching the by-hand derivation above. Then swap Bob's two angles to b=−45°, b′=45° — the same physical settings, just relabeled — and confirm S collapses to 0, reproducing the Worked Example below. Finally, drag freely through the rest of the angle space: no combination ever pushes the gauge past the 2√2 mark on either side, exactly what Tsirelson's bound predicts.">
+  <LazyCHSHBellTestExplorer />
+</InteractiveSection>
 
 ### Tsirelson's bound
 

@@ -11,7 +11,7 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-i/phase-kickback"
 ).map((problem) => problem.meta);
 
-export const kickbackF = balancedFunction(1); // f(x) = x on a single input qubit: f(0)=0, f(1)=1
+export const kickbackF = balancedFunction(1);
 
 export const kickbackXPlus = applySingleQubitGate(StateVector.basis(1, 0), HADAMARD, 0);
 
@@ -75,7 +75,30 @@ substitution is legitimate.
 ### The derivation
 
 Prepare the output qubit not in $|0\rangle$, but in
-$|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$, and apply $U_f$:
+$|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$, and apply $U_f$. As a
+circuit, with the concrete $f(x)=x$ oracle this lesson uses throughout
+(`kickbackF`, implemented as a plain CNOT: qubit 0 as control, ancilla
+qubit 1 as target), input qubit 0 prepared in $|+\rangle$ and ancilla
+qubit 1 walked from $|0\rangle$ to $|1\rangle$ to $|-\rangle$ via $X$ then
+$H$:
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "X", targets: [1] },
+    { gate: "H", targets: [1] },
+    { gate: "CNOT", targets: [0, 1] },
+  ]}
+  highlightColumn={3}
+  ariaLabel="Two-qubit phase kickback circuit: H prepares the input qubit (q0) in the plus state; X then H prepare the ancilla (q1) in the minus state; then CNOT, the oracle U_f for f(x)=x, with q0 as control and q1 as target, kicks the resulting phase back onto q0 instead of changing q1"
+/>
+
+The highlighted last column is $U_f$ itself, drawn as an ordinary CNOT
+because $f(x)=x$ means $U_f|x\rangle|y\rangle=|x\rangle|y\oplus x\rangle$
+exactly matches CNOT's action, with $q0$ (control) untouched and $q1$
+(target) flipped whenever $q0=1$. Everything below derives what that gate
+does algebraically once the ancilla is prepared in $|-\rangle$ specifically:
 
 $$
 U_f|x\rangle|-\rangle = U_f|x\rangle\frac{|0\rangle-|1\rangle}{\sqrt2} = \frac{U_f|x\rangle|0\rangle - U_f|x\rangle|1\rangle}{\sqrt2} = \frac{|x\rangle|0\oplus f(x)\rangle - |x\rangle|1\oplus f(x)\rangle}{\sqrt2}

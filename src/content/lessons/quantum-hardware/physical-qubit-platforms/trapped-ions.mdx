@@ -113,6 +113,58 @@ trapped ions a real engineering advantage over most solid-state
 platforms: any ion can be entangled with any other in the same trap, not
 just its physical neighbors, a fundamentally different connectivity
 graph from superconducting qubits' typically nearest-neighbor layout.
+The two connectivity graphs, drawn on the same five qubits, make the
+contrast concrete rather than just asserted in prose:
+
+<div className="not-prose grid gap-4 sm:grid-cols-2">
+
+<div>
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.5, y: 0.1 },
+    { id: "1", x: 0.186, y: 0.376 },
+    { id: "2", x: 0.306, y: 0.824 },
+    { id: "3", x: 0.694, y: 0.824 },
+    { id: "4", x: 0.814, y: 0.376 }
+  ]}
+  edges={[
+    { from: "0", to: "1" },
+    { from: "0", to: "2" },
+    { from: "0", to: "3" },
+    { from: "0", to: "4" },
+    { from: "1", to: "2" },
+    { from: "1", to: "3" },
+    { from: "1", to: "4" },
+    { from: "2", to: "3" },
+    { from: "2", to: "4" },
+    { from: "3", to: "4" }
+  ]}
+  ariaLabel="Five trapped-ion qubits arranged in a pentagon with an edge between every pair, showing all-to-all connectivity via the shared motional mode"
+/>
+<p className="mt-1 text-center text-xs text-muted-foreground">Trapped ions: all-to-all</p>
+</div>
+
+<div>
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.5, y: 0.1 },
+    { id: "1", x: 0.186, y: 0.376 },
+    { id: "2", x: 0.306, y: 0.824 },
+    { id: "3", x: 0.694, y: 0.824 },
+    { id: "4", x: 0.814, y: 0.376 }
+  ]}
+  edges={[
+    { from: "0", to: "1" },
+    { from: "1", to: "2" },
+    { from: "2", to: "3" },
+    { from: "3", to: "4" }
+  ]}
+  ariaLabel="Five superconducting qubits arranged in a pentagon with edges only between adjacent neighbors, showing nearest-neighbor connectivity"
+/>
+<p className="mt-1 text-center text-xs text-muted-foreground">Superconducting: nearest-neighbor</p>
+</div>
+
+</div>
 
 ## Physical Interpretation
 

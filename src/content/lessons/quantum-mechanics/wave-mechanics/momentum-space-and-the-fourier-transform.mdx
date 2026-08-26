@@ -1,10 +1,19 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform"
 ).map((problem) => problem.meta);
+
+export const gaussianPacketFrame = (sigma) => ({
+  paramLabel: `σ = ${sigma.toFixed(2)}`,
+  deltaX: sigma,
+  deltaP: 1 / (2 * sigma),
+});
+
+export const gaussianPacketFrames = Array.from({ length: 21 }, (_, i) => gaussianPacketFrame(0.3 + i * 0.1));
 
 export const lessonMeta = {
   title: "Momentum Space and the Fourier Transform",
@@ -140,6 +149,15 @@ $\Delta x\,\Delta p = \sigma\cdot\dfrac{1}{2\sigma}=\dfrac12$: the
 Gaussian packet exactly saturates the uncertainty bound $\Delta x\Delta
 p\ge\hbar/2$, the minimum-uncertainty state referenced (but not derived)
 in the last course.
+
+<InteractiveSection title="The uncertainty box: saturating ħ/2" description="A box of width Δx = σ and height Δp = 1/(2σ), the same construction as the Position and Momentum lesson's uncertainty box, now driven by this lesson's own Gaussian-packet formulas. Drag σ and watch the box narrow horizontally while it stretches vertically — its area Δx·Δp never changes, pinned at exactly 1/2 = ħ/2 (natural units), the worked example's saturation of the bound, shown geometrically rather than just stated.">
+  <PhaseSpacePanel
+    mode="box"
+    frames={gaussianPacketFrames}
+    sliderLabel="σ"
+    ariaLabel="Rectangle in the x, p plane with width sigma and height 1 over 2 sigma, shrinking in width and growing in height as sigma decreases, with area held fixed at one half, the Heisenberg minimum in natural units"
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

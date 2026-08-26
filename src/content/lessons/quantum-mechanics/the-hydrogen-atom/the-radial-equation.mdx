@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { radial1s, radial2p } from "@/lib/quantum/hydrogenAtom";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/the-radial-equation"
@@ -11,18 +12,25 @@ export const vEffL0 = effectivePotential(0);
 export const vEffL1 = effectivePotential(1);
 export const vEffL2 = effectivePotential(2);
 
-export const radialEffZoomGrid = Array(140).fill(0).map((_, i) => 0.5 + (i / 139) * 9.5);
-export const radialEffLValues = [0, 1, 2];
-export const radialEffFrames = radialEffLValues.map((l) => ({
-  paramLabel: `l = ${l}`,
-  series: [
-    {
-      label: "V_eff(r)",
-      color: "brand",
-      points: radialEffZoomGrid.map((r) => ({ x: r, y: -1 / r + (l * (l + 1)) / (2 * r * r) })),
-    },
-  ],
-}));
+export const rNearOrigin = Array(60).fill(0).map((_, i) => (i / 59) * 0.5);
+export const uAndRNearOriginFramesL0 = [
+  {
+    paramLabel: "r from 0 to 0.5, l=0",
+    series: [
+      { label: "u(r), l=0", color: "brand", points: rNearOrigin.map((r) => ({ x: r, y: r * radial1s(r) })) },
+      { label: "R(r), l=0", color: "accent", points: rNearOrigin.map((r) => ({ x: r, y: radial1s(r) })) },
+    ],
+  },
+];
+export const uAndRNearOriginFramesL1 = [
+  {
+    paramLabel: "r from 0 to 0.5, l=1",
+    series: [
+      { label: "u(r), l=1", color: "warning", points: rNearOrigin.map((r) => ({ x: r, y: r * radial2p(r) })) },
+      { label: "R(r), l=1", color: "muted", points: rNearOrigin.map((r) => ({ x: r, y: radial2p(r) })) },
+    ],
+  },
+];
 
 export const lessonMeta = {
   title: "The Radial Equation",
@@ -160,17 +168,6 @@ of falling to $-\infty$, and the turn gets steeper as $l$ grows, exactly
 the repulsive barrier keeping higher-$l$ electrons away from the
 nucleus.
 
-<InteractiveSection
-  title="Slide l, watch the centrifugal barrier rise"
-  description="Slide l through 0, 1, and 2 and watch the centrifugal term lift the effective potential away from the bare Coulomb well — the same V_eff(r) formula plotted above, now scanned continuously through the values already shown."
->
-  <ParametricCurve
-    frames={radialEffFrames}
-    sliderLabel="Angular momentum l"
-    ariaLabel="Effective potential negative one over r plus l times l plus one over two r squared, for l equals 0, 1, and 2, over r from 0.5 to 10"
-  />
-</InteractiveSection>
-
 ## Common Mistakes
 
 <Callout type="mistake">
@@ -186,6 +183,31 @@ since $R(r)=u(r)/r$ can stay finite as $r\to0$ if $u(r)\to0$
 proportionally to $r$, which is exactly the $l=0$ radial wavefunction's
 behavior.
 </Callout>
+
+The actual $1s$ ($l=0$) and $2p$ ($l=1$) radial wavefunctions make this
+concrete right at the origin (atomic units, $r$ from 0 to 0.5). $l=0$
+and $l=1$ get separate plots below, since $R(r)$ near the origin is
+over an order of magnitude larger for $l=0$ than for $l=1$ — on one
+shared axis the $l=1$ curves would flatten into an invisible line:
+
+<ParametricCurve
+  frames={uAndRNearOriginFramesL0}
+  ariaLabel="u of r and R of r near r equals 0, for l=0 (1s): the u curve vanishes at the origin while R stays near 2"
+/>
+
+For $l=0$, $u(r)\to0$ *linearly* as $r\to0$, so $R(r)=u(r)/r$ approaches
+the finite, nonzero value $R(0)=2$ — exactly the $u(0)=0$ boundary
+condition coexisting with a nonzero probability density at the nucleus.
+
+<ParametricCurve
+  frames={uAndRNearOriginFramesL1}
+  ariaLabel="u of r and R of r near r equals 0, for l=1 (2p): both the u curve and the R curve vanish at the origin"
+/>
+
+For $l=1$, $u(r)\to0$ even faster (quadratically, since the centrifugal
+barrier forces $R(r)\propto r^l=r$ itself), so $R(r)$ vanishes at the
+origin too. Same boundary condition on $u$, opposite conclusion about
+$R$: nonzero ($R(0)=2$) for $l=0$, zero for $l=1$.
 
 ## Practice Questions
 

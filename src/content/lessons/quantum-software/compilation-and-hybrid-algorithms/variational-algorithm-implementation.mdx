@@ -1,15 +1,33 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { QuantumCircuit, runCircuit } from "@/lib/quantum/circuitBuilder";
+import { PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
+import { expectationValue } from "@/lib/quantum/observables";
+import { exactGroundStateEnergy } from "@/lib/quantum/vqe";
+import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation"
 ).map((problem) => problem.meta);
 
+export const twoParamHamiltonian = PAULI_Z.scale(0.6).add(PAULI_X.scale(0.8));
+
+export const twoParamExactEnergy = exactGroundStateEnergy(twoParamHamiltonian);
+
+export const costLandscapeGrid = Array.from({ length: 15 }, (_, i) => {
+  const theta = (i / 14) * 2 * Math.PI;
+  return Array.from({ length: 15 }, (_, j) => {
+    const phi = (j / 14) * 2 * Math.PI;
+    const state = runCircuit(new QuantumCircuit(1).ry(0, theta).rz(0, phi));
+    const value = expectationValue(state, twoParamHamiltonian).re;
+    return { theta, phi, value };
+  });
+});
+
 export const lessonMeta = {
   title: "Variational Algorithm Implementation",
   description:
-    "Closing the loop this entire pillar built toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) finds ⟨Z⟩'s minimum at exactly θ=π, value -1, matching exactGroundStateEnergy(Z) exactly, and extends to a two-parameter Hamiltonian, converging to within 0.01% of the true ground energy by grid search alone.",
+    "Closing the loop this entire pillar built toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) finds ⟨Z⟩'s minimum at exactly θ=π, value -1, matching exactGroundStateEnergy(Z) exactly, and extends to a two-parameter Hamiltonian, converging to within 0.04% of the true ground energy by grid search alone.",
   course: "compilation-and-hybrid-algorithms",
   module: "variational-algorithm-implementation",
   order: 1,
@@ -103,11 +121,30 @@ $\sqrt{0.6^2+0.8^2}=1$), a two-parameter ansatz
 (`circuit.ry(0,theta).rz(0,phi)`) with $\langle H\rangle$ computed via
 direct matrix application to the circuit's output amplitudes,
 grid-searched over both $\theta$ and $\phi$, converges to
-$\langle H\rangle\approx-0.9999$, within $0.01\%$ of the true $-1$
+$\langle H\rangle\approx-0.9996$, within $0.04\%$ of the true $-1$
 ground energy, limited only by grid resolution (a finer grid would
 close the gap further, exactly as the Variational Method course already
 established for a completely different, continuous-wavefunction, trial
 family).
+
+Unlike the single-parameter case, this cost landscape is genuinely
+two-dimensional: $\langle H\rangle$ is now a function of a $(\theta,\phi)$
+plane, not a single curve. This page's own $15\times15$ grid search,
+run live over both parameters, traces out that entire plane as a
+color-mapped heatmap, with the grid's own minimum marked directly:
+
+<CostLandscapeHeatmap
+  ariaLabel="Cost landscape heatmap: expectation value of H=0.6Z+0.8X over a 15 by 15 grid search in theta and phi, with the grid minimum marked"
+  grid={costLandscapeGrid}
+  exactMin={twoParamExactEnergy}
+/>
+
+The darkest-green cell is the grid search's winner: the lowest
+$\langle H\rangle$ this particular $15\times15$ grid found, sitting
+close to (but, unlike the $H=Z$ case, not exactly on) the true
+continuous minimum, exactly the residual gap described above made
+visible as a picture of the whole landscape rather than a single
+reported number.
 
 ## Physical Interpretation
 
@@ -161,7 +198,7 @@ special, checkable coincidence of that specific problem's structure.
    paths (direct matrix vs. circuit-as-data) serves as a genuine
    correctness check on both implementations.
 4. What would you expect to happen to the two-parameter case's residual
-   gap (currently $\approx0.01\%$) if the grid resolution were doubled?
+   gap (currently $\approx0.04\%$) if the grid resolution were doubled?
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -174,7 +211,7 @@ special, checkable coincidence of that specific problem's structure.
   ($\theta=\pi$, $\langle Z\rangle=-1$), matching
   `exactGroundStateEnergy` precisely.
 - A two-parameter extension ($H=0.6Z+0.8X$) converges to within
-  $0.01\%$ of the true ground energy, limited only by grid resolution,
+  $0.04\%$ of the true ground energy, limited only by grid resolution,
   the same variational-method pattern established all the way back in
   Approximation Methods, now implemented end to end in software.
 

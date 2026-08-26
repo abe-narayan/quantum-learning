@@ -86,6 +86,16 @@ looks day to day.
 **Build a circuit implementing $H\,Z\,H$ on a single qubit (a known
 identity: $HZH=X$), and confirm it flips $|0\rangle$ to $|1\rangle$.**
 
+<PipelineDiagram
+  ariaLabel="This lesson's build-then-execute pipeline: build, add gates, execute, read amplitudes"
+  steps={[
+    { label: "Build", detail: "new QuantumCircuit(1)" },
+    { label: "Add gates", detail: "h(0).z(0).h(0)" },
+    { label: "Execute", detail: "runCircuit(circuit)" },
+    { label: "Read amplitudes", detail: "state.probabilities()" },
+  ]}
+/>
+
 ```
 const circuit = new QuantumCircuit(1);
 circuit.h(0).z(0).h(0);
@@ -98,11 +108,17 @@ matrix identity $HZH=X$ exactly, since underneath, `runCircuit` is doing
 nothing more than applying $H$, then $Z$, then $H$ in sequence, exactly
 as Quantum Gates & Circuits' direct approach would.
 
-Build the same three-instruction list yourself below and step through
-it, watching the state land on $|1\rangle$ after the final $H$ rather
+The circuit builder below is the same tool Quantum Gates & Circuits
+used, so it works in terms of qubit wires rather than a bare
+`QuantumCircuit(1)` and always keeps at least two of them on the
+canvas. Build the same three-instruction list — $H$, $Z$, $H$ — on
+qubit 0 and leave qubit 1 untouched: since gates act only on the wires
+they're applied to, an idle second qubit has zero effect on qubit 0's
+evolution, so stepping through it still reproduces exactly the circuit
+above. Watch the state land on $|1\rangle$ after the final $H$ rather
 than reading it as a claim about someone else's code:
 
-<InteractiveSection title="Build HZH and confirm it matches X" description="Build H, Z, H on qubit 0 yourself. Step through each gate. Confirm the final state lands on |1⟩, exactly matching X|0⟩.">
+<InteractiveSection title="Build HZH and confirm it matches X" description="Build H, Z, H on qubit 0 yourself, leaving qubit 1 idle. Step through each gate. Confirm q0 lands on |1⟩, exactly matching X|0⟩.">
   <LazyCircuitBuilder />
 </InteractiveSection>
 

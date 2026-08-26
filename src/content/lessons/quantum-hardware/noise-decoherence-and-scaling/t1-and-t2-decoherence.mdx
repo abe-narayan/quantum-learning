@@ -6,6 +6,44 @@ export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence"
 ).map((problem) => problem.meta);
 
+export const WORKED_EXAMPLE_T1_US = 80;
+export const T2_CEILING_US = 2 * WORKED_EXAMPLE_T1_US;
+export const TIME_AXIS_MAX_US = 200;
+export const T2_SWEEP_US = [10, 20, 30, 40, 55, 70, 80, 100, 120, 140, 160];
+
+export const t1T2DecayFrames = T2_SWEEP_US.map((t2) => {
+  const ratio = t2 / WORKED_EXAMPLE_T1_US;
+  const regime = ratio >= 1.5 ? "T1-limited" : "T2-limited";
+  const curvePoints = (T) =>
+    Array.from({ length: 60 }, (_, i) => {
+      const t = (i / 59) * TIME_AXIS_MAX_US;
+      return { x: t, y: Math.exp(-t / T) };
+    });
+  return {
+    paramLabel: `T2 = ${t2}μs (T2/T1 = ${ratio.toFixed(2)}, ${regime})`,
+    series: [
+      { label: "P1(t) = e^(-t/T1)", color: "brand", points: curvePoints(WORKED_EXAMPLE_T1_US) },
+      { label: "|ρ01(t)| = e^(-t/T2)", color: "warning", points: curvePoints(t2) },
+      {
+        label: `t = T1 (${WORKED_EXAMPLE_T1_US}μs)`,
+        color: "muted",
+        points: [
+          { x: WORKED_EXAMPLE_T1_US, y: 0 },
+          { x: WORKED_EXAMPLE_T1_US, y: 1 },
+        ],
+      },
+      {
+        label: `t = T2 (${t2}μs)`,
+        color: "accent",
+        points: [
+          { x: t2, y: 0 },
+          { x: t2, y: 1 },
+        ],
+      },
+    ],
+  };
+});
+
 export const lessonMeta = {
   title: "T1 & T2 Decoherence",
   description:
@@ -116,6 +154,18 @@ additional pure-dephasing process (beyond whatever contributes to T1) is
 the dominant coherence-loss mechanism, and improving T1 alone would do
 very little for overall coherence. The engineering priority should be
 identifying and suppressing the extra dephasing source instead.
+
+<InteractiveSection title="Drag T2 toward the 2T1 ceiling" description="T1 is fixed at the Worked Example's 80μs. Drag T2 from a strongly dephasing-dominated 10μs up toward the 160μs = 2T1 ceiling and watch both real-time-axis curves, P1(t)=e^(-t/T1) (population) and |ρ01(t)|=e^(-t/T2) (coherence). The vertical markers show t=T1 and t=T2 directly; the frame label reports the live T2/T1 ratio and calls the regime T1-limited or T2-limited exactly as the prose above does. Set T2=30μs to see the Worked Example's own numbers.">
+  <ParametricCurve
+    frames={t1T2DecayFrames}
+    sliderLabel="T2"
+    referenceLines={[
+      { y: 1, label: "full population / coherence" },
+      { y: Math.exp(-1), label: "1/e ≈ 0.37 (one time constant)" },
+    ]}
+    ariaLabel="Population decay P1(t) = e^(-t/T1) and coherence decay |ρ01(t)| = e^(-t/T2) plotted against real time in microseconds, with T1 fixed at 80 microseconds and T2 sweeping from 10 microseconds up to the 160-microsecond 2T1 ceiling, with vertical markers at t=T1 and t=T2"
+  />
+</InteractiveSection>
 
 ## Common Mistakes
 

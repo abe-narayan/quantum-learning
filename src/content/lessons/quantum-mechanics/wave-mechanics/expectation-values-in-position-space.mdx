@@ -1,10 +1,39 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/expectation-values-in-position-space"
 ).map((problem) => problem.meta);
+
+export const topHatDensityFrames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "|ψ(x)|² (top-hat, L = 1)",
+        color: "brand",
+        points: [
+          { x: -0.2, y: 0 },
+          { x: 0, y: 0 },
+          { x: 0, y: 1 },
+          { x: 1, y: 1 },
+          { x: 1, y: 0 },
+          { x: 1.2, y: 0 },
+        ],
+      },
+      {
+        label: "⟨x⟩ = L/2",
+        color: "warning",
+        points: [
+          { x: 0.5, y: 0 },
+          { x: 0.5, y: 1 },
+        ],
+      },
+    ],
+  },
+];
 
 export const lessonMeta = {
   title: "Expectation Values in Position Space",
@@ -92,7 +121,7 @@ platform's own test suite: a Gaussian packet built with width $\sigma$ has
 <InteractiveSection
   title="Widen σ, predict ⟨x⟩ and Δx before checking"
   description="Widen the Gaussian preset's σ. Predict how ⟨x⟩ and Δx change, then check the readout.">
-  <LazyWavefunctionExplorer />
+  <LazyWavefunctionExplorer showMeanSpreadOverlay />
 </InteractiveSection>
 
 ## Physical Interpretation
@@ -125,6 +154,17 @@ $$
 
 matching the well-known variance of a continuous uniform distribution,
 here derived from the Born rule, not imported from classical statistics.
+
+<ParametricCurve
+  frames={topHatDensityFrames}
+  ariaLabel="Top-hat probability density, flat at 1/L on [0, L] with L = 1, with a vertical line marking the mean at x = L/2"
+/>
+
+The density is flat, so the marked mean sits exactly in the middle by
+symmetry: as much probability weight sits to the left of $\langle
+x\rangle$ as to the right, the same "balance point" reading as a center
+of mass with uniform density, which is exactly what $\int x\,|\psi(x)|^2\,dx$
+computes.
 
 ## Common Mistakes
 

@@ -3,6 +3,7 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { PAULI_X, IDENTITY } from "@/lib/quantum/gates";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/tensor-products-and-composite-systems"
@@ -26,6 +27,18 @@ export const subsystemPresets = [
     ]
   }
 ];
+
+export const tensorCountingM = 2;
+
+export const tensorCountingFrame = (n) => ({
+  paramLabel: `n = ${n}, m = ${tensorCountingM}`,
+  bars: [
+    { label: "n+m-1 (product-state params)", value: n + tensorCountingM - 1 },
+    { label: "nm = dim(V⊗W)", value: n * tensorCountingM, highlight: true },
+  ],
+});
+
+export const tensorCountingFrames = Array.from({ length: 7 }, (_, i) => tensorCountingFrame(i + 2));
 
 export const lessonMeta = {
   title: "Tensor Products and Composite Systems",
@@ -172,6 +185,15 @@ direct contradiction in the Quantum Computing track, this dimension count
 is the structural reason that kind of proof was always going to succeed:
 there simply isn't enough room in the space of simple products to reach
 every vector.
+
+<InteractiveSection title="Watch the gap widen" description="Drag the subsystem dimension n from 2 to 8, holding the other subsystem fixed at m=2. The product-state parameter count n+m-1 climbs by 1 each step you take in n, while dim(V⊗W)=nm climbs by m=2 each step, twice as fast, so the gap between the two bars keeps widening as n grows: a direct picture of simple tensors becoming a shrinking slice of the whole space.">
+  <BarChartExplorer
+    frames={tensorCountingFrames}
+    sliderLabel="subsystem dimension n (with m = 2 fixed)"
+    ariaLabel="Bar chart comparing the product-state parameter count n+m-1 against dim(V tensor W)=nm as n varies from 2 to 8 with m fixed at 2, showing the gap between the two bars widen as n grows"
+    maxValue={16}
+  />
+</InteractiveSection>
 
 ## Physical Interpretation
 

@@ -35,7 +35,7 @@ export const deficiencyFrames = [
         points: halfLineXValues.map((x) => ({ x, y: Math.exp(-x) })),
       },
       {
-        label: "e^(+x): NOT normalizable on (0,∞) — no n₋ partner",
+        label: "e^(+x): NOT normalizable on (0,∞) — no n₋ partner, clamped to 8 so the plot stays legible (the true curve diverges to ∞)",
         color: "warning",
         points: halfLineXValues.map((x) => ({ x, y: Math.min(Math.exp(x), 8) })),
       },
@@ -152,6 +152,49 @@ finite dimensions $D(A)=D(A^\dagger)=\mathbb C^n$ automatically for any
 matrix, so this distinction is invisible; that's precisely why Hermitian
 Operators never needed to make it.
 
+Picture $D(A)$ and $D(A^\dagger)$ as two regions: symmetry only ever
+guarantees the smaller one sits inside the larger, $D(A)\subseteq
+D(A^\dagger)$, with no promise that there isn't room to spare.
+Self-adjointness demands the stronger claim that the two regions
+coincide exactly, no leftover room at all. The two operators this
+lesson works out land on opposite sides of that line:
+
+<div className="not-prose grid grid-cols-1 gap-4 overflow-x-auto sm:grid-cols-2">
+  <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <svg width={240} height={180} viewBox="0 0 240 180" role="img" aria-label="Self-adjoint case: D of p-hat and D of p-hat-dagger coincide exactly, drawn as one shared rectangle labeled from both the top and the bottom" className="max-w-full">
+      <rect x={40} y={45} width={160} height={90} rx={10} className="fill-brand/10 stroke-brand" strokeWidth={2.5} />
+      <rect x={44} y={49} width={152} height={82} rx={8} className="fill-none stroke-accent" strokeWidth={1.5} strokeDasharray="5 4" />
+      <text x={120} y={26} textAnchor="middle" className="fill-brand text-xs font-semibold">D(p̂)</text>
+      <text x={120} y={164} textAnchor="middle" className="fill-accent text-xs font-semibold">D(p̂†)</text>
+      <text x={120} y={94} textAnchor="middle" className="fill-muted-foreground text-xs">H¹(ℝ)</text>
+      <text x={120} y={110} textAnchor="middle" className="fill-muted-foreground text-[10px]">(same set, both sides)</text>
+    </svg>
+    <span className="text-center text-sm text-muted-foreground">
+      Whole line, derived above: $D(\hat p)=D(\hat p^\dagger)=H^1(\mathbb R)$
+      exactly — the two domains coincide, so $\hat p$ is genuinely
+      self-adjoint.
+    </span>
+  </div>
+  <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-muted/40 p-4">
+    <svg width={240} height={200} viewBox="0 0 240 200" role="img" aria-label="Merely symmetric case: D of p-hat drawn as a smaller rectangle strictly inside the larger rectangle D of p-hat-dagger, with the gap between them called out as unclosable because the deficiency indices are unequal" className="max-w-full">
+      <rect x={20} y={30} width={200} height={140} rx={12} className="fill-accent/10 stroke-accent" strokeWidth={2} />
+      <rect x={68} y={70} width={104} height={62} rx={8} className="fill-brand/20 stroke-brand" strokeWidth={2.5} />
+      <text x={120} y={48} textAnchor="middle" className="fill-accent text-[11px] font-medium">D(p̂†) = H¹(0,∞)</text>
+      <text x={120} y={96} textAnchor="middle" className="fill-brand text-[11px] font-semibold">D(p̂)</text>
+      <text x={120} y={110} textAnchor="middle" className="fill-brand text-[10px]">ψ(0)=0</text>
+      <line x1={120} y1={132} x2={120} y2={165} className="stroke-warning" strokeWidth={1.25} strokeDasharray="3 3" />
+      <text x={120} y={183} textAnchor="middle" className="fill-warning text-[10px] font-medium">gap: n₊=1 ≠ n₋=0, unclosable</text>
+    </svg>
+    <span className="text-center text-sm text-muted-foreground">
+      Half line, worked out below: the Dirichlet domain
+      $D(\hat p)=\{\psi\in H^1(0,\infty):\psi(0)=0\}$ sits strictly inside
+      $D(\hat p^\dagger)=H^1(0,\infty)$. The deficiency indices come out
+      unequal ($n_+=1\ne n_-=0$), so **no** choice of domain ever closes
+      that gap.
+    </span>
+  </div>
+</div>
+
 ### Deriving that $D(\hat p)$-functions vanish at infinity
 
 The domain that makes $\hat p=-i\hbar\,d/dx$ symmetric on the whole line
@@ -239,12 +282,14 @@ $$
 
 <ParametricCurve
   frames={deficiencyFrames}
-  ariaLabel="e to the minus x, normalizable on the half-line, versus e to the plus x, not normalizable — the two candidate deficiency-subspace solutions for momentum on a half-line"
+  ariaLabel="e to the minus x, normalizable on the half-line, versus e to the plus x, not normalizable and clamped at 8 for legibility since it actually diverges to infinity — the two candidate deficiency-subspace solutions for momentum on a half-line"
 />
 
-So the $\psi'=-\psi$ equation (eigenvalue $+i$) has exactly one
-$L^2(0,\infty)$ solution ($n_+=1$), while $\psi'=+\psi$ (eigenvalue
-$-i$) has none ($n_-=0$). **$n_+\ne n_-$**: by von Neumann's theorem,
+(the plotted $e^{+x}$ curve is clamped at $8$ for legibility — it
+actually diverges to infinity, which is exactly why this function
+isn't normalizable). So the $\psi'=-\psi$ equation (eigenvalue $+i$)
+has exactly one $L^2(0,\infty)$ solution ($n_+=1$), while $\psi'=+\psi$
+(eigenvalue $-i$) has none ($n_-=0$). **$n_+\ne n_-$**: by von Neumann's theorem,
 **no self-adjoint extension of $\hat p$ on the half-line exists at
 all**, not the Dirichlet choice above, not any other local boundary
 condition. Every domain choice leaves it merely symmetric at best.

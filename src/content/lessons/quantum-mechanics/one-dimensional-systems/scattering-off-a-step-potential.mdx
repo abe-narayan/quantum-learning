@@ -10,6 +10,22 @@ export const stepK1 = (ratio) => Math.sqrt(2 * ratio * stepHeight);
 export const stepK2 = (ratio) => Math.sqrt(2 * (ratio * stepHeight - stepHeight));
 export const stepReflection = (ratio) => ((stepK1(ratio) - stepK2(ratio)) / (stepK1(ratio) + stepK2(ratio))) ** 2;
 
+export const stepR = (ratio) => (stepK1(ratio) - stepK2(ratio)) / (stepK1(ratio) + stepK2(ratio));
+export const stepT = (ratio) => (2 * stepK1(ratio)) / (stepK1(ratio) + stepK2(ratio));
+export const stepPotentialAt = (x) => (x < 0 ? 0 : stepHeight);
+export const stepDensityAt = (x, ratio) =>
+  x < 0 ? 1 + stepR(ratio) ** 2 + 2 * stepR(ratio) * Math.cos(2 * stepK1(ratio) * x) : stepT(ratio) ** 2;
+
+export const stepWaveXValues = Array.from({ length: 221 }, (_, i) => -4 + (i / 220) * 5.5);
+export const stepWaveRatios = [1.08, 1.2, 1.5, 2, 3, 4.5, 6];
+export const stepWaveFrames = stepWaveRatios.map((ratio) => ({
+  paramLabel: `E/V0 = ${ratio.toFixed(2)}`,
+  xValues: stepWaveXValues,
+  potential: stepWaveXValues.map(stepPotentialAt),
+  density: stepWaveXValues.map((x) => stepDensityAt(x, ratio)),
+  markers: [{ x: 0, label: "x = 0" }],
+}));
+
 export const lessonMeta = {
   title: "Scattering Off a Step Potential",
   description:
@@ -147,6 +163,22 @@ $R$ drops fast as $E/V_0$ grows past 1, but the curve only approaches
 the axis asymptotically. It never actually touches $R=0$ at any finite
 energy, the visual form of the $R>0$ claim the next section makes
 explicit.
+
+That curve is the *aggregate* reflection probability; the actual
+mechanism producing it is a standing-wave ripple in $|\psi(x)|^2$ for
+$x<0$, from $\psi_1=e^{ik_1x}+r\,e^{-ik_1x}$ interfering with itself,
+meeting a flat, uniform $|t|^2$ for $x\ge0$ where only the single
+transmitted wave $t\,e^{ik_2x}$ survives:
+
+<ScatteringStandingWave
+  frames={stepWaveFrames}
+  sliderLabel="Energy ratio"
+  ariaLabel="Probability density |psi(x)|^2 overlaid on the step potential: a rippled standing-wave interference pattern for x less than 0 from the incident and reflected waves, meeting a flat uniform density for x greater than 0 from the transmitted wave, as the energy ratio E over V0 is scanned"
+/>
+
+Near $E/V_0=1$ the ripple amplitude is largest (large $r$, strong
+interference); as $E/V_0$ grows the ripples shrink toward the flat
+$|t|^2\to1$ line, the spatial picture of $R\to0$ only asymptotically.
 
 ## Physical Interpretation
 

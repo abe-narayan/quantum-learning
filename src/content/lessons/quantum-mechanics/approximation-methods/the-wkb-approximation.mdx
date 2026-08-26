@@ -8,12 +8,12 @@ export const practiceProblems = getProblemsForLesson(
 ).map((problem) => problem.meta);
 
 export const wkbGrid = createGrid(256, 0.025);
-export const wkbEnergy = 1.5; // n=1: E=(n+1/2)ħω
-export const wkbTurningPoint = Math.sqrt(2 * wkbEnergy); // E = x^2/2 => x = sqrt(2E)
+export const wkbEnergy = 1.5;
+export const wkbTurningPoint = Math.sqrt(2 * wkbEnergy);
 
 export const wkbPotentialArray = harmonicOscillatorPotential(wkbGrid, 1, 1);
 export const wkbNs = [0, 1, 2, 3];
-export const wkbEnergyForN = (n) => n + 0.5; // E_n=(n+1/2)ħω, ħ=ω=1, same convention as wkbEnergy above
+export const wkbEnergyForN = (n) => n + 0.5;
 
 export const wkbMomentumPointsForEnergy = (energy) => wkbGrid.x
   .map((x, i) => ({ x, gap: energy - wkbPotentialArray[i] }))

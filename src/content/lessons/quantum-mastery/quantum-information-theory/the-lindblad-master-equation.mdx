@@ -75,6 +75,32 @@ export const t1Frames = [
   },
 ];
 
+export const rhoPlusInitialCoherence = rhoPlus.get(0, 1).magnitude();
+export const t2Frames = [
+  {
+    paramLabel: "",
+    series: [
+      {
+        label: "Continuous |ρ01|(t) = |ρ01(0)| e^(-t/2T1)",
+        color: "brand",
+        points: Array.from({ length: 41 }, (_, i) => {
+          const t = (i / 40) * 2 * T1;
+          return { x: t, y: rhoPlusInitialCoherence * Math.exp(-t / (2 * T1)) };
+        }),
+      },
+      {
+        label: "Discrete Kraus channel, stepped",
+        color: "accent",
+        points: Array.from({ length: 41 }, (_, i) => {
+          const steps = Math.round((i / 40) * 2 * N);
+          const r = applyChannelRepeatedly(rhoPlus, amplitudeDampingChannel(gammaStep), steps);
+          return { x: steps * dt, y: r.get(0, 1).magnitude() };
+        }),
+      },
+    ],
+  },
+];
+
 ## Motivation
 
 Open Quantum Systems & Kraus Operators built the discrete Kraus picture
@@ -202,6 +228,20 @@ chosen, matching this platform's engine to full numerical precision:
 <ParametricCurve
   frames={t1Frames}
   ariaLabel="Continuous exponential decay e^(-t/T1) of P(1) plotted against the discrete Kraus channel stepped forward with gamma(dt), for T1=2, showing the two curves coincide exactly"
+/>
+
+The same exact match holds for the *coherence*, not just the
+population: starting from $\rho=|+\rangle\langle+|$ (so
+$\rho_{01}(0)=1/2$) and stepping `amplitudeDampingChannel(gamma(dt))`
+forward with `applyChannelRepeatedly` reproduces
+$|\rho_{01}(t)|=\rho_{01}(0)\,e^{-t/(2T_1)}$ exactly at every sampled
+$t$, over the same time range and using the same platform functions as
+the population chart above, just read off $|\rho_{01}|$ instead of
+$\rho_{11}$:
+
+<ParametricCurve
+  frames={t2Frames}
+  ariaLabel="Continuous exponential decay of the coherence magnitude |rho01(t)| = |rho01(0)| e^(-t/2T1), plotted against the discrete Kraus channel stepped forward with gamma(dt) starting from |+><+|, for T1=2, showing the two curves coincide exactly"
 />
 
 ### Deriving $T_2\leq2T_1$ from the generator's linearity

@@ -58,7 +58,6 @@ export const cgBarFrames = Object.entries(coupledStates).map(([label, vec]) => (
   bars: uncoupledLabels.map((uLabel, i) => ({
     label: uLabel,
     value: vec[i].re,
-    highlight: Math.abs(vec[i].re) > 1e-9,
     caption: Math.abs(vec[i].re) > 1e-9 ? vec[i].re.toFixed(4) : "0",
   })),
 }));

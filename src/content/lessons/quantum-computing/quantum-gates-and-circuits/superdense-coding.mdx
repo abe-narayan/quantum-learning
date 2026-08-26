@@ -169,6 +169,31 @@ $100\%$ measurement probability, the global phase again unobservable). Bob
 measures both qubits and reads off exactly the two bits Alice sent, every
 time, with no ambiguity.
 
+Here is the whole protocol as one circuit, concretely for message $11$:
+Bell-pair prep, Alice's $Z$-then-$X$ encoding, Bob's decode, and Bob's two
+measurements, left to right.
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "Z", targets: [0] },
+    { gate: "X", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "H", targets: [0] },
+    { gate: "MEASURE", targets: [0] },
+    { gate: "MEASURE", targets: [1] },
+  ]}
+  ariaLabel="The full superdense coding circuit for message 11: H on qubit 0 then CNOT(0,1) to prepare the Bell pair, Z then X on qubit 0 as Alice's encoding, CNOT(0,1) then H on qubit 0 as Bob's decode, then measurement of both qubits"
+/>
+
+Columns 1–2 are the $H$-then-$\text{CNOT}$ preparation from the section
+above. Columns 5–6, Bob's decode, are $\text{CNOT}$-then-$H$: literally the
+same two gates as columns 1–2, in the opposite order. That mirror-image
+relationship is exactly why the decode undoes the preparation regardless of
+what Alice's gates (columns 3–4) did to qubit 0 in between.
+
 ### Why the pair has to actually be entangled
 
 This only works because Alice's gate acts on a qubit that starts

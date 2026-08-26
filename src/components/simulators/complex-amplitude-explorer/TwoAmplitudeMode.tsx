@@ -53,13 +53,16 @@ function ProbabilityBar({
   );
 }
 
+/** Which reading (or control set) the two-amplitude mode shows — see `TwoAmplitudeMode`'s doc comment for the physics behind each. */
+export type TwoAmplitudeVariant = "double-slit" | "basis-change" | "global-vs-relative";
+
 /**
  * A two-level (α, β) amplitude pair, kept normalized (|α|²+|β|²=1) by
  * construction via `normalizedTwoLevelAmplitudes` — this is exactly a
  * single-qubit state, just controlled through amplitude/phase sliders
  * instead of Bloch-sphere angles.
  *
- * The bottom comparison panel has two mutually-exclusive readings of that
+ * The bottom comparison panel has three mutually-exclusive readings of that
  * same state, selected by `variant`:
  *
  * - `"double-slit"` (default): combining α and β at the *same* outcome
@@ -73,6 +76,13 @@ function ProbabilityBar({
  *   `superposition-interference-and-phase.mdx` derives from the Born rule
  *   for a measurement in the {|+⟩,|−⟩} basis. Unlike the double-slit
  *   reading, this one is a true probability and is always in [0, 1].
+ * - `"global-vs-relative"`: adds a second slider, global phase γ, which
+ *   (unlike δ) rotates *both* α and β together. Used by
+ *   `global-and-relative-phase.mdx` to make the mechanism behind "global
+ *   phase is unobservable" visible at the amplitude level: dragging γ
+ *   sweeps both arrows in lockstep while P(0), P(1), and the α*β
+ *   cross-term underneath stay frozen; dragging δ moves only β's arrow
+ *   and the cross-term rotates with it.
  */
 export function TwoAmplitudeMode({
   alphaMagnitude,
@@ -85,14 +95,16 @@ export function TwoAmplitudeMode({
   alphaPhase: number;
   betaPhase: number;
   onChange: (next: { alphaMagnitude?: number; alphaPhase?: number; betaPhase?: number }) => void;
-  variant?: "double-slit" | "basis-change";
+  variant?: TwoAmplitudeVariant;
 }) {
   const [alpha, beta] = normalizedTwoLevelAmplitudes(alphaMagnitude, alphaPhase, betaPhase);
   const relativePhaseDeg = ((betaPhase - alphaPhase) * 180) / Math.PI;
+  const globalPhaseDeg = (alphaPhase * 180) / Math.PI;
   const quantum = interferenceProbability(alpha, beta);
   const classical = classicalSumProbability(alpha, beta);
   const plusProbability = crossBasisProbability(alpha, beta);
   const minusProbability = 1 - plusProbability;
+  const crossTerm = alpha.conjugate().mul(beta);
 
   return (
     <div className="space-y-6">
@@ -124,6 +136,28 @@ export function TwoAmplitudeMode({
             className="mt-1.5 w-full accent-brand"
           />
         </label>
+        {variant === "global-vs-relative" ? (
+          <label className="block">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-foreground">Global phase (γ) — rotates α and β together</span>
+              <span className="font-mono text-xs text-muted-foreground">{globalPhaseDeg.toFixed(0)}°</span>
+            </div>
+            <input
+              type="range"
+              min={-180}
+              max={180}
+              step={1}
+              value={globalPhaseDeg}
+              onChange={(event) => {
+                const newGamma = (Number(event.target.value) * Math.PI) / 180;
+                const deltaGamma = newGamma - alphaPhase;
+                onChange({ alphaPhase: newGamma, betaPhase: betaPhase + deltaGamma });
+              }}
+              aria-label="global phase"
+              className="mt-1.5 w-full accent-accent"
+            />
+          </label>
+        ) : null}
         <label className="block">
           <div className="flex items-center justify-between text-sm">
             <span className="text-foreground">Relative phase (β − α)</span>
@@ -150,7 +184,22 @@ export function TwoAmplitudeMode({
         <ProbabilityBar label="P(1) = |β|²" value={beta.magnitudeSquared()} tone="brand" />
       </div>
 
-      {variant === "basis-change" ? (
+      {variant === "global-vs-relative" ? (
+        <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Global phase (γ) vs. relative phase (δ)
+          </p>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Drag γ and watch both arrows sweep around together while P(0) and P(1) above, and the
+            cross-term α*β below, stay completely still — global phase changes only how the state is
+            written, not the state itself. Drag the relative-phase slider instead and watch only β&rsquo;s
+            arrow move, with the cross-term rotating right along with it.
+          </p>
+          <div className="mt-3">
+            <KatexMath tex={`\\alpha^{*}\\beta = ${formatAmplitudeLatex(crossTerm, 3)}`} />
+          </div>
+        </div>
+      ) : variant === "basis-change" ? (
         <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Measuring in the {"{"}|+⟩,|−⟩{"}"} basis instead

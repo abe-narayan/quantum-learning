@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { blochStateFromAngles } from "@/lib/quantum/bloch";
+import { BerryPhaseCone } from "@/components/visualizations/BerryPhaseCone";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase"
@@ -212,6 +213,17 @@ sphere of field directions:
     frames={berryCurveFrames}
     ariaLabel="Numerically computed Berry phase versus the closed-form minus one half solid angle formula, as the cone half-angle theta varies from 10 to 170 degrees, showing near-exact agreement"
   />
+</InteractiveSection>
+
+That plot confirms the numbers agree, but it's an abstract phase-vs-angle
+curve. The actual geometric object behind $\gamma=-\tfrac12\Omega$ is a
+literal cap on the sphere of field directions:
+
+<InteractiveSection
+  title="The geometric picture: a cone traced on the sphere"
+  description="n̂(t) traces the teal loop at fixed half-angle θ around the cone's axis; the shaded cap is the solid angle it encloses. Drag θ from near 0° (a point, Ω≈0) to near 180° (nearly the whole sphere, Ω≈4π) and watch Ω and γ=−Ω/2 update to match."
+>
+  <BerryPhaseCone ariaLabel="A sphere of field directions with a loop traced at a draggable cone half-angle theta around a fixed axis, with the enclosed spherical cap shaded to represent the solid angle Omega, and live-computed values of Omega and the Berry phase gamma equal to minus one half Omega" />
 </InteractiveSection>
 
 ## Physical Interpretation

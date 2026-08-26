@@ -2,6 +2,8 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 
+export const shannonTerm = (x) => (x >= 1e-12 ? -x * Math.log2(x) : 0);
+
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states"
 ).map((problem) => problem.meta);
@@ -84,7 +86,26 @@ interpolates continuously between the two, since Lesson 4 already found
 $\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$ directly. This
 is a genuine graded measure, not a binary "entangled or not" flag, and
 it increases monotonically as $\theta$ moves from $0$ toward $\pi/4$
-(verified directly in `entanglement.test.ts`).
+(verified directly in `entanglement.test.ts`). Plotted across the full
+family, the climb from $0$ toward $\pi/4$ and the mirrored descent back
+to $0$ by $\pi/2$ are visible directly, not just asserted:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        {
+          label: "Entanglement entropy E(θ)",
+          color: "brand",
+          points: Array.from({ length: 41 }, (_, i) => ({ x: (i / 40) * (Math.PI / 2), y: shannonTerm(Math.cos((i / 40) * (Math.PI / 2)) ** 2) + shannonTerm(Math.sin((i / 40) * (Math.PI / 2)) ** 2) }))
+        }
+      ]
+    }
+  ]}
+  referenceLines={[{ y: 1, label: "1 bit — Bell state (θ=π/4)" }]}
+  ariaLabel="Entanglement entropy E(theta) plotted as a function of theta from 0 to pi/2, rising monotonically from 0 to 1 bit at theta equals pi/4 then falling back to 0"
+/>
 
 <InteractiveSection title="Climb from 0 bits to 1 bit of entropy" description="Dial the mixing weight away from 1 toward 0.5, moving the point from the sphere's surface toward its center. Watch the entropy readout climb from 0 bits (pure, weight 1) toward 1 bit (maximally mixed, weight 0.5), the same climb this family's E(θ) makes as θ moves from 0 toward π/4.">
   <LazyDensityMatrixExplorer />

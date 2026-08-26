@@ -64,6 +64,21 @@ reinforce.
 
 ## Mathematical Development
 
+The circuit for the whole derivation below is: $H$ on both qubits, then
+$Z$ on qubit 1 only, then $H$ on both qubits again.
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "H", targets: [1] },
+    { gate: "Z", targets: [1] },
+    { gate: "H", targets: [0] },
+    { gate: "H", targets: [1] },
+  ]}
+  ariaLabel="A two-qubit circuit: H on both qubits, then Z on qubit 1 only, then H on both qubits again"
+/>
+
 ### A uniform superposition
 
 Apply $H$ to both qubits of $|00\rangle$:

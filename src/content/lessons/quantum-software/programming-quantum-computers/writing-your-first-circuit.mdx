@@ -13,6 +13,20 @@ export const ghzSampleCounts = sampleMeasurements(ghzSampleState, 5000);
 export const ghzCount000 = ghzSampleCounts["000"] || 0;
 export const ghzCount111 = ghzSampleCounts["111"] || 0;
 
+export const ghzShotCounts = [100, 500, 1000, 5000, 20000, 100000];
+export const ghzFrames = ghzShotCounts.map((shots) => {
+  const counts = shots === 5000 ? ghzSampleCounts : sampleMeasurements(ghzSampleState, shots);
+  const count000 = counts["000"] || 0;
+  const count111 = counts["111"] || 0;
+  return {
+    paramLabel: `${shots.toLocaleString()} shots`,
+    bars: [
+      { label: "000", value: count000 / shots, caption: `${count000}` },
+      { label: "111", value: count111 / shots, caption: `${count111}`, highlight: true },
+    ],
+  };
+});
+
 export const lessonMeta = {
   title: "Writing Your First Circuit",
   description:
@@ -106,10 +120,11 @@ and 2479. The deviation from a perfectly even split is genuine
 shot count grows, following the standard $1/\sqrt{\text{shots}}$
 statistical scaling any repeated-sampling estimate obeys.
 
-Here's one real, live run of exactly that: the exact bars are pinned at
-0.5 by construction; the sampled bars are this page's own actual
-`sampleMeasurements` call, jittering around 0.5 by whatever this
-particular run of 5000 shots happened to land on.
+Here's one real, live run of exactly that at 5000 shots: the exact
+probability is $0.5$ for each outcome by construction; the sampled
+fraction is this page's own actual `sampleMeasurements` call, jittering
+around 0.5 by whatever this particular run of 5000 shots happened to
+land on.
 
 <BarChart
   ariaLabel="Exact GHZ probabilities vs. one real 5000-shot sampled run"
@@ -120,6 +135,24 @@ particular run of 5000 shots happened to land on.
     { label: "111 sampled", value: ghzCount111 / 5000, highlight: true }
   ]}
   maxValue={0.6}
+/>
+
+Practice Question 2 asks whether statistical noise grows or shrinks
+with more shots, in absolute count versus as a fraction of shots. A
+single shot count can't show that; scrubbing across shot counts can.
+Below are this page's own actual `sampleMeasurements` calls (same GHZ
+state, same two outcomes) run at 100, 500, 1000, 5000, 20,000, and
+100,000 shots. Slide across them and watch the sampled bars visibly
+tighten around the exact 0.5 line as shots grow, the $1/\sqrt{\text{shots}}$
+scaling made visible: the raw count captioned above each bar swings by
+more in absolute terms at high shot counts, even as the fraction it
+represents converges.
+
+<BarChartExplorer
+  ariaLabel="Sampled GHZ state fractions for 000 and 111 at increasing shot counts, converging toward the exact 0.5/0.5 split"
+  sliderLabel="Shots"
+  maxValue={0.7}
+  frames={ghzFrames}
 />
 
 ## Physical Interpretation

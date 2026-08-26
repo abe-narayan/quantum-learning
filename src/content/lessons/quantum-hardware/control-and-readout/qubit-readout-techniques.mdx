@@ -90,6 +90,21 @@ state. Representative current values sit in the 95-99% range depending
 on platform and integration time, good, but a real, nonzero error
 source, not the textbook's perfect projective measurement.
 
+Where does that error actually come from? Every single shot lands
+somewhere on the IQ plane, the 2D plane of the demodulated signal's
+in-phase (I) and quadrature (Q) components, as one point drawn from a
+noisy cloud centered near the "measured $|0\rangle$" location or the
+"measured $|1\rangle$" location. A threshold splits the plane into two
+bins. Noise is what gives each cloud its spread, and it's that spread,
+not the classifier, that lets some $|0\rangle$ shots land on the
+$|1\rangle$ side of the boundary (and vice versa): the single-shot
+physical origin of the error rate the bar chart below reports as a
+shot count.
+
+<InteractiveSection title="Drag the clouds apart and watch the error shrink" description="Drag the separation-to-noise ratio (SNR) slider, which sets how far apart the two point clouds sit relative to their own spread. Watch the two clouds slide together or apart, notice the overlap between them shrink or grow, and watch the live fidelity readout update as that overlap changes.">
+  <ReadoutScatter ariaLabel="IQ-plane scatter of single readout shots: two noisy point clouds, one centered at the measured zero location and one at the measured one location, separated by a dashed decision boundary. Dragging the separation-to-noise-ratio slider moves the clouds apart or together, shrinking or growing the overlap between them, with the resulting single-shot fidelity computed live from the two clusters' known Gaussian parameters." />
+</InteractiveSection>
+
 ### Readout error joins the broader error budget
 
 Readout error compounds with gate errors and decoherence

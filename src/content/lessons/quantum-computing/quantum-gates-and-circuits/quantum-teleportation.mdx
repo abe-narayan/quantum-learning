@@ -39,8 +39,8 @@ export const initial = messageState.tensor(bellPair);
 export const afterEntangle = applyCNOT(initial, 0, 1);
 export const afterHadamard = applySingleQubitGate(afterEntangle, HADAMARD, 0);
 
-export const firstMeasurement = measureQubit(afterHadamard, 0, 0.9); // forces outcome 1
-export const secondMeasurement = measureQubit(firstMeasurement.collapsed, 1, 0.9); // forces outcome 1
+export const firstMeasurement = measureQubit(afterHadamard, 0, 0.9);
+export const secondMeasurement = measureQubit(firstMeasurement.collapsed, 1, 0.9);
 
 export const bobUncorrected = secondMeasurement.collapsed;
 export const bobAfterX = applySingleQubitGate(bobUncorrected, PAULI_X, 2);
@@ -156,6 +156,31 @@ just from knowing *how* Alice's measurements were distributed, without
 even receiving her result, which would break no-signaling. They don't
 depend on it, so nothing leaks that way.
 
+Here is the whole protocol as one circuit, start to finish: the Bell-pair
+preparation on qubits 1 and 2, Alice's entangling $\text{CNOT}$ and
+Hadamard, her two measurements, and Bob's classical-conditioned
+correction, all in one picture.
+
+<StaticCircuitDiagram
+  numQubits={3}
+  instructions={[
+    { gate: "H", targets: [1] },
+    { gate: "CNOT", targets: [1, 2] },
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "H", targets: [0] },
+    { gate: "MEASURE", targets: [0] },
+    { gate: "MEASURE", targets: [1] },
+    { gate: "X", targets: [2] },
+    { gate: "Z", targets: [2] },
+  ]}
+  ariaLabel="Full teleportation circuit: H on qubit 1 and CNOT(1,2) prepare the shared Bell pair, then CNOT(0,1) and H on qubit 0 entangle Alice's message with her half of the pair, then qubits 0 and 1 are measured, and finally X then Z are applied to qubit 2 as Bob's classically-conditioned correction"
+/>
+
+The last two gates, $X$ and $Z$ on qubit 2, are drawn here as if always
+applied, but that's a simplification the picture can't show on its own:
+which of them actually fire depends on Alice's two classical bits, per
+the table just below.
+
 ### Bob applies a correction
 
 Reading off the four-branch formula above, Bob's qubit sits in one of
@@ -167,6 +192,23 @@ four states depending on Alice's outcomes $(m_0,m_1)$:
 | $01$ | $\beta\vert0\rangle+\alpha\vert1\rangle = X\vert\psi\rangle$ | apply $X$ |
 | $10$ | $\alpha\vert0\rangle-\beta\vert1\rangle = Z\vert\psi\rangle$ | apply $Z$ |
 | $11$ | $-\beta\vert0\rangle+\alpha\vert1\rangle = XZ\vert\psi\rangle$ | apply $X$, then $Z$ |
+
+The same four rows, drawn as the branching process they actually are:
+two measurements, each 50/50, and a correction fixed by which of the
+four branches they land in.
+
+<MeasurementTree
+  root={{
+    label: "Alice measures q0, q1",
+    children: [
+      { label: "00 → no correction", probability: 0.25 },
+      { label: "01 → apply X", probability: 0.25 },
+      { label: "10 → apply Z", probability: 0.25 },
+      { label: "11 → apply X, then Z", probability: 0.25 },
+    ],
+  }}
+  ariaLabel="Alice's two-bit measurement outcome tree: four equally-likely branches (00, 01, 10, 11), each requiring a different fixed correction on Bob's qubit"
+/>
 
 Alice sends her two classical bits to Bob (at ordinary, light-speed-limited
 communication speed, nothing here is instantaneous). Bob applies the

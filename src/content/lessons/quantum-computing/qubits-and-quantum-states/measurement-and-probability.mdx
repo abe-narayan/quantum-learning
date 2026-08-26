@@ -1,4 +1,5 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
@@ -166,6 +167,10 @@ on the equator just like $|+\rangle$, measuring it in the X-basis is
 completely random. That makes sense geometrically, since $|{+i}\rangle$ is
 $90°$ of longitude away from $|+\rangle$, as far from it as possible while
 staying on the equator.
+
+<InteractiveSection title="Sweeping the relative phase" description={`Switch the explorer below to two-amplitude mode. P(0)=|α|² and P(1)=|β|² above never move, since relative phase is invisible in the state's own basis — but the P(+) and P(−) bars beneath, computed from the formula P(+) = (1+2Re(α*β))/2 just derived above, trace out a continuous (1+cos φ)/2 curve as you drag the relative-phase slider through a full turn. Try landing near φ=90° (the |+i⟩ case just worked out by hand) and check the bars read close to 50/50, then push toward φ=0° or φ=180° to see P(+) sweep all the way to 1 or down to 0.`}>
+  <LazyComplexAmplitudeExplorer twoAmplitudeVariant="basis-change" />
+</InteractiveSection>
 
 ## Common Mistakes
 

@@ -11,6 +11,62 @@ export const resonanceK2 = Math.sqrt(2 * (resonanceEnergy - resonanceBarrierHeig
 export const transmissionAt = (L) =>
   1 / (1 + (resonanceBarrierHeight ** 2 * Math.sin(resonanceK2 * L) ** 2) / (4 * resonanceEnergy * (resonanceEnergy - resonanceBarrierHeight)));
 
+export const resonanceK1 = Math.sqrt(2 * resonanceEnergy);
+
+export const cMul = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]];
+export const cDiv = (a, b) => [
+  (a[0] * b[0] + a[1] * b[1]) / (b[0] * b[0] + b[1] * b[1]),
+  (a[1] * b[0] - a[0] * b[1]) / (b[0] * b[0] + b[1] * b[1]),
+];
+export const cExp = (theta) => [Math.cos(theta), Math.sin(theta)];
+export const cAbs2 = (a) => a[0] * a[0] + a[1] * a[1];
+export const cConj = (a) => [a[0], -a[1]];
+export const cScale = (s, a) => [s * a[0], s * a[1]];
+
+export const barrierT = (L) =>
+  cDiv(cExp(-resonanceK1 * L), [
+    Math.cos(resonanceK2 * L),
+    -((resonanceK1 ** 2 + resonanceK2 ** 2) / (2 * resonanceK1 * resonanceK2)) * Math.sin(resonanceK2 * L),
+  ]);
+
+export const barrierC = (L) =>
+  cScale(0.5 * (1 + resonanceK1 / resonanceK2), cMul(barrierT(L), cExp((resonanceK1 - resonanceK2) * L)));
+
+export const barrierD = (L) =>
+  cScale(0.5 * (1 - resonanceK1 / resonanceK2), cMul(barrierT(L), cExp((resonanceK1 + resonanceK2) * L)));
+
+export const barrierR = (L) => [barrierC(L)[0] + barrierD(L)[0] - 1, barrierC(L)[1] + barrierD(L)[1]];
+
+export const barrierRegion1DensityAt = (x, L) =>
+  1 + cAbs2(barrierR(L)) + 2 * (barrierR(L)[0] * Math.cos(2 * resonanceK1 * x) + barrierR(L)[1] * Math.sin(2 * resonanceK1 * x));
+
+export const barrierRegion2DensityAt = (x, L) =>
+  cAbs2(barrierC(L)) +
+  cAbs2(barrierD(L)) +
+  2 *
+    (cMul(barrierC(L), cConj(barrierD(L)))[0] * Math.cos(2 * resonanceK2 * x) -
+      cMul(barrierC(L), cConj(barrierD(L)))[1] * Math.sin(2 * resonanceK2 * x));
+
+export const barrierRegion3DensityAt = (L) => cAbs2(barrierT(L));
+
+export const barrierDensityAt = (x, L) =>
+  x < 0 ? barrierRegion1DensityAt(x, L) : x <= L ? barrierRegion2DensityAt(x, L) : barrierRegion3DensityAt(L);
+
+export const barrierPotentialAt = (x, L) => (x >= 0 && x <= L ? resonanceBarrierHeight : 0);
+
+export const barrierWaveXValues = Array.from({ length: 281 }, (_, i) => -3 + (i / 280) * 8);
+export const barrierWaveWidths = [0.5, 1.0, Math.PI / resonanceK2, 1.8, 2.2, (2 * Math.PI) / resonanceK2, 3.2];
+export const barrierWaveFrames = barrierWaveWidths.map((L) => ({
+  paramLabel: `L = ${L.toFixed(3)}`,
+  xValues: barrierWaveXValues,
+  potential: barrierWaveXValues.map((x) => barrierPotentialAt(x, L)),
+  density: barrierWaveXValues.map((x) => barrierDensityAt(x, L)),
+  markers: [
+    { x: 0, label: "x = 0" },
+    { x: L, label: "x = L" },
+  ],
+}));
+
 export const lessonMeta = {
   title: "Resonant Transmission Through a Barrier",
   description:
@@ -106,6 +162,28 @@ hitting exactly $T=1$, directly visible:
 Every peak touches exactly $1$, never overshooting, and the peaks repeat
 with spacing $\pi/k_2$ in $L$, exactly the periodicity $\sin^2(k_2L)=0$
 predicts.
+
+That $T(L)$ curve is the aggregate outcome; the mechanism behind each
+peak is the standing wave $|\psi(x)|^2$ actually forms, oscillating for
+$x<0$ from the incident and reflected waves interfering, oscillating
+again *inside* the barrier from its own two boundary-matched
+components, and flat past $x=L$ where only the transmitted wave
+survives:
+
+<ScatteringStandingWave
+  frames={barrierWaveFrames}
+  sliderLabel="Barrier width"
+  ariaLabel="Probability density |psi(x)|^2 overlaid on a rectangular barrier of height V0=2 at energy E=5: an oscillating standing wave for x less than 0, an oscillating pattern inside the barrier between its two edges, and a flat uniform density for x greater than L, as the barrier width L is scanned through resonant and non-resonant values"
+/>
+
+Watch the interior pattern as the slider crosses
+$L=\pi/k_2\approx1.283$ (the first resonance from the Worked Example
+below) and $L=2\pi/k_2\approx2.565$ (the second): at those exact
+widths, the oscillation inside the barrier fits precisely one and two
+half-wavelengths, respectively, between $x=0$ and $x=L$, and the
+outside-the-barrier ripple for $x<0$ visibly flattens, the spatial
+picture of $R\to0,T\to1$. At non-resonant widths, the interior pattern
+doesn't close up evenly at $x=L$, and some ripple persists for $x<0$.
 
 ## Physical Interpretation
 

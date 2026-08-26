@@ -1,12 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { firstOrderTransitionProbability, exactTwoLevelTransitionProbability } from "@/lib/quantum/approximationMethods";
+import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/approximation-methods/time-dependent-perturbation-theory"
 ).map((problem) => problem.meta);
 
-export const omegaFi = 1; // Ef - Ei, with Ei=0, Ef=1, ħ=1
+export const omegaFi = 1;
 export const tValues = Array(60).fill(0).map((_, i) => (i / 59) * 3);
 export const couplingStrengths = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5];
 
@@ -156,6 +157,18 @@ first peak, eventually shooting straight through $P=1$, a value no real
 probability can exceed. The exact curve never does; it genuinely
 oscillates, rising and falling, exactly the Rabi behavior described
 above.
+
+The frames above only sample a handful of fixed coupling strengths at
+resonance ($\omega_{fi}$ fixed). The explorer below runs the identical
+exact two-level engine (`exactTwoLevelTrajectory`, the same underlying
+solver behind `exactTwoLevelTransitionProbability` used throughout this
+lesson) with a continuously adjustable detuning — a parameter the static
+frames never expose — and draws the corresponding Bloch-sphere
+trajectory live.
+
+<InteractiveSection title="Watch the exact curve actually oscillate" description="Set detuning to zero and increase the coupling strength V: watch the population curve trace the same exact Rabi oscillation plotted above, and the Bloch vector sweep pole-to-pole and back rather than just climbing off a static frame. Then move detuning away from zero and see the oscillation's ceiling drop below 1, exactly the unitarity-respecting behavior the perturbative curve above cannot reproduce.">
+  <LazyRabiExplorer />
+</InteractiveSection>
 
 ## Common Mistakes
 

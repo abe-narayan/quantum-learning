@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { ExpectationTrace } from "@/components/visualizations/ExpectationTrace";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/free-particle-wave-packets"
@@ -106,6 +107,25 @@ laws.
 <InteractiveSection title="Group velocity, live" description="The Wavefunction Explorer's Free Gaussian Packet preset builds exactly this state. Set momentum to a nonzero value and watch ⟨x⟩ in the state panel advance at a constant rate. Measure it against the formula v_g=p₀/m (natural units, m=1, so v_g=p₀ directly) by comparing the displayed ⟨p⟩ to the rate ⟨x⟩ changes at.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
+
+<ExpectationTrace
+  yLabel="⟨x⟩(t), for p0=2, m=1, x0=-15"
+  annotation="Solid: ⟨x(t)⟩ = x₀ + v_g t. Dashed: the pure v_g·t slope line (no offset). The two are parallel because both advance at exactly v_g = p₀/m = 2 -- the offset between them is just the starting position x₀ = -15."
+  ariaLabel="Plot of the wave packet's mean position advancing linearly in time, alongside a dashed pure-slope reference line with the same rate"
+  series={[
+    {
+      label: "⟨x(t)⟩ = -15 + 2t",
+      color: "brand",
+      points: [0, 0.5, 1, 1.5, 2, 2.5, 3].map((t) => ({ t, value: -15 + 2 * t })),
+    },
+    {
+      label: "v_g·t (slope reference)",
+      color: "warning",
+      dashed: true,
+      points: [0, 0.5, 1, 1.5, 2, 2.5, 3].map((t) => ({ t, value: 2 * t })),
+    },
+  ]}
+/>
 
 ## Worked Example
 

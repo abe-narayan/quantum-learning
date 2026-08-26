@@ -67,6 +67,8 @@ export const capstoneBars = capstoneNValues.map((n, i) => ({
 
 export const capstoneN16 = optimalGroverIterations(4);
 export const capstoneN1024 = optimalGroverIterations(10);
+export const capstoneClassicalN16 = 2 ** 4;
+export const capstoneClassicalN1024 = 2 ** 10;
 
 export const lessonMeta = {
   title: "Capstone: What Scale Actually Requires",
@@ -181,6 +183,29 @@ one of these results is exactly what it claims to be. It's simply that
 "exactly correct at small scale" and "advantageous at large scale" are
 different claims, and this course has now derived, rather than merely
 asserted, exactly where the gap between them comes from.
+
+<BarChart
+  bars={[
+    { label: "classical, N=16", value: capstoneClassicalN16, highlight: false },
+    { label: "Grover, N=16", value: capstoneN16, highlight: true },
+  ]}
+  ariaLabel={`Wall 1: unstructured search query counts at N=16. Classical worst case is ${capstoneClassicalN16}, while Grover's optimal iteration count is only ${capstoneN16}`}
+/>
+
+<BarChart
+  bars={[
+    { label: "classical, N=1024", value: capstoneClassicalN1024, highlight: false },
+    { label: "Grover, N=1024", value: capstoneN1024, highlight: true },
+  ]}
+  ariaLabel={`Wall 1: unstructured search query counts at N=1024. Classical worst case is ${capstoneClassicalN1024}, while Grover's optimal iteration count is only ${capstoneN1024}`}
+/>
+
+Both bar pairs are real numbers from this course's own Grover engine
+(`optimalGroverIterations`), not illustrative round figures: classical
+brute force grows linearly with $N$ while Grover's $\Theta(\sqrt N)$
+optimum barely grows at all across the same range, exactly the gap Wall
+1 says is real, provable, and still nowhere near unconditional advantage
+on a structured problem.
 
 | Wall | What this course derived | What it implies about scale |
 |---|---|---|

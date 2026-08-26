@@ -70,6 +70,18 @@ of measuring, which no predetermined classical coin pair can do.
 
 ### The derivation
 
+The circuit for this whole derivation is just two columns: $H$ on qubit 0,
+then $\text{CNOT}$ with qubit 0 as control and qubit 1 as target.
+
+<StaticCircuitDiagram
+  numQubits={2}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+  ]}
+  ariaLabel="A two-qubit circuit: H on qubit 0, then CNOT with qubit 0 as control and qubit 1 as target"
+/>
+
 Start from $|00\rangle$. Apply $H$ to qubit 0 only:
 
 <QuantumStateDisplay state={afterH} label="H on qubit 0: (|00⟩ + |10⟩)/√2" />

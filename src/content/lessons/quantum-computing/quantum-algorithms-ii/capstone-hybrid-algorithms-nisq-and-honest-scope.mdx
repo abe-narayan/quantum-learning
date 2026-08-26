@@ -3,6 +3,8 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
 import { qaoaCircuit, expectedCutSize, bruteForceMaxCut } from "@/lib/quantum/qaoa";
+import { PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
+import { runVqe } from "@/lib/quantum/vqe";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope"
@@ -18,6 +20,10 @@ export const depthParamPairs = [
   { gamma: 1.0, beta: 1.0, label: "γ=1.00, β=1.00 (arbitrary)" }
 ];
 export const depthLayerCounts = [1, 2, 3, 4, 5, 6];
+export const capstoneVqeHamiltonian = PAULI_Z.scale(0.6).add(PAULI_X.scale(0.8));
+export const capstoneVqeResult = runVqe(capstoneVqeHamiltonian, 80);
+export const capstoneVqeAcceptedIterations = capstoneVqeResult.history.length - 1;
+export const capstoneVqeCircuitExecutions = 1 + 4 * capstoneVqeAcceptedIterations;
 export const depthFrames = depthParamPairs.map((pair) => ({
   paramLabel: pair.label,
   series: [
@@ -155,19 +161,30 @@ directly corrupts that one shot, with no built-in mechanism to average it
 away. This structural difference, not just historical accident, is why
 VQE is considered NISQ-friendly and Shor's algorithm is not. The contrast
 in how many independent chances each algorithm gets is real, drawn
-directly from this course's own worked examples, not illustrative:
+directly from this course's own worked examples, not illustrative: this
+is `runVqe` run again on the exact same $H=0.6Z+0.8X$ from the last
+lesson, and every candidate direction the pattern search actually
+evaluates — one initial evaluation plus four per-iteration candidates
+across every accepted-or-tried iteration — is a genuine circuit
+execution, computed here (`capstoneVqeCircuitExecutions` below), not
+asserted:
 
 <BarChart
   bars={[
     { label: "Shor's: usable measurements needed", value: 1, highlight: false },
-    { label: "VQE: circuit executions across one optimization run", value: 80, highlight: true }
+    { label: "VQE: circuit executions across one optimization run", value: capstoneVqeCircuitExecutions, highlight: true }
   ]}
-  ariaLabel="Number of circuit executions each algorithm needs or uses: Shor's single required measurement versus VQE's 80 optimizer iterations"
+  ariaLabel={`Number of circuit executions each algorithm needs or uses: Shor's single required measurement versus VQE's ${capstoneVqeCircuitExecutions} circuit executions across one optimization run`}
 />
 
 Shor's gets exactly one shot at the whole answer; VQE's toy example got
-80, each one a fresh opportunity for the classical loop to route around
-whatever the previous shot's noise or imperfection left behind.
+113 (1 initial evaluation, plus 4 candidate directions tried across each
+of the 28 accepted-or-tried pattern-search iterations), each one a fresh
+opportunity for the classical loop to route around whatever the previous
+shot's noise or imperfection left behind — far more chances than the 28
+accepted-or-tried iterations alone would suggest, since the pattern
+search actually runs the circuit for every candidate direction it tries,
+not just the ones it ends up keeping.
 
 ## Common Mistakes
 

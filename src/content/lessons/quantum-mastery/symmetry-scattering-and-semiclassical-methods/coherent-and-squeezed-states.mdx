@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { UncertaintyEllipse } from "@/components/visualizations/UncertaintyEllipse";
 import { annihilationOperator, creationOperator, positionOperator } from "@/lib/quantum/harmonicOscillator";
 import { Complex } from "@/lib/quantum/complex";
 
@@ -68,6 +69,14 @@ export const squeezeCheckPresets = [
 
 export const squeezedDeltaX = Math.exp(-squeezeR) / Math.sqrt(2);
 export const squeezedDeltaP = Math.exp(squeezeR) / Math.sqrt(2);
+
+export const ellipseRValues = Array.from({ length: 16 }, (_, i) => i * 0.1);
+export const ellipseFrames = ellipseRValues.map((r) => ({
+  paramLabel: `r = ${r.toFixed(2)}`,
+  deltaX: Math.exp(-r) / Math.sqrt(2),
+  deltaP: Math.exp(r) / Math.sqrt(2),
+}));
+export const ellipseCenter = { x: Math.sqrt(2) * alphaExample, y: 0 };
 
 export const squeezeBars = [
   { label: "Δx (coherent, r=0)", value: deltaXCoherent, caption: deltaXCoherent.toFixed(4) },
@@ -262,6 +271,18 @@ laboratory tool (LIGO's gravitational-wave detector uses squeezed light
 specifically to push measurement noise below what an ordinary coherent
 state, let alone classical light, could achieve on the "compressed"
 quadrature, at the unavoidable cost of extra noise on the other one).
+
+<InteractiveSection
+  title="The uncertainty ellipse in (x, p) phase space"
+  description={`The genuinely visual picture named above, drawn directly from the boxed Δx=e^(-r)/√2, Δp=e^(r)/√2 formulas: a circle of radius 1/√2 at r=0 (equal spread, the coherent state), stretching into an ever-thinner, ever-taller ellipse as r increases toward 1.5, centered throughout at (⟨x⟩,⟨p⟩)=(√2·${alphaExample}, 0). Δx shrinks and Δp grows in exact inverse lockstep, so the ellipse's area, and the Δx·Δp readout below, stays fixed at one half no matter how far it's squeezed.`}
+>
+  <UncertaintyEllipse
+    frames={ellipseFrames}
+    center={ellipseCenter}
+    sliderLabel="Squeeze parameter r"
+    ariaLabel="Phase-space uncertainty ellipse for a squeezed state, centered at a fixed point, morphing from a circle at r=0 into an increasingly stretched ellipse — narrower in x, taller in p — as the squeeze parameter r increases from 0 to 1.5, with the product Delta x times Delta p staying exactly one half throughout"
+  />
+</InteractiveSection>
 
 ## Worked Example
 

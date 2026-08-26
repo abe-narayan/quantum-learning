@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
+import { PipelineDiagram } from "@/components/visualizations/PipelineDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states"
@@ -83,6 +84,17 @@ $$
 e^{-i\hat H\Delta t/\hbar} \approx e^{-i\hat V\Delta t/(2\hbar)}\;e^{-i\hat T\Delta t/\hbar}\;e^{-i\hat V\Delta t/(2\hbar)}
 $$
 
+<PipelineDiagram
+  ariaLabel="Symmetric split-operator step: half potential step in position space, FFT to momentum space, kinetic step, inverse FFT back to position space, then a second half potential step in position space"
+  steps={[
+    { label: "e^(-iVΔt/2ħ)", detail: "half potential step (position space)" },
+    { label: "FFT", detail: "position → momentum space" },
+    { label: "e^(-iħk²Δt/2m)", detail: "kinetic step (momentum space)" },
+    { label: "IFFT", detail: "momentum → position space" },
+    { label: "e^(-iVΔt/2ħ)", detail: "half potential step (position space)" },
+  ]}
+/>
+
 half a potential step, a full kinetic step, half a potential step. This
 extra symmetry (not proven here, but a standard result) cancels the
 leading error term entirely, leaving $O(\Delta t^3)$ error per step,
@@ -132,7 +144,7 @@ never offer, because there's no "correct answer" being approximated in a
 decorative animation. There is here.
 
 <InteractiveSection title="Step through one slice at a time" description="Use the Step button (rather than Play) on any stationary preset to advance one single symmetric split-operator step at a time, and watch ⟨H⟩ in the comparison panel. For a reasonable time step (this course's presets are tuned this way) it should barely move at all, step to step, even though each step is only an approximation.">
-  <LazyWavefunctionExplorer />
+  <LazyWavefunctionExplorer initialPresetId="harmonic-ground" />
 </InteractiveSection>
 
 ## Worked Example

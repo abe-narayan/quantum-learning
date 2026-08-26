@@ -3,6 +3,8 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { LazyPeriodFindingExplorer } from "@/components/simulators/period-finding-explorer/LazyPeriodFindingExplorer";
+import { PeriodFindingSchematic } from "@/components/visualizations/PeriodFindingSchematic";
 import { periodFindingMeasurementDistribution, classicalOrder } from "@/lib/quantum/shor";
 
 export const practiceProblems = getProblemsForLesson(
@@ -83,6 +85,23 @@ scope, and explicitly not built here. What *is* built and directly
 verified is everything downstream: the QFT-based extraction from this
 state, which is the actual interference mechanism the algorithm depends
 on.
+
+<PeriodFindingSchematic
+  t={4}
+  ariaLabel="Schematic of the period-finding circuit's structure: Hadamards on four counting qubits, a staircase of controlled-U_a^(2^(t-1-k)) modular multiplications each reaching into a bundled target register, then a QFT box spanning the counting register"
+/>
+
+*(Shown at reduced size — four counting qubits — for legibility; the
+worked examples below use $t=6$.)*
+
+This schematic shows the *shape* of that circuit, not a running one: each
+counting qubit $q$ starts with an $H$, then controls one
+$U_a^{2^{t-1-q}}$ box that conditionally multiplies the target register
+by a power of $a$, exactly mirroring phase estimation's controlled-$U^{2^k}$
+staircase. The final box is the QFT from the section below, applied only
+to the counting register. As above, this platform builds the *state*
+that staircase would output directly from its closed-form amplitudes,
+not this gate sequence box by box.
 
 ### Why the period shows up after the QFT
 
@@ -185,6 +204,10 @@ outcomes, each with probability exactly $1/r$. When it isn't, the
 exactly on $r$ of them, still usable by continued fractions, but not the
 clean picture the sharp case suggests.
 </Callout>
+
+<InteractiveSection title="Find the smear yourself" description="Every example above uses N=15, where 2^t/r always happens to come out to a whole number, so the peaks are always perfectly sharp. Switch N to 21 below and try different bases a (and different counting-qubit counts t) until 2^t/r is NOT a whole number, for instance a=2 with t=6 gives r=6 and 2^6/6=64/6≈10.67, a non-integer spacing. Watch the single sharp peaks from the N=15 case turn into clusters of nearby outcomes sharing the probability instead, the 'smear across roughly 2r nearby outcomes' this callout just described, not merely asserted.">
+  <LazyPeriodFindingExplorer />
+</InteractiveSection>
 
 ## Practice Questions
 

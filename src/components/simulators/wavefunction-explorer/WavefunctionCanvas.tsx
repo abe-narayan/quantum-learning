@@ -40,12 +40,21 @@ export function WavefunctionCanvas({
   potential,
   mode,
   analyticalDensity,
+  showMeanSpreadOverlay = false,
 }: {
   grid: Grid1D;
   psi: Wavefunction1D;
   potential: readonly number[];
   mode: CanvasMode;
   analyticalDensity?: readonly number[];
+  /**
+   * Draws ⟨x⟩ (dashed vertical line) and the [⟨x⟩−Δx, ⟨x⟩+Δx] band (light
+   * fill) under the density curve, in "density" mode only. Off by default —
+   * most presets/lessons embedding this canvas aren't about mean/spread, and
+   * the extra lines would just be noise there; lessons specifically about
+   * ⟨x⟩ and Δx (e.g. expectation-values-in-position-space) opt in.
+   */
+  showMeanSpreadOverlay?: boolean;
 }) {
   if (mode === "momentum") {
     const { k, amplitudes } = psi.toMomentumSpace();
@@ -107,9 +116,37 @@ export function WavefunctionCanvas({
     return BASELINE_Y - (clipped / (potentialCeiling * 1.05)) * PLOT_HEIGHT;
   });
 
+  // ⟨x⟩ and Δx = sqrt(Var(x)), only computed when the overlay is requested —
+  // same expressions StatePanel already shows as text, just drawn on the plot.
+  const meanX = showMeanSpreadOverlay ? psi.expectationPosition() : null;
+  const spreadX = showMeanSpreadOverlay ? Math.sqrt(Math.max(psi.variancePosition(), 0)) : null;
+
   return (
     <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label="Position-space probability density">
       <line x1={PADDING_X} y1={BASELINE_Y} x2={WIDTH - PADDING_X} y2={BASELINE_Y} stroke="currentColor" strokeOpacity={0.25} />
+
+      {meanX !== null && spreadX !== null ? (
+        <g aria-hidden="true">
+          <rect
+            x={Math.min(toX(meanX - spreadX), toX(meanX + spreadX))}
+            y={PADDING_TOP}
+            width={Math.max(0, Math.abs(toX(meanX + spreadX) - toX(meanX - spreadX)))}
+            height={PLOT_HEIGHT}
+            fill="var(--accent)"
+            fillOpacity={0.08}
+          />
+          <line
+            x1={toX(meanX)}
+            y1={PADDING_TOP}
+            x2={toX(meanX)}
+            y2={BASELINE_Y}
+            stroke="var(--accent)"
+            strokeOpacity={0.6}
+            strokeWidth={1.25}
+            strokeDasharray="4 3"
+          />
+        </g>
+      ) : null}
 
       {/* Potential V(x), shown schematically (its own vertical scale, not shared with probability density). */}
       <path d={pathFrom(xs, potentialYs)} fill="none" stroke="currentColor" strokeOpacity={0.35} strokeWidth={1.25} strokeDasharray="3 3" />
@@ -136,6 +173,9 @@ export function WavefunctionCanvas({
       <text x={PADDING_X} y={30} fontSize={11} fill="currentColor" opacity={0.5}>- - - V(x) (schematic scale)</text>
       {analyticalDensity ? (
         <text x={PADDING_X} y={44} fontSize={11} fill="var(--warning)">- - - analytical |ψ(x)|²</text>
+      ) : null}
+      {meanX !== null ? (
+        <text x={WIDTH - PADDING_X} y={16} fontSize={11} fill="var(--accent)" textAnchor="end">- - - ⟨x⟩ ± Δx</text>
       ) : null}
     </svg>
   );

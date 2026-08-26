@@ -83,6 +83,25 @@ $$
 \boxed{HZH = X}
 $$
 
+<StaticCircuitDiagram
+  numQubits={1}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "Z", targets: [0] },
+    { gate: "H", targets: [0] },
+  ]}
+  ariaLabel="A one-qubit circuit: H, then Z, then H, drawn left to right"
+/>
+
+The diagram above is drawn left to right in the order the gates are
+*applied* ($H$, then $Z$, then $H$), which is exactly why the operator
+product for this same circuit is written right to left as $HZH$: the
+leftmost box in the picture ($H$, applied first) ends up as the
+rightmost factor in the product, and the rightmost box ($H$, applied
+last) ends up as the leftmost factor. Same three gates, same order of
+application, two different reading directions depending on whether
+you're looking at the picture or the algebra.
+
 This is a genuine, checkable fact about these three matrices, not a
 coincidence of notation. Geometrically it says: a $\pi$ rotation about
 the diagonal $H$-axis, sandwiching a $\pi$ rotation about $z$, nets out to

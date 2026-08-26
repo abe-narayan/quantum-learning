@@ -2,10 +2,21 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"
 ).map((problem) => problem.meta);
+
+export const rootsOfUnityFrame = (n) => ({
+  paramLabel: `n = ${n}`,
+  vectors: Array.from({ length: n }, (_, k) => ({
+    label: `z${k}`,
+    x: Math.cos((2 * Math.PI * k) / n),
+    y: Math.sin((2 * Math.PI * k) / n),
+    color: k === 0 ? "accent" : "brand"
+  }))
+});
 
 export const lessonMeta = {
   title: "Complex Numbers for Physics",
@@ -213,6 +224,16 @@ $$
 These $n$ **roots of unity** sit evenly spaced around the unit circle.
 They'll reappear if you go on to study the quantum Fourier transform,
 where this exact spacing is the whole mechanism.
+
+<InteractiveSection
+  title="Scrub n, watch the roots of unity space themselves out"
+  description="Drag the slider to change n. Each frame plots all n roots z_k = e^{2πik/n}, k = 0, …, n−1, as unit vectors. z_0 = 1 is highlighted; watch the other n−1 roots stay evenly spaced around the circle, 2π/n apart, no matter what n is.">
+  <VectorDiagramExplorer
+    frames={Array.from({ length: 7 }, (_, i) => rootsOfUnityFrame(i + 2))}
+    sliderLabel="Number of roots n"
+    ariaLabel="The n-th roots of unity plotted as unit vectors evenly spaced around the unit circle, for n scrubbable from 2 to 8"
+  />
+</InteractiveSection>
 
 ### A forward look: complex numbers as $2\times2$ real matrices
 

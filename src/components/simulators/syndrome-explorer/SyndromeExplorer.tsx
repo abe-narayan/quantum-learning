@@ -6,40 +6,55 @@ import { Complex } from "@/lib/quantum/complex";
 import {
   encodeBitFlipCode,
   encodePhaseFlipCode,
-  applyBitFlipError,
-  applyPhaseFlipError,
+  applyBitFlipErrors,
+  applyPhaseFlipErrors,
   runBitFlipCorrectionCycle,
   runPhaseFlipCorrectionCycle,
 } from "@/lib/quantum/errorCorrection";
 import { StateInspector } from "@/components/simulators/circuit-builder/StateInspector";
-import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 import { LabNotes } from "./LabNotes";
 
-const INJECT_OPTIONS = ([null, 0, 1, 2] as const).map((q) => ({
-  q,
-  label: q === null ? "None" : `Qubit ${q}`,
-}));
+const INJECTABLE_QUBITS = [0, 1, 2] as const;
 
 const ALPHA = new Complex(0.6);
 const BETA = new Complex(0.8);
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 
-// Minimal shareable state is which qubit (if any) has the injected error.
-// This component renders twice on the same /simulators page — once per
-// `mode` — so the two instances need distinct param names, not just a
-// shared prefix, or they'd stomp on each other's URL state.
+// Minimal shareable state is the SET of qubits (possibly empty) that have
+// an injected error. This component renders twice on the same /simulators
+// page — once per `mode` — so the two instances need distinct param names,
+// not just a shared prefix, or they'd stomp on each other's URL state.
 function paramNameForMode(mode: "bit-flip" | "phase-flip"): string {
   return mode === "bit-flip" ? "syn_bf" : "syn_pf";
 }
 
-/** Reads and validates the injected-qubit param for this instance's mode. Falls back to the default (no error) on anything malformed or absent. */
-function parseInjectedQubit(params: { get(key: string): string | null }, mode: "bit-flip" | "phase-flip"): number | null {
+/**
+ * Reads and validates the injected-qubits param for this instance's mode:
+ * a comma-separated list of qubit indices (e.g. "0,1"), or "none". Falls
+ * back to the default (no error) on anything malformed or absent. A bare
+ * single index (e.g. "1"), the format this param used before multi-qubit
+ * injection was supported, still parses correctly as a one-element set, so
+ * old shared links keep working.
+ */
+function parseInjectedQubits(params: { get(key: string): string | null }, mode: "bit-flip" | "phase-flip"): number[] {
   const raw = params.get(paramNameForMode(mode));
-  if (raw === null || raw === "none") return null;
-  const value = Number(raw);
-  return value === 0 || value === 1 || value === 2 ? value : null;
+  if (raw === null || raw === "none") return [];
+  const qubits = raw
+    .split(",")
+    .map((token) => Number(token))
+    .filter((n): n is 0 | 1 | 2 => n === 0 || n === 1 || n === 2);
+  return Array.from(new Set(qubits)).sort((a, b) => a - b);
+}
+
+/** Formats a sorted, nonempty list of qubit indices as prose, e.g. [0], [0,1], [0,1,2]. */
+function formatQubitList(qubits: readonly number[]): string {
+  if (qubits.length === 1) return `qubit ${qubits[0]}`;
+  const last = qubits[qubits.length - 1];
+  const rest = qubits.slice(0, -1).join(", ");
+  return `qubits ${rest} and ${last}`;
 }
 
 /**
@@ -58,7 +73,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
   const router = useRouter();
   const paramName = paramNameForMode(mode);
 
-  const [injected, setInjected] = useState<number | null>(() => parseInjectedQubit(searchParams, mode));
+  const [injected, setInjected] = useState<number[]>(() => parseInjectedQubits(searchParams, mode));
   const [copied, setCopied] = useState(false);
 
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -83,7 +98,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
     if (urlSyncTimeoutRef.current !== null) clearTimeout(urlSyncTimeoutRef.current);
     urlSyncTimeoutRef.current = setTimeout(() => {
       const params = new URLSearchParams(window.location.search);
-      params.set(paramName, injected === null ? "none" : String(injected));
+      params.set(paramName, injected.length === 0 ? "none" : injected.join(","));
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     }, URL_SYNC_DEBOUNCE_MS);
     return () => {
@@ -107,23 +122,44 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
     }
   }, []);
 
+  const toggleQubit = useCallback((qubit: number) => {
+    setInjected((prev) => (prev.includes(qubit) ? prev.filter((q) => q !== qubit) : [...prev, qubit].sort((a, b) => a - b)));
+  }, []);
+
   const encoded = mode === "bit-flip" ? encodeBitFlipCode(ALPHA, BETA) : encodePhaseFlipCode(ALPHA, BETA);
-  const applyError = mode === "bit-flip" ? applyBitFlipError : applyPhaseFlipError;
+  const applyErrors = mode === "bit-flip" ? applyBitFlipErrors : applyPhaseFlipErrors;
   const runCycle = mode === "bit-flip" ? runBitFlipCorrectionCycle : runPhaseFlipCorrectionCycle;
-  const errored = injected === null ? encoded : applyError(encoded, injected);
+  const errored = injected.length === 0 ? encoded : applyErrors(encoded, injected);
   const result = runCycle(errored, [0.5, 0.5]);
 
   const errorLabel = mode === "bit-flip" ? "X" : "Z";
+  const logicalErrorLabel = mode === "bit-flip" ? "bit" : "phase";
+
+  // For a weight-2+ error (more than one qubit checked), the syndrome
+  // extraction can still fire, but the standard single-qubit recovery step
+  // is only guaranteed correct for weight-1 errors: past that it either
+  // mis-applies a correction to an uninjected qubit (converting the error
+  // into a full logical flip) or, for the weight-3 case, sees no syndrome
+  // at all while the state is already fully flipped. Surfacing this in the
+  // live summary is what makes the weight-2 worked example checkable here.
+  let outcomeNote = "";
+  if (injected.length >= 2) {
+    if (result.correctedQubit !== null && !injected.includes(result.correctedQubit)) {
+      outcomeNote = ` — recovery mis-applies a correction to qubit ${result.correctedQubit}, converting this weight-${injected.length} error into a full logical ${logicalErrorLabel} flip`;
+    } else if (result.correctedQubit === null) {
+      outcomeNote = ` — this weight-${injected.length} error is undetectable at the syndrome stage (syndrome stays (0,0)), yet the state is already a full logical ${logicalErrorLabel} flip`;
+    }
+  }
 
   return (
     <div className="not-prose grid gap-6 rounded-3xl border border-border bg-surface p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
       <div className="space-y-6">
         <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
-          {injected === null
+          {injected.length === 0
             ? "No error injected. The encoded state is exactly the logical state, undisturbed."
-            : `${errorLabel} error injected on qubit ${injected}. Syndrome (${result.syndrome[0]}, ${result.syndrome[1]}) decodes to ${
+            : `${errorLabel} error${injected.length > 1 ? "s" : ""} injected on ${formatQubitList(injected)}. Syndrome (${result.syndrome[0]}, ${result.syndrome[1]}) decodes to ${
                 result.correctedQubit === null ? "no error" : `qubit ${result.correctedQubit}`
-              }.`}
+              }${outcomeNote}.`}
         </div>
         <StateInspector state={result.corrected} />
 
@@ -139,8 +175,14 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
               content: (
                 <ul className="list-disc space-y-1 pl-4">
                   <li>
-                    Inject an error on qubit 0, then 1, then 2, and confirm the decoded correction target always
-                    matches the qubit you picked — the logical state (top panel) never changes regardless.
+                    Check one qubit at a time — 0, then 1, then 2 — and confirm the decoded correction target
+                    always matches the qubit you picked — the logical state (top panel) never changes regardless.
+                  </li>
+                  <li>
+                    Now check two qubits at once (e.g. 0 and 1): the syndrome is still nonzero, but the decode
+                    table points at the third, uninjected qubit, so the standard recovery step actively converts
+                    the two-qubit error into a full logical {logicalErrorLabel} flip — checkable directly in the
+                    amplitude table above.
                   </li>
                   <li>
                     Compare the two panels side by side: the bit-flip code&apos;s syndrome pattern is exactly the
@@ -167,15 +209,27 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
 
         <section aria-labelledby="syndrome-inject-heading">
           <h3 id="syndrome-inject-heading" className="text-sm font-semibold text-foreground">
-            Inject a {errorLabel} error
+            Inject {errorLabel} error(s)
           </h3>
-          <div className="mt-3">
-            <PresetToggle
-              options={INJECT_OPTIONS}
-              index={INJECT_OPTIONS.findIndex((o) => o.q === injected)}
-              onChange={(i) => setInjected(INJECT_OPTIONS[i].q)}
-              ariaLabel="Qubit to error"
-            />
+          <p className="mt-1 text-xs text-muted-foreground">Check any combination of qubits — checking two or more drives a weight-2+ error.</p>
+          <div role="group" aria-label="Qubits to error" className="mt-3 flex flex-wrap gap-2">
+            {INJECTABLE_QUBITS.map((qubit) => {
+              const checked = injected.includes(qubit);
+              return (
+                <label
+                  key={qubit}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 focus-within:ring-offset-background",
+                    checked
+                      ? "bg-brand text-brand-foreground"
+                      : "border border-border bg-surface text-muted-foreground hover:bg-surface-muted"
+                  )}
+                >
+                  <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleQubit(qubit)} />
+                  Qubit {qubit}
+                </label>
+              );
+            })}
           </div>
         </section>
 
@@ -188,7 +242,11 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             Decoded correction:{" "}
-            {result.correctedQubit === null ? "none needed" : `apply ${errorLabel} to qubit ${result.correctedQubit}`}
+            {result.correctedQubit !== null
+              ? `apply ${errorLabel} to qubit ${result.correctedQubit}`
+              : injected.length > 0
+                ? "none applied — syndrome reads (0,0)"
+                : "none needed"}
           </p>
         </section>
       </div>

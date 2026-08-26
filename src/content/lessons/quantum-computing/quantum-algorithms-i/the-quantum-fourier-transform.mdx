@@ -3,6 +3,7 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { StateVector } from "@/lib/quantum/state";
 import { quantumFourierTransform } from "@/lib/quantum/qft";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
@@ -32,6 +33,21 @@ export const qftSweepImagFrames = qftSweepJ.map((j, i) => ({
     label: `|${qftSweepStates[i].basisLabel(k)}⟩`,
     value: amp.im,
     caption: amp.im.toFixed(3),
+  })),
+}));
+
+export const qftVectorColors = ["brand", "accent", "muted", "foreground"];
+
+export const qftSweepVectorFrames = qftSweepJ.map((j, i) => ({
+  paramLabel:
+    j === 0
+      ? `j = 0 (|${qftSweepStates[i].basisLabel(j)}⟩ in) — all 4 vectors coincide`
+      : `j = ${j} (|${qftSweepStates[i].basisLabel(j)}⟩ in)`,
+  vectors: qftSweepStates[i].amplitudes.map((amp, k) => ({
+    label: `|${qftSweepStates[i].basisLabel(k)}⟩`,
+    x: amp.re,
+    y: amp.im,
+    color: qftVectorColors[k % qftVectorColors.length],
   })),
 }));
 
@@ -192,9 +208,14 @@ output from the engine:
 
 <InteractiveSection
   title="Same magnitude, a different phase fan each time"
-  description="Scrub j from 0 to 3 to change which basis state gets transformed. Watch the real and imaginary parts of the four output amplitudes below: every magnitude stays exactly 0.5, but the phase step from one basis state to the next changes with j, matching e to the 2 pi i j k over 4 exactly."
+  description="Scrub j from 0 to 3 to change which basis state gets transformed. Each output amplitude e^(2 pi i j k / 4) is plotted below as a vector from the origin, real part on the horizontal axis and imaginary part on the vertical axis: every vector has the same length, 0.5, so all four tips sit on a common circle, and only the angle each one points at changes with j. At j=0 all four vectors are identical, (0.5, 0), so they land exactly on top of each other with overlapping labels — that's genuinely correct (QFT of a uniform input is itself uniform), not a rendering issue; advance the slider to j=1 to see the four angles fan out and separate. The bar charts underneath show the same four amplitudes split into real and imaginary parts, the two coordinates each vector tip above is built from."
 >
   <div className="space-y-4">
+    <VectorDiagramExplorer
+      frames={qftSweepVectorFrames}
+      sliderLabel="Input basis state j"
+      ariaLabel="Each output amplitude of the quantum Fourier transform plotted as a vector in the complex plane, real part horizontal and imaginary part vertical, as the input basis state j sweeps from 0 to 3; every vector has the same length and only its angle changes"
+    />
     <BarChartExplorer
       frames={qftSweepRealFrames}
       sliderLabel="Input basis state j"

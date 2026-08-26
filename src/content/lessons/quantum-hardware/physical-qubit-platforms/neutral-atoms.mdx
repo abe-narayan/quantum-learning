@@ -90,12 +90,19 @@ entangling two-qubit gate, conceptually similar in spirit to Quantum
 Algorithms I's controlled-phase gates, but arising from genuine atomic
 physics rather than an abstract circuit element.
 
-<RydbergBlockadeDiagram ariaLabel="Two neutral atoms: atom A excited to a Rydberg state with an enormously expanded orbital and a surrounding blockade radius; atom B, sitting within that radius, has its own excitation attempt shown suppressed" />
+<RydbergBlockadeDiagram ariaLabel="Two neutral atoms: atom A excited to a Rydberg state with an enormously expanded orbital and a surrounding blockade radius; a separation slider moves atom B closer to or farther from atom A, crossing the blockade radius" />
 
 Atom A's expanded Rydberg orbital is what creates the blockade radius
 around it; atom B, sitting inside that radius, has its energy levels
 shifted enough that the same laser can no longer excite it to |r⟩ &mdash;
-its excitation attempt is suppressed, not merely weaker.
+its excitation attempt is suppressed, not merely weaker. Crucially, this
+is a *distance-limited* effect, not a blanket property of "being a
+nearby atom": drag the slider above to pull atom B away from atom A and
+find the separation at which its excitation stops being suppressed and
+starts succeeding. That crossover, right at the blockade radius r_b, is
+the boundary a real Rydberg-blockade gate is engineered around &mdash;
+atoms meant to interact are placed inside it, and atoms meant to stay
+independent are placed outside it.
 
 The excitation step itself, driving an atom from its ground state up to
 the Rydberg state, is a laser resonantly coupling two atomic levels: the

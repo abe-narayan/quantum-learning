@@ -1,6 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
+import { Complex } from "@/lib/quantum/complex";
+import { Matrix } from "@/lib/quantum/matrix";
+import { purity, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
+
+export const diagonalRho = (p) => new Matrix([[new Complex(p), Complex.ZERO], [Complex.ZERO, new Complex(1 - p)]]);
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/purity-entropy-and-information"
@@ -120,6 +125,43 @@ qubit $I/2$, both eigenvalues are $0.5$, giving
 $S=-2(0.5\log_20.5)=-2(0.5)(-1)=1$: **exactly 1 bit**, the maximum a
 single qubit's density matrix can reach. Both values are computed
 directly by `vonNeumannEntropy` and checked as regression tests.
+
+Those two values are just the endpoints of a continuous trade-off.
+Sweep the diagonal family $\rho(p)=\text{diag}(p,1-p)$ across every
+$p\in[0,1]$, not merely $p=1$ and $p=0.5$, and plot both
+$\text{Tr}(\rho(p)^2)$ and $S(\rho(p))$, computed directly by `purity`
+and `vonNeumannEntropy` (the same engine functions used everywhere
+else in this lesson, not a re-derived formula) at each point:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        {
+          label: "Purity Tr(ρ²)",
+          color: "brand",
+          points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: purity(diagonalRho(i / 40)) }))
+        },
+        {
+          label: "Entropy S(ρ) (bits)",
+          color: "accent",
+          points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: vonNeumannEntropy(diagonalRho(i / 40)) }))
+        }
+      ]
+    }
+  ]}
+  referenceLines={[{ y: 1, label: "p=0.5 — maximally mixed: purity 0.5, entropy 1 bit" }]}
+  ariaLabel="Purity and von Neumann entropy plotted as functions of p for the diagonal family diag(p, 1-p) from p=0 to p=1: purity traces a U shape from 1 down to 0.5 at p=0.5 and back to 1, while entropy traces the mirrored inverted peak from 0 up to 1 bit at p=0.5 and back to 0"
+/>
+
+Purity traces a U shape, $1$ at both pure endpoints ($p=0$ and $p=1$)
+down to its minimum $0.5$ exactly at $p=0.5$; entropy traces the
+mirrored inverted peak, $0$ at both endpoints up to its maximum $1$ bit
+at the same $p=0.5$. The two limits from the previous paragraph are
+just this curve's endpoints and its midpoint, not a special case: purity
+and entropy move in exact lockstep, one falling wherever the other
+rises, across the entire family.
 
 ### The diagonal-entries trap
 

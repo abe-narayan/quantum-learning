@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { LazyWaveInterference } from "@/components/visualizations/wave-interference/LazyWaveInterference";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability"
@@ -116,6 +117,12 @@ relative phase. This is exactly the fringe pattern: as position $x$ on the
 screen changes, the relative phase between the two paths changes (their
 path lengths to the two slits differ), sweeping through exactly this
 range.
+
+<InteractiveSection
+  title="What path 1 and path 2 physically look like"
+  description="This is the literal physical picture behind ψ₁ and ψ₂ above: S₁ and S₂ are the two slits, each emitting a coherent wave toward the screen. The screen intensity at each point is the squared magnitude of the sum of the two waves there, exactly |ψ₁+ψ₂|², not the sum of the two individual intensities. Watch how the fringe pattern on the screen builds up from these two overlapping waves before moving to the abstract amplitude picture below.">
+  <LazyWaveInterference tryThisHint="Stop at φ = π/3 ≈ 1.047: the readout should show I/4A² = 0.750, the same partial constructive interference this lesson's worked example finds at θ = π/3 (ψ₁ = 0.6, ψ₂ = 0.6e^{iπ/3}), where the quantum probability (1.08) exceeds the classical prediction (0.72)." />
+</InteractiveSection>
 
 <InteractiveSection
   title="Sweep the phase, watch interference kill the signal"

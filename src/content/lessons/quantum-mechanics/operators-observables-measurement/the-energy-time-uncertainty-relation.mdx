@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { LinewidthDiagram } from "@/components/visualizations/LinewidthDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/operators-observables-measurement/the-energy-time-uncertainty-relation"
@@ -132,6 +133,14 @@ the stationary-state result already known from two earlier courses:
   proven in both the finite-dimensional and continuous-position settings
   already. The energy-time relation and the stationary-state result are
   not two separate facts. One is the extreme limit of the other.
+
+A short lifetime forces a visibly smeared energy level, which shows up
+directly in what gets emitted: the excited level itself broadens into a
+band, and the emission line built from it broadens right along with it,
+this is the natural linewidth named in the sodium-D-line photo above,
+made quantitative below.
+
+<LinewidthDiagram ariaLabel="Two linked panels: an excited energy level drawn as a soft band above a sharp ground state line, and below it a Lorentzian emission-line profile. A slider sets the lifetime delta t sub A; a shorter lifetime widens both the band and the emission peak, a longer lifetime narrows both, with delta E fixed at h-bar over two delta t sub A." />
 
 ## Worked Example
 

@@ -97,6 +97,7 @@ purposes, but large enough to be precisely measured spectroscopically
     frames={fineStructureFrames}
     sliderLabel="Principal quantum number n"
     ariaLabel="Bar chart comparing the magnitude of hydrogen energy level E_n to the order-of-magnitude fine-structure correction scale, for n from 1 to 4"
+    maxValue={fineStructureScaleEV * 8}
   />
 </InteractiveSection>
 
@@ -104,6 +105,16 @@ The specific result these corrections break is the exact
 $l$-independence of $E_n$ from Hydrogen Energy Levels: with fine
 structure, states of the same $n$ but different total angular momentum
 $j$ get slightly different energies.
+
+<LevelSplittingDiagram
+  leftLabel="n = 2"
+  rightLevels={[
+    { label: "j = 3/2" },
+    { label: "j = 1/2", highlight: true },
+  ]}
+  ariaLabel="Schematic diagram showing the single non-relativistic n=2 hydrogen energy level fanning out into two closely spaced levels labeled j=3/2 and j=1/2 once fine structure is included"
+  caption="Schematic, not to scale: the fine-structure splitting is real but tiny (~10⁻⁴ of E_n), and its actual size is computed later in Quantum Mastery."
+/>
 
 ## Honest Scope Statement
 
