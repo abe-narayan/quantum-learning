@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/programming-quantum-computers/circuit-representation-in-code"
@@ -77,14 +78,54 @@ runs.
 This lesson introduces no new physics whatsoever. `SINGLE_QUBIT_MATRICES`
 inside `circuitBuilder.ts` is literally the same `PAULI_X`, `HADAMARD`,
 etc. from `gates.ts`. The entire content here is about *software
-structure*, a genuinely different kind of lesson from this platform's
-physics-heavy courses, matching how real quantum programming actually
-looks day to day.
+structure* rather than physics, which is a fair description of what
+most quantum programming work actually looks like day to day: less
+deriving new matrices, more organizing gate sequences correctly.
 
 ## Worked Example
 
 **Build a circuit implementing $H\,Z\,H$ on a single qubit (a known
 identity: $HZH=X$), and confirm it flips $|0\rangle$ to $|1\rangle$.**
+
+<PredictBeforeReveal
+  question="circuit.h(0).z(0).h(0) has just been called, but runCircuit(circuit) has not. What has happened to the qubit's quantum state so far?"
+  options={[
+    { label: "It's been rotated by H, then Z, then H", value: "rotated" },
+    { label: "Nothing — three instructions were appended to a list, no state exists yet", value: "nothing" },
+    { label: "It collapsed to |1⟩ already", value: "collapsed" },
+  ]}
+  correctValue="nothing"
+  explanation="circuit.h(0).z(0).h(0) only appends three GateInstruction objects to circuit.instructions. No StateVector is created or touched until runCircuit(circuit) actually runs — that's the whole point of build-then-execute. Watch the diagram below grow one instruction at a time before anything executes."
+/>
+
+Here's that instruction list actually growing, one appended call at a time, exactly as `circuit.h(0).z(0).h(0)` builds it — still just data, nothing executed yet:
+
+<CircuitDiagramExplorer
+  sliderLabel="After calling"
+  frames={[
+    {
+      paramLabel: "circuit.h(0)",
+      numQubits: 1,
+      instructions: [{ gate: "H", targets: [0] }],
+      highlightColumn: 0,
+      ariaLabel: "Circuit with one instruction: H on qubit 0",
+    },
+    {
+      paramLabel: "circuit.h(0).z(0)",
+      numQubits: 1,
+      instructions: [{ gate: "H", targets: [0] }, { gate: "Z", targets: [0] }],
+      highlightColumn: 1,
+      ariaLabel: "Circuit with two instructions: H then Z on qubit 0",
+    },
+    {
+      paramLabel: "circuit.h(0).z(0).h(0)",
+      numQubits: 1,
+      instructions: [{ gate: "H", targets: [0] }, { gate: "Z", targets: [0] }, { gate: "H", targets: [0] }],
+      highlightColumn: 2,
+      ariaLabel: "Circuit with three instructions: H, Z, H on qubit 0",
+    },
+  ]}
+/>
 
 <PipelineDiagram
   ariaLabel="This lesson's build-then-execute pipeline: build, add gates, execute, read amplitudes"
@@ -161,8 +202,9 @@ Gates & Circuits' own functions). Only the software organization
 - This platform's `QuantumCircuit`/`runCircuit` implement exactly this
   pattern, dispatching every instruction to the same gate functions
   Quantum Gates & Circuits already built and tested.
-- This is a software-structure lesson, not new physics, a genuinely
-  different kind of content from this platform's matrix-heavy courses.
+- This is a software-structure lesson, not new physics — the same
+  content as this platform's matrix-heavy courses, organized
+  differently.
 
 ## Further Exploration
 

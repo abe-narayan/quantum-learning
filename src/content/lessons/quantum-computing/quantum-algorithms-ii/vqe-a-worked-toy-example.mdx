@@ -1,7 +1,9 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
 import { PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
-import { runVqe, exactGroundStateEnergy } from "@/lib/quantum/vqe";
+import { runVqe, exactGroundStateEnergy, costFunction } from "@/lib/quantum/vqe";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example"
@@ -10,6 +12,16 @@ export const practiceProblems = getProblemsForLesson(
 export const toyHamiltonian = PAULI_Z.scale(0.6).add(PAULI_X.scale(0.8));
 export const toyVqeResult = runVqe(toyHamiltonian, 80);
 export const toyGroundEnergy = exactGroundStateEnergy(toyHamiltonian);
+
+export const toyLandscapeSteps = 17;
+export const toyLandscapeGrid = Array.from({ length: toyLandscapeSteps }, (_, i) => {
+  const theta = (i / (toyLandscapeSteps - 1)) * 2 * Math.PI;
+  return Array.from({ length: toyLandscapeSteps }, (_, j) => {
+    const phi = (j / (toyLandscapeSteps - 1)) * 2 * Math.PI;
+    return { theta, phi, value: costFunction(toyHamiltonian, { theta, phi }) };
+  });
+});
+export const toyLandscapeBestCell = toyLandscapeGrid.flat().reduce((best, cell) => (cell.value < best.value ? cell : best));
 
 export const lessonMeta = {
   title: "VQE: A Worked Toy Example",
@@ -64,6 +76,17 @@ computed independently via `exactGroundStateEnergy`, not asserted.
 
 ### Running the optimizer
 
+<PredictBeforeReveal
+  question="runVqe(H, 80) allows up to 80 pattern-search iterations. Given the ansatz here is fully expressive for this single qubit, do you expect the run to use close to the full 80-iteration budget, or stop well short of it?"
+  options={[
+    { label: "It uses close to all 80 iterations to converge tightly", value: "full" },
+    { label: "It stops well short, once its step size shrinks enough", value: "early" },
+    { label: "It stops immediately — the starting point is already optimal", value: "immediate" },
+  ]}
+  correctValue="early"
+  explanation="The run halts after 28 iterations, fewer than half the 80-iteration budget, once its step size shrinks below 1e-6 — a second, real stopping condition distinct from the iteration cap, and the one that actually ends this run."
+/>
+
 `runVqe(H, 80)` starts at $(\theta,\varphi)=(\pi/2,0)$ (the state
 $|+\rangle$) and allows *up to* 80 pattern-search steps, but 80 is only a
 ceiling, not a count of what actually runs: the loop has a second, real
@@ -100,6 +123,39 @@ Hamiltonian, not a smoothed illustration:
 Every step either strictly improves the cost or shrinks the search step;
 the curve never dips below the dashed $E_0$ line, exactly what the
 variational principle from the last lesson guarantees.
+
+### The landscape underneath that descent
+
+The curve above only shows cost against iteration count, one number per
+step. It doesn't show what the pattern search was actually walking
+around inside: the full two-parameter surface $\langle\psi(\theta,
+\varphi)|H|\psi(\theta,\varphi)\rangle$ it was descending. Unlike the
+last lesson's $H=Z$ (whose energy ignores $\varphi$ entirely), this
+Hamiltonian has a genuine off-diagonal $X$ term, so both parameters
+matter: $\varphi$ now actually shifts the cost, rather than being
+completely free the way it was for $H=Z$'s $\varphi$-independent
+landscape:
+
+<CostLandscapeHeatmap
+  grid={toyLandscapeGrid}
+  exactMin={toyGroundEnergy}
+  ariaLabel="Heatmap of the cost function for H=0.6Z+0.8X over a 17 by 17 grid of theta and phi, both ranging from 0 to 2 pi, with the grid's lowest cell marked and compared to the exact ground energy"
+/>
+
+The grid's own darkest-green cell sits at $\theta\approx
+{toyLandscapeBestCell.theta.toFixed(2)}$, $\varphi\approx
+{toyLandscapeBestCell.phi.toFixed(2)}$, giving $\langle H\rangle\approx
+{toyLandscapeBestCell.value.toFixed(4)}$ (close to, but not exactly on,
+the true floor $-1$, since a $17\times17$ grid can't land on the exact
+continuous optimum). That is a genuinely *different* point from where
+`runVqe` actually converged, $\theta\approx
+{toyVqeResult.params.theta.toFixed(2)}$, $\varphi\approx
+{toyVqeResult.params.phi.toFixed(2)}$, itself reaching energy
+{toyVqeResult.energy.toFixed(4)}, essentially exactly $-1$. Two
+different search strategies, an exhaustive grid and an adaptive local
+one, landing in two different corners of the same surface, both close to
+the same floor: exactly the multiple-minimizers point the second Common
+Mistake below makes concrete, not a contradiction between them.
 
 ### Reading the convergence
 

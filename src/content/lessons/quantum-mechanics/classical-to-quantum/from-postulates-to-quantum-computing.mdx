@@ -3,6 +3,7 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, phaseGate } from "@/lib/quantum/gates";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/from-postulates-to-quantum-computing"
@@ -56,12 +57,12 @@ It's this exact framework, applied to the smallest nontrivial Hilbert
 space there is.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a superconducting-qubit quantum computer housed in a gold-framed glass cube"
-  caption="A real superconducting-qubit quantum computer. Every qubit inside is governed by exactly the same four postulates this course derived: a state vector, Hermitian observables, the Born rule, and unitary evolution."
-  credit="Onri Jay Benally / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/0/0b/DEFENSE_%2854394239497%29.jpg"
+  alt="The central vacuum chamber and optics of Sandia National Laboratories' neutral-atom quantum computing apparatus, used to test a new method for detecting qubit errors"
+  caption="A real neutral-atom quantum computer. Every qubit trapped and controlled by hardware like this is governed by exactly the same four postulates this course derived: a state vector, Hermitian observables, the Born rule, and unitary evolution."
+  credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
+  creditUrl="https://commons.wikimedia.org/wiki/File:DEFENSE_(54394239497).jpg"
+  license="Public Domain (U.S. Government work)"
 />
 
 ## Recap: A Qubit Is a Two-Level Quantum System
@@ -109,6 +110,17 @@ gate was applied beforehand. A phase gate changes $\varphi$, invisibly to
 a $\{|0\rangle,|1\rangle\}$-basis measurement, but a
 $\{|+\rangle,|-\rangle\}$-basis measurement reveals it immediately, via
 the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
+
+<PredictBeforeReveal
+  question="Starting from |+⟩, a phase gate with angle φ is applied. If you then measure in the {|0⟩,|1⟩} basis, how do P(0) and P(1) respond as φ sweeps from 0° to 360°?"
+  options={[
+    { label: "Both swing between 0 and 1 with φ", value: "swing" },
+    { label: "They stay fixed at 0.5 each, no matter what φ is", value: "fixed" },
+    { label: "They swap discontinuously at φ = 180°", value: "swap" },
+  ]}
+  correctValue="fixed"
+  explanation="A phase gate only changes the relative phase between |0⟩ and |1⟩, and P(0), P(1) depend only on the magnitudes |α|, |β|, which the phase gate leaves untouched. So the Z-basis bars stay pinned at 0.5 for every φ, while the phase only becomes visible once you switch to a basis, like {|+⟩,|−⟩}, that mixes |0⟩ and |1⟩ together."
+/>
 
 <InteractiveSection title="Slide φ, watch phase hide in one basis and appear in the other" description="Starting from H|0⟩ = |+⟩, a phase gate with angle φ is applied, then the qubit is measured in the {|0⟩,|1⟩} basis and, separately, in the {|+⟩,|-⟩} basis. Every bar below is computed by literally multiplying the platform's real Hadamard and phase-gate matrices, not typed in from the formula. Watch the Z-basis bars stay frozen at 0.5 for every φ, while the X-basis bars swing with it exactly as P(+) = (1+cos φ)/2 predicts.">
   <BarChartExplorer

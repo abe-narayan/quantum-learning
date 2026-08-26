@@ -93,10 +93,10 @@ $$
 P(\lambda_i) = |\langle e_i|\psi\rangle|^2
 $$
 
-This is a genuine postulate of quantum mechanics, not something derived
-from more basic principles in this course, or anywhere else in physics,
-but it isn't arbitrary either: it's the *unique* rule consistent with
-everything already built. Expand $|\psi\rangle=\sum_i c_i|e_i\rangle$
+This is a genuine postulate: nothing in this course, or anywhere else in
+physics, derives it from more basic principles. But it isn't an arbitrary
+choice either, it's the *unique* rule consistent with everything already
+built. Expand $|\psi\rangle=\sum_i c_i|e_i\rangle$
 where $c_i=\langle e_i|\psi\rangle$ (the completeness relation, Bra-Ket
 Formalism lesson). Total probability had better sum to $1$; check it does:
 
@@ -173,12 +173,23 @@ $\langle e_+|\psi\rangle=0.6$ and $\langle e_-|\psi\rangle=0.8$ (both
 real). Find $P(+1)$, $P(-1)$, and $\langle A\rangle$, and check the two
 ways of computing $\langle A\rangle$ agree.**
 
+<PredictBeforeReveal
+  question="With ⟨e₊|ψ⟩ = 0.6 and ⟨e₋|ψ⟩ = 0.8, which outcome is more likely?"
+  options={[
+    { label: "+1 is more likely", value: "plus" },
+    { label: "-1 is more likely", value: "minus" },
+    { label: "Equally likely", value: "equal" },
+  ]}
+  correctValue="minus"
+  explanation="P(-1) = 0.8² = 0.64 beats P(+1) = 0.6² = 0.36, even though 0.8 isn't twice 0.6 — squaring the amplitude widens the gap between the two outcomes. This is exactly the trap the Born rule sets: eyeballing the raw overlaps gets the ranking right here, but never the actual probabilities."
+/>
+
 $$
 P(+1) = |0.6|^2 = 0.36, \qquad P(-1)=|0.8|^2=0.64
 $$
 
-(Check: $0.36+0.64=1$ ✓, consistent with normalization as required.) The
-Born rule turns an overlap into a bar you can see, not just a number:
+(Check: $0.36+0.64=1$ ✓, consistent with normalization as required.) Put
+the two outcomes side by side and the gap between them is easy to see:
 
 <BarChart
   bars={[
@@ -188,7 +199,7 @@ Born rule turns an overlap into a bar you can see, not just a number:
   ariaLabel="Bar chart of P(+1) and P(-1) for the worked example"
 />
 
-Two bars, summing to exactly 1, visibly, not just algebraically.
+The two bars sum to exactly 1, as normalization demands.
 
 <InteractiveSection title="Slide c₊, watch normalization hold" description="Drag c₊ from 0 to 1. c₋ is set automatically to keep the state normalized (c₊² + c₋² = 1), and the two bars always sum to exactly 1 no matter where you leave the slider — normalization isn't a special property of the 0.6/0.8 example above, it holds everywhere along this whole family of states.">
   <BarChartExplorer
@@ -219,8 +230,9 @@ Both routes agree, as the general derivation above guarantees they must.
 <Callout type="mistake">
 **Using the amplitude directly instead of its squared modulus.**
 $P(\lambda_i)=|\langle e_i|\psi\rangle|^2$, not $\langle
-e_i|\psi\rangle$ itself, the single most common error in this entire
-course, worth flagging one last time at the point where it matters most.
+e_i|\psi\rangle$ itself. This has been the single most common error
+throughout the course; here is where it actually costs you a wrong
+probability.
 </Callout>
 
 <Callout type="mistake">

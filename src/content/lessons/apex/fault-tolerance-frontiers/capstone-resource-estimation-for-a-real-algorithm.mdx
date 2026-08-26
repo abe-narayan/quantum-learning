@@ -217,6 +217,17 @@ qubit-counting formula in Step 4 stays a single, reusable expression).
 
 ### Step 4 — total physical qubit count
 
+<PredictBeforeReveal
+  question="This step totals up the compute register's qubits (6 logical patches, each holding both its data and ancilla qubits) and the magic-state factory's qubits (15 more patches for one distillation round), all at the same code distance. Before computing exact numbers: roughly what fraction of the total physical qubit count will the magic-state factory alone account for?"
+  options={[
+    { label: "About 25%", value: "25" },
+    { label: "About 50%", value: "50" },
+    { label: "About 70% or more", value: "70" },
+  ]}
+  correctValue="70"
+  explanation="The factory alone comes out to 5/7 ≈ 71.4% of the total, computed exactly below — driven purely by patch count (15 factory patches vs. 6 compute patches, at the same per-patch qubit cost). That's exactly why Magic States and Distillation flagged the factory as the dominant resource cost of a real fault-tolerant architecture, not just a plausible-sounding claim."
+/>
+
 A distance-$d$ rotated surface-code patch holds $d^2$ data qubits and
 $d^2-1$ ancilla (syndrome-measurement) qubits, using the more
 qubit-efficient rotated-code convention Surface Codes in Depth
@@ -262,7 +273,7 @@ ratio at all.
 ## Physical Interpretation: what generalizes and what doesn't
 
 <Callout type="note">
-**This is genuinely how real resource estimates are built.** Published
+**This is how real resource estimates actually get built, not a simplified stand-in for it.** Published
 estimates for algorithmically significant problems, including the
 widely cited estimates for factoring cryptographically-relevant RSA
 moduli with Shor's algorithm, follow exactly these same four steps:

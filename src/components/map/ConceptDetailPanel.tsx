@@ -16,13 +16,15 @@ const PILLAR_LABEL: Record<ConceptNode["pillar"], string> = {
   apex: "Apex",
 };
 
-const PILLAR_TONE: Record<ConceptNode["pillar"], "brand" | "accent" | "neutral" | "warning" | "danger"> = {
+const PILLAR_TONE: Record<ConceptNode["pillar"], "brand" | "accent" | "neutral" | "warning" | "danger" | "success"> = {
   "quantum-mechanics": "brand",
   "quantum-computing": "accent",
   "quantum-hardware": "warning",
   "quantum-software": "neutral",
   "quantum-mastery": "danger",
-  apex: "brand",
+  // Distinct from "quantum-mechanics" above — see the matching note in
+  // ConceptMapExplorer.tsx's PILLAR_DOT.
+  apex: "success",
 };
 
 function simulatorHref(simulatorId: SimulatorId) {

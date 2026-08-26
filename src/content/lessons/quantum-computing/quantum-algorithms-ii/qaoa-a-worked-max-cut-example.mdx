@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
 import { LazyQAOAExplorer } from "@/components/simulators/qaoa-explorer/LazyQAOAExplorer";
 import { qaoaCircuit, expectedCutSize, bruteForceMaxCut } from "@/lib/quantum/qaoa";
 
@@ -28,6 +29,17 @@ export const landscapeFrames = landscapeBetas.map((beta) => ({
   ]
 }));
 
+export const heatmapSteps = 21;
+export const heatmapGrid = Array.from({ length: heatmapSteps }, (_, i) => {
+  const gamma = (i / (heatmapSteps - 1)) * Math.PI;
+  return Array.from({ length: heatmapSteps }, (_, j) => {
+    const beta = (j / (heatmapSteps - 1)) * Math.PI;
+    return { theta: gamma, phi: beta, value: expectedCutSize(qaoaCircuit(3, landscapeEdges, [gamma], [beta]), landscapeEdges) };
+  });
+});
+export const heatmapBestCell = heatmapGrid.flat().reduce((best, cell) => (cell.value > best.value ? cell : best));
+export const heatmapGreenCellCount = heatmapGrid.flat().filter((cell) => cell.value > 1.9).length;
+
 export const lessonMeta = {
   title: "QAOA: A Worked Max-Cut Example",
   description:
@@ -47,21 +59,32 @@ export const lessonMeta = {
 
 ## Motivation
 
-A single layer of QAOA, run on a triangle graph, lands within 0.05% of
-the best possible cut, on Max-Cut, a problem that's NP-hard in general.
-Is that luck, or is $p=1$ just enough structure for a graph this small?
-This lesson runs the actual circuit at good parameters and checks the
-result against `bruteForceMaxCut`, the true answer, computable directly
-since these graphs are small enough to check every one of the $2^n$
-colorings.
-
 Picture splitting a graph's vertices into two teams so that as many
 edges as possible cross between them: that's Max-Cut. The last lesson
 built the mechanism (cost phases, then a mixer) that biases the
 circuit's measurement distribution toward good splits, starting from a
-baseline of no optimization at all (expected cut $=|E|/2$). How good,
-concretely, is exactly what these two worked examples measure, and you
-can explore the cost landscape driving it yourself a bit further down.
+baseline of no optimization at all (expected cut $=|E|/2$). This lesson
+runs the actual circuit at good parameters, on a triangle and on a
+single edge, and checks the result against `bruteForceMaxCut`, the true
+answer, computable directly since these graphs are small enough to check
+every one of the $2^n$ colorings.
+
+<PredictBeforeReveal
+  question="For a single layer (p=1) of QAOA on the triangle graph, run at good (γ,β), how close do you expect the achieved cut to land to the true maximum of 2?"
+  options={[
+    { label: "Barely above the |E|/2 = 1.5 baseline", value: "barely" },
+    { label: "Clearly better than baseline, but well short of 2", value: "partial" },
+    { label: "Within a few percent of the true maximum", value: "close" },
+    { label: "Exactly 2, every single time", value: "exact" },
+  ]}
+  correctValue="close"
+  explanation="Grid-searched p=1 QAOA on the triangle reaches an expected cut of about 1.999, within 0.05% of the true maximum of 2, close for the shallowest possible circuit, but not exact: QAOA is a heuristic, and 'within a few percent' is the honest shape of that heuristic's result, not the 'always exactly optimal' guarantee Grover's or Deutsch-Jozsa give."
+/>
+
+Is that closeness luck, or is $p=1$ just enough structure for a graph
+this small? The rest of this lesson runs the actual numbers, on two
+graphs, and you can explore the cost landscape driving them yourself a
+bit further down.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Alice_and_Bob_Cryostat.jpg"
@@ -120,10 +143,37 @@ descent or Bayesian optimization over $(\gamma,\beta)$, run alongside the
 quantum circuit in the classical part of the hybrid loop. A grid search
 is the smallest honest substitute for that outer loop: it doesn't
 represent a full classical optimizer implementation, but it does find
-genuinely good parameters via genuinely evaluating the same
+genuinely good parameters, from actually evaluating the same
 `qaoaCircuit`/`expectedCutSize` functions a real optimizer would call.
 
-<InteractiveSection title="A bumpy landscape, not a single peak" description="Slide β across the values a grid search would try. Each curve sweeps γ continuously at that fixed β, for the real triangle circuit. Notice the curve bumps up and down rather than having one obvious peak, and which β gives the best peak height changes as you slide, exactly why a 2D grid (not a single 1D formula) was needed. At β=0.30 the curve's peak sits right at the grid-searched γ≈0.6, brushing the true maximum (dashed line at 2), matching the ≈1.999 result quoted above.">
+Here is the whole $21\times21$ grid at once, the surface a real optimizer
+has to navigate:
+
+<CostLandscapeHeatmap
+  grid={heatmapGrid}
+  thetaLabel="γ"
+  phiLabel="β"
+  thetaMaxLabel="π"
+  phiMaxLabel="π"
+  valueLabel="⟨cut⟩"
+  goal="max"
+  exactMin={landscapeTrueMax}
+  exactLabel="true max (brute force)"
+  ariaLabel="Heatmap of expected triangle cut size over a 21 by 21 grid of cost angle gamma and mixer angle beta, both ranging from 0 to pi, with the grid's best cell marked and compared to the true brute-force maximum"
+/>
+
+This $21\times21$ grid's own best cell sits at $\gamma\approx
+{heatmapBestCell.theta.toFixed(2)}$, $\beta\approx
+{heatmapBestCell.phi.toFixed(2)}$, giving $\langle\text{cut}\rangle\approx
+{heatmapBestCell.value.toFixed(4)}$, a *different* corner of the
+landscape from the $\gamma\approx0.6,\beta\approx0.3$ region singled out
+below, and further evidence this surface has more than one near-optimal
+spot rather than a single unique peak: {heatmapGreenCellCount} of the
+{heatmapSteps * heatmapSteps} grid cells already exceed
+$\langle\text{cut}\rangle=1.9$, spread across more than one green patch,
+not clustered around one location.
+
+<InteractiveSection title="A bumpy landscape, not a single peak" description="Slide β across the values a grid search would try. Each curve sweeps γ continuously at that fixed β, for the real triangle circuit — a horizontal slice through the heatmap above. Notice the curve bumps up and down rather than having one obvious peak, and which β gives the best peak height changes as you slide, exactly why a 2D grid (not a single 1D formula) was needed. At β=0.30 the curve's peak sits right at the grid-searched γ≈0.6, brushing the true maximum (dashed line at 2), matching the ≈1.999 result quoted above.">
   <ParametricCurve
     frames={landscapeFrames}
     sliderLabel="mixer angle β"

@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PipelineDiagram } from "@/components/visualizations/PipelineDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count"
@@ -108,7 +109,25 @@ Hamiltonian, whose gate count every earlier stage in this list can be
 applied to.
 
 This capstone's only job is to chain those stages together, then hand the
-result to the *other* capstone this pillar already built. **Capstone:
+result to the *other* capstone this pillar already built.
+
+<PipelineDiagram
+  ariaLabel="The four-stage pipeline this capstone chains together: Stage 1, check classical simulability; Stage 2, count T-gates via Clifford+T synthesis; Stage 3, apply routing and noise-aware compilation overhead; Stage 4, apply the Fault Tolerance Frontiers capstone's own error-budget, code-distance, distillation, and qubit-count methodology, producing a final total physical qubit count"
+  steps={[
+    { label: "Stage 1", detail: "Classically simulable?" },
+    { label: "Stage 2", detail: "T-count via synthesis" },
+    { label: "Stage 3", detail: "Routing overhead" },
+    { label: "Stage 4", detail: "Fault-tolerance pipeline", highlight: true },
+  ]}
+/>
+
+*The shape of this whole lesson, stated before a single number is
+computed*: four stages, each handed off from a specific earlier lesson,
+chained in sequence into a single physical-qubit estimate. The Worked
+Example's table and bar chart below fill in this same four-stage shape
+with this lesson's own toy circuit's actual numbers.
+
+**Capstone:
 Resource Estimation for a Real Algorithm**, the closing lesson of the
 Fault Tolerance Frontiers course, derived a complete four-step pipeline
 from "a circuit has $N_T$ T gates and $N_2$ two-qubit Clifford gates" to
@@ -346,6 +365,17 @@ answers is engineering fact and which is a current best guess.
 
 ## Worked Example
 
+<PredictBeforeReveal
+  question="This toy algorithm only needs 2 logical qubits. Roughly how many physical qubits do you expect the full fault-tolerant pipeline to demand once code distance and the magic-state factory are accounted for?"
+  options={[
+    { label: "A modest multiple of 2 — a few dozen", value: "few-dozen" },
+    { label: "A few hundred — comparable to a couple of surface-code patches", value: "few-hundred" },
+    { label: "Thousands — dominated by the magic-state factory, not the compute qubits", value: "thousands-factory" },
+  ]}
+  correctValue="thousands-factory"
+  explanation="The 2 logical qubits themselves need only a few hundred physical data-plus-ancilla qubits (two distance-11 surface-code patches). But keeping a T-gate-hungry circuit supplied with magic states needs a separate distillation factory built from many more patches than that, and the table below shows that factory alone dominating the final total — thousands of qubits where the 'algorithm' only asked for 2."
+/>
+
 The full pipeline, stage by stage, for this lesson's toy circuit:
 
 | Stage | Quantity | Value |
@@ -367,24 +397,30 @@ Watching the number transform stage by stage is the real content of
 this capstone: {rawTotalGateCount} raw gates become {totalTGates} T
 gates worth tracking separately, routing inflates the total to
 {routedTotalGateCount}, and the fault-tolerance methodology then
-expands that gate count into a {totalPhysicalQubits}-physical-qubit
-estimate, more than a thousand-fold growth from the original gate
-count, almost entirely driven by the magic-state factory's
-{(factoryShareOfTotal * 100).toFixed(1)}% share.
+expands that into a {totalPhysicalQubits}-physical-qubit estimate —
+over two thousand times the {logicalQubitCount} logical qubits the
+algorithm itself needed, almost entirely driven by the magic-state
+factory's {(factoryShareOfTotal * 100).toFixed(1)}% share.
 
 <BarChart
   bars={pipelineBars}
   ariaLabel={`Pipeline funnel for the toy molecular-simulation circuit: ${rawTotalGateCount} raw gates, ${totalTGates} T-count, ${routedTotalGateCount} gates after routing overhead, growing to ${totalPhysicalQubits} total physical qubits after fault-tolerant compilation, of which the magic-state factory is ${(factoryShareOfTotal * 100).toFixed(1)}%`}
 />
 
-Notice the shape: the first three bars move by small, explainable
-factors (routing added $2.5\times$ to the two-qubit count), while the
-jump to the last bar is enormous, over $1000\times$ the raw gate count.
-That asymmetry is itself the lesson's central quantitative point: the
+Notice the shape: the first three bars grow by modest, explainable
+multiplicative factors (routing added $2.5\times$ to the two-qubit
+count), and even the last bar's raw height is only a modest further
+step up from the routed gate count. The real asymmetry is hidden
+*inside* that last bar, not in how tall it is:
+{(factoryShareOfTotal * 100).toFixed(1)}% of those
+{totalPhysicalQubits} physical qubits are magic-state factory, not
+logical compute — the algorithm's own $2$ logical qubits account for
+only a sliver of the total. That split, not a dramatic jump in bar
+height, is this lesson's central quantitative point: the
 *compilation* side of this pipeline (Stages 1–3) costs modest,
 well-understood overhead, while the *fault-tolerance* side (Stage 4)
-costs orders of magnitude more, and is exactly the side where this
-lesson's honesty section says the real uncertainty concentrates.
+is where nearly all of the qubit budget, and nearly all of the
+remaining uncertainty this lesson flags below, actually lives.
 
 ## Common Mistakes
 
@@ -466,9 +502,9 @@ still under active research.
   capstone's own four-step methodology unchanged, producing a code
   distance of {codeDistance} and a final estimate of
   {totalPhysicalQubits} total physical qubits.
-- That last number is over a thousand times the circuit's raw gate
-  count, and the magic-state factory alone is
-  {(factoryShareOfTotal * 100).toFixed(1)}% of it — the same
+- That last number is over a thousand times the circuit's own
+  {logicalQubitCount} logical qubits, and the magic-state factory alone
+  is {(factoryShareOfTotal * 100).toFixed(1)}% of it — the same
   factory-dominance finding the fault-tolerance capstone reached,
   recurring here at a different logical-qubit count.
 - Stages 1–3 are solved, routine engineering practice; Stage 4's

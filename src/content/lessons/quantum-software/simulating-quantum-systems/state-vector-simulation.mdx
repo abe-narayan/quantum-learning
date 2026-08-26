@@ -56,33 +56,53 @@ cost analysis.
 
 ### What state-vector simulation actually is
 
-A **state-vector simulator** represents an $n$-qubit quantum state
-exactly as a list of $2^n$ complex amplitudes, precisely this
-platform's `StateVector` class, used without exception in every
-Quantum Computing pillar course. Applying a gate updates these
-amplitudes directly via ordinary linear algebra (`applySingleQubitGate`,
-`applyCNOT`), exact matrix multiplication, not an approximation of any
-kind.
+A **state-vector simulator** represents an $n$-qubit quantum state as a
+list of $2^n$ complex amplitudes — this platform's `StateVector` class,
+used without exception in every Quantum Computing pillar course.
+Applying a gate updates these amplitudes directly via ordinary linear
+algebra (`applySingleQubitGate`, `applyCNOT`): exact matrix
+multiplication, not an approximation of any kind.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
+  alt="Portrait photograph of mathematician John von Neumann at Los Alamos National Laboratory"
+  caption="John von Neumann, who gave quantum mechanics its modern linear-algebra formulation (state vectors, operators, inner products) and, in the same decade, helped design the stored-program computer architecture almost every classical machine still uses today. State-vector simulation is what happens when one of his ideas runs on the other."
+  credit="Los Alamos National Laboratory"
+  creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
+  license="Public domain"
+/>
 
 ### What it guarantees
 
 A state-vector simulator computes the *exact* quantum state (up to
 ordinary floating-point rounding, the same kind of error present in any
 numerical computation). Every amplitude, every probability, every
-expectation value this platform has ever displayed came from this exact
-technique. This is fundamentally different from *sampling* (Writing
+expectation value this platform has ever displayed came from this
+technique. That's fundamentally different from *sampling* (Writing
 Your First Circuit's `sampleMeasurements`), which only estimates
-probabilities statistically; a state-vector simulation, by contrast,
-computes those probabilities exactly.
+probabilities statistically by drawing finite outcomes; a state-vector
+simulation instead reads the probabilities straight off the amplitudes,
+no draws involved.
 
 Watching both side by side on the same circuit makes the distinction
 concrete rather than just asserted: the "exact" bars below never move
 (they ARE the state-vector answer), while the "sampled" bars are this
 page's own live `sampleMeasurements` calls against that exact state,
-landing closer to 0.5 as shot count grows, exactly the statistical
+landing closer to 0.5 as shot count grows, the same statistical
 convergence Writing Your First Circuit already demonstrated once, here
 made explorable across five different shot counts on a fresh Bell
 circuit.
+
+<PredictBeforeReveal
+  question="Keep sliding the shot count up — 5000, 50,000, 5 million. Does the sampled bar ever land on exactly 0.500, or just get closer without arriving?"
+  options={[
+    { label: "It reaches exactly 0.500 once shots are high enough", value: "reaches" },
+    { label: "It gets arbitrarily close but essentially never lands on exactly 0.500", value: "never-lands" },
+    { label: "It overshoots past 0.500 and oscillates around it", value: "oscillates" },
+  ]}
+  correctValue="never-lands"
+  explanation="Sampling is a random process — sampleMeasurements is drawing finite outcomes from a probability distribution, not reading the distribution off directly. The count of 00-outcomes divided by shots converges toward 0.5 in probability, but landing on exactly 0.500 at some specific finite shot count would itself be a coincidence. The exact bar, by contrast, was never sampled at all: runCircuit computed 0.5 directly from the state vector's amplitudes, with no randomness involved."
+/>
 
 <InteractiveSection title="Exact vs. sampled, side by side" description="Slide from 10 shots up to 5000. The exact bars are runCircuit's fixed output for this Bell circuit, computed once. The sampled bars are a fresh sampleMeasurements call at each shot count, this page's own live run, converging toward the exact bars as shots grow but never quite landing on them exactly.">
   <BarChartExplorer
@@ -98,12 +118,13 @@ circuit.
 "Simulating a quantum computer" on a classical machine (this platform's
 entire engine) and "being a quantum computer" (Physical Qubit Platforms'
 actual hardware) compute the *same* mathematical answer for a given
-circuit, but by *completely different physical means*. This precision
-matters: nothing about this platform's engine is somehow "not really"
-quantum mechanics; the linear algebra is exact. But it is being
-executed by classical hardware (Simulators vs. Real Hardware's
-opposite-failure-modes framing), which is exactly what makes this
-course's cost question (next lesson) a real one.
+circuit, but by *completely different physical means*. Nothing about
+this platform's engine is somehow "not really" quantum mechanics — the
+linear algebra is exact. It's just being carried out by classical
+hardware instead of a physical qubit (Simulators vs. Real Hardware's
+opposite-failure-modes framing), and that distinction is what makes
+this course's cost question (next lesson) a real one, not a
+formality.
 
 ## Physical Interpretation
 
@@ -119,13 +140,13 @@ thread, not adding new capability.
 **Is running `runCircuit` on this platform's `QuantumCircuit` "real
 quantum computing," or "just simulation"?**
 
-It's state-vector simulation: exact quantum-mechanical
-calculation, computed on ordinary classical hardware. It is NOT running
-on an actual quantum device (Physical Qubit Platforms), and so carries
-none of real hardware's physical noise (Noise, Decoherence & Scaling).
-But it is also not an approximation of the underlying physics in any
-way; the amplitudes it computes are exactly what an ideal, noiseless
-quantum computer would produce for the same circuit.
+It's state-vector simulation: exact quantum-mechanical calculation,
+computed on ordinary classical hardware. It isn't running on an actual
+quantum device (Physical Qubit Platforms), so it carries none of real
+hardware's physical noise (Noise, Decoherence & Scaling). It also isn't
+an approximation of the underlying physics — the amplitudes it computes
+are what an ideal, noiseless quantum computer would produce for the
+same circuit, down to floating-point precision.
 
 ## Common Mistakes
 

@@ -122,8 +122,8 @@ state.** For electrons specifically, "state" means a full specification
 including spin. Two electrons *can* share the same spatial orbital
 (like hydrogen's 1s) provided their spins differ (one spin-up, one
 spin-down), since a spin-up electron and a spin-down electron are, in
-the full state description, genuinely different single-particle states
-even with identical spatial wavefunctions.
+the full state description, distinct single-particle states even with
+identical spatial wavefunctions.
 
 ### No such restriction for bosons
 
@@ -142,6 +142,31 @@ lesson) rather than all collapsing into the lowest-energy 1s orbital, and
 ultimately why ordinary matter takes up space and resists compression.
 None of this needs to be added as extra physics; it falls entirely out
 of demanding the two-electron wavefunction be antisymmetric.
+
+It's worth being precise about what triggers exclusion, because it's
+easy to over-apply: it's antisymmetry under exchange of *identical*
+particles, not some general property of two-level quantum systems. A
+qubit in a quantum computer, a specific superconducting circuit, a
+specific trapped ion, a specific electron spin pinned to a specific
+quantum dot, is addressable and distinguishable from every other qubit
+in the device by its location or its control wiring, even if the two
+qubits are built from physically identical hardware. Nothing forces two
+such qubits' joint state to antisymmetrize, so there's no exclusion-like
+restriction stopping them both from sitting in $|0\rangle$ at once.
+Exclusion bites specifically when two truly identical particles are
+candidates for the *same* single-particle state with no label available
+to tell them apart, which is a much narrower situation than "two qubits."
+
+<PredictBeforeReveal
+  question="Two identical fermions, both forced into the same single-particle state e0. What does antisymmetrize(e0, e0) return?"
+  options={[
+    { label: "e0 ⊗ e0, same as the plain product", value: "product" },
+    { label: "A valid but unusual normalized state", value: "valid" },
+    { label: "Nothing — there is no such state", value: "none" },
+  ]}
+  correctValue="none"
+  explanation="tensorProduct(e0,e0) minus itself is the zero vector, exactly, and normalizeVector refuses to turn a zero vector into a unit-norm state — it throws instead. That's not a bug to patch around; it's the Pauli exclusion principle, showing up as a function call that has nothing to return."
+/>
 
 ## Worked Example
 
@@ -206,7 +231,7 @@ boson exclusion principle.
   normalized state exists, correct behavior, not a limitation.
 - "State," for electrons, includes spin. Two electrons can share a
   spatial orbital if their spins differ, since that makes their complete
-  single-particle states genuinely distinct.
+  single-particle states distinct.
 
 ## Further Exploration
 

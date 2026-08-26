@@ -142,6 +142,18 @@ nontrivial case this course's worked example uses.
 
 ### A checkable baseline
 
+<PredictBeforeReveal
+  question="Before any cost or mixer layers run, on the plain uniform superposition, what's the expected cut size for the 3-edge triangle graph?"
+  options={[
+    { label: "0 — no bias toward any coloring yet", value: "zero" },
+    { label: "1.5 — half of the 3 edges, on average", value: "half" },
+    { label: "2 — the true maximum, by symmetry", value: "max" },
+    { label: "3 — every edge cut on average", value: "all" },
+  ]}
+  correctValue="half"
+  explanation="Every basis state is equally likely (probability 1/8 each), and for any single edge exactly half of all colorings cut it. Summed over the triangle's 3 edges, the expected cut size is exactly 3 × 0.5 = 1.5, matching expectedCutSize's direct output on the uniform superposition below. This is the honest 'no optimization yet' floor every QAOA result in this lesson and the next has to beat."
+/>
+
 Before running any optimization, check the *starting point*: the uniform
 superposition itself, with no cost/mixer layers applied at all, gives
 every basis state equal probability $1/2^n$, so the expected cut size is

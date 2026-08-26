@@ -49,7 +49,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     date: "1997-12-11",
     title: "First Experimental Demonstration of Quantum Teleportation",
     summary:
-      "A team led by Anton Zeilinger in Innsbruck, Austria used entangled photon pairs and a joint (Bell-state) measurement to transfer an unknown photon's polarization state onto a distant photon, without the state ever traveling through the space in between and without violating the no-cloning theorem. It was the first time the teleportation protocol — proposed theoretically in 1993 — had actually been carried out, confirming that the trick genuinely works with real photons and real detectors, not just on paper.",
+      "A team led by Anton Zeilinger in Innsbruck, Austria used entangled photon pairs and a joint (Bell-state) measurement to transfer an unknown photon's polarization state onto a distant photon, without the state ever traveling through the space in between and without violating the no-cloning theorem. It was the first time the teleportation protocol — proposed theoretically in 1993 — had actually been carried out, confirming it works with real photons and real detectors, not just on paper.",
     category: "historical experiment",
     source: {
       name: "Nature",
@@ -87,7 +87,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     date: "2017-06-15",
     title: "China's Micius Satellite Distributes Entanglement Over 1,200 km and Violates a Bell Inequality",
     summary:
-      "The Micius satellite generated pairs of entangled photons in orbit and beamed one photon of each pair down to two ground stations in China separated by 1,200 km, far beyond what optical fiber loss allows. Measurements at the two stations violated a CHSH-type Bell inequality by several standard deviations, confirming the photons were still genuinely entangled after traveling through the atmosphere from space — a key proof that entanglement can survive real-world, long-distance channels needed for a future quantum internet.",
+      "The Micius satellite generated pairs of entangled photons in orbit and beamed one photon of each pair down to two ground stations in China separated by 1,200 km, far beyond what optical fiber loss allows. Measurements at the two stations violated a CHSH-type Bell inequality by several standard deviations, confirming the photons were still entangled after traveling through the atmosphere from space — a key proof that entanglement can survive real-world, long-distance channels needed for a future quantum internet.",
     category: "quantum networking",
     source: {
       name: "Science",
@@ -106,7 +106,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     date: "2019-10-23",
     title: "Google's Sycamore Processor Claims \"Quantum Supremacy\"",
     summary:
-      "Google's 53-qubit Sycamore chip sampled the output of a pseudo-random quantum circuit a million times in about 200 seconds, a task Google estimated would take the best classical supercomputer of the day roughly 10,000 years to reproduce (a figure IBM publicly disputed at the time, arguing a better classical algorithm could do it in days). That estimate did not hold for long: in 2022, Feng Pan, Keyang Chen, and Pan Zhang (Institute of Theoretical Physics, Chinese Academy of Sciences) published a tensor-network method that generated a million correlated bitstrings from the identical circuit in about 15 hours on a 512-GPU cluster, at a fidelity (~0.0037) comparable to Sycamore's own, and argued an exascale supercomputer could do the same task in seconds (Phys. Rev. Lett. 129, 090502). Google's underlying hardware result — that Sycamore genuinely samples from the circuit's quantum distribution — was never shown to be wrong, but the '10,000 years, unreachable classically' framing was: this was the first widely reported claim of a task supposedly beyond brute-force classical simulation, and also an early, concrete lesson that a classical-hardness claim is only as good as the best classical algorithm known at the time it's made.",
+      "Google's 53-qubit Sycamore chip sampled the output of a pseudo-random quantum circuit a million times in about 200 seconds, a task Google estimated would take the best classical supercomputer of the day roughly 10,000 years to reproduce (a figure IBM publicly disputed at the time, arguing a better classical algorithm could do it in days). That estimate did not hold for long: in 2022, Feng Pan, Keyang Chen, and Pan Zhang (Institute of Theoretical Physics, Chinese Academy of Sciences) published a tensor-network method that generated a million correlated bitstrings from the identical circuit in about 15 hours on a 512-GPU cluster, at a fidelity (~0.0037) comparable to Sycamore's own, and argued an exascale supercomputer could do the same task in seconds (Phys. Rev. Lett. 129, 090502). Google's underlying hardware result — that Sycamore does sample from the circuit's quantum distribution — was never shown to be wrong, but the '10,000 years, unreachable classically' framing was: this was the first widely reported claim of a task supposedly beyond brute-force classical simulation, and also an early, concrete lesson that a classical-hardness claim is only as good as the best classical algorithm known at the time it's made.",
     category: "hardware milestone",
     source: {
       name: "Nature",
@@ -226,7 +226,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     date: "2024-12-09",
     title: "Google's Willow Chip Achieves Below-Threshold Error Correction",
     summary:
-      "Google's 105-qubit Willow processor ran surface-code memories at increasing code distances (3x3, 5x5, 7x7 grids of physical qubits per logical qubit) and showed the logical error rate roughly halving each time the grid got bigger, rather than growing worse — the long-sought 'below threshold' behavior where adding more physical qubits per logical qubit actually helps instead of hurts. The larger memory's logical qubit also outlived its best individual physical qubit, a 'beyond breakeven' result that is a necessary (though not by itself sufficient) condition for building a large, genuinely fault-tolerant quantum computer.",
+      "Google's 105-qubit Willow processor ran surface-code memories at increasing code distances (3x3, 5x5, 7x7 grids of physical qubits per logical qubit) and showed the logical error rate roughly halving each time the grid got bigger, rather than growing worse — the long-sought 'below threshold' behavior where adding more physical qubits per logical qubit actually helps instead of hurts. The larger memory's logical qubit also outlived its best individual physical qubit, a 'beyond breakeven' result that is a necessary (though not by itself sufficient) condition for building a large, fault-tolerant quantum computer.",
     category: "error correction",
     source: {
       name: "Google Quantum AI",
@@ -323,7 +323,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     date: "1981-05",
     title: "Feynman Proposes Using Quantum Systems to Simulate Quantum Physics",
     summary:
-      "At a keynote talk at MIT, Richard Feynman pointed out that simulating quantum mechanics on an ordinary classical computer seems to require resources that grow exponentially with the number of particles involved, since a quantum state's description genuinely has exponentially many independent numbers. His proposed fix was direct: build a computer out of quantum-mechanical elements that obey quantum rules natively, so it could simulate other quantum systems without paying that exponential penalty. The idea took over a decade to formalize into concrete algorithms and decades more to run on real hardware, but this talk (published the following year) is the historical origin of quantum simulation as a research field.",
+      "At a keynote talk at MIT, Richard Feynman pointed out that simulating quantum mechanics on an ordinary classical computer seems to require resources that grow exponentially with the number of particles involved, since a quantum state's description has exponentially many independent numbers. His proposed fix was direct: build a computer out of quantum-mechanical elements that obey quantum rules natively, so it could simulate other quantum systems without paying that exponential penalty. The idea took over a decade to formalize into concrete algorithms and decades more to run on real hardware, but this talk (published the following year) is the historical origin of quantum simulation as a research field.",
     category: "historical experiment",
     source: {
       name: "International Journal of Theoretical Physics",
@@ -441,7 +441,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     date: "2024-05-15",
     title: "Harvard Entangles Two Diamond Quantum Memories Over Telecom Fiber",
     summary:
-      "A Harvard-led team built two independent quantum network nodes, each a silicon-vacancy color center in a nanophotonic diamond cavity holding both an electron spin and a nuclear spin, connected by telecom-wavelength optical fiber (including a 35 km loop deployed through real Boston-area infrastructure). Using heralded spin-photon entangling operations and quantum frequency conversion to telecom wavelengths, they entangled the two remote nodes' electron spins and, using the more error-resistant nuclear spins with built-in error detection, kept that remote entanglement alive for up to a full second, long enough to be genuinely useful rather than a fleeting correlation.",
+      "A Harvard-led team built two independent quantum network nodes, each a silicon-vacancy color center in a nanophotonic diamond cavity holding both an electron spin and a nuclear spin, connected by telecom-wavelength optical fiber (including a 35 km loop deployed through real Boston-area infrastructure). Using heralded spin-photon entangling operations and quantum frequency conversion to telecom wavelengths, they entangled the two remote nodes' electron spins and, using the more error-resistant nuclear spins with built-in error detection, kept that remote entanglement alive for up to a full second, long enough to be useful rather than a fleeting correlation.",
     category: "quantum networking",
     source: {
       name: "Nature",
@@ -542,7 +542,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     date: "2025-04-10",
     title: "Quantinuum Demonstrates Cryptographically Certified Quantum Randomness",
     summary:
-      "A team spanning Quantinuum, JPMorganChase, and three U.S. research institutions used a 56-qubit trapped-ion processor to run a protocol where a classical client sends deliberately hard-to-simulate random circuits to the quantum computer, which executes them and returns results a classical supercomputer (in this case, several combined, exceeding a quintillion floating-point operations per second) then verifies against. Because generating a convincing fake response would have required classically simulating circuits believed to be beyond any current supercomputer's reach, a successful, timely response effectively certifies the returned bits are genuinely random and were not predictable in advance, a real cryptographic protocol turned into a commercial product rather than a lab curiosity.",
+      "A team spanning Quantinuum, JPMorganChase, and three U.S. research institutions used a 56-qubit trapped-ion processor to run a protocol where a classical client sends deliberately hard-to-simulate random circuits to the quantum computer, which executes them and returns results a classical supercomputer (in this case, several combined, exceeding a quintillion floating-point operations per second) then verifies against. Because generating a convincing fake response would have required classically simulating circuits believed to be beyond any current supercomputer's reach, a successful, timely response effectively certifies the returned bits are random and were not predictable in advance, a real cryptographic protocol turned into a commercial product rather than a lab curiosity.",
     category: "cryptography",
     source: {
       name: "Nature",
@@ -550,7 +550,7 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
     },
     relatedLessonSlug: "quantum-software/simulating-quantum-systems/computational-cost-and-scaling",
     whyThisMatters:
-      "This lesson explains why quantum-advantage experiments deliberately target circuits beyond any classical simulator's reach; Quantinuum's 2025 protocol leans on that exact classical-hardness gap, turning 'a classical computer can't keep up' into a cryptographic certificate that a random number was genuinely quantum-generated.",
+      "This lesson explains why quantum-advantage experiments deliberately target circuits beyond any classical simulator's reach; Quantinuum's 2025 protocol leans on that exact classical-hardness gap, turning 'a classical computer can't keep up' into a cryptographic certificate that a random number was quantum-generated rather than guessed in advance.",
     difficulty: "intermediate",
   },
   // Source: QuEra Computing press release, "QuEra Computing Marks Record

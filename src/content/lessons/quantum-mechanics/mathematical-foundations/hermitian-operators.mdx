@@ -45,8 +45,8 @@ always a real number; nobody has ever measured $3+2i$ volts. If
 physical observables are represented by operators, and eigenvalues are the
 possible outcomes (previewed last lesson), those operators had better be
 restricted to ones whose eigenvalues are guaranteed real. That restriction
-has a name, **Hermitian**, and it turns out to be exactly the right one,
-provably.
+has a name, **Hermitian**, and this lesson proves it's exactly the right
+one, rather than just asserting it.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/55/Charles_Hermite_circa_1901_edit.jpg"
@@ -61,10 +61,10 @@ provably.
 
 A real number equals its own conjugate. **Hermitian** operators are the
 matrix generalization of that idea: an operator that, in a precise sense,
-equals its own conjugate transpose. The theorems below show this
-algebraic condition is exactly strong enough to force real eigenvalues:
-not a coincidence, but a genuine "if and only if"-flavored connection
-between an algebraic property and a physical requirement.
+equals its own conjugate transpose. The two theorems below pin down
+exactly how tight that link is: the algebraic condition $A=A^\dagger$
+turns out to be strong enough, on its own, to force every eigenvalue
+real and every pair of distinct eigenvectors orthogonal.
 
 ## Mathematical Development
 
@@ -186,10 +186,24 @@ $$
 1\cdot\begin{pmatrix}1&0\\0&0\end{pmatrix} + (-1)\cdot\begin{pmatrix}0&0\\0&1\end{pmatrix} = \begin{pmatrix}1&0\\0&-1\end{pmatrix} = Z \checkmark
 $$
 
-For $S$: $S^\dagger = \begin{pmatrix}1&0\\0&-i\end{pmatrix} \ne S$. **Not
-Hermitian.** A Hermitian matrix must have real entries on its diagonal
-(the $(i,i)$ entry has to equal its own conjugate), and $S$'s bottom-right
-entry, $i$, isn't real.
+Now the second matrix, $S=\begin{pmatrix}1&0\\0&i\end{pmatrix}$ (the S gate,
+if you've seen quantum computing).
+
+<PredictBeforeReveal
+  question="Is S = diag(1, i) Hermitian?"
+  options={[
+    { label: "Hermitian", value: "hermitian" },
+    { label: "Not Hermitian", value: "not-hermitian" },
+    { label: "Can't tell without computing S† in full", value: "unsure" },
+  ]}
+  correctValue="not-hermitian"
+  explanation="Not Hermitian, and you don't even need the full conjugate transpose to see it: a Hermitian matrix's diagonal entries must equal their own conjugates, i.e. be real, and S's bottom-right entry is i."
+/>
+
+$S^\dagger = \begin{pmatrix}1&0\\0&-i\end{pmatrix} \ne S$. **Not
+Hermitian**, confirming the prediction: $S$'s bottom-right entry, $i$,
+isn't real, so it already fails the diagonal check before the
+off-diagonal entries even matter.
 
 <InteractiveSection title="Check M = M† for yourself" description="Switch between three real gates and compare M to M† entry by entry. Pauli-Y and Pauli-Z match exactly (Hermitian); the S gate's bottom-right entry flips sign under the dagger and never matches (not Hermitian).">
   <MatrixGridExplorer

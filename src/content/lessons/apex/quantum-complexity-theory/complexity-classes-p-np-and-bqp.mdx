@@ -51,6 +51,15 @@ setup for the rest of this course: QMA (quantum verification), the Local
 Hamiltonian problem, and query-complexity lower bounds all live in the
 open territory this lesson maps out.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/1/1d/BQP_complexity_class_diagram.svg"
+  alt="Diagram showing BQP's suspected position relative to P, NP, and PSPACE among complexity classes"
+  caption="BQP's suspected (not proven) position relative to P, NP, and PSPACE. This lesson replaces the loose 'Venn diagram and move on' version of this picture with exactly which containments are proven theorems and which remain open."
+  credit="Mike1024, based on a diagram by Booyabazooka / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:BQP_complexity_class_diagram.svg"
+  license="Public domain"
+/>
+
 ## Mathematical Development
 
 ### Recap: the three classes, precisely
@@ -123,6 +132,17 @@ but $\mathsf{PSPACE}$ is the containment this lesson's diagram, and the
 open questions below, actually need.
 
 ### The genuinely open questions
+
+<PredictBeforeReveal
+  question="Three questions remain about how P, NP, and BQP relate: is NP⊆BQP? Is BQP⊆NP? Is P=BQP? Before reading on, predict how many of these three have actually been proven — true or false, either direction — by anyone."
+  options={[
+    { label: "All three — proven one way or the other", value: "all" },
+    { label: "Some proven, some still open", value: "some" },
+    { label: "None — all three are genuinely open questions", value: "none" },
+  ]}
+  correctValue="none"
+  explanation="None of the three has been proven either way. NP⊆BQP is widely believed false, on real but black-box-limited evidence, not proof. BQP⊆NP has no strong heuristic pointing either direction at all. P=BQP is widely believed false, largely on the strength of Shor's algorithm — but belief, however strong, is not proof. This is exactly what makes P, NP, and BQP's relationship the sharpest case study in this course for the difference between 'proven' and 'believed.'"
+/>
 
 Three questions about how $\mathsf{P}$, $\mathsf{NP}$, and
 $\mathsf{BQP}$ relate are **not** settled by anything above, or by
@@ -204,6 +224,17 @@ they're equal, or that they overlap only partially the way it's drawn.
 That is precisely the content of open questions (1) and (2) above.
 
 ### Shor's algorithm's actual complexity-theoretic status
+
+<PredictBeforeReveal
+  question="Shor's algorithm gives a polynomial-size quantum circuit that factors integers, with no known classical polynomial-time algorithm for the same task. Before reading the precise analysis below, predict: does this prove P ≠ BQP?"
+  options={[
+    { label: "Yes — it's an unconditional proof that P ≠ BQP", value: "yes" },
+    { label: "No — it's strong evidence, but conditional on an unproven assumption", value: "conditional" },
+    { label: "No — factoring says nothing relevant to P vs. BQP at all", value: "irrelevant" },
+  ]}
+  correctValue="conditional"
+  explanation="Shor's algorithm unconditionally proves factoring is in BQP — that part is a real theorem. But it does NOT prove P ≠ BQP, because that would additionally require factoring ∉ P, and 'factoring has no classical polynomial algorithm' is itself only a conjecture (the RSA security assumption), never proven. So Shor's algorithm is strong conditional evidence for P ≠ BQP, not a separation theorem — a distinction the next two sections make precise."
+/>
 
 <TheoremBox title="What Shor's algorithm proves" provenance="cited">
 

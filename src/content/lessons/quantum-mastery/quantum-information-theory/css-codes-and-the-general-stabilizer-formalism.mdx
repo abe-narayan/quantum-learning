@@ -122,18 +122,18 @@ $1$ logical qubit, distance $1$ (it corrects one bit-flip error but
 detects no phase errors at all: pure repetition codes have no genuine
 distance-3 guarantee against arbitrary single-qubit errors). This
 lesson builds the general theory of $[[n,k,d]]$ stabilizer codes, then
-constructs the **Steane code**, $[[7,1,3]]$, genuinely correcting
+constructs the **Steane code**, $[[7,1,3]]$, which actually corrects
 *any* single-qubit error, $X$, $Z$, or both, entirely from a single
 classical error-correcting code most of this platform's readers have
 never needed to think about: the Hamming$[7,4,3]$ code.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a real superconducting quantum computer housed in its characteristic glass cube enclosure at IBM's Thomas J. Watson Research Center"
+  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
+  alt="A D-Wave Two 512-qubit superconducting quantum processor chip, mounted in its package and ready for cooling to near-absolute zero"
   caption="Real fault-tolerant quantum computing, the eventual destination of stabilizer codes like the Steane code built in this lesson, requires physical hardware like this: superconducting qubits cooled to millikelvin temperatures, engineered specifically to make syndrome extraction and error correction possible at scale."
-  credit="OJB Quantum (Onri Jay Benally) / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
+  credit="Steve Jurvetson / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
+  license="CC BY 2.0"
 />
 
 ## Mathematical Development
@@ -262,12 +262,23 @@ large-scale fault-tolerant proposal, including the surface codes
 Surface Codes: A Conceptual Introduction covered structurally, is a CSS
 code built this same way, from a different, application-suited pair of
 classical codes; the Steane code is the smallest instance where the
-whole machinery is genuinely visible end to end.
+whole machinery is fully visible end to end.
 
 ## Worked Example
 
 **Confirm $X_1$ (a physical bit-flip error on qubit 1 alone) is
 detected by this code, and identify which syndrome bits flip.**
+
+<PredictBeforeReveal
+  question="X1 is a bit-flip error. Will it anticommute with (and so be caught by) one of the X-type generators (g1,g2,g3) or one of the Z-type generators (g4,g5,g6)?"
+  options={[
+    { label: "An X-type generator — X errors and X-type checks are the same kind of operator", value: "x-type" },
+    { label: "A Z-type generator — X and Z anticommute, so a Z-type check is what notices an X error", value: "z-type" },
+    { label: "Both kinds equally", value: "both" },
+  ]}
+  correctValue="z-type"
+  explanation="Two Pauli operators anticommute only when they're different and both non-identity. An X-type generator is built entirely from X's and I's, so it commutes with X1 trivially at every qubit — it can't see this error at all. Only a Z-type generator, built from Z's, anticommutes at the one qubit where X1 sits. This is exactly the 3-qubit code's rule (bit-flip errors need phase-type checks) surviving unchanged at [[7,1,3]] scale."
+/>
 
 $X_1$ anticommutes with a $Z$-type generator exactly when that
 generator's support includes qubit $1$: $g_4=IIIZZZZ$ does **not**
@@ -279,7 +290,7 @@ others, a nonzero, uniquely-identifying syndrome pattern (checked
 against $H$'s three rows directly: column $1$ of $H$ is $(0,0,1)^\top$,
 matching that only the third row, $g_6$'s row, has a $1$ there),
 exactly the mechanism Stabilizer Formalism Basics established for the
-3-qubit code, now running on a genuinely $[[7,1,3]]$ code capable of
+3-qubit code, now running on an actual $[[7,1,3]]$ code capable of
 also catching phase errors, which the bit-flip code could not detect at
 all.
 

@@ -126,7 +126,7 @@ directly from $a,a^\dagger$, no new postulate needed.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Baffled_LIGO_Scientists.jpg"
   alt="Two LIGO researchers examining fiber-coupling equipment inside the Pre-Stabilized Laser enclosure at LIGO Hanford, during the site's squeezed-light commissioning and upgrade work"
-  caption="LIGO's gravitational-wave detectors inject genuinely squeezed light, exactly the states derived in this lesson, to push measurement noise on one quadrature below what any coherent state (ordinary laser light) could achieve, at the cost of extra noise on the other, precisely the Delta x / Delta p trade-off proved here."
+  caption="LIGO's gravitational-wave detectors inject real squeezed light, exactly the states derived in this lesson, to push measurement noise on one quadrature below what any coherent state (ordinary laser light) could achieve, at the cost of extra noise on the other, precisely the Delta x / Delta p trade-off proved here."
   credit="Nutsinee Kijbunchoo / LIGO, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Baffled_LIGO_Scientists.jpg"
   license="CC BY 4.0"
@@ -158,7 +158,7 @@ $$
 
 The number-state probabilities $|c_n|^2=e^{-|\alpha|^2}|\alpha|^{2n}/n!$
 are exactly **Poisson-distributed** with mean $\langle N\rangle=|\alpha|^2$
-(a genuinely checkable statement: this is the Poisson distribution's own
+(a checkable statement: this is the Poisson distribution's own
 closed form). Built directly from this platform's own truncated
 `annihilationOperator`/`creationOperator` matrices (the same finite Fock
 basis The Quantum Harmonic Oscillator used):
@@ -219,6 +219,17 @@ so everything the earlier coherent-state derivation used (eigenstates
 existing, normalizability, the Fock-like expansion argument) carries over
 to $b,|\beta\rangle$ unchanged, just relabeled.
 
+<PredictBeforeReveal
+  question="Squeezing shrinks Δx below the coherent-state value 1/√2. What happens to the product Δx·Δp as a result?"
+  options={[
+    { label: "It drops below 1/2 — squeezing beats the uncertainty bound", value: "below" },
+    { label: "It stays exactly 1/2 — Δp grows to compensate", value: "same" },
+    { label: "It rises above 1/2 — squeezing costs you some minimality", value: "above" },
+  ]}
+  correctValue="same"
+  explanation="b obeys the identical commutator [b,b†]=1 that a does, so |β⟩ saturates the uncertainty bound exactly the same way |α⟩ does — it's minimum-uncertainty by construction, not by accident. The derivation below shows Δx and Δp individually as e^(∓r)/√2, and the exponentials cancel in the product no matter how large r gets."
+/>
+
 Inverting the Bogoliubov transform, $a=b\cosh r-b^\dagger\sinh r$
 (direct algebra: $b\cosh r-b^\dagger\sinh r=(a\cosh r+a^\dagger\sinh
 r)\cosh r-(a^\dagger\cosh r+a\sinh r)\sinh r=a(\cosh^2r-\sinh^2r)=a$),
@@ -263,7 +274,7 @@ the Heisenberg bound.
 
 "Squeezing" is exactly what the name suggests: at $r=0.5$, position spread
 shrinks to about $61\%$ of the coherent-state value while momentum spread
-grows to about $165\%$, the ellipse of uncertainty (a genuinely visual
+grows to about $165\%$, the ellipse of uncertainty (a visual
 picture, even though this lesson stays in the algebra) stretched along
 one quadrature and compressed along the other, its *area* fixed by
 Heisenberg. This isn't a mathematical curiosity: squeezed light is a real
@@ -274,7 +285,7 @@ quadrature, at the unavoidable cost of extra noise on the other one).
 
 <InteractiveSection
   title="The uncertainty ellipse in (x, p) phase space"
-  description={`The genuinely visual picture named above, drawn directly from the boxed Δx=e^(-r)/√2, Δp=e^(r)/√2 formulas: a circle of radius 1/√2 at r=0 (equal spread, the coherent state), stretching into an ever-thinner, ever-taller ellipse as r increases toward 1.5, centered throughout at (⟨x⟩,⟨p⟩)=(√2·${alphaExample}, 0). Δx shrinks and Δp grows in exact inverse lockstep, so the ellipse's area, and the Δx·Δp readout below, stays fixed at one half no matter how far it's squeezed.`}
+  description={`The visual picture named above, drawn directly from the boxed Δx=e^(-r)/√2, Δp=e^(r)/√2 formulas: a circle of radius 1/√2 at r=0 (equal spread, the coherent state), stretching into an ever-thinner, ever-taller ellipse as r increases toward 1.5, centered throughout at (⟨x⟩,⟨p⟩)=(√2·${alphaExample}, 0). Δx shrinks and Δp grows in exact inverse lockstep, so the ellipse's area, and the Δx·Δp readout below, stays fixed at one half no matter how far it's squeezed.`}
 >
   <UncertaintyEllipse
     frames={ellipseFrames}
@@ -293,7 +304,7 @@ $e^{-0.5}\approx0.6065$, so $\Delta x=0.6065/\sqrt2\approx0.4289$.
 $e^{0.5}\approx1.6487$, so $\Delta p=1.6487/\sqrt2\approx1.1658$.
 Product: $0.4289\times1.1658\approx0.5000$, matching $\tfrac12$ to four
 decimal places, a direct numeric confirmation (not just the general
-algebraic argument) that squeezing genuinely preserves the minimum-
+algebraic argument) that squeezing preserves the minimum-
 uncertainty product while redistributing it unevenly.
 
 ## Common Mistakes
@@ -349,5 +360,5 @@ contradictions.
 ## Further Exploration
 
 Next: [Three-Dimensional Scattering and the S-Matrix](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix),
-leaving the harmonic oscillator behind for the genuinely different
+leaving the harmonic oscillator behind for the very different
 machinery of unbound, scattering states in three dimensions.

@@ -3,6 +3,7 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { LazyCHSHBellTestExplorer } from "@/components/simulators/chsh-bell-test/LazyCHSHBellTestExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables"
@@ -62,6 +63,15 @@ export const lessonMeta = {
 
 ## Motivation
 
+Einstein spent the last decades of his life convinced that quantum
+mechanics, for all its predictive success, had to be an incomplete
+description of nature: that a particle's measurement outcome was fixed
+in advance by some deeper layer of reality physics simply hadn't found
+yet, not left genuinely open until the moment someone looked. It was a
+reasonable position, held by one of the greatest physicists who ever
+lived. In 1964 John Bell found a way to settle it, not with a
+philosophical argument, but with a number.
+
 Suppose Alice and Bob agree on any strategy they like before separating:
 coin flips, a shared secret code, an entire library of instructions
 distributed in advance. However clever that strategy, is there a limit
@@ -70,17 +80,18 @@ far apart to communicate? There is, and it's a hard, provable ceiling.
 No scheme of this kind, however elaborate, can push a specific
 combination of four correlations past the number 2. Quantum mechanics,
 checked against this exact bound in the next lesson, blows straight
-through it.
+through it, all the way to $2\sqrt2$: a number Einstein's picture of
+reality has no way to produce.
 
 Bell States and Entanglement, back in Quantum Gates & Circuits, already
 showed something suggestive: measuring both qubits of $|\Phi^+\rangle$
 in the $X$-basis still gives perfect correlation, and promised that no
 *predetermined* classical description of the two qubits could reproduce
-that in full generality. This lesson delivers the proof. It is entirely
-classical probability and combinatorics, no quantum mechanics appears
-anywhere in it, which is exactly the point: it establishes a hard limit
-that *any* local, predetermined theory must obey, before quantum
-mechanics is checked against that limit next.
+that in full generality. This lesson delivers the proof. It's entirely
+classical probability and combinatorics; no quantum mechanics appears
+anywhere in it, which is the point. It establishes a hard limit that
+*any* local, predetermined theory must obey, before quantum mechanics is
+checked against that limit next.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c3/John_bell_2.png"
@@ -91,18 +102,20 @@ mechanics is checked against that limit next.
   license="CC BY 4.0"
 />
 
-Einstein, Podolsky, and Rosen had raised exactly this worry three decades
-earlier, in their 1935 paper arguing that quantum mechanics must be an
-incomplete description of reality; what specifically bothered Einstein
-was the instantaneous, correlated update of a distant particle's state,
-which he dismissed in a 1947 letter to Max Born as *spukhafte
-Fernwirkung* ("spooky action at a distance"). Bell's own proof below,
-submitted to the short-lived journal *Physics Physique Fizika* in
-November 1964, drew fewer than a dozen citations in its first six years
-and sat largely unnoticed until Alain Aspect's experiments in the early
-1980s put it to an actual experimental test. Full citation: J. S. Bell,
-"On the Einstein Podolsky Rosen Paradox," *Physics Physique Fizika*
-**1**(3), 195–200 (1964).
+Bell was not the first to worry about this. Einstein, Podolsky, and
+Rosen raised the same concern three decades earlier, in their 1935 paper
+arguing that quantum mechanics must be an incomplete description of
+reality; what specifically bothered Einstein was the instantaneous,
+correlated update of a distant particle's state, which he dismissed in a
+1947 letter to Max Born as *spukhafte Fernwirkung* ("spooky action at a
+distance"). Bell's own proof below, submitted to the short-lived journal
+*Physics Physique Fizika* in November 1964, drew fewer than a dozen
+citations in its first six years and sat largely unnoticed until Alain
+Aspect's experiments in the early 1980s put it to an actual experimental
+test — decades after Einstein's death, and decades after he had
+concluded quantum mechanics simply had to be missing something. Full
+citation: J. S. Bell, "On the Einstein Podolsky Rosen Paradox," *Physics
+Physique Fizika* **1**(3), 195–200 (1964).
 
 ## Intuition
 
@@ -258,10 +271,10 @@ $A(A,\lambda)=A(A',\lambda)=+1$ and $B(B,\lambda)=B(B',\lambda)=+1$ for
 every trial (a trivial, fully deterministic LHV model with no randomness
 at all). Compute $S$.**
 
-$E(a,b)=(+1)(+1)=1$ for every pair of settings (since the outcomes are
-always $+1$ regardless of setting, with no $\lambda$-averaging needed
-(a single deterministic case). So
-$S=1+1+1-1=2$, right at the boundary, not exceeding it, exactly as the
+$E(a,b)=(+1)(+1)=1$ for every pair of settings, since the outcomes are
+always $+1$ regardless of setting, with no $\lambda$-averaging needed (a
+single deterministic case). So
+$S=1+1+1-1=2$: right at the boundary, not exceeding it, exactly as the
 inequality requires ($|S|\leq2$, and this trivial model saturates it
 without violating it).
 
@@ -317,6 +330,37 @@ outside the range of the values being averaged), never more.
 - Bell's theorem rules out *local* hidden-variable theories specifically;
   it says nothing about nonlocal hidden-variable theories like Bohmian
   mechanics.
+
+## Try It Yourself
+
+The proof above is airtight and entirely classical: $|S|\leq2$ for every
+local hidden-variable model, no exceptions. The next lesson derives, by
+hand, what an actual entangled qubit pair does instead. Before it does,
+make a prediction.
+
+<PredictBeforeReveal
+  question="A real pair of entangled qubits, measured at the right four angles: can the CHSH value S exceed 2?"
+  options={[
+    { label: "No — 2 is a fact about correlation itself, not just local models", value: "no" },
+    { label: "Yes, but only by a little", value: "yes-little" },
+    { label: "Yes, all the way up to 2√2 ≈ 2.83", value: "yes-2sqrt2" },
+  ]}
+  correctValue="yes-2sqrt2"
+  explanation="A real Bell pair reaches S=2√2≈2.828 exactly, the Tsirelson bound — well past the classical ceiling of 2, and the next lesson derives this number by hand from the density-matrix engine. Nothing above this lesson's proof is wrong: the proof shows |S|≤2 for every local hidden-variable model, full stop. Nature simply isn't a local hidden-variable model."
+/>
+
+You don't have to wait for the derivation to see the number. The
+interactive below runs the exact same `chshValue` engine on a real
+$|\Phi^+\rangle$ Bell pair, live: drag any of the four measurement
+angles and watch $S$ update.
+
+<InteractiveSection title="A real CHSH experiment, right now" description="All four angles start at 0°, where S stays inside the classical bound. Load the quantum-optimal preset (or find it yourself) and watch S climb past 2, toward 2√2 ≈ 2.83 — the exact violation the next lesson derives algebraically.">
+  <LazyCHSHBellTestExplorer />
+</InteractiveSection>
+
+The full version of this simulator, with lab notes and a side-by-side
+comparison against both bounds, lives at
+[/simulators#chsh-bell-test](/simulators#chsh-bell-test).
 
 ## Further Exploration
 

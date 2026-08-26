@@ -30,7 +30,7 @@ export const pathIntegrandFrames = [
 export const lessonMeta = {
   title: "The Path Integral Formulation (Introduction)",
   description:
-    "Feynman's alternative to the Schrödinger equation: sum a weight exp(-S/ħ) over every possible path, not just the classical one. Verified here in Euclidean (imaginary) time, where the free-particle path sum is a genuine convergent numerical integral: splitting one time interval into two and summing over every intermediate position reproduces the exact propagator to 1 part in 10¹⁵.",
+    "Feynman's alternative to the Schrödinger equation: sum a weight exp(-S/ħ) over every possible path, not just the classical one. Verified here in Euclidean (imaginary) time, where the free-particle path sum is a convergent numerical integral: splitting one time interval into two and summing over every intermediate position reproduces the exact propagator to 1 part in 10¹⁵.",
   course: "advanced-quantum-mechanics",
   module: "the-path-integral-formulation",
   order: 1,
@@ -46,19 +46,19 @@ export const lessonMeta = {
 
 ## Motivation
 
-Ask a quantum particle how it got from A to B, and Feynman's answer is:
-every way imaginable, all at once. Not just the straight line, or
-whatever trajectory Newton's laws would pick out — literally every
-conceivable path between the two points, including ones that zigzag
-wildly, double back on themselves, or wander off and return, each
-contributing its own share to the final amplitude. Every quantum
-mechanics lesson so far in this course, the Schrödinger equation,
-operators, eigenstates, is built on Hamiltonian/operator language,
-asking how the wavefunction evolves moment to moment. The path integral
-throws that question out and asks a completely different one instead:
-what is the amplitude for every possible way the particle could get from
-here to there, added up? Same physics, providing identical predictions,
-but a genuinely different picture of what's actually going on.
+Ask a quantum particle how it got from A to B, and Feynman's answer is
+unsettling: every way imaginable, all at once. Not just the straight
+line, or whatever trajectory Newton's laws would single out. Literally
+every conceivable path between the two points counts, including ones
+that zigzag wildly, double back on themselves, or wander off and
+return, each contributing its own share to the final amplitude. Every
+lesson before this one, the Schrödinger equation, operators,
+eigenstates, was built on Hamiltonian language: how does the
+wavefunction evolve from one moment to the next? The path integral
+drops that question and asks something stranger instead: what is the
+amplitude for every possible way the particle could get from here to
+there, summed together? Same physics, identical predictions, but a
+completely different picture of what is actually happening.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/b/bf/Richard_P._Feynman_Los_Alamos_ID_badge_photo.jpg"
@@ -119,9 +119,9 @@ $$
 K(x_f,t_f;x_i,t_i) = \int\mathcal D[x(t)]\;e^{iS[x(t)]/\hbar}
 $$
 
-This is a genuinely different-looking object from anything in the
-operator formalism, yet provably gives identical physical predictions,
-a fact this course states rather than proves in full generality.
+This looks nothing like anything in the operator formalism, yet it
+provably gives identical physical predictions, a fact this course
+states rather than proves in full generality.
 
 ### Why this lesson uses Euclidean (imaginary) time
 
@@ -133,10 +133,10 @@ beyond this course's scope). Substituting *imaginary* time,
 $\tau=it$ (a standard technique called **Wick rotation**, used
 throughout statistical mechanics and quantum field theory, not a
 simplification invented for this platform), turns the weight into
-$e^{-S_E/\hbar}$, a genuine, positive, exponentially-decaying real
-Gaussian. This is trivial to integrate numerically to high precision,
-while preserving exactly the same "sum over paths" structure this lesson
-is actually trying to teach.
+$e^{-S_E/\hbar}$, a positive, exponentially decaying real Gaussian.
+This integrates numerically to high precision without any special
+tricks, while preserving exactly the "sum over paths" structure this
+lesson is trying to teach.
 
 ### The free-particle Euclidean propagator
 
@@ -146,8 +146,8 @@ $$
 K_E(x_f,x_i;\tau) = \sqrt{\frac{m}{2\pi\hbar\tau}}\;\exp\!\left(-\frac{m(x_f-x_i)^2}{2\hbar\tau}\right)
 $$
 
-This is a genuine closed-form Gaussian, `euclideanFreePropagator` in this
-platform's engine.
+This is a closed-form Gaussian, computed directly by this platform's
+`euclideanFreePropagator`.
 
 ### The discretized path sum, verified against the exact answer
 
@@ -158,17 +158,17 @@ $$
 K_E(x_f,x_i;\tau) \overset{?}{=} \int_{-\infty}^\infty K_E(x_f,x_1;\tau/2)\,K_E(x_1,x_i;\tau/2)\;dx_1
 $$
 
-is the **Chapman-Kolmogorov composition law**, a genuine mathematical
-identity (equivalent to the Gaussian convolution theorem) that any
-correct path-sum formulation must satisfy. This platform's
+is the **Chapman-Kolmogorov composition law**, a mathematical identity
+(equivalent to the Gaussian convolution theorem) that any correct
+path-sum formulation must satisfy. This platform's
 `discretizedTwoSlicePropagator` computes the right-hand side directly, as
 a Riemann sum over a fine $x_1$ grid, literally summing over every
 discretized two-segment path, and matches the exact left-hand side to a
 relative error of $\sim10^{-15}$ (machine precision) across every tested
 $(x_f,x_i,\tau)$ combination. The Worked Example below plots the actual
-quantity being summed over $x_1$, worth glancing at now: it shows
-concretely where that Riemann sum's weight is concentrated, rather than
-leaving "sum over every intermediate position" as an abstract phrase.
+quantity being summed over $x_1$: it shows concretely where that Riemann
+sum's weight is concentrated, rather than leaving "sum over every
+intermediate position" as an abstract phrase.
 
 ## Physical Interpretation
 
@@ -177,10 +177,10 @@ opaque in the operator picture, most dramatically, why the *classical*
 path (the one satisfying $\delta S=0$) dominates in the macroscopic
 limit: paths near the classical one interfere constructively (nearby
 actions are nearly equal), while wildly different paths interfere
-destructively against their neighbors. This is a genuine, if informal,
-route to understanding the classical limit, complementary to, not a
-replacement for, the operator-based reasoning used throughout this
-platform's other courses.
+destructively against their neighbors. It is an informal route to
+understanding the classical limit, one that complements rather than
+replaces the operator-based reasoning used throughout this platform's
+other courses.
 
 ## Worked Example
 
@@ -194,6 +194,21 @@ $\approx0.0051667$, matching to a relative difference of
 $\sim1.3\times10^{-15}$, confirmed directly by this platform's test
 suite.
 
+Before looking at it, decide what you think the integrand should do as
+$x_1$ ranges over every real number, given that $x_i=-1$ and $x_f=3$.
+
+<PredictBeforeReveal
+  question="As x₁ sweeps over every real number, where should K_E(x_f,x_1;τ/2)·K_E(x_1,x_i;τ/2) be largest?"
+  options={[
+    { label: "Near x₁ = -1, the start point", value: "start" },
+    { label: "Near x₁ = 1, the classical midpoint", value: "midpoint" },
+    { label: "Near x₁ = 3, the end point", value: "end" },
+    { label: "Spread out evenly, no real peak", value: "flat" },
+  ]}
+  correctValue="midpoint"
+  explanation="The plot below peaks right at x₁ = 1, the straight-line midpoint between x_i = -1 and x_f = 3, and falls off fast on either side. Every x₁ is included in the sum, but the ones far from the classical path contribute almost nothing."
+/>
+
 The integrand being summed over, plotted directly against $x_1$ (the
 real product of the two Gaussian propagators, not an illustrative
 sketch), shows exactly where that sum's weight actually comes from:
@@ -206,22 +221,22 @@ sketch), shows exactly where that sum's weight actually comes from:
 
 The integrand peaks right around $x_1=1$, the straight-line midpoint
 between $x_i=-1$ and $x_f=3$, the classical intermediate position, and
-falls off fast on either side. This is the concrete,
-computed version of the Physical Interpretation section's claim: nearby
-paths (intermediate positions close to the classical one) contribute the
+falls off fast on either side. This is the concrete, computed version
+of the Physical Interpretation section's claim: nearby paths
+(intermediate positions close to the classical one) contribute the
 overwhelming share of the total sum, while distant ones contribute
-almost nothing, even though the sum genuinely runs over every $x_1$, not
-just the classical one.
+almost nothing, even though the sum runs over every $x_1$, not just the
+classical one.
 
 ## Common Mistakes
 
 <Callout type="mistake">
 **Thinking this lesson's Euclidean-time example is "the real path integral,
-simplified."** It's a genuine, standard technique (Wick rotation) used
-throughout physics, not a dumbed-down substitute, but it IS a
-deliberately chosen special case (free particle, imaginary time) rather
-than the fully general real-time, interacting-particle path integral,
-which is far more mathematically involved.
+simplified."** It's a standard technique (Wick rotation) used throughout
+physics, not a dumbed-down substitute. It IS, however, a deliberately
+chosen special case (free particle, imaginary time) rather than the
+fully general real-time, interacting-particle path integral, which is
+far more mathematically involved.
 </Callout>
 
 <Callout type="mistake">
@@ -252,19 +267,19 @@ $x_1$, not just the one lying on the classical straight-line trajectory.
 ## Summary
 
 - The path integral computes the propagator as a sum over every possible
-  path, each weighted by $e^{iS/\hbar}$, a genuinely different starting
-  point from the Schrödinger-equation/operator formalism.
+  path, each weighted by $e^{iS/\hbar}$, a fundamentally different
+  starting point from the Schrödinger-equation/operator formalism.
 - This course uses Euclidean (imaginary) time specifically because it
   turns the real-time formulation's oscillatory weight into a
   numerically well-behaved decaying real Gaussian, a standard technique,
   not a simplification unique to this platform.
 - The discretized two-segment path sum reproduces the exact free-particle
-  propagator to $\sim10^{-15}$ relative error, a genuine numerical
+  propagator to $\sim10^{-15}$ relative error, a direct numerical
   confirmation of the Chapman-Kolmogorov composition law.
 
 ## Further Exploration
 
 Next: **Capstone: Operators, Paths, and What's Still Open**, which
 closes this course by connecting the operator and path-integral
-perspectives and stating honestly what remains genuinely open in the
-foundations of quantum mechanics.
+perspectives and stating honestly what remains open in the foundations
+of quantum mechanics.

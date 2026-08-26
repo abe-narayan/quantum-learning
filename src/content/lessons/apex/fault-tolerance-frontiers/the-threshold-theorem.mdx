@@ -258,6 +258,17 @@ the threshold, $p_0 = 0.5\,p_{\text{th}} = 5\times10^{-5}$, against one at
 one-and-a-half times threshold, $p_0 = 1.5\,p_{\text{th}} = 1.5\times10^{-4}$,
 applying $p_{k+1} = c\,p_k^2$ directly:
 
+<PredictBeforeReveal
+  question="Both starting points sit close to p_th — one at 0.5×p_th, the other at 1.5×p_th, just a factor of 3 apart. After 4 levels of the same recursion p_(k+1) = c·p_k², how far apart do you expect the two final logical error rates to be?"
+  options={[
+    { label: "Still within about the same factor of 3", value: "same" },
+    { label: "A couple of orders of magnitude apart", value: "few" },
+    { label: "Many orders of magnitude apart — the doubling exponent compounds", value: "many" },
+  ]}
+  correctValue="many"
+  explanation="The table below shows it exactly: the below-threshold case collapses to about 1.5×10⁻⁹ while the above-threshold case climbs to about 6.5×10⁻², a gap of roughly seven orders of magnitude from a factor-of-3 head start. Each level squares the previous ratio to p_th, so a small initial gap on either side of threshold gets amplified explosively in opposite directions."
+/>
+
 | $L$ | $p_L$, below threshold ($p_0=0.5\,p_{\text{th}}$) | $p_L$, above threshold ($p_0=1.5\,p_{\text{th}}$) |
 |---|---|---|
 | 0 | $5.000\times10^{-5}$ | $1.500\times10^{-4}$ |

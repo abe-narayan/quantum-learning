@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { hydrogenEnergyLevel, RYDBERG_EV } from "@/lib/quantum/hydrogenAtom";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/fine-structure-introduction"
@@ -88,6 +89,17 @@ where $\alpha\approx1/137$ is the fine-structure constant, small enough
 that this course's $E_n=-13.6/n^2$ is an excellent approximation for most
 purposes, but large enough to be precisely measured spectroscopically
 (historically, this is exactly how fine structure was first discovered).
+
+<PredictBeforeReveal
+  question="|Eₙ| shrinks like 1/n² as n grows, while the ~α²×13.6 eV fine-structure scale stays roughly fixed. As n increases from 1 to 4, does the fine-structure correction become a bigger or smaller fraction of |Eₙ|?"
+  options={[
+    { label: "Bigger fraction of |Eₙ| at higher n", value: "bigger" },
+    { label: "Smaller fraction of |Eₙ| at higher n", value: "smaller" },
+    { label: "Always the same fraction, regardless of n", value: "same" },
+  ]}
+  correctValue="bigger"
+  explanation="|Eₙ| falls off fast (as 1/n²) while the fine-structure scale barely moves, so the correction eats a growing share of the level spacing at higher n, even though its absolute size stays roughly the same ~10⁻⁴ eV. Slide n in the chart below and compare the two caption numbers directly: the gap between the bars narrows in relative terms even as Eₙ itself shrinks."
+/>
 
 <InteractiveSection
   title="Slide n, size up the fine-structure gap"

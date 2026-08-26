@@ -33,6 +33,15 @@ that method up: not to make you re-implement it, but so every number the
 simulator has shown you all course is something you can actually account
 for.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/5/5e/JohnvonNeumann-LosAlamos.gif"
+  alt="Black-and-white portrait photograph of mathematician John von Neumann at Los Alamos"
+  caption="John von Neumann, whose stability analysis of finite-difference schemes for PDEs set the template this lesson follows in a different form: not just deriving a numerical method, but proving something concrete about when and how well it works."
+  credit="Los Alamos National Laboratory, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.gif"
+  license="Public domain (LANL)"
+/>
+
 ## Intuition
 
 The formal solution to the time-dependent Schrödinger equation is
@@ -199,7 +208,7 @@ for smooth, responsive animation.
   error term, giving $O(\Delta t^3)$ per-step accuracy from three pure-phase
   factors (potential half-step, kinetic step via FFT, potential half-step).
 - Every factor being a pure phase is exactly why norm is preserved
-  *exactly*, independent of $\Delta t$, a genuinely different guarantee
+  *exactly*, independent of $\Delta t$: a separate guarantee
   from *accuracy*, which does depend on $\Delta t$.
 - A real numerical issue (wall height times time step too large,
   corrupting the energy calculation while leaving norm and shape intact)
@@ -211,3 +220,8 @@ for smooth, responsive animation.
 Next: the [Wave Mechanics Challenge](/lessons/quantum-mechanics/wave-mechanics/wave-mechanics-challenge), synthesizing every idea from this
 course, the wavefunction, momentum space, the Schrödinger equation, and
 the concrete solvable systems, into a single set of capstone questions.
+
+The [full Wavefunction Explorer](/simulators#wavefunction-explorer) lets
+you flip between every preset's comparison panel, each built with its own
+$\Delta t$ and wall height tuned by exactly the commutator-error argument
+above, and watch the energy readout hold steady across all of them.

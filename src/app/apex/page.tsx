@@ -38,7 +38,7 @@ export default async function ApexPage() {
       <PageHeader
         eyebrow="Apex"
         title="The summit of the curriculum"
-        description="Everything earlier in QuantumLearn built toward this: the block-encoding framework that now underlies most quantum algorithms research, the real 2D surface-code lattice and its decoder (not just the conceptual 3-qubit codes), QMA and the Local Hamiltonian problem, tensor networks and the classical-simulation boundary that is the actual definition of quantum advantage, and a final course in reading and evaluating real quantum-computing papers. This is graduate-research-preparation material — dense, but built entirely on courses you've already completed. Start with Quantum Mastery's Quantum Shannon Theory course if POVMs, Stinespring dilation, and channel capacities aren't yet second nature."
+        description="Everything earlier in QuantumLearn built toward this: the block-encoding framework that now underlies most quantum algorithms research, the real 2D surface-code lattice and its decoder (not just the conceptual 3-qubit codes), QMA and the Local Hamiltonian problem, tensor networks and the classical-simulation boundary that is the actual definition of quantum advantage, and a final course in reading and evaluating real quantum-computing papers. This is graduate-research-preparation material — dense, but built entirely on courses you've already completed. Start with Quantum Mastery's Quantum Algorithms, Complexity & Simulation at Scale course (or Rigorous Quantum Information Theory, if fault tolerance is your entry point) if BQP, Trotterization, and the general stabilizer formalism aren't yet second nature."
         className="mt-4"
       />
 

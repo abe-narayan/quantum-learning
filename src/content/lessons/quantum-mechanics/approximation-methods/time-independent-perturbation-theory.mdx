@@ -77,13 +77,20 @@ the Schrödinger equation for the nudged system generally has no
 closed-form answer at all. Perturbation theory doesn't try to solve the
 nudged problem from scratch. It asks a more modest question: if the easy
 version is already fully understood, can the answer to the almost-easy
-version be built as a correction, layered on top, order by order? The
-Hydrogen Atom solved $H=p^2/2m-e^2/4\pi\epsilon_0r$ exactly, but almost no
-other Hamiltonian of physical interest can be solved exactly: real atoms
-have electron-electron repulsion, real oscillators are slightly
-anharmonic, real spins sit in small stray magnetic fields. If
-$H=H_0+H'$ with $H_0$ exactly solvable and $H'$ "small," you can build the
-true energies and states as a correction series in $H'$, order by order.
+version be built as a correction, layered on top, order by order? Hydrogen
+solved $H=p^2/2m-e^2/4\pi\epsilon_0r$ exactly, but almost nothing else of
+physical interest can be. If $H=H_0+H'$ with $H_0$ exactly solvable and
+$H'$ "small," the true energies and states can be built as a correction
+series in $H'$, one order at a time.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
+  alt="Portrait photograph of physicist Erwin Schrödinger, taken in 1933"
+  caption="Erwin Schrödinger, whose 1926 papers on quantum mechanics introduced the order-by-order energy and state correction formulas this lesson uses; the method is still commonly called Rayleigh-Schrödinger perturbation theory, crediting Lord Rayleigh's earlier, analogous treatment of coupled classical oscillators."
+  credit="Nobel Foundation"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Erwin_Schr%C3%B6dinger_(1933).jpg"
+  license="Public domain"
+/>
 
 ## Intuition
 
@@ -128,9 +135,9 @@ Every *other* state $m$ contributes here, weighted by how strongly $H'$
 couples $n$ to $m$ ($|H'_{mn}|^2$) and how close their unperturbed
 energies are (a small energy gap in the denominator makes a close-lying
 state contribute disproportionately). This formula assumes $E_n^{(0)}$
-is non-degenerate, a genuine restriction, stated honestly rather than
-silently assumed (degenerate perturbation theory needs an extra
-diagonalization step this course doesn't cover).
+is non-degenerate. That's a real restriction, not fine print: degenerate
+perturbation theory needs an extra diagonalization step this course
+doesn't cover.
 
 ### First-order state correction
 
@@ -154,6 +161,20 @@ exact same $H_0$ and $H'=\lambda x^4$ matrices as the worked example
 above, makes that concrete: every coefficient $c_m$ for odd $m$, and for
 $m=6$, comes back exactly 0.
 
+Only $|2^{(0)}\rangle$ and $|4^{(0)}\rangle$ can mix in at all, so the
+question is just which one dominates:
+
+<PredictBeforeReveal
+  question="The first-order state correction formula weights each allowed neighbor by 1/(E₀⁽⁰⁾−Eₘ⁽⁰⁾) — a bigger energy gap means a smaller coefficient. |4⁽⁰⁾⟩ sits twice as far from the ground state as |2⁽⁰⁾⟩ in energy. Which mixing coefficient should come out larger, |c₂| or |c₄|?"
+  options={[
+    { label: "|c₂| (the closer neighbor)", value: "c2" },
+    { label: "|c₄| (the farther neighbor)", value: "c4" },
+    { label: "They should be equal", value: "equal" },
+  ]}
+  correctValue="c2"
+  explanation="|c₂|≈0.0106 versus |c₄|≈0.0031 in the chart below — the closer neighbor wins by more than a factor of 3, not just a factor of 2. The 1/gap weighting in the formula explains part of that, but H'_{mn}=⟨m|λx⁴|n⟩ itself is also larger for the nearer transition, so both factors push the same direction and compound."
+/>
+
 <BarChartExplorer
   frames={petStateCorrectionFrames}
   ariaLabel="Magnitude of the first-order state correction mixing coefficient |c_m| for each basis state m=1 through 7 mixed into the perturbed ground state, for the quartic anharmonic oscillator at lambda=0.01"
@@ -167,10 +188,19 @@ mixing coefficient rather than just asserted in words.
 
 ## Physical Interpretation
 
-Perturbation theory is only as good as "$H'$ small" actually is. The
-worked example below applies it to a case with a fully independent exact
-check, giving a genuine numerical confirmation, not just trust in the
-formula.
+Perturbation theory is only as good as "$H'$ small" actually is, and
+that's easy to take on faith when there's nothing to check it against.
+The worked example below is different: the quartic oscillator's
+ground-state shift has an exact closed-form answer, so the
+perturbative machinery can be tested against it directly rather than
+just trusted.
+
+This is the same machinery Hydrogen's fine-structure treatment already
+leaned on informally (relativistic kinetic corrections and spin-orbit
+coupling both treated as a "small" $H'$ on top of the exactly-solved
+Coulomb $H_0$): the general $E_n^{(1)}=H'_{nn}$ formula derived here is
+exactly what made that earlier calculation legitimate rather than a
+lucky guess.
 
 ## Worked Example
 
@@ -240,7 +270,7 @@ depend on this specific choice.
 
 <Callout type="mistake">
 **Applying second-order perturbation theory to a degenerate $E_n^{(0)}$.**
-The $E_n^{(0)}-E_m^{(0)}$ denominator is exactly zero for a genuinely
+The $E_n^{(0)}-E_m^{(0)}$ denominator is exactly zero for a truly
 degenerate pair, and the formula breaks (this platform's engine
 deliberately throws rather than silently returning $\pm\infty$ or NaN).
 </Callout>
@@ -271,8 +301,8 @@ deliberately throws rather than silently returning $\pm\infty$ or NaN).
 - All three require $H'$ expressed in $H_0$'s eigenbasis, and
   non-degenerate $E_n^{(0)}$.
 - The quartic anharmonic oscillator's first-order shift,
-  $\frac34\lambda$, is checked here against an independent exact matrix
-  element, a genuine numerical confirmation, not a circular check.
+  $\frac34\lambda$, matches an independently-known exact matrix element
+  exactly, a real check on the machinery rather than a circular one.
 
 ## Further Exploration
 

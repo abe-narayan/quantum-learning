@@ -30,7 +30,7 @@ export default async function MapPage() {
       <PageHeader
         eyebrow="Map"
         title="The concept map"
-        description="Every key idea across Quantum Mechanics, Quantum Computing, Quantum Hardware, and Quantum Software, and how they build on each other. Click a concept for its definition, the real lessons that cover it, and its prerequisites."
+        description="Every key idea across all six pillars — Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, Quantum Mastery, and Apex — and how they build on each other. Click a concept for its definition, the real lessons that cover it, and its prerequisites."
       />
 
       <div className="mt-12">

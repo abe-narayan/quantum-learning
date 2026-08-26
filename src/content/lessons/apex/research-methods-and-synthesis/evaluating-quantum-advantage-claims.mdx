@@ -100,6 +100,23 @@ one either survives the claim or narrows exactly what it's actually saying.
 
 </DefinitionBox>
 
+<PipelineDiagram
+  ariaLabel="A left-to-right pipeline diagram: a vague quantum-advantage headline is narrowed by five questions asked in a fixed order. Q1, the exact computational task actually solved. Q2, the specific classical baseline compared against, and whether it was genuinely the best known approach at the time (highlighted). Q3, whether the claimed classical hardness rests on an unconditional proof or an unproven complexity-theoretic assumption. Q4, whether the task structurally avoids both of this course's classical-simulability loopholes, Gottesman-Knill structure and bounded bond-dimension growth. Q5, whether the demonstrated task is practically useful or specifically engineered to be classically hard (highlighted). The pipeline ends at five separate, checkable statements rather than one vague headline."
+  steps={[
+    { label: "\"Quantum advantage\" headline", detail: "vague, unevaluable" },
+    { label: "Q1 — the task", detail: "exact input/output spec" },
+    { label: "Q2 — the baseline", detail: "best known classical approach?", highlight: true },
+    { label: "Q3 — the assumption", detail: "proof, or unproven conjecture?" },
+    { label: "Q4 — the structural check", detail: "avoids both simulability loopholes?" },
+    { label: "Q5 — usefulness", detail: "useful, or engineered to be hard?", highlight: true },
+  ]}
+/>
+
+Read left to right, that is the whole checklist as one pipeline: each
+question either survives the claim or narrows exactly what it's actually
+saying, and what comes out the other end is five separate, checkable
+statements instead of one unevaluable headline.
+
 Notice what this checklist is not: it is not a way to debunk every claim,
 and it is not a way to declare every claim solid. It is a fixed set of
 questions that forces a headline to become five separate, checkable
@@ -370,7 +387,7 @@ category error in opposite directions.
 
 - A "quantum advantage" claim decomposes into five checkable questions:
   the specific task, the specific classical baseline (and whether it was
-  genuinely the best known), the specific assumption behind any claimed
+  actually the best known one), the specific assumption behind any claimed
   classical hardness, whether the task structurally avoids both of this
   course's classical-simulability loopholes (Gottesman-Knill structure and
   bounded bond-dimension growth), and whether the task is practically

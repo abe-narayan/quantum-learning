@@ -41,10 +41,10 @@ export const lessonMeta = {
 
 Measurement and Probability (Quantum Computing pillar) treats
 measurement as an instantaneous, ideal projection. Real qubit readout is
-neither instantaneous nor ideal: it takes real time, involves real
-noise, and has a real, measurable error rate. This lesson covers how
-readout actually works in hardware, and honestly quantifies how far it
-falls short of the textbook ideal.
+neither instantaneous nor ideal: it takes a few hundred nanoseconds to a
+couple of microseconds, involves real noise, and has a real, measurable
+error rate. This lesson covers how readout actually works in hardware,
+and quantifies exactly how far it falls short of the textbook ideal.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Measuring_a_qubit_leaves_no_room_for_error.jpg/1280px-Measuring_a_qubit_leaves_no_room_for_error.jpg"
@@ -87,8 +87,12 @@ qubit truly in $|0\rangle$ occasionally gets misclassified as "1," and
 vice versa. **Readout fidelity** quantifies this: the probability the
 reported classical bit matches the qubit's actual (pre-measurement)
 state. Representative current values sit in the 95-99% range depending
-on platform and integration time, good, but a real, nonzero error
-source, not the textbook's perfect projective measurement.
+on platform and integration time; a single-shot measurement typically
+integrates the reflected signal for a few hundred nanoseconds up to a
+couple of microseconds, longer integration averages out more noise and
+buys higher fidelity, but it also holds the qubit in a measured state
+longer, a direct speed-versus-accuracy tradeoff, not the textbook's
+instantaneous, perfect projective measurement.
 
 Where does that error actually come from? Every single shot lands
 somewhere on the IQ plane, the 2D plane of the demodulated signal's

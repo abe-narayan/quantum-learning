@@ -103,8 +103,8 @@ where the first-order formula is trustworthy.
 
 $|V_{fi}|^2$ sets the overall transition strength: no coupling, no
 transition, regardless of anything else. The $\sin^2(\omega_{fi}t/2)$
-factor makes the probability genuinely oscillate in time (it is *not* a
-monotonically growing quantity in general). A system can transition to
+factor makes the probability oscillate in time rather than climb
+monotonically toward some plateau. A system can transition to
 $|f\rangle$ and then transition back, entirely consistent with unitary
 (probability-conserving) time evolution.
 
@@ -123,10 +123,10 @@ strong coupling ($E_i=0,E_f=1,\hbar=1$).**
 For weak coupling ($V=0.01$), perturbative and exact agree to 4 decimal
 places. For strong coupling ($V=0.5$) at $t=3$, the perturbative formula
 predicts a probability near 1 (nearly certain transition) while the
-exact calculation gives $0.363$. The true system is genuinely
-Rabi-oscillating (its exact transition probability rises and falls
-periodically), a behavior the first-order formula, which only captures
-the *initial* rise, cannot see at all.
+exact calculation gives $0.363$. The true system is Rabi-oscillating:
+its exact transition probability rises and falls periodically, a
+behavior the first-order formula, which only captures the *initial*
+rise, cannot see at all.
 
 Watching both curves over time, at several coupling strengths, makes the
 breakdown visible directly rather than only from the table's four rows:
@@ -140,7 +140,7 @@ breakdown visible directly rather than only from the table's four rows:
     { label: "It becomes negative", value: "negative" },
   ]}
   correctValue="exceeds-one"
-  explanation="With ħ=ω_{fi}=1, the cap is just 4V². At V=0.5 it lands on exactly 1; push V any further and the perturbative formula's own ceiling climbs past 1 — a probability greater than 1, which no real probability can be. That isn't a bug in the arithmetic, it's the formula announcing its own breakdown. Watch the curve below: past V≈0.5 the perturbative (accent) line keeps climbing while the exact (brand) line, genuinely bounded by unitarity, oscillates and falls back instead."
+  explanation="With ħ=ω_{fi}=1, the cap is just 4V². At V=0.5 it lands on exactly 1; push V any further and the perturbative formula's own ceiling climbs past 1, a probability greater than 1, which no real probability can be. That isn't a bug in the arithmetic, it's the formula announcing its own breakdown. Watch the curve below: past V≈0.5 the perturbative (accent) line keeps climbing while the exact (brand) line, bound by unitarity no matter what V does, oscillates and falls back instead."
 />
 
 <ParametricCurve
@@ -154,16 +154,15 @@ Increase $V$ from $0.01$ toward $0.5$: at weak coupling the two curves
 sit right on top of each other. Past roughly $V\approx0.1$, the
 perturbative (accent) curve keeps climbing past the exact (brand) curve's
 first peak, eventually shooting straight through $P=1$, a value no real
-probability can exceed. The exact curve never does; it genuinely
-oscillates, rising and falling, exactly the Rabi behavior described
-above.
+probability can exceed. The exact curve never does; it keeps rising and
+falling, exactly the Rabi behavior described above.
 
 The frames above only sample a handful of fixed coupling strengths at
 resonance ($\omega_{fi}$ fixed). The explorer below runs the identical
 exact two-level engine (`exactTwoLevelTrajectory`, the same underlying
 solver behind `exactTwoLevelTransitionProbability` used throughout this
-lesson) with a continuously adjustable detuning — a parameter the static
-frames never expose — and draws the corresponding Bloch-sphere
+lesson) with a continuously adjustable detuning, a parameter the static
+frames never expose, and draws the corresponding Bloch-sphere
 trajectory live.
 
 <InteractiveSection title="Watch the exact curve actually oscillate" description="Set detuning to zero and increase the coupling strength V: watch the population curve trace the same exact Rabi oscillation plotted above, and the Bloch vector sweep pole-to-pole and back rather than just climbing off a static frame. Then move detuning away from zero and see the oscillation's ceiling drop below 1, exactly the unitarity-respecting behavior the perturbative curve above cannot reproduce.">

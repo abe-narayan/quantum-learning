@@ -15,13 +15,16 @@ const PILLAR_LABEL: Record<GlossaryTerm["pillar"], string> = {
   apex: "Apex",
 };
 
-const PILLAR_TONE: Record<GlossaryTerm["pillar"], "brand" | "accent" | "neutral" | "warning" | "danger"> = {
+const PILLAR_TONE: Record<GlossaryTerm["pillar"], "brand" | "accent" | "neutral" | "warning" | "danger" | "success"> = {
   "quantum-mechanics": "brand",
   "quantum-computing": "accent",
   "quantum-hardware": "warning",
   "quantum-software": "neutral",
   "quantum-mastery": "danger",
-  apex: "brand",
+  // Distinct from "quantum-mechanics" above — apex's badge previously
+  // reused the same "brand" tone as quantum-mechanics, making the two
+  // pillars indistinguishable in the filter list.
+  apex: "success",
 };
 
 function simulatorHref(simulatorId: NonNullable<GlossaryTerm["simulatorId"]>) {

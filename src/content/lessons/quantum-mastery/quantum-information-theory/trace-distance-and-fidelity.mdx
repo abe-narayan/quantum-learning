@@ -113,6 +113,28 @@ already sitting in this codebase, and "amplitude damping disturbs a
 state" stops being a qualitative claim and becomes an exact, computed
 number.
 
+This is also, unglamorously, the actual vocabulary of a hardware
+datasheet. When a lab reports a two-qubit gate at "99.5% fidelity," that
+number comes from randomized benchmarking: running long random Clifford
+sequences and fitting how a survival probability decays, which is an
+estimate of an average gate fidelity, a close relative of the $F$
+defined below. Google's 2019 "quantum supremacy" claim rested on
+cross-entropy benchmarking, comparing a chip's actual output
+distribution against the ideal circuit's predicted one, the same
+distinguishability question Helstrom's formula answers here, just asked
+of an entire circuit's output statistics instead of one qubit's state.
+Neither of those results means anything without the two objects this
+lesson derives from first principles.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sycamore_Quantum_Chip.jpg/1280px-Sycamore_Quantum_Chip.jpg"
+  alt="Google's Sycamore superconducting quantum processor chip, mounted in its housing, on display at the Deutsches Museum in Munich"
+  caption="Sycamore, the processor behind Google's 2019 quantum-supremacy claim. The claim itself was a distinguishability argument: could the chip's measured output statistics be told apart from what a classical computer would predict for an easier, spoofable distribution? That's the same question trace distance and fidelity make precise below, just posed about an entire circuit rather than a single qubit."
+  credit="Coldupnorth / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Sycamore_Quantum_Chip.jpg"
+  license="CC BY-SA 4.0"
+/>
+
 ## Mathematical Development
 
 ### Trace distance: definition and variational form
@@ -280,6 +302,17 @@ against itself), apply `amplitudeDampingChannel(0.3)` and
 `dephasingChannel(0.3)`, both already built and tested elsewhere in this
 platform:
 
+<PredictBeforeReveal
+  question="Same strength parameter, 0.3, fed to both channels acting on |+>. Which one leaves the state more mixed (lower purity Tr(rho^2))?"
+  options={[
+    { label: "Amplitude damping — it changes the state's populations, a bigger structural shift", value: "ad" },
+    { label: "Dephasing — |+> has nothing but coherence, and that's exactly what dephasing removes", value: "dp" },
+    { label: "The same either way, since both use strength 0.3", value: "same" },
+  ]}
+  correctValue="dp"
+  explanation="Dephasing wins the purity comparison (Tr(rho_DP^2) ≈ 0.745 vs Tr(rho_AD^2) ≈ 0.895 below), even though its trace distance from |+> is smaller (D ≈ 0.150 vs D ≈ 0.171). |+> is pure coherence in the computational basis, so a channel that attacks coherence directly (dephasing) costs it more purity per unit of strength than one that only partially damps population toward |0>. Trace distance and purity are tracking different things, and this pair is exactly where they come apart."
+/>
+
 <MatrixGrid matrix={rhoAD} label="After amplitude damping, gamma=0.3" compareTo={rhoDP} compareLabel="After dephasing, lambda=0.3" ariaLabel="Density matrices after amplitude damping and after dephasing, both applied to |+> with strength 0.3" />
 
 Computed directly via `eigenvaluesHermitian2x2` on $\rho_0-\rho_{AD}$
@@ -377,7 +410,7 @@ lower bound only in special cases.
 ## Further Exploration
 
 [Quantum Channels: Kraus and Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi)
-returns to these same two channels from a different angle entirely: not
-how much they disturb one input state, but what structural property,
-complete positivity, makes them valid physical channels in the first
-place.
+returns to these same two channels from a different angle entirely:
+instead of asking how much they disturb one input state, it asks what
+structural property, complete positivity, makes them valid physical
+channels in the first place.

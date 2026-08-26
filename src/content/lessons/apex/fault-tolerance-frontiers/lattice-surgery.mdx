@@ -221,6 +221,16 @@ even happens. The merge reports $m=-1$ every time, and disturbs
 nothing, exactly as measuring an operator a state is already an
 eigenstate of should.
 
+<PredictBeforeReveal
+  question="Patch L1 starts in |+⟩ — a definite eigenstate of its own X operator, not its Z operator. Patch L2 starts in |0⟩. The merge measures the product of the two patches' Z operators. Does L1 keep its own well-defined X-value after the merge?"
+  options={[
+    { label: "Yes — the merge only touches Z, so L1's X-value is untouched", value: "survives" },
+    { label: "No — L1 gets forced into a Z-eigenstate, destroying its X-superposition", value: "destroyed" },
+  ]}
+  correctValue="destroyed"
+  explanation="Measuring the product of the two patches' Z operators projects the joint state onto one of its two computational-basis terms with 50/50 probability, leaving L1 in a definite Z-eigenstate either way — the same back-action an ordinary Z⊗Z measurement has on a qubit that started in |+⟩."
+/>
+
 *Case 2—one patch in a superposition.* Prepare $L_1$ in $|+\rangle_L$
 (equal superposition of $Z_{L_1}=\pm1$) and $L_2$ in $|0\rangle_L$
 ($Z_{L_2}=+1$). Writing this out, $|+\rangle_{L_1}|0\rangle_{L_2}

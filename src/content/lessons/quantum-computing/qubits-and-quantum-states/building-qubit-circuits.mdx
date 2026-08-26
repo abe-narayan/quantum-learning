@@ -64,6 +64,18 @@ the same as $U_2$ then $U_1$, because matrix multiplication itself isn't
 commutative in general. Order is part of the circuit's meaning, not an
 implementation detail.
 
+<PredictBeforeReveal
+  question="Before doing any matrix multiplication: sandwich Z between two H gates, HZH. Which single gate do you expect the result to match?"
+  options={[
+    { label: "H itself", value: "h" },
+    { label: "X", value: "x" },
+    { label: "Y", value: "y" },
+    { label: "Z again, unchanged", value: "z" },
+  ]}
+  correctValue="x"
+  explanation="HZH = X, worked out below by direct matrix multiplication. Geometrically, H swaps the roles of the X-axis and Z-axis on the Bloch sphere, so sandwiching a π rotation about Z between two H's turns it into a π rotation about X."
+/>
+
 ### The identity $HZH = X$
 
 Take $H$, then $Z$, then $H$ again, written as the operator
@@ -102,7 +114,7 @@ last) ends up as the leftmost factor. Same three gates, same order of
 application, two different reading directions depending on whether
 you're looking at the picture or the algebra.
 
-This is a genuine, checkable fact about these three matrices, not a
+This is an actual, checkable fact about these three matrices, not a
 coincidence of notation. Geometrically it says: a $\pi$ rotation about
 the diagonal $H$-axis, sandwiching a $\pi$ rotation about $z$, nets out to
 exactly a $\pi$ rotation about $x$. Composing rotations about different

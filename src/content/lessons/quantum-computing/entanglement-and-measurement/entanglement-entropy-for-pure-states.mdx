@@ -37,16 +37,16 @@ export const lessonMeta = {
 ## Motivation
 
 Two pieces are now on the table: Lesson 5 proved that, for a 2-qubit
-*pure* state, the reduced state's mixedness is exactly equivalent to
+*pure* state, the reduced state's mixedness is equivalent to
 entanglement. Lesson 6 built the standard way to quantify mixedness, von
 Neumann entropy. Combining them gives **entanglement entropy**, but the
 word "pure" in the first sentence is not decoration, and this lesson
-proves exactly why it can't be dropped.
+proves why it can't be dropped.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
   alt="NIST apparatus for trapping and entangling two beryllium ions used as qubits"
-  caption="NIST's ion-trap apparatus, used to entangle pairs of trapped ions. Entanglement entropy is exactly the quantity that measures how tied together two such particles' fates are, even though this lesson only ever computes it on paper."
+  caption="NIST's ion-trap apparatus, used to entangle pairs of trapped ions. Entanglement entropy is the quantity that measures how tied together two such particles' fates are, even though this lesson only ever computes it on paper."
   credit="Y. Colombe/NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
   license="Public domain (U.S. government work)"
@@ -114,12 +114,21 @@ to $0$ by $\pi/2$ are visible directly, not just asserted:
 ### Why "pure" cannot be dropped: a counterexample
 
 Try applying the same formula, $S(\rho_A)$, to a *mixed* 2-qubit global
-state and see what goes wrong. Take
-$\rho_{AB}=I/4$, the maximally mixed state on two qubits. This is
-manifestly a **product state with zero entanglement**: $I/4=(I/2)\otimes(I/2)$
-exactly, the tensor product of two independent, unentangled, maximally
-mixed qubits. There is no correlation between them whatsoever, let
-alone entanglement.
+state and see what goes wrong. Take $\rho_{AB}=I/4$, the maximally mixed
+state on two qubits — which is $(I/2)\otimes(I/2)$, a plain product of
+two independent qubits, with zero entanglement by construction. Predict
+what its reduced entropy reports before computing it.
+
+<PredictBeforeReveal
+  question="ρ_AB = I/4 is a product state — provably zero entanglement, no correlation between the two qubits at all. What will S(ρ_A) report?"
+  options={[
+    { label: "0 bits, correctly reflecting zero entanglement", value: "zero" },
+    { label: "Something between 0 and 1 bit", value: "partial" },
+    { label: "1 bit — the same reading as a maximally entangled Bell state", value: "max" },
+  ]}
+  correctValue="max"
+  explanation="S(ρ_A) comes out to a full 1 bit — indistinguishable from a Bell state's reading — even though I/4 has provably zero entanglement. Reduced entropy, applied to a mixed global state, can't tell 'mixed because entangled' apart from 'mixed because the whole preparation was already a classical mixture.' That's exactly why the definition above required the global state to be pure."
+/>
 
 Its reduced state, computed by the same partial trace as always, is
 $\rho_A=\text{Tr}_B(I/4)=I/2$ (verified directly against the engine),

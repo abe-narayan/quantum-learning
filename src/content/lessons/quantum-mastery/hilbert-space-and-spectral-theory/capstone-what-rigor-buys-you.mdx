@@ -112,14 +112,23 @@ export const lessonMeta = {
 ## Motivation
 
 Five lessons ago, this course opened by pointing out that "check
-$A=A^\dagger$" was never quite the whole story. It's worth asking,
-now that the whole story has actually been told, an uncomfortable
-question: **did any of it matter?** Every prediction the earlier
-curriculum made using the informal shortcuts was correct. This capstone
-answers *why*: not "physicists got lucky," but "the specific systems
-this platform teaches all happen to sit exactly in the regime where the
-informal shortcut and the rigorous theorem agree," and closes by being
-honest about the one place they can come apart.
+$A=A^\dagger$" was never quite the whole story. Now that the whole story
+has been told, an uncomfortable question is due: **did any of it
+matter?** Every prediction the earlier curriculum made using the
+informal shortcuts was correct. This capstone answers *why*: not
+because physicists got lucky, but because the specific systems this
+platform teaches all happen to sit exactly in the regime where the
+informal shortcut and the rigorous theorem agree. It closes by being
+honest about the one place they come apart.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/d/d3/David_Hilbert_Grab_Wissen.jpg"
+  alt="David Hilbert's grave at Stadtfriedhof Göttingen, inscribed with his motto Wir müssen wissen — wir werden wissen"
+  caption="Hilbert's own epitaph, 'We must know — we will know,' reads less like a slogan and more like a research program once you've watched this course spend five lessons finding out exactly what 'know' has to mean for a domain, a spectrum, or a boundary condition before the earlier curriculum's shortcuts can be trusted rather than merely hoped for."
+  credit="Unknown author, published under GNU FDL / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:David_Hilbert_Grab_Wissen.jpg"
+  license="CC BY-SA 3.0"
+/>
 
 ## Four shortcuts, reexamined
 
@@ -130,7 +139,7 @@ Spaces and Self-Adjointness showed the full statement needs
 $D(\hat p)=D(\hat p^\dagger)$, not just the boundary-term calculation,
 and then *derived*, via the Fourier-transform equivalence to a
 self-adjoint multiplication operator, that this stronger condition
-genuinely holds on the whole line. The shortcut wasn't wrong; it was
+actually holds on the whole line. The shortcut wasn't wrong; it was
 incomplete in a way that happened not to matter for $\hat p$ on
 $\mathbb R$, because the missing piece (domain equality) turns out to
 hold there. It's *not* incomplete in a way that doesn't matter
@@ -173,14 +182,14 @@ resolvent's poles at genuine, physical bound-state energies.
 
 ## Why none of it ever went wrong
 
-There's a real pattern across all four cases, worth stating directly:
-**every boundary/domain condition the earlier curriculum picked by
-physical instinct, normalizable at infinity, finite at the origin,
-zero at a hard wall, is *exactly* the condition this course's theorems
-independently identify as the one making the operator genuinely
-self-adjoint.** That's not a coincidence to marvel at either; physically
-sensible conditions (finite total probability, finite energy) and
-mathematically self-adjoint conditions are pointing at the same target
+A single pattern runs across all four cases: **every boundary/domain
+condition the earlier curriculum picked by physical instinct,
+normalizable at infinity, finite at the origin, zero at a hard wall, is
+*exactly* the condition this course's theorems independently identify as
+the one making the operator self-adjoint.** That's not a coincidence to
+marvel at either; physically sensible conditions (finite total
+probability, finite energy) and mathematically self-adjoint conditions
+are pointing at the same target
 for exactly the reason Hilbert Spaces and Self-Adjointness's boundary-term
 derivations make explicit: both are, underneath, statements about a
 boundary contribution vanishing. Physical finiteness kills it by making
@@ -200,7 +209,7 @@ because it never needed a *momentum* operator on a half-line: the
 finite well, the infinite well, and hydrogen's radial equation all use
 position-basis Hamiltonians (built from $\hat p^2$, not $\hat p$ itself,
 and on the whole line or with $u(0)=0$, not a bare half-line momentum
-operator), which sidesteps the problem entirely. A genuinely different
+operator), which sidesteps the problem entirely. A slightly different
 question, "what is the momentum-toward-the-wall observable for a
 particle in a box?", would have run straight into this, and no amount
 of physical intuition about "just require $\psi(0)=0$" would have
@@ -219,18 +228,28 @@ pole locations of a resolvent derived from a completely different jump
 condition (lesson 4), and as a Sturm-Liouville eigenvalue problem with
 $p=w=1,q=0$ (lesson 5). "Four independent derivations, the same four
 numbers every time" is the claim this whole capstone has been building
-to, so it's worth seeing the four raw numbers side by side rather than
-taking that on faith. Each row below is produced by a genuinely
-different piece of this platform's real code, columns $n=1,2,3,4$ left
-to right: the closed-form formula itself; a literal
-$\sum_iE_iP_i$ built from real projectors and read out with the actual
-`expectationValue` function from Operators, Observables & Measurement;
-a resolvent pole found by bisecting the real jump condition
-$\sin(2ka)=0$ from lesson 4's Green's function, not by looking the
-answer up; and a Sturm-Liouville Rayleigh quotient computed by this
-platform's independent Fourier-based numerical engine acting on the
-real `infiniteSquareWellEigenstate`, which never touches the closed
+to; the four raw numbers belong side by side rather than taken on faith.
+Each row below is produced by a separately-written piece of this
+platform's real code, columns $n=1,2,3,4$ left to right: the closed-form
+formula itself; a literal $\sum_iE_iP_i$ built from real projectors and
+read out with the actual `expectationValue` function from Operators,
+Observables & Measurement; a resolvent pole found by bisecting the real
+jump condition $\sin(2ka)=0$ from lesson 4's Green's function, not by
+looking the answer up; and a Sturm-Liouville Rayleigh quotient computed
+by this platform's independent Fourier-based numerical engine acting on
+the real `infiniteSquareWellEigenstate`, which never touches the closed
 form at all.
+
+<PredictBeforeReveal
+  question="Three of these four rows (closed form, spectral-theorem sum, resolvent pole) are provably the same algebraic statement in disguise. The fourth (Sturm-Liouville) comes from an independent FFT-based numerical solver that never touches the n²π²/8a² formula. How closely do you expect that fourth row to match?"
+  options={[
+    { label: "Machine precision, same as the other three", value: "machine" },
+    { label: "Close, but only to within about a percent (grid spacing)", value: "percent" },
+    { label: "Not close at all — it's a genuinely different calculation", value: "off" },
+  ]}
+  correctValue="percent"
+  explanation="The table below shows the top three rows agree to all six displayed digits, because they're the same statement proved three ways. The Sturm-Liouville row is a real numerical measurement on a discretized grid, and it lands within about a percent — a gap from grid spacing alone, shrinking with finer resolution, not a sign of disagreement."
+/>
 
 <MatrixGridExplorer
   presets={convergencePresets}
@@ -244,7 +263,7 @@ displayed decimal places, because they are, underneath, the same
 algebraic statement proved three different ways: lesson 2's theorem says
 the discrete sum over projectors *is* the closed form once $E(\lambda)$
 is a staircase, and the resolvent's pole condition $\sin(2ka)=0$ reduces
-to exactly the same $k=n\pi/2a$. The bottom row is the one genuinely
+to exactly the same $k=n\pi/2a$. The bottom row is the one truly
 independent *numerical* check, an FFT-based kinetic-energy expectation
 on a discretized grid that never touches the $n^2\pi^2/8a^2$ formula,
 and it still lands within about a percent of the same numbers, a gap

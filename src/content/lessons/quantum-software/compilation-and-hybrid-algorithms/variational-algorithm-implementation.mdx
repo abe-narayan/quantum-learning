@@ -65,9 +65,9 @@ circuit.ry(0, theta);
 const state = runCircuit(circuit);
 ```
 
-This is genuinely the "software" version of the same physics, the
+This is the "software" version of the same physics — the
 circuit-as-data pattern (Circuit Representation in Code) applied to a
-variational algorithm specifically.
+variational algorithm.
 
 ### Computing the cost function
 
@@ -78,6 +78,18 @@ machinery is even needed.
 $\langle Z\rangle$ directly from the circuit's own output.
 
 ### The optimization loop, and verification
+
+<PredictBeforeReveal
+  question="The ansatz is Ry(θ)|0⟩ and the cost function is ⟨Z⟩. Where in θ ∈ [0, 2π] should a grid search find the minimum ⟨Z⟩?"
+  options={[
+    { label: "θ = 0", value: "0" },
+    { label: "θ = π/2", value: "half-pi" },
+    { label: "θ = π", value: "pi" },
+    { label: "θ = 3π/2", value: "three-half-pi" },
+  ]}
+  correctValue="pi"
+  explanation="Ry(π)|0⟩ = |1⟩ up to global phase, and ⟨Z⟩ on |1⟩ is exactly -1, the smallest value Z's expectation can take on any state. The grid search below confirms this directly, landing exactly on θ=π with ⟨Z⟩=-1, matching exactGroundStateEnergy(PAULI_Z) exactly."
+/>
 
 A simple grid search over $\theta\in[0,2\pi]$ (the same
 "smallest correct optimizer" choice Quantum Algorithms II's `runVqe`
@@ -127,7 +139,7 @@ close the gap further, exactly as the Variational Method course already
 established for a completely different, continuous-wavefunction, trial
 family).
 
-Unlike the single-parameter case, this cost landscape is genuinely
+Unlike the single-parameter case, this cost landscape is
 two-dimensional: $\langle H\rangle$ is now a function of a $(\theta,\phi)$
 plane, not a single curve. This page's own $15\times15$ grid search,
 run live over both parameters, traces out that entire plane as a
@@ -150,7 +162,7 @@ reported number.
 
 This is the entire Quantum Software pillar's thesis made concrete: the
 SAME physics (VQE, already fully built in Quantum Algorithms II) can be
-implemented via genuinely different SOFTWARE PATTERNS (direct matrix
+implemented via different SOFTWARE PATTERNS (direct matrix
 computation vs. circuit-as-data), and, when both are correct, they
 agree exactly. Software structure is a real engineering choice; it
 doesn't change the underlying physics being computed.
@@ -206,7 +218,7 @@ special, checkable coincidence of that specific problem's structure.
 
 - A VQE ansatz built with `QuantumCircuit` (`circuit.ry(0,theta)`)
   reproduces Quantum Algorithms II's matrix-based `ansatzState` physics
-  exactly, computed through a genuinely different software path.
+  exactly, computed through a different software path.
 - Grid-search optimization finds $H=Z$'s ground energy EXACTLY
   ($\theta=\pi$, $\langle Z\rangle=-1$), matching
   `exactGroundStateEnergy` precisely.
@@ -220,8 +232,7 @@ special, checkable coincidence of that specific problem's structure.
 This closes the algorithmic core of **Compilation & Hybrid Algorithms**:
 only **Quantum Error Mitigation** remains, closing out this course and,
 with it, the entire Quantum Software pillar. Every course from
-Mathematical Foundations through this lesson now has real lessons, real
-problems, and, wherever genuinely useful, real, verified engine code
-connecting them, with the four graduate-level Quantum Mastery courses
-still ahead across this platform's full, 26-course, five-pillar
-curriculum.
+Mathematical Foundations through this lesson now has lessons, problems,
+and, wherever useful, verified engine code connecting them, with the
+four graduate-level Quantum Mastery courses still ahead across this
+platform's full, 26-course, five-pillar curriculum.

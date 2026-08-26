@@ -38,6 +38,15 @@ is a small, mechanical skill; getting the *ordering convention* backwards
 is the single most common way people misread a circuit, so this lesson
 spends real time on that specifically.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
+  alt="Google's Sycamore superconducting quantum processor chip, mounted with its array of individually wired qubits"
+  caption="Every wire in a circuit diagram stands for one physical qubit like these on Google's Sycamore chip. The diagram is an abstraction; the wiring, control lines, and readout hardware underneath it are not."
+  credit="Google"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
+  license="CC BY 3.0"
+/>
+
 ## Intuition
 
 A circuit diagram is a small piece of sheet music: one horizontal line
@@ -98,9 +107,21 @@ and paper draws it: qubit 0's wire on top, time flowing left to right.
 />
 
 Column 1 is the $H\otimes I$ operator this section just derived; column 2
-is the two-qubit $\text{CNOT}$. Applying that same two-column circuit
-($H$ on qubit 0, then $\text{CNOT}$ with qubit 0 as control and qubit 1
-as target) to $|00\rangle$, one column at a time:
+is the two-qubit $\text{CNOT}$. Before applying that same two-column
+circuit to $|00\rangle$, predict what column 2 does to the state column 1
+leaves behind.
+
+<PredictBeforeReveal
+  question="Column 1 (H on qubit 0) turns |00⟩ into (|00⟩+|10⟩)/√2. What does column 2, CNOT(0,1), do to that state?"
+  options={[
+    { label: "Nothing changes, since qubit 1 is still |0⟩ in both terms", value: "unchanged" },
+    { label: "It flips qubit 1 in the |10⟩ term only, entangling the two qubits", value: "entangles" },
+    { label: "It collapses the superposition back to |00⟩", value: "collapses" },
+    { label: "It only affects qubit 0, since CNOT's control is qubit 0", value: "control-only" },
+  ]}
+  correctValue="entangles"
+  explanation="CNOT(0,1) checks qubit 0 (the control) in each term separately: the |00⟩ term has control 0, so it's untouched; the |10⟩ term has control 1, so its target (qubit 1) flips to 1, giving |11⟩. The result, (|00⟩+|11⟩)/√2, correlates the two qubits — measuring one now tells you the other, which is exactly what a product of single-qubit gates could never produce."
+/>
 
 <QuantumStateDisplay state={afterH} label="After column 1: H on qubit 0" />
 <QuantumStateDisplay state={afterCnot} label="After column 2: CNOT(0, 1)" />

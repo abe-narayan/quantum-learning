@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { StaticCircuitDiagram } from "@/components/visualizations/StaticCircuitDiagram";
 
 export const practiceProblems = getProblemsForLesson(
   "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"
@@ -100,6 +101,35 @@ T gates, **is** the price tag. This lesson is about how that price tag is
 actually computed, and why two different, both mathematically valid,
 compilation algorithms can quote wildly different prices for the exact
 same target gate at the exact same precision.
+
+Concretely, what either synthesis algorithm actually *hands back* is
+nothing more exotic than a short list of single-qubit gates, chained in
+series on one wire:
+
+<StaticCircuitDiagram
+  ariaLabel="An illustrative Clifford+T-synthesized single-qubit circuit: a chain of H, T, and S gates on one wire, approximating some target rotation to a fixed precision"
+  numQubits={1}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "T", targets: [0] },
+    { gate: "H", targets: [0] },
+    { gate: "T", targets: [0] },
+    { gate: "S", targets: [0] },
+    { gate: "H", targets: [0] },
+    { gate: "T", targets: [0] },
+  ]}
+/>
+
+*Illustrative only, not a specific computed output* — a stand-in for the
+general **shape** any Clifford+T synthesis algorithm's answer takes: a
+chain of gates drawn from the fixed alphabet $\{H,S,T\}$ (plus their
+adjoints, where the target gate set includes them), applied one after
+another to approximate a single target unitary. Solovay-Kitaev-style and
+Ross-Selinger-style synthesis both output a sequence with exactly this
+structure; what the rest of this lesson shows is that the two algorithms
+disagree sharply, for the same target and the same precision, on how
+*long* that chain has to be — count the T gates in a chain like this one,
+and the count is the entire quantity this lesson is about.
 
 ## Mathematical Development
 
@@ -244,6 +274,17 @@ estimation for a real algorithm) will need directly.
 long-running algorithm cannot afford entangled rounding error to
 accumulate). Compare the T-count a generic Solovay-Kitaev-style synthesis
 would need against the T-count Ross-Selinger-style synthesis achieves.**
+
+<PredictBeforeReveal
+  question="Both algorithms compile the same Rz(θ) target to the same precision ε=10⁻¹⁰. Roughly how much bigger do you expect the generic Solovay-Kitaev-style T-count to be than the Ross-Selinger-style T-count?"
+  options={[
+    { label: "About the same — both are 'efficient' synthesis algorithms", value: "same" },
+    { label: "A few times bigger — a modest constant-factor overhead", value: "few-times" },
+    { label: "Orders of magnitude bigger — thousands of times or more", value: "orders-of-magnitude" },
+  ]}
+  correctValue="orders-of-magnitude"
+  explanation="Both scale efficiently (polylogarithmically) with 1/ε, but a polylog with exponent 3.97 eventually dwarfs a polylog that is merely linear in log(1/ε), even with a small coefficient. At ε=10⁻¹⁰ the gap below comes out in the thousands, and it only widens at tighter precision — 'efficient' and 'near-optimal' are different guarantees, and the numbers make the difference concrete rather than abstract."
+/>
 
 First, the input both estimates share: $\log_2(1/\epsilon)$ for
 $\epsilon=10^{-10}$,

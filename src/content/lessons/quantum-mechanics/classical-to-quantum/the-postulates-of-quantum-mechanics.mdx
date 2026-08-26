@@ -64,14 +64,19 @@ export const lessonMeta = {
 
 ## Motivation
 
-The Mathematical Foundations course built the complete linear-algebra
-toolkit, vectors, inner products, Hermitian and unitary operators, the
-Born rule, as pure mathematics. The last three lessons built the
-physical case for why nature needs exactly this kind of structure:
-amplitudes that interfere (not classical probabilities), and specifically
-complex ones (not merely signed real ones). This lesson puts the two
-halves together into the actual postulates of quantum mechanics, the
-short list of assumptions that, together, *is* the theory.
+Everything up to this point has been in two separate pieces. The
+Mathematical Foundations course built the linear-algebra toolkit,
+vectors, inner products, Hermitian and unitary operators, the Born rule,
+as pure mathematics, without saying which physical theory any of it was
+for. The last three lessons argued the physical side on its own:
+experiment forces amplitudes rather than classical probabilities, and
+those amplitudes have to be complex, since only a complex phase can
+supply the continuously variable interference the double-slit data
+actually shows. This lesson is where the two pieces click together. Four
+short statements, and nothing more is needed: they *are* quantum
+mechanics, in the sense that literally every calculation in the rest of
+this course, and in the Quantum Computing pillar built on top of it, is
+just these four statements applied to one more specific system.
 
 ## Intuition
 
@@ -208,6 +213,18 @@ $\langle A\rangle = (+1)(\tfrac34)+(-1)(\tfrac14)=\tfrac12$.
 
 A $3:1$ split, visible at a glance, exactly matching the $\cos^2(\pi/6):\sin^2(\pi/6)$
 ratio the algebra above predicts.
+
+<PredictBeforeReveal
+  question="The worked example fixed θ = 30°, giving a 3:1 split favoring P(+1). Somewhere between θ = 0° (certain +1) and θ = 90° (certain -1), the split has to pass through an even 50/50. At what angle does that happen?"
+  options={[
+    { label: "45°", value: "45" },
+    { label: "60°", value: "60" },
+    { label: "30°", value: "30" },
+    { label: "There's no such angle", value: "none" },
+  ]}
+  correctValue="45"
+  explanation="P(+1)=cos²θ and P(-1)=sin²θ are equal exactly when cosθ and sinθ are equal in magnitude, which happens at θ=45° (both equal 1/√2, so both probabilities equal 1/2). Slide the control to 45° below and check: the two bars land exactly on 0.5 each, sitting precisely halfway between the two certain extremes."
+/>
 
 <InteractiveSection title="Slide θ, watch the split move" description="The worked example fixed θ = π/6 = 30°. Drag θ from 0° to 90° and watch P(+1) = cos²θ and P(-1) = sin²θ recompute live, always summing to 1, with the 30° worked-example point marked.">
   <BarChartExplorer

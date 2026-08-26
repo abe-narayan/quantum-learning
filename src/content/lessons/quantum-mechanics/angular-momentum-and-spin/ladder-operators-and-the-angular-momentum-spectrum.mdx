@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { angularMomentumRaising } from "@/lib/quantum/angularMomentum";
@@ -59,6 +60,15 @@ momentum's spectrum comes from exactly the same strategy, applied to a
 different pair of ladder operators built from $L_x,L_y$ (or the general
 $J_x,J_y$) instead.
 
+<ExternalFigure
+  src="https://www.nist.gov/sites/default/files/images/2019/07/10/19pml016_leibrandt_alclockuncertainty_hr.png"
+  alt="Illustration of NIST's quantum-logic optical atomic clock: a single trapped aluminum ion (blue) whose clock transition is read out via a companion magnesium ion (yellow), held in a gold ion-trap chip"
+  caption="A single trapped ion, held on one specific rung of its own angular-momentum ladder. Every optical atomic clock, including this one, works by locking a laser to the exact energy gap between two such rungs, the same m-to-m spacing this lesson derives from pure algebra."
+  credit="NIST / JILA (S. Burrows)"
+  creditUrl="https://www.nist.gov/programs-projects/trapped-ion-optical-clocks"
+  license="Public domain (U.S. government work)"
+/>
+
 ## Mathematical Development
 
 ### Building the ladder operators
@@ -100,7 +110,18 @@ indefinitely unless it eventually annihilates the state, there must be a
 exceed its bound. Both terminations are needed simultaneously, and since
 $J_+$ raises $m$ in steps of exactly $1$ (in units of $\hbar$), the
 distance from the bottom rung to the top, $j-(-j)=2j$, must be a
-**non-negative integer**, forcing
+**non-negative integer**.
+
+<PredictBeforeReveal
+  question="The top rung sits at m = j and the bottom rung at m = -j, with every step in between exactly 1 apart. What does that force j itself to be?"
+  options={[
+    { label: "Any non-negative real number", value: "any-real" },
+    { label: "Any non-negative integer only", value: "integer-only" },
+    { label: "0, 1/2, 1, 3/2, 2, ... (integer or half-integer)", value: "half-integer" },
+  ]}
+  correctValue="half-integer"
+  explanation="The distance from the bottom rung to the top rung is 2j, and since J+ climbs in steps of exactly 1, that distance has to be a non-negative integer. j itself can therefore be an integer or a half-integer, but nothing in between: 0, 1/2, 1, 3/2, 2, and so on. Nothing about rotation or 3D space went into this; it's a pure consequence of the ladder taking equal steps between two fixed ends."
+/>
 
 $$
 \boxed{j = 0,\ \tfrac12,\ 1,\ \tfrac32,\ 2,\ \dots}

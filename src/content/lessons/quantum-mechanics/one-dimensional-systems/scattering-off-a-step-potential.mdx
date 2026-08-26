@@ -47,11 +47,11 @@ export const lessonMeta = {
 
 A ball rolling toward a downhill (or gentle uphill, as long as it has
 enough energy) step always makes it across, classically, with
-certainty. A quantum particle, remarkably, does not: some of its
-probability always reflects, no matter how much energy it has above the
-step. This lesson derives exactly how much, from nothing but plane waves
-and boundary matching. No numerics are needed this time; it's a fully
-closed-form result.
+certainty. A quantum particle does not: some of its probability always
+reflects, no matter how much energy it has above the step. This lesson
+derives exactly how much, from nothing but plane waves and boundary
+matching, and this time the result is fully closed-form; no numerics
+needed.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5a/First_STM.jpg"
@@ -139,6 +139,18 @@ a genuine algebraic identity, not an assumption.
 Plotted against the energy ratio $E/V_0$, the shape of this falloff is
 worth seeing directly:
 
+<PredictBeforeReveal
+  question="As the incident energy E climbs far above the step height V0, what happens to the reflection probability R?"
+  options={[
+    { label: "R drops smoothly to exactly 0 at some finite E", value: "zero" },
+    { label: "R approaches 0 but never quite reaches it", value: "asymptotic" },
+    { label: "R levels off at some fixed nonzero value", value: "plateau" },
+    { label: "R starts increasing again once E is large enough", value: "increases" },
+  ]}
+  correctValue="asymptotic"
+  explanation="R = [(k1−k2)/(k1+k2)]² is zero only when k1 = k2, which requires V0 = 0 (no step at all). For any actual step, k1 ≠ k2 at every finite energy, so R stays strictly positive — it just gets small as E/V0 grows, since k2 → k1 in that limit. The curve below shows exactly this: it approaches the axis but never touches it."
+/>
+
 <ParametricCurve
   frames={[
     {
@@ -222,8 +234,8 @@ doesn't equal the transmission probability unless $k_1=k_2$.
 <Callout type="mistake">
 **Expecting classical behavior to reappear for large $E$.** $R\to0$ only
 in the limit $E\to\infty$ (where $k_2\to k_1$), never exactly at any
-finite energy. The reflection is genuinely persistent, not a
-small-energy artifact.
+finite energy. The reflection persists at every finite energy; it isn't
+a small-energy artifact that a fast enough particle escapes.
 </Callout>
 
 ## Practice Questions

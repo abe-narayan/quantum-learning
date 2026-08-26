@@ -137,7 +137,18 @@ $$
 |\langle u,v\rangle| \le \|u\|\,\|v\|
 $$
 
-This deserves a real derivation. Assume $v\ne0$ (the inequality is trivial
+<PredictBeforeReveal
+  question="Can |⟨u,v⟩| ever come out larger than ‖u‖‖v‖, for some choice of u and v?"
+  options={[
+    { label: "Yes, for some complex vectors", value: "yes" },
+    { label: "No — it never exceeds ‖u‖‖v‖", value: "no" },
+    { label: "Only when u and v are linearly dependent", value: "dependent" },
+  ]}
+  correctValue="no"
+  explanation="Never, for any u and v in any inner product space. Equality is achievable (when u and v are parallel), but the inequality never breaks in the other direction. The derivation below shows this falls out of nothing more exotic than positive-definiteness, applied to one specific, cleverly chosen vector."
+/>
+
+Here's the derivation, worked from scratch. Assume $v\ne0$ (the inequality is trivial
 if $v=0$), and define $c = \langle v,u\rangle/\langle v,v\rangle$: this
 is the coefficient that makes $w = u - cv$ orthogonal to $v$:
 
@@ -193,10 +204,10 @@ and $w$ is what's left over, sitting at a right angle to $v$.
 
 ## Physical Interpretation
 
-Two quantum states with $\langle\phi|\psi\rangle=0$ are the states a
-single measurement can distinguish with certainty. Orthogonality is not
-just a geometric nicety here; it's the mathematical condition for
-"perfectly distinguishable." $\|\psi\|=1$ will turn out to be exactly the
+Two quantum states with $\langle\phi|\psi\rangle=0$ are exactly the states
+a single measurement can tell apart with certainty: a geometric condition
+on vectors doubling as a statement about what's experimentally
+distinguishable. $\|\psi\|=1$ will turn out to be exactly the
 normalization condition that makes total measurement probability equal
 $1$, developed fully in the Probability and Quantum States lesson.
 

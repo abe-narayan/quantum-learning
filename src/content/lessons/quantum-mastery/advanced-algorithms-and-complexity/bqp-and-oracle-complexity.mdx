@@ -74,11 +74,11 @@ computation (the actual, still-open question of whether $\mathsf{BPP} =
 \mathsf{BQP}$).
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a real superconducting quantum computer in its glass-and-steel enclosure"
+  src="https://upload.wikimedia.org/wikipedia/commons/8/83/QuEra_Aquila_Magneto-Optical_Trap.jpg"
+  alt="The magneto-optical trap of QuEra's neutral-atom quantum computer, used to arrange and control large 2D arrays of qubits"
   caption="BQP is formally defined over circuit families like the ones a real machine such as this one actually runs. The oracle-relative separations this lesson proves (Deutsch-Jozsa, Simon's, Grover's/BBBV) are a precise but distinct, weaker kind of statement about idealized black-box query access — not a claim about what hardware like this achieves on a concrete, structured problem."
-  credit="Onri Jay Benally (OJB Quantum) / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
+  credit="QuEra Computing, Inc., via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:QuEra_Aquila_Magneto-Optical_Trap.jpg"
   license="CC BY 4.0"
 />
 
@@ -304,6 +304,17 @@ object than lower bounds against every possible algorithm exploiting
 every possible structure, which is precisely what an unconditional
 $\mathsf{BPP}$-vs-$\mathsf{BQP}$ proof would require, and which nobody
 currently knows how to do for any problem.
+
+<PredictBeforeReveal
+  question="Deutsch-Jozsa needs 2ⁿ⁻¹+1 classical queries for zero-error certainty (129, at n=8). If the classical algorithm is allowed just 1% failure probability instead, how many queries does it need?"
+  options={[
+    { label: "Still close to 129 — dropping certainty barely helps", value: "close" },
+    { label: "Roughly half, around 65", value: "half" },
+    { label: "A small constant, around 8", value: "constant" },
+  ]}
+  correctValue="constant"
+  explanation="Only 8 random queries. If f is balanced, the probability all k random queries happen to agree (falsely looking constant) is 2^-(k-1), so k=8 already pushes failure below 1%. The exponential Deutsch-Jozsa gap is entirely a demand-for-certainty artifact — it evaporates the moment classical algorithms are allowed the same kind of bounded error BQP already permits quantum ones."
+/>
 
 ## Worked Example
 

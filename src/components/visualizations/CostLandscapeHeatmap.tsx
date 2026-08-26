@@ -20,20 +20,37 @@ export function CostLandscapeHeatmap({
   thetaLabel = "θ",
   phiLabel = "φ",
   exactMin,
+  valueLabel = "⟨H⟩",
+  goal = "min",
+  exactLabel = "exact ground energy",
+  thetaMaxLabel = "2π",
+  phiMaxLabel = "2π",
 }: {
   /** Rows indexed by θ (top → bottom), columns by φ (left → right); every row must have the same length. */
   grid: CostLandscapeCell[][];
   ariaLabel: string;
   thetaLabel?: string;
   phiLabel?: string;
-  /** The true ground energy, shown in the caption next to the grid's own best value. */
+  /** The true optimal value (ground energy for a minimized cost, or the brute-force optimum for a maximized one), shown in the caption next to the grid's own best value. */
   exactMin?: number;
+  /** Symbol for the plotted quantity, used in tooltips, the legend, and the caption. */
+  valueLabel?: string;
+  /** Whether the grid's "best" cell (marked, and colored green) is its lowest or highest value. */
+  goal?: "min" | "max";
+  /** What `exactMin` represents, spelled out in the caption (e.g. "true max (brute force)"). */
+  exactLabel?: string;
+  /** Display label for the row axis's upper bound (θ ranges 0 to this). */
+  thetaMaxLabel?: string;
+  /** Display label for the column axis's upper bound (φ ranges 0 to this). */
+  phiMaxLabel?: string;
 }) {
-  const { min, max, minRow, minCol, cols } = useMemo(() => {
+  const { min, max, bestRow, bestCol, cols } = useMemo(() => {
     let min = Infinity;
     let max = -Infinity;
     let minRow = 0;
     let minCol = 0;
+    let maxRow = 0;
+    let maxCol = 0;
     grid.forEach((row, r) =>
       row.forEach((cell, c) => {
         if (cell.value < min) {
@@ -41,15 +58,28 @@ export function CostLandscapeHeatmap({
           minRow = r;
           minCol = c;
         }
-        if (cell.value > max) max = cell.value;
+        if (cell.value > max) {
+          max = cell.value;
+          maxRow = r;
+          maxCol = c;
+        }
       })
     );
-    return { min, max, minRow, minCol, cols: grid[0]?.length ?? 0 };
-  }, [grid]);
+    return {
+      min,
+      max,
+      bestRow: goal === "max" ? maxRow : minRow,
+      bestCol: goal === "max" ? maxCol : minCol,
+      cols: grid[0]?.length ?? 0,
+    };
+  }, [grid, goal]);
 
   const span = max - min || 1;
   const rows = grid.length;
-  const best = grid[minRow]?.[minCol];
+  const best = grid[bestRow]?.[bestCol];
+  const bestValue = goal === "max" ? max : min;
+  const worstLabel = goal === "max" ? "lowest" : "highest";
+  const bestLabel = goal === "max" ? "highest" : "lowest";
 
   return (
     <div className="not-prose space-y-3 rounded-xl border border-border bg-surface-muted/40 p-4">
@@ -65,18 +95,19 @@ export function CostLandscapeHeatmap({
           >
             {grid.map((row, r) =>
               row.map((cell, c) => {
-                const t = (cell.value - min) / span;
-                const isMin = r === minRow && c === minCol;
+                const raw = (cell.value - min) / span;
+                const t = goal === "max" ? 1 - raw : raw;
+                const isBest = r === bestRow && c === bestCol;
                 return (
                   <div
                     key={`${r}-${c}`}
-                    title={`${thetaLabel}=${cell.theta.toFixed(2)}, ${phiLabel}=${cell.phi.toFixed(2)}: ⟨H⟩=${cell.value.toFixed(4)}`}
+                    title={`${thetaLabel}=${cell.theta.toFixed(2)}, ${phiLabel}=${cell.phi.toFixed(2)}: ${valueLabel}=${cell.value.toFixed(4)}`}
                     className="relative aspect-square"
                     style={{
                       backgroundColor: `color-mix(in srgb, var(--success) ${(1 - t) * 100}%, var(--danger) ${t * 100}%)`,
                     }}
                   >
-                    {isMin ? (
+                    {isBest ? (
                       <span
                         className="absolute inset-0 flex items-center justify-center"
                         aria-hidden="true"
@@ -91,7 +122,7 @@ export function CostLandscapeHeatmap({
           </div>
           <div className="flex justify-between text-[10px] text-muted-foreground">
             <span>{phiLabel} = 0</span>
-            <span>{phiLabel} = 2π &rarr;</span>
+            <span>{phiLabel} = {phiMaxLabel} &rarr;</span>
           </div>
         </div>
       </div>
@@ -102,26 +133,26 @@ export function CostLandscapeHeatmap({
             className="h-3 w-3 rounded-sm"
             style={{ backgroundColor: "var(--success)" }}
           />
-          lowest ⟨H⟩ in grid
+          {bestLabel} {valueLabel} in grid
         </span>
         <span className="flex items-center gap-1.5">
           <span
             className="h-3 w-3 rounded-sm"
             style={{ backgroundColor: "var(--danger)" }}
           />
-          highest ⟨H⟩ in grid
+          {worstLabel} {valueLabel} in grid
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full border-2 border-background bg-foreground" />
-          grid minimum ({thetaLabel}={best?.theta.toFixed(2)}, {phiLabel}={best?.phi.toFixed(2)})
+          grid {goal === "max" ? "maximum" : "minimum"} ({thetaLabel}={best?.theta.toFixed(2)}, {phiLabel}={best?.phi.toFixed(2)})
         </span>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Grid rows step {thetaLabel} from 0 to 2π (top → bottom, {rows} points), columns step{" "}
-        {phiLabel} from 0 to 2π (left → right, {cols} points). Best grid value: ⟨H⟩ ={" "}
-        {min.toFixed(4)}
-        {exactMin !== undefined ? ` (exact ground energy: ${exactMin.toFixed(4)})` : null}.
+        Grid rows step {thetaLabel} from 0 to {thetaMaxLabel} (top → bottom, {rows} points), columns step{" "}
+        {phiLabel} from 0 to {phiMaxLabel} (left → right, {cols} points). Best grid value: {valueLabel} ={" "}
+        {bestValue.toFixed(4)}
+        {exactMin !== undefined ? ` (${exactLabel}: ${exactMin.toFixed(4)})` : null}.
       </p>
     </div>
   );

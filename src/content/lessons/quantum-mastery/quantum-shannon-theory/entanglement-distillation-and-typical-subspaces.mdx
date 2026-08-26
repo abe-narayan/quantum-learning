@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { Complex } from "@/lib/quantum/complex";
@@ -224,6 +225,15 @@ exactly conserved on average under LOCC for pure bipartite states (a
 fact proved elsewhere in this course's entropy lesson via concavity, not
 re-derived here).
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/8/80/Dr._Charles_Bennett_IBM_Fellow.jpg"
+  alt="Photograph of physicist Charles H. Bennett, IBM Fellow"
+  caption="Charles H. Bennett, the 'B' in Bennett-Bernstein-Popescu-Schumacher (1996), the paper that turns this lesson's typical-subspace counting argument into the entanglement-concentration protocol above. Bennett's earlier work with Gilles Brassard on BB84 and with colleagues on teleportation and superdense coding makes him a recurring figure across this platform's quantum information lessons — this is the same collaboration structure (a shared-entanglement resource, converted between forms by LOCC) running through all of them."
+  credit="IBM Research, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Dr._Charles_Bennett_IBM_Fellow.jpg"
+  license="CC BY-SA 2.0"
+/>
+
 ### Beyond pure states: mixed states and coherent information
 
 Real shared entanglement is never a perfect, isolated pure state —
@@ -325,7 +335,20 @@ $np=6\times0.9=5.4$, with standard deviation
 $\sigma=\sqrt{np(1-p)}\approx0.7348$. Defining the typical set here as
 types within one standard deviation of the mean, $k\in[4.665,\,6.135]$,
 gives exactly $k\in\{5,6\}$ — the two largest-$k$ types, since $p=0.9$
-means most copies are expected in the $|00\rangle$ branch. Their
+means most copies are expected in the $|00\rangle$ branch.
+
+<PredictBeforeReveal
+  question="The typical set at n=6 is just two of the seven possible types (k=5 and k=6), together only 7 of the 64 total basis strings — about 11% of the full dimension. How much of the total probability do you expect those two types to carry?"
+  options={[
+    { label: "A modest share, maybe 20-30%, since it's such a small slice of the space", value: "modest" },
+    { label: "The vast majority — well over 85% of the total probability", value: "vast" },
+    { label: "Almost none — probability should spread roughly evenly across all 64 strings", value: "none" },
+  ]}
+  correctValue="vast"
+  explanation="Together k=5 and k=6 carry about 88.6% of the total probability, computed just below — from only 11% of the dimension. That lopsidedness, a tiny subspace holding almost all the weight, is the entire mechanism behind entanglement concentration: project onto that small typical subspace and you keep almost everything that matters while discarding 89% of the dimension."
+/>
+
+Their
 combined probability mass is
 
 $$

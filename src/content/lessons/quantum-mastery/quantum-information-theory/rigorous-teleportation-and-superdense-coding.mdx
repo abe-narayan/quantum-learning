@@ -289,7 +289,7 @@ $$
 D\big(\rho_\psi,\ \mathcal T(\rho_\psi,\rho_R^{\text{noisy}})\big) \approx 0.0960, \qquad \text{Tr}\big[\mathcal T(\rho_\psi,\rho_R^{\text{noisy}})^2\big] \approx 0.8341
 $$
 
-a real, computed degradation, not an estimate. **This is genuinely
+a real, computed degradation, not an estimate. **This is meaningfully
 different from the standard textbook "average teleportation fidelity"
 formula** $F_{\text{avg}}=(2F_e+1)/3$ (where $F_e=\langle\Phi^+|\rho_R|\Phi^+\rangle$
 is the resource's singlet fraction, here $F_e=0.9$, giving
@@ -307,6 +307,17 @@ only the Haar-averaged figure.
 The same substitution, noisy $\rho_R$ in place of a perfect Bell pair,
 applied to Superdense Coding's encode-then-decode circuit reveals
 *which* of the two classical bits noise damages, not just that it does:
+
+<PredictBeforeReveal
+  question="Superdense coding encodes one classical bit via X (a population swap between |Phi+> and |Psi+>) and the other via Z (a relative-phase flip between |Phi+> and |Phi->). The shared Bell pair is dephased. Which bit do you expect to come through damaged?"
+  options={[
+    { label: "The X-encoded bit — population swaps are more fragile", value: "x-bit" },
+    { label: "The Z-encoded bit — dephasing is exactly a phase-destroying process", value: "z-bit" },
+    { label: "Both bits equally", value: "both" },
+  ]}
+  correctValue="z-bit"
+  explanation="Dephasing leaves populations alone and only scrambles relative phase, so it corrupts exactly the classical bit that's carried as a phase flip (the Z-encoded one) and leaves the population-encoded (X) bit untouched at any dephasing strength — confirmed below at lambda=0.2, where every message is confused only with its Z-flipped partner, never its X-flipped one."
+/>
 
 <BarChartExplorer
   frames={superdenseFramesNoisy}
@@ -352,7 +363,7 @@ information dephasing erases; the bit encoded via $X$ (a **population**
 swap, distinguishing $|\Phi^+\rangle$ from $|\Psi^+\rangle$) survives
 dephasing untouched, at any noise strength. A different noise
 model, amplitude damping, which *does* move population, would corrupt
-superdense coding's other bit instead, a genuinely different, checkable
+superdense coding's other bit instead, a distinct, checkable
 prediction this same channel construction could make by substituting a
 different Kraus channel into $\rho_R^{\text{noisy}}$.
 
@@ -430,7 +441,7 @@ channel.
 - For a perfect Bell pair, $\mathcal T$ is exactly the identity channel
   (verified to full numerical precision); for a dephased one
   ($\lambda=0.2$), $F\approx0.9528$, $D\approx0.0960$ for this course's
-  own specific message state, a genuinely different number from the
+  own specific message state, a meaningfully different number from the
   standard Haar-averaged formula's $0.9333$.
 - Superdense coding under the same noisy resource gives success
   probability exactly $1-\lambda/2$, and the failure mode is

@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 import { QuantumCircuit, runCircuit, sampleMeasurements } from "@/lib/quantum/circuitBuilder";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-software/programming-quantum-computers/writing-your-first-circuit"
@@ -65,7 +66,36 @@ circuit.h(0).cnot(0, 1).cnot(1, 2);
 
 Nothing has run yet. `circuit.instructions` holds three
 `GateInstruction` objects (Circuit Representation in Code), waiting to
-be executed.
+be executed. Here's that list taking shape one chained call at a time:
+
+<CircuitDiagramExplorer
+  sliderLabel="After calling"
+  frames={[
+    {
+      paramLabel: "circuit.h(0)",
+      numQubits: 3,
+      instructions: [{ gate: "H", targets: [0] }],
+      highlightColumn: 0,
+      ariaLabel: "3-qubit circuit with one instruction: H on qubit 0",
+    },
+    {
+      paramLabel: "circuit.h(0).cnot(0, 1)",
+      numQubits: 3,
+      instructions: [{ gate: "H", targets: [0] }, { gate: "CNOT", targets: [0, 1] }],
+      highlightColumn: 1,
+      ariaLabel: "3-qubit circuit with two instructions: H on qubit 0, then CNOT from qubit 0 to qubit 1",
+    },
+    {
+      paramLabel: "circuit.h(0).cnot(0, 1).cnot(1, 2)",
+      numQubits: 3,
+      instructions: [{ gate: "H", targets: [0] }, { gate: "CNOT", targets: [0, 1] }, { gate: "CNOT", targets: [1, 2] }],
+      highlightColumn: 2,
+      ariaLabel: "3-qubit circuit with three instructions: H on qubit 0, CNOT from qubit 0 to qubit 1, CNOT from qubit 1 to qubit 2",
+    },
+  ]}
+/>
+
+Now build the same three instructions yourself, on the interactive circuit below:
 
 <InteractiveSection title="Build the GHZ circuit yourself" description="Build this exact circuit yourself below (H on q0, then CNOT(0,1), then CNOT(1,2) on 3 qubits) and confirm you get the same two-peak distribution before reading Step 2's exact numbers.">
   <LazyCircuitBuilder />
@@ -95,6 +125,17 @@ differ from this platform's own `QuantumCircuit`.
 
 ### Step 2: Run it exactly
 
+<PredictBeforeReveal
+  question="Before running it, predict: what will state.probabilities() give for this 3-qubit GHZ circuit?"
+  options={[
+    { label: "0.5 spread evenly across all 8 outcomes", value: "uniform" },
+    { label: "1.0 on |000⟩ only", value: "zero-only" },
+    { label: "0.5 on |000⟩, 0.5 on |111⟩, 0 everywhere else", value: "ghz" },
+  ]}
+  correctValue="ghz"
+  explanation="H puts qubit 0 into superposition, and each CNOT then copies that superposition onto the next qubit, entangling all three into 1/√2(|000⟩+|111⟩). Only the all-zeros and all-ones outcomes get any probability — 0.5 each — and every other 3-bit string stays at exactly 0."
+/>
+
 ```
 const state = runCircuit(circuit);
 ```
@@ -115,7 +156,7 @@ They report a finite number of individual measurement shots
 (Qubit Readout Techniques). Running this platform's `sampleMeasurements`
 with 5000 shots gives counts close to (but not exactly) a 2500/2500
 split between "000" and "111", e.g. one representative run gave 2521
-and 2479. The deviation from a perfectly even split is genuine
+and 2479. The deviation from a perfectly even split is ordinary
 **statistical (shot) noise**, not a bug. It shrinks (relatively) as
 shot count grows, following the standard $1/\sqrt{\text{shots}}$
 statistical scaling any repeated-sampling estimate obeys.
@@ -237,13 +278,13 @@ results; only shot noise is present in this lesson's idealized
   as data; `runCircuit` executes them, giving exact GHZ-state
   probabilities `[0.5,...,0.5]`.
 - `sampleMeasurements` illustrates what real hardware actually reports:
-  shot-based counts with genuine statistical fluctuation around the
+  shot-based counts with real statistical fluctuation around the
   exact probabilities.
 - At 5000 shots on a perfect 50/50 state, roughly $\pm71$ counts of
   deviation is expected 95% of the time from shot noise alone.
 
 ## Further Exploration
 
-Next: [Simulators vs. Real Hardware](/lessons/quantum-software/programming-quantum-computers/simulators-vs-real-hardware), which adds genuine hardware
+Next: [Simulators vs. Real Hardware](/lessons/quantum-software/programming-quantum-computers/simulators-vs-real-hardware), which adds actual hardware
 error on top of this lesson's pure shot noise, completing the picture of
 what a real device's output actually looks like.

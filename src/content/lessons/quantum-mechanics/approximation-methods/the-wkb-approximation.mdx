@@ -28,7 +28,7 @@ export const wkbMomentumFrames = wkbNs.map((n) => ({
 export const lessonMeta = {
   title: "The WKB Approximation",
   description:
-    "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within 0.06% at this platform's grid resolution, a genuinely different approximation route arriving at (nearly) the same answer as perturbation theory and the variational method.",
+    "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within 0.06% at this platform's grid resolution — a route through classical mechanics and de Broglie wavelengths, unrelated to perturbation theory or the variational method, arriving at (nearly) the same answer anyway.",
   course: "approximation-methods",
   module: "the-wkb-approximation",
   order: 1,
@@ -152,6 +152,21 @@ allowed region, shows directly why higher $n$ means a bigger action
 integral: both the region's width (the turning points) and the peak
 momentum grow together.
 
+WKB is usually sold as a large-$n$ approximation, so it's worth pausing
+on what that predicts for this specific table before looking at it
+again:
+
+<PredictBeforeReveal
+  question="WKB is a semiclassical approximation, expected to improve as the quantum number grows. Given that, which row of the table above should show the largest error against the exact spectrum?"
+  options={[
+    { label: "n = 0 (smallest quantum number)", value: "n0" },
+    { label: "n = 3 (largest quantum number)", value: "n3" },
+    { label: "None in particular — all four errors should be about the same tiny size", value: "same" },
+  ]}
+  correctValue="same"
+  explanation="The 'large n is more accurate' rule of thumb is real for a generic potential, but it doesn't show up here: the errors run 0.00026, 0.00008, 0.00031, 0.00038 for n=0 through 3 — no downward trend at all, just grid-resolution noise scattered near zero. That's because the harmonic oscillator is one of the rare potentials where WKB is exact at every n, not just asymptotically, so there's no large-n convergence to see. The usual rule of thumb applies to potentials where WKB is only approximately right, which this one isn't."
+/>
+
 <InteractiveSection
   title="Step through n, watch the action integral grow"
   description="Step through the energy level n = 0 to 3, the same four levels as the table above. Each curve is the local classical momentum p(x), computed from the same harmonic oscillator potential, but shown only across the classically allowed region. Watch the turning points spread apart and the peak momentum grow as n increases — that growing area under the curve is exactly the action integral the quantization condition sets equal to (n+½)πħ."
@@ -214,7 +229,7 @@ points is not optional bookkeeping.
 
 ## Further Exploration
 
-Next: [Time-Dependent Perturbation Theory](/lessons/quantum-mechanics/approximation-methods/time-dependent-perturbation-theory), which asks a different
-question entirely: not "what is the corrected energy," but "given a
-small time-dependent nudge, what's the probability of a transition
-between states?"
+Next: [Time-Dependent Perturbation Theory](/lessons/quantum-mechanics/approximation-methods/time-dependent-perturbation-theory) leaves stationary states behind entirely and asks about
+transitions: switch on a small time-dependent coupling between two
+levels, and what's the probability of finding the system in the other
+one later?

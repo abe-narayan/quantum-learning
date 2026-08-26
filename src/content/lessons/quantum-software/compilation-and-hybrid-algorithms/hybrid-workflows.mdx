@@ -35,6 +35,15 @@ software angle: what does actually running one look like, step by step,
 and what does this course's compilation machinery cost when it repeats
 hundreds of times?
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Quantum_Bus_Device_%288116044085%29.jpg"
+  alt="A micrograph of a real spin-qubit quantum bus device, showing seven gate electrodes converging on the quantum dots at its center, with a Princeton tiger logo shown for scale at 1 millimeter"
+  caption="A real qubit bus device: the gate electrodes carry every control pulse the classical optimizer sends down, and read every measurement it gets back. A VQE or QAOA run bounces between exactly these two halves, hundreds of times over a single optimization."
+  credit="K. Petersson / Princeton University, NIST"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Bus_Device_(8116044085).jpg"
+  license="Public Domain (U.S. Government work)"
+/>
+
 ## Intuition
 
 Think of the loop like tuning a guitar by ear: pluck a string (quantum),
@@ -88,15 +97,14 @@ Decoherence & Scaling), applies once PER ITERATION of this loop, not
 once total. A VQE run with 100 optimization iterations transpiles and
 executes its ansatz circuit 100 separate times; any per-circuit
 overhead (SWAP gates, native-gate translation, statistical shot noise)
-is paid 100 times over, not once. This is a real, often-dominant cost
-driver for hybrid algorithms specifically, distinct from a single-shot
+is paid 100 times over, not once. That's often the dominant cost
+driver for hybrid algorithms, distinct from a single-shot
 circuit's one-time compilation cost.
 
-<InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. The per-iteration bar stays fixed at 6 SWAP gates, exactly this section's overhead figure, while the total-run bar grows as N times 6, the same multiplication the worked example below performs by hand for N=200. The chart's scale is fixed to keep the small per-iteration bar visible, so past a few iterations the total-run bar maxes out the chart; read its caption for the exact total.">
+<InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. Both bars are scaled to whichever is larger in each frame, so the per-iteration bar (a fixed 6 SWAP gates, this section's overhead figure) visibly shrinks relative to the total-run bar (N times 6) as N grows — the same multiplication the worked example below performs by hand for N=200, but shown as a shrinking fraction rather than a single number.">
   <BarChartExplorer
     sliderLabel="Iterations (N)"
-    ariaLabel="Per-iteration SWAP overhead (fixed at 6) versus total SWAP gates across the full optimization run (6 times N), as iteration count N grows. The chart's scale is fixed near the per-iteration value so the total-run bar clips at the top for larger N; see its caption for the exact total"
-    maxValue={24}
+    ariaLabel="Per-iteration SWAP overhead (fixed at 6 gates) versus total SWAP gates across the full optimization run (6 times N), as iteration count N grows from 1 to 200. Bars are scaled per frame, so the per-iteration bar shrinks visibly relative to the total-run bar as N increases"
     frames={[1, 20, 50, 100, 150, 200].map((n) => ({
       paramLabel: `N = ${n}`,
       bars: [
@@ -108,6 +116,18 @@ circuit's one-time compilation cost.
 </InteractiveSection>
 
 ### What runs where
+
+<PredictBeforeReveal
+  question="Looking at the four-step loop above (propose θ, run ansatz circuit, compute cost, update θ), how many of those steps actually need a quantum device?"
+  options={[
+    { label: "All four — it's a quantum algorithm end to end", value: "four" },
+    { label: "Three — only proposing θ is classical", value: "three" },
+    { label: "One — only running the ansatz circuit touches quantum hardware", value: "one" },
+    { label: "Zero — VQE is normally run on a classical simulator anyway", value: "zero" },
+  ]}
+  correctValue="one"
+  explanation="Only 'Run ansatz circuit' touches actual quantum hardware. Proposing θ, computing the cost from the returned measurement statistics, and deciding the next θ are all ordinary classical computation. The quantum device's job is narrowly scoped to state preparation and measurement, nothing else."
+/>
 
 The quantum device does exactly one job: prepare $|\psi(\vec\theta)\rangle$
 and report measurement statistics. EVERY OTHER STEP, proposing new
@@ -121,13 +141,13 @@ do efficiently.
 
 ## Physical Interpretation
 
-Recognizing this loop structure explains a real, practical fact about
+Recognizing this loop structure explains a practical fact about
 NISQ-era algorithms (Noise, Decoherence & Scaling): their total runtime
 is often dominated by the NUMBER OF ITERATIONS times per-iteration
-overhead, not by any single circuit's raw gate count, which is exactly
+overhead, not by any single circuit's raw gate count. That's exactly
 why minimizing per-circuit compilation and execution overhead (this
 course's entire subject) matters disproportionately for hybrid
-algorithms specifically.
+algorithms.
 
 ## Worked Example
 
@@ -143,8 +163,8 @@ $$
 A substantial number, even though each individual iteration's
 overhead (6 SWAPs) sounds modest. This directly motivates
 connectivity-aware ansatz design (choosing which qubits interact to
-minimize per-iteration SWAP count) as a real, high-leverage optimization
-for hybrid algorithms specifically.
+minimize per-iteration SWAP count) as a high-leverage optimization
+for hybrid algorithms in particular.
 
 ## Common Mistakes
 
@@ -152,8 +172,8 @@ for hybrid algorithms specifically.
 **Treating VQE/QAOA's classical optimizer as a minor implementation
 detail.** It's an equal partner in the algorithm's structure. The
 quantum device does ONE well-defined job (state preparation and
-measurement); everything else, including the crucial decision of what
-to try next, is genuinely classical computation.
+measurement); everything else, including the decision of what
+to try next, is ordinary classical computation.
 </Callout>
 
 <Callout type="mistake">
@@ -184,7 +204,7 @@ optimization run needs.
   repeat, exactly what `runVqe`/`runQaoa` already implement.
 - Compilation overhead (SWAP gates, native-gate decomposition) applies
   PER ITERATION, compounding substantially across a full optimization
-  run, a real, often-dominant cost for hybrid algorithms specifically.
+  run — often the dominant cost for hybrid algorithms.
 - The quantum device's role is narrowly scoped to state preparation and
   measurement; every other step is genuine classical computation.
 

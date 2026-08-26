@@ -126,9 +126,21 @@ $\theta,\varphi$ is far from optimal (the true minimizer is
 $\theta=\pi,\varphi=0$, giving $|1\rangle$, energy exactly $-1$). Placed
 on the actual energy spectrum, the inequality is a picture, not just an
 arithmetic check: the trial value has nowhere to go but at or above the
-floor $E_0$ sets. That isn't special to $\theta=\pi/2$; sweeping $\theta$
-across its *entire* range shows the trial energy staying at or above
-$E_0$ everywhere, never dipping below it even once:
+floor $E_0$ sets. That isn't special to $\theta=\pi/2$.
+
+<PredictBeforeReveal
+  question="Sweep θ across its entire range, 0 to 2π (φ=0 fixed), for H=Z. Does the trial energy ⟨ψ(θ)|Z|ψ(θ)⟩ ever dip below E₀=−1 anywhere along the way?"
+  options={[
+    { label: "Yes, briefly, near the far side of the sweep", value: "dips" },
+    { label: "No — it touches −1 once and stays at or above it everywhere else", value: "floor" },
+    { label: "No — it stays strictly above −1 everywhere, never touching it", value: "never-touches" },
+  ]}
+  correctValue="floor"
+  explanation="The variational principle is an inequality, not a strict one: equality is possible, exactly when the trial state coincides with the true ground state. For this ansatz that happens once, at θ=π (giving |1⟩, energy exactly −1). Everywhere else on the sweep the curve sits strictly above the floor, never below it — a live picture of the proof above, not a separate claim."
+/>
+
+Sweeping $\theta$ across its *entire* range shows the trial energy
+staying at or above $E_0$ everywhere, never dipping below it even once:
 
 <InteractiveSection title="Never below the floor, touching it once" description="Drag θ from 0 to 2π. Watch ⟨ψ|H|ψ⟩ touch the E₀ line exactly at θ=π (the true minimizer) and never cross below it anywhere else, exactly what the variational principle guarantees.">
   <ParametricCurve

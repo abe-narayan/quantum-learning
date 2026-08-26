@@ -134,7 +134,16 @@ Welcome to APEX. Every earlier pillar built toward a specific competence: Quantu
 
 The immediately preceding lesson simulated $e^{-iHt}$ by chopping time into $n$ small steps and applying each local piece of $H$ in sequence, paying a quantified $O(1/n)$ price in accuracy for every noncommuting pair of terms. That construction is powerful, but narrow in a specific sense: it only ever produces a *unitary* — a time-evolution operator — because $e^{-iHt}$ is always unitary for Hermitian $H$. Enormous swaths of quantum algorithms, though, want to apply something that *isn't* unitary at all: a projector, a non-Hermitian matrix, a Green's function, a covariance matrix, the inverse $H^{-1}$ that a linear-systems solver needs. A quantum computer's native operations are all unitary, so none of these can be applied directly.
 
-Block encoding is the general answer: embed an *arbitrary* matrix $A$ — not necessarily unitary, not necessarily Hermitian, not necessarily square in the fully general version — as a small corner of some bigger unitary $U$ that a quantum computer genuinely can run. Everything downstream (Hamiltonian simulation via quantum signal processing, quantum linear-systems solvers, amplitude-based algorithms, Gibbs-state preparation) is then just algebra performed *on the block encoding itself*, without ever needing $A$ to be unitary in the first place. This lesson builds the construction from scratch and verifies, numerically and exactly, that it does what it claims.
+Block encoding is the general answer: embed an *arbitrary* matrix $A$ — not necessarily unitary, not necessarily Hermitian, not necessarily square in the fully general version — as a small corner of some bigger unitary $U$ that a quantum computer can actually run. Everything downstream (Hamiltonian simulation via quantum signal processing, quantum linear-systems solvers, amplitude-based algorithms, Gibbs-state preparation) is then just algebra performed *on the block encoding itself*, without ever needing $A$ to be unitary in the first place. This lesson builds the construction from scratch and verifies, numerically and exactly, that it does what it claims.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Professor_Andrew_Childs.jpg"
+  alt="Portrait photograph of quantum algorithms researcher Andrew Childs"
+  caption="Andrew Childs, whose work on linear combinations of unitaries (with Wiebe and others) turned 'embed a non-unitary matrix inside a bigger unitary' from a niche trick into the general block-encoding framework this lesson builds from scratch."
+  credit="University of Maryland / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Professor_Andrew_Childs.jpg"
+  license="CC BY-SA 4.0"
+/>
 
 ## Mathematical Development
 
@@ -185,7 +194,7 @@ LCU implements a block encoding of $A/\|\alpha\|_1$ with a three-part circuit on
    \text{PREPARE}|0\rangle_{\text{anc}} = \sum_{i=0}^{m-1}\sqrt{\frac{\alpha_i}{\|\alpha\|_1}}\,|i\rangle_{\text{anc}} ,
    $$
    a state whose amplitudes are the square roots of the *normalized* coefficients $\alpha_i/\|\alpha\|_1$ (normalized so the state itself has norm $1$, as any physical state must).
-2. **SELECT.** Apply $U_i$ to the system register conditioned on the ancilla reading $|i\rangle$: $\text{SELECT} = \sum_i|i\rangle\langle i|_{\text{anc}}\otimes U_i$, a genuinely unitary operator on the combined register since each $U_i$ is unitary and the $|i\rangle\langle i|$ projectors are orthogonal.
+2. **SELECT.** Apply $U_i$ to the system register conditioned on the ancilla reading $|i\rangle$: $\text{SELECT} = \sum_i|i\rangle\langle i|_{\text{anc}}\otimes U_i$, a valid unitary operator on the combined register since each $U_i$ is unitary and the $|i\rangle\langle i|$ projectors are orthogonal.
 3. **PREPARE$^\dagger$.** Undo the ancilla preparation (any unitary's inverse is its conjugate transpose, always implementable in principle).
 
 <TheoremBox title="LCU implements a block encoding of A/‖α‖₁" provenance="derived">
@@ -214,7 +223,7 @@ This is not merely close to a block encoding — it is one, exactly, by the defi
 
 ## Physical Interpretation
 
-Nothing about SELECT or PREPARE "knows" what $A$ means physically — the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register genuinely ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is exactly what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
+Nothing about SELECT or PREPARE "knows" what $A$ means physically — the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register actually ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is exactly what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
 
 ## Why This Matters
 
@@ -250,7 +259,7 @@ The full circuit is six gates on two qubits (qubit $0$ = ancilla, qubit $1$ = sy
 
 <MatrixGrid matrix={topLeftBlock} label="Top-left block of U (computed from the circuit)" compareTo={matrixA} compareLabel="A (target)" ariaLabel="The top-left 2x2 block of the circuit's full 4x4 unitary, shown next to the target matrix A, to compare entry by entry" />
 
-with every entry matching to within {blockVsAMaxDiff.toExponential(2)} — floating-point-exact agreement, not an approximation. The circuit genuinely is a block encoding of $A$.
+with every entry matching to within {blockVsAMaxDiff.toExponential(2)} — floating-point-exact agreement, not an approximation. This circuit is a block encoding of $A$.
 
 **Verifying the post-selection claim on a specific state.** Feeding the circuit $|0\rangle_{\text{anc}}|\psi\rangle_{\text{sys}}$ for $|\psi\rangle=\tfrac{1}{\sqrt2}(|0\rangle+i|1\rangle)$ and running the actual instruction sequence gives a full 2-qubit output state; reading off just the ancilla-$|0\rangle$ amplitudes (rows $00,01$) against $A|\psi\rangle$ computed directly by matrix application:
 

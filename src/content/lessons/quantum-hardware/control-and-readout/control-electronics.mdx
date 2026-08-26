@@ -103,6 +103,19 @@ through an amplifier chain to a room-temperature digitizer:
 
 <ControlSignalChainDiagram ariaLabel="The full drive and readout signal chain: a room-temperature AWG and IQ mixer send a pulse down through the fridge's cooling stages, attenuated at each one, to the qubit, while the readout tone returns up through an amplifier chain to a room-temperature digitizer" />
 
+The generator has to be fast enough to actually place a pulse edge where
+the math says. A control-grade arbitrary waveform generator typically
+samples at 1-2 GS/s, a 0.5-1 ns tick, which is coarse next to the
+$4.17\text{ ns}$ pulse computed below but still gives several samples
+across it; slower, cheaper AWGs (a few hundred MS/s) start to blur a
+pulse that short. There's real cable delay to account for too: a meter
+of coax adds roughly 5 ns of one-way propagation delay, and by the time
+a signal has gone from a room-temperature rack down through a
+meter-plus of cryostat wiring to the mixing chamber and back, tens of
+nanoseconds have typically elapsed, latency that matters directly for
+anything needing a fast measure-then-react loop, like active qubit
+reset or mid-circuit feedback.
+
 ## Worked Example
 
 **What pulse duration implements a $\theta=\pi/3$ rotation, at Rabi

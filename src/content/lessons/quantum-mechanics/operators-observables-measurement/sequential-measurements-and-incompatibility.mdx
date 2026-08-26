@@ -15,6 +15,8 @@ export const plusState = applySingleQubitGate(zero, HADAMARD, 0);
 export const minusState = applySingleQubitGate(StateVector.basis(1, 1), HADAMARD, 0);
 export const zAfterPlus = plusState.probabilities();
 export const zAfterMinus = minusState.probabilities();
+export const jointZFirstThenXPlus = zero.probabilities()[0] * xBasisProbs[0];
+export const jointXFirstThenZZero = xBasisProbs[0] * zAfterPlus[0];
 
 export const lessonMeta = {
   title: "Sequential Measurements and Incompatibility",
@@ -35,10 +37,13 @@ export const lessonMeta = {
 
 ## Motivation
 
-"Incompatible observables disturb each other" has been stated abstractly
-(uncertainty relations, non-commuting operators) since the very first
-course on this platform. This lesson finally makes it fully concrete:
-one specific qubit, three measurements, real numbers at every step.
+Does the order you measure things in change what you find? For ordinary
+compatible quantities, no. For $Z$ and $X$ on a qubit, yes, and by a
+specific, checkable amount. "Incompatible observables disturb each
+other" has been stated abstractly (uncertainty relations, non-commuting
+operators) since the very first course on this platform. This lesson
+makes it fully concrete: one specific qubit, three measurements, real
+numbers at every step.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Exp%C3%A9rience_%C3%A0_3_polarisants.jpg"
@@ -89,6 +94,33 @@ $$
 was $100\%$ predictable. After it, $Z$'s outcome is completely random
 again. The $X$ measurement didn't just add new information, it
 *erased* the old certainty entirely.
+
+### Does the order actually matter?
+
+Run the numbers the other way: measure $X$ first, then $Z$. Starting
+from $|0\rangle$, $P(X{=}{+}1)=\tfrac12$ (Step 2's calculation, unchanged
+since it didn't use Step 1's outcome). Collapse to $|+\rangle$, then
+$P(Z{=}0)=\tfrac12$ (Step 3's calculation). The *joint* probability of
+seeing $Z{=}0$ together with $X{=}{+}1$ depends on which one you measure
+first:
+
+$$
+P(Z{=}0\text{ first, then }X{=}{+}1) = 1\times\frac12 = \frac12, \qquad P(X{=}{+}1\text{ first, then }Z{=}0) = \frac12\times\frac12 = \frac14
+$$
+
+Same two outcomes, same starting state, half the probability depending
+on which measurement comes first. This is the concrete, checkable
+content of "order matters" for incompatible observables: not a vague
+slogan, a factor of two you can verify by direct calculation.
+
+<BarChart
+  bars={[
+    { label: "Z first, then X=+1", value: jointZFirstThenXPlus },
+    { label: "X first, then Z=0", value: jointXFirstThenZZero, highlight: true },
+  ]}
+  ariaLabel="Bar chart comparing the joint probability of the outcome pair Z=0 and X=+1 depending on measurement order: one half when Z is measured first, one quarter when X is measured first"
+  maxValue={0.5}
+/>
 
 Laid out as a tree, every branch of this three-step sequence is visible
 at once:
@@ -206,6 +238,10 @@ probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
   disturbance by an incompatible measurement.
 - The result doesn't depend on which $X$-outcome occurred. Both
   $X$-eigenstates are equally "unaligned" with the $Z$-basis.
+- Measurement order itself is physically meaningful: $P(Z{=}0\text{ then
+  }X{=}{+}1)=\tfrac12$ but $P(X{=}{+}1\text{ then }Z{=}0)=\tfrac14$, the
+  same pair of outcomes at different probabilities depending on which
+  observable goes first.
 - This is the concrete face of the abstract $[X,Z]\ne0$ result proven
   earlier in this course.
 

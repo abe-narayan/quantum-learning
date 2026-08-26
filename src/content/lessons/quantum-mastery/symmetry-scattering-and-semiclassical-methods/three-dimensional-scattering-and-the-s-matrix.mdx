@@ -96,7 +96,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier",
-      note: "That lesson's two-boundary matching (continuity of ψ,ψ' at each edge) is exactly the technique this lesson reuses at r=a for hard-sphere scattering; the genuinely new ingredients are the centrifugal term and the discrete l-channel structure.",
+      note: "That lesson's two-boundary matching (continuity of ψ,ψ' at each edge) is exactly the technique this lesson reuses at r=a for hard-sphere scattering; the new ingredients are the centrifugal term and the discrete l-channel structure.",
     },
   ],
 };
@@ -109,7 +109,7 @@ boundary, read off reflection and transmission. Real scattering
 experiments, a beam of particles off a nucleus, electrons off an atom,
 happen in three dimensions, off a potential $V(r)$ depending only on
 distance from a center. The same matching *idea* survives entirely
-intact; what's new is genuinely new, not a cosmetic change of
+intact; what's new is new in substance, not a cosmetic change of
 coordinates.
 
 <ExternalFigure
@@ -140,7 +140,7 @@ $$
 
 This is **exactly a 1D Schrödinger equation** on the half-line $r\ge0$,
 the identical continuity-of-$\psi,\psi'$ matching technique from the 1D
-scattering lessons applies unchanged. Two things are genuinely new,
+scattering lessons applies unchanged. Two things are new here,
 neither cosmetic: (1) an extra **centrifugal barrier**
 $\hbar^2l(l+1)/2mr^2$, absent from any real 1D problem, pushing the
 particle away from $r=0$ for $l>0$; (2) the boundary condition
@@ -237,6 +237,17 @@ $$
 \sigma_0(ka) = \frac{4\pi}{k^2}\sin^2(ka)
 $$
 
+<PredictBeforeReveal
+  question="As ka→0 (long-wavelength limit), what should the quantum cross section σ₀ approach, relative to the sphere's classical geometric cross section πa²?"
+  options={[
+    { label: "σ₀ → πa², matching the classical silhouette exactly", value: "classical" },
+    { label: "σ₀ → 0, since a long wavelength barely notices the sphere", value: "zero" },
+    { label: "σ₀ → 4πa², four times the classical area", value: "four" },
+  ]}
+  correctValue="four"
+  explanation="Taking sin(ka)≈ka in σ₀=(4π/k²)sin²(ka) gives σ₀→4πa², not πa². A long-wavelength wave doesn't just clip the sphere's silhouette — it diffracts around the whole thing, and the wave nature of scattering, not the sphere's literal cross-sectional area, sets what a detector far away actually measures."
+/>
+
 <InteractiveSection
   title="s-wave cross section, in units of 4πa²"
   description="Plotted from the real closed-form δ₀=−ka above, no numbers hand-typed beyond a=1. As ka→0 the curve approaches exactly 1 (σ₀→4πa²), the famous 'four times the classical area' quantum result; it falls away as ka grows and the small-angle approximation sin(ka)≈ka stops holding."
@@ -269,8 +280,8 @@ watch the gap between them.
 
 At low energy ($ka\ll1$), $\sin(ka)\approx ka$, so
 $\sigma_0\to(4\pi/k^2)(ka)^2=4\pi a^2$: **four times** the sphere's
-classical cross-sectional area $\pi a^2$. This is genuinely surprising
-and genuinely correct, not a paradox: a classical particle either hits
+classical cross-sectional area $\pi a^2$. This is a strange-looking
+result, and a correct one, not a paradox: a classical particle either hits
 the sphere (cross section $\pi a^2$) or misses entirely; a long-wavelength
 quantum wave diffracts around the whole sphere, and the wave nature of
 scattering, not the sphere's literal silhouette, sets the cross section.

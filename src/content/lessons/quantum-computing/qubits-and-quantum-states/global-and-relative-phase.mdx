@@ -44,9 +44,8 @@ of "which way is up" does.
 
 **Relative phase** changes the phase of one amplitude *relative to* the
 other: $\alpha|0\rangle+\beta|1\rangle \to \alpha|0\rangle+e^{i\delta}\beta|1\rangle$.
-This is not a re-labeling. It genuinely rotates the state to a different
-point on the Bloch sphere (a different $\varphi$), and it is very much
-measurable.
+This is not a re-labeling. It rotates the state to a different point on the
+Bloch sphere (a different $\varphi$), and that rotation is measurable.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Mach-Zehnder_interferometer.svg"
@@ -58,6 +57,18 @@ measurable.
 />
 
 ## Mathematical Development
+
+<PredictBeforeReveal
+  question="Multiply an entire qubit state by e^{iγ} for some nonzero γ (a global phase). How many measurement probabilities, in any basis you could pick, change?"
+  options={[
+    { label: "None — every probability stays exactly the same", value: "none" },
+    { label: "Only in the computational basis", value: "comp-only" },
+    { label: "Only in bases other than computational", value: "other-only" },
+    { label: "All of them shift, by an amount depending on γ", value: "all" },
+  ]}
+  correctValue="none"
+  explanation="Zero, in any basis, for any γ. That isn't a lucky coincidence for one particular measurement, it's a theorem: the proof below shows P(e_i) = |⟨e_i|ψ⟩|² is left completely unchanged because |e^{iγ}| = 1 divides straight out of the modulus-squared. A relative phase, by contrast, does move probabilities, as the next section shows."
+/>
 
 ### Global phase is unobservable
 
@@ -102,7 +113,7 @@ by amplitude, not just point by point on the sphere.
 
 ### Relative phase is observable
 
-Now instead multiply *only* $\beta$: $\beta \to e^{i\delta}\beta$. In the
+Multiply only $\beta$ this time: $\beta \to e^{i\delta}\beta$. In the
 computational basis, this changes nothing,
 $|e^{i\delta}\beta|^2=|\beta|^2$, which is exactly why relative phase was
 invisible for the first several lessons of this course, where every
@@ -119,7 +130,7 @@ $$
 P(+)_{\text{new}} = \frac{1+2\operatorname{Re}(e^{i\delta}\alpha^*\beta)}{2}
 $$
 
-This genuinely depends on $\delta$ (take $\alpha=\beta=\tfrac{1}{\sqrt2}$:
+This depends on $\delta$ (take $\alpha=\beta=\tfrac{1}{\sqrt2}$:
 $P(+)$ ranges from $1$ at $\delta=0$ down to $0$ at $\delta=\pi$, as
 $\operatorname{Re}(e^{i\delta})$ sweeps from $1$ to $-1$). Relative phase
 is measurable, just not in the computational basis. This is precisely
@@ -220,5 +231,5 @@ equally (global) or only *some* of them (relative) determines that.
 
 Next: [Putting It Together](/lessons/quantum-computing/qubits-and-quantum-states/building-qubit-circuits), the capstone lesson for this course, where
 states, gates, rotations, measurement, and phase all combine to analyze
-multi-gate sequences, including one genuinely useful identity you'll
-verify yourself in the simulator.
+multi-gate sequences, including one useful identity you'll verify yourself
+in the simulator.

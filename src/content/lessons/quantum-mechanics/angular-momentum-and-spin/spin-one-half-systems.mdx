@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
@@ -79,6 +80,17 @@ $$
 confirmed to match exactly (to floating-point precision) in this
 platform's own test suite, not a coincidence or an analogy, but the
 literal $j=\tfrac12$ instance of the general construction Lesson 2 built.
+
+<PredictBeforeReveal
+  question="Sx, Sy, Sz are defined as the j=1/2 case of the general Jx,Jy,Jz construction from Lesson 2. How closely should they match (ħ/2)X, (ħ/2)Y, (ħ/2)Z, the Pauli matrices this platform has used since Course 1?"
+  options={[
+    { label: "Roughly similar, but not exactly the same operators", value: "similar" },
+    { label: "Exactly equal, entry by entry, with no approximation", value: "exact" },
+    { label: "Related only by a change of basis, not directly equal", value: "basis-change" },
+  ]}
+  correctValue="exact"
+  explanation="They're exactly equal, entry by entry, to floating-point precision. Sx, Sy, Sz aren't merely similar to the Pauli matrices; at j=1/2 the general ladder-operator construction produces exactly (ħ/2)X, (ħ/2)Y, (ħ/2)Z. Every qubit gate this platform has ever applied was already spin-1/2 physics."
+/>
 
 <InteractiveSection
   title="Sx, Sy, Sz against (ħ/2)X, (ħ/2)Y, (ħ/2)Z, entry by entry"
@@ -204,3 +216,8 @@ the abstract angular-momentum algebra, realized at $j=\tfrac12$.
 Next: [The Stern-Gerlach Experiment](/lessons/quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment), the historical experiment that
 first revealed spin quantization directly, simulated here using this
 platform's existing rotation and measurement machinery.
+
+The [Bloch sphere simulator](/simulators#bloch-sphere) is worth revisiting
+now that its point has a physical meaning: every rotation you apply there
+is a real spin-$\tfrac12$ direction turning in space, not just an abstract
+qubit state.

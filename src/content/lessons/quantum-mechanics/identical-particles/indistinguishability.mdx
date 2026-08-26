@@ -101,12 +101,13 @@ Given two single-particle states $|a\rangle,|b\rangle$ (built as
 ordinary vectors in some orbital basis), the plain product
 $|a\rangle\otimes|b\rangle$ (particle 1 in $a$, particle 2 in $b$) is
 *not*, in general, an eigenstate of $P_{12}$ at all. Exchanging gives
-$|b\rangle\otimes|a\rangle$, a genuinely different vector whenever
-$a\neq b$. This platform's `exchangeParticles` function performs exactly
-this swap on a combined amplitude vector, confirmed directly: applying
-it to a plain tensor product does *not* return the same vector (nor its
-negative), while applying it to `symmetrize(a,b)` or `antisymmetrize(a,b)`
-does, with eigenvalue $+1$ and $-1$ respectively (verified next lesson).
+$|b\rangle\otimes|a\rangle$, a different vector whenever $a\neq b$, and
+an eigenstate has to come back as a multiple of itself, not as something
+else entirely. This platform's `exchangeParticles` function performs
+this swap on a combined amplitude vector: applying it to a plain tensor
+product does not return the same vector (nor its negative), while
+applying it to `symmetrize(a,b)` or `antisymmetrize(a,b)` does, with
+eigenvalue $+1$ and $-1$ respectively (built next lesson).
 
 ## Physical Interpretation
 
@@ -116,6 +117,17 @@ meaningful description of two identical particles. Only the symmetric
 or antisymmetric *combination* is. This is the mathematical content of
 "you cannot track which particle is which": the state itself refuses to
 single one out.
+
+<PredictBeforeReveal
+  question="Apply the exchange operator P₁₂ to the product state |0⟩⊗|1⟩ (particle 1 in state 0, particle 2 in state 1). What comes back?"
+  options={[
+    { label: "The same vector, |0⟩⊗|1⟩", value: "same" },
+    { label: "Its negative, −|0⟩⊗|1⟩", value: "negative" },
+    { label: "A different vector, |1⟩⊗|0⟩", value: "different" },
+  ]}
+  correctValue="different"
+  explanation="P₁₂ relabels which particle sits in which state, so it hands back |1⟩⊗|0⟩ — not a multiple of the original vector at all. An eigenstate has to return as itself times some number; this doesn't, which is exactly why a bare product state can't describe two identical particles."
+/>
 
 ## Worked Example
 
@@ -174,7 +186,7 @@ special property that must be built in explicitly (next lesson).
 ## Summary
 
 - Quantum indistinguishability means no measurable prediction can depend
-  on which identical particle is "labeled" which, a genuinely stronger
+  on which identical particle is "labeled" which, a far stronger
   statement than classical indistinguishability.
 - The exchange operator $P_{12}$ satisfies $P_{12}^2=I$, forcing its
   eigenvalues to be exactly $+1$ or $-1$.

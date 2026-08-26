@@ -78,12 +78,12 @@ earlier lessons used, to show it working together as one coherent
 analysis rather than as eleven separate ideas.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a real superconducting quantum computer, photographed at IBM's Thomas J. Watson Research Center"
+  src="https://upload.wikimedia.org/wikipedia/commons/b/b9/IBM_Q_system_%2827274387309%29.jpg"
+  alt="IBM's 20-qubit quantum computing hardware, photographed at an IBM Q facility"
   caption="A real quantum computer. Every quantity this capstone computes by hand — concurrence, entropy, a CHSH value — is exactly what hardware like this measures on an actual physical qubit pair."
-  credit="OJB Quantum (Onri Jay Benally)"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
+  credit="IBM (photo: Connie Zhou)"
+  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_system_(27274387309).jpg"
+  license="Public domain"
 />
 
 ## The state
@@ -133,7 +133,7 @@ $\text{Tr}(\rho_A^2)=0.58$, matching `purity(reducedA)` exactly.
 
 ### Mixing in noise: which tools still apply
 
-Build a genuinely mixed global state,
+Build a global state that's actually mixed,
 $\rho_{\text{noisy}}=0.8\,\rho_\psi+0.2\,(I/4)$, and ask what can still
 be computed. `purity(reducedA)` and `vonNeumannEntropy` on the *reduced*
 state still work: reduced states are always $2\times2$ for a 2-qubit
@@ -147,8 +147,8 @@ there).
 
 But `entanglementEntropy` and `concurrenceOfPureState` **cannot** be
 called on $\rho_{\text{noisy}}$ at all: both require a `StateVector`
-argument, and $\rho_{\text{noisy}}$, being genuinely mixed, has no state
-vector to pass them. This is exactly Lesson 7's warning, not a new
+argument, and $\rho_{\text{noisy}}$, being a true mixture, has no state
+vector to pass them. This is Lesson 7's warning again, not a new
 restriction: reduced entropy stops being a valid entanglement measure
 once the global state is mixed, so the type signature itself refuses to
 let you compute the wrong thing here.
@@ -168,16 +168,34 @@ another honest, engine-enforced boundary, not a bug.
 
 ### A partial CHSH violation
 
+$C\approx0.92$ says this state is strongly entangled but not maximally
+so. Before running the numbers, predict what that means for a CHSH
+test.
+
+<PredictBeforeReveal
+  question="Using the Lesson 11 angle configuration derived for the maximally entangled |Φ+⟩ (C=1), what will S come out to for this state (C≈0.92)?"
+  options={[
+    { label: "No violation — S stays at or below 2", value: "none" },
+    { label: "A real but small violation, just above 2", value: "small" },
+    { label: "The full Tsirelson bound, S=2√2≈2.83", value: "full" },
+  ]}
+  correctValue="small"
+  explanation="chshValue gives S≈2.0623 for this state at the Lesson-11 angles: a real violation of the classical bound, but only barely — nowhere near 2√2. That tracks C≈0.92: strongly entangled, but the Lesson-11 angles were optimized for a Bell state (C=1), not this one, so both the entanglement itself and the angle choice leave something on the table."
+/>
+
 Using the standard angle configuration from Lesson 11
 ($\theta_a=0,\theta_{a'}=\pi/2,\theta_b=\pi/4,\theta_{b'}=-\pi/4$),
 derived specifically for $|\Phi^+\rangle$ and not this state,
 `chshValue` gives $S\approx2.0623$ for $|\psi\rangle$: still above the
 classical bound of 2, but only barely, nowhere near $2\sqrt2$. A
 numerical search over $B,B'$ (holding $A,A'$ fixed) finds this state can
-reach at best $|S|\approx2.20$, a real, genuine violation, consistent
-with $C\approx0.92$ indicating strong-but-not-maximal entanglement, and
-well short of $2\sqrt2$, consistent with this state not being a Bell
-state.
+reach at best $|S|\approx2.20$, a real violation, consistent with
+$C\approx0.92$ indicating strong-but-not-maximal entanglement, and well
+short of $2\sqrt2$, consistent with this state not being a Bell state.
+(The full [CHSH simulator](/simulators#chsh-bell-test) lets you search
+over all four angles by hand, on a Bell state instead of this one, if
+you want to see the Lesson-11 configuration recovered as the optimum
+there.)
 
 Four independently-built tools, one consistent picture: each bar below
 is shown as a fraction of its own maximum, so a taller bar means "more

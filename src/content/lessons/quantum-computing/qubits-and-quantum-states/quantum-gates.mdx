@@ -153,6 +153,18 @@ pairs.
 
 ## Interactive Experiment
 
+<PredictBeforeReveal
+  question="Apply H to |1⟩ using the matrix above. Which Bloch point does the result land on?"
+  options={[
+    { label: "The north pole, |0⟩", value: "north" },
+    { label: "The south pole, |1⟩", value: "south" },
+    { label: "The +x point on the equator, |+⟩", value: "plusx" },
+    { label: "The −x point on the equator, |−⟩", value: "minusx" },
+  ]}
+  correctValue="minusx"
+  explanation="H|1⟩ = (1/√2)[[1,1],[1,-1]]·[0,1]ᵀ = (1/√2)[1,-1]ᵀ = (1/√2)(|0⟩−|1⟩) = |−⟩, the equatorial point diametrically opposite |+⟩. It's easy to guess |+⟩ by pattern-matching to H|0⟩=|+⟩, but the minus sign on the second row of H flips the sign of |1⟩'s contribution, landing on the opposite side of the equator instead."
+/>
+
 <InteractiveSection title="Survey the gates, then compose two" description="Starting from |0⟩, apply each gate one at a time (resetting to |0⟩ between each) and watch where the vector lands. Then try composing two gates without resetting, e.g. H then S then H, and predict the final position before you click, using the matrices above.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>

@@ -117,9 +117,20 @@ $$
 From $a_0b_1=0$: either $a_0=0$ or $b_1=0$. If $a_0=0$, then
 $a_0b_0=0\neq\frac{1}{\sqrt2}$, a contradiction. If $b_1=0$, then
 $a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction. Either way, no
-choice of $a_0,a_1,b_0,b_1$ works. This state genuinely cannot be
+choice of $a_0,a_1,b_0,b_1$ works: this state simply cannot be
 factored. A fully worked version of exactly this proof, for this exact
 state, is the centerpiece of the next lesson.
+
+<PredictBeforeReveal
+  question="Before running the coefficient-matching argument: does (|00⟩+|11⟩)/√2 factor as some |a⟩⊗|b⟩?"
+  options={[
+    { label: "Yes, it's just |+⟩⊗|+⟩ written differently", value: "yes-plus" },
+    { label: "Yes, for some other choice of |a⟩ and |b⟩", value: "yes-other" },
+    { label: "No, no choice of |a⟩, |b⟩ works", value: "no" },
+  ]}
+  correctValue="no"
+  explanation="Matching coefficients against a0b0=1/√2, a0b1=0, a1b0=0, a1b1=1/√2 forces a contradiction no matter what you try: a0b1=0 needs a0=0 or b1=0, and either choice immediately zeroes out one of the two nonzero terms. There is no product state that reproduces this amplitude pattern — this is one of the states the parameter-counting argument above predicted must exist."
+/>
 
 <QuantumStateDisplay state={bellNumerator} label="Cannot be factored as |a⟩ ⊗ |b⟩" />
 
@@ -135,7 +146,7 @@ could describe qubit A's state completely on its own, hand it to someone
 else, and lose no information. An entangled state has no such
 description: asking "what is qubit A's state, by itself?" has no good
 answer, only the pair together has a well-defined state. This isn't a
-limitation of notation. It reflects something genuinely different about
+limitation of notation. It reflects a real difference in
 how the system behaves, with consequences (starting next lesson) for what
 happens when you measure just one of the two qubits.
 
@@ -169,7 +180,7 @@ $|+\rangle$.
 ## Common Mistakes
 
 <Callout type="mistake">
-**Assuming every multi-qubit state is "really" two separate qubits."**
+**Assuming every multi-qubit state is "really" two separate qubits.**
 The parameter-counting argument above shows this is false for a whole
 $2$-real-parameter family of 2-qubit states, and the gap only grows for
 more qubits.

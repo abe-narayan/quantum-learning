@@ -377,7 +377,20 @@ already trusted for this channel and state.
 For non-uniqueness, mix the Kraus operators with the Hadamard-like
 environment rotation $W=\frac1{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}$:
 $K_0'=(K_0+K_1)/\sqrt2$, $K_1'=(K_0-K_1)/\sqrt2$. These are visibly
-*different* matrices from $K_0,K_1$, yet
+*different* matrices from $K_0,K_1$.
+
+<PredictBeforeReveal
+  question="K0' and K1' above are built from a Hadamard-style mix of the original K0 and K1 — visibly different matrices. Does swapping this rotated pair into the Kraus sum change the physical channel, i.e. the actual output state Σ K_i' ρ K_i'†?"
+  options={[
+    { label: "Yes — different Kraus operators always mean a different physical process", value: "yes" },
+    { label: "No — it's the exact same channel, just read out through a rotated environment basis", value: "no" },
+    { label: "It depends on whether the input state rho is pure or mixed", value: "depends" },
+  ]}
+  correctValue="no"
+  explanation="The two Kraus sets produce identical output, verified numerically just below. Tr_E is basis-independent: rotating the orthonormal basis used to label the environment's outcomes can't change what's left after tracing it out. This is the entire content of Kraus non-uniqueness — it's the same physical unitary U and the same physical environment, just relabeled."
+/>
+
+Yet
 $K_0'\rho K_0'^\dagger+K_1'\rho K_1'^\dagger$ reproduces the identical
 $\begin{pmatrix}0.65&0.418330\\0.418330&0.35\end{pmatrix}$ — the same
 physical channel, read out through a rotated environment basis.

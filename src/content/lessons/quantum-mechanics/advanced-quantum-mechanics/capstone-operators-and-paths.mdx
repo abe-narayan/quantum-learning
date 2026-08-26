@@ -65,10 +65,11 @@ export const lessonMeta = {
 This course deliberately avoided re-deriving density matrices,
 entanglement, or Bell inequalities. Entanglement, Mixed States & Bell
 Tests already built that foundation thoroughly. What this course added
-were two genuinely new directions: open-system evolution (going beyond
+were two new directions instead: open-system evolution (going beyond
 unitary dynamics) and an entirely different formulation of quantum
 mechanics itself (the path integral). This capstone connects both back
-to the bigger picture.
+to the bigger picture, and says plainly where the course's honesty about
+open questions leaves us.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f4/Solvay_conference_1927_restored.jpg"
@@ -92,9 +93,20 @@ before. It's a strict extension, verified directly (trace-preservation
 condition) rather than assumed.
 
 Both decoherence channels this course built started from the very same
-$|+\rangle$ state, yet drive it toward genuinely different long-run
+$|+\rangle$ state, yet drive it toward completely different long-run
 fates. Watch what each one does to the SAME starting state as the
 coupling strength $\eta$ (used as both channel's parameter) changes:
+
+<PredictBeforeReveal
+  question="Apply amplitude damping to |+⟩ many, many times. What happens to its purity in the long run?"
+  options={[
+    { label: "It settles at 0.5, like dephasing does", value: "half" },
+    { label: "It climbs back up toward 1", value: "one" },
+    { label: "It drops toward 0", value: "zero" },
+  ]}
+  correctValue="one"
+  explanation="Purity climbs back to 1. Amplitude damping doesn't just scramble phase, it drains population toward |0⟩, a specific pure state. Once the qubit is (almost) entirely in |0⟩, it's (almost) pure again. Dephasing, with no preferred population target, gets stuck at the maximally mixed 0.5 instead. Same Kraus-operator machinery, opposite long-run purity behavior."
+/>
 
 <InteractiveSection
   title="Slide η, watch the two fates diverge"
@@ -107,34 +119,35 @@ coupling strength $\eta$ (used as both channel's parameter) changes:
   />
 </InteractiveSection>
 
-Dephasing destroys phase only, so the state it settles into is a genuine
+Dephasing destroys phase only, so the state it settles into is a true
 statistical mixture (purity 0.5, exactly the maximally mixed state).
 Amplitude damping destroys phase AND drains population toward a specific
-pure state, so purity actually recovers to 1 in the long run, a real
-structural difference between the two channels, not just two examples of
-"decoherence" with the same eventual behavior.
+pure state, so purity actually recovers to 1 in the long run. That's a
+real structural difference between the two channels, not just two
+examples of "decoherence" with the same eventual behavior.
 
 ### From operators to paths
 
-The path integral is a genuinely different formulation, not an extension
-in the same sense. It computes the same physical predictions (transition
-amplitudes) via a completely different mathematical object (a sum over
-histories, rather than an operator acting on a state). This course
-verified their consistency in one specific, tractable case (the free
-particle, Euclidean time) via the Chapman-Kolmogorov composition law,
-rather than asserting the equivalence in general.
+The path integral is a different formulation altogether, not an
+extension in the same sense as Kraus operators are. It computes the
+same physical predictions (transition amplitudes) via a completely
+different mathematical object: a sum over histories, rather than an
+operator acting on a state. This course verified their consistency in
+one specific, tractable case (the free particle, Euclidean time) via
+the Chapman-Kolmogorov composition law, rather than asserting the
+equivalence in general.
 
 ### What decoherence resolves, and what it doesn't
 
-Stated plainly, one more time, because it's easy to blur: decoherence
-(this course's Kraus-channel demonstration) explains why *coherent
-superpositions* don't survive contact with an environment, a real,
-checkable, and important physical fact. It does *not*, by itself, explain
-why a measurement yields one *definite* outcome rather than a
-probabilistic mixture of possibilities. That remains a genuinely open
-question in the foundations of quantum mechanics (interpretations like
-Copenhagen, many-worlds, or objective collapse models each answer it
-differently, and this course takes no position on which is correct).
+Stated plainly, one more time, because the two get blurred so often:
+decoherence (this course's Kraus-channel demonstration) explains why
+*coherent superpositions* don't survive contact with an environment, a
+real, checkable, and important physical fact. It does *not*, by itself,
+explain why a measurement yields one *definite* outcome rather than a
+probabilistic mixture of possibilities. That remains an open question in
+the foundations of quantum mechanics: interpretations like Copenhagen,
+many-worlds, or objective collapse models each answer it differently,
+and this course takes no position on which is correct.
 
 ## Where This Goes Next
 
@@ -186,9 +199,9 @@ fundamental" than the other.
 
 - This course extended (not repeated) Entanglement, Mixed States & Bell
   Tests: open quantum systems via Kraus operators, a numerical
-  demonstration of decoherence, and Feynman's path integral as a genuinely
-  different formulation, verified consistent with the operator picture in
-  one tractable case.
+  demonstration of decoherence, and Feynman's path integral as a
+  fundamentally different formulation, verified consistent with the
+  operator picture in one tractable case.
 - Decoherence explains coherence loss into an environment; it does not
   resolve which single outcome is observed upon measurement, an honest,
   explicitly-stated open question.

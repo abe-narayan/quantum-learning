@@ -128,6 +128,18 @@ the same $[[3,1,3]]$ bit-flip code this lesson's parameters describe.
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 
+<PredictBeforeReveal
+  question="An X error hits two qubits at once, qubit 0 and qubit 1. The code is only rated to correct one-qubit errors. What happens when you run the standard recovery procedure on it anyway?"
+  options={[
+    { label: "It correctly recovers the original state anyway", value: "recovers" },
+    { label: "It detects the problem and leaves the state alone", value: "leaves" },
+    { label: "It applies the wrong fix and turns two errors into a full logical bit flip", value: "worsens" },
+    { label: "The syndrome comes out (0,0), so nothing happens at all", value: "silent" },
+  ]}
+  correctValue="worsens"
+  explanation="The syndrome for X0X1 is (0,1), which the decode table reads as a single X error on qubit 2, a qubit the actual error never touched. Applying the prescribed fix, X on qubit 2, doesn't undo anything: it adds a third error on top of the two already there, and X0X1X2 is exactly the undetectable weight-3 error that swaps the logical alpha and beta outright. A distance-3 code doesn't just fail to help above its rated weight, it can actively convert a survivable-looking situation into a full logical error, worked out below."
+/>
+
 ## Worked Example
 
 **Confirm the bit-flip code's distance is exactly 3, not less, by
@@ -149,8 +161,8 @@ $0.6,0.8$ encoding, hit by $X_0X_1$ and "recovered," comes out as
 $0.8,0.6$, swapped). Only the weight-3 error $X_0X_1X_2$ on its own,
 with no recovery attempted, is truly undetectable at the syndrome stage
 ($Z_0Z_1$: both flip, parity preserved; $Z_1Z_2$: both flip, parity
-preserved) while still swapping $\alpha\leftrightarrow\beta$, the
-genuinely undetectable case confirming $d=3$.
+preserved) while still swapping $\alpha\leftrightarrow\beta$: an error
+that leaves no trace in the syndrome at all, confirming $d=3$.
 
 ## Common Mistakes
 

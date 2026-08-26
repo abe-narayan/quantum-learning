@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/central-potentials"
@@ -37,17 +38,31 @@ $R(r)Y_l^m(\theta,\varphi)$ with the angular part already fully solved.
 This lesson proves *why* that separation is valid at all: the answer is a
 commutator, not a coincidence.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/e/e5/Noether.jpg"
+  alt="A portrait photograph of mathematician Emmy Noether, taken around 1900"
+  caption="Emmy Noether, whose 1918 theorem ties every continuous symmetry to a conserved quantity: a rotationally symmetric potential conserves angular momentum classically, and forces [H,L²]=[H,Lz]=0 quantum mechanically, the operator-language version of the same fact proved below."
+  credit="Unknown photographer, c. 1900–1910, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Noether.jpg"
+  license="Public domain"
+/>
+
 ## Intuition
 
-A potential that only cares about distance from the origin, never
-direction, can't tell the difference between "before" and "after" you
-rotate the whole system around it. Rotating the electron's position
-doesn't change how far it is from the proton, so it can't change its
-potential energy either. That's the entire argument in one sentence:
-rotating everything is a symmetry of $V(r)$, and whenever some operation
-is a symmetry of the Hamiltonian, the operator that *generates* that
-operation, here, angular momentum, has to commute with $H$. Nothing more
-exotic than that is needed.
+A planet orbiting the sun sweeps out equal areas in equal times, Kepler's
+second law, and the textbook reason is that gravity, like the Coulomb
+force, pulls straight along the line connecting the two bodies: a force
+with no sideways component exerts no torque, so classical angular
+momentum $\vec L=\vec r\times\vec p$ never changes. The quantum argument
+below is the same idea in operator language. A potential that only cares
+about distance from the origin, never direction, can't tell the
+difference between "before" and "after" you rotate the whole system
+around it. Rotating the electron's position doesn't change how far it is
+from the proton, so it can't change its potential energy either. That's
+the entire argument in one sentence: rotating everything is a symmetry
+of $V(r)$, and whenever some operation is a symmetry of the Hamiltonian,
+the operator that *generates* that operation, here, angular momentum,
+has to commute with $H$. Nothing more exotic than that is needed.
 
 ## Mathematical Development
 
@@ -85,6 +100,17 @@ already fully derived and verified there, with zero new angular
 calculation needed here. This is exactly why the shapes below are the
 *only* angular shapes any central potential's energy eigenstates can
 ever take, regardless of $V(r)$'s specific radial form:
+
+<PredictBeforeReveal
+  question="Swap hydrogen's Coulomb potential for a 3D harmonic oscillator's V(r)=½mω²r², keeping the same (l, m). Does the angular shape |Y_l^m|² plotted below change?"
+  options={[
+    { label: "Yes — a different V(r) gives a different angular shape", value: "changes" },
+    { label: "No — the angular shape depends only on (l, m), never on V(r)", value: "same" },
+    { label: "Only the l=0 shape stays the same; l>0 shapes change", value: "l0-only" },
+  ]}
+  correctValue="same"
+  explanation="The commutators proved above, [H,L²]=[H,Lz]=0, never used the specific form of V(r), only that it depends on r alone. Swap in any other central potential and the same argument goes through unchanged, so the angular factor is still forced to be exactly one of these Y_l^m shapes. Only the radial factor R(r), not plotted here, would differ between hydrogen and an oscillator."
+/>
 
 <OrbitalShapePlot ariaLabel="Angular shape |Y_l^m|^2 for each (l, m), the only angular forms any central potential's eigenstates can take" />
 

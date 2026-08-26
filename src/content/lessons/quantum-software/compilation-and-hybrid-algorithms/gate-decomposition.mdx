@@ -68,9 +68,9 @@ H = R_y(\pi/2)\,R_z(\pi), \qquad X = R_z(\pi)\,R_y(\pi)
 $$
 
 The first three are trivial (a single native rotation each); $H$ and
-$X$ genuinely need a composition of two native gates, real,
-non-obvious identities, each confirmed to machine precision
-($\text{maxDiff}<10^{-15}$) rather than simply asserted. Drawn as an
+$X$ need a composition of two native gates — non-obvious identities,
+each confirmed to machine precision ($\text{maxDiff}<10^{-15}$) rather
+than simply asserted. Drawn as an
 actual circuit (application order, left to right, which reads opposite
 to the matrix product above, since the matrix product $H=R_y(\pi/2)R_z(\pi)$
 applies $R_z$ first, so it's drawn first here), the two-rotation
@@ -108,10 +108,10 @@ not just the two multi-rotation ones drawn above:
     { label: "Zero; H is already native", value: "zero" },
   ]}
   correctValue="two-vs-one"
-  explanation="Z=Rz(π) is already a single native rotation, but H=Ry(π/2)Rz(π) genuinely needs two, a real, non-obvious difference in compiled cost between two gates that look equally 'basic' in circuit notation. Step through the five gates below and watch Z, S, T stay a single RZ box while H and X expand to two."
+  explanation="Z=Rz(π) is already a single native rotation, but H=Ry(π/2)Rz(π) needs two — a non-obvious difference in compiled cost between two gates that look equally 'basic' in circuit notation. Step through the five gates below and watch Z, S, T stay a single RZ box while H and X expand to two."
 />
 
-<InteractiveSection title="Step through all five decompositions" description="Slide across Z, S, T, H, and X. Notice the first three are a single Rz box (theta = pi, pi/2, pi/4 respectively); H and X are genuinely the two-rotation sequences drawn above. Every angle here is exactly the value this lesson already stated, just rendered as an actual circuit instead of a formula.">
+<InteractiveSection title="Step through all five decompositions" description="Slide across Z, S, T, H, and X. Notice the first three are a single Rz box (theta = pi, pi/2, pi/4 respectively); H and X are the two-rotation sequences drawn above. Every angle here is exactly the value this lesson already stated, just rendered as an actual circuit instead of a formula.">
   <CircuitDiagramExplorer
     sliderLabel="Gate"
     frames={[
@@ -206,7 +206,7 @@ gives population 1 in $|1\rangle$, exactly matching $X|0\rangle=|1\rangle$.
 decomposition.** This is too strict, and physically wrong. Global
 phase is unobservable, so a decomposition that's correct up to phase IS
 a correct decomposition, and demanding exact equality would incorrectly
-reject genuinely valid ones.
+reject valid ones.
 </Callout>
 
 <Callout type="mistake">

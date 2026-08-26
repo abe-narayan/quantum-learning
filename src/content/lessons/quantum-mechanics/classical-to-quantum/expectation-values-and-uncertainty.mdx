@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { UncertaintyEllipse } from "@/components/visualizations/UncertaintyEllipse";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { StateVector } from "@/lib/quantum/state";
 import { PAULI_X, PAULI_Y } from "@/lib/quantum/gates";
 import { uncertainty, commutatorExpectation } from "@/lib/quantum/observables";
@@ -64,13 +65,21 @@ export const lessonMeta = {
 
 ## Motivation
 
-The Postulates lesson stated that a state generally doesn't give a
-definite value for an observable, only a probability distribution over
-outcomes. That distribution has a spread, and this lesson makes "how
-much spread" precise, then derives exactly when two different observables
-are forced to have a *trade-off* in their spreads: the uncertainty
-principle, as a genuine theorem rather than a slogan about disturbing
-what you measure.
+Heisenberg's original 1927 argument for $\Delta x\,\Delta p\ge\hbar/2$
+used a thought experiment: a gamma-ray microscope that necessarily kicks
+a particle's momentum around when you use short enough wavelengths to
+pin down its position precisely. It's a vivid picture, and it's also not
+a proof. It says nothing about why a similar bound should hold for other
+pairs of observables, or where the factor of $\tfrac12$ actually comes
+from.
+
+The Postulates lesson already established the piece this lesson needs:
+a state generally doesn't give one definite value for an observable,
+only a probability distribution over outcomes, and that distribution has
+a spread. This lesson makes "how much spread" precise, then derives
+exactly when two different observables are forced into a *trade-off*
+between their spreads, arriving at the uncertainty principle as an actual
+theorem rather than a story about disturbing what you measure.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Bundesarchiv_Bild183-R57262%2C_Werner_Heisenberg_crop.jpg"
@@ -214,6 +223,17 @@ $\Delta X\,\Delta Y = 1 \ge 1$: the bound is **exactly saturated**, not
 merely satisfied. (This is expected: $|0\rangle$ is a special "minimum
 uncertainty" state for this pair, not a coincidence of the numbers
 chosen.)
+
+<PredictBeforeReveal
+  question="As θ increases from 0° toward 45° (moving |ψ⟩ from |0⟩ toward |+⟩), what happens to the product ΔX·ΔY?"
+  options={[
+    { label: "It stays fixed at 1, same as at θ = 0°", value: "fixed" },
+    { label: "It increases past 1", value: "increases" },
+    { label: "It drops all the way to 0", value: "zero" },
+  ]}
+  correctValue="zero"
+  explanation="At θ = 45°, |ψ⟩ = |+⟩ is an eigenstate of X, so ΔX = 0 exactly, killing the product regardless of ΔY. The bound ½|⟨[X,Y]⟩| drops to 0 right alongside it — the trade-off vanishes for this particular state, it doesn't just get small."
+/>
 
 <InteractiveSection title="Slide θ, watch the bound track the product exactly" description="|ψ(θ)⟩ = cos θ|0⟩ + sin θ|1⟩ generalizes |0⟩ (θ = 0°, the worked example) to |+⟩ (θ = 45°, practice question 2). Both ΔX·ΔY and the bound ½|⟨[X,Y]⟩| are recomputed live by the platform's real expectation-value and commutator functions, not typed in by hand — watch them stay equal all the way from θ = 0° to 90°, including the θ = 45° point where both sides drop to exactly 0.">
   <BarChartExplorer

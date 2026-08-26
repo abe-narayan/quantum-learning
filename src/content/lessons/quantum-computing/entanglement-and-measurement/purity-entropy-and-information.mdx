@@ -168,7 +168,19 @@ rises, across the entire family.
 Here is the subtlety the definition's phrasing was built to avoid.
 Consider $\rho_1=\text{diag}(0.9,0.1)$ (a classical 90/10 mixture) versus
 $\rho_2=\begin{pmatrix}0.9&0.3\\0.3&0.1\end{pmatrix}$: same diagonal
-entries, different off-diagonal term. $\rho_1$'s eigenvalues are just its
+entries, different off-diagonal term.
+
+<PredictBeforeReveal
+  question="ρ₁=diag(0.9,0.1) and ρ₂ (same diagonal, off-diagonal entries ±0.3) have identical P(0)=0.9, P(1)=0.1 in the computational basis. Do they have the same von Neumann entropy?"
+  options={[
+    { label: "Yes — entropy only depends on the diagonal", value: "same" },
+    { label: "No — ρ₂'s off-diagonal term changes its eigenvalues", value: "different" },
+  ]}
+  correctValue="different"
+  explanation="ρ₂'s eigenvalues, from the quadratic formula with a=0.9, d=0.1, z=0.3, come out to exactly 1 and 0: ρ₂ is secretly a pure state, so S(ρ₂)=0, while S(ρ₁)≈0.469 bits — worked out in full just below. Identical diagonals, completely different entropy: entropy is a property of the eigenvalues, never a shortcut through the diagonal."
+/>
+
+$\rho_1$'s eigenvalues are just its
 diagonal entries, $0.9$ and $0.1$, giving $S(\rho_1)\approx0.469$ bits.
 But $\rho_2$'s eigenvalues (via the quadratic formula, with
 $a=0.9,d=0.1,z=0.3$) come out to exactly $1$ and $0$: $\rho_2$ is

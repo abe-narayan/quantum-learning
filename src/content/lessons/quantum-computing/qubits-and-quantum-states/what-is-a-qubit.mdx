@@ -27,16 +27,19 @@ export const lessonMeta = {
 
 ## Motivation
 
-A classical bit is always either 0 or 1. Every computer you've ever used
-(your laptop, your phone) is built entirely out of bits in one of these two
-states. It's a simple, robust idea, and it's wrong for describing how nature
-actually behaves at the scale of electrons and photons.
+Right now, every bit in your phone or laptop has a definite value. Nobody
+needs to check it for that to be true: it's 0, or it's 1, sitting there
+waiting, whether or not anything ever reads it. That assumption is so basic
+to how we think about information that it's easy to forget it's an
+assumption at all.
 
-When physicists tried to describe systems like a single electron's spin or a
-photon's polarization, they found something a classical bit can't capture:
-the system can be in a combination of "0" and "1" at once, in a precise
-mathematical sense, not just "we don't know which one it is yet." A qubit is
-the unit of information built to describe this.
+Shrink the question down to a single electron and the assumption breaks.
+Physicists studying things like an electron's spin or a photon's
+polarization found that these systems don't have a definite value sitting
+in reserve before you measure them. Instead they can be in an actual
+combination of "0" and "1" at once, a precise mathematical fact about the
+system rather than a polite way of saying "we don't know which one it is
+yet." A qubit is the unit of information built to describe exactly that.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
@@ -50,13 +53,14 @@ the unit of information built to describe this.
 ## Intuition
 
 A useful (if imperfect) way to start: imagine a coin that hasn't landed yet.
-While it's spinning in the air, it isn't heads, and it isn't tails. It's
-genuinely in a mixture of both possibilities. A qubit's superposition is
-similar in spirit, but stronger: it's not a coin whose outcome is merely
-*unknown*, it's a system whose state is a real, mathematical combination of
-$|0\rangle$ and $|1\rangle$, and that combination has consequences you can
-measure, like interference between the two possibilities, that a "maybe
-heads, maybe tails" coin could never produce.
+While it's spinning in the air, it isn't heads, and it isn't tails. It's in
+a mixture of both possibilities. A qubit's superposition is similar in
+spirit, but stronger. A spinning coin's outcome is merely *unknown*: it
+will turn out to have been heads or tails all along, once it lands. A
+qubit's superposition is a system whose state really is a mathematical
+combination of $|0\rangle$ and $|1\rangle$, and that combination has
+consequences you can measure, like interference between the two
+possibilities, that a "maybe heads, maybe tails" coin could never produce.
 
 <Callout type="note">
 Superposition is not classical uncertainty. A classical bit you haven't
@@ -127,7 +131,7 @@ $|1\rangle$, and every other point is some superposition of the two.
     { label: "100%", value: "100" },
   ]}
   correctValue="50"
-  explanation="A Hadamard gate takes |0⟩ to the equal superposition (1/√2)|0⟩ + (1/√2)|1⟩. By the Born rule, P(1) = |1/√2|² = 1/2, so measurement reads |1⟩ on about half of your attempts and |0⟩ on the other half — never something in between, even though the state itself was a genuine mix of both before you measured."
+  explanation="A Hadamard gate takes |0⟩ to the equal superposition (1/√2)|0⟩ + (1/√2)|1⟩. By the Born rule, P(1) = |1/√2|² = 1/2, so measurement reads |1⟩ on about half of your attempts and |0⟩ on the other half, never something in between, even though before you measured, the state was a genuine combination of both."
 />
 
 <InteractiveSection title="Apply a gate, then measure" description="Try it yourself: apply a gate below and watch α, β, and the measurement probabilities update as the vector moves. Then hit Measure a few times from the same state and notice the outcomes are random, but always land on 0 or 1 with exactly the probabilities shown.">

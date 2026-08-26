@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { hydrogenEnergyLevel } from "@/lib/quantum/hydrogenAtom";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels"
@@ -137,6 +138,17 @@ levels crowd together approaching the ionization threshold, exactly the
 "Rydberg series" pattern seen in hydrogen's real emission spectrum.
 `hydrogenEnergyLevel(n)` in this platform's engine computes exactly this
 formula and was verified against $E_1=-13.6$, $E_2=-3.4$, $E_4=-0.85$ eV.
+
+<PredictBeforeReveal
+  question="Levels crowd together as n grows, approaching the ionization threshold. Given that, is the photon energy released falling from n=3 to n=2 bigger or smaller than the energy released falling from n=2 to n=1?"
+  options={[
+    { label: "Bigger: the 3→2 drop releases more energy", value: "bigger" },
+    { label: "Smaller: the 3→2 drop releases less energy", value: "smaller" },
+    { label: "The same: every consecutive-n drop releases equal energy", value: "same" },
+  ]}
+  correctValue="smaller"
+  explanation="Smaller. The worked example below gives E(3→2) ≈ 1.89 eV, while E(2→1) = E_2 − E_1 = −3.40 − (−13.6) = 10.2 eV, over five times larger. Levels crowd together at high n exactly because each successive gap shrinks, which is why the visible Balmer lines (all landing on n=2) get closer together toward shorter wavelengths, while the Lyman series (landing on n=1) is spread out much further in energy."
+/>
 
 ## Worked Example
 

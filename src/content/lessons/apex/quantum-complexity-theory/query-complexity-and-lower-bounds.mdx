@@ -310,6 +310,17 @@ why this platform's complexity-theory lessons draw such a sharp,
 recurring line between "proven" and "believed" — this is what the
 "proven" side of that line looks like at its strongest.
 
+<PredictBeforeReveal
+  question="For N=16, the adversary-method computation above gives ADV(OR₁₆) = √16 = 4 by hand. Before this platform's own real optimalGroverIterations(4) engine is called below, predict how the actual optimal number of Grover queries for N=16 will compare to that 4."
+  options={[
+    { label: "Exactly 4 — matches the hand-computed bound exactly", value: "exact" },
+    { label: "Below 4 — the theorem only guarantees Ω(ADV(f)), up to a constant", value: "below" },
+    { label: "Above 4 — real circuits need strictly more queries than the bound suggests", value: "above" },
+  ]}
+  correctValue="below"
+  explanation="optimalGroverIterations(4) returns 3, strictly below the raw adversary number 4. This is not a contradiction: the theorem states Q₂(f)=Ω(ADV(f)) — some fixed constant c times ADV(f), not ADV(f) itself. 3 ≥ c·4 holds for any c ≤ 3/4. The adversary bound proves the right order of growth (√N), not the tightest exact constant for one specific N — exactly the distinction the Worked Example below makes concrete."
+/>
+
 ## Worked Example
 
 **For $N=16$ ($n=4$ qubits), compute the adversary bound

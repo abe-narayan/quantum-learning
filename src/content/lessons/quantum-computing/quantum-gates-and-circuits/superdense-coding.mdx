@@ -4,6 +4,7 @@ import { applySingleQubitGate, applyCNOT, HADAMARD, PAULI_X, PAULI_Z } from "@/l
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/superdense-coding"
@@ -43,6 +44,35 @@ export const decodedStates = encodedStates.map(decode);
 
 export const noEntanglementStart = applySingleQubitGate(StateVector.zero(2), HADAMARD, 0);
 export const noEntanglementDecoded = decode(noEntanglementStart);
+
+export const encodeGatesByMessage = {
+  "00": [],
+  "01": [{ gate: "X", targets: [0] }],
+  "10": [{ gate: "Z", targets: [0] }],
+  "11": [{ gate: "Z", targets: [0] }, { gate: "X", targets: [0] }],
+};
+
+export const encodeDescriptionByMessage = {
+  "00": "Alice applies nothing (I)",
+  "01": "Alice applies X",
+  "10": "Alice applies Z",
+  "11": "Alice applies Z, then X",
+};
+
+export const circuitFramesByMessage = superdenseMessages.map((msg) => ({
+  paramLabel: `Message ${msg.label}: ${encodeDescriptionByMessage[msg.label]}`,
+  numQubits: 2,
+  instructions: [
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+    ...encodeGatesByMessage[msg.label],
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "H", targets: [0] },
+    { gate: "MEASURE", targets: [0] },
+    { gate: "MEASURE", targets: [1] },
+  ],
+  ariaLabel: `Superdense coding circuit for message ${msg.label}: H then CNOT prepare the Bell pair, ${encodeDescriptionByMessage[msg.label]} encodes the message on qubit 0, CNOT then H decode, then both qubits are measured`,
+}));
 
 export const superdenseFrames = [
   ...superdenseMessages.map((msg, i) => ({
@@ -129,7 +159,7 @@ real engine:
   <QuantumStateDisplay state={encodedStates[3]} label="11 → Z then X" />
 </div>
 
-All four are genuinely different, mutually orthogonal states (the fourth
+All four are distinct, mutually orthogonal states (the fourth
 carries an overall $-1$ phase, unobservable on its own and irrelevant to
 what follows). Alice now sends Bob her one qubit, qubit 0, over an ordinary
 quantum channel. That's the entire transmission: **one qubit**, regardless
@@ -169,30 +199,21 @@ $100\%$ measurement probability, the global phase again unobservable). Bob
 measures both qubits and reads off exactly the two bits Alice sent, every
 time, with no ambiguity.
 
-Here is the whole protocol as one circuit, concretely for message $11$:
-Bell-pair prep, Alice's $Z$-then-$X$ encoding, Bob's decode, and Bob's two
-measurements, left to right.
+Here is the whole protocol as one circuit. Step through Alice's four
+possible messages below and watch only the middle of the circuit change:
+zero, one, or two gates depending on which two bits she's sending. The
+preparation at the start and Bob's decode at the end never move.
 
-<StaticCircuitDiagram
-  numQubits={2}
-  instructions={[
-    { gate: "H", targets: [0] },
-    { gate: "CNOT", targets: [0, 1] },
-    { gate: "Z", targets: [0] },
-    { gate: "X", targets: [0] },
-    { gate: "CNOT", targets: [0, 1] },
-    { gate: "H", targets: [0] },
-    { gate: "MEASURE", targets: [0] },
-    { gate: "MEASURE", targets: [1] },
-  ]}
-  ariaLabel="The full superdense coding circuit for message 11: H on qubit 0 then CNOT(0,1) to prepare the Bell pair, Z then X on qubit 0 as Alice's encoding, CNOT(0,1) then H on qubit 0 as Bob's decode, then measurement of both qubits"
-/>
+<InteractiveSection title="Step through all four messages" description="Scrub across the four messages Alice can send. The H-then-CNOT preparation (start) and CNOT-then-H decode (end) stay fixed; only the encoding gates in between change, zero gates for 00, growing to two for 11.">
+  <CircuitDiagramExplorer frames={circuitFramesByMessage} sliderLabel="Message" />
+</InteractiveSection>
 
-Columns 1–2 are the $H$-then-$\text{CNOT}$ preparation from the section
-above. Columns 5–6, Bob's decode, are $\text{CNOT}$-then-$H$: literally the
-same two gates as columns 1–2, in the opposite order. That mirror-image
-relationship is exactly why the decode undoes the preparation regardless of
-what Alice's gates (columns 3–4) did to qubit 0 in between.
+The first two gates are the $H$-then-$\text{CNOT}$ preparation from the
+section above. The last two gates before measurement, Bob's decode, are
+$\text{CNOT}$-then-$H$: literally the same two gates as the preparation, in
+the opposite order. That mirror-image relationship is exactly why the
+decode undoes the preparation regardless of how many gates Alice's
+encoding step inserted in between.
 
 ### Why the pair has to actually be entangled
 

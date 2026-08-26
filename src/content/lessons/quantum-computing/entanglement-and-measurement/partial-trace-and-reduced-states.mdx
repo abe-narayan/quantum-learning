@@ -148,7 +148,7 @@ Exactly the individual factors, confirmed directly against
 module's tests. And as a numeric check of the defining requirement
 itself, using $A_{\text{op}}=X$: $\langle{+}0|X\otimes I|{+}0\rangle=1$
 (since $|+\rangle$ is $X$'s $+1$-eigenstate), and $\text{Tr}(\rho_{|+\rangle}X)=1$
-too: both sides of the requirement genuinely agree, not just in the
+too: both sides of the requirement agree, not just in the
 abstract derivation but for this concrete state.
 
 ### An entangled state: something new
@@ -169,7 +169,18 @@ itself, and $\langle00|11\rangle=0$). And directly from $\rho_A(\theta)$:
 $\text{Tr}(\rho_A(\theta)Z)=\cos^2\theta-\sin^2\theta=\cos2\theta$:
 identical, for every $\theta$, exactly as the derivation guarantees.
 
-<InteractiveSection title="Predict the crossing at θ=π/4" description="Before looking, predict: as θ sweeps from 0 to π/2, do the off-diagonal entries of ρ_A(θ) ever become nonzero? The curve below plots only the two diagonal entries, computed by calling the real reducedDensityMatrixQubit0 on the actual entangled state at each θ, not from the closed-form formula directly.">
+<PredictBeforeReveal
+  question="As θ sweeps from 0 to π/2 in |ψ(θ)⟩=cosθ|00⟩+sinθ|11⟩, do the off-diagonal entries of ρ_A(θ) ever become nonzero?"
+  options={[
+    { label: "Yes, they peak somewhere in the middle", value: "peak" },
+    { label: "Yes, but only very close to θ=π/4", value: "near-pi4" },
+    { label: "No, they stay exactly zero for every θ", value: "zero" },
+  ]}
+  correctValue="zero"
+  explanation="ρ_A(θ) is diagonal — exactly diag(cos²θ, sin²θ) — for every θ, not just at special angles. The off-diagonal entry of ρ_AB that would need to survive the partial trace, cosθ sinθ ⟨00|·|11⟩-type cross terms, gets summed over the traced-out qubit's mismatched indices and is excluded by the index sum itself, term by term, no matter how θ is chosen. The plot below, built from the real reducedDensityMatrixQubit0 output rather than the closed-form formula, shows only the two diagonal curves because there is nothing off-diagonal to plot."
+/>
+
+<InteractiveSection title="Diagonal entries crossing at θ=π/4" description="Plotted directly from the real reducedDensityMatrixQubit0 output at each θ, not from the closed-form formula.">
   <ParametricCurve
     frames={[
       {

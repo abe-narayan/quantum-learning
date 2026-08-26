@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { LazyWaveInterference } from "@/components/visualizations/wave-interference/LazyWaveInterference";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability"
@@ -26,11 +27,18 @@ export const lessonMeta = {
 
 ## Motivation
 
+Richard Feynman once called the double-slit experiment "a phenomenon
+which is impossible, absolutely impossible, to explain in any classical
+way, and which has in it the heart of quantum mechanics." That's a bold
+claim for an experiment simple enough to set up with a laser pointer and
+two closely-spaced slits cut in foil. This lesson works through the
+actual numbers behind that claim.
+
 The last lesson defined classical probability precisely: it always
-describes ignorance about one underlying definite fact. This lesson
-presents a real, repeatedly confirmed experiment whose numbers cannot be
-explained that way, no matter how the ignorance is described: the
-double-slit experiment, and interference from it.
+describes ignorance about one underlying definite fact. The double-slit
+pattern is the concrete case where that definition breaks down, not
+through any subtlety in how the ignorance gets described, but in the raw
+measured numbers themselves.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Double_slit_interference.png"
@@ -117,6 +125,17 @@ relative phase. This is exactly the fringe pattern: as position $x$ on the
 screen changes, the relative phase between the two paths changes (their
 path lengths to the two slits differ), sweeping through exactly this
 range.
+
+<PredictBeforeReveal
+  question="At θ = π/2 (a quarter-cycle relative phase, neither in nor out of phase), how should the quantum prediction |ψ1+ψ2|² compare to the classical prediction |ψ1|²+|ψ2|²?"
+  options={[
+    { label: "Quantum is larger (constructive)", value: "larger" },
+    { label: "Quantum is smaller (destructive)", value: "smaller" },
+    { label: "They're exactly equal", value: "equal" },
+  ]}
+  correctValue="equal"
+  explanation="The cross terms ψ1*ψ2+ψ2*ψ1 vanish exactly at a quarter-cycle relative phase, so the quantum and classical predictions coincide there — the θ = π/2 row in the table above, 0.5 either way. That's the one special angle where interference has no net effect on the total, not because it's absent, but because its two contributions cancel."
+/>
 
 <InteractiveSection
   title="What path 1 and path 2 physically look like"

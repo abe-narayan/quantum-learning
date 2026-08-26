@@ -40,13 +40,15 @@ export const lessonMeta = {
 
 ## Motivation
 
-Copying data is the most ordinary operation in classical computing: you
-do it constantly, without thinking about it. It's worth asking directly:
-can a quantum computer copy an unknown qubit's state onto a second,
-blank qubit? The answer is a flat no, and the proof is short enough to
-walk through completely, using nothing more than linearity, a property
+Why can't you just copy a qubit? Copying data is the most ordinary
+operation in classical computing — you do it constantly, without
+thinking about it — so it's a fair question to ask of the quantum case
+directly: can a quantum computer copy an unknown qubit's state onto a
+second, blank qubit? The answer is a flat no, and not because no one has
+found a clever enough circuit yet. It follows from the same linearity
 every quantum gate has been guaranteed to have since the moment you
-learned gates are matrices.
+learned gates are matrices, and the proof is short enough to walk
+through completely, right now.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Wojciech_H._Zurek.gif"
@@ -168,6 +170,15 @@ their half in: a faster-than-light signal. No-cloning isn't a
 restriction on quantum mechanics; it's a requirement for quantum
 mechanics to be a consistent theory at all.
 
+This is also the exact fact that makes quantum key distribution
+(BB84, a few lessons ahead) secure against eavesdropping. If an
+attacker could clone a qubit in transit, they could keep one copy,
+forward the other, and measure their copy at leisure without ever
+touching the qubit that reaches its destination, undetected. Because
+cloning is impossible, an eavesdropper is forced to measure the actual
+qubit, which disturbs it, which is precisely what lets Alice and Bob
+detect the attack.
+
 ## Interactive Experiment
 
 The Common Mistakes section below addresses a specific, tempting
@@ -241,7 +252,9 @@ device correctly copying an *arbitrary, unknown* input.
 - Copying *known* classical states (via CNOT) is unaffected. The theorem
   is specifically about arbitrary, unknown quantum states.
 - No-cloning is required for the theory's consistency, not an incidental
-  restriction.
+  restriction, and it's the reason an eavesdropper on a quantum channel
+  can't clone-and-measure without disturbing the original, the basis for
+  BB84's security.
 
 ## Further Exploration
 

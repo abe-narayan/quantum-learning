@@ -2,6 +2,7 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applyCNOT, applySwap } from "@/lib/quantum/gates";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -39,6 +40,37 @@ export const swapDemo = [0, 1, 2, 3].map((step) =>
         ? applyCNOT(applyCNOT(StateVector.basis(2, 0b10), 0, 1), 1, 0)
         : applyCNOT(applyCNOT(applyCNOT(StateVector.basis(2, 0b10), 0, 1), 1, 0), 0, 1)
 );
+
+export const swapCircuitFrames = [
+  {
+    paramLabel: "Step 1: CNOT(0, 1)",
+    numQubits: 2,
+    highlightColumn: 0,
+    ariaLabel: "SWAP circuit showing only step 1, CNOT with qubit 0 as control and qubit 1 as target, highlighted",
+    instructions: [{ gate: "CNOT", targets: [0, 1] }],
+  },
+  {
+    paramLabel: "Step 2: CNOT(1, 0)",
+    numQubits: 2,
+    highlightColumn: 1,
+    ariaLabel: "SWAP circuit with step 2, CNOT with qubit 1 as control and qubit 0 as target, highlighted",
+    instructions: [
+      { gate: "CNOT", targets: [0, 1] },
+      { gate: "CNOT", targets: [1, 0] },
+    ],
+  },
+  {
+    paramLabel: "Step 3: CNOT(0, 1)",
+    numQubits: 2,
+    highlightColumn: 2,
+    ariaLabel: "SWAP circuit with step 3, CNOT with qubit 0 as control and qubit 1 as target, highlighted",
+    instructions: [
+      { gate: "CNOT", targets: [0, 1] },
+      { gate: "CNOT", targets: [1, 0] },
+      { gate: "CNOT", targets: [0, 1] },
+    ],
+  },
+];
 
 ## Motivation
 
@@ -136,8 +168,9 @@ $|00\rangle,|01\rangle,|10\rangle,|11\rangle$ order):
 Qubit 0 (the control) is always left alone; qubit 1 (the target) flips
 exactly when qubit 0 is 1. This truth table, $00\to00$, $01\to01$,
 $10\to11$, $11\to10$, is CNOT's complete classical-looking behavior on
-basis states. Its genuinely quantum behavior only shows up once the
-control is in superposition, which is the subject of the next lesson.
+basis states. The behavior that has no classical counterpart only shows
+up once the control is in superposition, which is the subject of the
+next lesson.
 
 ### CNOT is its own inverse
 
@@ -164,24 +197,30 @@ on demand, and it's exactly the next lesson's subject.
 ## Worked Example: SWAP from three CNOTs
 
 The **SWAP** gate exchanges two qubits' values entirely:
-$\text{SWAP}|ab\rangle = |ba\rangle$. Remarkably, it can be built from
-three CNOTs alone, alternating which qubit is the control:
+$\text{SWAP}|ab\rangle = |ba\rangle$. No new gate is needed to build it:
+three CNOTs alone, alternating which qubit is the control, do the job:
 
 $$
 \text{SWAP} = \text{CNOT}(0,1)\cdot\text{CNOT}(1,0)\cdot\text{CNOT}(0,1)
 $$
 
-Drawn out, the alternating control is visible at a glance in a way the
-algebra alone doesn't show as directly:
+Step through the three columns below, one CNOT at a time, and predict
+the two-qubit basis state before revealing it.
 
-<StaticCircuitDiagram
-  numQubits={2}
-  instructions={[
-    { gate: "CNOT", targets: [0, 1] },
-    { gate: "CNOT", targets: [1, 0] },
-    { gate: "CNOT", targets: [0, 1] },
+<InteractiveSection title="Step through the SWAP construction" description="Drag the slider from step 1 to step 3. Starting from |10⟩, predict what each CNOT does to the pair before checking against the panels below: which qubit is the control at that step, and does it flip the target?">
+  <CircuitDiagramExplorer frames={swapCircuitFrames} sliderLabel="Build step" />
+</InteractiveSection>
+
+<PredictBeforeReveal
+  question="Starting from |10⟩, after all three CNOTs (control 0, then control 1, then control 0), what is the final state?"
+  options={[
+    { label: "|10⟩ (unchanged)", value: "10" },
+    { label: "|01⟩ (swapped)", value: "01" },
+    { label: "|11⟩", value: "11" },
+    { label: "|00⟩", value: "00" },
   ]}
-  ariaLabel="Three CNOTs implementing SWAP: control alternates between qubit 0 and qubit 1"
+  correctValue="01"
+  explanation="Track it column by column: |10⟩ →(CNOT(0,1))→ |11⟩ →(CNOT(1,0))→ |01⟩ →(CNOT(0,1))→ |01⟩. The last CNOT is a no-op here because its control qubit (0) is now 0. The two qubits' values end up exchanged, exactly the SWAP identity being verified."
 />
 
 Track $|10\rangle$ through all three steps:

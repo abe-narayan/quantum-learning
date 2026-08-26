@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { angularMomentumZ, totalAngularMomentumSquared } from "@/lib/quantum/angularMomentum";
@@ -88,6 +89,17 @@ $l(l+1)\hbar^2$ (Lesson 2's formula), which is exactly why they end up
 energy-degenerate for any central potential: $H$ only sees $\vec L^{\,2}$
 and $r$, never $L_z$ directly.
 
+<PredictBeforeReveal
+  question="For a fixed l, the 2l+1 states with different m all share the same L² eigenvalue. Does H (which depends only on r and L²) distinguish between them?"
+  options={[
+    { label: "Yes, each m gets a different energy", value: "different" },
+    { label: "No, all 2l+1 of them are exactly degenerate in energy", value: "degenerate" },
+    { label: "Only m=0 has a different energy from the rest", value: "m0-special" },
+  ]}
+  correctValue="degenerate"
+  explanation="H for any central potential depends only on r and L² (never on Lz directly), and every m at a fixed l shares the identical L² eigenvalue l(l+1)ħ². Since H can't tell the m states apart, all 2l+1 of them come out with exactly the same energy. This is precisely the m-degeneracy the matrix comparison below shows directly: Lz's diagonal changes with m, but L² doesn't move at all."
+/>
+
 <InteractiveSection
   title="Step through l, watch L² ignore m entirely"
   description="Step through l = 0, 1, 2, 3. L² (right panel) stays exactly l(l+1) times the identity, the same number regardless of m: this is exactly why every m-state at a given l is energy-degenerate for any central potential. Lz's diagonal (left panel) shows the 2l+1 distinct m eigenvalues those degenerate states actually carry."
@@ -105,8 +117,17 @@ computational trick specific to hydrogen: it's a direct consequence of
 the potential depending only on $r$, and it works precisely because
 $\vec L^{\,2}$, $L_z$, and $H$ share a common eigenbasis whenever that
 symmetry holds. The angular momentum machinery this course built is the
-*general* tool; hydrogen is simply the first, and most famous, place it
-gets applied to a genuinely 3D system.
+general tool; hydrogen is simply the first, and most famous, place it
+gets applied to a fully three-dimensional system.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/4/41/Hydrogen_spectrum.svg"
+  alt="Hydrogen spectral series plotted by wavelength on a logarithmic scale, showing the Lyman, Balmer, Paschen, Brackett, Pfund, and Humphreys series of discrete emission lines"
+  caption="Hydrogen's actual emission spectrum: a finite set of sharp lines, not a continuum, one direct experimental consequence of energy depending only on n once R(r) is solved. This capstone's contribution was showing the angular part, Y_l^m, needs no further work to get here."
+  credit="Wikimedia Commons / OrangeDog"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Hydrogen_spectrum.svg"
+  license="CC BY-SA 3.0"
+/>
 
 ## Worked Example
 
@@ -174,5 +195,5 @@ $R_{n,l}(r)$ and the resulting energy levels.
 
 This completes **Angular Momentum & Spin**. Next: **The Hydrogen Atom**,
 which solves the radial equation this capstone previewed, completing the
-first genuinely three-dimensional solved system in this platform's
+first fully three-dimensional solved system in this platform's
 Quantum Mechanics pillar.

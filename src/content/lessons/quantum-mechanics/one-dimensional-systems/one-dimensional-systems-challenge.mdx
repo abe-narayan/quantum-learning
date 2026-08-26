@@ -33,7 +33,7 @@ export const lessonMeta = {
   objectives: [
     "Classify every 1D potential covered across Wave Mechanics and this course as bound, scattering, or both",
     "Solve synthesis problems connecting the finite well's numerics to the barrier's closed-form scattering",
-    "Identify what a genuinely 3-dimensional system would need beyond everything built so far",
+    "Identify what a truly 3-dimensional system would need beyond everything built so far",
   ],
 };
 
@@ -46,7 +46,7 @@ harmonic oscillator (exactly, closed form, by two independent methods),
 tunneling through a barrier below its height (approximately, but with a
 precise, derived exponential estimate), the finite well's bound states
 (exactly characterized, solved numerically), and scattering off a step
-or barrier above its height (exactly, closed form, with a genuine
+or barrier above its height (exactly, closed form, with a real
 resonance phenomenon). This capstone connects all of it.
 
 ## Recap: Every 1D System Solved So Far
@@ -66,6 +66,18 @@ $E>V_0$ is an allowed scattering energy). This bound/continuous split is
 completely general, not a coincidence of these five examples.
 
 ## Worked Synthesis Examples
+
+<PredictBeforeReveal
+  question="A finite well is made deeper and deeper (V0 grows, half-width a fixed). What happens to its total number of bound states?"
+  options={[
+    { label: "It stays fixed at whatever it started at", value: "fixed" },
+    { label: "It grows without bound, adding one state at a time", value: "grows" },
+    { label: "It grows at first, then saturates at some maximum", value: "saturates" },
+    { label: "It can only ever be exactly one, no matter how deep", value: "one" },
+  ]}
+  correctValue="grows"
+  explanation="The graphical picture from Solving the Finite Well Numerically makes this exact: the quarter-circle κ=√(2V0−k²) has radius √(2V0), which grows without bound as V0 grows, sweeping past more and more branches of the fixed tangent/cotangent curves and picking up one new bound state each time it crosses a branch. In the V0→∞ limit this reproduces the infinite well's endless ladder."
+/>
 
 **1. A finite well is made deeper and deeper (larger $V_0$, fixed
 width). What happens to its number of bound states, and why, using the
@@ -119,7 +131,7 @@ outside, so there's no discreteness-forcing condition at all.
 
 <Callout type="mistake">
 **Expecting a single unified formula to cover both regimes.** Bound
-states and scattering states are genuinely different mathematical
+states and scattering states are different kinds of mathematical
 problems (an eigenvalue condition vs. a boundary-value problem with a
 continuous parameter). This platform intentionally built separate tools
 for each rather than forcing an artificial unification.
@@ -160,15 +172,14 @@ which one is more trustworthy.
   form) are complementary case studies in *how* to solve a system when
   no single method (purely algebraic, purely numerical) suffices for
   everything.
-- Resonant transmission is a genuinely new phenomenon this course
-  introduced, with a direct, non-coincidental analogy to classical wave
-  optics.
+- Resonant transmission is a new phenomenon this course introduced, with
+  a direct, non-coincidental analogy to classical wave optics.
 
 ## Further Exploration
 
 This completes **One-Dimensional Systems**. The next steps deeper into
 the Quantum Mechanics pillar, **Angular Momentum & Spin** and
-**The Hydrogen Atom**, extend everything built so far to genuinely
-three-dimensional systems, where angular momentum (not yet built on this
-platform) becomes essential alongside the radial version of exactly the
-bound-state techniques this course developed.
+**The Hydrogen Atom**, extend everything built so far to systems that
+are actually three-dimensional, where angular momentum (not yet built on
+this platform) becomes essential alongside the radial version of exactly
+the bound-state techniques this course developed.

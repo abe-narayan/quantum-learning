@@ -113,9 +113,9 @@ sense (Continuous Spectra and Rigged Hilbert Space, next lesson, makes
 this precise); its "eigenvalues" fill the entire real line continuously.
 A sum over discrete $\lambda_i$ literally cannot be the right statement
 for such an operator. This lesson gives the one theorem that correctly
-covers both cases at once, and, the actual payoff, shows the discrete
-formula was never a separate fact, just this general theorem evaluated
-on a spectrum with no continuous part.
+covers both cases at once. The payoff is that the discrete formula was
+never a separate fact — just this general theorem evaluated on a
+spectrum with no continuous part.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/7/79/Hilbert.jpg"
@@ -173,7 +173,7 @@ $$
 
 </TheoremBox>
 
-This is a genuinely deep theorem of functional analysis (the general
+This is a substantial theorem of functional analysis (the general
 proof, for the unbounded case, is due to von Neumann); it is **stated
 here, not proved**, exactly as Hermitian Operators stated (rather than
 fully proved the existence half of) the finite-dimensional spectral
@@ -289,6 +289,17 @@ state $\psi=(|0\rangle+|1\rangle+|2\rangle)/\sqrt3$ (equal superposition
 of all three eigenvectors) and plot the scalar $\langle\psi|E(\lambda)
 \psi\rangle$ against $\lambda$ directly, the actual quantity the
 Riemann–Stieltjes integral above integrates against:
+
+<PredictBeforeReveal
+  question="ψ=(|0⟩+|1⟩+|2⟩)/√3 is an equal superposition, and P₁ projects onto a rank-2 subspace while P₂ projects onto a rank-1 subspace. As λ sweeps past both eigenvalues, does ⟨ψ|E(λ)ψ⟩ jump by the same amount at λ=1 and λ=2, or by different amounts?"
+  options={[
+    { label: "Same jump size both times", value: "same" },
+    { label: "Bigger jump at λ=1 (rank-2 subspace)", value: "bigger-first" },
+    { label: "Bigger jump at λ=2 (rank-1 subspace)", value: "bigger-second" },
+  ]}
+  correctValue="bigger-first"
+  explanation="The jump at λᵢ is ‖Pᵢψ‖², and for an equal superposition that's proportional to the eigenspace's dimension: ‖P₁ψ‖²=2/3 at λ=1 (rank-2), then only ‖P₂ψ‖²=1/3 at λ=2 (rank-1). The two jumps still sum to 1, since E(∞)=I."
+/>
 
 <ParametricCurve
   frames={eOfLambdaFrames}

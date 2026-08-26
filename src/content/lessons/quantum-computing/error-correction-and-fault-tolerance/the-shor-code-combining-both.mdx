@@ -46,14 +46,14 @@ one of them.
 
 ## Intuition
 
-The fix is almost embarrassingly simple once you see it: encode against
-phase flips, then encode *each piece of that encoding* again against
-bit flips. Nest one code inside the other, and an error that slips past
-one layer gets caught by the other, protect the protectors, in the
-words the Physical Interpretation section below uses for the general
-strategy. The rest of this lesson is bookkeeping: how nine qubits split
-into three groups of three, and why that specific split catches every
-single-qubit error there is.
+The fix is simple once you see it: encode against phase flips, then
+encode *each piece of that encoding* again against bit flips. Nest one
+code inside the other, and an error that slips past one layer gets
+caught by the other. The Physical Interpretation section below calls
+this "protecting the protectors," a strategy that outlives this
+particular code. The rest of this lesson is bookkeeping: how nine
+qubits split into three groups of three, and why that specific split
+catches every single-qubit error there is.
 
 ## Mathematical Development
 
@@ -97,6 +97,18 @@ A $Y$ error (both at once, on the same physical qubit) is caught by
 both mechanisms simultaneously, independently. The inner code doesn't
 care that an outer-level phase problem also exists, and vice versa.
 
+<PredictBeforeReveal
+  question="A Y error hits one physical qubit in group 1 (both a bit flip and a phase flip at once, since Y = iXZ). Which boundary in the diagram below should light up?"
+  options={[
+    { label: "Only group 1's inner bit-flip boundary", value: "inner" },
+    { label: "Only the outer phase-flip boundary", value: "outer" },
+    { label: "Both boundaries, independently", value: "both" },
+    { label: "Neither, since Y wasn't designed for by either code alone", value: "neither" },
+  ]}
+  correctValue="both"
+  explanation="Y decomposes into an X part and a Z part acting on the same qubit. The inner bit-flip code only ever looks for X, so it catches the X part and fires group 1's inner boundary, oblivious to any phase problem. The outer phase-flip code only ever looks for Z, so it independently catches the Z part and fires the outer boundary. Neither mechanism needs to know the other exists; a Y error just happens to trip both wires at once. Try it below."
+/>
+
 <NestedCodeDiagram ariaLabel="Nine qubits in three groups of three: each group boxed with a dashed inner bit-flip boundary, all three groups boxed with one larger dashed outer phase-flip boundary. A toggle for X, Z, or Y error and a target-qubit selector highlight which boundary fires: X lights the target's inner group boundary only, Z lights only the outer boundary, Y lights both at once." />
 
 ### Scope: conceptual, not simulated
@@ -105,11 +117,11 @@ This platform simulates the two 3-qubit codes exactly, with real
 CNOT-based encoding and genuine partial-measurement syndrome extraction.
 The full 9-qubit Shor code needs the same ideas nested: bit-flip
 syndrome extraction *within* each group of 3, plus phase-flip syndrome
-extraction *across* the three groups, genuinely more circuitry and
-qubit bookkeeping than this course's engine builds. This is an honest,
-documented scope limit, not a claim that the construction is somehow
-different or unverifiable in principle; every piece of it is the same
-two mechanisms already built and verified separately, just nested.
+extraction *across* the three groups, substantially more circuitry and
+qubit bookkeeping than this course's engine builds. That's a documented
+scope limit, not a claim that the construction is unverifiable in
+principle; every piece of it is the same two mechanisms already built
+and verified separately, just nested.
 
 ## Physical Interpretation
 
@@ -165,8 +177,8 @@ coincidence, produces exactly 9.
 **Believing this platform's engine could easily be extended to simulate
 the full Shor code with minor changes.** The syndrome extraction alone
 needs bookkeeping across two nested levels (within-group and
-across-group), a genuinely larger circuit, not a small addition to what
-Lessons 2 and 3 already built.
+across-group): a substantially larger circuit, not a small addition to
+what Lessons 2 and 3 already built.
 </Callout>
 
 ## Practice Questions

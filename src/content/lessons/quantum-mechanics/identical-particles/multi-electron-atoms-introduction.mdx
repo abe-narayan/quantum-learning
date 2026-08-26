@@ -60,12 +60,14 @@ export const lessonMeta = {
 
 ## Motivation
 
-The Hydrogen Atom course found $n^2$ degenerate orbitals for shell $n$
-(Hydrogen Energy Levels). The Pauli Exclusion Principle course found
-that each single-particle state, spatial orbital *and* spin, can hold
-at most one electron. Multiplying these two already-established facts
-together, with no new physics, gives the entire logical basis for the
-periodic table's shell structure.
+Why does the periodic table have the shape it does, two elements in the
+first row, eight in the next two, then a jump to eighteen? Nothing about
+this lesson needs new physics to answer that. Hydrogen Energy Levels
+already found $n^2$ degenerate orbitals for shell $n$; the previous
+lesson already found that each single-particle state, spatial orbital
+*and* spin, can hold at most one electron. Multiply those two
+already-established facts together and the shell structure of the whole
+periodic table falls out.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Glowing_noble_gases.jpg"
@@ -83,7 +85,7 @@ periodic table's shell structure.
 Shell $n$ has $n^2$ distinct spatial orbitals (Hydrogen Energy Levels'
 degeneracy count: $\sum_{l=0}^{n-1}(2l+1)=n^2$). Each spatial orbital,
 by exclusion, can hold at most 2 electrons, one spin-up, one spin-down
-(these are genuinely different complete single-particle states, as the
+(these count as different complete single-particle states, as the
 previous lesson established). So shell $n$ holds at most:
 
 $$
@@ -93,14 +95,25 @@ $$
 $n=1$: $2(1)^2=2$ electrons (fills 1s). $n=2$: $2(2)^2=8$ electrons
 (fills 2s and 2p together). $n=3$: $2(3)^2=18$, though in real multi-electron
 atoms the filling order gets more complicated starting around here (a
-genuine complication this introduction names but doesn't resolve; see
+real complication this introduction names but doesn't resolve; see
 below).
+
+The factor of 2 is most of chemistry's answer to "why do noble gases
+exist." An atom with every orbital up to some shell completely full,
+helium at 2, neon at 10 ($2+8$), has no partially-occupied orbital left
+to share or steal an electron through, which is exactly why those
+elements sit inertly at the ends of their rows while carbon, with 2p
+only two-sixths full, is eager to bond in four different directions at
+once. It's also why reactivity is periodic rather than a one-off
+property of each element: the same "one orbital short of closing" or
+"one orbital past closing" pattern recurs every time a shell's $2n^2$
+slots fill up again.
 
 ### What's exactly hydrogen-like, and what isn't
 
 The orbital *shapes* and *degeneracy counts* used above come directly
-from Hydrogen Energy Levels and Orbitals & Quantum Numbers, genuinely
-reused, not re-derived. What's *not* reused: hydrogen's exact
+from Hydrogen Energy Levels and Orbitals & Quantum Numbers, carried over
+wholesale, not re-derived. What's *not* reused: hydrogen's exact
 $l$-independence of energy (Hydrogen Energy Levels' special result for
 the pure $1/r$ potential) breaks down in a multi-electron atom, because
 each electron now also feels the other electrons' repulsion, not just
@@ -116,12 +129,22 @@ increasing $n$.
 
 This course does not attempt to solve the true multi-electron
 Hamiltonian (which has no exact closed-form solution even for helium,
-the two-electron case: a genuinely hard many-body problem, active
+the two-electron case: a hard many-body problem in its own right, active
 research territory for larger atoms). What this introduction provides is
 the *qualitative* structure, shell capacities and the shape of the
 filling logic, using hydrogen's exact orbitals as an approximate
 single-particle basis, which is both an honest, standard approximation
 and as far as this course's scope goes.
+
+<PredictBeforeReveal
+  question="Carbon has 6 electrons. Filling 1s and 2s to capacity (2 + 2 = 4) leaves 2 electrons for 2p, whose capacity is 6. Does 2p end up full, and does carbon have a closed outer shell like a noble gas?"
+  options={[
+    { label: "Yes — 2p fills completely, carbon is inert", value: "full" },
+    { label: "No — 2p ends up only 2 of 6 full, carbon's shell stays open", value: "partial" },
+  ]}
+  correctValue="partial"
+  explanation="Only 2 of 2p's 6 slots get filled: capacity isn't the same as occupancy. Carbon's outer shell is wide open, which is exactly why it's chemically versatile (four bonds) rather than inert like the noble gases in the figure above, whose outer shells really are full."
+/>
 
 ## Worked Example
 
@@ -241,8 +264,8 @@ limitation stated explicitly rather than glossed over.
   (Hydrogen Energy Levels) times 2 (exclusion's spin-up/spin-down limit
   per orbital).
 - This reuses hydrogen's orbitals as an approximate single-particle
-  basis, genuinely useful for electron configurations, but not an exact
-  solution to the true multi-electron Hamiltonian.
+  basis, useful for electron configurations, but not an exact solution
+  to the true multi-electron Hamiltonian.
 - Electron-electron repulsion (screening) breaks hydrogen's exact
   $l$-independence of energy, which is why real filling order departs
   from strict increasing-$n$ starting around $n=3$.
@@ -251,6 +274,5 @@ limitation stated explicitly rather than glossed over.
 
 This closes **Identical Particles & Many-Body Systems**. The next
 course, **Advanced Topics in Quantum Mechanics**, builds on density
-matrices and entanglement, genuinely new material building on, not
-repeating, the already-completed Entanglement, Mixed States & Bell Tests
-course.
+matrices and entanglement with new material, not a repeat of the
+already-completed Entanglement, Mixed States & Bell Tests course.

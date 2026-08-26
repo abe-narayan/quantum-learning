@@ -3,6 +3,11 @@ import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { finiteSquareWellPotential, finiteSquareWellGroundStateEnergy } from "@/lib/quantum/potentials";
+import { Complex } from "@/lib/quantum/complex";
+import { tensorProduct, symmetrize, antisymmetrize } from "@/lib/quantum/identicalParticles";
+import { vectorToExchangeGrid } from "@/components/visualizations/ExchangeDiagram";
+import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/spin-qubits"
@@ -37,6 +42,33 @@ export const dotSchematicLevels = [1, 2, 3].map((n) => {
   const k = Math.min(dotGroundK * n, dotKMax - 0.05);
   return { n, energy: (k * k) / 2 - dotDepth };
 });
+
+export const spinBasisDim = 2;
+export const spinUp = [new Complex(1), new Complex(0)];
+export const spinDown = [new Complex(0), new Complex(1)];
+export const spinProductUpDown = tensorProduct(spinUp, spinDown);
+export const spinSinglet = antisymmetrize(spinUp, spinDown);
+export const spinTriplet = symmetrize(spinUp, spinDown);
+export const exchangePresets = [
+  {
+    label: "Singlet: antisymmetrize(↑, ↓)",
+    before: vectorToExchangeGrid(spinProductUpDown, spinBasisDim),
+    after: vectorToExchangeGrid(spinSinglet, spinBasisDim),
+    beforeLabel: "↑⊗↓",
+    afterLabel: "normalize(↑⊗↓ − ↓⊗↑)",
+    basisLabels: ["↑", "↓"],
+    verdict: "antisymmetric",
+  },
+  {
+    label: "Triplet: symmetrize(↑, ↓)",
+    before: vectorToExchangeGrid(spinProductUpDown, spinBasisDim),
+    after: vectorToExchangeGrid(spinTriplet, spinBasisDim),
+    beforeLabel: "↑⊗↓",
+    afterLabel: "normalize(↑⊗↓ + ↓⊗↑)",
+    basisLabels: ["↑", "↓"],
+    verdict: "symmetric",
+  },
+];
 
 export const lessonMeta = {
   title: "Spin Qubits",
@@ -156,9 +188,9 @@ longer than superconducting qubits' microseconds (particularly for
 nuclear-spin-based qubits, which are extremely well isolated from
 charge noise) but gate operations are typically driven electrically or
 magnetically at speeds closer to superconducting qubits' nanosecond
-scale than trapped ions' microsecond scale, a genuinely different
-point in the coherence/speed tradeoff space than either platform already
-covered.
+scale than trapped ions' microsecond scale — landing in a stretch of the
+coherence/speed tradeoff space neither platform already covered quite
+occupies.
 
 Driving a spin electrically or magnetically is, physically, the
 original context the two-level Rabi problem was built for (electron/
@@ -188,6 +220,43 @@ That's why spin-qubit devices are laid out with nearest-neighbor,
 dot-to-dot connectivity rather than the all-to-all coupling a trapped-ion
 chain enjoys.
 
+Exchange works *because of* Pauli exclusion, not despite it. Two
+electrons are identical fermions, so their full two-particle wavefunction
+(spatial part times spin part) has to come out antisymmetric under
+swapping the two electrons. That requirement locks spin and space
+together: pair the electrons' spins into the antisymmetric combination
+(the **singlet**) and the spatial wavefunction is forced symmetric; pair
+the spins into any symmetric combination (a **triplet**) and the spatial
+wavefunction is forced antisymmetric instead. A symmetric spatial
+wavefunction overlaps the confining potential differently than an
+antisymmetric one, so singlet and triplet sit at different energies —
+that splitting *is* $J$. Identical Particles already built exactly this
+antisymmetrize/symmetrize machinery for two electrons in two spatial
+orbitals; here it's the same operator, applied to two spins instead:
+
+<PredictBeforeReveal
+  question="Two electrons' spins are prepared symmetric under exchange (a triplet state). Given that electrons are fermions, what does this force about the spatial part of their combined wavefunction?"
+  options={[
+    { label: "It must also be symmetric", value: "symmetric" },
+    { label: "It must be antisymmetric", value: "antisymmetric" },
+    { label: "No constraint — spin and spatial parts are independent", value: "independent" },
+  ]}
+  correctValue="antisymmetric"
+  explanation="The total wavefunction (spatial × spin) must be antisymmetric for identical fermions. A symmetric spin part forces an antisymmetric spatial part to make the product come out antisymmetric overall — this spin-space locking is exactly why the singlet and triplet spin states end up at different energies, the splitting J a two-qubit exchange gate switches on and off."
+/>
+
+<ExchangeDiagramExplorer
+  presets={exchangePresets}
+  ariaLabel="Two electron spins' combined amplitude grid before and after the exchange operator swaps which electron is spin-up vs spin-down, toggled between the singlet (antisymmetric) and triplet (symmetric) configurations"
+/>
+
+The singlet preset above is precisely the antisymmetric combination
+Identical Particles built for two spatial orbitals, now applied to two
+spins; the triplet preset is its symmetric counterpart. A working
+exchange gate is, physically, a controlled rotation between these two
+energy-split combinations, not a new piece of two-qubit-gate machinery
+invented from scratch for this platform.
+
 ## Physical Interpretation
 
 Spin qubits' central engineering pitch isn't raw coherence time or gate
@@ -197,6 +266,18 @@ into a practical advantage depends on solving spin-qubit-specific
 challenges (uniform, reliable dot fabrication; addressing individual
 spins without disturbing neighbors) that remain active engineering
 problems.
+
+Intel is the clearest bet on this pitch: its Components Research group
+fabricates spin-qubit test chips (Tunnel Falls) on the same 300mm
+production line and tooling it uses for commercial transistors, and it
+has paired that with Horse Ridge, cryogenic control chips designed to
+sit inside the refrigerator next to the qubits instead of routing every
+control line out to room-temperature electronics. Academic groups at
+Delft, UNSW, and RIKEN have pushed isotopically-purified silicon devices
+toward the multi-qubit, high-fidelity regime that would make this
+manufacturing argument pay off. Whether "the same fab line as classical
+chips" beats "atoms and photons that are identical by nature" is
+precisely the question the rest of this course's comparison turns on.
 
 ## Worked Example
 
@@ -256,6 +337,10 @@ coherence and control.
 - Sits in an intermediate coherence/speed regime, longer coherence than
   superconducting qubits, faster gates than trapped ions, with its own
   unresolved fabrication-uniformity challenges.
+- Two-qubit exchange gates are a direct consequence of Pauli exclusion:
+  the singlet/triplet energy splitting $J$ comes from the same
+  antisymmetrization requirement Identical Particles derived for any
+  two electrons, applied here to spin instead of spatial orbitals.
 
 ## Further Exploration
 

@@ -4,7 +4,9 @@ import { StateVector, tensorStates } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { applyBitOracle, balancedFunction } from "@/lib/quantum/oracles";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
@@ -34,6 +36,24 @@ export const kickbackFrames = kickbackAncillaPresets.map((preset, i) => ({
     caption: amp.re.toFixed(3),
   })),
 }));
+
+export const kickbackAncillaPrepGates = [
+  [],
+  [{ gate: "X", targets: [1] }],
+  [{ gate: "H", targets: [1] }],
+  [{ gate: "X", targets: [1] }, { gate: "H", targets: [1] }],
+];
+
+export const kickbackCircuitFrames = kickbackAncillaPresets.map((preset, i) => {
+  const instructions = [{ gate: "H", targets: [0] }, ...kickbackAncillaPrepGates[i], { gate: "CNOT", targets: [0, 1] }];
+  return {
+    paramLabel: preset.label,
+    numQubits: 2,
+    instructions,
+    highlightColumn: instructions.length - 1,
+    ariaLabel: `Circuit with input qubit 0 prepared in the plus state and ancilla qubit 1 prepared as ${preset.label}, ending in the oracle CNOT for f(x) = x, matching the ${preset.label} frame of the amplitude chart below`,
+  };
+});
 
 export const lessonMeta = {
   title: "Phase Kickback",
@@ -157,16 +177,31 @@ $f(x)=x$ used throughout this lesson (`balancedFunction(1)` on one input
 qubit), but scrub through four different ancilla preparations. Only one of
 them produces the clean phase pattern this lesson derived:
 
+<PredictBeforeReveal
+  question="Same oracle U_f (f(x)=x), same input register |+⟩, but the ancilla is prepared in |0⟩ instead of |−⟩. What happens to the output?"
+  options={[
+    { label: "Same phase pattern as |−⟩, since it's the same oracle", value: "same-phase" },
+    { label: "No phase at all — the ancilla just gets bit-flipped for some x", value: "bit-flip" },
+    { label: "A random, unpredictable mix of amplitudes", value: "random" },
+    { label: "The whole state stays exactly |+⟩|0⟩, unchanged", value: "unchanged" },
+  ]}
+  correctValue="bit-flip"
+  explanation="With the ancilla in |0⟩, U_f does exactly what it was defined to do: write f(x) into the ancilla as an ordinary bit. There's no phase anywhere — the ancilla just ends up correlated with x (flipped to |1⟩ on the branch where f(x)=1), which is the honest bit-oracle behavior from the previous lesson, not kickback. Kickback only appears because |−⟩ specifically is the −1 eigenstate of the bit-flip-conditioned-on-f(x) operation; |0⟩ isn't an eigenstate of it at all."
+/>
+
 <InteractiveSection
   title="Only minus produces the sign pattern"
-  description="Step through four ancilla preparations applied to the real oracle Uf with f(x) = x, input register prepared in the plus state. Watch the real part of every output amplitude. Only the minus preparation produces the alternating plus, minus, minus, plus sign pattern phase kickback predicts; zero and one just relabel which ancilla value goes with which x, an ordinary bit flip, and plus is left completely alone."
+  description="Step through four ancilla preparations applied to the real oracle Uf with f(x) = x, input register prepared in the plus state. The circuit above shows exactly what's being run for each preparation (same H and CNOT throughout, only the gates preparing qubit 1 change); the chart below shows the real part of every output amplitude. Only the minus preparation produces the alternating plus, minus, minus, plus sign pattern phase kickback predicts; zero and one just relabel which ancilla value goes with which x, an ordinary bit flip, and plus is left completely alone."
 >
-  <BarChartExplorer
-    frames={kickbackFrames}
-    sliderLabel="Ancilla preparation"
-    ariaLabel="Real part of each output amplitude of the bit oracle applied to |+⟩ on the input register, for four different ancilla preparations: 0, 1, plus, and minus"
-    maxValue={0.75}
-  />
+  <div className="space-y-4">
+    <CircuitDiagramExplorer frames={kickbackCircuitFrames} sliderLabel="Ancilla preparation" />
+    <BarChartExplorer
+      frames={kickbackFrames}
+      sliderLabel="Ancilla preparation"
+      ariaLabel="Real part of each output amplitude of the bit oracle applied to |+⟩ on the input register, for four different ancilla preparations: 0, 1, plus, and minus"
+      maxValue={0.75}
+    />
+  </div>
 </InteractiveSection>
 
 Only the $|-\rangle$ frame shows the alternating $+,-,-,+$ sign pattern

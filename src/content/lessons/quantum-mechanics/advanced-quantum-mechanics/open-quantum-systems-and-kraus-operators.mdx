@@ -29,7 +29,7 @@ export const krausCheckPresets = [
 export const lessonMeta = {
   title: "Open Quantum Systems & Kraus Operators",
   description:
-    "Every evolution this platform has built so far (Wave Mechanics' time evolution, Entanglement's 'unitary evolution and measurement of density matrices') was CLOSED-system: no environment. Kraus operators, ρ→ΣₖKₖρKₖ†, extend this to genuinely open systems: non-unitary, trace-preserving, and the actual mathematical language of decoherence.",
+    "Every evolution this platform has built so far (Wave Mechanics' time evolution, Entanglement's 'unitary evolution and measurement of density matrices') was CLOSED-system: no environment. Kraus operators, ρ→ΣₖKₖρKₖ†, extend this to open systems: non-unitary, trace-preserving, and the actual mathematical language of decoherence.",
   course: "advanced-quantum-mechanics",
   module: "open-quantum-systems-and-kraus-operators",
   order: 1,
@@ -56,21 +56,21 @@ export const lessonMeta = {
 ## Motivation
 
 Entanglement, Mixed States & Bell Tests built density matrices and
-covered their unitary evolution, but a genuinely *isolated* system
-evolving unitarily forever is an idealization. Every real system
-eventually interacts with something outside itself: stray photons, a
-measuring apparatus, thermal vibrations. This lesson introduces the
-mathematical language for that, **open quantum systems**, building
-directly on, and going beyond, the density-matrix foundation Entanglement
-already established.
+covered their unitary evolution, but a perfectly *isolated* system
+evolving unitarily forever is an idealization nobody has ever built in
+a lab. Every real system eventually interacts with something outside
+itself: stray photons, a measuring apparatus, thermal vibrations in the
+mounting hardware. This lesson introduces the mathematical language for
+that, **open quantum systems**, building directly on, and going beyond,
+the density-matrix foundation Entanglement already established.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="An IBM Quantum System One, showing its gold-plated cryostat housing that shields the superconducting qubit chip from environmental noise"
-  caption="A real IBM Quantum System One. Everything below the chip sits inside a dilution refrigerator precisely because a qubit is never a truly closed system: this entire apparatus exists to slow down exactly the kind of environmental coupling this lesson's Kraus operators describe mathematically."
-  credit="OJB Quantum (Onri Jay Benally) / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/4/48/Basic_Science_%2854395491965%29.jpg"
+  alt="A neutral-atom quantum computing vacuum chamber at Sandia National Laboratories, showing objective lenses for single-atom traps and surrounding magnetic field coils"
+  caption="A real neutral-atom quantum computing apparatus. Everything inside this vacuum chamber exists precisely because a qubit is never a truly closed system: the whole setup is built to slow down exactly the kind of environmental coupling this lesson's Kraus operators describe mathematically."
+  credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Basic_Science_(54395491965).jpg"
+  license="Public Domain (U.S. Government work)"
 />
 
 ## Mathematical Development
@@ -80,10 +80,10 @@ already established.
 $\rho\to U\rho U^\dagger$ (Entanglement's evolution rule) always preserves
 purity exactly: $\text{Tr}(\rho^2)$ never changes under it (a fact
 already provable from $U$'s unitarity alone). But real decoherence
-*does* change purity. A pure state genuinely becomes mixed over time
+*does* change purity. A pure state actually becomes mixed over time
 through environmental interaction. No unitary evolution of the system
 *alone* can do this; the resolution is that the system's evolution,
-when the environment is "traced out," need not be unitary at all.
+once the environment is "traced out," need not be unitary at all.
 
 ### The Kraus operator sum representation
 
@@ -99,8 +99,8 @@ $\sum_kK_k^\dagger K_k=I$ (the **trace-preservation condition**: it
 guarantees $\text{Tr}(\mathcal E(\rho))=\text{Tr}(\rho)$, so total
 probability stays 1). A single unitary $U$ is the special case of exactly
 one Kraus operator, $K_0=U$ (then $K_0^\dagger K_0=U^\dagger U=I$
-automatically). Kraus operators are a genuine *generalization* of
-unitary evolution, not a replacement for it.
+automatically). Kraus operators *generalize* unitary evolution; they
+don't replace it.
 
 ### Verified directly against the trace-preservation condition
 
@@ -113,9 +113,20 @@ outright) to confirm the check actually discriminates valid from invalid
 channels, rather than trivially returning `true`.
 
 Watch the trace-preservation condition play out physically, not just
-algebraically. Every intermediate step below is a genuine, valid quantum
-state (total probability exactly 1, Bloch vector never leaving the
-sphere's interior), even though it's visibly losing purity along the way.
+algebraically. Every intermediate step below is a valid quantum state
+(total probability exactly 1), even though it's visibly losing purity
+along the way.
+
+<PredictBeforeReveal
+  question="Start at |+⟩ on the equator and apply amplitude damping repeatedly. As the Bloch vector shrinks toward |0⟩, does it ever poke outside the sphere?"
+  options={[
+    { label: "No, it stays inside or on the sphere the whole time", value: "inside" },
+    { label: "It briefly leaves the sphere near the middle of the decay", value: "leaves" },
+    { label: "It can't be determined without picking a specific γ", value: "depends" },
+  ]}
+  correctValue="inside"
+  explanation="It never leaves. That's exactly what the trace-preservation condition ∑K†K=I guarantees: every intermediate ρ is a legitimate density matrix, so its Bloch vector has length ≤ 1 at every single step, even while purity is visibly dropping."
+/>
 
 <InteractiveSection
   title="Shrink the Bloch vector without leaving the sphere"
@@ -130,9 +141,15 @@ Physically, $\{K_k\}$ encodes *what could have happened* during the
 system's interaction with its environment. Each $K_k$ corresponds to
 one possible "environment outcome" (even though nothing is actually
 measured or recorded), and the sum $\sum_kK_k\rho K_k^\dagger$ correctly
-accounts for the system's state averaged over every possibility. This is
-exactly why it changes purity: it's a genuine statistical mixture over
-unknown environmental branches, encoded directly in the operator sum.
+accounts for the system's state averaged over every possibility. That's
+exactly why it changes purity: it's a statistical mixture over unknown
+environmental branches, encoded directly in the operator sum. On real
+hardware this is not an abstraction: a superconducting qubit's coupling
+to its control lines and to phonons in the chip substrate, or a trapped
+ion's coupling to stray electric-field noise, are physical instances of
+exactly this "environment outcome we don't track" picture, which is why
+$T_1$ and $T_2$ decay curves (measured routinely on every quantum
+processor) are Kraus-channel purity decay in disguise.
 
 ## Worked Example
 
@@ -147,9 +164,9 @@ $$
 K_0^\dagger K_0 + K_1^\dagger K_1 = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I
 $$
 
-confirmed for every $\gamma\in[0,1]$ by this platform's
-`isTracePreserving(amplitudeDampingChannel(gamma))`, which returns `true`
-across the full range.
+This holds for every $\gamma\in[0,1]$, confirmed directly by this
+platform's `isTracePreserving(amplitudeDampingChannel(gamma))`, which
+returns `true` across the full range.
 
 The same identity, seen rather than just algebraically derived: each
 preset below shows $K_0$, $K_1$, and $K_0^\dagger K_0+K_1^\dagger K_1$
@@ -201,13 +218,13 @@ is being bent.
 ## Summary
 
 - Open (environment-coupled) systems cannot, in general, evolve purely
-  unitarily: genuine purity loss requires going beyond
+  unitarily: real purity loss requires going beyond
   $\rho\to U\rho U^\dagger$.
 - The Kraus representation $\rho\to\sum_kK_k\rho K_k^\dagger$, subject to
   $\sum_kK_k^\dagger K_k=I$, is the general framework, a strict
   generalization of unitary evolution, not a replacement.
 - This platform's `isTracePreserving` verifies the condition directly,
-  confirmed both for genuine channels (amplitude damping, dephasing) and
+  confirmed both for physical channels (amplitude damping, dephasing) and
   against a deliberately invalid counter-example.
 
 ## Further Exploration

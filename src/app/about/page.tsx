@@ -75,9 +75,10 @@ export default async function AboutPage() {
             Students with a solid grounding in algebra and basic calculus and
             an interest in physics or computer science — no prior quantum
             mechanics or linear algebra required, though it helps. The
-            curriculum spans five tracks: quantum mechanics, quantum
-            computing, quantum hardware, quantum software, and Quantum
-            Mastery, a graduate-level track for those who complete the rest.
+            curriculum spans six pillars: quantum mechanics, quantum
+            computing, quantum hardware, and quantum software, followed by
+            Quantum Mastery&rsquo;s graduate-level rigor and Apex, the
+            research-depth capstone for those who complete the rest.
           </p>
         </Card>
       </div>

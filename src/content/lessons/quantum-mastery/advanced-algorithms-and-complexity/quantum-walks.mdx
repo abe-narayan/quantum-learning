@@ -107,6 +107,42 @@ export const walkExplorerFrames = walkExplorerSteps.map((steps) => {
   return { paramLabel: `T = ${steps}`, bars };
 });
 
+export function reachablePositions(offset) {
+  const positions = [];
+  for (let i = 0; i <= 2 * offset; i++) {
+    if ((i - offset) % 2 === 0) positions.push(i);
+  }
+  return positions;
+}
+
+export function walkGraphNodes(result) {
+  const idxs = reachablePositions(result.offset);
+  const mean = 1 / idxs.length;
+  return idxs.map((i, k) => ({
+    id: String(i - result.offset),
+    label: String(i - result.offset),
+    x: 0.04 + (k / (idxs.length - 1)) * 0.92,
+    y: 0.5,
+    group: result.probs[i] > mean ? 1 : 0,
+  }));
+}
+
+export function walkGraphEdges(nodes) {
+  const edges = [];
+  for (let k = 0; k < nodes.length - 1; k++) {
+    edges.push({ from: nodes[k].id, to: nodes[k + 1].id });
+  }
+  return edges;
+}
+
+export const walkGraphSteps = 12;
+export const walkGraphQuantum = hadamardWalk(walkGraphSteps);
+export const walkGraphClassical = classicalWalk(walkGraphSteps);
+export const walkGraphQuantumNodes = walkGraphNodes(walkGraphQuantum);
+export const walkGraphClassicalNodes = walkGraphNodes(walkGraphClassical);
+export const walkGraphQuantumEdges = walkGraphEdges(walkGraphQuantumNodes);
+export const walkGraphClassicalEdges = walkGraphEdges(walkGraphClassicalNodes);
+
 export const lessonMeta = {
   title: "Quantum Walks",
   description:
@@ -139,6 +175,15 @@ derivable fact about interference between paths that a classical walk's
 independent, memoryless steps can never produce, and it's the mechanism
 behind quantum walk search algorithms achieving the same quadratic
 Grover-style speedup on graph search problems.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Yakir_aharonov.jpg"
+  alt="Yakir Aharonov, physicist who co-introduced the quantum random walk"
+  caption="Aharonov, Davidovich, and Zagury's 1993 paper 'Quantum Random Walks' first framed a coin-and-shift process on a line as a genuine unitary evolution rather than a quantum-dressed classical Markov chain — exactly the object this lesson diagonalizes to derive its dispersion relation. The same coined-walk construction now underlies quantum walk search algorithms and has been physically realized with trapped ions and single photons."
+  credit="Kobi Kalmanowitz / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Yakir_aharonov.jpg"
+  license="CC BY-SA 3.0"
+/>
 
 ## Mathematical Development
 
@@ -303,6 +348,47 @@ light cone's edge, not a bug — see Common Mistakes below), but the
 overall envelope shrinking against the classical curve's fixed center
 height is unmistakable. Scrubbing $T$ makes that quadratic gap between
 the two spreading rates directly visible, not just asserted.
+
+### The same data, redrawn as a graph
+
+A bar chart plots probability against position; laying the reachable
+positions out as an actual line graph, nodes lit up when their
+probability exceeds the average $1/(\text{number of reachable
+positions})$, makes the *shape* of where probability sits easier to
+read at a glance than a skyline of bars. At $T=12$ (13 reachable
+positions, mean threshold $\approx0.0769$):
+
+<GraphDiagram
+  nodes={walkGraphQuantumNodes}
+  edges={walkGraphQuantumEdges}
+  ariaLabel="Quantum (Hadamard) walk after 12 steps, positions -12 to 12 drawn as a line graph, with nodes lit above-average probability: two separate lit clusters near positions -8 to -4 and 4 to 8, with both the center and the far edges dark"
+/>
+
+<GraphDiagram
+  nodes={walkGraphClassicalNodes}
+  edges={walkGraphClassicalEdges}
+  ariaLabel="Classical random walk after 12 steps, positions -12 to 12 drawn as a line graph, with nodes lit above-average probability: a single lit cluster centered at position 0 spanning -4 to 4, with the far edges dark"
+/>
+
+The classical walk lights up one cluster, centered on the origin, and
+goes dark toward the edges: probability mass diffusing outward from
+where it started, thinning as it goes. The quantum walk lights up *two*
+clusters, straddling $\pm8\approx T/\sqrt2$ — the light-cone edge
+derived above — while the center goes dark: exactly the "pushed
+outward, not spread inward" signature the bar charts above already
+showed, now visible as literal geography on the line the walker moves
+along rather than as bar heights.
+
+<PredictBeforeReveal
+  question="Quadruple the number of steps T (say from 10 to 40). The classical walk's typical displacement scales as √T. What happens to the quantum walk's typical displacement, which scales as T?"
+  options={[
+    { label: "It also roughly doubles, same as the classical walk", value: "double" },
+    { label: "It roughly quadruples — the same factor T was multiplied by", value: "quadruple" },
+    { label: "It grows by 16×, the square of the classical factor", value: "sixteen" },
+  ]}
+  correctValue="quadruple"
+  explanation="Classical displacement ∝ √T, so quadrupling T only doubles it (√4=2) — that's the diffusive slowdown. Quantum displacement ∝ T directly, so quadrupling T quadruples it. The table below shows exactly this: going from T=10 to T=40, √(classical variance) goes from √10≈3.16 to √40≈6.32 (doubled), while √(quantum variance) goes from √29.95≈5.47 to √469.1≈21.66 (quadrupled) — the same gap the dispersion relation's bounded group velocity predicts, now checked against real simulated numbers instead of just the scaling exponent."
+/>
 
 **Scaling check across $T=10,20,40,80,160$:**
 

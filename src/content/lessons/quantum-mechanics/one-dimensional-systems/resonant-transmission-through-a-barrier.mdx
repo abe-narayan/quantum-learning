@@ -93,8 +93,14 @@ Tunneling and the Finite Barrier covered $E<V_0$: a barrier taller than
 the particle's energy, crossed only by the exponentially-suppressed
 tunneling mechanism. This lesson covers the complementary regime,
 $E>V_0$: the particle has enough energy to classically cross the
-barrier, so *something* transmits. Exactly how much, as a function
-of energy, turns out to have a genuinely surprising structure.
+barrier, so *something* transmits, and classically all of it should,
+every time, with no obstacle at all worth mentioning. Quantum mechanics
+disagrees on both counts. At most energies the barrier reflects part of
+the beam even though the particle "should" sail over it — and then, at
+a specific, predictable sequence of energies, the reflection vanishes
+*completely*. $T=1$, exactly, not approximately. A barrier that is, by
+every classical measure, a solid obstruction becomes perfectly
+transparent.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/9/90/Reflective_and_anti-reflective_lens.jpg"
@@ -109,12 +115,13 @@ of energy, turns out to have a genuinely surprising structure.
 
 A barrier with $E>V_0$ has the *same* three-region structure as the
 step-potential problem, just with a third region (transmitted wave)
-past a *second* boundary. Crucially, inside the barrier the
-wavefunction still **oscillates** (not decays, since $E>V_0$ there
-means $k$ is real inside too), unlike the tunneling case's exponential
-decay. Two boundaries means two reflected waves can interfere with each
-other, and interference, constructive or destructive, is exactly what
-produces resonances.
+past a *second* boundary. The difference that matters: inside the
+barrier the wavefunction still **oscillates** (not decays, since
+$E>V_0$ there means $k$ is real inside too), unlike the tunneling
+case's exponential decay. Two boundaries means two reflected waves —
+one from entering the barrier, one from leaving it — can interfere with
+each other, and interference, constructive or destructive, is exactly
+what produces resonances.
 
 ## Mathematical Development
 
@@ -147,7 +154,21 @@ $$
 
 At these special energies, the barrier is **perfectly transparent**:
 every incident particle transmits, none reflects, despite the barrier
-being, in every other sense, a genuine obstacle. Sweeping barrier width
+being, in every other sense, a genuine obstacle.
+
+<PredictBeforeReveal
+  question="Fix E=5 and V0=2, then slowly widen the barrier L from near 0. What does the transmission probability T(L) do?"
+  options={[
+    { label: "T decreases monotonically as L grows", value: "monotonic" },
+    { label: "T oscillates, occasionally dipping toward 0 but never reaching 1 again", value: "damped" },
+    { label: "T oscillates and touches exactly 1 at a regular sequence of widths", value: "resonant" },
+    { label: "T stays essentially constant near 1 for any width", value: "constant" },
+  ]}
+  correctValue="resonant"
+  explanation="T = [1 + V0²sin²(k2L)/(4E(E−V0))]⁻¹ hits exactly 1 whenever sin(k2L)=0, i.e. k2L = nπ — a periodic, exact return to perfect transmission, not a decaying oscillation. The curve below plots exactly this and touches T=1 at each of those widths."
+/>
+
+Sweeping barrier width
 $L$ at fixed $E=5,V_0=2$ makes the oscillation, and the resonance peaks
 hitting exactly $T=1$, directly visible:
 
@@ -196,6 +217,19 @@ condition $k_2L=n\pi$ is exactly the same "round-trip phase is a
 multiple of $2\pi$" condition that governs optical thin-film
 interference: the same physics as light, showing up because both are
 governed by a wave equation with boundary matching.
+
+This isn't just a textbook curiosity. Resonant tunneling diodes (RTDs)
+use a thin quantum well sandwiched between two barriers, engineered so
+a transmission resonance sits at a specific electron energy. Applying a
+voltage shifts that resonance relative to the incoming electrons: as
+the bias increases, current first rises sharply as electrons sweep
+through the resonance, then *drops* as the bias pushes past it, even
+though the voltage keeps climbing. That drop is negative differential
+resistance, a behavior no ordinary resistor has, and it makes RTDs
+useful in high-frequency oscillators and fast switching circuits. The
+device runs on the same physics as this lesson's single barrier, just
+with two barriers instead of one and the resonance tuned electrically
+instead of by sweeping $L$ by hand.
 
 ## Worked Example
 

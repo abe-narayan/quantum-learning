@@ -147,7 +147,20 @@ exactly, checked directly in this module's tests.
 
 Here is the case with no state-vector equivalent at all. Take
 $\rho=I/2$, the maximally mixed qubit, and measure the computational
-basis projector $P_0=|0\rangle\langle0|$:
+basis projector $P_0=|0\rangle\langle0|$. Before working it out, predict
+both numbers: the probability of outcome 0, and what the state becomes
+afterward.
+
+<PredictBeforeReveal
+  question="ρ=I/2 has no state vector at all — total ignorance about the qubit's basis state. What happens when you measure P₀=|0⟩⟨0|?"
+  options={[
+    { label: "p₀ is undefined, since there's no |ψ⟩ to apply the Born rule to", value: "undefined" },
+    { label: "p₀=0.5, but the post-measurement state stays mixed", value: "half-mixed" },
+    { label: "p₀=0.5, and the post-measurement state collapses to a pure state, |0⟩⟨0|", value: "half-pure" },
+  ]}
+  correctValue="half-pure"
+  explanation="Both p=Tr(ρP) and the collapse formula ρ_after=PρP/p are defined for any valid density matrix, not just pure ones — that's exactly the point of rederiving them via the trace trick above. p₀ comes out to exactly 0.5, and the post-measurement state collapses all the way to the pure state |0⟩⟨0|, even though the state you started with had no state vector to begin with."
+/>
 
 $$
 p_0 = \text{Tr}(P_0\,\rho) = \text{Tr}\!\left(|0\rangle\langle0|\cdot\tfrac12I\right) = \tfrac12

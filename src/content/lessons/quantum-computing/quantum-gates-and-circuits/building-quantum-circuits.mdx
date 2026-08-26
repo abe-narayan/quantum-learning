@@ -3,6 +3,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
 import { measureQubit } from "@/lib/quantum/measurement";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -36,6 +37,37 @@ export const ghzStep2 = applyCNOT(ghzStep1, 0, 1);
 export const ghzStep3 = applyCNOT(ghzStep2, 0, 2);
 
 export const ghzMeasured = measureQubit(ghzStep3, 0, 0.9);
+
+export const ghzCircuitFrames = [
+  {
+    paramLabel: "Step 1: H on qubit 0",
+    numQubits: 3,
+    highlightColumn: 0,
+    ariaLabel: "Three-qubit circuit showing only step 1, H on qubit 0, highlighted",
+    instructions: [{ gate: "H", targets: [0] }],
+  },
+  {
+    paramLabel: "Step 2: CNOT(0, 1)",
+    numQubits: 3,
+    highlightColumn: 1,
+    ariaLabel: "Three-qubit circuit with step 2, CNOT with qubit 0 as control and qubit 1 as target, highlighted",
+    instructions: [
+      { gate: "H", targets: [0] },
+      { gate: "CNOT", targets: [0, 1] },
+    ],
+  },
+  {
+    paramLabel: "Step 3: CNOT(0, 2)",
+    numQubits: 3,
+    highlightColumn: 2,
+    ariaLabel: "Three-qubit circuit with step 3, CNOT with qubit 0 as control and qubit 2 as target, highlighted",
+    instructions: [
+      { gate: "H", targets: [0] },
+      { gate: "CNOT", targets: [0, 1] },
+      { gate: "CNOT", targets: [0, 2] },
+    ],
+  },
+];
 
 ## Motivation
 
@@ -71,17 +103,13 @@ brand-new circuit.
 ### The circuit
 
 Extend the Bell-state recipe by one qubit: $H$ on qubit 0, then
-$\text{CNOT}(0,1)$, then $\text{CNOT}(0,2)$.
+$\text{CNOT}(0,1)$, then $\text{CNOT}(0,2)$. Step through it below one
+gate at a time and predict the state before checking it against the
+panels underneath.
 
-<StaticCircuitDiagram
-  numQubits={3}
-  instructions={[
-    { gate: "H", targets: [0] },
-    { gate: "CNOT", targets: [0, 1] },
-    { gate: "CNOT", targets: [0, 2] },
-  ]}
-  ariaLabel="A three-qubit circuit: H on qubit 0, then CNOT with qubit 0 as control and qubit 1 as target, then CNOT with qubit 0 as control and qubit 2 as target"
-/>
+<InteractiveSection title="Step through the GHZ circuit" description="Drag the slider from step 1 to step 3. At each step, cover the state panels below and predict what changed before you look: which basis states gain or lose amplitude, and why.">
+  <CircuitDiagramExplorer frames={ghzCircuitFrames} sliderLabel="Build step" />
+</InteractiveSection>
 
 <QuantumStateDisplay state={ghzStep0} label="Start: |000⟩" />
 <QuantumStateDisplay state={ghzStep1} label="After H on qubit 0" />
@@ -108,8 +136,20 @@ $|a\rangle\otimes|b\rangle\otimes|c\rangle$, every one of the six
 "mixed" basis terms ($|001\rangle,|010\rangle,|011\rangle,|100\rangle,|101\rangle,|110\rangle$)
 would need zero amplitude, forcing at least one of $|a\rangle,|b\rangle,|c\rangle$
 to have a zero component, which then also zeroes out one of the surviving
-terms ($|000\rangle$ or $|111\rangle$). Genuinely entangled, same
-technique, one qubit more.
+terms ($|000\rangle$ or $|111\rangle$). Entangled by the same
+contradiction, one qubit more.
+
+<PredictBeforeReveal
+  question="If you measure qubit 0 of the GHZ state (|000⟩+|111⟩)/√2 and get outcome 1, what do you expect for qubits 1 and 2?"
+  options={[
+    { label: "Both collapse to 0", value: "00" },
+    { label: "Both collapse to 1", value: "11" },
+    { label: "One is 0, one is 1, but which is random", value: "mixed" },
+    { label: "They stay in superposition", value: "superposition" },
+  ]}
+  correctValue="11"
+  explanation="Every term in the state pairs qubit 0's value with the identical value on qubits 1 and 2 — there is no |1**0**0⟩ or |1**1**0⟩ term to collapse onto. Measuring qubit 0 as 1 leaves only the |111⟩ branch, so qubits 1 and 2 are both determined to be 1 with certainty, no further measurement needed."
+/>
 
 **What happens on measurement?** Measure qubit 0:
 

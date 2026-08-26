@@ -176,7 +176,7 @@ S$, a radial function times the dot product of orbital and spin angular
 momentum (the standard, Thomas-precession-corrected coefficient
 $\xi(r)=\frac{1}{2m^2c^2}\frac1r\frac{dV}{dr}$ is cited here rather than
 re-derived: getting the factor of $\tfrac12$ right requires the
-relativistic kinematics of the electron's rotating rest frame, genuinely
+relativistic kinematics of the electron's rotating rest frame, well
 outside this lesson's scope, an honest citation matching Fine Structure
 (Introduction)'s own convention). For fixed $n,l$, $\xi(r)$ is the *same*
 number for every state in that $(n,l)$ subspace (it depends only on $r$,
@@ -240,6 +240,17 @@ $$
 Independent agreement to 5 decimal places, not assumed. Plugging $n=2,l=1$
 into the boxed formula for both $2p$ fine-structure levels:
 
+<PredictBeforeReveal
+  question="Spin and orbital magnetic moments aligned (L·S>0) costs energy to hold in place; anti-aligned (L·S<0) is the lower-energy configuration. Given the coupled-basis eigenvalues above (+1/2 for j=3/2, −1 for j=1/2), which 2p sublevel ends up higher in energy?"
+  options={[
+    { label: "2p₃/₂ (j=3/2) sits higher", value: "32" },
+    { label: "2p₁/₂ (j=1/2) sits higher", value: "12" },
+    { label: "They stay exactly degenerate — spin-orbit coupling doesn't split them", value: "same" },
+  ]}
+  correctValue="32"
+  explanation="⟨L·S⟩=+1/2 for j=3/2 and −1 for j=1/2, so the j=3/2 quadruplet is pushed up and the j=1/2 doublet is pushed down, exactly what the diagram below shows numerically. The weighted average still comes out to zero (4×(+1/2)+2×(−1)=0), since spin-orbit coupling only splits the level, it can't shift the l=1 subspace's center of mass."
+/>
+
 <EnergyLevelDiagram
   levels={[
     { label: "2p (unperturbed within n=2, l=1)", energy: 0 },
@@ -262,7 +273,7 @@ supplies).
 
 ## Physical Interpretation
 
-The 2p level's $6$-fold spin-orbital degeneracy is genuinely lifted, not
+The 2p level's $6$-fold spin-orbital degeneracy is actually lifted, not
 just relabeled: $2p_{3/2}$ (four states, $m_j=\pm\tfrac32,\pm\tfrac12$)
 sits *above* the unperturbed energy, $2p_{1/2}$ (two states,
 $m_j=\pm\tfrac12$) sits *below* it, exactly as required for the
@@ -303,7 +314,7 @@ derived above (diagonalize $H'$ within the subspace *first*).
 **Assuming the uncoupled $|m_L,m_S\rangle$ basis is "good enough" since
 it's a valid basis for the degenerate subspace.** It's a valid basis, but
 not the *correct zeroth-order* one: the uncoupled-basis panel above shows
-$\vec L\cdot\vec S$ genuinely mixing these states, meaning a state that
+$\vec L\cdot\vec S$ actually mixing these states, meaning a state that
 starts as pure $|m_L,m_S\rangle$ does not stay an energy eigenstate once
 $H'_{SO}$ turns on.
 </Callout>
@@ -323,7 +334,7 @@ $H'_{SO}$ turns on.
    formula's $l(l+\tfrac12)(l+1)$ denominator, which is undefined at
    $l=0$ for a different reason)?
 4. Explain, using this lesson's derivation, why "diagonalize $H'$ within
-   the degenerate subspace" is a genuinely necessary first step and not
+   the degenerate subspace" is a strictly necessary first step and not
    just good practice: what specifically goes wrong in the boxed
    first-order formula, $\sum_\alpha\langle\beta|H'|\alpha\rangle
    c_\alpha=E^{(1)}c_\beta$, if a non-eigenvector combination is used
@@ -337,7 +348,7 @@ $H'_{SO}$ turns on.
   zeroth-order states are the eigenvectors of $H'$ restricted to
   (projected onto) the degenerate subspace, derived directly from the
   first-order Schrödinger equation, not assumed.
-- Applied to hydrogen's $2p$ level, $\vec L\cdot\vec S$ is genuinely
+- Applied to hydrogen's $2p$ level, $\vec L\cdot\vec S$ is actually
   non-diagonal in the uncoupled $|m_L,m_S\rangle$ basis but exactly
   diagonal in the coupled $|j,m_j\rangle$ basis, checked directly via this
   platform's own angular-momentum operators, not asserted by symmetry.

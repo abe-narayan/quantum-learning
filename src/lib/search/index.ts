@@ -70,7 +70,7 @@ const SIMULATOR_ENTRIES: SearchEntry[] = [
     type: "simulator",
     title: "Wavefunction Explorer",
     description:
-      "A real 1D numerical wavefunction simulator — position and momentum grids, an actual FFT, and genuine time evolution via the split-operator method.",
+      "A 1D numerical wavefunction simulator — position and momentum grids, a real FFT, and time evolution via the split-operator method.",
     href: "/simulators#wavefunction-explorer",
   },
   {
@@ -91,7 +91,7 @@ const SIMULATOR_ENTRIES: SearchEntry[] = [
     type: "simulator",
     title: "Max-Cut QAOA Explorer",
     description:
-      "Drag the cost angle γ and mixer angle β across a real p=1 QAOA circuit on a few small graphs and watch the genuinely computed expected cut size chase the real brute-force optimum.",
+      "Drag the cost angle γ and mixer angle β across a p=1 QAOA circuit on a few small graphs and watch the computed expected cut size chase the brute-force optimum.",
     href: "/simulators#qaoa-explorer",
   },
   {

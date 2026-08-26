@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/classical-states-and-observables"
@@ -52,7 +53,7 @@ export const lessonMeta = {
 
 Eleven lessons of linear algebra built a powerful mathematical toolkit
 without saying much about physics at all. Before applying that toolkit,
-it's worth being precise about what it's replacing: what "state" and
+this lesson pins down exactly what it's replacing: what "state" and
 "observable" meant *before* quantum mechanics, so the differences that are
 coming aren't differences of degree, but differences of kind.
 
@@ -169,6 +170,17 @@ $$
 
 This value is exact and unambiguous. There is nothing probabilistic
 about evaluating a function at a known point.
+
+<PredictBeforeReveal
+  question="Holding x = 1 fixed, if p increases from 2 to 3, what happens to the potential energy term ½kx²?"
+  options={[
+    { label: "It increases along with p", value: "increases" },
+    { label: "It decreases", value: "decreases" },
+    { label: "It stays exactly 2, unchanged", value: "unchanged" },
+  ]}
+  correctValue="unchanged"
+  explanation="½kx² depends only on x, which is held fixed at 1, so it stays exactly 2 no matter what p does. Only the kinetic term p²/2m responds to the slider below — a direct look at why E(x,p) is a function of the whole state, not one dial that moves everything at once."
+/>
 
 <InteractiveSection title="Slide p, watch E(x,p) respond deterministically" description="x is held fixed at 1. Drag p and watch the kinetic term, potential term, and total energy recompute instantly, with no spread and no probability distribution anywhere. p = 2 is marked, reproducing the worked example's E = 4 exactly.">
   <BarChartExplorer

@@ -129,9 +129,29 @@ standard vocabulary; the rotation formula is the whole language.
 
 ## Interactive Experiment
 
+<PredictBeforeReveal
+  question="R_z(2π) is a full 2π turn about the z-axis, so R_z(2π) = −I, not I (you'll show this in the practice questions). Apply R_z(2π) to |+⟩. What state comes out?"
+  options={[
+    { label: "|+⟩ again, exactly", value: "plus" },
+    { label: "−|+⟩, physically the same state as |+⟩", value: "negplus" },
+    { label: "|−⟩, the opposite equatorial point", value: "minus" },
+    { label: "|0⟩, back at the north pole", value: "zero" },
+  ]}
+  correctValue="negplus"
+  explanation="−I|+⟩ = −|+⟩. That's a different vector on paper, but an overall factor of −1 is a global phase, and global phase is never observable: −|+⟩ and |+⟩ give identical measurement probabilities and identical behavior in every experiment. Geometrically this matches the Bloch picture too: a full 2π rotation about any axis brings every point back to exactly where it started, so |+⟩ has to return to the same point on the sphere. The minus sign is the amplitude-level trace of a rotation that, physically, changed nothing at all."
+/>
+
 <InteractiveSection title="Rz vs. Rx/Ry, and a fixed point" description={`Set θ and φ to something away from the poles (e.g. via the |+⟩ preset), then apply Rz at a few different angles. Watch the state panel: θ should stay exactly fixed while φ changes. Confirm this numerically, not just visually. From the same starting state, try Rx and Ry instead. Unlike Rz, these generally move both θ and φ. Prepare |0⟩ (a pole) and apply Rz at any angle. Nothing moves: |0⟩ sits exactly on the z-axis, the rotation's own axis.`}>
   <LazyBlochSphereExplorer />
 </InteractiveSection>
+
+The checks above (Rz fixing θ, Rx/Ry moving both angles, Rz fixing the
+poles) are the ones this lesson's math actually predicts, but the same
+tool lives on its own page as the platform's full
+[Bloch Sphere Explorer](/simulators#bloch-sphere). It's worth bookmarking:
+come back to it any time you want to check a rotation, a gate sequence, or
+a measurement probability against your own hand computation, for any
+lesson in this course, not just this one.
 
 ## Worked Example
 

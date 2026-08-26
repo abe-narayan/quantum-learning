@@ -46,6 +46,21 @@ export function Hero() {
             </Button>
           </div>
 
+          <dl className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">
+            <div className="flex items-baseline gap-1.5">
+              <dt className="font-semibold text-foreground">219</dt>
+              <dd>lessons</dd>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <dt className="font-semibold text-foreground">14</dt>
+              <dd>interactive simulators</dd>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <dt className="font-semibold text-foreground">6</dt>
+              <dd>pillars, ending at Apex</dd>
+            </div>
+          </dl>
+
           <ContinueLearning />
         </div>
 

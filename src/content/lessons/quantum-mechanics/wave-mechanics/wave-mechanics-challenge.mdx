@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
@@ -58,7 +59,7 @@ export const lessonMeta = {
   objectives: [
     "Map every idea from this course onto its finite-dimensional counterpart from the last course",
     "Solve synthesis problems that combine tools from more than one lesson in this course",
-    "Identify what remains genuinely open for future courses (angular momentum, three dimensions, multi-particle systems)",
+    "Identify what remains open for future courses (angular momentum, three dimensions, multi-particle systems)",
   ],
 };
 
@@ -69,10 +70,19 @@ there for finite-dimensional Hilbert spaces, and carried them across to
 continuous position, one lesson at a time: the wavefunction as a
 continuum-limit basis expansion, momentum space as a Fourier-transform
 basis change, the Schrödinger equation as calculus substituted into
-already-proven dynamics, and three genuinely solved systems (the infinite
+already-proven dynamics, and three fully solved systems (the infinite
 well, the harmonic oscillator, and tunneling). None of it required new
 physical postulates. Only new mathematical machinery was needed to
 express the same four postulates in an infinite-dimensional setting.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/5/50/Paul_Dirac%2C_1933.jpg"
+  alt="Formal 1933 photographic portrait of physicist Paul Dirac"
+  caption="Paul Dirac, whose transformation theory showed in 1926 that Heisenberg's matrix mechanics and Schrödinger's wave mechanics were the same physics in different representations -- exactly the equivalence this capstone's recap table lays out row by row."
+  credit="Nobel Foundation"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Paul_Dirac,_1933.jpg"
+  license="Public domain"
+/>
 
 ## Recap: Finite Dimensions to Continuous Position
 
@@ -87,7 +97,7 @@ express the same four postulates in an infinite-dimensional setting.
 | Harmonic oscillator via ladder operators | Same spectrum, via direct substitution of a Gaussian ansatz |
 | $U(t)=e^{-iHt/\hbar}$, exact for 2-level systems | Split-operator numerical approximation, exact only as $\Delta t\to0$ |
 
-The last row is the one genuinely new feature: finite-dimensional
+The last row is the one substantively new feature: finite-dimensional
 evolution (a $2\times2$ or truncated matrix exponential) could often be
 computed exactly. Continuous-position evolution generally cannot, which
 is exactly why this course needed to build a real numerical engine (the
@@ -95,6 +105,17 @@ FFT, the split-operator method) rather than only proving formulas on
 paper.
 
 ## Worked Synthesis Examples
+
+<PredictBeforeReveal
+  question="A particle sits in the infinite well's ground state -- an energy eigenstate -- and is left alone. What happens to <x> over time?"
+  options={[
+    { label: "It oscillates back and forth", value: "oscillates" },
+    { label: "It stays exactly constant", value: "constant" },
+    { label: "It decays toward the well's center", value: "decays" },
+  ]}
+  correctValue="constant"
+  explanation="An energy eigenstate evolves by a pure phase (Schrodinger Equation in Position Space), so |psi(x,t)|^2 never changes, and neither does any expectation value built from it, including <x>. Worked Example 1 below reaches the same conclusion from Ehrenfest's theorem instead."
+/>
 
 **1. A particle is in the infinite well's ground state. Using both this
 course's position-space energy formula and Ehrenfest's theorem, explain
@@ -141,10 +162,10 @@ $\psi(x,t) = \tfrac{1}{\sqrt2}\left(\psi_1(x)e^{-iE_1t/\hbar} +
 \psi_2(x)e^{-iE_2t/\hbar}\right)$. Computing $|\psi(x,t)|^2$ produces
 cross terms proportional to $\cos\!\big((E_2-E_1)t/\hbar\big)$ (from
 expanding $|a+b|^2=|a|^2+|b|^2+2\,\mathrm{Re}(a^*b)$ with the two
-time-dependent phases): a genuine beat frequency set exactly by the
-energy gap, exactly what the Wavefunction Explorer's superposition preset
-animates. A single eigenstate has no second term to beat against, so no
-oscillation survives.
+time-dependent phases): a beat frequency set exactly by the energy gap,
+exactly what the Wavefunction Explorer's superposition preset animates. A
+single eigenstate has no second term to beat against, so no oscillation
+survives.
 
 <InteractiveSection
   title="Watch two eigenstates beat against each other"
@@ -173,7 +194,7 @@ course derived is exact.
 
 1. Using the recap table, identify which single derivation in this course
    most directly reproved something the last course had only stated
-   (rather than genuinely deriving something new).
+   (rather than deriving something new from scratch).
 2. A particle tunnels through a barrier. Using Ehrenfest's theorem,
    explain whether $\langle p\rangle$ is conserved throughout the process
    (hint: consider whether $V(x)$ is uniform).
@@ -190,7 +211,7 @@ course derived is exact.
   Schrödinger equation, bound states, tunneling) is the last course's
   finite-dimensional postulates, carried across to continuous position by
   a continuum limit, a Fourier transform, and direct calculus.
-- The one genuinely new ingredient is numerical: continuous-position time
+- The one new ingredient is numerical: continuous-position time
   evolution generally has no closed form, so this course built (and
   honestly documented the limitations of) a real split-operator engine.
 - Bound states (well, oscillator) are stationary; superpositions of
@@ -201,7 +222,7 @@ course derived is exact.
 ## Further Exploration
 
 This completes **Wave Mechanics**. Three-dimensional systems, angular
-momentum, and spin, genuinely new structure this course's 1D machinery
-doesn't yet cover, are the natural next steps deeper into the Quantum
+momentum, and spin, structure this course's 1D machinery doesn't yet
+cover at all, are the natural next steps deeper into the Quantum
 Mechanics pillar, building on the position-space Schrödinger equation,
 Fourier techniques, and bound-state intuition developed here.

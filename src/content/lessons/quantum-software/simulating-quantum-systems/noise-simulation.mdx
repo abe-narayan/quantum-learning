@@ -72,7 +72,7 @@ exactly as-is.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Measuring_a_qubit_leaves_no_room_for_error.jpg/1280px-Measuring_a_qubit_leaves_no_room_for_error.jpg"
   alt="Engineers assembling the cryogenic dilution-refrigerator hardware used to cool and measure superconducting quantum processors, at the FMN Laboratory"
-  caption="Engineers assembling the cryogenic hardware that will run real, genuinely noisy qubits. A noise simulator's entire job is predicting what dephasing and readout error like this will do to a circuit's output before ever consuming time on hardware like this."
+  caption="Engineers assembling the cryogenic hardware that will run real, physically noisy qubits. A noise simulator's entire job is predicting what dephasing and readout error like this will do to a circuit's output before ever consuming time on hardware like this."
   credit="Sergey Kushlevich / FMN Laboratory, Bauman Moscow State Technical University"
   creditUrl="https://commons.wikimedia.org/wiki/File:Measuring_a_qubit_leaves_no_room_for_error.jpg"
   license="CC BY 4.0"
@@ -95,24 +95,24 @@ elsewhere.
 ### A concrete demonstration
 
 $H$ then $H$ again is, ideally, the identity ($HH=I$): applied to
-$|0\rangle$, it should return exactly to $|0\rangle$. This platform's
-engine confirms this exactly with a trivial (identity) noise channel:
-`purity=1`, `P(0)=1`, no deviation at all.
+$|0\rangle$, it should return cleanly to $|0\rangle$. This platform's
+engine confirms it with a trivial (identity) noise channel: `purity=1`,
+`P(0)=1`, no deviation at all.
 
 With a real dephasing channel ($\lambda=0.2$) interleaved after each of
 the two $H$ gates instead, the SAME circuit no longer returns cleanly:
 $P(0)\approx0.9$ (not $1.0$), and purity drops to $\approx0.82$, a
-directly computed illustration of exactly what "noise degrades circuit
+directly computed illustration of what "noise degrades circuit
 fidelity" means numerically, not just qualitatively.
 
 The Noise & Decoherence Explorer below runs the *same* dephasing channel
 this lesson uses, but applies it repeatedly to a fixed state rather than
 interleaving it between gates, so its numbers won't reproduce this
-lesson's $\approx0.82$ exactly. Starting it from $|0\rangle$ specifically
-would show no decay at all: dephasing leaves a computational-basis state
-untouched entirely (there's no coherence for it to destroy), which is
-exactly *why* this lesson's demonstration needs the $H$ gates first, to
-rotate into a state dephasing can actually act on.
+lesson's $\approx0.82$. Starting it from $|0\rangle$ specifically would
+show no decay at all: dephasing leaves a computational-basis state
+untouched (there's no coherence for it to destroy), which is why this
+lesson's demonstration needs the $H$ gates first, to rotate into a
+state dephasing can actually act on.
 
 <InteractiveSection title="Watch purity fall under repeated dephasing" description="Start from |+⟩, pick Dephasing, and step forward. Watch purity fall the same qualitative way this lesson's H-then-noise-then-H sequence does, even though the exact numbers won't match (no gates are interleaved here, just repeated channel steps on a fixed state).">
   <LazyNoiseExplorer />
@@ -145,13 +145,24 @@ or can it stay flat for some steps?**
 
 This platform's own test suite shows purity after 1 noisy $H$ gate
 ($\approx0.82$) equals purity after 2 noisy $H$ gates (also
-$\approx0.82$), NOT strictly decreasing at every single step, but
+$\approx0.82$) — not strictly decreasing at every single step — but
 purity after 3 gates ($\approx0.70$) is strictly less than after 1. This
-reflects $H$'s specific interaction with dephasing noise (the second $H$
+reflects $H$'s specific interaction with dephasing noise: the second $H$
 partially "undoes" the first's basis rotation relative to the noise's
-preferred axis), a genuine, checkable detail illustrating that noise
-accumulation isn't always simply monotonic step-by-step, even though it
-trends downward overall.
+preferred axis, a checkable detail showing that noise accumulation
+isn't always monotonic step-by-step, even though it trends downward
+overall.
+
+<PredictBeforeReveal
+  question="Purity after 1 noisy H gate is ≈0.82. Adding a second noisy H gate — does purity drop further, stay about the same, or bounce back up?"
+  options={[
+    { label: "Drops further, since noise accumulates with every gate", value: "drops" },
+    { label: "Stays at about the same value, ≈0.82", value: "flat" },
+    { label: "Bounces back up toward 1", value: "recovers" },
+  ]}
+  correctValue="flat"
+  explanation="It stays flat at ≈0.82. The second H rotates the state back in a way that partially undoes the first H's alignment with the dephasing channel's preferred axis, so this particular step doesn't cost any additional purity — even though a third noisy H gate then drops purity again, to ≈0.70. Noise accumulation trends downward overall, but not gate-by-gate without exception."
+/>
 
 <InteractiveSection title="Purity across the worked example, computed live" description="Each step re-runs this platform's own runNoisyCircuit from |0⟩ with 1, 2, or 3 noisy H gates (dephasing λ=0.2 interleaved after every gate, exactly as runNoisyCircuit's loop does). Slide across gate counts: purity drops from 1 to ≈0.82 after the first gate, stays at ≈0.82 after the second (the non-monotonic step this section asks about), then drops again to ≈0.70 after the third.">
   <BarChartExplorer

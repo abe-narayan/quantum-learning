@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
@@ -50,7 +51,8 @@ Energy in classical mechanics splits into kinetic ($p^2/2m$) plus
 potential ($V(x)$). The Hamiltonian operator does the same split, with
 $p$ replaced by the operator $\hat p$ derived two lessons ago. Substituting
 that operator's explicit differential form into the abstract time-evolution
-equation is genuinely mechanical: no new physical input required.
+equation is pure bookkeeping: no new physical input required, just
+algebra applied to something already proven.
 
 ## Mathematical Development
 
@@ -113,7 +115,18 @@ localized wavefunction has broad, high-momentum Fourier content. The
 potential term simply weights each position by its local potential
 energy, position-space's most literal ingredient.
 
-<InteractiveSection title="Confirm the solver is honest" description="Every preset in the Wavefunction Explorer numerically solves this exact equation forward in time, not a canned animation but a genuine finite timestep integration (the next lessons build the specific potentials and the specific numerical method). Play any preset and watch the live ⟨H⟩ readout: for an eigenstate preset it should stay essentially fixed at the analytical E_n, a direct, numerical confirmation that the simulator is solving this equation correctly and not merely animating a plausible-looking picture.">
+<PredictBeforeReveal
+  question="The infinite-well ground state is an energy eigenstate. If the Wavefunction Explorer is honestly integrating the Schrodinger equation above forward in time step by step, what should its live <H> readout do while the preset plays?"
+  options={[
+    { label: "Stay essentially fixed at the analytical E_1", value: "fixed" },
+    { label: "Oscillate at a beat frequency", value: "oscillate" },
+    { label: "Drift steadily upward as the simulation runs", value: "drift" },
+  ]}
+  correctValue="fixed"
+  explanation="Energy is conserved for a stationary state, so <H> should sit essentially flat at the analytical E_1 for as long as the preset runs. A beat frequency would mean a superposition of two energies (a later lesson's territory), and steady drift would mean the numerical integrator itself is leaking energy it shouldn't -- exactly the failure mode the readout below is built to expose."
+/>
+
+<InteractiveSection title="Confirm the solver is honest" description="Every preset in the Wavefunction Explorer numerically solves this exact equation forward in time -- an actual finite-timestep integration, not a canned animation (the next lessons build the specific potentials and the specific numerical method). Play any preset and watch the live ⟨H⟩ readout against the prediction above: for an eigenstate preset it should stay essentially fixed at the analytical E_n, a direct, numerical confirmation that the simulator is solving this equation correctly and not merely animating a plausible-looking picture.">
   <LazyWavefunctionExplorer initialPresetId="infinite-well-ground" />
 </InteractiveSection>
 

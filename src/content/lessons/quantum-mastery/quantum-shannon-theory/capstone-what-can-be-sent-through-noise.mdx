@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { Complex } from "@/lib/quantum/complex";
@@ -220,6 +221,15 @@ Neumann entropy, the same inequality Entropy and Mutual Information
 proved), and $\chi=0$ exactly when every $\rho_i$ is identical, no
 label-dependent signal survives at all.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/3/38/Holevo%2C_Alexander2.jpg"
+  alt="Photograph of mathematician Alexander Holevo"
+  caption="Alexander Holevo, whose 1973 bound on how much classical information a quantum measurement can extract from an ensemble gives this section's quantity its name, and whose work with Schumacher and Westmoreland later turned that single-measurement bound into the full channel-capacity theorem (HSW) this lesson uses to compute C(p) below."
+  credit="Renate Schmid / Mathematisches Forschungsinstitut Oberwolfach, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Holevo,_Alexander2.jpg"
+  license="CC BY-SA 2.0 DE"
+/>
+
 ### The classical capacity: HSW
 
 Given a channel $\mathcal N$, define $\chi^*(\mathcal N)=\max_{\{p_i,\rho_i\}}\chi(\{p_i,\mathcal N(\rho_i)\})$,
@@ -365,6 +375,17 @@ re-derived here): $C(p)=1-S(\mathcal N_p(|0\rangle\langle0|))$, giving
 $C(0.2)={capacityAt02.toFixed(5)}$, $C(0.5)={capacityAt05.toFixed(5)}$,
 $C(0.8)={capacityAt08.toFixed(5)}$, strictly positive for every
 $p<1$, hitting exactly zero only at full depolarization $p=1$.
+
+<PredictBeforeReveal
+  question="At depolarizing strength p=0.5, this lesson's own C(0.5) shows the classical capacity is still clearly positive. Do you expect the same channel, at that same noise level, to still carry quantum information reliably (positive quantum capacity)?"
+  options={[
+    { label: "Yes — if classical bits get through, qubits should too, just at a lower rate", value: "yes" },
+    { label: "No — the certified quantum rate is already zero well before classical capacity gets anywhere near zero", value: "no" },
+    { label: "No information of any kind survives past p=0.5", value: "nothing" },
+  ]}
+  correctValue="no"
+  explanation="The hashing-bound lower bound on Q(p) is already negative (clamped to 0) by around p≈0.25, and the channel is proven exactly entanglement-breaking — hence Q=0 exactly — from p=2/3 onward. Meanwhile C(0.5) computed below is still comfortably positive. The same physical channel, at the same noise level, keeps carrying classical bits long after it can no longer carry any quantum information at all — this course's central fact."
+/>
 
 ### The quantum side: exactly where $Q(p)$ dies
 

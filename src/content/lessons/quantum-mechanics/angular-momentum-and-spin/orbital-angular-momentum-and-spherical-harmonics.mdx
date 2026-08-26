@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 
@@ -41,7 +42,7 @@ possible.
 ## Intuition
 
 Walk one full lap around the $z$-axis and you end up at exactly the same
-physical point you started from, so anything that's genuinely a function
+physical point you started from, so any actual function
 of position has to return to the same value it started with. The
 candidate function $e^{im\varphi}$ only manages that if $m$ is a whole
 number: with a half-integer $m$, one full lap leaves the function
@@ -49,6 +50,17 @@ pointing the opposite way in the complex plane, disagreeing with itself
 about what value it's supposed to take at a point it never actually left.
 That flat contradiction, not any additional physical law, is the entire
 content of the derivation below.
+
+<PredictBeforeReveal
+  question="Walk all the way around the z-axis (φ → φ+2π) and arrive back at the same physical point. Does e^(im·φ) with m = 1/2 return to its starting value?"
+  options={[
+    { label: "Yes, e^(im·φ) always returns to its starting value", value: "yes" },
+    { label: "No, it comes back negated: a contradiction for a real wavefunction", value: "no" },
+    { label: "It depends on which direction you walk around", value: "depends" },
+  ]}
+  correctValue="no"
+  explanation="e^(i(1/2)(φ+2π)) = e^(i(1/2)φ)·e^(iπ) = -e^(i(1/2)φ): the function comes back multiplied by -1, disagreeing with the value it started with at a point it never left. A genuine position-space wavefunction can't do that, which is exactly why half-integer m (and hence half-integer l) is excluded for orbital motion, even though the same value is perfectly fine for spin."
+/>
 
 ## Mathematical Development
 
@@ -129,6 +141,15 @@ Here's what these actually look like, computed directly from the
 $Y_l^m$ formulas above, not sketched by hand:
 
 <OrbitalShapePlot ariaLabel="Orbital angular momentum shape, |Y_l^m(theta)|^2" />
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/c/cf/HAtomOrbitals.png"
+  alt="Grid of computed hydrogen-atom orbital cross-sections: rows for principal quantum number n=1,2,3, columns for s, p, d (l=0,1,2), each shown as a black-to-white probability-density slice"
+  caption="Full hydrogen wavefunctions |ψ|² for several n and l (m=0), radial part times angular part together. The angular shape along each column, spherical for s, two-lobed for p, four-lobed for d, is exactly the |Y_l^m|² pattern above; it doesn't change with n, since the angular and radial parts of ψ separate cleanly for any central potential."
+  credit="Wikimedia Commons / FlorianMarquardt"
+  creditUrl="https://commons.wikimedia.org/wiki/File:HAtomOrbitals.png"
+  license="CC BY-SA 3.0"
+/>
 
 Compare $l=1,m=0$ (aligned along the $z$-axis, vanishing at the equator,
 exactly the $p_z$ shape described above) against $m=\pm1$ (the lobes

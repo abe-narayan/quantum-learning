@@ -32,17 +32,18 @@ export const lessonMeta = {
 
 ## Motivation
 
-Advanced Topics in Quantum Mechanics built the mathematics of open-system
-decoherence in the abstract; Control & Readout hinted at specific error
-sources (readout error, miscalibration) without organizing them. This
-lesson catalogs real noise sources and sorts them into two fundamentally
-different categories, a classification that determines which mitigation
-strategy actually applies.
+Ask an experimentalist why yesterday's calibration is off today, and
+the honest answer is usually "could be a dozen things." Advanced Topics
+in Quantum Mechanics built the mathematics of open-system decoherence in
+the abstract; Control & Readout hinted at specific error sources
+(readout error, miscalibration) without organizing them. This lesson
+does the sorting: it catalogs the real physical culprits and splits them
+into two categories that call for completely different fixes.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/4/48/Basic_Science_%2854395491965%29.jpg"
   alt="A neutral-atom quantum computing vacuum chamber at Sandia National Laboratories, showing objective lenses for single-atom traps and surrounding magnetic field coils"
-  caption="Real noise-mitigation hardware: at Sandia, a custom Faraday cage inside this vacuum chamber minimizes the stray electric field around trapped atoms, exactly the kind of physical isolation this lesson names as the fix for incoherent (environmental) errors, distinct from a coherent error's recalibration fix."
+  caption="Real noise-mitigation hardware: at Sandia, a custom Faraday cage inside this vacuum chamber minimizes the stray electric field around trapped atoms. That's physical isolation, the fix this lesson prescribes for incoherent (environmental) errors, and a fundamentally different move than a coherent error's recalibration fix."
   credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
   creditUrl="https://commons.wikimedia.org/wiki/File:Basic_Science_(54395491965).jpg"
   license="Public Domain (U.S. Government work)"
@@ -59,12 +60,12 @@ implements a systematically wrong rotation angle). This is, in
 principle, fully correctable once diagnosed; recalibration fixes it
 exactly.
 
-An **incoherent error** is a genuine, irreversible loss of information
-to an uncontrolled environment, exactly what Advanced Topics in Quantum
-Mechanics' Kraus channels model. This can be *mitigated* (better
-isolation, error correction) but not simply "fixed" by recalibrating a
-number, since the lost information isn't recoverable from the device
-alone.
+An **incoherent error** is a real, irreversible loss of information to
+an uncontrolled environment, the same process Advanced Topics in
+Quantum Mechanics' Kraus channels model. It can be *mitigated* (better
+isolation, error correction) but recalibrating a number won't fix it,
+because the lost information was never sitting somewhere on the device
+to recover.
 
 ### A catalog of physical sources
 
@@ -86,7 +87,7 @@ alone.
   qubits (next lesson's dedicated topic).
 
 The catalog sorts cleanly into the two categories, and each branch
-points to a genuinely different fix:
+points to a different fix:
 
 <MeasurementTree
   root={{
@@ -119,11 +120,12 @@ origin rather than being fixed in advance.
 
 Two of the incoherent sources in the catalog above,
 `amplitudeDampingChannel` and `dephasingChannel`, are directly steppable
-below. Unlike a coherent miscalibration (a deterministic, reversible
-rotation by the wrong angle), watch how each incoherent channel instead
-pulls the Bloch vector toward a fixed point it can never rotate back
-from on its own, exactly the irreversibility that makes "just
-recalibrate it" the wrong fix for this branch of the catalog:
+below. A coherent miscalibration is a deterministic, reversible rotation
+by the wrong angle: undo the rotation and the error is gone. Watch
+instead how each incoherent channel below pulls the Bloch vector toward
+a fixed point it can never rotate back from on its own. That's the
+irreversibility that makes "just recalibrate it" the wrong fix for this
+branch of the catalog:
 
 <PredictBeforeReveal
   question="A qubit starts on the Bloch sphere's equator (a superposition, z=0). Repeated applications of dephasing act on it. Where does the Bloch point end up?"
@@ -134,25 +136,25 @@ recalibrate it" the wrong fix for this branch of the catalog:
     { label: "Stays exactly on the equator's surface", value: "equator" },
   ]}
   correctValue="center"
-  explanation="Dephasing shrinks x and y toward zero while leaving z untouched. Starting at the equator, z is already 0, so shrinking x and y to 0 lands the point at the exact center: the maximally mixed state. That's a genuinely different motion from amplitude damping, which instead pulls everything toward the north pole — neither is a rotation a later recalibration could undo, which is exactly why both sit in the incoherent branch of the tree above."
+  explanation="Dephasing shrinks x and y toward zero while leaving z untouched. Starting at the equator, z is already 0, so shrinking x and y to 0 lands the point at the exact center: the maximally mixed state. Amplitude damping moves the state differently: it pulls everything toward the north pole instead. Neither motion is a rotation a later recalibration could undo, which is why both sit in the incoherent branch of the tree above."
 />
 
-<InteractiveSection title="Watch an incoherent channel act" description="Pick amplitude damping or dephasing, pick a starting state, and step through applications. Amplitude damping pulls everything toward |0⟩; dephasing shrinks x and y toward zero while leaving z untouched. Neither motion is a rotation a later, better-calibrated pulse could undo, which is exactly why these sit in the incoherent branch of the tree above.">
+<InteractiveSection title="Watch an incoherent channel act" description="Pick amplitude damping or dephasing, pick a starting state, and step through applications. Amplitude damping pulls everything toward |0⟩; dephasing shrinks x and y toward zero while leaving z untouched. Neither motion is a rotation a later, better-calibrated pulse could undo, and that's why these sit in the incoherent branch of the tree above.">
   <LazyNoiseExplorer />
 </InteractiveSection>
 
 ### Why the classification matters for mitigation
 
-A coherent miscalibration error is fixed by better/more frequent
+A coherent miscalibration error is fixed by better or more frequent
 calibration (Control & Readout), with no new hardware needed. An
-incoherent decoherence error fundamentally cannot be fixed this way; it
-requires either better physical isolation (reducing the coupling to the
+incoherent decoherence error can't be fixed this way at all; it needs
+either better physical isolation (reducing the coupling to the
 environment in the first place) or active error correction (Quantum
 Computing's Error Correction & Fault Tolerance course, redundantly
 encoding information so it survives some amount of unavoidable loss).
-Misidentifying which category a given error falls into leads to
-wasted engineering effort: recalibrating against a source that's
-actually environmental accomplishes nothing.
+Misidentify which category an error falls into and the engineering
+effort is wasted: recalibrating against a source that's actually
+environmental accomplishes nothing.
 
 ## Physical Interpretation
 
@@ -170,25 +172,25 @@ errors to the right bucket.
 restored to its original value immediately after recalibration. Is this
 most likely a coherent or incoherent error source?**
 
-Coherent: the fact that recalibration alone restores full fidelity
-(with no hardware change) is exactly the signature of a systematic,
-deterministic parameter drift (Control & Readout's Calibration lesson).
-An incoherent, genuinely environmental error would not be fixable by
-simply re-measuring and re-setting a classical control parameter.
+Coherent: recalibration alone restoring full fidelity, with no hardware
+change, is the signature of a systematic, deterministic parameter drift
+(Control & Readout's Calibration lesson). A genuinely environmental
+error wouldn't be fixable just by re-measuring and re-setting a
+classical control parameter.
 
 ## Common Mistakes
 
 <Callout type="mistake">
 **Assuming all noise is "decoherence."** Miscalibration and other
-coherent errors are a genuinely different (and often more easily fixed)
-category. Lumping everything together as "decoherence" obscures which
-mitigation strategy actually applies.
+coherent errors are a different (and often more easily fixed) category.
+Lumping everything together as "decoherence" obscures which mitigation
+strategy actually applies.
 </Callout>
 
 <Callout type="mistake">
 **Assuming incoherent errors can be "calibrated away."** Recalibration
 fixes systematic, deterministic errors; it cannot recover information
-genuinely lost to an uncontrolled environment. That requires isolation
+truly lost to an uncontrolled environment. That requires isolation
 improvements or active error correction instead.
 </Callout>
 

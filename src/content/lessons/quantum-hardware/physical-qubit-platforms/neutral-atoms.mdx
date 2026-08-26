@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/neutral-atoms"
@@ -79,7 +80,8 @@ largest qubit counts of any platform to date.
 ### Rydberg blockade: how two-qubit gates work
 
 Neutral atoms don't have a shared mechanical mode the way trapped ions
-do. Instead, two-qubit gates typically use **Rydberg blockade**: briefly
+do, so they need a completely different trick for two-qubit gates.
+Instead, two-qubit gates typically use **Rydberg blockade**: briefly
 exciting an atom to a highly excited ("Rydberg") state, whose enormously
 large electron orbit creates a strong interaction with any *nearby*
 atom also being excited, strong enough to shift the neighbor's energy
@@ -89,6 +91,17 @@ conditionally suppressing its neighbor's, is what implements an
 entangling two-qubit gate, conceptually similar in spirit to Quantum
 Algorithms I's controlled-phase gates, but arising from genuine atomic
 physics rather than an abstract circuit element.
+
+<PredictBeforeReveal
+  question="Atom B starts well outside atom A's blockade radius r_b and gets dragged steadily closer. What happens to its ability to be excited to the Rydberg state as it crosses r_b?"
+  options={[
+    { label: "It weakens gradually the whole way in, no sharp boundary", value: "gradual" },
+    { label: "It excites normally right up to r_b, then gets suppressed once inside it", value: "threshold" },
+    { label: "Distance from atom A doesn't affect atom B's excitation at all", value: "no-effect" },
+  ]}
+  correctValue="threshold"
+  explanation="The blockade radius is a real distance threshold, not a gradual fade: outside r_b atom B excites to |r⟩ just like an isolated atom would, and inside r_b the interaction shifts its levels enough that the same laser can no longer reach |r⟩ at all. Drag the slider below across r_b and watch the crossover happen right at the boundary, not gradually before it."
+/>
 
 <RydbergBlockadeDiagram ariaLabel="Two neutral atoms: atom A excited to a Rydberg state with an enormously expanded orbital and a surrounding blockade radius; a separation slider moves atom B closer to or farther from atom A, crossing the blockade radius" />
 
@@ -116,12 +129,11 @@ here:
 
 ## Physical Interpretation
 
-Neutral atoms' central engineering advantage is genuinely different
-from trapped ions' or superconducting qubits'. It's not raw speed, and
-not per-qubit coherence time alone, but *scalable, flexible geometry*:
-the ability to lay out and rearrange large numbers of identical,
-naturally-uniform qubits (since, like trapped ions, they're real atoms,
-not fabricated devices that vary chip-to-chip).
+Neutral atoms' central engineering advantage isn't raw speed, and it
+isn't per-qubit coherence time alone. It's *scalable, flexible
+geometry*: the ability to lay out and rearrange large numbers of
+identical, naturally-uniform qubits (since, like trapped ions, they're
+real atoms, not fabricated devices that vary chip-to-chip).
 
 This scaling path is not hypothetical: in September 2025, a Caltech team
 published a tweezer array holding 6,100 individual cesium atoms in
@@ -129,6 +141,13 @@ Nature, keeping them in superposition for about 13 seconds (roughly ten
 times longer than prior arrays of comparable scale) while still
 manipulating individual qubits with 99.98% accuracy, evidence that
 scaling atom count doesn't have to come at the cost of qubit quality.
+It's also why this is the platform with actual paying customers today:
+QuEra's Aquila system has been cloud-accessible for years, Pasqal sells
+neutral-atom systems directly to industrial and government labs in
+Europe, and Atom Computing and Harvard/QuEra collaborations have pushed
+past 1,000 and then 3,000 atoms in a single array. The same
+reconfigurable-tweezer argument this lesson makes about scaling is
+exactly the argument each of those roadmaps is selling.
 
 ## Worked Example
 

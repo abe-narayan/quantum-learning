@@ -36,7 +36,7 @@ export function SimulatorsPreview() {
               Build intuition by experimenting
             </h2>
             <p className="mt-3 max-w-xl text-muted-foreground">
-              10 interactive tools for manipulating quantum states directly, each backed by
+              14 interactive tools for manipulating quantum states directly, each backed by
               this platform&rsquo;s own tested quantum engine, not a scripted animation.
             </p>
           </div>

@@ -67,7 +67,7 @@ counts at once. That is a lot to ask of a noisy, near-term device. This
 lesson asks a pointed question: for the specific, high-value task of
 *estimating an amplitude* (not finding an eigenphase in general), is all
 of that machinery actually necessary? The honest, citable answer is no —
-and the "no" is a genuinely nontrivial, still-actively-used result, not
+and the "no" rests on a nontrivial, still-actively-used result, not
 a hand-wavy simplification.
 
 ## Mathematical Development
@@ -94,6 +94,15 @@ the familiar classical Monte Carlo scaling: halving the error requires
 amplitude-estimation algorithm below is measured against.
 
 ### The original algorithm: Grover iterate + QPE (BHMT 2000)
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Gilles_Brassard_%282019%29_%28cropped%29.jpg"
+  alt="Portrait photograph of Gilles Brassard, the quantum information theorist"
+  caption="Gilles Brassard, co-author (with Høyer, Mosca, and Tapp) of the 2000 amplitude estimation algorithm this section derives — the original Grover-iterate-plus-QPE construction that the rest of this lesson shows how to run without the QPE half."
+  credit="Lëa-Kim Châteauneuf / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Gilles_Brassard_(2019)_(cropped).jpg"
+  license="CC BY-SA 4.0"
+/>
 
 Brassard, Høyer, Mosca, and Tapp's amplitude estimation (2000) reuses
 this platform's own Grover derivation directly, with the search-specific
@@ -141,7 +150,7 @@ application plus the final inverse QFT on $t=O(\log(1/\epsilon))$ qubits
 
 ### QPE-free amplitude estimation: the same iterate, a classical schedule
 
-The genuinely important modern development (Suzuki, Uno, Raymond,
+The important modern development (Suzuki, Uno, Raymond,
 Tanaka, Onodera, and Yamamoto, "Amplitude Estimation without Phase
 Estimation," *Quantum Information Processing* **19**, 75 (2020); see
 also Grinko, Gacon, Zoufal, and Woerner, "Iterative Quantum Amplitude

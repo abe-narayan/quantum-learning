@@ -259,7 +259,7 @@ estimated, for a fault-tolerant quantum phase-estimation simulation,
 somewhere on the order of hundreds to low thousands of **logical**
 qubits, and a very large circuit cost: many millions to billions of
 T-gates, depending on the specific active space, basis set, and
-algorithmic variant chosen. These are genuinely large numbers, and they
+algorithmic variant chosen. These numbers are large, and they
 vary noticeably between published studies because the estimate depends
 on choices (active space size, Trotter step count or QSVT polynomial
 degree, error budget) that are themselves engineering trade-offs, not
@@ -272,8 +272,8 @@ builds next, on a toy-scale version of precisely this kind of estimate.
 ## Why This Matters
 
 Quantum simulation of molecules and materials is widely regarded, across
-the research field, as one of the most likely **first** genuinely
-practically useful applications of a large-scale fault-tolerant quantum
+the research field, as one of the most likely **first** practically
+useful applications of a large-scale fault-tolerant quantum
 computer — not because it is easy, but because of a specific conjunction
 of two honest facts. First, classical methods are believed to scale
 badly for a real, economically important subclass of molecules
@@ -332,6 +332,16 @@ concrete, checkable demonstration of exactly the failure the Z-string
 exists to prevent.
 
 ### Confirming it live, entry by entry
+
+<PredictBeforeReveal
+  question="Drop the Z-string and map mode 2's operators to I⊗σ⁻ and I⊗σ⁺ directly. Does {a₁, a₂†} still come out to zero?"
+  options={[
+    { label: "Yes — a₁ and a₂ act on different qubits, so they still anticommute", value: "yes-still-zero" },
+    { label: "No — without the Z-string the operators commute instead of anticommuting", value: "no-nonzero" },
+  ]}
+  correctValue="no-nonzero"
+  explanation="Operators on different tensor factors always commute, by definition of a tensor product — that's the natural, bosonic behavior, not the fermionic one the encoding needs. Without the Z-string, {a₁,a₂†} works out to 2(σ⁻⊗σ⁺), which is nonzero. The Z-string's whole job is to overwrite that natural commutation with the sign flip a real fermion swap requires, and the toggle below shows the two anticommutators side by side."
+/>
 
 <InteractiveSection
   title="Compare the Jordan-Wigner mapping with and without its Z-string"
@@ -400,9 +410,9 @@ elsewhere in this pillar for QSVT versus Trotterization.
 - VQE (heuristic, NISQ-friendly, no proven advantage) and phase
   estimation (provably efficient given good initial-state overlap, but
   fault-tolerance-dependent) are this field's two honestly distinct
-  paths forward, and molecular simulation is widely considered the most
-  likely first genuinely practical payoff of a fault-tolerant quantum
-  computer.
+  paths forward, and molecular simulation is widely considered the
+  field's best near-term bet for a practically useful payoff of a
+  fault-tolerant quantum computer.
 
 ## Further Exploration
 

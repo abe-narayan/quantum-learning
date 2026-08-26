@@ -36,7 +36,7 @@ export function RelatedCurrentQuantum({ lessonSlug }: { lessonSlug: string }) {
 
   return (
     <div className="mt-10 max-w-3xl border-t border-border pt-8">
-      <h2 className="text-sm font-semibold text-foreground">Connected to real, recent research</h2>
+      <h2 className="text-sm font-semibold text-foreground">Connected to real research</h2>
       <ul className="mt-4 space-y-3">
         {entries.map((entry) => (
           <li key={entry.slug} className="rounded-2xl border border-border bg-surface-muted/60 p-5">

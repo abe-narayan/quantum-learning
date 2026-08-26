@@ -64,9 +64,9 @@ export const lessonMeta = {
 We've been writing $|0\rangle$, $|1\rangle$, and
 $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$ since the first lesson without
 ever asking what the $|\cdot\rangle$ symbol actually *means* as notation, or
-what rules it follows. It's time to make that precise, not because the
-notation itself is deep, but because it makes everything after this lesson
-faster to write and harder to get wrong.
+what rules it follows. Time to make that precise. The notation itself isn't
+deep, but pinning it down now makes everything after this lesson faster to
+write and harder to get wrong.
 
 ## Intuition
 
@@ -135,7 +135,7 @@ This is **orthonormality**: each basis state has unit overlap with itself
 and zero overlap with the other. Plotting a few real inner products side
 by side makes the pattern easy to spot: full overlap with yourself, zero
 overlap with your orthogonal partner, and something in between for a
-state that's a genuine mix of both.
+state that blends both.
 
 <BarChart
   bars={[
@@ -148,8 +148,8 @@ state that's a genuine mix of both.
 />
 
 The highlighted bar is $\langle+|0\rangle$, worked out explicitly below:
-neither 0 nor 1, because $|+\rangle$ is a genuine mix of both basis
-states, not aligned with or orthogonal to either one. It's the reason
+neither 0 nor 1, because $|+\rangle$ blends both basis states, not
+aligned with or orthogonal to either one. It's the reason
 $|0\rangle$ and $|1\rangle$ are a sensible basis in the first place, and
 it lets you compute any inner product without matrix multiplication at
 all, just distribute and cancel:
@@ -216,6 +216,17 @@ The bar heights above are exactly what "cosine of the angle between them" means 
     ariaLabel="Vector psi swinging from the zero axis to the one axis as theta sweeps from 0 to 90 degrees, with its projections onto both fixed orthogonal axes"
   />
 </InteractiveSection>
+
+<PredictBeforeReveal
+  question="⟨+|0⟩, where |+⟩ = (|0⟩+|1⟩)/√2: closer to the ⟨0|0⟩ = 1 case, the ⟨0|1⟩ = 0 case, or somewhere strictly between?"
+  options={[
+    { label: "Exactly 1, like ⟨0|0⟩", value: "one" },
+    { label: "Exactly 0, like ⟨0|1⟩", value: "zero" },
+    { label: "Strictly between 0 and 1", value: "between" },
+  ]}
+  correctValue="between"
+  explanation="⟨+|0⟩ = 1/√2 ≈ 0.71, strictly between the two extremes, because |+⟩ is neither aligned with nor orthogonal to |0⟩: it blends both basis states equally. That's the same number the bar chart above already highlighted, and the worked example below derives it from scratch."
+/>
 
 ## Worked Example
 

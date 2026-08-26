@@ -69,11 +69,16 @@ export const lessonMeta = {
 
 ## Motivation
 
-Open any hardware datasheet and two numbers are listed for every qubit:
-T1 and T2. Physical Qubit Platforms and Advanced Topics in Quantum
-Mechanics already built everything needed to define them precisely and
-compute with them directly, rather than leaving them as opaque
-spec-sheet entries.
+Every time a hardware company announces a new chip, the press release
+leads with two numbers: T1 and T2, usually in microseconds, sometimes
+now creeping into milliseconds for the best trapped-ion and
+neutral-atom systems. Reporters repeat them, competitors get compared
+by them, and it's easy to nod along without actually knowing what
+"T1 = 100 μs" commits a device to. Physical Qubit Platforms and Advanced
+Topics in Quantum Mechanics already built everything needed to define
+both numbers precisely and compute with them directly, so this lesson
+turns them from a spec-sheet line into something you can reason about
+the moment you see it quoted.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f3/MRI_Scanner_Mark_One.jpg"
@@ -119,7 +124,7 @@ independent of T1. A device with $T_2$ close to $2T_1$ is described as
 "T1-limited" (dephasing is not the bottleneck); one with $T_2\ll2T_1$ is
 "T2-limited" (dephasing dominates).
 
-<InteractiveSection title="Dephasing vs. amplitude damping" description="Compare the two channels directly: start from |+⟩ (equal parts |0⟩ and |1⟩, maximal initial coherence) and step through dephasing, watching only x and y shrink while z stays at 0. Then switch to amplitude damping from the same starting state and watch z move too, as the state is pulled all the way to the north pole, exactly the qualitative T1-vs-T2 distinction this section just derived.">
+<InteractiveSection title="Dephasing vs. amplitude damping" description="Compare the two channels directly: start from |+⟩ (equal parts |0⟩ and |1⟩, maximal initial coherence) and step through dephasing, watching only x and y shrink while z stays at 0. Then switch to amplitude damping from the same starting state and watch z move too, as the state gets pulled all the way to the north pole — the same T1-vs-T2 distinction just derived above, now visible qubit by qubit.">
   <LazyNoiseExplorer />
 </InteractiveSection>
 
@@ -143,6 +148,18 @@ superconducting-qubit datasheet. A qubit's T1 and T2 are the same
 physical relaxation and dephasing processes Bloch defined, just measured
 on a different physical system.
 
+<Callout type="note">
+**Reading a T1/T2 number in a press release.** A quoted T1 or T2 is a
+time constant, not a "the qubit is dead here" cutoff — at $t=T_1$, 37%
+($e^{-1}$) of the population is still there, not zero. Two numbers only
+mean something read together: is $T_2$ close to $2T_1$ (T1-limited,
+dephasing is well under control) or well below it (T2-limited, some
+extra dephasing source is eating coherence)? And it's worth asking how
+the number was measured: a single best qubit on the chip, or an average
+across all of them, and over what run of the device. A headline T1 from
+one cherry-picked qubit is a different claim than a chip-wide median.
+</Callout>
+
 ## Worked Example
 
 **A device has $T_1=80\mu s$. What is the absolute maximum possible
@@ -155,7 +172,18 @@ the dominant coherence-loss mechanism, and improving T1 alone would do
 very little for overall coherence. The engineering priority should be
 identifying and suppressing the extra dephasing source instead.
 
-<InteractiveSection title="Drag T2 toward the 2T1 ceiling" description="T1 is fixed at the Worked Example's 80μs. Drag T2 from a strongly dephasing-dominated 10μs up toward the 160μs = 2T1 ceiling and watch both real-time-axis curves, P1(t)=e^(-t/T1) (population) and |ρ01(t)|=e^(-t/T2) (coherence). The vertical markers show t=T1 and t=T2 directly; the frame label reports the live T2/T1 ratio and calls the regime T1-limited or T2-limited exactly as the prose above does. Set T2=30μs to see the Worked Example's own numbers.">
+<PredictBeforeReveal
+  question="Same device: T1 = 80 μs, T2 = 30 μs. At t = 80 μs (one full T1), which has decayed further: the population P1(t), or the coherence |ρ01(t)|?"
+  options={[
+    { label: "Coherence has decayed further (it's lower)", value: "coherence-lower" },
+    { label: "Population has decayed further (it's lower)", value: "population-lower" },
+    { label: "They're equal at t = 80 μs", value: "equal" },
+  ]}
+  correctValue="coherence-lower"
+  explanation="P1(80) = e^(-80/80) = e^-1 ≈ 0.37, but |ρ01(80)| = e^(-80/30) = e^-2.67 ≈ 0.07. Coherence has fallen much further, exactly what a T2-limited device (T2 well under the 2T1 ceiling) means: it loses phase information faster than it loses energy. Drag the slider below to see both curves move together and check this at any point along the axis, not just t = 80 μs."
+/>
+
+<InteractiveSection title="Drag T2 toward the 2T1 ceiling" description="T1 is fixed at the Worked Example's 80μs. Drag T2 from a strongly dephasing-dominated 10μs up toward the 160μs = 2T1 ceiling and watch both real-time-axis curves, P1(t)=e^(-t/T1) (population) and |ρ01(t)|=e^(-t/T2) (coherence). The vertical markers show t=T1 and t=T2 directly; the frame label reports the live T2/T1 ratio and names the regime T1-limited or T2-limited the same way the prose above does. Set T2=30μs to see the Worked Example's own numbers.">
   <ParametricCurve
     frames={t1T2DecayFrames}
     sliderLabel="T2"
@@ -208,6 +236,9 @@ Methods, which actually is only approximate.
   disturbs phase, while pure dephasing needs no energy exchange.
 - A device's $T_2/T_1$ ratio diagnoses whether it's T1-limited or
   T2-limited, a real, actionable engineering distinction.
+- A quoted T1 or T2 is a time constant (37% remaining at $t=T$), not a
+  hard cutoff, and it's only fully meaningful alongside the other number
+  and a sense of how and over how many qubits it was measured.
 
 ## Further Exploration
 

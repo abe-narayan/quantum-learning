@@ -55,6 +55,22 @@ export function LearningJourney() {
             </div>
           ))}
         </div>
+
+        <div className="mt-14 border-t border-border pt-10">
+          <p className="max-w-2xl text-muted-foreground">
+            These two tracks are the start, not the whole curriculum. Finish them and{" "}
+            <strong className="font-semibold text-foreground">Quantum Hardware</strong> and{" "}
+            <strong className="font-semibold text-foreground">Quantum Software</strong> show you how
+            the physics and the algorithms become real devices and real code, then{" "}
+            <strong className="font-semibold text-foreground">Quantum Mastery</strong> adds
+            graduate-level rigor before{" "}
+            <strong className="font-semibold text-foreground">Apex</strong> — the platform&rsquo;s
+            capstone — takes you into research-depth material.
+          </p>
+          <Link href="/apex" className="mt-3 inline-block text-sm font-medium text-brand hover:underline">
+            See where the curriculum leads →
+          </Link>
+        </div>
       </Container>
     </section>
   );

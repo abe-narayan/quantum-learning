@@ -30,8 +30,7 @@ The Free-Particle Wave Packets lesson asserted the packet's *average*
 position obeys $d\langle x\rangle/dt=\langle p\rangle/m$ without proof.
 This lesson proves it (Ehrenfest's theorem), and goes further: explaining
 *why* the packet doesn't just move. It spreads, growing wider over time,
-a genuinely quantum effect with no classical counterpart for a free
-particle.
+a quantum effect with no classical counterpart for a free particle.
 
 ## Intuition
 
@@ -97,7 +96,7 @@ starting at the initial width $\sigma_0$ and growing *quadratically* in
 $t$ for large $t$. This is exactly what `timeEvolution.test.ts` checks
 numerically: a zero-momentum Gaussian packet evolved forward under the
 platform's split-operator method has its `variancePosition()` match this
-formula directly, confirming the simulator reproduces genuine dispersive
+formula directly, confirming the simulator reproduces actual dispersive
 physics, not merely translation.
 
 ## Physical Interpretation
@@ -111,7 +110,7 @@ lessons, does *not* spread. Its probability density is exactly
 stationary, which is precisely what makes those states special.)
 
 Ultrafast electron microscopy runs into this exact spreading as a real
-engineering problem: a pulse of free electrons, a genuine matter-wave
+engineering problem: a pulse of free electrons, itself a matter-wave
 packet obeying this same free-particle Schrödinger equation, broadens
 in time as it travels down the microscope column, exactly the
 $\sigma(t)$ growth derived above. Instrument designers correct for it
@@ -223,11 +222,11 @@ rates.
 - A free wave packet's different momentum components drift at different
   rates, causing the packet to spread: $\sigma(t)^2=\sigma_0^2+(\hbar
   t/(2m\sigma_0))^2$.
-- This is genuine, unitary (norm-preserving) quantum dynamics, numerically
+- This is exact, unitary (norm-preserving) quantum dynamics, numerically
   verified against the platform's split-operator time evolution.
 
 ## Further Exploration
 
-Next: [Tunneling and the Finite Barrier](/lessons/quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier), a genuinely non-classical
+Next: [Tunneling and the Finite Barrier](/lessons/quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier), an outright non-classical
 phenomenon, where part of a wave packet crosses a barrier it classically
 never could.

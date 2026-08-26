@@ -5,6 +5,7 @@ import { phaseGate } from "@/lib/quantum/gates";
 import { phaseEstimation } from "@/lib/quantum/qft";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
@@ -178,7 +179,9 @@ same interference machinery Deutsch-Jozsa used to read out a global
 constant-or-balanced fact, generalized to read out an arbitrary real number
 (to $t$-bit precision) instead of one bit. It's the component every
 period-finding algorithm (Shor's algorithm, in the next course) is built
-from.
+from — the [period-finding explorer](/simulators#period-finding-explorer)
+runs that end-to-end circuit live, for anyone who wants to see where this
+component ends up before the next course derives it.
 
 ## Worked Example
 
@@ -215,11 +218,23 @@ is what "exactly representable" means in practice.
 The derivation above assumed $\varphi N$ is an integer; for other phases,
 the precision register's state is a superposition peaked near the nearest
 representable value rather than a single certain outcome, still useful,
-but a probability distribution, not a certainty. Repeating the same
-circuit for $\varphi=1/3$ (which never terminates in binary) at the same
-$t=3$ shows exactly this: probability smears across several neighboring
-outcomes instead of collapsing onto one.
+but a probability distribution, not a certainty.
 </Callout>
+
+Repeating the same circuit for $\varphi=1/3$ (which never terminates in
+binary) at the same $t=3$ tests this directly:
+
+<PredictBeforeReveal
+  question="Run phaseEstimation on φ=1/3 with t=3 precision qubits. 1/3·8 = 2.667, not an integer, so φ isn't exactly representable in 3 bits. What does the measurement distribution look like?"
+  options={[
+    { label: "A single certain spike, just at a slightly wrong outcome", value: "wrong-spike" },
+    { label: "Uniformly random across all 8 outcomes", value: "uniform" },
+    { label: "Concentrated mostly on outcomes 2 and 3, the nearest representable values, with some spread beyond them", value: "smeared" },
+    { label: "The circuit fails to produce a valid probability distribution", value: "fails" },
+  ]}
+  correctValue="smeared"
+  explanation="The derivation's exact cancellation only happens when φN is an integer. For φ=1/3, t=3 (φN=8/3≈2.667), the amplitude is largest at the two integers straddling 8/3 — outcomes 2 and 3 — with a tail of smaller but nonzero probability on the other outcomes too, exactly the pattern the chart below shows. More precision qubits would sharpen this peak, never eliminate the smear entirely, since 1/3 has no finite binary expansion."
+/>
 
 <BarChart
   bars={[0, 1, 2, 3, 4, 5, 6, 7].map((x) => ({

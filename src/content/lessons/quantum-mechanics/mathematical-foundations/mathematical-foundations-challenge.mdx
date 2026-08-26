@@ -51,6 +51,15 @@ prediction through the postulates. This lesson adds no new mathematics.
 It only asks you to notice, on problems that don't announce which single
 lesson they come from, that the toolkit already fits together.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
+  alt="Black-and-white portrait photograph of the mathematician John von Neumann"
+  caption="John von Neumann, whose 1932 Mathematical Foundations of Quantum Mechanics first assembled Hilbert spaces, Hermitian operators, and the Born rule into the single rigorous framework this course has spent ten lessons rebuilding piece by piece."
+  credit="Los Alamos National Laboratory / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
+  license="Attribution, LANL"
+/>
+
 ## The Toolkit You Now Have
 
 Ten separate results, each earned in its own lesson, each still doing
@@ -73,6 +82,18 @@ work well beyond the lesson that introduced it:
 
 **1. A real, symmetric $2\times2$ matrix $M$ satisfies $M^2=I$. Is $M$
 necessarily unitary?**
+
+<PredictBeforeReveal
+  question="A real, symmetric matrix M satisfies M² = I. Is M necessarily unitary?"
+  options={[
+    { label: "Yes, necessarily", value: "yes" },
+    { label: "No, counterexamples exist", value: "no" },
+    { label: "Only if M is also diagonal", value: "diagonal-only" },
+    { label: "Can't tell without a specific M", value: "unsure" },
+  ]}
+  correctValue="yes"
+  explanation="Yes, necessarily — and the two-line argument below needs only two earlier facts: real+symmetric gives Hermitian (M† = M), and Hermitian plus M² = I gives M†M = M² = I, the unitarity condition. Neither the Hermitian Operators lesson nor the Unitary Operators lesson states this combined fact on its own; it only appears once you put both to work on the same matrix."
+/>
 
 Real and symmetric means $M^\dagger = M^T = M$ (conjugation does nothing
 to a real matrix), so $M$ is Hermitian. Check $M^\dagger M$: since

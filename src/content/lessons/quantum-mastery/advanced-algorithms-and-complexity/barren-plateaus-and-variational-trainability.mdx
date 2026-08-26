@@ -4,6 +4,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, rotationY, rotationZ, PAULI_Z } from "@/lib/quantum/gates";
 import { expectationValue } from "@/lib/quantum/observables";
 import { tensorAll } from "@/lib/quantum/matrix";
+import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability"
@@ -110,6 +111,45 @@ export const barrenLandscapeFrames = barrenNValues.map((n) => ({
   paramLabel: `n = ${n}`,
   series: landscapeCurvesForN(n, 100 + n),
 }));
+
+export function landscapeGridForN(n, seed, steps = 12) {
+  const layers = 4 * n;
+  const P = numParams(n, layers);
+  const H = tensorAll(Array.from({ length: n }, () => PAULI_Z));
+  const rng = mulberry32(seed);
+  const base = Array.from({ length: P }, () => rng() * 2 * Math.PI);
+  const grid = [];
+  for (let i = 0; i < steps; i++) {
+    const theta = (i / (steps - 1)) * 2 * Math.PI;
+    const row = [];
+    for (let j = 0; j < steps; j++) {
+      const phi = (j / (steps - 1)) * 2 * Math.PI;
+      const params = base.slice();
+      params[0] = theta;
+      params[1] = phi;
+      row.push({ theta, phi, value: scaledCost(n, layers, params, H) });
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+export function gridRange(grid) {
+  let min = Infinity;
+  let max = -Infinity;
+  for (const row of grid) for (const cell of row) {
+    if (cell.value < min) min = cell.value;
+    if (cell.value > max) max = cell.value;
+  }
+  return max - min;
+}
+
+export const barrenGridSmallN = 2;
+export const barrenGridLargeN = 6;
+export const barrenGridSmall = landscapeGridForN(barrenGridSmallN, 500);
+export const barrenGridLarge = landscapeGridForN(barrenGridLargeN, 500);
+export const barrenGridSmallRange = gridRange(barrenGridSmall);
+export const barrenGridLargeRange = gridRange(barrenGridLarge);
 
 export const lessonMeta = {
   title: "Barren Plateaus and Variational Trainability",
@@ -304,6 +344,52 @@ landscape instead of inferred from its variance.
   frames={barrenLandscapeFrames}
   sliderLabel="qubits (n)"
   ariaLabel="Cost function C(theta) plotted over a full period of theta, for four random draws of the other parameters, at each qubit count n from 2 to 6 — computed with this lesson's real multi-qubit ansatz and expectation-value engine, showing the curves visibly flattening toward zero as n grows"
+/>
+
+### The landscape flattens in two dimensions, not just one
+
+The curves above only ever move one parameter at a time. A full grid
+search over *two* parameters at once (holding everything else fixed at
+the same random draw) shows the same flattening as a literal picture of
+terrain rather than a bundle of 1D slices through it:
+
+<CostLandscapeHeatmap
+  grid={barrenGridSmall}
+  thetaLabel="θ₀"
+  phiLabel="θ₁"
+  ariaLabel={`Cost landscape grid search over the first two ansatz parameters for n=${barrenGridSmallN} qubits, showing sharp variation from deep green to deep red across the grid`}
+/>
+
+<CostLandscapeHeatmap
+  grid={barrenGridLarge}
+  thetaLabel="θ₀"
+  phiLabel="θ₁"
+  ariaLabel={`Cost landscape grid search over the first two ansatz parameters for n=${barrenGridLargeN} qubits, showing a nearly uniform color across the whole grid`}
+/>
+
+At $n=2$, sweeping just the first two parameters $\theta_0,\theta_1$
+over a $12\times12$ grid (everything else pinned at one random draw)
+covers a range of $\langle H\rangle$ values spanning $1.248$, most of
+the observable's full $[-1,1]$ reach, and the grid shows it: sharp
+green-to-red structure with a clear minimum. At $n=6$, the identical
+procedure (computed directly by this lesson's own `landscapeGridForN`,
+not a separate hand-picked example) covers a range of only $0.221$ —
+about $5.6\times$ narrower — and the grid looks almost uniformly
+colored: not because the search did anything different, but because
+there's less terrain left to find. This is the same $O(2^{-n})$
+collapse the variance numbers and the 1D curves above already showed,
+now visible as an actual loss of contrast in a picture, exactly what
+"nowhere for a gradient-based optimizer to go" looks like.
+
+<PredictBeforeReveal
+  question="This lesson's own ansatz pattern (4n layers, entangling ring, global Z⊗n cost) shows gradient variance dropping by roughly half per extra qubit, from n=3 (6.909×10⁻²) to n=6 (7.557×10⁻³). Over those 3 extra qubits, how much did the variance actually shrink?"
+  options={[
+    { label: "Roughly halved once, since it's one 'step' in the trend", value: "half" },
+    { label: "Roughly an order of magnitude (about 9×)", value: "order" },
+    { label: "Only a few percent — barren plateaus need many more qubits to bite", value: "percent" },
+  ]}
+  correctValue="order"
+  explanation="6.909×10⁻² / 7.557×10⁻³ ≈ 9.1×, close to the roughly-halving-per-qubit trend compounded over 3 qubits (2³=8, in the right ballpark given the noisy, finite-sample ratios reported above). The point isn't the exact factor — it's that the shrinkage compounds multiplicatively per qubit, so a trend that looks mild going from n=3 to n=4 becomes crippling by n=20 or n=50, exactly the extrapolation Practice Question 3 below asks you to make explicit."
 />
 
 ## Common Mistakes

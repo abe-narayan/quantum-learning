@@ -38,9 +38,14 @@ export const lessonMeta = {
 ## Motivation
 
 Physical Qubit Platforms mentioned superconducting and spin qubits
-operate at millikelvin temperatures almost in passing. This lesson makes
-precise exactly *why*: not "cold is generally good for delicate
-things," but a specific, computable physical requirement.
+operate at millikelvin temperatures almost in passing. That number is
+worth stopping on: the leftover glow of the Big Bang keeps empty
+intergalactic space sitting at about 2.7 K. A dilution refrigerator's
+mixing chamber, where the actual qubit chip is bolted down, runs colder
+than that, typically 10-20 mK, on the order of two hundred times colder
+than deep space. This lesson works out exactly why a chip needs to sit
+that cold, not just "cold is generally good for delicate things," but a
+specific, computable physical requirement.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
@@ -83,13 +88,14 @@ For a representative 5 GHz superconducting qubit frequency,
 | 4 K (simple cryocooler) | $\approx16.2$ |
 | 300 K (room temperature) | $\approx1250$ |
 
-Two things stand out directly from this table: room temperature is
-wildly unusable ($\bar n\sim1000$, thousands of thermal photons per
-mode), and, more subtly, **4 K, though very cold, is still nowhere
+Two things jump out of this table. Room temperature is wildly unusable
+($\bar n\sim1000$, thousands of thermal photons per mode). More
+subtly, **4 K, right around liquid helium's own boiling point (4.2 K)
+and cold enough to freeze every other element solid, is still nowhere
 near cold enough** ($\bar n\approx16$, over an order of magnitude too
-warm). This is exactly why dilution refrigerators push further, to the
-$10$-$20$ mK range, rather than stopping at the comparatively easy-to-reach
-4 K stage.
+warm). That's why dilution refrigerators push further, to the
+$10$-$20$ mK range, instead of stopping at the comparatively
+easy-to-reach 4 K stage.
 
 The table samples four points; the underlying curve (computed the same
 way, `thermalPhotonOccupation` swept continuously over temperature) shows
@@ -131,9 +137,9 @@ the same plot:
 A dilution refrigerator cools in stages: roughly room temperature, then
 liquid nitrogen temperature ($\sim77$ K), a pulse-tube stage ($\sim4$ K,
 reachable with comparatively simple mechanical cooling), and finally the
-dilution stage itself (a genuinely different cooling mechanism, based on
-the physics of mixing two isotopes of helium) reaching the millikelvin
-range. Each stage is progressively harder to build and more expensive
+dilution stage itself (a fundamentally different cooling mechanism,
+based on the physics of mixing two isotopes of helium) reaching the
+millikelvin range. Each stage is progressively harder to build and more expensive
 to operate, a real engineering reason systems don't just try to jump
 straight to millikelvin in one step.
 
@@ -181,7 +187,7 @@ somewhere in between, matching this estimate.
 
 <Callout type="mistake">
 **Thinking any cryogenic temperature is "cold enough."** As the table
-shows directly, 4 K, genuinely very cold by everyday standards, still
+shows, 4 K, cold enough to freeze nearly every other gas solid, still
 gives $\bar n\approx16$, more than an order of magnitude too warm for
 reliable qubit operation.
 </Callout>

@@ -367,6 +367,16 @@ as colored arrows, $u_1$/$w_1$ in one color and $u_2$/$w_2$ in the other,
 so the pairing this section claims (measure $A$ along $u_k$, $B$ collapses
 to the matching $w_k$) is something to look at, not just read.
 
+<PredictBeforeReveal
+  question="The Bell state's two Schmidt coefficients come out exactly equal (lambda1 = lambda2 = 0.5). Given that, are its Schmidt vectors u1, u2 pinned to one specific basis, the same way the worked example's genuinely unequal coefficients pin down a specific rotation?"
+  options={[
+    { label: "Yes — every pure state has one and only one Schmidt basis", value: "unique" },
+    { label: "No — with equal coefficients, any orthonormal basis works equally well", value: "not-unique" },
+  ]}
+  correctValue="not-unique"
+  explanation="Equal Schmidt coefficients mean rho_A is proportional to the identity, and every orthonormal basis diagonalizes the identity equally well — there's no preferred direction to find. This is exactly the same non-uniqueness ordinary degenerate eigenvectors have, and it's why the Bell-state panel below looks unrotated: the computational basis is just as valid a Schmidt basis as any other for this particular state, not because the state is somehow less entangled."
+/>
+
 <div className="not-prose space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4">
 
 <style>{`
@@ -476,7 +486,7 @@ means geometrically, and why it is not the same instruction as
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem A</p>
 <VectorDiagram
   vectors={panelVectors(workedPreset.u1, "u1", workedPreset.u2, "u2")}
-  ariaLabel="Subsystem A's Schmidt vectors u1 and u2 for the worked-example state, genuinely rotated away from the computational basis |0> and |1>"
+  ariaLabel="Subsystem A's Schmidt vectors u1 and u2 for the worked-example state, clearly rotated away from the computational basis |0> and |1>"
   showGrid={false}
 />
 </div>
@@ -484,7 +494,7 @@ means geometrically, and why it is not the same instruction as
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem B</p>
 <VectorDiagram
   vectors={panelVectors(workedPreset.w1, "w1", workedPreset.w2, "w2")}
-  ariaLabel="Subsystem B's Schmidt vectors w1 and w2 for the worked-example state, genuinely rotated away from the computational basis |0> and |1>, paired index-for-index with subsystem A's u1 and u2"
+  ariaLabel="Subsystem B's Schmidt vectors w1 and w2 for the worked-example state, clearly rotated away from the computational basis |0> and |1>, paired index-for-index with subsystem A's u1 and u2"
   showGrid={false}
 />
 </div>

@@ -15,7 +15,7 @@ import { buildBreadcrumbSchema } from "@/lib/structuredData";
 export const metadata: Metadata = buildPageMetadata({
   title: "Learn",
   description:
-    "The QuantumLearn curriculum — Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, and Quantum Mastery, from strong high-school math through graduate-level rigor.",
+    "The QuantumLearn curriculum — Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, Quantum Mastery, and Apex, from strong high-school math through graduate-level rigor.",
   path: "/learn",
 });
 
@@ -58,7 +58,7 @@ export default async function LearnPage() {
       <PageHeader
         eyebrow="Learn"
         title="The QuantumLearn curriculum"
-        description="Five tracks, each building on strong high-school math and physics, from first principles through graduate-level rigor in quantum mechanics and computing."
+        description="Six pillars, each building on strong high-school math and physics: quantum mechanics and computing from first principles, the hardware and software that make them real, and graduate-level mastery and research-depth work beyond that."
       />
 
       <ContinueLearning />

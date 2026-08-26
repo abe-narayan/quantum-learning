@@ -169,6 +169,18 @@ $|+\rangle$ exactly (probability $1$) at $t=0, \tfrac{2\pi}{\omega},
 The rotation formula above is exactly what the Bloch Sphere Explorer's
 gate buttons already compute, one discrete step at a time:
 
+<PredictBeforeReveal
+  question="U(t) depends on t only through the product ωt. If you click the same small Z-rotation gate five times in a row below, each click applying the same fixed time step, how should the vector's steps around the equator compare to each other?"
+  options={[
+    { label: "Five equal-sized steps", value: "equal" },
+    { label: "Big first step, then progressively smaller ones", value: "shrinking" },
+    { label: "Steps that grow larger each click", value: "growing" },
+    { label: "Unpredictable, different-sized steps", value: "random" },
+  ]}
+  correctValue="equal"
+  explanation="Equal time steps mean equal increments of ωt, and U(t) turns the Bloch vector by an angle proportional to ωt. So every click sweeps out exactly the same angle as the last — that's the concrete meaning of 'constant angular velocity' in the derivation above. Five clicks trace five identical steps around the equator, not a curve that speeds up, slows down, or wanders."
+/>
+
 <InteractiveSection
   title="Rotate step by step, trace out precession"
   description="Prepare |+⟩ and apply a Z-axis rotation gate repeatedly. Watch the vector sweep around the equator at a constant rate. This is U(t) for this Hamiltonian, discretized into steps you control, not a separate animation.">

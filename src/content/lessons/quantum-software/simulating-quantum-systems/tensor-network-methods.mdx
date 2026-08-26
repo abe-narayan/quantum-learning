@@ -45,7 +45,7 @@ specifically to exploit that.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Frontier_supercomputer_%2852291130197%29.jpg"
   alt="Rows of Frontier supercomputer cabinets at Oak Ridge National Laboratory"
-  caption="Oak Ridge National Laboratory's Frontier supercomputer, the world's first exascale system. Classically simulating quantum systems, exactly or via the tensor-network methods this lesson covers, is genuinely HPC-bound work; machines like this are what a serious simulation run actually targets."
+  caption="Oak Ridge National Laboratory's Frontier supercomputer, the world's first exascale system. Classically simulating quantum systems, whether by brute-force state-vector storage or the tensor-network methods this lesson covers, is HPC-bound work in practice; machines like this are what a serious simulation run actually targets."
   credit="Oak Ridge National Laboratory / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Frontier_supercomputer_(52291130197).jpg"
   license="CC BY 2.0"
@@ -88,21 +88,33 @@ $n$, not exponentially many.
 ### The direct tradeoff: this is not a free lunch
 
 Tensor networks are NOT a general replacement for state-vector
-simulation. A state with genuinely high (near-maximal) entanglement
-entropy requires bond dimensions that grow back toward the same $2^n$
-cost this technique was trying to avoid. This is a real, principled
+simulation. A state with truly high (near-maximal) entanglement entropy
+requires bond dimensions that grow back toward the same $2^n$ cost this
+technique was trying to avoid. This is a real, principled
 tradeoff, not a limitation of current tensor-network techniques waiting
 to be engineered away: highly-entangled states fundamentally do not
 compress this way, by the same information-counting argument that
 established the $2^n$ wall in the first place.
 
 Computational Cost & Scaling's own `stateVectorMemoryBytes` curve makes a
-good baseline for exactly how large this gap gets. A matrix-product-state
+good baseline for how large this gap gets. A matrix-product-state
 representation with bond dimension $D$ stores roughly $n$ tensors of
 shape $D\times2\times D$, so its total memory is about $32nD^2$ bytes,
 linear in $n$ instead of exponential. Fixing $D=16$ (a modest bond
-dimension, enough for mild entanglement but far from generic) and
-plotting both curves on the same log scale over 10-50 qubits:
+dimension, enough for mild entanglement but far from generic):
+
+<PredictBeforeReveal
+  question="At n=50 qubits, a bond-dimension-16 MPS storing 32nD² bytes versus the full 16·2ⁿ-byte state vector — how big is the gap?"
+  options={[
+    { label: "MPS is somewhat smaller, maybe half the size", value: "half" },
+    { label: "About the same order of magnitude", value: "same" },
+    { label: "MPS is many orders of magnitude smaller (kilobytes vs. petabytes)", value: "huge-gap" },
+  ]}
+  correctValue="huge-gap"
+  explanation="32·50·16² is 409,600 bytes, about 400 KB. 16·2⁵⁰ is about 18 PB — roughly 44 billion times larger. That gap is the entire payoff of exploiting limited entanglement, and it only holds for states a bond dimension of 16 can actually represent; a highly entangled 50-qubit state would force D back up toward 2²⁵, erasing the gap almost completely."
+/>
+
+Plotting both curves on the same log scale over 10-50 qubits:
 
 <InteractiveSection title="Watch the MPS curve stay flat where state-vector explodes" description="Trace the MPS curve: it barely rises across the whole range, because it only grows linearly in qubit count. The state-vector curve is the same exponential line from Computational Cost & Scaling. The gap between them, not either curve alone, is what 'exploiting limited entanglement' buys you, and only for states an MPS with this bond dimension can actually represent.">
   <ParametricCurve

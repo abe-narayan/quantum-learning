@@ -186,7 +186,7 @@ export default function SimulatorsPage() {
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
                 Drive a two-level system and watch population oscillate between the ground and excited state, exactly
                 (via direct numerical integration of the Schrödinger equation), both as a P(1) curve over time and as
-                a genuine Bloch-sphere trajectory. Detune the drive and watch the maximum transferable population
+                the matching trajectory on the Bloch sphere. Detune the drive and watch the maximum transferable population
                 drop below 1, following 4V²/(Δ²+4V²) exactly.
               </p>
               <div className="mt-6">
@@ -209,9 +209,9 @@ export default function SimulatorsPage() {
             <section id="wavefunction-explorer" className="scroll-mt-24">
               <h3 className="text-xl font-semibold tracking-tight text-foreground">Wavefunction Explorer</h3>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                A real 1D numerical wavefunction simulator — position and momentum grids, an actual FFT, and
-                genuine time evolution via the split-operator method. Watch wave packets disperse, energy
-                eigenstates stay stationary, superpositions beat, and particles tunnel through barriers.
+                A 1D numerical wavefunction simulator — position and momentum grids, a real FFT, and time
+                evolution via the split-operator method. Watch wave packets disperse, energy eigenstates
+                stay stationary, superpositions beat, and particles tunnel through barriers.
               </p>
               <div className="mt-6">
                 <LazyWavefunctionExplorer />
@@ -255,10 +255,9 @@ export default function SimulatorsPage() {
             <section id="qaoa-explorer" className="scroll-mt-24">
               <h3 className="text-xl font-semibold tracking-tight text-foreground">Max-Cut QAOA Explorer</h3>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                Drag the cost angle γ and mixer angle β across a real p=1 QAOA circuit on a few small graphs, and watch
-                the genuinely computed expected cut size chase (or miss) the real brute-force optimum live, generalizing
-                the QAOA lessons&rsquo; own grid-searched, single-graph worked examples into something you can explore
-                yourself.
+                Drag the cost angle γ and mixer angle β across a p=1 QAOA circuit on a few small graphs, and watch
+                the computed expected cut size chase (or miss) the brute-force optimum live, generalizing the QAOA
+                lessons&rsquo; own grid-searched, single-graph worked examples into something you can explore yourself.
               </p>
               <div className="mt-6">
                 <LazyQAOAExplorer />
@@ -277,9 +276,9 @@ export default function SimulatorsPage() {
             <section id="syndrome-explorer" className="scroll-mt-24">
               <h3 className="text-xl font-semibold tracking-tight text-foreground">Syndrome Explorer</h3>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                Inject a real X or Z error into a 3-qubit repetition code and watch the platform&rsquo;s actual
-                error-correction engine extract the syndrome via genuine ancilla CNOTs and partial measurement,
-                decode it, and apply the correction — the bit-flip code and its phase-flip dual, both live.
+                Inject an X or Z error into a 3-qubit repetition code and watch the platform&rsquo;s error-correction
+                engine extract the syndrome via ancilla CNOTs and partial measurement, decode it, and apply the
+                correction — the bit-flip code and its phase-flip dual, both live.
               </p>
               <div className="mt-6 grid gap-6 lg:grid-cols-2">
                 <div>

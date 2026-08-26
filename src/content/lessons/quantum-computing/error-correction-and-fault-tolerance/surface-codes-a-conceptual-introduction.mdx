@@ -9,7 +9,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Surface Codes: A Conceptual Introduction",
   description:
-    "Why real quantum hardware roadmaps build toward surface codes rather than the Shor code: nearest-neighbor-only stabilizers on a 2D grid, arbitrarily improvable distance, and a genuinely honest account of why this platform doesn't simulate one.",
+    "Why real quantum hardware roadmaps build toward surface codes rather than the Shor code: nearest-neighbor-only stabilizers on a 2D grid, arbitrarily improvable distance, and an honest account of why this platform doesn't simulate one.",
   course: "error-correction-and-fault-tolerance",
   module: "surface-codes-a-conceptual-introduction",
   order: 1,
@@ -153,7 +153,7 @@ Quantum Hardware pillar develops further).
 
 ### Scope: conceptual only
 
-Genuinely simulating even a small surface code (say, distance 3, needing
+Actually simulating even a small surface code (say, distance 3, needing
 roughly 9 physical qubits plus additional stabilizer-measurement
 ancillas, arranged and connected on an actual 2D pattern) is substantially
 more engineering than this course's `errorCorrection.ts` builds. Real
@@ -185,6 +185,18 @@ growing a surface code actually helps rather than adding more noise
 than it corrects, a milestone specifically because it confirmed the
 scaling behavior this lesson's "distance is a single tunable parameter"
 claim predicts, on real hardware, not just on paper.
+
+<PredictBeforeReveal
+  question="Both the Shor code and a surface code can be built at distance 3, using roughly the same qubit count. Which one keeps its qubit-efficiency edge as you push to much larger distance, say 11?"
+  options={[
+    { label: "The Shor code, since it was designed first and is more general", value: "shor" },
+    { label: "The surface code, since its local pattern just repeats", value: "surface" },
+    { label: "Neither, both scale identically in qubit count", value: "same" },
+    { label: "It depends entirely on the hardware, not the code", value: "depends" },
+  ]}
+  correctValue="surface"
+  explanation="At distance 3 the two are roughly tied, both around 9 data qubits. But reaching distance 11 with a Shor-style code means an entirely new, larger hand-designed construction, while a surface code just needs an 11x11 grid of the identical local stabilizer pattern already shown above. The surface code's advantage isn't in beating Shor's code at small size, it's that its design cost stays flat as distance grows. Worked out concretely below."
+/>
 
 ## Worked Example
 

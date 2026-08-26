@@ -160,12 +160,23 @@ resolvent operators, building on Green's Functions and Resolvents'
 $(E-H)^{-1}$); **cited here, not proved**, exactly as the general
 spectral theorem was cited two lessons ago. What's been fully derived
 above (orthogonality, reality) is already everything Hermitian Operators
-proved for matrices; completeness is the one genuinely new ingredient,
+proved for matrices; completeness is the one truly new ingredient,
 and it's the infinite-dimensional analogue of the same existence
 statement the finite-dimensional spectral theorem also had to assume
 rather than construct from scratch.
 
 ### Two "different" problems, one Sturm-Liouville problem
+
+<PredictBeforeReveal
+  question="The orthogonality and reality proofs above never used q(x) at all — only p, w, and the vanishing boundary term. Given that, do you expect the infinite well's flat q=0 and hydrogen's singular Coulomb-plus-centrifugal q(r) to both satisfy the same Sturm-Liouville theorem?"
+  options={[
+    { label: "No — hydrogen's q(r) blows up at the origin, so the proof needs redoing", value: "no" },
+    { label: "Yes — q never entered the orthogonality/reality argument", value: "yes" },
+    { label: "Only for l=0, where the centrifugal term vanishes", value: "l0-only" },
+  ]}
+  correctValue="yes"
+  explanation="Lagrange's identity only needs the boundary term [p(y₂y₁′−y₁y₂′)] to vanish at each endpoint — a fact about p and the boundary condition, not about q. The table below shows p=w=1 and a vanishing boundary term hold for both problems despite wildly different q(x), so both inherit orthogonality and reality for free, for every l."
+/>
 
 **The infinite square well** ($-a<x<a$, $\hbar=m=1$): $-y''=\lambda y$
 is already in Sturm-Liouville form with $p=1,q=0,w=1$, $\lambda=2E$,
@@ -195,7 +206,7 @@ end).
 
 Same $p$, same $w$, same eigenvalue convention: only $q(x)$ (whether
 the potential is a flat zero or a Coulomb-plus-centrifugal well) and the
-interval genuinely differ. Visually, the two potentials that go into
+interval actually differ. Visually, the two potentials that go into
 $q$ look nothing alike:
 
 <PotentialDiagram
@@ -235,7 +246,7 @@ hydrogen: not optimism, a theorem.
 
 ## Worked Example
 
-**Verify the infinite well's eigenfunctions are genuinely orthogonal,
+**Verify the infinite well's eigenfunctions are actually orthogonal,
 using this platform's own `infiniteSquareWellEigenstate` engine
 function, independent of the general proof above.**
 
@@ -258,7 +269,7 @@ numerical check in Advanced Topics in Quantum Mechanics).
 <Callout type="mistake">
 **Assuming the weight $w(x)$ is always $1$.** It's $1$ for every example
 in this lesson (and every potential this platform's core curriculum
-solves), but genuinely different Sturm-Liouville problems (Legendre's
+solves), but other Sturm-Liouville problems (Legendre's
 equation, Bessel's equation, both outside this course's scope) have
 nontrivial $w(x)\ne1$, and the orthogonality statement is with respect
 to *that* weight: $\int w\,y_my_n\,dx=0$, not $\int y_my_n\,dx=0$.

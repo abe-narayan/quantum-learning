@@ -205,6 +205,17 @@ famous closed-form prediction $\gamma=-\tfrac12\Omega$, minus half the
 **solid angle** $\Omega=2\pi(1-\cos\theta)$ the loop encloses on the
 sphere of field directions:
 
+<PredictBeforeReveal
+  question="Fix the cone half-angle θ and trace the same loop, but this time take twice as long to go around (ω half as fast, still ≪ω₀). What happens to the computed Berry phase γ?"
+  options={[
+    { label: "γ doubles, since the field spends twice as long at every point", value: "doubles" },
+    { label: "γ is cut in half, since the phase accumulates more slowly", value: "halves" },
+    { label: "γ is unchanged — it depends only on the loop's shape, not its duration", value: "same" },
+  ]}
+  correctValue="same"
+  explanation="γ = i∮⟨n|∇_R n⟩·dR is a line integral over the path in parameter space, with no leftover dt anywhere in the integrand — the chain rule that produced it cancelled the time-parametrization out completely. Slow the loop down, speed it up, traverse it unevenly: γ doesn't move, which is exactly the sense in which it's geometric rather than dynamical (the dynamical phase θ_n, by contrast, does grow with how long the loop takes)."
+/>
+
 <InteractiveSection
   title="Sweep the cone half-angle, watch geometry predict the phase"
   description="Each point is a full 3000-step loop integral around the cone at that θ, computed directly from real Bloch-sphere states, no formula used in the computation itself. The accent curve is the independent closed-form prediction, −π(1−cosθ). The two curves overlap almost exactly at every θ swept."

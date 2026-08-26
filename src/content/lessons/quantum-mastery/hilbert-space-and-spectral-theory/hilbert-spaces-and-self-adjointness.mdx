@@ -16,7 +16,7 @@ export const decayFrames = [
     paramLabel: "",
     series: [
       {
-        label: "|ψ₀(x)|² (ground harmonic oscillator state, ψ,ψ′ both genuinely in L²(ℝ))",
+        label: "|ψ₀(x)|² (ground harmonic oscillator state, ψ,ψ′ both actually in L²(ℝ))",
         color: "brand",
         points: decayGrid.x.map((x, i) => ({ x, y: groundDensity[i] })),
       },
@@ -46,7 +46,7 @@ export const deficiencyFrames = [
 export const lessonMeta = {
   title: "Hilbert Spaces and Self-Adjointness",
   description:
-    "Every earlier course checked A = A† and called it a day. Here that check gets separated into two genuinely different conditions, symmetric versus self-adjoint, distinguished only by whether the operator's domain matches its adjoint's domain — and the momentum operator on a half-line is a real, worked example where they come apart entirely.",
+    "Every earlier course checked A = A† and called it a day. Here that check splits into two distinct conditions, symmetric versus self-adjoint, distinguished only by whether the operator's domain matches its adjoint's domain, and the momentum operator on a half-line is a worked example where they come apart entirely.",
   course: "hilbert-space-and-spectral-theory",
   module: "hilbert-spaces-and-self-adjointness",
   order: 1,
@@ -59,7 +59,7 @@ export const lessonMeta = {
   objectives: [
     "State precisely what makes L²(ℝ) a Hilbert space (completeness, separability) and why both properties matter physically",
     "Derive, not assert, that a function in the domain of p̂ = −iħd/dx on the whole line vanishes at ±∞",
-    "Distinguish a symmetric (formally Hermitian) operator from a genuinely self-adjoint one, and compute the deficiency-subspace calculation showing p̂ on a half-line has no self-adjoint extension at all",
+    "Distinguish a symmetric (formally Hermitian) operator from a fully self-adjoint one, and compute the deficiency-subspace calculation showing p̂ on a half-line has no self-adjoint extension at all",
   ],
   related: [
     {
@@ -71,18 +71,21 @@ export const lessonMeta = {
 
 ## Motivation
 
-Hermitian Operators proved, correctly and completely, that $A=A^\dagger$
-forces real eigenvalues and orthogonal eigenvectors, for a **matrix**.
-Every later course reused that single check, $A=A^\dagger$, on operators
-like $\hat p=-i\hbar\,d/dx$ acting on functions, and it always worked.
-That's not a coincidence to wave away, but it's also not the whole
-story: on an infinite-dimensional space, $A=A^\dagger$ (checked by
-integration by parts) is a genuinely weaker statement than what "the
-eigenvalues are provably real and a complete eigenbasis provably exists"
-actually requires. This lesson isolates exactly what's missing, calls it
-by its real name (**self-adjointness**, not mere Hermiticity), and shows,
-with a fully worked example, a case where the missing piece breaks
-things outright.
+Hermitian Operators proved that $A=A^\dagger$ forces real eigenvalues and
+orthogonal eigenvectors, for a **matrix**. Every later course reused that
+same check on operators like $\hat p=-i\hbar\,d/dx$ acting on functions,
+integration by parts in place of a finite sum, and it always worked. Try
+that identical check on $\hat p=-i\,d/dx$ for a particle confined to
+$x>0$ by a hard wall, and it still goes through cleanly, yet the
+operator you get has no self-adjoint version at all, not with this
+boundary condition, not with any other. On an infinite-dimensional
+space, $A=A^\dagger$ checked by integration by parts is weaker than what
+"the eigenvalues are provably real and a complete eigenbasis provably
+exists" actually requires, and the half-line momentum operator is where
+that gap becomes a real obstruction rather than a footnote. This lesson
+isolates exactly what's missing, gives it its real name
+(**self-adjointness**, not mere Hermiticity), and works through that
+half-line case in full.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
@@ -136,7 +139,7 @@ it. Separability is what guarantees a countable eigenbasis can exist at
 all; without it, "expand $\psi$ in energy eigenstates" wouldn't even
 be the right *kind* of statement to make.
 
-### Formally Hermitian ("symmetric") vs. genuinely self-adjoint
+### Formally Hermitian ("symmetric") vs. actually self-adjoint
 
 An operator $A$ with domain $D(A)\subset\mathcal H$ is **symmetric** if
 $\langle\phi|A\psi\rangle=\langle A\phi|\psi\rangle$ for all
@@ -171,8 +174,8 @@ lesson works out land on opposite sides of that line:
     </svg>
     <span className="text-center text-sm text-muted-foreground">
       Whole line, derived above: $D(\hat p)=D(\hat p^\dagger)=H^1(\mathbb R)$
-      exactly — the two domains coincide, so $\hat p$ is genuinely
-      self-adjoint.
+      exactly — the two domains coincide, so $\hat p$ is
+      self-adjoint, not merely symmetric.
     </span>
   </div>
   <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-muted/40 p-4">
@@ -231,7 +234,7 @@ $\psi$ "well-behaved."
 
 With that lemma established, the boundary term in
 $\int\phi^*(-i\hbar\psi')dx=-i\hbar[\phi^*\psi]_{-\infty}^{\infty}+i\hbar\int\phi'^*\psi\,dx$
-genuinely vanishes (both $\phi,\psi\to0$), confirming $\hat p$ is
+vanishes outright (both $\phi,\psi\to0$), confirming $\hat p$ is
 symmetric on $H^1(\mathbb R)$.
 
 ### Why the full-line $\hat p$ is actually self-adjoint, not just symmetric
@@ -247,10 +250,9 @@ integration by parts or boundary term is even needed: multiplication
 by a real number is its own adjoint entrywise), and that maximal domain
 transforms back, under the same unitary Fourier transform, to exactly
 $H^1(\mathbb R)$. So $D(\hat p)=D(\hat p^\dagger)=H^1(\mathbb R)$: the
-full-line momentum operator is genuinely self-adjoint, not merely
-symmetric; this is why every calculation built on $\hat p$ so far in
-this platform was safe, even though the domain question was never
-raised.
+full-line momentum operator is self-adjoint, not merely symmetric; this
+is why every calculation built on $\hat p$ so far in this platform was
+safe, even though the domain question was never raised.
 
 ### Where it breaks: momentum on a half-line
 
@@ -267,6 +269,17 @@ count the dimensions of the solution spaces of
 $\hat p^\dagger\psi=+i\psi$ and $\hat p^\dagger\psi=-i\psi$ inside
 $L^2(0,\infty)$; call these dimensions $n_+,n_-$, the **deficiency
 indices**. A self-adjoint extension exists *only if* $n_+=n_-$.
+
+<PredictBeforeReveal
+  question="The Dirichlet domain ψ(0)=0 already makes p̂ symmetric on the half-line. Before computing n₊ and n₋: does the symmetric check that already passed mean a self-adjoint extension is guaranteed to exist?"
+  options={[
+    { label: "Yes — symmetric always extends", value: "yes" },
+    { label: "No — symmetry alone doesn't decide it", value: "no" },
+    { label: "Only if the wall is at x=0 specifically", value: "wall" },
+  ]}
+  correctValue="no"
+  explanation="Symmetric only guarantees D(p̂)⊆D(p̂†); von Neumann's theorem needs the deficiency indices n₊,n₋ equal, and the computation below shows n₊=1, n₋=0 for this exact operator. No boundary condition fixes that mismatch — the half-line momentum operator has no self-adjoint extension at all."
+/>
 
 **Compute the deficiency indices directly.** $\hat p^\dagger\psi=\pm
 i\psi$ means $-i\psi'=\pm i\psi$, i.e. $\psi'=\mp\psi$, with solutions
@@ -297,7 +310,7 @@ condition. Every domain choice leaves it merely symmetric at best.
 ## Physical Interpretation
 
 Self-adjointness isn't a technicality kept separate from physics: it's
-exactly the hypothesis Stone's theorem needs to generate a genuinely
+exactly the hypothesis Stone's theorem needs to generate a properly
 unitary time evolution $e^{-iAt/\hbar}$ (cited, not proved here: Stone's
 theorem is itself a substantial functional-analysis result). A merely
 symmetric operator can fail to generate *any* consistent unitary
@@ -323,7 +336,7 @@ member.**
 The harmonic-oscillator ground state $\psi_0(x)=(1/\pi)^{1/4}e^{-x^2/2}$
 (natural units) satisfies both $\psi_0,\psi_0'\in L^2(\mathbb R)$ (a
 Gaussian and $-x\psi_0(x)$ are both manifestly square-integrable), so
-$\psi_0\in D(\hat p)=H^1(\mathbb R)$ genuinely, not just by inspection:
+$\psi_0\in D(\hat p)=H^1(\mathbb R)$ by the actual hypotheses of the lemma, not just by inspection:
 
 <ParametricCurve
   frames={decayFrames}
@@ -334,7 +347,7 @@ $|\psi_0(x)|^2$, computed directly by this platform's
 `harmonicOscillatorEigenstate`, visibly decays to (numerically)
 indistinguishable from zero well before the grid's edge at $x=\pm8$,
 the concrete instance of the general lemma proved above, for a function
-that genuinely belongs to $\hat p$'s domain, not merely one chosen to
+that actually belongs to $\hat p$'s domain, not merely one chosen to
 look well-behaved.
 
 ## Common Mistakes
@@ -345,7 +358,7 @@ self-adjointness check.** That calculation only ever shows $A$ is
 *symmetric* on whatever domain you assumed. Self-adjointness additionally
 requires $D(A)=D(A^\dagger)$ exactly, a domain question that's
 automatically settled (and hence invisible) in finite dimensions, but
-genuinely open on a function space, as the half-line example shows: a
+a real open question on a function space, as the half-line example shows: a
 domain can be symmetric and still admit no self-adjoint extension at
 all.
 </Callout>

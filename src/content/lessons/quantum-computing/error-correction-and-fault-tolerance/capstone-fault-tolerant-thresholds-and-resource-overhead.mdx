@@ -91,7 +91,19 @@ binomial-tail computation, real classical probability math, deliberately
 using a toy threshold ($p=0.5$ for independent majority voting) far
 above the real, literature-cited surface-code figure below, purely to
 make the qualitative crossover visible without claiming a realistic
-number:
+number. Before sweeping it, make a call:
+
+<PredictBeforeReveal
+  question="In this toy majority-vote model, the physical error rate is p = 0.7, well above the toy crossover at p = 0.5. If you increase the code distance d (more physical qubits per logical qubit), what happens to the failure probability?"
+  options={[
+    { label: "It drops toward zero, same as below threshold", value: "drops" },
+    { label: "It stays flat, distance doesn't matter above threshold", value: "flat" },
+    { label: "It rises, more distance makes things worse", value: "rises" },
+    { label: "It oscillates unpredictably with d", value: "oscillates" },
+  ]}
+  correctValue="rises"
+  explanation="Above the crossover, each additional physical qubit is more likely than not to be wrong, so a majority vote among more of them is more likely, not less, to land on the wrong answer. The failure probability climbs with d instead of falling. This is the same logic Common Mistakes below applies to real error correction: past threshold, adding more error-correction machinery introduces more error than it removes. Sweep the slider below to see the curve's slope flip sign exactly at p = 0.5."
+/>
 
 <InteractiveSection title="Above and below threshold, opposite trends" description="Drag the slider to sweep the toy physical error rate p from 0.1 to 0.9. Below this toy model's own p=0.5 crossover, failure probability drops as distance grows, more redundancy helps. Above it, failure probability grows instead, exactly the 'more error correction makes it worse' case Common Mistakes warns about below. The curve's slope flips sign exactly at p = 0.5.">
   <ParametricCurve
@@ -104,9 +116,9 @@ number:
 ### Why this platform doesn't derive p_th's actual value
 
 The threshold's numeric value depends on the specific code, the physical
-noise model, and the decoding algorithm used, a genuinely empirical,
-code-specific calculation (often done by large-scale numerical
-simulation in the research literature), not something derivable from the
+noise model, and the decoding algorithm used. It's an empirical,
+code-specific calculation, often done by large-scale numerical
+simulation in the research literature, not something derivable from the
 qualitative combinatorial argument above alone. Commonly cited figures
 for surface codes are in the rough neighborhood of $p_{\text{th}}\sim
 0.5$–$1\%$ per gate, cited here as a widely-referenced approximate

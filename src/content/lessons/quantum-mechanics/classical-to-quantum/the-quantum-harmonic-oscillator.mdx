@@ -207,6 +207,18 @@ $a^\dagger|2\rangle = \sqrt{3}\,|3\rangle$, a state safely below the
 approximation. The energy is
 $E_2=\hbar\omega(2+\tfrac12)=1\cdot2.5=2.5$.
 
+<PredictBeforeReveal
+  question="This truncation only keeps |0⟩ through |4⟩. The true, untruncated oscillator says a†|4⟩ = √5|5⟩. What should the explorer below actually show when you slide it to n = 4?"
+  options={[
+    { label: "Every bar at 0 — there's no |5⟩ in this basis to raise into", value: "zero" },
+    { label: "A bar of height √5 sitting on |4⟩ itself", value: "self" },
+    { label: "A bar appears back at |0⟩, wrapping around", value: "wrap" },
+    { label: "A bar of height √5 at a slot labeled |5⟩", value: "extend" },
+  ]}
+  correctValue="zero"
+  explanation="The matrix has no |5⟩ row to put that amplitude in, so a†|4⟩ comes back as the zero vector in this 5-level truncation — every bar reads 0. That's the honest truncation error flagged above and in Practice Question 2: it only shows up at the very last rung of whatever cutoff you pick, and a bigger truncation just pushes the same artifact one rung higher rather than removing it."
+/>
+
 <InteractiveSection title="Slide n, watch the raising operator act" description="Each bar shows the actual coefficients of a†|n⟩ in the |0⟩...|4⟩ Fock basis, computed by literally applying the platform's real creationOperator matrix, the same 5-level truncation as the worked example. n = 2 reproduces a†|2⟩ = √3|3⟩ exactly. Slide to n = 4, the top of this truncation, to see the honest truncation error from Practice Question 2: every bar drops to 0, since there is no |5⟩ left in this basis for a† to raise into.">
   <BarChartExplorer
     frames={ladderFrames}

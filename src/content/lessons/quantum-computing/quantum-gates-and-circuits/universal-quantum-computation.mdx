@@ -106,16 +106,16 @@ platform's circuits use H, X, Y, Z, S, T, and CNOT throughout, plus
 arbitrary-angle rotations $R_x,R_y,R_z$. Is that an arbitrary shopping
 list, or does some small subset of it already suffice to build
 *everything* else, exactly or to any desired precision? And if so,
-which subset, and why does it need to include a genuinely non-obvious
+which subset, and why does it need to include a distinctly non-obvious
 gate like $T$?
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a gold-colored cylindrical quantum computing chamber housing cryogenic and control hardware"
-  caption="An IBM Quantum System One, whose control stack is compiled down to exactly the kind of small, fixed, discrete gate set (Clifford+T style) this lesson argues real hardware needs, rather than arbitrary continuous single-qubit rotations."
-  credit="Onri Jay Benally"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/5/50/Quantum-computer-Chalmers_2017.jpg"
+  alt="A real 3-qubit superconducting quantum processor with three read-out cavities, fabricated at Chalmers University of Technology"
+  caption="A real superconducting quantum processor, whose control stack is compiled down to exactly the kind of small, fixed, discrete gate set (Clifford+T style) this lesson argues real hardware needs, rather than arbitrary continuous single-qubit rotations."
+  credit="Anita Fors / Chalmers University of Technology"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum-computer-Chalmers_2017.jpg"
+  license="CC BY-SA 4.0"
 />
 
 ## Intuition
@@ -154,13 +154,13 @@ gates maps every product state to a product state, with no exception.**
 
 But CNOT does not have this property: The No-Cloning Theorem already
 built $\text{CNOT}(|+\rangle\otimes|0\rangle) =
-\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$, a genuinely entangled Bell
-state, from a product input. No tensor product $U\otimes V$ can equal
-CNOT, because $U\otimes V$ can never send a product state to an
-entangled one and CNOT demonstrably does. **Single-qubit gates alone,
-however many of them, in whatever sequence, can never reach every
-two-qubit unitary** — entangling gates are not an optional convenience,
-they are mathematically required for full generality.
+\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$, an entangled Bell state, from
+a product input. No tensor product $U\otimes V$ can equal CNOT, because
+$U\otimes V$ can never send a product state to an entangled one and
+CNOT demonstrably does. **Single-qubit gates alone, however many of
+them, in whatever sequence, can never reach every two-qubit unitary.**
+Entangling gates are not an optional convenience; they are
+mathematically required for full generality.
 
 ### The universality theorem
 
@@ -183,12 +183,12 @@ The plausibility argument, without the full constructive proof: every
 unitary $U(2^n)$ is generated, as a Lie group, by a Lie algebra of
 Hermitian generators. Single-qubit gates on each of the $n$ qubits
 supply every local generator (acting on one qubit at a time); CNOT
-alone supplies enough genuinely two-qubit generators, via commutators
-of local generators with the fixed CNOT structure, to eventually reach
+alone supplies enough true two-qubit generators, via commutators of
+local generators with the fixed CNOT structure, to eventually reach
 every direction in the full $2^n\times2^n$ generator space, not just
 the "diagonal" local ones. Reaching every generator direction means
 reaching every unitary connected to the identity, arbitrarily closely,
-by composing finitely many gates from the set — and since $U(2^n)$ is
+by composing finitely many gates from the set. Since $U(2^n)$ is
 connected, that's all of it.
 
 <Callout type="note">
@@ -241,7 +241,7 @@ $S$ and CNOT have the same property (checkable the same way).
 
 It's tempting to guess $\{H,S,\text{CNOT}\}$ is already universal,
 since it's discrete, includes an entangling gate, and every gate in it
-is genuinely used throughout this platform's algorithms. It is
+is used throughout this platform's algorithms. It is
 **not**, and the reason is the **Gottesman-Knill theorem** (cited here,
 not re-derived: the full proof tracks a stabilizer tableau through the
 circuit, exactly the bookkeeping Stabilizer Formalism Basics
@@ -298,8 +298,8 @@ matches $\frac{1}{\sqrt2}(X+Y)$ to at least 9 decimal digits). This is
 **not** a Pauli operator, not even a phase times one: it's an equal
 combination of $X$ and $Y$. So $T$ conjugates a Pauli into something
 that isn't a Pauli, and **$T$ is not a Clifford gate.** Adjoining it to
-$\{H,S,\text{CNOT}\}$ genuinely adds something Clifford circuits alone
-could never produce.
+$\{H,S,\text{CNOT}\}$ adds something Clifford circuits alone could
+never produce.
 
 <Callout type="note">
 $T^2=S$ and $S^2=Z$, so $T$ already contains $S$ (and everything built
@@ -313,16 +313,16 @@ $\{H,T,\text{CNOT}\}$ (equivalently Clifford+T) is a standard, cited
 universal set (Boykin et al. 2000): combined with the universality
 theorem above, it's enough to reach every $n$-qubit unitary to
 arbitrary accuracy. The single-qubit half of the claim is itself a
-genuinely surprising fact, stated here without full proof: $H$ and $T$
+surprising fact, stated here without full proof: $H$ and $T$
 generate a **dense** subgroup of $SU(2)$, meaning every point on the
 Bloch sphere can be approximated arbitrarily closely by *some* finite
 word in $H$ and $T$, even though $T$'s own rotation angle ($\pi/4$) is
 a perfectly ordinary rational multiple of $\pi$ and would, by itself,
 only ever reach 8 points. Density only emerges because $H$ and $T$
 rotate about *different* axes; composing rotations about non-parallel
-axes by a fixed angle repeatedly is known (a genuinely deep,
-number-theoretic fact this lesson cites rather than derives) to sweep
-out a dense set rather than a finite one.
+axes by a fixed angle repeatedly is known (a deep, number-theoretic
+fact this lesson cites rather than derives) to sweep out a dense set
+rather than a finite one.
 
 Density is an existence statement — it doesn't say how MANY $H$'s and
 $T$'s are needed to hit a given target to a given accuracy $\varepsilon$.
@@ -367,9 +367,8 @@ The **Toffoli gate** (CCNOT) flips a target qubit exactly when *both*
 of two control qubits are $|1\rangle$; it's a completely standard,
 reversible classical AND-like gate, but it is **not** itself a Clifford
 gate. The standard construction below (Nielsen & Chuang, Fig. 4.9)
-builds it from nothing but $H$, CNOT, $T$, and $T^\dagger$, a genuinely
-concrete instance of Clifford+T reaching a gate outside the Clifford
-group:
+builds it from nothing but $H$, CNOT, $T$, and $T^\dagger$, a concrete
+instance of Clifford+T reaching a gate outside the Clifford group:
 
 <StaticCircuitDiagram
   numQubits={3}
@@ -465,8 +464,7 @@ count.
 
 - Single-qubit gates alone map every product state to a product state,
   so they can never reach an entangling gate like CNOT; at least one
-  genuinely multi-qubit gate is mathematically required for
-  universality.
+  true multi-qubit gate is mathematically required for universality.
 - The universality theorem (cited): arbitrary single-qubit gates plus
   CNOT can reach any $n$-qubit unitary.
 - Real (especially fault-tolerant) hardware wants a small, FIXED,

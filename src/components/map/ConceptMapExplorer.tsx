@@ -20,7 +20,10 @@ const PILLAR_DOT: Record<ConceptNode["pillar"], string> = {
   "quantum-hardware": "bg-warning",
   "quantum-software": "bg-muted-foreground",
   "quantum-mastery": "bg-danger",
-  apex: "bg-brand",
+  // Distinct from "quantum-mechanics" (bg-brand above) — apex is its own
+  // pillar in the graph, so its dot needs its own color rather than
+  // reusing one already assigned to another pillar's nodes.
+  apex: "bg-success",
 };
 
 const PILLAR_LABEL: Record<ConceptNode["pillar"], string> = {

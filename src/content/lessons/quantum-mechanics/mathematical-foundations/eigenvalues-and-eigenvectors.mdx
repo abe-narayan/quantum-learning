@@ -63,9 +63,9 @@ stretch factor along each is its eigenvalue.
 
 Using the matrix $A=\begin{pmatrix}2&1\\1&2\end{pmatrix}$ from this
 lesson's own Worked Example below: the ordinary vector $e_1=(1,0)$ comes
-out tilted, landing at $(2,1)$, pointing in a genuinely different
-direction. But $v=(1,1)$ comes out at $(3,3)$, exactly $3v$, still on the
-same line through the origin, just three times as long.
+out tilted, landing at $(2,1)$, pointing somewhere else entirely. But
+$v=(1,1)$ comes out at $(3,3)$, exactly $3v$, still on the same line
+through the origin, just three times as long.
 
 <VectorDiagram
   vectors={[
@@ -80,6 +80,18 @@ same line through the origin, just three times as long.
 $e_1$'s image points somewhere new; $v$'s image stays on $v$'s own line.
 That's the whole picture: eigenvectors are the directions an operator
 treats as an axis of pure scaling, nothing else.
+
+<PredictBeforeReveal
+  question="Sweep a unit vector u all the way around the circle (360°). At how many angles will Au land back on the same line as u (pointing the same way or the opposite way)?"
+  options={[
+    { label: "0 — no angle works", value: "0" },
+    { label: "1", value: "1" },
+    { label: "2", value: "2" },
+    { label: "4", value: "4" },
+  ]}
+  correctValue="4"
+  explanation="Four. A has two eigenvector lines, along (1,1) and (1,−1), and each line crosses the unit circle twice (once in each direction), for four angles total out of the full sweep — everywhere else, Au tilts off u's line. That matches this lesson's own Worked Example below, which finds eigenvalue 3 along (1,1) and eigenvalue 1 along (1,−1)."
+/>
 
 <InteractiveSection title="Find the eigenvectors by eye" description="A unit vector u sweeps through every direction; Au (its image under A) is drawn alongside it. For most angles Au points somewhere else entirely. Find the two angles where Au snaps back onto the same line as u — those are A's eigenvector directions, and you can check your answer against this lesson's own worked example.">
   <VectorDiagramExplorer

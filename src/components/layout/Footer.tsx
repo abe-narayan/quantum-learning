@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { NAV_ITEMS, TRACK_NAV_ITEMS } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
-// The navbar groups the four track pages under a "Tracks" dropdown to keep
+// The navbar groups the five track pages under a "Tracks" dropdown to keep
 // its top-level item count sane, but the footer has no such pressure — it's
 // exactly where a complete, ungrouped site map belongs, so it lists both.
 const FOOTER_ITEMS = [...NAV_ITEMS, ...TRACK_NAV_ITEMS];

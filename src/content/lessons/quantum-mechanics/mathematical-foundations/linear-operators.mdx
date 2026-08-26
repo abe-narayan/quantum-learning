@@ -64,11 +64,24 @@ export const lessonMeta = {
 
 ## Motivation
 
-Physical transformations (rotate a system, evolve it forward in time,
-apply a quantum gate) need a mathematical object that turns one vector
-into another. Not every such map is well-behaved enough to reason about
-easily; the ones that are turn out to be exactly the **linear** ones, and
-almost everything physics does to a quantum state is represented by one.
+Rotate a system, evolve it forward in time, apply a quantum gate: every
+one of these turns one state vector into another, so physics needs a
+mathematical object that does exactly that. An enormous space of possible
+functions could do the job, but physics restricts itself to a narrow
+slice of them, the **linear** ones, and that restriction isn't a
+convenience. Linearity is exactly what lets a superposition be built from
+simpler pieces and have an operator act on the whole thing by acting on
+each piece separately. Lose linearity and superposition stops meaning
+anything.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Arthur_Cayley.jpg"
+  alt="Formal black-and-white studio portrait photograph of Arthur Cayley, seated"
+  caption="Arthur Cayley, whose 1858 memoir on matrix algebra treated a matrix as a single algebraic object in its own right, rather than just a grid of coefficients, and defined the composition rule this lesson derives below from the completeness relation."
+  credit="Herbert Rose Barraud / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Arthur_Cayley.jpg"
+  license="Public domain"
+/>
 
 ## Intuition
 
@@ -147,10 +160,10 @@ $$
 $$
 
 That final expression is exactly the ordinary matrix-multiplication
-formula. It's worth noticing this *is* a derivation, not a restated
-convention: "compose two operators" and "multiply their matrices" turn
-out to be the same operation because of the completeness relation, not by
-definition.
+formula, and it fell out of nowhere but completeness: "compose two
+operators" and "multiply their matrices" collapse into the same
+operation because inserting the identity was legal, not because matrix
+multiplication was defined to work out that way from the start.
 
 ### Identity, inverse
 
@@ -187,7 +200,18 @@ Via the derived formula, the $(1,2)$ entry (using 1-indexing) is
 $\sum_j A_{1j}B_{j2} = A_{11}B_{12}+A_{12}B_{22} = 2\cdot1+0\cdot0=2$,
 matching the direct computation.
 
-<InteractiveSection title="Confirm AB ≠ BA" description="Toggle between composing A then B versus B then A, using this lesson's own A and B. The two products land on genuinely different matrices — order is part of what an operator composition means, not a bookkeeping detail.">
+<PredictBeforeReveal
+  question="For this lesson's A and B, does AB equal BA?"
+  options={[
+    { label: "Yes, matrix multiplication always commutes", value: "yes" },
+    { label: "No, order changes the result", value: "no" },
+    { label: "Only because A happens to be diagonal", value: "diagonal" },
+  ]}
+  correctValue="no"
+  explanation="No: AB puts the 2 in the top-right entry, BA puts it in the bottom-left. Applying gate B first and then A is physically a different process from applying A first and then B, so it would be strange if the algebra didn't care about order too."
+/>
+
+<InteractiveSection title="Confirm AB ≠ BA" description="Toggle between composing A then B versus B then A, using this lesson's own A and B, and compare the two resulting matrices entry by entry.">
   <MatrixGridExplorer
     presets={compositionPresets}
     ariaLabel="Toggle between AB and BA to see the same two matrices produce different composed results depending on order"

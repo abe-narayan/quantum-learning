@@ -79,12 +79,12 @@ gate, every basis change, and every step of time evolution in quantum
 mechanics is one.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a real superconducting quantum computer in its glass-and-steel enclosure"
-  caption="A real quantum computer like this is exactly what randomized benchmarking runs on: applying long sequences of gates and tracking how the outcome statistics decay measures precisely how closely an implemented gate satisfies U†U=I, the unitarity condition this lesson derives from the adjoint definition."
-  credit="Onri Jay Benally (OJB Quantum) / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Microwave_Apparatus_%286029992084%29.jpg"
+  alt="A pair of trapped ions inside a glass vacuum chamber, illuminated by a green LED for visibility, being manipulated by microwave fields as part of a NIST quantum computing experiment"
+  caption="Real trapped-ion hardware like this is exactly what randomized benchmarking runs on: applying long sequences of microwave-driven gates and tracking how the outcome statistics decay measures precisely how closely an implemented gate satisfies U†U=I, the unitarity condition this lesson derives from the adjoint definition."
+  credit="Y. Colombe / NIST"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Microwave_Apparatus_(6029992084).jpg"
+  license="Public Domain (U.S. Government work)"
 />
 
 ## Intuition
@@ -199,6 +199,17 @@ the quantity a reported gate fidelity is quantifying.
 **Verify the Hadamard matrix $H=\frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}$
 is unitary, and contrast it with $S=\begin{pmatrix}1&0\\0&i\end{pmatrix}$
 from the last lesson (shown there to be non-Hermitian).**
+
+<PredictBeforeReveal
+  question="S is not Hermitian (shown last lesson). Does that mean S also fails to be unitary?"
+  options={[
+    { label: "Yes — non-Hermitian implies non-unitary", value: "non-unitary" },
+    { label: "No — S can still be unitary", value: "unitary" },
+    { label: "Can't tell without computing S†S", value: "unsure" },
+  ]}
+  correctValue="unitary"
+  explanation="S is unitary despite not being Hermitian — the two properties are independent, and the computation below confirms S†S = I directly. A matrix can fail one condition and satisfy the other; there's no implication either way."
+/>
 
 $H$ is real and symmetric, so $H^\dagger=H$. Compute $H^2$:
 

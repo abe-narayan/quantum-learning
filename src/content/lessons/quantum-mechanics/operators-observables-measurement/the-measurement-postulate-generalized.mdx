@@ -190,6 +190,31 @@ $$
 (A quick check: $P(N{=}2)=|1/\sqrt3|^2=\tfrac13$, and $\tfrac23+\tfrac13=1$,
 probabilities sum to 1, as they must.)
 
+Laid out as a branching tree, the single measurement of $N$ has exactly
+two possible outcomes, each carrying its own collapsed state:
+
+<MeasurementTree
+  root={{
+    label: "|ψ⟩ = (|0⟩+|1⟩+|2⟩)/√3",
+    children: [
+      {
+        label: `N=1 (${((collapseNormOnto1 ** 2) * 100).toFixed(0)}%) → (|0⟩+|1⟩)/√2`,
+        probability: collapseNormOnto1 ** 2,
+      },
+      {
+        label: `N=2 (${((collapseNormOnto2 ** 2) * 100).toFixed(0)}%) → |2⟩`,
+        probability: collapseNormOnto2 ** 2,
+      },
+    ],
+  }}
+  ariaLabel="Measurement tree showing the state psi branching on a measurement of N into two outcomes: N=1 with probability two thirds, collapsing to an equal superposition of |0> and |1>, and N=2 with probability one third, collapsing to |2>"
+/>
+
+Both branches' probabilities are computed the same way, $\|P_i|\psi\rangle\|^2$,
+whether the branch's own eigenspace is degenerate (N=1, two-dimensional)
+or not (N=2, one-dimensional) — the generalized rule doesn't need a
+special case for either.
+
 The bar chart below shows the *probabilities* that collapse produces,
 but not collapse itself: projecting and renormalizing are two distinct
 geometric steps, visible if instead of tracking all three components of

@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, T_GATE, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
 import { pureStateDensityMatrix, purity, vonNeumannEntropy, maximallyMixedState } from "@/lib/quantum/densityMatrix";
@@ -120,7 +121,7 @@ before that, back in Error Correction and Fault Tolerance, built the
 stabilizer formalism as a compact way to describe certain highly
 structured quantum states and circuits. These two threads look unrelated —
 one is about entanglement, the other about gate sets — but they turn out
-to be the field's two genuinely different answers to the single question
+to be the field's two structurally different answers to the single question
 that decides whether building a quantum computer for a given task is
 worth it at all: **can a classical computer already do this efficiently?**
 
@@ -132,6 +133,15 @@ circuit either clearly falls into a classically-easy category for a
 reason you can name, or it doesn't — and you will see exactly why the
 circuits used in real quantum-supremacy-style experiments were designed,
 deliberately, to be the ones that don't.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/0/03/RIKEN_R-CCS_Fugaku.jpg"
+  alt="Server racks of the Fugaku supercomputer at RIKEN's Center for Computational Science in Kobe, Japan"
+  caption="Fugaku, the RIKEN/Fujitsu machine that led the TOP500 list of the world's fastest classical computers in 2020. This lesson's two criteria are the precise, checkable version of the question a machine like this exists to answer: for a specific circuit, can hardware like this already do the job? When Google's 2019 Sycamore quantum-supremacy claim was challenged, it was exactly this class of classical supercomputing power -- large GPU clusters and tensor-network contractions run on a new Sunway supercomputer in China -- that mounted the strongest classical rebuttals, using precisely the bond-dimension machinery criterion (b) below formalizes."
+  credit="Barsaka2 / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:RIKEN_R-CCS_Fugaku.jpg"
+  license="CC0 1.0 (public domain)"
+/>
 
 ## Mathematical Development
 
@@ -352,6 +362,17 @@ authors happened to try.
 every entanglement number computed exactly using this platform's own
 `StateVector`, gate, and partial-trace functions — not asserted.**
 
+<PredictBeforeReveal
+  question="Circuit A below uses only H and CNOT gates, arranged to reach the maximum possible entanglement for its cut. Is it classically easy to simulate?"
+  options={[
+    { label: "No — that much entanglement makes any state hard to simulate", value: "no-too-entangled" },
+    { label: "Yes — Gottesman-Knill applies no matter how entangled the state is", value: "yes-gottesman-knill" },
+    { label: "It depends on exactly which qubits are entangled with which", value: "depends" },
+  ]}
+  correctValue="yes-gottesman-knill"
+  explanation="Circuit A is provably as entangled as a 6-qubit state can possibly be (3 ebits across a balanced cut, the absolute maximum) and is still classically easy, because every gate in it is Clifford. Criterion (a) never once asks how entangled the output is. The table below computes the entanglement exactly, and it climbs all the way to that maximum — the trivial simulability holds anyway."
+/>
+
 ### Circuit A: Clifford-only, pushed to maximal entanglement
 
 Apply $H$ to qubits $0,1,2$, then $\mathrm{CNOT}(0,3)$,
@@ -475,7 +496,7 @@ the state was.
 <Callout type="mistake">
 **Assuming a single non-Clifford gate makes a circuit "hard."** It removes
 *one* escape hatch (Gottesman-Knill), not both. Circuit B above contains a
-genuinely non-Clifford $T$ gate and is still classically easy, because
+non-Clifford $T$ gate and is still classically easy, because
 its entanglement independently stays bounded via criterion (b). A circuit
 is only a genuine hardness candidate when it defeats *both* criteria
 simultaneously, which is exactly why real quantum-advantage circuits are
@@ -523,7 +544,7 @@ the other.
 - These are **two independent sufficient conditions for "classically
   easy,"** verified exactly on two 6-qubit circuits: a Clifford-only
   circuit reaching the maximum possible entanglement for its cut (easy
-  via gate set alone), and a circuit with one genuinely non-Clifford $T$
+  via gate set alone), and a circuit with one non-Clifford $T$
   gate whose entanglement is provably capped at $1$ ebit per cut forever
   (easy via bounded entanglement alone).
 - Real quantum-advantage circuits are random specifically because

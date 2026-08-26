@@ -192,6 +192,17 @@ $j(j+1)$, exactly, not approximately. These are precisely the
 coefficients Degenerate Perturbation Theory used to build its coupled
 basis $U$, here actually derived rather than borrowed.
 
+<PredictBeforeReveal
+  question="Consider the stretched state |3/2,+3/2⟩ versus an interior state like |3/2,+1/2⟩. m₁+m₂ must equal mⱼ for any contributing product state. How many of the six uncoupled |mL,mS⟩ states can contribute to each?"
+  options={[
+    { label: "Both have exactly one contributing product state", value: "both-one" },
+    { label: "|3/2,+3/2⟩ has exactly one; |3/2,+1/2⟩ has two", value: "one-two" },
+    { label: "Both have exactly two contributing product states", value: "both-two" },
+  ]}
+  correctValue="one-two"
+  explanation="mⱼ=+3/2 with m₁∈{1,0,−1} and m₂∈{+½,−½} has only one solution, m₁=1,m₂=+½, so |3/2,+3/2⟩ is forced to equal that single product state exactly (coefficient 1, no superposition). mⱼ=+1/2 has two solutions, (m₁,m₂)=(1,−½) and (0,+½), so |3/2,+1/2⟩ is a genuine two-term superposition — exactly the √(2/3), √(1/3) split the recursion below derives."
+/>
+
 <InteractiveSection
   title="Step through each coupled state's CG decomposition"
   description="Each frame is one |j,mj⟩ coupled state; the bars show its real, computed Clebsch-Gordan coefficients against the six uncoupled |mL,mS⟩ product states. Exactly two bars are nonzero for the interior states (a genuine superposition); exactly one for the stretched states |3/2,±3/2⟩, matching the 'unique top state' argument above."
@@ -246,7 +257,7 @@ every $m,m',q$ at once.
 $J_z$ conservation forces $\langle jm;kq|j'm'\rangle=0$ unless
 $m'=m+q$ (apply $J_z$ to $|jm\rangle|kq\rangle$ before coupling: it has
 eigenvalue $m+q$; the coupled $|j'm'\rangle$ has eigenvalue $m'$; these
-can only match if $m'=m+q$, a genuinely two-line argument). The triangle
+can only match if $m'=m+q$, a two-line argument). The triangle
 rule from the recursion's construction above forces
 $\langle jm;kq|j'm'\rangle=0$ unless $|j-k|\le j'\le j+k$. **Both
 conditions are entirely about which CG coefficient vanishes**, established
@@ -265,7 +276,7 @@ parity. $Y_1^q$ is odd under $\vec r\to-\vec r$, and $Y_l^m$ has parity
 $(-1)^l$, so the full matrix element's integrand has parity
 $(-1)^{l+l'+1}$; it vanishes unless $l+l'$ is odd, which combined with the
 triangle rule above leaves exactly $\Delta l=\pm1$. This parity argument
-is genuinely separate from Wigner-Eckart itself, worth stating honestly
+is a separate ingredient from Wigner-Eckart itself, worth stating honestly
 rather than folding silently into "the selection rule.") This is exactly
 the electric-dipole selection rule underlying every atomic transition
 this platform's Hydrogen Atom course used, now derived from symmetry

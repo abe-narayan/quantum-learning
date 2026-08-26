@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/classical-to-quantum/stationary-states"
@@ -26,7 +27,7 @@ export const lessonMeta = {
 ## Motivation
 
 The last lesson's worked example showed a superposition of energy
-eigenstates precessing, its measurement statistics genuinely change over
+eigenstates precessing: its measurement statistics visibly change over
 time. This lesson proves the complementary fact directly: a state that
 starts as a *single* energy eigenstate never precesses at all, in a
 precise sense worth deriving rather than assuming.
@@ -38,7 +39,7 @@ energy eigenstate), time evolution can only ever produce that same note,
 just shifted in phase, since there's no other eigenstate around for it to
 leak into. A chord (superposition of several notes) is different: each
 note's phase advances at its own rate, and the *relative* phase between
-notes, which is what determines the chord's character, genuinely changes.
+notes, which is what determines the chord's character, does change.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/4/43/Chladni_plate_10.jpg"
@@ -93,6 +94,17 @@ prediction built from it is exactly constant in time.
 On the Bloch sphere, "accrues phase but stays stationary" versus "genuinely
 precesses" is a difference you can watch, not just derive:
 
+<PredictBeforeReveal
+  question="Prepare |0⟩ (a Z-eigenstate) and repeatedly apply a Z-axis rotation gate. Does the point on the Bloch sphere move?"
+  options={[
+    { label: "It sweeps around the equator", value: "sweeps" },
+    { label: "It stays fixed at the pole", value: "fixed" },
+    { label: "It spirals toward the equator", value: "spirals" },
+  ]}
+  correctValue="fixed"
+  explanation="|0⟩ is an eigenstate of H (up to the choice of Hamiltonian axis), so it only accrues an overall phase, e^{-iE_nt/ħ}, which is invisible on the Bloch sphere entirely — the point sits at the pole no matter how many rotations are applied. |+⟩, tried next, is a superposition of two different Z-eigenstates, so its relative phase is physical and the point genuinely sweeps."
+/>
+
 <InteractiveSection
   title="Fix |0⟩ at the pole, then set |+⟩ sweeping"
   description="Prepare |0⟩ and apply a Z-axis rotation gate repeatedly. Watch the point stay fixed at the pole, even though it's picking up phase with each application. Then prepare |+⟩ and repeat. This time the point visibly sweeps around the equator, because |+⟩ is a superposition of two different Z-eigenstates, not a single stationary one.">
@@ -121,7 +133,7 @@ generally, not just for the special case of an eigenstate.
 "Stationary state" is standard language throughout chemistry and atomic
 physics: an electron in a definite energy eigenstate of an atom (an
 "orbital") has a probability distribution over position that is
-genuinely static in time, even though nothing about the underlying state
+truly static in time, even though nothing about the underlying state
 vector has literally stopped changing. A superposition of two different
 orbitals, by contrast, has a probability distribution that visibly
 oscillates, the physical origin of phenomena like atomic transitions and
@@ -154,7 +166,7 @@ absent.
 <Callout type="mistake">
 **Assuming energy conservation only holds for eigenstates of $H$.** The
 derivation above shows $\langle H\rangle$ is exactly conserved for *any*
-initial state, a genuinely more general fact than stationarity itself.
+initial state, a strictly more general fact than stationarity itself.
 </Callout>
 
 ## Practice Questions

@@ -100,6 +100,18 @@ confirming the 50/50 claim. Now the post-measurement state: if the
 outcome is 0, only the $|00\rangle$ term survives, and dividing by
 $\sqrt{1/2}$ gives amplitude exactly 1 on $|00\rangle$:
 
+<PredictBeforeReveal
+  question="You measure qubit 0 of |Φ+⟩ = (|00⟩+|11⟩)/√2 and get outcome 0. What state is qubit 1 in immediately afterward?"
+  options={[
+    { label: "Still a 50/50 superposition of |0⟩ and |1⟩", value: "super" },
+    { label: "Exactly |0⟩, with certainty", value: "zero" },
+    { label: "Exactly |1⟩, with certainty", value: "one" },
+    { label: "Undefined until qubit 1 is also measured", value: "undefined" },
+  ]}
+  correctValue="zero"
+  explanation="Only the |00⟩ term survives outcome 0 — the |11⟩ term is zeroed out and the rest renormalized. There's nothing left in the state with qubit 1 equal to 1, so qubit 1 is exactly |0⟩, not merely likely to be |0⟩. No further measurement can change that."
+/>
+
 <QuantumStateDisplay state={bellAfterZero} label="Bell state, after measuring qubit 0 → outcome 0" />
 <QuantumStateDisplay state={bellAfterOne} label="Bell state, after measuring qubit 0 → outcome 1" />
 
@@ -140,8 +152,8 @@ that difference possible.
 
 ## Physical Interpretation
 
-Partial measurement is genuinely local: only the measured qubit's degree
-of freedom is projected. But when the qubits are entangled, "only the
+Partial measurement is local in a strict sense: only the measured qubit's
+degree of freedom is projected. But when the qubits are entangled, "only the
 measured qubit" and "the whole state" aren't separable questions:
 collapsing part of an indivisible state collapses the whole description
 at once, which is why the untouched qubit's outcome becomes definite even
@@ -209,7 +221,7 @@ normalized quantum state.
 
 ## Further Exploration
 
-Next: [The No-Cloning Theorem](/lessons/quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem), a genuinely surprising consequence of
+Next: [The No-Cloning Theorem](/lessons/quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem), a sharply counterintuitive consequence of
 the measurement and linearity rules from this course: no device can copy
 an unknown qubit state, and the proof follows directly from tools you
 already have.

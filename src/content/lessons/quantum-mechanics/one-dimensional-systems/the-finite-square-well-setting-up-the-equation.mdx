@@ -76,8 +76,8 @@ export const lessonMeta = {
 
 The infinite square well's walls are a convenient idealization: no real
 potential is actually infinite. Make the walls finite (a well of depth
-$V_0$ rather than $\infty$), and the physics changes in a genuinely new
-way. The wavefunction no longer vanishes exactly at the boundary. The
+$V_0$ rather than $\infty$), and the wavefunction no longer vanishes
+exactly at the boundary. The
 Tunneling and the Finite Barrier lesson already showed *why* a classically
 forbidden region allows a nonzero, exponentially decaying wavefunction
 rather than a zero one, and this lesson applies that exact mechanism to a
@@ -124,7 +124,7 @@ with a state that is bound but leaks substantially into the classically
 forbidden region on either side.
 
 Unlike the infinite well's vertical walls, this dip has finite depth,
-which is exactly what makes the outside region merely *unlikely*, not
+which is what makes the outside region merely *unlikely* rather than
 strictly forbidden. A bound state has $-V_0<E<0$. Define
 
 $$
@@ -195,10 +195,22 @@ equation altogether.
 The transcendental equation packages a real physical trade-off: a deeper
 or wider well (larger $V_0$ or $a$) pushes $k\tan(ka)$ and $\kappa$ into
 agreement at a lower (more negative) $E$, a more tightly bound state,
-matching intuition. Crucially, **a finite well supports only finitely
-many bound states** (possibly just one), unlike the infinite well's
-infinite ladder: a directly testable, qualitatively different
-prediction from the systems already solved.
+matching intuition. One consequence is easy to miss: **a finite well
+supports only finitely many bound states** (possibly just one), unlike
+the infinite well's infinite ladder. That's a directly testable,
+qualitatively different prediction from the systems already solved.
+
+<PredictBeforeReveal
+  question="Hold the half-width a fixed and let the well get deeper and deeper (V0 → ∞). What happens to the ground-state wavenumber k?"
+  options={[
+    { label: "k grows without bound", value: "diverges" },
+    { label: "k climbs toward π/(2a) and levels off there", value: "levels" },
+    { label: "k shrinks toward 0", value: "shrinks" },
+    { label: "k stays fixed no matter how deep the well gets", value: "fixed" },
+  ]}
+  correctValue="levels"
+  explanation="Worked out below: as V0 → ∞, κ → ∞ forces tan(ka) → ∞, which happens exactly at ka → π/2, i.e. k → π/(2a) — the infinite well's own ground-state wavenumber. Drag the slider in the interactive further down and watch finiteSquareWellGroundStateEnergy trace out exactly this approach for each half-width a."
+/>
 
 ## Worked Example
 

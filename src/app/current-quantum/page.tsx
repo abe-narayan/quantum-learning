@@ -10,7 +10,7 @@ import { buildBreadcrumbSchema } from "@/lib/structuredData";
 export const metadata: Metadata = buildPageMetadata({
   title: "Current Quantum",
   description:
-    "Real, recent quantum computing and physics developments — hardware milestones, algorithms, error correction, and networking experiments — each linked back to the QuantumLearn lesson that explains the concept behind it.",
+    "Real quantum computing and physics developments, from the foundational experiments to this decade's hardware — each linked back to the QuantumLearn lesson that explains the concept behind it.",
   path: "/current-quantum",
 });
 
@@ -53,8 +53,8 @@ export default async function CurrentQuantumPage() {
       />
       <PageHeader
         eyebrow="Current Quantum"
-        title="What's happening in quantum science right now"
-        description={`${entries.length} real, verified developments in quantum computing and physics, reverse-chronological, each linked back to the QuantumLearn lesson that explains the concept behind it.`}
+        title="The real research behind the curriculum"
+        description={`${entries.length} real, verified results in quantum computing and physics, from Bell's 1964 inequality to this decade's hardware, listed reverse-chronological and each linked back to the QuantumLearn lesson that explains the concept behind it.`}
       />
 
       <div className="mt-12 max-w-3xl">

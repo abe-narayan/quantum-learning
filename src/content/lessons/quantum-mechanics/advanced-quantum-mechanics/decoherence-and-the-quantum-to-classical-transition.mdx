@@ -54,7 +54,7 @@ export const decoherenceFrames = [
 export const lessonMeta = {
   title: "Decoherence & the Quantum-to-Classical Transition",
   description:
-    "Applying the dephasing channel repeatedly to |+⟩ drives its off-diagonal coherence from 0.5 toward exactly 0 and its purity from 1.0 toward exactly 0.5 (maximally mixed), a genuine numerical demonstration of why macroscopic superpositions don't survive contact with an environment, using nothing but repeated Kraus-channel application.",
+    "Applying the dephasing channel repeatedly to |+⟩ drives its off-diagonal coherence from 0.5 toward exactly 0 and its purity from 1.0 toward exactly 0.5 (maximally mixed), a direct numerical demonstration of why macroscopic superpositions don't survive contact with an environment, using nothing but repeated Kraus-channel application.",
   course: "advanced-quantum-mechanics",
   module: "decoherence-and-the-quantum-to-classical-transition",
   order: 1,
@@ -84,12 +84,12 @@ shows exactly how contact with an environment destroys quantum
 coherence, even with no measurement, and no observer, involved at all.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
-  alt="Portrait photograph of physicist Erwin Schrödinger, taken in 1933"
-  caption="Erwin Schrödinger, whose 1935 cat thought experiment is exactly the puzzle this lesson's Motivation opens with. Decoherence is the modern, numerically-verifiable partial answer to why the cat is never actually seen in superposition, though as this lesson stresses, it doesn't fully resolve what Schrödinger's paradox raised."
-  credit="Nobel Foundation"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Erwin_Schr%C3%B6dinger_(1933).jpg"
-  license="Public domain"
+  src="https://upload.wikimedia.org/wikipedia/commons/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
+  alt="A NIST trapped-ion apparatus: two beryllium ions held roughly 40 micrometers apart above a gold-plated chip trap, surrounded by a copper enclosure and gold wire mesh"
+  caption="A real trapped-ion apparatus at NIST, the kind of platform used to prepare exactly the kind of superposition this lesson's dephasing channel destroys. Trapped ions are among the cleanest systems physicists have for watching decoherence happen on demand: isolate the ion well and coherence lasts seconds; couple it to enough stray field noise, and the off-diagonal decay this lesson computes numerically becomes a curve you measure on an oscilloscope."
+  credit="Y. Colombe / NIST"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
+  license="Public domain (U.S. government work)"
 />
 
 ## Mathematical Development
@@ -98,8 +98,21 @@ coherence, even with no measurement, and no observer, involved at all.
 
 Starting from $|+\rangle=\frac1{\sqrt2}(|0\rangle+|1\rangle)$'s density
 matrix (off-diagonal entries $\pm0.5$, purity exactly 1, a pure state),
-applying the dephasing channel (previous lesson, $\lambda=0.3$)
-repeatedly gives:
+consider applying the dephasing channel from the previous lesson
+($\lambda=0.3$) over and over.
+
+<PredictBeforeReveal
+  question="As dephasing is applied to |+⟩ again and again, where does the purity Tr(ρ²) end up?"
+  options={[
+    { label: "It drops all the way to 0", value: "zero" },
+    { label: "It settles at 0.5, the maximally mixed state", value: "half" },
+    { label: "It stays at 1, purity is unaffected by dephasing", value: "one" },
+  ]}
+  correctValue="half"
+  explanation="Purity bottoms out at exactly 0.5, not 0 (purity can never go below 1/d for a d-dimensional system) and not 1 (dephasing does destroy coherence). 0.5 is the maximally mixed single-qubit state: all phase information gone, populations untouched."
+/>
+
+Applying the channel repeatedly gives:
 
 | Applications | Off-diagonal magnitude | Purity |
 |---|---|---|
@@ -156,9 +169,9 @@ tracing them out and watching the system's own density matrix lose its
 off-diagonal terms. **What decoherence does NOT do**: it does not, by
 itself, explain why a *single, definite* outcome is observed upon
 measurement (the diagonal state after decoherence is still a
-*probabilistic mixture*, not a single realized outcome). That remains a
-genuinely open interpretational question this course states honestly
-rather than claiming to resolve.
+*probabilistic mixture*, not a single realized outcome). That remains an
+open interpretational question this course states honestly rather than
+claiming to resolve.
 
 ## Worked Example
 
@@ -211,7 +224,7 @@ Quantum Computing's Error Correction and Noise/Decoherence courses).
 ## Summary
 
 - Repeated dephasing drives $|+\rangle$'s off-diagonal coherence toward 0
-  and its purity toward 0.5, a genuine numerical demonstration of
+  and its purity toward 0.5, a direct numerical demonstration of
   decoherence, not an assertion.
 - The diagonal (populations) are unaffected; only phase information is
   lost, so the resulting state looks exactly like a classical probabilistic
@@ -221,6 +234,11 @@ Quantum Computing's Error Correction and Noise/Decoherence courses).
   stated scope limitation, not a resolved question.
 
 ## Further Exploration
+
+Want to push past a single dephasing channel and mix in amplitude
+damping, different starting states, or your own coupling strengths? The
+full [Noise Explorer](/simulators#noise-explorer) simulator has the same
+engine behind it with a lot more room to experiment.
 
 Next: [The Path Integral Formulation](/lessons/quantum-mechanics/advanced-quantum-mechanics/the-path-integral-formulation), a complete change of
 perspective: not decoherence or density matrices at all, but an

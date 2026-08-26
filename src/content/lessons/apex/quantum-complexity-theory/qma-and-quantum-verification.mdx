@@ -36,6 +36,31 @@ export const qmaExactAtSmallestK = exactMajorityFailureProbability(qmaSmallestKB
 export const qmaHoeffdingAtSmallestK = Math.exp(-qmaSmallestKBelow1Percent / 18);
 export const qmaHoeffdingAtItsOwnThreshold = Math.exp(-qmaHoeffdingKBelow1Percent / 18);
 
+export function witnessDensityMatrixCells(a, b) {
+  return [
+    [{ re: a * a, im: 0 }, { re: a * b, im: 0 }],
+    [{ re: a * b, im: 0 }, { re: b * b, im: 0 }],
+  ];
+}
+
+export const qmaToyWitnessPresets = [
+  { name: "|0⟩", a: 1, b: 0 },
+  { name: "|1⟩", a: 0, b: 1 },
+  { name: "|+⟩ = (|0⟩+|1⟩)/√2", a: 1 / Math.sqrt(2), b: 1 / Math.sqrt(2) },
+  { name: "√0.1|0⟩ + √0.9|1⟩", a: Math.sqrt(0.1), b: Math.sqrt(0.9) },
+];
+
+export const qmaToyVerifierPresets = qmaToyWitnessPresets.map((w) => ({
+  label: `${w.name} — Pr[accept] = ${(w.b * w.b * 100).toFixed(0)}%`,
+  panels: [
+    {
+      label: "ρ = |ψ⟩⟨ψ| (bottom-right entry is the accept probability)",
+      cells: witnessDensityMatrixCells(w.a, w.b),
+      highlightDiagonal: true,
+    },
+  ],
+}));
+
 export const qmaAmplificationCurveFrames = [
   {
     paramLabel: "",
@@ -131,6 +156,66 @@ ones a well-behaved prover would send, must fail). Getting this backwards —
 checking only the witness Merlin was "supposed" to send — doesn't define a
 soundness condition at all; see the first Common Mistake below.
 
+<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<svg viewBox="0 0 760 300" width={760} className="w-full" role="img" aria-label="Two side-by-side panels contrasting QMA's completeness and soundness quantifiers. Left panel, titled 'x in L (completeness, existential)': Merlin picks one witness state, sends it to Arthur's verifier circuit V_n alongside the input x and blank ancillas, and a probability gauge shows the output qubit accepting with probability at least 2/3, satisfied by that one chosen witness. Right panel, titled 'x not in L (soundness, universal)': a cloud of many different, even entangled, candidate witness states funnels into the same verifier circuit V_n, and the probability gauge shows every single one of them accepted with probability at most 1/3, with no exceptions allowed.">
+  <text x={190} y={24} textAnchor="middle" className="fill-brand text-[13px] font-semibold">x ∈ L — completeness (∃)</text>
+  <text x={570} y={24} textAnchor="middle" className="fill-danger text-[13px] font-semibold">x ∉ L — soundness (∀)</text>
+  <line x1={380} y1={10} x2={380} y2={290} className="stroke-border" strokeWidth={1.5} strokeDasharray="4 4" />
+
+  <circle cx={70} cy={90} r={30} className="fill-brand/10 stroke-brand" strokeWidth={2} />
+  <text x={70} y={86} textAnchor="middle" className="fill-brand text-[11px] font-semibold">Merlin</text>
+  <text x={70} y={100} textAnchor="middle" className="fill-brand text-[10px]">picks one |ψ⟩</text>
+  <path d="M100 90 H165" className="stroke-foreground/70" strokeWidth={2} markerEnd="url(#arrowL)" />
+  <text x={132} y={82} textAnchor="middle" className="fill-muted-foreground text-[9px]">sends |ψ⟩</text>
+
+  <rect x={170} y={55} width={140} height={70} rx={8} className="fill-surface stroke-foreground" strokeWidth={2} />
+  <text x={240} y={86} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">Vₙ</text>
+  <text x={240} y={102} textAnchor="middle" className="fill-muted-foreground text-[9px]">|x⟩|ψ⟩|0…0⟩</text>
+
+  <path d="M240 125 V165" className="stroke-foreground/70" strokeWidth={2} markerEnd="url(#arrowL)" />
+  <rect x={190} y={170} width={100} height={26} rx={13} className="fill-brand/15 stroke-brand" strokeWidth={2} />
+  <text x={240} y={187} textAnchor="middle" className="fill-brand text-[10px] font-semibold">measure output</text>
+  <text x={240} y={222} textAnchor="middle" className="fill-brand text-[13px] font-bold">Pr[accept] ≥ 2/3</text>
+  <text x={240} y={240} textAnchor="middle" className="fill-muted-foreground text-[9.5px]">true for THIS chosen |ψ⟩</text>
+  <text x={240} y={266} textAnchor="middle" className="fill-foreground text-[18px] font-bold">✓</text>
+
+  <ellipse cx={465} cy={90} rx={40} ry={30} className="fill-danger/10 stroke-danger" strokeWidth={2} strokeDasharray="3 3" />
+  <text x={465} y={84} textAnchor="middle" className="fill-danger text-[10px] font-semibold">every possible</text>
+  <text x={465} y={98} textAnchor="middle" className="fill-danger text-[10px] font-semibold">p(n)-qubit |ψ⟩</text>
+  <path d="M508 90 H555" className="stroke-foreground/70" strokeWidth={2} markerEnd="url(#arrowR)" />
+
+  <rect x={560} y={55} width={140} height={70} rx={8} className="fill-surface stroke-foreground" strokeWidth={2} />
+  <text x={630} y={86} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">Vₙ</text>
+  <text x={630} y={102} textAnchor="middle" className="fill-muted-foreground text-[9px]">|x⟩|ψ⟩|0…0⟩</text>
+
+  <path d="M630 125 V165" className="stroke-foreground/70" strokeWidth={2} markerEnd="url(#arrowR)" />
+  <rect x={580} y={170} width={100} height={26} rx={13} className="fill-danger/15 stroke-danger" strokeWidth={2} />
+  <text x={630} y={187} textAnchor="middle" className="fill-danger text-[10px] font-semibold">measure output</text>
+  <text x={630} y={222} textAnchor="middle" className="fill-danger text-[13px] font-bold">Pr[accept] ≤ 1/3</text>
+  <text x={630} y={240} textAnchor="middle" className="fill-muted-foreground text-[9.5px]">true for EVERY |ψ⟩, no exceptions</text>
+  <text x={630} y={266} textAnchor="middle" className="fill-foreground text-[18px] font-bold">✗ (for all)</text>
+
+  <defs>
+    <marker id="arrowL" markerWidth={8} markerHeight={8} refX={6} refY={4} orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" className="fill-foreground/70" />
+    </marker>
+    <marker id="arrowR" markerWidth={8} markerHeight={8} refX={6} refY={4} orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" className="fill-foreground/70" />
+    </marker>
+  </defs>
+</svg>
+</div>
+
+The left panel is satisfied by exhibiting a single witness; the right panel
+is a claim about the *entire* space of $2^{p(n)}$-dimensional states,
+including ones with no resemblance to any witness a cooperative prover
+would send. That asymmetry — one witness suffices on the YES side,
+literally none may work on the NO side — is exactly what the rest of this
+section's amplification argument has to respect: amplifying the left panel
+is ordinary independent-trials probability, and amplifying the right panel
+has to hold up against an adversary who gets to choose the worst possible
+state across all $k$ copies at once.
+
 ### Amplifying the gap: where no-cloning bites
 
 Exactly as with $\mathsf{BQP}$, the constants $2/3$ and $1/3$ aren't
@@ -193,6 +278,15 @@ here, not re-derived: the point to take away is that the conclusion
 survives, but "just apply the classical Chernoff bound" is not, by itself,
 a valid proof of the soundness side the way it is for completeness.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/6/6d/John_Watrous.jpg"
+  alt="Portrait photograph of John Watrous, the computer scientist whose operator-level analysis with Alexei Kitaev, and separately with Chris Marriott in the Marriott-Watrous result, established that QMA's soundness side amplifies correctly even against adversarial, entangled witness states"
+  caption="John Watrous, whose work with Kitaev (and separately with Marriott) supplies the operator-level argument this lesson cites rather than re-derives: that QMA's soundness gap amplifies exponentially even when Merlin's k witness copies are entangled across every register, not sent as an honest product state."
+  credit="Joseph Petrik / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:John_Watrous.jpg"
+  license="CC BY-SA 4.0"
+/>
+
 ### NP ⊆ QMA: a classical certificate is a valid quantum witness
 
 <TheoremBox title="NP ⊆ QMA" provenance="derived">
@@ -224,6 +318,32 @@ exactly $\mathsf{NP}$'s own soundness), so this sum is $0$ regardless of
 which superposition Merlin sends, for **every** possible quantum state
 $|\psi\rangle$, not just basis states. $\mathsf{QMA}$'s soundness condition
 is satisfied trivially, with slack to spare.
+
+**Try it: the smallest possible instance of this proof.** Take the
+simplest non-trivial verifier circuit $V_n$ of exactly this reversible
+form: a single CNOT gate, witness qubit as control, one ancilla
+(initialized $|0\rangle$) as target, so $|w\rangle|0\rangle \mapsto
+|w\rangle|w\rangle$ — this is literally $C(x,w)=w$ compiled the way the
+proof above describes. Measuring the ancilla accepts (outputs $1$) with
+probability exactly $|b|^2$ for a general witness $|\psi\rangle=a|0\rangle+b|1\rangle$,
+by the same linearity argument used above. Toggle through four witnesses
+Merlin might send and read the real accept probability off the
+bottom-right diagonal entry of $\rho=|\psi\rangle\langle\psi|$:
+
+<MatrixGridExplorer
+  presets={qmaToyVerifierPresets}
+  ariaLabel="Density matrix of four candidate witness states sent to the toy verifier V_n = CNOT(witness, ancilla), with the bottom-right diagonal entry showing the real acceptance probability for each witness"
+/>
+
+$|1\rangle$ is the single witness that achieves probability $1$ — the
+one existential witness completeness needs. $|0\rangle$ achieves
+probability $0$, and $|{+}\rangle$ only $0.5$: most $p(n)$-qubit states
+are bad witnesses even for a YES instance, which is exactly why
+completeness only requires *some* witness to work, not every witness.
+The last preset, $\sqrt{0.1}|0\rangle+\sqrt{0.9}|1\rangle$, accepts with
+probability $0.9\geq2/3$ — a legitimate, if imperfect, witness, showing
+the $2/3$ threshold has real slack rather than demanding a "perfect"
+witness state.
 
 ### QMA ⊆ PSPACE: the same resource argument, with one more layer
 
@@ -300,6 +420,17 @@ complexity theory directly to condensed-matter physics and quantum
 chemistry — telling physicists, in a precise and provable sense, which
 "find the ground state" questions are unlikely to ever have an efficient
 answer, quantum or classical.
+
+<PredictBeforeReveal
+  question="Starting from a 2/3-vs-1/3 gap (per-copy error 1/3), both the exact majority-vote failure probability and the looser Hoeffding tail bound exp(-k/18) eventually drop below 1% as the number of independent witness copies k grows. Predict which one crosses below 1% at a smaller k, and roughly how far apart the two crossing points are."
+  options={[
+    { label: "They cross at essentially the same k", value: "same" },
+    { label: "The exact probability crosses first, needing meaningfully fewer copies", value: "exact_first" },
+    { label: "The Hoeffding bound crosses first, since it's built to be conservative", value: "bound_first" },
+  ]}
+  correctValue="exact_first"
+  explanation="The exact binomial failure probability first drops to 1% at k=47 (about 0.90%). The Hoeffding bound doesn't cross 1% until k=83 (about 0.99% there). Both statements are correct — the true failure probability really is below 1% already at k=47, and the bound only guarantees that once k=83 — the bound is simply loose, not wrong. This is the same honest gap between 'exact value' and 'certified bound' the adversary-method lesson draws for query complexity."
+/>
 
 ## Worked Example
 

@@ -287,6 +287,16 @@ $J_{DP}$ returns exactly $I$).
 
 ### How the spectrum moves as the channel strengthens
 
+<PredictBeforeReveal
+  question="At gamma=1, amplitude damping is total: every qubit decays to |0>, the same trivial, fully-known outcome regardless of input. Does the channel's Kraus rank drop back down to 1 there, the way it's exactly 1 at gamma=0?"
+  options={[
+    { label: "Yes — total decay is just as trivial as no decay at all, so rank 1 again", value: "rank1" },
+    { label: "No — it stays at rank 2, the same as every other gamma strictly between 0 and 1", value: "rank2" },
+  ]}
+  correctValue="rank2"
+  explanation="Rank 2 the whole way through, including gamma=1. 'Trivial outcome' and 'trivial channel' aren't the same thing: at gamma=1 the channel still needs two Kraus operators (K0 kills all population in |1>, K1 carries every |1> amplitude over to |0>) to correctly zero out coherences along with populations. Only gamma=0, literally no evolution at all, collapses back to a single K0=I."
+/>
+
 The presets above freeze $\gamma=\lambda=0.3$, which hides a fact the
 same `choiMatrix` construction reveals once it's swept over every
 strength $s\in[0,1]$: amplitude damping's *bottom* block eigenvalue
@@ -407,6 +417,6 @@ $\mathcal E$ to be a physically valid channel.
 ## Further Exploration
 
 Next: [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation),
-which asks a different question about the same channels: not "is this
-map physically valid as a single snapshot" but "what continuous-time
-generator produces it as time passes."
+which turns to a different question about these same channels: given
+that a map is physically valid at a single instant, what continuous-time
+generator would actually produce it as time unfolds?

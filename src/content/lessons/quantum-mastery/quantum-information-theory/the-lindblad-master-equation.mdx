@@ -180,6 +180,17 @@ dynamics at every infinitesimal step.
 
 ### Solving it exactly for amplitude damping
 
+<PredictBeforeReveal
+  question="Under pure amplitude damping (population decaying from |1> to |0> at rate Gamma), how fast do you expect the off-diagonal coherence rho01 to decay, relative to the population?"
+  options={[
+    { label: "The same rate, Gamma — it's all one decay process", value: "same" },
+    { label: "Twice as fast, rate 2*Gamma — losing population should scramble phase even harder", value: "double" },
+    { label: "Half as fast, rate Gamma/2", value: "half" },
+  ]}
+  correctValue="half"
+  explanation="The coherence decays at exactly half the population's rate, derived below directly from the Lindblad equation's own algebra, not assumed. That factor of two is exactly why pure amplitude damping alone gives T2 = 2*T1 rather than T2 = T1 — it's the best-case coherence time a purely population-decaying qubit can have, before any additional pure dephasing shortens it further."
+/>
+
 Take $H=0$ and a single jump operator $L=\sqrt\Gamma\,\sigma_-$, where
 $\sigma_-=|0\rangle\langle1|$ (the lowering operator: $\sigma_-|1\rangle=|0\rangle$)
 and $\Gamma\equiv1/T_1$. For $\rho=\begin{pmatrix}\rho_{00}&\rho_{01}\\\rho_{10}&\rho_{11}\end{pmatrix}$,

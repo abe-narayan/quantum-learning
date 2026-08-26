@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { pureStateDensityMatrix, convexCombination, maximallyMixedState, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
@@ -145,6 +146,15 @@ once $B$ is known? Every classical fact you'd expect to carry over does
 exists as "Quantum" Shannon theory rather than a relabeled copy of the
 classical version.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
+  alt="Photograph of John von Neumann at Los Alamos"
+  caption="John von Neumann (1903-1957). Every quantity in this lesson — mutual information, conditional entropy, coherent information — is built by combining the entropy he defined, $S(\rho)=-\mathrm{Tr}(\rho\log_2\rho)$, evaluated on three different density matrices ($\rho_A$, $\rho_B$, $\rho_{AB}$) and added or subtracted. The surprising sign of $S(A|B)$ below is a fact about how those three numbers can relate to each other, not about von Neumann's formula itself."
+  credit="Los Alamos National Laboratory, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
+  license="Public domain"
+/>
+
 ## Mathematical Development
 
 ### Quantum mutual information
@@ -209,7 +219,20 @@ $$
 again the direct analogue of classical $H(A|B)=H(AB)-H(B)$, interpreted
 the same way classically: the *remaining* uncertainty about $A$ once $B$
 is fully known. Classically, $H(A|B)\geq0$ always—you cannot know
-*less than nothing*. Applied to the Bell state:
+*less than nothing*.
+
+<PredictBeforeReveal
+  question="For the Bell state, S(rho_AB)=0 (pure global state) and S(rho_B)=1 bit (maximally mixed). Classically, H(A|B)=H(AB)-H(B) can never go below zero. What do you expect for the quantum conditional entropy S(A|B)=S(rho_AB)-S(rho_B) here?"
+  options={[
+    { label: "Exactly 0 — same floor as the classical case", value: "zero" },
+    { label: "Positive — entanglement should only add uncertainty about A", value: "positive" },
+    { label: "Negative — the classical floor doesn't have to hold quantum mechanically", value: "negative" },
+  ]}
+  correctValue="negative"
+  explanation="S(A|B) = 0 - 1 = -1 bit: negative, computed directly from this platform's own vonNeumannEntropy on a genuinely valid density matrix, not a typo or sign error. Classical joint uncertainty can never be less than either marginal's, but a pure entangled joint state can have strictly less entropy than one of its own reduced pieces — that's the entire reason this course is called 'Quantum' Shannon theory."
+/>
+
+Applied to the Bell state:
 
 $$
 S(A|B) = S(\rho_{AB}) - S(\rho_B) = 0 - 1 = -1 \text{ bit}

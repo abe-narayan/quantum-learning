@@ -99,11 +99,16 @@ export function PillarsOverview() {
       <Container>
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-brand">
-            Four pillars, one platform
+            Where to start
           </p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
-            Everything a quantum curriculum needs
+            Four ways in, one curriculum
           </h2>
+          <p className="mt-3 text-muted-foreground">
+            Pick whichever pulled you in — the physics, the algorithms, the hardware, or the
+            tooling. Each is a full sequence of courses, not a handful of overview pages, and
+            they share enough foundation that you can switch between them later.
+          </p>
         </div>
 
         <div className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -131,6 +136,19 @@ export function PillarsOverview() {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-14 border-t border-border pt-10">
+          <p className="max-w-2xl text-muted-foreground">
+            Finish these four and two more open up. <strong className="font-semibold text-foreground">Quantum Mastery</strong> covers
+            graduate-level mathematical physics and rigorous quantum information theory. Then{" "}
+            <strong className="font-semibold text-foreground">Apex</strong> — the platform&rsquo;s capstone — takes
+            you through fault-tolerant computing, complexity theory, and a final course in
+            reading real quantum-computing research papers.
+          </p>
+          <Link href="/apex" className="mt-3 inline-block text-sm font-medium text-brand hover:underline">
+            See where the curriculum ends →
+          </Link>
         </div>
       </Container>
     </section>

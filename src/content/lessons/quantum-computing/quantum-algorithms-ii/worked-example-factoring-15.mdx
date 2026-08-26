@@ -107,6 +107,18 @@ period directly: $r=4$.
 
 ### Step 4: the classical reduction
 
+<PredictBeforeReveal
+  question="r=4 is even, and a^(r/2)=7²mod15=4, not ≡ −1. Everything is in place for the reduction from Lesson 1. Before computing gcd(4−1,15) and gcd(4+1,15) directly: what are the two factors of 15 you expect to fall out?"
+  options={[
+    { label: "3 and 5", value: "3-5" },
+    { label: "1 and 15 (the reduction fails here)", value: "trivial" },
+    { label: "5 and 5", value: "5-5" },
+    { label: "There's not enough information yet", value: "unknown" },
+  ]}
+  correctValue="3-5"
+  explanation="gcd(4−1,15)=gcd(3,15)=3 and gcd(4+1,15)=gcd(5,15)=5 — the two prime factors of 15, computed, not looked up. This is the payoff every earlier lesson's abstract machinery was building toward: a real N, factored, end to end."
+/>
+
 From Lesson 1's reduction: $r=4$ is even, $a^{r/2}=7^2\bmod15=49\bmod15=4$,
 not $\equiv-1\equiv14\pmod{15}$, so the reduction applies cleanly.
 $\gcd(4-1,15)=\gcd(3,15)=3$, $\gcd(4+1,15)=\gcd(5,15)=5$.

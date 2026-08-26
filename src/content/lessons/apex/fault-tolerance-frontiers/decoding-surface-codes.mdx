@@ -282,7 +282,7 @@ indefinitely, or the backlog of unprocessed syndromes grows without
 bound and the whole point of real-time correction is lost. An
 asymptotically optimal decoder that's too slow for the hardware it's
 attached to is, operationally, not a working decoder at all. This is
-exactly why decoder speed and parallelism are a genuinely **active
+exactly why decoder speed and parallelism are an **active
 current research area**, not a solved footnote: real implementations
 use **Union-Find decoders** (near-linear time, trading a little accuracy
 for a lot of speed) and increasingly **neural-network decoders** (trained
@@ -348,7 +348,19 @@ Now X errors strike {boundaryErrorQubits[0]} and {boundaryErrorQubits[1]},
 the path N10 → N11 → N12 straight across the patch's middle row, from
 the **left boundary column to the right boundary column**. By the same
 cancellation as Case 2, the computed syndrome is only the two endpoints:
-**{boundaryErrorSyndrome.join(" and ")}**. Here is where it goes wrong:
+**{boundaryErrorSyndrome.join(" and ")}**.
+
+<PredictBeforeReveal
+  question="N10 and N12 both sit on the patch boundary, and the true error chain connecting them costs 2 (its length). A chain from either defect straight off the patch to the virtual boundary vertex costs 0. Which matching will minimum-weight perfect matching actually pick?"
+  options={[
+    { label: "Match N10 ↔ N12 to each other (total cost 2)", value: "pair" },
+    { label: "Match each of N10, N12 to the boundary separately (total cost 0)", value: "boundary" },
+  ]}
+  correctValue="boundary"
+  explanation="0 + 0 beats 2, so MWPM matches both defects to the boundary and applies no correction at all — cheaper, but wrong. The real error chain is left completely untouched, and (checked directly against every combination of the patch's four face stabilizers) that residual is a genuine uncorrected logical error, not a harmless degenerate relabeling like Case 2's."
+/>
+
+Here is where it goes wrong:
 N10 and N12 each already sit on their own patch boundary, so the
 decoding graph gives each of them a **zero-weight edge to the virtual
 boundary vertex** — a chain that simply runs off the patch needs no

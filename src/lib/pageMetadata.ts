@@ -1,7 +1,7 @@
 /**
  * Shared `Metadata` builder for static pages.
  *
- * Every top-level route (about, glossary, map, learn, the four pillar pages,
+ * Every top-level route (about, glossary, map, learn, the five pillar pages,
  * simulators, problems, lessons) had its own hand-rolled `title`/`description`
  * export with no `openGraph`, `twitter`, or `alternates.canonical`. Since
  * Next.js does *not* deep-merge a child segment's `openGraph`/`twitter` with

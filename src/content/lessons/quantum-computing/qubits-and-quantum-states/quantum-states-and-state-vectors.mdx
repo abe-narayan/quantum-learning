@@ -138,19 +138,33 @@ interference. Nothing like this has a classical-probability analogue.
 ## Physical Interpretation
 
 Treating $\mathbb{C}^2$ as the state space is a physical claim, not just a
-notational convenience: it says nature genuinely allows combinations that
+notational convenience: it says nature actually allows combinations that
 a classical description cannot represent, and it predicts real,
 measurable interference effects. Every one of those predictions has been
-confirmed experimentally. This is not a mathematical formalism chosen
-for elegance, it's the formalism that happens to match reality.
+confirmed experimentally. This isn't a mathematical formalism chosen for
+elegance; it's the formalism that happens to match reality.
 
 ## Interactive Experiment
 
-The bar chart above computed one specific case of destructive
-interference. Reproduce it yourself, live, instead of only reading the
-precomputed bars.
+The bar chart above computed one specific case, a 180° relative phase,
+where interference is total. What about a phase in between?
 
-<InteractiveSection title="Make interference happen yourself" description="Switch to Two Amplitudes (α, β) mode. Set α's magnitude to about 0.71 (≈√½) so both amplitudes start out equal-sized, then drag the relative-phase slider to 180°. Watch the Quantum |α+β|² bar drop to zero while the Classical |α|²+|β|² bar stays pinned at 1, the same two bars compared above, now produced live from sliders instead of only computed once.">
+<PredictBeforeReveal
+  question="Same two amplitudes, α₁ = 1/√2 and α₂ = 1/√2, but now give α₂ a relative phase of 90° instead of 180°, so α₂ = i/√2. What is |α₁+α₂|²?"
+  options={[
+    { label: "0 (still fully destructive)", value: "0" },
+    { label: "0.5", value: "0.5" },
+    { label: "1 (matches the classical sum)", value: "1" },
+    { label: "2", value: "2" },
+  ]}
+  correctValue="1"
+  explanation="α₁+α₂ = 1/√2 + i/√2, so |α₁+α₂|² = |1/√2|² + |i/√2|² + 2Re((1/√2)·conj(i/√2)) = 0.5 + 0.5 + 2Re(-i/2) = 1 + 0 = 1. The cross term 2Re(α₁*α₂) is proportional to the cosine of the relative phase, and cos 90° = 0, so it drops out completely at this one angle and the quantum answer happens to land on the classical value of 1 by coincidence. Nudge the phase away from 90° in either direction and the two answers separate again."
+/>
+
+Reproduce both cases yourself, live, instead of only reading precomputed
+numbers.
+
+<InteractiveSection title="Make interference happen yourself" description="Switch to Two Amplitudes (α, β) mode. Set α's magnitude to about 0.71 (≈√½) so both amplitudes start out equal-sized, then drag the relative-phase slider to 180°. Watch the Quantum |α+β|² bar drop to zero while the Classical |α|²+|β|² bar stays pinned at 1, the same two bars compared above, now produced live from sliders instead of only computed once. Then drag the slider back to 90° and confirm the two bars meet exactly where you predicted.">
   <LazyComplexAmplitudeExplorer />
 </InteractiveSection>
 

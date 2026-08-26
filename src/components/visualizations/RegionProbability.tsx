@@ -85,6 +85,7 @@ export function RegionProbability() {
         width={WIDTH}
         height={HEIGHT}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        className="w-full"
         role="img"
         aria-label={`Plot of the probability density |psi(x)|^2 for a normalized Gaussian, with the region from ${lo.toFixed(2)} to ${hi.toFixed(2)} shaded, giving a computed probability of ${probability.toFixed(3)}`}
       >

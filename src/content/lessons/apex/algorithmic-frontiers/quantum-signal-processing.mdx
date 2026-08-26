@@ -128,7 +128,7 @@ export const lessonMeta = {
 
 ## Motivation
 
-The previous lesson showed how to bury an arbitrary bounded operator $A$ inside a bigger unitary, as a block that a quantum computer can genuinely run. That solved *access*: given a block encoding, you can apply $A$ (probabilistically) to a state. It didn't solve *shaping*: Hamiltonian simulation wants $e^{-iHt}$, a linear-systems solver wants $H^{-1}$, an eigenvalue filter wants a step function, and none of these is $A$ itself — each is some *function of* $A$'s eigenvalues (or singular values). Block encoding alone gives you no lever for turning "access to $A$" into "access to $f(A)$" for a chosen $f$.
+The previous lesson showed how to bury an arbitrary bounded operator $A$ inside a bigger unitary, as a block that a quantum computer can actually run. That solved *access*: given a block encoding, you can apply $A$ (probabilistically) to a state. It didn't solve *shaping*: Hamiltonian simulation wants $e^{-iHt}$, a linear-systems solver wants $H^{-1}$, an eigenvalue filter wants a step function, and none of these is $A$ itself — each is some *function of* $A$'s eigenvalues (or singular values). Block encoding alone gives you no lever for turning "access to $A$" into "access to $f(A)$" for a chosen $f$.
 
 Quantum signal processing (QSP) is that lever, built first in the simplest possible setting: a single qubit, with no block encoding involved yet at all. Fix one real number $x\in[-1,1]$ (this stands in for one eigenvalue of $A$; the multi-eigenvalue, whole-matrix version is exactly what the next lesson, [The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation), builds by combining this lesson with the previous one). QSP shows that alternating one *fixed*, $x$-dependent single-qubit rotation with a short sequence of *tunable* phase rotations produces a single-qubit unitary whose top-left entry is an honest, computable polynomial in $x$ — and that essentially any target polynomial (subject to precise, checkable conditions) can be reached this way, by choosing the phases alone. No new circuit is designed for each new $f$; only the classical numbers change.
 
@@ -168,6 +168,19 @@ U_{\vec\phi}(x)=e^{i\phi_0Z}\prod_{k=1}^{d}\Big[W(x)\,e^{i\phi_kZ}\Big].
 $$
 
 Since $W(x)$ and every $S(\phi_k)$ are unitary and a product of unitaries is unitary, $U_{\vec\phi}(x)$ is unitary for every choice of phases and every $x\in[-1,1]$ — a one-line consequence, but the source of the boundedness constraint derived next.
+
+<PipelineDiagram
+  steps={[
+    { label: "e^{iφ₀Z}", detail: "tunable phase", highlight: true },
+    { label: "W(x)", detail: "fixed signal rotation" },
+    { label: "e^{iφ₁Z}", detail: "tunable phase", highlight: true },
+    { label: "W(x)", detail: "fixed signal rotation" },
+    { label: "e^{iφ₂Z}", detail: "tunable phase", highlight: true },
+  ]}
+  ariaLabel="The d=2 quantum signal processing sequence read left to right as written in the formula above: a tunable phase rotation, the fixed signal rotation W(x), another tunable phase, another copy of W(x), and a final tunable phase — three tunable phases sandwiching two copies of the single fixed W(x), whose (0,0) entry is the degree-2 polynomial derived below."
+/>
+
+Only the highlighted phases are knobs; $W(x)$ itself never changes, and appears exactly $d$ times for a length-$d$ sequence — the counting argument the Physical Interpretation section below returns to.
 
 <TheoremBox title="Boundedness and structure of the achieved polynomial" provenance="derived">
 
@@ -327,7 +340,7 @@ Every sampled point's imaginary part is at most ${maxChebyshevImaginaryResidual.
 </Callout>
 
 <Callout type="mistake">
-**Assuming $P(x)$ comes out real just because $x$ itself is real.** The $d=1$ nontrivial example, $(\phi_0,\phi_1)=(\pi/4,\pi/4)$, gives the purely imaginary $P(x)=ix$ — verified directly above, not merely asserted. The derived closed form $P(x)=e^{i(\phi_0+\phi_1)}x$ is real if and only if $\phi_0+\phi_1$ is an integer multiple of $\pi$; generic phase choices give a genuinely complex-valued polynomial, and realizing a specifically *real* (or purely imaginary, or any other prescribed) target requires choosing phases that satisfy that condition, not just any phases that satisfy the degree/parity/boundedness constraints.
+**Assuming $P(x)$ comes out real just because $x$ itself is real.** The $d=1$ nontrivial example, $(\phi_0,\phi_1)=(\pi/4,\pi/4)$, gives the purely imaginary $P(x)=ix$ — verified directly above, not merely asserted. The derived closed form $P(x)=e^{i(\phi_0+\phi_1)}x$ is real if and only if $\phi_0+\phi_1$ is an integer multiple of $\pi$; generic phase choices give a properly complex-valued polynomial, and realizing a specifically *real* (or purely imaginary, or any other prescribed) target requires choosing phases that satisfy that condition, not just any phases that satisfy the degree/parity/boundedness constraints.
 </Callout>
 
 ## Practice Questions

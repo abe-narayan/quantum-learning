@@ -94,6 +94,15 @@ and IS (a modern replacement for) the HHL algorithm for linear systems.
 Nothing else in this curriculum compresses that much of the field into one
 idea.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Singular_value_decomposition_visualisation.svg"
+  alt="Diagram visualizing the singular value decomposition of a matrix as a rotation, a scaling, and a second rotation"
+  caption="The singular value decomposition this lesson transforms: any matrix as a rotation, a scaling along orthogonal axes by the singular values σᵢ, and a second rotation. QSVT applies a chosen polynomial to exactly those σᵢ, simultaneously."
+  credit="CMG Lee / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Singular_value_decomposition_visualisation.svg"
+  license="CC BY-SA 4.0"
+/>
+
 ## Mathematical Development
 
 ### Setup: what QSVT starts from
@@ -276,8 +285,8 @@ reproduces $e^{-iHt}$ to accuracy $\varepsilon$, giving a completely
 different route to Hamiltonian simulation than the prerequisite Mastery
 course's Trotter-Suzuki product formulas.
 
-The comparison is worth stating precisely, because it's a genuinely
-important result, not folklore: first-order Trotterization is a
+The comparison is worth stating precisely, because it's an
+important, citable result, not folklore: first-order Trotterization is a
 first-principles product-formula approximation whose error per unit
 simulation scales like $t^2/n$ for $n$ steps (derived in full in that
 earlier lesson) — a *polynomial* dependence on $1/\varepsilon$. QSVT-based
@@ -326,7 +335,7 @@ makes exactly this case at length. None of this is a claim that QSVT
 proves new physics or new complexity-theoretic results by itself — it's a
 claim about *organization*: an entire research area's separately-invented
 tricks turned out to be one trick, viewed correctly. That kind of
-unification is rare and genuinely significant in any field, and this is
+unification is rare and significant in any field, and this is
 the platform's own explanation of that real, citable body of work, not a
 new result of its own.
 
@@ -357,7 +366,7 @@ Notice also the error column: it grows with $\sigma_i$, which is exactly
 the qualitative tradeoff special case 2 describes — a fixed-degree
 truncation is more accurate near $x=0$ and less accurate as $|x|$ grows, so
 approximating $e^{-iHt}$ well across $H$'s whole spectrum for larger $t$
-genuinely requires a higher-degree polynomial (and hence more QSVT
+requires a higher-degree polynomial (and hence more QSVT
 layers), not a fixed one.
 
 <ParametricCurve

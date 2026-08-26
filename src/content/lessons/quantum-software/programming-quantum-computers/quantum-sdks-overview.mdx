@@ -33,10 +33,11 @@ export const lessonMeta = {
 
 Circuit Representation in Code built one small, platform-specific
 circuit abstraction. Real-world quantum programming happens through a
-handful of established SDKs. This lesson surveys them at a conceptual
-level, not to teach any one's specific syntax, but to show the shared
-structure underneath all of them (the same structure this platform's
-own `QuantumCircuit` already demonstrates in miniature).
+handful of established SDKs — Qiskit, Cirq, PennyLane, and others. This
+lesson surveys them at a conceptual level. The goal is recognizing the
+shared structure underneath all of them (the same structure this
+platform's own `QuantumCircuit` already demonstrates in miniature),
+not memorizing any one's specific syntax.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
@@ -126,14 +127,24 @@ simulator (giving exact amplitudes), a noisy simulator (Simulating
 Quantum Systems' noise-simulation lesson), or real hardware
 (Physical Qubit Platforms' actual devices, with all of Noise, Decoherence
 & Scaling's real error sources). The circuit itself doesn't need to know
-or care which backend it's targeting, a genuine, valuable separation of
-concerns.
+or care which backend it's targeting — that separation of concerns is
+the whole point.
 
 The SAME Bell circuit (`h(0).cnot(0,1)`), run against two different
 backends this platform's own engine actually implements, makes this
 concrete: an exact backend returns the ideal amplitudes directly; a
 shot-sampled backend, standing in for what any real or noisy backend
 must ultimately report, hands back finite-shot counts instead.
+
+<PredictBeforeReveal
+  question="Same circuit, same code, two backends. Will the exact-simulator backend and the 1000-shot sampled backend report identical 00/11 numbers?"
+  options={[
+    { label: "Yes — the circuit is identical, so the numbers must match exactly", value: "same" },
+    { label: "No — the sampled backend will land close to 500/500 but not exactly", value: "different" },
+  ]}
+  correctValue="different"
+  explanation="The circuit never changes between the two runs below — only the backend does. The exact backend reports the ideal 0.5/0.5 amplitudes directly. The sampled backend reports actual counts out of 1000 shots, which land near 500/500 but jitter from run to run — the same statistical shot noise Writing Your First Circuit covers in full."
+/>
 
 <InteractiveSection title="Same circuit, two backends" description="Backend 1 is the exact simulator: runCircuit gives the Bell state's ideal 50/50 amplitudes directly. Backend 2 is a shot-sampled backend: this page's own live sampleMeasurements call, 1000 shots against that exact same circuit object. Slide between them and notice the circuit never changed, only which backend executed it.">
   <BarChartExplorer
@@ -192,8 +203,8 @@ convenience and ecosystem fit, not raw computational capability.
 
 <Callout type="mistake">
 **Assuming this platform's QuantumCircuit is "a real SDK."** It's a
-deliberately minimal illustration of the shared PATTERN real SDKs use,
-genuinely useful for understanding the structure, but far short of any
+deliberately minimal illustration of the shared PATTERN real SDKs use.
+Useful for seeing the structure clearly, but far short of any
 production SDK's actual feature set (error mitigation, hardware-specific
 compilation, and much more).
 </Callout>

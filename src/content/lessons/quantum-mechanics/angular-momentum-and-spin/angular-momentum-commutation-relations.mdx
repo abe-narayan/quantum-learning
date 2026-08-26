@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
@@ -49,8 +50,8 @@ export const lessonMeta = {
 ## Motivation
 
 Classically, angular momentum is $\vec L=\vec r\times\vec p$, nothing
-quantum about the definition itself. What's genuinely new is what happens
-when $\vec r$ and $\vec p$ become operators: $L_x,L_y,L_z$ turn out *not*
+quantum about the definition itself. The new physics shows up only once
+$\vec r$ and $\vec p$ become operators: $L_x,L_y,L_z$ turn out not
 to commute with each other, and the specific way they fail to commute is
 the algebraic seed this entire course grows from.
 
@@ -149,10 +150,24 @@ with arbitrary precision**, exactly the generalized uncertainty relation
 (Operators, Observables & Measurement) applied to angular momentum
 specifically. You can know $L_z$ and $\vec L^{\,2}$ (the total magnitude)
 simultaneously (shown in the next lesson), but never two different
-components of $\vec L$ at once. This is a genuinely new kind of
-uncertainty, distinct from position-momentum uncertainty, and it's the
+components of $\vec L$ at once. This is a distinct kind of
+uncertainty from position-momentum uncertainty, and it's the
 reason a classical picture of "the atom's angular momentum vector points
 in a definite direction" breaks down completely at the quantum level.
+
+Before reading on, decide what you think happens if an atom's angular
+momentum is prepared with a definite $L_z$ and then $L_x$ is measured:
+
+<PredictBeforeReveal
+  question="An atom is prepared with a definite value of Lz. What happens if you then measure Lx?"
+  options={[
+    { label: "Lx comes out with the same definite value", value: "same" },
+    { label: "Lx is completely undetermined until measured, with a spread of possible outcomes", value: "spread" },
+    { label: "The measurement fails because Lx doesn't exist yet", value: "fails" },
+  ]}
+  correctValue="spread"
+  explanation="Because [Lx,Lz]≠0, a state with a sharp Lz value is not an Lx eigenstate at all; it's a superposition of Lx eigenstates, so measuring Lx gives a genuine spread of outcomes governed by the Born rule, and the act of measuring it destroys the earlier certainty about Lz. This is the same incompatible-observables structure the Stern-Gerlach lesson later demonstrates experimentally with spin."
+/>
 
 This same algebra, with spin operators in place of orbital ones
 ($[S_x,S_y]=i\hbar S_z$), is the physics behind nuclear magnetic
@@ -184,7 +199,7 @@ products of commuting quantities.** Classically $L_x,L_y$ are ordinary
 numbers and always commute; quantum mechanically they're operators built
 from $x,y,z,p_x,p_y,p_z$, and the one nonzero canonical commutator
 $[z,p_z]=i\hbar$ survives the cross-product structure to produce a
-genuinely nonzero $[L_x,L_y]$.
+nonzero $[L_x,L_y]$.
 </Callout>
 
 <Callout type="mistake">
@@ -214,8 +229,8 @@ index order backward flips the sign.
   surviving canonical commutator $[z,p_z]=i\hbar$, with every cross-axis
   term vanishing.
 - This nonzero commutator means no two different components of $\vec L$
-  can be simultaneously known precisely, a genuinely new kind of
-  quantum uncertainty.
+  can be simultaneously known precisely, a kind of quantum uncertainty
+  distinct from the position-momentum kind.
 - The identity is checked directly against this platform's general
   $J_x,J_y,J_z$ matrix operators for several values of $j$, not just
   derived symbolically once.

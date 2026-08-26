@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemsForLesson(
@@ -86,7 +87,21 @@ The gap widens fast: on this shared scale, Grover's line is compressed
 into a sliver near $y=0$ well before $n$ reaches double digits, while the
 classical curve rockets upward. That's real, but it's a statement about
 *how much bigger* the classical curve is, not about Grover's own growth
-rate, which this axis cannot show. Rescaling to Grover's own range
+rate, which this axis cannot show.
+
+<PredictBeforeReveal
+  question="Grover's own query count, π/4·√N, is plotted alone on its own y-axis (not next to the classical 2^n curve). What shape should that curve have?"
+  options={[
+    { label: "A flat line near zero, like it looked next to 2^n", value: "flat" },
+    { label: "A straight line through the origin", value: "linear" },
+    { label: "A concave curve that keeps rising, just more and more slowly", value: "concave" },
+    { label: "An exponential curve, just with a smaller base", value: "exponential-shape" },
+  ]}
+  correctValue="concave"
+  explanation="On its own scale, π/4·√N is visibly a square-root curve: rising, concave, ever-slowing, never flat and never exponential. It only looked flat a moment ago because it was being compared directly against 2^n on the same axis — a genuine growth curve can still look negligible next to a big enough neighbor."
+/>
+
+Rescaling to Grover's own range
 answers that separately:
 
 <ParametricCurve

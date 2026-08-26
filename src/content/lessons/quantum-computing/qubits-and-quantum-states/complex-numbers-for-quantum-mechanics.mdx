@@ -36,8 +36,8 @@ we mostly left it at that: every example used real values like
 $\tfrac{1}{\sqrt2}$. That was deliberately gentle. It's about to stop being
 gentle. The Bloch sphere's phase factor $e^{i\varphi}$, the difference
 between a $Z$ gate and an $S$ gate, and the reason quantum interference
-exists at all all come down to genuinely complex amplitudes, not just real
-ones with a sign.
+exists at all all come down to amplitudes that are complex in the full
+sense, not real numbers wearing a plus or minus sign.
 
 So before going further, we need the actual toolkit: how to add, multiply,
 and geometrically picture complex numbers. If you've seen this before,
@@ -118,10 +118,11 @@ $$
   license="Public domain"
 />
 
-Remarkably, $\cos\theta + i\sin\theta$ can be written as a single
-exponential, $e^{i\theta}$. This is **Euler's formula**, and it's worth
-seeing where it comes from rather than just accepting it. The Taylor series
-for $e^x$ works for complex inputs too, so substitute $x = i\theta$:
+That combination, $\cos\theta + i\sin\theta$, can also be written as a
+single exponential, $e^{i\theta}$. This is **Euler's formula**, and the
+derivation is short enough to walk through rather than take on faith. The
+Taylor series for $e^x$ works for complex inputs too, so substitute
+$x = i\theta$:
 
 $$
 e^{i\theta} = 1 + i\theta + \frac{(i\theta)^2}{2!} + \frac{(i\theta)^3}{3!} + \frac{(i\theta)^4}{4!} + \cdots
@@ -148,6 +149,17 @@ by reading it in equations alone:
 <InteractiveSection title="Trace a circle at fixed modulus" description="Set a complex number to 0.6+0.8i using the rectangular sliders. Read off its modulus and phase in the polar readout. Then sweep the phase slider through a full turn (0 to 2π) and watch the point trace a circle while the modulus stays fixed. That circle *is* what 'multiplying by e^{iθ} rotates the point' means.">
   <LazyComplexAmplitudeExplorer />
 </InteractiveSection>
+
+<PredictBeforeReveal
+  question="Multiply two complex numbers that each have modulus 1 (both sit exactly on the unit circle). What happens to the modulus of the result?"
+  options={[
+    { label: "It grows past 1", value: "bigger" },
+    { label: "It stays exactly 1", value: "stays" },
+    { label: "It depends on the phases involved", value: "depends" },
+  ]}
+  correctValue="stays"
+  explanation="Moduli multiply: |z1 z2| = |z1||z2| = 1 × 1 = 1, regardless of the phases. Only the phase moves, to θ1+θ2; the point stays on the unit circle no matter how far you rotate it there. This is exactly why a phase gate, which only ever multiplies an amplitude by some e^{iθ}, never by itself changes a probability."
+/>
 
 ### Why polar form matters: multiplication adds phases
 

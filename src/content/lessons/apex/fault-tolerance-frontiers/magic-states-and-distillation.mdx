@@ -64,7 +64,7 @@ way, just more lattice surgery. It does not, and the reason is not an
 engineering gap that better decoders or bigger codes will close: it is a
 theorem. **Clifford gates, no matter how perfectly and fault-tolerantly
 implemented, can never be more than a classically-simulable subroutine.**
-Universality needs a genuinely different gate, the T gate, and the surface
+Universality needs an entirely different gate, the T gate, and the surface
 code has no transversal way to apply it. Magic-state distillation is the
 field's real, standard answer to that gap, and it is expensive enough that
 it usually dominates the resource budget of the entire computation.
@@ -115,7 +115,7 @@ $$
 T^2 = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/2} \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix} = S, \qquad S^2 = \begin{pmatrix} 1 & 0 \\ 0 & i^2 \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix} = Z,
 $$
 so T really is "half of S, which is half of Z": a single application of T
-is a genuinely finer phase rotation than any Clifford gate can produce on
+is a strictly finer phase rotation than any Clifford gate can produce on
 its own, which is exactly why it sits outside the group Gottesman-Knill
 covers.
 
@@ -192,6 +192,67 @@ noisy inputs, with post-selection on a stabilizer-style check, to purify
 logic as every syndrome-measurement circuit elsewhere in this course,
 applied here to a resource state instead of a data qubit.
 
+### The factory, drawn: one round of 15-to-1 distillation
+
+Every arithmetic step above has a physical picture behind it: 15
+independently-prepared noisy $|T\rangle$ copies go in, a Clifford-only
+circuit checks them against the $[[15,1,3]]$ Reed-Muller code's
+stabilizers and discards every run that fails the check, and exactly 1
+higher-fidelity $|T\rangle$ copy comes out the other side. No
+non-Clifford operation ever appears inside that box — the distillation
+circuit itself is built entirely from the same Clifford gates and Pauli
+measurements Gottesman-Knill already covers; only the *raw material*
+going in and coming out is non-Clifford.
+
+<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+  <svg width={720} height={230} viewBox="0 0 720 230" className="w-full" role="img" aria-label="Diagram of one round of 15-to-1 magic state distillation. Fifteen small square icons labeled T, each with error rate epsilon approximately 0.01, feed via an arrow into a central box labeled 15-to-1 distillation circuit: Clifford gates only, plus a Reed-Muller 15,1,3 stabilizer check, post-select and discard on a failed check. A second arrow leads from that box to a single output square labeled T, with error rate epsilon approximately 3.5 times 10 to the minus 5, a cubic improvement. A caption below notes that feeding 15 of this round's outputs into a second copy of the same circuit drives the error down again to about 1.5 times 10 to the minus 12.">
+    <text x={110} y={22} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">15 noisy copies</text>
+    {Array.from({ length: 15 }).map((_, i) => {
+      const col = i % 5;
+      const row = Math.floor(i / 5);
+      const x = 40 + col * 38;
+      const y = 40 + row * 38;
+      return (
+        <g key={i}>
+          <rect x={x} y={y} width={26} height={26} rx={4} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
+          <text x={x + 13} y={y + 17} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">T</text>
+        </g>
+      );
+    })}
+    <text x={110} y={166} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">each: ε ≈ 0.01</text>
+
+    <defs>
+      <marker id="magic-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 z" className="fill-border" />
+      </marker>
+    </defs>
+
+    <line x1={228} y1={98} x2={288} y2={98} className="stroke-border" strokeWidth={2} markerEnd="url(#magic-arrow)" />
+
+    <rect x={293} y={48} width={190} height={100} rx={10} className="fill-brand/10 stroke-brand" strokeWidth={2} />
+    <text x={388} y={76} textAnchor="middle" className="fill-brand text-[11px] font-semibold">15-to-1 distillation</text>
+    <text x={388} y={94} textAnchor="middle" className="fill-muted-foreground text-[9.5px]">Clifford gates only +</text>
+    <text x={388} y={108} textAnchor="middle" className="fill-muted-foreground text-[9.5px]">[[15,1,3]] stabilizer check</text>
+    <text x={388} y={128} textAnchor="middle" className="fill-accent text-[9.5px] font-medium">post-select: discard on failure</text>
+
+    <line x1={483} y1={98} x2={543} y2={98} className="stroke-border" strokeWidth={2} markerEnd="url(#magic-arrow)" />
+
+    <rect x={553} y={80} width={36} height={36} rx={5} className="fill-brand/20 stroke-brand" strokeWidth={2} />
+    <text x={571} y={103} textAnchor="middle" className="fill-brand text-[12px] font-mono font-semibold">T</text>
+    <text x={571} y={138} textAnchor="middle" className="fill-foreground text-[11px] font-semibold">1 purified copy</text>
+    <text x={571} y={156} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">ε ≈ 3.5×10⁻⁵</text>
+
+    <text x={360} y={196} textAnchor="middle" className="fill-muted-foreground text-[9.5px]">Feeding 15 of this round's outputs into a second copy of this</text>
+    <text x={360} y={211} textAnchor="middle" className="fill-muted-foreground text-[9.5px]">same circuit drives the error down again, to about 1.5×10⁻¹².</text>
+  </svg>
+</div>
+
+<p className="mt-2 text-center text-xs text-muted-foreground">
+  One round of 15-to-1 distillation: 15 noisy magic states go in, a
+  Clifford-only circuit checks and discards, and one higher-fidelity copy
+  comes out — the physical mechanism behind the ε collapse charted below.
+</p>
+
 ## Physical Interpretation: Why This Matters
 
 Magic-state distillation is not a footnote. By wide consensus in the
@@ -218,6 +279,17 @@ for an unprotected physical operation), find the output error rate after
 one round of 15-to-1 distillation, and after a second round applied to
 the first round's output.**
 
+<PredictBeforeReveal
+  question="Raw error rate ε₀ = 0.01 (1 in 100), and one round of 15-to-1 distillation suppresses error cubically: the output error is about 35 times the input error cubed. Roughly what order of magnitude should the output error land at?"
+  options={[
+    { label: "About 1 in 1,000 (10⁻³)", value: "e-3" },
+    { label: "About 1 in 30,000 (10⁻⁵)", value: "e-5" },
+    { label: "About 1 in 10,000,000 (10⁻⁷)", value: "e-7" },
+  ]}
+  correctValue="e-5"
+  explanation="35 × (0.01)³ = 35 × 10⁻⁶ = 3.5×10⁻⁵ — about 1 in 30,000, well past what a naive linear suppression would give (1 in 1,000), but nowhere near 10⁻⁷ either. The cube is doing real work, though it takes a second round, computed below, to reach the far smaller error rates a long computation actually needs."
+/>
+
 Using $\epsilon_{\text{out}} \approx 35\,\epsilon_{\text{in}}^3$:
 
 $$
@@ -234,7 +306,7 @@ it to roughly 1-in-700-billion. This is the double-exponential shape a
 cubic recursion always produces: $\epsilon_0 \to C\epsilon_0^3 \to
 C(C\epsilon_0^3)^3 = C^4\epsilon_0^9 \to \cdots$, the exponent on
 $\epsilon_0$ itself triples each round. That is the concrete, honest
-reason "just a couple of distillation rounds" genuinely suffices to reach
+reason "just a couple of distillation rounds" is enough to reach
 the extremely low logical error rates a long fault-tolerant computation
 needs, at the cost of the 15-to-1 (and $15^2$-to-1 for two rounds) qubit
 overhead the factory has to pay for it.

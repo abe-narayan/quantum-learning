@@ -75,9 +75,9 @@ Every result from the last two lessons, inner products, norms,
 orthogonality, can be written in ordinary vector and matrix notation. But
 quantum mechanics almost never is written that way, because Paul Dirac
 invented a notation compact enough to make the extra structure (operators,
-in particular) far easier to write and reason about. It's worth learning
-properly now, once, rather than reconstructing it piecemeal every time a
-new lesson introduces another piece of it.
+in particular) far easier to write and reason about. Learning it properly
+once here saves reconstructing it piecemeal every time a later lesson
+introduces another fragment of it.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/50/Paul_Dirac%2C_1933.jpg"
@@ -129,10 +129,10 @@ acts on kets: $\langle v|$ acts on $|w\rangle$ to produce the number
 $\langle v,w\rangle$. Every inner product space has exactly one such
 functional for each vector $|v\rangle$; the concrete conjugate-transpose
 recipe above is what that functional looks like once you write vectors as
-columns. This lesson mostly works with the concrete picture, but it's
-worth knowing the more abstract statement exists, since it's what lets
-bra-ket notation extend cleanly to infinite-dimensional spaces (like
-wavefunctions) later in the Quantum Mechanics pillar.
+columns. This lesson mostly works with the concrete picture, but the more
+abstract statement is what lets bra-ket notation extend cleanly to
+infinite-dimensional spaces (like wavefunctions) later in the Quantum
+Mechanics pillar, where there's no column of numbers to transpose.
 
 ### The outer product
 
@@ -182,10 +182,21 @@ $$
 \sum_i |e_i\rangle\langle e_i| = I
 $$
 
-This deserves a derivation, not just acceptance. It's one of the most
-useful identities in all of quantum mechanics. Apply the left side to an
-arbitrary $|\psi\rangle$, expanded in this basis as
-$|\psi\rangle=\sum_j c_j|e_j\rangle$:
+<PredictBeforeReveal
+  question="Does this identity depend on which orthonormal basis {|e_i⟩} you pick?"
+  options={[
+    { label: "Yes, only the standard basis works", value: "standard-only" },
+    { label: "No, it holds for any orthonormal basis", value: "any" },
+    { label: "Only in two dimensions", value: "2d-only" },
+  ]}
+  correctValue="any"
+  explanation="It holds for every orthonormal basis of the space, not just the standard one. The derivation below never uses anything about {|e_i⟩} except orthonormality, and the interactive check further down confirms it numerically for the Hadamard basis {|+⟩, |−⟩} too."
+/>
+
+Every remaining lesson in this course leans on this identity, so it's
+worth seeing where it actually comes from rather than filing it away as a
+rule. Apply the left side to an arbitrary $|\psi\rangle$, expanded in this
+basis as $|\psi\rangle=\sum_j c_j|e_j\rangle$:
 
 $$
 \left(\sum_i|e_i\rangle\langle e_i|\right)|\psi\rangle = \sum_i|e_i\rangle\langle e_i|\psi\rangle = \sum_i \langle e_i|\psi\rangle\,|e_i\rangle

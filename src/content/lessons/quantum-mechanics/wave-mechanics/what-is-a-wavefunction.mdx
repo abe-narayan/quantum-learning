@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
@@ -26,10 +27,13 @@ export const lessonMeta = {
 
 ## Motivation
 
-A finite list of amplitudes is enough to describe a qubit, or three
-qubits, or any number of qubits: $\mathbb{C}^2$, $\mathbb{C}^8$, always
-some finite dimension with one number per basis state. Position refuses
-that treatment — a particle isn't confined to finitely many discrete
+Ask where an electron in a hydrogen atom actually is, and quantum
+mechanics won't hand you a single point — it hands you a function.
+That function is $\psi(x)$, and this lesson is about where it comes from
+and what it means. A finite list of amplitudes is enough to describe a
+qubit, or three qubits, or any number of qubits: $\mathbb{C}^2$,
+$\mathbb{C}^8$, always some finite dimension with one number per basis
+state. Position refuses that treatment — a particle isn't confined to finitely many discrete
 spots, it can sit at *any* real number $x$, so no finite list of
 amplitudes can label a continuum of possibilities one at a time. The
 postulates from the last course (state, observable, measurement,
@@ -105,6 +109,17 @@ an unrelated approximation.
 >
   <DiscretizationLimit ariaLabel="Histogram of discrete cell probabilities over a Gaussian, converging to the continuous probability density as the number of grid cells N increases via a slider" />
 </InteractiveSection>
+
+<PredictBeforeReveal
+  question="c_i = psi(x_i) * sqrt(Delta x) has to hold so that |c_i|^2 = |psi(x_i)|^2 * Delta x stays finite as Delta x shrinks toward zero. If |c_i|^2 itself stays a sensible probability (between 0 and 1), what does that force |psi(x_i)|^2 to do as Delta x -> 0?"
+  options={[
+    { label: "It also stays between 0 and 1", value: "bounded" },
+    { label: "It can grow arbitrarily large", value: "unbounded" },
+    { label: "It has to go to zero", value: "zero" },
+  ]}
+  correctValue="unbounded"
+  explanation="|psi(x_i)|^2 = |c_i|^2 / Delta x, and dividing a bounded probability by a width shrinking to zero forces the density to blow up wherever the wavefunction is squeezed into a narrow region. That's not a pathology -- it's exactly why psi(x) is called an amplitude density rather than an amplitude, argued directly below."
+/>
 
 ### Why $\psi(x)$ is a density, not an amplitude
 

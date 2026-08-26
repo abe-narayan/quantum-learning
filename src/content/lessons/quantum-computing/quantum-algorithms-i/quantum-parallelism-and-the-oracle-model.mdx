@@ -4,6 +4,7 @@ import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
@@ -59,12 +60,12 @@ speedups, and it does not, for a reason worth understanding precisely before
 building anything on top of it.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="An IBM Quantum System One, a gold chandelier-shaped dilution refrigerator enclosure housing a superconducting quantum processor, photographed at IBM's Yorktown Heights research facility"
-  caption="An IBM Quantum System One: real hardware that physically hosts the qubit register this lesson puts into superposition. The gold cylinders are a dilution refrigerator, cooling the superconducting chip inside to near absolute zero so the H^⊗n step derived below actually holds."
-  credit="Onri Jay Benally, via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/IBM_QC.jpg/1280px-IBM_QC.jpg"
+  alt="The dilution-refrigerator cryostat housing IBM's 50-qubit superconducting quantum computing prototype, displayed at CES 2018"
+  caption="A dilution-refrigerator cryostat: real hardware that physically hosts the qubit register this lesson puts into superposition. Its nested gold stages cool the superconducting chip inside to near absolute zero so the H^⊗n step derived below actually holds."
+  credit="Lars Plougmann / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_QC.jpg"
+  license="CC BY-SA 2.0"
 />
 
 ## Mathematical Development
@@ -115,7 +116,21 @@ U_f\left(\frac{1}{\sqrt{2^n}}\sum_x|x\rangle\right)|0\rangle = \frac{1}{\sqrt{2^
 $$
 
 Every value of $f$ really is encoded in this one state; that part of
-"quantum parallelism" is real. But **measuring this state collapses it to
+"quantum parallelism" is real.
+
+<PredictBeforeReveal
+  question="The state above has a term |x⟩|f(x)⟩ for every possible input x, all at once. If you measure it right now, what do you get?"
+  options={[
+    { label: "The full table of every f(x), all 2^n values", value: "full-table" },
+    { label: "About half of the f(x) values, chosen at random", value: "half" },
+    { label: "Exactly one (x, f(x)) pair, chosen at random", value: "one" },
+    { label: "Nothing useful — the state is too scrambled to measure", value: "nothing" },
+  ]}
+  correctValue="one"
+  explanation="Measurement collapses the superposition to exactly one basis state, so you get exactly one (x, f(x)) pair, with probability 1/2^n for each possible x. Every other value of f that was sitting in the superposition a moment earlier is simply gone once you look. This is the entire reason 'quantum parallelism' needs a second trick (interference) to be useful at all."
+/>
+
+But **measuring this state collapses it to
 one random $x$ and its one value $f(x)$**, with probability $1/2^n$ each,
 exactly like measuring any other uniform superposition. You learn $f$ at one
 point, chosen randomly, having spent the same one query a classical computer

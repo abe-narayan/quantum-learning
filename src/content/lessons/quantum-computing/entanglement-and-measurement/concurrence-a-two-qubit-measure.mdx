@@ -1,11 +1,35 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const shannonTerm = (x) => (x >= 1e-12 ? -x * Math.log2(x) : 0);
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure"
 ).map((problem) => problem.meta);
+
+export const concurrenceIdentityThetas = Array.from({ length: 17 }, (_, i) => (i / 16) * (Math.PI / 2));
+
+export const concurrenceIdentityFrames = concurrenceIdentityThetas.map((theta) => {
+  const concurrence = Math.abs(Math.sin(2 * theta));
+  const reducedPurity = Math.cos(theta) ** 4 + Math.sin(theta) ** 4;
+  const fromIdentity = Math.sqrt(2 * (1 - reducedPurity));
+  const degrees = Math.round((theta * 180) / Math.PI);
+  return {
+    paramLabel: `θ = ${degrees}°`,
+    bars: [
+      { label: "C(θ) = 2|ad−bc|", value: concurrence, caption: concurrence.toFixed(3) },
+      { label: "Tr(ρ_A²)", value: reducedPurity, caption: reducedPurity.toFixed(3) },
+      {
+        label: "√(2(1−Tr(ρ_A²)))",
+        value: fromIdentity,
+        caption: fromIdentity.toFixed(3),
+        highlight: true,
+      },
+    ],
+  };
+});
 
 export const lessonMeta = {
   title: "Concurrence: A Two-Qubit Entanglement Measure",
@@ -32,7 +56,7 @@ lesson, for what looks like an entirely unrelated purpose. Finding it,
 and proving why it works, is this lesson's actual subject.
 
 Entanglement entropy needed an eigenvalue calculation, small for a
-$2\times2$ reduced state, but a genuinely different kind of computation
+$2\times2$ reduced state, but an entirely different kind of computation
 than anything amplitude-based. **Concurrence** answers the same
 question (how entangled is this pure 2-qubit state?) with a formula
 built directly from the four amplitudes, no diagonalization required.
@@ -84,6 +108,25 @@ they determine each other exactly, by this formula. Both are 0 together
 (product states) and both reach their respective maxima together (Bell
 states: $C=1$, $\text{Tr}(\rho_A^2)=0.5$).
 
+The identity above was derived algebraically, but it's worth watching it
+hold numerically, for a family where $C$ and $\text{Tr}(\rho_A^2)$ are
+computed two completely independent ways. For
+$|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$, the
+left-most bar below comes straight from $C=2|ad-bc|$, the middle bar
+from the reduced density matrix's trace, and the right bar from plugging
+that same trace into the identity's right-hand side — with no reference
+to $C$ at all. Watch the right bar track the left one exactly as $\theta$
+sweeps.
+
+<InteractiveSection title="The identity, checked at every θ" description="Step θ from 0 to 90°. C(θ) (left bar) is computed directly from the amplitudes; √(2(1−Tr(ρ_A²))) (right bar) is computed from the reduced state's purity with no reference to C. They match at every step, confirming the boxed identity rather than just asserting it.">
+  <BarChartExplorer
+    frames={concurrenceIdentityFrames}
+    sliderLabel="θ"
+    ariaLabel="Concurrence, reduced purity, and the identity's right-hand side as theta sweeps from 0 to 90 degrees, with the identity bar matching concurrence at every step"
+    maxValue={1}
+  />
+</InteractiveSection>
+
 ### Range and the partially-entangled family
 
 $C$ ranges from $0$ (product state) to $1$ (Bell state, the maximum a
@@ -98,15 +141,26 @@ including the general formula, not just the endpoints.
 Both $C(\theta)=|\sin2\theta|$ and $E(\theta)$ (Lesson 7's entanglement
 entropy for the same family) are 0 at $\theta=0$ and reach their maximum
 at $\theta=\pi/4$, and both are verified to be zero or nonzero together
-for every state tested, but they are genuinely different functions of
-$\theta$, not two names for the same number. $C$ is built from
-amplitudes with no logarithm anywhere; $E$ is a Shannon entropy, built
-from $\cos^2\theta,\sin^2\theta$ through $-p\log_2p$ terms. They agree on
-*which* states are entangled, and on the direction of "more" vs. "less,"
-without being numerically equal at intermediate $\theta$: two
-independent, cross-checking measures rather than duplicates of each
-other. Plotted together, the gap between them is visible directly, not
-just asserted:
+for every state tested. $C$ is built from amplitudes with no logarithm
+anywhere; $E$ is a Shannon entropy, built from $\cos^2\theta,\sin^2\theta$
+through $-p\log_2p$ terms. Before plotting them together, predict
+whether that shared structure makes them the same function.
+
+<PredictBeforeReveal
+  question="C(θ) and E(θ) are both 0 at θ=0 and both maximal at θ=π/4. Does that mean C(θ)=E(θ) for every θ in between?"
+  options={[
+    { label: "Yes — they're just two names for the same quantity", value: "same" },
+    { label: "No — they agree on the endpoints and on ordering, but differ in between", value: "different" },
+    { label: "No — they can even disagree on which states are entangled", value: "disagree" },
+  ]}
+  correctValue="different"
+  explanation="C(θ)=|sin2θ| is built from a sine; E(θ) is a Shannon entropy built from a logarithm. Plotted below, both curves start at 0 and peak at θ=π/4, but C(θ) climbs faster near the endpoints — E(θ)'s slope vanishes at θ=0, so it stays flatter and only catches up to C near θ=π/4. They agree on which states are entangled and on which of two states is more entangled — they never disagree about that — but they are two independent, cross-checking measures, not duplicates of each other."
+/>
+
+They agree on *which* states are entangled, and on the direction of
+"more" vs. "less," without being numerically equal at intermediate
+$\theta$. Plotted together, the gap between them is visible directly,
+not just asserted:
 
 <ParametricCurve
   frames={[
@@ -130,11 +184,13 @@ just asserted:
 />
 
 Both curves start at 0, both reach their maximum at $\theta=\pi/4$, and
-both are 0 only at $\theta=0$, exactly the agreement claimed above, but
-$E(\theta)$ (built from a logarithm) rises faster near the endpoints than
-$C(\theta)$ (built from a sine) does: two genuinely different functions
-that happen to agree on the two things that matter for this course, zero
-vs. nonzero, and which of two states is more entangled.
+both are 0 only at $\theta=0$, exactly the agreement predicted above, but
+$C(\theta)$ (built from a sine) rises faster near the endpoints than
+$E(\theta)$ (built from a logarithm) does: $E$'s slope vanishes at
+$\theta=0$, so it stays flatter before catching up to $C$ near
+$\theta=\pi/4$: two different functions that agree
+on the two things that matter for this course, zero vs. nonzero, and
+which of two states is more entangled.
 
 ### Scope: pure two-qubit states only
 
@@ -142,7 +198,7 @@ $C=2|ad-bc|$ is the pure-state concurrence formula for exactly two
 qubits; it is not the general definition. The Wootters concurrence for
 a general *mixed* two-qubit state requires the eigenvalues of the
 non-Hermitian matrix product $\rho(\sigma_y\otimes\sigma_y)\rho^*(\sigma_y\otimes\sigma_y)$,
-a genuinely harder numerical problem (eigenvalues of a non-Hermitian
+a substantially harder numerical problem (eigenvalues of a non-Hermitian
 matrix, which don't even have to be real) that this platform's
 $2\times2$-Hermitian-only eigensolver cannot handle and does not attempt.
 `concurrenceOfPureState` is named and scoped accordingly; it is not a
@@ -232,22 +288,22 @@ formula) comes out to a different number.
 
 ## Further Exploration
 
-The `testSeparability`/`concurrenceOfPureState` connection is worth
-sitting with for a moment: two entanglement measures that look unrelated
-on paper, one from eigenvalues, one from a determinant of amplitudes,
-turn out to be exactly interconvertible, and the platform had already
-written half the code for the second measure while building the first.
-Hidden structural connections like this one show up again throughout
-this subject; it's worth watching for them.
+The `testSeparability`/`concurrenceOfPureState` connection is a good
+one to remember: two entanglement measures that look unrelated on
+paper, one from eigenvalues, one from a determinant of amplitudes, turn
+out to be exactly interconvertible, and the platform had already written
+half the code for the second measure while building the first. This
+subject has more hidden connections like it than a first pass through
+the material would suggest.
 
 Next: [Unitary Evolution and Measurement of Density Matrices](/lessons/quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices), which
 extends the density-matrix formalism past static description, to how
 $\rho$ changes under gates and what happens to it during measurement.
 Before reading it, try predicting whether concurrence stays well-defined
-after a unitary gate is applied to just one qubit of the pair, the next
+after a unitary gate is applied to just one qubit of the pair; the next
 lesson's machinery will let you check.
 
 The general mixed-state Wootters concurrence this lesson names and
 explicitly declines to implement is built and actually computed, on a
-genuinely mixed two-qubit state, in [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement) —
+state that's mixed at the global level, in [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement) —
 the exact gap this lesson leaves open.

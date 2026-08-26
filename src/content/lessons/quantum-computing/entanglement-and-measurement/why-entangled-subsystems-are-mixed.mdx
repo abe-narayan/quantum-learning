@@ -2,6 +2,31 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 import { LazyEntanglementCorrelation } from "@/components/visualizations/entanglement-correlation/LazyEntanglementCorrelation";
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
+import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
+import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { PartialTraceHighlight } from "@/components/visualizations/PartialTraceHighlight";
+
+export const weaklyEntangledState = new StateVector([new Complex(Math.sqrt(0.99)), Complex.ZERO, Complex.ZERO, new Complex(Math.sqrt(0.01))]);
+export const bellPhiPlusState = new StateVector([new Complex(Math.SQRT1_2), Complex.ZERO, Complex.ZERO, new Complex(Math.SQRT1_2)]);
+export const productZeroZeroState = new StateVector([Complex.ONE, Complex.ZERO, Complex.ZERO, Complex.ZERO]);
+
+export const survivalPanelsFor = (state) => {
+  const rhoAB = pureStateDensityMatrix(state);
+  return {
+    rhoAB: matrixToCells(rhoAB),
+    rhoA0: matrixToCells(reducedDensityMatrixQubit0(rhoAB)),
+    rhoA1: matrixToCells(reducedDensityMatrixQubit1(rhoAB)),
+  };
+};
+
+export const survivalPresets = [
+  { label: "|00⟩ (product, ad−bc=0)", frames: [{ paramLabel: "|00⟩", ...survivalPanelsFor(productZeroZeroState) }] },
+  { label: "√0.99|00⟩+√0.01|11⟩ (weakly entangled)", frames: [{ paramLabel: "ad−bc≈0.0995", ...survivalPanelsFor(weaklyEntangledState) }] },
+  { label: "|Φ+⟩ (maximally entangled, ad−bc=0.5)", frames: [{ paramLabel: "|Φ+⟩", ...survivalPanelsFor(bellPhiPlusState) }] },
+];
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed"
@@ -26,12 +51,16 @@ export const lessonMeta = {
 
 ## Motivation
 
-The last lesson found something that looked almost too convenient: a
-maximally entangled Bell state's reduced density matrix came out exactly
-maximally mixed. Was that a coincidence of the specific example, or is
-there a real, provable connection between "how entangled the whole state
-is" and "how mixed each part is"? This lesson proves there is, and
-gets an exact formula out of the proof, not just a qualitative statement.
+Here is the strange fact the last lesson left sitting on the table: the
+2-qubit state $|\Phi^+\rangle$ is pure, completely specified, zero
+uncertainty about it whatsoever, and yet each of its two qubits, looked
+at on its own, is in the *most* uncertain single-qubit state there is,
+$\rho_A=I/2$. The whole is perfectly well-defined; either half alone is
+maximally undefined. That isn't a quirk of the specific 50/50 amplitudes
+in $|\Phi^+\rangle$. This lesson proves it's forced, for any 2-qubit pure
+state, by entanglement itself, and pins down an exact formula for how
+mixed a subsystem gets as a function of exactly how entangled the whole
+state is.
 
 <ExternalFigure
   src="https://www.nist.gov/sites/default/files/images/2017/01/05/quantum_physics_quantum_computing_fourier_transform_beryllium_ions.jpg"
@@ -40,6 +69,17 @@ gets an exact formula out of the proof, not just a qualitative statement.
   credit="NIST"
   creditUrl="https://www.nist.gov/image/quantumphysicsquantumcomputingfouriertransformberylliumionsjpg"
   license="Public domain (U.S. government work)"
+/>
+
+<PredictBeforeReveal
+  question="A 2-qubit state a|00⟩+d|11⟩ is only weakly entangled: a=√0.99, d=√0.01. Is qubit 0's reduced-state purity Tr(ρ_A²) closer to 1 (nearly pure) or closer to 0.5 (nearly maximally mixed)?"
+  options={[
+    { label: "Close to 1 — barely mixed at all", value: "near-one" },
+    { label: "Close to 0.5 — nearly maximally mixed", value: "near-half" },
+    { label: "Exactly 0.5, same as any entangled state", value: "exactly-half" },
+  ]}
+  correctValue="near-one"
+  explanation="Tr(ρ_A²) = 1 − 2|ad−bc|² (the identity this lesson derives below), and here ad−bc = √0.99·√0.01 ≈ 0.0995, so Tr(ρ_A²) ≈ 1 − 2(0.0995)² ≈ 0.980: barely mixed, not close to the maximally mixed 0.5 a Bell state reaches. Mixedness isn't an on/off consequence of 'being entangled' — it's a continuous quantity, exactly as entangled as ad−bc says and no more."
 />
 
 ## Mathematical Development
@@ -101,6 +141,19 @@ numerically against the engine (`purity` composed with
 determinant) for a Bell state, a product state, a partially entangled
 state, and an unstructured "random-looking" state; all four agree to
 floating-point precision.
+
+The mechanism behind the identity is visible directly in the partial
+trace itself: the $|00\rangle\langle11|$ cross term of $\rho_{AB}$, of
+size exactly $ad$, has mismatched bra/ket indices on *both* qubits, so it
+never survives into $\rho_A$ (or $\rho_B$) at all. It's precisely that
+excluded cross term, growing with $ad-bc$, that $\rho_A$ loses track of.
+For each state below, all three presets have the same amplitude pattern
+($a|00\rangle+d|11\rangle$), so $\rho_A$ stays exactly diagonal
+throughout; what changes is how far that diagonal sits from $1{:}0$:
+
+<InteractiveSection title="Watch the excluded cross term grow with entanglement" description="The dimmed |00⟩⟨11| corner of ρ_AB (top-right) is permanently excluded — mismatched indices on both qubits — so it never reaches ρ_A no matter which reduced cell you select. Switch presets and watch that dimmed corner itself grow from 0 (product |00⟩) to ≈0.0995 (weakly entangled) to 0.5 (|Φ+⟩), while ρ_A's own diagonal is dragged from 1:0 toward the 0.5:0.5 the boxed identity's maximum-mixedness case predicts. Click ρ_A's own diagonal cells to confirm exactly which ρ_AB entries (all diagonal, all eligible) build each one.">
+  <PartialTraceHighlight presets={survivalPresets} ariaLabel="The excluded off-diagonal cross term of the joint density matrix growing as the global state becomes more entangled, from a product state through a weakly entangled state to a maximally entangled Bell state, dragging the reduced state's diagonal toward 0.5/0.5" />
+</InteractiveSection>
 
 ### The theorem
 

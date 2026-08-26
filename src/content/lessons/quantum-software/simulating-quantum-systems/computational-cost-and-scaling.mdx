@@ -25,20 +25,33 @@ export const lessonMeta = {
 
 ## Motivation
 
-State-Vector Simulation named the technique; this lesson prices it
-exactly. Every number here follows directly from a single fact already
-built into this platform's engine: `applySingleQubitGate` iterates over
-every amplitude in the state (Circuit Representation in Code's
-underlying implementation), an $O(2^n)$ operation, every single time.
+In 1981, at a keynote co-organized by MIT and IBM, Feynman put his
+finger on the reason a quantum computer might be worth building at all.
+His diagnosis: simulating an $n$-particle quantum system on an ordinary
+computer seems to require resources that grow like $2^n$, no matter how
+clever the algorithm, because the system's state genuinely has that many
+independent numbers in it. His proposed fix was blunt — "nature isn't
+classical, dammit, and if you want to make a simulation of nature,
+you'd better make it quantum mechanical." This lesson is the other side
+of that same coin: it puts exact figures on the classical price tag
+Feynman was pointing at, using this platform's own engine as the
+receipts.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Summit_supercomputer_%2844552257460%29.jpg"
-  alt="Rows of Summit supercomputer cabinets at Oak Ridge National Laboratory"
-  caption="Oak Ridge National Laboratory's Summit supercomputer — 200 petaflops of classical computing power. Exact state-vector simulation's exponential memory cost is exactly why even a machine like this runs out of room well before 50 qubits."
-  credit="Photo by Carlos Jones / Oak Ridge National Laboratory / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Summit_supercomputer_(44552257460).jpg"
-  license="CC BY 2.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/1/1a/RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg"
+  alt="Richard Feynman photographed in 1984 at the Paine Estate in Waltham, Massachusetts, during his consulting work for Thinking Machines Corporation"
+  caption="Feynman in 1984, a few years after his 1981 keynote, consulting for Thinking Machines Corporation on the design of the Connection Machine — a massively parallel classical supercomputer built partly to attack the same simulation problem he'd identified."
+  credit="Photo © Tamiko Thiel"
+  creditUrl="https://commons.wikimedia.org/wiki/File:RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg"
+  license="CC BY-SA 3.0"
 />
+
+State-Vector Simulation named the technique this course has used since
+lesson one. Every number below follows from a single fact already built
+into this platform's engine: `applySingleQubitGate` iterates over every
+amplitude in the state (Circuit Representation in Code's underlying
+implementation), an $O(2^n)$ operation, every single time — Feynman's
+argument, run as actual code instead of asserted from a podium.
 
 ## Engineering Development
 
@@ -47,6 +60,17 @@ underlying implementation), an $O(2^n)$ operation, every single time.
 Each complex amplitude needs two double-precision floats (real and
 imaginary), 8 bytes each: 16 bytes per amplitude. Total memory:
 $16\times2^n$ bytes.
+
+<PredictBeforeReveal
+  question="Going from 20 to 30 qubits is only 10 more qubits. Roughly how much more memory does that cost?"
+  options={[
+    { label: "About 10× more", value: "10x" },
+    { label: "About 1000× more (2¹⁰)", value: "1000x" },
+    { label: "About 1,000,000× more", value: "million" },
+  ]}
+  correctValue="1000x"
+  explanation="Each additional qubit doubles the amplitude count, so 10 more qubits multiplies memory by 2¹⁰ = 1024. That's exactly the jump the table below shows: ~16.8 MB at 20 qubits becomes ~17.2 GB at 30, a ~1024× increase from adding a number of qubits you could count on two hands."
+/>
 
 | Qubits | Amplitudes | Memory |
 |---|---|---|
@@ -103,35 +127,45 @@ cost too, if simulating instead of running on hardware.
 
 ### Where the wall actually bites
 
-State-vector simulation is genuinely practical up to roughly 30-40
-qubits on serious classical hardware (well beyond a laptop, but within
-reach of research computing clusters), and essentially impossible
-beyond about 50, for any currently existing or plausible near-future
-classical computer. This concrete range is why quantum advantage
-experiments specifically target circuits in or beyond this regime: it's
-the qubit count at which *no* classical simulation technique (including
-the more sophisticated approaches the rest of this course covers) can
+State-vector simulation is practical up to roughly 30-40 qubits on
+serious classical hardware (well beyond a laptop, but within reach of
+research computing clusters), and essentially impossible beyond about
+50, for any currently existing or plausible near-future classical
+computer. This concrete range is why quantum advantage experiments
+specifically target circuits in or beyond this regime: it's the qubit
+count at which *no* classical simulation technique (including the more
+sophisticated approaches the rest of this course covers) can
 straightforwardly keep up.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Summit_supercomputer_%2844552257460%29.jpg"
+  alt="Rows of Summit supercomputer cabinets at Oak Ridge National Laboratory"
+  caption="Oak Ridge National Laboratory's Summit — 200 petaflops of classical computing power, and still nowhere near enough RAM to hold a generic 50-qubit state vector. This is the wall Feynman was describing in 1981, decades before anyone had a machine this size to run into it with."
+  credit="Photo by Carlos Jones / Oak Ridge National Laboratory / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Summit_supercomputer_(44552257460).jpg"
+  license="CC BY 2.0"
+/>
 
 ## Physical Interpretation
 
 This cost is not a limitation of any particular implementation choice.
 It's a direct consequence of quantum mechanics' own structure: an
-$n$-qubit state genuinely has $2^n$ independent complex degrees of
-freedom (Mathematical Foundations' tensor-product dimension counting),
-and representing that exactly requires storing all of them. This is, in
-one sense, exactly *why* quantum computers are potentially powerful:
-classical memory cannot compress this information away for a generic
-state.
+$n$-qubit state has $2^n$ independent complex degrees of freedom
+(Mathematical Foundations' tensor-product dimension counting), and
+representing that exactly requires storing all of them. This is, in one
+sense, why quantum computers are potentially powerful at all: classical
+memory cannot compress this information away for a generic state — the
+exact structural point Feynman was making in 1981, well before there
+was hardware capable of testing it directly.
 
-This is precisely why Google's 2019 Sycamore experiment used 53 qubits
+This is why Google's 2019 Sycamore experiment used 53 qubits
 specifically: that qubit count was chosen to sit just past what any
 existing supercomputer could feasibly state-vector-simulate directly, a
-concrete instance of the wall this lesson computes exactly. IBM
-subsequently argued a cleverer classical technique (not brute-force
-state-vector storage) could approximate the same task using disk space
-instead of RAM, a real dispute that illustrates the point above from
-the other side: pushing past this specific wall means abandoning exact
+concrete instance of the wall this lesson computes. IBM subsequently
+argued a cleverer classical technique (not brute-force state-vector
+storage) could approximate the same task using disk space instead of
+RAM, a real dispute that illustrates the point above from the other
+side: pushing past this specific wall means abandoning exact
 state-vector simulation entirely, not just buying a bigger machine.
 
 ## Worked Example
@@ -191,9 +225,9 @@ solution to it.
 - The practical wall sits around 30-40 qubits (serious clusters) to ~50
   qubits (beyond any existing classical system), a narrow 20-qubit span
   covering "easy" to "impossible."
-- This cost is fundamental (from $2^n$ genuine degrees of freedom in an
-  $n$-qubit state), not an implementation artifact fixable by better
-  classical hardware alone.
+- This cost is fundamental (from $2^n$ real degrees of freedom in an
+  $n$-qubit state, the same count Feynman pointed to in 1981), not an
+  implementation artifact fixable by better classical hardware alone.
 
 ## Further Exploration
 

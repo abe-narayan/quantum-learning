@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
@@ -87,9 +88,10 @@ $$
 \boxed{\hat p = -i\hbar\,\frac{d}{dx}}
 $$
 
-This is a genuine derivation, not a postulate. The *only* input was
-"plane waves carry definite momentum $p=\hbar k$," a statement about what
-momentum physically means, translated into an eigenvalue requirement.
+Nothing was postulated to get here. The *only* input was "plane waves
+carry definite momentum $p=\hbar k$," a statement about what momentum
+physically means, translated into an eigenvalue requirement and then
+solved.
 
 ### Hermiticity check
 
@@ -140,6 +142,17 @@ and Uncertainty lesson, applies here completely unchanged. The abstract
 proof never needed to know $\hat p$'s explicit form, only that the
 commutator was $i\hbar$.
 
+<PredictBeforeReveal
+  question="The calculation above applies x-hat then p-hat, in that order, to get [x-hat, p-hat] = i*hbar. If you instead compute [p-hat, x-hat] -- the operators in the opposite order -- what do you get?"
+  options={[
+    { label: "The same thing, +i*hbar", value: "same" },
+    { label: "The sign flips: -i*hbar", value: "flip" },
+    { label: "Zero -- the operators end up commuting", value: "zero" },
+  ]}
+  correctValue="flip"
+  explanation="[p-hat, x-hat] = -[x-hat, p-hat] = -i*hbar, since swapping the order of a commutator always flips its sign by definition ([A,B] = -[B,A]). Redoing the product-rule calculation with the operators reversed confirms it directly, which is exactly Practice Question 2 below."
+/>
+
 ## Physical Interpretation
 
 $\hat x$ and $\hat p$ don't commute because "multiply by $x$" and "take a
@@ -159,10 +172,10 @@ $$
 confirming the eigenvalue equation this whole derivation was built to
 satisfy, by direct substitution.
 
-A genuine plane wave isn't normalizable, but a broad Gaussian packet
+A true plane wave isn't normalizable, but a broad Gaussian packet
 built with a definite central momentum approximates one closely, and
-this platform's simulator computes its momentum expectation value from a
-real Fourier transform, not a label:
+this platform's simulator computes its momentum expectation value by
+actually running the Fourier transform, not by reading off a label:
 
 <InteractiveSection
   title="Set the momentum, watch ⟨p⟩ track it"

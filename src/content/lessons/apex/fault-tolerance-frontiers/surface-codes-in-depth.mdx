@@ -159,6 +159,16 @@ $$
 x_B = X_4X_5X_2X_7, \qquad z_C = Z_6Z_7Z_4Z_9
 $$
 
+<PredictBeforeReveal
+  question="The two stabilizers just introduced, xB and zC, share exactly 2 qubits, q4 and q7. Using the CSS rule from the prerequisite lesson — X-type and Z-type stabilizers commute iff their supports overlap in an even number of qubits — do xB and zC commute or anticommute?"
+  options={[
+    { label: "Commute — 2 is even", value: "commute" },
+    { label: "Anticommute — any shared qubit forces anticommuting", value: "anticommute" },
+  ]}
+  correctValue="commute"
+  explanation="Checked sign flip by sign flip below: X and Z anticommute at q4 (one sign flip) and again at q7 (a second sign flip), and two sign flips cancel, so xB and zC commute overall. That's the even-overlap commutation rule confirmed concretely, not just cited."
+/>
+
 At $q_4$: $X$ and $Z$ anticommute (one sign flip). At $q_7$: $X$ and $Z$
 anticommute again (a second sign flip). Two sign flips cancel:
 $x_Bz_C=(-1)^2z_Cx_B=z_Cx_B$. This is the CSS Codes and the General

@@ -95,15 +95,26 @@ $$
 $$
 
 The result is exactly the computational basis state whose label is the
-two input labels written side by side. This is a genuinely useful
-shorthand: $|i\rangle\otimes|j\rangle = |ij\rangle$, and you rarely need
-to write out the column-vector arithmetic by hand once you trust this
-rule.
+two input labels written side by side. This is a useful shorthand you'll
+lean on constantly: $|i\rangle\otimes|j\rangle = |ij\rangle$, and you
+rarely need to write out the column-vector arithmetic by hand once you
+trust this rule.
+
+<PredictBeforeReveal
+  question="Is |0⟩⊗|1⟩ the same state as |1⟩⊗|0⟩?"
+  options={[
+    { label: "Yes, tensor multiplication doesn't care about order", value: "same" },
+    { label: "No, they're different states", value: "different" },
+    { label: "They're the same up to normalization", value: "normalization" },
+  ]}
+  correctValue="different"
+  explanation="Computing both directly: |0⟩⊗|1⟩ = |01⟩ = (0,1,0,0) and |1⟩⊗|0⟩ = |10⟩ = (0,0,1,0). Neither the labels nor the underlying column vectors match — the tensor product is order-sensitive because it tracks which qubit each factor belongs to, exactly the way the classical strings '01' and '10' are different strings."
+/>
 
 <QuantumStateDisplay state={ketZeroOne} label="|0⟩ ⊗ |1⟩" />
 <QuantumStateDisplay state={ketOneZero} label="|1⟩ ⊗ |0⟩" />
 
-Notice these are different states: **order matters**. $|0\rangle\otimes|1\rangle$
+These are different states, confirming the prediction above: $|0\rangle\otimes|1\rangle$
 and $|1\rangle\otimes|0\rangle$ are as distinct as the classical strings
 "01" and "10".
 

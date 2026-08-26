@@ -1,3 +1,4 @@
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
@@ -74,10 +75,25 @@ export const lessonMeta = {
 Two spin-$\tfrac12$ particles, combined, don't have a single well-defined
 total spin: their combination can act as spin $0$ or spin $1$,
 depending on which specific combined state they're in. This lesson
-derives that decomposition explicitly, and finds something remarkable
-waiting inside it: the spin-$0$ combination is *exactly* a state this
-platform built in an entirely different course, for an entirely
+derives that decomposition explicitly, and turns up a state this
+platform already built in an entirely different course, for an entirely
 different reason.
+
+Before deriving anything, guess: does combining two spin-$\tfrac12$
+particles always give total spin $1$ (the "obvious" $\tfrac12+\tfrac12$
+answer), or can it come out differently depending on how the two spins
+are combined?
+
+<PredictBeforeReveal
+  question="Two spin-1/2 particles are combined. Is the total spin always exactly 1?"
+  options={[
+    { label: "Yes, spins just add: 1/2 + 1/2 = 1, always", value: "always-1" },
+    { label: "No, it depends on the specific combined state: total spin can be 0 or 1", value: "depends" },
+    { label: "No, the total spin is always 0", value: "always-0" },
+  ]}
+  correctValue="depends"
+  explanation="Spin doesn't add like ordinary numbers. Four independent combined states exist, and only some of them (the triplet) have total spin 1; one specific combination (the singlet) has total spin exactly 0. Which one you get depends entirely on which of the four states the two particles are actually in, derived explicitly below."
+/>
 
 ## Mathematical Development
 
@@ -137,7 +153,7 @@ matching $\vec J=0$:
 
 <InteractiveSection
   title="Scrub through the four states"
-  description="Scrub through the four states. Each spin has fixed length √3/2 ħ, drawn tip to tail (S₁ solid brand, S₂ solid accent); the dashed resultant J = S₁+S₂ is the classical cartoon of total spin. Across the three triplet states J keeps a fixed length √2 ħ while its vertical (z) component runs through +1, 0, -1 in units of ħ, matching the Jz column of the table above. For the singlet the two vectors are drawn nearly antiparallel (offset by a few degrees so both arrows stay visible) and cancel to a point at the origin, matching J=0 exactly. Caveat: this vector-cone picture is the standard textbook cartoon, not literal physics — S1 and S2 don't have simultaneously definite components along every axis as quantum operators, so no real spin vector actually points in one fixed direction like this.">
+  description="Scrub through the four states. Each spin has fixed length √3/2 ħ, drawn tip to tail (S₁ solid brand, S₂ solid accent); the dashed resultant J = S₁+S₂ is the classical cartoon of total spin. Across the three triplet states J keeps a fixed length √2 ħ while its vertical (z) component runs through +1, 0, -1 in units of ħ, matching the Jz column of the table above. For the singlet the two vectors are drawn nearly antiparallel (offset by a few degrees so both arrows stay visible) and cancel to a point at the origin, matching J=0 exactly. Caveat: this vector-cone picture is the standard textbook cartoon, not literal physics. S1 and S2 don't have simultaneously definite components along every axis as quantum operators, so no real spin vector actually points in one fixed direction like this.">
   <VectorDiagramExplorer
     frames={additionFrames}
     sliderLabel="State"
@@ -151,6 +167,15 @@ direction, so no measurement ever finds a spin literally pointing along
 the drawn arrow. What *is* exact is the length and $z$-projection each
 diagram frame encodes, both already verified directly from the
 operators in the table above.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Alain_Aspect_experiment_1981_diagram.svg"
+  alt="Diagram of Alain Aspect's 1981 Bell-test experiment: a source S emits a pair of correlated photons toward two polarization analyzers a and b, each feeding detectors D+ and D-, with coincidences recorded at R"
+  caption="The 1981 Aspect experiment, which measured exactly the kind of perfectly-correlated, individually-random outcomes this lesson derives for the spin-0 singlet, and confirmed they violate any theory built on a definite pre-existing direction for each particle."
+  credit="Wikimedia Commons / Neolexx"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Alain_Aspect_experiment_1981_diagram.svg"
+  license="CC BY 3.0"
+/>
 
 ### The singlet is a Bell state
 
@@ -181,7 +206,7 @@ the same $|\Psi^-\rangle$ up to an unobservable global phase:
 
 ## Physical Interpretation
 
-This is a genuinely deep connection, not a coincidence of notation: a
+This is a deep connection, not a coincidence of notation: a
 system with total angular momentum exactly zero necessarily has *no
 preferred direction at all*: measuring either particle's spin along
 *any* axis gives a perfectly random result, but the two particles'

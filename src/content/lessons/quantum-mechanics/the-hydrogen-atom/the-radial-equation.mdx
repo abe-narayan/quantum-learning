@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { radial1s, radial2p } from "@/lib/quantum/hydrogenAtom";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-mechanics/the-hydrogen-atom/the-radial-equation"
@@ -53,8 +54,9 @@ export const lessonMeta = {
 
 Last lesson proved the angular part is already solved. This lesson does
 the actual reduction: substitute that fact into the full 3D Schrödinger
-equation and watch a genuinely 3D partial differential equation collapse
-into a single ordinary differential equation in $r$ alone, one this
+equation and watch a full-blown partial differential equation in three
+variables collapse into a single ordinary differential equation in $r$
+alone, one this
 platform can then solve using the exact same machinery One-Dimensional
 Systems already built.
 
@@ -64,7 +66,7 @@ Systems already built.
   caption="A hydrogen maser: an atomic clock whose stability rests on the same bound-state structure this radial equation produces, precise enough to serve as a timekeeping reference in radio astronomy, exactly as described below."
   credit="NASA/JPL-Caltech"
   creditUrl="https://commons.wikimedia.org/wiki/File:Hydrogen_maser.jpg"
-  license="Courtesy NASA/JPL-Caltech"
+  license="Attribution only, NASA/JPL-Caltech"
 />
 
 ## Mathematical Development
@@ -116,6 +118,17 @@ condition $u(0)=0$ (so that $R(r)=u(r)/r$ stays finite at the origin).
 Every tool this platform built for 1D problems (the general solving
 strategy, boundary-condition matching) applies directly; only the
 specific $V_{\text{eff}}(r)$ for the Coulomb potential is new.
+
+<PredictBeforeReveal
+  question="The boundary condition above is stated as u(0)=0, not R(0)=0. For the l=0 (1s) state specifically, does R(r)=u(r)/r also vanish at r=0?"
+  options={[
+    { label: "Yes: u(0)=0 forces R(0)=0 too, for any l", value: "zero" },
+    { label: "No: R(0) can stay finite and nonzero even though u(0)=0", value: "nonzero" },
+    { label: "R(0) diverges to infinity", value: "diverge" },
+  ]}
+  correctValue="nonzero"
+  explanation="No. u(r)=rR(r) can vanish at the origin simply because of the factor of r, while R(r) itself stays finite. The plot later in this lesson confirms this directly for the actual 1s wavefunction: u(r) heads to 0 linearly as r→0, but R(r) approaches R(0)=2, not zero. This is exactly why s-states have nonzero probability density right at the nucleus."
+/>
 
 ## Physical Interpretation
 

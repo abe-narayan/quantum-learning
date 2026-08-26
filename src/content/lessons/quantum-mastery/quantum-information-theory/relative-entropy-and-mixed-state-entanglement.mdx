@@ -13,7 +13,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Relative Entropy and Mixed-State Entanglement",
   description:
-    "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute -- built here and actually evaluated on a genuinely mixed two-qubit state.",
+    "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute -- built here and evaluated explicitly on a state that's actually mixed, not pure in disguise.",
   course: "quantum-information-theory",
   module: "relative-entropy-and-mixed-state-entanglement",
   order: 5,
@@ -26,7 +26,7 @@ export const lessonMeta = {
   objectives: [
     "Define quantum relative entropy and prove its non-negativity via Klein's inequality",
     "State the general (mixed-state) Wootters concurrence formula and prove it reduces to the platform's existing pure-state formula",
-    "Compute the Wootters concurrence exactly for a genuinely mixed two-qubit state, using this platform's own eigensolver",
+    "Compute the Wootters concurrence exactly for a properly mixed two-qubit state, using this platform's own eigensolver",
   ],
   related: [
     {
@@ -106,7 +106,7 @@ general mixed-state Wootters concurrence formula explicitly and refusing
 to implement it: it needs eigenvalues of a **non-Hermitian** matrix
 product, which this platform's closed-form $2\times2$-Hermitian-only
 eigensolver cannot handle in general. This lesson builds the general
-formula properly, and finds one genuinely mixed, structurally special
+formula properly, and finds one properly mixed, structurally special
 case where this platform's *existing* eigensolver, unchanged, is
 still exactly enough to compute it.
 
@@ -176,7 +176,7 @@ $$
 S(\rho\|\sigma) = 0.9\log_2\frac{0.9}{0.5} + 0.1\log_2\frac{0.1}{0.5} \approx 0.531 \text{ bits}
 $$
 
-a genuinely positive number, as Klein's inequality requires, computed
+a strictly positive number, as Klein's inequality requires, computed
 directly via `Matrix`/`Complex` arithmetic matching this platform's
 existing `vonNeumannEntropy` conventions. (A structural edge case worth
 naming: if $\sigma$ has a zero eigenvalue in a direction $\rho$ has
@@ -203,7 +203,7 @@ it equals the **entanglement of formation** (the true convex-roof
 extension of entanglement entropy to mixed states) is a celebrated,
 difficult result whose proof is **cited, not re-derived**: it requires
 optimizing over every possible pure-state decomposition of $\rho$, a
-genuinely different and much harder problem than anything built so far
+substantially harder problem than anything built so far
 on this platform.
 
 **Reduction to the pure-state formula, derived, not cited.** For
@@ -220,7 +220,7 @@ agree completely on every pure state, confirming the general definition
 is a genuine extension, not a different quantity that happens to share a
 name.
 
-### A genuinely mixed worked example: the Werner state
+### An actually mixed worked example: the Werner state
 
 Take $\rho=p|\Psi^-\rangle\langle\Psi^-|+(1-p)\,I/4$ (a **Werner
 state**: a mixture of the singlet Bell state with the maximally mixed
@@ -228,12 +228,25 @@ state) at $p=0.7$, built directly via `convexCombination` and
 `maximallyMixedState`, exactly the tools Convex Combinations and
 Physical Mixtures already established:
 
-<MatrixGrid matrix={rhoWerner} label="Werner state, p=0.7" ariaLabel="The Werner state used as this lesson's genuinely mixed worked example, p=0.7" />
+<MatrixGrid matrix={rhoWerner} label="Werner state, p=0.7" ariaLabel="The Werner state used as this lesson's mixed-state worked example, p=0.7" />
 
 Its purity is $\text{Tr}(\rho^2)\approx0.6175$, strictly less than $1$:
 this is a genuinely mixed state, not a pure one in disguise, exactly
 the case Concurrence: A Two-Qubit Entanglement Measure's simpler formula
-cannot handle at all. Building $\tilde\rho$ and $R=\rho\tilde\rho$
+cannot handle at all.
+
+<PredictBeforeReveal
+  question="p=0.7 means this Werner state is a 70/30 mix of a maximally entangled singlet and pure noise (I/4). Is it still entangled at all, or has the noise already washed the entanglement out?"
+  options={[
+    { label: "Still entangled — 70% singlet should dominate", value: "entangled" },
+    { label: "Separable — mixing in any maximally mixed state destroys entanglement", value: "separable" },
+    { label: "Impossible to say without a full convex-roof optimization", value: "unknowable" },
+  ]}
+  correctValue="entangled"
+  explanation="C(0.7) = 0.55, computed below: a real, nonzero amount of entanglement survives. The formula's own max(0, ...) clipping only kicks in below p=1/3 (derived later from the closed form C(p)=max(0,(3p-1)/2)) — a Werner state stays entangled for a wide range of mixing before the noise finally wins, it doesn't vanish the moment the state stops being pure."
+/>
+
+Building $\tilde\rho$ and $R=\rho\tilde\rho$
 directly via real `Matrix.tensor`, `.mul()`, and complex conjugation:
 
 <MatrixGrid matrix={R} label="R = rho * rho-tilde" ariaLabel="The R matrix for the Werner state, whose eigenvalues determine the mixed-state concurrence" />
@@ -241,7 +254,7 @@ directly via real `Matrix.tensor`, `.mul()`, and complex conjugation:
 $R$ comes out **block-diagonal** for this particular family of states,
 a structural accident of the Werner state's symmetry, not something true
 of a general mixed two-qubit state, with two trivial $1\times1$ blocks
-(each exactly $0.005625$) and one genuinely $2\times2$ Hermitian block.
+(each exactly $0.005625$) and one honest $2\times2$ Hermitian block.
 Because that block happens to be Hermitian here,
 **`eigenvaluesHermitian2x2`, the exact same closed-form solver this
 platform has used since Entanglement, Mixed States & Bell Tests, is
@@ -256,7 +269,7 @@ $$
 $$
 
 A concrete, nonzero, **computed** mixed-state concurrence: this Werner
-state at $p=0.7$ is genuinely entangled, verified via this exact
+state at $p=0.7$ is actually entangled, verified via this exact
 number, not merely presumed. It matches the known closed form for
 Werner states, $C(p)=\max(0,(3p-1)/2)$, exactly ($(3\times0.7-1)/2=0.55$),
 across the whole family:
@@ -267,7 +280,7 @@ across the whole family:
 />
 
 Below $p=1/3$, $C(p)=0$: the Werner state becomes **separable**, not
-just weakly entangled, a genuinely different physical regime this
+just weakly entangled, a qualitatively different physical regime this
 formula detects sharply via the $\max(0,\cdot)$ clipping, not something
 the pure-state formula could ever have expressed (a pure state's
 concurrence is never forced to $0$ by a competing classical mixture,
@@ -303,7 +316,7 @@ an arbitrary mixed two-qubit state.
 Without it, $\sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4}$ can come
 out negative (it does for any Werner state with $p<1/3$): the clipping
 is not a numerical-safety afterthought, it's the formula correctly
-reporting zero entanglement for a genuinely separable state.
+reporting zero entanglement for a state that really is separable.
 </Callout>
 
 ## Practice Questions
@@ -331,7 +344,7 @@ reporting zero entanglement for a genuinely separable state.
 - The general Wootters concurrence $C(\rho)=\max(0,\sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4})$,
   built from $R=\rho\tilde\rho$, is proved to reduce exactly to the
   pure-state formula $2|ad-bc|$ when $\rho$ is pure.
-- Computed on a genuinely mixed Werner state ($p=0.7$, purity
+- Computed on an actually mixed Werner state ($p=0.7$, purity
   $\approx0.6175$): $C\approx0.55$, matching the known closed form
   $(3p-1)/2$ exactly, using this platform's *existing* Hermitian
   eigensolver on a structurally special (block-Hermitian) case, closing

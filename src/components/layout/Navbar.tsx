@@ -24,7 +24,7 @@ function isActive(pathname: string, href: string) {
 const INTERACTIVE_CLASSES =
   "transition-[color,background-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
-/** Desktop-only dropdown grouping the four track/pillar pages. */
+/** Desktop-only dropdown grouping the five track/pillar pages. */
 function TracksDropdown({ pathname }: { pathname: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);

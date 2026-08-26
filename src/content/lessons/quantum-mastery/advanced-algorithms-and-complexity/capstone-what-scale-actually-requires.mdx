@@ -225,6 +225,17 @@ statement that real research can and does push against, by finding
 smarter algorithms, better error bounds, and better-designed ansätze,
 rather than by hoping the walls simply aren't there.
 
+<PredictBeforeReveal
+  question="VQE's 1-qubit toy example converged perfectly. Scale the same ansatz pattern up naively. Which of this course's three walls would you hit first: running out of qubits to simulate the circuit, running out of gate budget for time evolution, or losing a trainable gradient?"
+  options={[
+    { label: "Running out of qubits — classical simulation is the first thing to break", value: "qubits" },
+    { label: "Running out of gate budget — Trotter/QFT costs grow fastest", value: "gates" },
+    { label: "Losing a trainable gradient — barren plateaus bite at modest qubit counts", value: "gradient" },
+  ]}
+  correctValue="gradient"
+  explanation="Module 5's own numbers make this concrete: gradient variance already drops by roughly 17× just going from n=2 to n=6 qubits — sizes small enough that classical simulation and Trotter gate counts are both trivial. Wall 3 is the one that shows up earliest as qubit count grows, well before Wall 1's structural limits or Wall 2's raw resource costs become the binding constraint, which is exactly why 'just add more qubits to a working small ansatz' is not, by itself, a viable scaling strategy."
+/>
+
 ## Worked Example
 
 **For each wall, name one concrete research direction that specifically

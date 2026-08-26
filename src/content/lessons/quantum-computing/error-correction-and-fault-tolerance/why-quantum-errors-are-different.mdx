@@ -27,10 +27,10 @@ export const lessonMeta = {
 
 Classical error correction protects a bit by copying it: store $0$ as
 $000$, and if noise flips one copy, majority vote recovers the original.
-Every part of that strategy fails for a qubit, for reasons that follow
-directly from facts this platform has already proven, not new physics,
-just consequences of no-cloning, continuous state space, and measurement
-collapse applied to a genuinely new problem.
+Every part of that strategy fails for a qubit, and the reasons are
+concrete, not exotic: no-cloning, continuous state space, and measurement
+collapse, three facts this platform has already proven, each block a
+specific step of the classical recipe.
 
 That skepticism was not hindsight: before 1995, it was a widely held
 view among physicists that no analogue of classical error correction
@@ -59,8 +59,10 @@ $|\psi\rangle$. So "just copy the qubit three times" is not merely
 impractical, it's provably impossible for an unknown state. Quantum
 error correction instead **encodes** one logical qubit's information
 *across* several physical qubits in an entangled state (as the next
-lesson's $\alpha|000\rangle+\beta|111\rangle$ does), genuinely different
-from naive copying, and precisely because naive copying is unavailable.
+lesson's $\alpha|000\rangle+\beta|111\rangle$ does). That's a different
+move from copying, not a workaround for it: no-cloning didn't make
+copying merely hard, it ruled the strategy out, so error correction had
+to be built from something else entirely.
 
 ### Obstacle 2: a continuum of possible errors
 
@@ -79,6 +81,18 @@ from "infinitely many possible errors" to "just these two" is the
 mathematical fact that makes quantum error correction possible at all, and
 exactly why this course builds a bit-flip ($X$) code and a phase-flip
 ($Z$) code separately, then combines them.
+
+<PredictBeforeReveal
+  question="A continuum of unwanted rotations can hit a single qubit on the Bloch sphere. How many distinct correction procedures do you actually need to build to handle all of them?"
+  options={[
+    { label: "Infinitely many, one per possible rotation angle", value: "infinite" },
+    { label: "Four, one each for I, X, Y, Z", value: "four" },
+    { label: "Two: correct X and Z, and Y is handled automatically", value: "two" },
+    { label: "One generic 'undo whatever happened' gate", value: "one" },
+  ]}
+  correctValue="two"
+  explanation="Any single-qubit error is a linear combination of I, X, Y, Z, since those four matrices span all 2x2 operators. That already cuts infinity down to four. It cuts further because Y = iXZ (confirmed in the Worked Example below): a code built to correct X and Z errors corrects Y for free, since Y is just X and Z acting together. Two correction mechanisms, not four and not infinitely many, are what the diagram below shows."
+/>
 
 <MeasurementTree
   ariaLabel="An arbitrary single-qubit error decomposes into I, X, Y, Z components; correcting X and Z automatically corrects Y as well"
@@ -170,11 +184,11 @@ combination of $I,X,Y,Z$.
 
 <Callout type="mistake">
 **Thinking syndrome measurement is "cheating" past the no-collapse
-requirement.** It genuinely doesn't collapse the encoded logical
-information. It's specifically designed to extract only error-location
-information, an engineering fact this course verifies directly (the
-corrected state exactly matches the original for *any* $\alpha,\beta$,
-not just a specific tested pair).
+requirement.** It doesn't collapse the encoded logical information at
+all. It's specifically designed to extract only error-location
+information, an engineering fact this course verifies directly: the
+corrected state matches the original exactly for arbitrary $\alpha,\beta$,
+not one hand-picked pair.
 </Callout>
 
 ## Practice Questions

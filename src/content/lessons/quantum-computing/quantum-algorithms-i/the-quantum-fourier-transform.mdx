@@ -134,6 +134,62 @@ multi-qubit or multi-controlled gate is needed anywhere in the circuit.
 checked directly against the closed-form DFT sum above for *every* basis
 state, $n=2$ through $n=4$: not spot-checked, exhaustively checked.
 
+Drawn out for $n=3$, with the actual rotation angles the loop above
+computes ($2\pi/2^k$ for $k=2,3$, i.e. $\pi/2$ and $\pi/4$), not
+placeholders. `StaticCircuitDiagram`'s gate set has no controlled-phase
+primitive with an arbitrary angle (only `CNOT`, `CZ`, `SWAP`), so this
+shape is drawn directly here, the same way Quantum Phase Estimation draws
+its own circuit — both diagrams read the real angles straight off the
+functions they depict:
+
+<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+  <svg width={600} height={168} viewBox="0 0 600 168" role="img" aria-label="Quantum Fourier transform circuit for n=3 qubits: H on q0, controlled-phase pi/2 from q1 and pi/4 from q2 onto q0, H on q1, controlled-phase pi/2 from q2 onto q1, H on q2, then a final swap of q0 and q2" className="min-w-full">
+    <line x1={40} y1={28} x2={600} y2={28} className="stroke-border" strokeWidth={2} />
+    <text x={4} y={32} className="fill-muted-foreground text-xs font-mono">q0</text>
+    <line x1={40} y1={84} x2={600} y2={84} className="stroke-border" strokeWidth={2} />
+    <text x={4} y={88} className="fill-muted-foreground text-xs font-mono">q1</text>
+    <line x1={40} y1={140} x2={600} y2={140} className="stroke-border" strokeWidth={2} />
+    <text x={4} y={144} className="fill-muted-foreground text-xs font-mono">q2</text>
+
+    <rect x={57} y={10} width={36} height={36} rx={8} className="fill-surface stroke-brand" strokeWidth={1.5} />
+    <text x={75} y={33} textAnchor="middle" className="fill-foreground text-sm font-semibold">H</text>
+
+    <line x1={145} y1={28} x2={145} y2={84} className="stroke-brand" strokeWidth={2} />
+    <circle cx={145} cy={28} r={5} className="fill-brand" />
+    <circle cx={145} cy={84} r={5} className="fill-brand" />
+    <text x={159} y={60} className="fill-foreground text-[11px] font-semibold">π/2</text>
+
+    <line x1={215} y1={28} x2={215} y2={140} className="stroke-brand" strokeWidth={2} />
+    <circle cx={215} cy={28} r={5} className="fill-brand" />
+    <circle cx={215} cy={140} r={5} className="fill-brand" />
+    <text x={229} y={88} className="fill-foreground text-[11px] font-semibold">π/4</text>
+
+    <rect x={267} y={66} width={36} height={36} rx={8} className="fill-surface stroke-brand" strokeWidth={1.5} />
+    <text x={285} y={89} textAnchor="middle" className="fill-foreground text-sm font-semibold">H</text>
+
+    <line x1={355} y1={84} x2={355} y2={140} className="stroke-brand" strokeWidth={2} />
+    <circle cx={355} cy={84} r={5} className="fill-brand" />
+    <circle cx={355} cy={140} r={5} className="fill-brand" />
+    <text x={369} y={116} className="fill-foreground text-[11px] font-semibold">π/2</text>
+
+    <rect x={407} y={122} width={36} height={36} rx={8} className="fill-surface stroke-brand" strokeWidth={1.5} />
+    <text x={425} y={145} textAnchor="middle" className="fill-foreground text-sm font-semibold">H</text>
+
+    <line x1={495} y1={28} x2={495} y2={140} className="stroke-brand" strokeWidth={2} />
+    <text x={495} y={33} textAnchor="middle" className="fill-brand text-base font-bold">×</text>
+    <text x={495} y={145} textAnchor="middle" className="fill-brand text-base font-bold">×</text>
+  </svg>
+</div>
+
+Reading it left to right matches the derivation exactly: $H$ on $q_0$,
+then two progressively finer controlled-phase corrections onto $q_0$ from
+$q_1$ and $q_2$; $H$ on $q_1$, then one correction onto it from $q_2$;
+$H$ on $q_2$ alone (no qubits left to correct from); finally the swap that
+undoes the bit-reversal this construction produces. Every rotation shown
+is one `applyControlledGate(phaseGate(angle), control, target)` call, and
+every angle is exactly the $2\pi/2^k$ the circuit section above derives,
+not a rounded or representative value.
+
 ### Inverse
 
 $\text{QFT}^{-1}$ reverses every step in the opposite order, with every

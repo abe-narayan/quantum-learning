@@ -27,16 +27,18 @@ export const lessonMeta = {
 
 ## Motivation
 
-Physical Qubit Platforms and this course's earlier lessons have built up
-individual error sources (T1/T2, crosstalk, readout error) in isolation.
-This lesson asks the question that actually matters for building a
-useful device: what happens when you chain hundreds or thousands of
-imperfect operations together?
+A press release announcing "1000 qubits" sounds like an order of
+magnitude more computer than one announcing "100 qubits." It might not
+be. Physical Qubit Platforms and this course's earlier lessons built up
+individual error sources, T1/T2, crosstalk, readout error, one at a
+time, in isolation. This lesson asks the question that actually decides
+whether a device is useful: what happens when hundreds or thousands of
+imperfect operations run back to back?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Quantum_metamaterial_with_24_artificial_atoms.png/1280px-Quantum_metamaterial_with_24_artificial_atoms.png"
   alt="An electron micrograph of a real superconducting chip patterned with 24 transmon qubit 'artificial atoms', coupled through shared microwave resonators"
-  caption="A real 24-qubit chip. Raw qubit count like this is exactly the incomplete metric this lesson warns about: every one of these qubits' gates still compounds error multiplicatively, the actual bottleneck this lesson's p^N table quantifies."
+  caption="A real 24-qubit chip. Raw qubit count like this is the incomplete metric this lesson warns about: every one of these qubits' gates still compounds error multiplicatively, the actual bottleneck this lesson's p^N table quantifies."
   credit="FMN Laboratory, Bauman Moscow State Technical University"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_metamaterial_with_24_artificial_atoms.png"
   license="CC BY 4.0"
@@ -47,9 +49,9 @@ imperfect operations together?
 ### Errors compound multiplicatively
 
 If each gate succeeds with probability $p$ (independent, per-gate
-fidelity), then $N$ sequential gates succeed with probability
-$p^N$, not $p$, and not $p\times N$ subtracted from 1, but a genuine
-exponential decay in $N$.
+fidelity), then $N$ sequential gates succeed with probability $p^N$.
+Not $p$, and not $1-N(1-p)$ either: it's an exponential decay in $N$,
+not a linear one.
 
 | Per-gate fidelity | N=10 | N=100 | N=1000 |
 |---|---|---|---|
@@ -57,15 +59,26 @@ exponential decay in $N$.
 | 99% | 90.4% | 36.6% | $4.3\times10^{-5}$ |
 | 95% | 59.9% | 0.6% | $\approx0$ |
 
-Even a genuinely excellent 99.9% per-gate fidelity, better than most
-current real hardware, drops to 36.8% overall success by 1000 gates,
+A 99.9% per-gate fidelity is better than most current real hardware
+achieves, and it still drops to 36.8% overall success by 1000 gates,
 barely better than a coin flip's worth of confidence in the final
-answer. This single table is the quantitative core of why "quantum
-supremacy"-scale algorithms need either extremely low error rates or
-active error correction, not just "more qubits."
+answer. This single table is the quantitative core of why
+"quantum-supremacy"-scale algorithms need either extremely low error
+rates or active error correction, not just more qubits.
 
 The table samples three values of $N$; the full curve makes the decay's
 shape, and how differently each fidelity ages, visible directly:
+
+<PredictBeforeReveal
+  question="Two devices run 200 sequential gates: one at 99% per-gate fidelity, one at 99.9%. Both numbers 'round to about 99%.' How different is their overall success probability at N=200?"
+  options={[
+    { label: "About the same, both round to ~99%", value: "same" },
+    { label: "Modestly different, maybe 20-30% apart", value: "modest" },
+    { label: "Dramatically different, several times apart", value: "dramatic" },
+  ]}
+  correctValue="dramatic"
+  explanation="0.99^200 ≈ 13.4% success; 0.999^200 ≈ 81.9% success. That's a factor of six apart, from two numbers that look nearly identical written as percentages. Exponentiation is unforgiving of small differences in the base once N gets large, which is exactly what the curve below lets you watch happen as you step from 95% up to 99.99%."
+/>
 
 <InteractiveSection title="Step through per-gate fidelities from 95% to 99.99%" description="Step through the fidelity values from 95% up to 99.99%. At each one, watch how far along the x-axis the curve survives before collapsing toward zero. The gap between 99% and 99.9% is enormous, even though both round to 'about 99%.'">
   <ParametricCurve
@@ -86,14 +99,13 @@ shape, and how differently each fidelity ages, visible directly:
 ### Qubit count is an incomplete metric
 
 A device with 1000 "noisy" qubits (a common marketing framing) is not
-automatically more capable than a much smaller device with dramatically
-lower error rates. The compounding-error table above applies per
-*qubit* too, and a computation using many qubits for many sequential
-gates compounds error across both dimensions simultaneously. Metrics
-like **quantum volume** (not derived in full here, but conceptually: a
-combined measure of qubit count, connectivity, and per-gate error
-together) exist specifically because raw qubit count alone is
-misleading.
+automatically more capable than a much smaller device with much lower
+error rates. The compounding-error table above applies per *qubit*
+too, and a computation using many qubits for many sequential gates
+compounds error across both dimensions at once. Metrics like **quantum
+volume** (not derived in full here, but conceptually: a combined
+measure of qubit count, connectivity, and per-gate error together)
+exist precisely because raw qubit count alone is misleading.
 
 ### Where error correction fits in
 

@@ -63,8 +63,8 @@ Quantum Gates & Circuits). This platform's test suite confirms
 directly: running `cnotOnLinearChain` for control=0, target=3 on a test
 state gives EXACTLY the same final amplitudes (difference $<10^{-9}$)
 as an idealized, connectivity-ignoring `applyCNOT(state, 0, 3)`. The
-SWAP network reproduces the correct logical result, at a real,
-computable cost.
+SWAP network reproduces the correct logical result, at a computable,
+nonzero cost.
 
 ### Counting the overhead
 
@@ -76,6 +76,18 @@ gates. Each SWAP itself decomposes into three CNOTs (Quantum Gates &
 Circuits), so this overhead compounds directly into Noise, Decoherence &
 Scaling's per-gate compounding-error problem: every inserted SWAP is
 several more real gates that can fail.
+
+<PredictBeforeReveal
+  question="Using swapOverheadForLinearChain's formula, 2(d-1), how many SWAP gates does bridging a control/target pair at distance d=5 need on a linear chain?"
+  options={[
+    { label: "5", value: "5" },
+    { label: "6", value: "6" },
+    { label: "8", value: "8" },
+    { label: "10", value: "10" },
+  ]}
+  correctValue="8"
+  explanation="2(d-1) = 2(5-1) = 8. The bar chart below plots exactly this formula for d=1 through 5, and the Worked Example further down walks through the actual gate-by-gate SWAP sequence for this same d=5 case."
+/>
 
 <BarChart
   ariaLabel="SWAP gate overhead versus control-target distance on a linear chain, for distances 1 through 5"
@@ -258,7 +270,7 @@ the logical outcome.
   device's connectivity constraints. SWAP-network insertion is the
   standard technique for limited (e.g. linear-chain) connectivity.
 - Verified directly: `cnotOnLinearChain` reproduces an idealized direct
-  CNOT's exact result, at a real, computable SWAP-gate cost of
+  CNOT's exact result, at a computable SWAP-gate cost of
   $2(d-1)$.
 - This overhead compounds directly with Noise, Decoherence & Scaling's
   per-gate error accumulation. Connectivity-aware circuit design is a

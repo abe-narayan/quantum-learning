@@ -26,6 +26,12 @@ export const variationalCurveFrames = [
   },
 ];
 
+export const compareSigmaA = 0.5;
+export const compareSigmaB = 1.5;
+export const compareEnergyA = gaussianTrialEnergy(trialGrid, trialPotential, compareSigmaA);
+export const compareEnergyB = gaussianTrialEnergy(trialGrid, trialPotential, compareSigmaB);
+export const sigmaCompareExplanation = `σ=${compareSigmaA} gives E(σ) ≈ ${compareEnergyA.toFixed(4)}; σ=${compareSigmaB} gives E(σ) ≈ ${compareEnergyB.toFixed(4)}. Both are legal trial widths and both sit above E₀=0.5, exactly as the theorem demands, but σ=${compareSigmaA} is closer to the true optimum σ≈0.704, so it comes in lower. There's nothing special about ${compareSigmaA} itself — pick any width closer to 0.704 than its rival and it wins the comparison.`;
+
 export const lessonMeta = {
   title: "The Variational Method",
   description:
@@ -109,11 +115,15 @@ lesson already used for a different (qubit) variational problem.
 ## Physical Interpretation
 
 The variational method's real power shows up when the true answer
-*isn't* known in advance. For a genuinely hard many-body Hamiltonian,
-minimizing $\langle H\rangle$ over an educated-guess trial family is
-often the only tractable route to a ground-energy estimate, and the
-theorem guarantees the answer errs on a known side (too high, never too
-low).
+*isn't* known in advance. For a hard many-body Hamiltonian, no matter
+how many electrons or interacting spins it describes, minimizing
+$\langle H\rangle$ over an educated-guess trial family is often the
+only tractable route to a ground-energy estimate at all, and the
+theorem guarantees the answer errs on a known side: too high, never too
+low. Quantum chemists use exactly this logic to estimate molecular
+ground states no computer can diagonalize exactly, and VQE hardware
+runs (see the caption above) does the same thing on a real device
+instead of on paper.
 
 ## Worked Example
 
@@ -123,12 +133,28 @@ low).
 Scanning $\sigma$ from 0.2 to 3 in 300 steps and calling
 `expectationEnergy` at each gives a minimum at $\sigma\approx0.704$,
 with $E(\sigma)\approx0.50002$, within $0.004\%$ of the exact $E_0=0.5$.
-This near-perfect agreement isn't a coincidence: the harmonic
-oscillator's *true* ground state genuinely *is* a Gaussian, so this
-particular trial family can, at its optimal parameter, reproduce it
-essentially exactly. (For a Hamiltonian whose true ground state isn't
-close to any Gaussian, the same procedure would still give a valid upper
-bound, just a much looser one.)
+That near-perfect match has a specific reason behind it: the harmonic
+oscillator's true ground state *is* a Gaussian, so a Gaussian trial
+family can, at its optimal width, reproduce it almost exactly. Try the
+same trick on a Hamiltonian whose ground state isn't shaped like a
+Gaussian (a double well, say, or an anharmonic potential) and the
+procedure still returns a valid upper bound on $E_0$, just a looser one,
+since no width of that particular trial family fits the true shape as
+well.
+
+Before scanning the whole range, it's worth checking whether intuition
+about "closer to the optimum" actually predicts the ranking correctly:
+
+<PredictBeforeReveal
+  question="Two trial widths, σ=0.5 and σ=1.5, are both far from the optimal σ≈0.704 but on opposite sides of it. Which one gives the lower trial energy E(σ)?"
+  options={[
+    { label: "σ = 0.5 (narrower)", value: "narrow" },
+    { label: "σ = 1.5 (wider)", value: "wide" },
+    { label: "They tie exactly", value: "tie" },
+  ]}
+  correctValue="narrow"
+  explanation={sigmaCompareExplanation}
+/>
 
 The scan itself, plotted directly (every point a real
 `gaussianTrialEnergy` call, not an illustrative curve), shows the bound
@@ -187,8 +213,8 @@ to the true ground state, only about the energy expectation value.
   bound that family can produce, reusing this platform's existing
   `Wavefunction1D`/`expectationEnergy` machinery directly.
 - For the harmonic oscillator, a Gaussian trial's optimized energy
-  matches the exact $E_0=0.5$ to within $0.004\%$, which is expected
-  since the true ground state genuinely is Gaussian-shaped here.
+  matches the exact $E_0=0.5$ to within $0.004\%$, expected since the
+  true ground state is itself Gaussian-shaped here.
 
 ## Further Exploration
 

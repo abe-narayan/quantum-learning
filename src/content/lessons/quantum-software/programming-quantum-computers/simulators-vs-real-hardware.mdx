@@ -22,7 +22,7 @@ export const practiceProblems = getProblemsForLesson(
 export const lessonMeta = {
   title: "Simulators vs. Real Hardware",
   description:
-    "Writing Your First Circuit isolated pure shot noise; real hardware adds genuine physical error (Noise, Decoherence & Scaling) on top, plus queue time and a hard qubit-count ceiling a simulator doesn't have, while an ideal noiseless simulator hits an entirely different wall: exponential memory cost in qubit count.",
+    "Writing Your First Circuit isolated pure shot noise; real hardware adds actual physical error (Noise, Decoherence & Scaling) on top, plus queue time and a hard qubit-count ceiling a simulator doesn't have, while an ideal noiseless simulator hits an entirely different wall: exponential memory cost in qubit count.",
   course: "programming-quantum-computers",
   module: "simulators-vs-real-hardware",
   order: 1,
@@ -47,7 +47,7 @@ where simulators themselves hit a very different wall.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
   alt="An IBM Quantum System One, a full commercial quantum computing system in its housing"
-  caption="An IBM Quantum System One. Everything this lesson calls 'real hardware' — queue time, a fixed physical qubit count, genuine physical error — comes from an actual system like this, not a simulator."
+  caption="An IBM Quantum System One. Everything this lesson calls 'real hardware' — queue time, a fixed physical qubit count, real physical error — comes from a device like this, not a simulator."
   credit="Photo by OJB Quantum / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
   license="CC BY 4.0"
@@ -62,7 +62,8 @@ Every physical error source Noise, Decoherence & Scaling covered
 sits on TOP of the pure statistical shot noise Writing Your First
 Circuit already demonstrated. A real device's reported counts deviate
 from the ideal probabilities by more than shot noise alone predicts; the
-excess deviation is a genuine, measurable signature of physical error.
+excess deviation is a measurable signature of physical error, not
+something a noiseless simulator will ever show you.
 
 ### Practical constraints unique to real hardware
 
@@ -85,9 +86,9 @@ every additional qubit. At $n=30$ qubits, that's over a billion
 amplitudes; well before $n=50$, the memory requirement exceeds any
 existing classical computer's capacity. This is the exact reason exact
 state-vector simulation cannot substitute for real hardware at large
-qubit counts, a genuinely different limitation from anything on the
-"real hardware" side of this comparison, developed fully in Simulating
-Quantum Systems' Computational Cost & Scaling lesson.
+qubit counts — a completely different kind of limitation from anything
+on the "real hardware" side of this comparison, developed fully in
+Simulating Quantum Systems' Computational Cost & Scaling lesson.
 
 <Callout type="note">
 **A preview of the exact numbers.** That later lesson computes this
@@ -170,10 +171,10 @@ Simulators and real hardware fail in *opposite* ways: a simulator is
 perfectly accurate (no physical error) but limited by classical memory,
 scaling exponentially badly with qubit count; real hardware has no such
 memory limit (a physical qubit doesn't cost exponentially more per
-additional qubit, at least not for this reason) but suffers genuine,
-unavoidable physical error and limited access. Neither is simply
-"better." The right choice depends on the specific development stage
-and question being asked.
+additional qubit, at least not for this reason) but suffers unavoidable
+physical error and limited access. Neither is simply "better." The
+right choice depends on the specific development stage and question
+being asked.
 
 ## Worked Example
 
@@ -215,7 +216,7 @@ increase.
    scientific notation.)
 3. For the worked example's 4-qubit debugging scenario, explain
    specifically why hardware noise would make it HARDER, not easier, to
-   isolate a genuine circuit-logic bug.
+   isolate an actual circuit-logic bug.
 4. Explain why simulators and real hardware are described as failing in
    "opposite ways," rather than one simply being more limited than the
    other overall.
@@ -224,7 +225,7 @@ increase.
 
 ## Summary
 
-- Real hardware adds genuine physical error (on top of pure shot noise)
+- Real hardware adds physical error (on top of pure shot noise)
   plus practical constraints (queue time, fixed qubit count,
   connectivity) that a simulator doesn't face.
 - An ideal simulator instead faces exponential memory cost ($2^n$

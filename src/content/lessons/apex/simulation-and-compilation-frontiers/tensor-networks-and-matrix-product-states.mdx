@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { StateVector } from "@/lib/quantum/state";
@@ -129,6 +130,15 @@ $2^n$-amplitude tensor, via the one tool with the exact power to do it:
 singular value decomposition, the same tool Schmidt Decomposition and
 Purification used to prove the two-party Schmidt theorem. Here it gets
 applied repeatedly, once per cut, to a genuinely multi-party chain.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Tensor_contraction_diagram.svg"
+  alt="Graphical tensor network notation showing two tensors joined by a summed index, with two open free indices"
+  caption="Graphical tensor notation: two tensors, drawn as shapes, joined by an edge for a summed (contracted) index, with open edges left as free indices. A matrix product state is exactly a chain of these, one tensor per site, joined by the bond indices this lesson computes via repeated SVD."
+  credit="Tensorworks / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Tensor_contraction_diagram.svg"
+  license="CC0"
+/>
 
 ## Mathematical Development
 
@@ -328,6 +338,17 @@ dimension, which is where the saving actually shows up.
 </InteractiveSection>
 
 ## Common Mistakes
+
+<PredictBeforeReveal
+  question="The lopsided state √0.99|000⟩ + √0.01|111⟩ has the same two nonzero Schmidt coefficients showing up (very unevenly weighted) as GHZ does. What is its bond dimension at the first cut, compared to GHZ's χ=2?"
+  options={[
+    { label: "Smaller — one term barely counts if its weight is tiny", value: "smaller" },
+    { label: "The same: χ=2, since rank only counts nonzero terms", value: "same" },
+    { label: "Larger, because the uneven weighting needs an extra parameter to encode", value: "larger" },
+  ]}
+  correctValue="same"
+  explanation="Bond dimension is the Schmidt rank — a count of nonzero terms, with no reference to how they're weighted. Both amplitudes here are nonzero, so χ=2 exactly as for GHZ, even though the entanglement entropy (which does weigh them) drops far below GHZ's full 1 bit. The computation below confirms both numbers exactly."
+/>
 
 <Callout type="mistake">
 **Assuming every cut of an MPS shares the same bond dimension.** GHZ's

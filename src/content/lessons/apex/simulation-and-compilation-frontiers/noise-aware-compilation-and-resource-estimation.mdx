@@ -205,7 +205,20 @@ now-good coupler.
 ## Worked Example
 
 **What is the estimated overall circuit success probability under each
-mapping?** Following the same union-bound-style reasoning Fault-Tolerance
+mapping?**
+
+<PredictBeforeReveal
+  question="The naive and noise-aware mappings run the exact same 17 CNOT-equivalent operations — same gate count, same SWAP count. Do you expect their estimated success probabilities to differ much?"
+  options={[
+    { label: "No — same gate count means essentially the same success probability", value: "no-difference" },
+    { label: "A small difference, well under a percentage point", value: "small" },
+    { label: "A real difference, several percentage points, from remapping alone", value: "real-difference" },
+  ]}
+  correctValue="real-difference"
+  explanation="Gate count says nothing about which physical coupler absorbs the load. Below, the same 17 operations reach noticeably different overall success probabilities purely because the noise-aware mapping routes the heaviest-used gates through the device's better-calibrated coupler instead of its worst one."
+/>
+
+Following the same union-bound-style reasoning Fault-Tolerance
 Frontiers' resource-estimation capstone used (the circuit succeeds only
 if *every* gate succeeds, so the overall success probability is the
 product of each gate's own success probability), and modeling each

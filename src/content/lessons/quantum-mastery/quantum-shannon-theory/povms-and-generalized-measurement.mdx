@@ -426,6 +426,17 @@ valid measurement of any kind can unambiguously discriminate
 $|\psi_1\rangle,|\psi_2\rangle$ with a smaller inconclusive probability
 than $s=|\langle\psi_1|\psi_2\rangle|$.
 
+<PredictBeforeReveal
+  question="This 3-outcome POVM tells |ψ1⟩ and |ψ2⟩ apart (overlap s=0.6) with zero chance of ever misidentifying one as the other. Can some ordinary 2-outcome projective measurement on this same qubit match that guarantee?"
+  options={[
+    { label: "Yes, with the right choice of measurement basis", value: "yes" },
+    { label: "No — provably impossible for any non-orthogonal pair, no matter the basis", value: "no" },
+    { label: "Yes, but only using two qubits instead of one", value: "twoqubit" },
+  ]}
+  correctValue="no"
+  explanation="No 2-outcome projective measurement can achieve zero misidentification here at all, regardless of basis — the derivation just below shows the two required projectors P1, P2 would have to be mutually orthogonal, which forces psi1 and psi2 to have already been orthogonal to begin with. Since s=0.6 means they weren't, only the extra 'inconclusive' outcome a POVM allows can make unambiguous discrimination possible."
+/>
+
 ### Why no 2-outcome projective measurement can do this at all
 
 A projective measurement on a qubit has at most 2 outcomes, both of

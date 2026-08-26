@@ -56,10 +56,11 @@ sines and cosines instead, just more painfully.
 Quantum mechanics is different. The complex numbers aren't a shortcut you
 could avoid with more work. The theory's central objects (amplitudes) are
 inherently complex, and a version of quantum mechanics built only from real
-numbers genuinely predicts different, wrong physics. We won't prove that
-claim in this lesson (it takes the whole framework this course builds to
-even state precisely), but it's why this course starts here rather than
-with vectors or physics.
+numbers actually predicts different, wrong physics — experiments have
+been done specifically to check this. We won't prove that claim here (it
+takes the whole framework this course builds to even state precisely),
+but it's why this course starts with complex arithmetic rather than
+vectors or physics.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Leonhard_Euler.jpg"
@@ -151,9 +152,10 @@ what kind of relationship it is.
 ### Deriving Euler's formula
 
 The expression $\cos\theta + i\sin\theta$ turns out to equal a single
-exponential, $e^{i\theta}$: this is **Euler's formula**. It's worth deriving,
-not just accepting, given the prediction above. The Taylor series for $e^x$ converges for complex
-inputs too, so substitute $x = i\theta$:
+exponential, $e^{i\theta}$: this is **Euler's formula**. The prediction
+above claimed exact equality, not approximation, which is a strong enough
+claim to earn a real derivation rather than a citation. The Taylor series
+for $e^x$ converges for complex inputs too, so substitute $x = i\theta$:
 
 $$
 e^{i\theta} = 1 + i\theta + \frac{(i\theta)^2}{2!} + \frac{(i\theta)^3}{3!} + \frac{(i\theta)^4}{4!} + \frac{(i\theta)^5}{5!} + \cdots
@@ -178,9 +180,9 @@ $$
 A useful immediate consequence: $|e^{i\theta}| = \sqrt{\cos^2\theta+\sin^2\theta} = 1$
 for every real $\theta$. Multiplying by $e^{i\theta}$ never changes a
 number's modulus. It only rotates it. Keep this fact; it resurfaces
-directly in the Unitary Operators lesson. It's easier to feel this as a
-fact about rotation, not just an algebraic identity, by watching it happen
-rather than only reading it:
+directly in the Unitary Operators lesson. Watching the point trace the
+circle makes the identity register as geometry instead of symbols on a
+page:
 
 <InteractiveSection
   title="Sweep θ, trace e^{iθ}'s unit circle"

@@ -348,6 +348,15 @@ high energy."
 
 ### The tightening sequence: 5-local, 2-local, and physical lattices
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Julia_Kempe.jpg"
+  alt="Portrait photograph of Julia Kempe, the computer scientist who, with Alexei Kitaev and Oded Regev, proved that 2-Local Hamiltonian is already QMA-complete"
+  caption="Julia Kempe, whose 2006 paper with Kitaev and Regev tightened Kitaev's original 5-local QMA-hardness construction down to 2-local interactions, using perturbation-theory gadgets to simulate higher-locality terms with pairwise ones."
+  credit="NYU Center for Data Science / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Julia_Kempe.jpg"
+  license="CC BY 4.0"
+/>
+
 Kitaev's original construction (circulated around 1999-2002 and published
 in Kitaev, Shen, and Vyalyi's book *Classical and Quantum Computation*)
 established $5$-Local Hamiltonian as $\mathsf{QMA}$-complete. Kempe,
@@ -397,9 +406,11 @@ context needed to understand why that lesson's practical algorithms
 target specific, structured molecular instances rather than claiming a
 general efficient solution. More broadly, Kitaev's theorem is the
 starting point of an entire subsequent research program —
-**Hamiltonian complexity theory** — connecting abstract computer science
-directly to real physical systems in a way remarkably few other
-complexity results manage.
+**Hamiltonian complexity theory** — where the object being classified as
+hard or easy is a real spin lattice or molecular Hamiltonian, not an
+encoded combinatorial puzzle: the tightening sequence above (5-local, to
+2-local, to 2D nearest-neighbor lattices) is that program measuring
+exactly how much physical realism its own hardness results can survive.
 
 ## Worked Example
 
@@ -421,6 +432,17 @@ full history state $|\eta\rangle = \tfrac{1}{\sqrt3}\sum_{t=0}^{2}
 $3 \times \tfrac13 \times 1 = 1$ — verified numerically by
 `toyHistoryStateNormCheck`, which evaluates to $1$ (up to floating-point
 rounding).
+
+<PredictBeforeReveal
+  question="H_prop,1 is built to penalize any t=0→t=1 transition that does NOT correctly apply the circuit's next gate U₁=X. Before computing it directly, predict how the energy of a wrong transition slice — (|0,0⟩+|1,0⟩)/√2, where the computational register is left unchanged instead of flipped by X — will compare to the correct transition slice (|0,0⟩+|1,1⟩)/√2."
+  options={[
+    { label: "Lower energy — leaving the register unchanged is cheaper", value: "lower" },
+    { label: "Equal energy — both are equally valid histories", value: "equal" },
+    { label: "Higher (strictly positive) energy — it fails to apply the gate", value: "higher" },
+  ]}
+  correctValue="higher"
+  explanation="toyPropagationEnergyOnCorrectSlice ≈ 0 — the correct transition costs nothing, exactly as a valid history state must. toyPropagationEnergyOnWrongSlice ≈ 0.5 — strictly positive, a real, checkable penalty for a transition that doesn't apply U₁ correctly. This one local, hand-verifiable fact is the load-bearing piece Kitaev's full construction scales up to all T propagation terms at once."
+/>
 
 Now check the propagation term's actual job on the $t{=}0 \to t{=}1$
 transition, using $U_1 = X$ in the general formula above:

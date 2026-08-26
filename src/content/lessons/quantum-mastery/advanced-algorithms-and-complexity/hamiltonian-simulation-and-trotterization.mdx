@@ -269,6 +269,17 @@ confirming the derivation's leading-order coefficient, not merely its
 existence, and the vanishing $O(\delta^3)$ remainder shrinking away as
 predicted.
 
+<PredictBeforeReveal
+  question="The derived total-error bound is t²/(2n)‖[A,B]‖. Fix t=1 and double the number of Trotter steps n. What happens to the bound?"
+  options={[
+    { label: "It roughly halves", value: "half" },
+    { label: "It drops by a factor of 4", value: "quarter" },
+    { label: "It barely changes — n isn't the dominant factor", value: "same" },
+  ]}
+  correctValue="half"
+  explanation="The bound is inversely proportional to n (everything else fixed), so doubling n exactly halves it — no square, no exponential, a plain O(1/n) first-order scaling. The table below confirms this directly: error×n converges to a constant (≈1.0) as n grows, which is precisely what error∝1/n means numerically, not just asymptotically."
+/>
+
 **Total error over $n$ steps, fixed $t=1$.** Comparing the full $n$-step
 product against exact $e^{-iHt}$:
 

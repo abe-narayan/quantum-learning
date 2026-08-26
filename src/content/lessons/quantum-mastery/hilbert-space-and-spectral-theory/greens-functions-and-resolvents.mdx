@@ -135,8 +135,8 @@ lessons ago), and the integrand's singularity is no longer isolated: it
 sweeps continuously along the whole continuous spectrum. Approaching a
 point $E'$ *on* that continuum from just above versus just below the
 real axis gives *different* limits, which is exactly what a branch cut
-means. This is captured precisely by an identity worth deriving in full,
-not just citing the name of:
+means. The identity behind that statement is worth deriving in full
+rather than just naming:
 
 $$
 \mathrm{Im}\left[\frac{1}{x-i\varepsilon}\right]=\mathrm{Im}\left[\frac{x+i\varepsilon}{x^2+\varepsilon^2}\right]=\frac{\varepsilon}{x^2+\varepsilon^2}
@@ -155,6 +155,17 @@ concentrates ever more sharply at $x=0$ as $\varepsilon\to0$ (its peak
 height $1/\varepsilon\to\infty$, its width $\sim\varepsilon\to0$),
 exactly the same delta-sequence structure as the last lesson's Dirichlet
 kernel, now for a Lorentzian instead of a sinc:
+
+<PredictBeforeReveal
+  question="As ε shrinks toward 0 in ε/(x²+ε²), the peak at x=0 climbs toward 1/ε. What happens to the total area under the curve over that same limit?"
+  options={[
+    { label: "It climbs too, tracking the peak", value: "climbs" },
+    { label: "It falls toward 0, tracking the width", value: "falls" },
+    { label: "It stays exactly π for every ε>0", value: "fixed" },
+  ]}
+  correctValue="fixed"
+  explanation="The antiderivative computation above gives exactly π for every ε>0 — not a limiting value, an exact one at each finite ε. Only the curve's shape sharpens as ε→0; the fixed area is what turns ε/(x²+ε²) into πδ(x), the same delta-sequence mechanism as the Dirichlet kernel one lesson ago, now driving the Sokhotski–Plemelji relation."
+/>
 
 <ParametricCurve
   frames={lorentzFrames}
@@ -182,7 +193,7 @@ continuous spectrum, is therefore proportional to a genuine density of
 states (a $\delta$-function's worth of weight at every point of the
 continuum), which is precisely why the continuous spectrum reads as a
 branch cut on the real axis rather than a single isolated pole: the
-function's value genuinely differs depending on which side of the cut
+function's value actually differs depending on which side of the cut
 you approach from.
 
 ### The free-particle Green's function, derived from a jump condition
@@ -249,7 +260,7 @@ no closed form. This is why resolvent and Green's-function methods
 dominate more advanced treatments (scattering theory, quantum field
 theory): they reformulate spectral problems as complex-analysis
 problems, trading "solve a transcendental equation" for "locate a
-singularity," a genuinely different and often more tractable kind of
+singularity," a different and often more tractable kind of
 question.
 
 ## Worked Example
@@ -268,7 +279,7 @@ wavefunctions and `infiniteSquareWellEnergyLevel` energies (not the
 closed-form boxed formula) over the first $200$ terms, gives
 $\approx0.76096$, agreement to about $5$-$6$ significant figures using
 only $200$ of the infinitely many terms in a series that converges like
-$1/n^2$ (so the remaining terms shrink the gap further); two genuinely different
+$1/n^2$ (so the remaining terms shrink the gap further); two unrelated
 derivations of the same object (one a boundary-value ODE solve, one a
 spectral sum over independently-known eigenfunctions) landing on the
 same number, exactly the kind of cross-check this platform's engine
@@ -281,8 +292,8 @@ tests already perform elsewhere.
 same way it does for bound states.** It doesn't: the continuous
 spectrum shows up as a *branch cut* (a discontinuity in the limiting
 value approached from above vs. below the real axis, via
-Sokhotski–Plemelji), never as an isolated pole. Only genuinely discrete
-eigenvalues produce poles.
+Sokhotski–Plemelji), never as an isolated pole. Only actual point
+eigenvalues, isolated from the rest of the spectrum, produce poles.
 </Callout>
 
 <Callout type="mistake">

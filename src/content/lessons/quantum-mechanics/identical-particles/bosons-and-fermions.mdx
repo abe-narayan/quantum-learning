@@ -38,7 +38,7 @@ export const eigenstatePresets = [
 export const lessonMeta = {
   title: "Bosons & Fermions",
   description:
-    "symmetrize(a,b) and antisymmetrize(a,b) build the actual +1 and -1 exchange eigenstates from any two single-particle states, verified directly against exchangeParticles, not just asserted to have the right symmetry.",
+    "symmetrize(a,b) and antisymmetrize(a,b) build the actual +1 and -1 exchange eigenstates from any two single-particle states, checked here against exchangeParticles rather than taken on faith.",
   course: "identical-particles",
   module: "bosons-and-fermions",
   order: 1,
@@ -54,11 +54,15 @@ export const lessonMeta = {
 
 ## Motivation
 
-The previous lesson showed a bare product state isn't a valid
-two-identical-particle state. This lesson builds the states that
-actually are valid: the symmetric combination (bosons) and the
-antisymmetric combination (fermions), and checks both directly against
-the exchange operator rather than trusting the construction blindly.
+Every particle in the universe turns out to belong to one of exactly two
+families, and which family decides whether it can pile up in a laser
+beam or a superfluid with a billion identical companions, or whether it
+insists on its own private quantum state the way electrons do. The
+previous lesson showed a bare product state isn't a valid
+two-identical-particle state at all. Here we build the two combinations
+that are: the symmetric sum (bosons) and the antisymmetric difference
+(fermions), and check both directly against the exchange operator
+rather than trusting the algebra that built them.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Liquid_helium_lambda_point_transition.jpg"
@@ -94,18 +98,18 @@ exactly, giving the zero vector, not a valid (normalizable) state at
 all. This is the Pauli exclusion principle, previewed here and made the
 whole subject of the next lesson.
 
-### Verified directly, not just asserted
+### Checking the construction against the operator
 
 This platform's `symmetrize`/`antisymmetrize` functions build exactly
 these combinations (with `normalizeVector` handling the division), and
 `exchangeParticles` independently swaps the combined vector's two
-particle-labels. Checking `exchangeParticles(symmetrize(a,b))` against
-`symmetrize(a,b)` itself (expecting exact equality) and
-`exchangeParticles(antisymmetrize(a,b))` against the *negative* of
-`antisymmetrize(a,b)` (expecting exact equality), both confirmed to
-floating-point precision, is a genuine numerical proof that the
-construction has the claimed eigenvalue, not a restatement of the
-algebra that built it.
+particle-labels. Feeding `symmetrize(a,b)` through `exchangeParticles`
+and comparing the result to `symmetrize(a,b)` itself (expecting exact
+equality), and doing the same for `antisymmetrize(a,b)` against its own
+*negative*, both hold to floating-point precision. That's a numerical
+check of the eigenvalue claim using a function that doesn't know how
+`symmetrize`/`antisymmetrize` were built, rather than just re-tracing
+the algebra that built them.
 
 ## Physical Interpretation
 
@@ -117,6 +121,17 @@ Angular Momentum & Spin) are bosons; particles with half-integer spin
 ($\frac12,\frac32,\ldots$, electrons, protons, neutrons) are fermions.
 This course takes the connection as given and explores its
 consequences, rather than deriving it.
+
+<PredictBeforeReveal
+  question="ψ_A = antisymmetrize(e0, e1). What do you expect exchangeParticles(ψ_A) to return?"
+  options={[
+    { label: "ψ_A itself, unchanged", value: "same" },
+    { label: "−ψ_A, every entry sign-flipped", value: "negative" },
+    { label: "The zero vector", value: "zero" },
+  ]}
+  correctValue="negative"
+  explanation="Every entry of ψ_A comes back with its sign flipped: exchangeParticles(ψ_A) = −ψ_A exactly, to floating-point precision. That's the −1 eigenvalue that defines a fermion — not asserted, but read straight off the numbers."
+/>
 
 ## Worked Example
 
@@ -181,9 +196,10 @@ applied differently depending on the situation.
   $a=b$ it vanishes entirely.
 - The spin-statistics theorem (integer spin ↔ boson, half-integer spin ↔
   fermion) is taken as an experimental fact; this platform's engine
-  verifies the ±1 eigenvalue claims directly, not just the construction.
+  checks the ±1 eigenvalue claims against `exchangeParticles` directly,
+  rather than resting on the construction alone.
 
 ## Further Exploration
 
-Next: [The Pauli Exclusion Principle](/lessons/quantum-mechanics/identical-particles/the-pauli-exclusion-principle), which takes the $a=b$
-vanishing result seriously as physics, not just an edge case.
+Next: [The Pauli Exclusion Principle](/lessons/quantum-mechanics/identical-particles/the-pauli-exclusion-principle), which treats the $a=b$
+vanishing result as real physics rather than a mathematical curiosity.

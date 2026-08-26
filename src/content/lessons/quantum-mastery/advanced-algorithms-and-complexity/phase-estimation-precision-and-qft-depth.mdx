@@ -152,6 +152,23 @@ circuit-engineering question: how much does the QFT actually cost to
 build, and what does an engineer get to trade away to build a cheaper
 approximation?
 
+Phase estimation isn't a side calculation here — it's the subroutine
+that turns "find the period of a modular exponential function" into
+"read off a phase," which is the entire mechanism behind Shor's
+algorithm. Every controlled-phase gate this lesson counts is a gate
+that a real factoring circuit has to pay for, and every bit of
+precision this lesson's bounds guarantee is a bit of confidence that
+the register didn't just round to the wrong period.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png"
+  alt="Peter Shor speaking after receiving the 2017 Dirac Medal from the ICTP"
+  caption="Shor's factoring algorithm is, underneath its number-theoretic dressing, an application of exactly the phase-estimation machinery this lesson analyzes: a QFT reads a periodicity off as a phase, and the precision and gate-count bounds derived below are the actual resource cost of doing that reliably."
+  credit="International Centre for Theoretical Physics (ICTP) / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png"
+  license="CC BY 3.0"
+/>
+
 ## Mathematical Development
 
 ### The exact closed-form measurement probability
@@ -361,6 +378,17 @@ while the derived error bound at $m=5,t=20$ is $2\pi(20)/2^5\approx
 3.93$, tiny on the scale relevant to any realistic target precision
 below the leading digit of the phase itself.
 
+<PredictBeforeReveal
+  question="The 4/π² worst-case success guarantee was derived above for t=5 (N=32). If the precision register were widened to t=20 (N over a million) instead, what happens to that worst-case floor?"
+  options={[
+    { label: "It gets much worse — more bits means more ways to misread", value: "worse" },
+    { label: "It improves — more bits should mean a better guarantee", value: "better" },
+    { label: "It stays exactly 4/π² ≈ 0.405, unchanged", value: "same" },
+  ]}
+  correctValue="same"
+  explanation="The derivation never used N or t: the bound 4/π² came from minimizing sinc(δ) over δ∈[-1/2,1/2], a statement purely about the worst-case rounding offset δ, not about register size. Widening t moves the whole distribution's outcomes closer together on the unit circle, but the worst-case shape at the midpoint between two adjacent outcomes is scale-invariant. What t does control is how finely 'the best estimate' resolves φ — not how confident you are in landing on it."
+/>
+
 ## Physical Interpretation
 
 Both halves of this lesson are the same idea in different clothes:
@@ -371,6 +399,16 @@ precisely how unlikely a large misread is; the AQFT bound says precisely
 how small a controlled-phase gate has to get before dropping it is
 provably safe. Neither is a hand-wave: both come from the same kind of
 elementary inequality chased all the way to a clean, checkable number.
+
+Real factoring demonstrations (Shor's algorithm run on small
+instances — $N=15$ or $N=21$ on photonic and superconducting hardware)
+live entirely inside these two bounds: the precision register has to be
+wide enough that the $4/\pi^2$-style guarantee resolves the right
+period with workable odds, and the QFT circuit driving that register
+has to fit within whatever coherence time and gate-error budget the
+device actually has. Neither bound is theoretical decoration; they are
+the two numbers an experimentalist actually checks before running the
+circuit.
 
 ## Worked Example
 

@@ -161,6 +161,18 @@ one from the 1990s, one from a 2019-and-later framework, one dating to
 Trotter and Lie, one named for its three 2009 authors — turn out to
 differ only in which function of $x$ they asked for.
 
+<PipelineDiagram
+  steps={[
+    { label: "Block encoding U_A", detail: "A embedded in a corner of a unitary" },
+    { label: "QSP phase sequence", detail: "one qubit, tunable φ₀…φ_d" },
+    { label: "QSVT circuit", detail: "same phases act on every singular value of A at once" },
+    { label: "Pick P(x)", detail: "step fn → Grover · same fn, multi-depth → amplitude estimation · e^{-ixt} → Ham. sim · 1/x → HHL", highlight: true },
+  ]}
+  ariaLabel="One pipeline shared by every algorithm in this course: a block encoding of A, feeding a QSP phase sequence on one qubit, lifted by QSVT to act on every singular value of A at once — with only the final step, which polynomial P(x) to realize, differing between Grover's algorithm, amplitude estimation, Hamiltonian simulation, and the HHL linear-systems solver."
+/>
+
+The first three boxes never change from row to row of the table above; the entire course's worth of distinct algorithms lives in the last box alone.
+
 ### What kind of unification this actually is
 
 It would overclaim to say QSVT makes Grover's original diffusion-operator
@@ -192,7 +204,7 @@ It doesn't. It relocates the hard part.
 ### Where the hard part actually moved
 
 QSVT is best understood as an **organizing principle** and a
-**practical design tool**, not a solved-forever result. Two genuinely
+**practical design tool**, not a solved-forever result. Two
 hard, problem-specific research questions remain exactly as hard as they
 were before this framework existed:
 
@@ -204,12 +216,12 @@ were before this framework existed:
    build one for an arbitrary matrix you care about.
 2. **Finding a good polynomial.** QSP guarantees that a feasible
    polynomial can be realized; it does not hand you the polynomial. For
-   a genuinely new target function, finding a bounded-degree polynomial
+   a new target function, finding a bounded-degree polynomial
    approximation with the accuracy and parity properties QSP needs can
    be a real approximation-theory research question in its own right,
    not a lookup-table exercise.
 
-### What is genuinely still open
+### What is still open
 
 Calibrated honesty, not hype: as of this writing, (a) efficient block
 encodings are not automatic for every matrix of interest, and finding
@@ -218,7 +230,7 @@ classical phase-finding subroutine (computing the phase sequence for a
 target polynomial) is polynomial-time and well-studied, but real
 numerical-stability considerations arise for very high-degree
 polynomials, where naive phase-finding can become ill-conditioned; and
-(c) whether QSVT-style methods will produce genuinely *new*, provable
+(c) whether QSVT-style methods will produce *new*, provable
 exponential speedups for problems outside the already-known algorithm
 families — versus re-deriving and tightening constant factors on results
 already known by other means — is an active, unresolved research
@@ -264,7 +276,7 @@ $$
 2\times25+1=\boxed{51}
 $$
 
-polynomial approximation to a step function — a genuinely different-looking
+polynomial approximation to a step function — a different-looking
 description of the *exact same* $25$-iteration circuit this course's own
 Grover engine runs, which is precisely the sense in which this
 unification is real: not a metaphor, a literal restatement of the same
@@ -301,7 +313,7 @@ $\Theta(\sqrt N)$ optimal for unstructured search.
   ariaLabel={`Hamiltonian simulation step counts at target error 0.001: first-order Trotter needs ${toolboxTrotterSmall} steps at t=5 and ${toolboxTrotterLarge} at t=50 (quadratic in t, this course's own derived bound); the QSVT-scaling proxy needs only ${toolboxQsvtSmall} at t=5 and ${toolboxQsvtLarge} at t=50 (illustrative, linear-plus-log in t)`}
 />
 
-Here the two framings genuinely diverge, not just relabel the same
+Here the two framings actually diverge, not just relabel the same
 number: increasing $t$ by $10\times$ (from $5$ to $50$) multiplies
 first-order Trotter's derived step count by almost exactly $100\times$
 ($t^2$ scaling, real and derived), while the QSVT-scaling proxy grows by
@@ -326,7 +338,7 @@ already-published result.
 solved."** The framework only takes over once you already have an
 efficient block encoding of your matrix of interest *and* a
 good polynomial approximation to your target function. Both of those
-can still be genuinely hard, problem-specific research questions —
+can still be hard, problem-specific research questions —
 QSVT is the mechanical middle step, not a replacement for either one.
 </Callout>
 
@@ -348,7 +360,7 @@ instance's cost becomes the same.
    does it add on top?
 2. Name one thing that would have to be true for QSVT to give Grover's
    algorithm an asymptotic advantage over its original $\Theta(\sqrt N)$
-   query count on genuinely unstructured search, and explain why BBBV's
+   query count on unstructured search, and explain why BBBV's
    bound (from the prerequisite Mastery course) rules it out.
 3. A researcher wants to apply this course's framework to a brand-new
    problem. Name the two specific things they would still need to find
@@ -375,7 +387,7 @@ instance's cost becomes the same.
   several cases, matches-or-improves the older constructions' scaling
   with a more composable methodology, but it does not make block-encoding
   construction or polynomial approximation automatically easy, and
-  whether it yields genuinely new exponential speedups beyond known
+  whether it yields new exponential speedups beyond known
   algorithm families remains an open research question.
 - The durable takeaway skill this course confers: recognizing a block
   encoding, a QSP phase sequence, or a QSVT construction in a real paper,

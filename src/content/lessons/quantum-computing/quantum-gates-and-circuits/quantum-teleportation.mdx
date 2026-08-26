@@ -7,6 +7,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-computing/quantum-gates-and-circuits/quantum-teleportation"
@@ -45,6 +46,47 @@ export const secondMeasurement = measureQubit(firstMeasurement.collapsed, 1, 0.9
 export const bobUncorrected = secondMeasurement.collapsed;
 export const bobAfterX = applySingleQubitGate(bobUncorrected, PAULI_X, 2);
 export const bobFinal = applySingleQubitGate(bobAfterX, PAULI_Z, 2);
+
+export const fullProtocolInstructions = [
+  { gate: "H", targets: [1] },
+  { gate: "CNOT", targets: [1, 2] },
+  { gate: "CNOT", targets: [0, 1] },
+  { gate: "H", targets: [0] },
+  { gate: "MEASURE", targets: [0] },
+  { gate: "MEASURE", targets: [1] },
+  { gate: "X", targets: [2] },
+  { gate: "Z", targets: [2] },
+];
+
+export const protocolStepLabels = [
+  "Step 1 of 8: prepare the shared pair — H on qubit 1",
+  "Step 2 of 8: prepare the shared pair — CNOT(1,2)",
+  "Step 3 of 8: Alice entangles her qubits — CNOT(0,1)",
+  "Step 4 of 8: Alice entangles her qubits — H on qubit 0",
+  "Step 5 of 8: Alice measures qubit 0, producing classical bit m₀",
+  "Step 6 of 8: Alice measures qubit 1, producing classical bit m₁",
+  "Step 7 of 8: Bob applies X to qubit 2, but only if m₁ = 1",
+  "Step 8 of 8: Bob applies Z to qubit 2, but only if m₀ = 1",
+];
+
+export const protocolStepAriaLabels = [
+  "Step 1: H applied to qubit 1, the first gate of the Bell-pair preparation",
+  "Step 2: CNOT with qubit 1 as control and qubit 2 as target, completing the Bell-pair preparation",
+  "Step 3: CNOT with qubit 0 (Alice's message) as control and qubit 1 as target, entangling the message with Alice's half of the pair",
+  "Step 4: H applied to qubit 0, completing Alice's entangling operation before measurement",
+  "Step 5: qubit 0 is measured, producing Alice's first classical bit m0",
+  "Step 6: qubit 1 is measured, producing Alice's second classical bit m1",
+  "Step 7: X is applied to Bob's qubit 2, conditioned on m1 equaling 1",
+  "Step 8: Z is applied to Bob's qubit 2, conditioned on m0 equaling 1, completing the protocol",
+];
+
+export const protocolFrames = fullProtocolInstructions.map((_, i) => ({
+  paramLabel: protocolStepLabels[i],
+  numQubits: 3,
+  instructions: fullProtocolInstructions,
+  highlightColumn: i,
+  ariaLabel: protocolStepAriaLabels[i],
+}));
 
 ## Motivation
 
@@ -150,36 +192,27 @@ will tell her.
 <QuantumStateDisplay state={secondMeasurement.collapsed} label={`Qubit 1 measured → outcome ${secondMeasurement.outcome}`} />
 
 Each of Alice's two measurements is exactly 50/50, **regardless of
-$\alpha,\beta$**, a fact worth pausing on: if her outcome statistics
-depended on the message, Bob could learn something about $|\psi\rangle$
-just from knowing *how* Alice's measurements were distributed, without
-even receiving her result, which would break no-signaling. They don't
-depend on it, so nothing leaks that way.
+$\alpha,\beta$**. That has to be true: if her outcome statistics depended
+on the message, Bob could learn something about $|\psi\rangle$ just from
+knowing *how* Alice's measurements were distributed, without even
+receiving her result, which would break no-signaling. They don't depend
+on it, so nothing leaks that way.
 
 Here is the whole protocol as one circuit, start to finish: the Bell-pair
 preparation on qubits 1 and 2, Alice's entangling $\text{CNOT}$ and
 Hadamard, her two measurements, and Bob's classical-conditioned
-correction, all in one picture.
+correction. Step through it column by column below; each step names
+exactly which classical bit, if any, has to come out a particular way
+before that gate actually fires.
 
-<StaticCircuitDiagram
-  numQubits={3}
-  instructions={[
-    { gate: "H", targets: [1] },
-    { gate: "CNOT", targets: [1, 2] },
-    { gate: "CNOT", targets: [0, 1] },
-    { gate: "H", targets: [0] },
-    { gate: "MEASURE", targets: [0] },
-    { gate: "MEASURE", targets: [1] },
-    { gate: "X", targets: [2] },
-    { gate: "Z", targets: [2] },
-  ]}
-  ariaLabel="Full teleportation circuit: H on qubit 1 and CNOT(1,2) prepare the shared Bell pair, then CNOT(0,1) and H on qubit 0 entangle Alice's message with her half of the pair, then qubits 0 and 1 are measured, and finally X then Z are applied to qubit 2 as Bob's classically-conditioned correction"
-/>
+<InteractiveSection title="Step through the full protocol" description="Move the slider one column at a time, from Bell-pair preparation through Alice's measurements to Bob's correction. The last two columns are the ones worth watching closely: X only fires if m1 = 1, and Z only fires if m0 = 1, so which of them actually run depends on which of the four branches Alice landed in.">
+  <CircuitDiagramExplorer frames={protocolFrames} sliderLabel="Step" />
+</InteractiveSection>
 
-The last two gates, $X$ and $Z$ on qubit 2, are drawn here as if always
-applied, but that's a simplification the picture can't show on its own:
-which of them actually fire depends on Alice's two classical bits, per
-the table just below.
+The last two gates, $X$ and $Z$ on qubit 2, are drawn as if always
+applied, but the step labels above spell out the truth: which of them
+actually fire depends on Alice's two classical bits, per the table just
+below.
 
 ### Bob applies a correction
 

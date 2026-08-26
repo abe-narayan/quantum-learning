@@ -71,12 +71,24 @@ this: encode via `encodeBitFlipCode`, then $H$ on every qubit; correct by
 un-Hadamarding, running the ordinary bit-flip correction cycle, then
 re-Hadamarding.
 
-### Verified, not just derived
+### Checked against the engine, not left as algebra
 
 For an arbitrary $\alpha,\beta$, a $Z$ error on any one of the three
 qubits is detected and corrected exactly by this construction, checked
 directly (to floating-point precision, accounting only for ordinary
 numerical error) for all three qubit positions, plus the no-error case.
+
+<PredictBeforeReveal
+  question="The bit-flip code's decode table maps syndrome (1,1) to qubit 1. If the phase-flip code is just that same circuit with Hadamards bolted on, what syndrome should a Z error on qubit 1 produce?"
+  options={[
+    { label: "(0,0), phase errors need a different table entirely", value: "zero" },
+    { label: "(1,1), the identical table entry, just reinterpreted", value: "same" },
+    { label: "(1,0), since Z only affects half the circuit", value: "half" },
+    { label: "It can't be predicted without re-deriving the whole circuit", value: "cant" },
+  ]}
+  correctValue="same"
+  explanation="Conjugating by H turns every X in the circuit into a Z (via HXH=Z) without touching the CNOT structure or the decode table itself. A Z error on qubit 1, once un-Hadamarded, looks to the underlying circuit exactly like the X error on qubit 1 the bit-flip code already knows how to read: syndrome (1,1), same table entry, no new lookup needed. Try it below."
+/>
 
 <InteractiveSection title="Same syndrome machinery, conjugated by H" description="Inject a Z error on qubit 2 this time. The syndrome bits still come from the same underlying CNOT structure, just conjugated by H on every qubit. Confirm the decode table still points at the errored qubit, and that the corrected state matches the original.">
   <LazySyndromeExplorer mode="phase-flip" />

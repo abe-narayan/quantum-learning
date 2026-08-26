@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemsForLesson } from "@/lib/problems/registry";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
 export const gateBudgetFrames = [
   {
@@ -12,6 +13,32 @@ export const gateBudgetFrames = [
     bars: [{ label: "Gate budget (10^n gates)", value: 5, highlight: true, caption: "~10⁵ gates" }],
   },
 ];
+
+export const coherenceSecondsByPlatform = [
+  { label: "Super-conducting", seconds: 1e-5, caption: "~10 μs" },
+  { label: "Spin qubits", seconds: 1e-3, caption: "~1 ms" },
+  { label: "Trapped ions", seconds: 1, caption: "~1 s" },
+  { label: "Neutral atoms", seconds: 13, caption: "~13 s", highlight: true },
+];
+export const coherenceTimeBars = coherenceSecondsByPlatform.map(({ label, seconds, caption, highlight }) => ({
+  label,
+  value: Math.log10(seconds) + 6,
+  caption,
+  highlight,
+}));
+
+export const gateSecondsByPlatform = [
+  { label: "Super-conducting", seconds: 1e-8, caption: "~10 ns" },
+  { label: "Spin qubits", seconds: 1e-7, caption: "~100 ns" },
+  { label: "Neutral atoms", seconds: 1e-6, caption: "~1 μs" },
+  { label: "Trapped ions", seconds: 1e-5, caption: "~10 μs", highlight: true },
+];
+export const gateTimeBars = gateSecondsByPlatform.map(({ label, seconds, caption, highlight }) => ({
+  label,
+  value: -Math.log10(seconds),
+  caption,
+  highlight,
+}));
 
 export const practiceProblems = getProblemsForLesson(
   "quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms"
@@ -43,6 +70,15 @@ qubits each trade something real for something else. This capstone adds
 no new physics. It puts all five in the same room, which is where the
 actual engineering decision-making happens in practice.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/9/91/IBM_Quantum_System_One.jpg"
+  alt="IBM Quantum System One, a full quantum computing system, showing the golden dilution-refrigerator cryostat casing suspended in its glass-walled enclosure"
+  caption="What five chapters of qubit physics have left out until now: the classical machine built around the chip. This particular system houses superconducting transmons, but every platform in this table needs its own version of this same infrastructure, cryogenics or vacuum optics, wiring, and control electronics, which is exactly where the Control & Readout course picks up."
+  credit="Onri Jay Benally / IBM"
+  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
+  license="CC BY 4.0"
+/>
+
 ## The Tradeoff Space, Side by Side
 
 Same four axes, five platforms, one table: this is what an actual
@@ -60,8 +96,8 @@ engineering decision between them rests on.
 tradeoff space, not precise specifications of any particular device;
 real numbers vary by generation, vendor, and continue to improve.)
 
-The table's five rows are five genuinely different physical structures,
-not just five sets of numbers; each platform lesson's own schematic,
+The table's five rows are five physically distinct structures, not just
+five sets of numbers; each platform lesson's own schematic,
 side by side, makes that concrete:
 
 <div className="not-prose grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -98,28 +134,154 @@ isolated, controllable two-level system) is exactly why the table above
 has no row that wins on every column: each structure's own geometry is
 what produces its particular coherence/speed/connectivity tradeoff.
 
-The table's coherence-time column, read as a relative ordering rather
-than exact numbers (bar height is ordinal; the caption under each bar
-is the table's own qualitative entry, not a precise measurement):
+### Coherence time, on an actual log scale
+
+The table's "~microseconds" vs. "~seconds" entries aren't just different
+adjectives, they're different by up to six orders of magnitude. Plotting
+the representative numbers each platform's own lesson already worked
+with (bar height is $\log_{10}(\text{seconds})$, shifted up by 6 so every
+bar is positive; the caption on each bar is the real value) makes the
+size of that gap honest instead of ordinal:
 
 <BarChart
-  ariaLabel="Relative coherence-time ordering across the five platforms, from the table above"
-  bars={[
-    { label: "Super-conducting", value: 1, caption: "~μs" },
-    { label: "Spin qubits", value: 2, caption: "intermediate" },
-    { label: "Trapped ions", value: 3, caption: "~s" },
-    { label: "Neutral atoms", value: 3, caption: "~s" },
-    { label: "Photonic", value: 4, highlight: true, caption: "no decoherence" },
-  ]}
+  ariaLabel="Coherence time in seconds, log scale, across four platforms: superconducting around 10 microseconds, spin qubits around 1 millisecond, trapped ions around 1 second, neutral atoms around 13 seconds"
+  bars={coherenceTimeBars}
 />
 
-Photonic's bar is highlighted because it isn't really on the same
-scale as the others at all: "no decoherence in flight" is a
-qualitatively different statement from a long-but-finite coherence
-time, which is exactly the nuance a single ranked bar can't fully
-capture and the table's loss-limited caveat spells out.
+Photonic qubits aren't on this chart at all, deliberately. $T_1$/$T_2$
+decay is a *rate*, something that happens gradually and can be assigned a
+time constant; "no decoherence in flight" isn't a very long rate, it's the
+absence of the gradual-decay mechanism the other four platforms all
+share. Forcing it onto this axis with some large placeholder number would
+misrepresent it as "just longer," when the Photonic Qubits lesson's whole
+point is that its dominant error (loss) has a different mathematical
+shape entirely.
+
+### Gate speed, the same way
+
+Gate time spans just as many orders of magnitude, in the opposite
+direction from coherence: here a taller bar means *faster* (the value
+plotted is $-\log_{10}(\text{seconds})$), so the platforms that were tall
+on the coherence chart tend to be short here, and vice versa:
+
+<BarChart
+  ariaLabel="Single-qubit gate speed across four platforms, log scale with taller meaning faster: superconducting around 10 nanoseconds, spin qubits around 100 nanoseconds, neutral atoms around 1 microsecond, trapped ions around 10 microseconds"
+  bars={gateTimeBars}
+/>
+
+Photonic is excluded here too, for a related but different reason: a
+passive polarization rotation has essentially no drive time at all, while
+the platform's actual bottleneck, the probabilistic two-photon gate, isn't
+clocked the way a Rabi-driven pulse is. There's no single "gate time"
+number to plot for a gate that sometimes doesn't happen.
+
+Lay the two charts side by side and the "no free lunch" pattern isn't an
+assertion anymore, it's arithmetic: superconducting and spin qubits sit
+at the fast end of the gate-speed chart and the short end of the
+coherence chart; trapped ions and neutral atoms sit at the opposite end
+of both. No platform is tall on both charts at once.
+
+### Connectivity: a shared mode versus a redrawable map
+
+The table's "connectivity" column hides two genuinely different
+mechanisms behind similar-sounding phrases. Trapped ions get all-to-all
+coupling for free from one shared vibrational mode; superconducting
+qubits get nearest-neighbor coupling from fixed, lithographically-drawn
+wires; neutral atoms get something in between, not an intrinsically
+richer graph, but a graph that can be *redrawn* between shots because
+each atom sits in its own independently-steerable tweezer:
+
+<div className="not-prose grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+<div>
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.5, y: 0.1 },
+    { id: "1", x: 0.186, y: 0.376 },
+    { id: "2", x: 0.306, y: 0.824 },
+    { id: "3", x: 0.694, y: 0.824 },
+    { id: "4", x: 0.814, y: 0.376 }
+  ]}
+  edges={[
+    { from: "0", to: "1" },
+    { from: "1", to: "2" },
+    { from: "2", to: "3" },
+    { from: "3", to: "4" }
+  ]}
+  ariaLabel="Five superconducting qubits with edges only between adjacent neighbors: a fixed, lithographically-drawn nearest-neighbor graph"
+/>
+<p className="mt-1 text-center text-xs text-muted-foreground">Superconducting: fixed, nearest-neighbor</p>
+</div>
+
+<div>
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.5, y: 0.1 },
+    { id: "1", x: 0.186, y: 0.376 },
+    { id: "2", x: 0.306, y: 0.824 },
+    { id: "3", x: 0.694, y: 0.824 },
+    { id: "4", x: 0.814, y: 0.376 }
+  ]}
+  edges={[
+    { from: "0", to: "1" }, { from: "0", to: "2" }, { from: "0", to: "3" }, { from: "0", to: "4" },
+    { from: "1", to: "2" }, { from: "1", to: "3" }, { from: "1", to: "4" },
+    { from: "2", to: "3" }, { from: "2", to: "4" },
+    { from: "3", to: "4" }
+  ]}
+  ariaLabel="Five trapped ions with an edge between every pair: fixed, all-to-all connectivity from the shared vibrational mode"
+/>
+<p className="mt-1 text-center text-xs text-muted-foreground">Trapped ions: fixed, all-to-all</p>
+</div>
+
+<div className="space-y-2">
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.1, y: 0.5 },
+    { id: "1", x: 0.3, y: 0.5 },
+    { id: "2", x: 0.5, y: 0.5 },
+    { id: "3", x: 0.7, y: 0.5 },
+    { id: "4", x: 0.9, y: 0.5 }
+  ]}
+  edges={[
+    { from: "0", to: "1" }, { from: "1", to: "2" }, { from: "2", to: "3" }, { from: "3", to: "4" }
+  ]}
+  ariaLabel="The same five neutral atoms laid out as a straight line, one of two geometries shown"
+/>
+<GraphDiagram
+  nodes={[
+    { id: "0", x: 0.5, y: 0.12 },
+    { id: "1", x: 0.12, y: 0.5 },
+    { id: "2", x: 0.5, y: 0.5 },
+    { id: "3", x: 0.88, y: 0.5 },
+    { id: "4", x: 0.5, y: 0.88 }
+  ]}
+  edges={[
+    { from: "2", to: "0" }, { from: "2", to: "1" }, { from: "2", to: "3" }, { from: "2", to: "4" }
+  ]}
+  ariaLabel="The same five neutral atoms rearranged between shots into a star geometry centered on one atom"
+/>
+<p className="mt-1 text-center text-xs text-muted-foreground">Neutral atoms: the same 5 atoms, reconfigured between runs</p>
+</div>
+
+</div>
+
+The first two graphs are each one fixed structure; the third is the same
+five qubits shown in two different layouts, because the whole point of
+an optical-tweezer array is that its geometry isn't baked in at
+fabrication time the way the other two are.
 
 ### The general pattern: no free lunch
+
+<PredictBeforeReveal
+  question="Every lesson in this course isolated its qubit from the environment as strongly as possible to protect coherence. Based on the coherence and gate-speed charts above, what would you predict about a platform's gate speed if you pushed its environmental isolation even further?"
+  options={[
+    { label: "Gate speed would improve too — isolation helps everything", value: "improve" },
+    { label: "Gate speed would tend to get worse — the same isolation that blocks noise also blocks the coupling gates need", value: "worse" },
+    { label: "Gate speed is unrelated to isolation on every platform", value: "unrelated" },
+  ]}
+  correctValue="worse"
+  explanation="This is the pattern underneath every row of the table above: trapped ions and neutral atoms isolate their qubits extremely well (seconds-long coherence) and pay for it with microsecond gates driven through comparatively weak mechanical or Rydberg coupling; superconducting and spin qubits accept noisier, shorter-lived qubits in exchange for the strong, fast coupling a solid-state circuit or gate voltage can provide directly. The same physical mechanism that keeps the environment out also keeps the control fields' coupling weak."
+/>
 
 Every platform trades something for something else: superconducting
 qubits trade coherence for speed and fabrication maturity; trapped ions

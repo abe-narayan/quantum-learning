@@ -123,7 +123,7 @@ export function PhenomenaPreview() {
     <section className="border-b border-border bg-surface-muted/40 py-16 sm:py-20">
       <Container>
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand">Genuinely strange</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-brand">Not analogies</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
             Four things classical physics can&rsquo;t explain
           </h2>

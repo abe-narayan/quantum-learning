@@ -34,18 +34,17 @@ export const lessonMeta = {
 ## Motivation
 
 A modest 50-logical-qubit algorithm, protected the way the threshold
-theorem requires, can cost on the order of 50,000 physical qubits, a
+theorem requires, can cost on the order of 50,000 physical qubits: a
 thousand-to-one tax paid before a single "useful" qubit does any work.
-Every noise source this course covered, sources, T1/T2, crosstalk,
-compounding error, feeds directly into that tax. This capstone-style
-lesson connects them to the concrete physical-to-logical overhead real
-hardware roadmaps target, and is honest about how far current devices
-are from paying it off.
+Every noise source this course covered, T1/T2, crosstalk, compounding
+error, feeds directly into that tax. This capstone lesson connects
+them to the physical-to-logical overhead real hardware roadmaps target,
+and stays honest about how far current devices are from paying it off.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/IQM_Quantum_Computer_Espoo_Finland.jpg/1280px-IQM_Quantum_Computer_Espoo_Finland.jpg"
   alt="A working IQM superconducting quantum computer installed in Espoo, Finland, showing the full system housing and cabling around the cryostat"
-  caption="A real, currently-operating quantum computer (IQM, Espoo, Finland): exactly the class of NISQ-era hardware this lesson is honest about being orders of magnitude short of the physical-qubit counts a fault-tolerant roadmap targets."
+  caption="A real, currently-operating quantum computer (IQM, Espoo, Finland). This is the class of NISQ-era hardware this lesson is honest about being orders of magnitude short of the physical-qubit counts a fault-tolerant roadmap targets."
   credit="Ragsxl / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:IQM_Quantum_Computer_Espoo_Finland.jpg"
   license="CC BY-SA 4.0"
@@ -73,7 +72,7 @@ rate arbitrarily. The catch, which that course's honest-scope framing
 already flagged, is that the overhead is large. Depending on the code and
 target logical error rate, estimates commonly range from the low hundreds
 to several thousand physical qubits per logical qubit for full fault
-tolerance at a useful scale, a genuinely large multiplier, not a minor
+tolerance at a useful scale, a large multiplier and not a minor
 implementation detail.
 
 Concretely, a surface-code-style logical qubit is built from a lattice of
@@ -90,12 +89,12 @@ just described, not the handful of physical qubits pictured here.
 
 **NISQ** (Noisy Intermediate-Scale Quantum) names the current era
 honestly: devices with tens to a few thousand physical qubits, without
-full error correction, whose usefulness is bounded by exactly this
-course's compounding-error problem (Scaling Challenges). NISQ-era
-algorithms (Quantum Algorithms II's VQE and QAOA are exactly this
-category) are specifically designed to extract value from shallow
-circuits, few enough sequential gates that compounding error stays
-tolerable, rather than assuming fault tolerance is already available.
+full error correction, whose usefulness is bounded by this course's own
+compounding-error problem (Scaling Challenges). NISQ-era algorithms
+(Quantum Algorithms II's VQE and QAOA both belong here) are specifically
+designed to extract value from shallow circuits, few enough sequential
+gates that compounding error stays tolerable, rather than assuming
+fault tolerance is already available.
 
 ### What "fault tolerant" actually targets
 
@@ -110,10 +109,10 @@ NISQ-scale devices, not merely a bigger version of one.
 
 This course covered noise sources, T1/T2, crosstalk, and compounding
 error quantitatively; it did not derive the threshold theorem itself
-(Error Correction & Fault Tolerance's scope) or attempt to predict a
-timeline for reaching fault tolerance, genuinely active, evolving
-engineering questions across the entire field, not settled facts this
-platform can state with false precision.
+(Error Correction & Fault Tolerance's scope), and it won't try to
+predict a timeline for reaching fault tolerance. That timeline is an
+active, evolving engineering question across the whole field, not a
+settled fact this platform can state with false precision.
 
 For a sense of what one real, published target currently looks like:
 IBM's public hardware roadmap names a specific planned system, Quantum
@@ -121,9 +120,9 @@ Starling, targeted for 2029 with 200 logical qubits capable of roughly
 100 million quantum operations, built on quantum LDPC codes the company
 says can cut physical-to-logical qubit overhead by up to 90% relative to
 the surface code this lesson's diagram illustrates. Whether that
-timeline holds is exactly the kind of prediction this lesson declines to
-make; it's included only to show concretely what one company's current,
-stated roadmap target looks like, not as a platform-endorsed forecast.
+timeline holds is a prediction this lesson declines to make; it's
+included only to show concretely what one company's current, stated
+roadmap target looks like, not as a platform-endorsed forecast.
 
 ## Worked Example
 
@@ -135,9 +134,9 @@ $$
 50 \times 1000 = 50{,}000 \text{ physical qubits}
 $$
 
-Dramatically more than any current device's qubit count, illustrating
-concretely why fault-tolerant quantum computing at a useful scale is
-described as a longer-term target rather than an immediate one.
+Far more than any current device's qubit count, which is exactly why
+fault-tolerant quantum computing at a useful scale gets described as a
+longer-term target rather than an immediate one.
 
 The 1000-to-1 ratio is too wide to show on a linear scale without the
 smaller bar vanishing entirely, so the heights below are $\log_{10}$ of
@@ -154,8 +153,19 @@ each count; the captions show the real numbers:
 The Synthesis section above named a range, not a single number: "the low
 hundreds to several thousand physical qubits per logical qubit." Sliding
 across representative values from that range, still fixed at 50 logical
-qubits, shows how much the physical-qubit bill depends on exactly where
-in that honestly-wide range a real device lands:
+qubits, shows how much the physical-qubit bill depends on where in that
+wide range a real device lands:
+
+<PredictBeforeReveal
+  question="Still 50 logical qubits, but now at the high end of the stated range, a 5000-to-1 overhead ratio. How many physical qubits does that need?"
+  options={[
+    { label: "50,000 (same as the 1000-to-1 worked example)", value: "50k" },
+    { label: "100,000", value: "100k" },
+    { label: "250,000", value: "250k" },
+  ]}
+  correctValue="250k"
+  explanation="50 × 5000 = 250,000 physical qubits, five times the worked example's 50,000, because the ratio itself is five times higher. The overhead scales linearly with the ratio for a fixed logical-qubit target, which is exactly why the honest range quoted above, low hundreds to several thousand to one, translates into such a wide range of physical-qubit bills."
+/>
 
 <InteractiveSection title="Explore the overhead-ratio range" description="Slide from a 100-to-1 ratio (the low end of the stated range) up to 5000-to-1 (several thousand, the high end). Logical qubits stay fixed at 50; the physical-qubit bar is 50 times the ratio, the same multiplication the worked example performs for the single 1000-to-1 case.">
   <BarChartExplorer
@@ -216,4 +226,4 @@ This closes **Noise, Decoherence & Scaling**, and the entire Quantum
 Hardware pillar. The Quantum Software pillar's courses (Programming
 Quantum Computers, Simulating Quantum Systems, Compilation & Hybrid
 Algorithms) pick up from here, covering how software actually targets
-and works around exactly the hardware constraints this pillar described.
+and works around the hardware constraints this pillar described.

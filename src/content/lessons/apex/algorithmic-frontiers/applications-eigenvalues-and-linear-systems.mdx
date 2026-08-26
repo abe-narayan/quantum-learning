@@ -121,7 +121,18 @@ of the most repeated, and most routinely overstated, sentences in
 popular writing about quantum computing. The underlying result — first
 Harrow, Hassidim, and Lloyd's 2009 algorithm (HHL), now more cleanly
 derived as one instance of QSVT — is real, important, and exactly as
-narrow as this lesson is about to make precise. It answers a genuinely
+narrow as this lesson is about to make precise.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/a/af/Seth_Lloyd.jpg"
+  alt="Portrait photograph of Seth Lloyd, the MIT physicist"
+  caption="Seth Lloyd, the 'L' of HHL — co-author, with Aram Harrow and Avinatan Hassidim, of the original 2009 quantum linear-systems algorithm this lesson reconstructs, more cleanly, as a single QSVT polynomial applied to a block encoding."
+  credit="Dmitry Rozhkov / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Seth_Lloyd.jpg"
+  license="CC BY-SA 3.0"
+/>
+
+It answers a
 different question than "solve $Ax=b$" in the classical sense: given a
 way to *quantumly* prepare $|b\rangle$ and a *quantum* black box for
 $A$, produce a *quantum state* proportional to $A^{-1}|b\rangle$. Every
@@ -163,10 +174,25 @@ $$
 
 for a normalizing constant $c$ chosen so $|P(x)|\leq1$ on that range
 (QSVT's polynomials must stay bounded by 1 to remain implementable as
-part of a unitary circuit). Applying the resulting QSVT circuit to
-$|b\rangle$ produces (up to renormalization and a success probability
-from postselecting the block-encoding's ancilla register) a state
-proportional to $P(A)|b\rangle\approx c\,A^{-1}|b\rangle=|x\rangle$.
+part of a unitary circuit).
+
+<TheoremBox title="Quantum linear systems via QSVT" provenance="cited">
+
+Given a block encoding of Hermitian $A$ (singular values in
+$[1/\kappa,1]$) and a state-preparation circuit for $|b\rangle$, applying
+the QSVT circuit for $P(x)\approx c/x$ to $|b\rangle$ and post-selecting
+the block encoding's ancilla on $|0\rangle$ produces a state proportional
+to
+
+$$
+P(A)|b\rangle \approx c\,A^{-1}|b\rangle = |x\rangle,
+$$
+
+the solution of $Ax=b$ — an immediate specialization of the prerequisite
+lesson's QSVT theorem, with no new machinery beyond choosing this one
+polynomial.
+
+</TheoremBox>
 
 **The regularization point, stated honestly.** $1/x$ is unbounded as
 $x\to0$, so no bounded-degree polynomial can approximate it uniformly
@@ -262,7 +288,7 @@ the whole point, exactly as this lesson has tried to be.
 
 ## Worked Example
 
-**A genuinely small, fully computed 2-dimensional (1-qubit) example.**
+**A small, fully computed 2-dimensional (1-qubit) example.**
 Take the real symmetric (hence Hermitian) matrix
 
 $$
@@ -285,7 +311,7 @@ $$
 \lambda_{\max}=4,\qquad\lambda_{\min}=2,\qquad\kappa=\frac{\lambda_{\max}}{\lambda_{\min}}=2
 $$
 
-(`linEigenMax`, `linEigenMin`, `linKappa`) — a genuinely well-conditioned
+(`linEigenMax`, `linEigenMin`, `linKappa`) — a well-conditioned
 matrix. Rescaling by $\|A\|=\lambda_{\max}=4$ to fit the block-encoding
 convention $\|A\|\leq1$ (`linATilde = linA/4`) gives singular values
 $\sigma_{\max}=1$, $\sigma_{\min}=0.5=1/\kappa$ (`linATildeSigmaMax`,
@@ -315,8 +341,8 @@ $$
 $|x\rangle$ that a real run of this algorithm would (ideally, in the
 zero-error limit) produce has *these exact same two numbers* as its
 amplitudes: $|x\rangle=0.707107\,|0\rangle+0.707107\,|1\rangle$. This
-is the entire point made concrete: the state genuinely, numerically
-encodes the classical answer's direction — it just isn't something you
+is the entire point made concrete: the state numerically
+encodes the classical answer's direction exactly — it just isn't something you
 can read out as "$0.25,0.25$" by measuring once. What you *can* extract
 with a handful of measurements is a small readout, e.g. the
 single-qubit observable expectation values (computed directly via
@@ -332,7 +358,7 @@ $$
 $$
 
 Both are real, exactly computed numbers extractable from $O(1)$ repeated
-measurements — genuinely useful global information — while the full pair
+measurements — useful global information in its own right — while the full pair
 $(0.707107,0.707107)$ that produced them is not something you get back
 directly at all.
 
@@ -347,7 +373,7 @@ the same honest way both times.
 
 <MatrixGridExplorer
   presets={linPresets}
-  ariaLabel="Comparison of the classical normalized solution vector against the quantum algorithm's output-state amplitudes for two choices of b — numerically identical in both cases, illustrating that the state genuinely encodes the answer, just not in a classically-readable form"
+  ariaLabel="Comparison of the classical normalized solution vector against the quantum algorithm's output-state amplitudes for two choices of b — numerically identical in both cases, illustrating that the state encodes the answer exactly, just not in a classically-readable form"
 />
 
 Toggling between the two presets changes the numbers, but in every case
@@ -367,7 +393,7 @@ shots to resolve each amplitude to your target precision — for a
 reason this algorithm is interesting is its behavior as $N$ grows, and
 full amplitude readout's cost grows with $N$ too, erasing the
 $\log_2N$-qubit advantage that motivated using it. If your application
-genuinely needs the full vector $x$ back in classical memory, this
+needs the full vector $x$ back in classical memory, this
 algorithm is not the tool for that job, regardless of $\kappa$.
 </Callout>
 

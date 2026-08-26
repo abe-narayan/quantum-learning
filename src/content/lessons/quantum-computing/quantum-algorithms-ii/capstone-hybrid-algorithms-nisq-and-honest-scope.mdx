@@ -95,6 +95,17 @@ partially average out or route around some kinds of noise. They aren't
 immune to it, but they're structurally more tolerant of imperfection than
 a single long, must-be-exactly-right circuit.
 
+<PredictBeforeReveal
+  question="Take the triangle's p=1-tuned parameters (γ=0.60, β=0.30) and repeat that exact same pair at every layer, p=1 through 6, without re-optimizing anything. Does expectedCutSize climb steadily toward the true max of 2 as p grows?"
+  options={[
+    { label: "Yes, more layers of the same good pair only helps", value: "climbs" },
+    { label: "No — it stays flat at the p=1 value", value: "flat" },
+    { label: "No — it swings up and down, sometimes landing below the p=1 baseline", value: "swings" },
+  ]}
+  correctValue="swings"
+  explanation="Repeating (γ=0.60, β=0.30) unchanged, expectedCutSize goes 1.999 (p=1) → 1.544 (p=2) → 1.460 (p=3) → 1.992 (p=4) → 1.592 (p=5) → 1.424 (p=6) — not a climb, a genuine swing, occasionally dropping below the 1.5 no-optimization baseline. Depth alone buys nothing; each depth needs its own re-optimized (γ,β), which is exactly what a real classical outer loop is for."
+/>
+
 <InteractiveSection title="More layers isn't automatically better" description="Slide between four fixed (γ,β) pairs and watch expectedCutSize on the triangle graph as the same pair is repeated across p=1..6 real QAOA layers. The pair tuned for p=1 (γ=0.60, β=0.30) does not simply keep climbing toward 2 as p grows — extra layers only help when their parameters are actually re-optimized for that depth, the real reason 'more layers' is a tradeoff, not a free improvement, per this capstone's practice questions.">
   <ParametricCurve
     frames={depthFrames}

@@ -82,6 +82,15 @@ combinations) throws away exactly the linear structure, the ability to
 superpose, that makes the theory quantum. The construction that keeps
 that structure is the **tensor product**.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
+  alt="Formal black-and-white portrait photograph of Erwin Schrödinger, taken around his 1933 Nobel Prize"
+  caption="Erwin Schrödinger, who in 1935 coined Verschränkung — entanglement — for exactly the failure to factor this lesson derives from pure dimension counting: 'the characteristic trait of quantum mechanics,' as he put it, not a minor wrinkle in it."
+  credit="Nobel Foundation / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Erwin_Schr%C3%B6dinger_(1933).jpg"
+  license="Public domain"
+/>
+
 ## Intuition
 
 Classically, two systems with $n$ and $m$ possible states have $nm$
@@ -167,7 +176,7 @@ seen quantum circuits: $A\otimes I$ acting on the whole two-qubit space.
 
 ### Why not every vector is a simple product: a dimension count
 
-Here is the central fact this lesson has been building toward. A simple
+Everything above sets up a single counting argument. A simple
 tensor $|u\rangle\otimes|v\rangle$ is specified by choosing a direction
 for $|u\rangle$ (up to scale, $n-1$ free complex parameters) and a
 direction for $|v\rangle$ ($m-1$ free parameters) and one overall scale,
@@ -198,16 +207,30 @@ every vector.
 ## Physical Interpretation
 
 Composite quantum systems are described by the tensor product of their
-parts' state spaces. This is itself a postulate of quantum mechanics
-(confirmed by every experiment ever run on multi-particle systems), not a
-consequence of anything more basic. Once accepted, entanglement stops
-being a special or exotic addition to the theory. It's simply what
-"most" states in a large enough composite space look like.
+parts' state spaces. This is itself a postulate of quantum mechanics,
+confirmed by every experiment ever run on multi-particle systems, rather
+than a consequence of anything more basic. Take that postulate seriously
+and the dimension count from earlier tells you what to expect: an
+entangled state isn't some delicate, hard-to-prepare object. It's the
+typical resident of a large composite space, with a product state as the
+rare exception.
 
 ## Worked Example
 
 **Is $\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ a simple tensor
 $|u\rangle\otimes|v\rangle$ for some $u,v\in\mathbb{C}^2$?**
+
+<PredictBeforeReveal
+  question="Before working it out algebraically: is (|00⟩+|11⟩)/√2 expressible as u⊗v for some single-qubit u, v?"
+  options={[
+    { label: "Yes, some u, v work", value: "yes" },
+    { label: "No, no u, v work", value: "no" },
+    { label: "Only if u, v are allowed complex entries", value: "complex-only" },
+    { label: "Can't tell without trying every u, v", value: "unsure" },
+  ]}
+  correctValue="no"
+  explanation="No u, v work, for any complex entries — this is the Bell state, the standard example of entanglement. The dimension-counting argument above already told you to expect this: simple tensors are a thin slice of a 4-dimensional space, and this particular vector misses that slice. The elimination below shows exactly where the attempt breaks down."
+/>
 
 Suppose it were, with $u=(u_0,u_1)$, $v=(v_0,v_1)$. Then $u\otimes v =
 (u_0v_0,\ u_0v_1,\ u_1v_0,\ u_1v_1)$, and matching against

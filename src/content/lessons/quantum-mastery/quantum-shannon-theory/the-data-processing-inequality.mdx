@@ -105,6 +105,15 @@ more about $A$ from a *processed* copy of $B$ than from $B$ itself. This
 lesson turns that intuition into an actual theorem, derives its most
 useful corollary in full, and checks it against a real, computed number.
 
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/c/c2/Claude_Shannon_c1930.png"
+  alt="Portrait photograph of Claude Shannon as a young man"
+  caption="Claude Shannon, whose 1948 theory of information first made 'processing cannot create information, only destroy it' a precise, provable statement — the same intuition this lesson upgrades to a fully quantum theorem about relative entropy under CPTP maps."
+  credit="University of Michigan Bentley Historical Library, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Claude_Shannon_c1930.png"
+  license="Public domain"
+/>
+
 ## Mathematical Development
 
 ### The monotonicity theorem
@@ -290,6 +299,17 @@ $\lambda$ (dephasing never touches populations, computed directly via
 $$
 I(A:B') = S_A+S_B-S_{AB}' = 2 - S_{AB}'(\lambda)
 $$
+
+<PredictBeforeReveal
+  question="Full dephasing (lambda=1) wipes out every off-diagonal, phase-coherent term on qubit B. Does the shared mutual information I(A:B') collapse all the way down to 0 bits, or does something survive?"
+  options={[
+    { label: "It collapses to 0 — no coherence left, no correlation left", value: "zero" },
+    { label: "It settles at exactly 1 bit — the classical population correlation survives", value: "one" },
+    { label: "It goes negative, the way S(A|B) can for the untouched Bell pair", value: "negative" },
+  ]}
+  correctValue="one"
+  explanation="I(A:B') -> 1 bit as lambda -> 1, not 0. Dephasing kills phase coherence but never touches populations, and the Bell pair's perfect classical (population) correlation — 'both 0 or both 1' — is carried entirely by populations. Half of the pair's original 2 bits is classical correlation that no amount of dephasing can remove; only the quantum half is vulnerable to this particular noise."
+/>
 
 Computed values (`mutualInformationAfterDephasingB`, exact, no
 rounding beyond display):

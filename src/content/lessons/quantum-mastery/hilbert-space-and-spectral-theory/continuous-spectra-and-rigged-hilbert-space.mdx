@@ -141,10 +141,10 @@ $$
 $$
 
 a direct, one-line computation, not a subtle one: $\phi_p\notin
-L^2(\mathbb R)$, full stop. This is genuinely different from (and a
-harder problem than) the vanishing-at-infinity issue Hilbert Spaces and
-Self-Adjointness dealt with: $\phi_p$ doesn't even decay, let alone
-vanish; $|\phi_p|^2$ is a nonzero constant everywhere on the line.
+L^2(\mathbb R)$, full stop. This is a harder failure mode than the
+vanishing-at-infinity issue Hilbert Spaces and Self-Adjointness dealt
+with: $\phi_p$ doesn't even decay, let alone vanish; $|\phi_p|^2$ is a
+nonzero constant everywhere on the line.
 
 ### $\langle p|p'\rangle=\delta(p-p')$, derived as a genuine limit
 
@@ -165,6 +165,17 @@ D_L(q)\,dq=1$ for *every* $L$ (a standard, exact identity, cited here),
 while its peak height $L/\pi$ grows and its main lobe's width shrinks
 like $1/L$ as $L\to\infty$, concentrating all its area into an
 ever-narrower spike at $q=0$:
+
+<PredictBeforeReveal
+  question="As L grows and the Dirichlet kernel's peak shoots up toward L/π while its width shrinks like 1/L, what happens to the total area under the curve?"
+  options={[
+    { label: "It grows without bound, same as the peak", value: "grows" },
+    { label: "It shrinks toward 0, same as the width", value: "shrinks" },
+    { label: "It stays exactly 1 for every L", value: "constant" },
+  ]}
+  correctValue="constant"
+  explanation="The area is exactly 1 for every L, not approximately — the worked example below derives this directly by substitution. Only the kernel's shape changes as L grows; its total area never does. That fixed-area, ever-narrowing behavior is precisely what 'D_L → δ as L → ∞' means."
+/>
 
 <ParametricCurve
   frames={sincFrames}
