@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { SINGLE_QUBIT_GATE_OPTIONS, TWO_QUBIT_GATE_OPTIONS } from "./gateDefinitions";
 import type { SingleQubitGateName, TwoQubitGateName } from "@/lib/quantum/circuitBuilder";
-import { ControlSection, PillGroup } from "../shared/controls";
+import { ControlSection, PillGroup, SymbolGloss } from "../shared/controls";
 
 export function GateControls({
   disabled,
@@ -100,7 +100,7 @@ export function GateControls({
               value={controlQubit}
               disabled={disabled}
               onChange={(e) => onControlQubitChange(Number(e.target.value))}
-              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="min-h-11 rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {qubitIds.map((q) => (
                 <option key={q} value={q}>
@@ -115,7 +115,7 @@ export function GateControls({
               value={twoQubitTarget}
               disabled={disabled}
               onChange={(e) => onTwoQubitTargetChange(Number(e.target.value))}
-              className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="min-h-11 rounded-md border border-border bg-surface px-2 py-1 font-mono text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {qubitIds.map((q) => (
                 <option key={q} value={q}>
@@ -142,6 +142,24 @@ export function GateControls({
         {controlQubit === twoQubitTarget && (
           <p className="mt-1 text-xs text-warning">Control and target must be different qubits.</p>
         )}
+        <SymbolGloss
+          items={[
+            {
+              symbol: "ctrl",
+              name: "control qubit",
+              means:
+                "the qubit that decides. It is never changed by the gate — it only determines whether the target is.",
+              glossaryId: "cnot-controlled-gates",
+            },
+            {
+              symbol: "CNOT",
+              name: "controlled-NOT",
+              means:
+                "flip the target, but only where the control is 1. Applied to a control already in superposition, it is how two qubits become entangled — this is the gate that does it.",
+              glossaryId: "cnot-controlled-gates",
+            },
+          ]}
+        />
       </ControlSection>
 
       <section aria-labelledby="edit-heading" className="flex flex-wrap gap-2">

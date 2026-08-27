@@ -285,7 +285,21 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        aria-controls="lesson-toc-mobile-panel"
+        // Named only while the panel exists. This disclosure unmounts its
+        // panel when collapsed, and an `aria-controls` IDREF that resolves
+        // to nothing is invalid — assistive tech either announces the
+        // relationship as broken or drops it. `aria-expanded` carries the
+        // state on its own while there is nothing to point at. Matches
+        // `TracksDropdown`/`SearchTrigger` in the chrome.
+        aria-controls={isOpen ? "lesson-toc-mobile-panel" : undefined}
+        // A stable hook for the print stylesheet, which hides this control
+        // (globals.css §print). It used to select on
+        // `[aria-controls="lesson-toc-mobile-panel"]`, which stopped matching
+        // the moment that attribute became conditional above — and the
+        // collapsed state is the common one, so the toggle would have started
+        // printing on every lesson. An attribute that exists for styling
+        // should not be one whose presence depends on runtime state.
+        data-toc-toggle=""
         className="flex w-full min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted/60 px-4 py-3 text-left text-sm transition-colors hover:bg-surface-muted"
       >
         <span className="flex min-w-0 flex-col">

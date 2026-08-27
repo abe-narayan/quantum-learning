@@ -46,10 +46,10 @@ Proving an algorithm can't be wrong in one direction is one thing. Proving it ac
 
 ## Motivation
 
-The last lesson showed VQE's cost function can never dip below the
+The last lesson showed <Term id="vqe">VQE</Term>'s cost function can never dip below the
 true ground energy — a real guarantee, but not yet a demonstration
 that the algorithm gets anywhere close to it. This lesson runs the
-real optimizer on a specific Hamiltonian, not a hand-picked success
+real optimizer on a specific <Term id="hamiltonians-time-evolution">Hamiltonian</Term>, not a hand-picked success
 story.
 
 <ExternalFigure
@@ -71,7 +71,7 @@ $$
 
 Both coefficients chosen so $\sqrt{0.6^2+0.8^2}=1$ exactly: for any
 Hamiltonian of the form $aX+bY+cZ$, the eigenvalues are exactly
-$\pm\sqrt{a^2+b^2+c^2}$ (a standard fact about Pauli combinations,
+$\pm\sqrt{a^2+b^2+c^2}$ (a standard fact about <Term id="pauli-matrices">Pauli</Term> combinations,
 consistent with this platform's `eigenvaluesHermitian2x2` giving the
 closed-form quadratic solution directly). So $E_0=-1$ here, exactly,
 computed independently via `exactGroundStateEnergy`, not asserted.
@@ -239,7 +239,7 @@ points.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [QAOA and Combinatorial Optimization](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-and-combinatorial-optimization), a structurally similar
+[QAOA and Combinatorial Optimization](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-and-combinatorial-optimization) is a structurally similar
 hybrid loop applied to an entirely different kind of problem: finding a
 good graph cut rather than a ground-state energy.
 

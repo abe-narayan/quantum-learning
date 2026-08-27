@@ -46,7 +46,7 @@ Max-Cut asks you to split a graph's vertices into two groups to maximize the num
 
 ## Motivation
 
-**QAOA** — the quantum approximate optimization algorithm — is that
+**<Term id="qaoa">QAOA</Term>** — the quantum approximate optimization algorithm — is that
 same hybrid loop, a parameterized circuit and a classically-optimized
 cost, retargeted from finding a ground energy to combinatorial
 optimization. Max-Cut is the first, standard example.
@@ -74,7 +74,7 @@ $$
 C = \sum_{(i,j)\in E}\frac{1-Z_iZ_j}{2}
 $$
 
-is a Hamiltonian whose eigenvalue on $|z\rangle$ is exactly the number of
+is a <Term id="hamiltonians-time-evolution">Hamiltonian</Term> whose eigenvalue on $|z\rangle$ is exactly the number of
 edges cut by that particular 2-coloring. Maximizing $\langle C\rangle$ is
 literally Max-Cut.
 
@@ -169,7 +169,7 @@ gives exactly $1.5$, confirmed directly, not just argued.
 ## Physical Interpretation
 
 QAOA's cost unitary "tags" each candidate coloring with a phase
-proportional to its quality, and the mixer lets those phases interfere.
+proportional to its quality, and the mixer lets those phases <Term id="phase-interference">interfere</Term>.
 This is structurally the same idea as Grover's oracle-then-diffusion
 pattern, now applied to a continuous-valued cost instead of a single
 marked item, and tuned by a classical optimizer choosing $\gamma,\beta$
@@ -231,7 +231,7 @@ convergence.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [QAOA: A Worked Max-Cut Example](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example), running $p=1$ QAOA on a
+[QAOA: A Worked Max-Cut Example](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example) runs $p=1$ QAOA on a
 triangle graph and a single edge, both reaching within a few percent of
 the true optimum.
 </NextDiscovery>

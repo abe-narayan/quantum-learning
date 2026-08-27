@@ -3,7 +3,7 @@ import { PillarScope } from "@/components/field/PillarScope";
 import { Section } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { GlossaryFilter } from "@/components/glossary/GlossaryFilter";
-import { GLOSSARY_TERMS } from "@/lib/content/glossary";
+import { GLOSSARY_TERMS, getStartHereTerms } from "@/lib/content/glossary";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
 import { buildBreadcrumbSchema } from "@/lib/structuredData";
@@ -23,6 +23,8 @@ const breadcrumbSchema = buildBreadcrumbSchema([
 export default async function GlossaryPage() {
   const lessons = await getAllLessonsMeta();
   const lessonTitles = Object.fromEntries(lessons.map((lesson) => [lesson.slug, lesson.title]));
+  const startHereTerms = getStartHereTerms();
+  const foundationalCount = GLOSSARY_TERMS.filter((term) => term.level === "foundational").length;
 
   return (
     // No single pillar — the glossary spans all six, alphabetically — so a
@@ -40,12 +42,18 @@ export default async function GlossaryPage() {
           Glossary
         </SectionTitle>
         <Lede className="mt-4">
-          {GLOSSARY_TERMS.length} quantum physics and quantum computing terms, alphabetically, each
-          with a precise definition and a link to the real lesson that covers it in depth.
+          {GLOSSARY_TERMS.length} quantum physics and quantum computing terms, each with a precise
+          definition and a link to the real lesson that covers it in depth. {foundationalCount} of
+          them assume no prior background — start with the {startHereTerms.length} below, then use
+          the A–Z or the filter for anything you meet along the way.
         </Lede>
 
         <div className="mt-10">
-          <GlossaryFilter terms={GLOSSARY_TERMS} lessonTitles={lessonTitles} />
+          <GlossaryFilter
+            terms={GLOSSARY_TERMS}
+            startHereTerms={startHereTerms}
+            lessonTitles={lessonTitles}
+          />
         </div>
       </Section>
     </PillarScope>

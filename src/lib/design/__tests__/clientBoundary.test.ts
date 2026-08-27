@@ -40,6 +40,18 @@ const SERVER_ONLY: Record<string, string> = {
   "lib/problems/registry":
     "statically imports all 547 problem modules — every answer and worked solution, ~366 KB gzip",
   "lib/content/lessons": "the lesson-corpus loader (dynamic-imports all 219 MDX modules)",
+  // 239 terms with full definitions, ~38KB gzipped source and growing with
+  // every lesson that needs a word explained. It reached the client exactly
+  // once, through `lib/search/glossaryEntries.ts`, which `SearchOverlay`
+  // dynamic-imported so the search panel could match glossary rows. That file
+  // is gone: glossary rows are now baked into `public/search-index.json` at
+  // build time, so search matches them without the module. Every remaining
+  // importer is a server component (`app/glossary/page.tsx`,
+  // `app/about/page.tsx`, `components/mdx/Term.tsx`) or type-only
+  // (`lib/search/index.ts`, `components/glossary/**`). Keeping it here means a
+  // future `"use client"` component that reaches for a definition fails loudly
+  // rather than quietly shipping the whole glossary to every visitor.
+  "lib/content/glossary.ts": "all 239 glossary definitions (~38KB gzip); search reads the prebuilt index instead",
   content: "raw lesson/problem content modules",
 };
 
@@ -53,7 +65,12 @@ const SERVER_ONLY: Record<string, string> = {
 const CLIENT_DATA_BUDGET_KB: Record<string, number> = {
   "lib/content/curriculum.ts": 16,
   "lib/content/concepts.ts": 18,
-  "lib/content/glossary.ts": 20,
+  // `lib/content/glossary.ts` used to sit here at a 20KB budget. It has moved
+  // to SERVER_ONLY instead — see the note there. A size budget was the right
+  // guard while a client component imported it; now that none does, "must not
+  // reach a client bundle at all" is both true and a stronger promise than any
+  // number, and it does not have to be renegotiated every time the glossary
+  // grows a term.
   // Reached from `ConceptDetailPanel` via `currentQuantum/registry`'s
   // `getEntriesForLesson`, which closes over the whole entry list. Mitigated
   // by the concept map being `ssr:false` and code-split, so it never blocks

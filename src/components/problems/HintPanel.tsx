@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Instrument } from "@/components/ui/Panel";
-import { MathText } from "@/components/ui/MathText";
+import { ScrollableMathText } from "./ScrollableMathText";
 import { cn } from "@/lib/utils";
 import type { Hint } from "@/lib/problems/types";
 
@@ -67,7 +67,7 @@ export function HintPanel({
               <span className="tech-value shrink-0 pt-px text-xs text-pillar-text">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <MathText text={hint.text} />
+              <ScrollableMathText text={hint.text} />
             </li>
           ))}
         </ol>

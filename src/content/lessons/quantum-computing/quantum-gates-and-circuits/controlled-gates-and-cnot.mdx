@@ -80,7 +80,7 @@ Every gate mentioned so far still acts on one qubit independently of the others.
 
 Tensor products build multi-qubit states; the last lesson's circuit
 notation showed how to draw operations on them. This lesson supplies
-the piece that's still missing: **CNOT** (controlled-NOT), the
+the piece that's still missing: **<Term id="cnot-controlled-gates">CNOT</Term>** (controlled-NOT), the
 single most important two-qubit gate in this course.
 
 <ExternalFigure
@@ -97,7 +97,7 @@ single most important two-qubit gate in this course.
 A controlled-$U$ gate is a conditional: "if the control qubit is
 $|1\rangle$, apply $U$ to the target; if the control is $|0\rangle$, do
 nothing." For a classical bit this would be an ordinary `if` statement.
-For a qubit, the control can be in *superposition*, and then the gate
+For a qubit, the control can be in *<Term id="superposition">superposition</Term>*, and then the gate
 does something no classical conditional can: it applies $U$ and
 not-$U$ simultaneously, in proportion to the control's amplitudes,
 producing correlation between the two qubits that wasn't there before.
@@ -153,7 +153,7 @@ to a $\oplus$ circle on the target wire.
   ariaLabel="CNOT gate: qubit 0 as control (dot), qubit 1 as target (circled plus)"
 />
 
-Reading off its action on each basis state (in the
+Reading off its action on each <Term id="computational-basis">basis state</Term> (in the
 $|00\rangle,|01\rangle,|10\rangle,|11\rangle$ order):
 
 <div className="not-prose my-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -187,7 +187,7 @@ CNOT is the standard building block for creating correlation between
 qubits *deliberately*. Applied to a control that's already in
 superposition, it doesn't produce a definite outcome for the target. It
 produces a target whose value is now tied to the control's, in whatever
-proportion the control's amplitudes dictate. That's entanglement, built
+proportion the control's amplitudes dictate. That's <Term id="entanglement">entanglement</Term>, built
 on demand, and it's exactly the next lesson's subject.
 
 ## Interactive Experiment
@@ -281,6 +281,6 @@ the SWAP derivation above relies on directly.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Bell States and Entanglement](/lessons/quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement), put a control qubit into
+Up next, [Bell States and Entanglement](/lessons/quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement) puts a control qubit into
 superposition *before* the CNOT, and watch what comes out.
 </NextDiscovery>

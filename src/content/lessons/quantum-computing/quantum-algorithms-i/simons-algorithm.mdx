@@ -79,7 +79,7 @@ allowed (the birthday-paradox bound: you need to query enough random
 inputs that two of them are likely to collide on the same output). The
 quantum algorithm below finds $s$ with high probability using only $O(n)$
 queries. That's a genuine, unconditional exponential separation between
-quantum and randomized classical query complexity, the first algorithm to
+quantum and randomized classical <Term id="query-complexity-black-box-model">query complexity</Term>, the first algorithm to
 show one, and its circuit shape is exactly the template Shor's algorithm
 scales up next: Hadamards, one oracle call, Hadamards again, then reading
 off something tied to a hidden algebraic object.
@@ -132,8 +132,8 @@ value. For a fixed $z$, the two terms in a pair contribute
 $(-1)^{x\cdot z}+(-1)^{(x\oplus s)\cdot z}$. Since $(x\oplus s)\cdot
 z\equiv x\cdot z+s\cdot z\pmod2$, this is
 $(-1)^{x\cdot z}\left[1+(-1)^{s\cdot z}\right]$: exactly $2\cdot(-1)^{x\cdot
-z}$ when $s\cdot z\equiv0\pmod2$ (the two terms interfere
-constructively), and exactly $0$ when $s\cdot z\equiv1\pmod2$ (they cancel
+z}$ when $s\cdot z\equiv0\pmod2$ (the two terms <Term id="phase-interference">interfere
+constructively</Term>), and exactly $0$ when $s\cdot z\equiv1\pmod2$ (they cancel
 perfectly). So every pair contributes nothing at all to any $z$ with
 $s\cdot z=1$, and the total amplitude on $|z\rangle$ is identically zero
 there:
@@ -320,7 +320,7 @@ doesn't hand you the answer directly.
   interference, finished off by classical post-processing, generalizing
   from XOR-periodicity over $\mathbb{F}_2^n$ (a hidden *additive* shift,
   found via ordinary Hadamards) to genuine modular periodicity (a hidden
-  *multiplicative* period, found via the QFT).
+  *multiplicative* period, found via the <Term id="quantum-fourier-transform">QFT</Term>).
 
 ## Further Exploration
 

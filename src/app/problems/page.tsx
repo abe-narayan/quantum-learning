@@ -22,6 +22,14 @@ const breadcrumbSchema = buildBreadcrumbSchema([
 export default async function ProblemsPage() {
   const problems = getAllProblemMeta();
 
+  // Counted from the corpus, not authored: `beginner` is the lowest rung of
+  // `ProblemDifficulty`, so this figure moves on its own as problems are
+  // added. The catalog below derives the same number for its own "New here?"
+  // control (and the actual filtering) — this is only the reading-column
+  // statement of it, which is the one place a beginner will read before they
+  // reach any control at all.
+  const foundationalCount = problems.filter((problem) => problem.difficulty === "beginner").length;
+
   // A lean lesson-slug → title lookup, for just the lessons these problems
   // actually reference, built here from the real lesson corpus — never
   // from the problem registry, and never imported into the client
@@ -61,10 +69,26 @@ export default async function ProblemsPage() {
         <SectionTitle level={1} size="xl" className="mt-3">
           Practice what you&rsquo;ve learned
         </SectionTitle>
+        {/*
+          The plain line first, before any count or filter strip: what these
+          are and how to use one. A newcomer arriving here sees a catalog of
+          graduate-flavoured exercises, and docs/BEGINNER_REVIEW.md's complaint
+          was never that they are too hard — it is that nothing on the page
+          says what to *do* with them, or that being wrong is free. Both facts
+          fit in a sentence, so they get one, in the reading column, above
+          everything else.
+        */}
         <Lede className="mt-4 max-w-2xl">
-          {problems.length} practice problems, tied to real lessons. Each is graded exactly, with
-          progressive hints and a worked solution if you get stuck.
+          A problem is one short exercise attached to one lesson. Type an answer, submit it, and it is
+          graded on the spot against the real quantum engine — take as many attempts as you like, then
+          open a hint or the full worked solution.
         </Lede>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          {problems.length} of them, across all six pillars, and{" "}
+          <span className="text-foreground">{foundationalCount} need only a first lesson</span> — the
+          Foundational filter below shows exactly those. Nothing is locked, nothing is scored, and every
+          problem links back to the lesson it came from.
+        </p>
       </Section>
 
       <Section width="wide" tight>

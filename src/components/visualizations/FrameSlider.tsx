@@ -48,7 +48,11 @@ export function FrameSlider({
         step={1}
         value={index}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-2 w-full accent-brand"
+        // `h-11`: a range input centres its track inside whatever height it's
+        // given, so this buys a 44px touch target on mobile without changing
+        // the track's appearance. Keyboard scrubbing (arrows/Home/End) is
+        // native to `input[type=range]`.
+        className="mt-1 h-11 w-full accent-brand"
         aria-label={effectiveLabel}
         // `valueLabel` is already the caller's pre-formatted, humanized
         // readout for the current frame (e.g. "θ = 30°", "η = 0.30") — wire

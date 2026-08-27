@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { LazyWavefunctionHeroExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionHeroExplorer";
 import { ContinueLearning } from "@/components/curriculum/ContinueLearning";
+import { CurriculumStrip } from "@/components/home/CurriculumStrip";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { getAllProblemMeta } from "@/lib/problems/registry";
 import { PILLARS } from "@/lib/content/curriculum";
@@ -13,7 +14,7 @@ import { PILLARS } from "@/lib/content/curriculum";
  * 14 named tools on /simulators, plus the concept map and the density-matrix
  * pillar's dedicated three-component mixture explorer — no single registry
  * exports a live count today, so this is hand-counted rather than derived.
- * Every other readout below (lessons, problems, pillars) comes straight from
+ * Every other readout below (lessons, problems, tracks) comes straight from
  * the same data the rest of the site reads.
  */
 const SIMULATOR_COUNT = "16+";
@@ -26,8 +27,13 @@ const SIMULATOR_COUNT = "16+";
  * visitor's eye can *do* something with is the physics, not the copy.
  *
  * Async because it reads the real curriculum counts (lessons, problems,
- * pillars) for the readout strip instead of hard-coding them — the same
+ * tracks) for the readout strip instead of hard-coding them — the same
  * pattern `ContinueLearning` already uses one level down.
+ *
+ * The readouts are followed by `CurriculumStrip` rather than left to stand
+ * alone: a count of "6 Tracks" is only a figure until the six are named, and
+ * naming them here is what stops the page's real contents from being
+ * invisible until the visitor has scrolled past two full sections.
  */
 export async function Hero() {
   const lessons = await getAllLessonsMeta();
@@ -85,9 +91,10 @@ export async function Hero() {
               { label: "Lessons", value: lessons.length },
               { label: "Problems", value: problemCount },
               { label: "Simulators", value: SIMULATOR_COUNT },
-              { label: "Pillars", value: PILLARS.length, unit: "→ Apex" },
+              { label: "Tracks", value: PILLARS.length, unit: "→ Apex" },
             ]}
           />
+          <CurriculumStrip />
         </Reveal>
       </Section>
     </section>

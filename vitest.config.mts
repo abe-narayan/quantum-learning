@@ -4,6 +4,7 @@ import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import rehypeScrollableMath from "./src/lib/mdx/rehypeScrollableMath.mjs";
 
 // Vite/Vitest has no built-in .mdx loader (that's Next's @next/mdx +
 // @mdx-js/loader, which is webpack-only). This plugin recompiles .mdx files
@@ -21,7 +22,11 @@ function mdx(): Plugin {
         {
           jsx: false,
           remarkPlugins: [remarkGfm, remarkMath],
-          rehypePlugins: [[rehypeKatex, { strict: false }]],
+          // Must stay after rehype-katex — it tags `.katex-display`, which
+          // does not exist until KaTeX has rendered. Kept in step with
+          // next.config.ts so `lessonRender.test.ts` exercises the real
+          // output rather than a pipeline the site never runs.
+          rehypePlugins: [[rehypeKatex, { strict: false }], rehypeScrollableMath],
         }
       );
       return { code: String(compiled), map: null };

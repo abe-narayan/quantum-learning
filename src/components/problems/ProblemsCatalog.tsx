@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ProblemFilters } from "./ProblemFilters";
+import { useCallback, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { FilterChips } from "@/components/curriculum/FilterChips";
 import { ProblemCard, ProblemRow } from "./ProblemCard";
 import { getCourse, COURSES } from "@/lib/content/curriculum";
 import { useProblemsProgress } from "@/lib/problems/progress";
@@ -20,6 +21,19 @@ import type { ProblemDifficulty, ProblemMeta, ProblemType } from "@/lib/problems
 type PillarFilter = "all" | Pillar;
 type DifficultyFilter = "all" | ProblemDifficulty;
 type TypeFilter = "all" | ProblemType;
+type StatusFilter = "all" | "unsolved" | "ready";
+
+/**
+ * Only offered once there is progress to filter *against* — see
+ * `hasProgress` below. "Ready" means every lesson this problem lists as a
+ * prerequisite is marked complete; it is a shortcut to the actionable
+ * subset, not a gate, and nothing in the catalog is ever hidden by default.
+ */
+const STATUS_OPTIONS: { id: StatusFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "unsolved", label: "Unsolved" },
+  { id: "ready", label: "Ready for you" },
+];
 
 const PILLAR_OPTIONS: { id: PillarFilter; label: string }[] = [
   { id: "all", label: "All" },
@@ -54,12 +68,29 @@ const TYPE_OPTIONS: { id: TypeFilter; label: string }[] = [
   { id: "conceptual", label: "Short Answer" },
 ];
 
-/** A small pillar-hued dot for the topic filter row. Wrapped in its own
- *  `data-pillar` so it resolves that pillar's color regardless of the
- *  page's own (pillar-less) scope — see globals.css §2. */
-function pillarIndicator(id: PillarFilter) {
-  if (id === "all") return null;
-  return <span data-pillar={id} className="h-2 w-2 rounded-full bg-pillar-accent" aria-hidden="true" />;
+/** The four filter rows as one value, so "what would this row's other option
+ *  leave?" is a single call with one field overridden rather than four
+ *  near-identical predicates. */
+type FilterState = {
+  pillar: PillarFilter;
+  difficulty: DifficultyFilter;
+  type: TypeFilter;
+  status: StatusFilter;
+};
+
+/** The one predicate the visible list, the per-option counts and the empty
+ *  state all go through, so a chip can never claim a count the list then
+ *  contradicts. `solved`/`ready` are passed in rather than read here: they
+ *  come from client-side progress the caller has already gathered once for
+ *  the whole corpus. */
+function matchesFilters(problem: ProblemMeta, state: FilterState, solved: boolean, ready: boolean): boolean {
+  const course = getCourse(problem.course);
+  if (state.pillar !== "all" && course?.pillar !== state.pillar) return false;
+  if (state.difficulty !== "all" && problem.difficulty !== state.difficulty) return false;
+  if (state.type !== "all" && problem.problemType !== state.type) return false;
+  if (state.status === "unsolved" && solved) return false;
+  if (state.status === "ready" && (solved || !ready)) return false;
+  return true;
 }
 
 /** Curriculum order (mechanics → apex, courses in authored order within each
@@ -92,6 +123,25 @@ function splitFeatured(items: ProblemMeta[]): { featured: ProblemMeta[]; rest: P
 }
 
 type Recommendation = { problem: ProblemMeta; resumed: boolean };
+
+/**
+ * The cold-start answer to "which one do I try first?"
+ *
+ * `pickRecommendation` below correctly declines to recommend anything to a
+ * visitor with no completed lessons — it has nothing to reason from. But
+ * that left the exact reader who most needs a starting point (someone
+ * landing on `/problems` before they have read anything) facing 547 problems
+ * across six pillars and a filter strip. This picks the first foundational
+ * problem in curriculum order — the same order the rest of the site teaches
+ * in, so it is the site's own opinion about where to begin rather than a
+ * separate ranking invented here. Falls back to the first problem overall if
+ * nothing is tagged `beginner`.
+ */
+function pickStartingPoint(problems: ProblemMeta[]): ProblemMeta | null {
+  if (problems.length === 0) return null;
+  const foundational = problems.filter((problem) => problem.difficulty === "beginner");
+  return sortByCourseOrder(foundational.length > 0 ? foundational : problems)[0] ?? null;
+}
 
 /**
  * "If I only practice one thing next, what should it be?" — derived from
@@ -149,6 +199,20 @@ export function ProblemsCatalog({
   const [pillar, setPillar] = useState<PillarFilter>("all");
   const [difficulty, setDifficulty] = useState<DifficultyFilter>("all");
   const [type, setType] = useState<TypeFilter>("all");
+  const [status, setStatus] = useState<StatusFilter>("all");
+
+  // Where "show me the easy ones" and "clear the filters" both land the
+  // reader. Focused as well as scrolled: a keyboard or screen-reader user who
+  // activates a control at the top of the page and gets only a scroll has
+  // been moved somewhere their focus isn't, and their next Tab goes back to
+  // the filter strip they just left.
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const goToResults = useCallback(() => {
+    const node = resultsRef.current;
+    if (!node) return;
+    node.focus({ preventScroll: true });
+    node.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
   // Read once, for every problem, not just the currently filtered set — a
   // recommendation or a section's "solved" readout has to reason about
@@ -163,21 +227,153 @@ export function ProblemsCatalog({
   );
 
   const completedLessons = useCompletedLessonSlugs();
+
+  // "Every lesson this problem lists as a prerequisite is already complete."
+  // Computed once for the whole corpus rather than per card, because both the
+  // `Ready` marker and the status filter need it, and because the status
+  // filter has to reason about problems the other filters are hiding.
+  // `hasProgress` gates the whole idea: with nothing completed, every problem
+  // with prerequisites is un-ready and every one without is trivially ready,
+  // which is noise rather than signal — see `ReadyTag` in ProblemCard.
+  const hasProgress = completedLessons.size > 0;
+  const readyBySlug = useMemo(() => {
+    const ready = new Set<string>();
+    if (!hasProgress) return ready;
+    for (const problem of problems) {
+      const prerequisites = problem.prerequisites ?? [];
+      if (prerequisites.length > 0 && prerequisites.every((slug) => completedLessons.has(slug))) {
+        ready.add(problem.slug);
+      }
+    }
+    return ready;
+  }, [problems, completedLessons, hasProgress]);
+
   const recommendation = useMemo(
     () => pickRecommendation(problems, completedLessons, progressBySlug),
     [problems, completedLessons, progressBySlug]
   );
   const recommendationCourse = recommendation ? getCourse(recommendation.problem.course) : undefined;
 
-  const filtered = useMemo(() => {
-    return problems.filter((problem) => {
-      const course = getCourse(problem.course);
-      const matchesPillar = pillar === "all" || course?.pillar === pillar;
-      const matchesDifficulty = difficulty === "all" || problem.difficulty === difficulty;
-      const matchesType = type === "all" || problem.problemType === type;
-      return matchesPillar && matchesDifficulty && matchesType;
-    });
-  }, [problems, pillar, difficulty, type]);
+  // The cold-start path, derived from the real corpus rather than an authored
+  // "start here" list: how many problems actually carry the lowest difficulty
+  // rung, and which of those comes first in curriculum order.
+  const foundationalCount = useMemo(
+    () => problems.filter((problem) => problem.difficulty === "beginner").length,
+    [problems]
+  );
+  const startingPoint = useMemo(() => pickStartingPoint(problems), [problems]);
+
+  const active: FilterState = useMemo(
+    () => ({ pillar, difficulty, type, status }),
+    [pillar, difficulty, type, status]
+  );
+
+  const matches = useCallback(
+    (problem: ProblemMeta, state: FilterState) => {
+      const solved = progressBySlug.get(problem.slug)?.solved ?? false;
+      return matchesFilters(problem, state, solved, readyBySlug.has(problem.slug));
+    },
+    [progressBySlug, readyBySlug]
+  );
+
+  const filtered = useMemo(
+    () => problems.filter((problem) => matches(problem, active)),
+    [problems, matches, active]
+  );
+
+  /**
+   * How many problems each option would leave, with the *other* three rows
+   * left as they are — the single most useful thing a filter row can say, and
+   * the reason `FilterChips` takes a `count`. Without it the only way to find
+   * out that "Foundational + Apex" is empty is to select it and watch the
+   * page go blank, which reads as a bug rather than as a fact about the
+   * corpus. Counted against the whole corpus rather than the visible set,
+   * because the question each chip answers is "what if I switched to this",
+   * not "what is here now".
+   */
+  const optionCounts = useMemo(() => {
+    const countIf = (override: Partial<FilterState>) =>
+      problems.reduce((total, problem) => total + (matches(problem, { ...active, ...override }) ? 1 : 0), 0);
+    return {
+      pillar: new Map(PILLAR_OPTIONS.map((option) => [option.id, countIf({ pillar: option.id })])),
+      difficulty: new Map(DIFFICULTY_OPTIONS.map((option) => [option.id, countIf({ difficulty: option.id })])),
+      type: new Map(TYPE_OPTIONS.map((option) => [option.id, countIf({ type: option.id })])),
+      status: new Map(STATUS_OPTIONS.map((option) => [option.id, countIf({ status: option.id })])),
+    };
+  }, [problems, matches, active]);
+
+  const withCounts = useCallback(
+    <T extends string>(options: { id: T; label: string }[], counts: Map<T, number>) =>
+      options.map((option) => ({ ...option, count: counts.get(option.id) ?? 0 })),
+    []
+  );
+
+  /**
+   * The active filters, as data — so the same list drives the visible
+   * "what is on right now" readout, each chip's individual undo, and the
+   * "Clear all" control, and the three can never disagree. Also what makes
+   * the state announceable: `aria-pressed` on a chip tells a screen-reader
+   * user the state of the chip they are *on*, but says nothing about the
+   * three rows they already scrolled past, which is exactly the confusion of
+   * a filtered list that looks empty for no visible reason.
+   */
+  const activeFilters = useMemo(() => {
+    const none: FilterState = { pillar: "all", difficulty: "all", type: "all", status: "all" };
+    const solo = (override: Partial<FilterState>) =>
+      problems.reduce((total, problem) => total + (matches(problem, { ...none, ...override }) ? 1 : 0), 0);
+
+    const list: { key: string; group: string; label: string; soloCount: number; clear: () => void }[] = [];
+    if (pillar !== "all") {
+      list.push({
+        key: "topic",
+        group: "Topic",
+        label: PILLAR_OPTIONS.find((option) => option.id === pillar)?.label ?? pillar,
+        soloCount: solo({ pillar }),
+        clear: () => setPillar("all"),
+      });
+    }
+    if (difficulty !== "all") {
+      list.push({
+        key: "difficulty",
+        group: "Difficulty",
+        label: DIFFICULTY_OPTIONS.find((option) => option.id === difficulty)?.label ?? difficulty,
+        soloCount: solo({ difficulty }),
+        clear: () => setDifficulty("all"),
+      });
+    }
+    if (type !== "all") {
+      list.push({
+        key: "type",
+        group: "Type",
+        label: TYPE_OPTIONS.find((option) => option.id === type)?.label ?? type,
+        soloCount: solo({ type }),
+        clear: () => setType("all"),
+      });
+    }
+    if (status !== "all") {
+      list.push({
+        key: "status",
+        group: "Showing",
+        label: STATUS_OPTIONS.find((option) => option.id === status)?.label ?? status,
+        soloCount: solo({ status }),
+        clear: () => setStatus("all"),
+      });
+    }
+    return list;
+  }, [problems, matches, pillar, difficulty, type, status]);
+
+  const clearAll = useCallback(() => {
+    setPillar("all");
+    setDifficulty("all");
+    setType("all");
+    setStatus("all");
+  }, []);
+
+  const showFoundational = useCallback(() => {
+    clearAll();
+    setDifficulty("beginner");
+    goToResults();
+  }, [clearAll, goToResults]);
 
   const solvedCount = useMemo(
     () => filtered.filter((problem) => progressBySlug.get(problem.slug)?.solved).length,
@@ -259,6 +455,39 @@ export function ProblemsCatalog({
         </div>
       ) : null}
 
+      {/*
+        The cold-start counterpart to the recommendation above, and the one
+        thing a beginner landing on this page most needs. `pickRecommendation`
+        correctly declines to recommend anything to a reader with no completed
+        lessons — it has nothing to reason from — which left exactly that
+        reader facing 547 graduate-flavoured exercises, six pillar sections
+        and a filter strip, with no visible answer to "which of these can I
+        possibly do?". Both facts here come from the corpus, not from an
+        authored starter list: how many problems actually sit on the lowest
+        difficulty rung, and which of those comes first in the order the rest
+        of the site teaches in.
+      */}
+      {!recommendation && startingPoint && foundationalCount > 0 ? (
+        <Instrument className="mb-10" label="New here?">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            <span className="text-foreground">
+              {foundationalCount} of these {problems.length} problems are foundational
+            </span>{" "}
+            — they assume a first lesson, not a degree. Everything else stays open to you; nothing here
+            is locked.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">
+            <Button onClick={showFoundational}>Show the {foundationalCount} foundational problems</Button>
+            <Link
+              href={`/problems/${startingPoint.slug}`}
+              className="inline-flex min-h-11 items-center rounded-[--radius-tight] text-sm text-pillar-text underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+            >
+              Or open the first one: &ldquo;{startingPoint.title}&rdquo;
+            </Link>
+          </div>
+        </Instrument>
+      ) : null}
+
       <div className="instrument overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-2.5 sm:px-5">
           <span className="tech-label">Filters</span>
@@ -266,16 +495,94 @@ export function ProblemsCatalog({
             <TechValue>{filtered.length}</TechValue> of {problems.length}
           </span>
         </div>
+        {/*
+          `FilterChips` (shared with `/learn`) replaces this directory's own
+          `ProblemFilters`, now deleted: it is the same control carrying the
+          three things that one was missing — 44px chips, a filled-vs-hollow
+          disc so the selected state is a shape and not only a tint, and a
+          per-option count. It also fixes the bug those chips shipped with:
+          `border-pillar-accent` is not a registered Tailwind color (the ramp
+          exposes `pillar`, which *is* `--pillar-accent`), so the selected
+          chip's outline compiled to nothing and the state really was
+          color-only. The one thing lost in the swap is the small pillar-hued
+          dot the Topic row used to carry; the count is the better use of that
+          slot, and the dot was decorative color anyway.
+        */}
         <div className="flex flex-wrap gap-x-8 gap-y-5 p-4 sm:p-5">
-          <ProblemFilters label="Topic" options={PILLAR_OPTIONS} selected={pillar} onChange={setPillar} indicator={pillarIndicator} />
-          <ProblemFilters label="Difficulty" options={DIFFICULTY_OPTIONS} selected={difficulty} onChange={setDifficulty} />
-          <ProblemFilters label="Type" options={TYPE_OPTIONS} selected={type} onChange={setType} />
+          <FilterChips label="Topic" options={withCounts(PILLAR_OPTIONS, optionCounts.pillar)} selected={pillar} onChange={setPillar} />
+          <FilterChips
+            label="Difficulty"
+            options={withCounts(DIFFICULTY_OPTIONS, optionCounts.difficulty)}
+            selected={difficulty}
+            onChange={setDifficulty}
+          />
+          <FilterChips label="Type" options={withCounts(TYPE_OPTIONS, optionCounts.type)} selected={type} onChange={setType} />
+          {/* Only offered once there is progress to filter *against* — with
+              nothing completed, "Ready for you" and "Unsolved" would both be
+              synonyms for "All" and the row would be three dead controls. */}
+          {hasProgress ? (
+            <FilterChips
+              label="Showing"
+              options={withCounts(STATUS_OPTIONS, optionCounts.status)}
+              selected={status}
+              onChange={setStatus}
+            />
+          ) : null}
         </div>
+
+        {/*
+          What is on right now, stated in words, with a one-click undo for
+          each and for all of them at once. Rendered inside the filter
+          instrument (not floating above the results) so the state and the
+          controls that produced it stay in one place.
+        */}
+        {activeFilters.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border px-4 py-3 sm:px-5">
+            <span className="tech-label shrink-0">Active</span>
+            {activeFilters.map((filter) => (
+              <button
+                key={filter.key}
+                type="button"
+                onClick={filter.clear}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-pillar-edge bg-pillar-wash px-3.5 py-1 text-sm text-pillar-text transition-colors duration-[--dur-fast] hover:border-pillar focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+              >
+                <span className="text-subtle-foreground">{filter.group}:</span>
+                {filter.label}
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="shrink-0">
+                  <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+                <span className="sr-only">— remove this filter</span>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={clearAll}
+              className="ml-auto inline-flex min-h-11 items-center rounded-[--radius-tight] px-1 text-sm text-muted-foreground underline underline-offset-4 transition-colors duration-[--dur-fast] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+            >
+              Show all {problems.length} problems
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      <div className="mt-5 flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
+      {/*
+        `tabIndex={-1}` so "Show the foundational problems" and "Clear all
+        filters" can move focus here rather than only scrolling the viewport.
+        The count line is a live region: a filter change repaints the whole
+        list below silently otherwise, which is precisely the case where a
+        screen-reader user is left not knowing whether anything happened.
+      */}
+      <div
+        ref={resultsRef}
+        tabIndex={-1}
+        aria-label="Problem results"
+        className="mt-5 flex items-center justify-between gap-3 scroll-mt-24 focus:outline-none"
+      >
+        <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
           {filtered.length} problem{filtered.length === 1 ? "" : "s"}
+          {activeFilters.length > 0
+            ? ` matching ${activeFilters.map((filter) => filter.label.toLowerCase()).join(", ")}`
+            : ""}
         </p>
         {solvedCount > 0 ? (
           <p className="tech-label text-pillar-text">
@@ -304,6 +611,7 @@ export function ProblemsCatalog({
                     featured={featured}
                     rest={rest}
                     progressBySlug={progressBySlug}
+                    readyBySlug={readyBySlug}
                     lessonTitleBySlug={lessonTitleBySlug}
                   />
                 </section>
@@ -327,6 +635,7 @@ export function ProblemsCatalog({
                   featured={featured}
                   rest={rest}
                   progressBySlug={progressBySlug}
+                  readyBySlug={readyBySlug}
                   lessonTitleBySlug={lessonTitleBySlug}
                 />
               </section>
@@ -334,9 +643,48 @@ export function ProblemsCatalog({
           </div>
         ) : null
       ) : (
-        <p className="mt-10 rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          No problems match these filters yet.
-        </p>
+        /*
+          A dead end with a way out of it. The previous version was a single
+          grey sentence: it named the situation and offered nothing, so a
+          reader who had narrowed to an empty intersection (easy to do — e.g.
+          Foundational + Apex, which genuinely has no members) had to work out
+          for themselves which of four chips to un-press. This states the
+          combination that produced the emptiness and puts both escapes —
+          drop everything, or fall back to the foundational set — in reach.
+        */
+        <div className="mt-10 rounded-[--radius-panel] border border-dashed border-border p-8 text-center">
+          <p className="text-sm text-foreground">
+            {activeFilters.length > 1
+              ? `No problem is all of these at once: ${activeFilters.map((filter) => filter.label).join(" + ")}.`
+              : `Nothing here yet: ${activeFilters[0]?.label ?? "no problems"}.`}
+          </p>
+          {activeFilters.length > 0 ? (
+            /* Each filter's own standalone total, so the emptiness reads as a
+               fact about the corpus ("Apex has 99 problems, none of them
+               foundational") rather than as a broken page. Derived through the
+               same `matches` predicate as the list itself. */
+            <p className="mt-2 text-sm text-muted-foreground">
+              {activeFilters
+                .map((filter) => `${filter.label} on its own: ${filter.soloCount}`)
+                .join(" · ")}
+            </p>
+          ) : null}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <Button
+              onClick={() => {
+                clearAll();
+                goToResults();
+              }}
+            >
+              Show all {problems.length} problems
+            </Button>
+            {foundationalCount > 0 && difficulty !== "beginner" ? (
+              <Button variant="secondary" onClick={showFoundational}>
+                Show the {foundationalCount} foundational problems
+              </Button>
+            ) : null}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -349,11 +697,16 @@ function ProblemGroupBody({
   featured,
   rest,
   progressBySlug,
+  readyBySlug,
   lessonTitleBySlug,
 }: {
   featured: ProblemMeta[];
   rest: ProblemMeta[];
   progressBySlug: Map<string, ProblemProgress>;
+  /** Slugs whose every prerequisite lesson is complete — empty for a reader
+   *  with no progress, so the `Ready` marker stays absent rather than
+   *  meaningless. See `readyBySlug` in `ProblemsCatalog`. */
+  readyBySlug: ReadonlySet<string>;
   lessonTitleBySlug: Record<string, string>;
 }) {
   return (
@@ -367,6 +720,7 @@ function ProblemGroupBody({
                 key={problem.slug}
                 problem={problem}
                 solved={progressBySlug.get(problem.slug)?.solved ?? false}
+                ready={readyBySlug.has(problem.slug)}
                 lessonTitle={lessonTitleBySlug[problem.lesson ?? ""]}
               />
             ))}
@@ -381,6 +735,7 @@ function ProblemGroupBody({
               <ProblemRow
                 problem={problem}
                 solved={progressBySlug.get(problem.slug)?.solved ?? false}
+                ready={readyBySlug.has(problem.slug)}
                 lessonTitle={lessonTitleBySlug[problem.lesson ?? ""]}
               />
             </li>

@@ -26,11 +26,11 @@ export const lessonMeta = {
   module: "complex-numbers-for-physics",
   order: 1,
   difficulty: "foundational",
-  estimatedMinutes: 30,
+  estimatedMinutes: 35,
   prerequisites: [],
   objectives: [
     "Perform arithmetic with complex numbers in rectangular and polar form",
-    "Derive Euler's formula from the Taylor series and use it to multiply complex numbers by adding phases",
+    "Derive Euler's formula from the power series for e^x, cos θ, and sin θ (all three stated in this lesson — no calculus required) and use it to multiply complex numbers by adding phases",
     "Explain, at least informally, why physics needs complex numbers rather than treating them as a bookkeeping trick",
   ],
   related: [
@@ -67,6 +67,16 @@ been done specifically to check this. We won't prove that claim here (it
 takes the whole framework this course builds to even state precisely),
 but it's why this course starts with complex arithmetic rather than
 vectors or physics.
+
+<Callout type="note">
+**What this lesson assumes.** Algebra, and trigonometry in radians —
+$\sin$, $\cos$, and the unit circle. No calculus. Euler's formula is
+derived here rather than quoted, and the derivation runs on three power
+series; those series are stated and checked numerically in their own
+section before the derivation uses them, so you don't need to have met
+them before. The one step that genuinely comes from calculus is named
+where it's used rather than slipped past.
+</Callout>
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Leonhard_Euler.jpg"
@@ -118,7 +128,7 @@ $$
 zz^* = (a+bi)(a-bi) = a^2 - abi + abi - b^2i^2 = a^2+b^2
 $$
 
-That non-negative real quantity defines the **modulus**:
+That non-negative real quantity defines the **<Term id="modulus">modulus</Term>**:
 
 $$
 |z| = \sqrt{zz^*} = \sqrt{a^2+b^2}
@@ -126,7 +136,7 @@ $$
 
 This single fact, that $zz^*$ is always real and non-negative, is the reason
 complex numbers can be turned into probabilities at all: whatever a
-"probability amplitude" turns out to be, multiplying it by its own
+"<Term id="amplitude">probability amplitude</Term>" turns out to be, multiplying it by its own
 conjugate always produces something you can legally call a probability.
 
 ### Polar form
@@ -139,9 +149,69 @@ $$
 z = a+bi = r(\cos\theta + i\sin\theta), \qquad r = |z|
 $$
 
-The next section derives a famously tidy relationship between this polar
-form and the exponential function. Before seeing the derivation, predict
-what kind of relationship it is.
+The step after this one rewrites $\cos\theta + i\sin\theta$ as a single
+exponential. The only tool it needs is the power series, so that comes
+first.
+
+### The power series this lesson borrows
+
+A **power series** is a polynomial with infinitely many terms. Some
+functions can be written as one, and where they can, the infinite
+polynomial doesn't approximate the function: it equals it. Three such
+expansions are all the next section uses, with $\theta$ in radians and
+$n! = 1\cdot 2\cdots n$:
+
+$$
+e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \cdots
+$$
+
+$$
+\cos\theta = 1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \cdots
+$$
+
+$$
+\sin\theta = \theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \cdots
+$$
+
+Where these come from is calculus. A <Term id="taylor-series">power
+series of this kind</Term> is built from a function's derivatives at a
+single point, and proving that the infinite sum reproduces the function is
+a theorem, not an observation. This lesson doesn't prove it. What you can
+do with arithmetic alone is check it. Put $x = 1$ into the first series
+and add the first seven terms:
+
+$$
+1 + 1 + \tfrac{1}{2} + \tfrac{1}{6} + \tfrac{1}{24} + \tfrac{1}{120} + \tfrac{1}{720} = 2.718055\ldots
+$$
+
+against $e = 2.718281\ldots$ — three decimal places already, and every
+further term shrinks the gap. The same works for cosine. Take
+$\theta = 0.5$ and keep three terms: $1 - 0.125 + 0.00260416\ldots =
+0.87760416\ldots$, against $\cos 0.5 = 0.87758256\ldots$, agreeing to four
+decimal places. Adding the next term, $-\theta^6/6!$, closes the gap to
+under $10^{-7}$.
+
+The derivation below takes one step further than any of those checks
+covers: it substitutes a complex number, $i\theta$, into the series for
+$e^x$. That the series still converges for complex inputs, and that its
+terms may be regrouped into two separate real series without changing the
+sum, are results from complex analysis. They are used here on citation,
+not proved. Everything after the substitution is ordinary algebra with
+$i^2 = -1$.
+
+<Callout type="note">
+**If power series are new to you.** One fact carries the whole derivation:
+the three expansions above are exact, not approximations. Nothing in the
+next section differentiates, integrates, or takes a limit — it
+substitutes, applies $i^2 = -1$, and sorts terms into two groups. The
+machinery behind the three series (Taylor's theorem, convergence, radius
+of convergence) belongs to a first calculus course, and the
+[glossary entry on Taylor series](/glossary#taylor-series) is the short
+version. You can come back for it later without losing anything here.
+</Callout>
+
+Before reading the derivation, predict what kind of relationship it
+establishes.
 
 <PredictBeforeReveal
   question="Is e^{iθ} = cos θ + i sin θ an exact identity for every real θ, or just a convenient approximation?"
@@ -160,8 +230,9 @@ what kind of relationship it is.
 The expression $\cos\theta + i\sin\theta$ turns out to equal a single
 exponential, $e^{i\theta}$: this is **Euler's formula**. The prediction
 above claimed exact equality, not approximation, which is a strong enough
-claim to earn a real derivation rather than a citation. The Taylor series
-for $e^x$ converges for complex inputs too, so substitute $x = i\theta$.
+claim to earn a real derivation rather than a citation. The series for
+$e^x$ from the previous section converges for complex inputs too, so
+substitute $x = i\theta$.
 
 <DerivationSteps>
   <DerivationStep annotation="Substitute x = iθ directly into the Taylor series for e^x.">
@@ -335,8 +406,9 @@ phase can sum to a modulus of zero.
   $90°$ rotation.
 - Conjugation and modulus: $z^*=a-bi$, $|z|=\sqrt{zz^*}=\sqrt{a^2+b^2}$,
   always real and non-negative.
-- Euler's formula, derived from the Taylor series:
-  $e^{i\theta}=\cos\theta+i\sin\theta$; consequently $|e^{i\theta}|=1$.
+- Euler's formula, derived from the power series for $e^x$, $\cos\theta$,
+  and $\sin\theta$: $e^{i\theta}=\cos\theta+i\sin\theta$; consequently
+  $|e^{i\theta}|=1$.
 - In polar form, multiplication multiplies magnitudes and **adds phases**:
   $z_1z_2=r_1r_2e^{i(\theta_1+\theta_2)}$.
 - De Moivre's theorem and the $n$th roots of unity follow directly from
@@ -353,7 +425,7 @@ phase can sum to a modulus of zero.
 </ChallengePrompt>
 
 <NextDiscovery>
-  Next: [Vector Spaces](/lessons/quantum-mechanics/mathematical-foundations/vector-spaces), where the complex numbers you just built become
+  Up next, [Vector Spaces](/lessons/quantum-mechanics/mathematical-foundations/vector-spaces): the complex numbers you just built become
   the *scalars* a vector space is allowed to use, the first step toward
   describing a quantum state as a vector rather than a single number. If
   you've studied the Quantum Computing track already, its [Complex Numbers

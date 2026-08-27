@@ -6,8 +6,14 @@ import { Instrument, FadeRule } from "@/components/ui/Panel";
 import { Eyebrow, SectionTitle, Lede, TechLabel, Readouts } from "@/components/ui/Typography";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/motion/Reveal";
-import { CourseList } from "@/components/curriculum/CourseList";
-import { CourseTimeline } from "@/components/curriculum/CourseTimeline";
+import { MasteryResultsIndex } from "@/components/mastery/MasteryResultsIndex";
+import { ReadinessReadout } from "@/components/apex/ReadinessReadout";
+import {
+  directPrerequisites,
+  firstAuthoredLessonSlug,
+  prerequisiteChain,
+} from "@/components/apex/readiness";
+import { getCourseHref } from "@/components/curriculum/courseHref";
 import { COURSES, PILLARS, getCoursesByPillar, getCourse, getPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { BASE_URL, buildBreadcrumbSchema, buildCourseListSchema, pillarUrl } from "@/lib/structuredData";
@@ -103,6 +109,13 @@ export default async function MasteryPage() {
 
   const gatedApexSlugs = new Set(dependencyRows.flatMap((row) => row.outbound.map((c) => c.slug)));
 
+  // The same prerequisite data the dependency structure above renders, walked
+  // transitively so `ReadinessReadout` can name the specific first course a
+  // reader who arrives early hasn't finished — see that component's own note
+  // on why this is a status readout and not a gate.
+  const directPrereqs = directPrerequisites(courses, lessons);
+  const prereqChain = prerequisiteChain(courses, lessons);
+
   const qft = computeQftStructure(3);
   const cellSize = 20;
   const margin = 32;
@@ -138,6 +151,18 @@ export default async function MasteryPage() {
           Where the notation becomes the object
         </SectionTitle>
         <Lede className="mt-5 max-w-[46rem]">{PILLAR_INFO.description}</Lede>
+        <Reveal delay={60}>
+          <p className="mt-4 max-w-[46rem] text-base leading-relaxed text-muted-foreground">
+            Five self-contained structures, each making rigorous what the
+            core curriculum used but never proved: the spectral theorem
+            beyond bounded self-adjoint operators, the general
+            angular-momentum coupling behind the Wigner-Eckart theorem and
+            Berry&rsquo;s geometric phase, the Schmidt decomposition and the
+            Lindblad master equation, a formal BQP with a real
+            Trotter-Suzuki error bound, and quantum Shannon theory&rsquo;s
+            POVMs, Stinespring dilation, and channel capacities.
+          </p>
+        </Reveal>
         <Reveal delay={90}>
           <Readouts
             className="mt-8"
@@ -147,6 +172,15 @@ export default async function MasteryPage() {
               { label: "Lessons authored", value: `${authoredModules}/${totalModules}` },
               { label: "Level", value: "Master", unit: "graduate" },
             ]}
+          />
+        </Reveal>
+        <Reveal delay={120}>
+          <ReadinessReadout
+            className="mt-8 max-w-[46rem]"
+            label="Prerequisites assumed"
+            pillarLabel="Quantum Mastery"
+            direct={directPrereqs}
+            chain={prereqChain}
           />
         </Reveal>
       </Section>
@@ -164,7 +198,7 @@ export default async function MasteryPage() {
           </SectionTitle>
           <p className="mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
             Mastery does not have a single on-ramp. Each course below opens once its own real
-            prerequisites — drawn from the four core pillars — are complete, and each links forward
+            prerequisites — drawn from the four core tracks — are complete, and each links forward
             to whichever Apex course actually lists it as a requirement. Nothing here is asserted
             independently of that data.
           </p>
@@ -183,17 +217,26 @@ export default async function MasteryPage() {
                 >
                   <div className="flex flex-wrap gap-1.5">
                     {internalPrereq ? (
-                      <Badge tone="brand">After: {internalPrereq.title}</Badge>
+                      <Link
+                        href={getCourseHref(internalPrereq.slug, firstAuthoredLessonSlug(internalPrereq.slug, lessons))}
+                        className="hover:underline"
+                      >
+                        <Badge tone="brand">After: {internalPrereq.title}</Badge>
+                      </Link>
                     ) : null}
                     {inbound.map((prereq) => (
-                      <Link key={prereq.slug} href={pillarVisual(prereq.pillar).route} className="hover:underline">
+                      <Link
+                        key={prereq.slug}
+                        href={getCourseHref(prereq.slug, firstAuthoredLessonSlug(prereq.slug, lessons))}
+                        className="hover:underline"
+                      >
                         <Badge tone="neutral">
                           {prereq.title} · {pillarTitle(prereq.pillar)}
                         </Badge>
                       </Link>
                     ))}
                     {inbound.length === 0 && !internalPrereq ? (
-                      <span className="text-xs text-subtle-foreground">No core-pillar prerequisite</span>
+                      <span className="text-xs text-subtle-foreground">No core-track prerequisite</span>
                     ) : null}
                   </div>
 
@@ -203,8 +246,13 @@ export default async function MasteryPage() {
 
                   <div>
                     <TechLabel>{course.difficulty}</TechLabel>
-                    <p className="mt-1 font-display text-lg font-semibold leading-snug text-foreground">
-                      {course.title}
+                    <p className="mt-1 font-display text-lg font-semibold leading-snug">
+                      <Link
+                        href={getCourseHref(course.slug, firstAuthoredLessonSlug(course.slug, lessons))}
+                        className="text-foreground transition-colors hover:text-pillar-text focus-visible:text-pillar-text"
+                      >
+                        {course.title}
+                      </Link>
                     </p>
                   </div>
 
@@ -214,7 +262,11 @@ export default async function MasteryPage() {
 
                   <div className="flex flex-wrap gap-1.5">
                     {outbound.map((dependent) => (
-                      <Link key={dependent.slug} href={pillarVisual("apex").route} className="hover:underline">
+                      <Link
+                        key={dependent.slug}
+                        href={getCourseHref(dependent.slug, firstAuthoredLessonSlug(dependent.slug, lessons))}
+                        className="hover:underline"
+                      >
                         <Badge tone="accent">{dependent.title}</Badge>
                       </Link>
                     ))}
@@ -349,15 +401,27 @@ export default async function MasteryPage() {
       </Section>
 
       {/* -------------------------------------------------------------
-          Courses
+          The five structures — a bespoke results index in Mastery's own
+          register (see MasteryResultsIndex's own doc comment), replacing
+          the generic CourseTimeline + CourseList every core pillar shares.
+          Deliberately distinct from ApexCourseIndex: roman numerals rather
+          than §-numbering, a "Result" statement rather than a research-index
+          framing, and a flowing module line rather than a two-column grid.
           ------------------------------------------------------------- */}
-      <Section width="wide">
-        <h2 className="sr-only">Courses</h2>
+      <Section width="wide" aria-labelledby="results-index-heading">
         <Reveal>
-          <CourseTimeline courses={courses} lessons={lessons} />
+          <Eyebrow>The five structures</Eyebrow>
+          <SectionTitle id="results-index-heading" level={2} size="lg" className="mt-3">
+            Where the curriculum&rsquo;s results get proved
+          </SectionTitle>
+          <p className="mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
+            Five independent entry points, not a single track — see &ldquo;Curriculum
+            position&rdquo; above for exactly what each one requires. Every statement
+            below traces to that course&rsquo;s own module list.
+          </p>
         </Reveal>
-        <Reveal delay={80} className="mt-8">
-          <CourseList courses={courses} lessons={lessons} />
+        <Reveal delay={80} className="mt-10">
+          <MasteryResultsIndex courses={courses} lessons={lessons} />
         </Reveal>
       </Section>
 

@@ -14,6 +14,15 @@ import { Predict } from "../shared/Predict";
 
 const DEFAULT_NUM_QUBITS = 3;
 const DEFAULT_MARKED_INDEX = 5;
+/**
+ * Iteration 0 is the uniform superposition: eight bars of identical height,
+ * i.e. a literally flat chart that shows nothing the algorithm does. Opening
+ * one iteration in means the marked bar is already visibly taller than the
+ * rest the moment the instrument mounts, per the bench's "open
+ * mid-phenomenon" rule. Reset still returns to 0 — that really is the start
+ * of the algorithm, and the framing tells the reader to step from there.
+ */
+const DEFAULT_ITERATION = 1;
 const MIN_QUBITS = 2;
 const MAX_QUBITS = 4;
 const MAX_ITERATION = 200;
@@ -56,7 +65,7 @@ export function GroverExplorer() {
 
   const [numQubits, setNumQubits] = useState(initialGrover?.numQubits ?? DEFAULT_NUM_QUBITS);
   const [markedIndex, setMarkedIndex] = useState(initialGrover?.markedIndex ?? DEFAULT_MARKED_INDEX);
-  const [iteration, setIteration] = useState(initialGrover?.iteration ?? 0);
+  const [iteration, setIteration] = useState(initialGrover?.iteration ?? DEFAULT_ITERATION);
   const [copied, setCopied] = useState(false);
 
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -155,17 +164,34 @@ export function GroverExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
-          <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          <p className="text-sm text-muted-foreground">
+            Somewhere in a list of {2 ** numQubits} items, exactly one is the one you want, and the only thing
+            you can do is ask a black box &ldquo;is this it?&rdquo; Classically you check them one at a time.
+            Grover&rsquo;s algorithm instead pushes probability onto the right answer a little more with every
+            round, so that when you finally measure, you are overwhelmingly likely to get it. Each bar below
+            is one item; its height is the chance of measuring that item right now.
+          </p>
+
+          <div
+            aria-live="polite"
+            className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
+          >
             {iteration === 0 ? (
-              <>Starting in the uniform superposition: every basis state has the same amplitude and probability.</>
+              <>
+                Iteration 0 — the uniform superposition every run starts from: all {2 ** numQubits} items
+                equally likely, so measuring now would be a pure guess at {(100 / 2 ** numQubits).toFixed(1)}%.
+                Press Step to run one round.
+              </>
             ) : (
               <>
-                After {iteration} iteration{iteration === 1 ? "" : "s"}: P(marked) = {(successProbability * 100).toFixed(1)}%.{" "}
+                After {iteration} round{iteration === 1 ? "" : "s"}, the marked item is at{" "}
+                {(successProbability * 100).toFixed(1)}% — up from a{" "}
+                {(100 / 2 ** numQubits).toFixed(1)}% blind guess.{" "}
                 {iteration === optimal
-                  ? "This is the theoretical optimum. Stepping further will start to overshoot."
+                  ? "This is the theoretical optimum for this search space. Stepping further will start to overshoot."
                   : iteration > optimal
-                    ? "Past the optimum: success probability is now falling back down."
-                    : null}
+                    ? "Past the optimum: extra rounds now rotate the state past the answer, and the success probability is falling back down."
+                    : "Keep stepping toward the optimum shown in the controls."}
               </>
             )}
           </div>

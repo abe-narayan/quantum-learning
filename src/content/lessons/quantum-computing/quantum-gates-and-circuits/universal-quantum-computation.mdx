@@ -239,7 +239,7 @@ finitely many gates from that fixed list?"
 ### The Clifford group, and why it secretly isn't enough
 
 Restrict to the discrete gates already built throughout Quantum Gates &
-Circuits: $H$, $S$, and CNOT. The **Clifford group** is exactly the set
+Circuits: $H$, $S$, and CNOT. The **<Term id="clifford-group">Clifford group</Term>** is exactly the set
 of unitaries that map every Pauli operator to another Pauli operator
 under conjugation, $UPU^\dagger \in \{\pm X,\pm Y,\pm Z,\pm iX,\dots\}$
 for every Pauli $P$. Building Quantum Circuits already verified $HZH=X$,
@@ -249,7 +249,7 @@ $S$ and CNOT have the same property (checkable the same way).
 It's tempting to guess $\{H,S,\text{CNOT}\}$ is already universal,
 since it's discrete, includes an entangling gate, and every gate in it
 is used throughout this platform's algorithms. It is
-**not**, and the reason is the **Gottesman-Knill theorem** (cited here,
+**not**, and the reason is the **<Term id="gottesman-knill-theorem">Gottesman-Knill theorem</Term>** (cited here,
 not re-derived: the full proof tracks a stabilizer tableau through the
 circuit, exactly the bookkeeping Stabilizer Formalism Basics
 introduced for error-correcting codes):
@@ -333,7 +333,7 @@ rather than a finite one.
 
 Density is an existence statement — it doesn't say how MANY $H$'s and
 $T$'s are needed to hit a given target to a given accuracy $\varepsilon$.
-The **Solovay-Kitaev theorem** (Kitaev 1997) answers that:
+The **<Term id="solovay-kitaev-theorem">Solovay-Kitaev theorem</Term>** (Kitaev 1997) answers that:
 
 $$
 \text{gate count} = O\!\left(\log^{c}(1/\varepsilon)\right), \quad c\approx 2\text{-}4
@@ -348,7 +348,7 @@ course, *why* $T$ gates specifically are the expensive resource in a
 fault-tolerant quantum computer: Clifford gates (including $H$ and
 CNOT) can be implemented fault-tolerantly in a comparatively cheap,
 transversal way, while $T$ needs a separate, costly procedure called
-magic-state distillation. The Fault-Tolerant Thresholds capstone's
+<Term id="magic-state-distillation">magic-state distillation</Term>. The Fault-Tolerant Thresholds capstone's
 physical-to-logical qubit overhead is, in real architectures, driven
 substantially by exactly this $T$-gate cost — a concrete instance of a
 number this lesson names but, matching that capstone's own honesty

@@ -3,12 +3,23 @@ import { PillarScope } from "@/components/field/PillarScope";
 import { Section, FullBleed } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede, Readouts } from "@/components/ui/Typography";
 import { Instrument } from "@/components/ui/Panel";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { CourseList } from "@/components/curriculum/CourseList";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { getCourseHref } from "@/components/curriculum/courseHref";
+import {
+  PillarBriefing,
+  PillarLessonStrip,
+  PillarNext,
+  pillarFacts,
+  pillarReadoutItems,
+} from "@/components/pillar/PillarFraming";
 import { ControlSignalChainDiagram } from "@/components/visualizations/ControlSignalChainDiagram";
 import { HardwarePlatformSchematic } from "@/components/visualizations/HardwarePlatformSchematic";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
+import { pillarVisual } from "@/lib/design/pillars";
 import { BASE_URL, buildBreadcrumbSchema, buildCourseListSchema, pillarUrl } from "@/lib/structuredData";
 import { buildPageMetadata } from "@/lib/pageMetadata";
 
@@ -44,6 +55,16 @@ export default async function HardwarePage() {
     { name: "Home", url: BASE_URL },
     { name: "Hardware", url },
   ]);
+  const field = pillarVisual("quantum-hardware");
+
+  // One derivation over the real registries for every figure this page quotes
+  // about itself, and for the primary action (the real first course, in
+  // curriculum order) — see `pillarFacts`, shared with the other three track
+  // pages, and mechanics/page.tsx for why `getCourseHref` (→
+  // `/courses/<slug>`) is the right destination.
+  const facts = pillarFacts(courses, lessons);
+  const { firstCourse, firstLesson } = facts;
+  const heroHref = firstCourse ? getCourseHref(firstCourse.slug, firstLesson?.slug) : "/learn";
 
   return (
     <PillarScope pillar="quantum-hardware">
@@ -66,14 +87,25 @@ export default async function HardwarePage() {
             The five competing physical platforms used to build real qubits, then the dilution
             fridges, control electronics, and readout hardware that cool, drive, and measure
             them, and the noise and scaling limits that keep any one platform from winning
-            outright. Start with <em>Physical Qubit Platforms</em> — it picks up right after
-            Qubits &amp; Quantum States.
+            outright.
           </p>
         </Reveal>
 
         <Reveal delay={80}>
-          <Readouts
+          <PillarBriefing
             className="mt-8"
+            facts={facts}
+            outcome="Explain why a superconducting chip and a trapped-ion trap solve the same problem in almost opposite ways — and what each one's coherence, gate speed and wiring budget actually costs."
+          />
+        </Reveal>
+
+        <Reveal delay={100}>
+          <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
+          {/* The track's own instrument readouts, kept separate from the
+              shared course/lesson/hour row above: these describe the physical
+              regime this track lives in, not the size of its curriculum. */}
+          <Readouts
+            className="mt-6"
             items={[
               { label: "Platforms compared", value: PLATFORMS.length },
               { label: "Coldest stage", value: "~15", unit: "mK" },
@@ -81,6 +113,27 @@ export default async function HardwarePage() {
             ]}
           />
         </Reveal>
+
+        {firstCourse ? (
+          <Reveal delay={120} className="mt-7 block">
+            <Button href={heroHref} size="lg">
+              Start: {firstCourse.title} →
+            </Button>
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+              <span>
+                {facts.firstCourseLessonCount} lessons
+                {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
+              </span>
+              <DifficultyMark difficulty={firstCourse.difficulty} />
+            </p>
+          </Reveal>
+        ) : null}
+
+        <p className="mt-6 max-w-[42rem] border-l-2 border-pillar-edge pl-4 text-xs leading-relaxed text-subtle-foreground">
+          The wiring lighting up behind this page is not decoration either: {field.fieldCaption.toLowerCase()} —
+          the finite delay between &ldquo;signal sent&rdquo; and &ldquo;qubit responds&rdquo; that Control &amp;
+          Readout derives in full.
+        </p>
       </Section>
 
       <Section width="full" bleed tight className="border-y border-border bg-surface-muted/30">
@@ -102,10 +155,13 @@ export default async function HardwarePage() {
         </div>
       </Section>
 
-      <Section width="wide" tight>
+      <Section width="wide" tight aria-labelledby="hardware-platforms-heading">
         <Reveal>
-          <p className="tech-label">Platform comparison</p>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
+          <Eyebrow>Platform comparison</Eyebrow>
+          <SectionTitle level={2} size="sm" id="hardware-platforms-heading" className="mt-3">
+            Five ways to build a qubit
+          </SectionTitle>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
             Five platforms, one problem: each encodes a qubit in a different physical degree of
             freedom. The engineering tradeoffs — coherence, gate speed, connectivity, scale — are
             what <em>Physical Qubit Platforms</em> compares directly.
@@ -125,6 +181,16 @@ export default async function HardwarePage() {
               </div>
             ))}
           </div>
+        </Reveal>
+      </Section>
+
+      <Section width="reading" tight aria-labelledby="hardware-start-heading">
+        <Reveal>
+          <PillarLessonStrip
+            courses={courses}
+            lessons={lessons}
+            headingId="hardware-start-heading"
+          />
         </Reveal>
       </Section>
 
@@ -155,6 +221,12 @@ export default async function HardwarePage() {
           </div>
         </div>
       </FullBleed>
+
+      <Section width="reading" tight aria-labelledby="hardware-next-heading">
+        <Reveal>
+          <PillarNext pillar="quantum-hardware" headingId="hardware-next-heading" />
+        </Reveal>
+      </Section>
     </PillarScope>
   );
 }

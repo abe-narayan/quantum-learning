@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { pillarVisual } from "@/lib/design/pillars";
-import type { GlossaryTerm } from "@/lib/content/glossary";
+import { CONCEPT_NODES } from "@/lib/content/concepts";
+import type { GlossaryEntry, GlossaryTerm } from "@/lib/content/glossary";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { GlossaryStartHere } from "@/components/glossary/GlossaryStartHere";
 
 const PILLAR_LABEL: Record<GlossaryTerm["pillar"], string> = {
   "quantum-mechanics": "Quantum Mechanics",
@@ -31,13 +34,30 @@ function letterAnchorId(letter: string) {
 
 export function GlossaryFilter({
   terms,
+  startHereTerms,
   lessonTitles,
 }: {
-  terms: GlossaryTerm[];
+  terms: GlossaryEntry[];
+  /** The curated beginner tier, already in reading order (`getStartHereTerms()`). */
+  startHereTerms: GlossaryEntry[];
   /** Real lesson slug -> real lesson title, sourced from getAllLessonsMeta() on the server. */
   lessonTitles: Record<string, string>;
 }) {
   const [query, setQuery] = useState("");
+
+  const titlesById = useMemo(
+    () => new Map(terms.map((term) => [term.id, term.title])),
+    [terms]
+  );
+
+  // Every /map concept node is also a glossary term sharing the same `id`
+  // (GLOSSARY_TERMS is literally built from CONCEPT_NODES plus extra terms —
+  // see lib/content/glossary.ts), so this set is exactly "which glossary
+  // terms have a node on the concept map" — no data duplication, and never a
+  // fabricated link. `concepts.ts` is a small, budgeted client data module
+  // (see clientBoundary.test.ts's CLIENT_DATA_BUDGET_KB), already imported
+  // by the map's own client component.
+  const conceptIds = useMemo(() => new Set(CONCEPT_NODES.map((node) => node.id)), []);
 
   const sorted = useMemo(
     () => [...terms].sort((a, b) => a.title.localeCompare(b.title)),
@@ -53,7 +73,7 @@ export function GlossaryFilter({
   }, [sorted, query]);
 
   const groups = useMemo(() => {
-    const map = new Map<string, GlossaryTerm[]>();
+    const map = new Map<string, GlossaryEntry[]>();
     for (const term of filtered) {
       const letter = letterOf(term.title);
       if (!map.has(letter)) map.set(letter, []);
@@ -64,8 +84,54 @@ export function GlossaryFilter({
 
   const presentLetters = useMemo(() => new Set(groups.keys()), [groups]);
 
+  // The Start here tier is a *browsing* affordance — a path through the A-Z
+  // for someone who doesn't yet know which word they're missing. Once the
+  // reader is filtering they have named the word themselves, so the tier is
+  // no longer helping and would only push their matches off-screen. It is
+  // unmounted rather than hidden so its fifteen links can't be tabbed into
+  // while invisible.
+  const filtering = query.trim().length > 0;
+
+  // A "See also" link points at another entry's `#id`. While a filter is
+  // active that entry may not be rendered, and a bare `href="#..."` to an
+  // element that isn't in the DOM silently does nothing — the worst kind of
+  // broken link, because it looks fine. So a cross-reference clicked while
+  // filtering clears the filter first and completes the jump on the next
+  // render, once the destination actually exists.
+  // A ref rather than state, and keyed on `query` rather than on itself: the
+  // pending anchor is a one-shot instruction for the *next* render, not a
+  // value anything renders, so putting it in state meant the effect had to
+  // clear it by calling `setPendingAnchor(null)` inside itself — a
+  // set-state-in-effect cascade that React's compiler lint rejects outright.
+  // Reading and clearing a ref does the same job with no extra render.
+  const pendingAnchorRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const anchor = pendingAnchorRef.current;
+    if (anchor === null) return;
+    pendingAnchorRef.current = null;
+    // Assigning the hash (rather than scrollIntoView) is deliberate: it both
+    // scrolls and updates `:target`, so the destination highlights exactly as
+    // it would for a deep link arriving from a lesson.
+    if (document.getElementById(anchor)) window.location.hash = `#${anchor}`;
+  }, [query]);
+
+  const crossReference = (id: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!filtering) return;
+    event.preventDefault();
+    pendingAnchorRef.current = id;
+    setQuery("");
+  };
+
   return (
-    <div className="lg:grid lg:grid-cols-[2.75rem_1fr] lg:items-start lg:gap-10">
+    <>
+      {filtering ? null : (
+        <div className="mb-10">
+          <GlossaryStartHere terms={startHereTerms} />
+        </div>
+      )}
+
+      <div className="lg:grid lg:grid-cols-[2.75rem_1fr] lg:items-start lg:gap-10">
       {/* Persistent alphabet index — desktop: a sticky rail of real in-page
           anchors (not buttons), so it's a genuine jump-list a keyboard or
           screen-reader user can Tab/traverse, not a JS-only scroll gimmick.
@@ -164,21 +230,68 @@ export function GlossaryFilter({
                     const visual = pillarVisual(term.pillar);
 
                     return (
-                      <div key={term.id} id={term.id} data-pillar={term.pillar} className="scroll-mt-40 py-5">
-                        <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div
+                        key={term.id}
+                        id={term.id}
+                        data-pillar={term.pillar}
+                        // The `:target` treatment is what makes a deep link
+                        // land *visibly*. `/glossary#dirac-notation` (from
+                        // MechanicsSection, from lessons, from every `<Term>`
+                        // gloss's "Full glossary entry →") scrolls the entry
+                        // into view, but in a wall of a hundred-odd similar
+                        // rows "which one did I just arrive at?" is a real
+                        // question — especially now that the Start here tier
+                        // sends readers into the list by anchor too. The
+                        // transparent left border and negative margin are
+                        // always present so lighting it up shifts nothing.
+                        className="-ml-4 scroll-mt-40 border-l-2 border-transparent py-5 pl-4 target:border-pillar-accent target:bg-pillar-wash"
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
                           <dt className="font-display text-lg font-semibold tracking-tight text-foreground">
                             {term.title}
                           </dt>
-                          <span
-                            aria-label={PILLAR_LABEL[term.pillar]}
-                            className="shrink-0 rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-pillar-text"
-                          >
-                            {visual.short}
-                          </span>
+                          {/* Two independent signals, both readable without
+                              color: how much background the entry assumes
+                              (`DifficultyMark`'s filled/hollow ticks *plus*
+                              the level spelled out — the same instrument
+                              courses, lessons and problems already use) and
+                              which pillar it belongs to. Neither is a badge
+                              the reader earns; both are labels on a
+                              reference. */}
+                          <div className="flex shrink-0 items-center gap-3">
+                            <DifficultyMark difficulty={term.level} />
+                            <span
+                              aria-label={PILLAR_LABEL[term.pillar]}
+                              className="rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-pillar-text"
+                            >
+                              {visual.short}
+                            </span>
+                          </div>
                         </div>
                         <dd className="mt-1.5 max-w-[42rem] text-sm leading-relaxed text-muted-foreground">
                           {term.definition}
                         </dd>
+
+                        {term.relatedIds.length > 0 ? (
+                          // Two-way traffic between the beginner layer and
+                          // the research layer: `shot` points up at
+                          // `shot-noise-standard-error`, and that entry
+                          // points back down. Same-page `#` anchors, so the
+                          // `:target` rule above highlights the destination.
+                          <dd className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                            <span className="tech-label">See also</span>
+                            {term.relatedIds.map((relatedId) => (
+                              <a
+                                key={relatedId}
+                                href={`#${relatedId}`}
+                                onClick={crossReference(relatedId)}
+                                className="text-sm text-muted-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar-accent"
+                              >
+                                {titlesById.get(relatedId) ?? relatedId}
+                              </a>
+                            ))}
+                          </dd>
+                        ) : null}
 
                         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
                           {coveredIn.map((lesson) => (
@@ -198,6 +311,14 @@ export function GlossaryFilter({
                               Try the simulator
                             </Link>
                           ) : null}
+                          {conceptIds.has(term.id) ? (
+                            <Link
+                              href={`/map?concept=${term.id}`}
+                              className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar-accent"
+                            >
+                              See how this connects on the map
+                            </Link>
+                          ) : null}
                         </div>
                       </div>
                     );
@@ -207,9 +328,24 @@ export function GlossaryFilter({
             ))}
           </div>
         ) : (
-          <p className="mt-8 text-sm text-muted-foreground">No terms match &ldquo;{query}&rdquo;.</p>
+          <div className="mt-8 text-sm text-muted-foreground">
+            <p>No terms match &ldquo;{query}&rdquo;.</p>
+            <p className="mt-2">
+              Try{" "}
+              <span className="tech-value rounded border border-border px-1 py-0.5 text-xs">Ctrl K</span>{" "}
+              to search lessons, problems and simulators by name, or browse the{" "}
+              <Link
+                href="/map"
+                className="text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar-accent"
+              >
+                concept map
+              </Link>{" "}
+              to find it by what it connects to.
+            </p>
+          </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -87,12 +87,12 @@ qubits, more controlled modular multiplications) and whose *entire*
 output must be correct. A single bit-flip anywhere in a deep circuit can
 corrupt the period-finding measurement beyond recovery, which is why
 factoring cryptographically relevant numbers is believed to require
-**fault-tolerant** hardware (physical qubits protected by quantum error
-correction, the next course's subject) that doesn't exist at scale yet.
+**fault-tolerant** hardware (physical qubits protected by <Term id="quantum-error-correction">quantum error
+correction</Term>, the next course's subject) that doesn't exist at scale yet.
 
 VQE and QAOA use comparatively shallow circuits (one ansatz layer, or a
 few QAOA layers) run *many times*, with the classical optimizer able to
-partially average out or route around some kinds of noise. They aren't
+partially average out or route around some kinds of <Term id="noise-decoherence">noise</Term>. They aren't
 immune to it, but they're structurally more tolerant of imperfection than
 a single long, must-be-exactly-right circuit.
 
@@ -118,7 +118,7 @@ a single long, must-be-exactly-right circuit.
 
 ### The NISQ era, defined
 
-**NISQ** (Noisy Intermediate-Scale Quantum) names the current hardware
+**<Term id="nisq">NISQ</Term>** (Noisy Intermediate-Scale Quantum) names the current hardware
 era: tens to a few thousand physical qubits, no error correction, limited
 circuit depth before noise dominates the signal. VQE and QAOA are the
 leading NISQ-era algorithm candidates precisely because their hybrid

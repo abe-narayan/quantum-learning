@@ -18,18 +18,29 @@
    genuine second design ("laboratory notebook" — warm paper, ink, restrained
    accents), not a de-tuned afterthought.
 
-   Three selectors drive the theme, in the same pattern this file used before
-   the dark-first flip, just mirrored:
-     - `:root`                                     -> dark (the default)
+   Three selectors drive the theme:
+     - `:root`                                     -> dark. The site default,
+                                                     and what a first-time
+                                                     visitor gets whatever
+                                                     their OS is set to.
+     - `:root[data-theme="light"]`                 -> explicit light, chosen
+                                                     in ThemeToggle
      - `@media (prefers-color-scheme: light)
-          :root:not([data-theme="dark"])`          -> OS says light, no explicit
-                                                     choice stored
-     - `:root[data-theme="light"]`                 -> explicit light from
-                                                     ThemeToggle, wins over OS
-   `:not([data-theme="dark"])` keeps the media query from fighting an explicit
-   dark override on a light-preference OS. The no-flash script in
-   src/app/layout.tsx and ThemeToggle.tsx write only "light"/"dark"; the
-   absence of the attribute is "system".
+          :root[data-theme="system"]`              -> explicit "follow my OS",
+                                                     chosen in ThemeToggle,
+                                                     with the OS saying light
+
+   The middle case used to be `:root[data-theme="system"]`, which made the
+   *absence* of a stored choice mean "follow the OS" — quietly contradicting
+   the paragraph above it. A first-time visitor on a light-default OS got a
+   white page, which is exactly the outcome the dark-first decision exists to
+   prevent. "System" is now an explicit stored value with its own attribute
+   rather than being encoded as the absence of one, so ThemeToggle's three
+   states are three real, distinguishable states and the unset default is the
+   site's own identity.
+
+   The no-flash script in src/app/layout.tsx and ThemeToggle.tsx write
+   "light", "dark" or "system"; the absence of the attribute is dark.
    ============================================================================ */
 
 /* ----------------------------------------------------------------------------
@@ -44,9 +55,9 @@
      panel/surface in the app snaps to, so "how raised is this?" is a choice
      between four named values rather than an ad-hoc opacity. */
   --depth-0: #05070c;
-  --depth-1: #0a0e17;
-  --depth-2: #10151f;
-  --depth-3: #171d29;
+  --depth-1: #0c111b;
+  --depth-2: #141a26;
+  --depth-3: #1e2634;
 
   --background: var(--depth-0);
   --foreground: #e6ebf4;
@@ -59,13 +70,23 @@
      this is mostly used for, and past AAA for large text. */
   --muted-foreground: #98a2b6;
   /* Even quieter voice for de-emphasised technical metadata (units, source
-     ids, axis ticks). Still >= 4.5:1 on --depth-0. */
-  --subtle-foreground: #7b8598;
+     ids, axis ticks).
 
-  --border: #1e2634;
+     Held at >= 4.5:1 against the *composited* ground, not just against a flat
+     `--depth-0`. That distinction is load-bearing: the previous `#7b8598`
+     cleared 4.5:1 on the bare page colour and every token test passed, but the
+     `.atmosphere` layer lightens the ground where it is densest, and at the
+     top of a phone viewport — where the 60rem glow pool covers most of a
+     390px-wide screen and the vertical density ramp is at full strength — the
+     real ratio fell to 4.13:1 in Quantum Software and under 4.5:1 in all six
+     pillars. Readouts and units sit exactly there, at the top of a hero.
+     See compositedContrast.test.ts, which measures it. */
+  --subtle-foreground: #858fa2;
+
+  --border: #2b3547;
   /* For edges that must actually read as a line rather than a suggestion:
      table rules, active panel outlines, focus containers. */
-  --border-strong: #2d374a;
+  --border-strong: #46536b;
 
   --brand: #818cf8;
   --brand-foreground: #05070c;
@@ -152,16 +173,16 @@
      `[data-pillar]` block that overrides a depth step has to re-declare the
      aliases that point at it for the same reason. */
   --depth-0: #02040a;
-  --depth-1: #06090f;
-  --depth-2: #0b0f17;
-  --depth-3: #121722;
+  --depth-1: #080d16;
+  --depth-2: #101622;
+  --depth-3: #19212e;
   --background: var(--depth-0);
   --surface: var(--depth-1);
   --surface-muted: var(--depth-2);
   --surface-raised: var(--depth-3);
   --foreground: #f1f5fb;
-  --border: #1c2433;
-  --border-strong: #333e52;
+  --border: #232c3c;
+  --border-strong: #3b4759;
   --atmosphere-strength: 1.35;
 }
 
@@ -271,7 +292,7 @@
    Duplicated verbatim across the media query and the explicit override,
    matching how this file has always handled the two theme selectors. */
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
+  :root[data-theme="system"] {
     color-scheme: light;
 
     --depth-0: #fbfbfd;
@@ -287,10 +308,10 @@
     --surface-raised: var(--depth-3);
 
     --muted-foreground: #566072;
-    --subtle-foreground: #6b7484;
+    --subtle-foreground: #656e7e;
 
-    --border: #e2e5ec;
-    --border-strong: #c6ccd8;
+    --border: #d7dbe4;
+    --border-strong: #b3bbca;
 
     --brand: #4f46e5;
     --brand-foreground: #ffffff;
@@ -299,7 +320,7 @@
 
     --success: #15803d;
     --warning: #b45309;
-    --danger: #dc2626;
+    --danger: #b91c1c;
 
     /* Pillar ramp re-aimed for ink-on-paper: the accent is now a *dark*
        lightness (readable as text), the "strong" step is darker still, and
@@ -317,21 +338,21 @@
 
   /* Apex in light mode: still the most severe pillar, but expressed as a
      cooler, denser paper with heavier rules rather than as darkness. */
-  :root:not([data-theme="dark"]) [data-pillar="apex"] {
+  :root[data-theme="system"] [data-pillar="apex"] {
     --depth-0: #f4f6fa;
     --depth-1: #ffffff;
     --depth-2: #eaedf3;
     --depth-3: #dfe3eb;
     --foreground: #080b12;
-    --border: #d3d8e2;
-    --border-strong: #a9b2c2;
+    --border: #cbd1dd;
+    --border-strong: #9aa4b6;
   }
 
   /* @tailwindcss/typography drives lesson body copy through its own
      `--tw-prose-*` variables — a separate system from the tokens above. The
      dark values are the default now (section 5), so light mode is what has
      to reset them, back to the plugin's stock `prose-neutral` ramp. */
-  :root:not([data-theme="dark"]) .prose {
+  :root[data-theme="system"] .prose {
     --tw-prose-body: #404040;
     --tw-prose-headings: #0d1017;
     --tw-prose-lead: #525252;
@@ -368,10 +389,10 @@
   --surface-raised: var(--depth-3);
 
   --muted-foreground: #566072;
-  --subtle-foreground: #6b7484;
+  --subtle-foreground: #656e7e;
 
-  --border: #e2e5ec;
-  --border-strong: #c6ccd8;
+  --border: #d7dbe4;
+  --border-strong: #b3bbca;
 
   --brand: #4f46e5;
   --brand-foreground: #ffffff;
@@ -380,9 +401,14 @@
 
   --success: #15803d;
   --warning: #b45309;
-  --danger: #dc2626;
+  --danger: #b91c1c;
 
-  --pillar-l-accent: 0.52;
+  /* 0.51 rather than 0.52: `--pillar-text` is `--pillar-accent`, and at 0.52
+     the Mechanics hue fell to 4.42:1 against the composited light ground
+     (atmosphere over `--depth-0`) at the top of a phone viewport — passing
+     every flat-ground check and still failing the one a reader gets. One
+     step darker clears it in all six hues with margin. */
+  --pillar-l-accent: 0.51;
   --pillar-l-strong: 0.4;
   --pillar-l-dim: 0.72;
   --pillar-l-wash: 0.7;
@@ -398,8 +424,8 @@
   --depth-2: #eaedf3;
   --depth-3: #dfe3eb;
   --foreground: #080b12;
-  --border: #d3d8e2;
-  --border-strong: #a9b2c2;
+  --border: #cbd1dd;
+  --border-strong: #9aa4b6;
 }
 
 :root[data-theme="light"] .prose {
@@ -461,6 +487,38 @@ body {
   scroll-margin-top: 6rem;
 }
 
+/* ----------------------------------------------------------------------------
+   Full-bleed overhang
+   ----------------------------------------------------------------------------
+   `FullBleed` (src/components/ui/Section.tsx) spans the viewport with
+   `w-screen`. `100vw` is defined to include the classic scrollbar gutter while
+   the page's own available width is not, so on any page tall enough to have a
+   vertical scrollbar every full-bleed section is ~15px wider than the content
+   box and hangs ~7px over each edge — enough to give the page a real
+   horizontal scrollbar leading to a strip of empty space. There is no
+   pure-CSS width that means "viewport minus scrollbar", so the overhang is
+   absorbed here.
+
+   `clip`, emphatically not `hidden`: `overflow: hidden` on the root makes it a
+   scroll container, which silently breaks every `position: sticky` element on
+   the site (the lesson table-of-contents rail, the navbar). `clip` clips
+   without creating a scroll container, so sticky keeps working.
+
+   This is a backstop for sub-pixel-to-scrollbar overhang from decorative
+   full-bleed layers. It is not a licence to let real content overflow: content
+   wider than the page is still a bug, it is just no longer a bug that also
+   scrolls the whole document sideways. `docs/A11Y_AUDIT.md`'s 320px sweep and
+   the browser probe both still measure element rects, not scrollbars. */
+html,
+body {
+  /* Both, not just `html`: the root's `overflow` propagates to the viewport
+     and the root then computes to `visible`, so `html { overflow-x: clip }`
+     alone leaves `body` itself unclipped and the overhang still extends the
+     scrollable area. Measured on /mechanics: html-only = 8px of horizontal
+     scroll remaining; html + body = 0. */
+  overflow-x: clip;
+}
+
 /* One focus treatment, defined once, for everything that doesn't opt into a
    component-specific ring. Uses the pillar channel so the focus ring is
    *also* part of the identity: a keyboard user in Hardware sees amber, in
@@ -489,14 +547,56 @@ body {
 .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
+  /* Don't let a horizontal flick on an equation chain into the browser's
+     back-navigation gesture. Reaching the end of a formula should feel like
+     the end of the formula, not like leaving the lesson. */
+  overscroll-behavior-x: contain;
   padding: 1.1rem 1.35rem;
   border-radius: var(--radius-panel);
-  background:
-    linear-gradient(var(--pillar-wash), var(--pillar-wash)),
-    var(--surface-muted);
   border: 1px solid var(--border);
   border-left: 3px solid var(--pillar-edge);
   scrollbar-width: thin;
+
+  /* Overflow indicator, pure CSS (the local/scroll background-attachment
+     technique). `rehypeScrollableMath` makes this box focusable so a keyboard
+     user *can* scroll it, but nothing told any reader there was more to see —
+     a wide equation simply ended at the viewport edge, and truncated notation
+     reads as a complete (wrong) statement rather than as a clipped one. That
+     is a comprehension bug for a beginner and a correctness bug for everyone.
+
+     Two `local`-attached cover layers sit at the content's own left/right
+     ends and scroll with it; two `scroll`-attached edge glows sit at the
+     box's left/right and stay put. At scrollLeft 0 the left cover is exactly
+     over the left glow and hides it; scroll right and the cover moves away,
+     revealing the glow. The result: a pillar-tinted edge appears on
+     whichever side has more equation, and disappears at the ends.
+
+     The layer order is top-to-bottom, so: covers, glows, then the pillar wash
+     that used to be the whole background. The wash is `local` at 100% so it
+     spans the full scrollable width rather than only the visible box. */
+  background-color: var(--surface-muted);
+  background-image:
+    linear-gradient(to right, var(--surface-muted), transparent),
+    linear-gradient(to left, var(--surface-muted), transparent),
+    radial-gradient(farthest-side at 0 50%, var(--pillar-edge), transparent),
+    radial-gradient(farthest-side at 100% 50%, var(--pillar-edge), transparent),
+    linear-gradient(var(--pillar-wash), var(--pillar-wash));
+  background-repeat: no-repeat;
+  background-position: left center, right center, left center, right center, 0 0;
+  background-size:
+    1.75rem 100%,
+    1.75rem 100%,
+    0.9rem 100%,
+    0.9rem 100%,
+    100% 100%;
+  background-attachment: local, local, scroll, scroll, local;
+}
+
+/* The focus ring alone says "this is focused"; it does not say *why* a static
+   block of maths took focus. The added inset edge and cursor make the
+   scrollability itself visible at the moment a keyboard user lands on it. */
+.katex-display:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--pillar-accent);
 }
 
 /* ----------------------------------------------------------------------------
@@ -657,6 +757,45 @@ h3[id$="-heading"] {
    that should win, not defaults that should yield.
    ---------------------------------------------------------------------------- */
 @layer components {
+  /* ----------------------------------------------------------------------------
+     Marginalia
+     ----------------------------------------------------------------------------
+     A side note that sits out in the gutter beside the measured reading column
+     on very wide viewports, and stays in normal flow everywhere else.
+
+     Scoped to `[data-reading-column]` — set by `Section width="reading"`, see
+     src/components/ui/Section.tsx — rather than applied unconditionally,
+     because the whole move depends on a precondition the note itself cannot
+     see: that there is a gutter to move into. The utilities on the element
+     used to say `2xl:absolute 2xl:left-[calc(100%+3rem)]` with no such guard,
+     which assumed the nearest positioned ancestor was always the ~46rem
+     column. Two of the three call sites sit in a full-width section instead,
+     so `100%` was the whole container and the note landed 3rem past its right
+     edge — 272px off the side of a 1905px viewport, which is what gave the
+     homepage a horizontal scrollbar. In a wide section the note now stays
+     inline, which is the correct rendering for it. */
+  .marginalia {
+    position: static;
+  }
+
+  @media (width >= 96rem) {
+    [data-reading-column] .marginalia {
+      position: absolute;
+      width: 14rem;
+    }
+    [data-reading-column] .marginalia-right {
+      left: calc(100% + 3rem);
+    }
+    [data-reading-column] .marginalia-left {
+      right: calc(100% + 3rem);
+      border-left-width: 0;
+      border-right-width: 2px;
+      padding-left: 0;
+      padding-right: 1rem;
+      text-align: right;
+    }
+  }
+
   /* ----------------------------------------------------------------------------
      8. Instrument surfaces
      ----------------------------------------------------------------------------
@@ -926,7 +1065,7 @@ h3[id$="-heading"] {
     --accent-foreground: #ffffff !important;
     --success: #15803d !important;
     --warning: #b45309 !important;
-    --danger: #dc2626 !important;
+    --danger: #b91c1c !important;
     --pillar-l-accent: 0.5 !important;
     --pillar-l-strong: 0.38 !important;
     --pillar-l-dim: 0.75 !important;
@@ -1036,10 +1175,17 @@ h3[id$="-heading"] {
      src/components/lessons/TableOfContents.tsx) is in-page navigation
      chrome, not lesson content — the same category as `header` and
      `footer nav` above. Its links point at anchors on the very page it sits
-     on, which conveys nothing on paper. Keyed off `aria-label`/`aria-controls`
-     rather than a class string, matching this file's stated preference. */
+     on, which conveys nothing on paper. Keyed off `aria-label` and a stable
+     `data-` hook rather than a class string, matching this file's stated
+     preference.
+
+     `[data-toc-toggle]`, not `[aria-controls="lesson-toc-mobile-panel"]`: the
+     toggle only names its panel while the panel is mounted (an IDREF that
+     resolves to nothing is invalid ARIA), and collapsed is the common state,
+     so an `aria-controls` selector silently stopped matching and the control
+     printed on every lesson. */
   nav[aria-label="On this page"],
-  [aria-controls="lesson-toc-mobile-panel"],
+  [data-toc-toggle],
   #lesson-toc-mobile-panel {
     display: none !important;
   }

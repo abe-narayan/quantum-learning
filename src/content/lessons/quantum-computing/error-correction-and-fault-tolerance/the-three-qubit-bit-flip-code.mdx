@@ -38,7 +38,7 @@ A stray interaction flips a qubit's |0⟩ to |1⟩ or back, and unless something
 
 Bit flips happen. This lesson builds the smallest code that
 catches it: protection against a single $X$ (bit-flip) error on any one
-of three physical qubits — CNOT and partial
+of three <Term id="physical-qubit">physical qubits</Term> — CNOT and partial
 measurement, both already fully built and tested on this platform, are
 all it needs.
 
@@ -55,7 +55,7 @@ all it needs.
 
 ### Encoding
 
-Starting from a single logical qubit $\alpha|0\rangle+\beta|1\rangle$ on
+Starting from a single <Term id="logical-qubit">logical qubit</Term> $\alpha|0\rangle+\beta|1\rangle$ on
 qubit 0, with two fresh qubits at $|0\rangle$:
 
 $$
@@ -63,7 +63,7 @@ $$
 $$
 
 Each CNOT copies qubit 0's value into a fresh qubit, not cloning the
-*superposition* (which no-cloning forbids), only entangling the fresh
+*superposition* (which <Term id="no-cloning-theorem">no-cloning</Term> forbids), only entangling the fresh
 qubits' computational-basis value with qubit 0's, term by term. The
 result, $\alpha|000\rangle+\beta|111\rangle$, is `encodeBitFlipCode`'s
 exact output.

@@ -28,7 +28,7 @@ Every time VQE's classical optimizer proposes a new parameter vector, the exact 
 
 ## Motivation
 
-Quantum Algorithms II built VQE and QAOA as physics:
+Quantum Algorithms II built <Term id="vqe">VQE</Term> and QAOA as physics:
 minimize $\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ over
 parameters $\vec\theta$. This lesson looks at the same algorithms from a
 software angle: what does actually running one look like, step by step,
@@ -91,12 +91,12 @@ from) is easier to see at a glance:
 
 ### Why compilation overhead compounds here
 
-Every prior lesson's compilation concern, transpilation's SWAP
-overhead, gate decomposition into native rotations, noise (Noise,
+Every prior lesson's compilation concern, transpilation's <Term id="qubit-routing-swap-overhead">SWAP
+overhead</Term>, gate decomposition into native rotations, noise (Noise,
 Decoherence & Scaling), applies once PER ITERATION of this loop, not
 once total. A VQE run with 100 optimization iterations transpiles and
 executes its ansatz circuit 100 separate times; any per-circuit
-overhead (SWAP gates, native-gate translation, statistical shot noise)
+overhead (SWAP gates, native-gate translation, statistical <Term id="shot-noise-standard-error">shot noise</Term>)
 is paid 100 times over, not once. That's often the dominant cost
 driver for hybrid algorithms, distinct from a single-shot
 circuit's one-time compilation cost.
@@ -211,7 +211,7 @@ optimization run needs.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation), which builds this exact
+[Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation) builds this exact
 loop end to end using this platform's own `QuantumCircuit`, closing the
 gap between this course's software concepts and Quantum Algorithms II's
 physics.

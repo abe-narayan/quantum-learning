@@ -141,7 +141,7 @@ Every earlier pillar built toward a specific competence: Quantum Mechanics gave 
 
 The immediately preceding lesson simulated $e^{-iHt}$ by chopping time into $n$ small steps and applying each local piece of $H$ in sequence, paying a quantified $O(1/n)$ price in accuracy for every noncommuting pair of terms. That construction is powerful, but narrow in a specific sense: it only ever produces a *unitary* — a time-evolution operator — because $e^{-iHt}$ is always unitary for Hermitian $H$. Enormous swaths of quantum algorithms, though, want to apply something that *isn't* unitary at all: a projector, a non-Hermitian matrix, a Green's function, a covariance matrix, the inverse $H^{-1}$ that a linear-systems solver needs. A quantum computer's native operations are all unitary, so none of these can be applied directly.
 
-Block encoding is the general answer: embed an *arbitrary* matrix $A$ — not necessarily unitary, not necessarily Hermitian, not necessarily square in the fully general version — as a small corner of some bigger unitary $U$ that a quantum computer can actually run. Everything downstream (Hamiltonian simulation via quantum signal processing, quantum linear-systems solvers, amplitude-based algorithms, Gibbs-state preparation) is then just algebra performed *on the block encoding itself*, without ever needing $A$ to be unitary in the first place. This lesson builds the construction from scratch and verifies, numerically and exactly, that it does what it claims.
+Block encoding is the general answer: embed an *arbitrary* matrix $A$ (not necessarily unitary, not necessarily Hermitian, not necessarily square in the fully general version) as a small corner of some bigger unitary $U$ that a quantum computer can actually run. Everything downstream (Hamiltonian simulation via quantum signal processing, quantum linear-systems solvers, amplitude-based algorithms, Gibbs-state preparation) is then just algebra performed *on the block encoding itself*, without ever needing $A$ to be unitary in the first place. This lesson builds the construction from scratch and verifies, numerically and exactly, that it does what it claims.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Professor_Andrew_Childs.jpg"
@@ -243,16 +243,16 @@ $$
 </DerivationStep>
 </DerivationSteps>
 
-This is not merely close to a block encoding — it is one, exactly, by the definition above, of $A/\|\alpha\|_1$. When $\|\alpha\|_1=1$ (as in the worked example below), $U$ block-encodes $A$ itself with no extra rescaling.
+This is not merely close to a block encoding: it is one, exactly, by the definition above, of $A/\|\alpha\|_1$. When $\|\alpha\|_1=1$ (as in the worked example below), $U$ block-encodes $A$ itself with no extra rescaling.
 
 ## Physical Interpretation
 
-Nothing about SELECT or PREPARE "knows" what $A$ means physically — the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register actually ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is exactly what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
+Nothing about SELECT or PREPARE "knows" what $A$ means physically: the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register actually ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is exactly what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
 
 ## Why This Matters
 
 <InsightBlock>
-  Block encodings turn "I have a matrix" into "I have a circuit" — the
+  Block encodings turn "I have a matrix" into "I have a circuit": the
   translation step that every later Apex construction (QSP, QSVT,
   amplitude estimation, linear-systems solving) is built on top of.
 </InsightBlock>
@@ -331,17 +331,17 @@ Every input gives exactly $0.5$ — not a coincidence, but a consequence of this
 ## Summary
 
 - A **block encoding** of a matrix $A$ (with $\|A\|\leq1$) is a unitary $U$ whose ancilla-$|0\rangle$ sub-block equals $A$ exactly; operationally, running $U$ on $|0\rangle_{\text{anc}}|\psi\rangle$ and post-selecting the ancilla on $|0\rangle$ leaves the system in $A|\psi\rangle$ (normalized), with success probability $\|A|\psi\rangle\|^2$.
-- **LCU** (linear combination of unitaries) builds a block encoding of $A/\|\alpha\|_1$ for any $A=\sum_i\alpha_iU_i$ via PREPARE (an ancilla superposition weighted by $\sqrt{\alpha_i/\|\alpha\|_1}$), SELECT (apply $U_i$ conditioned on ancilla $=|i\rangle$), and PREPARE$^\dagger$ — derived exactly above, not merely asserted.
+- **LCU** (linear combination of unitaries) builds a block encoding of $A/\|\alpha\|_1$ for any $A=\sum_i\alpha_iU_i$ via PREPARE (an ancilla superposition weighted by $\sqrt{\alpha_i/\|\alpha\|_1}$), SELECT (apply $U_i$ conditioned on ancilla $=|i\rangle$), and PREPARE$^\dagger$, derived exactly above, not merely asserted.
 - Verified numerically and exactly on $A=(X+Z)/2$: a real six-gate, two-qubit circuit built from this platform's actual gate-application functions reproduces $A$ as its top-left block to machine precision, and reproduces $A|\psi\rangle$ on the post-selected branch for a genuine complex-amplitude input state, with success probability confirmed to be a constant $0.5$ for this specific $A$ (traced to $A^2=\tfrac12I$), not a general property of block encodings.
 - Block encodings are now the field's standard input model for linear-algebra-flavored quantum algorithms — Hamiltonian simulation, linear-systems solving, and more are phrased as "given a block encoding, apply QSVT," which is exactly where this course goes next.
 
 ## Further Exploration
 
 <NextDiscovery>
-  Next: [Quantum Signal Processing](/lessons/apex/algorithmic-frontiers/quantum-signal-processing),
-  which takes the block encoding built here as a black box and shows how a
+  [Quantum Signal Processing](/lessons/apex/algorithmic-frontiers/quantum-signal-processing)
+  takes the block encoding built here as a black box and shows how a
   sequence of single-qubit rotations interleaved with calls to it can apply an
   essentially arbitrary polynomial transformation to $A$'s eigenvalues (or
-  singular values, in the non-Hermitian case) — the generic engine that this
+  singular values, in the non-Hermitian case), the generic engine that this
   lesson's "why this matters" section named as the field's second half.
 </NextDiscovery>

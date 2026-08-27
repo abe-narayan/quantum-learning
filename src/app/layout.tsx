@@ -83,7 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script
           dangerouslySetInnerHTML={{
             __html:
-              '(function(){try{var t=localStorage.getItem("quantumlearn:theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
+              '(function(){try{var t=localStorage.getItem("quantumlearn:theme");if(t==="light"||t==="dark"||t==="system")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
           }}
         />
         {/* Scroll-reveal safety net. `[data-reveal]` starts at `opacity: 0`

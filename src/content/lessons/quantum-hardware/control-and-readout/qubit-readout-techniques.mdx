@@ -64,7 +64,7 @@ and quantifies exactly how far it falls short of the textbook ideal.
 ### Dispersive readout: measure the resonator, not the qubit
 
 Directly probing a qubit's energy levels risks disturbing (or fully
-collapsing) the state in an uncontrolled way. **Dispersive readout**
+<Term id="wavefunction-collapse">collapsing</Term>) the state in an uncontrolled way. **Dispersive readout**
 sidesteps this: the qubit is coupled to a separate microwave resonator,
 engineered so that the resonator's own resonant frequency shifts
 slightly depending on whether the qubit is in $|0\rangle$ or $|1\rangle$
@@ -87,11 +87,11 @@ resonator's frequency, never sampled directly.
 Real readout doesn't cleanly return "0" or "1." It returns an analog
 signal (voltage, phase) that must be classified into one of two bins.
 Noise in this signal means the classification is imperfect: a
-qubit truly in $|0\rangle$ occasionally gets misclassified as "1," and
+qubit actually in $|0\rangle$ occasionally gets misclassified as "1," and
 vice versa. **Readout fidelity** quantifies this: the probability the
 reported classical bit matches the qubit's actual (pre-measurement)
 state. Representative current values sit in the 95-99% range depending
-on platform and integration time; a single-shot measurement typically
+on platform and integration time; a <Term id="shot-noise-standard-error">single-shot</Term> measurement typically
 integrates the reflected signal for a few hundred nanoseconds up to a
 couple of microseconds, longer integration averages out more noise and
 buys higher fidelity, but it also holds the qubit in a measured state
@@ -135,7 +135,7 @@ noisy cloud centered near the "measured $|0\rangle$" location or the
 
 ### Readout error joins the broader error budget
 
-Readout error compounds with gate errors and decoherence
+Readout error compounds with <Term id="gate-fidelity">gate errors</Term> and decoherence
 (Physical Qubit Platforms' coherence-time discussion, and the Noise,
 Decoherence & Scaling course) into the device's overall error
 budget. A computation with perfect gates but 97% readout fidelity still
@@ -239,7 +239,7 @@ error to ignore.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Calibration](/lessons/quantum-hardware/control-and-readout/calibration), which covers how a real device's actual pulse
+[Calibration](/lessons/quantum-hardware/control-and-readout/calibration) covers how a real device's actual pulse
 parameters (Rabi frequency, resonance frequency) are found and kept
 accurate over time, since none of this lesson's or the previous
 lesson's formulas work with parameters that drift uncalibrated.

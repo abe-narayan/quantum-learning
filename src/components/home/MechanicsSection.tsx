@@ -12,14 +12,21 @@ const PILLAR = "quantum-mechanics" as const;
  * Small, accurate, static sketches of what the lessons behind them actually
  * derive — plain SVG, no canvas. Teasers for the real interactive versions
  * inside the lessons and at /simulators, not a second copy of them.
+ *
+ * Both are `aria-hidden`: each one draws exactly what its card's own
+ * description sentence already says in words (two equal amplitudes and a
+ * phase; a wave decaying through a barrier and re-emerging). They previously
+ * carried `role="img"` descriptions that restated that sentence, which meant
+ * a screen-reader user heard the same content twice per card. The visible
+ * prose is the accessible version here, so the drawings are decoration.
  */
 function SuperpositionGlyph({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 140 80"
       className={className}
-      role="img"
-      aria-label="Bar chart of two equal-height amplitude bars labeled |0> and |1>, with a phase dial above them, illustrating a state that is a combination of both at once."
+      aria-hidden="true"
+      data-decorative=""
     >
       <line x1="8" y1="66" x2="132" y2="66" stroke="var(--border)" strokeWidth="1.5" />
       <rect x="22" y="22" width="26" height="44" rx="3" fill="currentColor" />
@@ -38,8 +45,8 @@ function TunnelingGlyph({ className }: { className?: string }) {
     <svg
       viewBox="0 0 160 80"
       className={className}
-      role="img"
-      aria-label="A wave arriving from the left, decaying smoothly while crossing a shaded energy barrier, then re-emerging with reduced but nonzero amplitude on the right, illustrating quantum tunneling."
+      aria-hidden="true"
+      data-decorative=""
     >
       <line x1="6" y1="66" x2="154" y2="66" stroke="var(--border)" strokeWidth="1.5" />
       <rect x="70" y="14" width="24" height="52" fill="currentColor" opacity="0.14" stroke="currentColor" strokeWidth="1.25" />
@@ -58,7 +65,7 @@ const PHENOMENA = [
   {
     title: "Superposition",
     description:
-      "A state can be a weighted combination of two outcomes at once, c_a|a⟩ + c_b|b⟩ — a relative phase invisible in one basis, decisive in another.",
+      "A state can be a weighted combination of two outcomes at once — written c_a|a⟩ + c_b|b⟩ — carrying a relative phase invisible in one basis and decisive in another.",
     href: "/lessons/quantum-mechanics/classical-to-quantum/superposition-interference-and-phase",
     Glyph: SuperpositionGlyph,
   },
@@ -99,12 +106,50 @@ export function MechanicsSection() {
           </Lede>
         </Reveal>
 
+        {/* The page's first contact with Dirac notation — the two cards
+            directly below print `c_a|a⟩ + c_b|b⟩`, and ComputingSection
+            prints a Bell state after that. The notation stays (it is what
+            the material actually looks like, and sanding it off would make
+            the homepage read as marketing about physics rather than
+            physics), but it gets grounded exactly once, here, at first use:
+            one clause saying a ket is a name for a state, plus the glossary
+            entry for a reader who wants more. Every later appearance on the
+            page can then stand unglossed. See docs/BEGINNER_REVIEW.md
+            blocker 3. */}
+        <Reveal delay={60} className="mt-8 border-l-2 border-pillar-edge pl-4">
+          <TechLabel>Notation</TechLabel>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            <span className="font-tech text-foreground">|0⟩</span> — spoken &ldquo;ket
+            zero&rdquo; — is just a name for a state, the way <em>x</em> is a name for a
+            number. The cards below and the rest of this page write quantum states that
+            way.{" "}
+            <Link
+              href="/glossary#dirac-notation"
+              className="font-medium text-pillar underline-offset-4 hover:underline"
+            >
+              Dirac notation, in the glossary →
+            </Link>
+          </p>
+        </Reveal>
+
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           {PHENOMENA.map((phenomenon, index) => {
             const Glyph = phenomenon.Glyph;
             return (
               <Reveal key={phenomenon.title} delay={index * 90}>
-                <Link href={phenomenon.href} className="group block">
+                {/* The link wraps the whole card — figure, heading, description
+                    and CTA — so the accessible name would otherwise be computed
+                    by concatenating all of it: the heading, then the whole
+                    description sentence, then "See the derivation →",
+                    announced as one run-on name before the reader can decide
+                    whether to follow it. `aria-label` here replaces that with
+                    the one thing a name should be — where the link goes. The
+                    label is the visible heading verbatim, so speech input
+                    still matches what a sighted user says (WCAG 2.5.3, label
+                    in name). The glyph contributes nothing either way: it is
+                    `aria-hidden`, since its old `role="img"` description just
+                    restated the description sentence beneath it. */}
+                <Link href={phenomenon.href} aria-label={phenomenon.title} className="group block">
                   <div className="text-pillar">
                     <Glyph className="h-16 w-full" />
                   </div>
@@ -128,7 +173,7 @@ export function MechanicsSection() {
           />
           <Link
             href={visual.route}
-            className="inline-flex items-center text-sm font-semibold text-pillar hover:underline"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
           >
             Enter {visual.short} →
           </Link>

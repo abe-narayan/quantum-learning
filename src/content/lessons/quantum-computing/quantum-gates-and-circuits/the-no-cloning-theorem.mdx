@@ -71,7 +71,7 @@ A "cloning machine" would need to be a single, fixed device that works
 for *any* input state, since the whole point is you don't know the state
 in advance (if you already knew it, you could just prepare a second copy
 yourself with no machine needed). But a fixed quantum device is a fixed
-unitary matrix, and matrices are linear. Linear operations are
+<Term id="unitary-operator">unitary</Term> matrix, and matrices are linear. Linear operations are
 extremely constrained: what they do to a superposition is *completely
 determined* by what they do to the pieces of that superposition
 separately. That single fact is enough to break cloning.
@@ -100,8 +100,8 @@ $$
 U(|0\rangle\otimes|0\rangle) = |0\rangle\otimes|0\rangle, \qquad U(|1\rangle\otimes|0\rangle) = |1\rangle\otimes|1\rangle
 $$
 
-Nothing wrong yet: a device that measures the input in the computational
-basis and prepares a matching copy could achieve exactly this much.
+Nothing wrong yet: a device that measures the input in the <Term id="computational-basis">computational
+basis</Term> and prepares a matching copy could achieve exactly this much.
 
 ### The contradiction: apply it to a superposition
 
@@ -124,7 +124,7 @@ $$
   </DerivationStep>
 </DerivationSteps>
 
-That's the Bell state $|\Phi^+\rangle$ from two lessons ago, and it does
+That's the <Term id="bell-states">Bell state</Term> $|\Phi^+\rangle$ from two lessons ago, and it does
 not match what cloning was supposed to produce. Both sides are real, computable states, not just symbols; laying the
 engine's actual output for each side next to the other makes the
 mismatch impossible to miss. Here's the attempted-cloning circuit itself,
@@ -183,7 +183,7 @@ mechanics to be a consistent theory at all.
 No-cloning isn't a restriction on quantum mechanics; it's a requirement for quantum mechanics to be a consistent theory at all.
 </InsightBlock>
 
-This is also the exact fact that makes quantum key distribution
+This is also the exact fact that makes <Term id="qkd-bb84">quantum key distribution</Term>
 (BB84, a few lessons ahead) secure against eavesdropping. If an
 attacker could clone a qubit in transit, they could keep one copy,
 forward the other, and measure their copy at leisure without ever
@@ -272,7 +272,7 @@ device correctly copying an *arbitrary, unknown* input.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Quantum Teleportation](/lessons/quantum-computing/quantum-gates-and-circuits/quantum-teleportation). You can't copy an unknown state, but
+[Quantum Teleportation](/lessons/quantum-computing/quantum-gates-and-circuits/quantum-teleportation) is next. You can't copy an unknown state, but
 you *can* move it, destroying the original in the process. The full
 protocol uses entanglement, CNOT, and partial measurement, all from this
 course, plus the fact you just proved.

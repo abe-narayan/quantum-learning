@@ -59,7 +59,7 @@ dropped.
 ### The definition
 
 For a pure 2-qubit state $|\psi\rangle_{AB}$, its **entanglement
-entropy** is defined as the von Neumann entropy of either reduced state:
+entropy** is defined as the <Term id="von-neumann-entropy-purity">von Neumann entropy</Term> of either reduced state:
 
 $$
 E(|\psi\rangle) = S(\rho_A) = S(\rho_B)
@@ -69,7 +69,7 @@ The two are always equal for a pure bipartite state (not asserted:
 `entanglementEntropy`'s tests check it directly for several states, and
 it follows from the fact that $\rho_A$ and $\rho_B$ share the same
 nonzero eigenvalues for any pure bipartite state, a standard consequence
-of the Schmidt decomposition). `entanglementEntropy` in `entanglement.ts`
+of the <Term id="schmidt-decomposition">Schmidt decomposition</Term>). `entanglementEntropy` in `entanglement.ts`
 computes $S(\rho_A)$ specifically: `pureStateDensityMatrix`, then
 `reducedDensityMatrixQubit0`, then `vonNeumannEntropy`, composing three
 pieces this course has already built and tested individually.
@@ -132,7 +132,7 @@ what its reduced entropy reports before computing it.
   explanation="S(ρ_A) comes out to a full 1 bit — indistinguishable from a Bell state's reading — even though I/4 has provably zero entanglement. Reduced entropy, applied to a mixed global state, can't tell 'mixed because entangled' apart from 'mixed because the whole preparation was already a classical mixture.' That's exactly why the definition above required the global state to be pure."
 />
 
-Its reduced state, computed by the same partial trace as always, is
+Its reduced state, computed by the same <Term id="partial-trace">partial trace</Term> as always, is
 $\rho_A=\text{Tr}_B(I/4)=I/2$ (verified directly against the engine),
 giving $S(\rho_A)=1$ bit, the *same* value as a maximally entangled
 Bell state. Reduced entropy just reported "maximal entanglement" for a
@@ -236,7 +236,7 @@ not simply "entangled, like any other entangled state."
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Concurrence: A Two-Qubit Entanglement Measure](/lessons/quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure), a second,
+[Concurrence: A Two-Qubit Entanglement Measure](/lessons/quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure) is a second,
 independently-derived measure for pure 2-qubit states, reusing machinery
 this platform already built for testing separability.
 

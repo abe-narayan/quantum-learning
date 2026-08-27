@@ -2,19 +2,22 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
-import { SectionTitle, Lede, TechLabel, Readouts } from "@/components/ui/Typography";
+import { SectionTitle, Lede } from "@/components/ui/Typography";
 import { FadeRule } from "@/components/ui/Panel";
 import { PillarScope } from "@/components/field/PillarScope";
 import { COURSES, PILLARS } from "@/lib/content/curriculum";
 import type { Course, LessonMeta, LessonMetaWithSlug } from "@/lib/content/types";
 import { getCourseCheckpointProblems } from "@/lib/problems/registry";
 import { CourseCheckpoint } from "@/components/problems/CourseCheckpoint";
-import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { getCourseHref } from "@/components/curriculum/courseHref";
 import { LessonCompleteToggle } from "./LessonCompleteToggle";
 import { ReadingProgressBar } from "./ReadingProgressBar";
 import { TableOfContentsDesktop, TableOfContentsMobile } from "./TableOfContents";
 import { LessonMetaStrip } from "./LessonMetaStrip";
 import { LessonFooterNav } from "./LessonFooterNav";
+import { LessonInstrumentLine } from "./LessonInstrumentLine";
+import { LessonObjectives } from "./LessonObjectives";
+import { PrerequisiteReadout } from "./PrerequisiteReadout";
 import { RelatedCurrentQuantum } from "@/components/currentQuantum/RelatedCurrentQuantum";
 
 /** `id` of the prose container — shared by the ToC and reading-progress bar
@@ -59,9 +62,20 @@ export function LessonLayout({
 }) {
   const pillar = course ? PILLARS.find((p) => p.slug === course.pillar) : undefined;
 
+  // Same helper CourseList/CourseTimeline use to decide a course's primary
+  // click target — see courseHref.ts. Resolves to the real /courses/<slug>
+  // page (live as of this pass) with a same-behavior fallback to the
+  // course's first authored lesson if that route is ever pulled, so this
+  // breadcrumb segment never points at a dead link either way.
+  const courseHref = course
+    ? getCourseHref(course.slug, firstLessonOf(course, allLessons)?.slug)
+    : undefined;
+
   const position = moduleIndex(course, meta.module);
   const totalModules = course?.modules.length ?? 0;
-  const progressPercent = position >= 0 && totalModules > 0 ? ((position + 1) / totalModules) * 100 : 0;
+  // The missing rung between the breadcrumb's course segment and the lesson
+  // title — see LessonInstrumentLine's doc comment.
+  const moduleTitle = position >= 0 ? course?.modules[position]?.title : undefined;
 
   const courseLessons = allLessons.filter((lesson) => lesson.course === course?.slug);
   const orderedLessons = sortByCourseOrder(courseLessons, course);
@@ -107,19 +121,6 @@ export function LessonLayout({
     })
     .filter((entry): entry is { lesson: LessonMetaWithSlug; note: string } => Boolean(entry));
 
-  // Difficulty is rendered separately via `DifficultyMark` (the tick ladder
-  // + label used everywhere else difficulty appears — courses, timeline,
-  // lesson search, problems) rather than as a plain-text item here, so a
-  // reader gets the same at-a-glance instrument before committing to a
-  // lesson that they'd get anywhere else on the site. See docs/UX_REVIEW.md
-  // P0-3.
-  const readoutItems = [
-    ...(course && position >= 0
-      ? [{ label: "Module", value: position + 1, unit: `/ ${totalModules}` }]
-      : []),
-    { label: "Duration", value: meta.estimatedMinutes, unit: "min" },
-  ];
-
   return (
     // Retints accents, focus rings, prose links, equation slabs and the
     // background field to this lesson's course's pillar — see
@@ -153,56 +154,70 @@ export function LessonLayout({
               <span aria-hidden="true" data-decorative="" className="tech-label text-subtle-foreground">
                 /
               </span>
-              <span className="tech-label text-pillar-text">{course.title}</span>
+              {/* Destination resolved via the shared getCourseHref (see
+                  above) rather than a hardcoded /courses/<slug> — the same
+                  single decision point CourseList/CourseTimeline use, so
+                  this breadcrumb segment tracks whatever they'd resolve to
+                  without duplicating the live/fallback logic here. */}
+              <Link
+                href={courseHref ?? "/learn"}
+                className="tech-label text-pillar-text transition-colors hover:text-foreground"
+              >
+                {course.title}
+              </Link>
             </>
           ) : null}
         </nav>
 
-        {/* The title moment (see docs/UX_REVIEW.md P2-6). The title used to
-            arrive fourth — after a readouts row and a progress rule — so the
-            biggest, quietest thing on the page was preceded by two chrome
-            blocks instead of leading with it. Title and lede now come
-            immediately after the breadcrumb; the "how hard, how long, how
-            far into the course" instrument strip drops to a single compact
-            row right below the lede instead of gating the title. Nothing
-            here was removed, only reordered and tightened — see
-            LessonMetaStrip.tsx for where the heavier "Lineage" block (the
-            other half of the six-block wall the review flagged) went. */}
+        {/* ============================================================
+            The pre-content stack, compressed to three instruments
+            ============================================================
+            docs/BEGINNER_REVIEW.md's headline friction here was "five
+            stacked instruments before 'Motivation'": difficulty +
+            readouts, progress rule, prerequisites, objectives — each
+            individually justified, together a wall between the reader and
+            the first sentence of the lesson.
+
+            Nothing was deleted and nothing was pushed below the fold. The
+            three blocks that all answered the *same* question ("how hard,
+            how far in, how long") collapse into one dense
+            `LessonInstrumentLine` row — same facts, instrument scale
+            instead of display scale, plus the module name the breadcrumb
+            never reached. `PrerequisiteReadout` keeps its position
+            unchanged: docs/BEGINNER_REVIEW.md calls it the single best
+            beginner-honesty mechanism on the site, it is the highest-value
+            item above the fold, and it stays fully expanded for every
+            reader. Only `LessonObjectives` gained a fold, and only on
+            advanced/master lessons — see its doc comment for why that
+            reader, and not the beginner, is the one who can spare it. */}
         <div className="mt-6 max-w-3xl">
           <SectionTitle level={1} size="xl">
             {meta.title}
           </SectionTitle>
-          <Lede className="mt-5">{meta.description}</Lede>
+          <Lede className="mt-4">{meta.description}</Lede>
 
-          <div className="mt-6 flex flex-wrap items-center gap-x-10 gap-y-4">
-            <DifficultyMark difficulty={meta.difficulty} />
-            <Readouts items={readoutItems} />
-          </div>
+          <LessonInstrumentLine
+            className="mt-5"
+            difficulty={meta.difficulty}
+            moduleTitle={course ? moduleTitle : undefined}
+            position={course ? position : -1}
+            totalModules={totalModules}
+            estimatedMinutes={meta.estimatedMinutes}
+          />
 
-          {course && position >= 0 ? (
-            <div
-              className="mt-3 h-px w-full max-w-[14rem] overflow-hidden rounded-full bg-surface-muted"
-              role="presentation"
-            >
-              <div className="h-full bg-pillar" style={{ width: `${progressPercent}%` }} />
-            </div>
-          ) : null}
+          {/* "Do I have what I need?" — above the fold, unmissable, but a
+              single compact row rather than the old multi-column Lineage
+              wall (see PrerequisiteReadout.tsx for the full reasoning and
+              docs/UX_REVIEW.md P2-6 for why it can't just move back to being
+              that wall). Full cross-course detail stays in LessonMetaStrip's
+              disclosure below the body. */}
+          <PrerequisiteReadout prerequisites={prerequisites} />
 
-          {meta.objectives.length > 0 ? (
-            <div className="mt-7 border-l-2 border-pillar-edge pl-5">
-              <TechLabel>Objectives</TechLabel>
-              <ol className="mt-3 space-y-2.5">
-                {meta.objectives.map((objective, i) => (
-                  <li key={objective} className="flex gap-3 text-sm leading-relaxed text-foreground/90 sm:text-[0.95rem]">
-                    <span className="tech-value shrink-0 pt-px text-xs text-pillar-text">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span>{objective}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          ) : null}
+          <LessonObjectives
+            className="mt-5"
+            objectives={meta.objectives}
+            difficulty={meta.difficulty}
+          />
         </div>
 
         <TableOfContentsMobile containerId={LESSON_PROSE_ID} />
@@ -271,6 +286,9 @@ export function LessonLayout({
           finishedCourse={finishedCourse}
           nextCourseSuggestions={nextCourseSuggestions}
           pillar={pillar}
+          unlocks={resurfacesIn}
+          course={course}
+          courseHref={courseHref}
         />
 
         {finishedCourse && checkpointProblems.length > 0 ? (

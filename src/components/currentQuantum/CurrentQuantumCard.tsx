@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { entryPillar } from "./entryPillar";
 import { CATEGORY_META } from "./categoryIcons";
 import { formatEntryDate, entryDateTimeAttr } from "./dateUtils";
+import { ENTRY_IMAGE_ASPECT } from "./imageAspect";
 
 /**
  * One real, dated development, framed as an instrument reading rather than
@@ -32,6 +33,34 @@ import { formatEntryDate, entryDateTimeAttr } from "./dateUtils";
  * `lessonTitle` is passed as `undefined` — the entry is already the one
  * connected to *that* lesson, so a self-referential "explained in" link
  * would be redundant there.
+ *
+ * ------------------------------------------------------------
+ * Click target — the whole instrument face, not just the link line
+ * ------------------------------------------------------------
+ * There is no per-entry page, so the card's one real destination is the
+ * lesson it connects to. That link used to be a single line of text near the
+ * bottom of a tall card: everything above it looked interactive and wasn't.
+ * The fix is the technique `CourseList` documents at length — the "Explained
+ * in" link is a real `<a>` whose `::after` is stretched (`absolute inset-0`)
+ * to the `.instrument`, which is already `position: relative`, so a click
+ * anywhere on the instrument's chrome activates it.
+ *
+ * That overlay is a *positioned* element, so per CSS 2.1 Appendix E it paints
+ * (and hit-tests) above every non-positioned in-flow sibling. Each block of
+ * real readable text — the title, the summary, the figure with its own credit
+ * link, and the "why this matters" paragraph — therefore carries `relative
+ * z-10` so it stays selectable, and any link inside it stays independently
+ * clickable rather than silently navigating to the lesson. `isolate` on the
+ * instrument scopes those z-indices to one card.
+ *
+ * The header strip (category, date, difficulty) and the padding stay *under*
+ * the overlay: they are metadata, not prose to copy, and they are what makes
+ * "click the card" true. The `Source:` line lives outside the instrument
+ * entirely, so it is never covered.
+ *
+ * When `lessonTitle` is undefined there is no link and none of this applies —
+ * the card renders exactly as it did, with no phantom hover affordance
+ * promising a click that does nothing.
  */
 export function CurrentQuantumCard({
   entry,
@@ -70,6 +99,10 @@ export function CurrentQuantumCard({
       ) : null}
 
       <Instrument
+        className={cn(
+          lessonTitle &&
+            "isolate transition-colors duration-[--dur-fast] ease-[--ease-instrument] has-[a[data-entry-link]:hover]:border-pillar-edge has-[a[data-entry-link]:focus-visible]:border-pillar-edge"
+        )}
         label={
           <span className="inline-flex items-center gap-1.5">
             <CategoryIcon aria-hidden="true" data-decorative="" className="h-3.5 w-3.5 shrink-0 text-pillar" />
@@ -96,12 +129,17 @@ export function CurrentQuantumCard({
           </>
         }
       >
-        <Heading className="font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
+        <Heading className="relative z-10 font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
           {entry.title}
         </Heading>
-        <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{entry.summary}</p>
+        <p className="relative z-10 mt-2.5 text-sm leading-relaxed text-muted-foreground">
+          {entry.summary}
+        </p>
 
         {entry.imageUrl && entry.imageAttribution ? (
+          // Raised with the text blocks: the figure carries its own
+          // credit/license link, which would otherwise sit under the stretched
+          // overlay and navigate to the lesson instead of the source.
           <ExternalFigure
             src={entry.imageUrl}
             alt={entry.imageAlt ?? entry.title}
@@ -109,17 +147,25 @@ export function CurrentQuantumCard({
             credit={entry.imageAttribution.credit}
             creditUrl={entry.imageAttribution.creditUrl}
             license={entry.imageAttribution.license}
-            className="mt-4"
+            aspect={ENTRY_IMAGE_ASPECT[entry.slug]}
+            className="relative z-10 mt-4"
           />
         ) : null}
 
         <div className="mt-4 rounded-[var(--radius-tight)] border-l-2 border-pillar-edge bg-pillar-wash px-4 py-3">
           <TechLabel className="text-pillar-text">Why this matters</TechLabel>
-          <p className="mt-1.5 text-sm leading-relaxed text-foreground">{entry.whyThisMatters}</p>
+          <p className="relative z-10 mt-1.5 text-sm leading-relaxed text-foreground">
+            {entry.whyThisMatters}
+          </p>
           {lessonTitle ? (
+            // Deliberately NOT `relative`/`z-10` itself: the stretched
+            // `::after` must resolve against the `.instrument`, and giving this
+            // anchor a positioned context of its own would shrink the overlay
+            // back to the link's own box.
             <Link
               href={`/lessons/${entry.relatedLessonSlug}`}
-              className="mt-2.5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-pillar-text hover:underline"
+              data-entry-link
+              className="mt-2.5 inline-flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-pillar-text after:absolute after:inset-0 after:content-[''] hover:underline"
             >
               <span aria-hidden="true">&#8646;</span>
               <span>Explained in: {lessonTitle}</span>

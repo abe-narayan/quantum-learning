@@ -69,7 +69,7 @@ stabilizer code, not just this one.
 ### Code parameters: [[n,k,d]]
 
 A quantum code is described by three numbers: $n$ (physical qubits used),
-$k$ (logical qubits protected), and $d$ (the code's **distance**, the
+$k$ (logical qubits protected), and $d$ (the code's **<Term id="code-distance">distance</Term>**, the
 minimum number of physical qubits an *undetectable* error must act on).
 The 3-qubit bit-flip code is $[[3,1,3]]$: $3$ physical qubits, $1$
 logical qubit, and distance $3$ (a weight-3 error, $X$ on all three
@@ -111,10 +111,10 @@ question the capstone returns to with concrete numbers for real
 fault-tolerant architectures.
 
 Real devices add a constraint this lesson's lookup-table decode doesn't
-face at 3-qubit scale: speed. A physical qubit keeps decohering while
+face at 3-qubit scale: speed. A physical qubit keeps <Term id="noise-decoherence">decohering</Term> while
 the syndrome is being measured and decoded, so the correction has to be
 computed and applied before that error information goes stale. Google's
-2023 surface-code experiments paired syndrome extraction with a
+2023 <Term id="surface-codes">surface-code</Term> experiments paired syndrome extraction with a
 classical decoder running fast enough to keep pace with the device's
 measurement rate, a genuine real-time computing problem sitting on top
 of the decode-table lookup this lesson builds, and one that gets
@@ -230,7 +230,7 @@ here as a real, active area this platform doesn't build).
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Surface Codes: A Conceptual Introduction](/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction), the family of codes
+[Surface Codes: A Conceptual Introduction](/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction) is the family of codes
 real quantum hardware roadmaps actually build toward: higher distance,
 much better qubit efficiency, at the cost of substantially more complex
 syndrome decoding.

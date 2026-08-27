@@ -46,12 +46,20 @@ export default async function MapPage() {
         <SectionTitle level={1} size="xl" className="mt-3">
           The concept map
         </SectionTitle>
+        {/* One plain sentence, first. The page used to open with a four-line
+            paragraph above a graph of ~90 nodes, which told a newcomer what
+            was on the map but not what the picture *was* or where to click.
+            The explorer immediately below carries the first actions. */}
         <Lede className="mt-4">
-          Every key idea across all six pillars — Quantum Mechanics, Quantum Computing, Quantum
-          Hardware, Quantum Software, Quantum Mastery, and Apex — and how they build on each other.
-          Select a concept for its definition, the real lessons that cover it, its prerequisites, and
-          what it unlocks next.
+          This is a map of every idea on QuantumLearn and what you need to understand before each
+          one.
         </Lede>
+        <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted-foreground">
+          It spans all six pillars — Quantum Mechanics, Quantum Computing, Quantum Hardware,
+          Quantum Software, Quantum Mastery and Apex. Select any concept for its definition, the
+          lessons that teach it, the full chain of what comes first, and what it unlocks next.
+          Read it as a graph or as a plain list, whichever you prefer.
+        </p>
 
         <div className="mt-10">
           <LazyConceptMapExplorer lessonTitles={lessonTitles} lessonDifficulty={lessonDifficulty} />

@@ -31,7 +31,9 @@ function gateNarration(gate: SingleQubitGateId, qubit: 0 | 1) {
 
 export function TwoQubitExplorer() {
   const [state, setState] = useState<StateVector>(() => StateVector.zero(2));
-  const [narration, setNarration] = useState("Starting state: |00⟩ — both qubits definitely 0.");
+  const [narration, setNarration] = useState(
+    "Starting state: |00⟩ — both qubits definitely 0, and completely independent of each other. Run the “Create a Bell state” walkthrough in the controls to entangle them, then measure one qubit and watch what happens to the other."
+  );
   const [activePresetId, setActivePresetId] = useState<string | null>("start");
   const [lastMeasurement, setLastMeasurement] = useState<string | null>(null);
   const [targetQubit, setTargetQubit] = useState<0 | 1>(0);
@@ -190,6 +192,13 @@ export function TwoQubitExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
+          <p className="text-sm text-muted-foreground">
+            Two qubits can be genuinely independent — knowing one tells you nothing about the other — or
+            they can be <em>entangled</em>, where neither has a state of its own and measuring one instantly
+            fixes the other. Nothing travels between them; the correlation was always in the pair. The
+            correlation table below is where the difference shows up.
+          </p>
+
           <div
             aria-live="polite"
             className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
@@ -205,6 +214,7 @@ export function TwoQubitExplorer() {
 
           <SimulatorFraming
             shows="Whether two qubits act independently or become entangled — correlated in a way no classical coin pair can be."
+            watchFor="Initialize |++⟩ and the correlation table shows all four outcomes at 25%: independent. Build a Bell state and only the diagonal survives — same 50/50 odds per qubit, but the two now always agree."
             tryThis="Run the Bell-state guided preset, then measure qubit 0 — notice qubit 1's outcome is now fixed too, even though you never touched it."
           />
         </>

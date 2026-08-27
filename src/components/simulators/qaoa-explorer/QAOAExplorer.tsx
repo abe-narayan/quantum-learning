@@ -23,10 +23,20 @@ function bitAt(index: number, totalQubits: number, node: number): number {
  * preset graphs, and watch the real `expectedCutSize` track (or miss) the
  * real `bruteForceMaxCut` optimum live.
  */
+const DEFAULT_PRESET_ID = QAOA_GRAPH_PRESETS[1].id;
+const DEFAULT_GAMMA = 0.6;
+const DEFAULT_BETA = 0.3;
+
 export function QAOAExplorer() {
-  const [presetId, setPresetId] = useState(QAOA_GRAPH_PRESETS[1].id);
-  const [gamma, setGamma] = useState(0.6);
-  const [beta, setBeta] = useState(0.3);
+  const [presetId, setPresetId] = useState(DEFAULT_PRESET_ID);
+  const [gamma, setGamma] = useState(DEFAULT_GAMMA);
+  const [beta, setBeta] = useState(DEFAULT_BETA);
+
+  function handleReset() {
+    setPresetId(DEFAULT_PRESET_ID);
+    setGamma(DEFAULT_GAMMA);
+    setBeta(DEFAULT_BETA);
+  }
 
   const preset = QAOA_GRAPH_PRESETS.find((p) => p.id === presetId) ?? QAOA_GRAPH_PRESETS[0];
 
@@ -112,10 +122,21 @@ export function QAOAExplorer() {
           />
         </div>
 
-        <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
-          Most likely measured bitstring: |{mostLikelyIndex.toString(2).padStart(preset.n, "0")}⟩ at{" "}
-          {(mostLikelyProbability * 100).toFixed(1)}% probability. Approximation ratio ⟨cut⟩ / true max ={" "}
-          {(ratio * 100).toFixed(1)}%.
+        <p className="text-sm text-muted-foreground">
+          Max-Cut: split the dots into two groups so that as many lines as possible run <em>between</em> the
+          groups rather than inside one. Those crossing lines are dashed above; the count is the
+          &ldquo;cut&rdquo;. Checking every possible split gets hopeless fast, so QAOA instead tunes two
+          angles until measuring the circuit tends to hand you a good split.
+        </p>
+
+        <div
+          aria-live="polite"
+          className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
+        >
+          The split shown above is the one this circuit is most likely to hand you — bitstring |
+          {mostLikelyIndex.toString(2).padStart(preset.n, "0")}⟩, at {(mostLikelyProbability * 100).toFixed(1)}%.
+          On average it cuts {expected.toFixed(2)} of the {trueMax} edges the best possible split cuts, so
+          you are at {(ratio * 100).toFixed(1)}% of optimal.
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
@@ -169,6 +190,7 @@ export function QAOAExplorer() {
           onGammaChange={setGamma}
           beta={beta}
           onBetaChange={setBeta}
+          onReset={handleReset}
         />
       }
     />

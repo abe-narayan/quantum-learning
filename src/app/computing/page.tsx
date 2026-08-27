@@ -3,12 +3,23 @@ import { PillarScope } from "@/components/field/PillarScope";
 import { Section, SplitFigure } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede, Readouts } from "@/components/ui/Typography";
 import { Instrument } from "@/components/ui/Panel";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { CourseList } from "@/components/curriculum/CourseList";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { getCourseHref } from "@/components/curriculum/courseHref";
+import {
+  PillarBriefing,
+  PillarLessonStrip,
+  PillarNext,
+  pillarFacts,
+  pillarReadoutItems,
+} from "@/components/pillar/PillarFraming";
 import { LazyBlochSphereHeroExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereHeroExplorer";
 import { StaticCircuitDiagram } from "@/components/visualizations/StaticCircuitDiagram";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
+import { pillarVisual } from "@/lib/design/pillars";
 import { BASE_URL, buildBreadcrumbSchema, buildCourseListSchema, pillarUrl } from "@/lib/structuredData";
 import { buildPageMetadata } from "@/lib/pageMetadata";
 import type { GateInstruction } from "@/lib/quantum/circuitBuilder";
@@ -46,7 +57,16 @@ export default async function ComputingPage() {
     { name: "Home", url: BASE_URL },
     { name: "Computing", url },
   ]);
-  const totalHours = courses.reduce((sum, course) => sum + course.estimatedHours, 0);
+  const field = pillarVisual("quantum-computing");
+
+  // One derivation over the real registries for every figure this page quotes
+  // about itself, and for the primary action (the real first course, in
+  // curriculum order) — see `pillarFacts`, shared with the other three track
+  // pages, and mechanics/page.tsx for why `getCourseHref` (→
+  // `/courses/<slug>`) is the right destination.
+  const facts = pillarFacts(courses, lessons);
+  const { firstCourse, firstLesson } = facts;
+  const heroHref = firstCourse ? getCourseHref(firstCourse.slug, firstLesson?.slug) : "/learn";
 
   return (
     <PillarScope pillar="quantum-computing">
@@ -71,18 +91,36 @@ export default async function ComputingPage() {
               </Lede>
               <p className="mt-4 max-w-[38rem] text-sm leading-relaxed text-muted-foreground">
                 Then run the algorithms that actually use it: Deutsch-Jozsa, Grover, Shor, VQE,
-                QAOA, and the error correction that keeps any of it working. Start with{" "}
-                <em>Qubits &amp; Quantum States</em> — it only needs the linear algebra and
-                complex numbers from Mathematical Foundations for Quantum Mechanics.
+                QAOA, and the error correction that keeps any of it working.
               </p>
-              <Readouts
+
+              <PillarBriefing
                 className="mt-8"
-                items={[
-                  { label: "Courses", value: courses.length },
-                  { label: "Curriculum hours", value: totalHours },
-                  { label: "Starts from", value: "Qubits & Quantum States" },
-                ]}
+                facts={facts}
+                outcome="Build a working algorithm out of gates you chose yourself — and say honestly which problems it does and does not speed up."
               />
+
+              <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
+
+              {firstCourse ? (
+                <div className="mt-7">
+                  <Button href={heroHref} size="lg">
+                    Start: {firstCourse.title} →
+                  </Button>
+                  <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+                    <span>
+                      {facts.firstCourseLessonCount} lessons
+                      {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
+                    </span>
+                    <DifficultyMark difficulty={firstCourse.difficulty} />
+                  </p>
+                </div>
+              ) : null}
+
+              <p className="mt-6 max-w-sm border-l-2 border-pillar-edge pl-4 text-xs leading-relaxed text-subtle-foreground">
+                The background behind this page is not decoration either: {field.fieldCaption.toLowerCase()},
+                the same Larmor precession the sphere beside this text lets you drive by hand.
+              </p>
             </Reveal>
           }
           figure={
@@ -109,6 +147,16 @@ export default async function ComputingPage() {
         </Reveal>
       </Section>
 
+      <Section width="reading" tight aria-labelledby="computing-start-heading">
+        <Reveal>
+          <PillarLessonStrip
+            courses={courses}
+            lessons={lessons}
+            headingId="computing-start-heading"
+          />
+        </Reveal>
+      </Section>
+
       <Section width="wide" aria-labelledby="computing-curriculum-heading">
         <SplitFigure
           align="start"
@@ -116,11 +164,11 @@ export default async function ComputingPage() {
             <Reveal>
               <Eyebrow>Curriculum</Eyebrow>
               <SectionTitle level={2} size="lg" id="computing-curriculum-heading" className="mt-3">
-                {courses.length} courses
+                {courses.length} courses, one qubit to fault tolerance
               </SectionTitle>
               <p className="mt-3 max-w-sm text-muted-foreground">
-                States, then circuits, then the algorithms and error correction that make them
-                useful — one qubit to fault tolerance.
+                States, then circuits, then the algorithms and the error correction that make them
+                useful, each course built directly on the one before it.
               </p>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-subtle-foreground">
                 Same asymmetric split as the state above: the course stack is the wide, weighty
@@ -134,6 +182,12 @@ export default async function ComputingPage() {
             </Reveal>
           }
         />
+      </Section>
+
+      <Section width="reading" tight aria-labelledby="computing-next-heading">
+        <Reveal>
+          <PillarNext pillar="quantum-computing" headingId="computing-next-heading" />
+        </Reveal>
       </Section>
     </PillarScope>
   );

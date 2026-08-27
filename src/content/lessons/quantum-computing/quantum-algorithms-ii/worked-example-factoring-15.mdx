@@ -74,7 +74,7 @@ Pick $a=7$ (coprime to $15$; checked by $\gcd(7,15)=1$).
 With $t=6$ counting qubits, `periodFindingMeasurementDistribution(7, 15,
 6)` gives exactly four peaks, at outcomes $0,16,32,48$, each with
 probability $0.25$, and (numerically) zero everywhere else. This is the
-one genuinely quantum step: the interference pattern from applying the
+one genuinely quantum step: the <Term id="phase-interference">interference</Term> pattern from applying the
 QFT to the counting register after the modular-exponentiation state was
 prepared.
 
@@ -139,7 +139,7 @@ interference. Every other step (picking $a$, checking $\gcd(a,N)=1$,
 interpreting the measured fraction, computing $a^{r/2}\bmod N$, running
 Euclid's algorithm twice) is ordinary classical computation a laptop
 performs instantly. This is the concrete, worked version of Lesson 1's
-abstract claim: quantum speedup lives in one specific, narrow subroutine,
+abstract claim: <Term id="quantum-advantage-supremacy">quantum speedup</Term> lives in one specific, narrow subroutine,
 not throughout the whole algorithm.
 
 <PipelineDiagram
@@ -168,7 +168,7 @@ valid to run.
 RSA keys today.** $15$ has $4$ bits; real RSA keys have thousands. Running
 this exact pipeline at cryptographically relevant size needs a
 controlled-modular-exponentiation circuit with thousands of logical
-qubits and deep circuits, protected by error correction: engineering far
+qubits and deep circuits, protected by <Term id="quantum-error-correction">error correction</Term>: engineering far
 beyond both this course's toy engine and current quantum hardware. This
 worked example demonstrates the *mechanism*, not a practical attack.
 </Callout>
@@ -212,7 +212,7 @@ and combining results, not by trusting one shot.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [The Variational Principle and Ansatz Circuits](/lessons/quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits), a completely
+Up next, [The Variational Principle and Ansatz Circuits](/lessons/quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits) is a completely
 different style of quantum algorithm, built for today's noisy, small
 quantum devices rather than the large fault-tolerant machines Shor's
 algorithm needs.

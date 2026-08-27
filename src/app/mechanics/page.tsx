@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
 import { PillarScope } from "@/components/field/PillarScope";
 import { Section, FullBleed, Marginalia } from "@/components/ui/Section";
-import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
+import { Eyebrow, SectionTitle, Lede, Readouts } from "@/components/ui/Typography";
 import { Instrument, FadeRule } from "@/components/ui/Panel";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { CourseList } from "@/components/curriculum/CourseList";
 import { CourseTimeline } from "@/components/curriculum/CourseTimeline";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { getCourseHref } from "@/components/curriculum/courseHref";
+import {
+  PillarBriefing,
+  PillarLessonStrip,
+  PillarNext,
+  pillarFacts,
+  pillarReadoutItems,
+} from "@/components/pillar/PillarFraming";
 import { LazyWavefunctionHeroExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionHeroExplorer";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
@@ -40,6 +50,17 @@ export default async function MechanicsPage() {
   ]);
   const field = pillarVisual("quantum-mechanics");
 
+  // Every figure this page quotes about itself — course/lesson/hour counts,
+  // the background it assumes, its difficulty range, and the real first
+  // course and lesson — comes from one derivation over the real registries.
+  // See `pillarFacts`; the other three track pages call the same function so
+  // none of these can drift apart. `getCourseHref` resolves to the
+  // `/courses/<slug>` overview (see courseHref.ts), whose own hero has the
+  // next click straight to the first lesson.
+  const facts = pillarFacts(courses, lessons);
+  const { firstCourse, firstLesson } = facts;
+  const heroHref = firstCourse ? getCourseHref(firstCourse.slug, firstLesson?.slug) : "/learn";
+
   return (
     <PillarScope pillar="quantum-mechanics">
       <script
@@ -54,20 +75,47 @@ export default async function MechanicsPage() {
             Reality, from first principles
           </SectionTitle>
           <Lede className="mt-5">
-            This is quantum theory on its own terms, not a computing prerequisite: the actual
-            mathematics reality obeys.
+            Quantum theory on its own terms, not as a computing prerequisite: the actual
+            mathematics reality obeys, built up rigorously enough that its results are derived here
+            rather than asserted.
           </Lede>
         </Reveal>
         <Reveal delay={80}>
           <p className="mt-4 max-w-[42rem] text-base leading-relaxed text-muted-foreground">
             Linear algebra and complex numbers first, then state vectors, operators, and the
             Schrödinger equation, built up rigorously through the hydrogen atom and open quantum
-            systems. Start with <em>Mathematical Foundations for Quantum Mechanics</em> if that
-            math isn&rsquo;t second nature yet. Build intuition with the Wavefunction Explorer
-            (real wave-packet evolution and tunneling), the Rabi Explorer (driven two-level
-            systems), and the Density Matrix Explorer (mixed states and decoherence).
+            systems. Build intuition with the Wavefunction Explorer (real wave-packet evolution
+            and tunneling), the Rabi Explorer (driven two-level systems), and the Density Matrix
+            Explorer (mixed states and decoherence).
           </p>
         </Reveal>
+
+        <Reveal delay={100}>
+          <PillarBriefing
+            className="mt-8"
+            facts={facts}
+            outcome="Derive the hydrogen atom's energy levels from the Schrödinger equation, and compute a tunneling probability, yourself — not recognise them, derive them."
+          />
+        </Reveal>
+
+        <Reveal delay={120}>
+          <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
+        </Reveal>
+
+        {firstCourse ? (
+          <Reveal delay={140} className="mt-7 block">
+            <Button href={heroHref} size="lg">
+              Start: {firstCourse.title} →
+            </Button>
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+              <span>
+                {facts.firstCourseLessonCount} lessons
+                {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
+              </span>
+              <DifficultyMark difficulty={firstCourse.difficulty} />
+            </p>
+          </Reveal>
+        ) : null}
 
         <Marginalia className="mt-8">
           The field behind this page is not decoration: {field.fieldCaption.toLowerCase()}, drawn
@@ -81,6 +129,16 @@ export default async function MechanicsPage() {
           >
             <LazyWavefunctionHeroExplorer />
           </Instrument>
+        </Reveal>
+      </Section>
+
+      <Section width="reading" tight aria-labelledby="mechanics-start-heading">
+        <Reveal>
+          <PillarLessonStrip
+            courses={courses}
+            lessons={lessons}
+            headingId="mechanics-start-heading"
+          />
         </Reveal>
       </Section>
 
@@ -119,6 +177,12 @@ export default async function MechanicsPage() {
           <div className="mt-2 border-l-2 border-pillar-edge pl-6">
             <CourseList courses={courses} lessons={lessons} />
           </div>
+        </Reveal>
+      </Section>
+
+      <Section width="reading" tight aria-labelledby="mechanics-next-heading">
+        <Reveal>
+          <PillarNext pillar="quantum-mechanics" headingId="mechanics-next-heading" />
         </Reveal>
       </Section>
     </PillarScope>

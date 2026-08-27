@@ -129,7 +129,7 @@ export const lessonMeta = {
 <LessonHook eyebrow="Access isn't shaping">
   A block encoding lets you apply a matrix $A$ to a state. It says
   nothing about applying $e^{-iHt}$, or $A^{-1}$, or any other function
-  of $A$'s eigenvalues — and almost every algorithm actually wants one of
+  of $A$'s eigenvalues, and almost every algorithm actually wants one of
   those instead.
 </LessonHook>
 
@@ -209,11 +209,11 @@ Write $P(x)$ for the $(0,0)$ entry of $U_{\vec\phi}(x)$. Then, for every choice 
 
 The worked derivations below confirm both properties on fully explicit cases, including one case where the degree bound is strict (the achieved polynomial's degree is strictly *less* than $d$).
 
-The much deeper direction — that essentially *any* polynomial satisfying these necessary conditions is also *achievable* by some phase sequence — is a real theorem, not derived here:
+The much deeper direction, that essentially *any* polynomial satisfying these necessary conditions is also *achievable* by some phase sequence, is a real theorem, not derived here:
 
 <TheoremBox title="Quantum signal processing (Low, Chuang, and collaborators)" provenance="cited">
 
-Fix $d\geq0$. A polynomial $P:[-1,1]\to\mathbb{C}$ arises as the $(0,0)$ entry of $U_{\vec\phi}(x)$ for some phase sequence $\phi_0,\dots,\phi_d$ if and only if $\deg P\leq d$, $P$ has parity matching $d$, $|P(x)|\leq1$ on $[-1,1]$, and a technical completeness condition holds: there exists a complementary polynomial $Q(x)$ (degree $\leq d$, parity matching $d-1$) such that $|P(x)|^2+(1-x^2)|Q(x)|^2=1$ for every $x\in[-1,1]$ — exactly the extra structure needed so that $P$ and $Q$ can be assembled into an actual unitary's two independent rows.
+Fix $d\geq0$. A polynomial $P:[-1,1]\to\mathbb{C}$ arises as the $(0,0)$ entry of $U_{\vec\phi}(x)$ for some phase sequence $\phi_0,\dots,\phi_d$ if and only if $\deg P\leq d$, $P$ has parity matching $d$, $|P(x)|\leq1$ on $[-1,1]$, and a technical completeness condition holds: there exists a complementary polynomial $Q(x)$ (degree $\leq d$, parity matching $d-1$) such that $|P(x)|^2+(1-x^2)|Q(x)|^2=1$ for every $x\in[-1,1]$, exactly the extra structure needed so that $P$ and $Q$ can be assembled into an actual unitary's two independent rows.
 
 </TheoremBox>
 
@@ -251,7 +251,7 @@ $$
 
 </TheoremBox>
 
-exactly degree $1$ and odd (matching $d=1$), and $|P(x)|=|x|\leq1$ automatically, for *any* choice of $\phi_0,\phi_1$ — confirming both parts of the boundedness/parity theorem above on an explicit, fully symbolic case.
+exactly degree $1$ and odd (matching $d=1$), and $|P(x)|=|x|\leq1$ automatically, for *any* choice of $\phi_0,\phi_1$, confirming both parts of the boundedness/parity theorem above on an explicit, fully symbolic case.
 
 **The trivial case, $\phi_0=\phi_1=0$.** The formula gives $P(x)=x$: with no phase tuning at all, $U=W(x)$ itself, and its $(0,0)$ entry is literally $x$ by inspection of $W(x)$'s own definition.
 
@@ -269,17 +269,17 @@ $$
 
 </TheoremBox>
 
-manifestly degree $\leq2$ and even (matching $d=2$), and — since it is a difference of two unit-modulus-weighted terms — $|P(x)|\leq1$ still holds for every $x$, by the same unitarity argument as before, for *any* $\phi_0,\phi_1,\phi_2$.
+manifestly degree $\leq2$ and even (matching $d=2$), and, since it is a difference of two unit-modulus-weighted terms, $|P(x)|\leq1$ still holds for every $x$, by the same unitarity argument as before, for *any* $\phi_0,\phi_1,\phi_2$.
 
-**The trivial case, all phases zero.** The formula collapses to $P(x)=x^2-(1-x^2)=2x^2-1$ — exactly the degree-2 Chebyshev polynomial of the first kind, $T_2(x)=\cos(2\arccos x)=2x^2-1$ (via the standard double-angle identity $\cos2\theta=2\cos^2\theta-1$). This is not a coincidence of $d=2$: using $W(x)=e^{i\arccos(x)X}$ from above, the all-zero-phase QSP unitary of *any* length $d$ is simply
+**The trivial case, all phases zero.** The formula collapses to $P(x)=x^2-(1-x^2)=2x^2-1$, exactly the degree-2 Chebyshev polynomial of the first kind, $T_2(x)=\cos(2\arccos x)=2x^2-1$ (via the standard double-angle identity $\cos2\theta=2\cos^2\theta-1$). This is not a coincidence of $d=2$: using $W(x)=e^{i\arccos(x)X}$ from above, the all-zero-phase QSP unitary of *any* length $d$ is simply
 
 $$
 U_{\vec 0}(x)=W(x)^d=e^{id\arccos(x)X}=\cos\!\big(d\arccos x\big)\,I+i\sin\!\big(d\arccos x\big)\,X,
 $$
 
-so its $(0,0)$ entry is *exactly* $\cos(d\arccos x)=T_d(x)$, the degree-$d$ Chebyshev polynomial, for every degree $d$ at once — the cleanest possible family of worked examples, and the one used for the visualization below.
+so its $(0,0)$ entry is *exactly* $\cos(d\arccos x)=T_d(x)$, the degree-$d$ Chebyshev polynomial, for every degree $d$ at once, the cleanest possible family of worked examples, and the one used for the visualization below.
 
-**A degree-collapse worth flagging.** The degree-2 formula's coefficient of $x^2$ is $e^{i(\phi_0+\phi_1+\phi_2)}+e^{i(\phi_0-\phi_1+\phi_2)}$ (writing $-(1-x^2)=x^2-1$ and collecting $x^2$ terms), which vanishes whenever the two exponents differ by $\pi$, i.e. whenever $2\phi_1=\pi\pmod{2\pi}$. Taking $\phi_0=\phi_2=0,\ \phi_1=\pi/2$: the two phases become $e^{i\pi/2}=i$ and $e^{-i\pi/2}=-i$, exact negatives, so $P(x)=ix^2-(-i)(1-x^2)=ix^2+i-ix^2=i$ — a *constant*, degree $0$, even though $d=2$. The theorem above only promises degree *at most* $d$; this is a fully explicit case where that bound is strict, confirmed numerically below.
+**A degree-collapse worth flagging.** The degree-2 formula's coefficient of $x^2$ is $e^{i(\phi_0+\phi_1+\phi_2)}+e^{i(\phi_0-\phi_1+\phi_2)}$ (writing $-(1-x^2)=x^2-1$ and collecting $x^2$ terms), which vanishes whenever the two exponents differ by $\pi$, i.e. whenever $2\phi_1=\pi\pmod{2\pi}$. Taking $\phi_0=\phi_2=0,\ \phi_1=\pi/2$: the two phases become $e^{i\pi/2}=i$ and $e^{-i\pi/2}=-i$, exact negatives, so $P(x)=ix^2-(-i)(1-x^2)=ix^2+i-ix^2=i$, a *constant*, degree $0$, even though $d=2$. The theorem above only promises degree *at most* $d$; this is a fully explicit case where that bound is strict, confirmed numerically below.
 
 ## Physical Interpretation
 
@@ -294,7 +294,7 @@ Every layer of QSP does the same two things: $W(x)$ is a "measurement" of the si
 
 A striking fraction of "what quantum algorithm solves problem $X$" questions in current research reduce to two separate sub-problems: (1) what polynomial (or, after the next lesson generalizes this to matrices, what function) approximates the operation you actually want — a truncated Jacobi–Anger/Chebyshev expansion approximates $e^{-iHt}$ for Hamiltonian simulation, a carefully shaped odd polynomial approximates $1/x$ for matrix inversion, a smoothed sign function approximates an eigenvalue filter — and (2) how to realize that exact polynomial via QSP. This lesson is entirely about why (2) has a clean answer: the achievability theorem above says that essentially any polynomial satisfying the stated degree/parity/boundedness/completeness conditions is realizable, exactly, by *some* phase sequence, turning "redesign a circuit for this new function" into "solve one classical numerical problem for these new phases." That reframing, more than any single algorithm built from it, is why QSP (and its full-matrix generalization, QSVT, next) is often described as the master key underlying modern quantum algorithms.
 
-Being honest about scope: finding the actual phase sequence $\phi_0,\dots,\phi_d$ for a given target $(P,Q)$ is itself a real, nontrivial computational problem, distinct from the existence theorem this lesson states. It is not derived here — but it is a *solved* problem, with known, numerically stable classical algorithms (e.g. via optimization over the phases, or via an explicit factorization procedure recovering them one at a time from $P$ and $Q$'s roots) that run in time polynomial in $d$. The point of separating the two is exactly the point of the previous paragraph: the existence theorem is what makes "just compute the phases classically" a meaningful thing to be able to say at all.
+Being honest about scope: finding the actual phase sequence $\phi_0,\dots,\phi_d$ for a given target $(P,Q)$ is itself a real, nontrivial computational problem, distinct from the existence theorem this lesson states. It is not derived here, but it is a *solved* problem, with known, numerically stable classical algorithms (e.g. via optimization over the phases, or via an explicit factorization procedure recovering them one at a time from $P$ and $Q$'s roots) that run in time polynomial in $d$. The point of separating the two is exactly the point of the previous paragraph: the existence theorem is what makes "just compute the phases classically" a meaningful thing to be able to say at all.
 
 ## Worked Example
 
@@ -354,7 +354,7 @@ confirming the general (not just the two clean special-case) formula, for phases
   ariaLabel="The achieved polynomial P(x) for x from -1 to 1, computed via real complex matrix multiplication for QSP degree d=1 through d=4 with all phases zero, showing the Chebyshev polynomials T_1 through T_4 with visibly increasing oscillation as d grows"
 />
 
-Every sampled point's imaginary part is at most ${maxChebyshevImaginaryResidual.toExponential(2)}$ across all four curves — identically zero up to floating-point rounding, exactly as the exact identity $U_{\vec0}(x)=\cos(d\arccos x)I+i\sin(d\arccos x)X$ predicts for the real $(0,0)$ entry. Each additional phase pair buys one more degree of oscillation, from a single monotonic ramp at $d=1$ to a four-lobed curve at $d=4$ — a direct, visible demonstration of why higher-degree QSP sequences can approximate more complicated target functions.
+Every sampled point's imaginary part is at most ${maxChebyshevImaginaryResidual.toExponential(2)}$ across all four curves — identically zero up to floating-point rounding, exactly as the exact identity $U_{\vec0}(x)=\cos(d\arccos x)I+i\sin(d\arccos x)X$ predicts for the real $(0,0)$ entry. Each additional phase pair buys one more degree of oscillation, from a single monotonic ramp at $d=1$ to a four-lobed curve at $d=4$, a direct, visible demonstration of why higher-degree QSP sequences can approximate more complicated target functions.
 
 ## Common Mistakes
 
@@ -376,17 +376,17 @@ Every sampled point's imaginary part is at most ${maxChebyshevImaginaryResidual.
 
 ## Summary
 
-- **Quantum signal processing** alternates a fixed signal rotation $W(x)=\begin{pmatrix}x&is\\is&x\end{pmatrix}=e^{i\arccos(x)X}$ with tunable phase rotations $e^{i\phi_kZ}$; the resulting unitary's $(0,0)$ entry is a polynomial $P(x)$ with degree at most $d$, parity matching $d$, and $|P(x)|\leq1$ — all three properties following directly from unitarity, not assumed.
+- **Quantum signal processing** alternates a fixed signal rotation $W(x)=\begin{pmatrix}x&is\\is&x\end{pmatrix}=e^{i\arccos(x)X}$ with tunable phase rotations $e^{i\phi_kZ}$; the resulting unitary's $(0,0)$ entry is a polynomial $P(x)$ with degree at most $d$, parity matching $d$, and $|P(x)|\leq1$, all three properties following directly from unitarity, not assumed.
 - Worked and verified exactly: $d=1$ gives $P(x)=e^{i(\phi_0+\phi_1)}x$ (a phase-rotated copy of $x$); $d=2$ gives $P(x)=e^{i(\phi_0+\phi_1+\phi_2)}x^2-e^{i(\phi_0-\phi_1+\phi_2)}(1-x^2)$, which reduces to the exact Chebyshev polynomial $T_d(x)=\cos(d\arccos x)$ for any $d$ when every phase is zero, and can even collapse to a lower-degree constant for special phases — all confirmed via this platform's actual `Complex`/`Matrix` linear algebra, not merely asserted.
-- The deep direction — that essentially any polynomial meeting the degree/parity/boundedness/completeness conditions is *achievable* by some phase sequence — is a real theorem (Low, Chuang, and collaborators), cited here rather than proved; finding those phases is itself a separate, already-solved classical computational problem.
+- The deep direction, that essentially any polynomial meeting the degree/parity/boundedness/completeness conditions is *achievable* by some phase sequence, is a real theorem (Low, Chuang, and collaborators), cited here rather than proved; finding those phases is itself a separate, already-solved classical computational problem.
 - This is the field's master-key technique: reduce "what quantum algorithm solves problem $X$" to "what polynomial approximates the function I need," then realize that exact polynomial via QSP with no new circuit design, only new phase angles.
 
 ## Further Exploration
 
 <NextDiscovery>
-  Next: [The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation),
-  which generalizes this exact single-qubit machinery — the same alternating
-  structure, the same achievability theorem — from a single signal $x$ to an
+  [The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation)
+  generalizes this exact single-qubit machinery (the same alternating
+  structure, the same achievability theorem) from a single signal $x$ to an
   entire block-encoded matrix's singular values at once, by combining this
   lesson directly with the block-encoding construction from the lesson before
   it.

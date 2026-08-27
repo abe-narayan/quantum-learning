@@ -61,7 +61,7 @@ argument, run as actual code instead of asserted from a podium.
 
 ### Memory cost
 
-Each complex amplitude needs two double-precision floats (real and
+Each complex <Term id="amplitude">amplitude</Term> needs two double-precision floats (real and
 imaginary), 8 bytes each: 16 bytes per amplitude. Total memory:
 $16\times2^n$ bytes.
 
@@ -135,7 +135,7 @@ State-vector simulation is practical up to roughly 30-40 qubits on
 serious classical hardware (well beyond a laptop, but within reach of
 research computing clusters), and essentially impossible beyond about
 50, for any currently existing or plausible near-future classical
-computer. This concrete range is why quantum advantage experiments
+computer. This concrete range is why <Term id="quantum-advantage-supremacy">quantum advantage</Term> experiments
 specifically target circuits in or beyond this regime: it's the qubit
 count at which *no* classical simulation technique (including the more
 sophisticated approaches the rest of this course covers) can
@@ -238,8 +238,8 @@ solution to it.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Tensor Network Methods](/lessons/quantum-software/simulating-quantum-systems/tensor-network-methods), which push past this wall for a
-specific, important class of circuits, not by cheating the $2^n$ fact,
-but by exploiting structure (limited entanglement) that a generic
-state-vector simulator ignores.
+[Tensor Network Methods](/lessons/quantum-software/simulating-quantum-systems/tensor-network-methods) push past this wall for a
+specific, important class of circuits: the underlying $2^n$ scaling
+doesn't change, but structure (limited entanglement) that a generic
+state-vector simulator ignores can be exploited directly.
 </NextDiscovery>

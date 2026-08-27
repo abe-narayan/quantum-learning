@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
-import { ControlSection } from "../shared/controls";
+import { ControlSection, SymbolGloss } from "../shared/controls";
 
 const QUBIT_OPTIONS = [2, 3, 4].map((n) => ({ n, label: `N=${2 ** n}` }));
 
@@ -32,7 +32,7 @@ export function GroverControls({
       <ControlSection
         id="grover-qubits"
         title="Search space size"
-        description={`${numQubits} qubits, N=${dimension} basis states. Changing this resets the search.`}
+        description={`How many items the search is over: ${numQubits} qubits hold N=${dimension} of them. Changing this restarts the search.`}
       >
         <PresetToggle
           options={QUBIT_OPTIONS}
@@ -41,14 +41,28 @@ export function GroverControls({
           ariaLabel="Number of qubits"
           disabled={disabled}
         />
+        <SymbolGloss
+          items={[
+            {
+              symbol: "N",
+              name: "search space size",
+              means: `the number of items you're searching, N = 2 to the power of the qubit count. ${numQubits} qubits index ${dimension} items — one bar each in the chart.`,
+            },
+          ]}
+        />
       </ControlSection>
 
-      <ControlSection id="grover-marked" title="Marked item">
+      <ControlSection
+        id="grover-marked"
+        title="Marked item"
+        description="The one item the black box says yes to — the needle. Pick a different one and the tall bar moves with it."
+      >
         <select
           value={markedIndex}
           disabled={disabled}
+          aria-label="Marked item — the one item the oracle recognizes"
           onChange={(e) => onMarkedIndexChange(Number(e.target.value))}
-          className="w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="min-h-11 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {Array.from({ length: dimension }, (_, i) => (
             <option key={i} value={i}>
@@ -61,16 +75,33 @@ export function GroverControls({
       <ControlSection
         id="grover-run"
         title="Run"
-        description={`Iteration ${iteration}. Theoretical optimum for this N and 1 marked item: ${optimalIteration}.`}
+        description={`Currently at round ${iteration}. The best number of rounds for N=${dimension} with one marked item is ${optimalIteration} — past that, success probability falls again.`}
       >
         <div className="flex flex-wrap gap-2">
           <Button variant="primary" size="sm" disabled={disabled} onClick={onStep}>
             Step (oracle + diffusion)
           </Button>
           <Button variant="ghost" size="sm" disabled={disabled} onClick={onReset}>
-            Reset
+            Reset to round 0
           </Button>
         </div>
+        <SymbolGloss
+          items={[
+            {
+              symbol: "1.",
+              name: "oracle",
+              means:
+                "the black box that recognizes the item you want. It doesn't reveal it — it just flips the sign of that one item's amplitude, leaving every probability unchanged.",
+              glossaryId: "oracle",
+            },
+            {
+              symbol: "2.",
+              name: "diffusion",
+              means:
+                "the step that turns that invisible sign flip into a visible height difference, by reflecting every amplitude about their average. Oracle plus diffusion is one round.",
+            },
+          ]}
+        />
       </ControlSection>
     </div>
   );

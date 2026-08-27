@@ -43,8 +43,8 @@ BQP and Oracle Complexity did two things carefully: it gave BQP a formal
 definition, and it proved that Deutsch-Jozsa, Simon's algorithm, and
 Grover's algorithm establish *query*-complexity separations relative to a
 black-box oracle, not unconditional *time*-complexity separations between
-classical and quantum computation. That lesson deliberately stopped there
-— it proved what those specific algorithms do and don't establish, but it
+classical and quantum computation. That lesson deliberately stopped there:
+it proved what those specific algorithms do and don't establish, but it
 never placed BQP within the broader classical complexity landscape most
 popular accounts gesture at with a Venn diagram and move on.
 
@@ -114,7 +114,7 @@ $2^{-\Omega(k)}$ by a Chernoff-Hoeffding bound on sums of independent
 bounded random variables, so *any* pair of constants bounded away from
 $1/2$ defines the identical class $\mathsf{BQP}$, up to polynomial
 overhead in circuit size. That amplification fact is exactly why "the
-error bound is $1/3$" is a convention, not a substantive commitment —
+error bound is $1/3$" is a convention, not a substantive commitment,
 the same reasoning applies verbatim to $\mathsf{BPP}$, the classical
 bounded-error analogue.
 
@@ -133,8 +133,8 @@ classical computer with enough *memory* (polynomial) can eventually
 compute what a quantum computer computes, given enough *time*
 (potentially exponential). Space and time are different resources, and
 this containment is a statement about space only. It's also not the
-tightest containment known — $\mathsf{BQP}\subseteq\mathsf{PP}$ is a
-strictly stronger, separately proven fact (cited here, not derived) —
+tightest containment known ($\mathsf{BQP}\subseteq\mathsf{PP}$ is a
+strictly stronger, separately proven fact, cited here, not derived),
 but $\mathsf{PSPACE}$ is the containment this lesson's diagram, and the
 open questions below, actually need.
 
@@ -157,8 +157,8 @@ anything currently known in complexity theory. Precision matters more
 here than anywhere else in this course.
 
 **(1) Is $\mathsf{NP}\subseteq\mathsf{BQP}$?** This asks whether a
-quantum computer can efficiently solve *every* problem in $\mathsf{NP}$
-— whether some quantum analogue of brute-force certificate search could
+quantum computer can efficiently solve *every* problem in $\mathsf{NP}$:
+whether some quantum analogue of brute-force certificate search could
 be made polynomial in general, the way Grover's algorithm makes
 unstructured search quadratically faster but not exponentially faster.
 This is **not known**, and it is **widely believed to be false**. The
@@ -183,7 +183,7 @@ power can always be *verified* the $\mathsf{NP}$ way after the fact,
 even if it can't be *found* that way. This is also **not known**. Unlike
 question (1), there isn't even a strong heuristic argument pointing one
 way: specific problems believed to be in $\mathsf{BQP}$ are known for
-which no $\mathsf{NP}$-style classical certificate is currently known —
+which no $\mathsf{NP}$-style classical certificate is currently known:
 the natural "certificate," the full quantum computational transcript,
 isn't classically polynomial-length or obviously checkable in
 polynomial time. But the absence of a *known* certificate is not a proof
@@ -195,8 +195,8 @@ certificate itself is allowed to be quantum.
 of all: do quantum computers give *any* advantage over classical ones
 for deciding languages, given unlimited polynomial time on both sides?
 $\mathsf{P}\neq\mathsf{BQP}$ is **not a proven theorem**. It is
-essentially universally believed, on the strength of Shor's algorithm —
-examined precisely below — but belief, however strong and however
+essentially universally believed, on the strength of Shor's algorithm
+(examined precisely below), but belief, however strong and however
 widely shared among experts, is not proof.
 
 <ComplexityClassDiagram
@@ -397,21 +397,21 @@ proof that it's false in the unrestricted, non-black-box setting.
   false, on real but black-box-limited BBBV-style evidence; the second
   has no strong heuristic pointing either way; the third is widely
   believed false largely on the strength of Shor's algorithm.
-- Shor's algorithm proves factoring $\in\mathsf{BQP}$ — a real,
-  unconditional theorem — but does not prove $\mathsf{P}\neq
+- Shor's algorithm proves factoring $\in\mathsf{BQP}$ (a real,
+  unconditional theorem), but does not prove $\mathsf{P}\neq
   \mathsf{BQP}$, because factoring is not known to be
   $\mathsf{NP}$-complete and its classical hardness is itself an
   unproven (if widely believed) conjecture.
-- This distinction — a proven theorem versus strong conditional
-  evidence resting on an unproven assumption — is precisely the tool
+- This distinction, a proven theorem versus strong conditional
+  evidence resting on an unproven assumption, is precisely the tool
   needed to evaluate extraordinary quantum-advantage claims without
   either dismissing or over-crediting them.
 
 ## Further Exploration
 
 <NextDiscovery>
-  Next: [QMA and Quantum Verification](/lessons/apex/quantum-complexity-theory/qma-and-quantum-verification)
-  takes on open question (2) directly — building the class where a
+  [QMA and Quantum Verification](/lessons/apex/quantum-complexity-theory/qma-and-quantum-verification)
+  takes on open question (2) directly: building the class where a
   *quantum* certificate, not a classical one, is what a poly-time verifier
   checks, and asking exactly how that changes what's provable.
 </NextDiscovery>

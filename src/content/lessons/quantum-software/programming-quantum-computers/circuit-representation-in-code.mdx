@@ -45,7 +45,7 @@ the same basic shape: construct a circuit object by appending gate
 instructions to it, then pass the finished circuit to a separate
 execution step. This isn't just stylistic. It's what allows a circuit
 to be inspected, optimized (Compilation & Hybrid Algorithms' own
-transpilation lesson), or sent to different backends (a simulator today,
+<Term id="quantum-compilation-transpilation">transpilation</Term> lesson), or sent to different backends (a simulator today,
 real hardware tomorrow) without rewriting the circuit itself.
 
 ### This platform's QuantumCircuit
@@ -56,7 +56,7 @@ circuit.h(0).cnot(0, 1);
 const state = runCircuit(circuit);
 ```
 
-`circuit.h(0).cnot(0,1)` doesn't touch any quantum state at all. It
+`circuit.h(0).cnot(0,1)` doesn't touch any <Term id="quantum-state">quantum state</Term> at all. It
 appends two `GateInstruction` objects (plain data: `{gate:"H",
 targets:[0]}` and `{gate:"CNOT",targets:[0,1]}`) to a list.
 `runCircuit(circuit)` is the separate execution step: it starts from
@@ -226,7 +226,7 @@ Gates & Circuits' own functions). Only the software organization
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Quantum SDKs Overview](/lessons/quantum-software/programming-quantum-computers/quantum-sdks-overview), which surveys how real-world SDKs
-extend this basic pattern with additional structure (registers,
-backends, transpilation).
+[Quantum SDKs Overview](/lessons/quantum-software/programming-quantum-computers/quantum-sdks-overview) surveys how real-world SDKs
+extend this basic pattern with additional structure: registers,
+backends, transpilation.
 </NextDiscovery>

@@ -78,7 +78,7 @@ The last lesson's oracle writes f(x)'s value into a second qubit. That's the hon
 
 ## Motivation
 
-The last lesson's oracle, $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$,
+The last lesson's <Term id="oracle">oracle</Term>, $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$,
 is the *honest* definition. This lesson derives exactly when and why
 the phase substitution is legitimate.
 
@@ -148,7 +148,7 @@ back onto the control-like register instead of staying on the target.
 Equivalently: for fixed $x$, $U_f$ acts on the ancilla alone as
 $X^{f(x)}$, the identity when $f(x)=0$ and a bit flip when $f(x)=1$,
 straight from $y\oplus f(x)$, and $|-\rangle$ is exactly $X$'s
-$-1$-eigenstate ($|+\rangle$ its $+1$-eigenstate). That eigenstate framing
+$-1$-<Term id="eigenvalue-eigenvector">eigenstate</Term> ($|+\rangle$ its $+1$-eigenstate). That eigenstate framing
 is what the callouts below mean by "$|-\rangle$ is an eigenstate of the
 apply-$X$-conditioned-on-$f(x)$ operation": applying an operator to its own
 eigenstate only ever multiplies it by a number, never moves it.
@@ -219,7 +219,7 @@ operation, with eigenvalue $+1$ instead of $-1$.
 Phase kickback is the mechanism that turns "compute $f$" into "multiply
 each branch of a superposition by a sign depending on $f$," a *global*
 property of the whole superposition rather than a per-branch classical bit.
-Once $f(x)$'s value is a phase, it becomes something interference (via
+Once $f(x)$'s value is a phase, it becomes something <Term id="phase-interference">interference</Term> (via
 Hadamards, or the QFT) can act on, which is precisely why this trick shows
 up as the very first step inside Deutsch-Jozsa and Grover's algorithm both.
 
@@ -285,7 +285,7 @@ exactly what this derivation needs.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [The Deutsch-Jozsa Algorithm](/lessons/quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm), the first full algorithm built from
+[The Deutsch-Jozsa Algorithm](/lessons/quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm) is the first full algorithm built from
 this trick, determining whether $f$ is constant or balanced with exactly
 one query, where any classical algorithm needs exponentially many in the
 worst case.

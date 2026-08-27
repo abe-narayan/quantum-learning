@@ -69,7 +69,7 @@ Can two people agree on a secret string of bits over a channel anyone might be l
 
 The last lesson proved that an unknown qubit state can't be copied. That
 sounds like a purely mathematical curiosity until BB84, the first
-quantum key distribution protocol, puts it to work: Eve cannot silently
+<Term id="qkd-bb84">quantum key distribution</Term> protocol, puts it to work: Eve cannot silently
 make a copy of each qubit, keep one, and pass the other along
 undisturbed. Every real quantum channel primitive
 this needs, encoding a bit in a basis, changing basis with $H$, and
@@ -88,7 +88,7 @@ measuring, is already in this course's engine.
 
 A classical bit sent in the open can always be copied and read without
 leaving a trace. A qubit is different: it can be encoded in one of two
-*conjugate* bases, the computational (Z) basis $\{|0\rangle,|1\rangle\}$ or
+*conjugate* bases, the <Term id="computational-basis">computational (Z) basis</Term> $\{|0\rangle,|1\rangle\}$ or
 the Hadamard (X) basis $\{|+\rangle,|-\rangle\}$, and if you don't know which
 basis was used, measuring in the wrong one destroys the information you were
 trying to read while giving you a coin flip instead. Alice exploits this:
@@ -166,8 +166,8 @@ who wasn't measuring the actual qubits.
 ### Eve, and why intercepting is not free
 
 Suppose an eavesdropper Eve intercepts each qubit in transit, measures it
-in a randomly guessed basis, and resends whatever she collapsed it to,
-hoping neither Alice nor Bob notices. No-cloning is exactly why she can't
+in a randomly guessed basis, and resends whatever she <Term id="wavefunction-collapse">collapsed</Term> it to,
+hoping neither Alice nor Bob notices. <Term id="no-cloning-theorem">No-cloning</Term> is exactly why she can't
 do better: she cannot duplicate the qubit and forward an untouched original
 while keeping a copy for herself, so she is forced to measure the real
 thing and pass along only what her own measurement leaves behind.
@@ -261,8 +261,8 @@ Nothing about BB84 requires entanglement or anything exotic: every qubit
 Alice sends is in a definite, unentangled state; the security comes purely
 from the fact that $Z$-basis and $X$-basis are *conjugate*, non-commuting
 observables, exactly like position and momentum. Measuring one basis
-necessarily disturbs the other, which is the same physics the uncertainty
-principle expresses elsewhere in this curriculum. No-cloning closes the
+necessarily disturbs the other, which is the same physics the <Term id="heisenberg-uncertainty-principle">uncertainty
+principle</Term> expresses elsewhere in this curriculum. No-cloning closes the
 one loophole that would otherwise defeat this: without it, Eve could copy
 each qubit an unlimited number of times, measure the copies in every
 possible basis, and reconstruct the state exactly, all without ever

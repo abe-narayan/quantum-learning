@@ -35,7 +35,7 @@ Everything up to now has described qubit states: points on the sphere. This less
 
 ## Motivation
 
-These are quantum gates, and every quantum circuit
+These are <Term id="quantum-gates">quantum gates</Term>, and every quantum circuit
 you'll ever see is just a sequence of them.
 
 <ExternalFigure
@@ -53,7 +53,7 @@ A classical logic gate (AND, NOT, OR) takes a bit and produces a bit, and
 most of them are irreversible: given the output of an AND gate, you can't
 recover its two inputs. Quantum gates are different by requirement: they
 must be **reversible**, which turns out to mean every quantum gate is a
-*rotation* of the Bloch sphere. Rotations never destroy information.
+*rotation* of the <Term id="bloch-sphere-term">Bloch sphere</Term>. Rotations never destroy information.
 Rotate one way, then rotate back, and you're exactly where you started.
 That single constraint shapes everything about how quantum gates behave.
 
@@ -73,7 +73,7 @@ $$
 
 For this to equal $\langle\psi|\psi\rangle$ for *every* state
 $|\psi\rangle$, we need $U^\dagger U = I$. A matrix satisfying this is
-called **unitary**. Unitary matrices are automatically invertible (with
+called **<Term id="unitary-operator">unitary</Term>**. Unitary matrices are automatically invertible (with
 $U^{-1}=U^\dagger$), which is exactly the reversibility property from the
 intuition above: undoing a gate is just applying its conjugate
 transpose.
@@ -124,7 +124,7 @@ $$
 
 Let's verify $H|0\rangle$ directly:
 $H|0\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}(|0\rangle+|1\rangle) = |+\rangle$.
-$H$ is the gate that *creates* superposition from a definite state, and
+$H$ is the gate that *creates* <Term id="superposition">superposition</Term> from a definite state, and
 since it's its own inverse ($H^2=I$, worth checking), it also *removes*
 superposition: $H|+\rangle=|0\rangle$. Geometrically, $H$ rotates by $\pi$
 about the diagonal axis exactly between the $x$- and $z$-axes, the only
@@ -230,7 +230,7 @@ answer, write out $|\psi\rangle$ as an explicit column vector first.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Single-Qubit Rotations](/lessons/quantum-computing/qubits-and-quantum-states/single-qubit-rotations), which generalizes every gate in this
+[Single-Qubit Rotations](/lessons/quantum-computing/qubits-and-quantum-states/single-qubit-rotations) generalizes every gate in this
 lesson into one formula, a rotation by *any* angle about *any* axis,
 and proves the claim that every single-qubit gate is secretly one of
 these.

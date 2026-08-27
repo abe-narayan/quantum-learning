@@ -57,8 +57,8 @@ of this course's cost analysis.
 
 ### What state-vector simulation actually is
 
-A **state-vector simulator** represents an $n$-qubit quantum state as a
-list of $2^n$ complex amplitudes — this platform's `StateVector` class,
+A **state-vector simulator** represents an $n$-qubit <Term id="quantum-state">quantum state</Term> as a
+list of $2^n$ complex <Term id="amplitude">amplitudes</Term> — this platform's `StateVector` class,
 used without exception in every Quantum Computing pillar course.
 Applying a gate updates these amplitudes directly via ordinary linear
 algebra (`applySingleQubitGate`, `applyCNOT`): exact matrix
@@ -78,7 +78,7 @@ multiplication, not an approximation of any kind.
 A state-vector simulator computes the *exact* quantum state (up to
 ordinary floating-point rounding, the same kind of error present in any
 numerical computation). Every amplitude, every probability, every
-expectation value this platform has ever displayed came from this
+<Term id="expectation-value">expectation value</Term> this platform has ever displayed came from this
 technique. That's fundamentally different from *sampling* (Writing
 Your First Circuit's `sampleMeasurements`), which only estimates
 probabilities statistically by drawing finite outcomes; a state-vector

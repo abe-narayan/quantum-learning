@@ -165,7 +165,7 @@ algorithm yet."
 ### What "quantum advantage" actually requires
 
 Both results share a hidden assumption worth stating explicitly: the
-speedup is counted in **oracle queries**, not real-world running time.
+speedup is counted in **<Term id="query-complexity-black-box-model">oracle queries</Term>**, not real-world running time.
 Building a genuine quantum oracle for some function of interest (encoding
 "is this database entry a match," say) as an efficient reversible circuit
 is a separate, often much harder engineering problem than the query-count
@@ -177,7 +177,7 @@ where most of the difficulty in quantum algorithm design still lives.
 
 ## Physical Interpretation
 
-Interference is the entire mechanism behind both results: Deutsch-Jozsa's
+<Term id="phase-interference">Interference</Term> is the entire mechanism behind both results: Deutsch-Jozsa's
 amplitude on $|0\rangle^{\otimes n}$ collapsing to exactly $0$ or $\pm1$,
 Grover's rotation concentrating amplitude on the marked state. Interference
 itself is a genuinely quantum resource with no classical analogue.
@@ -216,7 +216,7 @@ it only widens as $n$ grows further.
 fact.** It's true for specially-constructed promise problems like
 Deutsch-Jozsa; it's false for unstructured search (Grover, quadratic,
 provably optimal) and false in general: most problems have no known
-quantum speedup at all.
+<Term id="quantum-advantage-supremacy">quantum speedup</Term> at all.
 </Callout>
 
 <Callout type="note">

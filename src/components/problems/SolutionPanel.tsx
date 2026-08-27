@@ -1,24 +1,39 @@
 import { Button } from "@/components/ui/Button";
 import { Instrument } from "@/components/ui/Panel";
-import { MathText } from "@/components/ui/MathText";
 import { KatexMath } from "@/components/ui/KatexMath";
+import { ScrollableMathText } from "./ScrollableMathText";
 import type { Explanation, Solution } from "@/lib/problems/types";
 
-/** A solution teaches — numbered steps building to the answer, then (for
- *  conceptual problems especially) why it's right and why common
- *  alternatives aren't. Collapsed until explicitly revealed — the last,
- *  most deliberate step of the hint ladder, not a default-open panel, and
- *  named plainly ("Reveal full solution," not a bare disclosure triangle)
- *  so committing to it reads as the real decision it is. */
+/**
+ * A solution teaches — numbered steps building to the answer, then (for
+ * conceptual problems especially) why it's right and why common alternatives
+ * aren't. Collapsed until explicitly revealed — the last, most deliberate
+ * step of the hint ladder, not a default-open panel, and named plainly
+ * ("Reveal full solution," not a bare disclosure triangle) so committing to
+ * it reads as the real decision it is.
+ *
+ * The panel itself is always present and always says what it holds, because a
+ * worked solution nobody can find is the same as no worked solution: a reader
+ * who is stuck should never have to guess whether one exists. What changes
+ * with `attempted` is only whether the reveal is *live* — before a first
+ * submission the control states the condition instead of firing, so the
+ * solution cannot be read past on the way to the answer box, and after one
+ * submission (right or wrong) it is unconditionally available. `attempted` is
+ * read from persisted progress by the caller, so it does not re-lock on
+ * reload.
+ */
 export function SolutionPanel({
   solution,
   explanation,
   revealed,
+  attempted,
   onReveal,
 }: {
   solution: Solution;
   explanation?: Explanation;
   revealed: boolean;
+  /** Whether this reader has submitted at least one answer to this problem. */
+  attempted: boolean;
   onReveal: () => void;
 }) {
   if (!revealed) {
@@ -26,13 +41,19 @@ export function SolutionPanel({
       <Instrument
         label="Solution"
         readout={
-          <Button variant="ghost" size="sm" onClick={onReveal}>
-            Reveal full solution
-          </Button>
+          attempted ? (
+            <Button variant="ghost" size="sm" onClick={onReveal}>
+              Reveal full solution
+            </Button>
+          ) : (
+            <span className="tech-label text-subtle-foreground">Opens after your first submission</span>
+          )
         }
       >
         <p className="text-sm text-muted-foreground">
-          The worked steps and final answer, once you&rsquo;re ready to see them — not before.
+          {attempted
+            ? "Every step worked out, plus the final answer and the usual wrong turns. Taking it costs nothing — the problem stays here."
+            : "Every step worked out, plus the final answer and the usual wrong turns. Submit something first, even a guess — reading the solution before attempting it is the one way to get nothing out of it."}
         </p>
       </Instrument>
     );
@@ -47,10 +68,20 @@ export function SolutionPanel({
               <span className="tech-value shrink-0 pt-px text-xs text-pillar-text">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <MathText text={step.description} />
+              <ScrollableMathText text={step.description} />
             </p>
             {step.latex ? (
-              <div className="mt-2 overflow-x-auto pl-7">
+              /*
+                `tabIndex={0}` for exactly the reason
+                `src/lib/mdx/rehypeScrollableMath.mjs` documents at length: a
+                scroll container is focusable-by-default only in Firefox, so
+                without it a keyboard-only reader can see the left of a wide
+                step and has no way to reach the rest. 37 of the 169 authored
+                solution steps carry display LaTeX long enough for this to
+                matter. No `role`/`aria-label`: KaTeX emits its own MathML and
+                naming the container would flatten it.
+              */
+              <div tabIndex={0} className="mt-2 overflow-x-auto pl-7 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2">
                 <KatexMath tex={step.latex} display />
               </div>
             ) : null}
@@ -58,18 +89,18 @@ export function SolutionPanel({
         ))}
       </ol>
       <div className="mt-4 rounded-[--radius-tight] border border-pillar-edge bg-pillar-wash p-3 text-sm font-medium text-foreground">
-        <MathText text={solution.finalAnswer} />
+        <ScrollableMathText text={solution.finalAnswer} />
       </div>
 
       {explanation ? (
         <div className="mt-5 space-y-2.5 border-t border-border pt-4 text-sm">
           <p className="text-foreground">
             <span className="font-semibold">Why: </span>
-            <MathText text={explanation.correctIdea} />
+            <ScrollableMathText text={explanation.correctIdea} />
           </p>
           {explanation.whyCorrect ? (
             <p className="text-muted-foreground">
-              <MathText text={explanation.whyCorrect} />
+              <ScrollableMathText text={explanation.whyCorrect} />
             </p>
           ) : null}
           {explanation.whyWrong && explanation.whyWrong.length > 0 ? (
@@ -78,7 +109,7 @@ export function SolutionPanel({
               <ul className="mt-1.5 list-disc space-y-1 pl-5 text-muted-foreground">
                 {explanation.whyWrong.map((reason, index) => (
                   <li key={index}>
-                    <MathText text={reason} />
+                    <ScrollableMathText text={reason} />
                   </li>
                 ))}
               </ul>

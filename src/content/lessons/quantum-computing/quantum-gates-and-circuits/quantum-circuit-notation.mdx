@@ -63,14 +63,14 @@ circuit is reading a story of the state evolving, one column at a time.
 - **Wires**, read top to bottom, are qubits 0, 1, 2, ..., matching this
   platform's ordering convention exactly, so the topmost wire is always
   qubit 0.
-- **Boxes** on a wire (labeled $H$, $X$, $S$, etc.) are single-qubit
-  gates, identical to the ones from the last course.
+- **Boxes** on a wire (labeled $H$, $X$, $S$, etc.) are <Term id="single-qubit-gates">single-qubit
+  gates</Term>, identical to the ones from the last course.
 - **A filled dot** connected by a vertical line to a $\oplus$ symbol (or
-  to another gate box) is a **controlled operation**: the dot marks the
+  to another gate box) is a **<Term id="cnot-controlled-gates">controlled operation</Term>**: the dot marks the
   control qubit, the connected symbol marks the target and what happens
   to it. The next lesson covers this in full.
 - **A meter symbol** (⏱-like gauge icon, conventionally) marks a
-  measurement of that wire at that point in time.
+  <Term id="measurement">measurement</Term> of that wire at that point in time.
 - **A blank wire** at a given time step means: nothing happens to that
   qubit there, which is not "no operation," it's *implicitly the
   identity gate*, tensored in with whatever the other wires are doing.
@@ -82,7 +82,7 @@ exactly as established in the last course's circuit lesson, is written
 and multiplied **right to left**: the leftmost box in the diagram is the
 rightmost (first-applied) operator in the product. If qubit 0 gets an $H$
 while qubit 1 does nothing, that single column is the operator
-$H\otimes I$ (not $I\otimes H$, since order in the tensor product matches
+$H\otimes I$ (not $I\otimes H$, since order in the <Term id="tensor-product">tensor product</Term> matches
 wire order, qubit 0 first). A second column applying $\text{CNOT}$ across
 both wires, written as its own two-qubit operator, composes on the left:
 
@@ -209,7 +209,7 @@ product, needed to keep the dimensions consistent.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Controlled Gates and CNOT](/lessons/quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot), the dot-and-$\oplus$ notation
+[Controlled Gates and CNOT](/lessons/quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot) uses the dot-and-$\oplus$ notation
 introduced here, worked out completely: the matrix, the truth table, and
 why it's the standard building block for entangling circuits.
 </NextDiscovery>

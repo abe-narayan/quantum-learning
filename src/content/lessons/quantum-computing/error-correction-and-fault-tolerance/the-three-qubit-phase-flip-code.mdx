@@ -63,7 +63,7 @@ runs both directions).
 
 ### Turning the code around
 
-If $U$ is any circuit built from $X$ gates and CNOTs (like the bit-flip
+If $U$ is any circuit built from $X$ gates and <Term id="cnot-controlled-gates">CNOTs</Term> (like the bit-flip
 code's encoder and error), then $H^{\otimes n}UH^{\otimes n}$ replaces
 every $X$ in $U$ with $HXH=Z$, because inserting $HH=I$ between every
 pair of gates in $U$ converts each one individually. Applying $H$ to
@@ -101,7 +101,7 @@ numerical error) for all three qubit positions, plus the no-error case.
 ## Physical Interpretation
 
 The phase-flip code isn't a second, independently-designed piece of
-engineering. It's the *same* code, viewed in a rotated basis. This is a
+engineering. It's the *same* code, viewed in a rotated <Term id="basis">basis</Term>. This is a
 recurring and powerful pattern in quantum information: many "different"
 constructions turn out to be the same one, conjugated by a fixed
 change of basis, once you know which conjugation to apply.
@@ -140,8 +140,8 @@ a state still in the wrong basis.
    plus $HXH=Z$ and $HZH=X$).
 2. Explain why a $Z$ error on the bit-flip code (without the Hadamard
    conjugation) produces syndrome $(0,0)$, "no error detected," even
-   though an error occurred, using the fact that $Z$ only changes relative
-   phase, not which computational-basis term has amplitude.
+   though an error occurred, using the fact that $Z$ only changes <Term id="global-relative-phase">relative
+   phase</Term>, not which computational-basis term has amplitude.
 3. If both an $X$ error and a $Z$ error hit the *same* physical qubit
    (together forming, up to phase, a $Y$ error), can either the bit-flip
    code alone or the phase-flip code alone correct it? What would be
@@ -167,7 +167,7 @@ a state still in the wrong basis.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [The Shor Code: Combining Both](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both), concatenating these two
+[The Shor Code: Combining Both](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both) concatenates these two
 constructions to correct an arbitrary single-qubit error, introduced
 conceptually, since simulating its full 9-qubit circuit is beyond this
 course's engine.

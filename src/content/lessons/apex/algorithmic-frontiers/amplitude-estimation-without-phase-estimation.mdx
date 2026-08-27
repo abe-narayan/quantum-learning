@@ -77,7 +77,7 @@ counts at once. That is a lot to ask of a noisy, near-term device.
   necessary?
 </Question>
 
-The honest, citable answer is no — and the "no" rests on a nontrivial,
+The honest, citable answer is no, and that "no" rests on a nontrivial,
 still-actively-used result, not a hand-wavy simplification.
 
 ## Mathematical Development
@@ -91,7 +91,7 @@ the flag qubit returns $1$. Classically (or by simply running $A$ and
 measuring, with no quantum trick at all) this is a Bernoulli-sampling
 problem: each shot is a coin flip with bias $a$, and the sample-mean
 estimator $\hat a$ after $n$ shots has variance $a(1-a)/n$, so its
-standard deviation — the estimator's typical error — is
+standard deviation (the estimator's typical error) is
 $\sqrt{a(1-a)/n}=O(1/\sqrt n)$. Solving for the sample size needed to
 reach a target precision $\epsilon$:
 
@@ -163,14 +163,14 @@ so $\epsilon=O(1/M)$, i.e. $M=O(1/\epsilon)$ Grover-iterate applications
 suffice — the celebrated **quadratic speedup for estimation**,
 Heisenberg-limited $O(1/\epsilon)$ in place of classical Monte Carlo's
 $O(1/\epsilon^2)$. The cost: those $M=2^t$ applications of $Q$ are
-queried *in superposition*, so the entire circuit — every controlled-$Q$
-application plus the final inverse QFT on $t=O(\log(1/\epsilon))$ qubits
-— must run coherently before a single measurement is taken.
+queried *in superposition*, so the entire circuit (every controlled-$Q$
+application plus the final inverse QFT on $t=O(\log(1/\epsilon))$ qubits)
+must run coherently before a single measurement is taken.
 
 ### QPE-free amplitude estimation: the same iterate, a classical schedule
 
 The important modern development keeps the exact
-same building block — the Grover iterate $Q$ above — and the exact same
+same building block (the Grover iterate $Q$ above) and the exact same
 closed-form probability $\sin^2((2m+1)\theta)$, but discards both the
 controlled-$Q$ superposition and the QFT entirely.
 
@@ -204,8 +204,8 @@ The precise, citable result: with the right choice of schedule (an
 exponentially increasing $\{m_k\}$ combined via maximum likelihood, or
 via Grinko et al.'s overlapping-confidence-interval combining rule),
 this still achieves $\epsilon=O(1/M_{\max})$ precision using a *total*
-Grover-iterate count across all rounds that is $O(1/\epsilon)$ — the same
-Heisenberg-limited asymptotic scaling as the QPE-based algorithm — with
+Grover-iterate count across all rounds that is $O(1/\epsilon)$ (the same
+Heisenberg-limited asymptotic scaling as the QPE-based algorithm), with
 only state preparation, the Grover iterate, and measurement as building
 blocks, and only classical (not quantum) post-processing. The intuitive
 reason a handful of classically-chosen $m_k$ can pin down $\theta$ this
@@ -227,7 +227,7 @@ period the high-$m$ rounds' precise-but-ambiguous reading falls in.
 ## Physical Interpretation: Why the QPE-Free Version Matters
 
 <InsightBlock>
-  Same asymptotic query scaling, radically different circuit structure —
+  Same asymptotic query scaling, radically different circuit structure:
   QPE-free amplitude estimation buys hardware deployability without
   giving up the quadratic speedup.
 </InsightBlock>
@@ -239,7 +239,7 @@ structure*, and that difference is exactly the Quantum Hardware pillar's
 central constraint made concrete. QPE-based amplitude estimation needs a
 $t=O(\log(1/\epsilon))$-qubit ancilla register and, critically, every one
 of its controlled-$Q$ applications plus the final QFT must survive
-*coherently*, back to back, before any measurement collapses the state —
+*coherently*, back to back, before any measurement collapses the state:
 exactly the long, uninterrupted coherence window that decoherence and
 gate error accumulate against on real, noisy hardware. The QPE-free
 version never asks for that: each round is state-prep, $m_k$ plain
@@ -338,8 +338,8 @@ chosen $m$ and skip the smaller ones.** A single large-$m$ measurement is
 *more* sensitive to $\theta$ (its slope is amplified by the $(2m+1)$
 factor derived above) but also more ambiguous, since $\sin^2((2m+1)
 \theta)$ is periodic and many $\theta$ values can match one large-$m$
-reading. The smaller-$m$ rounds in the schedule aren't redundant padding
-— they're what resolves *which* period the large-$m$ round's precise
+reading. The smaller-$m$ rounds in the schedule are not redundant padding:
+they resolve *which* period the large-$m$ round's precise
 reading actually falls in.
 </Callout>
 

@@ -37,7 +37,7 @@ Ask an experimentalist why yesterday's calibration is off today, and the honest 
 ## Motivation
 
 Advanced Topics
-in Quantum Mechanics built the mathematics of open-system decoherence in
+in Quantum Mechanics built the mathematics of open-system <Term id="coherence">decoherence</Term> in
 the abstract; Control & Readout hinted at specific error sources
 (readout error, miscalibration) without organizing them. This lesson
 does the sorting: it catalogs the real physical culprits and splits them
@@ -65,7 +65,7 @@ exactly.
 
 An **incoherent error** is a real, irreversible loss of information to
 an uncontrolled environment, the same process Advanced Topics in
-Quantum Mechanics' Kraus channels model. It can be *mitigated* (better
+Quantum Mechanics' <Term id="kraus-operators-cptp-maps">Kraus channels</Term> model. It can be *mitigated* (better
 isolation, error correction) but recalibrating a number won't fix it,
 because the lost information was never sitting somewhere on the device
 to recover.
@@ -73,7 +73,7 @@ to recover.
 ### A catalog of physical sources
 
 - **Miscalibration drift** (coherent): Control & Readout's Calibration
-  lesson; slow parameter drift between calibration runs.
+  lesson; slow <Term id="calibration-drift">parameter drift</Term> between calibration runs.
 - **Amplitude damping / energy relaxation** (incoherent): the qubit
   spontaneously decays to its ground state, releasing energy to the
   environment; modeled by `amplitudeDampingChannel`.
@@ -86,7 +86,7 @@ to recover.
   generating drive pulses (Control Electronics), which can be either
   coherent (a systematic pulse-shape distortion) or incoherent (random
   electronic noise on the line), depending on its specific origin.
-- **Crosstalk**: unwanted coupling between supposedly-independent
+- **<Term id="crosstalk">Crosstalk</Term>**: unwanted coupling between supposedly-independent
   qubits (next lesson's dedicated topic).
 
 The catalog sorts cleanly into the two categories, and each branch
@@ -193,7 +193,7 @@ strategy actually applies.
 <Callout type="warning">
 **Assuming incoherent errors can be "calibrated away."** Recalibration
 fixes systematic, deterministic errors; it cannot recover information
-truly lost to an uncontrolled environment. That requires isolation
+already lost to an uncontrolled environment. That requires isolation
 improvements or active error correction instead.
 </Callout>
 
@@ -227,7 +227,7 @@ improvements or active error correction instead.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [T1 & T2 Decoherence](/lessons/quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence), which quantifies the two specific
+[T1 & T2 Decoherence](/lessons/quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence) quantifies the two specific
 incoherent error channels (amplitude damping, dephasing) this lesson
 named, connecting Advanced Topics in Quantum Mechanics' discrete Kraus
 channels directly to the continuous decay times real hardware datasheets

@@ -126,10 +126,10 @@ Error correction (built across the entire previous course) repairs the
 *quantum state* itself: extra ancilla qubits, syndrome measurement, and
 an explicit recovery operation restore $|\psi\rangle$ before the
 computation continues, at a large physical-qubit overhead
-(Fault-Tolerant Thresholds' whole subject). **Error mitigation** asks a
-narrower question: for a hybrid algorithm like VQE or QAOA, what
-actually gets used at the end isn't the quantum state at all, it's a
-handful of *expectation values*, $\langle H\rangle$, computed from
+(Fault-Tolerant Thresholds' whole subject). **<Term id="quantum-error-mitigation">Error mitigation</Term>** asks a
+narrower question: for a hybrid algorithm like <Term id="vqe">VQE</Term> or QAOA, what
+actually gets used at the end is not the quantum state at all but a
+handful of *<Term id="expectation-value">expectation values</Term>*, $\langle H\rangle$, computed from
 measurement statistics. Error mitigation accepts that every individual
 run is noisy, and instead corrects the **statistics computed from many
 noisy runs**, using no extra qubits at all, just extra circuit

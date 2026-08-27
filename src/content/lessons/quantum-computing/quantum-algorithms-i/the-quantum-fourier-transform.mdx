@@ -81,7 +81,7 @@ Deutsch-Jozsa's Hadamard trick could extract a single yes/no bit from a phase. T
 ## Motivation
 
 Deutsch-Jozsa used $H^{\otimes n}$ as an interference step: turn phases into
-measurable amplitudes. The **quantum Fourier transform (QFT)** is the
+measurable amplitudes. The **<Term id="quantum-fourier-transform">quantum Fourier transform (QFT)</Term>** is the
 natural generalization of that idea, the same "Hadamard trick," but general
 enough to extract not just a single yes/no bit but an entire *periodic
 pattern* out of a phase, which is exactly what phase estimation (next
@@ -116,7 +116,7 @@ $$
 </EquationReveal>
 
 This is the ordinary discrete Fourier transform, applied directly to a
-state vector's amplitudes instead of a classical array, and it's the
+state vector's <Term id="amplitude">amplitudes</Term> instead of a classical array, and it's the
 closed-form definition, not a circuit yet; the circuit comes next.
 
 ### Checking it reduces to H
@@ -213,7 +213,7 @@ of an inverse, not just a name.
 
 ## Physical Interpretation
 
-The QFT is a change of basis: from "which computational basis state" to
+The QFT is a change of <Term id="basis">basis</Term>: from "which computational basis state" to
 "which frequency of phase oscillation across computational basis states."
 The circuit above needs only $O(n^2)$ gates on $n$ qubits to do it, versus
 the $O(N^2)$ cost of the direct $N\times N$ DFT matrix derived above.
@@ -352,6 +352,6 @@ this lesson's worked example relies on.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Quantum Phase Estimation](/lessons/quantum-computing/quantum-algorithms-i/quantum-phase-estimation), which uses the QFT's inverse as its
+[Quantum Phase Estimation](/lessons/quantum-computing/quantum-algorithms-i/quantum-phase-estimation) uses the QFT's inverse as its
 final step to read a unitary's eigenphase directly out of a register.
 </NextDiscovery>

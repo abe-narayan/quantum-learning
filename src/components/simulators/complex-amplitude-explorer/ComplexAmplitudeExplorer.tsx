@@ -15,8 +15,17 @@ import { SimulatorFraming } from "../shared/Framing";
 
 type Mode = "single" | "two-amplitude";
 
-const DEFAULT_RE = 1;
-const DEFAULT_IM = 0;
+/**
+ * 0.5 + 0.5i, not 1 + 0i. A real number with zero imaginary part is the one
+ * amplitude that looks like an ordinary number, so opening there hides the
+ * whole point of the instrument — the phase readout sits at 0° and the arrow
+ * lies flat along the real axis. At 0.5 + 0.5i both parts are nonzero and the
+ * phase reads 45° on mount, per the bench's "open mid-phenomenon" rule.
+ * Deliberately *not* 0.6 + 0.8i: `complex-numbers-for-quantum-mechanics.mdx`
+ * asks the reader to dial that exact value in themselves.
+ */
+const DEFAULT_RE = 0.5;
+const DEFAULT_IM = 0.5;
 const DEFAULT_ALPHA_MAGNITUDE = Math.SQRT1_2;
 const DEFAULT_BETA_PHASE = 0;
 const RE_IM_BOUND = 1.5;
@@ -170,6 +179,22 @@ export function ComplexAmplitudeExplorer({
     setIm(presetIm);
   }
 
+  // Live narration in the same voice as BlochSphereExplorer's aria-live line.
+  // This instrument had a state *panel* but no narrator: the numbers moved and
+  // nothing said what the movement meant, and a screen-reader user got no
+  // announcement at all. The single fact worth narrating here is the one the
+  // whole instrument exists to make obvious — phase moves, probability doesn't.
+  const magnitude = Math.hypot(re, im);
+  const phaseDegrees = (Math.atan2(im, re) * 180) / Math.PI;
+  const singleModeNarration =
+    magnitude < 1e-6
+      ? "The amplitude is zero: no size, no direction, and no chance of ever measuring this outcome."
+      : `The amplitude is ${magnitude.toFixed(2)} long, pointing ${Math.round(
+          phaseDegrees
+        )}° around. Squaring the length gives ${(magnitude * magnitude).toFixed(
+          3
+        )} — that, and only that, is the probability. Rotating the arrow changes the direction and leaves the probability exactly where it is.`;
+
   function reset() {
     if (mode === "single") {
       setRe(DEFAULT_RE);
@@ -208,6 +233,22 @@ export function ComplexAmplitudeExplorer({
             Reset
           </Button>
         </div>
+      </div>
+
+      <p className="mt-4 text-sm text-muted-foreground">
+        Quantum mechanics does not hand you probabilities directly. It hands you an{" "}
+        <span className="font-medium text-foreground">amplitude</span>: an arrow with a length and a
+        direction, drawn below. Square its length and you get the probability. The direction never shows
+        up in that answer at all — and yet it is the reason two possibilities can cancel each other out.
+      </p>
+
+      <div
+        aria-live="polite"
+        className="mt-3 rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+      >
+        {mode === "single"
+          ? singleModeNarration
+          : "Two amplitudes now. Their lengths set how likely each path is on its own; the angle between them sets whether they reinforce or cancel when both are open."}
       </div>
 
       {mode === "single" ? (

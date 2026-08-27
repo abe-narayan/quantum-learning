@@ -1,6 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 import type { ComponentPropsWithoutRef } from "react";
 import { Callout } from "@/components/mdx/Callout";
+import { Term } from "@/components/mdx/Term";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
@@ -81,6 +82,7 @@ function Table(props: ComponentPropsWithoutRef<"table">) {
 const components: MDXComponents = {
   table: Table,
   Callout,
+  Term,
   DefinitionBox,
   TheoremBox,
   ExternalFigure,

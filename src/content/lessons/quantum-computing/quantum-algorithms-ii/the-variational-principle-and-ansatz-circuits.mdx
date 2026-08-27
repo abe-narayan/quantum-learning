@@ -42,8 +42,8 @@ VQE and QAOA never run a fixed circuit once and stop the way Shor's algorithm do
 ## Motivation
 
 Shor's algorithm is a fixed sequence of gates, run once, with a classical
-post-processing step at the end. **VQE (the variational quantum
-eigensolver)** and **QAOA** work completely differently: a
+post-processing step at the end. **<Term id="vqe">VQE (the variational quantum
+eigensolver)</Term>** and **QAOA** work completely differently: a
 parameterized circuit is run many times, with a *classical optimizer*
 adjusting its parameters between runs to improve some measured quantity,
 a genuinely hybrid loop, not a one-shot circuit. This lesson derives the
@@ -62,7 +62,7 @@ mathematical fact that makes that loop meaningful at all.
 
 ### The variational principle, proved
 
-Let $H$ be a Hermitian Hamiltonian with eigenvalues
+Let $H$ be a Hermitian <Term id="hamiltonians-time-evolution">Hamiltonian</Term> with eigenvalues
 $E_0\le E_1\le\cdots$ and corresponding orthonormal eigenstates
 $|\phi_0\rangle,|\phi_1\rangle,\dots$ ($E_0$ the ground-state energy). Any
 normalized state $|\psi\rangle$ can be written in this eigenbasis:
@@ -84,7 +84,7 @@ never overshoot below it.
 
 ### The ansatz and the hybrid loop
 
-An **ansatz** is a parameterized circuit $|\psi(\vec\theta)\rangle$. This
+An **<Term id="ansatz">ansatz</Term>** is a parameterized circuit $|\psi(\vec\theta)\rangle$. This
 platform's single-qubit VQE uses
 $|\psi(\theta,\varphi)\rangle=R_z(\varphi)R_y(\theta)|0\rangle$, which
 reaches *every* point on the Bloch sphere as $\theta,\varphi$ vary, so it
@@ -113,7 +113,7 @@ better answer.
 VQE and QAOA are built for a different regime than Shor's algorithm: they
 tolerate imperfect answers (an approximate ground energy, a near-optimal
 cut) in exchange for using much shallower circuits. This is the reason
-this family of algorithms is the leading candidate for near-term ("NISQ",
+this family of algorithms is the leading candidate for near-term ("<Term id="nisq">NISQ</Term>",
 covered in the capstone) hardware that can't yet run Shor's deep,
 long-coherence-time circuits reliably.
 
@@ -214,7 +214,7 @@ limitation of VQE in practice.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [VQE: A Worked Toy Example](/lessons/quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example), running the full hybrid optimization
+[VQE: A Worked Toy Example](/lessons/quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example) runs the full hybrid optimization
 loop on two different Hamiltonians and confirming convergence to their
 exact ground-state energies.
 </NextDiscovery>

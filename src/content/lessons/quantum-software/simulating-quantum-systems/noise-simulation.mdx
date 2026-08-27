@@ -84,9 +84,9 @@ exactly as-is.
 ### Interleaving ideal evolution with a noise channel
 
 A noisy circuit simulator alternates two steps for every gate: (1) apply
-the gate's IDEAL unitary evolution to a density matrix
+the gate's IDEAL <Term id="unitary-evolution">unitary evolution</Term> to a density matrix
 (`evolveDensityMatrix`, $\rho\to U\rho U^\dagger$), then (2) apply a
-noise channel (Advanced Topics in Quantum Mechanics' `applyKrausChannel`)
+<Term id="kraus-operators-cptp-maps">noise channel</Term> (Advanced Topics in Quantum Mechanics' `applyKrausChannel`)
 modeling whatever physical error process (Noise, Decoherence & Scaling's
 T1/T2, or others) affects the real device between operations. This
 platform's `runNoisyCircuit` implements exactly this two-step loop,
@@ -124,7 +124,7 @@ state dephasing can actually act on.
 This platform's `runNoisyCircuit` is deliberately scoped to
 single-qubit circuits. Extending it correctly to multiple qubits
 requires expanding each gate into a full $2^n\times2^n$ unitary (via
-tensor products with identity on every untouched qubit) before applying
+<Term id="tensor-product">tensor products</Term> with identity on every untouched qubit) before applying
 it to a multi-qubit density matrix. This is real, well-understood
 machinery, just not needed by anything this course's lessons actually
 demonstrate, an explicit, stated scope choice, not a hidden limitation.

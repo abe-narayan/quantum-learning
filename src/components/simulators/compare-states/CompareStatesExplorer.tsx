@@ -13,11 +13,22 @@ import { STATE_PRESETS } from "../bloch-sphere/presets";
 import { ComplexPlaneCanvas } from "../complex-amplitude-explorer/ComplexPlaneCanvas";
 import { SimulatorInstrument } from "../shared/SimulatorInstrument";
 import { SimulatorFraming } from "../shared/Framing";
-import { SimulatorSlider } from "../shared/controls";
+import { SimulatorSlider, SymbolGloss } from "../shared/controls";
 
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 const TWO_PI = 2 * Math.PI;
+
+/**
+ * A generic state (60° tilt, 45° around), not `STATE_PRESETS[0]` = |0⟩. At
+ * |0⟩ all three panels are degenerate at once — the Bloch point sits on the
+ * pole, both amplitudes sit on the real axis, and the bar chart reads
+ * 100/0 — so the instrument's whole claim (that three very different
+ * pictures are the same number) has nothing to demonstrate on mount. This
+ * angle makes every panel show something distinct, per the bench's "open
+ * mid-phenomenon" rule. Presets, including |0⟩, stay one click away.
+ */
+const DEFAULT_ANGLES: BlochAngles = { theta: Math.PI / 3, phi: Math.PI / 4 };
 
 // This simulator's whole displayed view — Bloch sphere, complex-plane points, and
 // probability bars — is a pure function of the same θ/φ Bloch angles used throughout
@@ -65,7 +76,7 @@ export function CompareStatesExplorer() {
   const router = useRouter();
 
   const [angles, setAngles] = useState<BlochAngles>(
-    () => parseAnglesFromParams(searchParams) ?? STATE_PRESETS[0].angles
+    () => parseAnglesFromParams(searchParams) ?? DEFAULT_ANGLES
   );
   const [copied, setCopied] = useState(false);
 
@@ -145,10 +156,29 @@ export function CompareStatesExplorer() {
       stageClassName="@container"
       stage={
         <>
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
         <Button size="sm" variant="secondary" onClick={handleCopyLink} aria-live="polite">
           {copied ? "Copied!" : "Copy link"}
         </Button>
+        <Button size="sm" variant="secondary" onClick={() => setAngles(DEFAULT_ANGLES)}>
+          Reset
+        </Button>
+      </div>
+
+      <p className="mt-4 text-sm text-muted-foreground">
+        A qubit&rsquo;s state is a single thing, but it gets drawn three completely different ways depending
+        on what a course is trying to show you. All three below are driven by the same two numbers — move
+        either slider and watch every panel move together, because they were never separate to begin with.
+      </p>
+
+      <div
+        aria-live="polite"
+        className="mt-3 rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+      >
+        Tilted {Math.round((angles.theta * 180) / Math.PI)}° from |0⟩ and turned{" "}
+        {Math.round((angles.phi * 180) / Math.PI)}° around: measuring this qubit gives 0 about{" "}
+        {Math.round(probabilities[0] * 100)}% of the time and 1 about {Math.round(probabilities[1] * 100)}%.
+        Every panel below is showing that one fact.
       </div>
 
       <div className="mt-4 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
@@ -183,6 +213,25 @@ export function CompareStatesExplorer() {
           onChange={(phi) => setAngles({ theta: angles.theta, phi })}
         />
       </div>
+
+      <SymbolGloss
+        items={[
+          {
+            symbol: "θ",
+            name: "polar angle",
+            means:
+              "how far the state is tilted from |0⟩ at the top of the sphere. This is the slider that changes the odds: 0° is certain 0, 180° certain 1, 90° an even split.",
+            glossaryId: "bloch-sphere-term",
+          },
+          {
+            symbol: "φ",
+            name: "azimuthal angle",
+            means:
+              "which way it points once tilted — the relative phase. Drag it and the bar chart does not move at all, but the complex-plane panel spins. That difference is the whole reason phase matters.",
+            glossaryId: "global-relative-phase",
+          },
+        ]}
+      />
 
       {/* Container query, not viewport: three ~200px-minimum panels need
           about 700px of actual stage width to read well, which a wide

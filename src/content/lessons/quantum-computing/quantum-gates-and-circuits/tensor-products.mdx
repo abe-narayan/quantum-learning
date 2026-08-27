@@ -44,7 +44,7 @@ A classical
 2-bit register needs 2 bits to describe: which one of $\{00,01,10,11\}$ it's
 in. A quantum 2-qubit register needs to describe a *superposition* over
 all four of those possibilities simultaneously, which turns out to
-require exactly 4 complex amplitudes, not 2. This lesson derives where
+require exactly 4 complex <Term id="amplitude">amplitudes</Term>, not 2. This lesson derives where
 that "4" comes from, and it won't stop at 4: by the end, you'll see why
 $n$ qubits need $2^n$ amplitudes, the single fact that makes quantum
 computers exponentially hard to simulate classically, and (later courses)
@@ -68,7 +68,7 @@ shouldn't lose any of that information: whatever mathematical operation
 combines two qubit states needs to preserve both spheres' worth of detail
 *and* leave room for something classical bits could never do, correlation
 between them that isn't just "A's state" plus "B's state" separately. The
-**tensor product**, written $\otimes$, is that operation.
+**<Term id="tensor-product">tensor product</Term>**, written $\otimes$, is that operation.
 
 ## Mathematical Development
 
@@ -96,7 +96,7 @@ $$
 |0\rangle \otimes |1\rangle = \begin{pmatrix}1\\0\end{pmatrix}\otimes\begin{pmatrix}0\\1\end{pmatrix} = \begin{pmatrix}1\cdot0\\1\cdot1\\0\cdot0\\0\cdot1\end{pmatrix} = \begin{pmatrix}0\\1\\0\\0\end{pmatrix} = |01\rangle
 $$
 
-The result is exactly the computational basis state whose label is the
+The result is exactly the <Term id="computational-basis">computational basis</Term> state whose label is the
 two input labels written side by side. This is a useful shorthand you'll
 lean on constantly: $|i\rangle\otimes|j\rangle = |ij\rangle$, and you
 rarely need to write out the column-vector arithmetic by hand once you
@@ -136,7 +136,7 @@ full story, behind why multi-qubit states can look complicated fast.
 
 ### Normalization survives tensoring
 
-If $|a\rangle$ and $|b\rangle$ are each normalized
+If $|a\rangle$ and $|b\rangle$ are each <Term id="normalization">normalized</Term>
 ($\langle a|a\rangle=\langle b|b\rangle=1$), is $|a\rangle\otimes|b\rangle$
 automatically normalized too? Compute its norm using the inner product
 from Dirac Notation:
@@ -243,7 +243,7 @@ track which ket is qubit 0.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Multi-Qubit State Vectors](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors), where we ask the sharper question
+Up next, [Multi-Qubit State Vectors](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors) asks the sharper question
 this lesson set up: is every valid multi-qubit state actually *reachable*
 as a tensor product of single-qubit states? The answer is no, and the
 states that aren't are the entangled ones.

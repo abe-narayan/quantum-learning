@@ -15,10 +15,26 @@ import { SimulatorFraming } from "../shared/Framing";
 const DEFAULT_WHAT_TO_NOTICE =
   "Watch the StateInspector panel below — the moment the state stops being writable as a simple product of two separate qubits is the moment CNOT actually did something CNOT-specific.";
 
+/**
+ * The canonical two-gate Bell circuit, loaded on mount. An empty canvas is
+ * technically a valid starting point and teaches nothing: the diagram is
+ * blank, the step slider is absent, and the state inspector shows |00⟩ with
+ * nothing to inspect. Opening with H then CNOT already applied means the
+ * instrument mounts showing a real entangled state, a scrubable two-step
+ * history, and the live "this step just entangled qubits 0 and 1" note — per
+ * the bench's "open mid-phenomenon" rule. Clear empties it in one click for
+ * anyone who wants to build from scratch, and switching the qubit count
+ * (which the lessons' GHZ exercise does) resets to empty anyway.
+ */
+const STARTING_CIRCUIT: GateInstruction[] = [
+  { gate: "H", targets: [0] },
+  { gate: "CNOT", targets: [0, 1] },
+];
+
 export function CircuitBuilder() {
   const [numQubits, setNumQubits] = useState(2);
-  const [instructions, setInstructions] = useState<GateInstruction[]>([]);
-  const [step, setStep] = useState(0);
+  const [instructions, setInstructions] = useState<GateInstruction[]>(STARTING_CIRCUIT);
+  const [step, setStep] = useState(STARTING_CIRCUIT.length);
   const [targetQubit, setTargetQubit] = useState(0);
   const [controlQubit, setControlQubit] = useState(0);
   const [twoQubitTarget, setTwoQubitTarget] = useState(1);
@@ -95,6 +111,13 @@ export function CircuitBuilder() {
       stageClassName="space-y-6"
       stage={
         <>
+          <p className="text-sm text-muted-foreground">
+            A quantum circuit is read left to right: each horizontal line is one qubit, and each box is an
+            operation applied to it. Loaded here is the two-gate circuit that produces a Bell pair — the
+            standard way to entangle two qubits. Drag the step slider to run it forwards and backwards, add
+            your own gates from the controls, or Clear and start from nothing.
+          </p>
+
           <CircuitDiagram numQubits={numQubits} instructions={instructions} step={step} onSelectStep={setStep} />
 
           {instructions.length > 0 && (
@@ -115,6 +138,7 @@ export function CircuitBuilder() {
 
           <SimulatorFraming
             shows="The same build-then-run workflow real quantum SDKs use: stack gates, then scrub through the step slider to see the state vector evolve one gate at a time."
+            watchFor="Scrub the step slider back to 1. After H alone, the state inspector still calls this a product state — H on one qubit cannot entangle anything. Only the CNOT at step 2 flips that verdict."
             tryThis={
               <ul>
                 <li>

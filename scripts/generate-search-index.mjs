@@ -38,9 +38,44 @@
  * `dev`/`build`/`test` via the `predev`/`prebuild`/`pretest` npm lifecycle
  * hooks (alongside `generate:registry`).
  */
+import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { registerHooks } from "node:module";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+/**
+ * Lets this script `import()` the repo's plain-data `.ts` modules that use
+ * extension-less relative specifiers.
+ *
+ * Node's native TypeScript support strips types but keeps ESM's strict
+ * resolution rules: `import { CONCEPT_NODES } from "./concepts"` (which is
+ * how `src/lib/content/glossary.ts` is written, and how the rest of the repo
+ * is written) has no extension, so Node refuses it. This synchronous,
+ * in-thread resolve hook appends `.ts` for relative specifiers that have no
+ * extension and do resolve to a real `.ts` file, and defers to Node for
+ * everything else — bare specifiers, `node:` builtins, `@/...` aliases (which
+ * are still NOT resolvable here, and must not appear in any module this
+ * script imports at runtime).
+ *
+ * Deliberately not a general TypeScript loader: nothing this script imports
+ * is allowed to do anything at import time except define plain data.
+ */
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    if (
+      specifier.startsWith(".") &&
+      !path.extname(specifier) &&
+      context.parentURL?.startsWith("file:")
+    ) {
+      const candidate = path.resolve(path.dirname(fileURLToPath(context.parentURL)), `${specifier}.ts`);
+      if (existsSync(candidate)) {
+        return { url: pathToFileURL(candidate).href, shortCircuit: true };
+      }
+    }
+    return nextResolve(specifier, context);
+  },
+});
 
 const ROOT = process.cwd();
 const LESSONS_ROOT = path.join(ROOT, "src/content/lessons");
@@ -162,8 +197,33 @@ async function main() {
   // `search/index.ts` are both written so their only *runtime* imports are
   // each other/plain data, making this safe.
   const curriculumModule = await import(pathToFileURL(path.join(ROOT, "src/lib/content/curriculum.ts")).href);
+  // The glossary is imported for real (it's plain data, and the resolve hook
+  // at the top of this file handles its extension-less `./concepts` import)
+  // rather than text-parsed like lessons and problems: `GLOSSARY_TERMS` is
+  // assembled at module scope from `CONCEPT_NODES` *plus* a literal array, so
+  // scraping the literal would silently drop every concept-derived term.
+  //
+  // This is also the only place the glossary is allowed to be read for
+  // search. It is a large prose corpus under a client-bundle budget, so the
+  // terms must reach the browser through this prebuilt JSON — never through a
+  // client-side import in `src/components/search/**`.
+  const glossaryModule = await import(pathToFileURL(path.join(ROOT, "src/lib/content/glossary.ts")).href);
+  const terms = glossaryModule.GLOSSARY_TERMS;
+
+  if (!Array.isArray(terms) || terms.length === 0) {
+    throw new Error(
+      "No glossary terms found in src/lib/content/glossary.ts — refusing to generate a search index with no glossary. A single-word query is the most common search a newcomer makes."
+    );
+  }
+
   const searchModule = await import(pathToFileURL(path.join(ROOT, "src/lib/search/index.ts")).href);
-  const index = searchModule.buildSearchIndex(lessons, problems, curriculumModule.COURSES);
+  const index = searchModule.buildSearchIndex(
+    lessons,
+    problems,
+    curriculumModule.COURSES,
+    terms,
+    curriculumModule.PILLARS
+  );
 
   if (index.length === 0) {
     throw new Error("buildSearchIndex() produced an empty index — refusing to write an empty search-index.json.");
@@ -172,7 +232,7 @@ async function main() {
   await mkdir(path.dirname(OUTPUT), { recursive: true });
   await writeFile(OUTPUT, JSON.stringify(index), "utf8");
   console.log(
-    `generate-search-index: wrote ${index.length} entries (${lessons.length} lessons, ${problems.length} problems) to ${path.relative(ROOT, OUTPUT)}`
+    `generate-search-index: wrote ${index.length} entries (${terms.length} glossary terms, ${lessons.length} lessons, ${problems.length} problems) to ${path.relative(ROOT, OUTPUT)}`
   );
 }
 

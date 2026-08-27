@@ -49,7 +49,7 @@ Order-finding needs the period of the function f(x)=aˣ mod N, and periods are e
 ## Motivation
 
 This lesson connects the two: build the
-right state, apply the QFT (Quantum Algorithms I), and read off the period from where the output
+right state, apply the <Term id="quantum-fourier-transform">QFT</Term> (Quantum Algorithms I), and read off the period from where the output
 amplitude concentrates.
 
 <ExternalFigure
@@ -78,14 +78,14 @@ counting qubit $q$ conditionally multiplying the second register by
 $a^{2^{t-1-q}}\bmod N$, mirroring phase estimation's controlled-$U^{2^k}$
 structure exactly). **This platform constructs this exact state directly
 from its closed-form amplitudes instead of building that gate sequence.**
-`periodFindingState` places amplitude $1/\sqrt{2^t}$ at index $(x,\,a^x\bmod
+`periodFindingState` places <Term id="amplitude">amplitude</Term> $1/\sqrt{2^t}$ at index $(x,\,a^x\bmod
 N)$ for every $x$, which is precisely what the real circuit outputs, just
 without implementing the controlled-modular-multiplication circuitry
 itself. That circuitry is real, substantial engineering (a genuine
 "quantum arithmetic" subroutine), well beyond this course's educational
 scope, and explicitly not built here. What *is* built and directly
 verified is everything downstream: the QFT-based extraction from this
-state, which is the actual interference mechanism the algorithm depends
+state, which is the actual <Term id="phase-interference">interference</Term> mechanism the algorithm depends
 on.
 
 <PeriodFindingSchematic
@@ -245,7 +245,7 @@ clean picture the sharp case suggests.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Worked Example: Factoring 15](/lessons/quantum-computing/quantum-algorithms-ii/worked-example-factoring-15), running the complete pipeline,
+Up next, [Worked Example: Factoring 15](/lessons/quantum-computing/quantum-algorithms-ii/worked-example-factoring-15) runs the complete pipeline,
 period finding, the classical reduction, and gcd, on the smallest number
 that actually demonstrates Shor's algorithm end to end.
 

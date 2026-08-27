@@ -93,8 +93,8 @@ export const lessonMeta = {
 ## Motivation
 
 It's worth saying that plainly before
-recapping any of them, because the payoff of this capstone isn't a new
-derivation — it's realizing that no new derivation is needed. **Block
+recapping any of them, because the payoff of this capstone is realizing
+that no new derivation is needed, not a new derivation itself. **Block
 encodings** (Module 1) gave a universal way to embed an arbitrary matrix
 $A$, not necessarily unitary, not necessarily square, into the corner of
 a larger unitary $U_A$ that any quantum circuit can run. **Quantum
@@ -122,15 +122,15 @@ difficulty.
 ### The recap, restated as one throughline
 
 A block encoding turns "I have a matrix" into "I have a circuit with
-that matrix sitting in a submatrix of its unitary action" — the
+that matrix sitting in a submatrix of its unitary action": the
 translation step every later lesson in this course depends on, since
 none of QSP, QSVT, or amplitude estimation know what a "matrix" is; they
 only know what a circuit is. QSP then answers a narrower, purely
 single-qubit question completely: given a single tunable rotation angle
 $x$ (the "signal"), how much freedom do you have to sculpt an arbitrary
 target function of $x$ by sandwiching that rotation between $d$ tunable
-phases? The answer — any polynomial of degree $\le d$ satisfying parity
-and boundedness constraints, and no more — is a complete characterization,
+phases? The answer, any polynomial of degree $\le d$ satisfying parity
+and boundedness constraints, and no more, is a complete characterization,
 not a heuristic. QSVT's move is to notice that a block encoding's
 singular value decomposition puts exactly this same one-qubit signal
 structure inside *every* singular subspace of $A$ at once, so the same
@@ -169,9 +169,9 @@ phase-sequence machinery — with only $P(x)$ changed.
 Read across any single row and the pattern is the whole course: pick the
 function you actually need, find a polynomial that approximates it well
 enough, and QSVT turns that polynomial into a circuit. Read down the
-"what it achieves" column and four superficially unrelated algorithms —
-one from the 1990s, one from a 2019-and-later framework, one dating to
-Trotter and Lie, one named for its three 2009 authors — turn out to
+"what it achieves" column and four superficially unrelated algorithms
+(one from the 1990s, one from a 2019-and-later framework, one dating to
+Trotter and Lie, one named for its three 2009 authors) turn out to
 differ only in which function of $x$ they asked for.
 
 <PipelineDiagram
@@ -196,7 +196,7 @@ precisely, is:
 
 - **Explain** each of them as an instance of one construction, rather
   than as unrelated tricks that happen to work.
-- **Match or improve** several of their asymptotic query complexities —
+- **Match or improve** several of their asymptotic query complexities:
   QSVT-based Hamiltonian simulation's $O(t\lVert H\rVert+\log(1/\epsilon))$
   beats first-order Trotter's derived $O(t^2\lVert[A,B]\rVert/\epsilon)$
   scaling (see the worked visualization below), while Grover-via-QSVT
@@ -224,7 +224,7 @@ were before this framework existed:
 1. **Finding a good block encoding.** Not every matrix of interest has
    an efficient one sitting around. For a sparse matrix, a Pauli-sum
    Hamiltonian, or a matrix with known structure, constructing an
-   efficient block encoding is itself a real piece of algorithm design —
+   efficient block encoding is itself a real piece of algorithm design:
    the framework tells you what to do *once you have one*, not how to
    build one for an arbitrary matrix you care about.
 2. **Finding a good polynomial.** QSP guarantees that a feasible
@@ -289,7 +289,7 @@ $$
 2\times25+1=\boxed{51}
 $$
 
-polynomial approximation to a step function — a different-looking
+polynomial approximation to a step function, a different-looking
 description of the *exact same* $25$-iteration circuit this course's own
 Grover engine runs, which is precisely the sense in which this
 unification is real: not a metaphor, a literal restatement of the same
@@ -317,7 +317,7 @@ compiled implementation.
 />
 
 Grover's bar doesn't change at all depending on which construction built
-it — the whole point of stating this honestly is that QSVT *reproduces*
+it: the whole point of stating this honestly is that QSVT *reproduces*
 this number, it doesn't beat it, because BBBV's bound already proved
 $\Theta(\sqrt N)$ optimal for unstructured search.
 
@@ -330,7 +330,7 @@ Here the two framings actually diverge, not just relabel the same
 number: increasing $t$ by $10\times$ (from $5$ to $50$) multiplies
 first-order Trotter's derived step count by almost exactly $100\times$
 ($t^2$ scaling, real and derived), while the QSVT-scaling proxy grows by
-under $7\times$ (dominated by the linear-in-$t$ term at this scale) —
+under $7\times$ (dominated by the linear-in-$t$ term at this scale):
 the concrete, numeric shape of "QSVT-based simulation provably scales
 better than first-order Trotter for large $t$ or tight $\epsilon$,"
 computed from this course's own formulas rather than asserted.
@@ -342,7 +342,7 @@ computed from this course's own formulas rather than asserted.
 original circuit were wrong."** None of them were. QSVT *explains* each
 as one instance of a shared construction and, for some, matches or
 improves the asymptotic scaling with a more composable design
-methodology — it doesn't retroactively invalidate a single correct,
+methodology, but it doesn't retroactively invalidate a single correct,
 already-published result.
 </Callout>
 

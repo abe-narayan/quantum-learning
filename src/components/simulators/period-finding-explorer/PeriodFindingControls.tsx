@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/Button";
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
-import { ControlSection } from "../shared/controls";
+import { ControlSection, SymbolGloss } from "../shared/controls";
 
 const N_PRESETS = [15, 21, 35];
 const X_BITS_OPTIONS = [4, 5, 6, 7];
@@ -29,6 +30,7 @@ export function PeriodFindingControls({
   validBases,
   xBits,
   onXBitsChange,
+  onReset,
 }: {
   N: number;
   onNChange: (n: number) => void;
@@ -37,10 +39,15 @@ export function PeriodFindingControls({
   validBases: number[];
   xBits: number;
   onXBitsChange: (bits: number) => void;
+  onReset: () => void;
 }) {
   return (
     <div className="space-y-8">
-      <ControlSection id="pf-n" title="N (number to factor)" description="Changing N picks a fresh set of valid bases a.">
+      <ControlSection
+        id="pf-n"
+        title="N — the number to factor"
+        description="Changing N picks a fresh set of valid bases a."
+      >
         <PresetToggle
           options={N_TOGGLE_OPTIONS}
           index={N_TOGGLE_OPTIONS.findIndex((o) => o.n === N)}
@@ -51,13 +58,14 @@ export function PeriodFindingControls({
 
       <ControlSection
         id="pf-a"
-        title="a (coprime to N)"
-        description="Every listed value satisfies gcd(a, N) = 1, computed directly, not curated by hand."
+        title="a — the number you repeatedly multiply by"
+        description="Any a sharing no factor with N will do. Every value listed is checked for that directly, not curated by hand."
       >
         <select
           value={a}
+          aria-label="a — the base you repeatedly multiply by, mod N"
           onChange={(e) => onAChange(Number(e.target.value))}
-          className="w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="min-h-11 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {validBases.map((base) => (
             <option key={base} value={base}>
@@ -65,12 +73,28 @@ export function PeriodFindingControls({
             </option>
           ))}
         </select>
+        <SymbolGloss
+          items={[
+            {
+              symbol: "r",
+              name: "the period (order)",
+              means:
+                "how many times you have to multiply by a before the remainders start repeating. Find r and simple arithmetic hands you N's factors — that's Shor's algorithm in one line.",
+            },
+            {
+              symbol: "gcd",
+              name: "greatest common divisor",
+              means:
+                "the largest number dividing both a and N. gcd(a, N) = 1 means they share no factors, which is the only condition a has to satisfy here.",
+            },
+          ]}
+        />
       </ControlSection>
 
       <ControlSection
         id="pf-t"
-        title="Counting qubits t"
-        description="2^t outcomes in the counting register. More qubits sharpen the peaks but slow the computation down."
+        title="t — how precisely to measure"
+        description="Counting qubits. Each one you add doubles the number of possible readouts, which sharpens the peaks — and doubles the work for a real machine."
       >
         <PresetToggle
           options={X_BITS_TOGGLE_OPTIONS}
@@ -78,7 +102,21 @@ export function PeriodFindingControls({
           onChange={(i) => onXBitsChange(X_BITS_TOGGLE_OPTIONS[i].bits)}
           ariaLabel="Counting qubits"
         />
+        <SymbolGloss
+          items={[
+            {
+              symbol: "t",
+              name: "counting qubits",
+              means: `the size of the register you read out: t = ${xBits} gives 2^${xBits} = ${2 ** xBits} possible answers, one per bar in the chart.`,
+              glossaryId: "quantum-phase-estimation-precision",
+            },
+          ]}
+        />
       </ControlSection>
+
+      <Button variant="secondary" size="sm" onClick={onReset}>
+        Reset to N=15, a=7
+      </Button>
     </div>
   );
 }

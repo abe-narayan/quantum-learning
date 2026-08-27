@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { Eyebrow, Readouts, SectionTitle } from "@/components/ui/Typography";
 import { Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { getCourseHref } from "@/components/curriculum/courseHref";
 import { COURSES, getCourse } from "@/lib/content/curriculum";
 import { pillarVisual } from "@/lib/design/pillars";
 import { useCompletedLessonSlugs } from "@/lib/content/progress";
@@ -33,12 +35,27 @@ function buildCourseStatuses(lessons: LessonMetaWithSlug[]): Map<string, CourseS
  * visitor's own stored completion (which of those are actually finished).
  *
  * Renders nothing for a brand-new visitor (nothing completed yet — the
- * "two ways in" panel above already answers this question for them) and
+ * "two ways in" panel below already answers this question for them) and
  * nothing once every authored course is complete (there's no "next" to
  * recommend). Otherwise: the first course, in curriculum order, whose
  * prerequisites are all done but which isn't done itself — i.e. the next
  * genuinely-unlocked step — with a direct link to its first unfinished
  * lesson.
+ *
+ * Rendered *before* "two ways in" on `/learn` — a returning reader who
+ * already has progress doesn't need to re-decide how to start, so this is
+ * the first thing they see in that section, styled with more weight (a
+ * heavier accent border, a larger heading) than the plain `Instrument`s
+ * below it. (Deliberately not `bg-pillar-wash`: `.instrument` already
+ * layers the pillar wash over an opaque `--surface`, and the utility's
+ * `background-color` — in Tailwind's `utilities` layer, which beats
+ * `components` regardless of specificity — would have replaced that opaque
+ * base with the semi-transparent wash color itself, letting the canvas
+ * field show through behind this card's text.) Its own bottom margin
+ * (`mb-14`, not a margin on the block that follows it) is what keeps a
+ * first-time visitor's layout byte-for-byte identical to before this was
+ * reordered: when this returns null, no margin exists either, so nothing
+ * shifts.
  */
 export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) {
   const completed = useCompletedLessonSlugs();
@@ -68,16 +85,20 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
   const prerequisiteTitles = next.prerequisites
     .map((slug) => getCourse(slug)?.title)
     .filter((title): title is string => Boolean(title));
+  // Same helper CourseList/CourseTimeline use — one source of truth for
+  // where a course actually goes (its `/courses/<slug>` page today; a
+  // fallback lesson if that route is ever gated off).
+  const courseHref = getCourseHref(next.slug, nextStatus?.slugs[0]);
 
   return (
-    <div data-pillar={next.pillar} className="mt-14">
+    <div data-pillar={next.pillar} className="mb-14">
       <Eyebrow>If you only do one thing next</Eyebrow>
-      <SectionTitle level={2} size="sm" className="mt-2">
+      <SectionTitle level={2} size="md" className="mt-2">
         {next.title}
       </SectionTitle>
 
       <Instrument
-        className="mt-5 border-l-2 border-l-pillar-edge"
+        className="mt-5 border-l-4 border-l-pillar-edge"
         label="Recommended next course"
         footnote={
           prerequisiteTitles.length > 0
@@ -89,7 +110,7 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
         <Readouts
           className="mt-5"
           items={[
-            { label: "Pillar", value: visual.short },
+            { label: "Track", value: visual.short },
             { label: "Difficulty", value: <DifficultyMark difficulty={next.difficulty} /> },
             { label: "Length", value: next.estimatedHours, unit: "h" },
           ]}
@@ -118,11 +139,19 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
           </p>
         </div>
 
-        {nextLesson ? (
-          <Button href={`/lessons/${nextLesson.slug}`} className="mt-5">
-            Start &ldquo;{nextLesson.title}&rdquo;
-          </Button>
-        ) : null}
+        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+          {nextLesson ? (
+            <Button href={`/lessons/${nextLesson.slug}`}>
+              Start &ldquo;{nextLesson.title}&rdquo;
+            </Button>
+          ) : null}
+          <Link
+            href={courseHref}
+            className="text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
+          >
+            View the full course →
+          </Link>
+        </div>
       </Instrument>
     </div>
   );

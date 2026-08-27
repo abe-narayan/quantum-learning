@@ -63,7 +63,7 @@ export function ApexSection() {
               items={[
                 { label: "Courses", value: courses.length },
                 { label: "Est. time", value: hours, unit: "hrs" },
-                { label: "Pillars climbed", value: PILLARS.length - 1, unit: "→ here" },
+                { label: "Tracks climbed", value: PILLARS.length - 1, unit: "→ here" },
               ]}
             />
           </Reveal>

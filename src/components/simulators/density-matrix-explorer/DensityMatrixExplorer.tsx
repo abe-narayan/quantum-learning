@@ -16,7 +16,17 @@ import { MIXTURE_PRESETS } from "./presets";
 
 const DEFAULT_COMPONENT_1: BlochAngles = { theta: 0, phi: 0 };
 const DEFAULT_COMPONENT_2: BlochAngles = { theta: Math.PI, phi: 0 };
-const DEFAULT_WEIGHT = 1;
+/**
+ * A 90/10 mixture, not weight 1. Weight 1 is a *pure* state sitting exactly on
+ * the sphere's surface — in an instrument built to show mixedness, that's the
+ * one setting with no mixedness in it. At 0.9 the point already sits visibly
+ * inside the surface and purity/entropy read something other than their pure
+ * values on mount, per the bench's "open mid-phenomenon" rule. The pure
+ * reference is one click away on the presets, and Reset returns there
+ * explicitly (see `reset` below).
+ */
+const DEFAULT_WEIGHT = 0.9;
+const DEFAULT_PRESET_ID = "mostly-0";
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 
@@ -93,12 +103,14 @@ export function DensityMatrixExplorer() {
   const [component2, setComponent2] = useState<BlochAngles>(initialFromUrl?.component2 ?? DEFAULT_COMPONENT_2);
   const [weight, setWeight] = useState(initialFromUrl?.weight ?? DEFAULT_WEIGHT);
   const [activePresetId, setActivePresetId] = useState<string | null>(() =>
-    initialFromUrl ? matchMixturePresetId(initialFromUrl.component1, initialFromUrl.component2, initialFromUrl.weight) : "pure-0"
+    initialFromUrl
+      ? matchMixturePresetId(initialFromUrl.component1, initialFromUrl.component2, initialFromUrl.weight)
+      : DEFAULT_PRESET_ID
   );
   const [narration, setNarration] = useState(() =>
     initialFromUrl
       ? "Restored the shared mixture from your link."
-      : "Weight 1 on |0⟩ — a pure state, sitting exactly on the sphere's surface."
+      : "A 90/10 mixture of |0⟩ and |1⟩ — mostly |0⟩, but not certainly. The point has already left the sphere's surface: that gap is the missing certainty."
   );
   const [copied, setCopied] = useState(false);
 
@@ -209,7 +221,7 @@ export function DensityMatrixExplorer() {
   }
 
   function reset() {
-    applyMixturePreset("pure-0");
+    applyMixturePreset(DEFAULT_PRESET_ID);
   }
 
   return (
@@ -219,6 +231,14 @@ export function DensityMatrixExplorer() {
       footnote="Next: see what happens when a real noise channel — not a hand-picked mixture — pulls a pure state toward the center → try the Noise &amp; Decoherence Explorer."
       stage={
         <>
+          <p className="mb-4 text-sm text-muted-foreground">
+            There are two different ways not to know what a qubit will do. In a superposition, the qubit
+            genuinely has no answer yet. In a <em>mixture</em>, it does have one — you just weren&rsquo;t
+            told which. This instrument builds the second kind: pick two states, set how often each one is
+            the true one, and the density matrix ρ is what an experimenter who only knows those odds can
+            say. Distance from the sphere&rsquo;s surface is exactly how much they don&rsquo;t know.
+          </p>
+
           <div className="mx-auto max-w-sm">
             <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
           </div>

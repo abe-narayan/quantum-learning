@@ -24,8 +24,17 @@ const CATEGORY_OPTIONS: CategoryFilter[] = [
   "cryptography",
 ];
 
+// `min-h-11` rather than a transparent `::after` touch-floor: these chips wrap
+// onto several rows with only `gap-2` (8px) between them, so inflating the hit
+// area past the painted box by ~9px a side would make vertically adjacent
+// chips steal each other's taps. Growing the chip itself is the version that
+// is honest about where the target is.
+//
+// The `focus-visible:ring-*` chain is not decoration either: this rule used to
+// end at `focus-visible:outline-none` with nothing replacing the outline, so a
+// keyboard user tabbing through fifteen filters had no visible focus at all.
 const FILTER_CHIP =
-  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-[--dur-fast] ease-[--ease-instrument] focus-visible:outline-none";
+  "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-medium transition-colors duration-[--dur-fast] ease-[--ease-instrument] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 const FILTER_CHIP_ACTIVE = "border-pillar-edge bg-pillar-wash text-pillar-text";
 const FILTER_CHIP_IDLE =
   "border-border bg-surface text-muted-foreground hover:border-border-strong hover:bg-surface-muted hover:text-foreground";
@@ -94,8 +103,8 @@ export function CurrentQuantumCatalog({
         </fieldset>
 
         <fieldset className="m-0 min-w-0 border-0 p-0">
-          <legend className="tech-label p-0">Curriculum area</legend>
-          <div className="mt-2.5 flex flex-wrap gap-2" role="group" aria-label="Filter by curriculum area">
+          <legend className="tech-label p-0">Track</legend>
+          <div className="mt-2.5 flex flex-wrap gap-2" role="group" aria-label="Filter by track">
             <button
               type="button"
               aria-pressed={pillar === "all"}

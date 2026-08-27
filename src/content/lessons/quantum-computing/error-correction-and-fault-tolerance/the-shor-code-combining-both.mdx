@@ -33,7 +33,7 @@ What happens when a single qubit suffers both an X error and a Z error at once, 
 Neither 3-qubit code alone handles it: the
 bit-flip code is blind to phase errors, the phase-flip code is blind to
 bit errors. Peter Shor's 1995 code answers this by **concatenating** the
-two constructions: nine physical qubits, protecting against an
+two constructions: nine <Term id="physical-qubit">physical qubits</Term>, protecting against an
 arbitrary single-qubit error (any combination of $X$, $Y$, $Z$) on any
 one of them.
 
@@ -61,7 +61,7 @@ catches every single-qubit error there is.
 
 ### The construction
 
-First, phase-flip-encode the logical qubit into 3 qubits:
+First, phase-flip-encode the <Term id="logical-qubit">logical qubit</Term> into 3 qubits:
 $\alpha|+++\rangle+\beta|---\rangle$ (using
 `encodePhaseFlipCode`'s construction: $\alpha|000\rangle+\beta|111\rangle$
 with $H$ on every qubit turns $|000\rangle\to|+++\rangle$,
@@ -214,7 +214,7 @@ what Lessons 2 and 3 already built.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Stabilizer Formalism Basics](/lessons/quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics), which gives a compact, general
+[Stabilizer Formalism Basics](/lessons/quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics) gives a compact, general
 language for describing codes like these, using the two 3-qubit codes
 already built as the concrete worked examples.
 </NextDiscovery>

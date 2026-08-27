@@ -58,7 +58,7 @@ of, two lessons from now.
 
 ## Intuition
 
-Measuring a single-qubit state collapses it to a definite basis state,
+Measuring a single-qubit state <Term id="wavefunction-collapse">collapses</Term> it to a definite basis state,
 full stop. Measuring one qubit *within* a multi-qubit state has to do
 something more careful: the other qubits are still there, still possibly
 in superposition, and the measurement can't simply erase them. What it
@@ -71,7 +71,7 @@ got, and rescale what's left so it's still a valid, normalized state.
 
 To measure qubit $k$ of an $n$-qubit state $|\psi\rangle$: the
 probability of outcome $b\in\{0,1\}$ is the sum of $|\text{amplitude}|^2$
-over every computational basis term whose qubit-$k$ bit equals $b$:
+over every <Term id="computational-basis">computational basis</Term> term whose qubit-$k$ bit equals $b$:
 
 $$
 P(\text{qubit } k = b) = \sum_{\substack{i:\, \text{bit } k \text{ of } i \,=\, b}} |c_i|^2
@@ -85,7 +85,7 @@ $$
 |\psi'\rangle = \frac{1}{\sqrt{P(b)}}\sum_{\substack{i:\, \text{bit } k \text{ of } i \,=\, b}} c_i |i\rangle
 $$
 
-This is the general single-qubit computational-basis Born rule from the
+This is the general single-qubit computational-basis <Term id="born-rule">Born rule</Term> from the
 last course, applied one qubit at a time instead of to the whole
 register at once. The "collapse to a definite basis state" you already
 know is exactly the special case where the state being measured has only
@@ -148,7 +148,7 @@ superposition. Measure qubit 1:
 Qubit 1's outcome is certain (it was already definite), and, crucially,
 qubit 0's superposition survives completely untouched. Measuring one
 qubit of a product state never disturbs the other; measuring one qubit of
-an entangled state generally does. Entanglement is precisely what makes
+an entangled state generally does. <Term id="entanglement">Entanglement</Term> is precisely what makes
 that difference possible.
 
 ## Physical Interpretation
@@ -223,7 +223,7 @@ normalized quantum state.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [The No-Cloning Theorem](/lessons/quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem), a sharply counterintuitive consequence of
+[The No-Cloning Theorem](/lessons/quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem) is a sharply counterintuitive consequence of
 the measurement and linearity rules from this course: no device can copy
 an unknown qubit state, and the proof follows directly from tools you
 already have.

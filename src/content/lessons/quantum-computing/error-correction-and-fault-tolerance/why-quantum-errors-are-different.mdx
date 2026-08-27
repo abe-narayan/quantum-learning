@@ -64,11 +64,11 @@ Andrew Steane's seven-qubit code follows, a second, independent construction con
 
 ### Obstacle 1: no-cloning rules out simple copying
 
-Quantum Gates & Circuits proved the no-cloning theorem: no unitary can map
+Quantum Gates & Circuits proved the <Term id="no-cloning-theorem">no-cloning theorem</Term>: no unitary can map
 $|\psi\rangle|0\rangle\to|\psi\rangle|\psi\rangle$ for every unknown
 $|\psi\rangle$. So "just copy the qubit three times" is not merely
-impractical, it's provably impossible for an unknown state. Quantum
-error correction instead **encodes** one logical qubit's information
+impractical, it's provably impossible for an unknown state. <Term id="quantum-error-correction">Quantum
+error correction</Term> instead **encodes** one logical qubit's information
 *across* several physical qubits in an entangled state (as the next
 lesson's $\alpha|000\rangle+\beta|111\rangle$ does). That's a different
 move from copying, not a workaround for it: no-cloning didn't make
@@ -83,7 +83,7 @@ not just a full $X$ flip, counts as an error. This looks like it needs
 infinitely many distinct correction procedures, one per possible
 rotation angle. It doesn't: any single-qubit error can be expanded as a
 linear combination of exactly four fixed operators, $I,X,Y,Z$ (the
-identity and the three Pauli matrices this platform has used since Course
+identity and the three <Term id="pauli-matrices">Pauli matrices</Term> this platform has used since Course
 1), a fact that follows from $I,X,Y,Z$ forming a basis for all
 $2\times2$ matrices. **Correcting against $X$ and $Z$ errors specifically
 (and therefore $Y=iXZ$, their combination) is enough to correct against
@@ -142,14 +142,14 @@ what $\alpha,\beta$ were, checked directly, not just argued.
 Every one of these three obstacles has the same shape: a classical
 strategy exploits something quantum mechanics specifically forbids
 (perfect copying, discreteness, harmless observation). Quantum error
-correction isn't a patched-up version of the classical scheme. It's a
-different scheme, built from entanglement and syndrome extraction, that
+correction is a different scheme, built from entanglement and syndrome
+extraction, not a patched-up version of the classical one, that
 happens to solve the same underlying problem (protect information from
 noise) using only what quantum mechanics actually allows.
 
 Solving these three obstacles in principle still leaves a practical
 question: a code only helps once the physical error rate is below a
-threshold, below that line, adding more physical qubits per logical
+<Term id="quantum-threshold-theorem">threshold</Term>, below that line, adding more physical qubits per logical
 qubit makes things worse, not better. In 2023, Google reported a
 surface-code experiment in which a logical qubit's error rate went down
 as they increased the code's physical-qubit count, rather than up,
@@ -233,6 +233,6 @@ not one hand-picked pair.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [The Three-Qubit Bit-Flip Code](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code), building and verifying the first
+[The Three-Qubit Bit-Flip Code](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code) builds and verifies the first
 concrete code, protecting against $X$ errors specifically, end to end.
 </NextDiscovery>

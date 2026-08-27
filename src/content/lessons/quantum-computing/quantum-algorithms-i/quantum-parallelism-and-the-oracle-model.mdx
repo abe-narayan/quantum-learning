@@ -74,7 +74,7 @@ subject, worth understanding precisely before building anything on top of it.
 
 Applying $H$ to a single qubit gives
 $H|0\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$. Applying $H$ to *each*
-qubit of an $n$-qubit register independently, starting from
+qubit of an $n$-qubit <Term id="quantum-register">register</Term> independently, starting from
 $|0\rangle^{\otimes n}$, gives a tensor product of $n$ such states:
 
 $$
@@ -94,7 +94,7 @@ To use this superposition to say anything about a function $f$, you need a
 way to apply $f$ *quantum mechanically*. A classical function is often
 irreversible ($\text{AND}(0,0)=\text{AND}(0,1)=0$: two different inputs, one
 output, no way to run it backward), but every quantum gate must be unitary,
-hence reversible. The standard fix is the **oracle model**: represent $f$ as
+hence reversible. The standard fix is the **<Term id="oracle">oracle model</Term>**: represent $f$ as
 a unitary $U_f$ acting on an input register $|x\rangle$ plus one extra output
 qubit $|y\rangle$:
 
@@ -130,7 +130,7 @@ Every value of $f$ really is encoded in this one state; that part of
   explanation="Measurement collapses the superposition to exactly one basis state, so you get exactly one (x, f(x)) pair, with probability 1/2^n for each possible x. Every other value of f that was sitting in the superposition a moment earlier is simply gone once you look. This is the entire reason 'quantum parallelism' needs a second trick (interference) to be useful at all."
 />
 
-But **measuring this state collapses it to
+But **measuring this state <Term id="wavefunction-collapse">collapses</Term> it to
 one random $x$ and its one value $f(x)$**, with probability $1/2^n$ each,
 exactly like measuring any other uniform superposition. You learn $f$ at one
 point, chosen randomly, having spent the same one query a classical computer
@@ -179,7 +179,7 @@ doubles. Total probability always sums to $1$; only its distribution across
 an exponentially larger set of branches changes.
 
 The entire content of Deutsch-Jozsa, phase estimation, and Grover's algorithm
-is a specific way to make the *interference* between these $2^n$ branches
+is a specific way to make the *<Term id="phase-interference">interference</Term>* between these $2^n$ branches
 concentrate the measurement probability onto an answer that reveals a
 **global** property of $f$ (constant vs. balanced; a period; a marked item)
 that no single query (classical or quantum) could reveal on its own. That
@@ -259,7 +259,7 @@ itself.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Phase Kickback](/lessons/quantum-computing/quantum-algorithms-i/phase-kickback), the single algebraic trick (encoding $f(x)$'s
+[Phase Kickback](/lessons/quantum-computing/quantum-algorithms-i/phase-kickback) is the single algebraic trick (encoding $f(x)$'s
 value as a phase rather than a separate qubit's value) that every algorithm
 in this course reuses.
 </NextDiscovery>

@@ -4,6 +4,8 @@ import { Reveal } from "@/components/motion/Reveal";
 import { CourseProgressBadge } from "@/components/curriculum/CourseProgressBadge";
 import { LessonCompletionMark } from "@/components/curriculum/LessonCompletionMark";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { getCourseHref } from "@/components/curriculum/courseHref";
+import { firstAuthoredLessonSlug } from "./readiness";
 import { getCourse } from "@/lib/content/curriculum";
 import { cn } from "@/lib/utils";
 import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
@@ -30,7 +32,40 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * same filled/hollow four-tick + text encoding `CourseList`/`CourseTimeline`
  * use) rather than bare text, so "Advanced" reads identically everywhere on
  * the site instead of being its own unlabeled convention here.
+ *
+ * The course title and each "Requires" entry route through `getCourseHref`
+ * (`src/components/curriculum/courseHref.ts`) — the single place that
+ * decides where a course link goes, now `/courses/<slug>` for every course
+ * on the site — with a real authored-lesson fallback rather than a
+ * hardcoded path.
+ *
+ * ------------------------------------------------------------
+ * Click targets — the whole row, not just the title
+ * ------------------------------------------------------------
+ * Same technique and same reasoning as `CourseList` (see its header comment
+ * for the full CSS 2.1 Appendix E paint-order argument): an entry here has
+ * two kinds of real destination — the course, and each of its lessons — so
+ * it cannot be one big `<a>` without nesting links, which is invalid HTML.
+ * Instead the course title is a real `<a>` whose `::after` is stretched over
+ * the whole `<li>` (`relative isolate`), and every block of genuinely
+ * readable text — the description, the "Requires" line, the stats, the
+ * module rows — carries `relative z-10`, so it stays selectable and the
+ * links inside it reach their own destinations rather than the course.
+ * There is deliberately no separate "View course →" affordance; the row is
+ * the way in.
+ *
+ * One subtlety specific to this list, which `CourseList` doesn't have: a
+ * `Reveal` sits between the `<li>` and the title link. A transformed element
+ * is a containing block for absolutely-positioned descendants, so if that
+ * wrapper held a transform the stretched `::after` would size to the wrapper
+ * instead of the row. It doesn't in any steady state — globals.css §11 sets
+ * `transform: none` on `[data-reveal][data-revealed="true"]` and again,
+ * `!important`, under `prefers-reduced-motion` — so the overlay resolves
+ * against the `relative` `<li>`. Do not add a transform to that wrapper.
  */
+
+/* `firstAuthoredLessonSlug` lives in ./readiness now — one definition shared
+   by /apex and /mastery instead of a copy per component. */
 
 /**
  * A compact structural diagram: which Apex courses are independent threads,
@@ -60,7 +95,7 @@ function ApexStructure({ courses }: { courses: Course[] }) {
       <p className="sr-only">
         Structure: {threads.map((thread) => thread.title).join(", ")} are independent
         research threads within Apex; {synthesis.title} is the course that requires all of
-        them, converging the pillar into a single closing capstone.
+        them, converging the track into a single closing capstone.
       </p>
 
       {/* Stacked convergence — sm/md, and the fallback below lg on larger
@@ -122,7 +157,13 @@ export function ApexCourseIndex({
     <div>
       <ApexStructure courses={courses} />
 
-      <ol className="divide-y divide-border border-y border-border">
+      {/* `-mx-3` against each row's `px-3`: the row's hover wash gets real
+          padding around its text without the text itself shifting out of
+          alignment with the rest of the section, and every hairline (this
+          list's own border-y and the divide between rows) stays the same
+          width as the wash. 12px is well inside `Container`'s 16px gutter,
+          so nothing overflows at 320px. */}
+      <ol className="-mx-3 divide-y divide-border border-y border-border">
         {courses.map((course, index) => {
           const lessonByModule = new Map(
             lessons
@@ -137,19 +178,36 @@ export function ApexCourseIndex({
           const authoredSlugs = course.modules
             .map((module) => lessonByModule.get(module.slug)?.slug)
             .filter((slug): slug is string => Boolean(slug));
-          const prerequisiteTitles = course.prerequisites
-            .map((slug) => getCourse(slug)?.title)
-            .filter((title): title is string => Boolean(title));
+          const prerequisiteCourses = course.prerequisites
+            .map((slug) => getCourse(slug))
+            .filter((c): c is Course => Boolean(c));
           const n = String(index + 1).padStart(2, "0");
 
           return (
-            <li key={course.slug} id={`course-${course.slug}`} className="scroll-mt-24 py-9 sm:py-11">
+            <li
+              key={course.slug}
+              id={`course-${course.slug}`}
+              className={cn(
+                "relative isolate scroll-mt-24 px-3 py-9 transition-colors duration-[--dur-fast] ease-[--ease-instrument] sm:py-11",
+                // `pillar`, not `pillar-accent`: the ramp is exposed to
+                // Tailwind as `pillar`/`pillar-edge`/`pillar-wash`
+                // (globals.css §"Pillar ramp"), and `pillar-accent` is not a
+                // registered color — it would compile to nothing and the
+                // whole-row hover affordance would silently not exist.
+                "has-[a[data-course-link]:hover]:bg-pillar-wash",
+                "has-[a[data-course-link]:focus-visible]:bg-pillar-wash"
+              )}
+            >
               <Reveal as="div" delay={index * 70} className="group">
                 <div className="grid gap-5 sm:grid-cols-[4rem_1fr] sm:gap-8">
                   <span
                     aria-hidden="true"
                     data-decorative=""
-                    className="font-tech text-2xl leading-none text-subtle-foreground transition-colors duration-[--dur-fast] ease-[--ease-mech] group-hover:text-pillar-text"
+                    // Keyed to the course link specifically, not to hovering
+                    // anywhere in the row: the affordance has to predict what
+                    // a click at the pointer's current position would do, and
+                    // a lesson row opens the lesson, not the course.
+                    className="font-tech text-2xl leading-none text-subtle-foreground transition-colors duration-[--dur-fast] ease-[--ease-mech] group-has-[a[data-course-link]:hover]:text-pillar-text group-has-[a[data-course-link]:focus-visible]:text-pillar-text"
                   >
                     §{n}
                   </span>
@@ -157,9 +215,15 @@ export function ApexCourseIndex({
                   <div>
                     <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
                       <SectionTitle level={3} size="md">
-                        {course.title}
+                        <Link
+                          href={getCourseHref(course.slug, authoredSlugs[0])}
+                          data-course-link
+                          className="underline-offset-4 transition-colors duration-[--dur-fast] ease-[--ease-mech] after:absolute after:inset-0 after:content-[''] hover:text-pillar-text hover:underline focus-visible:text-pillar-text"
+                        >
+                          {course.title}
+                        </Link>
                       </SectionTitle>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                      <div className="relative z-10 flex flex-wrap items-center gap-x-4 gap-y-1">
                         <DifficultyMark difficulty={course.difficulty} />
                         <TechValue className="text-sm">{course.estimatedHours}h</TechValue>
                         <TechValue className="text-sm">
@@ -170,13 +234,31 @@ export function ApexCourseIndex({
                       </div>
                     </div>
 
-                    <p className="mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
+                    <p className="relative z-10 mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
                       {course.description}
                     </p>
 
-                    {prerequisiteTitles.length > 0 ? (
-                      <p className="mt-2 text-xs text-subtle-foreground">
-                        Requires → {prerequisiteTitles.join(" · ")}
+                    {prerequisiteCourses.length > 0 ? (
+                      // `relative z-10` raises the whole line — and the links
+                      // inside it, which paint in this element's own stacking
+                      // context — clear of the stretched `::after`. Without
+                      // it every one of them would silently navigate to *this*
+                      // course. They are inline links inside a sentence, so
+                      // WCAG 2.5.8's inline exception applies and inflating
+                      // them to 44px would break the line.
+                      <p className="relative z-10 mt-2 flex flex-wrap items-center gap-x-1.5 text-xs text-subtle-foreground">
+                        <span>Requires →</span>
+                        {prerequisiteCourses.map((prereq, i) => (
+                          <span key={prereq.slug}>
+                            <Link
+                              href={getCourseHref(prereq.slug, firstAuthoredLessonSlug(prereq.slug, lessons))}
+                              className="text-subtle-foreground underline-offset-2 hover:text-pillar-text hover:underline focus-visible:text-pillar-text"
+                            >
+                              {prereq.title}
+                            </Link>
+                            {i < prerequisiteCourses.length - 1 ? " ·" : ""}
+                          </span>
+                        ))}
                       </p>
                     ) : null}
 
@@ -187,14 +269,19 @@ export function ApexCourseIndex({
                         return (
                           <li
                             key={module.slug}
-                            className="flex items-baseline gap-2.5 border-b border-border/60 py-2 text-sm"
+                            className="relative z-10 flex items-center gap-2.5 border-b border-border/60 text-sm"
                           >
                             <span className="tech-value shrink-0 text-xs text-subtle-foreground">{mn}</span>
                             {lesson ? (
+                              // A real row, not an inline link: `min-h-11`
+                              // gives it the 44px target WCAG 2.5.8 asks for
+                              // without changing the type size, and the row
+                              // is raised out of the stretched course link's
+                              // paint layer so it opens the lesson.
                               <Link
                                 href={`/lessons/${lesson.slug}`}
                                 className={cn(
-                                  "group/row flex min-w-0 flex-1 items-baseline justify-between gap-3",
+                                  "group/row flex min-h-11 min-w-0 flex-1 items-center justify-between gap-3 py-2",
                                   "text-foreground transition-colors duration-[--dur-fast] ease-[--ease-mech]",
                                   "hover:text-pillar-text focus-visible:text-pillar-text"
                                 )}
@@ -212,9 +299,9 @@ export function ApexCourseIndex({
                                 </span>
                               </Link>
                             ) : (
-                              <span className="flex-1 text-muted-foreground">
-                                {module.title}{" "}
-                                <span className="text-xs text-subtle-foreground">— not yet authored</span>
+                              <span className="flex min-h-11 flex-1 items-center py-2 text-muted-foreground">
+                                {module.title}
+                                <span className="ml-1 text-xs text-subtle-foreground">— not yet authored</span>
                               </span>
                             )}
                           </li>

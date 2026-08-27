@@ -69,11 +69,11 @@ specific systems).
 
 ### What a tensor network representation does
 
-Instead of one flat list of $2^n$ amplitudes, a tensor network
+Instead of one flat list of $2^n$ amplitudes, a <Term id="tensor-network-methods">tensor network</Term>
 represents the state as a *network* of smaller, connected tensors, one
 per qubit (or small group of qubits), linked by "bond" indices whose
 size controls how much entanglement the representation can capture. If
-the true entanglement is limited, a network with small bond dimensions
+the true entanglement is limited, a network with small <Term id="bond-dimension">bond dimensions</Term>
 can represent the state *exactly* (or to excellent approximation) using
 far fewer total numbers than $2^n$, sometimes only *linearly* many in
 $n$, not exponentially many.
@@ -87,8 +87,8 @@ $n$, not exponentially many.
 
 ### The direct tradeoff: this is not a free lunch
 
-Tensor networks are NOT a general replacement for state-vector
-simulation. A state with truly high (near-maximal) entanglement entropy
+Tensor networks are not a general replacement for state-vector
+simulation. A state with high (near-maximal) entanglement entropy
 requires bond dimensions that grow back toward the same $2^n$ cost this
 technique was trying to avoid. This is a real, principled
 tradeoff, not a limitation of current tensor-network techniques waiting
@@ -97,7 +97,7 @@ compress this way, by the same information-counting argument that
 established the $2^n$ wall in the first place.
 
 Computational Cost & Scaling's own `stateVectorMemoryBytes` curve makes a
-good baseline for how large this gap gets. A matrix-product-state
+good baseline for how large this gap gets. A <Term id="matrix-product-state">matrix-product-state</Term>
 representation with bond dimension $D$ stores roughly $n$ tensors of
 shape $D\times2\times D$, so its total memory is about $32nD^2$ bytes,
 linear in $n$ instead of exponential. Fixing $D=16$ (a modest bond
@@ -223,8 +223,8 @@ whenever the state's entanglement structure isn't known to be limited.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Noise Simulation](/lessons/quantum-software/simulating-quantum-systems/noise-simulation), which returns to state-vector-style
+[Noise Simulation](/lessons/quantum-software/simulating-quantum-systems/noise-simulation) returns to state-vector-style
 simulation (density matrices, not tensor networks) to model what a
-NOISY circuit's output actually looks like, reusing Advanced Topics in
+noisy circuit's output actually looks like, reusing Advanced Topics in
 Quantum Mechanics' Kraus-channel machinery directly.
 </NextDiscovery>

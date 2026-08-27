@@ -47,7 +47,7 @@ Does adding more error correction always help a noisy quantum computer?
 
 ## Motivation
 
-The **threshold theorem** answers precisely, and understanding why
+The **<Term id="quantum-threshold-theorem">threshold theorem</Term>** answers precisely, and understanding why
 closes the loop back to Quantum Algorithms II's Shor's-algorithm
 capstone, which flagged fault-tolerant hardware as the missing
 ingredient for factoring at cryptographic scale.
@@ -76,8 +76,8 @@ combination all failing shrinks exponentially in $d/2$), so increasing
 $d$ (a bigger surface code grid, say) drives the logical error rate
 toward zero. This only works while $p$ is below some critical value, the
 **threshold** $p_{\text{th}}$: above it, more physical qubits mean *more*
-opportunities for errors to combine, and increasing $d$ makes the logical
-error rate *worse*, not better.
+opportunities for errors to combine, and increasing $d$ makes the <Term id="logical-error-rate">logical
+error rate</Term> *worse*, not better.
 
 **Concatenation** reaches the same tradeoff by a different route: instead
 of building one bigger code (a larger surface-code grid), encode each
@@ -147,7 +147,7 @@ claim is made that they could.
 This closes the exact gap Quantum Algorithms II's capstone identified:
 Shor's algorithm needs one long circuit to succeed essentially in a
 single shot, at cryptographically relevant scale, achievable only with
-physical error rates safely below threshold and a code with distance
+physical error rates safely below threshold and a code with <Term id="code-distance">distance</Term>
 large enough to suppress the residual logical error rate over the whole
 circuit's duration. VQE and QAOA, by contrast, tolerate a much higher
 effective error rate precisely because their hybrid structure doesn't

@@ -65,7 +65,7 @@ not memorizing any one's specific syntax.
   details.
 - **PennyLane** (Xanadu): built specifically around hybrid
   quantum-classical differentiable programming, with first-class support
-  for the gradient-based optimization VQE and QAOA (Quantum Algorithms
+  for the gradient-based optimization <Term id="vqe">VQE</Term> and QAOA (Quantum Algorithms
   II) require.
 
 Other SDKs exist (this is not an exhaustive list). The point isn't
@@ -78,7 +78,7 @@ platform's `QuantumCircuit`/`runCircuit`/`sampleMeasurements` already
 built in simplified form: (1) **build** a circuit as a data structure,
 (2) target a **backend**, a simulator or a specific piece of real
 hardware, to execute it, and (3) **read back results**, typically as
-measurement counts over many shots (Qubit Readout Techniques), not a
+measurement counts over <Term id="shot-noise-standard-error">many shots</Term> (Qubit Readout Techniques), not a
 single exact answer. Framework differences are mostly about ergonomics,
 target audience (research vs. production), and which hardware
 ecosystem each is most tightly integrated with, not about
@@ -127,7 +127,7 @@ exactly the abstraction the next section names.
 
 A "backend" is exactly the abstraction that lets identical circuit code
 run against wildly different execution engines: an ideal noiseless
-simulator (giving exact amplitudes), a noisy simulator (Simulating
+simulator (giving exact <Term id="amplitude">amplitudes</Term>), a noisy simulator (Simulating
 Quantum Systems' noise-simulation lesson), or real hardware
 (Physical Qubit Platforms' actual devices, with all of Noise, Decoherence
 & Scaling's real error sources). The circuit itself doesn't need to know
@@ -240,6 +240,6 @@ compilation, and much more).
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Writing Your First Circuit](/lessons/quantum-software/programming-quantum-computers/writing-your-first-circuit), a hands-on walkthrough building and
+[Writing Your First Circuit](/lessons/quantum-software/programming-quantum-computers/writing-your-first-circuit) is a hands-on walkthrough building and
 running a complete circuit using this platform's own `QuantumCircuit`.
 </NextDiscovery>

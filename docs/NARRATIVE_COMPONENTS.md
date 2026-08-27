@@ -69,6 +69,100 @@ pipeline, same as anywhere else in a lesson.
 
 ---
 
+## Inline glossary — `Term`
+
+The one gap none of the components above close: a reader mid-paragraph who
+doesn't recognize a term has to leave the lesson, go to `/glossary`, search,
+and find their way back. `Term` (`src/components/mdx/Term.tsx`) gives a
+technical phrase a plain-language definition *in place*, without losing
+reading position.
+
+```mdx
+The <Term id="partial-trace">reduced density matrix</Term> is what's left
+once you trace out the rest of an entangled system.
+```
+
+Renders as the phrase with a quiet dotted underline; activating it (click,
+or Tab then Space) reveals a small panel with the glossary entry's title,
+its one-or-two-sentence definition, and a link to the full `/glossary`
+entry. Activating it again — or opening a second `Term` on the page — hides
+it.
+
+**Props:**
+- `id` (required) — a real `id` from `GLOSSARY_TERMS` in
+  `src/lib/content/glossary.ts`, the same id `/glossary` anchors each entry
+  on as `#<id>`. **Address by id, not by title.** Prose almost never uses a
+  term's exact glossary title verbatim ("the density matrix gets reduced"
+  vs. the entry titled "Partial Trace"), so `id` is the stable handle and
+  `children` stays free to read naturally.
+- `children` (required) — the phrase exactly as it should read in the
+  sentence. It does not need to match the glossary entry's `title`.
+
+**An `id` with no matching glossary entry throws during render** — caught
+immediately by `lessonRender.test.ts` (which renders all 219 lessons) — the
+same "fail loudly, not silently" bar the two MDX hazards above are held to.
+A term genuinely missing from the glossary is a gap to fix in
+`src/lib/content/glossary.ts` first (a file this pass does not own), not a
+reason for this component to quietly render the bare phrase with no gloss.
+
+**Definitions are never authored here.** The panel always shows the live
+`definition` (and `title`) from `GLOSSARY_TERMS`, so a `Term` call site can
+never drift out of sync with what `/glossary` itself says — edit the
+glossary once, every inline gloss for that term updates with it.
+
+**Use sparingly, on genuine first-encounter jargon.** The brief this
+component answers is explicit that a paragraph turned into "a minefield of
+links" is a failure: gloss the handful of terms in a lesson a newcomer is
+actually likely to stumble on, not every noun that happens to have a
+glossary entry. A reader who already knows the term should barely notice
+the dotted underline; a lesson that glosses six terms in one paragraph has
+made every one of them harder to notice. As a rule of thumb, gloss a term
+once per lesson, at its first real use — not at every repetition.
+
+**Implementation note, if you're extending this component:** it deliberately
+does *not* use `<details>`, unlike `EquationReveal`'s block-level term
+glossary. `<details>` is flow content — an HTML parser implicitly closes an
+open `<p>` the instant it sees one, which would silently split the
+surrounding paragraph in two with no error from MDX, React or `tsc`. `Term`
+has to sit *inside* a `<p>`, so it's built from `<span>`/`<label>`/`<input>`
+(all phrasing content) with a native checkbox driving the reveal via
+`:checked`/`:has()` — zero client JS, and keyboard/screen-reader support
+comes from the browser's own checkbox semantics for free. The revealed
+panel is a plain block-level reveal in the text flow rather than a floating
+tooltip, specifically so it can never overflow sideways at 320px without
+JS-measured positioning. See the comment at the top of `Term.tsx` for the
+full reasoning before changing either decision.
+
+### Considered and not built: a prose-level "prerequisite check"
+
+The brief for this pass asked us to weigh a lightweight affordance for a
+lesson to say "this assumes you're comfortable with X" at a specific point
+in the prose — distinct from the frontmatter prerequisites `LessonMetaStrip`
+already lists (as a collapsed "Lineage" strip below the lesson body).
+
+Decision: **not built.** The gap it would fill is already covered by two
+existing pieces of vocabulary working together, and a dedicated component
+would mostly duplicate them: `Callout type="note"` already covers "a
+definition reminder, a forward reference" in its documented vocabulary
+above, and pairing one with a `Term` for the specific concept and a `Link`
+to the lesson that covers it in full gives an author everything a
+"prerequisite check" would — a flag, an inline refresher, and an escape
+hatch to the fuller treatment — with no new component to learn:
+
+```mdx
+<Callout type="note">
+  This builds on the <Term id="entanglement">entanglement</Term> covered in
+  [Bell states](/lessons/quantum-computing/qubits-and-quantum-states/bell-states) —
+  worth a quick look first if that still feels shaky.
+</Callout>
+```
+
+A component whose only job is to restate that pattern under a new name would
+add API surface without adding capability — the same trap `ObservePredictExplain`
+fell into below.
+
+---
+
 ## Restyled existing components
 
 These six existed before this pass and keep their exact prop APIs — only
@@ -415,6 +509,30 @@ The forward hook — a teaser for what's next, usually right after
 
 ### `ObservePredictExplain` — OBSERVE / PREDICT / EXPLAIN sequence
 
+**Recommendation: remove this component.** It is used in exactly 1 of 219
+lessons (`quantum-hardware/control-and-readout/qubit-readout-techniques.mdx`),
+and four independent prior review passes (docs/UX_REVIEW.md) judged it a
+poor fit for this corpus: the site's one established, load-bearing pattern
+is predict-*then*-observe (`PredictBeforeReveal`, "the single best
+interaction pattern on the site"), and this component is that pattern's
+mirror image, asking a reader to observe a result before committing to a
+guess about it — which gives away the answer the guess is supposed to test.
+Nothing here disagrees with that read; a fifth pass reaches the same
+conclusion for the same reason.
+
+**Not deleted in this pass.** Removing the export (and its
+`mdx-components.tsx` registration) would immediately break the one lesson
+above the next time it renders — `<ObservePredictExplain>` would resolve to
+nothing and the page would throw — and that `.mdx` file is out of scope
+here (owned by the content agents currently editing lesson prose, not by
+this pass's file ownership). The correct sequence is: migrate that one
+lesson's usage to plain sequential components (an `InteractiveSection`, a
+`PredictBeforeReveal`, then prose — exactly the "sequencing directly"
+alternative described below, which is what that lesson's own content
+actually calls for), *then* delete `ObservePredictExplain.tsx` and its
+registration in the same change. Whoever picks this up next: do not add a
+sixth call site in the meantime.
+
 A three-beat wrapper: show something happening, ask for a prediction, then
 explain the mechanism. Three named slots, so content can't end up in the
 wrong beat by accident — each slot holds ordinary MDX/JSX and composes with
@@ -461,6 +579,12 @@ doesn't have a reusable primitive yet; don't force it into this one.
 
 ## Choosing between similar-looking components
 
+- **A technical term a newcomer may not know, used in passing in a
+  sentence** → `Term`, addressed by its glossary `id`. Not for a concept the
+  lesson is about to spend a whole section defining and deriving — that's
+  `DefinitionBox`, in full, once. `Term` is for the second, third, offhand
+  mention, or a term from *another* lesson's vocabulary that this one
+  leans on without re-teaching it.
 - **A short aside** (note/caution/correction) → `Callout`.
 - **The one-sentence takeaway** → `InsightBlock`.
 - **A provocative question with no answer options** → `Question`.

@@ -122,7 +122,9 @@ export function EquationReveal({
 
   return (
     <div className={cn("not-prose instrument my-8 overflow-hidden", className)}>
-      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 sm:px-5">
+      {/* Wraps rather than squeezing: at 320px the hint is longer than the
+          strip, and `justify-between` on a nowrap row crushed both labels. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-2.5 sm:px-5">
         <TechLabel>Equation</TechLabel>
         <TechLabel className="text-subtle-foreground">Select a term for its meaning — or open the glossary below</TechLabel>
       </div>
@@ -145,12 +147,26 @@ export function EquationReveal({
                   onBlur={() => setActiveId((current) => (current === term.id ? null : current))}
                   onClick={() => setActiveId((current) => (current === term.id ? null : term.id))}
                   className={cn(
-                    "tech-value rounded-full border px-2.5 py-1 text-xs transition-colors",
+                    "tech-value inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors",
                     isActive
                       ? "border-pillar-edge bg-pillar-wash text-pillar-strong"
                       : "border-border bg-surface text-foreground hover:border-pillar-edge"
                   )}
                 >
+                  {/* The selected chip is marked by a *shape* that appears
+                      (a filled dot) as well as by its tint, so "which term am
+                      I reading about" survives grayscale and every flavour of
+                      color-blindness — the same filled/hollow principle
+                      DifficultyMark and PrerequisiteReadout use. `aria-pressed`
+                      already carries it for assistive tech. */}
+                  <span
+                    aria-hidden="true"
+                    data-decorative=""
+                    className={cn(
+                      "h-1.5 w-1.5 shrink-0 rounded-full",
+                      isActive ? "bg-current" : "border border-current opacity-40"
+                    )}
+                  />
                   <ChipSymbol symbol={term.symbol} />
                 </button>
               );
@@ -161,9 +177,33 @@ export function EquationReveal({
             {activeTerm ? activeTerm.gloss : "Hover, tap, or Tab to a term above for its meaning."}
           </p>
 
-          <details className="mt-1 group">
-            <summary className="tech-label w-fit cursor-pointer select-none text-pillar">
-              Full term glossary
+          <details className="group mt-1">
+            {/* The collapsed state has to advertise that there is something
+                behind it, or the disclosure is dead weight: a rotating
+                chevron (state carried by rotation, not color) plus the term
+                count, so "there are 5 definitions in here" is legible without
+                opening it. */}
+            <summary
+              className={cn(
+                "flex min-h-11 w-fit cursor-pointer select-none list-none items-center gap-2 pr-2",
+                "[&::-webkit-details-marker]:hidden"
+              )}
+            >
+              <svg
+                aria-hidden="true"
+                data-decorative=""
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.75}
+                className="h-3.5 w-3.5 shrink-0 text-pillar transition-transform group-open:rotate-90"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m7.5 5 5 5-5 5" />
+              </svg>
+              <TechLabel className="text-pillar">Full term glossary</TechLabel>
+              <span className="text-xs text-subtle-foreground">
+                all {terms.length} definitions, always readable
+              </span>
             </summary>
             <dl className="mt-2 space-y-1.5 text-sm">
               {terms.map((term) => (

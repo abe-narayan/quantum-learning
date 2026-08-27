@@ -269,13 +269,13 @@ $$
 quantity that happens to share the classical name. This is computed
 from the exact same `vonNeumannEntropy` calls as every other number in
 this lesson, on a genuinely valid density matrix. For the classically
-correlated state above, by contrast, $S(A|B)=1-1=0$—non-negative, as
+correlated state above, by contrast, $S(A|B)=1-1=0$, non-negative, as
 the classical formula demands, because that state carries no
 entanglement at all. The sign of $S(A|B)$ is doing real physical work.
 
 <InsightBlock>
-  Negative $S(A|B)$ doesn't mean knowing "more than everything" about
-  $A$ — it means the joint state $\rho_{AB}$ is more pure than $\rho_B$
+  Negative $S(A|B)$ does not mean knowing "more than everything" about
+  $A$. It means the joint state $\rho_{AB}$ is more pure than $\rho_B$
   alone, which can only happen through entanglement. The missing
   information is entanglement, not ignorance.
 </InsightBlock>
@@ -295,14 +295,14 @@ quantum correlation with the reference to make quantum information
 recoverable on the other side. Its regularized version,
 $Q(\mathcal N)=\lim_{n\to\infty}\tfrac1n\max I(A{>}B)$ over $n$ uses of
 the channel, *is* the channel's quantum capacity (the LSD theorem,
-Lloyd-Shor-Devetak)—stated here, not proved, and picked back up in
+Lloyd-Shor-Devetak), stated here, not proved, and picked back up in
 this course's capstone, which asks exactly how much quantum information
 a noisy channel can carry.
 
 ## Why This Matters
 
 Classical conditional entropy $H(A|B)\geq0$ is not an incidental
-property of Shannon's formula—it is a statement about what
+property of Shannon's formula; it is a statement about what
 information *is*: you cannot be more uncertain about $A$ after learning
 $B$ than knowing nothing at all, because in the worst case $B$ is simply
 useless and $H(A|B)=H(A)$. Every classical intuition about
@@ -322,7 +322,7 @@ number of qubits of quantum communication needed to transfer $A$ to
 whoever already holds $B$, so that they can reconstruct the full joint
 state (the **quantum state merging** protocol, Horodecki-Oppenheim-Winter
 2005). When $S(A|B)<0$, state merging *generates* $|S(A|B)|$ EPR pairs
-as a byproduct instead of consuming qubits—negative conditional
+as a byproduct instead of consuming qubits. Negative conditional
 entropy is a resource, not a paradox, and it is exactly why "how much
 can be learned/sent" needs $S(A|B)$ and $I(A{>}B)$ as precise vocabulary
 rather than loose analogy to the classical case.
@@ -335,7 +335,7 @@ rather than loose analogy to the classical case.
   The protocol that gives $|S(A|B)|$ its operational meaning: the exact
   number of qubits of quantum communication needed to transfer $A$ to
   whoever already holds $B$. When $S(A|B)<0$, the protocol runs in
-  reverse — it *generates* $|S(A|B)|$ EPR pairs instead of consuming
+  reverse: it *generates* $|S(A|B)|$ EPR pairs instead of consuming
   qubits.
 </ResearchConnection>
 
@@ -355,14 +355,14 @@ p=0,\ 0.25,\ 0.5,\ 0.75,\ 1 \ \Longrightarrow\ S(\rho_A)=S(\rho_B)=1.000000 \tex
 $$
 
 This holds because both the singlet and $I/4$ individually reduce to
-$I/2$ on either qubit, so *any* convex mixture of them does too —
+$I/2$ on either qubit, so *any* convex mixture of them does too:
 diluting the singlet with noise never changes either marginal, only the
 correlation between them.
 
 **$S(\rho_{AB})$ varies smoothly, computed exactly via the Bell basis.**
 $I/4$ is diagonal in *every* basis, and $|\Psi^-\rangle\langle\Psi^-|$ is
 already diagonal in the Bell basis (eigenvalue 1 on $|\Psi^-\rangle$, 0
-on the other three Bell vectors)—so $\rho(p)$ is diagonal in the Bell
+on the other three Bell vectors), so $\rho(p)$ is diagonal in the Bell
 basis too, with eigenvalues $\lambda_{\Psi^-}=\tfrac{1+3p}{4}$ and
 $\lambda_{\text{other}}=\tfrac{1-p}{4}$ (each of the other three Bell
 vectors), verified directly by applying $\rho(p)$ to all four Bell
@@ -403,7 +403,7 @@ is already positive for any $p>1/3\approx0.333$. **The two thresholds
 are not the same.** Every Werner state with $p>1/3$ is genuinely
 entangled, but $S(A|B)$ only turns negative much later, past
 $p\approx0.7476$. Negative conditional entropy is a *sufficient*
-signature of entanglement, never a *necessary* one—there is a wide
+signature of entanglement, never a *necessary* one: there is a wide
 entangled-but-$S(A|B)\geq0$ regime ($1/3<p\lesssim0.7476$) sitting
 between the separable region and the region where the quantum-state-merging
 "bonus qubits" effect kicks in.
@@ -414,7 +414,7 @@ between the separable region and the region where the quantum-state-merging
 **Thinking $S(A|B)<0$ is a paradox, a sign error, or evidence that
 someone knows "more than everything" about $A$.** It is none of these.
 $\rho_A$ on its own is still exactly as mixed as its entropy says (1 bit,
-maximally uncertain, for the Bell state)—what's negative is a
+maximally uncertain, for the Bell state); what's negative is a
 *difference*, $S(\rho_{AB})-S(\rho_B)$, and that difference is negative
 precisely because $\rho_{AB}$ is *more* pure (lower entropy) than
 $\rho_B$ alone, which can only happen through entanglement. Classical
@@ -459,8 +459,8 @@ agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
   1 bit for a purely classical correlated mixture, using this platform's
   own `vonNeumannEntropy` throughout.
 - Conditional quantum entropy $S(A|B)=S(\rho_{AB})-S(\rho_B)$ can be
-  **negative**—$-1$ bit for the Bell state, computed directly, not
-  asserted—unlike its classical counterpart $H(A|B)\geq0$. The
+  **negative**: $-1$ bit for the Bell state, computed directly, not
+  asserted, unlike its classical counterpart $H(A|B)\geq0$. The
   magnitude of a negative $S(A|B)$ is the exact quantum-state-merging
   communication cost (here, a *savings*: EPR pairs generated, not spent).
 - Coherent information $I(A{>}B)=-S(A|B)$ controls a channel's ability
@@ -468,17 +468,17 @@ agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
   quantum capacity (LSD theorem), picked up again in this course's
   capstone.
 - Swept across the Werner-state family, $S(A|B)$ crosses zero near
-  $p\approx0.7476$—strictly later than the $p=1/3$ entanglement
+  $p\approx0.7476$, strictly later than the $p=1/3$ entanglement
   threshold from concurrence, proving negative conditional entropy is a
   sufficient, not necessary, signature of entanglement.
 
 ## Further Exploration
 
 <NextDiscovery>
-  Next: [The Data-Processing Inequality](/lessons/quantum-mastery/quantum-shannon-theory/the-data-processing-inequality),
-  which proves that quantum operations can never increase how
+  [The Data-Processing Inequality](/lessons/quantum-mastery/quantum-shannon-theory/the-data-processing-inequality)
+  proves that quantum operations can never increase how
   distinguishable two states are or how much information a channel
-  output carries about its input—built from the exact same Klein's
+  output carries about its input, built from the exact same Klein's
   inequality this course's prerequisite lesson proved, applied now to
   the mutual information defined here.
 </NextDiscovery>

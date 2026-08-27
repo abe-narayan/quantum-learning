@@ -34,11 +34,11 @@ Ask where an electron in a hydrogen atom actually is, and quantum mechanics won'
 That function is $\psi(x)$, and this lesson is about where it comes from
 and what it means. A finite list of amplitudes is enough to describe a
 qubit, or three qubits, or any number of qubits: $\mathbb{C}^2$,
-$\mathbb{C}^8$, always some finite dimension with one number per basis
+$\mathbb{C}^8$, always some finite dimension with one number per <Term id="basis">basis</Term>
 state. Position refuses that treatment — a particle isn't confined to finitely many discrete
 spots, it can sit at *any* real number $x$, so no finite list of
 amplitudes can label a continuum of possibilities one at a time. The
-postulates from the last course (state, observable, measurement,
+postulates from the last course (state, <Term id="observable">observable</Term>, measurement,
 dynamics) survive this move with their content untouched; only their
 *representation* changes, and pinning down exactly how is this lesson's
 entire job.
@@ -58,8 +58,8 @@ Don't start from continuous $x$ directly. Start from what you already
 know. Chop space into a fine grid of positions $x_1, x_2, \ldots, x_N$
 spaced $\Delta x$ apart (this is *exactly* the grid this course's numerical
 simulator uses internally). A particle's state on this grid is an ordinary
-finite-dimensional state vector, $|\psi\rangle = \sum_i c_i|x_i\rangle$,
-with $\sum_i |c_i|^2 = 1$ by the Born rule you already know. Then ask what
+finite-dimensional <Term id="quantum-state">state vector</Term>, $|\psi\rangle = \sum_i c_i|x_i\rangle$,
+with $\sum_i |c_i|^2 = 1$ by the <Term id="born-rule">Born rule</Term> you already know. Then ask what
 happens to this description as $\Delta x \to 0$.
 
 ## Mathematical Development
@@ -98,7 +98,7 @@ $$
 
 with $\langle x|x'\rangle = \delta(x-x')$ (a Dirac delta) replacing the
 discrete $\langle x_i|x_j\rangle = \delta_{ij}$, the continuum's version
-of an orthonormal basis. **This platform's numerical simulator is this
+of an <Term id="orthonormal-basis">orthonormal basis</Term>. **This platform's numerical simulator is this
 same construction, deliberately left at finite $\Delta x$**: `Grid1D`
 *is* $\{x_1,\ldots,x_N\}$, and a `Wavefunction1D`'s `amplitudes` array
 *is* $\{\psi(x_1),\ldots,\psi(x_N)\}$. The discretization this lesson

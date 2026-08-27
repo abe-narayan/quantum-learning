@@ -25,7 +25,7 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Not every gate can just run">
-CNOT(0, 3) is a single, free-floating logical operation — but on a linear-chain device where a qubit can only talk to its immediate neighbors, qubits 0 and 3 aren't even adjacent.
+<Term id="cnot-controlled-gates">CNOT(0, 3)</Term> is a single, free-floating logical operation — but on a linear-chain device where a qubit can only talk to its immediate neighbors, qubits 0 and 3 aren't even adjacent.
 </LessonHook>
 
 ## Motivation
@@ -34,7 +34,7 @@ Every circuit this platform's `QuantumCircuit` has built (Programming
 Quantum Computers) freely calls `cnot(control, target)` between any two
 qubit indices, a purely logical, connectivity-agnostic operation.
 Physical Qubit Platforms already noted real hardware often only supports
-gates between *specific*, physically adjacent qubit pairs. **Transpilation**
+gates between *specific*, physically adjacent qubit pairs. **<Term id="quantum-compilation-transpilation">Transpilation</Term>**
 is the compilation step that bridges this gap: rewriting a logical
 circuit into one a specific device's connectivity can actually execute.
 
@@ -58,7 +58,7 @@ device. Qubits 0 and 3 aren't adjacent.
 
 ### The SWAP-network solution
 
-The standard fix: physically move (via SWAP gates) the control qubit's
+The standard fix: physically move (via <Term id="qubit-routing-swap-overhead">SWAP gates</Term>) the control qubit's
 data stepwise until it sits next to the target, apply the real CNOT,
 then swap back to restore the original qubit ordering. This is exactly
 what this platform's `cnotOnLinearChain` implements, using nothing
@@ -283,7 +283,7 @@ the logical outcome.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Gate Decomposition](/lessons/quantum-software/compilation-and-hybrid-algorithms/gate-decomposition), which covers the OTHER major compilation
+[Gate Decomposition](/lessons/quantum-software/compilation-and-hybrid-algorithms/gate-decomposition) covers the other major compilation
 step: translating each individual gate into a specific hardware's native
 gate set, verified directly against several of this platform's own gate
 matrices.

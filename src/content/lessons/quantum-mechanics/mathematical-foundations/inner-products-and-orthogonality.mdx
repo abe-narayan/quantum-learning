@@ -55,13 +55,13 @@ export const lessonMeta = {
 
 ## Motivation
 
-A vector space, as built in the last lesson, has no notion of length or
+A <Term id="vector-space">vector space</Term>, as built in the last lesson, has no notion of length or
 angle: you can add and scale vectors, but nothing yet says how "big" one
 is or whether two of them are perpendicular. Physics needs both. The
-length of a quantum state vector will turn out to be tied to total
+length of a <Term id="quantum-state">quantum state</Term> vector will turn out to be tied to total
 probability, and "perpendicular" states will turn out to be the ones a
 single measurement can perfectly tell apart. The extra structure that
-supplies length and angle is called an **inner product**.
+supplies length and angle is called an **<Term id="inner-product">inner product</Term>**.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Augustin-Louis_Cauchy.jpg"
@@ -121,7 +121,7 @@ satisfies all three axioms.
 ### Norm and normalization
 
 The **norm** is $\|v\| = \sqrt{\langle v,v\rangle}$, real and
-non-negative by positive-definiteness. A vector is **normalized** if
+non-negative by positive-definiteness. A vector is **<Term id="normalization">normalized</Term>** if
 $\|v\|=1$; any nonzero $v$ can be normalized by scaling:
 $v/\|v\|$ always has norm exactly $1$ (check:
 $\|v/\|v\|\|^2 = \langle v/\|v\|, v/\|v\|\rangle = \langle v,v\rangle/\|v\|^2 = 1$).
@@ -191,7 +191,7 @@ $$
 
 ### Geometric interpretation and Gram-Schmidt
 
-For real vectors, $u\cdot v = \|u\|\|v\|\cos\theta$, so Cauchy-Schwarz is
+For real vectors, $u\cdot v = \|u\|\|v\|\cos\theta$, so <Term id="cauchy-schwarz-inequality">Cauchy-Schwarz</Term> is
 just $|\cos\theta|\le1$. Complex vectors don't have a literal angle in the
 same sense, but the ratio $|\langle u,v\rangle|/(\|u\|\|v\|)\in[0,1]$
 still measures how much $u$ and $v$ "overlap," the same word used for
@@ -292,7 +292,7 @@ for the opposite convention when reading other sources.
 </ChallengePrompt>
 
 <NextDiscovery>
-  Next: [The Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism), which gives this exact inner-product
+  [The Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism) gives this exact inner-product
   structure a compact, standard notation: bras, kets, outer products, and
   the completeness relation, used throughout the rest of quantum mechanics.
 </NextDiscovery>

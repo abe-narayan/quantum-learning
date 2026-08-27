@@ -38,21 +38,40 @@ function StatusGlyph({ status }: { status: ValidationResult["status"] }) {
   );
 }
 
-/** Never relies on color alone — an icon and the status label are always present as text too. */
-export function Feedback({ result }: { result: ValidationResult }) {
+/**
+ * Grading feedback. Never relies on color alone — an icon and the status
+ * label are always present as text too, so "Not quite" survives grayscale
+ * and every form of color blindness.
+ *
+ * The `role="status"` container is rendered unconditionally, empty, and only
+ * its *contents* change on submission. A live region that is inserted into
+ * the DOM at the same moment it gains content is unreliably announced —
+ * several screen reader / browser pairs only observe mutations inside
+ * regions that were already present when the observer attached. Keeping the
+ * empty wrapper mounted from first paint is what makes the announcement
+ * dependable rather than incidental.
+ */
+export function Feedback({ result }: { result: ValidationResult | null }) {
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className={cn("flex gap-2.5 rounded-[--radius-tight] border px-4 py-3 text-sm", STATUS_STYLES[result.status])}
-    >
-      <span className="mt-0.5 shrink-0">
-        <StatusGlyph status={result.status} />
-      </span>
-      <span>
-        <p className="font-semibold">{STATUS_LABEL[result.status]}</p>
-        <p className="mt-1 text-foreground/90">{result.message}</p>
-      </span>
+    /* An empty wrapper carries no margin and so no height: the always-mounted
+       region costs nothing in layout until it has something to say. */
+    <div role="status" aria-live="polite" className={result ? "mt-4" : undefined}>
+      {result ? (
+        <div
+          className={cn(
+            "flex gap-2.5 rounded-[--radius-tight] border px-4 py-3 text-sm",
+            STATUS_STYLES[result.status]
+          )}
+        >
+          <span className="mt-0.5 shrink-0">
+            <StatusGlyph status={result.status} />
+          </span>
+          <span>
+            <p className="font-semibold">{STATUS_LABEL[result.status]}</p>
+            <p className="mt-1 text-foreground/90">{result.message}</p>
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }

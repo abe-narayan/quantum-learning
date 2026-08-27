@@ -30,7 +30,7 @@ The Shor code needs 9-qubit-wide stabilizers and no way to improve its distance 
 ## Motivation
 
 The Shor code needs 9-qubit-wide stabilizers and offers no way to improve
-its distance without redesigning the whole code. The **surface code**,
+its distance without redesigning the whole code. The **<Term id="surface-codes">surface code</Term>**,
 the leading candidate for real, large-scale fault-tolerant quantum
 computing, fixes both problems: every stabilizer touches only 4
 neighboring qubits on a 2D grid, and distance grows simply by making the
@@ -49,7 +49,7 @@ grid bigger, with no fundamental redesign.
 
 ### The lattice structure
 
-Physical qubits sit on the edges of a 2D grid. Two types of stabilizer,
+Physical qubits sit on the edges of a 2D grid. Two types of <Term id="stabilizer-formalism">stabilizer</Term>,
 one per grid vertex and one per grid face, are each a product of $Z$'s
 (vertex stabilizers) or $X$'s (face stabilizers) on the 4 qubits touching
 that vertex or face, always exactly 4 qubits, **regardless of how large
@@ -131,7 +131,7 @@ at the 3-qubit scale it actually simulates.
 
 ### Distance scales with grid size
 
-A surface code's distance equals the grid's linear size (roughly, the
+A surface code's <Term id="code-distance">distance</Term> equals the grid's linear size (roughly, the
 shorter of its two dimensions): a $d\times d$ grid gives a
 distance-$d$ code, using $O(d^2)$ physical qubits for 1 logical qubit.
 Unlike the Shor code, where reaching a larger distance means an entirely
@@ -162,7 +162,7 @@ roughly 9 physical qubits plus additional stabilizer-measurement
 ancillas, arranged and connected on an actual 2D pattern) is substantially
 more engineering than this course's `errorCorrection.ts` builds. Real
 implementations also need a nontrivial *decoding* algorithm (commonly
-minimum-weight perfect matching) to interpret many simultaneous syndrome
+<Term id="mwpm-decoding">minimum-weight perfect matching</Term>) to interpret many simultaneous syndrome
 measurements, itself a serious piece of software distinct from the
 simple lookup table Lesson 2's 3-qubit code could use. This is named
 explicitly as out of scope, not glossed over: this course teaches the

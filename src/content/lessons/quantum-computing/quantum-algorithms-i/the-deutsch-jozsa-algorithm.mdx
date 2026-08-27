@@ -93,7 +93,7 @@ breaking the pattern.
   explanation="One query, full stop. Phase kickback marks every |x⟩ with (-1)^f(x) in a single call to U_f, and the second Hadamard layer converts that global phase pattern into an amplitude that lands on exactly ±1 (constant) or exactly 0 (balanced), derived below. There's no partial credit or repeated sampling involved: the promise itself guarantees a clean either/or answer from one query."
 />
 
-That's exactly what Deutsch-Jozsa achieves: exactly **one** query
+That's exactly what <Term id="deutsch-jozsa">Deutsch-Jozsa</Term> achieves: exactly **one** query
 to $U_f$, using the phase-kickback trick from last lesson plus a second
 layer of Hadamards to turn phases back into a directly measurable answer.
 
@@ -210,7 +210,7 @@ the derivation predicted.
 The classical lower bound is about *worst-case adversarial inputs*; the
 quantum algorithm sidesteps it entirely by never querying individual
 inputs at all. It queries the oracle exactly once, in superposition, and
-lets interference between all $2^n$ branches (constructive for constant
+lets <Term id="phase-interference">interference</Term> between all $2^n$ branches (constructive for constant
 $f$, perfectly destructive for balanced $f$) decide the global answer.
 Nothing about any *individual* $f(x)$ is ever learned; only the global
 constant-or-balanced fact is, which is exactly what the promise problem
@@ -257,7 +257,7 @@ measurable probability difference.
    sequence of "all queries so far returned 0."
 4. Deutsch-Jozsa's promise is somewhat artificial: real-world problems
    rarely come pre-labeled "constant or balanced." What does this suggest
-   about its value as a *demonstration* of quantum advantage versus a
+   about its value as a *demonstration* of <Term id="quantum-advantage-supremacy">quantum advantage</Term> versus a
    *practically useful* algorithm?
 
 <PracticeLinks problems={practiceProblems} />
@@ -277,7 +277,7 @@ measurable probability difference.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [The Quantum Fourier Transform](/lessons/quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform), the generalization of the
+[The Quantum Fourier Transform](/lessons/quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform) is the generalization of the
 $H^{\otimes n}$-based interference trick used here to a much richer family
 of algorithms: phase estimation, and eventually Shor's algorithm.
 </NextDiscovery>

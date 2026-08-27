@@ -60,9 +60,9 @@ A single real number can encode everything a unitary does to one of its eigensta
 
 ## Motivation
 
-Every eigenstate of a unitary $U$ satisfies $U|\psi\rangle=e^{2\pi i\varphi}|\psi\rangle$
+Every <Term id="eigenvalue-eigenvector">eigenstate</Term> of a unitary $U$ satisfies $U|\psi\rangle=e^{2\pi i\varphi}|\psi\rangle$
 for some phase $\varphi\in[0,1)$, a single real number encoding everything
-$U$ does to that eigenstate. **Quantum phase estimation (QPE)** reads
+$U$ does to that eigenstate. **<Term id="quantum-phase-estimation">Quantum phase estimation (QPE)</Term>** reads
 $\varphi$ out into an ordinary qubit register, as a binary fraction, using
 nothing but controlled-$U$ applications and the inverse QFT.
 
@@ -179,7 +179,7 @@ rotation), not an arbitrary black-box $U$.
 
 Phase estimation is the QFT run in reverse on a phase that's already been
 "written" onto a register by repeated controlled-$U$ applications, the
-same interference machinery Deutsch-Jozsa used to read out a global
+same <Term id="phase-interference">interference</Term> machinery Deutsch-Jozsa used to read out a global
 constant-or-balanced fact, generalized to read out an arbitrary real number
 (to $t$-bit precision) instead of one bit. It's the component every
 period-finding algorithm (Shor's algorithm, in the next course) is built
@@ -314,7 +314,7 @@ representable phases, not just the one worked out by hand above.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Grover's Algorithm](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion), which returns to Deutsch-Jozsa's style of
+Up next, [Grover's Algorithm](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion) returns to Deutsch-Jozsa's style of
 problem (a search rather than a period) and gets a *quadratic*, not
 exponential, speedup, for reasons this course makes precise rather than
 hand-waves.

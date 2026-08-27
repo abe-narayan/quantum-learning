@@ -16,6 +16,17 @@ import { SimulatorInstrument } from "../shared/SimulatorInstrument";
 import { SimulatorFraming } from "../shared/Framing";
 
 const SAMPLES = 240;
+/**
+ * The trajectory always spans exactly three cycles of the effective Rabi
+ * frequency (see `tMax`), so sample 20 is a quarter of the first cycle: the
+ * instant the drive has moved the *most* population it will ever move. Opening
+ * there rather than at t=0 means the instrument shows the phenomenon it's for —
+ * a qubit mid-flip, off the north pole — instead of an undisturbed |0⟩ and a
+ * flat P(1)=0 readout, per the bench's "open mid-phenomenon" rule.
+ */
+const INITIAL_SAMPLE_INDEX = 20;
+const DEFAULT_DRIVE_STRENGTH = 1;
+const DEFAULT_DETUNING = 0;
 const PLAY_INTERVAL_MS = 40;
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
@@ -58,9 +69,9 @@ export function RabiExplorer() {
 
   const initialFromUrl = parseRabiParams(searchParams);
 
-  const [driveStrength, setDriveStrength] = useState(initialFromUrl?.driveStrength ?? 1);
-  const [detuning, setDetuning] = useState(initialFromUrl?.detuning ?? 0);
-  const [sampleIndex, setSampleIndex] = useState(0);
+  const [driveStrength, setDriveStrength] = useState(initialFromUrl?.driveStrength ?? DEFAULT_DRIVE_STRENGTH);
+  const [detuning, setDetuning] = useState(initialFromUrl?.detuning ?? DEFAULT_DETUNING);
+  const [sampleIndex, setSampleIndex] = useState(INITIAL_SAMPLE_INDEX);
   const [isPlaying, setIsPlaying] = useState(false);
   const [copied, setCopied] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -140,16 +151,29 @@ export function RabiExplorer() {
     setIsPlaying((p) => !p);
   };
 
+  // Config changes deliberately KEEP the current sample index rather than
+  // rewinding to t=0. The window always spans exactly three cycles of the
+  // effective Rabi frequency, so a fixed index is a fixed *fraction of a
+  // cycle* — index 20 is "a quarter of the way through the first cycle,"
+  // i.e. peak transfer, whatever V and Δ are. Holding it means dragging the
+  // detuning slider shows the peak height falling live, which is the single
+  // most important thing this instrument has to teach. Rewinding to 0 would
+  // instead drop the reader back onto a flat P(1)=0 after every drag.
   const handleDriveStrengthChange = (v: number) => {
     setDriveStrength(v);
-    setSampleIndex(0);
     setIsPlaying(false);
   };
 
   const handleDetuningChange = (d: number) => {
     setDetuning(d);
-    setSampleIndex(0);
     setIsPlaying(false);
+  };
+
+  const handleReset = () => {
+    setIsPlaying(false);
+    setDriveStrength(DEFAULT_DRIVE_STRENGTH);
+    setDetuning(DEFAULT_DETUNING);
+    setSampleIndex(INITIAL_SAMPLE_INDEX);
   };
 
   // Continuous auto-play is a looping visual animation (the Bloch vector and
@@ -183,6 +207,16 @@ export function RabiExplorer() {
   const omegaEff = Math.sqrt(detuning * detuning + 4 * driveStrength * driveStrength);
   const maxPopulation = (4 * driveStrength * driveStrength) / (detuning * detuning + 4 * driveStrength * driveStrength);
 
+  // The instrument's live narration, in the same voice as BlochSphereExplorer's
+  // aria-live line: what just changed, in words, with no unglossed symbols.
+  const pctIn1 = Math.round(p1 * 100);
+  const narration =
+    detuning === 0
+      ? `t = ${current.t.toFixed(2)}: the drive has moved ${pctIn1}% of the qubit into |1⟩. The drive is exactly on resonance, so given the right pulse length the transfer reaches 100% — that pulse is what hardware people call a π pulse.`
+      : `t = ${current.t.toFixed(2)}: the drive has moved ${pctIn1}% of the qubit into |1⟩. The drive is off resonance by Δ = ${detuning.toFixed(
+          2
+        )}, so no pulse length ever gets past ${Math.round(maxPopulation * 100)}% — that ceiling is 4V²/(Δ²+4V²), and it is why a mistuned control pulse can never fully flip a qubit.`;
+
   return (
     <SimulatorInstrument
       label="Rabi driving — two-level system"
@@ -191,38 +225,74 @@ export function RabiExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
-          <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
-            {detuning === 0 ? (
-              <>On resonance: population fully transfers to |1⟩ and back, P(1) = sin²(Vt).</>
-            ) : (
-              <>
-                Off resonance: population never fully transfers. Maximum reachable P(1) ≈{" "}
-                {maxPopulation.toFixed(3)}, set by 4V²/(Δ²+4V²).
-              </>
-            )}
+          <p className="text-sm text-muted-foreground">
+            A qubit starts in its low-energy state, |0⟩. You shine a control pulse on it — a microwave tone
+            for a superconducting qubit, a laser for a trapped ion or neutral atom. The pulse does not
+            &ldquo;set&rdquo; the qubit to |1⟩; it drives it smoothly back and forth between |0⟩ and |1⟩ for
+            as long as you leave it on. Two knobs control that: how hard you push (
+            <span className="font-mono text-pillar">V</span>), and how well your pulse&rsquo;s frequency
+            matches the qubit&rsquo;s own (<span className="font-mono text-pillar">Δ</span>).
+          </p>
+
+          <div
+            aria-live="polite"
+            className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
+          >
+            {narration}
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
-              <p className="mb-2 text-xs font-medium text-muted-foreground">Population of |1⟩ over time</p>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                P(1) — chance of finding the qubit in |1⟩ — over time
+              </p>
               <PopulationCurve samples={populationSamples} tMax={tMax} currentT={current.t} currentP1={p1} />
             </div>
             <div>
-              <p className="mb-2 text-xs font-medium text-muted-foreground">Bloch-sphere trajectory (drag to rotate)</p>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                The same thing on the Bloch sphere: |0⟩ is the top, |1⟩ the bottom (drag to rotate)
+              </p>
               <BlochSphereCanvas blochPoint={blochPoint} className="mx-auto w-full max-w-[220px]" />
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
-            <KatexMath
-              tex={`P(1) = ${p1.toFixed(4)} \\qquad \\Omega_{\\text{eff}} = \\sqrt{\\Delta^2+4V^2} = ${omegaEff.toFixed(3)}`}
-              display
-            />
+          <div className="rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+            <div className="overflow-x-auto">
+              <KatexMath
+                tex={`P(1) = ${p1.toFixed(4)} \\qquad \\Omega_{\\text{eff}} = \\sqrt{\\Delta^2+4V^2} = ${omegaEff.toFixed(3)}`}
+                display
+              />
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Reading it out loud: the chance of measuring |1⟩ right now is {p1.toFixed(3)}, and the qubit is
+              cycling between |0⟩ and |1⟩ at rate Ω<sub>eff</sub> = {omegaEff.toFixed(3)} — which grows with
+              both the drive strength V and the detuning Δ, but only V raises how much population actually
+              gets across.
+            </p>
           </div>
 
           <SimulatorFraming
-            shows="Driving a qubit at its transition frequency swaps its state completely; drive off-resonance and something has to give."
-            tryThis="Set detuning to 0 and confirm population fully cycles 0→1→0. Then increase detuning until the Bloch trajectory visibly stops reaching the south pole, and check that the displayed max P(1) matches 4V²/(Δ²+4V²)."
+            shows="Driving a qubit at exactly its own transition frequency flips it completely; drive it slightly off that frequency and something has to give."
+            watchFor={
+              <>
+                The drive rate Ω<sub>eff</sub> gets <em>faster</em> as you detune, while the height the
+                population curve reaches gets <em>lower</em>. Going off resonance does not slow the qubit
+                down — it just stops the flip from ever completing.
+              </>
+            }
+            tryThis={
+              <ul>
+                <li>
+                  Leave detuning at 0 and press Play: the population curve should reach a full 1.0 and come
+                  back down, three times over. That round trip is one Rabi oscillation.
+                </li>
+                <li>
+                  Now drag detuning away from 0 without touching anything else. The instrument holds its
+                  position at the peak of the first cycle, so you can watch the maximum reachable P(1) fall
+                  live — and check it against 4V²/(Δ²+4V²) in the readout.
+                </li>
+              </ul>
+            }
           />
         </>
       }
@@ -248,10 +318,7 @@ export function RabiExplorer() {
               }}
               isPlaying={isPlaying}
               onTogglePlay={handleTogglePlay}
-              onReset={() => {
-                setIsPlaying(false);
-                setSampleIndex(0);
-              }}
+              onReset={handleReset}
               prefersReducedMotion={prefersReducedMotion}
             />
           </div>

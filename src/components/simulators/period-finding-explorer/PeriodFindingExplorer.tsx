@@ -18,10 +18,20 @@ import { SimulatorFraming } from "../shared/Framing";
  * (peaks at multiples of 2^t / r) for every combination, not just the one
  * lesson preset.
  */
+const DEFAULT_N = 15;
+const DEFAULT_A = 7;
+const DEFAULT_X_BITS = 6;
+
 export function PeriodFindingExplorer() {
-  const [N, setN] = useState(15);
-  const [a, setA] = useState(7);
-  const [xBits, setXBits] = useState(6);
+  const [N, setN] = useState(DEFAULT_N);
+  const [a, setA] = useState(DEFAULT_A);
+  const [xBits, setXBits] = useState(DEFAULT_X_BITS);
+
+  function handleReset() {
+    setN(DEFAULT_N);
+    setA(DEFAULT_A);
+    setXBits(DEFAULT_X_BITS);
+  }
 
   const validBases = useMemo(() => coprimeBases(N), [N]);
   const effectiveA = validBases.includes(a) ? a : validBases[0];
@@ -62,19 +72,36 @@ export function PeriodFindingExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
-          <div className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
-            a = {effectiveA}, N = {N}: classical order r = {order}
+          <p className="text-sm text-muted-foreground">
+            Factoring a big number is hard; finding how often a repeating pattern repeats is not — and the
+            two turn out to be the same problem. Multiply a by itself over and over, always keeping the
+            remainder after dividing by N, and the answers eventually loop. How long that loop is, is
+            r. This is the quantum subroutine that finds r, and it is the whole reason Shor&rsquo;s
+            algorithm threatens today&rsquo;s public-key encryption.
+          </p>
+
+          <div
+            aria-live="polite"
+            className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
+          >
+            With a = {effectiveA} and N = {N}, the pattern repeats every r = {order} steps
             {spacingIsExact
               ? `, so the ${peakCount} peaks below land exactly on multiples of 2^${xBits}/${order} = ${spacing}.`
               : `. 2^${xBits}/${order} = ${spacing.toFixed(2)} isn't a whole number, so the peaks below smear across roughly 2r nearby outcomes instead of landing exactly on r sharp ones.`}
           </div>
 
-          <BarChart
-            bars={bars}
-            ariaLabel={`Measurement probability distribution over the ${dimension} counting-register outcomes for a=${effectiveA}, N=${N}, t=${xBits} counting qubits`}
-            maxValue={Math.max(0.05, ...distribution)}
-            height={220}
-          />
+          <div>
+            <p className="mb-2 text-xs font-medium text-muted-foreground">
+              What you&rsquo;d actually measure: one bar per possible readout, its height the chance of
+              getting it. The spacing between the tall bars is what encodes r.
+            </p>
+            <BarChart
+              bars={bars}
+              ariaLabel={`Measurement probability distribution over the ${dimension} counting-register outcomes for a=${effectiveA}, N=${N}, t=${xBits} counting qubits`}
+              maxValue={Math.max(0.05, ...distribution)}
+              height={220}
+            />
+          </div>
 
           <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
             <KatexMath
@@ -85,6 +112,7 @@ export function PeriodFindingExplorer() {
 
           <SimulatorFraming
             shows="This is the actual quantum subroutine behind Shor's algorithm — measuring reveals a distribution whose peak spacing exposes the hidden period r, without ever computing r directly."
+            watchFor="Nothing here ever computes r and then draws peaks around it. The peaks come out of the circuit; r is what you read back off their spacing. That inversion is the entire trick."
             tryThis={
               <ul>
                 <li>
@@ -106,6 +134,7 @@ export function PeriodFindingExplorer() {
           validBases={validBases}
           xBits={xBits}
           onXBitsChange={setXBits}
+          onReset={handleReset}
         />
       }
     />

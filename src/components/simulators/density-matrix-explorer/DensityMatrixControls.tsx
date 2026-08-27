@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import type { BlochAngles } from "@/lib/quantum/bloch";
 import { STATE_PRESETS } from "../bloch-sphere/presets";
 import { MIXTURE_PRESETS } from "./presets";
-import { ControlSection, SimulatorSlider } from "../shared/controls";
+import { ControlSection, SimulatorSlider, SymbolGloss } from "../shared/controls";
 
 function ComponentPicker({
   title,
@@ -39,7 +39,7 @@ function ComponentPicker({
       </div>
       <div className="mt-2 space-y-2">
         <SimulatorSlider
-          label="θ"
+          label="θ (tilt from |0⟩)"
           value={angles.theta}
           min={0}
           max={Math.PI}
@@ -49,7 +49,7 @@ function ComponentPicker({
           onChange={(theta) => onChange({ theta, phi: angles.phi })}
         />
         <SimulatorSlider
-          label="φ"
+          label="φ (spin around)"
           value={angles.phi}
           min={0}
           max={2 * Math.PI}
@@ -97,29 +97,60 @@ export function DensityMatrixControls({
 
       <ControlSection
         id="components"
-        title="The two components being mixed"
-        description="ρ = p·ρ₁ + (1−p)·ρ₂, where ρ₁ and ρ₂ are the density matrices of these two pure states."
+        title="The two states being mixed"
+        description="Pick the two possibilities. The qubit really is one of them — you just don't know which."
       >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <ComponentPicker title="Component 1 (ρ₁)" angles={component1} onChange={onComponent1Change} isInert={weight === 0} />
-          <ComponentPicker title="Component 2 (ρ₂)" angles={component2} onChange={onComponent2Change} isInert={weight === 1} />
+        <div className="grid gap-3 @sm:grid-cols-2">
+          <ComponentPicker title="Possibility 1 (ρ₁)" angles={component1} onChange={onComponent1Change} isInert={weight === 0} />
+          <ComponentPicker title="Possibility 2 (ρ₂)" angles={component2} onChange={onComponent2Change} isInert={weight === 1} />
         </div>
+        <SymbolGloss
+          items={[
+            {
+              symbol: "θ",
+              name: "polar angle",
+              means:
+                "how far a state is tilted away from |0⟩ at the top of the sphere. 0° is |0⟩, 90° is an even superposition, 180° is |1⟩.",
+              glossaryId: "bloch-sphere-term",
+            },
+            {
+              symbol: "φ",
+              name: "azimuthal angle",
+              means:
+                "which way the state points once tilted — its relative phase. It never changes the odds of measuring 0 or 1, only how the state interferes.",
+              glossaryId: "global-relative-phase",
+            },
+            {
+              symbol: "ρ",
+              name: "density matrix",
+              means:
+                "the full description of a qubit when you only know the odds, not the state — the two-by-two table of numbers in the panel to the left.",
+              glossaryId: "mixed-state",
+            },
+          ]}
+        />
       </ControlSection>
 
-      <ControlSection id="weight" title="Mixing weight p" className="border-t border-border pt-5">
+      <ControlSection
+        id="weight"
+        title="How often possibility 1 is the true one"
+        description="ρ = p·ρ₁ + (1−p)·ρ₂. At p = 1 or 0 there's no uncertainty at all and the state is pure again; the middle is where mixing actually happens."
+        className="border-t border-border pt-5"
+      >
         <SimulatorSlider
-          label="Mixing weight p"
+          label="p (weight on possibility 1)"
           value={weight}
           min={0}
           max={1}
           step={0.01}
           formatValue={(v) => v.toFixed(2)}
+          valueText={(v) => `${Math.round(v * 100)} percent possibility 1, ${Math.round((1 - v) * 100)} percent possibility 2`}
           onChange={onWeightChange}
         />
       </ControlSection>
 
       <Button variant="secondary" size="sm" onClick={onReset}>
-        Reset
+        Reset to the 90/10 mixture
       </Button>
     </div>
   );

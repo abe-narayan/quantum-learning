@@ -45,7 +45,7 @@ Two entangled qubits keep agreeing with each other even when you change how you 
 ## Motivation
 
 The last lesson ended with a promise: put CNOT's control qubit into
-superposition first, and something new happens. This lesson delivers on
+<Term id="superposition">superposition</Term> first, and something new happens. This lesson delivers on
 it. The result is the most famous state in quantum computing, and the
 question of what makes it different from ordinary correlated randomness
 is one every serious treatment of the subject has to answer precisely,
@@ -117,7 +117,7 @@ recomputed live after each gate instead of shown as separate panels:
   ariaLabel="The Bell-pair preparation circuit, H on qubit 0 then CNOT(0,1), stepped gate by gate with live amplitude bars."
 />
 
-This is the Bell state $|\Phi^+\rangle$, one of four (the other three,
+This is the <Term id="bell-states">Bell state</Term> $|\Phi^+\rangle$, one of four (the other three,
 $|\Phi^-\rangle,|\Psi^+\rangle,|\Psi^-\rangle$, come from the same
 recipe starting at $|01\rangle,|10\rangle,|11\rangle$ instead; you'll
 derive one yourself in the practice questions).
@@ -146,12 +146,12 @@ If $b_1=0$: then $a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction.
 No values of
 $a_0,a_1,b_0,b_1$ satisfy all four equations simultaneously, so
 $|\Phi^+\rangle$ is **not** a product state. This is a complete proof, not
-an assertion: entanglement isn't a label we attach to this state, it's a
+an assertion: <Term id="entanglement">entanglement</Term> isn't a label we attach to this state, it's a
 provable mathematical fact about it.
 
 ### Is this different from classical correlation?
 
-Measuring each qubit of $|\Phi^+\rangle$ in the computational basis gives
+Measuring each qubit of $|\Phi^+\rangle$ in the <Term id="computational-basis">computational basis</Term> gives
 0 or 1 with 50/50 probability individually, and the two outcomes always
 match, exactly what a pair of classically-correlated coins would give
 too. So far, no difference. The gap shows up when you measure in a
@@ -221,8 +221,8 @@ gives $\frac{1}{\sqrt2}(|00\rangle-|10\rangle)$. Apply
 $\text{CNOT}(0,1)$: $|00\rangle\to|00\rangle$ (control 0),
 $-|10\rangle\to-|11\rangle$ (control 1, target flips). Result:
 $\frac{1}{\sqrt2}(|00\rangle-|11\rangle) = |\Phi^-\rangle$, the same
-"both qubits match" pattern as $|\Phi^+\rangle$, but with a relative
-phase of $-1$ between the two terms instead of $+1$. Two of the four
+"both qubits match" pattern as $|\Phi^+\rangle$, but with a <Term id="global-relative-phase">relative
+phase</Term> of $-1$ between the two terms instead of $+1$. Two of the four
 starting points ($|00\rangle$ and $|10\rangle$) give the two
 $|00\rangle,|11\rangle$-type Bell states; the other two give the
 $|01\rangle,|10\rangle$-type states, one of which is $|\Psi^+\rangle$,
@@ -276,7 +276,7 @@ correlation.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Multi-Qubit Measurement](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement), which makes precise exactly what
+[Multi-Qubit Measurement](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement) makes precise exactly what
 happens to the *rest* of an entangled state when you measure only part of
 it, the mechanism behind the perfect correlation you just derived.
 </NextDiscovery>

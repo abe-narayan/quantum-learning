@@ -167,7 +167,7 @@ $$
 P(k) = \binom{n}{k}\,p^{k}(1-p)^{n-k}
 $$
 
-— exactly the **binomial distribution** $\mathrm{Binomial}(n,p)$
+This is exactly the **binomial distribution** $\mathrm{Binomial}(n,p)$
 evaluated at $k$, with mean $np$: since $p$ is the *larger* of the two
 branch weights whenever $p>\tfrac12$, the typical types cluster near
 $k\approx np$, i.e. near "almost all copies in the $|00\rangle$ branch,"
@@ -183,7 +183,7 @@ $|00\rangle$-branch copies, $k/n$, lies within any fixed $\epsilon>0$ of
 $p$ (equivalently, whose exponential rate $-\tfrac1n\log_2\lambda_k$ lies
 within $\epsilon$ of $H(p)$). Call this the **typical set** $T_\epsilon$. Its probability
 mass $\to 1$ as $n\to\infty$, while its *size* is only
-$|T_\epsilon|\approx 2^{nH(p)}$ — exponentially smaller than the full
+$|T_\epsilon|\approx 2^{nH(p)}$, exponentially smaller than the full
 space of dimension $2^n$ whenever $H(p)<1$, i.e. whenever $|\psi\rangle$
 is not already maximally entangled.
 
@@ -197,8 +197,8 @@ be compressed into only $\approx nH$ of them, because only the typical
 outcomes ever really occur. Here the same counting argument says
 something about *entanglement* rather than compression: the typical
 subspace, restricted to just its $\approx 2^{nH(p)}$ dimensions, carries
-almost all of $|\psi\rangle^{\otimes n}$'s probability weight, and —
-crucially — its Schmidt coefficients are all *nearly equal* to
+almost all of $|\psi\rangle^{\otimes n}$'s probability weight, and,
+crucially, its Schmidt coefficients are all *nearly equal* to
 $2^{-nH(p)}$ within that subspace (every typical type $k$ has
 $-\tfrac1n\log_2\lambda_k\approx H(p)$ by definition, so
 $\lambda_k\approx 2^{-nH(p)}$ for every one of them). A state whose
@@ -244,7 +244,7 @@ re-derived here).
 
 ### Beyond pure states: mixed states and coherent information
 
-Real shared entanglement is never a perfect, isolated pure state —
+Real shared entanglement is never a perfect, isolated pure state:
 transmission through fiber or free space adds noise, so Alice and Bob
 actually share $n$ copies of some *mixed* state $\rho_{AB}$. The typical
 subspace idea still applies (via the state's purification: distilling
@@ -265,7 +265,7 @@ $I_c(A\rangle B)=S(\rho_B)-S(\rho_{AB})$ from The Data-Processing
 Inequality: exactly the same quantity that lesson used to bound how much
 quantum information a noisy channel can carry, now reappearing as the
 bound on how much entanglement noisy channel *use* can generate. That
-coincidence is not an accident — it is the technical heart of this
+coincidence is not an accident: it is the technical heart of this
 course's own capstone on channel capacities, which this lesson's typical
 subspace argument is the concrete, fully-worked special case of.
 
@@ -275,7 +275,7 @@ Distillation is not a mathematical curiosity: it is the specific reason
 long-distance quantum communication is possible at all. A pair of
 entangled photons sent through real optical fiber picks up loss and
 decoherence over distance, so the entanglement Alice and Bob actually
-end up sharing is never a perfect Bell pair — it degrades roughly
+end up sharing is never a perfect Bell pair: it degrades roughly
 exponentially with distance. **Quantum repeaters** solve this by
 chaining shorter, higher-fidelity entangled links and periodically
 *distilling*: sacrificing some pairs' worth of noisy entanglement to
@@ -292,8 +292,8 @@ lesson only ever *asserted*: why should entanglement entropy, a number
 computed from an abstract density matrix's eigenvalues, be *the*
 measure of "how entangled" a state is, rather than just one convenient
 choice among many? This lesson supplies the missing operational answer.
-**Distillable entanglement** — the asymptotic rate of perfect Bell pairs
-extractable per copy by LOCC — is a measure defined purely in terms of
+**Distillable entanglement** (the asymptotic rate of perfect Bell pairs
+extractable per copy by LOCC) is a measure defined purely in terms of
 what a physical protocol can actually *do* with the state, with no
 reference to entropy at all. The fact that this operational quantity
 turns out to equal $S(\rho_A)$ exactly, for pure states, is what makes
@@ -370,7 +370,7 @@ raw *dimension* (individual basis strings, not types): those two typical
 types together account for $\binom{6}{5}+\binom{6}{6}=6+1=7$ of the full
 $2^6=64$-dimensional space — only $10.9\%$ of the dimension, yet
 $88.6\%$ of the probability. The asymptotic prediction
-$2^{nH(p)}=2^{6\times0.468996}\approx7.03$ is already remarkably close
+$2^{nH(p)}=2^{6\times0.468996}\approx7.03$ is already close
 to the exact count of $7$, even at this small, by-hand-checkable $n$.
 Entanglement concentration's target rate here is
 $m\approx nH(p)=6\times0.468996\approx2.81$ Bell pairs from six copies
@@ -501,7 +501,7 @@ mixed-state entanglement measures that general (non-pure-state)
 distillation protocols are ultimately judged against.
 
 <NextDiscovery>
-  Next: Relative Entropy and Mixed-State Entanglement picks up where
+  Relative Entropy and Mixed-State Entanglement picks up where
   "Beyond pure states" leaves off, with the mixed-state entanglement
   measures that general distillation protocols are ultimately judged
   against.

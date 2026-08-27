@@ -116,7 +116,7 @@ The **quantum threshold theorem** answered the objection directly.
 It showed that continuous noise is not the problem
 it first appears to be: discretizing errors via syndrome measurement
 (the subject of this course's earlier lessons) combined with
-**concatenation** — nesting a code inside itself, recursively — can
+**concatenation** (nesting a code inside itself, recursively) can
 suppress logical error *arbitrarily far*, provided the physical error
 rate per gate sits below a fixed constant $p_{\text{th}}$, the
 **threshold**. This is arguably the single most historically important
@@ -164,7 +164,7 @@ $$
 
 for some constant $c$ set entirely by the specific fault-tolerant
 gadget circuitry (how many locations a fault can occur at, how many
-pairs of them combine into an uncorrectable error) — not by anything
+pairs of them combine into an uncorrectable error), not by anything
 this platform derives from first principles here.
 
 ### Concatenating: nesting the code inside itself
@@ -177,7 +177,7 @@ qubits with error rate $p$ — they are level-1 logical qubits, each
 already suppressed to error rate $p_1 \approx cp^2$. The same two-fault
 argument applies one level up, with $p_1$ standing in for $p$, and
 iterating $L$ times gives the recursion that is the theorem's real
-engine — unrolled below to the closed-form suppression (or blowup) it
+engine, unrolled below to the closed-form suppression (or blowup) it
 produces:
 
 <DerivationSteps>
@@ -204,7 +204,7 @@ produces:
 </DerivationSteps>
 
 Define
-$p_{\text{th}} := 1/c$ — the physical error rate at which $cp_0 = 1$, the
+$p_{\text{th}} := 1/c$, the physical error rate at which $cp_0 = 1$, the
 recursion's fixed point. Two regimes fall out immediately:
 
 - **$p_0 < p_{\text{th}}$** (so $cp_0 < 1$): raising a number less than 1
@@ -258,7 +258,7 @@ $\big(\log(1/\varepsilon)\big)^{\log_2 n}$: a fixed power of a logarithm,
 i.e. **polylogarithmic in $1/\varepsilon$**. This is the theorem's real,
 precise quantitative content: not merely "arbitrarily reliable
 computation is possible," but "arbitrarily reliable computation costs
-only polylog overhead" — a qualitatively different, far stronger claim
+only polylog overhead," a qualitatively different, far stronger claim
 than a polynomial or exponential resource cost would be.
 
 ## Physical Interpretation: Why This Matters
@@ -315,13 +315,13 @@ applying $p_{k+1} = c\,p_k^2$ directly:
 | 4 | $1.526\times10^{-9}$ | $6.568\times10^{-2}$ |
 
 Four levels of concatenation take the below-threshold case from
-$5\times10^{-5}$ down to about $1.5\times10^{-9}$ — a suppression by
-almost five orders of magnitude from just four levels — while the
+$5\times10^{-5}$ down to about $1.5\times10^{-9}$, a suppression by
+almost five orders of magnitude from just four levels, while the
 *identical* recursion, started only three times further from threshold,
 takes the above-threshold case from $1.5\times10^{-4}$ up past
 $6.5\times10^{-2}$: worse by nearly three orders of magnitude, and
 climbing (the small-$p$ approximation the recursion relies on is itself
-breaking down here, which is part of the point — above threshold, the
+breaking down here, which is part of the point: above threshold, the
 gadget doesn't stay in the small-error regime it was designed for).
 
 Pushing the below-threshold case further: reaching a target logical
@@ -331,7 +331,7 @@ $L \approx \log_2\!\big(\ln(1/(c\varepsilon))/\ln(1/0.5)\big) \approx 5.54$,
 so $L=6$ integer levels — confirmed directly: continuing the recursion
 gives $p_5 \approx 2.33\times10^{-14}$ (not yet below target) and
 $p_6 \approx 5.42\times10^{-24}$ (comfortably below it). Six levels of a
-7-qubit code cost $7^6 = 117{,}649$ physical qubits per logical qubit —
+7-qubit code cost $7^6 = 117{,}649$ physical qubits per logical qubit,
 a large number, but a **polylogarithmic**, not exponential, function of
 $1/\varepsilon$: reaching $\varepsilon = 10^{-36}$ instead would only
 add a couple more levels, not double the qubit count.
@@ -356,7 +356,7 @@ gadget and noise model assumed). Surface-code threshold estimates from
 the prerequisite lesson, by contrast, are generally *numerical,
 simulation-based* results for a specific noise model and a specific
 decoder, and tend to land at far more hardware-friendly, roughly
-percent-level physical error rates. Neither number is "the" threshold —
+percent-level physical error rates. Neither number is "the" threshold:
 comparing threshold values across code families, proof techniques, and
 noise-model assumptions is genuinely subtle, and a different quoted
 number reflects different assumptions, not different underlying physics.
@@ -366,7 +366,7 @@ number reflects different assumptions, not different underlying physics.
 **Reading "arbitrarily small logical error at polylog overhead" as
 "logical error can be driven to exactly zero."** The theorem guarantees
 $p_L \to 0$ as $L\to\infty$, and that polylog-in-$1/\varepsilon$ qubit
-cost gets you to any *fixed*, arbitrarily small target $\varepsilon>0$ —
+cost gets you to any *fixed*, arbitrarily small target $\varepsilon>0$:
 it does not claim zero error is achievable, and it says nothing at all
 about what happens if the physical error rate itself sits above
 $p_{\text{th}}$, where (as the worked example above shows numerically)
@@ -427,7 +427,7 @@ the same machinery drives the logical error rate *up*, not down.
 ## Further Exploration
 
 <NextDiscovery>
-  Next: [Capstone: Resource Estimation for a Real Algorithm](/lessons/apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm)
+  The [capstone](/lessons/apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm)
   takes this lesson's polylog-overhead formula out of the abstract and
   applies it to a full, concrete resource estimate for running one real
   algorithm fault-tolerantly.

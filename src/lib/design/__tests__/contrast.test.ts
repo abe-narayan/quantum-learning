@@ -68,6 +68,23 @@ const TEXT_TOKENS: Array<[token: string, minimum: number, note: string]> = [
   ["--border-strong", 1.4, "emphasised borders"],
 ];
 
+/** The three neutral text voices. Unlike the accent colors, these carry
+ *  running prose, so they have to hold up on every panel body text sits on,
+ *  not just on the page ground. */
+const NEUTRAL_TEXT: Array<[token: string, note: string]> = [
+  ["--foreground", "body text"],
+  ["--muted-foreground", "secondary text (lesson metadata, descriptions)"],
+  ["--subtle-foreground", "tertiary text (units, captions, axis labels)"],
+];
+
+/** The surface ladder is authored as aliases (`--surface: var(--depth-1)`),
+ *  so a token has to be followed one hop to reach a literal color. */
+function resolve(tokens: Record<string, string>, token: string): string {
+  const value = tokens[token];
+  const alias = value?.match(/^var\((--[\w-]+)\)$/);
+  return alias ? tokens[alias[1]] : value;
+}
+
 const THEMES: Array<[label: string, selector: string]> = [
   // `:root` *is* the dark theme now — see the dark-first note in globals.css.
   ["dark (default)", ":root {"],
@@ -86,6 +103,44 @@ describe.each(THEMES)("palette contrast — %s", (label, selector) => {
     const value = tokens[token];
     expect(value, `${label}: ${token} is not declared`).toBeDefined();
     expect(contrast(value, background)).toBeGreaterThanOrEqual(minimum);
+  });
+});
+
+describe.each(THEMES)("text on the panels it sits on — %s", (label, selector) => {
+  // Checking text against `--background` alone is not enough: almost nothing
+  // on this site sits directly on the page ground. Lesson metadata, captions,
+  // and axis labels sit on `.panel` and its muted variant, which are one and
+  // two steps *up* the depth ladder — a lighter ground in dark mode, so the
+  // ratio is always worse there than the `--background` check reports.
+  const tokens = tokensIn(GLOBALS_CSS, selector);
+
+  it.each(NEUTRAL_TEXT)("%s clears AA on --surface and --surface-muted", (token) => {
+    for (const surface of ["--surface", "--surface-muted"] as const) {
+      const ground = resolve(tokens, surface);
+      expect(ground, `${label}: ${surface} does not resolve to a literal`).toMatch(/^#[0-9a-f]{3,8}$/i);
+      expect(
+        contrast(tokens[token], ground),
+        `${label}: ${token} on ${surface}`,
+      ).toBeGreaterThanOrEqual(AA_NORMAL);
+    }
+  });
+
+  it("clears AA for body text on --surface-raised", () => {
+    // Only `--foreground` is asserted here. `--surface-raised` has exactly two
+    // usages (the incorrect state in `Feedback.tsx` and the hover state in
+    // `PracticeLinks.tsx`), and both put `--foreground` on it. Demanding the
+    // dimmer voices clear it too would force darkening colors for a pairing
+    // that does not exist on the site.
+    const ground = resolve(tokens, "--surface-raised");
+    expect(contrast(tokens["--foreground"], ground)).toBeGreaterThanOrEqual(AA_NORMAL);
+  });
+
+  it("keeps the two secondary text voices distinguishable", () => {
+    // `--muted-foreground` and `--subtle-foreground` encode a real hierarchy
+    // (description vs. caption). If a contrast fix pushes one onto the other
+    // they still pass AA individually while the hierarchy silently collapses.
+    const ratio = contrast(tokens["--muted-foreground"], tokens["--subtle-foreground"]);
+    expect(ratio, `${label}: the two secondary voices have converged`).toBeGreaterThan(1.15);
   });
 });
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { getPillar } from "@/lib/content/curriculum";
 import { pillarVisual } from "@/lib/design/pillars";
-import { getConcept, type ConceptNode, type SimulatorId } from "@/lib/content/concepts";
+import { type ConceptNode, type SimulatorId } from "@/lib/content/concepts";
 import { getEntriesForLesson, type CurrentQuantumEntry } from "@/lib/content/currentQuantum/registry";
 import { formatEntryDate } from "@/components/currentQuantum/dateUtils";
 import type { Difficulty } from "@/lib/content/types";
@@ -17,6 +17,7 @@ function simulatorHref(simulatorId: SimulatorId) {
 
 export function ConceptDetailPanel({
   node,
+  path,
   dependents,
   lessonTitles,
   difficulty,
@@ -25,6 +26,14 @@ export function ConceptDetailPanel({
   onClose,
 }: {
   node: ConceptNode;
+  /**
+   * The full prerequisite route to `node` from `getPrerequisitePath`: every
+   * concept that has to come first, in an order where nothing precedes its
+   * own prerequisites, with `node` itself last. Rendering the whole chain —
+   * not just the one or two direct prerequisites — is what turns "you need
+   * Entanglement first" into an actual study route someone can follow.
+   */
+  path: ConceptNode[];
   /** Direct dependents — concepts that list `node` as a prerequisite — so
    *  the panel can point *forward*, not just back. */
   dependents: ConceptNode[];
@@ -43,9 +52,10 @@ export function ConceptDetailPanel({
   const pillarInfo = getPillar(node.pillar);
   const visual = pillarVisual(node.pillar);
 
-  const prerequisites = node.prerequisiteIds
-    .map((id) => getConcept(id))
-    .filter((concept): concept is ConceptNode => concept !== undefined);
+  // The route without `node` itself, plus the set of *direct* prerequisites
+  // so the chain can mark which entries come immediately before this one.
+  const priorConcepts = path.filter((entry) => entry.id !== node.id);
+  const directPrerequisiteIds = new Set(node.prerequisiteIds);
 
   const coveredIn = node.lessonSlugs
     .map((slug) => ({ slug, title: lessonTitles[slug] }))
@@ -84,7 +94,7 @@ export function ConceptDetailPanel({
           type="button"
           onClick={onClose}
           aria-label="Close concept details"
-          className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-surface-muted hover:text-foreground"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface-muted hover:text-foreground"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -95,29 +105,54 @@ export function ConceptDetailPanel({
       <h2 className="mt-3 font-display text-xl font-semibold tracking-tight text-foreground">{node.title}</h2>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{node.definition}</p>
 
-      {node.simulatorId ? (
-        <Button href={simulatorHref(node.simulatorId)} variant="secondary" size="sm" className="mt-4 self-start">
-          Try the simulator
-        </Button>
-      ) : null}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        {node.simulatorId ? (
+          <Button href={simulatorHref(node.simulatorId)} variant="secondary" size="sm" className="self-start">
+            Try the simulator
+          </Button>
+        ) : null}
+        {/* Every concept on the map has a matching glossary entry — GLOSSARY_TERMS
+            is built directly from CONCEPT_NODES plus additional terms, sharing the
+            same `id`, so this link is never a guess or a fabricated route. */}
+        <Link
+          href={`/glossary#${node.id}`}
+          className="inline-flex min-h-11 items-center text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar-accent"
+        >
+          Full glossary entry →
+        </Link>
+      </div>
 
+      {/* The payoff, and deliberately the first section under the definition:
+          a node on a diagram is only worth clicking if it leads somewhere you
+          can actually read. Rows are full-width link targets rather than bare
+          inline links so they clear the 44px touch minimum. */}
       <div className="mt-6">
-        <span className="tech-label">Covered in</span>
+        <span className="tech-label">Lessons that teach this</span>
         {coveredIn.length > 0 ? (
           <ul className="mt-2 space-y-1.5">
             {coveredIn.map((lesson) => (
               <li key={lesson.slug}>
                 <Link
                   href={`/lessons/${lesson.slug}`}
-                  className="text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar-accent"
+                  className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-[--radius-tight] border border-border bg-surface-muted/40 px-3 py-2 text-sm text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-pillar-wash"
                 >
-                  {lesson.title}
+                  <span className="min-w-0">{lesson.title}</span>
+                  <span aria-hidden="true" className="shrink-0 text-pillar-text opacity-60 transition-opacity group-hover:opacity-100">
+                    →
+                  </span>
                 </Link>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-muted-foreground">No linked lesson found.</p>
+          // Said plainly rather than left as an ambiguous dead end: this
+          // concept is on the map because the structure needs it, and the
+          // glossary entry linked above is its written definition until a
+          // lesson is authored.
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            No lesson on the site covers this one yet. Its full written definition is in the
+            glossary entry linked above.
+          </p>
         )}
       </div>
 
@@ -145,24 +180,49 @@ export function ConceptDetailPanel({
         </div>
       ) : null}
 
+      {/* "What do I need to learn before this?" — the one question a
+          dependency graph is uniquely able to answer, so it gets the whole
+          chain back to a root, in order, not just the direct parents. */}
       <div className="mt-6">
-        <span className="tech-label">Prerequisites</span>
-        {prerequisites.length > 0 ? (
-          <ul className="mt-2 space-y-1.5">
-            {prerequisites.map((prereq) => (
-              <li key={prereq.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelectConcept(prereq.id)}
-                  className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar-accent"
-                >
-                  {prereq.title}
-                </button>
-              </li>
-            ))}
-          </ul>
+        <span className="tech-label">Learn these first</span>
+        {priorConcepts.length > 0 ? (
+          <>
+            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+              {priorConcepts.length === 1
+                ? "One concept comes before this one."
+                : `${priorConcepts.length} concepts come before this one, in this order.`}{" "}
+              Marked entries lead directly into it.
+            </p>
+            <ol className="mt-2 space-y-1.5">
+              {priorConcepts.map((prereq, index) => (
+                <li key={prereq.id}>
+                  <button
+                    type="button"
+                    onClick={() => onSelectConcept(prereq.id)}
+                    className="group flex min-h-11 w-full items-center gap-3 rounded-[--radius-tight] border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-pillar-wash"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border font-mono text-[0.625rem] tabular-nums text-muted-foreground"
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="min-w-0 flex-1">{prereq.title}</span>
+                    {directPrerequisiteIds.has(prereq.id) ? (
+                      <span className="shrink-0 rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-[0.5625rem] font-semibold uppercase tracking-[0.08em] text-pillar-text">
+                        Direct
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </>
         ) : (
-          <p className="mt-2 text-sm text-muted-foreground">No prerequisites — this is a starting point.</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Nothing comes before this one — it is a starting point on the map, and you can begin
+            here with no background.
+          </p>
         )}
       </div>
 
@@ -179,7 +239,7 @@ export function ConceptDetailPanel({
                   <button
                     type="button"
                     onClick={() => onSelectConcept(dependent.id)}
-                    className="group flex w-full items-center justify-between gap-3 rounded-[--radius-tight] border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-pillar-wash"
+                    className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-[--radius-tight] border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-pillar-wash"
                   >
                     <span className="min-w-0 truncate">{dependent.title}</span>
                     <span className="flex shrink-0 items-center gap-2.5">

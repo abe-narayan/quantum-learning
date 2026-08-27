@@ -1,4 +1,4 @@
-import { SimulatorSlider } from "../shared/controls";
+import { SimulatorSlider, SymbolGloss } from "../shared/controls";
 
 /**
  * Two synced control pairs — real/imaginary and magnitude/phase — driving
@@ -47,7 +47,7 @@ export function AmplitudeControls({
       </div>
       <div className="space-y-4 border-t border-border pt-4">
         <SimulatorSlider
-          label="Magnitude |z|"
+          label="|z| (magnitude — how long it is)"
           min={0}
           max={1.5}
           step={0.01}
@@ -57,7 +57,7 @@ export function AmplitudeControls({
           disabled={disabled}
         />
         <SimulatorSlider
-          label="Phase"
+          label="θ (phase — which way it points)"
           min={-180}
           max={180}
           step={1}
@@ -71,6 +71,31 @@ export function AmplitudeControls({
           disabled={disabled}
         />
       </div>
+      <SymbolGloss
+        items={[
+          {
+            symbol: "a, b",
+            name: "real and imaginary parts",
+            means:
+              "the arrow's horizontal and vertical reach — a is how far right, b is how far up. Together they place the tip of the arrow.",
+            glossaryId: "complex-number",
+          },
+          {
+            symbol: "|z|",
+            name: "magnitude",
+            means:
+              "the arrow's length. Square it and you have the probability of this outcome — nothing else about the amplitude survives that step.",
+            glossaryId: "modulus",
+          },
+          {
+            symbol: "θ",
+            name: "phase",
+            means:
+              "which way the arrow points. Invisible in any single measurement, decisive whenever two amplitudes meet: same direction reinforces, opposite cancels.",
+            glossaryId: "global-relative-phase",
+          },
+        ]}
+      />
     </div>
   );
 }

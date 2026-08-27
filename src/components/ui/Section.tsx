@@ -57,7 +57,18 @@ export function Section({
     width === "full" || bleed ? (
       children
     ) : (
-      <Container className={WIDTH_CLASSES[width]}>{children}</Container>
+      <Container
+        // `data-reading-column` is what `Marginalia` anchors to (see its
+        // docstring and the `.marginalia` rule in globals.css). Only the
+        // measured column has a gutter beside it, so only the measured column
+        // may host a note out in the margin. `relative` makes this element —
+        // not some arbitrary positioned ancestor further up — the box that
+        // `left: calc(100% + 3rem)` is measured from.
+        {...(width === "reading" ? { "data-reading-column": "" } : null)}
+        className={cn(width === "reading" && "relative", WIDTH_CLASSES[width])}
+      >
+        {children}
+      </Container>
     );
 
   return (
@@ -79,11 +90,23 @@ export function Section({
 /**
  * A section that breaks out of its parent Container to span the full
  * viewport width, without needing the parent to be restructured. Uses the
- * standard `left: 50%; margin-left: -50vw` escape hatch — and `100vw`
+ * standard `left: 50%; translate: -50%` escape hatch — and `100vw`
  * deliberately, not `100%`, since the point is to ignore the ancestor's
- * width. `overflow-x` is owned by the caller's own content: a full-bleed
- * element cannot itself cause horizontal page scroll, because it is exactly
- * viewport-wide, but anything wider placed inside it can.
+ * width.
+ *
+ * This used to claim that "a full-bleed element cannot itself cause
+ * horizontal page scroll, because it is exactly viewport-wide". It is not:
+ * `100vw` includes the classic scrollbar gutter, while the page's own
+ * available width does not, so on any page long enough to have a vertical
+ * scrollbar this element is ~15px wider than the content box and hangs over
+ * both edges. Measured on `/mechanics`: `w-screen` = 1920 against a
+ * `clientWidth` of 1905, giving 8px of real horizontal scroll.
+ *
+ * There is no pure-CSS width that means "viewport minus scrollbar" — `vw` is
+ * defined to include it — so the overhang is absorbed by `overflow-x: clip`
+ * on the root instead (globals.css §"Full-bleed overhang"). `clip` rather
+ * than `hidden` specifically: `hidden` would turn the root into a scroll
+ * container and break every `position: sticky` element on the site.
  */
 export function FullBleed({
   children,
@@ -126,8 +149,21 @@ export function SplitFigure({
         className
       )}
     >
-      <div className={cn(reverse && "lg:order-2")}>{text}</div>
-      <div className={cn(reverse && "lg:order-1")}>{figure}</div>
+      {/* `min-w-0` on both cells is load-bearing, not defensive noise. A grid
+          item's default `min-width: auto` is its *min-content* width, so a
+          child that legitimately refuses to shrink — a `min-w-max` timeline
+          rail, a wide table, a KaTeX line — pushes its track past the grid's
+          own width instead of overflowing inside it. The symptom is remote
+          from the cause: an `overflow-x-auto` wrapper one level down is
+          correct and still does nothing, because the track grew to fit and
+          there is no overflow left to scroll. That is exactly what happened
+          here — `CourseTimeline`'s `sm:min-w-max` rail stretched the figure
+          track to 2871px inside a 1088px grid and gave every
+          `/courses/<slug>` page a horizontal scrollbar 1.8 screens wide.
+          `min-w-0` lets the track take its `fr` share and hands the overflow
+          back to the scroll container that was already there to catch it. */}
+      <div className={cn("min-w-0", reverse && "lg:order-2")}>{text}</div>
+      <div className={cn("min-w-0", reverse && "lg:order-1")}>{figure}</div>
     </div>
   );
 }
@@ -150,11 +186,23 @@ export function Marginalia({
     <aside
       className={cn(
         "my-6 border-l-2 border-pillar-edge pl-4 text-sm text-muted-foreground",
-        // Above `2xl` there is genuine room outside the reading column; below
-        // it, the note stays inline rather than overlapping the text.
-        side === "right"
-          ? "2xl:absolute 2xl:left-[calc(100%+3rem)] 2xl:w-56 2xl:border-l-2 2xl:pl-4"
-          : "2xl:absolute 2xl:right-[calc(100%+3rem)] 2xl:w-56 2xl:border-l-0 2xl:border-r-2 2xl:pr-4 2xl:pl-0 2xl:text-right",
+        // The move out into the margin lives in globals.css, under
+        // `[data-reading-column] .marginalia`, because it has a precondition
+        // Tailwind utilities on this element cannot express: *there has to be
+        // a margin*.
+        //
+        // These classes used to say `2xl:absolute 2xl:left-[calc(100%+3rem)]`
+        // unconditionally, which silently assumed the nearest positioned
+        // ancestor was the ~46rem reading column. Two of the three call sites
+        // sit in a full-width `Section` instead, so `100%` was the whole
+        // container and the note was flung 3rem past its right edge — 272px
+        // off the side of a 1905px viewport, giving the *homepage* a
+        // horizontal scrollbar. Anchoring to an explicit marker means a note
+        // in a wide section now stays inline, which is the correct rendering
+        // for it, rather than being positioned against a box that was never
+        // the reading column.
+        "marginalia",
+        side === "right" ? "marginalia-right" : "marginalia-left",
         className
       )}
     >

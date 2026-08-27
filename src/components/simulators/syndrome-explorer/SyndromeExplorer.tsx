@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { SimulatorInstrument } from "../shared/SimulatorInstrument";
 import { SimulatorFraming } from "../shared/Framing";
 import { Predict } from "../shared/Predict";
-import { ControlSection } from "../shared/controls";
+import { ControlSection, SymbolGloss } from "../shared/controls";
 
 const INJECTABLE_QUBITS = [0, 1, 2] as const;
 
@@ -167,6 +167,13 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
       stageClassName="space-y-6"
       stage={
         <>
+          <p className="text-sm text-muted-foreground">
+            You cannot check a qubit for errors by looking at it — looking destroys it. The trick is to spread
+            one qubit&rsquo;s worth of information across three, then ask only whether they still{" "}
+            <em>agree with each other</em>. That question has an answer you can safely read out, and it
+            names the broken qubit without ever revealing what was being stored.
+          </p>
+
           <div aria-live="polite" className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {injected.length === 0
               ? "No error injected. The encoded state is exactly the logical state, undisturbed."
@@ -231,6 +238,11 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
                 );
               })}
             </div>
+            {injected.length > 0 ? (
+              <Button size="sm" variant="ghost" className="mt-3" onClick={() => setInjected([])}>
+                Clear all errors
+              </Button>
+            ) : null}
           </ControlSection>
 
           {injected.length === 1 ? (
@@ -246,7 +258,11 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
             />
           ) : null}
 
-          <ControlSection id="syndrome-readout" title="Syndrome">
+          <ControlSection
+            id="syndrome-readout"
+            title="Syndrome"
+            description="The two agreement checks, read out. This is the only thing measured — the encoded data itself is never touched."
+          >
             <p className="font-mono text-sm text-foreground">
               ({result.syndrome[0]}, {result.syndrome[1]})
             </p>
@@ -258,6 +274,26 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
                   ? "none applied — syndrome reads (0,0)"
                   : "none needed"}
             </p>
+            <SymbolGloss
+              items={[
+                {
+                  symbol: "(0,0)",
+                  name: "syndrome",
+                  means:
+                    "the pair of answers to “does qubit 0 agree with qubit 1?” and “does qubit 1 agree with qubit 2?”. 0 means yes. Any other pattern points at exactly one culprit.",
+                  glossaryId: "stabilizer-formalism",
+                },
+                {
+                  symbol: errorLabel,
+                  name: mode === "bit-flip" ? "bit flip" : "phase flip",
+                  means:
+                    mode === "bit-flip"
+                      ? "the error being injected: a qubit's 0 and 1 get swapped. Applying the same flip again undoes it, which is why the correction is just a second X."
+                      : "the error being injected: the qubit's phase gets reversed. Invisible to a plain 0-or-1 measurement, and lethal to interference — which is why it needs its own code.",
+                  glossaryId: "pauli-matrices",
+                },
+              ]}
+            />
           </ControlSection>
         </div>
       }

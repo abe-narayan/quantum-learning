@@ -62,7 +62,7 @@ where simulators themselves hit a very different wall.
 ### What real hardware adds on top of shot noise
 
 Every physical error source Noise, Decoherence & Scaling covered
-(T1/T2 decay, crosstalk, readout error, compounding multi-gate error)
+(<Term id="t1-t2-coherence-times">T1/T2 decay</Term>, <Term id="crosstalk">crosstalk</Term>, readout error, compounding multi-gate error)
 sits on TOP of the pure statistical shot noise Writing Your First
 Circuit already demonstrated. A real device's reported counts deviate
 from the ideal probabilities by more than shot noise alone predicts; the
@@ -79,13 +79,13 @@ something a noiseless simulator will ever show you.
   is limited differently (next section).
 - **Connectivity constraints**: real hardware often only supports gates
   between specific qubit pairs (Physical Qubit Platforms' connectivity
-  discussion), requiring extra SWAP gates (Compilation & Hybrid
+  discussion), requiring extra <Term id="qubit-routing-swap-overhead">SWAP gates</Term> (Compilation & Hybrid
   Algorithms) a simulator doesn't need.
 
 ### Where simulators hit their own wall
 
 An ideal, noiseless simulator represents a state as a list of $2^n$
-complex amplitudes (this platform's own `StateVector`), doubling with
+complex <Term id="amplitude">amplitudes</Term> (this platform's own `StateVector`), doubling with
 every additional qubit. At $n=30$ qubits, that's over a billion
 amplitudes; well before $n=50$, the memory requirement exceeds any
 existing classical computer's capacity. This is the exact reason exact
@@ -99,7 +99,7 @@ Simulating Quantum Systems' Computational Cost & Scaling lesson.
 precisely via `stateVectorMemoryBytes`: about 16.8 MB at 20 qubits (a
 laptop handles this easily), already 17.2 GB at 30 qubits, and 18.0 PB
 at 50 qubits, beyond any existing classical system's storage. The wall
-isn't a rough estimate; it's an exact, computed curve.
+is an exact, computed curve, not a rough estimate.
 </Callout>
 
 <PredictBeforeReveal

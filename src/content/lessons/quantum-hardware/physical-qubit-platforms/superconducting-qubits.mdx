@@ -31,22 +31,29 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="An engineered artificial atom">
-A plain LC circuit is a quantum harmonic oscillator, and its evenly-spaced levels make a terrible qubit — a "0→1" drive pulse would just as happily drive "1→2," "2→3," and so on.
+A plain LC circuit is a <Term id="quantum-harmonic-oscillator">quantum harmonic oscillator</Term>, and its evenly-spaced levels make a terrible qubit — a "0→1" drive pulse would just as happily drive "1→2," "2→3," and so on.
 </LessonHook>
 
 ## Motivation
 
 A superconducting qubit is, physically, a tiny electrical circuit: an
-inductor and capacitor, cooled in a dilution refrigerator to
+inductor and capacitor, cooled in a <Term id="dilution-refrigerator">dilution refrigerator</Term> to
 millikelvin temperatures (colder than deep space) so that thermal noise
 doesn't wash out the delicate quantum states. The engineering challenge
 this lesson opens with is Approximation Methods' oscillator, revisited
 here as real hardware.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
-  alt="Google's Sycamore superconducting quantum processor chip, showing its grid of transmon qubits and coupling wiring"
+  alt="Google's Sycamore superconducting quantum processor chip: a dark silicon die at the center of a metallic carrier whose fan-out traces radiate to the package edge"
   caption="Google's Sycamore processor: a real superconducting chip built from exactly the Josephson-junction transmon circuits this lesson describes, cooled in a dilution refrigerator and driven by microwave pulses computed from the same Rabi model this lesson reuses."
+  aspect="aspect-[16/9]"
+  pins={[
+    { id: "die", x: 55, y: 47, label: "The processor die itself — a grid of Josephson-junction transmon circuits. Each one is the nonlinear LC circuit this lesson develops, an engineered artificial atom rather than a real one." },
+    { id: "fanout", x: 27, y: 54, label: "Fan-out traces radiating from the die: the control lines carrying each qubit's microwave drive pulse, whose duration is the computable π-pulse time t = π/(2Ω) derived below." },
+    { id: "edge", x: 15, y: 36, label: "The carrier's edge, where every one of those traces terminates and wiring runs up out of the dilution refrigerator — the qubits themselves sit at millikelvin temperatures, colder than deep space, so thermal noise doesn't wash out the states." },
+    { id: "bond", x: 62, y: 66, label: "The bonded edge where die meets carrier. Wiring up many identical lithographed circuits like this is exactly why every major commercial player bet on this platform first: it's a chip." },
+  ]}
   credit="Google"
   creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
   license="CC BY 3.0"
@@ -109,7 +116,7 @@ lets a microwave pulse address only the qubit subspace.
 Superconducting qubits' defining tradeoff is relatively short coherence
 times (typically microseconds, with energy relaxation $T_1$ and dephasing
 $T_2$ both in this range for current devices) but very fast gates
-(single-qubit gates typically tens of nanoseconds). The *ratio* of gate
+(<Term id="single-qubit-gates">single-qubit gates</Term> typically tens of nanoseconds). The *ratio* of gate
 time to coherence time, not either number alone, is what determines
 how many operations fit before decoherence dominates; the Noise,
 Decoherence & Scaling course develops this tradeoff quantitatively.
@@ -119,8 +126,8 @@ specifically because it's a chip. IBM's public roadmap ran from the
 127-qubit Eagle processor through the 1,121-qubit Condor, then pivoted
 toward smaller, higher-fidelity "Heron" chips linked together into
 modular systems rather than chasing qubit count in isolation. Google's
-Willow chip reported in late 2024 that its surface-code logical error
-rate kept dropping as the code was scaled up, the first real evidence
+Willow chip reported in late 2024 that its <Term id="surface-codes">surface-code</Term> <Term id="logical-error-rate">logical error
+rate</Term> kept dropping as the code was scaled up, the first real evidence
 that error correction on this platform gets easier, not harder, with
 size. Neither result required inventing new physics; both are the same
 lithographic, wire-up-many-identical-circuits argument this section
@@ -219,6 +226,6 @@ not either number in isolation.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Trapped Ions](/lessons/quantum-hardware/physical-qubit-platforms/trapped-ions), a completely different physical platform, with
+[Trapped Ions](/lessons/quantum-hardware/physical-qubit-platforms/trapped-ions) is a completely different physical platform, with
 the opposite speed/coherence tradeoff.
 </NextDiscovery>

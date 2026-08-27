@@ -180,12 +180,12 @@ two that differ by a logical operator are not — one of them causes a
 ### Why this is a graph-matching problem
 
 Picture every currently-flipped stabilizer as a **vertex** in a new
-graph — call it the decoding graph — completely separate from the
+graph, call it the decoding graph, completely separate from the
 physical lattice. A single-qubit error is exactly one edge of this
 graph, connecting the two defects it would produce; a longer connected
 chain of same-type errors produces a defect only at the chain's two
-*endpoints* (every interior vertex along the chain gets touched twice —
-once by each of its two neighboring errors in the chain — and flips
+*endpoints* (every interior vertex along the chain gets touched twice,
+once by each of its two neighboring errors in the chain, and flips
 back to even parity). So under an independent-error noise model, the
 probability that a specific pair of defects came from a single error
 chain falls off with the chain's length, which makes $-\log(\text{probability})$
@@ -199,7 +199,7 @@ Given that weighted graph, "find the most probable error consistent
 with this syndrome" becomes: **pair up every defect with a partner (a
 real defect, or the virtual boundary) such that the total edge weight
 is minimized** — a minimum-weight perfect matching. This reduction is
-not a metaphor or a loose analogy — it's an exact restatement of the
+not a metaphor or a loose analogy: it's an exact restatement of the
 same maximum-likelihood question, and it's why "decode a surface code"
 and "solve a matching problem" are the same sentence in the literature.
 
@@ -247,7 +247,7 @@ falls off *exponentially* with code distance $d$,
 </EquationReveal>
 
 for some roughly constant prefactor $A$. $p_{th}$ itself is genuinely
-decoder- and noise-model-dependent — cited in real work as roughly
+decoder- and noise-model-dependent, cited in real work as roughly
 percent-level (commonly in the ballpark of $\sim 1\%$ for circuit-level
 noise with a strong decoder), not a single universal constant that
 applies to every code variant or every decoder equally. Deriving this
@@ -259,7 +259,7 @@ phase transition (the Nishimori point) in that model.
 <ResearchConnection title="Mapping decoding onto a statistical-mechanics phase transition" source="Dennis, Kitaev, Landahl & Preskill (2002)" url="https://arxiv.org/abs/quant-ph/0110143">
   The rigorous derivation of the threshold exponent maps the decoding
   problem onto a random-bond Ising model, with $p_{th}$ corresponding to
-  a genuine phase transition (the Nishimori point) in that model — well
+  a genuine phase transition (the Nishimori point) in that model, well
   beyond this lesson's scope to re-derive, cited here as an established
   real result, not asserted from nothing.
 </ResearchConnection>
@@ -275,7 +275,7 @@ phase transition (the Nishimori point) in that model.
 
 ### What threshold buys you, operationally
 
-"Threshold" does not mean errors stop happening below $p_{th}$ —
+"Threshold" does not mean errors stop happening below $p_{th}$:
 physical qubits keep failing at rate $p$ regardless. What changes is
 what a **bigger patch** does for you: below threshold, each two extra
 steps of distance multiply $p_L$ by another full factor of $(p/p_{th})$,
@@ -285,8 +285,8 @@ promise of fault-tolerant quantum computing rests on this one
 inequality holding. Above threshold, the sign of the exponent's effect
 flips against you: $(p/p_{th})>1$ raised to a *larger* power is a
 *larger* number, so a bigger patch gets **less** reliable, not more.
-This isn't a minor caveat — it's why "just add more qubits" is not
-automatically a fix for a noisy device: every additional physical qubit
+This is why "just add more qubits" is not
+automatically a fix for a noisy device, not a minor caveat: every additional physical qubit
 and every additional syndrome-extraction gate is one more chance to
 introduce an error, and above threshold, the corrections start
 introducing errors faster than they remove them.
@@ -303,7 +303,7 @@ introducing errors faster than they remove them.
 ### Why this matters: decoding is a live engineering problem
 
 Minimum-weight perfect matching can be solved efficiently
-(polynomial-time, via variants of Edmonds' blossom algorithm) — but
+(polynomial-time, via variants of Edmonds' blossom algorithm), but
 "efficient" in the complexity-theory sense is not the same as "fast
 enough." A real superconducting device runs syndrome-extraction rounds
 on the order of a microsecond; the decoder has to keep up with that rate
@@ -337,7 +337,7 @@ asserted.
 An X error strikes only qubit {singleErrorQubit[0]}, the edge connecting
 N01 and N11. Computed directly from the incidence table, the syndrome is
 exactly the two vertices that qubit touches:
-**{singleErrorSyndrome.join(" and ")}** — the defect pair away-from-boundary
+**{singleErrorSyndrome.join(" and ")}**, the defect pair away-from-boundary
 example from Surface Codes in Depth, reproduced explicitly. The decoding
 graph has exactly one edge between these two defects (weight 1, the
 qubit itself), so the minimum-weight matching is unambiguous: pair
@@ -570,7 +570,7 @@ cheaper alternative explanation.
 ## Further Exploration
 
 <NextDiscovery>
-  Next: [Lattice Surgery](/lessons/apex/fault-tolerance-frontiers/lattice-surgery)
+  [Lattice Surgery](/lessons/apex/fault-tolerance-frontiers/lattice-surgery)
   asks the next honest question this lesson's single isolated patch
   sidesteps entirely — how do two separate logical qubits, each sitting
   in their own patch like the one decoded here, actually interact for a

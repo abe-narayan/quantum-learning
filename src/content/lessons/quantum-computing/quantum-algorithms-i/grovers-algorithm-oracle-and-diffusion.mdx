@@ -50,7 +50,7 @@ needs $O(N)$ queries on average, full stop.
   explanation="Grover's algorithm needs O(√N) queries, not O(N). That's a quadratic speedup — for N=1,000,000 items, roughly 1,000 queries instead of up to a million. The next section derives the oracle and diffusion operator that make this scaling possible."
 />
 
-**Grover's algorithm** finds it in $O(\sqrt N)$ queries, exactly that
+**<Term id="grovers-algorithm">Grover's algorithm</Term>** finds it in $O(\sqrt N)$ queries, exactly that
 quadratic speedup, and it's the *best possible* for unstructured search
 (proven elsewhere, not claimed here), not an artifact of insufficient
 cleverness.
@@ -68,7 +68,7 @@ cleverness.
 
 ### The oracle
 
-Grover's oracle marks the target directly with a sign, using
+Grover's <Term id="oracle">oracle</Term> marks the target directly with a sign, using
 `applyPhaseOracle`: $|x\rangle\to-|x\rangle$ for the marked $x$, unchanged
 otherwise. This is exactly the phase-oracle form Phase Kickback derived
 from the bit-oracle model with the ancilla in $|-\rangle$, reused here
@@ -77,7 +77,7 @@ directly, not redefined.
 ### The diffusion operator, derived
 
 Let $|s\rangle=H^{\otimes n}|0\rangle^{\otimes n}$ be the uniform
-superposition. Grover's **diffusion operator** is $D=2|s\rangle\langle
+<Term id="superposition">superposition</Term>. Grover's **diffusion operator** is $D=2|s\rangle\langle
 s|-I$, a reflection about $|s\rangle$. Substitute $|s\rangle=H^{\otimes
 n}|0\rangle$ directly:
 

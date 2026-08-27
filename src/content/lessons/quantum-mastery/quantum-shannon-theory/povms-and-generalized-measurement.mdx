@@ -220,13 +220,13 @@ projector: $P(i)=\text{Tr}(E_i\rho)$.
 </DefinitionBox>
 
 Nothing here says the $E_i$ are orthogonal, and nothing caps the number
-of outcomes at the Hilbert space dimension — a qubit can have a
+of outcomes at the Hilbert space dimension: a qubit can have a
 3-outcome, 4-outcome, or arbitrarily-many-outcome POVM, which is exactly
 the extra room the worked example below needs.
 
 ### Why $\sum_iE_i=I$ is exactly the right condition
 
-This isn't an arbitrary normalization convention; it's forced by
+This is forced, not an arbitrary normalization convention, by
 requiring $\{P(i)=\text{Tr}(E_i\rho)\}$ to be an honest probability
 distribution for *every* physical state $\rho$, in two separate pieces.
 
@@ -306,7 +306,7 @@ matrix multiplied out and checked.
 ### Quantum instruments: what a POVM leaves out
 
 A POVM fixes $P(i)=\text{Tr}(E_i\rho)$, but says nothing about what
-state the system is left in *given* outcome $i$ occurred — and that
+state the system is left in *given* outcome $i$ occurred, and that
 post-measurement state is not determined by $E_i$ alone.
 
 <DefinitionBox title="Quantum instrument">
@@ -331,7 +331,7 @@ $|w\rangle$, $K=|w\rangle\langle v|$ satisfies
 $K^\dagger K=|v\rangle\langle w|w\rangle\langle v|=|v\rangle\langle v|=E$,
 so *every* choice of $|w\rangle$ gives a valid Kraus operator for the
 same $E$, yet each leaves the post-measurement state deterministically
-at $|w\rangle$ — a different physical state for each choice, all
+at $|w\rangle$, a different physical state for each choice, all
 completely invisible to the POVM. The concrete version of exactly this,
 with real numbers, appears in the worked example.
 
@@ -342,7 +342,7 @@ can definitely answer" the way an orthogonal projector does. It only has
 to be a legitimate *piece* of a valid probability assignment. That
 relaxation is what buys the extra outcomes: a POVM can dedicate an
 entire outcome to "I don't know," provided that outcome's operator is
-still positive semi-definite and the whole set still sums to $I$ — a
+still positive semi-definite and the whole set still sums to $I$, a
 concession an orthogonal projective measurement, capped at $d$ mutually
 exclusive outcomes with no slack, cannot make.
 
@@ -410,7 +410,7 @@ $$
 
 Both routes to $E_?$ agree exactly, and $E_?=0.75\,|\phi\rangle\langle\phi|$
 for $|\phi\rangle\approx(0.894,\,0.447)$, the symmetric bisector direction
-$\propto|\psi_1\rangle+|\psi_2\rangle$ — the inconclusive outcome points
+$\propto|\psi_1\rangle+|\psi_2\rangle$: the inconclusive outcome points
 exactly "between" the two candidate states, which is the geometrically
 sensible place for "I can't tell" to live. Summing all three:
 
@@ -427,7 +427,7 @@ actual state is $|\psi_2\rangle$, by the mirrored construction:
 $P(E_1)={povmProbsPsi2[0].toFixed(3)}$ (exactly zero),
 $P(E_2)={povmProbsPsi2[1].toFixed(3)}$,
 $P(E_?)={povmProbsPsi2[2].toFixed(3)}$. In general,
-$P(\text{correct})=1-s$ and $P(\text{inconclusive})=s$ — this is the
+$P(\text{correct})=1-s$ and $P(\text{inconclusive})=s$: this is the
 optimal (Ivanovic-Dieks-Peres) unambiguous discrimination bound: **no**
 valid measurement of any kind can unambiguously discriminate
 $|\psi_1\rangle,|\psi_2\rangle$ with a smaller inconclusive probability
@@ -455,7 +455,7 @@ projector annihilating $\psi_2$) and $P_2$ would need
 $\langle\psi_1|P_2|\psi_1\rangle=0$ (giving
 $P_2=|\psi_1^\perp\rangle\langle\psi_1^\perp|=|1\rangle\langle1|$). But
 $P_1+P_2=I$ requires $|\psi_2^\perp\rangle\perp|\psi_1^\perp\rangle$,
-i.e. $\langle\psi_2^\perp|\psi_1^\perp\rangle=-\cos\theta=0$ — true only
+i.e. $\langle\psi_2^\perp|\psi_1^\perp\rangle=-\cos\theta=0$, true only
 when $\theta=90°$, i.e. when $\psi_1,\psi_2$ were already orthogonal to
 begin with. For this lesson's genuinely non-orthogonal pair
 ($s=0.6\neq0$), **no** 2-outcome projective measurement can achieve zero
@@ -465,7 +465,7 @@ projective measurement cannot do at all. The best a forced-decision
 (2-outcome) measurement can do is *minimize error instead of eliminating
 it*: Helstrom's formula (Trace Distance and Fidelity) gives minimum error
 probability $\tfrac12(1-\sin\theta)={helstromErrorMin.toFixed(3)}$ for
-equal priors — a real, nonzero error rate on every single trial, traded
+equal priors, a real, nonzero error rate on every single trial, traded
 here for this POVM's zero error rate at the cost of a 60% inconclusive
 rate.
 
@@ -493,7 +493,7 @@ $|(U\psi)_i|^2$ for $i=1,2,3$ reproduces
 $\big({naimarkProbsPsi1[0].toFixed(3)},\ {naimarkProbsPsi1[1].toFixed(3)},\ {naimarkProbsPsi1[2].toFixed(3)}\big)$
 for $|\psi_1\rangle$ and
 $\big({naimarkProbsPsi2[0].toFixed(3)},\ {naimarkProbsPsi2[1].toFixed(3)},\ {naimarkProbsPsi2[2].toFixed(3)}\big)$
-for $|\psi_2\rangle$ — identical, to numerical precision, to the direct
+for $|\psi_2\rangle$, identical, to numerical precision, to the direct
 Born-rule numbers $\text{Tr}(E_i\rho)$ computed above from two completely
 independent calculations. The fourth basis outcome never fires for
 either state, consistent with this POVM genuinely needing only 3
@@ -629,8 +629,8 @@ choice is a common *default*, not a fact forced by the POVM itself.
 
 ## Further Exploration
 
-Next: [Stinespring Dilation and Channel Purification](/lessons/quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification),
-which asks the same "enlarge, then restrict" question this lesson asked
+[Stinespring Dilation and Channel Purification](/lessons/quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification)
+asks the same "enlarge, then restrict" question this lesson asked
 about measurement, but about an entire *channel*: every CPTP map is a
 unitary on a larger system followed by discarding part of it, the direct
 channel-level analog of the Naimark dilation proved here. For the
@@ -638,8 +638,8 @@ Helstrom minimum-error bound used above as the point of comparison, see
 [Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity).
 
 <NextDiscovery>
-  Next: Stinespring Dilation and Channel Purification asks the same
+  Stinespring Dilation and Channel Purification asks the same
   "enlarge, then restrict" question this lesson asked about measurement,
-  but about an entire channel — the direct channel-level analog of the
+  but about an entire channel: the direct channel-level analog of the
   Naimark dilation proved here.
 </NextDiscovery>

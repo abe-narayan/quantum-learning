@@ -36,15 +36,15 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Colder than deep space">
-The leftover glow of the Big Bang keeps empty intergalactic space at about 2.7 K. A dilution refrigerator's mixing chamber runs colder than that — typically 10-20 mK, on the order of two hundred times colder than deep space.
+The leftover glow of the Big Bang keeps empty intergalactic space at about 2.7 K. A <Term id="dilution-refrigerator">dilution refrigerator</Term>'s mixing chamber runs colder than that — typically 10-20 mK, on the order of two hundred times colder than deep space.
 </LessonHook>
 
 ## Motivation
 
-Physical Qubit Platforms mentioned superconducting and spin qubits
+Physical Qubit Platforms mentioned superconducting and <Term id="spin-qubits">spin qubits</Term>
 operate at millikelvin temperatures almost in passing. That number is
 worth stopping on. This lesson works out exactly why a chip needs to sit
-that cold, not just "cold is generally good for delicate things," but a
+that cold: not "cold is generally good for delicate things," but a
 specific, computable physical requirement.
 
 <AnnotatedFigure
@@ -67,7 +67,7 @@ specific, computable physical requirement.
 ### Thermal photon occupation
 
 A qubit's energy-level structure is, to good approximation near its
-lowest transition, a harmonic mode at some frequency $\omega$
+lowest transition, a <Term id="quantum-harmonic-oscillator">harmonic mode</Term> at some frequency $\omega$
 (Superconducting Qubits' anharmonic oscillator, right near its 0-1 gap).
 In thermal equilibrium at temperature $T$, the mean number of thermal
 photons occupying that mode follows the **Bose-Einstein distribution**:
@@ -124,7 +124,7 @@ easy-to-reach 4 K stage.
 
 The table samples four points; the underlying curve (computed the same
 way, `thermalPhotonOccupation` swept continuously over temperature) shows
-the crossover isn't a cliff, it's a smooth exponential, with the horizontal
+the crossover is a smooth exponential rather than a cliff, with the horizontal
 axis plotted as $\log_{10}(T/\text{K})$ and the vertical axis as
 $\log_{10}(\bar n)$ so both the $10^{-7}$ and $10^3$ ends stay visible on
 the same plot:
@@ -258,7 +258,7 @@ frequencies rather than much lower ones.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Control Electronics](/lessons/quantum-hardware/control-and-readout/control-electronics), which covers how microwave pulses are
-actually generated and delivered to drive the qubits this lesson keeps
+[Control Electronics](/lessons/quantum-hardware/control-and-readout/control-electronics) covers how microwave pulses are
+generated and delivered to drive the qubits this lesson keeps
 cold enough to use.
 </NextDiscovery>

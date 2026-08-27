@@ -4,6 +4,30 @@ export type NavItem = {
   description: string;
 };
 
+/**
+ * Where the persistent "Start learning" call to action goes.
+ *
+ * Deliberately the **first lesson**, not `/learn`. `/learn` is already one
+ * click away as its own nav item, so pointing the primary button at it made
+ * the loudest control in the chrome a duplicate of the link two inches to its
+ * left — and it answered "start learning" with another index to choose from
+ * rather than with a page that starts teaching. `what-is-a-qubit` is the
+ * genuine beginner entry point: the first lesson of the first course of the
+ * first track, with no prerequisites.
+ *
+ * Note this is *not* the prerequisite-graph root (`/map` picks that), which
+ * is a different and much less welcoming page for someone on their first
+ * visit.
+ *
+ * The route is `/lessons/<slug>` where the slug is the lesson's path under
+ * `src/content/lessons`. Guarded by `src/lib/search/__tests__/index.test.ts`,
+ * which asserts the generated search index contains an entry with exactly
+ * this href — so a moved or renamed lesson fails a test instead of shipping a
+ * 404 on the site's most-clicked button.
+ */
+export const START_LEARNING_HREF =
+  "/lessons/quantum-computing/qubits-and-quantum-states/what-is-a-qubit";
+
 // The logo already links home, so "Home" as a text link was pure duplication
 // — dropped rather than kept for symmetry. The pillar pages moved into
 // `TRACK_NAV_ITEMS` (rendered as a grouped "Tracks" dropdown by Navbar.tsx)

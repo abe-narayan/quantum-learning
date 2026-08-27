@@ -129,7 +129,16 @@ export function ExternalFigure({
         <div
           role="img"
           aria-label={alt}
-          className="flex aspect-video w-full flex-col items-center justify-center gap-1 bg-surface-muted p-6 text-center text-sm text-muted-foreground"
+          // `aspect ?? "aspect-video"`, not a bare `aspect-video`: this box
+          // has to occupy exactly the space the loaded image would have. A
+          // portrait figure (`aspect-[3/4]`) that fails to load used to
+          // reserve 3:4 while loading and then collapse to 16:9 on failure —
+          // a layout shift produced by the very component whose stated job is
+          // to reserve space and prevent one.
+          className={cn(
+            "flex w-full flex-col items-center justify-center gap-1 bg-surface-muted p-6 text-center text-sm text-muted-foreground",
+            aspect ?? "aspect-video"
+          )}
         >
           <span className="font-medium text-foreground">Image unavailable</span>
           <span>{alt}</span>
@@ -179,6 +188,10 @@ export function ExternalFigure({
                 className="underline decoration-border underline-offset-2 hover:text-foreground"
               >
                 {credit}
+                {/* `target="_blank"` otherwise moves the reader to a new tab
+                    with no warning — the one thing an attribution link owes a
+                    screen-reader or keyboard user before they follow it. */}
+                <span className="sr-only"> (opens in a new tab)</span>
               </a>
             ) : (
               credit

@@ -23,9 +23,26 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   ghost: "border border-transparent text-foreground hover:border-border hover:bg-surface-muted",
 };
 
+// `lg` already clears the 44px target minimum on its own painted box
+// (py-2.5 + text-base = 44px). `sm` (32px) and `md` (36px) do not, so they
+// carry a transparent `::after` that grows the *hit* area to 44px tall while
+// the painted face stays exactly where it was — the same technique
+// `IconButton`'s `TOUCH_TARGET_CLASSES` uses, and for the same reason:
+// inflating the visible control would break the shared baseline every row of
+// instrument controls on this site lines up on.
+//
+// Deliberately vertical-only (`after:w-full`, not `after:w-11`): buttons on
+// this site sit in horizontal rows far more often than vertical stacks, so a
+// horizontal expansion is the one that would make two adjacent controls steal
+// each other's taps. Vertically, the expansion is 6px/side for `sm` and
+// 4px/side for `md`, which stays inside the `gap-2` (8px) minimum the stacked
+// cases use.
+const TOUCH_FLOOR =
+  "relative after:absolute after:left-0 after:top-1/2 after:h-11 after:w-full after:min-h-full after:-translate-y-1/2 after:content-['']";
+
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-sm",
+  sm: `px-3 py-1.5 text-sm ${TOUCH_FLOOR}`,
+  md: `px-4 py-2 text-sm ${TOUCH_FLOOR}`,
   lg: "px-5 py-2.5 text-base",
 };
 

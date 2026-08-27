@@ -7,17 +7,52 @@ import type { Pillar } from "@/lib/content/types";
 import { PILLAR_ORDER, PILLAR_VISUALS } from "@/lib/design/pillars";
 import { fetchSearchIndex } from "@/lib/search/fetchIndex";
 import type { SearchEntry, SearchEntryType } from "@/lib/search/types";
+import { SEARCH_DIALOG_ID } from "@/lib/search/ids";
 import { cn } from "@/lib/utils";
 
 const TYPE_LABELS: Record<SearchEntryType, string> = {
+  term: "Glossary",
   lesson: "Lessons",
   problem: "Problems",
   simulator: "Simulators",
   course: "Courses",
+  track: "Tracks",
 };
 
-const TYPE_ORDER: SearchEntryType[] = ["lesson", "problem", "simulator", "course"];
+// Glossary first, deliberately. The most common query from someone new to
+// the subject is a word they just hit and didn't recognise, and for that
+// query a one-paragraph definition is a better landing than a 20-minute
+// lesson — especially since a glossary entry links straight on to the
+// lessons that cover it, so it costs a reader who wanted the lesson exactly
+// one extra click while saving the reader who wanted the definition a
+// dead-end detour. Everything else keeps its previous relative order.
+// `track` last: six entries that a reader almost always reaches through the
+// nav instead. They earn their place in the index because typing a subject
+// name ("hardware", "mechanics") previously returned lessons *about* it and
+// never the section itself — but they should not outrank a lesson.
+const TYPE_ORDER: SearchEntryType[] = ["term", "lesson", "problem", "simulator", "course", "track"];
 const RESULTS_PER_GROUP = 6;
+
+/** Where an empty-handed search sends someone. Real routes only. */
+const NO_RESULT_ROUTES = [
+  { href: "/glossary", label: "Glossary", hint: "look a word up" },
+  { href: "/map", label: "Concept map", hint: "see how ideas connect" },
+  { href: "/learn", label: "Learning path", hint: "start from the beginning" },
+];
+
+/**
+ * How well an entry matches, lower being better: exact title, title prefix,
+ * title substring, then description-only. Sorted *before* pillar order so a
+ * literal title hit is never buried under a pillar that merely happens to
+ * come earlier in the curriculum and mentions the word in passing.
+ */
+function matchScore(entry: SearchEntry, query: string): number {
+  const title = entry.title.toLowerCase();
+  if (title === query) return 0;
+  if (title.startsWith(query)) return 1;
+  if (title.includes(query)) return 2;
+  return 3;
+}
 
 // `null` stands for "no pillar" (most simulators, and any entry the index
 // doesn't tag) — its rank sorts after every real pillar so a kind group
@@ -46,6 +81,10 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
   // The index isn't baked into the page — it's fetched lazily, only once the
   // overlay actually mounts (i.e. once the user opens search), and cached at
   // module scope by `fetchSearchIndex()` so re-opening never re-fetches.
+  //
+  // Glossary terms ride along inside that same JSON (see `buildSearchIndex`),
+  // deliberately: the glossary module is a large prose corpus under a
+  // client-bundle budget, so it must never be imported from this directory.
   useEffect(() => {
     let cancelled = false;
     fetchSearchIndex()
@@ -83,7 +122,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
   const groups = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return [];
-    return TYPE_ORDER.map((type) => {
+    const built = TYPE_ORDER.map((type) => {
       const matches = index.filter(
         (entry) =>
           entry.type === type &&
@@ -91,22 +130,61 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
       );
       if (matches.length === 0) return null;
 
-      const ordered = [...matches].sort((a, b) => pillarRank(a.pillar) - pillarRank(b.pillar));
+      const ordered = [...matches].sort(
+        (a, b) =>
+          matchScore(a, trimmed) - matchScore(b, trimmed) ||
+          pillarRank(a.pillar) - pillarRank(b.pillar) ||
+          a.title.localeCompare(b.title)
+      );
       const visible = ordered.slice(0, RESULTS_PER_GROUP);
       const remaining = matches.length - visible.length;
       const pillarBreaks = new Set<number>();
+      const seenPillars = new Set<string>();
+      // Relevance now outranks pillar order, so a pillar *can* show up in two
+      // separate runs (a title hit in Mechanics, then later a
+      // description-only hit in Mechanics). Sub-headers only make sense while
+      // each pillar is one contiguous cluster; the moment one isn't, the
+      // per-row pillar chips take over instead of printing "Mechanics" twice
+      // as if they were different sections.
+      let pillarsAreContiguous = true;
       let previousPillar: Pillar | undefined;
       visible.forEach((entry, i) => {
-        if (i === 0 || entry.pillar !== previousPillar) pillarBreaks.add(i);
+        if (i === 0 || entry.pillar !== previousPillar) {
+          pillarBreaks.add(i);
+          const key = entry.pillar ?? "__general";
+          if (seenPillars.has(key)) pillarsAreContiguous = false;
+          seenPillars.add(key);
+        }
         previousPillar = entry.pillar;
       });
       // Only worth labelling sub-clusters when there's more than one pillar
       // on screen — a single-pillar (or single "General") kind group reads
       // fine as one flat list.
-      const showPillarLabels = pillarBreaks.size > 1;
+      const showPillarLabels = pillarsAreContiguous && pillarBreaks.size > 1;
 
-      return { type, visible, remaining, total: matches.length, pillarBreaks, showPillarLabels };
+      return {
+        type,
+        visible,
+        remaining,
+        total: matches.length,
+        pillarBreaks,
+        showPillarLabels,
+        bestScore: matchScore(ordered[0], trimmed),
+      };
     }).filter((group): group is NonNullable<typeof group> => group !== null);
+
+    // Glossary leads only when it actually *matched a term*. Definitions are
+    // full paragraphs, so a common word ("state", "system") matches dozens of
+    // them on description text alone — and letting that push the lessons
+    // below the fold would be the opposite of helpful. When the glossary's
+    // best hit is description-only, it sinks to just under Lessons instead.
+    const termPosition = built.findIndex((group) => group.type === "term");
+    if (termPosition !== -1 && built[termPosition].bestScore >= 3) {
+      const [termGroup] = built.splice(termPosition, 1);
+      const lessonPosition = built.findIndex((group) => group.type === "lesson");
+      built.splice(lessonPosition === -1 ? 0 : lessonPosition + 1, 0, termGroup);
+    }
+    return built;
   }, [index, query]);
 
   const hasQuery = query.trim().length > 0;
@@ -203,6 +281,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
     >
       <div
         ref={dialogRef}
+        id={SEARCH_DIALOG_ID}
         role="dialog"
         aria-modal="true"
         aria-label="Search QuantumLearn"
@@ -226,8 +305,8 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={handleInputKeyDown}
-            placeholder="Search lessons, problems, simulators, courses…"
-            aria-label="Search lessons, problems, simulators, and courses"
+            placeholder="Search a word, lesson, problem or course…"
+            aria-label="Search glossary terms, lessons, problems, simulators, and courses"
             autoComplete="off"
             spellCheck={false}
             className="min-w-0 flex-1 rounded-[var(--radius-tight)] bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand"
@@ -257,7 +336,8 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
         <div className="flex-1 overflow-y-auto p-2">
           {!hasQuery ? (
             <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-              Start typing to search across lessons, problems, simulators, and courses.
+              Start typing. Searches the glossary, every lesson and problem, the simulators, and the
+              courses — a single word works.
             </p>
           ) : indexStatus === "loading" ? (
             <p className="px-3 py-6 text-center text-sm text-muted-foreground">Loading search index…</p>
@@ -266,9 +346,29 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
               Search is temporarily unavailable. Please try again.
             </p>
           ) : !hasResults ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-              No results for &ldquo;{query}&rdquo;.
-            </p>
+            <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+              <p>No results for &ldquo;{query}&rdquo;.</p>
+              <p className="mt-2">Nothing here matched, but these are all one click away:</p>
+              {/* A zero-result screen is the moment a newcomer is most
+                  likely to give up, so it ends in real destinations rather
+                  than an apology. Each is a genuinely different next move:
+                  a definition, a structural view, and the front door of the
+                  curriculum. */}
+              <ul className="mt-3 flex flex-col gap-1.5 text-left sm:mx-auto sm:w-max">
+                {NO_RESULT_ROUTES.map((route) => (
+                  <li key={route.href}>
+                    <Link
+                      href={route.href}
+                      onClick={handleSelect}
+                      className="rounded-[var(--radius-tight)] px-2 py-1 text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-pillar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    >
+                      {route.label}
+                      <span className="ml-2 text-xs text-muted-foreground no-underline">{route.hint}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : (
             <ul className="space-y-4">
               {groups.map(({ type, visible, remaining, total, pillarBreaks, showPillarLabels }) => (
@@ -302,6 +402,21 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
                           >
                             <span className="min-w-0">
                               <span className="block text-sm font-medium text-foreground">{entry.title}</span>
+                              {/* The "which one is this?" line. Kind comes
+                                  from the group header above, pillar from
+                                  the chip/sub-header, and this supplies the
+                                  missing third coordinate — the course —
+                                  without which two lessons with the same
+                                  title are indistinguishable before the
+                                  click. */}
+                              {entry.course ? (
+                                <span
+                                  data-pillar={entry.pillar}
+                                  className="mt-0.5 block truncate font-tech text-[0.625rem] font-medium uppercase tracking-[0.08em] text-pillar-text"
+                                >
+                                  {entry.course}
+                                </span>
+                              ) : null}
                               <span className="line-clamp-1 block text-xs text-muted-foreground">
                                 {entry.description}
                               </span>

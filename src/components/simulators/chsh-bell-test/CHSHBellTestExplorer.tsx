@@ -99,6 +99,14 @@ export function CHSHBellTestExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
+        <p className="text-sm text-muted-foreground">
+          Two particles are prepared together, then carried far apart. Alice measures one, Bob measures the
+          other, each choosing between two angles. If each particle had simply been carrying its answer
+          all along — the way a pair of sealed envelopes would — then a certain combination of their
+          results, called S, could never exceed 2. Real entangled particles exceed it. This computes S
+          from your angles, exactly.
+        </p>
+
         <div
           aria-live="polite"
           className={cn(
@@ -138,7 +146,10 @@ export function CHSHBellTestExplorer() {
             type="button"
             onClick={() => setShowComparison((current) => !current)}
             aria-expanded={showComparison}
-            aria-controls="chsh-comparison-panel"
+            // Named only while the panel exists — it is unmounted when
+            // collapsed, and an `aria-controls` IDREF that resolves to nothing
+            // is invalid. `aria-expanded` carries the state on its own.
+            aria-controls={showComparison ? "chsh-comparison-panel" : undefined}
             className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <span className="text-sm font-medium text-foreground">

@@ -46,7 +46,7 @@ export function ComputingSection() {
                 <Reveal delay={100} className="mt-6">
                   <Link
                     href="/lessons/quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement"
-                    className="text-sm font-medium text-pillar hover:underline"
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-pillar hover:underline"
                   >
                     See the proof of entanglement →
                   </Link>
@@ -64,7 +64,7 @@ export function ComputingSection() {
                   />
                   <Link
                     href={visual.route}
-                    className="inline-flex items-center text-sm font-semibold text-pillar hover:underline"
+                    className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
                   >
                     Enter {visual.short} →
                   </Link>

@@ -38,12 +38,18 @@ An uncharged atom feels no long-range Coulomb repulsion from its neighbors — o
 
 Trapped ions rely on the ion's electric charge, but that same charge
 means ions repel each other, limiting how densely they can be packed in
-a single trap. Neutral atoms sidestep this entirely.
+a single trap. <Term id="neutral-atoms">Neutral atoms</Term> sidestep this entirely.
 
-<ExternalFigure
+<AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5e/1225_site_cold_cesium_atom_array.png"
   alt="A false-color fluorescence image of 1225 individual cesium atoms, each held in its own optical tweezer, arranged in a square grid roughly 100 microns wide"
-  caption="A real optical tweezer array: 1225 individual laser-cooled cesium atoms, each in its own tweezer spaced 3 microns apart, imaged directly by camera. Every bright dot is one loaded trap; the gaps show a real array can be sparsely loaded, exactly the reconfigurable geometry this lesson describes."
+  caption="A real optical tweezer array: 1225 individual laser-cooled cesium atoms, each in its own tweezer spaced 3 microns apart, imaged directly by camera. Every bright dot is one loaded trap — exactly the reconfigurable geometry this lesson describes."
+  aspect="aspect-square"
+  pins={[
+    { id: "atom", x: 29, y: 55, label: "One bright dot is one cesium atom, held at the focus of its own optical tweezer — a tightly focused laser beam the atom is drawn toward, since no net charge means no electric field can grip it." },
+    { id: "spacing", x: 57, y: 37, label: "Neighboring traps sit about 3 μm apart. That separation is the design knob for Rydberg blockade: atoms meant to entangle go inside the blockade radius, atoms meant to stay independent go outside it." },
+    { id: "extent", x: 6, y: 93, label: "The array's outer edge: 1225 separately-steerable tweezers inside roughly 100 μm. Because each trap is its own steerable laser focus, the whole geometry can be rearranged between experiments, or even mid-experiment." },
+  ]}
   credit="Preston Huft / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:1225_site_cold_cesium_atom_array.png"
   license="CC BY 4.0"
@@ -91,7 +97,7 @@ levels and prevent it from being excited to the same Rydberg state at
 the same time. This blockade effect, one atom's excitation
 conditionally suppressing its neighbor's, is what implements an
 entangling two-qubit gate, conceptually similar in spirit to Quantum
-Algorithms I's controlled-phase gates, but arising from genuine atomic
+Algorithms I's <Term id="cnot-controlled-gates">controlled-phase gates</Term>, but arising from genuine atomic
 physics rather than an abstract circuit element.
 
 <PredictBeforeReveal
@@ -122,7 +128,7 @@ independent are placed outside it.
 The excitation step itself, driving an atom from its ground state up to
 the Rydberg state, is a laser resonantly coupling two atomic levels: the
 same two-level Rabi problem every other platform in this course uses to
-implement a single-qubit gate, just aimed at a different pair of levels
+implement a <Term id="single-qubit-gates">single-qubit gate</Term>, just aimed at a different pair of levels
 here:
 
 <InteractiveSection title="Drive the ground-to-Rydberg transition" description="Set detuning to zero and vary the coupling strength V, playing the role of the laser's Rabi frequency driving the ground state up to the Rydberg state: watch the population sweep from 0 to 1 and back at t_π=π/(2V), exactly the resonant excitation step Rydberg-blockade gates rely on. Move detuning away from zero and see the achievable population drop below 1, the atomic-physics analog of an off-resonant control pulse on any platform.">
@@ -132,7 +138,7 @@ here:
 ## Physical Interpretation
 
 Neutral atoms' central engineering advantage isn't raw speed, and it
-isn't per-qubit coherence time alone. It's *scalable, flexible
+isn't per-qubit <Term id="coherence">coherence time</Term> alone. It's *scalable, flexible
 geometry*: the ability to lay out and rearrange large numbers of
 identical, naturally-uniform qubits (since, like trapped ions, they're
 real atoms, not fabricated devices that vary chip-to-chip).
@@ -211,6 +217,6 @@ light.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Photonic Qubits](/lessons/quantum-hardware/physical-qubit-platforms/photonic-qubits), a platform that doesn't trap anything at all.
-Information travels rather than sits still.
+[Photonic Qubits](/lessons/quantum-hardware/physical-qubit-platforms/photonic-qubits) is a platform that doesn't trap anything at all:
+information travels rather than sits still.
 </NextDiscovery>

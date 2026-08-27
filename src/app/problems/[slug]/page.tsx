@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getAllProblemMeta, getProblem } from "@/lib/problems/registry";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { getCourse, getPillar } from "@/lib/content/curriculum";
-import { ProblemLayout } from "@/components/problems/ProblemLayout";
+import { ProblemLayout, PREREQUISITE_ANCHOR_ID } from "@/components/problems/ProblemLayout";
 import { ProblemView } from "@/components/problems/ProblemView";
 import {
   BASE_URL,
@@ -48,6 +48,9 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
   // Fetched the same way lesson pages do, so "Builds on" / "Back to lesson"
   // links can resolve full lesson titles regardless of which course they're in.
   const allLessons = await getAllLessonsMeta();
+  const homeLesson = problem.meta.lesson
+    ? allLessons.find((lesson) => lesson.slug === problem.meta.lesson)
+    : undefined;
 
   const course = getCourse(problem.meta.course);
   const pillar = course ? getPillar(course.pillar) : undefined;
@@ -73,7 +76,23 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([problemSchema, breadcrumbSchema]) }}
       />
-      <ProblemView problem={problem} />
+      {/* Resolved here, server-side, from the lesson corpus `ProblemLayout`
+          already needs — so a wrong answer can offer "re-read the lesson this
+          came from" next to the feedback itself, without `ProblemView` (a
+          client component) importing anything that reaches the content
+          registry. See docs/DESIGN_SYSTEM.md §10. */}
+      <ProblemView
+        problem={problem}
+        lessonSlug={homeLesson?.slug}
+        lessonTitle={homeLesson?.title}
+        /* Only offered when there is something for the anchor to show: a
+           problem with no declared prerequisites renders the readout's "No
+           prerequisites — this is a starting point" line, which is not a
+           useful destination for a reader who just got the answer wrong. */
+        prerequisiteAnchorId={
+          (problem.meta.prerequisites?.length ?? 0) > 0 ? PREREQUISITE_ANCHOR_ID : undefined
+        }
+      />
     </ProblemLayout>
   );
 }

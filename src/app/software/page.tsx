@@ -3,11 +3,22 @@ import { PillarScope } from "@/components/field/PillarScope";
 import { Section } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede, Readouts } from "@/components/ui/Typography";
 import { Instrument } from "@/components/ui/Panel";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { CourseList } from "@/components/curriculum/CourseList";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { getCourseHref } from "@/components/curriculum/courseHref";
+import {
+  PillarBriefing,
+  PillarLessonStrip,
+  PillarNext,
+  pillarFacts,
+  pillarReadoutItems,
+} from "@/components/pillar/PillarFraming";
 import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
+import { pillarVisual } from "@/lib/design/pillars";
 import { swapOverheadForLinearChain } from "@/lib/quantum/transpilation";
 import { stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 import { BASE_URL, buildBreadcrumbSchema, buildCourseListSchema, pillarUrl } from "@/lib/structuredData";
@@ -103,6 +114,16 @@ export default async function SoftwarePage() {
     { name: "Software", url },
   ]);
   const swapOverhead = swapOverheadForLinearChain(0, 2);
+  const field = pillarVisual("quantum-software");
+
+  // One derivation over the real registries for every figure this page quotes
+  // about itself, and for the primary action (the real first course, in
+  // curriculum order) — see `pillarFacts`, shared with the other three track
+  // pages, and mechanics/page.tsx for why `getCourseHref` (→
+  // `/courses/<slug>`) is the right destination.
+  const facts = pillarFacts(courses, lessons);
+  const { firstCourse, firstLesson } = facts;
+  const heroHref = firstCourse ? getCourseHref(firstCourse.slug, firstLesson?.slug) : "/learn";
 
   return (
     <PillarScope pillar="quantum-software">
@@ -125,11 +146,41 @@ export default async function SoftwarePage() {
           </Lede>
           <p className="mt-4 max-w-[42rem] text-sm leading-relaxed text-muted-foreground">
             This is the SDK, simulation, and compilation stack — not the physics or the physical
-            device, but the code and infrastructure layer that sits between them. Start with{" "}
-            <em>Programming Quantum Computers</em> — it builds on Quantum Gates &amp; Circuits.
+            device, but the code and infrastructure layer that sits between them.
           </p>
         </Reveal>
+
         <Reveal delay={80}>
+          <PillarBriefing
+            className="mt-8"
+            facts={facts}
+            outcome="Trace a circuit from source, through transpilation onto a real device's connectivity, to the bitstrings that come back — and say why a 50-qubit simulation is not an option."
+          />
+        </Reveal>
+
+        <Reveal delay={100}>
+          <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
+        </Reveal>
+
+        {firstCourse ? (
+          <Reveal delay={120} className="mt-7 block">
+            <Button href={heroHref} size="lg">
+              Start: {firstCourse.title} →
+            </Button>
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+              <span>
+                {facts.firstCourseLessonCount} lessons
+                {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
+              </span>
+              <DifficultyMark difficulty={firstCourse.difficulty} />
+            </p>
+          </Reveal>
+        ) : null}
+
+        <Reveal delay={140}>
+          {/* The track's own instrument readout, kept separate from the shared
+              course/lesson/hour row above: this one is a computed physical
+              limit, not a measure of the curriculum's size. */}
           <p className="mt-8 tech-label">The state-vector wall, exactly</p>
           <Readouts
             className="mt-3"
@@ -145,6 +196,21 @@ export default async function SoftwarePage() {
             figure. This is why 30-50 qubits is where exact state-vector simulation stops being
             practical on ordinary hardware.
           </p>
+          <p className="mt-6 max-w-[42rem] border-l-2 border-pillar-edge pl-4 text-xs leading-relaxed text-subtle-foreground">
+            The gates streaming behind this page are not decoration either:{" "}
+            {field.fieldCaption.toLowerCase()} — a circuit actually executing, the same model the
+            live instrument below runs for real.
+          </p>
+        </Reveal>
+      </Section>
+
+      <Section width="reading" tight aria-labelledby="software-start-heading">
+        <Reveal>
+          <PillarLessonStrip
+            courses={courses}
+            lessons={lessons}
+            headingId="software-start-heading"
+          />
         </Reveal>
       </Section>
 
@@ -204,10 +270,13 @@ export default async function SoftwarePage() {
         </Reveal>
 
         <Reveal delay={80} className="mt-10 block">
-          <p className="tech-label">$ courses --pillar quantum-software</p>
-          <div className="mt-4">
-            <CourseList courses={courses} lessons={lessons} />
-          </div>
+          <CourseList courses={courses} lessons={lessons} />
+        </Reveal>
+      </Section>
+
+      <Section width="reading" tight aria-labelledby="software-next-heading">
+        <Reveal>
+          <PillarNext pillar="quantum-software" headingId="software-next-heading" />
         </Reveal>
       </Section>
     </PillarScope>

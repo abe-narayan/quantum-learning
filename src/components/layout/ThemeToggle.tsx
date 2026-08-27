@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useSyncExternalStore, type ReactElement } from "react";
+import { IconButton } from "@/components/ui/IconButton";
 import { cn } from "@/lib/utils";
 
 type Theme = "light" | "dark" | "system";
@@ -40,31 +41,34 @@ function subscribe(listener: () => void) {
 function getSnapshot(): Theme {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "light" || stored === "dark") return stored;
+    if (stored === "light" || stored === "dark" || stored === "system") return stored;
   } catch {
-    // Storage unavailable (private browsing, quota, etc.) — fall back to
-    // following the OS/browser preference for this session.
+    // Storage unavailable (private browsing, quota, etc.) — fall back to the
+    // site default for this session.
   }
-  return "system";
+  // Dark, not "system". The absence of a stored choice is not a preference
+  // for the OS setting, it is the absence of a choice — and the site's answer
+  // to that is its own identity. See the theme note at the top of
+  // globals.css: a first-time visitor on a light-default OS used to get a
+  // white page, which the dark-first palette exists to prevent. "System" is
+  // now something a reader picks, not something they fall into.
+  return "dark";
 }
 
-/** Matches the `<html>` server render in src/app/layout.tsx, which has no
- * `data-theme` attribute (i.e. "system") until the inline no-flash script
- * or this component sets one. */
+/** Matches the `<html>` server render in src/app/layout.tsx, which carries no
+ * `data-theme` attribute until the inline no-flash script or this component
+ * sets one — and the unattributed default is dark. */
 function getServerSnapshot(): Theme {
-  return "system";
+  return "dark";
 }
 
-/** Mirrors the inline no-flash script in src/app/layout.tsx: only "light"
- * and "dark" ever get an explicit `data-theme` attribute. "system" clears
- * it, handing control back to the `prefers-color-scheme` fallback in
- * globals.css. */
+/** Mirrors the inline no-flash script in src/app/layout.tsx: all three states
+ * write an explicit `data-theme`, including "system", which globals.css pairs
+ * with a `prefers-color-scheme: light` query. Clearing the attribute would
+ * now mean *dark*, not "follow the OS", so "system" can no longer be encoded
+ * as its absence. */
 function applyTheme(theme: Theme) {
-  if (theme === "system") {
-    document.documentElement.removeAttribute("data-theme");
-  } else {
-    document.documentElement.setAttribute("data-theme", theme);
-  }
+  document.documentElement.setAttribute("data-theme", theme);
 }
 
 function SunIcon() {
@@ -125,11 +129,10 @@ export function ThemeToggle({ className }: { className?: string }) {
   function cycleTheme() {
     const next = THEME_CYCLE[(THEME_CYCLE.indexOf(theme) + 1) % THEME_CYCLE.length];
     try {
-      if (next === "system") {
-        window.localStorage.removeItem(STORAGE_KEY);
-      } else {
-        window.localStorage.setItem(STORAGE_KEY, next);
-      }
+      // "system" is stored explicitly rather than removed: with dark as the
+      // unattributed default, removing the key would read back as "dark" on
+      // the next load and silently discard the reader's choice.
+      window.localStorage.setItem(STORAGE_KEY, next);
     } catch {
       // Storage unavailable — the effect above still applies the theme for
       // this page view, it just won't survive a reload.
@@ -141,17 +144,19 @@ export function ThemeToggle({ className }: { className?: string }) {
   const next = THEME_CYCLE[(THEME_CYCLE.indexOf(theme) + 1) % THEME_CYCLE.length];
 
   return (
-    <button
-      type="button"
+    // `IconButton` owns the 40px painted face *and* the 44px hit area it
+    // carries on a transparent `::after` — see TOUCH_TARGET_CLASSES for why
+    // the target grows without the button visibly growing with it.
+    <IconButton
       onClick={cycleTheme}
       className={cn(
-        "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-tight)] border border-transparent text-muted-foreground transition-[color,background-color,border-color] duration-[--dur-fast] ease-[--ease-instrument] hover:border-border hover:bg-surface-muted hover:text-foreground",
+        "border border-transparent text-muted-foreground transition-[color,background-color,border-color] duration-[--dur-fast] ease-[--ease-instrument] hover:border-border hover:bg-surface-muted hover:text-foreground",
         className
       )}
       aria-label={`Theme: ${THEME_LABEL[theme]}. Switch to ${THEME_LABEL[next]}.`}
       title={`Theme: ${THEME_LABEL[theme]}`}
     >
       <Icon />
-    </button>
+    </IconButton>
   );
 }

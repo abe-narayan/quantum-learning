@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { STATE_PRESETS } from "./presets";
 import { FIXED_GATES, ROTATION_AXES, type FixedGateDefinition, type RotationAxisId } from "./gateDefinitions";
 import type { BlochAngles } from "@/lib/quantum/bloch";
-import { ControlSection, SimulatorSlider, RunControls, PillGroup } from "../shared/controls";
+import { ControlSection, SimulatorSlider, RunControls, PillGroup, SymbolGloss } from "../shared/controls";
 
 export function BlochSphereControls({
   angles,
@@ -71,7 +71,11 @@ export function BlochSphereControls({
         </div>
       </ControlSection>
 
-      <ControlSection id="gates" title="Gates">
+      <ControlSection
+        id="gates"
+        title="Gates"
+        description="A gate is a rotation of the arrow — nothing more. It is reversible, it never involves chance, and it never collapses anything. Only Measure does that."
+      >
         {/* `@sm:` (container query, not viewport): this grid is only ever
             wide enough for 6 columns when its own box is, which is not the
             same thing as the viewport — see SimulatorInstrument.tsx. Inside
@@ -98,6 +102,37 @@ export function BlochSphereControls({
             <RotationRow key={axis.id} axisId={axis.id} label={axis.label} disabled={disabled} onApply={onApplyRotation} />
           ))}
         </div>
+
+        <SymbolGloss
+          items={[
+            {
+              symbol: "H",
+              name: "Hadamard",
+              means:
+                "the superposition-maker. Takes a definite |0⟩ or |1⟩ to the equator, where a measurement is a genuine 50/50 — and takes it straight back again if applied twice.",
+              glossaryId: "hadamard-gate",
+            },
+            {
+              symbol: "X",
+              name: "the quantum NOT",
+              means: "a half turn that swaps |0⟩ and |1⟩. Y and Z are the same half turn about the other two axes.",
+              glossaryId: "pauli-matrices",
+            },
+            {
+              symbol: "S, T",
+              name: "phase gates",
+              means:
+                "quarter and eighth turns about the vertical axis. They change nothing about the odds of 0 or 1 — watch P(0) and P(1) hold still — and everything about interference.",
+              glossaryId: "single-qubit-gates",
+            },
+            {
+              symbol: "Rx",
+              name: "arbitrary rotation",
+              means: "the same idea with the angle up to you: turn the arrow by any amount about the x, y or z axis.",
+              glossaryId: "single-qubit-gates",
+            },
+          ]}
+        />
       </ControlSection>
 
       <ControlSection

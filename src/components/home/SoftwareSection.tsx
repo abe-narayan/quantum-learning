@@ -88,7 +88,10 @@ export function SoftwareSection() {
                     and tied to a specific lesson, with progressive hints and a worked
                     solution — not multiple choice standing in for understanding.
                   </p>
-                  <Link href="/problems" className="mt-4 inline-block text-sm font-medium text-pillar hover:underline">
+                  <Link
+                    href="/problems"
+                    className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-pillar hover:underline"
+                  >
                     View all problems →
                   </Link>
                 </Reveal>
@@ -105,7 +108,7 @@ export function SoftwareSection() {
                   />
                   <Link
                     href={visual.route}
-                    className="inline-flex items-center text-sm font-semibold text-pillar hover:underline"
+                    className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
                   >
                     Enter {visual.short} →
                   </Link>

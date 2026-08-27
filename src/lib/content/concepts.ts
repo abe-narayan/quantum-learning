@@ -805,3 +805,43 @@ export function buildConceptGraph(): ConceptGraph {
 export function getConcept(id: string): ConceptNode | undefined {
   return CONCEPT_NODES.find((node) => node.id === id);
 }
+
+/**
+ * The full prerequisite chain leading to `id`: every concept you have to
+ * understand first, ordered so that each entry's own prerequisites appear
+ * before it (roots first), followed by `id` itself last.
+ *
+ * This is the single most useful question a dependency graph can answer for
+ * someone new — "what do I need to learn before this?" — so it lives here as
+ * a pure function rather than inside the map component: `/map`'s graph uses
+ * it to highlight the chain, and `ConceptDetailPanel` renders it as an
+ * ordered, clickable route.
+ *
+ * Post-order depth-first search, which yields a valid topological order for
+ * a DAG. Unknown prerequisite ids are skipped (matching `buildConceptGraph`,
+ * which also drops edges to ids that don't exist) and the `visiting` set
+ * makes it terminate even if hand-authored data ever introduced a cycle.
+ * Returns `[]` for an id that isn't on the map at all.
+ */
+export function getPrerequisitePath(id: string): ConceptNode[] {
+  const byId = new Map(CONCEPT_NODES.map((node) => [node.id, node]));
+  if (!byId.has(id)) return [];
+
+  const out: ConceptNode[] = [];
+  const done = new Set<string>();
+  const visiting = new Set<string>();
+
+  function visit(currentId: string) {
+    if (done.has(currentId) || visiting.has(currentId)) return;
+    const node = byId.get(currentId);
+    if (!node) return;
+    visiting.add(currentId);
+    for (const prereqId of node.prerequisiteIds) visit(prereqId);
+    visiting.delete(currentId);
+    done.add(currentId);
+    out.push(node);
+  }
+
+  visit(id);
+  return out;
+}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Instrument } from "@/components/ui/Panel";
-import { MathText } from "@/components/ui/MathText";
+import { ScrollableMathText } from "./ScrollableMathText";
 import type { Problem } from "@/lib/problems/types";
 import type { ProblemProgress } from "@/lib/problems/progress/types";
 import { useProblemsProgress } from "@/lib/problems/progress";
@@ -58,9 +58,12 @@ export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: strin
               <button
                 type="button"
                 onClick={() => setOpenSlug(isOpen ? null : problem.meta.slug)}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+                className="flex min-h-11 w-full items-center justify-between gap-3 rounded-[--radius-tight] px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
                 aria-expanded={isOpen}
-                aria-controls={panelId}
+                // Only while the panel is mounted — it is rendered
+                // conditionally below, and an `aria-controls` IDREF that
+                // resolves to nothing is invalid.
+                aria-controls={isOpen ? panelId : undefined}
               >
                 <span className="flex items-center gap-3">
                   <span
@@ -85,7 +88,7 @@ export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: strin
 
               {isOpen ? (
                 <div id={panelId} className="space-y-4 border-t border-border p-4">
-                  <MathText text={problem.question.prompt} className="text-sm leading-relaxed text-foreground" />
+                  <ScrollableMathText text={problem.question.prompt} className="text-sm leading-relaxed text-foreground" />
                   <ProblemView problem={problem} />
                 </div>
               ) : null}

@@ -38,7 +38,7 @@ export function MasterySection() {
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
             Graduate-level mathematical physics and rigorous quantum information theory —
             for readers who&rsquo;ve finished the core curriculum and are ready to draw on
-            every earlier pillar at once, not read about a new one.
+            every earlier track at once, not read about a new one.
           </p>
         </Reveal>
 
@@ -59,7 +59,7 @@ export function MasterySection() {
           />
           <Link
             href={visual.route}
-            className="inline-flex items-center text-sm font-semibold text-pillar hover:underline"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
           >
             Enter {visual.short} →
           </Link>

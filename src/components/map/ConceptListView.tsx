@@ -17,6 +17,7 @@ export function ConceptListView({
   nodes,
   completedLessonSlugs,
   nodeDifficulty,
+  rootIds,
   selectedId,
   onSelect,
 }: {
@@ -25,6 +26,8 @@ export function ConceptListView({
   /** concept id -> resolved difficulty. Empty when the caller hasn't wired
    *  lesson difficulty data up yet — see `ConceptMapExplorer`'s prop doc. */
   nodeDifficulty: Map<string, Difficulty>;
+  /** Concepts with no prerequisites — the map's genuine entry point(s). */
+  rootIds: Set<string>;
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
@@ -49,6 +52,7 @@ export function ConceptListView({
                 const isCompleted = completedCount > 0 && completedCount === node.lessonSlugs.length;
                 const isSelected = node.id === selectedId;
                 const difficulty = nodeDifficulty.get(node.id);
+                const isRoot = rootIds.has(node.id);
                 const prereqTitles = node.prerequisiteIds
                   .map((id) => nodesById.get(id)?.title)
                   .filter((title): title is string => Boolean(title));
@@ -60,7 +64,7 @@ export function ConceptListView({
                       onClick={() => onSelect(node.id)}
                       aria-current={isSelected ? "true" : undefined}
                       className={cn(
-                        "flex w-full flex-col gap-0.5 rounded-[--radius-tight] border px-3 py-2 text-left transition-colors duration-[--dur-fast]",
+                        "flex min-h-11 w-full flex-col justify-center gap-0.5 rounded-[--radius-tight] border px-3 py-2 text-left transition-colors duration-[--dur-fast]",
                         isSelected
                           ? "border-pillar-accent bg-pillar-wash"
                           : "border-border bg-surface hover:border-pillar-edge hover:bg-surface-muted"
@@ -80,7 +84,11 @@ export function ConceptListView({
                           ) : null}
                         </span>
                       </span>
-                      {prereqTitles.length > 0 ? (
+                      {isRoot ? (
+                        <span className="w-fit rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-pillar-text">
+                          Start here — no prerequisites
+                        </span>
+                      ) : prereqTitles.length > 0 ? (
                         <span className="text-xs text-muted-foreground">Requires: {prereqTitles.join(", ")}</span>
                       ) : null}
                     </button>

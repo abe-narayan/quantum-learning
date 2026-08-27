@@ -1,4 +1,5 @@
-import type { Course, LessonMetaWithSlug, Pillar } from "@/lib/content/types";
+import type { Course, LessonMetaWithSlug, Pillar, PillarInfo } from "@/lib/content/types";
+import type { GlossaryTerm } from "@/lib/content/glossary";
 import type { ProblemMeta } from "@/lib/problems/types";
 import type { SearchEntry } from "./types";
 
@@ -165,9 +166,20 @@ function titleCase(value: string): string {
 export function buildSearchIndex(
   lessons: LessonMetaWithSlug[],
   problems: ProblemMeta[],
-  courses: Course[]
+  courses: Course[],
+  terms: GlossaryTerm[],
+  /** The six track landing pages. Passed in rather than imported for the same
+   *  reason everything else here is: this module is loaded by
+   *  `scripts/generate-search-index.mjs` under plain Node, which resolves no
+   *  `@/...` alias, so its only runtime imports must be ones Node can follow.
+   *  Defaulted so existing callers that only want a count still compile. */
+  pillars: PillarInfo[] = []
 ): SearchEntry[] {
   const coursePillarBySlug = new Map(courses.map((course) => [course.slug, course.pillar]));
+  // The course a lesson/problem lives in, by title. A result row that says
+  // only "Bell States · Quantum Computing" makes a reader guess; one that says
+  // which *course* it sits in tells them whether it's the page they mean.
+  const courseTitleBySlug = new Map(courses.map((course) => [course.slug, course.title]));
 
   const lessonEntries: SearchEntry[] = lessons.map((lesson) => ({
     type: "lesson",
@@ -175,6 +187,7 @@ export function buildSearchIndex(
     description: lesson.description,
     href: `/lessons/${lesson.slug}`,
     pillar: coursePillarBySlug.get(lesson.course),
+    course: courseTitleBySlug.get(lesson.course),
   }));
 
   const problemEntries: SearchEntry[] = problems.map((problem) => {
@@ -185,6 +198,7 @@ export function buildSearchIndex(
       description: `${titleCase(problem.problemType)} problem · ${titleCase(problem.difficulty)}${tagSuffix}`,
       href: `/problems/${problem.slug}`,
       pillar: coursePillarBySlug.get(problem.course),
+      course: courseTitleBySlug.get(problem.course),
     };
   });
 
@@ -192,9 +206,74 @@ export function buildSearchIndex(
     type: "course",
     title: course.title,
     description: course.description,
-    href: PILLAR_HREF[course.pillar],
+    // Deliberately NOT `PILLAR_HREF[course.pillar]`. Searching a course title
+    // and landing on the pillar landing page — where you then have to find
+    // that same course again in a list of eight — is a dead end dressed up as
+    // a result. `/courses/<slug>` is a real, statically generated page for
+    // every course (`src/app/courses/[slug]/page.tsx`).
+    //
+    // This duplicates `getCourseHref()` in
+    // `src/components/curriculum/courseHref.ts` rather than importing it, for
+    // the same reason `PILLAR_HREF` above is duplicated: this module is
+    // imported by `scripts/generate-search-index.mjs` under plain Node, which
+    // resolves no `@/...` alias. `src/lib/design/__tests__/routes.test.ts`
+    // asserts the two agree, so they cannot drift silently.
+    href: `/courses/${course.slug}`,
     pillar: course.pillar,
   }));
 
-  return [...lessonEntries, ...problemEntries, ...SIMULATOR_ENTRIES, ...courseEntries];
+  // Glossary terms.
+  //
+  // These belong in the *same* search box as everything else because a
+  // newcomer's most common query is a word they just hit and didn't
+  // recognise ("decoherence", "ancilla", "unitary") — not a lesson title. A
+  // search that can't answer a bare single word fails precisely the reader
+  // it matters most to.
+  //
+  // Baked in here, at build time, rather than imported by the search overlay
+  // at runtime: `src/lib/content/glossary.ts` is a large prose corpus with a
+  // client-bundle budget (`src/lib/design/__tests__/clientBoundary.test.ts`),
+  // and the overlay already fetches this prebuilt JSON lazily — so the terms
+  // ride along at zero extra client-bundle cost. Do not add a client-side
+  // import of the glossary module to `src/components/search/**`.
+  //
+  // `/glossary#<id>` is the canonical deep link to one entry: the same anchor
+  // `GlossaryFilter` renders (`id={term.id}`) and the same one `<Term>` links
+  // to (`src/components/mdx/Term.tsx`). Not a dead end either — a glossary
+  // entry links on to the lessons that cover the term.
+  //
+  // The whole definition is carried as the description, not a truncation: it
+  // is what makes a term findable by *description* as well as by name, for a
+  // reader who only remembers what the thing does. The result row clamps it.
+  const termEntries: SearchEntry[] = terms.map((term) => ({
+    type: "term",
+    title: term.title,
+    description: term.definition,
+    href: `/glossary#${term.id}`,
+    pillar: term.pillar,
+  }));
+
+  // Track landing pages. Six entries, and the reason they exist is narrow and
+  // real: typing a subject name — "hardware", "mechanics", "software" —
+  // returned lessons *about* that subject and never the section itself, so the
+  // one query a disoriented newcomer is most likely to type was the one query
+  // that could not take them to the obvious place. `PILLAR_HREF` is the route
+  // table for exactly this, guarded against the design-system table by
+  // `src/lib/design/__tests__/pillars.test.ts`.
+  const trackEntries: SearchEntry[] = pillars.map((pillar) => ({
+    type: "track",
+    title: pillar.title,
+    description: pillar.description,
+    href: PILLAR_HREF[pillar.slug],
+    pillar: pillar.slug,
+  }));
+
+  return [
+    ...termEntries,
+    ...lessonEntries,
+    ...problemEntries,
+    ...SIMULATOR_ENTRIES,
+    ...courseEntries,
+    ...trackEntries,
+  ];
 }

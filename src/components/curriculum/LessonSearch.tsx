@@ -54,9 +54,21 @@ export function LessonSearch({
   return (
     <div>
       <div className="max-w-md">
-        <label htmlFor="lesson-search" className="tech-label">
-          Search lessons
-        </label>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <label htmlFor="lesson-search" className="tech-label">
+            Search lessons
+          </label>
+          {/* The escape hatch, offered *before* the reader has to fail at
+              searching. Search only helps someone who already knows the word
+              they want; a beginner frequently does not, and the honest answer
+              for them is "here is the whole list." */}
+          <Link
+            href="/lessons"
+            className="font-tech text-[0.7rem] uppercase tracking-wide text-pillar-text underline-offset-4 hover:underline"
+          >
+            Browse all {lessons.length} →
+          </Link>
+        </div>
         <div className="relative mt-2">
           <input
             ref={inputRef}
@@ -66,14 +78,17 @@ export function LessonSearch({
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search by title or description…"
-            className="w-full rounded-full border border-border bg-surface px-4 py-2 pr-9 text-sm text-foreground placeholder:text-subtle-foreground"
+            className="w-full rounded-full border border-border bg-surface px-4 py-3 pr-11 text-sm text-foreground placeholder:text-subtle-foreground"
           />
           {query ? (
+            // `w-11` (44px), flush with the input's full height via `inset-y-0`,
+            // rather than a visually-sized icon button — the × glyph stays
+            // small but the tappable area meets the 44px touch-target minimum.
             <button
               type="button"
               onClick={clear}
               aria-label="Clear search"
-              className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-subtle-foreground hover:text-foreground"
+              className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-subtle-foreground hover:text-foreground"
             >
               <svg aria-hidden="true" data-decorative="" viewBox="0 0 16 16" className="h-3.5 w-3.5">
                 <path

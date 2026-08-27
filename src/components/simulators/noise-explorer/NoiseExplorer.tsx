@@ -18,6 +18,15 @@ import { DecayCurve } from "./DecayCurve";
 import { NoiseControls, type ChannelType } from "./NoiseControls";
 
 const MAX_STEPS = 40;
+/**
+ * Zero steps is an undisturbed pure state sitting exactly on the sphere — in
+ * an instrument whose entire subject is decoherence, that's the one
+ * configuration showing none of it. Opening part-way into the decay means the
+ * Bloch vector is already visibly shrunk inside the sphere, and purity reads
+ * something other than 1, the moment the instrument mounts. Reset still
+ * returns to 0, which is the honest "before any noise" reference.
+ */
+const INITIAL_STEPS = 6;
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 const STRENGTH_MIN = 0.01;
@@ -73,7 +82,7 @@ export function NoiseExplorer() {
   const [presetId, setPresetId] = useState(initialFromUrl?.presetId ?? "+");
   const [channel, setChannel] = useState<ChannelType>(initialFromUrl?.channel ?? "amplitude-damping");
   const [strength, setStrength] = useState(initialFromUrl?.strength ?? 0.15);
-  const [steps, setSteps] = useState(0);
+  const [steps, setSteps] = useState(INITIAL_STEPS);
   const [copied, setCopied] = useState(false);
 
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -148,19 +157,21 @@ export function NoiseExplorer() {
   const validation = useMemo(() => validateDensityMatrix(rho), [rho]);
   const purityTrajectory = useMemo(() => trajectory.map((r) => purity(r)), [trajectory]);
 
+  // Config changes hold the current step count rather than rewinding to 0:
+  // "six applications of this channel" stays a meaningful, comparable amount
+  // of elapsed noise across every starting state, channel and strength, so
+  // switching channels compares like with like instead of dropping the reader
+  // back onto an undisturbed pure state after every click.
   function handlePresetChange(id: string) {
     setPresetId(id);
-    setSteps(0);
   }
 
   function handleChannelChange(next: ChannelType) {
     setChannel(next);
-    setSteps(0);
   }
 
   function handleStrengthChange(v: number) {
     setStrength(v);
-    setSteps(0);
   }
 
   const narration =
@@ -182,6 +193,13 @@ export function NoiseExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
+          <p className="text-sm text-muted-foreground">
+            A qubit is never truly alone: it leaks information into everything around it, a little at a time.
+            This runs that leakage for real, one step at a time. The arrow is the qubit&rsquo;s state — on the
+            sphere&rsquo;s surface means a definite quantum state, and the further inside the surface it
+            sinks, the more of that state has been lost to the environment for good.
+          </p>
+
           <div className="mx-auto max-w-sm">
             <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
           </div>
@@ -216,6 +234,7 @@ export function NoiseExplorer() {
 
           <SimulatorFraming
             shows="Real qubits leak information to their environment — this applies an actual Kraus-operator noise channel step by step so you can watch a pure state decay toward the channel&rsquo;s fixed point."
+            watchFor="Purity is the one number to keep an eye on: 1 means the qubit still holds a definite quantum state, 0.5 means it has decayed to a coin flip and the quantum information is gone. Amplitude damping ends back at purity 1 (at |0⟩); dephasing does not."
             tryThis={
               <ul>
                 <li>

@@ -112,13 +112,31 @@ export function PredictBeforeReveal({
               onKeyDown={(event) => handleKeyDown(event, index)}
               onFocus={() => setActiveIndex(index)}
               className={cn(
-                "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
+                "inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium leading-tight transition-colors",
                 isSelected
                   ? "bg-brand text-brand-foreground"
                   : "border border-border bg-surface text-muted-foreground disabled:opacity-60",
                 selected === null && "hover:bg-surface-muted"
               )}
             >
+              {/* "Which one did I pick" is carried by a shape that appears (a
+                  check) as well as by the fill, so the committed answer is
+                  still identifiable in grayscale or with a color-vision
+                  deficiency — and, once committed, the locked options are
+                  distinguished by more than a 60% opacity difference. */}
+              {isSelected ? (
+                <svg
+                  aria-hidden="true"
+                  data-decorative=""
+                  viewBox="0 0 16 16"
+                  className="h-3.5 w-3.5 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 8.5 6.5 11.5 12.5 4.5" />
+                </svg>
+              ) : null}
               {option.label}
             </button>
           );

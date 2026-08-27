@@ -107,6 +107,24 @@ export function WavefunctionSimulation({
   // Wavefunction1D.momentumStatistics's doc comment.
   const { meanMomentum, kineticEnergy } = useMemo(() => psi.momentumStatistics(1), [psi]);
 
+  // Live narration, matching the aria-live line every other instrument on the
+  // bench carries: this one had a numeric StatePanel but nothing that said in
+  // words what the numbers meant, and nothing announced to a screen reader as
+  // the simulation ran. Both quantities are read off the real evolved state —
+  // no separate model.
+  const initialSpread = useMemo(() => Math.sqrt(setup.psi0.variancePosition()), [setup.psi0]);
+  const spread = Math.sqrt(psi.variancePosition());
+  const spreadRatio = initialSpread > 0 ? spread / initialSpread : 1;
+  const narration = setup.isStationary
+    ? `t = ${t.toFixed(2)}. This is an energy eigenstate: its shape has not changed and never will, no matter how long you run it. Switch to the Re / Im view and you'll see what is still moving — the phase turns while the probability sits perfectly still.`
+    : `t = ${t.toFixed(2)}. The packet is centred at x = ${psi
+        .expectationPosition()
+        .toFixed(1)} and is now ${spreadRatio.toFixed(2)}× as wide as it started. ${
+        spreadRatio > 1.05
+          ? "Spreading like this is not the simulation losing accuracy — an unconfined quantum particle genuinely becomes less and less localized over time."
+          : "Watch that width: it does not stay put."
+      }`;
+
   return (
     <div ref={containerRef} className="space-y-3">
       <WavefunctionCanvas
@@ -126,6 +144,13 @@ export function WavefunctionSimulation({
         onSpeedChange={onSpeedChange}
         prefersReducedMotion={prefersReducedMotion}
       />
+
+      <div
+        aria-live="polite"
+        className="rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+      >
+        {narration}
+      </div>
 
       <StatePanel psi={psi} t={t} meanMomentum={meanMomentum} energy={kineticEnergy + psi.expectationPotential(setup.potential)} />
 

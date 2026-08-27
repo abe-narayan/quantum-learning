@@ -11,9 +11,61 @@ import { WavefunctionSimulation } from "./WavefunctionSimulation";
 import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
 import { SimulatorInstrument } from "../shared/SimulatorInstrument";
 import { SimulatorFraming } from "../shared/Framing";
+import { ControlSection, SymbolGloss } from "../shared/controls";
 
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
+
+/**
+ * Plain-English glosses for the parameter symbols the presets expose, keyed by
+ * `ParamSpec.key` so only the ones the *current* preset actually shows get
+ * rendered — a reader adjusting the tunneling barrier shouldn't have to read
+ * past a definition of ω. Keys with no entry (plain-language labels like
+ * "Starting position" or "Barrier height") need no gloss and deliberately
+ * have none.
+ */
+const PARAMETER_GLOSSES: Record<string, { symbol: string; name: string; means: string; glossaryId?: string }> = {
+  width: {
+    symbol: "σ",
+    name: "packet width",
+    means:
+      "how spread out the particle starts. A narrow packet knows its position well and its momentum badly — that trade is Heisenberg's uncertainty principle, and you can watch it play out.",
+    glossaryId: "heisenberg-uncertainty-principle",
+  },
+  momentum: {
+    symbol: "p",
+    name: "momentum",
+    means: "which way the packet is launched, and how fast. Negative sends it left. It also fixes the packet's energy.",
+  },
+  n: {
+    symbol: "n",
+    name: "energy level",
+    means:
+      "which rung of the energy ladder this state sits on. n = 1 is the ground state; each step up adds one more bump to the wave.",
+    glossaryId: "energy-eigenstate",
+  },
+  omega: {
+    symbol: "ω",
+    name: "angular frequency",
+    means:
+      "how steep the trapping well is. Steeper means a tighter, higher-energy ground state and wider spacing between the levels.",
+    glossaryId: "quantum-harmonic-oscillator",
+  },
+  n2: {
+    symbol: "n₂",
+    name: "second energy level",
+    means:
+      "the upper of the two levels being superposed. The energy gap between them sets how fast the combined state beats back and forth.",
+    glossaryId: "energy-eigenstate",
+  },
+  barrierHeight: {
+    symbol: "V₀",
+    name: "barrier height",
+    means:
+      "the energy wall the packet is thrown at. Classically nothing gets past a wall taller than its own energy — here some of it does anyway.",
+    glossaryId: "quantum-tunneling",
+  },
+};
 
 // Minimal shareable state is the configuration layer this component itself
 // already isolates in its doc comment below: which preset, which parameter
@@ -189,14 +241,18 @@ export function WavefunctionExplorer({
               {copied ? "Copied!" : "Copy link"}
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground">
+            A quantum particle has no single position — it has a wave, and this solves the equation that
+            wave really obeys, numerically, frame by frame. Nothing below is a scripted animation.
+          </p>
           <p className="text-sm text-muted-foreground">{preset.description}</p>
 
-          <div role="tablist" aria-label="View mode" className="flex overflow-hidden rounded-full border border-border w-fit">
+          <div role="tablist" aria-label="View mode" className="flex w-fit max-w-full overflow-hidden rounded-full border border-border">
             {(
               [
-                { id: "density", label: "|ψ(x)|²" },
-                { id: "real-imaginary", label: "Re / Im" },
-                { id: "momentum", label: "|φ(k)|²" },
+                { id: "density", label: "|ψ(x)|²", hint: "Where it is: chance of finding the particle at each point." },
+                { id: "real-imaginary", label: "Re / Im", hint: "The wave itself, both parts — this is what carries the phase." },
+                { id: "momentum", label: "|φ(k)|²", hint: "How fast it's going: the same state, as a spread of momenta." },
               ] as const
             ).map((option) => (
               <button
@@ -204,9 +260,11 @@ export function WavefunctionExplorer({
                 type="button"
                 role="tab"
                 aria-selected={mode === option.id}
+                aria-label={`${option.label} — ${option.hint}`}
+                title={option.hint}
                 onClick={() => setMode(option.id)}
                 className={
-                  "px-3 py-1 text-xs font-medium transition-colors " +
+                  "min-h-11 px-4 py-1 text-xs font-medium transition-colors " +
                   (mode === option.id ? "bg-pillar text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted")
                 }
               >
@@ -214,6 +272,13 @@ export function WavefunctionExplorer({
               </button>
             ))}
           </div>
+          <p className="text-xs text-muted-foreground">
+            {mode === "density"
+              ? "|ψ(x)|² — where it is. The height at each point is the chance of finding the particle there."
+              : mode === "real-imaginary"
+                ? "Re / Im — the wave itself. These two parts can be moving even when |ψ(x)|² sits perfectly still."
+                : "|φ(k)|² — how fast it is going. The same state re-expressed as a spread of momenta rather than positions."}
+          </p>
 
           <WavefunctionSimulation
             key={configKey}
@@ -227,6 +292,7 @@ export function WavefunctionExplorer({
 
           <SimulatorFraming
             shows="A real numerical solution to the time-dependent Schrödinger equation — watch which states stay frozen in shape and which ones move, spread, or leak through barriers."
+            watchFor="The norm readout below the plot should stay pinned at 1.0000 the whole time. That's the simulation proving it hasn't lost any of the particle to numerical error — the same check you'd run on real physics code."
             tryThis={
               <ul>
                 <li>
@@ -247,12 +313,18 @@ export function WavefunctionExplorer({
       }
       controls={
         <div className="space-y-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Parameters</p>
-            <div className="mt-2">
-              <PresetControls params={preset.params} values={paramValues} onChange={handleParamChange} />
-            </div>
-          </div>
+          <ControlSection
+            id="wave-params"
+            title="Parameters"
+            description="Every change rebuilds the starting state and restarts the evolution from t = 0."
+          >
+            <PresetControls params={preset.params} values={paramValues} onChange={handleParamChange} />
+            <SymbolGloss
+              items={preset.params
+                .map((spec) => PARAMETER_GLOSSES[spec.key])
+                .filter((gloss): gloss is (typeof PARAMETER_GLOSSES)[string] => gloss !== undefined)}
+            />
+          </ControlSection>
           <Button variant="secondary" size="sm" onClick={handleResetParams}>
             Reset parameters to default
           </Button>

@@ -3,7 +3,7 @@ import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { cn } from "@/lib/utils";
 import { SINGLE_QUBIT_GATES, type SingleQubitGateId } from "./gateDefinitions";
 import { GUIDED_PRESETS } from "./presets";
-import { ControlSection } from "../shared/controls";
+import { ControlSection, SymbolGloss } from "../shared/controls";
 
 const TARGET_QUBIT_OPTIONS = ([0, 1] as const).map((qubit) => ({ qubit, label: `q${qubit}` }));
 
@@ -74,7 +74,11 @@ export function OperationControls({
         </div>
       </ControlSection>
 
-      <ControlSection id="init" title="Initialize">
+      <ControlSection
+        id="init"
+        title="Initialize"
+        description="Jump straight to a starting state. |00⟩ through |11⟩ are the four definite ones; |++⟩ is two independent coin flips; Bell is the entangled pair."
+      >
         <div className="grid grid-cols-3 gap-2">
           {INIT_OPTIONS.map((option) => (
             <Button
@@ -126,6 +130,32 @@ export function OperationControls({
             SWAP
           </Button>
         </div>
+
+        <SymbolGloss
+          items={[
+            {
+              symbol: "|00⟩",
+              name: "ket notation",
+              means:
+                "just a label for a state — |01⟩ means “qubit 0 is 0 and qubit 1 is 1”. The bracket carries no maths of its own; it only says “this is a quantum state”.",
+              glossaryId: "dirac-notation",
+            },
+            {
+              symbol: "H",
+              name: "Hadamard",
+              means:
+                "puts one qubit into an even superposition of 0 and 1. On its own it cannot entangle anything — it only ever touches the one qubit you aim it at.",
+              glossaryId: "hadamard-gate",
+            },
+            {
+              symbol: "CNOT",
+              name: "controlled-NOT",
+              means:
+                "flips qubit 1, but only where qubit 0 is 1. Apply it after H and the two qubits become entangled — this is the gate that does it.",
+              glossaryId: "cnot-controlled-gates",
+            },
+          ]}
+        />
       </ControlSection>
     </div>
   );

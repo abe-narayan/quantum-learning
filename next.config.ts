@@ -1,5 +1,15 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 import createMDX from "@next/mdx";
+
+// Absolute path to this repo's own rehype plugin — see the rehypePlugins note
+// below for why it can't be project-relative. `process.cwd()` is the project
+// root here: Next resolves and evaluates next.config from the directory the
+// build was started in, which is the only place `next build` is valid.
+const SCROLLABLE_MATH_PLUGIN = path.resolve(
+  process.cwd(),
+  "src/lib/mdx/rehypeScrollableMath.mjs",
+);
 
 // Security headers for this pure-SSG site (no `output: 'export'` — this repo
 // has no next.config `output` override, so `next build`/`next start` run the
@@ -109,7 +119,20 @@ const withMDX = createMDX({
     // properties, so it doesn't need to run before or after rehype-katex —
     // katex output lives inside heading *children*, not on the heading
     // element itself, so the two plugins don't touch the same properties.
-    rehypePlugins: ["rehype-slug", ["rehype-katex", { strict: false }]],
+    // `rehypeScrollableMath` MUST stay last: it tags `.katex-display`, which
+    // only exists once rehype-katex has rendered. See that file for why the
+    // tab stop it adds is worth it and why it can't live in mdx-components.
+    //
+    // It is passed as an ABSOLUTE path, not `"./src/lib/mdx/..."`. @next/mdx
+    // loads a string plugin with `require.resolve()` from inside
+    // `node_modules/@next/mdx/mdx-js-loader.js`, so a project-relative
+    // specifier resolves against that package's directory and throws
+    // MODULE_NOT_FOUND for every .mdx file in the corpus.
+    rehypePlugins: [
+      "rehype-slug",
+      ["rehype-katex", { strict: false }],
+      SCROLLABLE_MATH_PLUGIN,
+    ],
   },
 });
 

@@ -62,6 +62,10 @@ export function ResearchConnection({
               className="underline decoration-border underline-offset-2 hover:text-foreground"
             >
               {source}
+              {/* `target="_blank"` moves the reader to a new tab with no
+                  warning otherwise — the one thing a citation link owes a
+                  screen-reader or keyboard user before they follow it. */}
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>
           ) : (
             source

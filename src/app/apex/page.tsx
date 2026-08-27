@@ -34,7 +34,7 @@ export default async function ApexPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify([courseListSchema, breadcrumbSchema]) }}
       />
 
-      <ApexHero courses={courses} />
+      <ApexHero courses={courses} lessons={lessons} />
 
       <Section width="wide" aria-labelledby="open-problems-heading">
         <Eyebrow>§ 01 — At the boundary of what&rsquo;s known</Eyebrow>

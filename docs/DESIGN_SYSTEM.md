@@ -46,6 +46,30 @@ designs; neither is a de-tuned copy of the other.
 Tailwind utilities exist for all of these (`bg-surface`, `text-muted-foreground`,
 `border-border-strong`, `bg-surface-raised`, `text-subtle-foreground`, …).
 
+#### The depth ladder is separated on purpose — don't "tidy" it
+
+The dark rungs are spaced further apart than looks necessary in a swatch strip,
+and this is deliberate. Measured against the page ground, the original values
+gave a panel **1.04:1** — a panel that is not visibly a panel — with `--border`
+at **1.33:1** and `--border-strong` at **1.69:1**, despite the latter's whole
+stated job being "a line that must read as a line." On a good monitor in a dark
+room that reads as intentional minimalism; on a laptop in daylight the entire
+surface hierarchy disappears and the site becomes undifferentiated black. The
+current values put `--border` at 1.63:1 and `--border-strong` at 2.60:1.
+
+Two light-theme values were outright WCAG AA failures and are now fixed:
+`--subtle-foreground` sat at **4.28:1** on `--surface-muted`, and `--danger` —
+the color that tells a reader their answer was wrong — at **4.39:1**. Both now
+clear 4.5:1.
+
+Any change to `--depth-*`, `--border*`, `--subtle-foreground`, or `--danger`
+must keep `src/lib/design/__tests__/contrast.test.ts` green. That test parses
+the real stylesheet, checks the neutral text voices against the panels they
+actually sit on (not just `--background`, which almost nothing sits directly
+on), and asserts `--muted-foreground` and `--subtle-foreground` stay
+distinguishable from *each other* — a contrast fix that pushes one onto the
+other passes AA individually while silently collapsing the hierarchy.
+
 ### The pillar channel — the most important thing in this document
 
 Six pillars, six identities, derived from **two numbers** each (an OKLCH hue

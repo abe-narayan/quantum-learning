@@ -136,7 +136,7 @@ export function HardwareSection() {
                 />
                 <Link
                   href={visual.route}
-                  className="inline-flex items-center text-sm font-semibold text-pillar hover:underline"
+                  className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
                 >
                   Enter {visual.short} →
                 </Link>

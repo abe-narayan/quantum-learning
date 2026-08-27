@@ -81,14 +81,14 @@ For a two-particle state $\psi(1,2)$ (particle 1 in some situation,
 particle 2 in another), define the **exchange operator**
 $P_{12}\psi(1,2)=\psi(2,1)$: it swaps which particle is "assigned" to
 which single-particle state. Since the particles are physically
-identical, swapping them must leave every observable prediction
+identical, swapping them must leave every <Term id="observable">observable</Term> prediction
 unchanged: $|P_{12}\psi|^2=|\psi|^2$ everywhere.
 
 ### Why the eigenvalues are exactly ±1
 
 Applying $P_{12}$ twice returns the original labeling exactly:
 $P_{12}^2\psi(1,2)=P_{12}\psi(2,1)=\psi(1,2)$, so $P_{12}^2=I$. If
-$\psi$ is an eigenstate, $P_{12}\psi=\lambda\psi$, then
+$\psi$ is an <Term id="eigenvalue-eigenvector">eigenstate</Term>, $P_{12}\psi=\lambda\psi$, then
 $P_{12}^2\psi=\lambda^2\psi=\psi$, forcing $\lambda^2=1$, so
 $\lambda=+1$ or $\lambda=-1$, no other value is possible. Nature turns
 out to use both: particles with $\lambda=+1$ (symmetric wavefunctions)
@@ -105,7 +105,7 @@ $|a\rangle\otimes|b\rangle$ (particle 1 in $a$, particle 2 in $b$) is
 $|b\rangle\otimes|a\rangle$, a different vector whenever $a\neq b$, and
 an eigenstate has to come back as a multiple of itself, not as something
 else entirely. This platform's `exchangeParticles` function performs
-this swap on a combined amplitude vector: applying it to a plain tensor
+this swap on a combined <Term id="amplitude">amplitude</Term> vector: applying it to a plain tensor
 product does not return the same vector (nor its negative), while
 applying it to `symmetrize(a,b)` or `antisymmetrize(a,b)` does, with
 eigenvalue $+1$ and $-1$ respectively (built next lesson).
@@ -199,7 +199,7 @@ special property that must be built in explicitly (next lesson).
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Bosons & Fermions](/lessons/quantum-mechanics/identical-particles/bosons-and-fermions), which builds the actual $+1$ and $-1$
+Up next, [Bosons & Fermions](/lessons/quantum-mechanics/identical-particles/bosons-and-fermions) builds the actual $+1$ and $-1$
 eigenstates explicitly (symmetrization and antisymmetrization) and
 verifies their eigenvalues directly.
 </NextDiscovery>

@@ -48,7 +48,18 @@ export const COURSES: Course[] = [
     pillar: "quantum-mechanics",
     title: "Mathematical Foundations for Quantum Mechanics",
     description:
-      "The linear algebra, complex numbers, and probability you need before the physics makes sense.",
+      "The linear algebra, complex numbers, and probability you need before the physics makes sense. Starts from algebra and trigonometry and builds every tool it uses — no calculus assumed — but it is a mathematics course from the first page: derivations and proofs rather than analogies.",
+    // Stays "foundational" deliberately. This is the curriculum's only
+    // zero-prerequisite course, and `CurriculumExplorer`'s difficulty filter
+    // is an exact-match filter — promoting it to "intermediate" would hide
+    // the one true entry point from a beginner filtering for "Foundational,"
+    // and would make `DIFFICULTY_HINT.intermediate` ("Builds directly on
+    // earlier courses") false for a course that builds on nothing. The real
+    // signal a reader needs — this is rigorous from page one, unlike the
+    // intuition-first route through "What Is a Qubit?" — is carried by the
+    // description above instead, which renders directly beside the
+    // `DifficultyMark` on every course card. See docs/BEGINNER_REVIEW.md
+    // blocker 4.
     difficulty: "foundational",
     estimatedHours: 6,
     prerequisites: [],

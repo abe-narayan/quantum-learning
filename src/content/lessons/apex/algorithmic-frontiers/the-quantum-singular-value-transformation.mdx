@@ -88,7 +88,7 @@ phases. Neither result, on its own, looks like it should be the center of
 modern quantum algorithms.
 
 The quantum singular value transformation (QSVT) is the observation that
-these two results are not separate tricks — they are one machine. Feed a
+these two results are not separate tricks: they are one machine. Feed a
 block encoding of $A$ into the QSP phase sequence, treating the
 block-encoding ancilla itself as the "signal qubit," and the *entire
 matrix* $A$ gets the same polynomial transformation, applied
@@ -205,16 +205,16 @@ $$
 </DerivationStep>
 </DerivationSteps>
 
-(the general theorem — proved in full in Gilyén, Su, Low & Wiebe's
-original construction, cited below rather than re-derived here — extends
+(the general theorem, proved in full in Gilyén, Su, Low & Wiebe's
+original construction, cited below rather than re-derived here, extends
 this to show $\mathcal H_i$ is invariant under the *whole* alternating
 sequence, not just one application of $U$, that $U^\dagger$ preserves
 $\mathcal H_i$ too, and that distinct $\mathcal
 H_i$'s are mutually orthogonal; fixing the exact phase convention that
 makes this identification precise is the real technical heart of that
 proof). And $\Pi_0$ restricted to $\mathcal H_i$
-is, by construction, exactly the projector onto $|v_i^0\rangle$ — the same
-role $|0\rangle\langle0|$ plays in bare single-qubit QSP — so
+is, by construction, exactly the projector onto $|v_i^0\rangle$, the same
+role $|0\rangle\langle0|$ plays in bare single-qubit QSP, so
 $\Pi_\varphi$ restricted to $\mathcal H_i$ is *identical* to the
 single-qubit phase gate $e^{i\varphi Z}$ in that subspace's own local
 basis.
@@ -292,10 +292,10 @@ The comparison is worth stating precisely, because it's an
 important, citable result, not folklore: first-order Trotterization is a
 first-principles product-formula approximation whose error per unit
 simulation scales like $t^2/n$ for $n$ steps (derived in full in that
-earlier lesson) — a *polynomial* dependence on $1/\varepsilon$. QSVT-based
+earlier lesson), a *polynomial* dependence on $1/\varepsilon$. QSVT-based
 simulation instead achieves query complexity that is optimal, or
 near-optimal, in *all* of $t$, $1/\varepsilon$, and the block encoding's
-own cost, scaling like $t+\log(1/\varepsilon)/\log\log(1/\varepsilon)$ —
+own cost, scaling like $t+\log(1/\varepsilon)/\log\log(1/\varepsilon)$,
 matching, up to the log factor, the information-theoretic
 no-fast-forwarding lower bound of $\Omega(t)$. That "$\log(1/\varepsilon)$
 instead of $\mathrm{poly}(1/\varepsilon)$" gap is the real, citable
@@ -313,7 +313,7 @@ regularized region near $0$ *is* realizable, and applying it via QSVT to
 $H$'s block encoding produces (something proportional to) $H^{-1}|b\rangle$.
 This is the modern, QSVT-based approach to solving linear systems,
 superseding HHL's original, more specialized phase-estimation-based
-construction — and its full derivation, including exactly how the
+construction, and its full derivation, including exactly how the
 near-$0$ region is regularized and what that costs in condition number,
 belongs to this course's own later lesson,
 [Applications: Eigenvalues and Linear Systems](/lessons/apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems).
@@ -328,8 +328,8 @@ different choice of $P$.
   url="https://arxiv.org/abs/1806.01838"
 >
   Building on Low and Chuang's earlier "qubitization" technique, this
-  paper is now widely regarded — a real, well-cited claim in the research
-  literature, not marketing — as a unifying framework subsuming most of
+  paper is now widely regarded, a real, well-cited claim in the research
+  literature, not marketing, as a unifying framework subsuming most of
   the pre-2018 "zoo" of specialized quantum algorithms as special cases
   of a single construction: Grover's algorithm and amplitude estimation,
   essentially every variant of Hamiltonian simulation, and HHL-style
@@ -347,8 +347,8 @@ different choice of $P$.
 </ResearchConnection>
 
 None of this is a claim that QSVT
-proves new physics or new complexity-theoretic results by itself — it's a
-claim about *organization*: an entire research area's separately-invented
+proves new physics or new complexity-theoretic results by itself: it's a
+claim about *organization*, an entire research area's separately-invented
 tricks turned out to be one trick, viewed correctly. That kind of
 unification is rare and significant in any field, and this is
 the platform's own explanation of that real, citable body of work, not a
@@ -372,8 +372,8 @@ values a block-encoded Hermitian matrix might have:
 | {qsvtDemoResults[1].sigma} | {qsvtDemoResults[1].approx.toFixed(6)} | {qsvtDemoResults[1].exact.toFixed(6)} | {qsvtDemoResults[1].error.toExponential(3)} |
 | {qsvtDemoResults[2].sigma} | {qsvtDemoResults[2].approx.toFixed(6)} | {qsvtDemoResults[2].exact.toFixed(6)} | {qsvtDemoResults[2].error.toExponential(3)} |
 
-The same fixed polynomial — one choice of phases $\Phi$ in the underlying
-QSP sequence — is applied identically at every $\sigma_i$; there is no
+The same fixed polynomial, one choice of phases $\Phi$ in the underlying
+QSP sequence, is applied identically at every $\sigma_i$; there is no
 per-$\sigma_i$ retuning. QSVT would apply this exact polynomial
 simultaneously to *all three* singular values (and any others $A$ has) in
 a single circuit, because each lives in its own decoupled $\mathcal H_i$.
@@ -397,8 +397,8 @@ value a real block-encoded matrix might have.
 
 ## Visualizing the Decoupled Subspaces
 
-The picture behind the key leap above — one big alternating circuit that
-secretly decomposes into many independent 2D rotations — is worth drawing
+The picture behind the key leap above, one big alternating circuit that
+secretly decomposes into many independent 2D rotations, is worth drawing
 directly. Each row below is one invariant subspace $\mathcal H_i$, running
 its own private copy of the identical phase sequence; the polynomial
 values shown match the worked example's table exactly.
@@ -478,9 +478,9 @@ values shown match the worked example's table exactly.
 Each row is completely self-contained: nothing computed inside $\mathcal
 H_1$ ever touches $\mathcal H_2$ or $\mathcal H_3$. What makes QSVT a
 statement about the *whole matrix* $A$, rather than three separate
-one-qubit calculations, is that a single physical circuit — one sequence
+one-qubit calculations, is that a single physical circuit (one sequence
 of $U$, $U^\dagger$, and $\Pi_\varphi$ gates, acting on the real
-$(a+n)$-qubit register — implements all three rows (and every other
+$(a+n)$-qubit register) implements all three rows (and every other
 singular value $A$ has) simultaneously, simply because quantum mechanics
 lets a single unitary act linearly across every invariant subspace at
 once.
@@ -521,8 +521,8 @@ size.
 ## Summary
 
 - QSVT alternates a block-encoding unitary $U$ (and $U^\dagger$) with
-  projector-controlled phase rotations $\Pi_\varphi=e^{i\varphi(2\Pi_0-I)}$
-  — the direct generalization of QSP's $e^{i\varphi Z}$ to an ancilla
+  projector-controlled phase rotations $\Pi_\varphi=e^{i\varphi(2\Pi_0-I)}$,
+  the direct generalization of QSP's $e^{i\varphi Z}$ to an ancilla
   register instead of a bare qubit.
 - The key structural fact: the big Hilbert space decomposes into
   independent 2D invariant subspaces $\mathcal H_i$, one per singular
@@ -540,14 +540,14 @@ size.
   QSVT-based replacement for HHL.
 - Gilyén, Su, Low & Wiebe's 2018-2019 QSVT construction is now widely
   regarded as the framework that unifies most of the pre-2018 "zoo" of
-  specialized quantum algorithms — a real, significant, and well-cited
+  specialized quantum algorithms, a real, significant, and well-cited
   organizing result in quantum algorithms research.
 
 ## Further Exploration
 
 <NextDiscovery>
-  Next: [Amplitude Estimation Without Phase Estimation](/lessons/apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation),
-  which pushes special case 1 above further: the same reflect-and-compose
+  [Amplitude Estimation Without Phase Estimation](/lessons/apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation)
+  pushes special case 1 above further: the same reflect-and-compose
   structure reappears there to get Grover's quadratic speedup for
   *estimating* a probability rather than just amplifying it, without ever
   calling the phase-estimation subroutine the original algorithm needed. For

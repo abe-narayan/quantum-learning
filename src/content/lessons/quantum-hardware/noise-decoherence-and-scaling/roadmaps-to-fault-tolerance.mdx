@@ -53,8 +53,8 @@ and stays honest about how far current devices are from paying it off.
 
 ## Intuition
 
-Error correction's promise sounds almost free: encode a logical qubit
-redundantly across several physical ones, and the logical error rate
+Error correction's promise sounds almost free: encode a <Term id="logical-qubit">logical qubit</Term>
+redundantly across several <Term id="physical-qubit">physical ones</Term>, and the <Term id="logical-error-rate">logical error rate</Term>
 drops below the physical error rate. What that promise doesn't
 advertise up front is the exchange rate, how many physical qubits it
 costs per logical qubit, and that number is the entire roadmap question
@@ -91,7 +91,7 @@ just described, not the handful of physical qubits pictured here.
 **NISQ** (Noisy Intermediate-Scale Quantum) names the current era
 honestly: devices with tens to a few thousand physical qubits, without
 full error correction, whose usefulness is bounded by this course's own
-compounding-error problem (Scaling Challenges). NISQ-era algorithms
+compounding-error problem (Scaling Challenges). <Term id="nisq">NISQ</Term>-era algorithms
 (Quantum Algorithms II's VQE and QAOA both belong here) are specifically
 designed to extract value from shallow circuits, few enough sequential
 gates that compounding error stays tolerable, rather than assuming
@@ -99,11 +99,11 @@ fault tolerance is already available.
 
 ### What "fault tolerant" actually targets
 
-A fault-tolerant quantum computer isn't simply "a quantum computer with
-more qubits." It's a device where logical error rates are suppressed
-far enough below physical error rates that arbitrarily long, deep
-computations become reliable, via the specific error-correction overhead
-mechanism above. This is a qualitatively different target from
+A fault-tolerant quantum computer needs more than "more qubits." The
+target is a device where logical error rates are suppressed far enough
+below physical error rates that arbitrarily long, deep computations
+become reliable, via the specific error-correction overhead mechanism
+above. This is a qualitatively different target from
 NISQ-scale devices, not merely a bigger version of one.
 
 ## Honest Scope Statement
@@ -120,7 +120,7 @@ IBM's public hardware roadmap names a specific planned system, Quantum
 Starling, targeted for 2029 with 200 logical qubits capable of roughly
 100 million quantum operations, built on quantum LDPC codes the company
 says can cut physical-to-logical qubit overhead by up to 90% relative to
-the surface code this lesson's diagram illustrates. Whether that
+the <Term id="surface-codes">surface code</Term> this lesson's diagram illustrates. Whether that
 timeline holds is a prediction this lesson declines to make; it's
 included only to show concretely what one company's current, stated
 roadmap target looks like, not as a platform-endorsed forecast.

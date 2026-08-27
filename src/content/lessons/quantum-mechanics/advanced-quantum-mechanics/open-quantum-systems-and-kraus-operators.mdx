@@ -60,7 +60,7 @@ A perfectly isolated system evolving unitarily forever is an idealization nobody
 ## Motivation
 
 Entanglement, Mixed States & Bell Tests built density matrices and
-covered their unitary evolution. This lesson introduces the
+covered their <Term id="unitary-operator">unitary evolution</Term>. This lesson introduces the
 mathematical language for what's still missing, **open quantum
 systems**, building directly on, and going beyond, that density-matrix
 foundation.
@@ -68,7 +68,7 @@ foundation.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/4/48/Basic_Science_%2854395491965%29.jpg"
   alt="A neutral-atom quantum computing vacuum chamber at Sandia National Laboratories, showing objective lenses for single-atom traps and surrounding magnetic field coils"
-  caption="A real neutral-atom quantum computing apparatus. Everything inside this vacuum chamber exists precisely because a qubit is never a truly closed system: the whole setup is built to slow down exactly the kind of environmental coupling this lesson's Kraus operators describe mathematically."
+  caption="A real neutral-atom quantum computing apparatus. Everything inside this vacuum chamber exists precisely because a qubit is never a fully closed system: the whole setup is built to slow down exactly the kind of environmental coupling this lesson's Kraus operators describe mathematically."
   credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
   creditUrl="https://commons.wikimedia.org/wiki/File:Basic_Science_(54395491965).jpg"
   license="Public Domain (U.S. Government work)"
@@ -79,7 +79,7 @@ foundation.
 ### Why unitary evolution alone isn't enough
 
 $\rho\to U\rho U^\dagger$ (Entanglement's evolution rule) always preserves
-purity exactly: $\text{Tr}(\rho^2)$ never changes under it (a fact
+<Term id="von-neumann-entropy-purity">purity</Term> exactly: $\text{Tr}(\rho^2)$ never changes under it (a fact
 already provable from $U$'s unitarity alone). But real decoherence
 *does* change purity. A pure state actually becomes mixed over time
 through environmental interaction. No unitary evolution of the system
@@ -95,7 +95,7 @@ $$
 \rho \to \mathcal E(\rho) = \sum_k K_k\,\rho\,K_k^\dagger
 $$
 
-for some set of **Kraus operators** $\{K_k\}$ satisfying
+for some set of **<Term id="kraus-operators-cptp-maps">Kraus operators</Term>** $\{K_k\}$ satisfying
 $\sum_kK_k^\dagger K_k=I$ (the **trace-preservation condition**: it
 guarantees $\text{Tr}(\mathcal E(\rho))=\text{Tr}(\rho)$, so total
 probability stays 1). A single unitary $U$ is the special case of exactly
@@ -231,7 +231,7 @@ is being bent.
 ## Further Exploration
 
 <NextDiscovery>
-Next: [Decoherence & the Quantum-to-Classical Transition](/lessons/quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition), which uses
+[Decoherence & the Quantum-to-Classical Transition](/lessons/quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition) uses
 these exact channels to watch coherence decay numerically, and asks what
 that decay means physically.
 

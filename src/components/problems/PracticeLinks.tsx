@@ -20,7 +20,7 @@ export function PracticeLinks({ problems }: { problems: ProblemMeta[] }) {
           <li key={problem.slug}>
             <Link
               href={`/problems/${problem.slug}`}
-              className="group flex items-center justify-between gap-3 rounded-[--radius-tight] border border-border bg-surface px-4 py-3 text-sm transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-surface-raised"
+              className="group flex min-h-11 items-center justify-between gap-3 rounded-[--radius-tight] border border-border bg-surface px-4 py-3 text-sm transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-surface-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
             >
               <span className="font-medium text-foreground group-hover:text-pillar-text">{problem.title}</span>
               <span className="tech-value shrink-0 text-xs text-subtle-foreground">{problem.estimatedMinutes} min</span>
