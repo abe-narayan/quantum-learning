@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { getAllLessonSlugs, getAllLessonsMeta, loadLesson } from "../lessons";
+// (Pipeline note: lesson MDX compiles through rehypeKatexHtml — see
+// vitest.config.mts — which replaced rehype-katex for build-memory reasons.)
 import { getCourse, getModule } from "../curriculum";
 
 /** The loaded-lesson shape, derived from `loadLesson` rather than imported:

@@ -6,9 +6,9 @@ import createMDX from "@next/mdx";
 // below for why it can't be project-relative. `process.cwd()` is the project
 // root here: Next resolves and evaluates next.config from the directory the
 // build was started in, which is the only place `next build` is valid.
-const SCROLLABLE_MATH_PLUGIN = path.resolve(
+const KATEX_HTML_PLUGIN = path.resolve(
   process.cwd(),
-  "src/lib/mdx/rehypeScrollableMath.mjs",
+  "src/lib/mdx/rehypeKatexHtml.mjs",
 );
 
 // Security headers for this pure-SSG site (no `output: 'export'` — this repo
@@ -104,11 +104,9 @@ const nextConfig: NextConfig = {
   enablePrerenderSourceMaps: false,
   experimental: {
     turbopackRustReactCompiler: true,
-    // Explicitly kept at its default (true): Vercel preserves .next/cache
-    // between builds, so warm compiles drop from minutes to ~30s. Measured
-    // cold-build peaks on this corpus were HIGHER with the cache disabled
-    // (~7.5GB vs ~6.3GB max process), so turning it off buys nothing on
-    // memory either.
+    // Explicitly kept at its default (true): warm rebuilds reuse
+    // .next/cache/turbopack, and measured cold-build peaks on this corpus
+    // were HIGHER with the cache disabled.
     turbopackFileSystemCacheForBuild: true,
   },
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
@@ -140,13 +138,17 @@ const withMDX = createMDX({
     remarkPlugins: ["remark-gfm", "remark-math"],
     // rehype-slug adds a stable `id` (github-slugger) to every heading node
     // it visits, which the ToC/reading-progress work needs to `<a href="#...">`
-    // + `IntersectionObserver` into. It only mutates heading nodes' hast
-    // properties, so it doesn't need to run before or after rehype-katex —
-    // katex output lives inside heading *children*, not on the heading
-    // element itself, so the two plugins don't touch the same properties.
-    // `rehypeScrollableMath` MUST stay last: it tags `.katex-display`, which
-    // only exists once rehype-katex has rendered. See that file for why the
-    // tab stop it adds is worth it and why it can't live in mdx-components.
+    // + `IntersectionObserver` into.
+    //
+    // `rehypeKatexHtml` REPLACES the previous `rehype-katex` +
+    // `rehypeScrollableMath` pair: it renders the same KaTeX HTML with the
+    // same options and error semantics, but emits each equation as a single
+    // `<KatexHtml html="…"/>` string node instead of thousands of hast
+    // elements — the difference between ~82MB and a few MB of compiled
+    // lesson JS, and the main lever against the Vercel cold-build OOM. It
+    // also injects the `.katex-display` tabindex the scrollable-math plugin
+    // used to add (see its header for the full a11y rationale). Keep it in
+    // lockstep with vitest.config.mts so tests exercise the real pipeline.
     //
     // It is passed as an ABSOLUTE path, not `"./src/lib/mdx/..."`. @next/mdx
     // loads a string plugin with `require.resolve()` from inside
@@ -155,8 +157,7 @@ const withMDX = createMDX({
     // MODULE_NOT_FOUND for every .mdx file in the corpus.
     rehypePlugins: [
       "rehype-slug",
-      ["rehype-katex", { strict: false }],
-      SCROLLABLE_MATH_PLUGIN,
+      [KATEX_HTML_PLUGIN, { strict: false }],
     ],
   },
 });

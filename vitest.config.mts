@@ -3,8 +3,8 @@ import { defineConfig, type Plugin } from "vitest/config";
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import rehypeScrollableMath from "./src/lib/mdx/rehypeScrollableMath.mjs";
+import rehypeSlug from "rehype-slug";
+import rehypeKatexHtml from "./src/lib/mdx/rehypeKatexHtml.mjs";
 
 // Vite/Vitest has no built-in .mdx loader (that's Next's @next/mdx +
 // @mdx-js/loader, which is webpack-only). This plugin recompiles .mdx files
@@ -22,11 +22,12 @@ function mdx(): Plugin {
         {
           jsx: false,
           remarkPlugins: [remarkGfm, remarkMath],
-          // Must stay after rehype-katex — it tags `.katex-display`, which
-          // does not exist until KaTeX has rendered. Kept in step with
-          // next.config.ts so `lessonRender.test.ts` exercises the real
-          // output rather than a pipeline the site never runs.
-          rehypePlugins: [[rehypeKatex, { strict: false }], rehypeScrollableMath],
+          // Kept in step with next.config.ts (including rehype-slug, so
+          // heading ids exist in test renders) so `lessonRender.test.ts`
+          // exercises the real output rather than a pipeline the site never
+          // runs. `rehypeKatexHtml` renders math to single `<KatexHtml/>`
+          // string nodes — see that plugin's header.
+          rehypePlugins: [rehypeSlug, [rehypeKatexHtml, { strict: false }]],
         }
       );
       return { code: String(compiled), map: null };

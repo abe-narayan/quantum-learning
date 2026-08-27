@@ -1,6 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 import type { ComponentPropsWithoutRef } from "react";
 import { Callout } from "@/components/mdx/Callout";
+import { KatexHtml } from "@/components/mdx/KatexHtml";
 import { Term } from "@/components/mdx/Term";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
@@ -52,6 +53,10 @@ const components: MDXComponents = {
   // component throws at render instead of silently 404ing. The invariant is
   // guarded by src/lib/design/__tests__/mdxMapping.test.ts.
   table: Table,
+  // Not used in any authored lesson — injected into every compiled lesson by
+  // src/lib/mdx/rehypeKatexHtml.mjs (one per equation), so it MUST stay
+  // mapped or every math-bearing lesson fails to render.
+  KatexHtml,
   Callout,
   Term,
   DefinitionBox,
