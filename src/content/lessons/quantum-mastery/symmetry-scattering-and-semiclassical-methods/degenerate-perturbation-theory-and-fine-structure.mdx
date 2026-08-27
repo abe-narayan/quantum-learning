@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
 import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
 import { RYDBERG_EV, radial2p } from "@/lib/quantum/hydrogenAtom";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/symmetry-scattering-and-semiclassical-methods/degenerate-perturbation-theory-and-fine-structure"
-).map((problem) => problem.meta);
+);
 
 export const Lx = angularMomentumX(1);
 export const Ly = angularMomentumY(1);

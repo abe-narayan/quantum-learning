@@ -6,6 +6,13 @@ import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import type { Pillar } from "@/lib/content/types";
 import { PILLAR_ORDER, PILLAR_VISUALS } from "@/lib/design/pillars";
 import { fetchSearchIndex } from "@/lib/search/fetchIndex";
+import {
+  matchScore,
+  matchesAllTokens,
+  prepareSearchEntries,
+  tokenizeQuery,
+  type SearchableEntry,
+} from "@/lib/search/match";
 import type { SearchEntry, SearchEntryType } from "@/lib/search/types";
 import { SEARCH_DIALOG_ID } from "@/lib/search/ids";
 import { cn } from "@/lib/utils";
@@ -40,19 +47,13 @@ const NO_RESULT_ROUTES = [
   { href: "/learn", label: "Learning path", hint: "start from the beginning" },
 ];
 
-/**
- * How well an entry matches, lower being better: exact title, title prefix,
- * title substring, then description-only. Sorted *before* pillar order so a
- * literal title hit is never buried under a pillar that merely happens to
- * come earlier in the curriculum and mentions the word in passing.
- */
-function matchScore(entry: SearchEntry, query: string): number {
-  const title = entry.title.toLowerCase();
-  if (title === query) return 0;
-  if (title.startsWith(query)) return 1;
-  if (title.includes(query)) return 2;
-  return 3;
-}
+// Matching and scoring live in `@/lib/search/match` (pure, unit-tested):
+// queries and entries are diacritic-folded so "schrodinger" finds
+// "Schrödinger", tokens AND-match in any order so "state bell" finds "Bell
+// state", and `matchScore` keeps the old hierarchy — exact title, title
+// prefix, title substring, description-only — sorted *before* pillar order so
+// a literal title hit is never buried under a pillar that merely happens to
+// come earlier in the curriculum and mentions the word in passing.
 
 // `null` stands for "no pillar" (most simulators, and any entry the index
 // doesn't tag) — its rank sorts after every real pillar so a kind group
@@ -72,7 +73,7 @@ type IndexStatus = "loading" | "ready" | "error";
 
 export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
   const [query, setQuery] = useState("");
-  const [index, setIndex] = useState<SearchEntry[]>([]);
+  const [index, setIndex] = useState<SearchableEntry[]>([]);
   const [indexStatus, setIndexStatus] = useState<IndexStatus>("loading");
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -90,7 +91,10 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
     fetchSearchIndex()
       .then((data) => {
         if (cancelled) return;
-        setIndex(data);
+        // Fold once, at load: ~190KB of title/description text folded per
+        // keystroke was the old cost; folded match fields are precomputed
+        // here and the per-keystroke path only folds the query.
+        setIndex(prepareSearchEntries(data));
         setIndexStatus("ready");
       })
       .catch(() => {
@@ -120,23 +124,27 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
   // of matches can't blow the panel out; `pillarBreaks` records which
   // visible rows start a new pillar cluster, for the sub-headers below.
   const groups = useMemo(() => {
-    const trimmed = query.trim().toLowerCase();
-    if (!trimmed) return [];
+    const tokens = tokenizeQuery(query);
+    if (tokens.length === 0) return [];
+    const phrase = tokens.join(" ");
     const built = TYPE_ORDER.map((type) => {
-      const matches = index.filter(
-        (entry) =>
-          entry.type === type &&
-          (entry.title.toLowerCase().includes(trimmed) || entry.description.toLowerCase().includes(trimmed))
-      );
+      // Each entry's score is computed exactly once per query, here — not
+      // inside the sort comparator, where it used to be recomputed
+      // O(n log n) times per keystroke.
+      const matches: { entry: SearchEntry; score: number }[] = [];
+      for (const candidate of index) {
+        if (candidate.entry.type !== type || !matchesAllTokens(candidate, tokens)) continue;
+        matches.push({ entry: candidate.entry, score: matchScore(candidate, tokens, phrase) });
+      }
       if (matches.length === 0) return null;
 
-      const ordered = [...matches].sort(
+      const ordered = matches.sort(
         (a, b) =>
-          matchScore(a, trimmed) - matchScore(b, trimmed) ||
-          pillarRank(a.pillar) - pillarRank(b.pillar) ||
-          a.title.localeCompare(b.title)
+          a.score - b.score ||
+          pillarRank(a.entry.pillar) - pillarRank(b.entry.pillar) ||
+          a.entry.title.localeCompare(b.entry.title)
       );
-      const visible = ordered.slice(0, RESULTS_PER_GROUP);
+      const visible = ordered.slice(0, RESULTS_PER_GROUP).map((match) => match.entry);
       const remaining = matches.length - visible.length;
       const pillarBreaks = new Set<number>();
       const seenPillars = new Set<string>();
@@ -169,7 +177,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
         total: matches.length,
         pillarBreaks,
         showPillarLabels,
-        bestScore: matchScore(ordered[0], trimmed),
+        bestScore: ordered[0].score,
       };
     }).filter((group): group is NonNullable<typeof group> => group !== null);
 

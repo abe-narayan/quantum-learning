@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/classical-to-quantum/classical-states-and-observables"
-).map((problem) => problem.meta);
+);
 
 export const oscillatorMass = 1;
 export const oscillatorK = 4;

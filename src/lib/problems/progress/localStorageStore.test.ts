@@ -91,6 +91,38 @@ describe("handleExternalStorageChange (problem progress)", () => {
     expect(store.getProblemProgress("some-problem").solved).toBe(false);
   });
 
+  it("coerces corrupted field values (truthy non-booleans) back to safe defaults", async () => {
+    // Valid JSON, wrong shape: `"false"` / `1` are truthy, so without the
+    // per-field type guards this record would render as solved with the
+    // solution already revealed.
+    const { getProgressStore, handleExternalStorageChange } = await import("./localStorageStore");
+    const store = getProgressStore();
+
+    handleExternalStorageChange({
+      key: KEY,
+      newValue: JSON.stringify({ attempts: "nope", solved: "false", hintsRevealed: "3", solutionRevealed: 1 }),
+    } as StorageEvent);
+
+    expect(store.getProblemProgress("some-problem")).toEqual({
+      attempts: [],
+      solved: false,
+      hintsRevealed: 0,
+      solutionRevealed: false,
+    });
+  });
+
+  it("reads a corrupted record straight from storage as safe defaults too (getItem path)", async () => {
+    const fakeStorage = makeFakeLocalStorage();
+    vi.stubGlobal("window", { localStorage: fakeStorage });
+    fakeStorage.setItem(KEY, JSON.stringify({ attempts: [], solved: "yes", hintsRevealed: 2, solutionRevealed: "no" }));
+
+    const { getProgressStore } = await import("./localStorageStore");
+    const progress = getProgressStore().getProblemProgress("some-problem");
+    expect(progress.solved).toBe(false);
+    expect(progress.solutionRevealed).toBe(false);
+    expect(progress.hintsRevealed).toBe(2); // valid fields survive the guard
+  });
+
   it("clears the whole cache on a `key: null` event, so the next read reflects underlying storage again", async () => {
     const fakeStorage = makeFakeLocalStorage();
     vi.stubGlobal("window", { localStorage: fakeStorage });

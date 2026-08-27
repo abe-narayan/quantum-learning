@@ -86,6 +86,31 @@ const cspHeader = `
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  // Build-memory levers (this 219-MDX/821-page corpus OOM'd Vercel's 8GB
+  // build container before these + the lesson/problem meta registries):
+  // - enablePrerenderSourceMaps defaults to true, which passes
+  //   --enable-source-maps to every static-generation worker process; the
+  //   memory-usage guide (node_modules/next/dist/docs/01-app/02-guides/
+  //   memory-usage.md) recommends disabling it when prerendering OOMs. Cost:
+  //   uglier stack traces in build-time prerender errors only — zero change
+  //   to the built site.
+  // - turbopackRustReactCompiler runs the React Compiler natively in
+  //   Turbopack instead of via babel-plugin-react-compiler in Node worker
+  //   threads inside the (single) compile process — the Babel pass otherwise
+  //   parses essentially every client component during "Creating an
+  //   optimized production build", which is the phase Vercel killed.
+  //   Experimental in 16.3 but a reimplementation of the same compiler;
+  //   verified locally via a full build + corpus render tests.
+  enablePrerenderSourceMaps: false,
+  experimental: {
+    turbopackRustReactCompiler: true,
+    // Explicitly kept at its default (true): Vercel preserves .next/cache
+    // between builds, so warm compiles drop from minutes to ~30s. Measured
+    // cold-build peaks on this corpus were HIGHER with the cache disabled
+    // (~7.5GB vs ~6.3GB max process), so turning it off buys nothing on
+    // memory either.
+    turbopackFileSystemCacheForBuild: true,
+  },
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   async headers() {
     return [

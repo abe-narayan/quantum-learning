@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { QuantumCircuit, runCircuit } from "@/lib/quantum/circuitBuilder";
 import { PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
 import { expectationValue } from "@/lib/quantum/observables";
 import { exactGroundStateEnergy } from "@/lib/quantum/vqe";
 import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation"
-).map((problem) => problem.meta);
+);
 
 export const twoParamHamiltonian = PAULI_Z.scale(0.6).add(PAULI_X.scale(0.8));
 

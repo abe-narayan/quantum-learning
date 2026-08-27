@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Complex } from "@/lib/quantum/complex";
 import { phaseGate } from "@/lib/quantum/gates";
 import { phaseEstimation } from "@/lib/quantum/qft";
@@ -8,9 +8,9 @@ import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/quantum-phase-estimation"
-).map((problem) => problem.meta);
+);
 
 export const qpeExactProbs = phaseEstimation(phaseGate(2 * Math.PI * (3 / 8)), [Complex.ZERO, Complex.ONE], 3).probabilities();
 export const qpeSmearedProbs = phaseEstimation(phaseGate(2 * Math.PI * (1 / 3)), [Complex.ZERO, Complex.ONE], 3).probabilities();

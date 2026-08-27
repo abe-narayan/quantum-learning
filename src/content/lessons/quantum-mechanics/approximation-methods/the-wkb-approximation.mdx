@@ -1,11 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { harmonicOscillatorPotential } from "@/lib/quantum/potentials";
+import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/approximation-methods/the-wkb-approximation"
-).map((problem) => problem.meta);
+);
 
 export const wkbGrid = createGrid(256, 0.025);
 export const wkbEnergy = 1.5;

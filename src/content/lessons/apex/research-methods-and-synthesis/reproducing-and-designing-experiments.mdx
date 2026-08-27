@@ -1,9 +1,9 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/research-methods-and-synthesis/reproducing-and-designing-experiments"
-).map((problem) => problem.meta);
+);
 
 export const seExampleP = 0.85;
 export const seExampleNSmall = 20;

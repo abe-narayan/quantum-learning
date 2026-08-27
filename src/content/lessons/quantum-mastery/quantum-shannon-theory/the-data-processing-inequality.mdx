@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
@@ -9,9 +9,9 @@ import { pureStateDensityMatrix, vonNeumannEntropy, eigenvaluesHermitian2x2 } fr
 import { partialTrace } from "@/lib/quantum/partialTrace";
 import { dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-shannon-theory/the-data-processing-inequality"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "The Data-Processing Inequality",

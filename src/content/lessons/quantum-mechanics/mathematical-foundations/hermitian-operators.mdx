@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PAULI_Y, PAULI_Z, S_GATE } from "@/lib/quantum/gates";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/hermitian-operators"
-).map((problem) => problem.meta);
+);
 
 export const hermitianCheckPreset = (label, matrix) => ({
   label,

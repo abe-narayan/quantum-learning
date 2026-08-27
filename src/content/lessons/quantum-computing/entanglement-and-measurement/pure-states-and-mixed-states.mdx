@@ -4,11 +4,11 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/pure-states-and-mixed-states"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Pure States and Mixed States",

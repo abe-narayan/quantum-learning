@@ -1,11 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
+import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/programming-quantum-computers/circuit-representation-in-code"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Circuit Representation in Code",

@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Distinguishing Theorem from Heuristic",

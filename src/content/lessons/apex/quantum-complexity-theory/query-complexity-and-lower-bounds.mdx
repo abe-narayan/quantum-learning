@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { optimalGroverIterations } from "@/lib/quantum/grover";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/quantum-complexity-theory/query-complexity-and-lower-bounds"
-).map((problem) => problem.meta);
+);
 
 export const illustrationQubits = 4;
 export const illustrationN = 2 ** illustrationQubits;

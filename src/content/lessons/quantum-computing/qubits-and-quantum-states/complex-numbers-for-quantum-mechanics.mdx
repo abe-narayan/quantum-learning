@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Complex Numbers for Quantum Mechanics",

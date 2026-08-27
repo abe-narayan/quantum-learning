@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 import { StabilizerTable } from "@/components/visualizations/StabilizerTable";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"
-).map((problem) => problem.meta);
+);
 
 export const generatorPatterns = {
   g1: "ZZI",

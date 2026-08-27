@@ -1,13 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix, tensorAll } from "@/lib/quantum/matrix";
 import { IDENTITY, PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
 import { StabilizerTable } from "@/components/visualizations/StabilizerTable";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "CSS Codes and the General Stabilizer Formalism",

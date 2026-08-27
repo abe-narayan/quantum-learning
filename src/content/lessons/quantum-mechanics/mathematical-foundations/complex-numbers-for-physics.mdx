@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"
-).map((problem) => problem.meta);
+);
 
 export const rootsOfUnityFrame = (n) => ({
   paramLabel: `n = ${n}`,

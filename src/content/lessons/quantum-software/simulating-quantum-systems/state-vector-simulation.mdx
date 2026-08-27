@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { QuantumCircuit, runCircuit, sampleMeasurements } from "@/lib/quantum/circuitBuilder";
 
 export const svsCircuit = new QuantumCircuit(2).h(0).cnot(0, 1);
@@ -16,9 +16,9 @@ export const svsFrames = svsShotCounts.map((shots, i) => ({
   ],
 }));
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/simulating-quantum-systems/state-vector-simulation"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "State-Vector Simulation",

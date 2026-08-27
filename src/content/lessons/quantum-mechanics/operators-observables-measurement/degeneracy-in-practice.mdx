@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/operators-observables-measurement/degeneracy-in-practice"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Degeneracy in Practice: A Worked System",

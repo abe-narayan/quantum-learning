@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyRabiExplorer } from "@/components/simulators/rabi-explorer/LazyRabiExplorer";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { finiteSquareWellPotential, finiteSquareWellGroundStateEnergy } from "@/lib/quantum/potentials";
@@ -8,10 +8,13 @@ import { tensorProduct, symmetrize, antisymmetrize } from "@/lib/quantum/identic
 import { vectorToExchangeGrid } from "@/components/visualizations/ExchangeDiagram";
 import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
+import { HardwarePlatformSchematic } from "@/components/visualizations/HardwarePlatformSchematic";
+import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/physical-qubit-platforms/spin-qubits"
-).map((problem) => problem.meta);
+);
 
 export const dotGrid = createGrid(256, 0.1);
 export const dotHalfWidth = 1.5;

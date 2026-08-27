@@ -1,13 +1,14 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
+import { GroverAmplitudeSweep } from "@/components/visualizations/GroverAmplitudeSweep";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification"
-).map((problem) => problem.meta);
+);
 
 export const groverRotationFrame = (k) => {
   const n = 4;

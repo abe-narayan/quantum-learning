@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { LazyWaveInterference } from "@/components/visualizations/wave-interference/LazyWaveInterference";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "From Classical to Quantum Probability",

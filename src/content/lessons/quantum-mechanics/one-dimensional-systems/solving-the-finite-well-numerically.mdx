@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/one-dimensional-systems/solving-the-finite-well-numerically"
-).map((problem) => problem.meta);
+);
 
 export const wellHalfWidth = 1;
 export const tangentCap = 6;

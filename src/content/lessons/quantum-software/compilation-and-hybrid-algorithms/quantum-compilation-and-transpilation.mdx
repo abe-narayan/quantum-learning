@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { swapOverheadForLinearChain } from "@/lib/quantum/transpilation";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Quantum Compilation & Transpilation",

@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PAULI_X, PAULI_Y, PAULI_Z, applySingleQubitGate, rotationX, rotationZ } from "@/lib/quantum/gates";
 import { blochStateFromAngles, stateToBlochVector } from "@/lib/quantum/bloch";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 import { BlochSphereCanvas } from "@/components/simulators/bloch-sphere/BlochSphereCanvas";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/operators-observables-measurement/simultaneous-eigenstates-and-compatible-observables"
-).map((problem) => problem.meta);
+);
 
 export const commutatorPreset = (label, a, aLabel, b, bLabel) => ({
   label,

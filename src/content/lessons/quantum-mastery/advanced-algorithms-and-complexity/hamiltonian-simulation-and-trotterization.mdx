@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { PAULI_X, PAULI_Z, IDENTITY } from "@/lib/quantum/gates";
 import { commutator } from "@/lib/quantum/observables";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"
-).map((problem) => problem.meta);
+);
 
 export function matrixExponential(H, t, terms = 40) {
   const n = H.rows;

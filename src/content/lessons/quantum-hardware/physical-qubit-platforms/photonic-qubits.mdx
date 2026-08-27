@@ -1,12 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { LossVsDecoherence } from "@/components/visualizations/LossVsDecoherence";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { HardwarePlatformSchematic } from "@/components/visualizations/HardwarePlatformSchematic";
+import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/physical-qubit-platforms/photonic-qubits"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Photonic Qubits",

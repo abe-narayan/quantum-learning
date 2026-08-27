@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 import { LazyThreeComponentMixtureExplorer } from "@/components/simulators/density-matrix-explorer/LazyThreeComponentMixtureExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/convex-combinations-and-physical-mixtures"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Convex Combinations and Physical Mixtures",

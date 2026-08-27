@@ -12,7 +12,15 @@ const cache = new Map<string, LessonProgress>();
 function parseProgress(raw: string | null): LessonProgress {
   if (!raw) return EMPTY_LESSON_PROGRESS;
   try {
-    return { ...EMPTY_LESSON_PROGRESS, ...(JSON.parse(raw) as LessonProgress) };
+    const parsed = { ...EMPTY_LESSON_PROGRESS, ...(JSON.parse(raw) as LessonProgress) };
+    // Guard against a corrupted or previous-schema record whose fields
+    // don't match this shape — e.g. `completed: "false"` (a truthy string)
+    // would otherwise count as a completed lesson everywhere `completed`
+    // is read as a boolean.
+    return {
+      completed: typeof parsed.completed === "boolean" ? parsed.completed : EMPTY_LESSON_PROGRESS.completed,
+      completedAt: typeof parsed.completedAt === "number" ? parsed.completedAt : EMPTY_LESSON_PROGRESS.completedAt,
+    };
   } catch {
     return EMPTY_LESSON_PROGRESS;
   }

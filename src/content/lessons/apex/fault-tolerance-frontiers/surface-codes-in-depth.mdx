@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { SurfaceCodePatchExplorer } from "@/components/visualizations/SurfaceCodePatchExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/fault-tolerance-frontiers/surface-codes-in-depth"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Surface Codes in Depth",

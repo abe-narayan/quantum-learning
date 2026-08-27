@@ -348,18 +348,28 @@ metadata and its actual URL to disagree.
 
 **Loading (`src/lib/content/lessons.ts`)** — server-only:
 
-- `getAllLessonSlugs()` — walks `src/content/lessons/` at request/build
-  time (`node:fs`) and returns every authored slug. This is what
-  `generateStaticParams` uses, so every deploy picks up newly authored
+- `getAllLessonSlugs()` — returns every authored slug, sourced from
+  `lessonMeta.generated.ts` (see below). This is what
+  `generateStaticParams` uses; `scripts/generate-lesson-registry.mjs` runs
+  before every dev/build/test, so every deploy picks up newly authored
   lessons automatically — no registry to hand-update per lesson.
 - `loadLesson(slug)` — a dynamic `import(`@/content/lessons/${slug}.mdx`)`,
   returning `{ default: Component, lessonMeta }`. This is the pattern
   Next's own docs recommend for slug-driven MDX content outside `app/`, and
   it means content isn't bundled into every page's JS — each lesson is its
   own chunk, loaded only when its route is hit.
-- `getAllLessonsMeta()` — loads every lesson's metadata plus its slug
+- `getAllLessonsMeta()` — every lesson's metadata plus its slug
   (`LessonMetaWithSlug`), used for catalog pages and for resolving
-  prerequisites (next paragraph).
+  prerequisites (next paragraph). Served from
+  `src/lib/content/lessonMeta.generated.ts`, a plain-data registry that
+  `scripts/generate-lesson-registry.mjs` text-extracts from the MDX sources
+  (the same brace-scan technique the search-index generator uses). It used
+  to dynamically import all 219 *compiled* MDX modules just to read their
+  `lessonMeta` exports — since the root-layout Footer calls this, every
+  static-generation worker held the whole compiled corpus (~36MB of
+  KaTeX-heavy JS) in memory for the entire build, which OOM'd Vercel's 8GB
+  build container. Registry↔module drift is caught by a deep-equality test
+  in `src/lib/content/__tests__/lessons.test.ts`.
 
 **Lesson identity and cross-course prerequisites.** A lesson's *identity*
 is its file-path-derived slug — there is no separate ID field. This is a

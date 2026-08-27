@@ -1,9 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { Question } from "@/components/narrative/Question";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead"
-).map((problem) => problem.meta);
+);
 
 export const toyCombinations = (n, k) => Array.from({ length: k }, (_, i) => (n - i) / (i + 1)).reduce((acc, term) => acc * term, 1);
 export const toyFailureProbability = (d, p) => Array.from({ length: d - Math.floor(d / 2) }, (_, i) => Math.floor(d / 2) + 1 + i).reduce((sum, k) => sum + toyCombinations(d, k) * p ** k * (1 - p) ** (d - k), 0);

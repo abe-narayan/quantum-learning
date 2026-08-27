@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { StaticCircuitDiagram } from "@/components/visualizations/StaticCircuitDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"
-).map((problem) => problem.meta);
+);
 
 export const solovayKitaevIllustrativeExponent = 3.97;
 

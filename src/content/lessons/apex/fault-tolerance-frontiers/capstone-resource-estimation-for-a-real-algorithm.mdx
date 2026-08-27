@@ -1,9 +1,9 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm"
-).map((problem) => problem.meta);
+);
 
 export function smallestOddAtLeast(x) {
   let n = Math.ceil(x);

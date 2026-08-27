@@ -7,7 +7,7 @@ import { LazyWavefunctionHeroExplorer } from "@/components/simulators/wavefuncti
 import { ContinueLearning } from "@/components/curriculum/ContinueLearning";
 import { CurriculumStrip } from "@/components/home/CurriculumStrip";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
-import { getAllProblemMeta } from "@/lib/problems/registry";
+import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { PILLARS } from "@/lib/content/curriculum";
 
 /**

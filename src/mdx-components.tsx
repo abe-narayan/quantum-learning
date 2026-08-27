@@ -8,64 +8,21 @@ import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { LessonHook } from "@/components/narrative/LessonHook";
-import { Question } from "@/components/narrative/Question";
 import { InsightBlock } from "@/components/narrative/InsightBlock";
 import { DerivationSteps, DerivationStep } from "@/components/narrative/DerivationSteps";
 import { EquationReveal } from "@/components/narrative/EquationReveal";
-import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
 import { ResearchConnection } from "@/components/narrative/ResearchConnection";
 import { HistoricalMoment } from "@/components/narrative/HistoricalMoment";
 import { ChallengePrompt } from "@/components/narrative/ChallengePrompt";
 import { NextDiscovery } from "@/components/narrative/NextDiscovery";
-import { ObservePredictExplain } from "@/components/narrative/ObservePredictExplain";
 import { BarChart } from "@/components/visualizations/BarChart";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { EnergyLevelDiagram } from "@/components/visualizations/EnergyLevelDiagram";
-import { LevelSplittingDiagram } from "@/components/visualizations/LevelSplittingDiagram";
-import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
-import { ScatteringStandingWave } from "@/components/visualizations/ScatteringStandingWave";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
-import { PathPhasorSum } from "@/components/visualizations/PathPhasorSum";
 import { StaticCircuitDiagram } from "@/components/visualizations/StaticCircuitDiagram";
 import { PipelineDiagram } from "@/components/visualizations/PipelineDiagram";
-import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
-import { HardwarePlatformSchematic } from "@/components/visualizations/HardwarePlatformSchematic";
-import { DilutionRefrigeratorDiagram } from "@/components/visualizations/DilutionRefrigeratorDiagram";
-import { ControlSignalChainDiagram } from "@/components/visualizations/ControlSignalChainDiagram";
-import { DispersiveReadoutDiagram } from "@/components/visualizations/DispersiveReadoutDiagram";
-import { RydbergBlockadeDiagram } from "@/components/visualizations/RydbergBlockadeDiagram";
-import { LogicalQubitPatchDiagram } from "@/components/visualizations/LogicalQubitPatchDiagram";
-import { CrosstalkDiagram } from "@/components/visualizations/CrosstalkDiagram";
-import { OrbitalShapePlot } from "@/components/visualizations/OrbitalShapePlot";
-import { PhaseWindingCircle } from "@/components/visualizations/PhaseWindingCircle";
-import { OrbitalDensityCloud } from "@/components/visualizations/OrbitalDensityCloud";
-import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
-import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
-import { GraphDiagram } from "@/components/visualizations/GraphDiagram";
 import { MatrixGrid } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
-import { ExchangeDiagram } from "@/components/visualizations/ExchangeDiagram";
-import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
-import { ReadoutScatter } from "@/components/visualizations/ReadoutScatter";
-import { BB84RoundTable } from "@/components/visualizations/BB84RoundTable";
-import { ComplexityClassDiagram } from "@/components/visualizations/ComplexityClassDiagram";
-import { ClassicalSimulabilityMap } from "@/components/visualizations/ClassicalSimulabilityMap";
-import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
-import { DecoherenceBlochDecay } from "@/components/visualizations/DecoherenceBlochDecay";
-import { GroverAmplitudeSweep } from "@/components/visualizations/GroverAmplitudeSweep";
-import { SpinAxisMeasurement } from "@/components/visualizations/SpinAxisMeasurement";
-import { ErrorCorrectionCycle } from "@/components/visualizations/ErrorCorrectionCycle";
-import { TensorNetworkDiagram } from "@/components/visualizations/TensorNetworkDiagram";
-import { SurfaceCodePatchExplorer } from "@/components/visualizations/SurfaceCodePatchExplorer";
-import { StabilizerTable } from "@/components/visualizations/StabilizerTable";
-import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
-import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
-import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
-import { ExpectationTrace } from "@/components/visualizations/ExpectationTrace";
-import { PartialTraceHighlight } from "@/components/visualizations/PartialTraceHighlight";
-import { UncertaintyEllipse } from "@/components/visualizations/UncertaintyEllipse";
-import { LinewidthDiagram } from "@/components/visualizations/LinewidthDiagram";
-import { LossVsDecoherence } from "@/components/visualizations/LossVsDecoherence";
 
 // Markdown tables (from remark-gfm) render as plain `<table>` elements with
 // no built-in overflow handling — a wide comparison table would otherwise
@@ -80,6 +37,20 @@ function Table(props: ComponentPropsWithoutRef<"table">) {
 }
 
 const components: MDXComponents = {
+  // POLICY: this mapping is reserved for components used broadly across the
+  // lesson corpus (roughly ≥10 lessons, or universal like the table wrapper).
+  // Every component mapped here is eagerly imported into EVERY one of the
+  // ~219 compiled lesson MDX modules' graphs — for the many "use client"
+  // components that means every lesson page's client bundle carries them,
+  // and every static-generation worker pays their build-memory cost, whether
+  // the lesson uses them or not. Narrowly-used components are instead
+  // imported explicitly (`import { X } from "@/components/..."`) by the few
+  // lessons that use them. This is safe to enforce strictly: a JSX tag that
+  // is neither mapped here nor imported by its lesson file fails the build
+  // loudly, because `loadLesson` (src/lib/content/lessons.ts) deliberately
+  // does NOT catch import/evaluation errors for known slugs — an undefined
+  // component throws at render instead of silently 404ing. The invariant is
+  // guarded by src/lib/design/__tests__/mdxMapping.test.ts.
   table: Table,
   Callout,
   Term,
@@ -89,65 +60,22 @@ const components: MDXComponents = {
   InteractiveSection,
   PredictBeforeReveal,
   LessonHook,
-  Question,
   InsightBlock,
   DerivationSteps,
   DerivationStep,
   EquationReveal,
-  AnnotatedFigure,
   ResearchConnection,
   HistoricalMoment,
   ChallengePrompt,
   NextDiscovery,
-  ObservePredictExplain,
   BarChart,
   BarChartExplorer,
   EnergyLevelDiagram,
-  LevelSplittingDiagram,
-  PotentialDiagram,
-  ScatteringStandingWave,
   ParametricCurve,
-  PathPhasorSum,
   StaticCircuitDiagram,
   PipelineDiagram,
-  MeasurementTree,
-  HardwarePlatformSchematic,
-  DilutionRefrigeratorDiagram,
-  ControlSignalChainDiagram,
-  DispersiveReadoutDiagram,
-  RydbergBlockadeDiagram,
-  LogicalQubitPatchDiagram,
-  CrosstalkDiagram,
-  OrbitalShapePlot,
-  PhaseWindingCircle,
-  OrbitalDensityCloud,
-  VectorDiagram,
-  VectorDiagramExplorer,
-  GraphDiagram,
   MatrixGrid,
   MatrixGridExplorer,
-  ExchangeDiagram,
-  ExchangeDiagramExplorer,
-  ReadoutScatter,
-  BB84RoundTable,
-  ComplexityClassDiagram,
-  ClassicalSimulabilityMap,
-  CircuitStateStepper,
-  DecoherenceBlochDecay,
-  GroverAmplitudeSweep,
-  SpinAxisMeasurement,
-  ErrorCorrectionCycle,
-  TensorNetworkDiagram,
-  SurfaceCodePatchExplorer,
-  StabilizerTable,
-  CircuitDiagramExplorer,
-  CostLandscapeHeatmap,
-  PhaseSpacePanel,
-  ExpectationTrace,
-  PartialTraceHighlight,
-  UncertaintyEllipse,
-  LinewidthDiagram,
-  LossVsDecoherence,
 };
 
 export function useMDXComponents(): MDXComponents {

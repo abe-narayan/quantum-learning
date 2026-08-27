@@ -1,13 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const shannonTerm = (x) => (x >= 1e-12 ? -x * Math.log2(x) : 0);
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure"
-).map((problem) => problem.meta);
+);
 
 export const concurrenceIdentityThetas = Array.from({ length: 17 }, (_, i) => (i / 16) * (Math.PI / 2));
 

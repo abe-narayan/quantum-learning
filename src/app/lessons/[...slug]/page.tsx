@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllLessonSlugs, getAllLessonsMeta, loadLesson } from "@/lib/content/lessons";
+import { getAllLessonSlugs, getAllLessonsMeta, getLessonMeta, loadLesson } from "@/lib/content/lessons";
 import { getCourse, getPillar } from "@/lib/content/curriculum";
 import { LessonLayout } from "@/components/lessons/LessonLayout";
 import {
@@ -23,10 +23,12 @@ type LessonPageProps = {
 
 export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const lesson = await loadLesson(slug.join("/"));
-  if (!lesson) return {};
+  // Registry lookup, not loadLesson(): metadata needs only title/description,
+  // so the metadata pass never has to import the compiled MDX module.
+  const meta = getLessonMeta(slug.join("/"));
+  if (!meta) return {};
 
-  const { title, description } = lesson.lessonMeta;
+  const { title, description } = meta;
   const url = `${BASE_URL}/lessons/${slug.join("/")}`;
   const fullTitle = `${title} · QuantumLearn`;
 
@@ -64,7 +66,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const breadcrumbSchema = buildBreadcrumbSchema([
     { name: "Learn", url: `${BASE_URL}/learn` },
     ...(pillar ? [{ name: pillar.title, url: pillarUrl(pillar.slug) }] : []),
-    ...(course ? [{ name: course.title, url: pillarUrl(course.pillar) }] : []),
+    // The course crumb must point at the course's own page — the same URL the
+    // visible breadcrumb links to via getCourseHref — not the pillar URL
+    // (which the previous crumb already used; duplicating it produced two
+    // BreadcrumbList items with different names but the same URL).
+    ...(course ? [{ name: course.title, url: `${BASE_URL}/courses/${course.slug}` }] : []),
     { name: lesson.lessonMeta.title, url: `${BASE_URL}/lessons/${slug}` },
   ]);
 

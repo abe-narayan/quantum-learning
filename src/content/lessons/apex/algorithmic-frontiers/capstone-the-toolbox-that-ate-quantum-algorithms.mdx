@@ -1,13 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Matrix } from "@/lib/quantum/matrix";
 import { PAULI_X, PAULI_Z, IDENTITY } from "@/lib/quantum/gates";
 import { commutator } from "@/lib/quantum/observables";
 import { optimalGroverIterations } from "@/lib/quantum/grover";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms"
-).map((problem) => problem.meta);
+);
 
 export const toolboxFrobeniusNorm = (M) => {
   let sum = 0;

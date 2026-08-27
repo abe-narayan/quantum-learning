@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Callout } from "@/components/mdx/Callout";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Evaluating Quantum Advantage Claims",

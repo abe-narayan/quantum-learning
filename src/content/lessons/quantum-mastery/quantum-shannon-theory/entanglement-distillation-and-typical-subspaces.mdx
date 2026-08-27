@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
@@ -9,9 +9,9 @@ import { pureStateDensityMatrix, vonNeumannEntropy } from "@/lib/quantum/density
 import { reducedDensityMatrixQubit0 } from "@/lib/quantum/partialTrace";
 import { BarChart } from "@/components/visualizations/BarChart";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Entanglement Distillation and Typical Subspaces",

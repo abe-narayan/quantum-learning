@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { LogicalQubitPatchDiagram } from "@/components/visualizations/LogicalQubitPatchDiagram";
 
 export const ftRatios = [100, 500, 1000, 2000, 5000];
 export const ftFrames = ftRatios.map((ratio) => ({
@@ -10,9 +11,9 @@ export const ftFrames = ftRatios.map((ratio) => ({
   ],
 }));
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/roadmaps-to-fault-tolerance"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Roadmaps to Fault Tolerance",

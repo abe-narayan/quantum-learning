@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
@@ -12,9 +12,9 @@ import { Matrix } from "@/lib/quantum/matrix";
 import { StateVector } from "@/lib/quantum/state";
 import { pureStateDensityMatrix, densityMatrixExpectationValue } from "@/lib/quantum/densityMatrix";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-shannon-theory/povms-and-generalized-measurement"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "POVMs and Generalized Measurement",

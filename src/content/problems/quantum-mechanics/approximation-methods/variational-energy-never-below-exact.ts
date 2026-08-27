@@ -29,7 +29,12 @@ export const variationalEnergyNeverBelowExact: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 0.001,
+    // The value itself is ≈ +1.94e-5, so the tolerance must be smaller than
+    // the value: a looser one (0.001 previously) accepted 0 and negative
+    // submissions, contradicting this problem's whole point that the sign
+    // can never be negative. 1e-5 accepts plausible roundings (1.9e-5,
+    // 1.94e-5, 2e-5) while rejecting 0 and everything below it.
+    tolerance: 0.00001,
     incorrectFeedback: "Subtract: optimized trial energy minus exact ground energy. The variational theorem guarantees this is never negative.",
   },
   hints: [

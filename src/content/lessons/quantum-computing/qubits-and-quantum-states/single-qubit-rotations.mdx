@@ -1,10 +1,10 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/single-qubit-rotations"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Single-Qubit Rotations",

@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PipelineDiagram } from "@/components/visualizations/PipelineDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count"
-).map((problem) => problem.meta);
+);
 
 export function smallestOddAtLeast(x) {
   let n = Math.ceil(x);

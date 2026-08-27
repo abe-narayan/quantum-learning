@@ -26,12 +26,9 @@ import { buildBreadcrumbSchema } from "@/lib/structuredData";
  * links here from the "open a lesson right now" strip; nothing that pointed at
  * `/lessons` before is broken by the change, because the redirect's target was
  * never a deep link.
- *
- * NOTE for whoever owns `src/app/sitemap.ts`: this route needs adding to
- * `STATIC_ROUTES` there, and its entry in `EXCLUDED_FROM_SITEMAP` in
- * `src/lib/design/__tests__/routes.test.ts` should be removed — its stated
- * reason ("a permanentRedirect stub to /learn — no content of its own") is no
- * longer true. Both files are outside this agent's scope.
+ * (Both follow-ups that used to be flagged here are done: `/lessons` is in
+ * `sitemap.ts`'s `STATIC_ROUTES`, and it is no longer excluded in
+ * `routes.test.ts`.)
  */
 
 export const metadata: Metadata = buildPageMetadata({

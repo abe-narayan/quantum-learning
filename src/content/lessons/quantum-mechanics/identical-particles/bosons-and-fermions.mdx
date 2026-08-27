@@ -1,13 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Complex } from "@/lib/quantum/complex";
 import { symmetrize, antisymmetrize, exchangeParticles } from "@/lib/quantum/identicalParticles";
 import { vectorToExchangeGrid } from "@/components/visualizations/ExchangeDiagram";
 import { ExchangeDiagramExplorer } from "@/components/visualizations/ExchangeDiagramExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/identical-particles/bosons-and-fermions"
-).map((problem) => problem.meta);
+);
 
 export const basisDim = 3;
 export const e0 = [new Complex(1), new Complex(0), new Complex(0)];

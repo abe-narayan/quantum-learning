@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 import { harmonicOscillatorEnergyLevel } from "@/lib/quantum/potentials";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/wave-mechanics/the-harmonic-oscillator-in-position-space"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "The Harmonic Oscillator in Position Space",

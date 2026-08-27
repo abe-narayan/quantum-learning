@@ -1,69 +1,42 @@
-import { readdir } from "node:fs/promises";
-import path from "node:path";
 import type { ComponentType } from "react";
 import type { LessonMeta, LessonMetaWithSlug } from "./types";
+import { LESSON_METAS } from "./lessonMeta.generated";
 
-const LESSONS_ROOT = path.join(process.cwd(), "src/content/lessons");
-
-async function walk(dir: string, base = ""): Promise<string[]> {
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch (error) {
-    if (base === "" && (error as NodeJS.ErrnoException).code === "ENOENT") {
-      // The lessons root itself doesn't exist yet (e.g. a fresh checkout
-      // before any content has been authored). That's a legitimate "no
-      // lessons" state, not a bug, so an empty corpus is the honest answer.
-      return [];
-    }
-    // Any other failure (permissions, a transient FS error, or ENOENT on a
-    // nested directory that the top-level readdir just told us exists) is a
-    // genuine bug, not "no lessons". Propagate it so the build fails loudly
-    // instead of silently shipping a lesson-free site — mirroring how
-    // `loadLesson()` below refuses to swallow errors for known-good slugs.
-    throw error;
-  }
-  const slugs: string[] = [];
-
-  for (const entry of entries) {
-    const relativePath = base ? `${base}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      slugs.push(...(await walk(path.join(dir, entry.name), relativePath)));
-    } else if (entry.name.endsWith(".mdx")) {
-      slugs.push(relativePath.replace(/\.mdx$/, ""));
-    }
-  }
-
-  return slugs;
-}
-
-// Module-level (not React `cache()`) memoization is deliberate here. React's
-// `cache()` from "react" only dedupes within a single request/render pass —
-// in Next's static generation, each page's static generation is its own such
-// pass, so `cache()` would NOT stop getAllLessonsMeta() from re-walking the
-// filesystem and re-importing every lesson module on every one of the ~155+
-// lesson pages (that's exactly the O(N^2) import blowup this file exists to
-// fix). A plain module-level cache instead persists for the lifetime of the
-// `next build` process, so the walk + every lesson import happens once total
-// and is reused by every page/catalog call site, regardless of the "request"
-// boundaries React's cache() respects.
-
-let slugsPromise: Promise<string[]> | null = null;
+/**
+ * Lesson METADATA comes from `lessonMeta.generated.ts` (produced by
+ * `scripts/generate-lesson-registry.mjs` before every dev/build/test run);
+ * lesson BODIES are dynamically imported per slug by `loadLesson()` below.
+ *
+ * This split is the site's core build-memory invariant. The previous version
+ * of `getAllLessonsMeta()` obtained metadata by dynamically importing every
+ * one of the 219 compiled MDX modules — each a full React component tree with
+ * KaTeX-rendered math, ~36MB of compiled JS for the corpus — and caching them
+ * for the life of the process. Because the root-layout Footer and every
+ * catalog/lesson/problem page call it, every one of Next's static-generation
+ * worker processes imported and retained the entire compiled corpus, which
+ * multiplied into a SIGKILL/OOM on Vercel's 8GB build container. Now metadata
+ * consumers touch only a small plain-data array, and the only compiled MDX
+ * module a page ever imports is the one lesson body it renders.
+ *
+ * Staleness semantics match the problem registry: the generated file is
+ * rewritten by the `predev`/`prebuild`/`pretest` hooks, so a lesson added
+ * mid-`next dev` session appears after re-running the generator (or
+ * restarting dev) — same accepted tradeoff as `registry.generated.ts`.
+ * Drift between a registry entry and the real module's `lessonMeta` export is
+ * caught by the equality assertion in `__tests__/lessons.test.ts`.
+ */
 
 /** All authored lesson slugs, e.g. "quantum-computing/qubits-and-quantum-states/what-is-a-qubit". */
 export function getAllLessonSlugs(): Promise<string[]> {
-  if (!slugsPromise) {
-    // Deliberately not `.catch(() => [])`-ed: `walk()` already resolves a
-    // missing lessons root to `[]` (a legitimate empty corpus) and rejects
-    // for every other error. Swallowing that rejection here would turn any
-    // real filesystem failure into a silent empty corpus, which — since
-    // `generateStaticParams` and `dynamicParams = false` derive every
-    // `/lessons/*` route from this list — would let `next build` succeed
-    // while every lesson URL 404s. Let it throw and fail the build instead.
-    slugsPromise = walk(LESSONS_ROOT);
-  }
-  return slugsPromise;
+  return Promise.resolve(LESSON_METAS.map((lesson) => lesson.slug));
 }
+
+/**
+ * Known-good slugs as a Set for O(1) membership checks in `loadLesson`.
+ * (Async APIs above are kept Promise-returning so the many existing call
+ * sites — and any future move back to runtime discovery — stay unchanged.)
+ */
+const KNOWN_SLUGS = new Set(LESSON_METAS.map((lesson) => lesson.slug));
 
 type LessonModule = {
   default: ComponentType;
@@ -75,7 +48,7 @@ const lessonModuleCache = new Map<string, Promise<LessonModule | null>>();
 /**
  * Dynamically loads a single lesson's MDX component and metadata by slug.
  *
- * `generateStaticParams` (via `getAllLessonSlugs()`) establishes the full set
+ * The generated registry (via `getAllLessonSlugs()`) establishes the full set
  * of known-good slugs up front, and the lesson route sets `dynamicParams =
  * false`. That means a thrown error here for a slug that IS in that known
  * set is never a legitimate "not found" — it's a real bug in the MDX file
@@ -90,8 +63,7 @@ export function loadLesson(slug: string): Promise<LessonModule | null> {
   if (cached) return cached;
 
   const promise = (async () => {
-    const knownSlugs = await getAllLessonSlugs();
-    if (!knownSlugs.includes(slug)) {
+    if (!KNOWN_SLUGS.has(slug)) {
       // Unknown slug: a failed import here is expected ("no such lesson"),
       // so swallow it and let the caller 404.
       // `@vite-ignore`: harmless for webpack/Turbopack (which already
@@ -114,30 +86,17 @@ export function loadLesson(slug: string): Promise<LessonModule | null> {
   return promise;
 }
 
-let allLessonsMetaPromise: Promise<LessonMetaWithSlug[]> | null = null;
-
 /** Metadata for every authored lesson, used to drive catalog pages. */
 export function getAllLessonsMeta(): Promise<LessonMetaWithSlug[]> {
-  if (!allLessonsMetaPromise) {
-    allLessonsMetaPromise = (async () => {
-      const slugs = await getAllLessonSlugs();
+  return Promise.resolve(LESSON_METAS);
+}
 
-      const lessons = await Promise.all(
-        slugs.map(async (slug) => {
-          const mod = await loadLesson(slug);
-          if (!mod) return null;
-          return { ...mod.lessonMeta, slug };
-        })
-      );
-
-      return lessons.filter((lesson): lesson is LessonMetaWithSlug => lesson !== null);
-    })();
-  }
-  return allLessonsMetaPromise;
+/** Registry lookup for a single lesson's metadata — no MDX module import. */
+export function getLessonMeta(slug: string): LessonMetaWithSlug | undefined {
+  return LESSON_METAS.find((lesson) => lesson.slug === slug);
 }
 
 /** Every authored lesson belonging to a given course slug. */
 export async function getLessonsForCourse(courseSlug: string): Promise<LessonMetaWithSlug[]> {
-  const all = await getAllLessonsMeta();
-  return all.filter((lesson) => lesson.course === courseSlug);
+  return LESSON_METAS.filter((lesson) => lesson.course === courseSlug);
 }

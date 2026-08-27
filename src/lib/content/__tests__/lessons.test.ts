@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { getAllLessonSlugs, loadLesson } from "../lessons";
+import { getAllLessonSlugs, getAllLessonsMeta, loadLesson } from "../lessons";
 import { getCourse, getModule } from "../curriculum";
 
 /** The loaded-lesson shape, derived from `loadLesson` rather than imported:
@@ -74,6 +74,29 @@ describe("lesson corpus integrity", () => {
       expect(mod, `loadLesson("${slug}") resolved to null`).not.toBeNull();
       expect(mod?.default, `lesson "${slug}" has no default export`).toBeTypeOf("function");
       expect(mod?.lessonMeta, `lesson "${slug}" has no lessonMeta export`).toBeDefined();
+    }
+  });
+
+  it("generated metadata registry matches every real module's lessonMeta export", async () => {
+    // `getAllLessonsMeta()` serves metadata from `lessonMeta.generated.ts`
+    // (text-extracted by scripts/generate-lesson-registry.mjs) instead of
+    // importing compiled MDX modules — that is the build-memory invariant
+    // that fixed the Vercel OOM. The one real risk of that design is silent
+    // drift between a registry entry and the module's actual `lessonMeta`
+    // export (e.g. the brace-scan extractor mis-slicing an unusual literal).
+    // This closes it: deep-equality against every real module, in the one
+    // test file that already pays for compiling the whole corpus.
+    const registry = await getAllLessonsMeta();
+    const bySlug = new Map(registry.map((entry) => [entry.slug, entry] as const));
+    expect(registry.length, "registry lesson count").toBe(slugs.length);
+    for (const slug of slugs) {
+      const entry = bySlug.get(slug);
+      expect(entry, `registry has no entry for "${slug}"`).toBeDefined();
+      const { slug: entrySlug, ...entryMeta } = entry!;
+      expect(entrySlug).toBe(slug);
+      expect(entryMeta, `registry entry for "${slug}" drifted from the module's lessonMeta`).toEqual(
+        modules.get(slug)?.lessonMeta
+      );
     }
   });
 

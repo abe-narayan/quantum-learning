@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
 import { amplitudeDampingChannel, dephasingChannel, applyChannelRepeatedly } from "@/lib/quantum/openSystems";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/capstone-operators-and-paths"
-).map((problem) => problem.meta);
+);
 
 export const capstonePlusRho = new Matrix([
   [new Complex(0.5), new Complex(0.5)],

@@ -1,13 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, applySingleQubitGate } from "@/lib/quantum/gates";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility"
-).map((problem) => problem.meta);
+);
 
 export const zero = StateVector.zero(1);
 export const xBasisProbs = applySingleQubitGate(zero, HADAMARD, 0).probabilities();

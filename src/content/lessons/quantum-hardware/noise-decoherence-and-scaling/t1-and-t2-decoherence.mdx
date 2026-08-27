@@ -1,10 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+import { DecoherenceBlochDecay } from "@/components/visualizations/DecoherenceBlochDecay";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence"
-).map((problem) => problem.meta);
+);
 
 export const WORKED_EXAMPLE_T1_US = 80;
 export const T2_CEILING_US = 2 * WORKED_EXAMPLE_T1_US;

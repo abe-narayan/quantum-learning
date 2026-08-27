@@ -1,11 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { finiteSquareWellPotential, finiteSquareWellGroundStateEnergy } from "@/lib/quantum/potentials";
+import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/one-dimensional-systems/the-finite-square-well-setting-up-the-equation"
-).map((problem) => problem.meta);
+);
 
 export const finiteWellGrid = createGrid(256, 0.1);
 export const finiteWellShape = finiteSquareWellPotential(finiteWellGrid, 2, 4);

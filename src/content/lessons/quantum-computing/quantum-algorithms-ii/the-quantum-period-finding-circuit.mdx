@@ -1,15 +1,15 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { LazyPeriodFindingExplorer } from "@/components/simulators/period-finding-explorer/LazyPeriodFindingExplorer";
 import { PeriodFindingSchematic } from "@/components/visualizations/PeriodFindingSchematic";
 import { periodFindingMeasurementDistribution, classicalOrder } from "@/lib/quantum/shor";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-ii/the-quantum-period-finding-circuit"
-).map((problem) => problem.meta);
+);
 
 export const periodDistribution = periodFindingMeasurementDistribution(7, 15, 6);
 

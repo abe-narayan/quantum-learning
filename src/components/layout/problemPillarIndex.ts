@@ -38,9 +38,12 @@ import type { Pillar } from "@/lib/content/types";
  * this one — so a stale entry here is possible after a content change. A
  * missing/renamed slug degrades gracefully (the navbar simply shows no
  * pillar indicator on that one problem, same as today), it does not mislabel
- * one pillar as another.
+ * one pillar as another — and `__tests__/problemPillarIndex.test.ts` diffs
+ * this table against the real content directory, so a stale entry fails the
+ * suite instead of lingering. (Exported for that test only; chrome consumers
+ * go through `problemPillar` below.)
  */
-const PROBLEM_SLUGS_BY_PILLAR: Record<Pillar, readonly string[]> = {
+export const PROBLEM_SLUGS_BY_PILLAR: Record<Pillar, readonly string[]> = {
   "quantum-mechanics": [
     "allowed-m-values-for-j-three-halves",
     "amplitude-damping-trace-check",

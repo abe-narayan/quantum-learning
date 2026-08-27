@@ -5,11 +5,12 @@ import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
 import { measureQubit } from "@/lib/quantum/measurement";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Multi-Qubit Measurement",

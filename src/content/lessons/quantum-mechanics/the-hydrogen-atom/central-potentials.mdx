@@ -1,10 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { OrbitalShapePlot } from "@/components/visualizations/OrbitalShapePlot";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/the-hydrogen-atom/central-potentials"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Central Potentials",

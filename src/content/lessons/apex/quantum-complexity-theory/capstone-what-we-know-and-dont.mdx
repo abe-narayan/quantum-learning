@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { LessonHook } from "@/components/narrative/LessonHook";
@@ -8,10 +8,11 @@ import { DerivationSteps, DerivationStep } from "@/components/narrative/Derivati
 import { ResearchConnection } from "@/components/narrative/ResearchConnection";
 import { ChallengePrompt } from "@/components/narrative/ChallengePrompt";
 import { NextDiscovery } from "@/components/narrative/NextDiscovery";
+import { ComplexityClassDiagram } from "@/components/visualizations/ComplexityClassDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/quantum-complexity-theory/capstone-what-we-know-and-dont"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Capstone: What We Know and Don't",

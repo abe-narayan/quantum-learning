@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 import { QuantumCircuit, runCircuit, sampleMeasurements } from "@/lib/quantum/circuitBuilder";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/programming-quantum-computers/writing-your-first-circuit"
-).map((problem) => problem.meta);
+);
 
 export const ghzSampleCircuit = new QuantumCircuit(3).h(0).cnot(0, 1).cnot(1, 2);
 export const ghzSampleState = runCircuit(ghzSampleCircuit);

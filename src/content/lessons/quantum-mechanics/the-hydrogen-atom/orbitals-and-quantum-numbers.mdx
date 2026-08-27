@@ -1,11 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { radial1s, radial2s, radial2p } from "@/lib/quantum/hydrogenAtom";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { OrbitalDensityCloud } from "@/components/visualizations/OrbitalDensityCloud";
+import { OrbitalShapePlot } from "@/components/visualizations/OrbitalShapePlot";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers"
-).map((problem) => problem.meta);
+);
 
 export const R_MAX = 15;
 export const R_STEPS = 120;

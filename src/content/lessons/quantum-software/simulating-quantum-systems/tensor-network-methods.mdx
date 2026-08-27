@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 import { TensorNetworkDiagram } from "@/components/visualizations/TensorNetworkDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/simulating-quantum-systems/tensor-network-methods"
-).map((problem) => problem.meta);
+);
 
 export const mpsBondDimension = 16;
 export const mpsMemoryBytes = (n) => 16 * n * 2 * mpsBondDimension * mpsBondDimension;

@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PAULI_X, PAULI_Y, HADAMARD } from "@/lib/quantum/gates";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge"
-).map((problem) => problem.meta);
+);
 
 export const involutionPreset = (label, matrix) => ({
   label,

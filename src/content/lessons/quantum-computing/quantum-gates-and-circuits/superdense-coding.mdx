@@ -2,13 +2,13 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, HADAMARD, PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/superdense-coding"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Superdense Coding",

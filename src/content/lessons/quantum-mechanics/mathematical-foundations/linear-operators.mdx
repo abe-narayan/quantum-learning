@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/linear-operators"
-).map((problem) => problem.meta);
+);
 
 export const opA = new Matrix([[new Complex(2), new Complex(0)], [new Complex(0), new Complex(3)]]);
 export const opB = new Matrix([[new Complex(0), new Complex(1)], [new Complex(1), new Complex(0)]]);

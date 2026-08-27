@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PAULI_Z } from "@/lib/quantum/gates";
 import { costFunction, exactGroundStateEnergy } from "@/lib/quantum/vqe";
 import { eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits"
-).map((problem) => problem.meta);
+);
 
 export const zGroundEnergy = exactGroundStateEnergy(PAULI_Z);
 export const [zEigenA, zEigenB] = eigenvaluesHermitian2x2(PAULI_Z);

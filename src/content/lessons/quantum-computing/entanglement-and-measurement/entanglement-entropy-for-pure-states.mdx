@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 
 export const shannonTerm = (x) => (x >= 1e-12 ? -x * Math.log2(x) : 0);
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Entanglement Entropy for Pure Bipartite States",

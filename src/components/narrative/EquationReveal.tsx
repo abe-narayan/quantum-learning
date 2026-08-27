@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import katex from "katex";
+import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { TechLabel } from "@/components/ui/Typography";
 
@@ -42,17 +41,47 @@ function looksLikeLatexSource(symbol: string): boolean {
  *  through KaTeX instead of showing visible `^{...}`/`_{...}` markup. */
 function ChipSymbol({ symbol }: { symbol: string }) {
   const isLatex = looksLikeLatexSource(symbol);
-  const html = useMemo(() => {
-    if (!isLatex) return null;
-    try {
-      return katex.renderToString(symbol, { displayMode: false, throwOnError: false, strict: false });
-    } catch {
-      return null;
-    }
+  // Keyed by the symbol it was rendered from, so a stale result for a
+  // previous symbol is simply ignored at render time — no state reset (and
+  // so no lint-flagged synchronous setState) needed in the effect.
+  const [rendered, setRendered] = useState<{ symbol: string; html: string } | null>(null);
+
+  // KaTeX is loaded on demand (`await import`), never statically: this
+  // component sits in the global MDX mapping, so a top-level `import katex`
+  // here put ~272KB of minified KaTeX into the eager client JS of every
+  // lesson page — to serve only this misuse-fallback branch, which the
+  // documented usage never hits. The normal path (plain-text chips, the
+  // equation itself KaTeX'd at build time) ships none of it. When the
+  // fallback *does* trigger, the chip shows its raw `symbol` text for the
+  // instant the chunk takes to arrive, then typesets — an acceptable
+  // transient for a safety net that already dev-warns the author.
+  useEffect(() => {
+    if (!isLatex) return;
+    let cancelled = false;
+    import("katex")
+      .then(({ default: katex }) => {
+        if (cancelled) return;
+        try {
+          setRendered({
+            symbol,
+            html: katex.renderToString(symbol, { displayMode: false, throwOnError: false, strict: false }),
+          });
+        } catch {
+          // Even throwOnError:false can throw on non-Error inputs; keep the
+          // raw symbol text.
+        }
+      })
+      .catch(() => {
+        // Chunk failed to load (offline, CDN hiccup) — keep the raw symbol
+        // text, which is exactly what the pre-KaTeX state already shows.
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [isLatex, symbol]);
 
-  if (html) {
-    return <span className="katex-math" dangerouslySetInnerHTML={{ __html: html }} />;
+  if (isLatex && rendered?.symbol === symbol) {
+    return <span className="katex-math" dangerouslySetInnerHTML={{ __html: rendered.html }} />;
   }
   return <>{symbol}</>;
 }

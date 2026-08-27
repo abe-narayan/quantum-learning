@@ -1,12 +1,12 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { angularMomentumZ, totalAngularMomentumSquared } from "@/lib/quantum/angularMomentum";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom"
-).map((problem) => problem.meta);
+);
 
 export const hydrogenPresetForL = (l) => ({
   label: `l = ${l}  (${2 * l + 1} degenerate m-states)`,

@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { StateVector } from "@/lib/quantum/state";
 import { PAULI_Y } from "@/lib/quantum/gates";
 import { pureStateDensityMatrix, convexCombination, maximallyMixedState, eigenvaluesHermitian2x2, purity } from "@/lib/quantum/densityMatrix";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Relative Entropy and Mixed-State Entanglement",

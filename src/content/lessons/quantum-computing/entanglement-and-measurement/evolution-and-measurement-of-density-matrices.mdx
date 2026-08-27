@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { Complex } from "@/lib/quantum/complex";
@@ -8,9 +8,9 @@ import { IDENTITY, PAULI_X, PAULI_Y, PAULI_Z, HADAMARD } from "@/lib/quantum/gat
 import { outerProduct } from "@/lib/quantum/projectors";
 import { evolveDensityMatrix, densityMatrixMeasurementProbability } from "@/lib/quantum/densityMatrix";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices"
-).map((problem) => problem.meta);
+);
 
 export const gateEvolutionRho = new Matrix([
   [new Complex(0.75), Complex.ZERO],

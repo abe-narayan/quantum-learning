@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
 import { amplitudeDampingChannel, dephasingChannel } from "@/lib/quantum/openSystems";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators"
-).map((problem) => problem.meta);
+);
 
 export const [K0_AD, K1_AD] = amplitudeDampingChannel(0.3);
 export const [K0_DP, K1_DP] = dephasingChannel(0.3);

@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { blochStateFromAngles } from "@/lib/quantum/bloch";
 import { BerryPhaseCone } from "@/components/visualizations/BerryPhaseCone";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase"
-).map((problem) => problem.meta);
+);
 
 export const berryLoopStates = (theta, steps) =>
   Array.from({ length: steps + 1 }, (_, i) => blochStateFromAngles({ theta, phi: (2 * Math.PI * i) / steps }));

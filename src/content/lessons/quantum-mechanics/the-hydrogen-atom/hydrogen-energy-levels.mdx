@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { hydrogenEnergyLevel } from "@/lib/quantum/hydrogenAtom";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels"
-).map((problem) => problem.meta);
+);
 
 export const hydrogenLevels = [1, 2, 3, 4, 5, 6].map((n) => ({
   label: `n = ${n}`,

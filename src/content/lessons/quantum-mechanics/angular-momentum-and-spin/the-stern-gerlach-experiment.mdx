@@ -1,8 +1,10 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { SternGerlachScreen } from "@/components/visualizations/SternGerlachScreen";
+import { SpinAxisMeasurement } from "@/components/visualizations/SpinAxisMeasurement";
+import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
 
 export const sequentialTree = {
   label: "start",
@@ -54,9 +56,9 @@ export const sequentialTree = {
   ],
 };
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "The Stern-Gerlach Experiment",

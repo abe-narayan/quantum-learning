@@ -2,11 +2,11 @@ import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/La
 import { LazySuperpositionJourney } from "@/components/visualizations/superposition-journey/LazySuperpositionJourney";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/what-is-a-qubit"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "What Is a Qubit?",

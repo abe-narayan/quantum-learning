@@ -7,11 +7,14 @@
  * renaming, or deleting a file under `src/content/problems/**` — this file
  * will be silently overwritten on the next run either way.
  *
- * Entries are sorted by content path for reproducibility, which is NOT the
- * same as the previous hand-authored order. The only place PROBLEMS order is
- * read semantically is `getCourseCheckpointProblems` in `registry.ts`
- * (spreads a sample across a course) — a reordering changes which sample
- * problems it picks, not correctness.
+ * Entries are sorted by content path (plain code-unit comparison — see
+ * `compareSlugs` in scripts/lib/extract.mjs — deterministic across
+ * machines/locales), which is NOT the same as the previous hand-authored
+ * order. The only place PROBLEMS order is read semantically is
+ * `getCourseCheckpointProblems` in `registry.ts` (spreads a sample across
+ * a course) — a reordering changes which sample problems it picks, not
+ * correctness. `problemMeta.generated.ts` is emitted by the same run in
+ * the same order.
  *
  * See `registry.ts`, which imports `PROBLEMS` from here and owns every
  * lookup function (`getProblem`, `getProblemsForLesson`, ...); this file's

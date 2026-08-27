@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { QuantumCircuit, runCircuit, sampleMeasurements } from "@/lib/quantum/circuitBuilder";
 
 export const sdkSampleCircuit = new QuantumCircuit(2).h(0).cnot(0, 1);
@@ -8,9 +8,9 @@ export const sdkSampleCounts = sampleMeasurements(sdkSampleState, 1000);
 export const sdkCount00 = sdkSampleCounts["00"] || 0;
 export const sdkCount11 = sdkSampleCounts["11"] || 0;
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/programming-quantum-computers/quantum-sdks-overview"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Quantum SDKs Overview",

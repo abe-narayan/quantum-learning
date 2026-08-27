@@ -1,11 +1,12 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
+import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/sources-of-noise"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Sources of Noise",

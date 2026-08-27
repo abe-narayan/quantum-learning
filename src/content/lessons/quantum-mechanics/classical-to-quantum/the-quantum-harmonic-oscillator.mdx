@@ -1,13 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { harmonicOscillatorEnergyLevels, creationOperator } from "@/lib/quantum/harmonicOscillator";
 import { Complex } from "@/lib/quantum/complex";
 
 export const oscillatorLevels = harmonicOscillatorEnergyLevels(6, 1);
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
-).map((problem) => problem.meta);
+);
 
 export const ladderDimension = 5;
 export const ladderOperator = creationOperator(ladderDimension);

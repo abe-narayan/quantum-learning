@@ -1,10 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { thermalPhotonOccupation } from "@/lib/quantum/thermalPhysics";
+import { DilutionRefrigeratorDiagram } from "@/components/visualizations/DilutionRefrigeratorDiagram";
+import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/control-and-readout/cryogenic-systems"
-).map((problem) => problem.meta);
+);
 
 export const QUBIT_FREQUENCY_HZ = 5e9;
 export const T_MIN_K = 0.01;

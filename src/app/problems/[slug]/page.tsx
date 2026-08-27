@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllProblemMeta, getProblem } from "@/lib/problems/registry";
+import { getProblem } from "@/lib/problems/registry";
+// Meta-only source for generateStaticParams: enumerating slugs must not be
+// the thing that pulls the full 547-problem graph in — though this page's
+// render genuinely needs it via `getProblem` above.
+import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { getCourse, getPillar } from "@/lib/content/curriculum";
 import { ProblemLayout, PREREQUISITE_ANCHOR_ID } from "@/components/problems/ProblemLayout";
@@ -66,7 +70,9 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
   const breadcrumbSchema = buildBreadcrumbSchema([
     { name: "Problems", url: `${BASE_URL}/problems` },
     ...(pillar ? [{ name: pillar.title, url: pillarUrl(pillar.slug) }] : []),
-    ...(course ? [{ name: course.title, url: pillarUrl(course.pillar) }] : []),
+    // Course crumb points at the course's own page (matching the visible
+    // breadcrumb), not the pillar URL the previous crumb already used.
+    ...(course ? [{ name: course.title, url: `${BASE_URL}/courses/${course.slug}` }] : []),
     { name: problem.meta.title, url: `${BASE_URL}/problems/${slug}` },
   ]);
 

@@ -70,6 +70,30 @@ describe("handleExternalStorageChange (lesson progress)", () => {
     expect(store.getLessonProgress("some-lesson").completed).toBe(false);
   });
 
+  it("coerces corrupted field values (truthy non-booleans) back to safe defaults", async () => {
+    // Valid JSON, wrong shape: `"false"` is a truthy string, so without the
+    // per-field type guard it would count as a completed lesson.
+    const { getLessonProgressStore, handleExternalStorageChange } = await import("./localStorageStore");
+    const store = getLessonProgressStore();
+
+    handleExternalStorageChange({
+      key: KEY,
+      newValue: JSON.stringify({ completed: "false", completedAt: "yesterday" }),
+    } as StorageEvent);
+
+    expect(store.getLessonProgress("some-lesson")).toEqual({ completed: false, completedAt: null });
+  });
+
+  it("reads a corrupted record straight from storage as safe defaults too (getItem path)", async () => {
+    const fakeStorage = makeFakeLocalStorage();
+    vi.stubGlobal("window", { localStorage: fakeStorage });
+    fakeStorage.setItem(KEY, JSON.stringify({ completed: 1, completedAt: null }));
+
+    const { getLessonProgressStore, getAllCompletedLessonSlugs } = await import("./localStorageStore");
+    expect(getLessonProgressStore().getLessonProgress("some-lesson").completed).toBe(false);
+    expect(getAllCompletedLessonSlugs().has("some-lesson")).toBe(false);
+  });
+
   it("invalidates the completed-slugs aggregate cache so a completion from another tab is picked up", async () => {
     // A real browser's localStorage is one shared, synchronous store across
     // tabs on the same origin — by the time tab B's `storage` event fires,

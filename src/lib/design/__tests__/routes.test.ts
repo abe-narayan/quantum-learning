@@ -24,10 +24,12 @@ import { COURSES } from "@/lib/content/curriculum";
  * ---------------------------------------------------------------
  * Why this file reads source text instead of importing the modules
  * ---------------------------------------------------------------
- * This is load-bearing, not a stylistic choice. `src/app/sitemap.ts` and
- * `src/app/courses/[slug]/page.tsx` both call `getAllLessonSlugs()` /
- * `getAllLessonsMeta()`, which dynamically import every lesson in
- * `src/content/lessons/**`. Under Vitest those .mdx files have no build
+ * This is load-bearing, not a stylistic choice. (Historical note: it became
+ * *less* dire when `getAllLessonsMeta()` moved to the generated metadata
+ * registry — metadata reads no longer import MDX modules at all — but the
+ * principle stands: route tests must not pull content-registry graphs.)
+ * `src/lib/content/__tests__/lessons.test.ts` still imports every lesson via
+ * `loadLesson()`. Under Vitest those .mdx files have no build
  * cache: `vitest.config.ts`'s `mdx()` plugin recompiles all ~219 of them
  * in-process through remark-math + rehype-katex on first import. Measured
  * on this machine, a single test that touches that corpus

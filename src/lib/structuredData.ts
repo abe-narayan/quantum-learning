@@ -17,11 +17,26 @@ import { DIFFICULTY_LABEL } from "./content/types";
 import type { ProblemDifficulty } from "./problems/types";
 import { PROBLEM_TO_DIFFICULTY } from "./problems/types";
 
-// Placeholder domain — no production domain is configured anywhere in this
-// repo. Matches the placeholder used in src/app/sitemap.ts, src/app/robots.ts,
-// and src/app/layout.tsx; swap all of them for the real deployed domain
-// together.
-export const BASE_URL = "https://quantumlearn.example";
+// Single source of truth for the site origin — src/app/sitemap.ts, robots.ts,
+// and layout.tsx import this rather than redeclaring it (they used to carry
+// four independent copies of the placeholder that all had to be swapped
+// together). Resolution order:
+//   1. NEXT_PUBLIC_SITE_URL — explicit override for any host.
+//   2. VERCEL_PROJECT_PRODUCTION_URL — set automatically in every Vercel
+//      build (bare domain, no protocol), so canonicals/OG/sitemap/robots are
+//      correct on Vercel with zero configuration.
+//   3. The placeholder, for local builds where absolute URLs don't matter.
+// Read at build time only (this is a pure-SSG site), so a changed env var
+// takes effect on the next build, which is the only place it could anyway.
+// `?.trim() || undefined` (not `??`): an env var set to "" or whitespace must
+// fall through to the next source, not produce a BASE_URL that makes
+// `new URL("")` throw at build time with an obscure message.
+const configuredOrigin =
+  (process.env.NEXT_PUBLIC_SITE_URL?.trim() || undefined) ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim()
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.trim()}`
+    : undefined);
+export const BASE_URL = (configuredOrigin ?? "https://quantumlearn.example").replace(/\/+$/, "");
 
 const SITE_NAME = "QuantumLearn";
 const SITE_DESCRIPTION =

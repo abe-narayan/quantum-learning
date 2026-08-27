@@ -5,11 +5,11 @@ import { measureQubit } from "@/lib/quantum/measurement";
 import { LazyCircuitBuilder } from "@/components/simulators/circuit-builder/LazyCircuitBuilder";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/building-quantum-circuits"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Building Quantum Circuits",

@@ -2,12 +2,13 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { BB84RoundTable } from "@/components/visualizations/BB84RoundTable";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution"
-).map((problem) => problem.meta);
+);
 
 export const zBasisEncode = (bit) => StateVector.basis(1, bit);
 export const xBasisEncode = (bit) => applySingleQubitGate(StateVector.basis(1, bit), HADAMARD, 0);

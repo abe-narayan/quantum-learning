@@ -4,17 +4,23 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "npm run generate:registry && npm run generate:search-index",
+    "predev": "npm run generate",
     "dev": "next dev",
-    "prebuild": "npm run generate:registry && npm run generate:search-index",
+    "prebuild": "npm run generate",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "pretypecheck": "npm run generate:registry && npm run generate:lesson-registry",
     "typecheck": "tsc --noEmit",
-    "pretest": "npm run generate:registry && npm run generate:search-index",
+    "pretest": "npm run generate",
     "test": "vitest run",
+    "generate": "npm run generate:registry && npm run generate:lesson-registry && npm run generate:search-index",
     "generate:registry": "node scripts/generate-problem-registry.mjs",
+    "generate:lesson-registry": "node scripts/generate-lesson-registry.mjs",
     "generate:search-index": "node scripts/generate-search-index.mjs"
+  },
+  "engines": {
+    "node": ">=22.18"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

@@ -1,12 +1,9 @@
 import type { MetadataRoute } from "next";
 import { COURSES } from "@/lib/content/curriculum";
 import { getAllLessonSlugs } from "@/lib/content/lessons";
-import { getAllProblemMeta } from "@/lib/problems/registry";
+import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 
-// No production domain is configured anywhere in this repo (checked
-// next.config.ts, .env*, and src/app/ for an existing "https://" reference).
-// This is a placeholder — swap it for the real deployed domain.
-const BASE_URL = "https://quantumlearn.example";
+import { BASE_URL } from "@/lib/structuredData";
 
 const STATIC_ROUTES = [
   "",

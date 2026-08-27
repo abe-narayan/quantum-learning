@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { harmonicOscillatorEigenstate } from "@/lib/quantum/potentials";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness"
-).map((problem) => problem.meta);
+);
 
 export const decayGrid = createGrid(256, 16 / 256);
 export const groundState = harmonicOscillatorEigenstate(decayGrid, 0, 1);

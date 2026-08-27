@@ -1,12 +1,12 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { angularMomentumRaising } from "@/lib/quantum/angularMomentum";
 import { Complex } from "@/lib/quantum/complex";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum"
-).map((problem) => problem.meta);
+);
 
 export const ladderDim = (j) => Math.round(2 * j + 1);
 

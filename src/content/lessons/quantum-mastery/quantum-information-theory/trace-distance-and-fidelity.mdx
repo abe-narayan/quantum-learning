@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
@@ -8,9 +8,9 @@ import { HADAMARD, applySingleQubitGate } from "@/lib/quantum/gates";
 import { pureStateDensityMatrix, purity, eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
 import { amplitudeDampingChannel, dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Trace Distance and Fidelity",

@@ -1,11 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { radial1s, radial2p } from "@/lib/quantum/hydrogenAtom";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/the-hydrogen-atom/the-radial-equation"
-).map((problem) => problem.meta);
+);
 
 export const rGridEff = Array(160).fill(0).map((_, i) => 0.05 + (i / 159) * 7.95);
 export const effectivePotential = (l) => rGridEff.map((r) => -1 / r + (l * (l + 1)) / (2 * r * r));

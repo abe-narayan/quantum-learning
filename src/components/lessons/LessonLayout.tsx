@@ -8,7 +8,11 @@ import { PillarScope } from "@/components/field/PillarScope";
 import { COURSES, PILLARS } from "@/lib/content/curriculum";
 import type { Course, LessonMeta, LessonMetaWithSlug } from "@/lib/content/types";
 import { getCourseCheckpointProblems } from "@/lib/problems/registry";
-import { CourseCheckpoint } from "@/components/problems/CourseCheckpoint";
+// The lazy wrapper, not `CourseCheckpoint` itself: a static import here put
+// the whole ProblemView/KaTeX chain in the eager client graph of every
+// lesson page, though the checkpoint renders only on a course's final
+// lesson — see LazyCourseCheckpoint's doc comment.
+import { LazyCourseCheckpoint } from "@/components/problems/LazyCourseCheckpoint";
 import { getCourseHref } from "@/components/curriculum/courseHref";
 import { LessonCompleteToggle } from "./LessonCompleteToggle";
 import { ReadingProgressBar } from "./ReadingProgressBar";
@@ -293,7 +297,7 @@ export function LessonLayout({
 
         {finishedCourse && checkpointProblems.length > 0 ? (
           <div className="mt-10 max-w-3xl">
-            <CourseCheckpoint courseTitle={finishedCourse.title} problems={checkpointProblems} />
+            <LazyCourseCheckpoint courseTitle={finishedCourse.title} problems={checkpointProblems} />
           </div>
         ) : null}
       </Container>

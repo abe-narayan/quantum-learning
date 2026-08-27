@@ -1,13 +1,14 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
 import { Complex } from "@/lib/quantum/complex";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/angular-momentum-and-spin/angular-momentum-commutation-relations"
-).map((problem) => problem.meta);
+);
 
 export const commCommutator = (j) => angularMomentumX(j)
   .mul(angularMomentumY(j))

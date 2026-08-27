@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, phaseGate, applySingleQubitGate, applyControlledGate, applySwap } from "@/lib/quantum/gates";
 import { phaseEstimation, quantumFourierTransform } from "@/lib/quantum/qft";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth"
-).map((problem) => problem.meta);
+);
 
 export function closedFormProb(phi, m, t) {
   const N = 2 ** t;

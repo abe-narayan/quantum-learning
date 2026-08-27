@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/dirac-notation"
-).map((problem) => problem.meta);
+);
 
 export const zeroState = new StateVector([Complex.ONE, Complex.ZERO]);
 export const oneState = new StateVector([Complex.ZERO, Complex.ONE]);

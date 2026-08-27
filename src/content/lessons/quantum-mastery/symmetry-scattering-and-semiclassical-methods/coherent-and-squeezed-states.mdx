@@ -1,13 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { UncertaintyEllipse } from "@/components/visualizations/UncertaintyEllipse";
 import { annihilationOperator, creationOperator, positionOperator } from "@/lib/quantum/harmonicOscillator";
 import { Complex } from "@/lib/quantum/complex";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states"
-).map((problem) => problem.meta);
+);
 
 export const dim = 30;
 

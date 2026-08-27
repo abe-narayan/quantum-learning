@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, rotationY, rotationZ, PAULI_Z } from "@/lib/quantum/gates";
 import { expectationValue } from "@/lib/quantum/observables";
 import { tensorAll } from "@/lib/quantum/matrix";
 import { CostLandscapeHeatmap } from "@/components/visualizations/CostLandscapeHeatmap";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability"
-).map((problem) => problem.meta);
+);
 
 export function mulberry32(seed) {
   let a = seed >>> 0;

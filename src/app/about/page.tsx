@@ -9,7 +9,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { COURSES, PILLARS } from "@/lib/content/curriculum";
 import { GLOSSARY_TERMS } from "@/lib/content/glossary";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
-import { getAllProblemMeta } from "@/lib/problems/registry";
+import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { buildSearchIndex } from "@/lib/search";
 import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
 import { buildBreadcrumbSchema } from "@/lib/structuredData";

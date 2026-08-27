@@ -2,7 +2,7 @@ import { PILLARS } from "./curriculum";
 import type { Pillar } from "./types";
 
 /**
- * One of the 12 real simulator anchors on `/simulators` (each `<section>`
+ * One of the 13 real simulator anchors on `/simulators` (each `<section>`
  * there is addressable as `/simulators#${simulatorId}`).
  */
 export type SimulatorId =

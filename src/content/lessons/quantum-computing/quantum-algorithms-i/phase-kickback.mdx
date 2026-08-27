@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { StateVector, tensorStates } from "@/lib/quantum/state";
 import { applySingleQubitGate, HADAMARD } from "@/lib/quantum/gates";
 import { applyBitOracle, balancedFunction } from "@/lib/quantum/oracles";
@@ -9,9 +9,9 @@ import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/phase-kickback"
-).map((problem) => problem.meta);
+);
 
 export const kickbackF = balancedFunction(1);
 

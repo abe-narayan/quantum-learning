@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
 import { pureStateDensityMatrix, convexCombination, maximallyMixedState } from "@/lib/quantum/densityMatrix";
@@ -13,9 +13,9 @@ export const maximallyMixedTwoQubit = maximallyMixedState(4);
 
 
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/the-chsh-inequality"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "The CHSH Inequality and Quantum Violation",

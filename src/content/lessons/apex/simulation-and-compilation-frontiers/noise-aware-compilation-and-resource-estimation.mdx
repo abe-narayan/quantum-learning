@@ -1,9 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { GraphDiagram } from "@/components/visualizations/GraphDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation"
-).map((problem) => problem.meta);
+);
 
 export const requiredInteractions = [
   { from: 0, to: 1 },

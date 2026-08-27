@@ -1,10 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
+import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors"
-).map((problem) => problem.meta);
+);
 
 export const eigenDemoA = (x, y) => ({ x: 2 * x + y, y: x + 2 * y });
 export const eigenSweepU = (angleDeg) => ({

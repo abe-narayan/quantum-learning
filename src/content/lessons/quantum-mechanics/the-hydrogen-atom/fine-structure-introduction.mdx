@@ -1,11 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { hydrogenEnergyLevel, RYDBERG_EV } from "@/lib/quantum/hydrogenAtom";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { LevelSplittingDiagram } from "@/components/visualizations/LevelSplittingDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/the-hydrogen-atom/fine-structure-introduction"
-).map((problem) => problem.meta);
+);
 
 export const fineStructureAlpha = 1 / 137;
 export const fineStructureScaleEV = fineStructureAlpha * fineStructureAlpha * RYDBERG_EV;

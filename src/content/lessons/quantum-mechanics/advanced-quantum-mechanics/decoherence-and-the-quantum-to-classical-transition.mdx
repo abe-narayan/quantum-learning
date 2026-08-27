@@ -1,13 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
 import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
 import { dephasingChannel, applyChannelRepeatedly } from "@/lib/quantum/openSystems";
+import { DecoherenceBlochDecay } from "@/components/visualizations/DecoherenceBlochDecay";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"
-).map((problem) => problem.meta);
+);
 
 export const decoherenceLambda = 0.3;
 

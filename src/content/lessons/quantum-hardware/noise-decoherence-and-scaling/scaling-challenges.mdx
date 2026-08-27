@@ -1,9 +1,9 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/noise-decoherence-and-scaling/scaling-challenges"
-).map((problem) => problem.meta);
+);
 
 export const FIDELITIES = [0.95, 0.99, 0.999, 0.9999];
 export const MAX_GATES = 1200;

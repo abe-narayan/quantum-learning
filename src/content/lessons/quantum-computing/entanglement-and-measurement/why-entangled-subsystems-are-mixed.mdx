@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matrix-explorer/LazyDensityMatrixExplorer";
 import { LazyEntanglementCorrelation } from "@/components/visualizations/entanglement-correlation/LazyEntanglementCorrelation";
 import { Complex } from "@/lib/quantum/complex";
@@ -28,9 +28,9 @@ export const survivalPresets = [
   { label: "|Φ+⟩ (maximally entangled, ad−bc=0.5)", frames: [{ paramLabel: "|Φ+⟩", ...survivalPanelsFor(bellPhiPlusState) }] },
 ];
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Why Entangled Subsystems Are Mixed",

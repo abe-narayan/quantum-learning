@@ -2,14 +2,14 @@ import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
 import { spinObservableInXZPlane, chshValue } from "@/lib/quantum/chsh";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/capstone-analyzing-quantum-correlations"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Capstone: Analyzing Quantum Correlations",

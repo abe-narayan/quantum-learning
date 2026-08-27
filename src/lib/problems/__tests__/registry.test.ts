@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getAllProblems, getProblem, getProblemsForLesson } from "../registry";
 import { getCourse } from "@/lib/content/curriculum";
+import { LESSON_METAS } from "@/lib/content/lessonMeta.generated";
 import { StateVector } from "@/lib/quantum/state";
 import { Complex } from "@/lib/quantum/complex";
 import { HADAMARD, PAULI_X, PAULI_Y, PAULI_Z, applySingleQubitGate, applyCNOT, rotationAboutAxis } from "@/lib/quantum/gates";
@@ -39,6 +40,21 @@ describe("problem registry integrity", () => {
   it("references a real course for every problem", () => {
     for (const problem of problems) {
       expect(getCourse(problem.meta.course), `course "${problem.meta.course}" for ${problem.meta.slug}`).toBeDefined();
+    }
+  });
+
+  it("references a real lesson for every problem that sets meta.lesson", () => {
+    // The course reference is checked above, but `meta.lesson` was not — a
+    // typo'd lesson slug silently orphans the problem: getProblemsForLesson
+    // never returns it, so no lesson page ever links to it. Sourced from the
+    // generated metadata registry (cheap — no MDX imports).
+    const lessonSlugs = new Set(LESSON_METAS.map((meta) => meta.slug));
+    for (const problem of problems) {
+      if (problem.meta.lesson === undefined) continue;
+      expect(
+        lessonSlugs.has(problem.meta.lesson),
+        `lesson "${problem.meta.lesson}" for ${problem.meta.slug} is not a real lesson slug`
+      ).toBe(true);
     }
   });
 

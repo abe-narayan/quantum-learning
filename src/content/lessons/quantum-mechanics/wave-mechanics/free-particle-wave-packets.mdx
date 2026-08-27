@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 import { ExpectationTrace } from "@/components/visualizations/ExpectationTrace";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/wave-mechanics/free-particle-wave-packets"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Free-Particle Wave Packets",

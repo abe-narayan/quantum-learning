@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { optimalGroverIterations } from "@/lib/quantum/grover";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity"
-).map((problem) => problem.meta);
+);
 
 export const djN = 8;
 export const djClassicalWorstCase = 2 ** (djN - 1) + 1;

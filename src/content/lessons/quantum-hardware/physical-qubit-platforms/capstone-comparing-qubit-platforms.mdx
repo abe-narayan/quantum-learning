@@ -1,7 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { Question } from "@/components/narrative/Question";
+import { GraphDiagram } from "@/components/visualizations/GraphDiagram";
+import { HardwarePlatformSchematic } from "@/components/visualizations/HardwarePlatformSchematic";
+import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
 
 export const gateBudgetFrames = [
   {
@@ -40,9 +44,9 @@ export const gateTimeBars = gateSecondsByPlatform.map(({ label, seconds, caption
   highlight,
 }));
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Capstone: Comparing Qubit Platforms",

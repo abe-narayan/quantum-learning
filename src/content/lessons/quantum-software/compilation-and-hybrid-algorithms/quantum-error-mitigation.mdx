@@ -1,13 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
 import { MatrixGrid } from "@/components/visualizations/MatrixGrid";
 import { BarChart } from "@/components/visualizations/BarChart";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/compilation-and-hybrid-algorithms/quantum-error-mitigation"
-).map((problem) => problem.meta);
+);
 
 export const zneP = 0.05;
 

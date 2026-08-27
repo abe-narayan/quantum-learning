@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { pureStateDensityMatrix, convexCombination, maximallyMixedState, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
 import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Quantum Entropy and Information Measures",

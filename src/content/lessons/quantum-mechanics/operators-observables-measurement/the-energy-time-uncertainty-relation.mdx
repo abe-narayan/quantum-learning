@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
 import { LinewidthDiagram } from "@/components/visualizations/LinewidthDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/operators-observables-measurement/the-energy-time-uncertainty-relation"
-).map((problem) => problem.meta);
+);
 
 export const boundFrame = (deltaEHalves) => ({
   paramLabel: `ΔE = ${(deltaEHalves / 2).toFixed(2)}`,

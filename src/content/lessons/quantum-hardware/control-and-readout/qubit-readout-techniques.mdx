@@ -1,5 +1,8 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { ObservePredictExplain } from "@/components/narrative/ObservePredictExplain";
+import { DispersiveReadoutDiagram } from "@/components/visualizations/DispersiveReadoutDiagram";
+import { ReadoutScatter } from "@/components/visualizations/ReadoutScatter";
 
 export const readoutFidelities = [95, 96, 97, 98, 99];
 export const readoutFrames = readoutFidelities.map((pct) => ({
@@ -10,9 +13,9 @@ export const readoutFrames = readoutFidelities.map((pct) => ({
   ],
 }));
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-hardware/control-and-readout/qubit-readout-techniques"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Qubit Readout Techniques",

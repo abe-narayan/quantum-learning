@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { HADAMARD, S_GATE } from "@/lib/quantum/gates";
 import { Matrix } from "@/lib/quantum/matrix";
 import { Complex } from "@/lib/quantum/complex";
@@ -7,9 +7,9 @@ import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 import { VectorDiagramExplorerPair } from "@/components/visualizations/VectorDiagramExplorerPair";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/unitary-operators"
-).map((problem) => problem.meta);
+);
 
 export const unitaryCheckPreset = (label, matrix) => ({
   label,

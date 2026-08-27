@@ -1,12 +1,13 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { Callout } from "@/components/mdx/Callout";
+import { ComplexityClassDiagram } from "@/components/visualizations/ComplexityClassDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "apex/quantum-complexity-theory/the-local-hamiltonian-problem"
-).map((problem) => problem.meta);
+);
 
 export function applyPauliX(state) {
   return [state[1], state[0]];

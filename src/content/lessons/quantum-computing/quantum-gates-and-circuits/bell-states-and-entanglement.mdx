@@ -4,11 +4,12 @@ import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Bell States and Entanglement",

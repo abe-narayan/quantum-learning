@@ -1,10 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
+import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/why-quantum-errors-are-different"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Why Quantum Errors Are Different",

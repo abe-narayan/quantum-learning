@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
 import { infiniteSquareWellEnergyLevel } from "@/lib/quantum/potentials";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents"
-).map((problem) => problem.meta);
+);
 
 export const wellHalfWidth = 1;
 export const wellGreenFunction = (E, xLess, xGreater, a) => {

@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { barrierScatteringTransmission } from "@/lib/quantum/scattering";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/one-dimensional-systems/one-dimensional-systems-challenge"
-).map((problem) => problem.meta);
+);
 
 export const challengeBarrierWidth = 1.2825;
 export const challengeBarrierHeights = [1, 2, 3, 4];

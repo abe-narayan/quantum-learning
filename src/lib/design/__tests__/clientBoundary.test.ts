@@ -52,6 +52,18 @@ const SERVER_ONLY: Record<string, string> = {
   // future `"use client"` component that reaches for a definition fails loudly
   // rather than quietly shipping the whole glossary to every visitor.
   "lib/content/glossary.ts": "all 239 glossary definitions (~38KB gzip); search reads the prebuilt index instead",
+  // The meta-only registry split out of `lib/problems/registry` so server
+  // pages can list/count problems without the bodies. Meta-only is *lighter*
+  // than the full registry, not light: 547 titles/slugs/tags is still a
+  // corpus-sized module, and any client surface that needs a slice of it
+  // should be handed that slice by a server component (the
+  // `problemPillarIndex` pattern) rather than importing the whole thing.
+  "lib/problems/metaRegistry.ts": "meta for all 547 problems; shape a slice server-side instead of shipping the index",
+  "lib/problems/problemMeta.generated.ts": "the generated all-problem meta array behind metaRegistry",
+  // Same reasoning as the problem meta registry: 219 lesson metas (~40KB
+  // gzip) are for server components to slice; client surfaces get exactly
+  // the fields they need as props (slug→title maps etc.).
+  "lib/content/lessonMeta.generated.ts": "the generated all-lesson meta array behind lib/content/lessons",
   content: "raw lesson/problem content modules",
 };
 
@@ -205,6 +217,43 @@ function findServerOnlyReachableFrom(entry: string): { module: string; reason: s
   return null;
 }
 
+/**
+ * Bare package specifiers (e.g. `"katex"`, `"react"`) reachable through
+ * *static* imports from an entry module, mapped to the path that reached
+ * them.
+ *
+ * Honest about lazy boundaries by construction, not by special-casing:
+ * `importsOf` matches only `import ... from "..."` statement forms, so a
+ * `dynamic(() => import("..."))` factory or an on-demand `await
+ * import("...")` is never an edge here — which mirrors the bundler exactly,
+ * where a dynamic `import()` starts a separate, lazily fetched chunk instead
+ * of joining the eager graph. A `Lazy*` wrapper therefore contributes its
+ * own (thin) imports but not its dynamically-loaded payload.
+ */
+function externalPackagesReachableFrom(entry: string): Map<string, string[]> {
+  const seen = new Set<string>();
+  const found = new Map<string, string[]>();
+  const queue: Array<{ file: string; via: string[] }> = [{ file: entry, via: [rel(entry)] }];
+
+  while (queue.length > 0) {
+    const { file, via } = queue.shift()!;
+    if (seen.has(file)) continue;
+    seen.add(file);
+
+    for (const specifier of importsOf(read(file))) {
+      const resolved = resolve(file, specifier);
+      if (resolved) {
+        queue.push({ file: resolved, via: [...via, rel(resolved)] });
+      } else if (!specifier.startsWith(".") && !specifier.startsWith("@/") && !found.has(specifier)) {
+        // Unresolvable and not a project path — an external package.
+        found.set(specifier, [...via, specifier]);
+      }
+    }
+  }
+
+  return found;
+}
+
 const CLIENT_FILES = ALL_FILES.filter((file) => /^\s*["']use client["']/.test(read(file)));
 
 describe("client bundle boundary", () => {
@@ -250,6 +299,49 @@ describe("client bundle boundary", () => {
       over,
       "these ship to the browser for interactive filtering/search; if one has genuinely outgrown its budget, raise it deliberately or split the module",
     ).toEqual([]);
+  });
+
+  it("keeps katex out of the eager graph of the global MDX component mapping", () => {
+    // `src/mdx-components.tsx` is compiled into every one of the 219 lesson
+    // pages, and the client components it references hydrate on all of them
+    // — so anything statically reachable from it is paid on every lesson.
+    // KaTeX is ~272KB minified and already rendered at build time for lesson
+    // math; the only sanctioned client-side uses are on-demand (`await
+    // import("katex")` in EquationReveal's misuse fallback) or behind
+    // `next/dynamic` boundaries, neither of which is an eager edge — see
+    // externalPackagesReachableFrom for why that exclusion is honest. This
+    // walk slightly *over*approximates the client payload (it also traverses
+    // mapping components that stay server-rendered), so a pass is a stronger
+    // promise than the bundle needs, and a failure names a real static chain.
+    const external = externalPackagesReachableFrom(path.join(SRC, "mdx-components.tsx"));
+
+    // Guards the guard: the mapping's graph unquestionably reaches react,
+    // clsx, etc. — if the walk ever finds nothing, the walk is broken, and
+    // the katex assertion below would be passing vacuously.
+    expect(external.size).toBeGreaterThan(1);
+
+    expect(
+      external.get("katex")?.join(" -> "),
+      "katex must not be statically reachable from the MDX mapping; load it on demand or behind a client-side next/dynamic boundary",
+    ).toBeUndefined();
+  });
+
+  it("keeps katex out of the eager graph of LessonLayout", () => {
+    // The other katex-to-every-lesson chain the audit found: LessonLayout
+    // statically imported CourseCheckpoint -> ProblemView -> Solution/Hint
+    // panels -> KatexMath -> katex, even though the checkpoint renders only
+    // on a course's final lesson. It now goes through LazyCourseCheckpoint's
+    // dynamic boundary. Same overapproximation caveat as above — this walk
+    // also crosses LessonLayout's server-only imports (the problem registry),
+    // which never ship to the client; that only makes a pass stronger.
+    const external = externalPackagesReachableFrom(
+      path.join(SRC, "components/lessons/LessonLayout.tsx"),
+    );
+
+    expect(
+      external.get("katex")?.join(" -> "),
+      "katex must not be statically reachable from LessonLayout; keep the checkpoint/problem chain behind LazyCourseCheckpoint",
+    ).toBeUndefined();
   });
 
   it("keeps every App Router page a server component", () => {

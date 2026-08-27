@@ -24,6 +24,12 @@ function parseProgress(raw: string | null): ProblemProgress {
       ...parsed,
       attempts: Array.isArray(parsed.attempts) ? parsed.attempts : EMPTY_PROGRESS.attempts,
       hintsRevealed: typeof parsed.hintsRevealed === "number" ? parsed.hintsRevealed : EMPTY_PROGRESS.hintsRevealed,
+      // Same guard for the booleans: a corrupted truthy string (e.g.
+      // `solved: "false"`) would otherwise mark the problem solved / the
+      // solution revealed everywhere these are read as booleans.
+      solved: typeof parsed.solved === "boolean" ? parsed.solved : EMPTY_PROGRESS.solved,
+      solutionRevealed:
+        typeof parsed.solutionRevealed === "boolean" ? parsed.solutionRevealed : EMPTY_PROGRESS.solutionRevealed,
     };
   } catch {
     return EMPTY_PROGRESS;

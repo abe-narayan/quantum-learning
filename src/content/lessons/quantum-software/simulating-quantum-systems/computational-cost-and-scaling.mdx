@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-software/simulating-quantum-systems/computational-cost-and-scaling"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Computational Cost & Scaling",

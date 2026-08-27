@@ -1,10 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"
-).map((problem) => problem.meta);
+);
 
 export const csDemoV = { x: 1, y: 2 };
 export const csDemoU = (angleDeg) => ({

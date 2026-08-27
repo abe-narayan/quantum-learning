@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { firstOrderEnergyCorrection, firstOrderStateCorrection, secondOrderEnergyCorrection } from "@/lib/quantum/approximationMethods";
 import { harmonicOscillatorEnergyLevels, positionOperator } from "@/lib/quantum/harmonicOscillator";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/approximation-methods/time-independent-perturbation-theory"
-).map((problem) => problem.meta);
+);
 
 export const petH0diag = harmonicOscillatorEnergyLevels(8, 1);
 export const petX = positionOperator(8, 1, 1);

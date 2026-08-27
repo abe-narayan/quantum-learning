@@ -273,7 +273,12 @@ describe("MDX corpus hazards", () => {
       }
     }
 
-    expect(registered.size, "parsed no components out of mdx-components.tsx").toBeGreaterThan(40);
+    // The mapping is deliberately small now: it keeps only broadly-used
+    // components, and narrowly-used ones are imported explicitly by the
+    // lessons that use them (see the policy comment in src/mdx-components.tsx
+    // and the ≤30 budget in src/lib/design/__tests__/mdxMapping.test.ts).
+    // This bound only guards against the parser silently matching nothing.
+    expect(registered.size, "parsed no components out of mdx-components.tsx").toBeGreaterThan(15);
     expect(
       seenAcrossCorpus.size,
       "the tag scan found almost no components — the strip step is probably too aggressive",

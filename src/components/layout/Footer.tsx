@@ -24,9 +24,12 @@ export async function Footer() {
   // Derived live, same source `Hero.tsx` uses (`getAllLessonsMeta().length`)
   // — this used to be a hand-typed `LESSON_COUNT = 219` constant that could
   // silently drift from the real count the next time a lesson was added or
-  // removed. See docs/UX_REVIEW.md P2-7. `getAllLessonsMeta()` is
-  // module-level-memoized (see its own doc comment), so this costs nothing
-  // extra on pages that already render something that calls it.
+  // removed. See docs/UX_REVIEW.md P2-7. `getAllLessonsMeta()` reads the
+  // generated metadata registry (a small plain-data array — no MDX module
+  // imports; see src/lib/content/lessons.ts), so calling it from the footer
+  // of every page is genuinely cheap. That mattered: this exact call used to
+  // dynamically import all 219 compiled MDX modules, which put the whole
+  // corpus in every static-generation worker just to render this count.
   const lessonCount = (await getAllLessonsMeta()).length;
 
   return (

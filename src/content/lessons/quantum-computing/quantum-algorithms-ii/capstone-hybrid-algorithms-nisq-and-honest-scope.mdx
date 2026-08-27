@@ -1,14 +1,14 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
 import { qaoaCircuit, expectedCutSize, bruteForceMaxCut } from "@/lib/quantum/qaoa";
 import { PAULI_X, PAULI_Z } from "@/lib/quantum/gates";
 import { runVqe } from "@/lib/quantum/vqe";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope"
-).map((problem) => problem.meta);
+);
 
 export const depthEdges = [[0, 1], [1, 2], [0, 2]];
 export const depthTrueMax = bruteForceMaxCut(3, depthEdges);

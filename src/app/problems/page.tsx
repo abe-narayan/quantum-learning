@@ -3,7 +3,7 @@ import { PillarScope } from "@/components/field/PillarScope";
 import { Section } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { ProblemsCatalog } from "@/components/problems/ProblemsCatalog";
-import { getAllProblemMeta } from "@/lib/problems/registry";
+import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
 import { buildBreadcrumbSchema } from "@/lib/structuredData";

@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { Complex } from "@/lib/quantum/complex";
@@ -8,9 +8,9 @@ import { eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
 import { amplitudeDampingChannel, dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Quantum Channels: Kraus and Choi",

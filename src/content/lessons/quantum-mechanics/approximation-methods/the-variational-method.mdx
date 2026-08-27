@@ -1,12 +1,12 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { gaussianTrialEnergy } from "@/lib/quantum/approximationMethods";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { harmonicOscillatorPotential, harmonicOscillatorEnergyLevel } from "@/lib/quantum/potentials";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/approximation-methods/the-variational-method"
-).map((problem) => problem.meta);
+);
 
 export const trialGrid = createGrid(1024, 0.05);
 export const trialPotential = harmonicOscillatorPotential(trialGrid, 1, 1);

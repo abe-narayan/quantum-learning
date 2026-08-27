@@ -2,11 +2,11 @@ import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/La
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/measurement-and-probability"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Measurement and Probability",

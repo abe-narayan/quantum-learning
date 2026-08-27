@@ -1,5 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { Complex } from "@/lib/quantum/complex";
@@ -7,10 +7,11 @@ import { Matrix } from "@/lib/quantum/matrix";
 import { StateVector } from "@/lib/quantum/state";
 import { pureStateDensityMatrix, eigenvaluesHermitian2x2, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
 import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
+import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Schmidt Decomposition and Purification",

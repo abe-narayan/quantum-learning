@@ -4,11 +4,11 @@ import { applyCNOT, applySwap } from "@/lib/quantum/gates";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Controlled Gates and CNOT",

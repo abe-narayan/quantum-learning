@@ -5,7 +5,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { PillarBand } from "@/components/home/PillarBand";
 import { DailyPuzzle } from "@/components/home/DailyPuzzle";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
-import { getAllProblemMeta } from "@/lib/problems/registry";
+import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { PILLAR_VISUALS } from "@/lib/design/pillars";
 
 const PILLAR = "quantum-software" as const;

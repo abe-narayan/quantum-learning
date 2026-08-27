@@ -1,14 +1,15 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 import { createGrid } from "@/lib/quantum/wavefunction";
 import { barrierPotential } from "@/lib/quantum/potentials";
 import { LazyTunnelingIntroVisual } from "@/components/visualizations/tunneling-intro/LazyTunnelingIntroVisual";
+import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier"
-).map((problem) => problem.meta);
+);
 
 export const barrierGrid = createGrid(256, 0.1);
 export const barrierShape = barrierPotential(barrierGrid, 0, 1, 5);

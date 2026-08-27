@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { QuantumField } from "@/components/field/QuantumField";
-import { buildOrganizationSchema, buildWebSiteSchema } from "@/lib/structuredData";
+import { BASE_URL, buildOrganizationSchema, buildWebSiteSchema } from "@/lib/structuredData";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,11 +26,6 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   axes: ["opsz", "SOFT", "WONK"],
 });
-
-// Placeholder domain — no production domain is configured anywhere in this
-// repo. Matches the placeholder used in src/app/sitemap.ts and robots.ts;
-// swap all three for the real deployed domain together.
-const BASE_URL = "https://quantumlearn.example";
 
 const title = {
   default: "QuantumLearn — Learn Quantum Mechanics & Quantum Computing",

@@ -1,11 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyWavefunctionExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionExplorer";
 import { PhaseSpacePanel } from "@/components/visualizations/PhaseSpacePanel";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform"
-).map((problem) => problem.meta);
+);
 
 export const gaussianPacketFrame = (sigma) => ({
   paramLabel: `σ = ${sigma.toFixed(2)}`,

@@ -5,11 +5,11 @@ import { applySingleQubitGate, applyCNOT, HADAMARD } from "@/lib/quantum/gates";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem"
-).map((problem) => problem.meta);
+);
 
 export const plusSingle = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
 

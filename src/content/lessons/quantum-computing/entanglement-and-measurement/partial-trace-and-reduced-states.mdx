@@ -2,15 +2,15 @@ import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
 import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { PartialTraceHighlight } from "@/components/visualizations/PartialTraceHighlight";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/partial-trace-and-reduced-states"
-).map((problem) => problem.meta);
+);
 
 export const lessonMeta = {
   title: "Partial Trace and Reduced States",

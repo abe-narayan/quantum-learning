@@ -1,9 +1,10 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
-import { getProblemsForLesson } from "@/lib/problems/registry";
+import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { ScatteringStandingWave } from "@/components/visualizations/ScatteringStandingWave";
 
-export const practiceProblems = getProblemsForLesson(
+export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/one-dimensional-systems/scattering-off-a-step-potential"
-).map((problem) => problem.meta);
+);
 
 export const stepHeight = 4;
 export const stepK1 = (ratio) => Math.sqrt(2 * ratio * stepHeight);

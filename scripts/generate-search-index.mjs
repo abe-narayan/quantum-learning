@@ -7,8 +7,8 @@
  * page's RSC/hydration payload via the root layout.
  *
  * Why this exists as a script rather than something called at request time:
- * the index needs metadata from every lesson (158 MDX files under
- * `src/content/lessons/**`) and every problem (423 TS files under
+ * the index needs metadata from every lesson (the MDX files under
+ * `src/content/lessons/**`) and every problem (the TS files under
  * `src/content/problems/**`), and neither is something a plain Node script
  * can get by just importing the real modules:
  *
@@ -39,10 +39,13 @@
  * hooks (alongside `generate:registry`).
  */
 import { existsSync } from "node:fs";
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+// Shared with generate-lesson-registry.mjs — one implementation of the
+// walk + brace-scan + literal-eval technique (see scripts/lib/extract.mjs).
+import { walk, compareSlugs, extractObjectLiteral } from "./lib/extract.mjs";
 
 /**
  * Lets this script `import()` the repo's plain-data `.ts` modules that use
@@ -82,80 +85,8 @@ const LESSONS_ROOT = path.join(ROOT, "src/content/lessons");
 const PROBLEMS_ROOT = path.join(ROOT, "src/content/problems");
 const OUTPUT = path.join(ROOT, "public/search-index.json");
 
-/** Recursively collects every file ending in `extension` under `dir`, as slugs relative to `dir` (posix-separated, no extension). */
-async function walk(dir, extension, base = "") {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const slugs = [];
-
-  for (const entry of entries) {
-    const relativePath = base ? `${base}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      slugs.push(...(await walk(path.join(dir, entry.name), extension, relativePath)));
-    } else if (entry.name.endsWith(extension)) {
-      slugs.push(relativePath.slice(0, -extension.length));
-    }
-  }
-
-  return slugs;
-}
-
-/** Finds the index of the `}` that closes the `{` at `openIndex`, respecting string literals (so braces inside strings don't confuse depth-counting). */
-function findMatchingBrace(source, openIndex) {
-  let depth = 0;
-  let inString = null;
-
-  for (let i = openIndex; i < source.length; i++) {
-    const ch = source[i];
-    if (inString) {
-      if (ch === "\\") {
-        i++; // skip the escaped character
-      } else if (ch === inString) {
-        inString = null;
-      }
-      continue;
-    }
-    if (ch === '"' || ch === "'" || ch === "`") {
-      inString = ch;
-    } else if (ch === "{") {
-      depth++;
-    } else if (ch === "}") {
-      depth--;
-      if (depth === 0) return i;
-    }
-  }
-
-  throw new Error("Unbalanced braces while scanning for the end of an object literal");
-}
-
-/**
- * Finds the first match of `keyPattern` (a regex whose match ends in "{",
- * e.g. `/meta:\s*\{/`) in `source`, then extracts and evaluates the object
- * literal that opening brace starts. Only ever evaluates the small,
- * self-contained literal it extracts — not the surrounding file — so this
- * is safe even though the source files themselves import from aliases this
- * script can't resolve.
- */
-function extractObjectLiteral(source, keyPattern, filePath, label) {
-  const match = keyPattern.exec(source);
-  if (!match) {
-    throw new Error(`${filePath}: could not find ${label} (expected to match ${keyPattern})`);
-  }
-  const openIndex = match.index + match[0].length - 1;
-  const closeIndex = findMatchingBrace(source, openIndex);
-  const literal = source.slice(openIndex, closeIndex + 1);
-  try {
-    // Evaluating our own trusted, plain-data object literal extracted from
-    // this repo's source (never user input) — the whole point is to avoid
-    // executing the rest of the file, which is what a real `import()`
-    // would do.
-    return new Function(`"use strict"; return (${literal});`)();
-  } catch (err) {
-    throw new Error(`${filePath}: failed to evaluate ${label}: ${err.message}`);
-  }
-}
-
 async function collectLessons() {
-  const slugs = (await walk(LESSONS_ROOT, ".mdx")).sort((a, b) => a.localeCompare(b));
+  const slugs = (await walk(LESSONS_ROOT, ".mdx")).sort(compareSlugs);
   if (slugs.length === 0) {
     throw new Error(`No lesson files found under ${LESSONS_ROOT} — refusing to generate an empty search index.`);
   }
@@ -171,7 +102,7 @@ async function collectLessons() {
 }
 
 async function collectProblems() {
-  const slugs = (await walk(PROBLEMS_ROOT, ".ts")).sort((a, b) => a.localeCompare(b));
+  const slugs = (await walk(PROBLEMS_ROOT, ".ts")).sort(compareSlugs);
   if (slugs.length === 0) {
     throw new Error(`No problem files found under ${PROBLEMS_ROOT} — refusing to generate an empty search index.`);
   }
@@ -180,7 +111,10 @@ async function collectProblems() {
   for (const slug of slugs) {
     const filePath = path.join(PROBLEMS_ROOT, `${slug}.ts`);
     const source = await readFile(filePath, "utf8");
-    const meta = extractObjectLiteral(source, /\bmeta:\s*\{/, filePath, "meta");
+    // Line-anchored — must stay identical to generate-problem-registry.mjs's
+    // pattern, or the two generators could extract DIFFERENT blocks from the
+    // same file (the search index has no drift test; the meta registry does).
+    const meta = extractObjectLiteral(source, /^\s*meta:\s*\{/m, filePath, "meta");
     problems.push(meta);
   }
   return problems;
