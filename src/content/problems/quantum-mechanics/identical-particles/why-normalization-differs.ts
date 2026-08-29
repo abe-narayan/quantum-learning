@@ -20,8 +20,8 @@ export const whyNormalizationDiffers: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["orthogonal", "a≠b", "distinct"],
-      ["a=b", "same state", "different norm", "not 1/√2"],
+      ["orthogonal", "distinct", "different states", "not equal", "a and b differ", "two different"],
+      ["a equals b", "same state", "same single-particle state", "identical states", "both the same", "different norm", "not 1/√2"],
     ],
     incorrectFeedback: "Address both cases explicitly: when a,b are distinct/orthogonal (where 1/√2 happens to be correct) and when a=b (where it is not).",
     partialFeedback: "Good — now be explicit about what the actual norm is in the a=b case for the symmetric combination.",

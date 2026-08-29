@@ -1,4 +1,4 @@
-import type { ProblemMeta } from "./types";
+import { compareProblemDifficulty, type ProblemMeta } from "./types";
 import { PROBLEM_METAS } from "./problemMeta.generated";
 
 /**
@@ -37,8 +37,18 @@ export function getProblemMeta(slug: string): ProblemMeta | undefined {
   return PROBLEM_METAS.find((meta) => meta.slug === slug);
 }
 
+/**
+ * A lesson's practice list, ordered easiest to hardest (stable within a
+ * rung). Mirrors `getProblemsForLesson` in `registry.ts` exactly — lesson
+ * pages render this list while the full-problem twin backs the problem
+ * pages, so the two must never disagree on order; `metaRegistry.test.ts`
+ * pins them together. `compareProblemDifficulty` lives in `types.ts`, which
+ * imports none of the problem/quantum graph, so this module stays light.
+ */
 export function getProblemMetaForLesson(lessonSlug: string): ProblemMeta[] {
-  return PROBLEM_METAS.filter((meta) => meta.lesson === lessonSlug);
+  return PROBLEM_METAS.filter((meta) => meta.lesson === lessonSlug).sort((a, b) =>
+    compareProblemDifficulty(a.difficulty, b.difficulty)
+  );
 }
 
 export function getProblemMetaForCourse(courseSlug: string): ProblemMeta[] {

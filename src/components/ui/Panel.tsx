@@ -45,7 +45,7 @@ export function Panel({
       className={cn(
         inset ? "panel-inset" : "panel",
         interactive &&
-          "transition-[border-color,background-color,transform] duration-[--dur-fast] ease-[--ease-instrument] hover:border-pillar-edge hover:bg-surface-muted motion-safe:hover:-translate-y-0.5",
+          "transition-[border-color,background-color,transform] duration-(--dur-fast) ease-instrument hover:border-pillar-edge hover:bg-surface-muted motion-safe:hover:-translate-y-0.5",
         className
       )}
     >
@@ -81,7 +81,16 @@ export function Instrument({
       {label || readout ? (
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-4 py-2.5 sm:px-5">
           {label ? <TechLabel>{label}</TechLabel> : <span />}
-          {readout ? <div className="flex items-center gap-4">{readout}</div> : null}
+          {/* `flex-wrap` because a readout is data. The outer row wraps the
+              label and the readout onto separate lines on a narrow screen,
+              which leaves this group ~256px at 320px — enough for one value,
+              not always for three (a date, a difficulty ladder and a units
+              string), and a non-wrapping row would have pushed the last one
+              out through the `overflow-hidden` on `.instrument` above, where
+              it is clipped rather than scrollable and so disappears with no
+              symptom. `gap-y-1` keeps a wrapped second line tight against the
+              first instead of inheriting the 16px horizontal gap. */}
+          {readout ? <div className="flex flex-wrap items-center gap-x-4 gap-y-1">{readout}</div> : null}
         </div>
       ) : null}
       <div className={cn("p-4 sm:p-5", bodyClassName)}>{children}</div>

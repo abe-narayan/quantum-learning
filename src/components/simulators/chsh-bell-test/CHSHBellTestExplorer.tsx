@@ -7,6 +7,7 @@ import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
 import {
   spinObservableInXZPlane,
   chshValue,
+  correlationExpectation,
   CHSH_CLASSICAL_BOUND,
   CHSH_QUANTUM_BOUND,
 } from "@/lib/quantum/chsh";
@@ -73,23 +74,36 @@ function anglesEqual(x: ChshAngles, y: ChshAngles, tolerance = 1e-6): boolean {
  * actual experiment that ruled local realism out.
  */
 export function CHSHBellTestExplorer() {
-  const [angles, setAngles] = useState<ChshAngles>(ZERO_ANGLES);
+  // First contact opens at the quantum-optimal angles, S = 2√2 ≈ 2.828 —
+  // the violation itself is on screen immediately, with the all-zero
+  // classical reference configuration (S = 2 exactly) one preset click away.
+  const [angles, setAngles] = useState<ChshAngles>(OPTIMAL_ANGLES);
   const [showComparison, setShowComparison] = useState(false);
 
   const rho = useMemo(() => pureStateDensityMatrix(bellPhiPlus()), []);
 
-  const sValue = useMemo(() => {
-    const observables = {
-      a: spinObservableInXZPlane(angles.a),
-      aPrime: spinObservableInXZPlane(angles.aPrime),
-      b: spinObservableInXZPlane(angles.b),
-      bPrime: spinObservableInXZPlane(angles.bPrime),
+  const { sValue, terms } = useMemo(() => {
+    const a = spinObservableInXZPlane(angles.a);
+    const aPrime = spinObservableInXZPlane(angles.aPrime);
+    const b = spinObservableInXZPlane(angles.b);
+    const bPrime = spinObservableInXZPlane(angles.bPrime);
+    return {
+      sValue: chshValue(rho, { a, aPrime, b, bPrime }),
+      // The four correlations S is assembled from, each straight from
+      // `correlationExpectation` — shown live so the reader can see *where*
+      // the violation comes from, not just that it happened.
+      terms: {
+        ab: correlationExpectation(rho, a, b),
+        abPrime: correlationExpectation(rho, a, bPrime),
+        aPrimeB: correlationExpectation(rho, aPrime, b),
+        aPrimeBPrime: correlationExpectation(rho, aPrime, bPrime),
+      },
     };
-    return chshValue(rho, observables);
   }, [rho, angles]);
 
   const exceedsClassical = Math.abs(sValue) > CHSH_CLASSICAL_BOUND + CLASSICAL_BOUND_EPSILON;
   const isZeroPreset = anglesEqual(angles, ZERO_ANGLES);
+  const atClassicalBound = Math.abs(Math.abs(sValue) - CHSH_CLASSICAL_BOUND) < 1e-6;
 
   return (
     <SimulatorInstrument
@@ -110,7 +124,7 @@ export function CHSHBellTestExplorer() {
         <div
           aria-live="polite"
           className={cn(
-            "rounded-xl border px-4 py-3 text-sm text-foreground",
+            "rounded-panel border px-4 py-3 text-sm text-foreground",
             exceedsClassical ? "border-accent/40 bg-accent/10" : "border-pillar/25 bg-pillar/5"
           )}
         >
@@ -134,7 +148,36 @@ export function CHSHBellTestExplorer() {
           <CHSHGauge sValue={sValue} />
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+        <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
+          <p className="text-xs font-medium text-muted-foreground">
+            The four correlations S is built from — note the last one is <em>subtracted</em>
+          </p>
+          <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
+            {[
+              { label: "E(a,b)", value: terms.ab, subtracted: false },
+              { label: "E(a,b′)", value: terms.abPrime, subtracted: false },
+              { label: "E(a′,b)", value: terms.aPrimeB, subtracted: false },
+              { label: "E(a′,b′)", value: terms.aPrimeBPrime, subtracted: true },
+            ].map((term) => (
+              <div key={term.label}>
+                <dt className={cn("font-mono text-[11px]", term.subtracted ? "text-accent" : "text-muted-foreground")}>
+                  {term.subtracted ? "− " : "+ "}
+                  {term.label}
+                </dt>
+                <dd className="font-mono text-sm text-foreground">{term.value.toFixed(3)}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        {/* No `overflow-x-auto` here: the only child is a block-level
+            `.katex-display`, which fills this content box and carries its own
+            horizontal scroll (globals.css §6), so this box never had anything to
+            scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+            y axis to `auto` too, which would silently clip a tall equation. The tab
+            stop the slab needs now lives on `.katex-display` itself; see
+            `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+        <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
           <KatexMath
             tex={`S = E(a,b) + E(a,b') + E(a',b) - E(a',b') = ${sValue.toFixed(4)}`}
             display
@@ -150,7 +193,7 @@ export function CHSHBellTestExplorer() {
             // collapsed, and an `aria-controls` IDREF that resolves to nothing
             // is invalid. `aria-expanded` carries the state on its own.
             aria-controls={showComparison ? "chsh-comparison-panel" : undefined}
-            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="flex w-full items-center justify-between gap-3 rounded-panel border border-border bg-surface px-4 py-3 text-left transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <span className="text-sm font-medium text-foreground">
               Compare: classical bound vs. your quantum result vs. Tsirelson&rsquo;s bound
@@ -165,18 +208,19 @@ export function CHSHBellTestExplorer() {
         </div>
 
         <Predict
-          question="Right now, at all-zero angles, S sits exactly at the classical limit of 2. If you move any angle away from zero — by hand or via the quantum-optimal preset — can S cross above 2?"
+          question="You open at the quantum-optimal angles: S = 2√2 ≈ 2.83, past anything classical. Load the all-angles-0° classical preset — where does S land?"
           options={[
-            { id: "yes", label: "Yes — it can exceed 2" },
-            { id: "no", label: "No — 2 is a hard ceiling" },
+            { id: "above", label: "Still above 2" },
+            { id: "exactly", label: "Exactly at 2 — right on the classical limit" },
+            { id: "below", label: "Well below 2" },
           ]}
-          outcomeId={isZeroPreset ? null : exceedsClassical ? "yes" : "no"}
+          outcomeId={!isZeroPreset ? null : exceedsClassical ? "above" : atClassicalBound ? "exactly" : "below"}
         />
 
         <SimulatorFraming
           shows="Whether any theory where each particle secretly “knows” its measurement outcome in advance (local hidden variables) can match what entangled qubits actually do. It can't — and this experiment shows you the number that proves it."
           watchFor="Every angle combination a real classical theory could ever produce is capped at S=2. Only genuine quantum correlations can cross that line."
-          tryThis="Start with all four angles at 0° and confirm S stays inside the classical bound. Then load the quantum-optimal preset and watch S climb past 2, toward 2√2 ≈ 2.83."
+          tryThis="You open at the quantum-optimal angles, S ≈ 2.83 — already past any classical explanation. Load the all-angles-0° classical preset and watch S drop to exactly 2, then come back via the quantum-optimal preset and watch it cross the line again."
         />
         </>
       }
@@ -244,7 +288,11 @@ function CHSHGauge({ sValue }: { sValue: number }) {
           aria-hidden="true"
         />
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[11px] text-muted-foreground">
+      {/* `flex-wrap`: these three labels total ~40 monospace characters, which
+          overflows the stage at 320px and would push a horizontal scrollbar
+          onto the whole page. Wrapping drops the middle label to its own line
+          instead — the gauge above still lines up, and nothing is cut off. */}
+      <div className="mt-1 flex flex-wrap justify-between gap-x-2 gap-y-1 font-mono text-[11px] text-muted-foreground">
         <span>−2√2 ≈ {(-quantumBound).toFixed(2)}</span>
         <span>classical bound ±2</span>
         <span>2√2 ≈ {quantumBound.toFixed(2)}</span>

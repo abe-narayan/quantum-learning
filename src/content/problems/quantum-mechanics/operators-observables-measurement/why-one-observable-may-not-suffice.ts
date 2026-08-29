@@ -22,7 +22,26 @@ export const whyOneObservableMayNotSuffice: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["same eigenvalue", "multiple eigenvectors", "more than one state"],
-      ["can't distinguish", "doesn't tell you which", "ambiguous within the eigenspace"],
+      {
+        phrases: [
+          "can't distinguish",
+          "cannot distinguish",
+          "can't tell",
+          "cannot tell",
+          "doesn't tell you which",
+          "does not tell you which",
+          "ambiguous",
+          "ambiguity",
+          "not enough",
+          "insufficient",
+          "underdetermined",
+          "which one",
+          "leaves it open",
+          "still unresolved",
+        ],
+        missingFeedback:
+          "You have identified the degeneracy. Draw the consequence: the measured eigenvalue does not pick out a single state within that eigenspace, so one observable leaves the system's state ambiguous and a second, commuting observable is needed to resolve it.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that a degenerate eigenvalue has more than one eigenvector, and that knowing only the eigenvalue can't tell you which of those eigenvectors (or superposition within that subspace) you actually have.",
   },

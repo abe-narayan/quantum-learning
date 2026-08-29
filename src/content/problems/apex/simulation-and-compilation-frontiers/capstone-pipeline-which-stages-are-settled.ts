@@ -24,7 +24,24 @@ export const capstonePipelineWhichStagesAreSettled: ConceptualProblem = {
     requiredConceptGroups: [
       ["classical simulability", "t-count", "synthesis", "routing", "compilation", "swap overhead", "engineering practice", "solved", "routine", "toolchain", "transpiler"],
       ["decoder", "physical error rate", "code choice", "architecture", "qldpc", "still evolving", "moving target", "assumption", "uncertain"],
-      ["method", "methodology", "structure", "four-step", "solid", "not the method"],
+      {
+        phrases: [
+          "input",
+          "not the method",
+          "method itself",
+          "methodology",
+          "method is solid",
+          "method is sound",
+          "structure is solid",
+          "structure of the method",
+          "four-step",
+          "four step",
+          "numbers it is fed",
+          "numbers fed into",
+        ],
+        missingFeedback:
+          "You have located the uncertainty in Stage 4. Say where inside Stage 4 it sits: the four-step method itself is as settled as Stages 1 to 3, and what moves is the numbers fed into it, the achieved physical error rate, decoder throughput and accuracy, and the code or architecture family chosen.",
+      },
     ],
     incorrectFeedback:
       "Stages 1-3 (classical-simulability checking, T-count synthesis, routing/SWAP-overhead compilation) are routine, already-automated engineering practice -- real compiler toolchains do this today. Stage 4's four-step resource-estimation *method* is equally solid, but the specific numbers it outputs depend on assumptions still under active research: the physical error rate a real device achieves, real-time decoder throughput and accuracy, and the specific code/architecture family chosen (e.g. surface codes vs. emerging qLDPC codes).",

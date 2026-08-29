@@ -1,6 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
-import { barrierScatteringTransmission } from "@/lib/quantum/scattering";
+import { barrierScatteringTransmission, stepPotentialScattering } from "@/lib/quantum/scattering";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/one-dimensional-systems/one-dimensional-systems-challenge"
@@ -20,15 +20,22 @@ export const challengeTransmissionFrames = challengeBarrierHeights.map((v0) => (
   ],
 }));
 
+export const synthesisEnergy = 6;
+export const synthesisV0 = 4;
+export const synthesisStep = stepPotentialScattering(synthesisEnergy, synthesisV0);
+export const synthesisBarrierT = barrierScatteringTransmission(synthesisEnergy, synthesisV0, challengeBarrierWidth);
+export const synthesisStepErrPct = (Math.abs(synthesisStep.transmission - synthesisBarrierT) / synthesisBarrierT) * 100;
+export const synthesisResonanceErrPct = (Math.abs(1 - synthesisBarrierT) / synthesisBarrierT) * 100;
+
 export const lessonMeta = {
   title: "One-Dimensional Systems Challenge",
   description:
-    "A synthesis capstone connecting the finite well's bound states to the step and barrier's scattering states -- and to every 1D potential this platform has now solved, bound or unbound, exactly or numerically.",
+    "A synthesis capstone connecting the finite well's bound states to the step and barrier's scattering states, and to every 1D potential the two courses have now solved, bound or unbound, exactly or numerically.",
   course: "one-dimensional-systems",
   module: "one-dimensional-systems-challenge",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 22,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier"],
   objectives: [
     "Classify every 1D potential covered across Wave Mechanics and this course as bound, scattering, or both",
@@ -38,12 +45,13 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Between Wave Mechanics and this course, this platform has now solved every standard 1D potential from the opening chapter of any quantum mechanics textbook — bound states and scattering states alike. This capstone connects all of it.
+Between Wave Mechanics and this course, every standard 1D potential from the opening chapters of a quantum mechanics textbook has now been solved, bound states and scattering states alike. This capstone puts them in one picture.
 </LessonHook>
 
 ## Motivation
 
-Every one, closed-form or numerically: the infinite well (exactly, closed form), the
+Two courses of one-dimensional quantum mechanics leave a complete
+inventory: the infinite well (exactly, closed form), the
 <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term> (exactly, closed form, by two independent methods),
 <Term id="quantum-tunneling">tunneling</Term> through a barrier below its height (approximately, but with a
 precise, derived exponential estimate), the finite well's bound states
@@ -64,8 +72,10 @@ resonance phenomenon).
 Every bound-state system has a **discrete** spectrum (the infinite
 well's and oscillator's infinite ladders, the finite well's small finite
 set); every scattering system has a **continuous** spectrum (any
-$E>V_0$ is an allowed scattering energy). This bound/continuous split is
-completely general, not a coincidence of these five examples.
+$E>V_0$ is an allowed scattering energy). The bound/continuous split is
+general, not a coincidence of these five examples: it comes from whether
+the boundary conditions at infinity are restrictive enough to pick out
+isolated energies.
 
 ## Worked Synthesis Examples
 
@@ -78,7 +88,7 @@ completely general, not a coincidence of these five examples.
     { label: "It can only ever be exactly one, no matter how deep", value: "one" },
   ]}
   correctValue="grows"
-  explanation="The graphical picture from Solving the Finite Well Numerically makes this exact: the quarter-circle κ=√(2V0−k²) has radius √(2V0), which grows without bound as V0 grows, sweeping past more and more branches of the fixed tangent/cotangent curves and picking up one new bound state each time it crosses a branch. In the V0→∞ limit this reproduces the infinite well's endless ladder."
+  explanation="It grows without limit, one state at a time. Counting them is a matter of counting curve crossings, which Worked Example 1 below does. The endpoint is worth noting now: as V0→∞ the count diverges, which is how the finite well recovers the infinite well's endless ladder rather than contradicting it."
 />
 
 **1. A finite well is made deeper and deeper (larger $V_0$, fixed
@@ -89,25 +99,45 @@ The number of bound states grows. The quarter-circle
 $\kappa=\sqrt{2V_0-k^2}$ has radius $\sqrt{2V_0}$, growing with $V_0$.
 It eventually sweeps past more and more branches of the (fixed) tangent
 and cotangent curves, adding one new bound state each time it crosses
-another branch. This is exactly the mechanism behind the earlier
+another branch. This is the mechanism behind the earlier
 observation that a shallow well supports few states while a very deep
 one approaches the infinite well's endless ladder.
 
-**2. A particle scatters off a barrier at an energy far above resonance
+**2. A particle scatters off a barrier at an energy away from resonance
 (neither $E\gg V_0$ nor near any $k_2L=n\pi$). Which earlier result, the
 step's or the resonance's, better estimates its transmission
-probability, and why?**
+probability? Make the comparison quantitative.**
 
-Neither exactly, but the step-potential intuition is the better starting
+Neither is exact, but the step-potential intuition is the better starting
 point: away from a resonance, the barrier's transmission is dominated by
 the same kind of impedance mismatch that produces step reflection, just
 computed for two boundaries instead of one. The resonance condition is a
 special, narrow enhancement layered on top of that baseline behavior,
 useful for predicting where $T$ peaks, not for a generic energy.
 
+The engine functions this lesson already imports settle it with real
+numbers. Take $E=6$, $V_0=4$, and the same barrier width $L=1.2825$ as
+the chart below (the nearest resonance sits at $E=7$, where
+$k_2L=\pi$). `stepPotentialScattering(6, 4)` gives the one-boundary
+baseline, and `barrierScatteringTransmission(6, 4, 1.2825)` the exact
+two-boundary answer:
+
+| Estimate | $T$ at $E=6$ |
+|---|---|
+| Step baseline, $4k_1k_2/(k_1+k_2)^2$ | {synthesisStep.transmission.toFixed(4)} |
+| Resonance logic ($T=1$ at the peak) | 1.0000 |
+| Exact barrier formula | {synthesisBarrierT.toFixed(4)} |
+
+The step baseline misses the exact value by about
+{synthesisStepErrPct.toFixed(1)}%; carrying the resonance's $T=1$ over
+to this off-peak energy misses by about
+{synthesisResonanceErrPct.toFixed(1)}%. The two-boundary interference
+correction is real but small at this energy, while the resonance
+enhancement is not present at all away from its peak.
+
 <InteractiveSection
   title="Slide V0, watch resonance peaks emerge"
-  description="Slide the barrier height V0 and watch the transmission curve T(E) develop resonance peaks touching exactly 1, the exact mechanism behind Worked Example 2's comparison between resonant and off-resonant energies."
+  description="Slide the barrier height V0 and watch the transmission curve T(E) develop resonance peaks touching T = 1, the mechanism behind Worked Example 2's comparison between resonant and off-resonant energies."
 >
   <ParametricCurve
     frames={challengeTransmissionFrames}
@@ -124,10 +154,10 @@ spectrum and the other a continuum?**
 The finite well requires the wavefunction to *also* decay (not oscillate)
 outside on *both* sides, a much more restrictive requirement,
 satisfiable only at special, discrete energies (the transcendental
-equation's roots). The barrier's scattering state is oscillatory (a
-genuine propagating wave, not a decaying one) on *both* outer sides too.
-Any energy is compatible with *some* valid oscillatory solution
-outside, so there's no discreteness-forcing condition at all.
+equation's roots). The barrier's scattering state is oscillatory on
+*both* outer sides too, a propagating wave rather than a decaying one.
+Any energy is compatible with *some* valid oscillatory solution outside,
+so nothing forces discreteness.
 
 ## Common Mistakes, Revisited
 
@@ -135,14 +165,14 @@ outside, so there's no discreteness-forcing condition at all.
 **Expecting a single unified formula to cover both regimes.** Bound
 states and scattering states are different kinds of mathematical
 problems (an <Term id="eigenvalue-eigenvector">eigenvalue</Term> condition vs. a boundary-value problem with a
-continuous parameter). This platform intentionally built separate tools
+continuous parameter). The curriculum deliberately built separate tools
 for each rather than forcing an artificial unification.
 </Callout>
 
 <Callout type="note">
 **Treating "numerically solved" as less rigorous than "closed form."**
-The finite well's bisection-derived energy is exactly as correct (to
-machine precision) as the barrier's closed-form transmission formula.
+The finite well's bisection-derived energy is as correct, to machine
+precision, as the barrier's closed-form transmission formula.
 The difference is which tool the underlying mathematics demands, not
 which one is more trustworthy.
 </Callout>
@@ -156,7 +186,7 @@ which one is more trustworthy.
 2. If a well were deep enough to support exactly 3 even-parity bound
    states, roughly how many times would the growing quarter-circle from
    Worked Example 1 need to cross a tangent branch?
-3. A future course extends this platform to 3 spatial dimensions (e.g.
+3. A future course extends these tools to 3 spatial dimensions (e.g.
    the Hydrogen Atom). Which single idea from *this* course, bound vs.
    continuous spectra, do you expect to reappear essentially unchanged,
    and which technique (transcendental-equation bisection, plane-wave
@@ -168,8 +198,8 @@ which one is more trustworthy.
 
 - Every 1D potential solved across Wave Mechanics and this course splits
   cleanly into bound (discrete spectrum) or scattering (continuous
-  spectrum) systems, a completely general distinction, not specific to
-  any one potential.
+  spectrum) systems, a general distinction rather than a feature of any
+  one potential.
 - The finite well (bound, numerical) and the barrier (scattering, closed
   form) are complementary case studies in *how* to solve a system when
   no single method (purely algebraic, purely numerical) suffices for
@@ -180,10 +210,11 @@ which one is more trustworthy.
 ## Further Exploration
 
 <NextDiscovery>
-This completes **One-Dimensional Systems**. The next steps deeper into
-the Quantum Mechanics pillar, **Angular Momentum & Spin** and
-**The Hydrogen Atom**, extend everything built so far to systems that
-are actually three-dimensional, where angular momentum (not yet built on
-this platform) becomes essential alongside the radial version of exactly
-the bound-state techniques this course developed.
+This completes **One-Dimensional Systems**. Everything solved here lived
+on a line, which is one dimension short of an atom. The next steps deeper
+into the Quantum Mechanics pillar, **Angular Momentum & Spin** and
+**The Hydrogen Atom**, add the two missing dimensions. What comes with
+them is angular momentum, an idea with no one-dimensional counterpart at
+all, working alongside a radial equation you will recognize: it is the
+bound-state problem of this course, in a new variable.
 </NextDiscovery>

@@ -39,11 +39,15 @@ export const identifyingNisqFriendlyAlgorithms: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "QAOA's shallow, repeated circuit structure with classical feedback tolerates imperfection better than Shor's single long, must-succeed circuit." }],
-    finalAnswer: "(a)",
+    finalAnswer: "QAOA's shallow circuit is repeated under a classical optimization loop; Shor's needs one long, precise circuit to succeed.",
   },
   explanation: {
     correctIdea: "NISQ-friendliness is about structural error tolerance, not about one algorithm being 'better' in some absolute sense.",
     whyCorrect: "This is exactly the circuit-depth argument the capstone lesson develops in detail.",
-    whyWrong: ["Options b, c, and d each contain a factual error about either QAOA's nature or Shor's algorithm's actual implementation history."],
+    whyWrong: [
+      { optionId: "b", text: "QAOA is a quantum circuit built from Hadamards and rotations acting on qubits." },
+      { optionId: "c", text: "Small-scale demonstrations of Shor's algorithm have run on real hardware. The obstacle is scaling to cryptographic sizes, not that nobody has tried." },
+      { optionId: "d", text: "No quantum algorithm is noise-immune. QAOA is more noise-tolerant structurally, not absolutely." },
+    ],
   },
 };

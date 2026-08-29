@@ -15,13 +15,29 @@ export type PipelineStep = {
  */
 export function PipelineDiagram({ steps, ariaLabel, loop = false }: { steps: PipelineStep[]; ariaLabel: string; loop?: boolean }) {
   return (
-    <div role="img" aria-label={ariaLabel} className="not-prose overflow-x-auto panel-inset p-5">
+    // `role="group"`, not `role="img"` — the same policy applied to the rest
+    // of this directory. This component's own doc comment says it outright:
+    // "Pure layout (CSS flexbox, wraps on narrow screens) rather than SVG,
+    // since the content here is a sequence, not a geometric figure". There is
+    // no picture under this role — only `step.label` and `step.detail` text
+    // boxes, which are the entire diagram. `img` erased every stage name and
+    // every sub-caption of a compilation pipeline or hybrid loop and left the
+    // caller's one-sentence label standing in for a ten-box flow.
+    // The arrows and the "↻ repeat" glyph are already `aria-hidden`, so
+    // `group` re-exposes the words without introducing double-reads.
+    //
+    // No `tabIndex={0}`: the inner row is `flex flex-wrap`, so on a narrow
+    // screen the step boxes wrap onto new lines instead of overflowing, and no
+    // single box (a short label over a short detail, `px-3` padding) is wide
+    // enough to overflow on its own. A tab stop here would land on a container
+    // with nothing to scroll.
+    <div role="group" aria-label={ariaLabel} className="not-prose overflow-x-auto panel-inset p-5">
       <div className="flex flex-wrap items-center gap-2">
         {steps.map((step, i) => (
           <div key={i} className="flex items-center gap-2">
             <div
               className={cn(
-                "rounded-lg border px-3 py-2 text-center text-xs font-medium",
+                "rounded-(--radius-tight) border px-3 py-2 text-center text-xs font-medium",
                 step.highlight ? "border-accent bg-accent/10 text-accent" : "border-border bg-surface text-foreground"
               )}
             >

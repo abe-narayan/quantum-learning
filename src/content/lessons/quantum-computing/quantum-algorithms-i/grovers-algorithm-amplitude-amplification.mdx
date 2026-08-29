@@ -1,5 +1,4 @@
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
-import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
@@ -45,32 +44,25 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="More iterations isn't always better">
-Grover's algorithm needs the right number of iterations, not simply "more" — run it past the optimum and the success probability doesn't plateau, it swings back down.
+Grover's algorithm needs the right number of iterations, not "more". Run it past the optimum and the success probability does not plateau. It swings back down.
 </LessonHook>
 
 ## Motivation
 
-The last lesson showed both Grover building blocks are reflections, and
-composing two reflections is a rotation. This lesson makes that rotation
-exact, turning "search gets faster" into a specific formula for the
-success probability after exactly $k$ iterations, and from that, the exact
-optimal number of iterations to run. Primary source: L. K. Grover, "A
-Fast Quantum Mechanical Algorithm for Database Search," in *Proceedings
-of the 28th Annual ACM Symposium on Theory of Computing (STOC '96)*,
-pp. 212–219 (1996), also available as arXiv:quant-ph/9605043.
+The last lesson showed that both Grover building blocks are reflections,
+and that composing two reflections is a rotation. This lesson makes the
+rotation exact.
 
-<ResearchConnection title="A Fast Quantum Mechanical Algorithm for Database Search" source="L. K. Grover, STOC '96 (1996)" url="https://arxiv.org/abs/quant-ph/9605043">
-The original paper deriving the algorithm this lesson turns into an exact closed-form success probability: quadratic speedup over classical unstructured search, from a fixed rotation angle applied once per query.
+That is worth more than a tidier description. Once you know the rotation
+angle, the success probability after $k$ iterations is a closed-form
+trigonometric expression, and every practical question about the algorithm
+becomes arithmetic: how many iterations to run, how confident you can be
+when you stop, and what happens if you run too many. The last of those has
+an answer most people guess wrong.
+
+<ResearchConnection title="A Fast Quantum Mechanical Algorithm for Database Search" source="L. K. Grover, STOC '96 (1996), arXiv:quant-ph/9605043" url="https://arxiv.org/abs/quant-ph/9605043">
+The original paper. A quadratic speedup over classical unstructured search, from a fixed rotation angle applied once per query.
 </ResearchConnection>
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Measuring_a_qubit_leaves_no_room_for_error.jpg/1280px-Measuring_a_qubit_leaves_no_room_for_error.jpg"
-  alt="Engineers assembling the cryogenic dilution-refrigerator hardware used to cool and measure superconducting quantum processors, at the FMN Laboratory"
-  caption="Engineers assembling the cryogenic hardware that cools and measures a real superconducting qubit register. Every rotation this lesson derives algebraically corresponds to an actual sequence of microwave pulses applied to a physical chip cooled inside apparatus like this."
-  credit="Kushlevich Sergey / FMN Laboratory, Bauman Moscow State Technical University"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Measuring_a_qubit_leaves_no_room_for_error.jpg"
-  license="CC BY 4.0"
-/>
 
 ## Mathematical Development
 
@@ -108,7 +100,7 @@ at angle $(2k+1)\theta$ from $|\alpha\rangle$:
 <EquationReveal
   terms={[
     { id: "k", symbol: "k", gloss: "The number of Grover iterations run so far." },
-    { id: "theta", symbol: "θ", gloss: "arcsin(1/√N) — the fixed angle each iteration rotates the state by (as 2θ)." },
+    { id: "theta", symbol: "θ", gloss: "arcsin(1/√N). Each iteration rotates the state by 2θ." },
     { id: "alpha", symbol: "|α⟩", gloss: "The renormalized uniform superposition over all unmarked items." },
     { id: "beta", symbol: "|β⟩", gloss: "The marked item being searched for." },
   ]}
@@ -152,7 +144,7 @@ Because $P(\text{marked})=\sin^2((2k+1)\theta)$ is periodic in $k$,
 running *past* the optimal count doesn't keep improving the odds: it
 oscillates back down and later back up, exactly like an ordinary rotation
 overshooting a target angle and coming back around. Grover's algorithm
-needs the *right* number of iterations, not simply "more."
+needs the *right* number of iterations, not "more."
 
 <PredictBeforeReveal
   question="If you keep running Grover iterations well past the count that gives the highest P(marked), what happens to P(marked)?"
@@ -163,10 +155,10 @@ needs the *right* number of iterations, not simply "more."
     { label: "It drops permanently to 0", value: "zero" },
   ]}
   correctValue="oscillate"
-  explanation="P(marked)=sin²((2k+1)θ) is periodic in k, exactly like an ordinary rotation that overshoots a target angle and comes back around. Running past the optimal iteration count doesn't lock in the peak — it oscillates back down, and later back up, exactly what the closed form predicts and what stepping past the peak below shows directly."
+  explanation="P(marked)=sin²((2k+1)θ) is periodic in k, like any rotation that overshoots a target angle and keeps going. Running past the optimal count does not lock in the peak. The probability falls, then rises again, and the closed form says exactly when. This is the practical reason Grover's algorithm needs to know N before you run it: without N you cannot compute θ, and without θ you do not know when to stop."
 />
 
-<InteractiveSection title="Watch the rotation itself, not just the bars" description="This is the geometry the derivation above is actually about: the plane spanned by |α⟩ (x-axis) and |β⟩ (y-axis). The dashed vector is the fixed starting state |s⟩ at angle θ. The solid vector is the state after k iterations, at angle (2k+1)θ, computed from the exact θ=arcsin(1/√N) for N=16 (matching the Worked Example below). Drag the slider through k and watch the solid vector sweep by a constant 2θ every step: it reaches closest to |β⟩ around the optimal k, then keeps going, overshoots, and swings back — the same periodicity as the closed form, seen as an actual rotation instead of a bar height.">
+<InteractiveSection title="Watch the rotation itself, not just the bars" description="This is the geometry the derivation above is about: the plane spanned by |α⟩ (x-axis) and |β⟩ (y-axis). The dashed vector is the fixed starting state |s⟩ at angle θ. The solid vector is the state after k iterations, at angle (2k+1)θ, computed from the exact θ=arcsin(1/√N) for N=16 (matching the Worked Example below). Drag the slider through k and watch the solid vector sweep by a constant 2θ every step. It comes closest to |β⟩ around the optimal k, then keeps going, overshoots, and swings back: the same periodicity as the closed form, seen as a rotation rather than a bar height.">
   <VectorDiagramExplorer
     frames={Array.from({ length: 13 }, (_, k) => groverRotationFrame(k))}
     sliderLabel="Iterations k"
@@ -183,18 +175,22 @@ overshoot; here is the third view, every basis state's own probability
 bar, swept past the optimal iteration count on purpose so the marked
 bar's rise and its fall are both visible in the same control:
 
-<InteractiveSection title="Watch the marked bar rise, peak, and fall" description="Step through real Grover iterations, several past the optimal count. The marked state's bar climbs toward its peak then swings back down — the same sin²((2k+1)θ) periodicity as the closed form, now read directly off a probability bar instead of a rotation angle.">
+<InteractiveSection title="Watch the marked bar rise, peak, and fall" description="Step through real Grover iterations, several past the optimal count. The marked state's bar climbs toward its peak, then swings back down: the same sin²((2k+1)θ) periodicity as the closed form, read off a probability bar rather than a rotation angle.">
   <GroverAmplitudeSweep n={4} markedIndices={[5]} ariaLabel="Grover amplitude amplification over iterations for N=16, showing the marked state's probability rise past its peak then fall back down as iterations continue past the optimum." />
 </InteractiveSection>
 
 ## Physical Interpretation
 
-Grover's speedup comes entirely from geometry: a fixed rotation angle
-$2\theta\approx2/\sqrt N$ per iteration means reaching the marked state's
-neighborhood (angle $\approx\pi/2$) takes $O(\sqrt N)$ steps, each costing
-one oracle query, quadratically fewer than the $O(N)$ a classical search
-needs, with no shortcut through the oracle's black-box structure required
-or exploited.
+Grover's speedup comes from geometry and nothing else. Each iteration
+rotates by a fixed $2\theta\approx2/\sqrt N$, so reaching the marked
+state's neighbourhood (angle $\approx\pi/2$) takes $O(\sqrt N)$ steps at
+one oracle query apiece: quadratically fewer than the $O(N)$ a classical
+search needs.
+
+Note what the algorithm never does. It never looks inside the oracle, and
+it never exploits structure in the search space, because there is none to
+exploit. The speedup is what remains available when a problem offers no
+handholds at all, which is also why it is only quadratic.
 
 ## Worked Example
 

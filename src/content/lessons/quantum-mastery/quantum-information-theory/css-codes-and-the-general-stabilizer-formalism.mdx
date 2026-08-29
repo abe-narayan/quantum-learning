@@ -30,7 +30,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction",
-      note: "Surface codes are also CSS codes, built the same way from a different (topological, not Hamming) pair of classical codes -- this lesson's machinery is exactly what's conceptually gestured at there.",
+      note: "Surface codes are also CSS codes, built the same way from a different (topological, not Hamming) pair of classical codes; this lesson's machinery is what is conceptually gestured at there.",
     },
   ],
 };
@@ -110,6 +110,23 @@ export const allGeneratorsCommute = checkAllGeneratorsCommute(generators);
 
 export const logicalX = pauliString("XXXIIII");
 export const logicalZ = pauliString("ZZZIIII");
+export const singleQubitErrors = ["X", "Z"].flatMap((type) =>
+  Array.from({ length: 7 }, (_, i) => ({ type, qubit: i + 1 }))
+);
+export const syndromeOf = (error) =>
+  generatorEntries.map((entry) => {
+    const site = entry.pattern[error.qubit - 1];
+    return site !== "I" && site !== error.type ? 1 : 0;
+  });
+export const syndromeRows = singleQubitErrors.map((error) => ({
+  label: `${error.type}${error.qubit}`,
+  bits: syndromeOf(error),
+}));
+export const syndromeStrings = syndromeRows.map((row) => row.bits.join(""));
+export const distinctSyndromeCount = new Set(syndromeStrings).size;
+export const allSyndromesDistinct = distinctSyndromeCount === syndromeStrings.length;
+export const allSyndromesNonzero = syndromeStrings.every((s) => s.includes("1"));
+
 export const logicalXCommutesWithAllStabilizers = Object.values(generators).every((g) => logicalX.mul(g).equals(g.mul(logicalX), 1e-9));
 export const logicalZCommutesWithAllStabilizers = Object.values(generators).every((g) => logicalZ.mul(g).equals(g.mul(logicalZ), 1e-9));
 export const logicalXZAnticommute = logicalX.mul(logicalZ).equals(logicalZ.mul(logicalX).scale(-1), 1e-9);
@@ -117,31 +134,21 @@ export const logicalXZAnticommute = logicalX.mul(logicalZ).equals(logicalZ.mul(l
 <LessonHook eyebrow="A code that actually corrects everything">
   The 3-qubit bit-flip code corrects one bit-flip error but detects no
   phase errors at all. The Steane code, built here from a single
-  classical error-correcting code, corrects any single-qubit error — $X$,
-  $Z$, or both.
+  classical error-correcting code, corrects both kinds at once.
 </LessonHook>
 
 ## Motivation
 
 Stabilizer Formalism Basics renamed two syndrome measurements the
 3-qubit bit-flip code already had. That code has $n=3$ physical qubits,
-$1$ logical qubit, distance $1$ (it corrects one bit-flip error but
-detects no phase errors at all: pure repetition codes have no genuine
-distance-3 guarantee against arbitrary single-qubit errors). This
-lesson builds the general theory of $[[n,k,d]]$ stabilizer codes, then
+$1$ logical qubit, distance $1$: it corrects one bit-flip error and
+detects no phase error at all, since a repetition code offers no
+protection against $Z$. This lesson builds the general theory of
+<Term id="css-stabilizer-codes">$[[n,k,d]]$ stabilizer codes</Term>, then
 constructs the **Steane code**, $[[7,1,3]]$, which actually corrects
 *any* single-qubit error, $X$, $Z$, or both, entirely from a single
 classical error-correcting code most of this platform's readers have
 never needed to think about: the Hamming$[7,4,3]$ code.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
-  alt="A D-Wave Two 512-qubit superconducting quantum processor chip, mounted in its package and ready for cooling to near-absolute zero"
-  caption="Real fault-tolerant quantum computing, the eventual destination of stabilizer codes like the Steane code built in this lesson, requires physical hardware like this: superconducting qubits cooled to millikelvin temperatures, engineered specifically to make syndrome extraction and error correction possible at scale."
-  credit="Steve Jurvetson / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
-  license="CC BY 2.0"
-/>
 
 ## Mathematical Development
 
@@ -157,9 +164,9 @@ exactly as one binary constraint halves a classical bit string count),
 holding $k$ **logical qubits**. The **distance** $d$ is the minimum
 weight of any Pauli operator in the **normalizer** $N(S)$ (operators
 commuting with every stabilizer) that is *not itself in* $S$: an
-undetectable logical error, the direct generalization of Stabilizer
-Formalism Basics' syndrome-flip mechanism: an error *is* detected
-whenever it anticommutes with some generator (flipping that syndrome
+undetectable logical error. This is the direct generalization of
+Stabilizer Formalism Basics' syndrome-flip mechanism. An error *is*
+detected whenever it anticommutes with some generator (flipping that syndrome
 bit), so only errors commuting with *every* generator can possibly go
 undetected, and among those, only ones actually outside $S$ change the
 encoded logical state.
@@ -213,9 +220,9 @@ logical qubit, $n-k=6$ stabilizer generators, exactly matching
 Stabilizer Formalism Basics' generator-counting logic scaled up.
 
 Because $C_2$'s generator matrix and $C_1$'s parity-check matrix are
-*both* just $H$ here (a genuine structural coincidence of the
-self-dual-containing Hamming code, not true of CSS codes in general),
-the six stabilizer generators are:
+*both* just $H$ here (a structural feature of the self-dual-containing
+Hamming code, not true of CSS codes in general), the six stabilizer
+generators are:
 
 $$
 g_1{=}IIIXXXX,\ \ g_2{=}IXXIIXX,\ \ g_3{=}XIXIXIX,\ \ g_4{=}IIIZZZZ,\ \ g_5{=}IZZIIZZ,\ \ g_6{=}ZIZIZIZ
@@ -223,7 +230,7 @@ $$
 
 (the three $X$-rows and three $Z$-rows of $H$, read as which qubits get
 a Pauli). **Verified two independent ways.** First, algebraically: the
-proof above shows commutation follows from $C_2\subseteq C1$
+proof above shows commutation follows from $C_2\subseteq C_1$
 (already confirmed via $HH^\top=0$). Second, at the level of actual
 $128\times128$ quantum operators, built with this platform's own
 `tensorAll` applied to real `PAULI_X`, `PAULI_Z`, `IDENTITY` matrices,
@@ -239,8 +246,7 @@ isn't already a stabilizer element of $C_2$; anything in $C_2$ acts as
 the identity on the codespace, since it's already a product of
 stabilizer generators). Enumerating all $16$ codewords of $C_1$ and all
 $8$ codewords of $C_2$ directly (brute force over $2^4$ and $2^3$
-generator combinations respectively, genuinely small enough to check
-exhaustively) gives $|C_1\setminus C_2|=8$, with minimum weight
+generator combinations respectively, small enough to check exhaustively) gives $|C_1\setminus C_2|=8$, with minimum weight
 $\boxed{d=3}$, matching the classical Hamming code's own minimum
 distance exactly, confirmed by direct enumeration, not simply asserted
 by analogy.
@@ -284,7 +290,7 @@ detected by this code, and identify which syndrome bits flip.**
     { label: "Both kinds equally", value: "both" },
   ]}
   correctValue="z-type"
-  explanation="Two Pauli operators anticommute only when they're different and both non-identity. An X-type generator is built entirely from X's and I's, so it commutes with X1 trivially at every qubit — it can't see this error at all. Only a Z-type generator, built from Z's, anticommutes at the one qubit where X1 sits. This is exactly the 3-qubit code's rule (bit-flip errors need phase-type checks) surviving unchanged at [[7,1,3]] scale."
+  explanation="Two Pauli operators anticommute only when they're different and both non-identity. An X-type generator is built entirely from X's and I's, so it commutes with X1 trivially at every qubit; it cannot see this error at all. Only a Z-type generator, built from Z's, anticommutes at the one qubit where X1 sits. This is the 3-qubit code's rule (bit-flip errors need phase-type checks) surviving unchanged at [[7,1,3]] scale."
 />
 
 $X_1$ anticommutes with a $Z$-type generator exactly when that
@@ -296,18 +302,74 @@ anticommutes). So $X_1$ flips exactly the $g_6$ syndrome bit and no
 others, a nonzero, uniquely-identifying syndrome pattern (checked
 against $H$'s three rows directly: column $1$ of $H$ is $(0,0,1)^\top$,
 matching that only the third row, $g_6$'s row, has a $1$ there),
-exactly the mechanism Stabilizer Formalism Basics established for the
+the mechanism Stabilizer Formalism Basics established for the
 3-qubit code, now running on an actual $[[7,1,3]]$ code capable of
 also catching phase errors, which the bit-flip code could not detect at
 all.
 
 Try it on any of the other 13 single-qubit errors below (all 7 qubits
-times both $X$ and $Z$) — the grid highlights the chosen qubit's column
+times both $X$ and $Z$). The grid highlights the chosen qubit's column
 and bolds every generator row that anticommutes with that error, with
 the anticommutation computed live from each generator's own pattern,
 not looked up from a table of answers:
 
 <StabilizerTable generators={generatorEntries} ariaLabel="Interactive table of the Steane code's six stabilizer generators g1 through g6 across qubits 1 through 7, with a qubit and X/Z error-type selector that highlights which generators anticommute with the chosen single-qubit error" />
+
+### The full syndrome table, and what makes the code correcting
+
+"Detected" is weaker than "corrected." Detection needs each error to
+produce *some* nonzero syndrome. Correction needs each error to produce a
+*different* one, because the decoder sees only the syndrome and must
+choose a repair from it. Both claims are checkable by enumeration, so
+here is the enumeration. Each row is the six-bit pattern
+$(g_1,\ldots,g_6)$ of which generators anticommute with that error,
+computed from the generator patterns above:
+
+<div role="region" aria-label="Syndrome table for all fourteen single-qubit errors on the Steane code. Each row gives the six-bit pattern of which stabilizer generators anticommute with that error. Every X error lights up only the Z-type generators g4, g5, g6, and every Z error lights up only the X-type generators g1, g2, g3. All fourteen patterns are nonzero and no two are the same." tabIndex={0} className="not-prose my-6 overflow-x-auto rounded-panel border border-border">
+  <table className="w-full border-collapse text-sm">
+    <thead>
+      <tr className="border-b border-border bg-surface-muted">
+        <th className="px-3 py-2 text-left font-semibold">Error</th>
+        {generatorEntries.map((entry) => (
+          <th key={entry.label} className="px-3 py-2 text-center font-semibold">{entry.label}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {syndromeRows.map((row) => (
+        <tr key={row.label} className="border-b border-border/60">
+          <td className="px-3 py-1.5 font-mono">{row.label}</td>
+          {row.bits.map((bit, i) => (
+            <td
+              key={generatorEntries[i].label}
+              className={bit ? "px-3 py-1.5 text-center font-mono font-semibold text-pillar-text" : "px-3 py-1.5 text-center font-mono text-muted-foreground"}
+            >
+              {bit}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+All {syndromeStrings.length} syndromes are nonzero
+({allSyndromesNonzero ? "verified" : "FAILED"}) and all
+{" "}{distinctSyndromeCount} are distinct
+({allSyndromesDistinct ? "verified" : "FAILED"}), both computed by
+enumeration rather than asserted. That pair of facts *is* the
+distance-3 property in operational form: the decoder can invert the
+syndrome map on single-qubit errors, so every one of them is correctable,
+not merely noticeable.
+
+The table's block structure is worth reading. Every $X$ error leaves
+$g_1,g_2,g_3$ silent and every $Z$ error leaves $g_4,g_5,g_6$ silent,
+because an $X$-type check cannot see an $X$ error. The three bits an
+$X_q$ error does light up are exactly column $q$ of $H$, and the Hamming
+code's columns are the seven distinct nonzero three-bit strings. The
+classical code's distinctness property is doing the work directly; the
+quantum code inherits correctability from it rather than earning it
+separately. This is the CSS construction paying out.
 
 ## Common Mistakes
 
@@ -316,7 +378,7 @@ not looked up from a table of answers:
 construction.** The generators only commute when $C_2\subseteq C_1$,
 proved above from the binary dot-product anticommutation rule. The
 Steane code's specific choice, $C_2=$ the Hamming code's own dual,
-works only because $HH^\top=0$, a genuine (not automatic) property of
+works only because $HH^\top=0$, a special (not automatic) property of
 that particular classical code.
 </Callout>
 
@@ -369,17 +431,12 @@ concept.
 
 ## Further Exploration
 
-This completes **Rigorous Quantum Information Theory**, and with it, the
-Schmidt decomposition, trace distance and fidelity, the Choi–Jamiolkowski
-isomorphism, the Lindblad master equation, mixed-state entanglement
-measures, and channel-formalism teleportation this course built from the
-Quantum Mechanics and Quantum Computing pillars' combined foundation:
-proofs, throughout, of facts those two pillars had to leave asserted.
-
 <NextDiscovery>
-  This completes Rigorous Quantum Information Theory — the Schmidt
-  decomposition, trace distance and fidelity, the Choi–Jamiolkowski
+  This completes **Rigorous Quantum Information Theory**. The Schmidt
+  decomposition, trace distance and fidelity, the Choi–Jamiołkowski
   isomorphism, the Lindblad master equation, mixed-state entanglement
-  measures, and channel-formalism teleportation, all proofs of facts the
-  earlier pillars had to leave asserted.
+  measures, and channel-formalism teleportation were each stated as fact
+  somewhere in the Quantum Mechanics or Quantum Computing pillars; this
+  course supplied the proofs, and marked clearly the few places where it
+  had to cite rather than derive.
 </NextDiscovery>

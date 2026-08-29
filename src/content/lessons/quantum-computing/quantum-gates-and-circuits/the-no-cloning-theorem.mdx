@@ -39,30 +39,33 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-No quantum device can ever copy an unknown qubit's state onto a second, blank qubit — not because no one has found a clever enough circuit yet, but because it follows directly from the same linearity every quantum gate is guaranteed to have.
+No quantum device can copy an unknown qubit's state onto a blank one. Not because nobody has found a clever enough circuit, but because linearity, which every quantum gate has, forbids it.
 </LessonHook>
 
 ## Motivation
 
-Why can't you just copy a qubit? Copying data is the most ordinary
-operation in classical computing — you do it constantly, without
-thinking about it — so it's a fair question to ask of the quantum case
-directly. The answer follows from the same linearity
-every quantum gate has been guaranteed to have since the moment you
-learned gates are matrices, and the proof is short enough to walk
-through completely, right now.
+Why can't you copy a qubit? Copying is the most ordinary operation in
+classical computing. You do it constantly without thinking about it, and
+`ctrl-C` has never once failed on the grounds that the data was in an
+unknown state.
+
+The answer turns on linearity, a property every quantum gate has had since
+the moment you learned gates are matrices. The proof is four lines, and it
+is worth following closely: no-cloning is the load-bearing fact behind
+quantum cryptography, and it is the reason teleportation has to destroy
+its original.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Wojciech_H._Zurek.gif"
   alt="Portrait photograph of physicist Wojciech H. Zurek"
-  caption="Wojciech Zurek, who co-derived the no-cloning theorem with William Wootters in 1982 (independently of a related result by Dennis Dieks the same year) — the exact linearity argument this lesson walks through."
+  caption="Wojciech Zurek, of Los Alamos National Laboratory, who with William Wootters published the linearity argument reproduced below in a 1982 paper titled, memorably, 'A single quantum cannot be cloned.'"
   credit="Los Alamos National Laboratory"
   creditUrl="https://commons.wikimedia.org/wiki/File:Wojciech_H._Zurek.gif"
   license="Public Domain (LANL)"
 />
 
 <HistoricalMoment date="1982">
-Wojciech Zurek and William Wootters co-derive the no-cloning theorem (independently of a related result by Dennis Dieks the same year) — the exact linearity argument this lesson walks through.
+Wojciech Zurek and William Wootters derive the no-cloning theorem, independently of a related result by Dennis Dieks the same year. Their linearity argument is the one this lesson walks through.
 </HistoricalMoment>
 
 ## Intuition
@@ -100,8 +103,9 @@ $$
 U(|0\rangle\otimes|0\rangle) = |0\rangle\otimes|0\rangle, \qquad U(|1\rangle\otimes|0\rangle) = |1\rangle\otimes|1\rangle
 $$
 
-Nothing wrong yet: a device that measures the input in the <Term id="computational-basis">computational
-basis</Term> and prepares a matching copy could achieve exactly this much.
+Nothing wrong yet. A device that measures the input in the <Term id="computational-basis">computational
+basis</Term> and prepares a matching copy achieves this much, and such devices
+exist.
 
 ### The contradiction: apply it to a superposition
 
@@ -112,12 +116,12 @@ linear, and $|+\rangle\otimes|0\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)\oti
 so linearity forces:
 
 <DerivationSteps>
-  <DerivationStep annotation="U is linear, so it distributes over the sum — apply the assumption from the previous section to each term separately.">
+  <DerivationStep annotation="U is linear, so it distributes over the sum. Apply the assumption from the previous section to each term separately.">
 $$
 U(|+\rangle\otimes|0\rangle) = \frac{1}{\sqrt2}\Big(U(|0\rangle\otimes|0\rangle)+U(|1\rangle\otimes|0\rangle)\Big) = \frac{1}{\sqrt2}(|00\rangle+|11\rangle)
 $$
   </DerivationStep>
-  <DerivationStep annotation="Compare against what genuine cloning of |+⟩ would have to produce: two independent copies of |+⟩, expanded by distributing the tensor product.">
+  <DerivationStep annotation="Compare against what true cloning of |+⟩ would have to produce: two independent copies of |+⟩, expanded by distributing the tensor product.">
 $$
 |+\rangle\otimes|+\rangle = \frac12(|00\rangle+|01\rangle+|10\rangle+|11\rangle)
 $$
@@ -125,11 +129,10 @@ $$
 </DerivationSteps>
 
 That's the <Term id="bell-states">Bell state</Term> $|\Phi^+\rangle$ from two lessons ago, and it does
-not match what cloning was supposed to produce. Both sides are real, computable states, not just symbols; laying the
-engine's actual output for each side next to the other makes the
-mismatch impossible to miss. Here's the attempted-cloning circuit itself,
-the same H-then-CNOT construction used in the Bell-state derivation two
-lessons ago:
+not match what cloning was supposed to produce. Both sides are computable
+states rather than symbols, so put the engine's output for each of them
+side by side. First the attempted-cloning circuit, which is the same
+H-then-CNOT construction as the Bell-state derivation:
 
 <StaticCircuitDiagram
   numQubits={2}
@@ -141,19 +144,19 @@ lessons ago:
 />
 
 <PredictBeforeReveal
-  question="Apply H to qubit 0 (making it |+⟩), then CNOT(0,1) with qubit 1 as a blank |0⟩ — an attempt to 'copy' |+⟩. Does this circuit actually produce two independent copies, |+⟩ ⊗ |+⟩?"
+  question="Apply H to qubit 0 (making it |+⟩), then CNOT(0,1) with qubit 1 as a blank |0⟩, in an attempt to 'copy' |+⟩. Does this circuit produce two independent copies, |+⟩ ⊗ |+⟩?"
   options={[
-    { label: "Yes, exactly |+⟩ ⊗ |+⟩", value: "clones" },
+    { label: "Yes, |+⟩ ⊗ |+⟩", value: "clones" },
     { label: "No, it produces an entangled Bell state", value: "bell" },
     { label: "No, it produces |0⟩ ⊗ |0⟩", value: "zero" },
     { label: "Yes, but only approximately", value: "approx" },
   ]}
   correctValue="bell"
-  explanation="H then CNOT is exactly the circuit this lesson's linearity argument predicts will fail: it produces the Bell state |Φ+⟩ = (|00⟩+|11⟩)/√2, which has zero amplitude on |01⟩ and |10⟩. Genuine cloning would need |+⟩⊗|+⟩ = ½(|00⟩+|01⟩+|10⟩+|11⟩), with equal amplitude on all four terms. The two panels below show these real, computed states side by side — they don't match, which is the contradiction the proof above derives algebraically."
+  explanation="H then CNOT is the circuit this lesson's linearity argument predicts will fail. It produces the Bell state |Φ+⟩ = (|00⟩+|11⟩)/√2, which has zero amplitude on |01⟩ and |10⟩. Cloning would need |+⟩⊗|+⟩ = ½(|00⟩+|01⟩+|10⟩+|11⟩), with equal amplitude on all four terms. The two panels below show the computed states side by side. They don't match, and that mismatch is the contradiction the proof derives algebraically."
 />
 
 <div className="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <QuantumStateDisplay state={actualCnotOutput} label="What a real device (H then CNOT) actually produces" />
+  <QuantumStateDisplay state={actualCnotOutput} label="What a real device (H then CNOT) produces" />
   <QuantumStateDisplay state={hypotheticalCloneOutput} label="What cloning |+⟩ would require: |+⟩ ⊗ |+⟩" />
 </div>
 
@@ -169,10 +172,10 @@ This isn't a technological limitation waiting on better engineering. The
 proof only used linearity, a property that holds for *every* possible
 quantum gate, so no future device of any kind can evade it. No-cloning is
 also not an arbitrary restriction bolted onto the theory: if cloning were
-possible, you could make unlimited copies of one unknown qubit and
-measure each copy in a different basis, reconstructing the full state
-exactly, directly violating the measurement-disturbs-the-state structure
-this course has built lesson by lesson. Worse, a device that clones one
+possible, you could make unlimited copies of one unknown qubit, measure
+each copy in a different basis, and reconstruct the full state to arbitrary
+precision, which would flatly contradict the measurement postulate this
+course has been building on. Worse, a device that clones one
 half of an entangled pair many times over would let its holder detect,
 instantaneously, which basis someone light-years away chose to measure
 their half in: a faster-than-light signal. No-cloning isn't a
@@ -183,23 +186,22 @@ mechanics to be a consistent theory at all.
 No-cloning isn't a restriction on quantum mechanics; it's a requirement for quantum mechanics to be a consistent theory at all.
 </InsightBlock>
 
-This is also the exact fact that makes <Term id="qkd-bb84">quantum key distribution</Term>
+This is also the fact that makes <Term id="qkd-bb84">quantum key distribution</Term>
 (BB84, a few lessons ahead) secure against eavesdropping. If an
 attacker could clone a qubit in transit, they could keep one copy,
 forward the other, and measure their copy at leisure without ever
 touching the qubit that reaches its destination, undetected. Because
-cloning is impossible, an eavesdropper is forced to measure the actual
-qubit, which disturbs it, which is precisely what lets Alice and Bob
-detect the attack.
+cloning is impossible, an eavesdropper has to measure the qubit itself,
+which disturbs it, which is what lets Alice and Bob detect the attack.
 
 ## Interactive Experiment
 
-The Common Mistakes section below addresses a specific, tempting
-objection: "CNOT copies bits, so cloning must be possible." Test it
-directly, on the platform's real two-qubit engine, using the exact
-H-then-CNOT sequence this lesson's contradiction step used.
+The Common Mistakes section below addresses a tempting objection: "CNOT
+copies bits, so cloning must be possible." Test it on the platform's
+two-qubit engine, using the H-then-CNOT sequence from the contradiction
+step.
 
-<InteractiveSection title="Try to clone |+⟩ with CNOT" description="Use the Create a Bell state guided walkthrough (H on qubit 0, then CNOT) — exactly this lesson's U(|+⟩⊗|0⟩) computation. Check the resulting state against two independent copies of |+⟩: it lands on the entangled Bell state instead, the same mismatch derived above, now produced by the platform's actual engine rather than only algebra.">
+<InteractiveSection title="Try to clone |+⟩ with CNOT" description="Use the Create a Bell state guided walkthrough (H on qubit 0, then CNOT), which is this lesson's U(|+⟩⊗|0⟩) computation. Check the resulting state against two independent copies of |+⟩: it lands on the entangled Bell state instead, the same mismatch derived above, this time produced by the simulator engine rather than by algebra.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
@@ -228,7 +230,7 @@ states without breaking somewhere else.
 <Callout type="mistake">
 **"CNOT copies bits, so cloning must be possible."** $\text{CNOT}(|b\rangle\otimes|0\rangle)=|b\rangle\otimes|b\rangle$
 for $b=0$ or $1$ individually, but apply linearity to a superposition
-input, exactly as the proof above does, and CNOT produces the Bell state,
+input, just as the proof above does, and CNOT produces the Bell state,
 not two copies of the superposition. CNOT copies *known classical
 basis states*; it does not clone unknown quantum states.
 </Callout>
@@ -242,7 +244,7 @@ device correctly copying an *arbitrary, unknown* input.
 
 ## Practice Questions
 
-1. Where exactly in the proof does linearity get used? What would go
+1. At which step does the proof use linearity? What would go
    wrong with the argument if quantum gates weren't linear operations?
 2. A device is claimed to clone $|0\rangle$ and $|-\rangle$ correctly.
    Using the same method as the worked example, find the state it must

@@ -25,15 +25,20 @@ export const successProbability500Gates: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Compute 0.999^500.",
+    incorrectFeedback: "Raise the per-gate fidelity to the power of the gate count. Multiplying the error rate by the count and subtracting from one is only a linear approximation, and at this depth it noticeably misestimates the survival.",
+    nearMisses: [
+      { value: 0.5, tolerance: 0.005, feedback: "0.5 comes from 1 − N(1−p), the linear estimate. It undercounts survival because the compounding is multiplicative, not additive." },
+      { value: 0.905, tolerance: 0.005, feedback: "That is the lesson's N = 100 entry. At 500 gates the exponent is five times larger." },
+      { value: 0.368, tolerance: 0.005, feedback: "That is the N = 1000 entry. This circuit is half that depth, so its survival is the square root of that value." },
+    ],
   },
   hints: [
     { text: "0.999^500 = exp(500 × ln(0.999))." },
     { text: "ln(0.999) ≈ -0.0010005, so the exponent is ≈ -0.50." },
-    { text: "exp(-0.50) ≈ 0.607." },
+    { text: "Exponentiate the result. The answer should land between the lesson's table entries for shallower and deeper circuits." },
   ],
   solution: {
-    steps: [{ description: "0.999^500 ≈ 0.607 — about 60.7% overall success probability." }],
+    steps: [{ description: "0.999^500 ≈ 0.607, about 60.7% overall success probability." }],
     finalAnswer: "≈0.607 (60.7%)",
   },
   explanation: {

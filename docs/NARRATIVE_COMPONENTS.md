@@ -254,9 +254,17 @@ simulator," with a concrete instruction before the embed.
   description="Increase the initial momentum spread and note how quickly the packet delocalizes."
   mode="observe"
 >
-  <LazyWavePacketSimulator />
+  <LazyWavefunctionExplorer />
 </InteractiveSection>
 ```
+
+(Copied verbatim from the component's own docstring, which names a
+`LazyWavePacketSimulator` that has never existed — corrected here to a real
+one, as is the `LazyDoubleSlitSimulator` in `ObservePredictExplain`'s
+example further down. Check any name against the real `Lazy*.tsx` files
+under `src/components/simulators/` and `src/components/visualizations/`
+before pasting an example: an unresolved JSX tag in a lesson is a
+*render*-time failure, not a compile one.)
 
 `title` defaults to `"Try it yourself"`. `mode` (optional): `"observe"` |
 `"predict"` | `"run"` | `"compare"` — names the label strip badge.
@@ -540,7 +548,7 @@ the rest of this vocabulary (a simulator, a `PredictBeforeReveal`, prose).
 
 ```mdx
 <ObservePredictExplain
-  observe={<LazyDoubleSlitSimulator />}
+  observe={<LazyWaveInterference />}
   predict={
     <PredictBeforeReveal
       question="What happens to the pattern if you close one slit?"

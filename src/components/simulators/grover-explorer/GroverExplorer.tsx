@@ -174,7 +174,7 @@ export function GroverExplorer() {
 
           <div
             aria-live="polite"
-            className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
+            className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
           >
             {iteration === 0 ? (
               <>
@@ -198,7 +198,14 @@ export function GroverExplorer() {
 
           <AmplitudeBars state={state} markedIndices={[markedIndex]} />
 
-          <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+          {/* No `overflow-x-auto` here: the only child is a block-level
+              `.katex-display`, which fills this content box and carries its own
+              horizontal scroll (globals.css §6), so this box never had anything to
+              scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+              y axis to `auto` too, which would silently clip a tall equation. The tab
+              stop the slab needs now lives on `.katex-display` itself; see
+              `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+          <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
             <KatexMath
               tex={`P(\\text{marked}) = ${successProbability.toFixed(4)}`}
               display

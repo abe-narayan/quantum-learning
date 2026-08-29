@@ -41,9 +41,34 @@ export const REQUIRED_LEVELS = Math.ceil(REQUIRED_LEVELS_CONTINUOUS);
 
 export const TOTAL_PHYSICAL_QUBITS_PER_LOGICAL_QUBIT = STEANE_QUBITS_PER_LEVEL ** REQUIRED_LEVELS;
 
+export const crossoverRatios = Array.from({ length: 41 }, (_, i) => 0.5 + i * 0.025);
+
+export const crossoverLevels = [1, 2, 3, 4, 5];
+
+export const logicalRateAtRatio = (ratio, levels, c) =>
+  (1 / c) * Math.pow(ratio, Math.pow(2, levels));
+
+export const crossoverFrames = crossoverLevels.map((levels) => ({
+  paramLabel: `L = ${levels} concatenation level${levels === 1 ? "" : "s"}`,
+  series: [
+    {
+      label: "log10 of the logical error rate p_L",
+      color: "brand",
+      points: crossoverRatios.map((ratio) => ({
+        x: ratio,
+        y: Math.log10(logicalRateAtRatio(ratio, levels, THRESHOLD_C)),
+      })),
+    },
+  ],
+}));
+
+export const crossoverReferenceLines = [
+  { y: Math.log10(P_TH), label: "p_L = p_th: encoding buys nothing" },
+];
+
 export const thresholdComparisonFrames = [
   {
-    paramLabel: `c = ${THRESHOLD_C.toExponential(0)}, p_th = ${P_TH.toExponential(0)} — log10(logical error rate) vs. concatenation level L`,
+    paramLabel: `c = ${THRESHOLD_C.toExponential(0)}, p_th = ${P_TH.toExponential(0)}: log10(logical error rate) vs. concatenation level L`,
     series: [
       {
         label: "Below threshold, p0 = 0.5 · p_th",
@@ -67,7 +92,7 @@ export const lessonMeta = {
   module: "the-threshold-theorem",
   order: 5,
   difficulty: "master",
-  estimatedMinutes: 26,
+  estimatedMinutes: 65,
   prerequisites: ["apex/fault-tolerance-frontiers/decoding-surface-codes", "apex/fault-tolerance-frontiers/magic-states-and-distillation"],
   objectives: [
     "State the quantum threshold theorem precisely: if the physical error rate per gate/timestep is below a constant threshold p_th, an arbitrarily long quantum computation can be run with arbitrarily small logical error probability, at only polylogarithmic overhead in circuit size",
@@ -84,8 +109,8 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   Below one fixed physical error rate, a quantum computer can run an
-  arbitrarily long computation with arbitrarily small failure probability —
-  at only polylogarithmic cost. Above it, the identical machinery makes
+  arbitrarily long computation with arbitrarily small failure
+  probability, at only polylogarithmic cost. Above it, the identical machinery makes
   things worse instead of better.
 </LessonHook>
 
@@ -101,14 +126,14 @@ continuous amount, and naively, it looked like *any* nonzero noise rate
 would eventually corrupt a long computation beyond repair, no matter how
 good your error-correcting code. Some serious physicists doubted
 quantum computation could ever be made robust against realistic,
-continuous noise at all — not as an engineering difficulty, but as a
+continuous noise at all, not as an engineering difficulty but as a
 matter of principle.
 
 The **quantum threshold theorem** answered the objection directly.
 
 <HistoricalMoment date="1996–1998">
   Several groups prove the quantum threshold theorem independently, with
-  different constructions and proof techniques — Shor's own
+  different constructions and proof techniques: Shor's own
   fault-tolerant constructions, Aharonov and Ben-Or, Kitaev, and Knill,
   Laflamme, and Zurek among them.
 </HistoricalMoment>
@@ -122,30 +147,35 @@ rate per gate sits below a fixed constant $p_{\text{th}}$, the
 **threshold**. This is arguably the single most historically important
 theorem in the field: it converted "quantum computing is an interesting
 theoretical curiosity that any real noise will eventually destroy" into
-"quantum computing is a scalable engineering target — build hardware
+"quantum computing is a scalable engineering target: build hardware
 below threshold, and error correction provably does the rest."
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png"
-  alt="Peter Shor at the 2017 Dirac Medal award ceremony"
-  caption="Peter Shor, whose fault-tolerant constructions were among the independent lines of work (alongside Aharonov–Ben-Or, Kitaev, and Knill–Laflamme–Zurek) that established the threshold theorem in the mid-to-late 1990s."
-  credit="Bengt Nyman, via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png"
-  license="CC BY 3.0"
-/>
+<ResearchConnection
+  title="The threshold theorem's original proofs"
+  source="Shor, FOCS 1996 (arXiv:quant-ph/9605011); Aharonov & Ben-Or, STOC 1997 (arXiv:quant-ph/9611025); Knill, Laflamme & Zurek, Science 279, 342 (1998)"
+  url="https://arxiv.org/abs/quant-ph/9611025"
+>
+  Three of the independent constructions behind the theorem, published
+  within about two years of each other, with Kitaev's a fourth. Aharonov
+  and Ben-Or's is the one to read first for the recursion this lesson
+  unrolls, and for how much apparatus a rigorous constant-error proof
+  actually requires: the fault-tolerant gadget definitions, the
+  fresh-ancilla assumption, and the noise model all have to be pinned
+  down before the recursion means anything.
+</ResearchConnection>
 
 ## Mathematical Development
 
 ### One level: why a logical error needs two physical faults
 
-Take a distance-3 code that corrects any single error — the Steane
-$[[7,1,3]]$ code, already familiar from this platform's CSS-code
+Take a distance-3 code that corrects any single error: the Steane
+$[[7,1,3]]$ code, familiar from the CSS-code
 coverage in Quantum Mastery, and the code the original threshold proofs
 used as their central example. Fault-tolerant syndrome extraction is
 built so that any *single* fault anywhere in the correction gadget
 (a bad gate, a bad measurement, a bad preparation) either gets corrected
-or, at worst, produces a detectable, correctable error — by
-construction, exactly as this course's decoding lessons required. A
+or, at worst, produces a detectable, correctable error by
+construction, as this course's decoding lessons required. A
 genuine, *uncorrected* logical error therefore requires **at least two
 independent physical faults** landing inside the same correction cycle:
 one to introduce an error the code cannot distinguish from a different
@@ -165,7 +195,7 @@ $$
 for some constant $c$ set entirely by the specific fault-tolerant
 gadget circuitry (how many locations a fault can occur at, how many
 pairs of them combine into an uncorrectable error), not by anything
-this platform derives from first principles here.
+derived from first principles here.
 
 ### Concatenating: nesting the code inside itself
 
@@ -173,7 +203,7 @@ Concatenation replaces each of the level-1 code's 7 physical qubits with
 another encoded block of the same code, one level deeper. A level-2
 logical qubit is now built from $7^2 = 49$ physical qubits. Crucially,
 the *inputs* to the level-2 correction gadget are no longer raw physical
-qubits with error rate $p$ — they are level-1 logical qubits, each
+qubits with error rate $p$. They are level-1 logical qubits, each
 already suppressed to error rate $p_1 \approx cp^2$. The same two-fault
 argument applies one level up, with $p_1$ standing in for $p$, and
 iterating $L$ times gives the recursion that is the theorem's real
@@ -209,13 +239,43 @@ recursion's fixed point. Two regimes fall out immediately:
 
 - **$p_0 < p_{\text{th}}$** (so $cp_0 < 1$): raising a number less than 1
   to a rapidly growing power $2^L$ drives it to zero, and it does so
-  *doubly* exponentially fast in $L$ — each additional level squares the
+  *doubly* exponentially fast in $L$: each additional level squares the
   previous suppression factor rather than merely multiplying it.
 - **$p_0 > p_{\text{th}}$** (so $cp_0 > 1$): the same formula now blows
   up doubly exponentially. Concatenating *more* only makes the logical
   error rate worse, precisely mirroring the surface code's
   above-threshold behavior from the prerequisite lesson, via a
   completely different mechanism.
+
+The word "threshold" is doing something specific here that "the error
+rate has to be low enough" does not capture, and the sharpest way to see
+it is to sweep $p_0$ across $p_{\text{th}}$ at fixed $L$ rather than
+watching one fixed $p_0$ across levels:
+
+<InteractiveSection
+  title="The crossing, swept"
+  description="Logical error rate after L levels of concatenation, as the physical error rate is varied across the threshold. Drag the slider to add levels. Every curve passes through the same point — p_0 = p_th, where p_L = p_th exactly — and pivots about it, falling away steeply on the left and climbing steeply on the right. The pivot point does not move with L; only the steepness does."
+>
+  <ParametricCurve
+    frames={crossoverFrames}
+    referenceLines={crossoverReferenceLines}
+    sliderLabel="Concatenation levels L"
+    ariaLabel="Log base 10 of the logical error rate after L levels of concatenation, plotted against the ratio of physical error rate to threshold, swept from 0.5 to 1.5. At every value of L the curve passes through the same fixed point where the ratio equals 1 and the logical error rate equals the threshold. To the left of that point the curve drops, steeply and more steeply as L grows; to the right it rises, and rises faster as L grows."
+  />
+</InteractiveSection>
+
+That fixed crossing point is what makes $p_{\text{th}}$ a threshold and
+not merely a rule of thumb. At $p_0=p_{\text{th}}$ exactly, the recursion
+has $cp_0=1$, so $p_L=1/c=p_{\text{th}}$ for every $L$: encoding buys
+nothing, no matter how much of it you do, and the curves all pin
+themselves to that one point. On either side of it, adding a level
+squares the accumulated factor rather than multiplying it: going from
+$L=2$ to $L=3$ multiplies $p_L$ by $r^{2^2}$, which is a 16-fold
+*improvement* at $r=0.5$ and a 5-fold *regression* at $r=1.5$. The same
+hardware investment pays or charges depending only on which side of the
+crossing the device sits, and the sign flips there. A hardware programme's
+entire question is which side of that point it is on; how far from it is
+a secondary question about how many levels to build.
 
 ### Inverting the recursion: how many levels does a target error rate need?
 
@@ -243,8 +303,8 @@ using $n^{\log_2 X} = X^{\log_2 n}$:
     { id: "n", symbol: "n", gloss: "Physical qubits per encoded block for the code in use (n = 7 for the Steane code)." },
     { id: "L", symbol: "L", gloss: "Number of concatenation levels." },
     { id: "eps", symbol: "ε", gloss: "Target logical error rate the computation must reach." },
-    { id: "r", symbol: "r", gloss: "r = c·p₀, the physical error rate scaled by the threshold constant — r < 1 below threshold." },
-    { id: "log2n", symbol: "log₂ n", gloss: "The fixed exponent set by the code's own qubit overhead — for Steane, log₂7." },
+    { id: "r", symbol: "r", gloss: "r = c·p₀, the physical error rate scaled by the threshold constant, with r < 1 below threshold." },
+    { id: "log2n", symbol: "log₂ n", gloss: "The fixed exponent set by the code's own qubit overhead: for Steane, log₂7." },
   ]}
 >
   $$
@@ -253,13 +313,58 @@ using $n^{\log_2 X} = X^{\log_2 n}$:
 </EquationReveal>
 
 The base of this power, $\ln(1/(c\varepsilon))$, grows only
-*logarithmically* in $1/\varepsilon$ — so $N_L$ grows like
+*logarithmically* in $1/\varepsilon$, so $N_L$ grows like
 $\big(\log(1/\varepsilon)\big)^{\log_2 n}$: a fixed power of a logarithm,
 i.e. **polylogarithmic in $1/\varepsilon$**. This is the theorem's real,
 precise quantitative content: not merely "arbitrarily reliable
 computation is possible," but "arbitrarily reliable computation costs
 only polylog overhead," a qualitatively different, far stronger claim
 than a polynomial or exponential resource cost would be.
+
+### What the theorem assumes, and where those assumptions bite
+
+$p_{k+1}\approx c\,p_k^2$ is not an unconditional statement about noisy
+quantum systems. It is the conclusion of a proof whose hypotheses are
+worth naming, because a device can violate any of them while still
+reporting a per-gate error rate below the quoted threshold:
+
+- **Errors are local and independent, or nearly so.** The two-fault
+  counting argument silently assumes faults at different locations are
+  uncorrelated. A noise process that hits many qubits at once, or that
+  correlates faults across a correction cycle, breaks the $p^2$ step
+  directly rather than merely worsening the constant. Rigorous
+  extensions to non-Markovian and weakly-correlated noise exist, and
+  they buy back a threshold at the cost of a smaller constant and
+  stronger locality assumptions on the system-bath coupling.
+- **Fresh ancillas are available on demand.** Each correction round
+  discards entropy into freshly prepared $|0\rangle$ states. A device
+  that cannot supply them at the rate the syndrome extraction consumes
+  them has no way to remove the entropy errors deposit, and no amount of
+  concatenation substitutes for that.
+- **Operations run in parallel, and classical control keeps up.**
+  Concatenation only stays polylogarithmic in *time* if each level's
+  correction gadgets run concurrently and the classical decoding keeps
+  pace with syndrome extraction. Serialize them and the overhead
+  argument above no longer describes the runtime.
+- **The threshold constant $c$ is gadget-specific.** $c$ counts the pairs
+  of fault locations in a particular fault-tolerant construction, so
+  $p_{\text{th}}=1/c$ is a property of the construction, not of quantum
+  mechanics. Two proofs of "the threshold theorem" can quote thresholds
+  orders of magnitude apart and both be correct.
+
+<ResearchConnection
+  title="A threshold proof with its noise model made explicit"
+  source="Aliferis, Gottesman & Preskill, Quantum Information and Computation 6, 97 (2006) (arXiv:quant-ph/0504218)"
+  url="https://arxiv.org/abs/quant-ph/0504218"
+>
+  A rigorous accuracy-threshold proof for concatenated distance-3 codes,
+  written in a way that makes the assumptions above visible rather than
+  buried: the noise is specified as a bounded-strength system-bath
+  coupling rather than a stochastic per-gate failure probability, which
+  is what lets the result cover correlated and non-Markovian noise. The
+  threshold it proves is small and pessimistic by construction, which is
+  the honest price of a proof that does not assume independent errors.
+</ResearchConnection>
 
 ## Physical Interpretation: Why This Matters
 

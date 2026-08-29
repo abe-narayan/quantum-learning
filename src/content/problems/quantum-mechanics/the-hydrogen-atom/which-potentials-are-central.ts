@@ -33,17 +33,21 @@ export const whichPotentialsAreCentral: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "A central potential must be expressible as a function of r=√(x²+y²+z²) alone, unchanged by any rotation about the origin.",
   },
   hints: [
-    { text: "Central means: depends only on r=√(x²+y²+z²), the same value for any direction at a fixed distance." },
-    { text: "x²+y²+z² is literally r² — a function of r alone." },
-    { text: "The others depend on direction, not just distance." },
+    { text: "Central means the potential takes the same value everywhere on a sphere about the origin, whatever the direction." },
+    { text: "Pick two points at the same distance from the origin but in different directions, such as (1,0,0) and (0,1,0), and evaluate each candidate at both." },
+    { text: "Any expression that can be rewritten in terms of x²+y²+z² alone passes; anything that distinguishes a direction fails." },
   ],
   solution: {
-    steps: [{ description: "x²+y²+z²=r² is manifestly a function of r alone, so V=r² is central; none of the others are invariant under a general rotation." }],
-    finalAnswer: "(a) V = x²+y²+z²",
+    steps: [{ description: "x²+y²+z² is r², a function of distance alone, so it takes the same value at every point of a sphere about the origin. Each of the others gives different values at (1,0,0) and (0,1,0), which are the same distance out, so none of them is rotationally invariant." }],
+    finalAnswer: "V = x²+y²+z², which is r² and so depends on distance alone.",
   },
   explanation: {
-    correctIdea: "Central potentials are exactly those built from x²+y²+z² (or its square root), never from an individual Cartesian component alone.",
-    whyCorrect: "Rotating the coordinate axes leaves x²+y²+z² completely unchanged, which is the defining property of a central potential.",
-    whyWrong: ["Options with a single bare coordinate or a product of coordinates all fail to be rotationally invariant."],
+    correctIdea: "A potential is central when it can be written in terms of x²+y²+z² alone, so that no direction is singled out.",
+    whyCorrect: "Rotating the axes leaves x²+y²+z² unchanged, which is the defining property.",
+    whyWrong: [
+      { optionId: "b", text: "Singles out the x-axis. It gives 1 at (1,0,0) and 0 at (0,1,0), both at distance 1." },
+      { optionId: "c", text: "Depends on direction in the strongest way here: it changes sign under flipping one coordinate, and vanishes on all three coordinate planes." },
+      { optionId: "d", text: "Is symmetric about the z-axis but not about the origin. It gives 1 at (1,0,0) and 0 at (0,0,1)." },
+    ],
   },
 };

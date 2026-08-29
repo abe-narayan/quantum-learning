@@ -23,10 +23,14 @@ export const superdenseLambdaForTargetSuccess: NumericProblem = {
     value: 0.5,
     tolerance: 0.001,
     incorrectFeedback: "Set 1 - lambda/2 = 0.75 and solve for lambda.",
+    nearMisses: [
+      { value: 0.25, feedback: "0.25 is lambda/2, the amount the success probability dropped. Undo the halving to recover lambda." },
+      { value: 0.75, feedback: "0.75 is the target success probability, not the dephasing strength that produces it." },
+    ],
   },
   hints: [
-    { text: "1 - lambda/2 = 0.75" },
-    { text: "lambda/2 = 0.25" },
+    { text: "Set the closed form equal to the target success rate and solve for lambda; no new physics is needed beyond rearranging one linear equation." },
+    { text: "Isolate the lambda/2 term first, then undo the halving. Sanity check against the lesson's data points: lambda=0.4 gave 0.8, so a target of 0.75 needs more dephasing than that." },
   ],
   solution: {
     steps: [

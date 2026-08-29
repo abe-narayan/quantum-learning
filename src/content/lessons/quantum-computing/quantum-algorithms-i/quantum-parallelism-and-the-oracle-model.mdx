@@ -5,7 +5,6 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
-import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { MeasurementTree } from "@/components/visualizations/MeasurementTree";
@@ -17,7 +16,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Quantum Parallelism and the Oracle Model",
   description:
-    "Applying a Hadamard to every qubit puts every possible input into superposition at once, and why that alone doesn't let you read out a function's values on all of them, setting up exactly the problem the rest of this course solves.",
+    "Applying a Hadamard to every qubit puts every possible input into superposition at once, and why that alone doesn't let you read out a function's values on all of them, which is the problem the rest of this course solves.",
   course: "quantum-algorithms-i",
   module: "quantum-parallelism-and-the-oracle-model",
   order: 1,
@@ -57,17 +56,17 @@ Every algorithm in this course starts from the same trick: put a register into s
 
 ## Motivation
 
-The "somehow" is the entire
-subject, worth understanding precisely before building anything on top of it.
+Put a register into superposition, apply a computation once, then read
+something useful out at the end. That "somehow" in the middle is the whole
+subject of this course, and it is worth understanding what it has to
+overcome before building anything on top of it.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/IBM_QC.jpg/1280px-IBM_QC.jpg"
-  alt="The dilution-refrigerator cryostat housing IBM's 50-qubit superconducting quantum computing prototype, displayed at CES 2018"
-  caption="A dilution-refrigerator cryostat: real hardware that physically hosts the qubit register this lesson puts into superposition. Its nested gold stages cool the superconducting chip inside to near absolute zero so the H^⊗n step derived below actually holds."
-  credit="Lars Plougmann / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_QC.jpg"
-  license="CC BY-SA 2.0"
-/>
+The popular version of the story stops one step early. Yes, one query to
+$f$ on a superposition of $2^n$ inputs produces a state containing every
+value of $f$ at once. No, you cannot read them. This lesson works out
+exactly how much a measurement of that state gives you (one value, chosen
+at random), and that disappointing answer is what every algorithm in the
+rest of the course is designed to route around.
 
 ## Mathematical Development
 
@@ -116,8 +115,8 @@ $$
 U_f\left(\frac{1}{\sqrt{2^n}}\sum_x|x\rangle\right)|0\rangle = \frac{1}{\sqrt{2^n}}\sum_x|x\rangle|f(x)\rangle
 $$
 
-Every value of $f$ really is encoded in this one state; that part of
-"quantum parallelism" is real.
+Every value of $f$ is encoded in this one state. That part of "quantum
+parallelism" is true, and it is the part the headlines report.
 
 <PredictBeforeReveal
   question="The state above has a term |x⟩|f(x)⟩ for every possible input x, all at once. If you measure it right now, what do you get?"
@@ -125,10 +124,10 @@ Every value of $f$ really is encoded in this one state; that part of
     { label: "The full table of every f(x), all 2^n values", value: "full-table" },
     { label: "About half of the f(x) values, chosen at random", value: "half" },
     { label: "Exactly one (x, f(x)) pair, chosen at random", value: "one" },
-    { label: "Nothing useful — the state is too scrambled to measure", value: "nothing" },
+    { label: "Nothing useful: the state is too scrambled to measure", value: "nothing" },
   ]}
   correctValue="one"
-  explanation="Measurement collapses the superposition to exactly one basis state, so you get exactly one (x, f(x)) pair, with probability 1/2^n for each possible x. Every other value of f that was sitting in the superposition a moment earlier is simply gone once you look. This is the entire reason 'quantum parallelism' needs a second trick (interference) to be useful at all."
+  explanation="Measurement collapses the superposition to one basis state, so you get one (x, f(x)) pair, with probability 1/2^n for each possible x. Every other value of f that was sitting in the superposition a moment earlier is gone once you look. This is why 'quantum parallelism' needs a second ingredient, interference, before it is useful at all."
 />
 
 But **measuring this state <Term id="wavefunction-collapse">collapses</Term> it to
@@ -164,7 +163,7 @@ from `applySingleQubitGate` applied $n$ times in a row, not just algebra:
 
 <InteractiveSection
   title="2ⁿ branches, each shrinking as n grows"
-  description="Scrub n from 1 to 4 qubits and watch H applied to every qubit spread the state across exactly 2 to the n equally likely branches, each shrinking as n grows. This is the real probability distribution computed from applySingleQubitGate, not a picture: it is exactly why quantum parallelism alone is not a speedup, one measurement still reveals only one of these branches no matter how many there are."
+  description="Scrub n from 1 to 4 qubits and watch H applied to every qubit spread the state across 2 to the n equally likely branches, each shrinking as n grows. These are the real probabilities computed by applySingleQubitGate, and they show why quantum parallelism alone is not a speedup: one measurement reveals one branch, however many there are."
 >
   <BarChartExplorer
     frames={parallelismFrames}
@@ -190,11 +189,11 @@ where the real work happens.
 ## Physical Interpretation
 
 "Quantum computers try every input at once" is the half of the story that
-makes headlines and the half that, alone, is useless: a superposition over
-$2^n$ branches is not $2^n$ independent computations you get to read out;
-it's one probabilistic system that gives you exactly one measurement's
-worth of information, same as always. Every algorithm in this course earns
-its speedup by arranging interference deliberately, not by superposition
+makes headlines, and on its own it is useless. A superposition over $2^n$
+branches is not $2^n$ independent computations you get to read out. It is
+one probabilistic system that yields one measurement's worth of
+information, the same as any other. Every algorithm in this course earns
+its speedup by arranging interference on purpose, never by superposition
 alone.
 
 ## Worked Example
@@ -209,7 +208,7 @@ $U_f\left(\frac{1}{2}\sum_{x=0}^3|x\rangle\right)|0\rangle =
 it to one specific $x$ (each with probability $1/4$) together with the
 correct $f(x)$, exactly one $(x,f(x))$ pair, the same information a single
 classical query $f(x)$ would give for a chosen $x$. The other three values of
-$f$ are still completely unknown after this one query, quantum or classical.
+$f$ remain unknown after this one query, quantum or classical.
 
 ## Common Mistakes
 
@@ -224,8 +223,7 @@ never from reading out multiple branches at once.
 **Treating the oracle model as free.** $U_f$ is assumed to exist as a given
 unitary; building one for a specific real-world $f$ can itself be
 expensive. Query complexity (how many calls to $U_f$ an algorithm needs) is
-what these algorithms actually bound, not the cost of constructing $U_f$
-itself.
+what these algorithms bound, not the cost of constructing $U_f$ itself.
 </Callout>
 
 ## Practice Questions

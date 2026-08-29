@@ -21,11 +21,16 @@ export const synthesisEigenvalueFromTraceDet: NumericProblem = {
     type: "numeric",
     value: 3,
     tolerance: 0.001,
-    incorrectFeedback: "Set up the characteristic equation λ² - tr·λ + det = 0 with tr=4, det=3, then factor.",
+    incorrectFeedback: "Set up the characteristic equation λ² - tr·λ + det = 0 with the given numbers, then factor. Check your roots: they must add up to the trace and multiply to the determinant.",
+    nearMisses: [
+      { value: 1, feedback: "1 is the smaller root. Both roots come from the same factorization; the question asks for the larger." },
+      { value: 4, feedback: "4 is the trace, the sum of both eigenvalues rather than one of them." },
+      { value: 2, feedback: "2 is the average of the two eigenvalues, which is where the characteristic parabola's vertex sits. The roots lie one unit either side of it." },
+    ],
   },
   hints: [
     { text: "λ² - (trace)λ + (determinant) = 0." },
-    { text: "λ² - 4λ + 3 = 0 factors nicely." },
+    { text: "Substitute the given trace and determinant, then factor the quadratic. Its two roots add to the trace and multiply to the determinant; report the larger one." },
   ],
   solution: {
     steps: [
@@ -36,7 +41,7 @@ export const synthesisEigenvalueFromTraceDet: NumericProblem = {
   },
   explanation: {
     correctIdea: "Trace and determinant alone determine a 2×2 matrix's characteristic equation, without needing the matrix itself.",
-    whyCorrect: "1+3=4 (matches trace) and 1×3=3 (matches determinant) — both consistency checks pass.",
+    whyCorrect: "1+3=4 (matches trace) and 1×3=3 (matches determinant): both consistency checks pass.",
     whyWrong: ["Being Hermitian guarantees the eigenvalues are real, which is why factoring over the reals works cleanly here."],
   },
 };

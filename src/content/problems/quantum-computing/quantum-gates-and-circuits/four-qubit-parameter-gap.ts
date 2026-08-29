@@ -32,6 +32,17 @@ export const fourQubitParameterGap: NumericProblem = {
     tolerance: 0.5,
     incorrectFeedback:
       "First compute the general 4-qubit state's parameter count ($2\\times2^4$ real numbers, minus 1 for normalization, minus 1 for global phase), then the product-state count (2 real parameters per qubit factor, times 4), then subtract.",
+    nearMisses: [
+      {
+        value: 2 * 2 ** n - productStateParameters,
+        feedback: "You kept all 32 real numbers. Normalization removes one degree of freedom and the unobservable global phase removes another, before the comparison.",
+      },
+      {
+        value: 2 * 2 ** n - 1 - productStateParameters,
+        feedback: "One subtraction is missing. Both normalization and the global phase have to come off the general count.",
+      },
+      { value: generalStateParameters, feedback: "That is the general state's own parameter count. The question asks how many more it has than a product state, so subtract the product count of 8." },
+    ],
   },
   hints: [
     { text: "A general 4-qubit state has $2^4=16$ complex amplitudes, i.e. 32 real numbers, before any constraints." },

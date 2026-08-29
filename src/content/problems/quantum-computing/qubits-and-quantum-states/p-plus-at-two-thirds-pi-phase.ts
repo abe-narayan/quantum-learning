@@ -33,6 +33,11 @@ export const pPlusAtTwoThirdsPiPhase: NumericProblem = {
     value: pPlus,
     tolerance: 0.01,
     incorrectFeedback: "Use $P(+)=\\frac{1+2\\operatorname{Re}(\\alpha^*\\beta)}{2}$ from the Measurement lesson, with $\\alpha=\\frac{1}{\\sqrt2}$ and $\\beta=e^{i\\delta}\\frac{1}{\\sqrt2}$.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is P(0), the computational-basis probability. It is deliberately blind to δ, which is exactly why the X basis is the one that reveals a relative phase." },
+      { value: 0.75, feedback: "0.75 is P(−), the other X-basis outcome. The two sum to 1, so check which sign the formula carries on the interference term." },
+      { value: -0.5, feedback: "−0.5 is cos δ itself. It still has to be folded into P(+) = (1 + 2Re(α*β))/2, where Re(α*β) = cos(δ)/2." },
+    ],
   },
   hints: [
     { text: "This is the same P(+) formula from the Measurement lesson, applied to a state with an explicit relative phase δ between α and β." },

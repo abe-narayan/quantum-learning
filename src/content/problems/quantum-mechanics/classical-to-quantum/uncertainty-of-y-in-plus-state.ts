@@ -22,12 +22,16 @@ export const uncertaintyOfYInPlusState: NumericProblem = {
     type: "numeric",
     value: 1,
     tolerance: 0.01,
-    incorrectFeedback: "First find ⟨Y⟩ and ⟨Y²⟩ in |+⟩ (recall Y² = I for any Pauli operator), then Var(Y) = ⟨Y²⟩ - ⟨Y⟩².",
+    incorrectFeedback: "Find ⟨Y⟩ and ⟨Y²⟩ separately, recalling that every Pauli operator squares to the identity. If you answered zero, you treated |+⟩ as an eigenstate of Y; it is an eigenstate of X, which is a different operator.",
+    nearMisses: [
+      { value: 0, feedback: "Zero uncertainty means the state is an eigenstate of Y. |+⟩ is an eigenstate of X; measuring Y on it gives ±1 with equal probability." },
+      { value: Math.SQRT1_2, tolerance: 0.01, feedback: "Check the variance: ⟨Y²⟩ = 1 because Y² = I, and ⟨Y⟩ = 0, so the variance is 1 and its square root is 1 too." },
+    ],
   },
   hints: [
-    { text: "Y² = I for every Pauli operator, so ⟨Y²⟩ = 1 always." },
-    { text: "Compute ⟨Y⟩ = ⟨+|Y|+⟩ directly — Y|+⟩ involves ±i times |∓⟩-type terms that turn out to cancel." },
-    { text: "If ⟨Y⟩=0, then Var(Y) = 1 - 0 = 1, and ΔY = √1." },
+    { text: "Uncertainty needs two ingredients, ⟨Y⟩ and ⟨Y²⟩, and one of them comes free: every Pauli operator squares to the identity. Start there." },
+    { text: "Since Y² = I, its expectation is fixed regardless of the state. The real work is ⟨Y⟩ = ⟨+|Y|+⟩: write out Y|+⟩ and watch the imaginary terms cancel." },
+    { text: "With ⟨Y⟩ vanishing, the variance is just ⟨Y²⟩. Take the square root to get ΔY." },
   ],
   solution: {
     steps: [

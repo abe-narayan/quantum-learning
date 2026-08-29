@@ -40,21 +40,24 @@ export const whichStateFailsNormalization: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Check each option's |α|²+|β|² and see which one doesn't sum to 1.",
   },
   hints: [
+    { text: "Normalization is a condition on the squared magnitudes, not the coefficients themselves." },
     { text: "Compute |α|² + |β|² for each option and check whether it equals 1." },
-    { text: "For option (b): 0.5² + 0.5² = 0.25 + 0.25 = 0.5, not 1." },
+    { text: "Watch the option whose coefficients look like they should already add to 1. Squaring changes what they add to." },
   ],
   solution: {
     steps: [
-      { description: "Test option (b): $0.5^2+0.5^2 = 0.25+0.25 = 0.5 \\neq 1$." },
-      { description: "The other three options each check out to exactly 1: (a) $0.36+0.64=1$; (c) $\\tfrac12+\\tfrac12=1$; (d) $1+0=1$." },
+      { description: "Test $0.5|0\\rangle+0.5|1\\rangle$: $0.5^2+0.5^2 = 0.25+0.25 = 0.5 \\neq 1$." },
+      { description: "The other three each check out to 1: $0.6|0\\rangle+0.8|1\\rangle$ gives $0.36+0.64=1$; $\\tfrac{1}{\\sqrt2}|0\\rangle+\\tfrac{i}{\\sqrt2}|1\\rangle$ gives $\\tfrac12+\\tfrac12=1$; $|0\\rangle$ gives $1+0=1$." },
     ],
-    finalAnswer: `Option (b): $|0.5|^2+|0.5|^2 = ${candidateB.norm().toFixed(2)}^2 \\neq 1$`,
+    finalAnswer: `$0.5|0\\rangle+0.5|1\\rangle$: $|0.5|^2+|0.5|^2 = ${(candidateB.norm() ** 2).toFixed(2)} \\neq 1$`,
   },
   explanation: {
     correctIdea: "Normalization requires |α|²+|β|² = 1 exactly — a state whose coefficients are 'reasonable-looking' numbers isn't automatically normalized.",
     whyCorrect: `Directly checked with this platform's engine: candidateA.isNormalized() = ${candidateA.isNormalized()}, candidateB.isNormalized() = ${candidateB.isNormalized()}, candidateC.isNormalized() = ${candidateC.isNormalized()}, candidateD.isNormalized() = ${candidateD.isNormalized()}.`,
     whyWrong: [
-      "0.5 and 0.5 look like they should add to something clean, but normalization is about the SQUARES of the coefficients, and 0.5²+0.5²=0.5, not 1 — this state would need to be scaled up by 1/√0.5 to become physical.",
+      { optionId: "a", text: "The 3-4-5 triangle in disguise: 0.36 + 0.64 = 1, so this one is normalized." },
+      { optionId: "c", text: "The i changes the phase and not the magnitude: |i/√2|² is still 1/2, and the two halves sum to 1." },
+      { optionId: "d", text: "A basis state, with 1² + 0² = 1. Basis states are always normalized." },
     ],
   },
 };

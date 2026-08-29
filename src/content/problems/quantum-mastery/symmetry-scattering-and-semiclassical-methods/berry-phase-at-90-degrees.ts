@@ -26,10 +26,15 @@ export const berryPhaseAt90Degrees: NumericProblem = {
     value: gamma,
     tolerance: 0.01,
     incorrectFeedback: "cos(90°)=0, so the solid angle is the full hemisphere's Ω=2π, and γ=−Ω/2.",
+    nearMisses: [
+      { value: Math.PI, tolerance: 0.01, feedback: "The magnitude is right but the sign is not. The formula carries a minus sign, so the phase is −π." },
+      { value: -2 * Math.PI, tolerance: 0.01, feedback: "−2π is the full solid angle, not half of it. The Berry phase for spin-1/2 is −Ω/2." },
+      { value: 0, feedback: "A vanishing Berry phase corresponds to a degenerate loop enclosing no solid angle. Sweeping the equator encloses a whole hemisphere." },
+    ],
   },
   hints: [
-    { text: "cos(90°)=0, so Ω=2π(1−0)=2π." },
-    { text: "γ=−Ω/2=−π." },
+    { text: "cos(90°)=0, so the enclosed solid angle is Ω=2π(1−0)=2π, a full hemisphere of field directions." },
+    { text: "The Berry phase for a spin-1/2 is minus half the enclosed solid angle. Apply that to the Ω you just found, and keep the sign." },
   ],
   solution: {
     steps: [{ description: "Ω=2π(1−cos90°)=2π(1−0)=2π. γ=−Ω/2=−π≈−3.1416." }],

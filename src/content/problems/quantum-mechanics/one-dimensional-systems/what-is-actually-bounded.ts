@@ -21,7 +21,11 @@ export const whatIsActuallyBounded: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["T, not t", "transmission probability", "includes the k2/k1 factor"],
+      {
+        phrases: ["T rather than t", "capital T", "transmission probability", "includes the k2/k1 factor", "k2/k1", "flux factor", "flux correction", "r+t=1", "r + t = 1", "reflection plus transmission"],
+        missingFeedback:
+          "You have said t is an amplitude rather than a probability. Name the quantity that is bounded: the transmission probability T = (k₂/k₁)|t|², whose flux factor is what makes R + T = 1 and keeps T inside [0,1].",
+      },
       ["amplitude", "not itself a probability", "flux-corrected"],
     ],
     incorrectFeedback: "Name both pieces: that t is an amplitude, not a probability, and that the actual transmission probability T = (k2/k1)*|t|^2 (which includes the flux-correction factor) is what's guaranteed to stay between 0 and 1, not t itself.",

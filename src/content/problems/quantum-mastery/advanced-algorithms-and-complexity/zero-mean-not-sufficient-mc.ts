@@ -43,11 +43,15 @@ export const zeroMeanNotSufficientMc: MultipleChoiceProblem = {
       { description: "The real obstruction is the gradient's typical magnitude (standard deviation, i.e. √variance) collapsing toward zero as n grows." },
       { description: "That's a statement about variance, specifically shown (cited from concentration of measure) to scale as O(2^-n) for deep, expressive circuits against global cost functions." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Zero mean also holds for easily trainable landscapes; the obstruction is the gradient's variance collapsing for deep circuits and global cost functions.",
   },
   explanation: {
     correctIdea: "Barren plateaus are fundamentally a variance (typical-magnitude) phenomenon, not a mean phenomenon.",
     whyCorrect: "This is exactly the distinction the lesson draws between its two results — one elementary and general, one deep and n-dependent.",
-    whyWrong: ["Options b, c, and d each misattribute the source or scope of the actual obstruction."],
+    whyWrong: [
+      { optionId: "b", text: "Calls the zero-mean derivation wrong. It is rigorous and general; it is just an incomplete story on its own." },
+      { optionId: "c", text: "Restricts zero mean to n=1. The derivation only used that the parameter is marginally uniform over a period, so it holds for any n; the variance is what depends on n." },
+      { optionId: "d", text: "Relocates the obstruction to hardware coherence times. This lesson's argument is about statistical and optimization structure." },
+    ],
   },
 };

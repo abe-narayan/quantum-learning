@@ -107,12 +107,38 @@ export function DiscretizationLimit({ ariaLabel }: { ariaLabel: string }) {
     <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-          <line x1={PAD_LEFT} y1={HEIGHT - PAD_BOTTOM} x2={WIDTH - PAD_RIGHT} y2={HEIGHT - PAD_BOTTOM} className="stroke-border" strokeWidth={1} />
-          <line x1={PAD_LEFT} y1={PAD_TOP} x2={PAD_LEFT} y2={HEIGHT - PAD_BOTTOM} className="stroke-border" strokeWidth={1} />
-          <text x={WIDTH - PAD_RIGHT} y={HEIGHT - PAD_BOTTOM + 14} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          {/* The x and y axes are the frame the whole discretization argument is read
+              against — a reader cannot tell "the bars sum to the area under the curve"
+              without seeing where y = 0 is. They were `stroke-border`, the panel-edge
+              token, which measures 1.41:1 on `--surface-muted` and so failed WCAG 2.1
+              SC 1.4.11's 3:1 floor for meaningful graphical objects: the baseline the
+              bars stand on was effectively invisible. `stroke-axis` is the chart
+              channel and clears 3:1 on every panel depth in both themes. */}
+          <line x1={PAD_LEFT} y1={HEIGHT - PAD_BOTTOM} x2={WIDTH - PAD_RIGHT} y2={HEIGHT - PAD_BOTTOM} className="stroke-axis" strokeWidth={1} />
+          <line x1={PAD_LEFT} y1={PAD_TOP} x2={PAD_LEFT} y2={HEIGHT - PAD_BOTTOM} className="stroke-axis" strokeWidth={1} />
+          {/* Axis names were authored at 10 units, raised to 14, and are now 17.
+              The 14 came from dividing by the wrong number. The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+              (320 less Container's `px-4` gutters), but this SVG renders inside
+              `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+              radius and fill and no padding at all — the `p-4` does. Subtract
+              2 x (16px padding + 1px border) = 34px.
+              So the scale is 254/480 = 0.529, not 0.6: 10 units painted at 5.29px
+              and the 14 that was meant to clear the ~9px floor painted at
+              **7.41px** and did not. 17 units gives 9.00px.
+              The fill stays `--muted-foreground` (~6.9:1) rather than moving to
+              `--axis` (~4.5:1): `--axis` is a *minimum* for strokes, and swapping
+              text onto it would lower contrast, not raise it. */}
+          <text x={WIDTH - PAD_RIGHT} y={HEIGHT - PAD_BOTTOM + 18} textAnchor="end" className="fill-muted-foreground text-[17px]">
             x
           </text>
-          <text x={PAD_LEFT - 6} y={PAD_TOP + 8} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          {/* The y label used to hang left of the axis (`x={PAD_LEFT - 6}`, anchored
+              end). At 14 units "|ψ(x)|²" was ~45 units wide and would run off the left
+              edge of the viewBox, so it moved above the top of the y axis — the same
+              placement `ExpectationTrace` already uses for its own y label. At 17 the
+              baseline also moves from PAD_TOP - 4 (= 12) to PAD_TOP - 2 (= 14): a
+              17-unit glyph has ~13 units of ascent, so a baseline at 12 put the cap
+              tops at -1 and SVG would have clipped the top of the label away. */}
+          <text x={PAD_LEFT - 4} y={PAD_TOP - 2} className="fill-muted-foreground text-[17px]">
             |&psi;(x)|&sup2;
           </text>
 

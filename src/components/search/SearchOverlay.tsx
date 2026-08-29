@@ -4,16 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import type { Pillar } from "@/lib/content/types";
-import { PILLAR_ORDER, PILLAR_VISUALS } from "@/lib/design/pillars";
+import { PILLAR_VISUALS } from "@/lib/design/pillars";
 import { fetchSearchIndex } from "@/lib/search/fetchIndex";
-import {
-  matchScore,
-  matchesAllTokens,
-  prepareSearchEntries,
-  tokenizeQuery,
-  type SearchableEntry,
-} from "@/lib/search/match";
-import type { SearchEntry, SearchEntryType } from "@/lib/search/types";
+import { prepareSearchEntries, tokenizeQuery, type SearchableEntry } from "@/lib/search/match";
+import { suggestCorrection } from "@/lib/search/didYouMean";
+import { rankResults } from "@/lib/search/rank";
+import type { SearchEntryType } from "@/lib/search/types";
 import { SEARCH_DIALOG_ID } from "@/lib/search/ids";
 import { cn } from "@/lib/utils";
 
@@ -26,18 +22,12 @@ const TYPE_LABELS: Record<SearchEntryType, string> = {
   track: "Tracks",
 };
 
-// Glossary first, deliberately. The most common query from someone new to
-// the subject is a word they just hit and didn't recognise, and for that
-// query a one-paragraph definition is a better landing than a 20-minute
-// lesson — especially since a glossary entry links straight on to the
-// lessons that cover it, so it costs a reader who wanted the lesson exactly
-// one extra click while saving the reader who wanted the definition a
-// dead-end detour. Everything else keeps its previous relative order.
-// `track` last: six entries that a reader almost always reaches through the
-// nav instead. They earn their place in the index because typing a subject
-// name ("hardware", "mechanics") previously returned lessons *about* it and
-// never the section itself — but they should not outrank a lesson.
-const TYPE_ORDER: SearchEntryType[] = ["term", "lesson", "problem", "simulator", "course", "track"];
+// Matching, scoring, group ordering and the question-stem rewrite all live in
+// `@/lib/search/rank` (which composes `match`, `groupRanking` and
+// `questionQuery`), pure and unit-tested against the real
+// `public/search-index.json`. What is left here is presentation: how many rows
+// a group shows, where the pillar sub-headers fall, and what the empty screen
+// offers instead.
 const RESULTS_PER_GROUP = 6;
 
 /** Where an empty-handed search sends someone. Real routes only. */
@@ -51,18 +41,10 @@ const NO_RESULT_ROUTES = [
 // queries and entries are diacritic-folded so "schrodinger" finds
 // "Schrödinger", tokens AND-match in any order so "state bell" finds "Bell
 // state", and `matchScore` keeps the old hierarchy — exact title, title
-// prefix, title substring, description-only — sorted *before* pillar order so
-// a literal title hit is never buried under a pillar that merely happens to
-// come earlier in the curriculum and mentions the word in passing.
-
-// `null` stands for "no pillar" (most simulators, and any entry the index
-// doesn't tag) — its rank sorts after every real pillar so a kind group
-// reads curriculum-order-first, general-last.
-function pillarRank(pillar: Pillar | undefined): number {
-  if (!pillar) return PILLAR_ORDER.length;
-  const index = PILLAR_ORDER.indexOf(pillar);
-  return index === -1 ? PILLAR_ORDER.length : index;
-}
+// prefix, title substring, description-only, and now lesson-body-terms-only —
+// sorted *before* pillar order so a literal title hit is never buried under a
+// pillar that merely happens to come earlier in the curriculum and mentions
+// the word in passing.
 
 type SearchOverlayProps = {
   onClose: () => void;
@@ -77,6 +59,9 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
   const [indexStatus, setIndexStatus] = useState<IndexStatus>("loading");
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  // The "did you mean" control, so ArrowDown out of the field can reach it on
+  // the one screen where there are no result links to walk into.
+  const suggestionRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
   // The index isn't baked into the page — it's fetched lazily, only once the
@@ -116,35 +101,21 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
     return Array.from(dialog.querySelectorAll<HTMLAnchorElement>("[data-search-result]"));
   }
 
-  // Two-level structure: grouped by kind (the primary split — a visitor
-  // searching mid-lesson almost always wants "Lessons" first), and within
-  // each kind, pillar-major ordered so the curriculum's own structure shows
-  // through rather than an arbitrary index order. `visible` is capped at
-  // RESULTS_PER_GROUP per kind (unchanged from before) so six pillars' worth
-  // of matches can't blow the panel out; `pillarBreaks` records which
+  // Everything about *which* results and in what order — matching, the
+  // relevance bands, group order, and the question-stem rewrite — is
+  // `rankResults`, which is pure and tested against the real committed index.
+  const ranked = useMemo(() => rankResults(index, query), [index, query]);
+
+  // What is left here is the two-level presentation: grouped by kind (the
+  // primary split — a visitor searching mid-lesson almost always wants
+  // "Lessons" first), and within each kind, pillar-major ordered so the
+  // curriculum's own structure shows through rather than an arbitrary index
+  // order. `visible` is capped at RESULTS_PER_GROUP per kind so six pillars'
+  // worth of matches can't blow the panel out; `pillarBreaks` records which
   // visible rows start a new pillar cluster, for the sub-headers below.
   const groups = useMemo(() => {
-    const tokens = tokenizeQuery(query);
-    if (tokens.length === 0) return [];
-    const phrase = tokens.join(" ");
-    const built = TYPE_ORDER.map((type) => {
-      // Each entry's score is computed exactly once per query, here — not
-      // inside the sort comparator, where it used to be recomputed
-      // O(n log n) times per keystroke.
-      const matches: { entry: SearchEntry; score: number }[] = [];
-      for (const candidate of index) {
-        if (candidate.entry.type !== type || !matchesAllTokens(candidate, tokens)) continue;
-        matches.push({ entry: candidate.entry, score: matchScore(candidate, tokens, phrase) });
-      }
-      if (matches.length === 0) return null;
-
-      const ordered = matches.sort(
-        (a, b) =>
-          a.score - b.score ||
-          pillarRank(a.entry.pillar) - pillarRank(b.entry.pillar) ||
-          a.entry.title.localeCompare(b.entry.title)
-      );
-      const visible = ordered.slice(0, RESULTS_PER_GROUP).map((match) => match.entry);
+    return ranked.groups.map(({ type, matches }) => {
+      const visible = matches.slice(0, RESULTS_PER_GROUP).map((match) => match.entry);
       const remaining = matches.length - visible.length;
       const pillarBreaks = new Set<number>();
       const seenPillars = new Set<string>();
@@ -170,34 +141,36 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
       // fine as one flat list.
       const showPillarLabels = pillarsAreContiguous && pillarBreaks.size > 1;
 
-      return {
-        type,
-        visible,
-        remaining,
-        total: matches.length,
-        pillarBreaks,
-        showPillarLabels,
-        bestScore: ordered[0].score,
-      };
-    }).filter((group): group is NonNullable<typeof group> => group !== null);
-
-    // Glossary leads only when it actually *matched a term*. Definitions are
-    // full paragraphs, so a common word ("state", "system") matches dozens of
-    // them on description text alone — and letting that push the lessons
-    // below the fold would be the opposite of helpful. When the glossary's
-    // best hit is description-only, it sinks to just under Lessons instead.
-    const termPosition = built.findIndex((group) => group.type === "term");
-    if (termPosition !== -1 && built[termPosition].bestScore >= 3) {
-      const [termGroup] = built.splice(termPosition, 1);
-      const lessonPosition = built.findIndex((group) => group.type === "lesson");
-      built.splice(lessonPosition === -1 ? 0 : lessonPosition + 1, 0, termGroup);
-    }
-    return built;
-  }, [index, query]);
+      return { type, visible, remaining, total: matches.length, pillarBreaks, showPillarLabels };
+    });
+  }, [ranked]);
 
   const hasQuery = query.trim().length > 0;
   const hasResults = groups.length > 0;
   const totalResults = groups.reduce((sum, group) => sum + group.total, 0);
+  // Set when `rankResults` answered a shorter query than the reader typed —
+  // a question stem was dropped because nothing in the index is named by the
+  // sentence ("what is a bra" → "bra"). Shown, never silent: a search box
+  // that quietly answers a different question is one a reader stops trusting,
+  // and knowing which words did the work is what lets them narrow it.
+  const interpretedAs = ranked.interpretedAs;
+
+  // The recovery pass, and *only* on the way to the zero-result screen. One
+  // mistyped letter ("entanglment") is a hard zero under the strict matcher,
+  // which is the right contract for every query that works and the wrong one
+  // for the single moment a reader most needs help. `suggestCorrection`
+  // re-runs the corrected spelling through the same matcher before returning
+  // it, so anything rendered below is guaranteed to lead somewhere — a
+  // suggestion that lands on a second empty screen is worse than none.
+  //
+  // Guarded on `hasResults` rather than folded into the matcher: no distance
+  // is computed, and the vocabulary is not even built, for a query that found
+  // something. The `index`/`query` deps are the same ones `groups` uses, so
+  // this recomputes exactly when the result set does.
+  const suggestion = useMemo(() => {
+    if (!hasQuery || hasResults || indexStatus !== "ready") return null;
+    return suggestCorrection(tokenizeQuery(query), index);
+  }, [hasQuery, hasResults, indexStatus, query, index]);
 
   // Focus the input on open, restore focus to the trigger on close, and lock
   // background scroll while the overlay is up.
@@ -253,7 +226,13 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
   function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      getResultLinks()[0]?.focus();
+      // With no results there is nothing in `getResultLinks()`, and ArrowDown
+      // did nothing at all — the one screen where the keyboard user has just
+      // been told there is a next move and then can't reach it by the key
+      // they were already using to walk results. The suggestion is the first
+      // (and only) thing below the field in that state, so it takes the slot.
+      const first = getResultLinks()[0] ?? suggestionRef.current;
+      first?.focus();
     } else if (event.key === "Enter") {
       const firstMatch = groups[0]?.visible[0];
       if (firstMatch) {
@@ -293,7 +272,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Search QuantumLearn"
-        className="flex h-full w-full flex-col border-border bg-surface sm:h-auto sm:max-h-[80vh] sm:max-w-xl sm:rounded-[var(--radius-panel)] sm:border sm:shadow-2xl"
+        className="flex h-full w-full flex-col border-border bg-surface sm:h-auto sm:max-h-[80vh] sm:max-w-xl sm:rounded-panel sm:border sm:shadow-2xl"
       >
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
           <svg
@@ -317,15 +296,44 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
             aria-label="Search glossary terms, lessons, problems, simulators, and courses"
             autoComplete="off"
             spellCheck={false}
-            className="min-w-0 flex-1 rounded-[var(--radius-tight)] bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand"
+            // `.input-instrument` (globals.css §8) plus overrides: this field
+            // is set into the overlay header's own frame, so the recipe's
+            // border/fill are switched off (utilities outrank the components
+            // layer) and its placeholder is raised to the muted voice. Focus
+            // is the sitewide `:focus-visible` pillar outline, not a brand
+            // ring of its own.
+            className="input-instrument min-w-0 flex-1 border-0 bg-transparent text-base placeholder:text-muted-foreground"
           />
+          {/* Two faces, because the two widths have two different exits.
+              At `sm` and up the dialog is a floating panel over a tappable
+              backdrop and the keyboard is the primary input, so the control
+              names the key that closes it. Below `sm` the panel is the whole
+              viewport — `p-0`, `h-full w-full` on the wrapper above — so no
+              backdrop is reachable and this button is the *only* way out;
+              "Esc" names a key a phone does not have, on a 34 × 24px target
+              well under the 44px floor every other control on this site
+              holds. So the small screen gets a real close glyph at the
+              standard hit size instead. `aria-label` is unchanged and
+              unconditional, so the accessible name is "Close search" either
+              way and never the literal string "Esc". */}
           <button
             type="button"
             onClick={onClose}
             aria-label="Close search"
-            className="shrink-0 rounded-[var(--radius-tight)] px-2 py-1 font-tech text-xs font-medium text-muted-foreground hover:bg-surface-muted hover:text-foreground"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-(--radius-tight) font-tech text-xs font-medium text-muted-foreground hover:bg-surface-muted hover:text-foreground sm:h-auto sm:w-auto sm:px-2 sm:py-1"
           >
-            Esc
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              className="h-4 w-4 sm:hidden"
+            >
+              <path d="M3 3l10 10M13 3L3 13" />
+            </svg>
+            <span className="hidden sm:inline">Esc</span>
           </button>
         </div>
 
@@ -337,8 +345,16 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
               : indexStatus === "error"
                 ? "Search is temporarily unavailable."
                 : !hasResults
-                  ? `No results for ${query}.`
-                  : `${totalResults} result${totalResults === 1 ? "" : "s"} found.`}
+                  ? // The suggestion is announced, not just drawn. A "did you
+                    // mean" a screen-reader user is never told about is a fix
+                    // for sighted readers only, and this is the screen where
+                    // the reader has the least to go on.
+                    suggestion
+                    ? `No results for ${query}. Did you mean ${suggestion}? Press the search instead button to try it.`
+                    : `No results for ${query}.`
+                  : interpretedAs
+                    ? `${totalResults} result${totalResults === 1 ? "" : "s"} found for ${interpretedAs}.`
+                    : `${totalResults} result${totalResults === 1 ? "" : "s"} found.`}
         </p>
 
         <div className="flex-1 overflow-y-auto p-2">
@@ -356,6 +372,34 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
           ) : !hasResults ? (
             <div className="px-3 py-6 text-center text-sm text-muted-foreground">
               <p>No results for &ldquo;{query}&rdquo;.</p>
+              {/* Rendered as a control, not a sentence. "Did you mean
+                  entanglement?" as prose leaves the reader to retype the word
+                  they already got wrong once; as a button it is the recovery
+                  itself. It replaces the query rather than navigating to one
+                  entry, so what they get back is the whole corrected result
+                  set and they stay inside search — which is where someone who
+                  has just failed to find something wants to be.
+
+                  `break-words` because the corrected query is data: a long
+                  concept name inside a 320px-wide overlay has nowhere else to
+                  go, and `min-h-11` keeps the tap target at the site's floor
+                  when it is the only thing on screen worth tapping. */}
+              {suggestion ? (
+                <p className="mt-3">
+                  <button
+                    ref={suggestionRef}
+                    type="button"
+                    onClick={() => {
+                      setQuery(suggestion);
+                      inputRef.current?.focus();
+                    }}
+                    className="inline-flex min-h-11 max-w-full items-center justify-center gap-1.5 break-words rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-4 py-2 text-sm text-foreground transition-colors duration-(--dur-fast) ease-instrument hover:border-pillar focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar"
+                  >
+                    Did you mean{" "}
+                    <span className="font-medium text-pillar-text">{suggestion}</span>?
+                  </button>
+                </p>
+              ) : null}
               <p className="mt-2">Nothing here matched, but these are all one click away:</p>
               {/* A zero-result screen is the moment a newcomer is most
                   likely to give up, so it ends in real destinations rather
@@ -368,7 +412,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
                     <Link
                       href={route.href}
                       onClick={handleSelect}
-                      className="rounded-[var(--radius-tight)] px-2 py-1 text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-pillar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                      className="rounded-(--radius-tight) px-2 py-1 text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-pillar focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar"
                     >
                       {route.label}
                       <span className="ml-2 text-xs text-muted-foreground no-underline">{route.hint}</span>
@@ -378,7 +422,20 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
               </ul>
             </div>
           ) : (
-            <ul className="space-y-4">
+            <>
+              {/* Only ever rendered when the sentence the reader typed named
+                  nothing in the index and dropping its question stem did
+                  (see `rankResults`). It is a statement of what was searched,
+                  not a control: the reader's own words are still in the field
+                  above, so narrowing is one keystroke away and there is
+                  nothing to undo. */}
+              {interpretedAs ? (
+                <p className="px-3 pb-2 text-xs text-muted-foreground">
+                  Showing results for{" "}
+                  <span className="font-medium text-foreground">{interpretedAs}</span>
+                </p>
+              ) : null}
+              <ul className="space-y-4">
               {groups.map(({ type, visible, remaining, total, pillarBreaks, showPillarLabels }) => (
                 <li key={type}>
                   <p className="px-3 pb-1 font-tech text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
@@ -404,7 +461,7 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
                             onClick={handleSelect}
                             onKeyDown={handleResultKeyDown}
                             className={cn(
-                              "flex items-start justify-between gap-3 rounded-[var(--radius-tight)] px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                              "flex items-start justify-between gap-3 rounded-(--radius-tight) px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar",
                               "hover:bg-surface-muted focus-visible:bg-surface-muted"
                             )}
                           >
@@ -449,7 +506,8 @@ export function SearchOverlay({ onClose, triggerRef }: SearchOverlayProps) {
                   ) : null}
                 </li>
               ))}
-            </ul>
+              </ul>
+            </>
           )}
         </div>
 

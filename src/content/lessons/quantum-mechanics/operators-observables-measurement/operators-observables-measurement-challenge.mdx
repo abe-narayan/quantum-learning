@@ -3,6 +3,7 @@ import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Complex } from "@/lib/quantum/complex";
 import { PAULI_Z } from "@/lib/quantum/gates";
 import { projectorOntoSubspace } from "@/lib/quantum/projectors";
+import { hydrogenEnergyLevel } from "@/lib/quantum/hydrogenAtom";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 
@@ -30,6 +31,11 @@ export const synthesisPresets = [
   }
 ];
 
+export const hydrogenDegeneracyLevels = [1, 2, 3, 4].map((n) => ({
+  label: `n=${n} (${n * n}-fold)`,
+  energy: hydrogenEnergyLevel(n)
+}));
+
 export const lessonMeta = {
   title: "Operators, Observables & Measurement Challenge",
   description:
@@ -38,34 +44,41 @@ export const lessonMeta = {
   module: "operators-observables-measurement-challenge",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 24,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-mechanics/operators-observables-measurement/degeneracy-in-practice"],
   objectives: [
     "Map every generalized result from this course onto the specific postulate it generalizes",
     "Solve synthesis problems combining spectral decomposition, compatibility, and the measurement postulate",
-    "Identify what remains genuinely open for future courses that need degenerate spectra",
+    "Identify what remains open for future courses that need degenerate spectra",
   ],
 };
 
 <LessonHook eyebrow="Why this matters">
-This course took four ideas the earlier quantum-mechanics courses had already introduced in a specific, sometimes special-cased form — eigenvalues as measurement outcomes, the Born rule, uncertainty relations, compatible observables — and rebuilt each one at full generality.
+Eigenvalues as measurement outcomes, the Born rule, uncertainty relations, compatible observables: the earlier quantum-mechanics courses introduced all four in a specific, sometimes quietly special-cased form. This course rebuilt each one at full generality.
 </LessonHook>
 
 ## Motivation
 
-Projectors instead of bare eigenvectors, degenerate
-eigenspaces instead of assuming they don't exist, a proven (not asserted)
-criterion for compatibility, and an honestly-derived energy-time bound
-that doesn't pretend time is an operator.
+The upgrades were concrete: projectors instead of bare eigenvectors,
+degenerate eigenspaces instead of assuming they don't exist, a proven
+(not asserted) criterion for compatibility, and an
+energy-time bound derived without pretending time is an operator.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/4/41/Hydrogen_spectrum.svg"
-  alt="Hydrogen emission spectrum on a logarithmic wavelength scale, showing the Lyman, Balmer, Paschen, Brackett, Pfund, and Humphreys series"
-  caption="Each line here marks a transition between two energy eigenvalues of hydrogen's Hamiltonian. Every one of those levels except the ground state is degenerate over l and m -- an entire multiplet of distinct orbital states hides inside each single line, exactly the situation this course's projectors, compatible observables, and CSCOs exist to describe."
-  credit="OrangeDog / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Hydrogen_spectrum.svg"
-  license="CC BY-SA 3.0"
+None of that is bookkeeping. Hydrogen, the system the next courses build
+toward, has degeneracy everywhere above its ground state:
+
+<EnergyLevelDiagram
+  levels={hydrogenDegeneracyLevels}
+  unit="eV"
+  ariaLabel="Hydrogen's first four energy levels drawn on an energy axis, at about minus 13.6, minus 3.4, minus 1.51 and minus 0.85 electronvolts. Each level is labelled with its degeneracy: n equals 1 is 1-fold, n equals 2 is 4-fold, n equals 3 is 9-fold, n equals 4 is 16-fold. The levels crowd together as n increases."
 />
+
+Each rung is a single energy eigenvalue, so $H$ on its own cannot tell
+its $n^2$ member states apart. The $n=3$ level alone hides nine distinct
+orbital states behind one number. Writing the Born rule for a measurement
+of $H$ on hydrogen, or saying what state the atom is left in afterwards,
+is impossible with the tools the earlier courses supplied. That is what
+this course fixed.
 
 ## Recap: Specific Cases to General Theory
 
@@ -75,7 +88,7 @@ that doesn't pretend time is an operator.
 | "$[A,B]=0$ removes the uncertainty tradeoff" (From Classical to Quantum) | $[A,B]=0\iff$ shared eigenbasis, proven both directions (Simultaneous Eigenstates) |
 | A single observable's eigenvalue as a state label | A complete *set* of commuting observables, needed when any one is degenerate (Complete Sets) |
 | $P(a_i)=\lvert c_i\rvert^2$ (From Classical to Quantum, implicitly nondegenerate) | $P(a_i)=\langle\psi\rvert P_i\lvert\psi\rangle$, reducing exactly to $\lvert c_i\rvert^2$ (Measurement Postulate, Generalized) |
-| "Incompatible observables disturb each other" (stated) | A fully numeric $Z\to X\to Z$ sequence showing exactly how (Sequential Measurements) |
+| "Incompatible observables disturb each other" (stated) | A fully numeric $Z\to X\to Z$ sequence, tracking the disturbance step by step (Sequential Measurements) |
 | $\Delta x\Delta p\ge\hbar/2$ specifically (Wave Mechanics) | $\Delta E\,\Delta t_A\ge\hbar/2$ for *any* observable $A$, derived via Ehrenfest's theorem (Energy-Time Uncertainty) |
 
 Nothing in the right column contradicts the left column, every general
@@ -113,7 +126,7 @@ immediate measurement of the same observable never disturbs its own
 outcome. Only an *incompatible* observable measured in between can, as
 Sequential Measurements demonstrated.
 
-<InteractiveSection title="Idempotent versus merely Hermitian" description="Compare a genuine projector (P² = P, the property this example relies on) against Pauli-Z, which is Hermitian but not idempotent (Z² = I ≠ Z). Idempotence is a real, extra condition beyond Hermiticity, not automatic.">
+<InteractiveSection title="Idempotent versus merely Hermitian" description="Compare a projector (P² = P, the property this example relies on) against Pauli-Z, which is Hermitian but not idempotent (Z² = I ≠ Z). Idempotence is an extra condition beyond Hermiticity, not something Hermiticity gives you for free.">
   <MatrixGridExplorer
     presets={synthesisPresets}
     ariaLabel="Choose between a projector and a merely-Hermitian operator to compare each one against its own square"
@@ -122,25 +135,36 @@ Sequential Measurements demonstrated.
 
 **3. Two observables $A$ and $B$ satisfy $[A,B]=0$. A student claims this
 means measuring $A$ then $B$ always gives the same result as measuring
-$B$ then $A$. Is this exactly right?**
+$B$ then $A$. Is the claim right as stated?**
 
-Not quite as stated. Compatibility guarantees the two measurements don't
+<PredictBeforeReveal
+  question="[A,B] = 0, and the state is not an eigenstate of either. Does measuring A then B give the same individual outcomes as measuring B then A?"
+  options={[
+    { label: "Yes: commuting observables make order irrelevant in every sense", value: "same" },
+    { label: "No, and compatibility says nothing about repeated measurements either", value: "nothing" },
+    { label: "The joint probabilities match, but the individual outcomes are still random", value: "probabilities" },
+  ]}
+  correctValue="probabilities"
+  explanation="Compatibility fixes the statistics, not the individual draws. The joint probability of any outcome pair is the same in either order, which is the real content of [A,B] = 0, but each measurement still collapses a superposition and each outcome is still random. What compatibility does buy is repeatability: measure A, then B, then A again, and the third measurement reproduces the first outcome with certainty, because collapsing onto a shared eigenbasis for B leaves the state an eigenstate of A."
+/>
+
+Not quite as stated. Compatibility guarantees the two measurements do not
 *disturb* each other's probability distribution or destroy each other's
-definiteness, but if the *pre-measurement* state isn't already an
-eigenstate of both, the two individual outcomes are still genuinely
-random (with the same joint probabilities regardless of order). What's
-guaranteed is that a *second* measurement of $A$ after measuring $B$
-(compatible) reproduces $A$'s *first* outcome with certainty, exactly
-because <Term id="wavefunction-collapse">collapse</Term> onto a shared eigenbasis for one operator leaves the
-state an eigenstate of the other too.
+definiteness, but if the *pre-measurement* state is not already an
+eigenstate of both, the two individual outcomes remain random, with the
+same joint probabilities regardless of order. What is guaranteed is that
+a *second* measurement of $A$ after measuring the compatible $B$
+reproduces $A$'s *first* outcome with certainty, because
+<Term id="wavefunction-collapse">collapse</Term> onto a shared eigenbasis for one operator leaves the state an
+eigenstate of the other too.
 
 ## Common Mistakes, Revisited
 
 <Callout type="note">
 **Treating this course's generalizations as replacing the earlier
 postulates.** They're the same postulates, made precise for a case
-(degeneracy) the earlier statements quietly assumed away, exactly the
-same relationship "From Classical to Quantum" had to "Mathematical
+(degeneracy) the earlier statements quietly assumed away. It is the same
+relationship "From Classical to Quantum" had to "Mathematical
 Foundations," and "Wave Mechanics" had to "From Classical to Quantum."
 </Callout>
 
@@ -175,8 +199,8 @@ content, not a mathematical nicety.
   underlying idea: the earlier courses' postulates, made precise for
   degenerate spectra and multi-observable systems.
 - Every general result in this course reduces exactly to its
-  already-proven nondegenerate special case, a real, checked consistency
-  property, not a coincidence.
+  already-proven nondegenerate special case, which is a consistency
+  requirement each derivation had to meet, not a coincidence.
 - Degeneracy is the generic situation for real physical systems with
   enough symmetry, not a mathematical edge case to note in passing, and
   this course's tools are the honest prerequisite for describing them

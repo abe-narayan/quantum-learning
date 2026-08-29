@@ -1,7 +1,11 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyNoiseExplorer } from "@/components/simulators/noise-explorer/LazyNoiseExplorer";
-import { amplitudeDampingChannel, dephasingChannel } from "@/lib/quantum/openSystems";
+import { amplitudeDampingChannel, dephasingChannel, applyChannelRepeatedly } from "@/lib/quantum/openSystems";
+import { purity, pureStateDensityMatrix, evolveDensityMatrix } from "@/lib/quantum/densityMatrix";
+import { StateVector } from "@/lib/quantum/state";
+import { Complex } from "@/lib/quantum/complex";
+import { rotationZ } from "@/lib/quantum/gates";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
 export const practiceProblems = getProblemMetaForLesson(
@@ -24,6 +28,49 @@ export const krausCheckPreset = (label, K0, K1, sum) => ({
 export const krausCheckPresets = [
   krausCheckPreset("Amplitude damping (γ=0.3)", K0_AD, K1_AD, sumAD),
   krausCheckPreset("Dephasing (λ=0.3)", K0_DP, K1_DP, sumDP),
+];
+
+export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+
+export const rhoPlus = pureStateDensityMatrix(plusState);
+
+export const weakDamping = amplitudeDampingChannel(0.1);
+
+export const weakDephasing = dephasingChannel(0.1);
+
+export const unitaryStep = rotationZ(0.3);
+
+export const PURITY_STEPS = 41;
+
+export const stepCounts = Array.from({ length: PURITY_STEPS }, (_, i) => i);
+
+export const unitaryPurityAt = (n) => {
+  let rho = rhoPlus;
+  for (let i = 0; i < n; i += 1) rho = evolveDensityMatrix(rho, unitaryStep);
+  return purity(rho);
+};
+
+export const purityCurveFrames = [
+  {
+    paramLabel: "Starting from |+⟩, one channel application per step",
+    series: [
+      {
+        label: "Unitary rotation (closed system)",
+        color: "muted",
+        points: stepCounts.map((n) => ({ x: n, y: unitaryPurityAt(n) })),
+      },
+      {
+        label: "Amplitude damping, γ = 0.1",
+        color: "brand",
+        points: stepCounts.map((n) => ({ x: n, y: purity(applyChannelRepeatedly(rhoPlus, weakDamping, n)) })),
+      },
+      {
+        label: "Dephasing, λ = 0.1",
+        color: "warning",
+        points: stepCounts.map((n) => ({ x: n, y: purity(applyChannelRepeatedly(rhoPlus, weakDephasing, n)) })),
+      },
+    ],
+  },
 ];
 
 export const lessonMeta = {
@@ -59,32 +106,61 @@ A perfectly isolated system evolving unitarily forever is an idealization nobody
 
 ## Motivation
 
-Entanglement, Mixed States & Bell Tests built density matrices and
-covered their <Term id="unitary-operator">unitary evolution</Term>. This lesson introduces the
-mathematical language for what's still missing, **open quantum
-systems**, building directly on, and going beyond, that density-matrix
-foundation.
+Entanglement, Mixed States & Bell Tests built density matrices and gave
+them a <Term id="unitary-operator">unitary evolution</Term> rule, $\rho\to U\rho U^\dagger$. That rule has a
+property which turns out to be fatal for describing anything real: it
+cannot change $\mathrm{Tr}(\rho^2)$. A state that starts pure stays pure
+for ever.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/4/48/Basic_Science_%2854395491965%29.jpg"
-  alt="A neutral-atom quantum computing vacuum chamber at Sandia National Laboratories, showing objective lenses for single-atom traps and surrounding magnetic field coils"
-  caption="A real neutral-atom quantum computing apparatus. Everything inside this vacuum chamber exists precisely because a qubit is never a fully closed system: the whole setup is built to slow down exactly the kind of environmental coupling this lesson's Kraus operators describe mathematically."
-  credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Basic_Science_(54395491965).jpg"
-  license="Public Domain (U.S. Government work)"
+Real states do not. Left alone for long enough, every laboratory qubit
+decoheres, and its purity is measurably lower afterwards than before. So
+the rule is not merely incomplete; applied to an open system it is
+wrong, and the correction is the subject of this lesson.
+
+The plot below is the whole problem in one picture. All three curves
+start from $|+\rangle$ and apply one step of evolution at a time: a
+unitary rotation, an amplitude-damping channel, and a dephasing channel.
+
+<ParametricCurve
+  frames={purityCurveFrames}
+  ariaLabel="Purity, trace of rho squared, plotted against the number of evolution steps from 0 to 40, starting from the pure state plus. The unitary curve is flat at 1 throughout. The dephasing curve falls steadily from 1 and levels off at 0.5. The amplitude damping curve dips from 1 to a shallow minimum of about 0.875 at step 7, then rises back toward 1, reaching about 0.99 by step 40."
 />
+
+The unitary curve does not move, as promised. The dephasing curve falls
+from $1$ to $0.5$, the maximally mixed value for a qubit, and stays
+there. The amplitude-damping curve does something the other two do not:
+it falls, bottoms out at step $7$ around $0.875$, and climbs back toward
+$1$. Nothing
+in this lesson's machinery forbids that, and the reason it happens is
+worth working out before reading on.
 
 ## Mathematical Development
 
 ### Why unitary evolution alone isn't enough
 
-$\rho\to U\rho U^\dagger$ (Entanglement's evolution rule) always preserves
-<Term id="von-neumann-entropy-purity">purity</Term> exactly: $\text{Tr}(\rho^2)$ never changes under it (a fact
-already provable from $U$'s unitarity alone). But real decoherence
-*does* change purity. A pure state actually becomes mixed over time
-through environmental interaction. No unitary evolution of the system
-*alone* can do this; the resolution is that the system's evolution,
-once the environment is "traced out," need not be unitary at all.
+$\rho\to U\rho U^\dagger$ preserves <Term id="von-neumann-entropy-purity">purity</Term> exactly, and the one-line proof is
+worth having: $\mathrm{Tr}\big((U\rho U^\dagger)^2\big) = \mathrm{Tr}(U\rho
+U^\dagger U\rho U^\dagger) = \mathrm{Tr}(U\rho^2U^\dagger) =
+\mathrm{Tr}(\rho^2)$, using $U^\dagger U=I$ once and the cyclic property
+of the trace once.
+
+No choice of $U$ escapes that. So if purity drops in the laboratory, the
+system's evolution is not being generated by any unitary acting on the
+system alone. The resolution is not to abandon unitarity: the system plus
+its environment does evolve unitarily. It is that discarding the
+environment, by tracing it out, leaves behind a map on the system that
+need not be unitary at all.
+
+<PredictBeforeReveal
+  question="The amplitude damping curve above falls and then climbs back toward 1. Amplitude damping models a qubit losing energy to a cold environment. Where does that leave the qubit after many steps?"
+  options={[
+    { label: "In the maximally mixed state, purity 1/2, like dephasing", value: "mixed" },
+    { label: "In the pure ground state |0⟩, purity 1", value: "ground" },
+    { label: "Nowhere in particular; the curve is a numerical artifact", value: "artifact" }
+  ]}
+  correctValue="ground"
+  explanation="Amplitude damping drives every state toward |0⟩, which is pure. The purity dip in between is real: partway through, the qubit is a genuine mixture of 'has decayed' and 'has not decayed yet'. Once decay is essentially certain, that ambiguity is gone and purity returns. So decoherence is not the same thing as purity loss, and a channel can restore purity while still being irreversible: the |+⟩ information is destroyed either way."
+/>
 
 ### The Kraus operator sum representation
 
@@ -95,28 +171,31 @@ $$
 \rho \to \mathcal E(\rho) = \sum_k K_k\,\rho\,K_k^\dagger
 $$
 
-for some set of **<Term id="kraus-operators-cptp-maps">Kraus operators</Term>** $\{K_k\}$ satisfying
-$\sum_kK_k^\dagger K_k=I$ (the **trace-preservation condition**: it
-guarantees $\text{Tr}(\mathcal E(\rho))=\text{Tr}(\rho)$, so total
-probability stays 1). A single unitary $U$ is the special case of exactly
-one Kraus operator, $K_0=U$ (then $K_0^\dagger K_0=U^\dagger U=I$
-automatically). Kraus operators *generalize* unitary evolution; they
-don't replace it.
+for some set of **<Term id="kraus-operators-cptp-maps">Kraus operators</Term>** $\{K_k\}$ satisfying $\sum_kK_k^\dagger
+K_k=I$, the **trace-preservation condition**, which guarantees
+$\mathrm{Tr}(\mathcal E(\rho))=\mathrm{Tr}(\rho)$ so that total
+probability stays $1$.
+
+A single unitary is the one-operator case, $K_0=U$, where the condition
+reduces to $U^\dagger U=I$ and is satisfied automatically. So the Kraus
+form contains unitary evolution rather than competing with it, and the
+interesting channels are the ones needing two or more operators. Purity
+can only change when there is more than one term in the sum, which is
+visible directly in the formula: with one term the map is a similarity
+transformation, and with several it is a mixture.
 
 ### Verified directly against the trace-preservation condition
 
-This platform's `isTracePreserving` function checks $\sum_kK_k^\dagger
-K_k=I$ directly, entry by entry, not just for the two decoherence
-channels this course builds (amplitude damping, dephasing, both
-confirmed trace-preserving), but also against a deliberately broken
-example (a single Kraus operator scaled by 2, which fails the condition
-outright) to confirm the check actually discriminates valid from invalid
-channels, rather than trivially returning `true`.
+This platform's `isTracePreserving` checks $\sum_kK_k^\dagger K_k=I$ entry
+by entry. It confirms both channels this course builds, amplitude damping
+and dephasing, and it also rejects a deliberately broken example: a
+single Kraus operator scaled by $2$, whose sum comes out $4I$. That
+second test matters more than the first, because a check that only ever
+returns `true` proves nothing.
 
-Watch the trace-preservation condition play out physically, not just
-algebraically. Every intermediate step below is a valid quantum state
-(total probability exactly 1), even though it's visibly losing purity
-along the way.
+The condition has a geometric consequence you can watch. Every
+intermediate state below is a legitimate density matrix, so its Bloch
+vector stays within the sphere at every step, even while purity falls.
 
 <PredictBeforeReveal
   question="Start at |+⟩ on the equator and apply amplitude damping repeatedly. As the Bloch vector shrinks toward |0⟩, does it ever poke outside the sphere?"
@@ -126,7 +205,7 @@ along the way.
     { label: "It can't be determined without picking a specific γ", value: "depends" },
   ]}
   correctValue="inside"
-  explanation="It never leaves. That's exactly what the trace-preservation condition ∑K†K=I guarantees: every intermediate ρ is a legitimate density matrix, so its Bloch vector has length ≤ 1 at every single step, even while purity is visibly dropping."
+  explanation="It never leaves. The trace-preservation condition ∑K†K=I is what guarantees this: every intermediate ρ is a legitimate density matrix, so its Bloch vector has length ≤ 1 at every step, even as purity falls. A set of matrices failing that condition would produce vectors outside the sphere, which is to say states with total probability above or below 1."
 />
 
 <InteractiveSection
@@ -138,19 +217,22 @@ along the way.
 
 ## Physical Interpretation
 
-Physically, $\{K_k\}$ encodes *what could have happened* during the
-system's interaction with its environment. Each $K_k$ corresponds to
-one possible "environment outcome" (even though nothing is actually
-measured or recorded), and the sum $\sum_kK_k\rho K_k^\dagger$ correctly
-accounts for the system's state averaged over every possibility. That's
-exactly why it changes purity: it's a statistical mixture over unknown
-environmental branches, encoded directly in the operator sum. On real
-hardware this is not an abstraction: a superconducting qubit's coupling
-to its control lines and to phonons in the chip substrate, or a trapped
-ion's coupling to stray electric-field noise, are physical instances of
-exactly this "environment outcome we don't track" picture, which is why
-$T_1$ and $T_2$ decay curves (measured routinely on every quantum
-processor) are Kraus-channel purity decay in disguise.
+Each $K_k$ stands for one thing the environment could have done. For
+amplitude damping, $K_1$ is "a photon was emitted" and $K_0$ is "no
+photon was emitted"; nothing measures which, and no record is kept. The
+sum $\sum_kK_k\rho K_k^\dagger$ is the system's state averaged over the
+branches, weighted by their amplitudes.
+
+That averaging is the whole source of purity change. A single branch
+would be a unitary-like map and would preserve purity; a mixture over
+branches nobody tracked is exactly what a mixed state is.
+
+On hardware this is not a metaphor. A superconducting qubit couples to
+its control lines and to phonons in the substrate; a trapped ion couples
+to stray electric-field noise. In both cases the environment records
+which branch occurred and the experimenter cannot read it, which is why
+the $T_1$ and $T_2$ decay curves measured routinely on every processor
+are these channels in another notation.
 
 ## Worked Example
 
@@ -169,12 +251,11 @@ This holds for every $\gamma\in[0,1]$, confirmed directly by this
 platform's `isTracePreserving(amplitudeDampingChannel(gamma))`, which
 returns `true` across the full range.
 
-The same identity, seen rather than just algebraically derived: each
-preset below shows $K_0$, $K_1$, and $K_0^\dagger K_0+K_1^\dagger K_1$
-for a real channel this platform computes numerically
-(`amplitudeDampingChannel(0.3)` and `dephasingChannel(0.3)`), with the
-sum's diagonal highlighted to make "$=I$" visually immediate rather than
-something to take on faith from the LaTeX above.
+The same identity, seen rather than derived. Each preset below shows
+$K_0$, $K_1$, and $K_0^\dagger K_0+K_1^\dagger K_1$ for a channel the
+platform computes numerically, with the sum's diagonal highlighted. Note
+how different the two channels' individual operators are, and how
+identical their sums come out.
 
 <MatrixGridExplorer
   presets={krausCheckPresets}
@@ -224,9 +305,12 @@ is being bent.
 - The Kraus representation $\rho\to\sum_kK_k\rho K_k^\dagger$, subject to
   $\sum_kK_k^\dagger K_k=I$, is the general framework, a strict
   generalization of unitary evolution, not a replacement.
+- Purity falling is a symptom of decoherence, not a definition of it:
+  amplitude damping destroys a superposition while returning the qubit
+  to a pure state.
 - This platform's `isTracePreserving` verifies the condition directly,
-  confirmed both for physical channels (amplitude damping, dephasing) and
-  against a deliberately invalid counter-example.
+  confirmed for amplitude damping and dephasing and rejected for a
+  deliberately invalid counter-example.
 
 ## Further Exploration
 

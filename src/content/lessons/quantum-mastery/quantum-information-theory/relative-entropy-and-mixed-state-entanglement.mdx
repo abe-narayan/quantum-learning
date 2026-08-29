@@ -13,7 +13,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Relative Entropy and Mixed-State Entanglement",
   description:
-    "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute -- built here and evaluated explicitly on a state that's actually mixed, not pure in disguise.",
+    "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute, built here and evaluated explicitly on a state that is actually mixed, not pure in disguise.",
   course: "quantum-information-theory",
   module: "relative-entropy-and-mixed-state-entanglement",
   order: 5,
@@ -31,7 +31,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure",
-      note: "That lesson names the general mixed-state formula and explicitly refuses to implement it -- this is the lesson that closes the gap.",
+      note: "That lesson names the general mixed-state formula and explicitly refuses to implement it; this is the lesson that closes the gap.",
     },
   ],
 };
@@ -99,7 +99,7 @@ export const concurrenceFrames = [
 ];
 
 <LessonHook eyebrow="A gap left open on purpose">
-  A pure-state entanglement formula that simply refuses to run on a
+  A pure-state entanglement formula that refuses to run on a
   mixed state poses a question this lesson answers head-on, not a
   limitation to quietly work around.
 </LessonHook>
@@ -119,7 +119,7 @@ still exactly enough to compute it.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/3d/NIST_Physicists_Boost_Entanglement_of_Atom_Pairs_%285940505535%29.jpg"
   alt="NIST researchers illuminating trapped beryllium ion pairs with ultraviolet laser pulses during an experiment to purify and boost entanglement between them"
-  caption="This NIST experiment purifies entanglement out of noisy, mixed pairs of trapped ions -- the physical version of exactly this lesson's question: how much genuine entanglement survives once a state is no longer pure, and how do you extract or quantify it."
+  caption="This NIST experiment purifies entanglement out of noisy, mixed pairs of trapped ions — the physical version of this lesson's question: how much entanglement survives once a state is no longer pure, and how do you extract or quantify it."
   credit="Bill Pietsch / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:NIST_Physicists_Boost_Entanglement_of_Atom_Pairs_(5940505535).jpg"
   license="Public domain (U.S. government work)"
@@ -143,12 +143,32 @@ $$
 
 </EquationReveal>
 
-a quantum generalization of the classical Kullback–Leibler divergence,
-measuring how distinguishable $\sigma$ is from the "true" state $\rho$
-using base-2 logarithms (matching this platform's von Neumann entropy
-convention, in bits).
+the <Term id="quantum-relative-entropy">quantum relative entropy</Term>, a
+generalization of the classical Kullback–Leibler divergence measuring how
+distinguishable $\sigma$ is from the "true" state $\rho$, in base-2
+logarithms to match this platform's von Neumann entropy convention.
 
 ### Klein's inequality: $S(\rho\|\sigma)\geq0$
+
+<TheoremBox title="Klein's inequality" provenance="derived">
+
+**Hypotheses.** $\rho$ and $\sigma$ are density matrices on the same
+finite-dimensional Hilbert space. For $S(\rho\|\sigma)$ to be finite one
+further condition is needed: $\text{supp}(\rho)\subseteq\text{supp}(\sigma)$.
+Otherwise the quantity is $+\infty$, which is the correct value rather
+than an error, and the inequality holds trivially.
+
+**Conclusion.** $S(\rho\|\sigma)\geq0$, with equality if and only if
+$\rho=\sigma$.
+
+Nothing is assumed about commutation. The proof below handles the
+non-commuting case through the doubly stochastic matrix
+$c_{ij}=|\langle i|j\rangle|^2$, which is exactly where the
+non-commutativity is absorbed; when $\rho$ and $\sigma$ do commute,
+$c_{ij}$ is a permutation and the argument collapses to the classical
+Kullback–Leibler statement.
+
+</TheoremBox>
 
 **Proof.**
 
@@ -163,7 +183,7 @@ convention, in bits).
     S(\rho\|\sigma) \geq \sum_ip_i\log_2(p_i/r_i) = D_{cl}(p\|r)
     $$
   </DerivationStep>
-  <DerivationStep annotation="r is itself a genuine probability distribution: Σᵢrᵢ = Σᵢⱼc_ijqⱼ = Σⱼqⱼ Σᵢc_ij = Σⱼqⱼ = 1, using doubly-stochasticity again.">
+  <DerivationStep annotation="r is itself a probability distribution: Σᵢrᵢ = Σᵢⱼc_ijqⱼ = Σⱼqⱼ Σᵢc_ij = Σⱼqⱼ = 1, using doubly-stochasticity again.">
     $\sum_ir_i=\sum_{ij}c_{ij}q_j=\sum_jq_j\sum_ic_{ij}=\sum_jq_j=1$
   </DerivationStep>
   <DerivationStep annotation="D_cl(p‖r) ≥ 0 by a second application of Jensen.">
@@ -203,9 +223,15 @@ $$
 \tilde\rho \equiv (\sigma_y\otimes\sigma_y)\,\rho^*\,(\sigma_y\otimes\sigma_y), \qquad R \equiv \rho\tilde\rho, \qquad C(\rho) \equiv \max\big(0,\ \sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4}\big)
 $$
 
-where $\mu_1\geq\mu_2\geq\mu_3\geq\mu_4\geq0$ are $R$'s eigenvalues (real
-and non-negative despite $R$ generally being **non-Hermitian**, a
-genuine, non-obvious fact about this specific construction). This
+where $\mu_1\geq\mu_2\geq\mu_3\geq\mu_4\geq0$ are $R$'s eigenvalues. That
+they are real and non-negative at all is not obvious, since $R$ is in
+general **non-Hermitian**. The reason: $\tilde\rho\geq0$ (it is a unitary
+conjugation of $\rho^*$, and complex conjugation preserves positive
+semidefiniteness), so with $A=\sqrt\rho$ and $B=\sqrt\rho\,\tilde\rho$ we
+have $R=AB$ while $BA=\sqrt\rho\,\tilde\rho\sqrt\rho\geq0$. Since $AB$
+and $BA$ always share their nonzero spectrum, $R$'s eigenvalues are those
+of a positive semidefinite matrix, with no invertibility assumed
+anywhere. This
 formula (Wootters, 1998) is *defined* here as stated; the theorem that
 it equals the **entanglement of formation** (the true convex-roof
 extension of entanglement entropy to mixed states) is a celebrated,
@@ -225,22 +251,22 @@ symbolic computation for $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\
 with fully general complex amplitudes $a,b,c,d$ confirms
 $|\langle\psi|\tilde\psi\rangle|=2|ad-bc|$ exactly: the two formulas
 agree completely on every pure state, confirming the general definition
-is a genuine extension, not a different quantity that happens to share a
-name.
+extends the pure-state one rather than being a different quantity that
+happens to share a name.
 
 ### An actually mixed worked example: the Werner state
 
 Take $\rho=p|\Psi^-\rangle\langle\Psi^-|+(1-p)\,I/4$ (a **Werner
 state**: a mixture of the singlet Bell state with the maximally mixed
 state) at $p=0.7$, built directly via `convexCombination` and
-`maximallyMixedState`, exactly the tools Convex Combinations and
+`maximallyMixedState`, the same tools Convex Combinations and
 Physical Mixtures already established:
 
 <MatrixGrid matrix={rhoWerner} label="Werner state, p=0.7" ariaLabel="The Werner state used as this lesson's mixed-state worked example, p=0.7" />
 
 Its purity is $\text{Tr}(\rho^2)\approx0.6175$, strictly less than $1$:
-this is a genuinely mixed state, not a pure one in disguise, exactly
-the case Concurrence: A Two-Qubit Entanglement Measure's simpler formula
+this is a properly mixed state, not a pure one in disguise, the
+case Concurrence: A Two-Qubit Entanglement Measure's simpler formula
 cannot handle at all.
 
 <PredictBeforeReveal
@@ -251,7 +277,7 @@ cannot handle at all.
     { label: "Impossible to say without a full convex-roof optimization", value: "unknowable" },
   ]}
   correctValue="entangled"
-  explanation="C(0.7) = 0.55, computed below: a real, nonzero amount of entanglement survives. The formula's own max(0, ...) clipping only kicks in below p=1/3 (derived later from the closed form C(p)=max(0,(3p-1)/2)) — a Werner state stays entangled for a wide range of mixing before the noise finally wins, it doesn't vanish the moment the state stops being pure."
+  explanation="C(0.7) = 0.55, computed below: a real, nonzero amount of entanglement survives. The formula's own max(0, ...) clipping only kicks in below p=1/3 (derived later from the closed form C(p)=max(0,(3p-1)/2)). A Werner state stays entangled for a wide range of mixing before the noise finally wins; entanglement does not vanish the moment the state stops being pure."
 />
 
 Building $\tilde\rho$ and $R=\rho\tilde\rho$
@@ -264,9 +290,9 @@ a structural accident of the Werner state's symmetry, not something true
 of a general mixed two-qubit state, with two trivial $1\times1$ blocks
 (each exactly $0.005625$) and one honest $2\times2$ Hermitian block.
 Because that block happens to be Hermitian here,
-**`eigenvaluesHermitian2x2`, the exact same closed-form solver this
+**`eigenvaluesHermitian2x2`, the same closed-form solver this
 platform has used since Entanglement, Mixed States & Bell Tests, is
-already enough**: no new eigensolver was built or needed:
+already enough**, and no new eigensolver was built or needed:
 
 $$
 \text{block eigenvalues: } \{0.600625,\ 0.005625\}, \qquad \text{full spectrum: } \{0.600625,\ 0.005625,\ 0.005625,\ 0.005625\}
@@ -294,25 +320,141 @@ the pure-state formula could ever have expressed (a pure state's
 concurrence is never forced to $0$ by a competing classical mixture,
 since a pure state has no classical mixture in it at all).
 
+### A second, independent test: the Peres-Horodecki criterion
+
+Concurrence is not the only way to ask "is this mixed state entangled?"
+There is a second test, discovered the same year the Wootters program
+began, that needs no eigensolver gymnastics at all: transpose half the
+state and see if it is still a state.
+
+<DefinitionBox title="Partial transpose">
+
+For a two-qubit state $\rho$ with matrix elements
+$\rho_{(ij),(kl)}=\langle ij|\rho|kl\rangle$ (first index qubit $A$,
+second qubit $B$), the partial transpose over $B$ transposes only the
+second index pair:
+
+$$
+\big(\rho^{T_B}\big)_{(ij),(kl)} \equiv \rho_{(il),(kj)}
+$$
+
+$\rho^{T_B}$ is always Hermitian with trace 1, but it need not be
+positive semidefinite. That failure is the test.
+
+</DefinitionBox>
+
+<TheoremBox title="Peres-Horodecki (PPT) criterion" provenance="cited">
+
+If $\rho$ is separable, then $\rho^{T_B}\geq0$ (Peres, Phys. Rev. Lett.
+77, 1413 (1996)): a negative eigenvalue of the partial transpose proves
+entanglement. For $2\times2$ and $2\times3$ systems the converse also
+holds (M., P., and R. Horodecki, Phys. Lett. A 223, 1 (1996)):
+$\rho^{T_B}\geq0$ proves separability. So for two qubits, PPT is a
+complete entanglement test. Both directions are cited here, not
+re-derived; the sufficiency proof uses the theory of positive maps.
+
+</TheoremBox>
+
+**Cross-check on the same Werner state, all four eigenvalues computed.**
+In the basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$, with
+$p=0.7$:
+
+$$
+\rho_W=\begin{pmatrix}
+\tfrac{1-p}{4} & 0 & 0 & 0\\[2pt]
+0 & \tfrac{1+p}{4} & -\tfrac{p}{2} & 0\\[2pt]
+0 & -\tfrac{p}{2} & \tfrac{1+p}{4} & 0\\[2pt]
+0 & 0 & 0 & \tfrac{1-p}{4}
+\end{pmatrix}
+=\begin{pmatrix}
+0.075 & 0 & 0 & 0\\
+0 & 0.425 & -0.35 & 0\\
+0 & -0.35 & 0.425 & 0\\
+0 & 0 & 0 & 0.075
+\end{pmatrix}
+$$
+
+The only off-diagonal entries sit at $(01,10)$ and $(10,01)$. The partial
+transpose swaps the $B$ indices, so it moves those two coherences to the
+$(00,11)$ and $(11,00)$ corners and leaves every diagonal entry fixed:
+
+$$
+\rho_W^{T_B}=\begin{pmatrix}
+\tfrac{1-p}{4} & 0 & 0 & -\tfrac{p}{2}\\[2pt]
+0 & \tfrac{1+p}{4} & 0 & 0\\[2pt]
+0 & 0 & \tfrac{1+p}{4} & 0\\[2pt]
+-\tfrac{p}{2} & 0 & 0 & \tfrac{1-p}{4}
+\end{pmatrix}
+=\begin{pmatrix}
+0.075 & 0 & 0 & -0.35\\
+0 & 0.425 & 0 & 0\\
+0 & 0 & 0.425 & 0\\
+-0.35 & 0 & 0 & 0.075
+\end{pmatrix}
+$$
+
+Two eigenvalues can be read off the untouched middle diagonal:
+$\tfrac{1+p}{4}=0.425$, twice. The corner $2\times2$ block
+$\big(\begin{smallmatrix}0.075 & -0.35\\ -0.35 & 0.075\end{smallmatrix}\big)$
+has eigenvalues $0.075\pm0.35$, i.e. $0.425$ and $-0.275$. The full
+spectrum of $\rho_W^{T_B}$ at $p=0.7$ is therefore
+
+$$
+\Big\{\tfrac{1+p}{4},\ \tfrac{1+p}{4},\ \tfrac{1+p}{4},\ \tfrac{1-3p}{4}\Big\}
+= \{0.425,\ 0.425,\ 0.425,\ -0.275\}
+$$
+
+which sums to $1$, as any partial transpose's spectrum must. One
+eigenvalue is negative, so the state is entangled: the same verdict the
+concurrence computation reached, by a completely different route. Better
+still, the general-$p$ spectrum makes the agreement quantitative. The
+lone candidate for negativity is $\tfrac{1-3p}{4}$, which drops below
+zero exactly at $p=1/3$: the same threshold where
+$C(p)=\max(0,(3p-1)/2)$ switches on. Two independent tests, one derived
+from an eigenvalue formula and one from a transpose, draw the
+entangled/separable boundary at the identical point. (For this family
+the match runs deeper: the negativity, defined as the absolute sum of
+$\rho^{T_B}$'s negative eigenvalues, is $(3p-1)/4=0.275$ at $p=0.7$,
+half the concurrence $0.55$.)
+
+**Bound entanglement: where PPT stops being the whole story.** The
+two-qubit completeness above does not survive in higher dimensions. For
+$3\times3$ and $2\times4$ systems, P. Horodecki constructed states that
+are entangled yet have positive partial transpose (Phys. Lett. A 232,
+333 (1997)), so there PPT remains a one-way test. Such PPT-entangled
+states turn out to be *bound entangled*: no amount of
+<Term id="locc">local operations and classical communication</Term> can
+distill their entanglement back into usable Bell pairs (M., P., and R.
+Horodecki, Phys. Rev. Lett. 80, 5239 (1998)). Entanglement you can prove
+is present but can never cash out is
+a phenomenon with no two-qubit analogue, and it is one reason mixed-state
+entanglement theory is still an active research area rather than a closed
+chapter.
+
 ## Physical Interpretation
 
 <InsightBlock>
-  A mixed state's uncertainty is an unavoidable blend of quantum
-  correlation (entanglement) and classical ignorance. The convex-roof
-  optimization behind the Wootters formula is exactly what disentangles
-  the two, returning a number that measures only the first.
+  For a pure state, "how mixed is the part I hold?" and "how entangled is
+  the whole?" are the same question. For a mixed state they come apart,
+  and every difficulty in this lesson traces back to that one split.
 </InsightBlock>
 
 Relative entropy quantifies how costly it is to mistake $\sigma$ for the
-true state $\rho$ (Klein's inequality is exactly the statement that this
-cost is never negative: you cannot "profit" from using the wrong
-model). The general Wootters concurrence answers a structurally harder
-question than the pure-state formula did: a mixed state's uncertainty is
-an unavoidable mix of *quantum* correlation (entanglement) and *classical*
-ignorance (which pure state it actually is, averaged over), and this
-formula's convex-roof optimization (behind the cited theorem) is exactly
-what disentangles the two, returning a number that measures only the
-first.
+true state $\rho$, and Klein's inequality is the statement that this cost
+is never negative: no wrong model pays.
+
+The concurrence story is harder for a reason worth naming precisely. A
+mixed $\rho$ carries two kinds of uncertainty at once, quantum
+correlation and classical ignorance about which pure state was prepared,
+and entropy of the reduced state cannot tell them apart. A separable
+mixture of product states has plenty of reduced-state entropy and no
+entanglement at all. The convex roof behind the Wootters formula is what
+performs the separation: it minimizes average pure-state entanglement
+over *every* decomposition of $\rho$, so any entanglement the number
+reports is entanglement no choice of preparation could have explained
+away as classical mixing. That minimization is why the general formula
+was hard to find and why its equality with entanglement of formation is a
+theorem rather than a definition.
 
 ## Common Mistakes
 

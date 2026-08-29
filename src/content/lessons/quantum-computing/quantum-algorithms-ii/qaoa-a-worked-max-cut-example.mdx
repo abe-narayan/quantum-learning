@@ -145,10 +145,10 @@ $(\gamma,\beta)$ cost landscape for even a small graph has no simple
 closed-form optimum. Real QAOA implementations typically use gradient
 descent or Bayesian optimization over $(\gamma,\beta)$, run alongside the
 quantum circuit in the classical part of the hybrid loop. A grid search
-is the smallest honest substitute for that outer loop: it doesn't
-represent a full classical optimizer implementation, but it does find
-genuinely good parameters, from actually evaluating the same
-`qaoaCircuit`/`expectedCutSize` functions a real optimizer would call.
+is the smallest honest substitute for that outer loop. It is not a full
+classical optimizer, but it finds good parameters, and it finds them by
+evaluating the same `qaoaCircuit` and `expectedCutSize` functions a real
+optimizer would call.
 
 Here is the whole $21\times21$ grid at once, the surface a real optimizer
 has to navigate:
@@ -177,7 +177,7 @@ spot rather than a single unique peak: {heatmapGreenCellCount} of the
 $\langle\text{cut}\rangle=1.9$, spread across more than one green patch,
 not clustered around one location.
 
-<InteractiveSection title="A bumpy landscape, not a single peak" description="Slide β across the values a grid search would try. Each curve sweeps γ continuously at that fixed β, for the real triangle circuit — a horizontal slice through the heatmap above. Notice the curve bumps up and down rather than having one obvious peak, and which β gives the best peak height changes as you slide, exactly why a 2D grid (not a single 1D formula) was needed. At β=0.30 the curve's peak sits right at the grid-searched γ≈0.6, brushing the true maximum (dashed line at 2), matching the ≈1.999 result quoted above.">
+<InteractiveSection title="A bumpy landscape, not a single peak" description="Slide β across the values a grid search would try. Each curve sweeps γ continuously at that fixed β for the real triangle circuit, which is a horizontal slice through the heatmap above. The curve bumps up and down rather than showing one obvious peak, and which β gives the best peak height changes as you slide. That is why a 2D grid was needed rather than a 1D formula. At β=0.30 the curve's peak sits at the grid-searched γ≈0.6, brushing the true maximum (dashed line at 2) and matching the ≈1.999 result quoted above.">
   <ParametricCurve
     frames={landscapeFrames}
     sliderLabel="mixer angle β"
@@ -186,7 +186,7 @@ not clustered around one location.
   />
 </InteractiveSection>
 
-<InteractiveSection title="Search the full (γ,β) landscape yourself" description="The curves above only sliced the landscape at seven fixed β values. Here both γ and β are free — drag either slider and watch the triangle's most-likely measured coloring, expected cut ⟨C⟩, and approximation ratio update live against the real bruteForceMaxCut optimum. Try to find the γ≈0.6, β≈0.3 region quoted above by feel, then switch the preset to the single edge and see whether its own γ≈1.55, β≈0.40 optimum is easier or harder to land on.">
+<InteractiveSection title="Search the full (γ,β) landscape yourself" description="The curves above sliced the landscape at seven fixed β values. Here both γ and β are free. Drag either slider and watch the triangle's most-likely measured coloring, expected cut ⟨C⟩, and approximation ratio update against the real bruteForceMaxCut optimum. Try finding the γ≈0.6, β≈0.3 region by feel, then switch the preset to the single edge and see whether its γ≈1.55, β≈0.40 optimum is easier or harder to land on. Note how much of the space is mediocre: this is the search a classical optimizer has to do, on every problem instance, before the quantum circuit is worth running.">
   <LazyQAOAExplorer />
 </InteractiveSection>
 

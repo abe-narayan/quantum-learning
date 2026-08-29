@@ -53,7 +53,18 @@ export function BlochSphereControls({
             step={0.005}
             disabled={disabled}
             formatValue={(v) => `${Math.round((v * 180) / Math.PI)}°`}
-            valueText={(v) => `${Math.round((v * 180) / Math.PI)} degrees`}
+            // A bare "60 degrees" tells a screen-reader user nothing about
+            // what moved — the whole reason θ matters is the probability it
+            // sets, and that lives in a bar chart they cannot see while
+            // dragging. P(0) = cos²(θ/2) is the Born rule for the canonical
+            // Bloch state (see `blochStateFromAngles` in lib/quantum/bloch.ts),
+            // so this is a readout of the same quantity the bars draw, not a
+            // second derivation of it.
+            valueText={(v) =>
+              `${Math.round((v * 180) / Math.PI)} degrees, probability of measuring 0 is ${Math.round(
+                Math.cos(v / 2) ** 2 * 100
+              )} percent`
+            }
             onChange={(theta) => onManualAngles({ theta, phi: angles.phi })}
           />
           <SimulatorSlider
@@ -90,6 +101,12 @@ export function BlochSphereControls({
               disabled={disabled}
               onClick={() => onApplyGate(gate)}
               title={gate.explanation}
+              // Without this the six buttons announce as "X", "Y", "Z", "H",
+              // "S", "T" — six single letters with no hint that they are
+              // gates or that pressing one rotates the sphere. `title` only
+              // supplies the accessible *description*, which many screen
+              // readers do not read by default.
+              aria-label={`Apply the ${gate.label} gate`}
               className="h-10"
             >
               {gate.label}
@@ -187,7 +204,17 @@ function RotationRow({
         onChange={setDegrees}
         className="w-full sm:flex-1"
       />
-      <Button size="sm" variant="secondary" disabled={disabled} onClick={() => onApply(axisId, (degrees * Math.PI) / 180)}>
+      <Button
+        size="sm"
+        variant="secondary"
+        disabled={disabled}
+        onClick={() => onApply(axisId, (degrees * Math.PI) / 180)}
+        // Three of these rows stack here, so a screen reader's button list
+        // used to read "Apply, Apply, Apply" with nothing to tell them apart.
+        // The visible word stays "Apply" — the row's own slider label is what
+        // identifies it on screen.
+        aria-label={`Apply ${label} rotation of ${degrees} degrees`}
+      >
         Apply
       </Button>
     </div>

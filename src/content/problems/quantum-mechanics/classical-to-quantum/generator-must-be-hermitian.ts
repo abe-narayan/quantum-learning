@@ -33,17 +33,24 @@ export const generatorMustBeHermitian: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Expand U(dt)=I-iHdt/ℏ and impose U†U=I to first order — what condition on H falls out?",
   },
   hints: [
-    { text: "This is exactly the derivation at the start of the lesson." },
+    { text: "The requirement on U is unitarity, U†U = I. Start there and work backwards to H." },
+    { text: "Take an infinitesimal step: U(dt) ≈ I − iH dt/ℏ, and write down its adjoint." },
+    { text: "Multiply the two and keep terms to first order in dt. The dt terms must cancel, and that cancellation is a condition on H." },
   ],
   solution: {
     steps: [
-      { description: "Expanding $U^\\dagger(dt)U(dt)=I$ to first order in $dt$ forces $H^\\dagger=H$." },
+      { description: "For an infinitesimal step, $U(dt)=I-iH\\,dt/\\hbar$ and $U^\\dagger(dt)=I+iH^\\dagger dt/\\hbar$." },
+      { description: "Multiplying and keeping first order in $dt$ gives $U^\\dagger U = I + i(H^\\dagger - H)dt/\\hbar$. Unitarity demands this equal $I$, so $H^\\dagger = H$." },
     ],
-    finalAnswer: "H must be Hermitian.",
+    finalAnswer: "H must be Hermitian, which is what unitarity of U(t) forces.",
   },
   explanation: {
-    correctIdea: "Unitarity of the evolution operator is what forces its generator to be Hermitian.",
-    whyCorrect: "This is a direct consequence of Postulate 4, not a separate assumption.",
-    whyWrong: ["H itself is never required to be unitary — that property belongs to U(t), the operator built from H."],
+    correctIdea: "Hermiticity of the generator is not an extra assumption. It falls out of requiring the evolution it generates to be unitary.",
+    whyCorrect: "The first-order expansion of U†U = I leaves H† − H = 0 as its only surviving condition.",
+    whyWrong: [
+      { optionId: "b", text: "Assigns U's property to H. H is what gets exponentiated; the exponential is the unitary one." },
+      { optionId: "c", text: "Reverses the roles of the two factors. It is the −i in the exponent together with a Hermitian H that makes U unitary." },
+      { optionId: "d", text: "Confuses real entries with Hermiticity. Pauli-Y has imaginary off-diagonal entries and is Hermitian." },
+    ],
   },
 };

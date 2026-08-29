@@ -31,7 +31,20 @@ export function ExchangeDiagramExplorer({ presets, ariaLabel }: { presets: Excha
       {presets.length > 1 && (
         <PresetToggle options={presets} index={index} onChange={setIndex} ariaLabel={ariaLabel} />
       )}
-      <div role="img" aria-label={`${ariaLabel}: ${preset.label}`} className="space-y-4 overflow-x-auto">
+      {/* `role="group"`, not `role="img"` — see the long note in
+          `ExchangeDiagram`, which shares this subtree. The explorer case is
+          the sharper one: every preset here swaps the amplitudes *and* the
+          verdict (product → symmetric → antisymmetric → the a=b zero vector),
+          and the verdict badge is the only place the answer is written. With
+          `img`, pressing through the presets renamed the figure and erased
+          every number and every conclusion behind the new name, so the control
+          did nothing a screen-reader user could observe.
+
+          No `tabIndex={0}`: the grids are at most 3 × 3.5rem = 168px wide and
+          sit in a `flex-wrap` row, so this container does not actually
+          overflow at any realistic width and a tab stop here would scroll
+          nothing. */}
+      <div role="group" aria-label={`${ariaLabel}: ${preset.label}`} className="space-y-4 overflow-x-auto">
         <ExchangeDiagramContent
           before={preset.before}
           after={preset.after}

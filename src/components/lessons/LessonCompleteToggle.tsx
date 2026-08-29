@@ -39,7 +39,21 @@ export function LessonCompleteToggle({ slug }: { slug: string }) {
         onClick={() => setCompleted(!progress.completed)}
         aria-pressed={progress.completed}
       >
-        {progress.completed ? "✓ Completed" : "Mark as complete"}
+        {progress.completed ? (
+          <>
+            {/* The tick is a visual confirmation, not part of the button's
+                name: bare in the label it was spoken ("check mark
+                Completed" / "tick Completed"), on top of the "pressed"
+                state `aria-pressed` already announces. Decorative here, so
+                the accessible name is exactly "Completed". */}
+            <span aria-hidden="true" data-decorative="">
+              {"✓ "}
+            </span>
+            Completed
+          </>
+        ) : (
+          "Mark as complete"
+        )}
       </Button>
     </div>
   );

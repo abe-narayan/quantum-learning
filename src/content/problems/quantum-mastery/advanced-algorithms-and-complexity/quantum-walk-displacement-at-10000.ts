@@ -25,6 +25,11 @@ export const quantumWalkDisplacementAt10000: NumericProblem = {
     value,
     tolerance: 5,
     incorrectFeedback: "Compute √(1−1/√2) first (≈0.5412), then multiply by T=10000.",
+    nearMisses: [
+      { value: 100, feedback: "100 is √T, the classical random walk's diffusive spread. The quantum walk spreads ballistically, linearly in T, which is the whole contrast this lesson draws." },
+      { value: 2928.93, tolerance: 5, feedback: "That is (1 − 1/√2)·T, the variance coefficient times T without the square root applied to the coefficient. Take the root of the coefficient, not of T." },
+      { value: 10000, tolerance: 5, feedback: "10,000 is T itself, the maximum possible displacement. The walk's typical spread is a fixed fraction of that, about 0.54 T." },
+    ],
   },
   hints: [
     { text: "√⟨x²⟩ = T·√(1−1/√2)." },

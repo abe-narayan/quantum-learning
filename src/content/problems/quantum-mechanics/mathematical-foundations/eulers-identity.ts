@@ -46,6 +46,10 @@ export const eulersIdentity: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Euler's identity, e^{iπ}+1=0, is just Euler's formula evaluated at θ=π.",
     whyCorrect: "cos(π)=-1 and sin(π)=0, so the imaginary part vanishes and only -1 remains.",
-    whyWrong: ["e^{iθ} always has modulus 1 (|e^{iθ}|=1 for every real θ), so it can never be 0 — ruling out that option immediately, regardless of θ."],
+    whyWrong: [
+      { optionId: "b", text: "Takes cos(π) as +1. It is −1; +1 is the value at θ=0 or θ=2π." },
+      { optionId: "c", text: "Lands a quarter turn short. That is e^{iπ/2}, where cos vanishes and sin is 1." },
+      { optionId: "d", text: "Ruled out without any evaluation: |e^{iθ}| = 1 for every real θ, so it never reaches 0." },
+    ],
   },
 };

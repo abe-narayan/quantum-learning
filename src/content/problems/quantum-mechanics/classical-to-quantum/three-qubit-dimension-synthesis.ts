@@ -22,6 +22,10 @@ export const threeQubitDimensionSynthesis: NumericProblem = {
     value: 8,
     tolerance: 0.001,
     incorrectFeedback: "Tensor-product dimensions multiply: dim(V⊗W⊗X) = dim(V)·dim(W)·dim(X), not add.",
+    nearMisses: [
+      { value: 6, feedback: "6 adds the three dimensions. Tensor-product dimensions multiply, which is why the state space grows exponentially in the qubit count rather than linearly." },
+      { value: 3, feedback: "3 is the number of qubits. Each contributes a factor of 2 to the dimension." },
+    ],
   },
   hints: [
     { text: "dim(V⊗W⊗X) = dim(V) × dim(W) × dim(X)." },

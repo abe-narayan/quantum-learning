@@ -35,6 +35,11 @@ export const twoPToThreePSplittingRatio: NumericProblem = {
     value: ratio,
     tolerance: 0.01,
     incorrectFeedback: "Every other factor in the boxed formula is identical between the two cases — only 1/n³ changes, so the ratio is (3/2)³.",
+    nearMisses: [
+      { value: 1.5, feedback: "1.5 is the ratio of the principal quantum numbers. The splitting scales as 1/n³, so the ratio is that cubed." },
+      { value: 2.25, tolerance: 0.005, feedback: "2.25 is (3/2)², one power short. The ⟨1/r³⟩ expectation gives a cubic dependence on n." },
+      { value: 8 / 27, tolerance: 0.005, feedback: "That is the reciprocal. The smaller n has the larger splitting, so the ratio ΔE(2)/ΔE(3) exceeds 1." },
+    ],
   },
   hints: [
     { text: "Everything in the boxed formula except 1/n³ is the same for both (same l=1, same j=3/2 and j=1/2 bracket values)." },

@@ -36,16 +36,28 @@ function paramNameForMode(mode: "bit-flip" | "phase-flip"): string {
 }
 
 /**
+ * First-contact default when no URL param is present: one real error already
+ * injected (on qubit 1), so the instrument opens mid-phenomenon — a nonzero
+ * syndrome on screen, correction visibly at work — instead of the blank
+ * "nothing is wrong" state. "Clear all errors" still reaches the undisturbed
+ * reference state, and a shared link with `syn_bf`/`syn_pf` set (including
+ * an explicit "none") always wins over this default.
+ */
+const DEFAULT_INJECTED: number[] = [1];
+
+/**
  * Reads and validates the injected-qubits param for this instance's mode:
  * a comma-separated list of qubit indices (e.g. "0,1"), or "none". Falls
- * back to the default (no error) on anything malformed or absent. A bare
- * single index (e.g. "1"), the format this param used before multi-qubit
- * injection was supported, still parses correctly as a one-element set, so
- * old shared links keep working.
+ * back to the first-contact default (an error on qubit 1) when the param is
+ * absent; an explicit "none" still means no error, so shared no-error links
+ * keep working. A bare single index (e.g. "1"), the format this param used
+ * before multi-qubit injection was supported, still parses correctly as a
+ * one-element set, so old shared links keep working.
  */
 function parseInjectedQubits(params: { get(key: string): string | null }, mode: "bit-flip" | "phase-flip"): number[] {
   const raw = params.get(paramNameForMode(mode));
-  if (raw === null || raw === "none") return [];
+  if (raw === null) return [...DEFAULT_INJECTED];
+  if (raw === "none") return [];
   const qubits = raw
     .split(",")
     .map((token) => Number(token))
@@ -174,7 +186,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
             names the broken qubit without ever revealing what was being stored.
           </p>
 
-          <div aria-live="polite" className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          <div aria-live="polite" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {injected.length === 0
               ? "No error injected. The encoded state is exactly the logical state, undisturbed."
               : `${errorLabel} error${injected.length > 1 ? "s" : ""} injected on ${formatQubitList(injected)}. Syndrome (${result.syndrome[0]}, ${result.syndrome[1]}) decodes to ${
@@ -226,10 +238,26 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
                   <label
                     key={qubit}
                     className={cn(
-                      "flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-pillar focus-within:ring-offset-2 focus-within:ring-offset-background",
+                      // `min-h-11` (44px): the real checkbox is `sr-only`, so
+                      // this label *is* the whole hit area, and at `py-1.5`
+                      // around 12px text it stood about 28px tall — the
+                      // smallest tap target in any of these instruments, on
+                      // the control the reader is meant to toggle repeatedly.
+                      // `border` unconditional, matching
+                      // `visualizations/PresetToggle.tsx` and
+                      // `simulators/shared/controls.tsx`'s `PillGroup`. Only
+                      // the unchecked pill used to have one, so checking a
+                      // qubit shrank that pill by 2px in each axis and shoved
+                      // every pill after it along this `flex-wrap` row — and
+                      // this is a *multi-select*, so the reader is expected to
+                      // check several in a row and watch the row twitch under
+                      // the pointer each time. Worse than the single-select
+                      // case: the target for the reader's *next* click moves
+                      // as a result of the click they just made.
+                      "flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-pillar focus-within:ring-offset-2 focus-within:ring-offset-background",
                       checked
-                        ? "bg-pillar text-brand-foreground"
-                        : "border border-border bg-surface text-muted-foreground hover:bg-surface-muted"
+                        ? "border-pillar bg-pillar text-brand-foreground"
+                        : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
                     )}
                   >
                     <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleQubit(qubit)} />

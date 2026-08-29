@@ -21,7 +21,20 @@ export const whyRxNeedsFullTurnOnOne: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["not on the x-axis", "off the x-axis", "perpendicular to the x-axis", "not on the rotation axis"],
+      [
+        "not on the x-axis",
+        "off the x-axis",
+        "off axis",
+        "off-axis",
+        "perpendicular",
+        "not on the rotation axis",
+        "not the rotation axis",
+        "z-axis",
+        "z axis",
+        "south pole",
+        "different axis",
+        "away from the axis",
+      ],
       ["full circle", "2π", "complete revolution", "full turn", "full rotation"],
     ],
     incorrectFeedback: "Start with where |1⟩ actually sits on the sphere relative to the x-axis, then think about what path it traces under a rotation about that axis.",

@@ -1,15 +1,19 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
+import { PAULI_Z, IDENTITY } from "@/lib/quantum/gates";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/operators-observables-measurement/degeneracy-in-practice"
 );
 
+export const zZero = PAULI_Z.tensor(IDENTITY);
+export const zOne = IDENTITY.tensor(PAULI_Z);
+
 export const lessonMeta = {
   title: "Degeneracy in Practice: A Worked System",
   description:
-    "Every idea from this course applied to one real, familiar system -- a Bell state -- using two-qubit observables to build an honest complete set of commuting observables and watch it resolve degeneracy exactly.",
+    "Every idea from this course applied to one familiar system, a Bell state, using two-qubit observables to build a complete set of commuting observables and watch it resolve a degeneracy.",
   course: "operators-observables-measurement",
   module: "degeneracy-in-practice",
   order: 1,
@@ -27,23 +31,15 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Every tool this course has built — spectral decomposition, compatible observables, complete sets, the generalized measurement postulate — is about to get applied to one concrete, already-familiar system: a Bell state.
+Spectral decomposition, compatible observables, complete sets, the generalized measurement postulate: every tool this course has built is about to be applied at once, to a system you already know. A Bell state.
 </LessonHook>
 
 ## Motivation
 
-That Bell state comes from the Quantum Gates & Circuits course. No new
-physics here, just this course's machinery, all at once, on a system
-you already know.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/IBM_QC.jpg/1280px-IBM_QC.jpg"
-  alt="The dilution-refrigerator cryostat housing IBM's 50-qubit superconducting quantum computing prototype, displayed at CES 2018"
-  caption="Real multi-qubit hardware, like this superconducting quantum processor cooled to millikelvin temperatures, is exactly the kind of physical system this lesson's two-qubit CSCO (Z0, Z1) and Bell-state collapse calculation describe."
-  credit="Lars Plougmann / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_QC.jpg"
-  license="CC BY-SA 2.0"
-/>
+The target is a Bell state, built originally in the Quantum Gates &
+Circuits course. There is no new physics in this lesson. It runs this
+course's machinery end to end on a system you already know, which is the
+best way to find out whether the machinery makes sense to you.
 
 ## Intuition
 
@@ -51,9 +47,10 @@ $\hat Z$ on a single qubit has two nondegenerate eigenvalues, no
 degeneracy to worry about. Move to *two* qubits, and an <Term id="observable">observable</Term> that
 only looks at *one* of them ($\hat Z$ on qubit 0, ignoring qubit 1
 entirely) automatically becomes degenerate on the 4-dimensional combined
-space: two different values of qubit 1 give the *same* eigenvalue. This
-is degeneracy showing up for a completely ordinary reason, not a
-contrived example.
+space: two different values of qubit 1 give the *same* eigenvalue. The
+degeneracy arises here for the most ordinary reason there is, an
+observable that ignores part of the system, rather than from a contrived
+construction.
 
 ## Mathematical Development
 
@@ -72,9 +69,28 @@ new engine code needed. Their eigenvalues on the four basis states:
 | $\lvert11\rangle$ | $-1$ | $-1$ |
 
 $Z_0$ alone is degenerate ($+1$ on both $|00\rangle,|01\rangle$); so is
-$Z_1$. But the *pair* $(Z_0,Z_1)$ gives four distinct tuples, a genuine
-CSCO for this space, exactly as Complete Sets of Commuting Observables
-predicted.
+$Z_1$. But the *pair* $(Z_0,Z_1)$ gives four distinct tuples, a CSCO for
+this space, of the kind Complete Sets of Commuting Observables described
+abstractly.
+
+Written out as matrices, both operators are diagonal, and the degeneracy
+is visible as repeated entries down the diagonal:
+
+<MatrixGrid
+  matrix={zZero}
+  label="Z₀ = Z ⊗ I"
+  compareTo={zOne}
+  compareLabel="Z₁ = I ⊗ Z"
+  highlightDiagonal
+  ariaLabel="Two four-by-four diagonal matrices side by side. Z-zero has diagonal entries 1, 1, minus 1, minus 1, so the value 1 appears twice in a row and minus 1 appears twice in a row. Z-one has diagonal entries 1, minus 1, 1, minus 1, alternating. Every off-diagonal entry of both matrices is zero."
+/>
+
+Each matrix repeats each of its two eigenvalues twice, which is the
+degeneracy stated in numbers: $Z_0$ cannot tell $|00\rangle$ from
+$|01\rangle$, because it assigns them the same diagonal entry. What makes
+the pair complete is that they repeat in *different patterns*, $(+,+,-,-)$
+against $(+,-,+,-)$, so reading both diagonals down together gives four
+distinct labels.
 
 ### Why they commute
 
@@ -85,9 +101,9 @@ $$
 Z_0Z_1 = (Z\otimes I)(I\otimes Z) = (ZI)\otimes(IZ) = Z\otimes Z = (IZ)\otimes(ZI) = (I\otimes Z)(Z\otimes I) = Z_1Z_0
 $$
 
-so $[Z_0,Z_1]=0$, confirmed directly, not merely asserted, and a
-completely general fact ($A\otimes I$ and $I\otimes B$ commute for *any*
-$A,B$, since they act on independent subsystems).
+so $[Z_0,Z_1]=0$, confirmed by computation rather than asserted. Nothing
+in that line used any property of $Z$: $A\otimes I$ and $I\otimes B$
+commute for *any* $A,B$, because they act on independent subsystems.
 
 ### Measuring $Z_0$ on an entangled state
 
@@ -108,15 +124,27 @@ which, already <Term id="normalization">normalized</Term>, collapses to exactly 
 
 ### Then measuring $Z_1$
 
+<PredictBeforeReveal
+  question="Z₀ has just been measured on |Φ+⟩ and returned +1, collapsing the state. Qubit 1 has not been touched. What does a subsequent Z₁ measurement give?"
+  options={[
+    { label: "+1 or −1, still a 50/50 coin flip", value: "random" },
+    { label: "+1, with certainty", value: "certain-plus" },
+    { label: "−1, with certainty", value: "certain-minus" },
+    { label: "Undefined until qubit 1 is measured in some basis", value: "undefined" },
+  ]}
+  correctValue="certain-plus"
+  explanation="+1, with no uncertainty left. Before the first measurement, Z₁ on |Φ+⟩ was a genuine 50/50. The Z₀ measurement collapsed the state to |00⟩, which is already a Z₁ eigenstate with eigenvalue +1, so the second measurement has nothing left to decide. Nothing was done to qubit 1: the correlation was in the state from the start, and the first measurement is what made it readable."
+/>
+
 On the now-collapsed $|00\rangle$, $Z_1$'s eigenvalue is $+1$ with
 **certainty** ($|00\rangle$ is already a $Z_1$-eigenstate). The full pair
 $(Z_0,Z_1)=(+1,+1)$ now uniquely identifies the state as $|00\rangle$,
-this course's CSCO machinery working exactly as designed, on a real
-two-qubit state.
+which is the CSCO machinery of this course doing on a real two-qubit
+state what the abstract argument said it would.
 
 <InteractiveSection
   title="Measure qubit 0, watch qubit 1 fall in line"
-  description="Prepare |Φ+⟩, measure qubit 0. Confirm qubit 1's outcome is forced to match, exactly as this lesson's Z₀/Z₁ collapse calculation predicts.">
+  description="Prepare |Φ+⟩ and measure qubit 0. Confirm that qubit 1's outcome is forced to match, as this lesson's Z₀/Z₁ collapse calculation predicts. Repeat it several times: the individual outcomes are random, the agreement between them never is.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
@@ -127,9 +155,9 @@ course's formalism instead of asserted as a special fact: measuring
 qubit 0 as $0$ forces qubit 1 to also be $0$, because the only
 $|\Phi^+\rangle$-component consistent with $Z_0{=}{+}1$ is $|00\rangle$.
 There is no $|01\rangle$ component in $|\Phi^+\rangle$ at all. The
-"spooky" correlation from Bell States and Entanglement is, precisely,
-this lesson's projector-and-collapse mechanics applied to an entangled
-input.
+"spooky" correlation from Bell States and Entanglement is this lesson's
+projector-and-collapse mechanics applied to an entangled input, with no
+extra ingredient.
 
 ## Worked Example
 
@@ -148,8 +176,9 @@ $|11\rangle$ terms.
 <Callout type="note">
 **Thinking $Z_0$ and $Z_1$ commuting is special to the Bell state.**
 It's a property of the *operators* ($A\otimes I$ vs. $I\otimes B$),
-completely independent of which state they're applied to. The Bell
-state is just an interesting *input* to already-compatible observables.
+independent of which state they're applied to. The Bell state is an
+interesting *input* to observables that were already compatible before it
+arrived.
 </Callout>
 
 <Callout type="warning">

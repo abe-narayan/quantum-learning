@@ -59,7 +59,7 @@ export async function CurriculumStrip() {
                 href={visual.route}
                 data-pillar={pillar.slug}
                 aria-label={`${pillar.title} — ${count} lessons`}
-                className="flex min-h-11 flex-col justify-center gap-0.5 rounded-[var(--radius-tight)] border border-border bg-surface px-3 py-2 transition-colors duration-[--dur-fast] ease-[--ease-instrument] hover:border-pillar-edge hover:bg-pillar-wash"
+                className="flex min-h-11 flex-col justify-center gap-0.5 rounded-(--radius-tight) border border-border bg-surface px-3 py-2 transition-colors duration-(--dur-fast) ease-instrument hover:border-pillar-edge hover:bg-pillar-wash"
               >
                 <span className="flex items-baseline gap-1.5">
                   {/* The index is the ordering cue the sections below repeat

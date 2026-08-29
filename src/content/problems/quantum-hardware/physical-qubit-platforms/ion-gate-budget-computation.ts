@@ -26,11 +26,15 @@ export const ionGateBudgetComputation: NumericProblem = {
     value,
     tolerance: 1000,
     incorrectFeedback: "Divide 2 seconds by 20 microseconds (20×10⁻⁶ seconds).",
+    nearMisses: [
+      { value: 0.1, tolerance: 0.001, feedback: "0.1 divides the bare numbers 2 and 20 with the units ignored. Seconds and microseconds differ by a factor of a million." },
+      { value: 10000, tolerance: 100, feedback: "10,000 is off by a factor of ten in the unit conversion: 2 s is 2,000,000 μs, not 200,000." },
+    ],
   },
   hints: [
-    { text: "Convert both to the same units: 2s = 2,000,000 μs." },
-    { text: "2,000,000 μs ÷ 20 μs." },
-    { text: "= 100,000." },
+    { text: "The two times are quoted in different units, so convert before dividing. Microseconds work well here." },
+    { text: "2 s = 2,000,000 μs; the gate time is already in microseconds." },
+    { text: "Divide the coherence time by the gate time. The answer should come out far larger than a superconducting device's budget, which is the platform contrast the lesson is drawing." },
   ],
   solution: {
     steps: [{ description: "2s / 20μs = 2×10⁶μs / 20μs = 10⁵ = 100,000 gates." }],

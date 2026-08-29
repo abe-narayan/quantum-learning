@@ -269,6 +269,20 @@ mobile-safe, inline `sr-only` labels) and
 and both carry worked usage examples in the author reference. They are
 documentation describing something that isn't there.
 
+> **Largely resolved 2026-08-29.** The table above is the state at review
+> time and is left as recorded. Re-measured against the current corpus (same
+> 219 lessons): `AnnotatedFigure` **8**, `ObservePredictExplain` **1**,
+> `Question` **4**, `HistoricalMoment` **17**, `EquationReveal` **32**,
+> `ResearchConnection` **34**, `ChallengePrompt` **38**, `InsightBlock`
+> **40**, `DerivationSteps` **47**, `InteractiveSection` **163**,
+> `PredictBeforeReveal` **213**, `LessonHook` **218**, `NextDiscovery`
+> **219**, `Callout` **219**. Nothing is at zero any more.
+> `ObservePredictExplain`'s single call site is deliberate and is the
+> blocker on retiring it — see `docs/NARRATIVE_COMPONENTS.md`, which
+> recommends removing the component rather than growing its usage. The
+> inline glossary `Term`, which did not exist when this table was measured,
+> now stands at 559 calls across 191 lessons, and is still climbing.
+
 The clearest case of the gap: `AnnotatedFigure` was built for exactly
 multi-feature apparatus photos, and Quantum Hardware's platform/dilution-fridge
 lessons (which have exactly that kind of figure) use a flat, single-caption

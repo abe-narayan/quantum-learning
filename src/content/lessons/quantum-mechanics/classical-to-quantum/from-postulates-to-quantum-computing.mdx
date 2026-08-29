@@ -29,6 +29,10 @@ export const phaseGateFrame = (phiDeg) => ({
 
 export const phaseGateFrames = Array.from({ length: 13 }, (_, i) => phaseGateFrame(i * 30));
 
+export const hadamardDagger = HADAMARD.dagger();
+
+export const hadamardUnitarityCheck = hadamardDagger.mul(HADAMARD);
+
 export const lessonMeta = {
   title: "From Postulates to Quantum Computing",
   description:
@@ -47,25 +51,41 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-The Quantum Computing pillar is not a different subject requiring new physics. It's this exact framework — states, observables, measurement, dynamics, uncertainty — applied to the smallest nontrivial Hilbert space there is.
+The Quantum Computing pillar is not a second subject with its own physics. It is this framework (states, observables, measurement, dynamics, uncertainty) evaluated in the smallest Hilbert space where anything interesting can happen.
 </LessonHook>
 
 ## Motivation
 
 This course built the postulates of quantum mechanics from the ground
 up: states, observables, measurement, dynamics, uncertainty, and two
-concrete solvable systems (a generic two-level system and the harmonic
-oscillator). If you haven't taken Quantum Computing yet, or even if
-you have, what follows will look familiar.
+solvable systems (a generic two-level system and the harmonic
+oscillator). None of that mentioned computing.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/0/0b/DEFENSE_%2854394239497%29.jpg"
-  alt="The central vacuum chamber and optics of Sandia National Laboratories' neutral-atom quantum computing apparatus, used to test a new method for detecting qubit errors"
-  caption="A real neutral-atom quantum computer. Every qubit trapped and controlled by hardware like this is governed by exactly the same four postulates this course derived: a state vector, Hermitian observables, the Born rule, and unitary evolution."
-  credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
-  creditUrl="https://commons.wikimedia.org/wiki/File:DEFENSE_(54394239497).jpg"
-  license="Public Domain (U.S. Government work)"
+It did not need to. A qubit is a two-dimensional Hilbert space, and every
+rule a quantum-computing course states about qubits turns out to be one
+of this course's four postulates with $n=2$ substituted in. The rest of
+this lesson is that substitution, done explicitly, entry by entry.
+
+Here is the smallest case in full. The Hadamard gate is the first gate
+any quantum-computing course introduces; Postulate 4 says a gate has to
+be unitary, meaning $H^\dagger H = I$. Rather than assert it, compare the
+matrix against the product:
+
+<MatrixGrid
+  matrix={HADAMARD}
+  label="H (the Hadamard gate)"
+  compareTo={hadamardUnitarityCheck}
+  compareLabel="H†H"
+  highlightDiagonal
+  ariaLabel="Two two-by-two matrices side by side. On the left, the Hadamard gate with all four entries equal to 0.71 except the bottom-right, which is negative 0.71. On the right, the product of its conjugate transpose with itself: ones on the diagonal and zeros off it, the identity matrix."
 />
+
+The product on the right is the identity, computed from the platform's
+own gate definitions rather than asserted. Whatever else the Hadamard
+gate does, it preserves the length of every vector it touches, which is
+the only property Postulate 4 ever demanded of time evolution. That is
+the whole relationship between the two subjects, and the table below
+works through the rest of it.
 
 ## Recap: A Qubit Is a Two-Level Quantum System
 
@@ -73,7 +93,7 @@ you have, what follows will look familiar.
 |---|---|
 | State = unit vector in $\mathbb{C}^n$, up to phase | Qubit state $\alpha\lvert0\rangle+\beta\lvert1\rangle$, $\lvert\alpha\rvert^2+\lvert\beta\rvert^2=1$ |
 | Observable = Hermitian operator | The computational-basis measurement (a projective measurement in the $\{\lvert0\rangle,\lvert1\rangle\}$ basis) |
-| Measurement = Born rule | $P(0)=\lvert\alpha\rvert^2$, $P(1)=\lvert\beta\rvert^2$, the exact same formula, in the exact same words |
+| Measurement = Born rule | $P(0)=\lvert\alpha\rvert^2$, $P(1)=\lvert\beta\rvert^2$: the same formula, in the same words |
 | Dynamics = unitary evolution | Quantum gates ($X,H,S,\ldots$), every gate is a unitary matrix |
 | Uncertainty relation | The Pauli operators' commutators, worked directly in this course's Expectation Values lesson |
 | Two-level Hamiltonian evolution | Bloch-sphere rotation, computed by this platform's `rotationAboutAxis`, reused directly in the Time Evolution lesson |
@@ -89,13 +109,13 @@ to $\mathbb{C}^2$.
 <Term id="unitary-operator">unitary</Term>, using this course's own derivation rather than "because that's
 the rule"?**
 
-Postulate 4 (Dynamics) requires evolution to be unitary because
-<Term id="normalization">normalization</Term> must be preserved: the Unitary Operators lesson
-(Mathematical Foundations) proved unitarity is exactly the condition
-guaranteeing that. A "gate" is nothing but a name for a short, discrete
-step of this course's continuous $U(t)=e^{-iHt/\hbar}$ evolution (Time
-Evolution lesson), the same requirement, just applied over a fixed,
-useful time interval instead of continuously.
+Postulate 4 requires evolution to be unitary because <Term id="normalization">normalization</Term> must
+be preserved, and the Unitary Operators lesson proved that unitarity is
+the necessary and sufficient condition for that. A "gate" is a name for a
+short, discrete stretch of this course's continuous $U(t)=e^{-iHt/\hbar}$
+evolution, run for a fixed useful interval instead of watched
+continuously. The check drawn above, $H^\dagger H = I$, is what that
+requirement looks like when the interval is the one a Hadamard takes.
 
 **2. The Hadamard gate takes $|0\rangle\to|+\rangle$. Using the
 interference result from this course, explain why measuring a qubit
@@ -103,15 +123,17 @@ prepared this way in the $\{|0\rangle,|1\rangle\}$ <Term id="basis">basis</Term>
 information about phase, but measuring in the $\{|+\rangle,|-\rangle\}$
 basis does.**
 
-This is exactly the Superposition, Interference, and Phase lesson's
-result, applied directly: $|+\rangle$ written in the
-$\{|0\rangle,|1\rangle\}$ basis has coefficients with a *fixed* relative
-phase ($\varphi=0$ for $H|0\rangle$), so measuring in that same basis
-gives fixed probabilities $P(0)=P(1)=\tfrac12$ regardless of what phase
-gate was applied beforehand. A phase gate changes $\varphi$, invisibly to
-a $\{|0\rangle,|1\rangle\}$-basis measurement, but a
-$\{|+\rangle,|-\rangle\}$-basis measurement reveals it immediately, via
-the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
+This is the Superposition, Interference, and Phase lesson's result with
+qubit labels on it. $|+\rangle$ written in the $\{|0\rangle,|1\rangle\}$
+basis has equal-magnitude coefficients, so measuring in that basis gives
+$P(0)=P(1)=\tfrac12$ no matter what phase gate ran beforehand. The phase
+gate does change $\varphi$; the computational-basis measurement is simply
+blind to it. Measure in $\{|+\rangle,|-\rangle\}$ instead and the same
+$\varphi$ drives the outcome through $P(+)=\tfrac{1+\cos\varphi}{2}$.
+
+This is why a quantum algorithm almost always ends with a basis change
+before its final measurement: the answer is usually stored in a phase,
+and a phase read in the wrong basis reads as nothing at all.
 
 <PredictBeforeReveal
   question="Starting from |+⟩, a phase gate with angle φ is applied. If you then measure in the {|0⟩,|1⟩} basis, how do P(0) and P(1) respond as φ sweeps from 0° to 360°?"
@@ -121,10 +143,10 @@ the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
     { label: "They swap discontinuously at φ = 180°", value: "swap" },
   ]}
   correctValue="fixed"
-  explanation="A phase gate only changes the relative phase between |0⟩ and |1⟩, and P(0), P(1) depend only on the magnitudes |α|, |β|, which the phase gate leaves untouched. So the Z-basis bars stay pinned at 0.5 for every φ, while the phase only becomes visible once you switch to a basis, like {|+⟩,|−⟩}, that mixes |0⟩ and |1⟩ together."
+  explanation="A phase gate changes only the relative phase between |0⟩ and |1⟩, while P(0) and P(1) depend on the magnitudes |α| and |β|, which it leaves alone. The Z-basis bars therefore hold at 0.5 for every φ. The phase becomes visible only in a basis like {|+⟩,|−⟩} that mixes |0⟩ and |1⟩ together, which is exactly the move a Hadamard makes before a final measurement."
 />
 
-<InteractiveSection title="Slide φ, watch phase hide in one basis and appear in the other" description="Starting from H|0⟩ = |+⟩, a phase gate with angle φ is applied, then the qubit is measured in the {|0⟩,|1⟩} basis and, separately, in the {|+⟩,|-⟩} basis. Every bar below is computed by literally multiplying the platform's real Hadamard and phase-gate matrices, not typed in from the formula. Watch the Z-basis bars stay frozen at 0.5 for every φ, while the X-basis bars swing with it exactly as P(+) = (1+cos φ)/2 predicts.">
+<InteractiveSection title="Slide φ, watch phase hide in one basis and appear in the other" description="Starting from H|0⟩ = |+⟩, a phase gate of angle φ is applied, and the qubit is then measured in the {|0⟩,|1⟩} basis and, separately, in the {|+⟩,|-⟩} basis. Every bar comes from multiplying the platform's Hadamard and phase-gate matrices, not from evaluating the formula. The Z-basis bars hold at 0.5 for every φ while the X-basis bars swing through the full range, tracing P(+) = (1+cos φ)/2. Same state, same φ, two questions, two entirely different answers.">
   <BarChartExplorer
     frames={phaseGateFrames}
     sliderLabel="φ (degrees)"
@@ -133,13 +155,12 @@ the derived formula $P(+)=\tfrac{1+\cos\varphi}{2}$.
   />
 </InteractiveSection>
 
-As the correspondence table above notes, this same $H|0\rangle\to|+\rangle$
-step, followed by a phase gate, is exactly a Bloch-sphere rotation
-computed by this platform's `rotationAboutAxis`. Reproduce it directly
-below: apply a Hadamard gate to send $|0\rangle$ to the equator, then
-apply a Z-axis rotation gate to play the role of the phase gate above,
-and watch the same $\varphi$-dependence appear as a literal rotation of
-the Bloch vector, not just a formula.
+As the correspondence table notes, this $H|0\rangle\to|+\rangle$ step
+followed by a phase gate is a Bloch-sphere rotation, computed by the same
+`rotationAboutAxis` the Time Evolution lesson used. Reproduce it below:
+send $|0\rangle$ to the equator with a Hadamard, then apply a Z-axis
+rotation in place of the phase gate, and the $\varphi$-dependence that
+moved the bars above appears as the vector physically turning.
 
 <InteractiveSection title="Reproduce H|0⟩ then a phase gate, live" description="Prepare |0⟩ and apply a Hadamard gate to reach |+⟩ on the equator. Then apply a Z-axis rotation gate to play the role of the phase gate from Worked Example 2, and watch the Bloch vector sweep around the equator by the same angle φ that moved the bars above.">
   <LazyBlochSphereExplorer />
@@ -149,11 +170,12 @@ the Bloch vector, not just a formula.
 combined 4-dimensional state is automatically normalized, if each qubit
 was normalized on its own?**
 
-This is the Tensor Products and Composite Systems lesson's result
-(Mathematical Foundations): $\langle u\otimes v,u\otimes v\rangle =
-\langle u,u\rangle\langle v,v\rangle = 1\cdot1=1$, derived from the
-multiplicative rule for inner products on simple tensors, no separate
-renormalization step is ever needed.
+This is the Tensor Products and Composite Systems lesson's result:
+$\langle u\otimes v,u\otimes v\rangle = \langle u,u\rangle\langle
+v,v\rangle = 1\cdot1=1$, from the multiplicative rule for inner products
+on simple tensors. No renormalization step is needed, and none is
+available to fix things if you get it wrong, which is a useful check when
+building multi-qubit states by hand.
 
 ## Common Mistakes, Revisited
 
@@ -166,9 +188,10 @@ built for general quantum systems.
 
 <Callout type="note">
 **Forgetting that "qubit" just means "the smallest nontrivial Hilbert
-space."** Nothing about the postulates requires exactly two dimensions.
-Qubits are convenient and physically realizable, not mathematically
-special.
+space."** Nothing in the postulates singles out two dimensions. Qutrits
+(three levels) and qudits obey the identical four statements; two is the
+choice hardware and error correction find easiest to work with, not a
+mathematical requirement.
 </Callout>
 
 ## Practice Questions

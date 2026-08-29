@@ -22,6 +22,10 @@ export const realDimensionOfComplexSpace: NumericProblem = {
     value: 6,
     tolerance: 0.001,
     incorrectFeedback: "Each complex coordinate needs two independent real numbers (real and imaginary parts) — the real dimension isn't just the number of complex coordinates.",
+    nearMisses: [
+      { value: 3, feedback: "3 is the complex dimension. Over the reals, each coordinate splits into a real and an imaginary part, doubling the count." },
+      { value: 9, feedback: "9 squares the complex dimension. The relationship between the two dimensions is a factor of 2, not a power." },
+    ],
   },
   hints: [
     { text: "dim_C(C^n) = n, but dim_R(C^n) is different." },

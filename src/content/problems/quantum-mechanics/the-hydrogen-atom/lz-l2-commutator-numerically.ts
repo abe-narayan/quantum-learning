@@ -33,12 +33,12 @@ export const lzL2CommutatorNumerically: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "L² commutes with every component of angular momentum, including Lz — the commutator matrix should be exactly zero.",
+    incorrectFeedback: "The title already tells you what to expect here. If you found something else, check that you formed the commutator as Lz L² minus L² Lz in that order, and that both matrices are the j=1 representations. Any surviving entry traces to an arithmetic slip, not to the physics.",
   },
   hints: [
-    { text: "L² is built symmetrically from Lx²+Ly²+Lz² — it doesn't privilege any one axis." },
-    { text: "An operator that treats x, y, z symmetrically commutes with any single component, including Lz." },
-    { text: "The answer is 0 (up to floating-point rounding)." },
+    { text: "You are asked for the largest entry of a commutator matrix. Before grinding through the multiplication, ask what the symmetry of L² predicts about its commutator with any single component." },
+    { text: "L² = Lx² + Ly² + Lz² treats the three axes on an equal footing, and Lz generates rotations about the z axis. An operator that is rotationally invariant commutes with every rotation generator." },
+    { text: "So symmetry fixes what every entry of [Lz, L²] must be. Run the j=1 matrices through the commutator and confirm that the largest magnitude matches the prediction, up to floating-point rounding." },
   ],
   solution: {
     steps: [
@@ -49,7 +49,7 @@ export const lzL2CommutatorNumerically: NumericProblem = {
     finalAnswer: "0",
   },
   explanation: {
-    correctIdea: "This is the same commuting-operator fact Central Potentials relies on to argue energy eigenstates can be simultaneous L², Lz eigenstates — verified here directly against the matrices, not just asserted abstractly.",
+    correctIdea: "This is the same commuting-operator fact Central Potentials relies on to argue energy eigenstates can be simultaneous L², Lz eigenstates, verified here directly against the matrices rather than asserted abstractly.",
     whyCorrect: "The engine's actual matrix commutator, computed from independently-verified Jx, Jy, Jz matrices, comes out to zero.",
     whyWrong: ["Any nonzero answer would indicate a real bug in either the ladder-operator construction or the commutator computation."],
   },

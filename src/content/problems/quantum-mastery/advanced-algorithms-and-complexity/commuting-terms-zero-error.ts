@@ -43,11 +43,15 @@ export const commutingTermsZeroError: MultipleChoiceProblem = {
       { description: "If [A,B]=0, both the leading term and every higher-order remainder term vanish identically." },
       { description: "So the product formula e^{-iAδ}e^{-iBδ}=e^{-i(A+B)δ} holds exactly, with zero Trotter error at any step size." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Every order vanishes, so the product formula is exact whenever A and B commute.",
   },
   explanation: {
     correctIdea: "Noncommutativity is the entire source of Trotter error — commuting operators need no splitting approximation at all.",
     whyCorrect: "This matches ordinary scalar exponent rules extending cleanly to commuting operators, and is exactly what the derivation's structure implies.",
-    whyWrong: ["Options b, c, and d each misread what the commutator term in the derivation actually controls."],
+    whyWrong: [
+      { optionId: "b", text: "Leaves an O(δ³) error behind. That remainder is built from higher-order commutators, which vanish too when A and B commute." },
+      { optionId: "c", text: "Invokes a denominator the derived formula does not have. A zero commutator makes the error term vanish, not blow up." },
+      { optionId: "d", text: "Retires the formula in the commuting case. The derivation still applies; it simply predicts zero error." },
+    ],
   },
 };

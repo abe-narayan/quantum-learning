@@ -23,6 +23,10 @@ export const fullyDestructiveCrossBasis: NumericProblem = {
     value: 0,
     tolerance: 0.01,
     incorrectFeedback: "cos(π) = -1. Substitute into (1+cosφ)/2.",
+    nearMisses: [
+      { value: 1, feedback: "1 is P(−). At φ = π the state is |−⟩, so all the weight sits on the other X-basis outcome." },
+      { value: 0.5, feedback: "0.5 is the φ = π/2 case, where the interference term drops out. At φ = π the term is at its most negative and cancels the 1 entirely." },
+    ],
   },
   hints: [
     { text: "cos(π) = -1." },

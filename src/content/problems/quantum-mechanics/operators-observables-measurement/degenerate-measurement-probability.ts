@@ -22,6 +22,10 @@ export const degenerateMeasurementProbability: NumericProblem = {
     value: 0.666667,
     tolerance: 0.001,
     incorrectFeedback: "P(N=1) sums |c_i|^2 over every basis state sharing eigenvalue 1 — that's |0> and |1> here, each with coefficient 1/sqrt(3).",
+    nearMisses: [
+      { value: 1 / 3, tolerance: 0.002, feedback: "1/3 counts only one of the two degenerate basis states. Both |0⟩ and |1⟩ carry eigenvalue 1, so both contribute to this outcome." },
+      { value: 1 / Math.sqrt(3), tolerance: 0.002, feedback: "That is an amplitude, not a probability. Square each coefficient before summing." },
+    ],
   },
   hints: [
     { text: "Which basis states share the eigenvalue 1?" },

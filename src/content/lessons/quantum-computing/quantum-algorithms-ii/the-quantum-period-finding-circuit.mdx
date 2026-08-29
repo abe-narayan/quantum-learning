@@ -48,18 +48,14 @@ Order-finding needs the period of the function f(x)=aˣ mod N, and periods are e
 
 ## Motivation
 
-This lesson connects the two: build the
-right state, apply the <Term id="quantum-fourier-transform">QFT</Term> (Quantum Algorithms I), and read off the period from where the output
-amplitude concentrates.
+Two pieces are already in hand. The last lesson reduced factoring to
+finding the period of $f(x)=a^x\bmod N$, and Quantum Algorithms I built a
+<Term id="quantum-fourier-transform">QFT</Term> that turns periodic phase patterns into sharp, measurable peaks.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
-  alt="Close-up of Google's Sycamore superconducting quantum processor chip"
-  caption="Google's Sycamore chip, a real superconducting quantum processor of the general type that would need to execute a circuit like this lesson's period-finding state and QFT, gate by gate, at meaningful scale."
-  credit="Google"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
-  license="CC BY 3.0"
-/>
+The two fit together the way a key fits a lock, which is not a coincidence:
+Shor found the reduction *because* he knew what the QFT could do. Build the
+right state, transform the counting register, and read the period off the
+positions where the amplitude concentrates.
 
 ## Mathematical Development
 
@@ -81,20 +77,19 @@ from its closed-form amplitudes instead of building that gate sequence.**
 `periodFindingState` places <Term id="amplitude">amplitude</Term> $1/\sqrt{2^t}$ at index $(x,\,a^x\bmod
 N)$ for every $x$, which is precisely what the real circuit outputs, just
 without implementing the controlled-modular-multiplication circuitry
-itself. That circuitry is real, substantial engineering (a genuine
-"quantum arithmetic" subroutine), well beyond this course's educational
-scope, and explicitly not built here. What *is* built and directly
-verified is everything downstream: the QFT-based extraction from this
-state, which is the actual <Term id="phase-interference">interference</Term> mechanism the algorithm depends
-on.
+itself. That circuitry is substantial engineering, a quantum-arithmetic
+subroutine in its own right, beyond this course's scope and explicitly not
+built here. What *is* built and verified is everything downstream: the
+QFT-based extraction from this state, which is the <Term id="phase-interference">interference</Term> mechanism
+the algorithm turns on.
 
 <PeriodFindingSchematic
   t={4}
   ariaLabel="Schematic of the period-finding circuit's structure: Hadamards on four counting qubits, a staircase of controlled-U_a^(2^(t-1-k)) modular multiplications each reaching into a bundled target register, then a QFT box spanning the counting register"
 />
 
-*(Shown at reduced size — four counting qubits — for legibility; the
-worked examples below use $t=6$.)*
+*(Shown with four counting qubits for legibility; the worked examples below
+use $t=6$.)*
 
 This schematic shows the *shape* of that circuit, not a running one: each
 counting qubit $q$ starts with an $H$, then controls one
@@ -125,8 +120,8 @@ For $a=7$, $N=15$ (order $r=4$, from the last lesson) with $t=6$ counting
 qubits, `periodFindingMeasurementDistribution` gives probability exactly
 $0.25$ at outcomes $0,16,32,48$, precisely the multiples of
 $2^6/4=16$, and numerically zero everywhere else. Sampling every fourth
-outcome from the real distribution shows exactly this: four sharp peaks
-against a flat floor of genuine zeros, not a smoothly-decaying curve:
+outcome from the real distribution shows it: four sharp peaks against a
+flat floor of zeros, not a smoothly decaying curve.
 
 <PredictBeforeReveal
   question="For a=7, N=15 (order r=4), with t=6 counting qubits (so 2^t=64 possible outcomes), where should the measurement probability peak after applying the QFT?"
@@ -137,11 +132,12 @@ against a flat floor of genuine zeros, not a smoothly-decaying curve:
     { label: "A smooth spread across all 64 outcomes", value: "spread" },
   ]}
   correctValue="mult16"
-  explanation="A period-r function's QFT concentrates amplitude at multiples of 2^t/r. Here r=4 and 2^t=64, so 64/4=16: peaks land exactly at outcomes 0, 16, 32, 48, each with probability 1/r=0.25. That's precisely what the engine computes below, not approximately — four sharp peaks against a flat floor of genuine zeros everywhere else."
+  explanation="A period-r function's QFT concentrates amplitude at multiples of 2^t/r. Here r=4 and 2^t=64, so 64/4=16, and the peaks land at outcomes 0, 16, 32, 48, each with probability 1/r=0.25. That is what the engine computes below: four sharp peaks against a floor of exact zeros, not a smoothly decaying spread. Note that the peak spacing carries r, not the peak heights, which is why one measurement plus arithmetic suffices."
 />
 
 <BarChart
   bars={Array.from({ length: 16 }, (_, i) => ({ label: String(i * 4), value: periodDistribution[i * 4], highlight: periodDistribution[i * 4] > 0 }))}
+  maxValue={0.5}
   ariaLabel="Measurement probability at every fourth outcome of the period-finding distribution for a=7, N=15, t=6 counting qubits"
 />
 
@@ -166,11 +162,15 @@ reimplementing a standard classical number-theory routine.
 
 ## Physical Interpretation
 
-Nothing new physically happens here beyond what phase estimation already
-established. Modular exponentiation just supplies a *periodic* function
-instead of an arbitrary one, and periodicity is exactly the structure the
-QFT is built to expose as a small set of sharp peaks rather than a spread
-across every outcome.
+Nothing new happens physically beyond what phase estimation established.
+Modular exponentiation supplies a *periodic* function rather than an
+arbitrary one, and periodicity is the structure the QFT exposes as a small
+set of sharp peaks instead of a spread across every outcome.
+
+That is the whole reason factoring falls to a quantum computer and most
+problems do not. Factoring has a period hiding in it, and the QFT is a
+period detector. Take away the periodicity and the algorithm has nothing to
+grip.
 
 ## Worked Example
 

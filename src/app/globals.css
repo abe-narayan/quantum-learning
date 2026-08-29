@@ -88,6 +88,49 @@
      table rules, active panel outlines, focus containers. */
   --border-strong: #46536b;
 
+  /* ---------------------------------------------------------------------
+     The chart channel. `--border` is a *panel edge* — deliberately near
+     invisible (1.41:1 on `--surface-muted`), which is right for a hairline
+     around a card and wrong for the axis of a graph. Every figure on this
+     site had been drawing its axes with it.
+
+     `--axis` is for marks a reader must perceive to read the figure at all:
+     the axis lines themselves, tick marks, tick labels, reference/threshold
+     lines, and the outline of a plotted region.
+
+     It is aimed at the *text* bar, not the graphics bar: 4.85:1 on the
+     lightest panel depth (`--surface-raised`) rising to 6.03:1 on the
+     darkest, and 4.56–5.45:1 across the paper theme. SC 1.4.11 would only
+     ask 3:1, but the same token fills tick *labels*, and a tick label is
+     small text that owes 4.5:1 under SC 1.4.3 — an axis token tuned to the
+     graphics bar would have quietly downgraded every numeric label on the
+     site from `--muted-foreground`'s 6.78:1 to a failing 4.19:1. One token
+     that clears the stricter of the two bars is simpler than two tokens
+     nobody would reliably tell apart at a call site.
+
+     It stays a step quieter than `--muted-foreground` (7.36:1 dark) on
+     purpose: the frame of a figure should be legible without competing with
+     the data drawn inside it.
+
+     `--axis-grid` is for background gridlines *only* — the optional ruling a
+     reader may use but never has to. It sits deliberately below the 3:1 floor
+     so the data stays the loudest thing in the frame; a figure whose grid is
+     load-bearing should use `--axis` for it instead.
+
+     Panel frames, decorative rules and diagram chrome keep `--border`. The
+     distinction is "must this be seen to read the figure", not "is this
+     inside an SVG". */
+  --axis: #8592ac;
+  --axis-grid: #44526b;
+
+  /* The machined-face top highlight — the single light-catch line that makes
+     `.panel`, `.instrument` and the primary Button read as milled surfaces
+     rather than flat rectangles. One token so all three catch the *same*
+     light: a faint foreground mix over the dark ground, a white mix on paper
+     (where it disappears on white panels — highlights don't exist on paper —
+     but still bevels a filled control like the brand button). */
+  --panel-highlight: color-mix(in srgb, var(--foreground) 6%, transparent);
+
   --brand: #818cf8;
   --brand-foreground: #05070c;
   --accent: #34d8e8;
@@ -244,6 +287,12 @@
   --color-surface-raised: var(--surface-raised);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
+
+  /* Exposed as colors so figures can write `stroke-axis`, `fill-axis`,
+     `text-axis` and `stroke-axis-grid` rather than reaching for the panel-edge
+     token. See the chart-channel note in section 1. */
+  --color-axis: var(--axis);
+  --color-axis-grid: var(--axis-grid);
   --color-muted-foreground: var(--muted-foreground);
   --color-subtle-foreground: var(--subtle-foreground);
 
@@ -313,20 +362,34 @@
     --border: #d7dbe4;
     --border-strong: #b3bbca;
 
+    /* Chart channel on paper — see the note in section 1. Same job, inverted
+       direction: dark enough to read on white rather than light enough to read
+       on black. Must stay verbatim-identical to the explicit light block. */
+    --axis: #616a7b;
+    --axis-grid: #b9c0cd;
+
     --brand: #4f46e5;
     --brand-foreground: #ffffff;
     --accent: #0e7490;
     --accent-foreground: #ffffff;
 
-    --success: #15803d;
-    --warning: #b45309;
+    /* One step darker than the Tailwind ramp values they started as
+       (green-700/amber-700): those sat at 4.38–4.39:1 composited on their
+       own /10 badge wash (Badge.tsx, Feedback.tsx). These clear 4.9:1 on
+       the wash over every light ground and 5.8:1 on plain white. */
+    --success: #137437;
+    --warning: #a34a08;
     --danger: #b91c1c;
+
+    --panel-highlight: color-mix(in srgb, white 45%, transparent);
 
     /* Pillar ramp re-aimed for ink-on-paper: the accent is now a *dark*
        lightness (readable as text), the "strong" step is darker still, and
        wash/glow drop to a fraction of their dark-mode alpha — the same tint
-       that reads as atmospheric haze over black reads as a stain on paper. */
-    --pillar-l-accent: 0.52;
+       that reads as atmospheric haze over black reads as a stain on paper.
+       0.51, not 0.52 — same composited-ground rationale as the explicit
+       light block below; the two blocks must stay verbatim-identical. */
+    --pillar-l-accent: 0.51;
     --pillar-l-strong: 0.4;
     --pillar-l-dim: 0.72;
     --pillar-l-wash: 0.7;
@@ -358,12 +421,12 @@
     --tw-prose-lead: #525252;
     --tw-prose-links: #0d1017;
     --tw-prose-bold: #0d1017;
-    --tw-prose-counters: #737373;
+    --tw-prose-counters: #696969; /* not stock prose-neutral: #737373 is 3.97:1 on --surface-raised */
     --tw-prose-bullets: #d4d4d4;
     --tw-prose-hr: var(--border);
     --tw-prose-quotes: #171717;
     --tw-prose-quote-borders: var(--border);
-    --tw-prose-captions: #737373;
+    --tw-prose-captions: #696969; /* not stock prose-neutral: #737373 is 3.97:1 on --surface-raised */
     --tw-prose-kbd: #171717;
     --tw-prose-code: #171717;
     --tw-prose-pre-code: #e5e5e5;
@@ -394,14 +457,26 @@
   --border: #d7dbe4;
   --border-strong: #b3bbca;
 
+  /* Chart channel on paper — see the note in section 1. Same job, inverted
+     direction: dark enough to read on white rather than light enough to read
+     on black. Must stay verbatim-identical to the system-light block. */
+  --axis: #616a7b;
+  --axis-grid: #b9c0cd;
+
   --brand: #4f46e5;
   --brand-foreground: #ffffff;
   --accent: #0e7490;
   --accent-foreground: #ffffff;
 
-  --success: #15803d;
-  --warning: #b45309;
+  /* One step darker than the Tailwind ramp values they started as
+     (green-700/amber-700): those sat at 4.38–4.39:1 composited on their
+     own /10 badge wash (Badge.tsx, Feedback.tsx). These clear 4.9:1 on
+     the wash over every light ground and 5.8:1 on plain white. */
+  --success: #137437;
+  --warning: #a34a08;
   --danger: #b91c1c;
+
+  --panel-highlight: color-mix(in srgb, white 45%, transparent);
 
   /* 0.51 rather than 0.52: `--pillar-text` is `--pillar-accent`, and at 0.52
      the Mechanics hue fell to 4.42:1 against the composited light ground
@@ -434,12 +509,12 @@
   --tw-prose-lead: #525252;
   --tw-prose-links: #0d1017;
   --tw-prose-bold: #0d1017;
-  --tw-prose-counters: #737373;
+  --tw-prose-counters: #696969; /* not stock prose-neutral: #737373 is 3.97:1 on --surface-raised */
   --tw-prose-bullets: #d4d4d4;
   --tw-prose-hr: var(--border);
   --tw-prose-quotes: #171717;
   --tw-prose-quote-borders: var(--border);
-  --tw-prose-captions: #737373;
+  --tw-prose-captions: #696969; /* not stock prose-neutral: #737373 is 3.97:1 on --surface-raised */
   --tw-prose-kbd: #171717;
   --tw-prose-code: #171717;
   --tw-prose-pre-code: #e5e5e5;
@@ -482,9 +557,26 @@ body {
   scroll-behavior: smooth;
 }
 
-/* In-page anchors land under the sticky navbar without this. */
-[id] {
-  scroll-margin-top: 6rem;
+/* In-page anchors land under the sticky navbar without this.
+
+   Inside `@layer base` on purpose. Unlayered, this rule outranks *every*
+   Tailwind utility — those are emitted into `@layer utilities`, and unlayered
+   CSS beats any layer regardless of specificity — so it silently swallowed
+   every `scroll-mt-*` a page set for its own taller sticky chrome. `/glossary`
+   is the case that exposed it: it asks for `scroll-mt-40` above a sticky
+   filter bar, got 6rem, and landed every glossary deep link (every `<Term>`
+   gloss, the homepage's glossary link, every glossary hit in site search)
+   about 86px underneath that bar. Six other pages carry `scroll-mt-24`, which
+   is coincidentally the same 6rem — dead, but not visibly wrong, so nothing
+   flagged it.
+
+   This is the same layer trap the `.tech-label` note below documents for
+   colour: a rule that must be a *default* belongs in `base`, and only a rule
+   that must beat a utility belongs outside the layers. */
+@layer base {
+  [id] {
+    scroll-margin-top: 6rem;
+  }
 }
 
 /* ----------------------------------------------------------------------------
@@ -558,7 +650,7 @@ body {
   scrollbar-width: thin;
 
   /* Overflow indicator, pure CSS (the local/scroll background-attachment
-     technique). `rehypeScrollableMath` makes this box focusable so a keyboard
+     technique). `rehypeKatexHtml` makes this box focusable so a keyboard
      user *can* scroll it, but nothing told any reader there was more to see —
      a wide equation simply ended at the viewport edge, and truncated notation
      reads as a complete (wrong) statement rather than as a clipped one. That
@@ -811,9 +903,11 @@ h3[id$="-heading"] {
     border-radius: var(--radius-panel);
     background: var(--surface);
     /* The highlight is an inset box-shadow rather than a pseudo-element so it
-       survives `overflow: hidden` children (canvases, scroll regions). */
+       survives `overflow: hidden` children (canvases, scroll regions).
+       `--panel-highlight` is the shared machined-face token (section 1), so
+       panel, instrument and Button all catch the same light per theme. */
     box-shadow:
-      inset 0 1px 0 color-mix(in srgb, var(--foreground) 6%, transparent),
+      inset 0 1px 0 var(--panel-highlight),
       0 1px 2px rgb(0 0 0 / 0.25);
   }
 
@@ -835,7 +929,7 @@ h3[id$="-heading"] {
       linear-gradient(var(--pillar-wash), var(--pillar-wash)),
       var(--surface);
     box-shadow:
-      inset 0 1px 0 color-mix(in srgb, var(--foreground) 7%, transparent),
+      inset 0 1px 0 var(--panel-highlight),
       0 2px 12px rgb(0 0 0 / 0.22);
   }
 
@@ -857,6 +951,26 @@ h3[id$="-heading"] {
       linear-gradient(var(--pillar-edge), var(--pillar-edge)) 0 100% / 1px 14px no-repeat,
       linear-gradient(var(--pillar-edge), var(--pillar-edge)) 100% 100% / 14px 1px no-repeat,
       linear-gradient(var(--pillar-edge), var(--pillar-edge)) 100% 100% / 1px 14px no-repeat;
+  }
+
+  /* The text-input voice. One recipe for every search/filter field on the
+     site (LessonIndex, LessonSearch, GlossaryFilter, SearchOverlay) so an
+     input cannot quietly reinvent the soft SaaS pill the instrument language
+     avoids: tight radius, hairline border, surface fill, the quiet
+     placeholder voice. Sizing (width, padding, text scale) stays a utility
+     at the call site; focus comes from the global `:focus-visible` outline,
+     which text inputs match whenever focused. Call sites set in a frame of
+     their own (the search overlay header) override border/background with
+     utilities, which win by layer order. */
+  .input-instrument {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-tight);
+    background: var(--surface);
+    color: var(--foreground);
+  }
+
+  .input-instrument::placeholder {
+    color: var(--subtle-foreground);
   }
 
   /* A hairline that fades at both ends — used to separate full-bleed sections
@@ -881,6 +995,20 @@ h3[id$="-heading"] {
       linear-gradient(90deg, color-mix(in srgb, var(--border) 78%, transparent) 1px, transparent 1px);
     background-size: 44px 44px;
   }
+}
+
+/* Earned variation, not decoration (docs/DESIGN_SYSTEM.md): LessonLayout
+   stamps `data-difficulty` on the lesson root, and master-difficulty lessons
+   read one notch denser — tighter leading, paragraphs pulled a little closer
+   — so the page itself signals "reference instrument, not guided walk".
+   Unlayered on purpose: the typography plugin's `.prose` styles live in the
+   utilities layer, and only unlayered rules outrank them. Deliberately two
+   declarations and only for `master`; anything louder reads as a bug. */
+[data-difficulty="master"] .prose {
+  line-height: 1.65;
+}
+[data-difficulty="master"] .prose :where(p, ul, ol) {
+  margin-block: 1.1em;
 }
 
 /* ----------------------------------------------------------------------------
@@ -1057,14 +1185,19 @@ h3[id$="-heading"] {
     --surface-raised: #eceef2 !important;
     --border: #d7dae0 !important;
     --border-strong: #b6bcc7 !important;
+    /* Print draws on white at whatever the printer's ink density is, so the
+       chart channel goes a step darker than screen paper rather than matching
+       it — an axis that survives a grayscale laser printer. */
+    --axis: #4d5566 !important;
+    --axis-grid: #aeb5c2 !important;
     --muted-foreground: #3f4451 !important;
     --subtle-foreground: #4a5060 !important;
     --brand: #4f46e5 !important;
     --brand-foreground: #ffffff !important;
     --accent: #0e7490 !important;
     --accent-foreground: #ffffff !important;
-    --success: #15803d !important;
-    --warning: #b45309 !important;
+    --success: #137437 !important;
+    --warning: #a34a08 !important;
     --danger: #b91c1c !important;
     --pillar-l-accent: 0.5 !important;
     --pillar-l-strong: 0.38 !important;

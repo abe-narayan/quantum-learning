@@ -49,7 +49,7 @@ export const lessonMeta = {
   module: "the-quantum-singular-value-transformation",
   order: 3,
   difficulty: "master",
-  estimatedMinutes: 30,
+  estimatedMinutes: 70,
   prerequisites: ["apex/algorithmic-frontiers/quantum-signal-processing"],
   objectives: [
     "Explain how QSVT lifts single-qubit Quantum Signal Processing to act on the singular values of an arbitrary block-encoded matrix, by alternating the block-encoding unitary with projector-controlled phase rotations",
@@ -144,8 +144,8 @@ For any degree-$d$ real polynomial $P$ with parity $d\bmod2$ and
 $|P(x)|\leq1$ on $[-1,1]$ (plus a mild boundary condition), there exists a
 phase sequence $\Phi=(\varphi_0,\dots,\varphi_d)$ such that the alternating
 sequence above realizes $P$ as $U_\Phi(x)$'s top-left entry, for every
-$x\in[-1,1]$ simultaneously. Proved in the prerequisite lesson; used here
-without re-derivation.
+$x\in[-1,1]$ simultaneously. Stated (with machine-checked low-degree cases)
+in the prerequisite lesson; cited there, used here.
 
 </TheoremBox>
 
@@ -253,6 +253,22 @@ Wiebe, 2019 — see "Why This Matters" below.)
 
 </TheoremBox>
 
+The theorem's cost is worth pinning down before reading on, because the
+answer is the reason QSVT is a useful construction rather than a
+restatement of QSP.
+
+<PredictBeforeReveal
+  question="A degree-d QSVT sequence applies P to every singular value of A at once. If A has 2^n distinct singular values instead of 3, how many times does the circuit have to call the block encoding U?"
+  options={[
+    { label: "About 2^n times — once per singular value", value: "exponential" },
+    { label: "About n times — logarithmically many, one per qubit", value: "log" },
+    { label: "d times — unchanged, because the count depends only on the polynomial's degree", value: "degree" },
+    { label: "d × 2^n times — the polynomial has to be applied in each subspace separately", value: "product" },
+  ]}
+  correctValue="degree"
+  explanation="d times, regardless of how many singular values A has. Nothing in the alternating sequence U, Π_φ, U†, Π_φ, … references a particular σᵢ: one physical circuit acts linearly across every invariant subspace at once. The query cost is set by the degree the target polynomial needs for the accuracy you want, and by nothing about A's spectrum. That decoupling is the entire content of the theorem, and it is why the same construction is affordable for a 2^n-dimensional matrix and a 2-dimensional one."
+/>
+
 ## Physical Interpretation
 
 ### Special case 1: Grover's algorithm and amplitude amplification
@@ -301,6 +317,37 @@ no-fast-forwarding lower bound of $\Omega(t)$. That "$\log(1/\varepsilon)$
 instead of $\mathrm{poly}(1/\varepsilon)$" gap is the real, citable
 headline of Low & Chuang's QSP-based Hamiltonian simulation result:
 provably near-optimal query complexity, not merely "another method."
+
+<ResearchConnection
+  title="The optimality claim behind special case 2"
+  source="Low & Chuang, Phys. Rev. Lett. 118, 010501 (2017) (arXiv:1606.02685); Low & Chuang, Quantum 3, 163 (2019) (arXiv:1610.06546)"
+  url="https://arxiv.org/abs/1610.06546"
+>
+  The first paper proves the query complexity quoted above; the second,
+  "Hamiltonian simulation by qubitization," is the one that makes the
+  block-encoding connection explicit and is the direct ancestor of the
+  QSVT theorem stated here. Read the qubitization paper for the
+  invariant-subspace argument in its original form: the two-dimensional
+  "rooms" this lesson draws are its Lemma, and seeing it stated for a
+  Hermitian $H$ before the general singular-value case makes the
+  generalization read as the small step it is.
+</ResearchConnection>
+
+<Callout type="warning">
+**The asymptotic optimality is a query bound, and queries are not the
+only cost.** Three things sit outside it. The block encoding of $H$ has
+to be built, and its own gate cost multiplies every one of the $d$
+queries. The subnormalization factor an LCU-style encoding introduces
+(the $\|\alpha\|_1$ of the block-encoding lesson) rescales $H$, so the
+effective $t\lVert H\rVert$ in the bound is $t\lVert\alpha\rVert_1$, not
+$t$ times the spectral norm anyone quotes for the physical Hamiltonian.
+And the phase sequence $\Phi$ has to be computed classically at the
+degree the target accuracy demands, which at degrees in the thousands is
+a numerically delicate calculation in its own right (see the
+prerequisite lesson's honest accounting of it). "Optimal query
+complexity" is a true and useful statement about one of these three
+costs.
+</Callout>
 
 ### Special case 3: linear systems (a preview)
 
@@ -403,13 +450,13 @@ directly. Each row below is one invariant subspace $\mathcal H_i$, running
 its own private copy of the identical phase sequence; the polynomial
 values shown match the worked example's table exactly.
 
-<div role="img" aria-label="Three independent two-dimensional subspaces, one per singular value 0.2, 0.6, and 0.9, each showing the same alternating sequence of the block-encoding unitary U and projector-controlled phase rotations acting entirely within that subspace, converging to P evaluated at that subspace's own singular value" className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div role="img" aria-label="Three independent two-dimensional subspaces, one per singular value 0.2, 0.6, and 0.9, each showing the same alternating sequence of the block-encoding unitary U and projector-controlled phase rotations acting entirely within that subspace, converging to P evaluated at that subspace's own singular value" className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
 <svg viewBox="0 0 640 320" width="640" className="w-full">
   <g>
     <rect x="4" y="8" width="628" height="80" rx="10" fill="none" className="stroke-border" strokeWidth="1.5" strokeDasharray="5 4" />
     <text x="16" y="26" className="fill-muted-foreground text-[10px] font-mono">H_1 (invariant subspace for sigma_1 = {qsvtDemoResults[0].sigma})</text>
     <rect x="12" y="44" width="112" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
-    <text x="68" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0&gt;|v_1&gt;</text>
+    <text x="68" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0⟩|v_1⟩</text>
     <text x="134" y="65" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
     <rect x="146" y="44" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
     <text x="169" y="65" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U</text>
@@ -431,7 +478,7 @@ values shown match the worked example's table exactly.
     <rect x="4" y="98" width="628" height="80" rx="10" fill="none" className="stroke-border" strokeWidth="1.5" strokeDasharray="5 4" />
     <text x="16" y="116" className="fill-muted-foreground text-[10px] font-mono">H_2 (invariant subspace for sigma_2 = {qsvtDemoResults[1].sigma})</text>
     <rect x="12" y="134" width="112" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
-    <text x="68" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0&gt;|v_2&gt;</text>
+    <text x="68" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0⟩|v_2⟩</text>
     <text x="134" y="155" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
     <rect x="146" y="134" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
     <text x="169" y="155" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U</text>
@@ -453,7 +500,7 @@ values shown match the worked example's table exactly.
     <rect x="4" y="188" width="628" height="80" rx="10" fill="none" className="stroke-border" strokeWidth="1.5" strokeDasharray="5 4" />
     <text x="16" y="206" className="fill-muted-foreground text-[10px] font-mono">H_3 (invariant subspace for sigma_3 = {qsvtDemoResults[2].sigma})</text>
     <rect x="12" y="224" width="112" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
-    <text x="68" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0&gt;|v_3&gt;</text>
+    <text x="68" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">|0⟩|v_3⟩</text>
     <text x="134" y="245" textAnchor="middle" className="fill-muted-foreground text-[13px]">&#8594;</text>
     <rect x="146" y="224" width="46" height="34" rx="6" className="fill-surface stroke-border" strokeWidth="1.25" />
     <text x="169" y="245" textAnchor="middle" className="fill-foreground text-[10px] font-mono">U</text>
@@ -471,7 +518,7 @@ values shown match the worked example's table exactly.
     <rect x="458" y="224" width="168" height="34" rx="6" className="fill-accent/10 stroke-accent" strokeWidth="1.5" />
     <text x="542" y="245" textAnchor="middle" className="fill-accent text-[10px] font-mono">P(sigma_3) &#8776; {qsvtDemoResults[2].approx.toFixed(3)}</text>
   </g>
-  <text x="320" y="298" textAnchor="middle" className="fill-foreground text-[11px] font-mono">P(A) = sum_i P(sigma_i) |u_i&gt;&lt;v_i|  (one polynomial, every subspace, at once)</text>
+  <text x="320" y="298" textAnchor="middle" className="fill-foreground text-[11px] font-mono">P(A) = sum_i P(sigma_i) |u_i⟩⟨v_i|  (one polynomial, every subspace, at once)</text>
 </svg>
 </div>
 

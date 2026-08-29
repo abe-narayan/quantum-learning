@@ -26,6 +26,11 @@ export const phaseOf1PlusI: NumericProblem = {
     value: phase,
     tolerance: 0.02,
     incorrectFeedback: "Plot 1 + i in the complex plane: it sits on the line at 45° from the positive real axis. Convert that angle to radians.",
+    nearMisses: [
+      { value: 45, tolerance: 0.5, feedback: "45 is the angle in degrees. The question asks for radians, so multiply by π/180." },
+      { value: Math.SQRT2, tolerance: 0.02, feedback: "√2 is the modulus, the other half of the polar form. The phase is the angle, not the length." },
+      { value: 1, feedback: "1 is the ratio b/a. The phase is the arctangent of that ratio, not the ratio itself." },
+    ],
   },
   hints: [
     { text: "The phase is θ = atan2(imaginary part, real part), the angle the point makes with the positive real axis." },

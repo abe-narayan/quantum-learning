@@ -27,12 +27,16 @@ export const yEqualsIxzVerification: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "First compute XZ's (0,1) entry, then multiply by i.",
+    incorrectFeedback: "Compute XZ's (0,1) entry first, then multiply by i. A positive answer means Z's minus sign went missing; an answer of zero means the factor of i was dropped or the wrong entry was read.",
+    nearMisses: [
+      { value: 1, feedback: "The sign is off. Z's (1,1) entry is −1, and that minus survives into (XZ)₀₁ = −1, so the imaginary part of i(−1) is −1." },
+      { value: 0, feedback: "A zero imaginary part would mean the entry is real. Multiplying the real number (XZ)₀₁ by i makes it purely imaginary; read off its coefficient." },
+    ],
   },
   hints: [
     { text: "XZ's (0,1) entry is X's row 0 dotted with Z's column 1." },
-    { text: "X row 0 = (0,1), Z column 1 = (0,-1)." },
-    { text: "(0)(0)+(1)(-1) = -1, then multiply by i to get -i." },
+    { text: "Write out X's top row and Z's rightmost column: each has a single nonzero entry, and Z's carries a minus sign." },
+    { text: "Sum the products of the dot product, then multiply the result by i. The question asks for the imaginary part of what you get." },
   ],
   solution: {
     steps: [

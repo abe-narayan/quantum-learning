@@ -78,8 +78,12 @@ export function ApexSection() {
               The curriculum ends here. For now.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
+              {/* Deliberately "Browse", not "Start": /learn is an index, and
+                  labeling a link to an index "start" is the mismatch the
+                  hero and navbar's shared "Start learning" contract
+                  (START_LEARNING_HREF) exists to avoid. */}
               <Button href="/learn" size="lg">
-                Start at the beginning
+                Browse the curriculum
               </Button>
               <Button href={visual.route} size="lg" variant="secondary">
                 See the summit

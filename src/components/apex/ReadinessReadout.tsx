@@ -117,7 +117,7 @@ export function ReadinessReadout({
                   // at 320px instead of pushing the row into a horizontal
                   // scroll.
                   "inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border px-3.5 py-2 text-sm leading-tight",
-                  "transition-colors duration-[--dur-fast] ease-[--ease-mech]",
+                  "transition-colors duration-(--dur-fast) ease-mech",
                   status === "done"
                     ? "border-pillar-edge bg-pillar-wash text-pillar-text"
                     : "border-border-strong text-foreground/90 hover:border-pillar-edge hover:text-pillar-text focus-visible:border-pillar-edge focus-visible:text-pillar-text"
@@ -164,7 +164,7 @@ export function ReadinessReadout({
             )}
             <Link
               href={startHere.href}
-              className="text-foreground underline decoration-border-strong underline-offset-2 transition-colors duration-[--dur-fast] ease-[--ease-mech] hover:text-pillar-text hover:decoration-pillar-edge focus-visible:text-pillar-text"
+              className="text-foreground underline decoration-border-strong underline-offset-2 transition-colors duration-(--dur-fast) ease-mech hover:text-pillar-text hover:decoration-pillar-edge focus-visible:text-pillar-text"
             >
               {startHere.title}
             </Link>

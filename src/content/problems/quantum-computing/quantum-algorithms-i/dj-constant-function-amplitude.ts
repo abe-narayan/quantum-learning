@@ -39,20 +39,24 @@ export const djConstantFunctionAmplitude: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.005,
-    incorrectFeedback: "For any constant function, every term in the sum (1/2ⁿ)Σₓ(−1)^f(x) has the same sign.",
+    incorrectFeedback: "For a constant function, every term in the final interference sum carries the same sign, so nothing cancels. If you answered a half, you may be picturing a single-qubit superposition rather than the fully constructive interference happening here.",
+    nearMisses: [
+      { value: 0, feedback: "Zero is the balanced-function answer: there the ±1 terms cancel in pairs. A constant function makes every term agree in sign, so they add rather than cancel." },
+      { value: 1 / 8, tolerance: 0.005, feedback: "1/8 is 2⁻ⁿ, the probability of |000⟩ in the uniform superposition before the oracle and the final Hadamards. The interference is what concentrates all of it on one string." },
+    ],
   },
   hints: [
-    { text: "f is constant, so (−1)^f(x) is the same for every x." },
-    { text: "The sum (1/8)Σₓ(−1)^f(x) becomes (1/8)(±8) = ±1." },
-    { text: "Probability is the squared amplitude." },
+    { text: "Ask what the oracle does when f is constant: it applies one overall sign to the whole superposition, the same for every input x." },
+    { text: "The amplitude on the all-zeros string is the normalized sum 2⁻ⁿ Σₓ(-1)^f(x). With f constant, every term in that sum carries the same sign." },
+    { text: "All 2ⁿ terms add coherently, so the amplitude reaches the largest magnitude it possibly can. Square it to get the probability." },
   ],
   solution: {
     steps: [{ description: "For constant f, the amplitude on |000⟩ is exactly ±1, so P(|000⟩)=1." }],
     finalAnswer: "P = 1.0",
   },
   explanation: {
-    correctIdea: "Every constant function gives certainty of measuring the all-zero string — the defining signature Deutsch-Jozsa checks for.",
-    whyCorrect: "This holds for any n, not just n=3 — verified directly against the engine's actual circuit execution.",
-    whyWrong: ["Answering 0.5 would describe neither the constant nor balanced case correctly — both give a definite (0 or 1) probability, never something in between."],
+    correctIdea: "Every constant function gives certainty of measuring the all-zero string, the defining signature Deutsch-Jozsa checks for.",
+    whyCorrect: "This holds for any n, not just n=3, verified directly against the engine's actual circuit execution.",
+    whyWrong: ["Answering 0.5 would describe neither the constant nor balanced case correctly: both give a definite (0 or 1) probability, never something in between."],
   },
 };

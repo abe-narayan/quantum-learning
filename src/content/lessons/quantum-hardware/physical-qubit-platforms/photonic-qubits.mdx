@@ -18,7 +18,7 @@ export const lessonMeta = {
   module: "photonic-qubits",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 18,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/physical-qubit-platforms/neutral-atoms"],
   objectives: [
     "Explain how a qubit can be encoded in a photon's polarization or spatial path",
@@ -76,7 +76,7 @@ qubit in superposition, directly realizing the same math this platform's
 `the-bloch-sphere` and interferometer-based lessons already built,
 now with an actual physical interferometer.
 
-<InteractiveSection title="The same qubit math, a different physical carrier" description="This is the exact same Bloch sphere from the-bloch-sphere lesson — nothing about the underlying math changes when the qubit is a photon's polarization or path instead of a trapped ion's spin or a superconducting circuit's charge. Apply a gate and measure; whatever state you land on is exactly as valid a photonic-qubit state as it was for every other platform.">
+<InteractiveSection title="The same qubit math, a different physical carrier" description="This is the same Bloch sphere from the-bloch-sphere lesson — nothing about the underlying math changes when the qubit is a photon's polarization or path instead of a trapped ion's spin or a superconducting circuit's charge. Apply a gate and measure; whatever state you land on is as valid a photonic-qubit state as it was for every other platform.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -85,7 +85,7 @@ now with an actual physical interferometer.
 Every other platform in this course needs serious cooling: millikelvin
 temperatures for a superconducting circuit, ultra-high vacuum and laser
 cooling for a trapped ion or neutral atom, cryostat-adjacent electronics
-for a <Term id="spin-qubits">quantum dot</Term>. A photon needs none of that. The waveguides, beam
+for a <Term id="quantum-dot">quantum dot</Term>. A photon needs none of that. The waveguides, beam
 splitters, and modulators that create and steer it run at room
 temperature, because the photon isn't sitting in a noisy thermal
 environment the way a solid-state qubit is; it's just moving through
@@ -184,8 +184,27 @@ through well-isolated fiber largely doesn't interact with anything along
 its path; there's no "bath" continuously nudging it the way a solid-state
 qubit sits embedded in a noisy physical device. The dominant failure mode
 instead is binary: the photon survives to be detected, or it's lost
-(absorbed, scattered) along the way, a fundamentally different
-statistical structure than gradual dephasing.
+(absorbed, scattered) along the way — a different statistical structure
+from gradual dephasing.
+
+**How much of a single-photon signal survives 50 km of telecom fiber?**
+
+Good telecom fiber at its low-loss wavelength attenuates about
+0.2 dB/km. Over 50 km, the total loss is:
+
+$$
+50\text{ km}\times0.2\text{ dB/km}=10\text{ dB}
+\implies P_{\text{survive}}=10^{-10/10}=0.10
+$$
+
+Only 10% of photons arrive at all; the other 90% are simply gone, each
+one lost at a single random point along the way. Note what the loss
+budget depends on: *distance traveled*, not time elapsed. A matter
+qubit's $T_1$ clock runs whether or not the qubit goes anywhere, so
+its error grows with how long the computation takes; a photon's
+dominant error grows with how far it has to fly. That inversion is why
+photons excel at links (where distance is the job) and matter qubits
+excel at storage (where time is).
 
 ## Common Mistakes
 
@@ -199,8 +218,8 @@ $T_1$/$T_2$ decay.
 <Callout type="warning">
 **Assuming photonic two-qubit gates work the same way as matter-qubit
 gates, just with light instead.** The lack of a natural photon-photon
-interaction is a fundamentally different (and harder) engineering
-problem than anything the other platforms in this course face.
+interaction is a different, and harder, engineering problem than
+anything the other platforms in this course face.
 </Callout>
 
 ## Practice Questions

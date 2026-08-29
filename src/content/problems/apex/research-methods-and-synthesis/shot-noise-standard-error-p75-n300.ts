@@ -23,10 +23,27 @@ export const shotNoiseStandardErrorP75N300: NumericProblem = {
     value: 0.025,
     tolerance: 0.001,
     incorrectFeedback:
-      "SE = sqrt(p(1-p)/N) = sqrt(0.75 * 0.25 / 300) = sqrt(0.1875 / 300) = sqrt(0.000625) = 0.025.",
+      "SE = sqrt(p(1-p)/N). If your answer is near 0.43, you forgot to divide by N and computed the single-trial standard deviation instead. Compute p(1-p) first, divide by the shot count, then take the square root.",
+    nearMisses: [
+      {
+        value: Math.sqrt(0.75 * 0.25),
+        feedback:
+          "That is the single-trial standard deviation, sqrt(p(1-p)). You forgot to divide by N before taking the square root, so the shot count never got a chance to shrink the uncertainty.",
+      },
+      {
+        value: (0.75 * 0.25) / 300,
+        tolerance: 0.00005,
+        feedback: "That is the variance of the estimator, p(1-p)/N. A standard error is a standard deviation, so take its square root.",
+      },
+      {
+        value: Math.sqrt((0.75 * 0.25) / Math.sqrt(300)),
+        tolerance: 0.002,
+        feedback: "N enters inside the square root as a plain divisor, not as sqrt(N). The familiar 1/sqrt(N) shrinkage is what comes out after the root is taken.",
+      },
+    ],
   },
   hints: [
-    { text: "This is exactly the formula this lesson derived: SE(p̂) = sqrt(p(1-p)/N), the standard deviation of the sample-proportion ESTIMATOR itself, not of a single trial." },
+    { text: "This is the formula this lesson derived: SE(p̂) = sqrt(p(1-p)/N), the standard deviation of the sample-proportion estimator itself, not of a single trial." },
     { text: "Compute p(1-p) first: 0.75 × 0.25 = 0.1875." },
     { text: "Divide by N=300, then take the square root: sqrt(0.1875 / 300) = sqrt(0.000625)." },
   ],
@@ -44,8 +61,8 @@ export const shotNoiseStandardErrorP75N300: NumericProblem = {
     whyCorrect:
       "k successes out of N independent trials is binomially distributed with variance Np(1-p); dividing by the constant N to form p̂ = k/N scales the variance by 1/N², giving Var(p̂) = p(1-p)/N and hence SE(p̂) = sqrt(p(1-p)/N).",
     whyWrong: [
-      "Forgetting to divide by N before taking the square root gives the SINGLE-TRIAL standard deviation, sqrt(p(1-p)) ≈ 0.433, dramatically overstating the uncertainty in the average of 300 trials.",
-      "Using sqrt(p(1-p)) × N or sqrt(N) alone confuses the shot count's role in REDUCING uncertainty (it divides variance, inside the square root) with scaling it up.",
+      "Forgetting to divide by N before taking the square root gives the single-trial standard deviation, sqrt(p(1-p)) ≈ 0.433, dramatically overstating the uncertainty in the average of 300 trials.",
+      "Using sqrt(p(1-p)) × N or sqrt(N) alone confuses the shot count's role in reducing uncertainty (it divides variance, inside the square root) with scaling it up.",
     ],
   },
 };

@@ -27,6 +27,26 @@ type CalloutType = "note" | "warning" | "mistake";
  * imbalance above.
  */
 
+// ## Why a `<div>` and not an `<aside>`
+//
+// A callout is parenthetic content, which is `<aside>`'s definition, so this
+// looks like a plain semantics bug. It is examined and deliberately kept.
+// `<aside>` maps to the `complementary` **landmark** role, and it only
+// escapes that mapping when scoped inside sectioning content (`article`,
+// `section`, `nav`, `aside`) — the lesson prose container is a `<div>`
+// (LessonLayout's `#lesson-prose`), so every one of these would become a
+// page-level landmark. At 486 uses across 219 lessons that is routinely five
+// or more `complementary` landmarks per lesson, which does not make callouts
+// easier to find; it buries `main`, `navigation` and `contentinfo` in the
+// landmark rotor and makes the one navigation aid a screen-reader user has
+// for the *page* useless. Landmarks are a small, high-value set by design.
+//
+// The boundary a reader actually needs is already present and better: the
+// severity label ("Note" / "Careful" / "Common mistake") is real text in its
+// own paragraph, read out in document order, naming the kind of thing this
+// is. `role="note"` was considered as a non-landmark middle ground and
+// rejected as adding nothing that label does not already say out loud.
+//
 // Weight escalates with severity: `note` carries a hairline border and a
 // pillar-neutral accent bar; `warning`/`mistake` step up to a full,
 // semantic-colored border so severity reads even before the label is read.
@@ -105,7 +125,7 @@ export function Callout({
     <div
       data-callout={type}
       className={cn(
-        "not-prose my-6 rounded-[var(--radius-panel)] border bg-surface p-4 text-sm sm:p-5",
+        "not-prose my-6 rounded-panel border bg-surface p-4 text-sm sm:p-5",
         BORDER_STYLES[type]
       )}
     >

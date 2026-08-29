@@ -21,7 +21,7 @@ export const lessonMeta = {
     "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation",
   ],
   objectives: [
-    "Derive the position-space Schrodinger equation from the abstract time-evolution postulate and the explicit p-hat operator",
+    "Derive the position-space Schrödinger equation from the abstract time-evolution postulate and the explicit p-hat operator",
     "Identify the kinetic and potential energy terms in the resulting Hamiltonian",
     "Explain, at a physical level, how the Wavefunction Explorer numerically integrates this equation forward in time",
   ],
@@ -33,8 +33,11 @@ The last course derived iħ d|ψ⟩/dt = H|ψ⟩ from requiring the evolution ge
 
 ## Motivation
 
-That substitution shows the <Term id="schrodinger-equation">Schrödinger equation</Term> is a special
-case of what's already been proven, not a new postulate.
+Substituting $H=\hat p^2/2m+V(\hat x)$ into the abstract evolution
+equation shows the <Term id="schrodinger-equation">Schrödinger equation</Term> is a special
+case of what's already been proven, not a new postulate. One
+substitution, and the most famous equation in quantum mechanics falls
+out of results this course already owns.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Portrait_of_Erwin_Schr%C3%B6dinger_%281887-1961%29%2C_Physicist_%282551920224%29.jpg"
@@ -73,9 +76,9 @@ with the overall minus to leave $-\hbar^2$).
 ### Substituting into the abstract equation
 
 Take $i\hbar\,d|\psi\rangle/dt = \hat H|\psi\rangle$ from the last course
-and apply $\langle x|\cdot\rangle$ to both sides (i.e., work in the
-position representation, exactly as every quantity in this course has
-been). The left side becomes $i\hbar\,\partial\psi(x,t)/\partial t$;
+and apply $\langle x|\cdot\rangle$ to both sides, working in the position
+representation as every quantity in this course has been.
+The left side becomes $i\hbar\,\partial\psi(x,t)/\partial t$;
 the right side, using the explicit $\hat H$ above, becomes
 $-\frac{\hbar^2}{2m}\partial^2\psi/\partial x^2+V(x)\psi(x,t)$. Together:
 
@@ -99,8 +102,8 @@ $$
 -\frac{\hbar^2}{2m}\psi_n''(x) + V(x)\psi_n(x) = E_n\,\psi_n(x)
 $$
 
-(an <Term id="eigenvalue-eigenvector">eigenvalue</Term> equation for the differential operator $\hat H$, exactly
-analogous to $H|\psi\rangle=E|\psi\rangle$ for a matrix), then
+(an <Term id="eigenvalue-eigenvector">eigenvalue</Term> equation for the differential operator $\hat H$, the
+same shape as $H|\psi\rangle=E|\psi\rangle$ for a matrix), then
 $\psi(x,t)=e^{-iE_nt/\hbar}\psi_n(x)$ solves the full time-dependent
 equation, and $|\psi(x,t)|^2=|\psi_n(x)|^2$ for all $t$: the numerically
 verified stationarity the Infinite Square Well and Harmonic Oscillator
@@ -110,23 +113,24 @@ lessons build on directly.
 
 The kinetic term $-\frac{\hbar^2}{2m}\psi''$ measures curvature: a
 sharply-curving <Term id="wavefunction">wavefunction</Term> (large $|\psi''|$) carries large kinetic
-energy, exactly matching the earlier lesson's observation that a tightly
-localized wavefunction has broad, high-momentum Fourier content. The
-potential term simply weights each position by its local potential
-energy, position-space's most literal ingredient.
+energy, which is the earlier lesson's observation that a tightly localized
+wavefunction has broad, high-momentum Fourier content, restated as a
+property of the equation. The potential term is the plainest thing on the
+page: it weights each position by the potential energy a classical
+particle would have there.
 
 <PredictBeforeReveal
-  question="The infinite-well ground state is an energy eigenstate. If the Wavefunction Explorer is honestly integrating the Schrodinger equation above forward in time step by step, what should its live <H> readout do while the preset plays?"
+  question="The infinite-well ground state is an energy eigenstate. If the Wavefunction Explorer is honestly integrating the Schrödinger equation above forward in time step by step, what should its live <H> readout do while the preset plays?"
   options={[
     { label: "Stay essentially fixed at the analytical E_1", value: "fixed" },
     { label: "Oscillate at a beat frequency", value: "oscillate" },
     { label: "Drift steadily upward as the simulation runs", value: "drift" },
   ]}
   correctValue="fixed"
-  explanation="Energy is conserved for a stationary state, so <H> should sit essentially flat at the analytical E_1 for as long as the preset runs. A beat frequency would mean a superposition of two energies (a later lesson's territory), and steady drift would mean the numerical integrator itself is leaking energy it shouldn't -- exactly the failure mode the readout below is built to expose."
+  explanation="Energy is conserved for a stationary state, so <H> should sit essentially flat at the analytical E_1 for as long as the preset runs. A beat frequency would mean a superposition of two energies (a later lesson's territory), and steady drift would mean the numerical integrator itself is leaking energy it should not, which is the failure mode the readout below is built to expose."
 />
 
-<InteractiveSection title="Confirm the solver is honest" description="Every preset in the Wavefunction Explorer numerically solves this exact equation forward in time -- an actual finite-timestep integration, not a canned animation (the next lessons build the specific potentials and the specific numerical method). Play any preset and watch the live ⟨H⟩ readout against the prediction above: for an eigenstate preset it should stay essentially fixed at the analytical E_n, a direct, numerical confirmation that the simulator is solving this equation correctly and not merely animating a plausible-looking picture.">
+<InteractiveSection title="Confirm the solver is honest" description="Every preset in the Wavefunction Explorer solves the equation above forward in time by finite-timestep integration, rather than replaying a canned animation (the next lessons build the specific potentials and the numerical method). Play any preset and watch the live ⟨H⟩ readout against the prediction above: for an eigenstate preset it should stay essentially fixed at the analytical E_n, which is a numerical confirmation that the simulator is solving this equation and not merely drawing a plausible-looking picture.">
   <LazyWavefunctionExplorer initialPresetId="infinite-well-ground" />
 </InteractiveSection>
 
@@ -144,8 +148,8 @@ $$
 \hat H\psi = e^{-iEt/\hbar}\,\hat H\psi_0(x) = e^{-iEt/\hbar}\,E\,\psi_0(x)
 $$
 
-(using the time-independent equation on $\psi_0$ in the last step). The
-two sides match exactly, confirming the ansatz.
+(using the time-independent equation on $\psi_0$ in the last step). Both
+sides come out to $E\,e^{-iEt/\hbar}\psi_0(x)$, so the ansatz holds.
 
 ## Common Mistakes
 

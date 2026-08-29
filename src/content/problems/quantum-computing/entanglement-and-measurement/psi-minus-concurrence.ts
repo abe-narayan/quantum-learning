@@ -27,19 +27,23 @@ export const psiMinusConcurrence: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Here a=d=0, b=1/√2, c=-1/√2 — compute ad-bc carefully, including the sign on c.",
+    incorrectFeedback: "The usual slip is the sign: c carries a minus sign, so the product bc is negative and ad-bc comes out positive. If you got zero, you probably dropped that sign, and a Bell state is certainly not a product state.",
+    nearMisses: [
+      { value: 0, feedback: "Zero concurrence means a product state. You dropped the minus sign on c: bc = −0.5, so ad − bc = +0.5, not 0." },
+      { value: 0.5, feedback: "0.5 is |ad−bc|. The definition doubles it: C = 2|ad−bc|." },
+    ],
   },
   hints: [
-    { text: "a=0, d=0, b=1/√2, c=-1/√2." },
-    { text: "ad-bc = 0 - (1/√2)(-1/√2) = 0.5." },
-    { text: "C = 2|ad-bc|." },
+    { text: "Read the four amplitudes a, b, c, d off the state in standard basis order. Two of them vanish, and the two that survive carry opposite signs." },
+    { text: "With a and d both zero, ad-bc reduces to -bc. Multiply the two surviving amplitudes, minding the minus sign on c." },
+    { text: "Double the absolute value of what you found. As a check, the result should sit at the very top of the concurrence scale, where every Bell state lives." },
   ],
   solution: {
     steps: [
       { description: "$ad-bc = 0 - \\left(\\tfrac1{\\sqrt2}\\right)\\left(-\\tfrac1{\\sqrt2}\\right) = 0.5$." },
       { description: "$C = 2\\times0.5 = 1$." },
     ],
-    finalAnswer: "C = 1 — |Ψ−⟩ is maximally entangled, like all four Bell states.",
+    finalAnswer: "C = 1: |Ψ−⟩ is maximally entangled, like all four Bell states.",
   },
   explanation: {
     correctIdea: "Every Bell state reaches the maximum concurrence of 1, regardless of which specific relative sign or basis pair it uses.",

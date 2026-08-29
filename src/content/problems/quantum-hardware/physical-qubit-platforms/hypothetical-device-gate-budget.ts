@@ -26,11 +26,15 @@ export const hypotheticalDeviceGateBudget: NumericProblem = {
     value,
     tolerance: 100,
     incorrectFeedback: "Convert both to the same units (e.g. nanoseconds) and divide.",
+    nearMisses: [
+      { value: 10, tolerance: 0.5, feedback: "10 is the ratio of the two bare numbers, 500 and 50, with the unit prefixes ignored. Microseconds and nanoseconds differ by a factor of a thousand." },
+      { value: 100000, tolerance: 100, feedback: "100,000 is the trapped-ion budget from the earlier lesson. This device is an order of magnitude short of it, which is the comparison the capstone wants." },
+    ],
   },
   hints: [
-    { text: "500μs = 500,000 ns." },
-    { text: "500,000 ns ÷ 50 ns." },
-    { text: "= 10,000." },
+    { text: "The two times are quoted in different units, so convert before dividing. Nanoseconds are the convenient common unit here." },
+    { text: "500 μs = 500,000 ns; the gate time is already in nanoseconds." },
+    { text: "Divide the coherence time by the gate time. Sanity check the comparison the capstone is after: the result should still fall short of trapped ions' 100,000-gate budget." },
   ],
   solution: {
     steps: [{ description: "500,000 ns / 50 ns = 10,000." }],

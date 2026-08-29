@@ -22,6 +22,10 @@ export const topHatNormalizationConstant: NumericProblem = {
     value: 0.353553,
     tolerance: 0.001,
     incorrectFeedback: "Normalization requires the integral of |A|^2 over the interval to equal 1: |A|^2 * L = 1, so A = 1/sqrt(L).",
+    nearMisses: [
+      { value: 0.125, feedback: "0.125 is 1/L. Normalization constrains |A|², so A picks up a square root: A = 1/√L." },
+      { value: 8, feedback: "8 is the interval length. A shrinks as the interval grows, since the same total probability spreads further." },
+    ],
   },
   hints: [
     { text: "Normalization requires integral of |psi(x)|^2 dx = 1 over the region where psi is nonzero." },

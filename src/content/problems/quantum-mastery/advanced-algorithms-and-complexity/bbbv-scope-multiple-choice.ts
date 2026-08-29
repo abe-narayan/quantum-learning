@@ -43,11 +43,15 @@ export const bbbvScopeMultipleChoice: MultipleChoiceProblem = {
       { description: "This matches Grover's O(√N) upper bound, proving query-optimality for unstructured search specifically." },
       { description: "It says nothing about structured problems, where the function isn't a black box and other algorithmic techniques may apply." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "It proves Θ(√N) optimality for unstructured black-box search, and says nothing about structured NP-complete problems.",
   },
   explanation: {
     correctIdea: "BBBV is a rigorous, but scope-limited, theorem: optimal for black-box search, silent on structured problems.",
     whyCorrect: "This is exactly the distinction the lesson derives and explicitly contrasts with Shor's algorithm, which succeeds precisely because it exploits structure the oracle model hides by construction.",
-    whyWrong: ["Options b, c, and d each either overreach the bound's scope or understate its rigor."],
+    whyWrong: [
+      { optionId: "b", text: "Overreaches the bound's scope. Concrete NP-complete instances are structured, not black boxes, so the bound doesn't transfer and NP ⊆ BQP stays open." },
+      { optionId: "c", text: "Understates the bound's rigor. This is a matching lower bound, not a 'best known so far' observation." },
+      { optionId: "d", text: "Narrows the bound to one circuit. The hybrid-method proof bounds every possible quantum algorithm's query count." },
+    ],
   },
 };

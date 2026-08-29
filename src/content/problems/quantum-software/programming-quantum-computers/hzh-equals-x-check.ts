@@ -27,20 +27,27 @@ export const hzhEqualsXCheck: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "H, Z, H composed together equal the X gate exactly (a standard gate identity) — what does X do to |0⟩?",
+    incorrectFeedback: "If you answered 0.5, you probably reasoned from the first H alone; the second H undoes that basis change. If you answered 0, you may be thinking of the HH = I identity instead. Reduce the three gates to a single equivalent gate first, then apply it to |0⟩.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is where the first H leaves the state. The Z and the second H are what turn that superposition back into a definite outcome." },
+      { value: 0, feedback: "0 is the HH = I result, with no Z in between. Inserting Z between the two Hadamards makes the circuit an X gate instead." },
+    ],
   },
   hints: [
-    { text: "HZH is a known identity, equal to the X gate." },
-    { text: "X flips |0⟩ to |1⟩ exactly." },
-    { text: "So P(measuring |1⟩) should be exactly 1." },
+    { text: "Three gates in sequence. Rather than multiplying matrices entry by entry, ask whether this particular sandwich of gates is one of the standard conjugation identities." },
+    { text: "Conjugating Z by H changes basis: HZH = X. The whole circuit therefore acts on |0⟩ as a single X gate." },
+    { text: "Work out what X does to the start state, then read off the probability of the flipped outcome from the resulting state." },
   ],
   solution: {
-    steps: [{ description: "HZH=X, and X|0⟩=|1⟩, so P(|1⟩)=1 exactly." }],
+    steps: [
+      { description: "HZH = X, a standard conjugation identity." },
+      { description: "X|0⟩ = |1⟩, so the final state is |1⟩ and P(|1⟩) = 1." },
+    ],
     finalAnswer: "1.0",
   },
   explanation: {
     correctIdea: "This confirms the circuit-as-data representation reproduces a known matrix identity exactly, since runCircuit just dispatches to the same gate functions in sequence.",
-    whyCorrect: "Matches this platform's own circuitBuilder test suite result.",
-    whyWrong: ["Answering 0 would suggest confusing this with HH=I (which WOULD leave |0⟩ unchanged) rather than HZH=X."],
+    whyCorrect: "Matches the circuitBuilder test suite result.",
+    whyWrong: ["Answering 0 would suggest confusing this with HH=I (which would leave |0⟩ unchanged) rather than HZH=X."],
   },
 };

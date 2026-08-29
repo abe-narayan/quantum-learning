@@ -25,11 +25,16 @@ export const lEquals2DegeneracyCount: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "Use the 2l+1 count from this course's ladder-operator derivation.",
+    nearMisses: [
+      { value: 4, feedback: "4 is 2l, which forgets the m=0 rung sitting between the negative and positive values." },
+      { value: 2, feedback: "2 is l itself, the angular momentum label. The question asks how many m values it permits." },
+      { value: 3, feedback: "3 would be the count for l=1. At l=2 the ladder runs from m=−2 to m=+2." },
+    ],
   },
   hints: [
     { text: "The general count of allowed m values for a given l is 2l+1." },
     { text: "With l=2: 2(2)+1." },
-    { text: "= 5." },
+    { text: "Evaluate 2(2)+1, or simply list the allowed m values from -l up to +l and count them." },
   ],
   solution: {
     steps: [{ description: "2l+1 = 2(2)+1 = 5 states: m=−2,−1,0,1,2." }],

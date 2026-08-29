@@ -65,16 +65,31 @@ export function DerivationStep({ annotation, children, stepNumber }: DerivationS
  * the wrapper injects `stepNumber` onto each one, so the list stays numbered
  * correctly even if a step is added or removed later. A real `<ol>`/`<li>`
  * pair underneath (numbers are visually replaced by the pillar-edged badge,
- * but the native list semantics — "list, N items" — still reach assistive
- * tech).
+ * but the list semantics — "list, N items" — still reach assistive tech;
+ * see the `role="list"` note on the `<ol>` for why that takes an explicit
+ * role rather than coming free from the element).
  */
 export function DerivationSteps({ children, className }: { children: ReactNode; className?: string }) {
   const steps = Children.toArray(children).filter(isValidElement);
 
   return (
     <ol
+      // `role="list"` on an element that already *is* a list is not
+      // redundant here, it is the fix for `list-none`. WebKit drops list
+      // semantics entirely from any list whose items compute to
+      // `list-style-type: none` — a deliberate heuristic for the very common
+      // "nav menu built out of a `<ul>`" case — so in Safari/VoiceOver this
+      // derivation announced as loose text with no "list, N items" and no
+      // item boundaries. Each `<DerivationStep>` carries `list-none` (the
+      // visible numbering is the pillar-edged badge, not a marker glyph),
+      // which is exactly the trigger. An explicit role opts the semantics
+      // back in without restoring the marker. `<ol>` and `<ul>` both map to
+      // the `list` role — ordinality comes from document order, not from the
+      // role — so this does not flatten the derivation into an unordered
+      // list.
+      role="list"
       className={cn(
-        "not-prose my-8 space-y-5 rounded-[var(--radius-panel)] border border-border bg-surface p-5 sm:p-6",
+        "not-prose my-8 space-y-5 rounded-panel border border-border bg-surface p-5 sm:p-6",
         className
       )}
     >

@@ -65,8 +65,8 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   Heisenberg's own 1927 argument for the <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term> was a
-  thought experiment about a microscope disturbing a particle. It isn't a
-  proof — and it isn't why the principle is actually true.
+  thought experiment about a microscope disturbing a particle. It is not
+  a proof, and it is not the reason the principle holds.
 </LessonHook>
 
 ## Motivation
@@ -74,23 +74,23 @@ export const lessonMeta = {
 Heisenberg's original 1927 argument for $\Delta x\,\Delta p\ge\hbar/2$
 used a thought experiment: a gamma-ray microscope that necessarily kicks
 a particle's momentum around when you use short enough wavelengths to
-pin down its position precisely. It's a vivid picture, and it's also not
-a proof. It says nothing about why a similar bound should hold for other
-pairs of observables, or where the factor of $\tfrac12$ actually comes
-from.
+pin down its position. It is a vivid picture, and it is not a proof. It
+says nothing about why a similar bound should hold for other pairs of
+observables, and it never produces the factor of $\tfrac12$; the number
+just has to be put in by hand.
 
 The Postulates lesson already established the piece this lesson needs:
 a state generally doesn't give one definite value for an <Term id="observable">observable</Term>,
 only a probability distribution over outcomes, and that distribution has
-a spread. This lesson makes "how much spread" precise, then derives
-exactly when two different observables are forced into a *trade-off*
-between their spreads, arriving at the uncertainty principle as an actual
-theorem rather than a story about disturbing what you measure.
+a spread. This lesson makes "how much spread" quantitative, then finds
+the condition under which two observables are forced into a *trade-off*
+between their spreads. The uncertainty principle comes out the far end as
+a theorem with a proof, not a story about disturbing what you measure.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Bundesarchiv_Bild183-R57262%2C_Werner_Heisenberg_crop.jpg"
   alt="Portrait photograph of Werner Heisenberg, taken around 1933"
-  caption="Werner Heisenberg, whose 1927 uncertainty principle motivated exactly the trade-off derived rigorously in this lesson from the Cauchy-Schwarz inequality."
+  caption="Werner Heisenberg, photographed around 1933. He stated the trade-off in 1927 and argued for it with a microscope thought experiment; the proof this lesson gives, from the Cauchy-Schwarz inequality, came later and is the reason the bound is believed."
   credit="Bundesarchiv, Bild 183-R57262 / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild183-R57262,_Werner_Heisenberg_crop.jpg"
   license="CC BY-SA 3.0 DE"
@@ -99,10 +99,17 @@ theorem rather than a story about disturbing what you measure.
 ## Intuition
 
 If you measured the same observable on many identically-prepared copies
-of the same state, you'd get a distribution of outcomes with some average
-and some spread around that average, exactly like real, empirical
-statistics. Quantum uncertainty is that same ordinary statistical spread,
-computed for the underlying quantum probability distribution.
+of the same state, you would get a distribution of outcomes with some
+average and some spread around that average, the way any repeated
+measurement in a laboratory does. Quantum uncertainty is that ordinary
+statistical spread, computed for the Born-rule distribution.
+
+What makes it more than ordinary statistics is that some *pairs* of
+observables cannot both have small spread in the same state. Nothing in
+classical statistics forbids two quantities from both being sharp at
+once, so if quantum mechanics forbids it, the prohibition has to come
+from somewhere specific in the formalism. Finding that place is the work
+of this lesson.
 
 ## Mathematical Development
 
@@ -117,8 +124,8 @@ $$
 $$
 
 the same "mean of the squared deviation" formula as ordinary
-statistics, since $P(\lambda_i)$ from the <Term id="born-rule">Born rule</Term> is a genuine
-probability distribution. The **uncertainty** is
+statistics, since $P(\lambda_i)$ from the <Term id="born-rule">Born rule</Term> is a probability
+distribution in the usual sense. The **uncertainty** is
 $\Delta A = \sqrt{\operatorname{Var}(A)}$, the standard deviation of
 measurement outcomes.
 
@@ -143,7 +150,7 @@ $\langle g|g\rangle=\operatorname{Var}(B)$.
 ### Applying Cauchy-Schwarz
 
 <PredictBeforeReveal
-  question="Does a lower bound like ΔA·ΔB ≥ (something) hold for any two Hermitian observables A, B — or is it special to position and momentum?"
+  question="Does a lower bound like ΔA·ΔB ≥ (something) hold for any two Hermitian observables A and B, or is it special to position and momentum?"
   options={[
     { label: "Special to position and momentum only", value: "position-momentum-only" },
     { label: "Holds generally, for any Hermitian A and B", value: "general" },
@@ -162,17 +169,17 @@ $$
 Now examine $\langle f|g\rangle = \langle\psi|\tilde A\tilde B|\psi\rangle$ more closely.
 
 <DerivationSteps>
-  <DerivationStep annotation="Split the operator product into its symmetric and antisymmetric parts — an algebraic identity true for any two operators, nothing physical assumed yet.">
+  <DerivationStep annotation="Split the operator product into its symmetric and antisymmetric parts. This is an algebraic identity true for any two operators; nothing physical has been assumed yet.">
 $$
 \tilde A\tilde B = \tfrac12(\tilde A\tilde B+\tilde B\tilde A) + \tfrac12(\tilde A\tilde B-\tilde B\tilde A) = \tfrac12\{\tilde A,\tilde B\} + \tfrac12[\tilde A,\tilde B]
 $$
   </DerivationStep>
-  <DerivationStep annotation="The anticommutator {Ã,B̃} is Hermitian (its adjoint reassembles to itself), so its expectation value is real; the commutator [Ã,B̃] is anti-Hermitian (its adjoint is its own negative), so its expectation value is purely imaginary — the same style of argument the Hermitian Operators lesson used, with a sign flipped.">
+  <DerivationStep annotation="Check the two halves separately. Using (MN)† = N†M† and Ã† = Ã, B̃† = B̃: the anticommutator's adjoint is (ÃB̃ + B̃Ã)† = B̃Ã + ÃB̃, which is the anticommutator back, so it is Hermitian and its expectation value is real. The commutator's adjoint is (ÃB̃ − B̃Ã)† = B̃Ã − ÃB̃, which is minus the commutator, so it is anti-Hermitian and its expectation value is purely imaginary. Same style of argument as the Hermitian Operators lesson, with one sign flipped.">
 $$
 \langle f|g\rangle = \underbrace{\tfrac12\langle\{\tilde A,\tilde B\}\rangle}_{\text{real}} + \underbrace{\tfrac12\langle[\tilde A,\tilde B]\rangle}_{\text{purely imaginary}}
 $$
   </DerivationStep>
-  <DerivationStep annotation="Squared magnitude of a real-plus-imaginary sum is the sum of the squares of each part; dropping the non-negative real-part-squared term only weakens the bound, never breaks it.">
+  <DerivationStep annotation="Squared magnitude of a real-plus-imaginary sum is the sum of the squares of each part; dropping the non-negative real-part-squared term only weakens the bound, never breaks it. The commutator can also lose its tildes at this point: Ã and B̃ differ from A and B by multiples of the identity, which commute with everything, so [Ã,B̃] = [A,B] exactly.">
 $$
 |\langle f|g\rangle|^2 = \left(\tfrac12\langle\{\tilde A,\tilde B\}\rangle\right)^2 + \left(\tfrac12\langle[\tilde A,\tilde B]\rangle/i\right)^2 \ge \left(\tfrac12|\langle[A,B]\rangle|\right)^2
 $$
@@ -187,18 +194,20 @@ $$
 \operatorname{Var}(A)\operatorname{Var}(B) \ge |\langle f|g\rangle|^2 \ge \left(\tfrac12|\langle[A,B]\rangle|\right)^2
 $$
   </DerivationStep>
-  <DerivationStep annotation="Take square roots — every quantity here is non-negative, so this is legal in both directions.">
+  <DerivationStep annotation="Take square roots. Every quantity here is non-negative, so the inequality survives in both directions.">
 $$
 \Delta A\,\Delta B \ge \tfrac12\left|\langle[A,B]\rangle\right|
 $$
   </DerivationStep>
 </DerivationSteps>
 
-This is the **generalized uncertainty relation**. It's a genuine theorem,
-derived entirely from Cauchy-Schwarz and the definitions of Hermitian and
-anti-Hermitian operators. Nothing here invoked measurement disturbance,
-experimental limitations, or any physical argument beyond the postulates
-already established.
+This is the **generalized uncertainty relation**, and it is a theorem:
+every step above is Cauchy-Schwarz plus the definitions of Hermitian and
+anti-Hermitian. No measurement disturbance was invoked, no experimental
+limitation, no physical argument beyond the postulates already in hand.
+Notice also where the $\tfrac12$ came from. It is the $\tfrac12$ in the
+symmetric/antisymmetric split of the first step, carried through
+untouched. Heisenberg's microscope could never have produced it.
 
 ### When is there no trade-off at all?
 
@@ -212,11 +221,15 @@ all pairs.
 ## Physical Interpretation
 
 The familiar position-momentum uncertainty principle, $\Delta x\,\Delta p
-\ge \hbar/2$, is this exact relation applied to the specific commutator
-$[x,p]=i\hbar$ (introduced properly in the Position and Momentum lesson).
-The derivation above shows this isn't about clumsy measuring instruments
-disturbing a system. It's a structural fact about non-commuting
-Hermitian operators, true even for perfect, idealized measurements.
+\ge \hbar/2$, is this relation with $[x,p]=i\hbar$ substituted in (the
+commutator is introduced properly in the Position and Momentum lesson).
+Substituting gives $\Delta x\,\Delta p \ge \tfrac12|i\hbar| = \hbar/2$,
+with no further physics required.
+
+So the position-momentum bound is not about clumsy instruments. It is a
+structural fact about two operators that fail to commute, and it survives
+intact for perfect, idealized measurements made on separate copies of the
+state, where nothing is being disturbed at all.
 
 ## Worked Example
 
@@ -241,25 +254,26 @@ chosen.)
     { label: "It drops all the way to 0", value: "zero" },
   ]}
   correctValue="zero"
-  explanation="At θ = 45°, |ψ⟩ = |+⟩ is an eigenstate of X, so ΔX = 0 exactly, killing the product regardless of ΔY. The bound ½|⟨[X,Y]⟩| drops to 0 right alongside it — the trade-off vanishes for this particular state, it doesn't just get small."
+  explanation="At θ = 45°, |ψ⟩ = |+⟩ is an eigenstate of X, so ΔX = 0 exactly, killing the product no matter what ΔY does. The bound ½|⟨[X,Y]⟩| = |⟨Z⟩| drops to 0 alongside it, because |+⟩ sits on the equator where ⟨Z⟩ = 0. The relation is not merely satisfied here; both sides are zero, so the trade-off is absent for this state rather than small."
 />
 
-<InteractiveSection title="Slide θ, watch the bound track the product exactly" description="|ψ(θ)⟩ = cos θ|0⟩ + sin θ|1⟩ generalizes |0⟩ (θ = 0°, the worked example) to |+⟩ (θ = 45°, practice question 2). Both ΔX·ΔY and the bound ½|⟨[X,Y]⟩| are recomputed live by the platform's real expectation-value and commutator functions, not typed in by hand — watch them stay equal all the way from θ = 0° to 90°, including the θ = 45° point where both sides drop to exactly 0.">
+<InteractiveSection title="Slide θ, watch the bound track the product" description="|ψ(θ)⟩ = cos θ|0⟩ + sin θ|1⟩ carries the state from |0⟩ (θ = 0°, the worked example) through |+⟩ (θ = 45°, practice question 2). Both ΔX·ΔY and the bound ½|⟨[X,Y]⟩| are recomputed by the platform's expectation-value and commutator functions rather than typed in by hand. They stay equal across the entire range, including θ = 45° where both drop to zero: this pair saturates the inequality for every state on this path.">
   <BarChartExplorer
     frames={uncertaintyFrames}
     sliderLabel="θ (degrees)"
-    ariaLabel="Delta X times Delta Y and the uncertainty relation's bound, both recomputed live from the real state vector and Pauli operators as theta varies from 0 to 90 degrees"
+    ariaLabel="Delta X times Delta Y and the uncertainty relation's bound, both recomputed live from the real state vector and Pauli operators as theta varies from 0 to 90 degrees, on a fixed vertical scale running from 0 to 1 so both bars are seen shrinking together to zero at theta equals 45 degrees"
+    maxValue={1}
   />
 </InteractiveSection>
 
 X and Y are themselves a pair of Cartesian axes (the equatorial plane of
 the Bloch sphere), so the same $\Delta X,\Delta Y$ pair drawn above as bar
-heights has a genuine geometric picture too: an ellipse of semi-axes
-$\Delta X,\Delta Y$. It's drawn centered at the origin, showing the
-*shape* of the trade-off rather than tracking $\langle X\rangle,\langle
-Y\rangle$ (which do drift as $|\psi(\theta)\rangle$ rotates):
+heights has a geometric reading: an ellipse with those two semi-axes. It
+is drawn centered at the origin, which shows the *shape* of the trade-off
+rather than tracking $\langle X\rangle,\langle Y\rangle$ (those do drift
+as $|\psi(\theta)\rangle$ rotates):
 
-<InteractiveSection title="Same trade-off, drawn as a region instead of two bars" description="Semi-axes ΔX and ΔY of the ellipse are the exact values computed above for |ψ(θ)⟩. The dot marks (0, 0), a fixed reference origin — not ⟨X⟩, ⟨Y⟩, which do drift with θ as noted above. At θ = 0° and θ = 90° (the worked example and its mirror) the bound is saturated with ΔX = ΔY = 1, a circle. At θ = 45° (|+⟩, practice question 2) ΔX collapses to 0 while ΔY stays 1, so the ellipse degenerates to a vertical segment — the same product going to zero that the bar chart above shows.">
+<InteractiveSection title="Same trade-off, drawn as a region instead of two bars" description="The ellipse's semi-axes ΔX and ΔY are the same values plotted above for |ψ(θ)⟩. The dot marks (0, 0), a fixed reference origin, not ⟨X⟩ and ⟨Y⟩, which drift with θ as noted above. At θ = 0° and θ = 90° the bound is saturated with ΔX = ΔY = 1 and the ellipse is a circle. At θ = 45°, ΔX collapses to 0 while ΔY stays 1, so the ellipse flattens into a vertical segment: the same product going to zero that the bar chart shows, seen as a shape losing a dimension.">
   <UncertaintyEllipse
     frames={ellipseFrames}
     center={ellipseCenter}
@@ -276,8 +290,9 @@ Y\rangle$ (which do drift as $|\psi(\theta)\rangle$ rotates):
 <Callout type="mistake">
 **Describing uncertainty as "measuring one property disturbs the other."**
 The derivation above never mentions a measurement disturbing anything.
-It's a property of the state and the two operators, true even for a
-single idealized measurement of each, considered separately.
+Both $\Delta A$ and $\Delta B$ are properties of one state and two
+operators, and each can be estimated on its own fresh batch of identical
+copies, with no measurement of the other observable happening anywhere.
 </Callout>
 
 <Callout type="warning">
@@ -316,14 +331,15 @@ any trade-off at all.
 
 ## Further Exploration
 
-<ChallengePrompt prompt="The worked example computed the bound for A=X, B=Y in the state |0⟩. Redo it for |1⟩ instead — does the bound come out the same, or different?">
-  $\langle[X,Y]\rangle=2i\langle Z\rangle$ still holds; only
-  $\langle Z\rangle$ changes sign between $|0\rangle$ and $|1\rangle$ —
-  does that change the bound's magnitude?
+<ChallengePrompt prompt="The worked example computed the bound for A=X, B=Y in the state |0⟩. Redo it for |1⟩. Does the bound come out the same, or different?">
+  $\langle[X,Y]\rangle=2i\langle Z\rangle$ still holds, and only
+  $\langle Z\rangle$ changes sign between $|0\rangle$ and $|1\rangle$.
+  Does a sign change reach the bound, given the absolute value sitting
+  around it?
 </ChallengePrompt>
 
 <NextDiscovery>
   [Time Evolution and the Schrödinger Equation](/lessons/quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation) uses
-  Postulate 4 to derive exactly what $U(t)$ looks like, and works a genuine
-  two-level example computed directly with the existing quantum engine.
+  Postulate 4 to pin down what $U(t)$ actually is, and works a two-level
+  example end to end with the platform's own quantum engine.
 </NextDiscovery>

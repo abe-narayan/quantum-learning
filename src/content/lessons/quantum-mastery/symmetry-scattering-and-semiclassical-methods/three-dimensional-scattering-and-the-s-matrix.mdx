@@ -118,8 +118,8 @@ depending only on distance from a center.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/9/97/Sir_Ernest_Rutherfords_laboratory%2C_early_20th_century._%289660575343%29.jpg"
-  alt="Photograph of Ernest Rutherford's experimental apparatus at the Cavendish Laboratory, Cambridge, early 20th century"
-  caption="Scattering theory, phase shifts, cross sections, and all, traces directly back to Rutherford's own laboratory: his 1911 analysis of alpha particles scattering off gold nuclei is the historical origin of describing a potential entirely through what it does to an incoming beam at infinity, exactly this lesson's partial-wave program."
+  alt="The apparatus Rutherford used in his atom-splitting experiments, set up on a small table in the centre of his research room at Cambridge. The equipment is bench-scale, occupying a single tabletop rather than filling the room around it."
+  caption="Scattering theory, phase shifts, cross sections, and all, traces directly back to Rutherford's own laboratory: his 1911 analysis of alpha particles scattering off gold nuclei is the historical origin of describing a potential entirely through what it does to an incoming beam at infinity, this lesson's partial-wave program."
   credit="Science Museum London / Science and Society Picture Library, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Sir_Ernest_Rutherfords_laboratory,_early_20th_century._(9660575343).jpg"
   license="CC BY-SA 2.0"
@@ -143,7 +143,7 @@ $$
 $$
 
 This is **exactly a 1D Schrödinger equation** on the half-line $r\ge0$,
-the identical continuity-of-$\psi,\psi'$ matching technique from the 1D
+so the identical continuity-of-$\psi,\psi'$ matching technique from the 1D
 scattering lessons applies unchanged. Two things are new here,
 neither cosmetic: (1) an extra **centrifugal barrier**
 $\hbar^2l(l+1)/2mr^2$, absent from any real 1D problem, pushing the
@@ -205,7 +205,7 @@ angle).
 <DefinitionBox title="S-matrix">
 
 The **$S$-matrix** in channel $l$ is defined as
-$S_l\equiv e^{2i\delta_l}$, the ratio of the outgoing to incoming
+$S_l\equiv e^{2i\delta_l}$, the <Term id="partial-wave-scattering-s-matrix">ratio of the outgoing to incoming</Term>
 spherical-wave coefficient hiding inside $\sin(kr-l\pi/2+\delta_l)=\frac1{2i}\left[e^{i(kr-l\pi/2+\delta_l)}-e^{-i(kr-l\pi/2+\delta_l)}\right]$.
 
 </DefinitionBox>
@@ -249,7 +249,7 @@ $$
     { label: "σ₀ → 4πa², four times the classical area", value: "four" },
   ]}
   correctValue="four"
-  explanation="Taking sin(ka)≈ka in σ₀=(4π/k²)sin²(ka) gives σ₀→4πa², not πa². A long-wavelength wave doesn't just clip the sphere's silhouette — it diffracts around the whole thing, and the wave nature of scattering, not the sphere's literal cross-sectional area, sets what a detector far away actually measures."
+  explanation="Taking sin(ka)≈ka in σ₀=(4π/k²)sin²(ka) gives σ₀→4πa², not πa². A long-wavelength wave doesn't just clip the sphere's silhouette — it diffracts around the whole thing, and the detector far away registers that too."
 />
 
 <InteractiveSection
@@ -271,7 +271,7 @@ watch the gap between them.
 
 <InteractiveSection
   title="Free wave vs. actual wave: the phase shift made visible"
-  description="The free wave sin(kr−lπ/2) (l=0, no sphere) against the actual s-wave u₀(r)∝sin(kr+δ₀), both plotted past the hard wall at r=a. u₀ is forced to exactly zero inside the sphere (r<a, the wall), then rejoins the same frequency kr as the free wave but offset by exactly δ₀=−ka. Drag the slider: the wave is shifted outward by exactly one sphere radius at every energy — what visibly changes with ka is how many oscillations fit in the same window, making the shift more apparent, the same δ₀ that sets σ₀(ka) in the plot above."
+  description="The free wave sin(kr−lπ/2) (l=0, no sphere) against the actual s-wave u₀(r)∝sin(kr+δ₀), both plotted past the hard wall at r=a. u₀ is forced to exactly zero inside the sphere (r<a, the wall), then rejoins the same frequency kr as the free wave but offset by δ₀=−ka. Drag the slider: the wave is shifted outward by exactly one sphere radius at every energy. What visibly changes with ka is how many oscillations fit in the same window, making the shift more apparent, the same δ₀ that sets σ₀(ka) in the plot above."
 >
   <ParametricCurve
     frames={radialWaveFrames}
@@ -298,7 +298,7 @@ asymptotic curiosity.
 <Callout type="mistake">
 **Forgetting the centrifugal term when writing down the "radial
 Schrödinger equation."** Without $\hbar^2l(l+1)/2mr^2$, the equation
-describes a genuine 1D problem, not the $l$-th partial wave of a 3D one;
+describes a 1D problem, not the $l$-th partial wave of a 3D one;
 this term is exactly what makes different $l$'s behave differently even
 for the *same* potential $V(r)$.
 </Callout>
@@ -344,11 +344,10 @@ dominates, as used above.
 
 ## Further Exploration
 
-The [capstone](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/capstone-symmetry-and-the-classical-limit)
-ties phase shifts, Berry phase, and WKB together as three different
-routes to the same classical/geometric limit.
-
 <NextDiscovery>
-  The capstone ties phase shifts, Berry phase, and WKB together as
-  three different routes to the same classical/geometric limit.
+  The [capstone](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/capstone-symmetry-and-the-classical-limit)
+  puts phase shifts beside Berry phase and WKB, three quantities that
+  each reduce to a classical action or a classical geometry in the
+  appropriate limit, and asks what they have in common beyond the word
+  "phase."
 </NextDiscovery>

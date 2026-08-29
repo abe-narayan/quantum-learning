@@ -36,7 +36,15 @@ export function LevelSplittingDiagram({
   const rightYs = [CENTER_Y - RIGHT_LEVEL_GAP / 2, CENTER_Y + RIGHT_LEVEL_GAP / 2];
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
+    // `tabIndex={0}`. The `<svg>` carries an intrinsic `width={WIDTH}` (340)
+    // and no `w-full`, so it paints at 340 real pixels against a ~256px
+    // content box on a 320px phone and this wrapper is what scrolls. A scroll
+    // container is focusable by default in no browser but Firefox, so a
+    // keyboard-only reader saw the unsplit level on the left and could not
+    // reach the split levels on the right — the entire content of the figure.
+    // No `role`/`aria-label` on the wrapper: the `<svg>` is already
+    // `role="img"` with the label and naming both announces it twice.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         <line
           x1={LEFT_X}
@@ -61,7 +69,15 @@ export function LevelSplittingDiagram({
                 y2={y}
                 strokeWidth={1}
                 strokeDasharray="3 3"
-                className="stroke-foreground/30"
+                // The fan lines are the diagram's verb: "this one level splits into
+                // these two" is carried entirely by them, and without them the figure
+                // is three unrelated horizontal rules. `--foreground` at 30% opacity
+                // composites to roughly 3.2:1 on `--surface-muted` — right at the WCAG
+                // 2.1 SC 1.4.11 boundary and below it on the lighter panel depths.
+                // `--axis` is the token that guarantees the 3:1 on every depth in both
+                // themes, and the 1px dashed treatment already keeps them subordinate
+                // to the 2–3px level lines.
+                className="stroke-axis"
               />
               <line
                 x1={RIGHT_X}

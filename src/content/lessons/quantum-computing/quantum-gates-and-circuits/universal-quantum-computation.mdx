@@ -57,12 +57,12 @@ export const toffoliVerificationFrames = Array.from({ length: 8 }, (_, inputInde
 export const lessonMeta = {
   title: "Universal Quantum Computation",
   description:
-    "The promise Qubits & Quantum States made and never cashed in: why single-qubit gates alone can't reach every circuit, why adding just CNOT is (in principle) enough for all of them, why real hardware wants a small discrete set instead of a continuous one, and why that discrete set needs one non-Clifford gate, verified directly by checking T against the Clifford group's defining property and building a real Toffoli gate from Clifford+T alone.",
+    "Why single-qubit gates alone can't reach every circuit, why adding CNOT is enough in principle, why real hardware wants a fixed discrete set instead, and why that set needs one non-Clifford gate; with T checked against the Clifford property and a Toffoli built from Clifford+T alone.",
   course: "quantum-gates-and-circuits",
   module: "universal-quantum-computation",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 30,
+  estimatedMinutes: 55,
   prerequisites: [
     "quantum-computing/quantum-gates-and-circuits/building-quantum-circuits",
     "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement",
@@ -92,34 +92,24 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="The promise this course never cashed in">
-This platform's circuits use H, X, Y, Z, S, T, and CNOT throughout — is that an arbitrary shopping list, or does some small subset of it already suffice to build everything else?
+This platform's circuits use H, X, Y, Z, S, T, and CNOT throughout. Is that an arbitrary shopping list, or does a small subset of it already suffice to build every circuit there is?
 </LessonHook>
 
 ## Motivation
 
 Building Qubit Circuits computed $HZH=X$ and then said, in passing, that
-composing rotations about different axes "makes it possible to build
-*any* gate from just a small, fixed set of 'universal' ones," promising
-the idea would return in the next course. It never did. Quantum Gates
-& Circuits went on to build CNOT, Bell states, teleportation, BB84, and
-superdense coding, all without ever pinning down what "universal" means
-or why any small set deserves the name. This lesson keeps that promise.
+composing rotations about different axes "makes it possible to build *any*
+gate from just a small, fixed set of 'universal' ones," promising the idea
+would return in the next course. It never did. This course went on to build
+CNOT, Bell states, teleportation, BB84, and superdense coding without
+pinning down what "universal" means or why any small set deserves the name.
+This lesson keeps that promise.
 
-The question is basic enough that skipping it is a real gap — and this
-platform's gate set also includes arbitrary-angle rotations
-$R_x,R_y,R_z$, not just the fixed set already listed. Any subset that
-suffices could do so exactly, or only to any desired precision — and if
-so, which subset, and why does it need to include a distinctly
-non-obvious gate like $T$?
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/5/50/Quantum-computer-Chalmers_2017.jpg"
-  alt="A real 3-qubit superconducting quantum processor with three read-out cavities, fabricated at Chalmers University of Technology"
-  caption="A real superconducting quantum processor, whose control stack is compiled down to exactly the kind of small, fixed, discrete gate set (Clifford+T style) this lesson argues real hardware needs, rather than arbitrary continuous single-qubit rotations."
-  credit="Anita Fors / Chalmers University of Technology"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum-computer-Chalmers_2017.jpg"
-  license="CC BY-SA 4.0"
-/>
+Three questions have to be separated to answer it. Is there a set that
+reaches everything? Can it be finite, given that the unitaries form a
+continuum? And if it can, which finite set, and why does the standard
+answer include a gate as odd-looking as $T$ rather than stopping at the
+gates you would naturally reach for?
 
 ## Intuition
 
@@ -183,7 +173,7 @@ decomposition) says that's *exactly* what's missing:
 > implement any unitary operation on any number of qubits.
 
 <ResearchConnection title="Elementary gates for quantum computation" source="Barenco et al., Physical Review A 52, 3457 (1995)" url="https://arxiv.org/abs/quant-ph/9503016">
-The result this lesson leans on: arbitrary single-qubit unitaries plus CNOT alone can implement any unitary operation on any number of qubits — the theorem that turns "H, X, Y, Z, S, T, CNOT" from an arbitrary list into a provably complete toolkit.
+The result this lesson leans on: arbitrary single-qubit unitaries plus CNOT alone can implement any unitary operation on any number of qubits. It is the theorem that turns "H, X, Y, Z, S, T, CNOT" from an arbitrary list into a provably complete toolkit.
 </ResearchConnection>
 
 The plausibility argument, without the full constructive proof: every
@@ -265,10 +255,9 @@ simulate, which is exactly why a quantum computer is believed to be
 more powerful than a classical one for some problems. A circuit family
 that's *always* classically efficient to simulate cannot be the source
 of that advantage. Since Clifford circuits are always classically
-efficient (Gottesman-Knill), **Clifford alone cannot be a universal
-gate set** — some Clifford-circuit is classically-simulable, but a
-universal set must be able to reach circuits (like Shor's algorithm's)
-that are believed not to be.
+efficient (Gottesman-Knill), **Clifford alone cannot be a universal gate
+set**. Every Clifford circuit is classically simulable, and a universal set
+has to reach circuits (Shor's, for one) that are believed not to be.
 
 <PredictBeforeReveal
   question="If {H, S, CNOT} alone were secretly universal, what would that imply about quantum computers?"
@@ -331,15 +320,16 @@ axes by a fixed angle repeatedly is known (a deep, number-theoretic
 fact this lesson cites rather than derives) to sweep out a dense set
 rather than a finite one.
 
-Density is an existence statement — it doesn't say how MANY $H$'s and
-$T$'s are needed to hit a given target to a given accuracy $\varepsilon$.
-The **<Term id="solovay-kitaev-theorem">Solovay-Kitaev theorem</Term>** (Kitaev 1997) answers that:
+Density is an existence statement. It does not say how many $H$'s and $T$'s
+are needed to hit a given target to a given accuracy $\varepsilon$, and a
+set that needed exponentially many would be useless. The
+**<Term id="solovay-kitaev-theorem">Solovay-Kitaev theorem</Term>** (Kitaev 1997) settles it:
 
 $$
 \text{gate count} = O\!\left(\log^{c}(1/\varepsilon)\right), \quad c\approx 2\text{-}4
 $$
 
-— *polylogarithmic* in $1/\varepsilon$, not exponential. That efficiency
+Polylogarithmic in $1/\varepsilon$, not exponential. That efficiency
 is what turns "Clifford+T can in principle reach anything" into a
 practically usable compilation target, the discrete analogue of Gate
 Decomposition's exact continuous $R_z,R_y$ decomposition. It's also,
@@ -350,9 +340,8 @@ CNOT) can be implemented fault-tolerantly in a comparatively cheap,
 transversal way, while $T$ needs a separate, costly procedure called
 <Term id="magic-state-distillation">magic-state distillation</Term>. The Fault-Tolerant Thresholds capstone's
 physical-to-logical qubit overhead is, in real architectures, driven
-substantially by exactly this $T$-gate cost — a concrete instance of a
-number this lesson names but, matching that capstone's own honesty
-about scope, does not derive.
+substantially by this $T$-gate cost: a number this lesson names but,
+matching that capstone's own scoping, does not derive.
 
 ## Physical Interpretation
 
@@ -362,17 +351,17 @@ however complex, reduces to NAND gates wired together. $\{H,T,\text{CNOT}\}$
 plays the same role here: every circuit on this platform (Bell states,
 Grover's algorithm, VQE ansatzes, the 3-qubit codes) is, underneath its
 convenient named gates, reachable from a vocabulary of exactly three
-gates. That's also precisely why "a quantum programming language"
-means something general-purpose at all, rather than a fixed menu of
-special-case circuits: a compiler targeting Clifford+T (or any other
-proven-universal set) is targeting something provably able to express
-whatever circuit gets asked of it.
+gates. That is also why "a quantum programming language" can mean something
+general-purpose rather than a fixed menu of special-case circuits: a
+compiler targeting Clifford+T, or any other proven-universal set, is
+targeting something provably able to express whatever circuit it is asked
+for.
 
 ## Worked Example: Building Toffoli from Clifford+T
 
-The **Toffoli gate** (CCNOT) flips a target qubit exactly when *both*
-of two control qubits are $|1\rangle$; it's a completely standard,
-reversible classical AND-like gate, but it is **not** itself a Clifford
+The **Toffoli gate** (CCNOT) flips a target qubit exactly when *both* of
+two control qubits are $|1\rangle$. It is a standard reversible
+classical AND-like gate, and it is **not** a Clifford
 gate. The standard construction below (Nielsen & Chuang, Fig. 4.9)
 builds it from nothing but $H$, CNOT, $T$, and $T^\dagger$, a concrete
 instance of Clifford+T reaching a gate outside the Clifford group:
@@ -395,10 +384,10 @@ three-qubit computational basis states, using this platform's own
 reproduces the Toffoli truth table on every input, each output landing
 on the correct basis state with probability $>0.999$ and zero leakage
 into any other basis state (checked to below $10^{-9}$): $|110\rangle$
-and $|111\rangle$ swap (both controls set, target flips); every other
-input is left alone. This isn't a schematic claim, it's a gate-by-gate
-replay of the circuit above through the exact same engine every other
-lesson's circuits run on, and it lands on Toffoli's truth table exactly.
+and $|111\rangle$ swap (both controls set, target flips), and every other
+input is left alone. This is not a schematic claim. It is a gate-by-gate
+replay of the circuit above through the same engine every other lesson's
+circuits run on, landing on Toffoli's truth table exactly.
 
 Two controls set, so the target should flip: $|110\rangle\to|111\rangle$.
 Running the 15 gates above on $|110\rangle$ (control qubits 0 and 1
@@ -425,9 +414,8 @@ tracked $|10\rangle$ through three explicit steps.
 is universal.** It isn't automatic. $\{H,S,\text{CNOT}\}$ alone (no
 $T$) is discrete, includes an entangling gate, and is still NOT
 universal, by Gottesman-Knill. What makes $T$ essential is specifically
-that it maps a Pauli to a non-Pauli under conjugation, verified
-directly above — a property most "reasonable-looking" gates don't
-automatically have.
+that it maps a Pauli to a non-Pauli under conjugation, verified directly
+above. Most "reasonable-looking" gates fail that test.
 </Callout>
 
 <Callout type="note">

@@ -83,7 +83,31 @@ export function TunnelingIntroVisual() {
         {prefersReducedMotion ? (
           <Badge tone="neutral">Reduced motion — showing the settled outcome</Badge>
         ) : (
-          <Button variant="secondary" size="sm" onClick={handleReplay} disabled={isPlaying && !hasFinished}>
+          // `aria-disabled` rather than the native `disabled` prop. This is the
+          // one and only control in the figure, and it disables itself *as the
+          // direct result of being pressed*: handleReplay sets `isPlaying` true
+          // and `frameIndex` 0, which is precisely the `isPlaying && !hasFinished`
+          // condition that greyed it out. A natively-disabled button stops being
+          // focusable while it currently holds focus, so a keyboard reader who
+          // pressed Replay had focus dropped to <body> by their own keystroke —
+          // and then spent the four-second playback with no focus at all, their
+          // next Tab restarting from the top of the page rather than continuing
+          // past the figure. `aria-disabled` announces the same "dimmed,
+          // unavailable" state while keeping the button focusable, so focus is
+          // still on Replay when the run finishes and it becomes live again.
+          // The handler no-ops while a pass is in flight, and
+          // `aria-disabled:pointer-events-none` reproduces the dead-to-the-mouse
+          // behaviour `disabled` gave.
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              if (isPlaying && !hasFinished) return;
+              handleReplay();
+            }}
+            aria-disabled={isPlaying && !hasFinished}
+            className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+          >
             Replay
           </Button>
         )}

@@ -23,24 +23,39 @@ export const wStateEntropyAndBondDimension: NumericProblem = {
     value: 0.918296,
     tolerance: 0.001,
     incorrectFeedback:
-      "rho_1 is already diagonal with eigenvalues 2/3 and 1/3, so its von Neumann entropy is just the Shannon entropy of those two numbers: S = -(2/3)log2(2/3) - (1/3)log2(1/3), the same formula this lesson applied to GHZ's own (1/2, 1/2) eigenvalues.",
+      "Three checks. The entropy must use log base 2 to come out in bits. Both eigenvalues contribute a term, each with a minus sign in front. And if you got exactly 1 bit, you used GHZ's even eigenvalues instead of the W state's uneven pair; the uneven split is the whole point of the comparison.",
+    nearMisses: [
+      {
+        value: 0.636514,
+        feedback: "That is the same entropy in nats. Bits require log base 2; dividing by ln 2 converts your answer.",
+      },
+      {
+        value: 1,
+        feedback:
+          "1 bit is GHZ's answer, from an even (1/2, 1/2) split. The W state's split is (2/3, 1/3), and an uneven spectrum always carries strictly less entropy at the same rank.",
+      },
+      {
+        value: 2,
+        feedback: "2 is the Schmidt rank (the bond dimension), not the entropy. Rank counts the surviving terms; entropy weighs how evenly they are weighted.",
+      },
+    ],
   },
   hints: [
-    { text: "rho_1 is already diagonal -- its eigenvalues are just its diagonal entries, 2/3 and 1/3, no further diagonalization needed." },
-    { text: "Von Neumann entropy of a diagonal density matrix is the Shannon entropy of its diagonal entries (used throughout this lesson and Entanglement Entropy for Pure Bipartite States)." },
-    { text: "S = -(2/3) log2(2/3) - (1/3) log2(1/3) ≈ 0.918296 bits." },
+    { text: "The prompt already hands you rho_1 in diagonal form, so no diagonalization is needed. The remaining question is which formula turns a density matrix's eigenvalues into an entanglement entropy measured in bits." },
+    { text: "For a diagonal density matrix, the von Neumann entropy is the Shannon entropy of the diagonal entries: S = -Σ λ log2(λ), the same formula this lesson applied to GHZ's (1/2, 1/2) eigenvalues." },
+    { text: "Evaluate S = -(2/3) log2(2/3) - (1/3) log2(1/3). Because the split is uneven, expect strictly less than the 1 bit that GHZ's even split gives." },
   ],
   solution: {
     steps: [
-      { description: "rho_1 = diag(2/3, 1/3), read directly from the reshaped W-state amplitude matrix via rho = M M-dagger, exactly this lesson's own construction applied to a different state." },
+      { description: "rho_1 = diag(2/3, 1/3), read directly from the reshaped W-state amplitude matrix via rho = M M-dagger, this lesson's own construction applied to a different state." },
       { description: "$S(\\rho_1) = -\\tfrac{2}{3}\\log_2\\tfrac{2}{3} - \\tfrac{1}{3}\\log_2\\tfrac{1}{3}$" },
-      { description: "$= \\tfrac{2}{3}(0.584963) + \\tfrac{1}{3}(1.584963) \\approx 0.389975 + 0.528321$" },
+      { description: "$= \\tfrac{2}{3}(0.584963) + \\tfrac{1}{3}(1.584963) \\approx 0.389975 + 0.528321 = 0.918296$" },
     ],
     finalAnswer: "S(rho_1) ≈ 0.918296 bits.",
   },
   explanation: {
     correctIdea: "Bond dimension (Schmidt rank, 2 here, identical to GHZ) counts how many Schmidt terms survive; entanglement entropy weighs how evenly they're weighted. The W state's uneven (2/3, 1/3) split carries less entropy than GHZ's even (1/2, 1/2) split despite the identical rank.",
-    whyCorrect: "This is exactly the bond-dimension-versus-entropy distinction this lesson's second Common Mistake callout makes, worked out here for a genuinely different state instead of just asserted.",
+    whyCorrect: "This is the bond-dimension-versus-entropy distinction this lesson's second Common Mistake callout makes, worked out here for a different state instead of just asserted.",
     whyWrong: ["Assuming bond dimension 2 automatically means 'the same entanglement as GHZ' ignores that entropy depends on the actual eigenvalue values, not merely how many of them are nonzero."],
   },
 };

@@ -63,17 +63,20 @@ This is the payoff lesson for a question this course has been building toward si
 
 ## Motivation
 
-Multi-Qubit State Vectors showed a state
-vector has no answer whenever the qubits are <Term id="entanglement">entangled</Term>. The density
-matrix, unlike the state vector, can answer this, via an operation
-called the **<Term id="partial-trace">partial trace</Term>**, which this lesson derives from a single,
-non-negotiable physical requirement rather than just presenting as a
-formula to memorize.
+Multi-Qubit State Vectors showed that a state vector has no answer
+whenever the qubits are <Term id="entanglement">entangled</Term>. The density matrix does, through an
+operation called the **<Term id="partial-trace">partial trace</Term>**.
+
+The formula for it is short and, presented cold, looks arbitrary: sum over
+one qubit's index while holding it matched between bra and ket. So this
+lesson does not present it cold. It states one physical requirement any
+sensible answer must meet, and then shows that requirement has exactly one
+solution, which is the formula.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/de/Ion_Trap_%286099414213%29.jpg"
   alt="Microscope photograph of a NIST ion-trap microchip with a single trapped beryllium ion marked in red"
-  caption="A single trapped ion on a NIST microchip. Partial trace answers exactly the question this photo poses physically: what is the state of just this one ion, considered on its own?"
+  caption="A single trapped ion on a NIST microchip. Partial trace answers the question this photo poses physically: what is the state of this one ion, considered on its own, when it is entangled with others nearby?"
   credit="NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Ion_Trap_(6099414213).jpg"
   license="Public domain (U.S. government work)"
@@ -92,9 +95,9 @@ $$
 \text{Tr}\big[(A_{\text{op}}\otimes I)\,\rho_{AB}\big] = \text{Tr}(A_{\text{op}}\,\rho_A)
 $$
 
-This isn't a guess at a reasonable-sounding property; it is *the*
-defining requirement. Anything claiming to be "qubit 0's state" that
-gets this wrong for even one observable isn't describing qubit 0.
+This is not a guess at a reasonable-sounding property. It is *the*
+defining requirement. Anything claiming to be "qubit 0's state" that gets
+it wrong for even one observable is not describing qubit 0.
 
 ### Deriving the formula
 
@@ -119,23 +122,24 @@ $$
 
 This sums over the traced-out qubit's index, keeping it matched between bra
 and ket, while the kept qubit's indices stay free. This is the
-**partial trace**, $\rho_A=\text{Tr}_B(\rho_{AB})$, and it is not one
-reasonable choice among several; it is the *unique* operation making
-local observables come out right. `partialTrace.ts` implements exactly
-this index sum (generalized to any number of qubits via bitmask
-indexing, not hardcoded to 2), matching the same qubit-0-is-MSB
-convention `gates.ts` established for every other multi-qubit operation
-on this platform.
+**partial trace**, $\rho_A=\text{Tr}_B(\rho_{AB})$. It is not one
+reasonable choice among several. It is the *unique* operation making local
+observables come out right, which is why the formula's odd-looking index
+pattern is forced rather than chosen. `partialTrace.ts` implements this
+index sum (generalized to any number of qubits via bitmask indexing, not
+hardcoded to 2), following the qubit-0-is-MSB convention `gates.ts`
+established for every other multi-qubit operation on this platform.
 
-<InteractiveSection title="Click through the index-sum formula" description="Select a cell of the reduced matrix on the right to see exactly which ρ_AB entries the sum (ρ_A)_{i'i} = Σ_j (ρ_AB)_{i'j,ij} adds together. Every ρ_AB entry shown dimmed has mismatched traced-out-qubit indices, so it is excluded from every reduced entry, not just the one you didn't select. Toggle which qubit is traced out, and switch between the product state, the Bell state, and the ψ(θ) family used throughout this lesson.">
+<InteractiveSection title="Click through the index-sum formula" description="Select a cell of the reduced matrix on the right to see which ρ_AB entries the sum (ρ_A)_{i'i} = Σ_j (ρ_AB)_{i'j,ij} adds together. Every dimmed ρ_AB entry has mismatched traced-out-qubit indices, so it is excluded from every reduced entry, not only the one you did not select. Toggle which qubit is traced out, and switch between the product state, the Bell state, and the ψ(θ) family used throughout this lesson.">
   <PartialTraceHighlight presets={partialTracePresets} ariaLabel="Interactive partial trace: click a reduced-matrix cell to highlight the joint density matrix entries summed into it" />
 </InteractiveSection>
 
 ### A product state: the sanity check
 
-For a product state $\rho_{AB}=\rho_A\otimes\rho_B$, the partial trace
-must return $\rho_A$ exactly: tracing out a completely independent
-subsystem shouldn't change anything about the other one. Take
+For a product state $\rho_{AB}=\rho_A\otimes\rho_B$, the partial trace has
+to return $\rho_A$ unchanged. Tracing out an independent subsystem should
+not affect the other one, and a definition that failed this test would be
+wrong for reasons having nothing to do with entanglement. Take
 $|{+}0\rangle$:
 
 <QuantumStateDisplay state={plusZeroState} label="|+0⟩" />
@@ -179,7 +183,7 @@ identical, for every $\theta$, exactly as the derivation guarantees.
     { label: "No, they stay exactly zero for every θ", value: "zero" },
   ]}
   correctValue="zero"
-  explanation="ρ_A(θ) is diagonal — exactly diag(cos²θ, sin²θ) — for every θ, not just at special angles. The off-diagonal entry of ρ_AB that would need to survive the partial trace, cosθ sinθ ⟨00|·|11⟩-type cross terms, gets summed over the traced-out qubit's mismatched indices and is excluded by the index sum itself, term by term, no matter how θ is chosen. The plot below, built from the real reducedDensityMatrixQubit0 output rather than the closed-form formula, shows only the two diagonal curves because there is nothing off-diagonal to plot."
+  explanation="ρ_A(θ) is diag(cos²θ, sin²θ) for every θ, not only at special angles. The ρ_AB entry that would have to survive, the cosθ sinθ cross term between |00⟩ and |11⟩, has mismatched indices on the traced-out qubit and is dropped by the index sum itself, term by term, whatever θ is. The plot below is built from the real reducedDensityMatrixQubit0 output rather than the closed-form formula, and shows only two curves because there is nothing off-diagonal to plot."
 />
 
 <InteractiveSection title="Diagonal entries crossing at θ=π/4" description="Plotted directly from the real reducedDensityMatrixQubit0 output at each θ, not from the closed-form formula.">
@@ -198,19 +202,18 @@ identical, for every $\theta$, exactly as the derivation guarantees.
 </InteractiveSection>
 
 At $\theta=\pi/4$ (a Bell state), $\rho_A=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$.
-The reduced state of one qubit of a maximally entangled pair is
-*maximally mixed*, even though the full 2-qubit state $|\Phi^+\rangle$
-is perfectly well-defined and pure. This is the central, striking fact
-the next lesson takes apart in full.
+The reduced state of one qubit of a maximally entangled pair is *maximally
+mixed*, even though the full 2-qubit state $|\Phi^+\rangle$ is pure and
+completely specified. Knowing everything about the pair leaves you knowing
+nothing about either member. The next lesson takes that apart.
 
 ## Physical Interpretation
 
-The partial trace answers, precisely and uniquely, what earlier lessons
-in this platform could only gesture at: measuring only qubit 0 of an
-entangled pair, with qubit 1 never touched, behaves *exactly* as if
-qubit 0 were literally described by $\rho_A=\text{Tr}_B(\rho_{AB})$,
-not as an approximation or a bookkeeping convenience, but because
-$\rho_A$ was *defined* to make that true.
+The partial trace answers what earlier lessons could only gesture at.
+Measuring qubit 0 of an entangled pair, with qubit 1 never touched,
+behaves as if qubit 0 were described by $\rho_A=\text{Tr}_B(\rho_{AB})$,
+and it does so by construction rather than by luck: $\rho_A$ was defined
+as the unique object that makes it true.
 
 ## Worked Example
 
@@ -284,8 +287,8 @@ artifact.
 ## Further Exploration
 
 <NextDiscovery>
-[Why Entangled Subsystems Are Mixed](/lessons/quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed) takes the striking
-fact from today's last example, a pure global state with a mixed
-local state, and proves it's not a special property of Bell states, but
-a necessary consequence of entanglement itself.
+[Why Entangled Subsystems Are Mixed](/lessons/quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed) takes the fact
+from this lesson's last example, a pure global state with a mixed local
+state, and proves it is not a special property of Bell states but a
+consequence of entanglement itself, with an exact formula attached.
 </NextDiscovery>

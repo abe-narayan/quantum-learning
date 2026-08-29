@@ -9,16 +9,16 @@ export type SimulatorSkeletonVariant = "standard" | "hero" | "heroWide";
 //   the pillar-tinted wash and corner ticks the real, now-Instrument-shelled
 //   simulator will swap in with — no visual "downgrade then upgrade" flash.
 // - "hero": the square, max-w-sm panel used by the Bloch sphere hero on the
-//   homepage — the loaded component wraps itself in a plain rounded-xl div
+//   homepage — the loaded component wraps itself in a plain rounded-panel div
 //   (not an Instrument), so the skeleton must match *that* exactly to avoid
 //   a layout jump.
 // - "heroWide": the wide 16/10 panel used by the wavefunction hero, also on
 //   the homepage, same plain-panel treatment as "hero".
 const PANEL_CLASSES: Record<SimulatorSkeletonVariant, string> = {
   standard: "not-prose instrument flex aspect-[4/3] items-center justify-center overflow-hidden sm:aspect-[2/1]",
-  hero: "flex aspect-square items-center justify-center rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8",
+  hero: "flex aspect-square items-center justify-center rounded-panel border border-border bg-surface p-6 shadow-sm sm:p-8",
   heroWide:
-    "flex aspect-[16/10] items-center justify-center rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8",
+    "flex aspect-[16/10] items-center justify-center rounded-panel border border-border bg-surface p-6 shadow-sm sm:p-8",
 };
 
 /**

@@ -141,7 +141,7 @@ export function MasteryResultsIndex({
             key={course.slug}
             id={`structure-${course.slug}`}
             className={cn(
-              "relative isolate scroll-mt-24 px-3 py-9 transition-colors duration-[--dur-fast] ease-[--ease-instrument] sm:py-11",
+              "relative isolate scroll-mt-24 px-3 py-9 transition-colors duration-(--dur-fast) ease-instrument sm:py-11",
               // `pillar-wash`, not `pillar-accent`: the ramp is exposed to
               // Tailwind as `pillar`/`pillar-edge`/`pillar-wash`; an
               // unregistered color would compile to nothing and the
@@ -165,7 +165,7 @@ export function MasteryResultsIndex({
                     <Link
                       href={getCourseHref(course.slug, authoredSlugs[0])}
                       data-course-link
-                      className="underline-offset-4 transition-colors duration-[--dur-fast] ease-[--ease-mech] after:absolute after:inset-0 after:content-[''] hover:text-pillar-text hover:underline focus-visible:text-pillar-text"
+                      className="underline-offset-4 transition-colors duration-(--dur-fast) ease-mech after:absolute after:inset-0 after:content-[''] hover:text-pillar-text hover:underline focus-visible:text-pillar-text"
                     >
                       {course.title}
                     </Link>
@@ -231,7 +231,7 @@ export function MasteryResultsIndex({
                               href={`/lessons/${lesson.slug}`}
                               className={cn(
                                 "group/row flex min-h-11 items-center gap-3 py-1 text-foreground",
-                                "transition-colors duration-[--dur-fast] ease-[--ease-mech]",
+                                "transition-colors duration-(--dur-fast) ease-mech",
                                 "hover:text-pillar-text focus-visible:text-pillar-text"
                               )}
                             >
@@ -243,7 +243,7 @@ export function MasteryResultsIndex({
                               <span
                                 aria-hidden="true"
                                 data-decorative=""
-                                className="shrink-0 text-xs opacity-0 transition-opacity duration-[--dur-fast] group-hover/row:opacity-100"
+                                className="shrink-0 text-xs opacity-0 transition-opacity duration-(--dur-fast) group-hover/row:opacity-100"
                               >
                                 →
                               </span>

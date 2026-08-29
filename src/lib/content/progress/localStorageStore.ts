@@ -121,6 +121,14 @@ export function getLessonProgressStore(): LessonProgressStore {
  */
 let completedSlugsCache: Set<string> | null = null;
 
+/**
+ * The one object every "no slugs to report" answer returns, so that answer is
+ * referentially stable too. `new Set()` per call is a *different* empty set
+ * each time, which is the one thing a `useSyncExternalStore` snapshot may
+ * never be — see the catch below.
+ */
+const NO_COMPLETED_SLUGS: Set<string> = new Set();
+
 export function invalidateCompletedLessonSlugsCache() {
   completedSlugsCache = null;
 }
@@ -128,7 +136,7 @@ export function invalidateCompletedLessonSlugsCache() {
 /** Enumerates every completed lesson slug — used for aggregate per-course progress. */
 export function getAllCompletedLessonSlugs(): Set<string> {
   if (completedSlugsCache) return completedSlugsCache;
-  if (typeof window === "undefined") return new Set();
+  if (typeof window === "undefined") return NO_COMPLETED_SLUGS;
 
   const slugs = new Set<string>();
   try {
@@ -139,7 +147,21 @@ export function getAllCompletedLessonSlugs(): Set<string> {
       if (readFromStorage(slug).completed) slugs.add(slug);
     }
   } catch {
-    return new Set();
+    // Storage blocked outright — `window.localStorage` itself throws a
+    // SecurityError when a browser is set to block site data, and this
+    // function IS `useCompletedLessonSlugs`'s `getSnapshot`. Returning a
+    // fresh `new Set()` here meant every call produced a snapshot React's
+    // `Object.is` check read as changed, so every component reading lesson
+    // progress — `PrerequisiteReadout` (every lesson AND every problem
+    // page), `CourseTimeline`, `ProblemsCatalog`, `ConceptMapExplorer`,
+    // `ContinueLearning` — re-rendered forever and the tab hung with
+    // "Maximum update depth exceeded". Caching the failure the same way
+    // `readFromStorage` already caches its own makes the unavailable case
+    // stable instead of fatal; a later successful write still calls
+    // `invalidateCompletedLessonSlugsCache`, so this is not a permanent
+    // latch.
+    completedSlugsCache = NO_COMPLETED_SLUGS;
+    return completedSlugsCache;
   }
 
   completedSlugsCache = slugs;

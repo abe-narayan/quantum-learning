@@ -27,6 +27,10 @@ export const infiniteWellPoleLocation: NumericProblem = {
     value: firstPoleEnergy,
     tolerance: 0.01,
     incorrectFeedback: "Use E=n²π²/(8a²) with n=1, a=1.5 — this is exactly the lesson's boxed pole condition sin(2ka)=0, i.e. 2ka=π for the first pole.",
+    nearMisses: [
+      { value: Math.PI ** 2 / 72, tolerance: 0.005, feedback: "That substitutes the full width 2a = 3 where the formula wants the half-width a = 1.5." },
+      { value: (4 * Math.PI ** 2) / 18, tolerance: 0.01, feedback: "That is the n = 2 pole. The question asks for the first one." },
+    ],
   },
   hints: [
     { text: "Poles occur where sin(2ka)=0, i.e. 2ka=nπ." },

@@ -36,7 +36,7 @@ export const TOUCH_TARGET_CLASSES =
  *  of them (the theme toggle's bordered face vs. the menu button's bare
  *  one) and this primitive is not the place to flatten that. */
 const ICON_BUTTON_CLASSES =
-  "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-tight)]";
+  "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-(--radius-tight)";
 
 export type IconButtonProps = Omit<ComponentPropsWithRef<"button">, "children" | "className" | "type"> & {
   /** The icon. Give the button an `aria-label` — an SVG-only button has no

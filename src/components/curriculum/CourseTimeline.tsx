@@ -158,7 +158,7 @@ export function CourseTimeline({
                   aria-hidden
                   data-decorative=""
                   className={cn(
-                    "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 font-tech text-xs font-semibold transition-colors duration-[--dur-fast] ease-[--ease-instrument] group-hover:border-pillar group-focus-within:border-pillar",
+                    "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 font-tech text-xs font-semibold transition-colors duration-(--dur-fast) ease-instrument group-hover:border-pillar group-focus-within:border-pillar",
                     isComplete
                       ? "border-pillar bg-pillar-wash text-pillar-text"
                       : isStarted
@@ -196,9 +196,9 @@ export function CourseTimeline({
               <Link
                 href={courseHref}
                 aria-label={`${course.title} — ${statusLabel}`}
-                className="flex min-h-11 flex-col gap-2 rounded-[--radius-tight] py-2 pl-3 transition-colors duration-[--dur-fast] ease-[--ease-instrument] hover:bg-surface-muted sm:items-start sm:gap-2 sm:pb-8 sm:pl-0 sm:pt-3"
+                className="flex min-h-11 flex-col gap-2 rounded-(--radius-tight) py-2 pl-3 transition-colors duration-(--dur-fast) ease-instrument hover:bg-surface-muted sm:items-start sm:gap-2 sm:pb-8 sm:pl-0 sm:pt-3"
               >
-                <p className="text-sm font-semibold leading-snug text-foreground transition-colors duration-[--dur-fast] ease-[--ease-mech] group-hover:text-pillar-text">
+                <p className="text-sm font-semibold leading-snug text-foreground transition-colors duration-(--dur-fast) ease-mech group-hover:text-pillar-text">
                   {course.title}
                   {/* The station circle (✓ / number, ring color) is `aria-hidden`
                       pure decoration — this is the only place a screen-reader

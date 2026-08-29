@@ -57,6 +57,10 @@ export const zeroOneProductReducedState: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "A product state's reduced states are simply its individual factors, unchanged by the partial trace.",
     whyCorrect: "This is the sanity-check property partial trace must satisfy, verified directly in this lesson.",
-    whyWrong: ["Option c would only be correct if |01⟩ were entangled, which it isn't."],
+    whyWrong: [
+      { optionId: "b", text: "Reports qubit 0's factor. In |01⟩, qubit 0 is |0⟩ and qubit 1 is |1⟩." },
+      { optionId: "c", text: "A maximally mixed reduced state only arises when the traced-out partner was entangled, and |01⟩ is a product." },
+      { optionId: "d", text: "Brings in the X basis, which nothing in |01⟩ involves. Both qubits sit in computational-basis states." },
+    ],
   },
 };

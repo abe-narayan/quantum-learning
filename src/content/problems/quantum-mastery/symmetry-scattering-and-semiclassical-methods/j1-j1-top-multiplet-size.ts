@@ -25,6 +25,11 @@ export const j1j1TopMultipletSize: NumericProblem = {
     value: 5,
     tolerance: 0,
     incorrectFeedback: "A multiplet of total angular momentum j always contains 2j+1 states, mⱼ=j,j−1,...,−j.",
+    nearMisses: [
+      { value: 9, feedback: "9 is the whole product space, 3×3. It splits into three multiplets of sizes 5, 3 and 1; the question asks only for the top one." },
+      { value: 2, feedback: "2 is j, the top multiplet's total angular momentum. Its state count is 2j+1." },
+      { value: 4, feedback: "4 is 2j, which forgets the mⱼ=0 rung sitting between the negative and positive values." },
+    ],
   },
   hints: [
     { text: "Any multiplet of definite j contains 2j+1 states (mⱼ = j, j−1, ..., −j)." },

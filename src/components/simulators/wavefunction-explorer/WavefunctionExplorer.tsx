@@ -17,6 +17,18 @@ const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 
 /**
+ * The three ways to draw the same evolving state. Hoisted out of the JSX so
+ * the roving-tabindex handler can index into the same array the buttons are
+ * rendered from — an inline literal would rebuild on every render and the
+ * handler would have no stable list to walk.
+ */
+const VIEW_MODE_OPTIONS: { id: CanvasMode; label: string; hint: string }[] = [
+  { id: "density", label: "|ψ(x)|²", hint: "Where it is: chance of finding the particle at each point." },
+  { id: "real-imaginary", label: "Re / Im", hint: "The wave itself, both parts — this is what carries the phase." },
+  { id: "momentum", label: "|φ(k)|²", hint: "How fast it's going: the same state, as a spread of momenta." },
+];
+
+/**
  * Plain-English glosses for the parameter symbols the presets expose, keyed by
  * `ParamSpec.key` so only the ones the *current* preset actually shows get
  * rendered — a reader adjusting the tunneling barrier shouldn't have to read
@@ -223,6 +235,25 @@ export function WavefunctionExplorer({
     setConfig((prev) => ({ ...prev, paramValues: defaultParamValues(preset) }));
   }
 
+  // Roving tabindex + arrow keys for the view-mode radiogroup, the same ARIA
+  // Authoring Practices pattern `shared/controls.tsx`'s PillGroup uses: only
+  // the selected segment is in the Tab order, and arrows move *and* select
+  // the adjacent one, wrapping at the ends.
+  const viewModeRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  function handleViewModeKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    let delta = 0;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") delta = 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") delta = -1;
+    else return;
+
+    event.preventDefault();
+    const current = VIEW_MODE_OPTIONS.findIndex((option) => option.id === mode);
+    const nextIndex = ((current === -1 ? 0 : current) + delta + VIEW_MODE_OPTIONS.length) % VIEW_MODE_OPTIONS.length;
+    setMode(VIEW_MODE_OPTIONS[nextIndex].id);
+    viewModeRefs.current[nextIndex]?.focus();
+  }
+
   return (
     <SimulatorInstrument
       label="Wavefunction — time-dependent Schrödinger equation"
@@ -247,24 +278,42 @@ export function WavefunctionExplorer({
           </p>
           <p className="text-sm text-muted-foreground">{preset.description}</p>
 
-          <div role="tablist" aria-label="View mode" className="flex w-fit max-w-full overflow-hidden rounded-full border border-border">
-            {(
-              [
-                { id: "density", label: "|ψ(x)|²", hint: "Where it is: chance of finding the particle at each point." },
-                { id: "real-imaginary", label: "Re / Im", hint: "The wave itself, both parts — this is what carries the phase." },
-                { id: "momentum", label: "|φ(k)|²", hint: "How fast it's going: the same state, as a spread of momenta." },
-              ] as const
-            ).map((option) => (
+          {/*
+            `role="radiogroup"`, not the `role="tablist"` this used to claim.
+            The ARIA tabs pattern promises a set of tabpanels the tabs own via
+            `aria-controls`, plus arrow-key navigation with a roving tabindex —
+            none of which existed here, and none of which fits: there is one
+            canvas below, redrawn in a different view, not three panels. A
+            radiogroup is what this control actually is, and the keyboard
+            behaviour below is the same APG pattern `shared/controls.tsx`'s
+            PillGroup implements, ported rather than reinvented. The joined
+            segmented-control look is unchanged.
+          */}
+          <div
+            role="radiogroup"
+            aria-label="View mode"
+            className="flex w-fit max-w-full overflow-hidden rounded-full border border-border"
+          >
+            {VIEW_MODE_OPTIONS.map((option, i) => (
               <button
                 key={option.id}
+                ref={(el) => {
+                  viewModeRefs.current[i] = el;
+                }}
                 type="button"
-                role="tab"
-                aria-selected={mode === option.id}
+                role="radio"
+                aria-checked={mode === option.id}
+                tabIndex={mode === option.id ? 0 : -1}
                 aria-label={`${option.label} — ${option.hint}`}
                 title={option.hint}
                 onClick={() => setMode(option.id)}
+                onKeyDown={handleViewModeKeyDown}
                 className={
-                  "min-h-11 px-4 py-1 text-xs font-medium transition-colors " +
+                  // The focus ring is inset (`ring-inset`, no offset): these
+                  // three buttons sit flush inside one `overflow-hidden`
+                  // pill, so an offset ring would be clipped away by the
+                  // parent and leave the focused segment unmarked.
+                  "min-h-11 px-4 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pillar " +
                   (mode === option.id ? "bg-pillar text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted")
                 }
               >

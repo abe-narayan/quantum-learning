@@ -29,12 +29,12 @@ export const wkbMomentumFrames = wkbNs.map((n) => ({
 export const lessonMeta = {
   title: "The WKB Approximation",
   description:
-    "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within 0.06% at this platform's grid resolution — a route through classical mechanics and de Broglie wavelengths, unrelated to perturbation theory or the variational method, arriving at (nearly) the same answer anyway.",
+    "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within ~0.05% at the engine's grid resolution. A route through classical mechanics and de Broglie wavelengths, unrelated to perturbation theory or the variational method, arriving at (nearly) the same answer anyway.",
   course: "approximation-methods",
   module: "the-wkb-approximation",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 25,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-mechanics/approximation-methods/the-variational-method"],
   objectives: [
     "State the WKB (Bohr-Sommerfeld) quantization condition and identify the classically allowed region it integrates over",
@@ -55,14 +55,23 @@ Perturbation theory needs a small parameter; the variational method needs a good
 
 ## Motivation
 
-WKB (Wentzel-Kramers-Brillouin) treats the <Term id="wavefunction">wavefunction</Term> as approximately a
-classical wave with a slowly-varying local wavelength set by the local
-classical momentum $p(x)=\sqrt{2m(E-V(x))}$, demanding that this wave
-close consistently on itself between the classical turning points.
+WKB (Wentzel-Kramers-Brillouin) treats the <Term id="wavefunction">wavefunction</Term> as a classical wave
+whose local wavelength is set by the local classical momentum
+$p(x)=\sqrt{2m(E-V(x))}$, and demands that the wave close consistently on
+itself between the classical turning points.
+
+The idea predates the Schrödinger equation. Bohr and Sommerfeld were
+fitting whole numbers of waves into classical orbits in 1913, years
+before anyone knew what was doing the waving, and the condition below is
+recognisably theirs with one correction added. What the 1926 work
+supplied was a derivation from the wave equation, plus a statement of
+when the approximation can be trusted: the potential must vary slowly
+over one de Broglie wavelength, which fails hardest right at the turning
+points, where $p(x)\to0$ and the wavelength diverges.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/b/b4/Kramers_1928.jpg"
-  alt="Photograph of physicist Hendrik Kramers, taken around 1928 in Ann Arbor, Michigan"
+  alt="Hendrik Kramers, the Dutch theoretical physicist, in a portrait taken around 1928 during a visit to Ann Arbor, Michigan"
   caption="Hendrik Kramers, the 'K' in WKB, photographed around 1928, the same period he, Gregor Wentzel, and Léon Brillouin independently developed the semiclassical quantization method this lesson applies to the harmonic oscillator."
   credit="AIP Emilio Segrè Visual Archives, Goudsmit Collection"
   creditUrl="https://commons.wikimedia.org/wiki/File:Kramers_1928.jpg"
@@ -92,10 +101,12 @@ directly:
   ariaLabel="Harmonic oscillator potential with the n=1 energy line and classically allowed region shaded"
 />
 
-The shaded band is exactly where $E>V(x)$, the region the action
-integral $\int_{x_1}^{x_2}p(x)dx$ sums over; outside it, $p(x)$ would be
-imaginary, which is precisely why the integral stops at the turning
-points rather than running over all $x$.
+The shaded band is where $E>V(x)$, and it is the region the action
+integral $\int_{x_1}^{x_2}p(x)\,dx$ runs over. Outside it $p(x)$ turns
+imaginary, which is why the integral stops at the turning points rather
+than sweeping all of $x$. The quantum wavefunction does not stop there;
+it decays into the forbidden region, and reproducing that decay correctly
+is what the boundary-matching argument behind the $\tfrac12$ handles.
 
 ### The quantization condition
 
@@ -111,30 +122,61 @@ This is the **Bohr-Sommerfeld quantization condition** (with the
 $\frac12$ Maslov correction for two smooth/"soft" turning points, the
 standard case for a smooth confining potential like the harmonic
 oscillator). This platform's `wkbActionIntegral` computes the left side
-directly, as a Riemann sum over the grid restricted to where $E>V(x)$;
+as a Riemann sum over the grid restricted to where $E>V(x)$, and
 `wkbQuantizedEnergy` bisects on $E$ until the integral matches the right
-side for a given $n$, the same bisection strategy Wave Mechanics'
-`finiteSquareWellGroundStateEnergy` already used for a different
-transcendental equation.
+side for a given $n$. That is the same bisection Wave Mechanics'
+`finiteSquareWellGroundStateEnergy` used on a different transcendental
+equation.
+
+### Why the harmonic oscillator comes out exact
+
+For $V(x)=\tfrac12m\omega^2x^2$ the action integral can be done in closed
+form. The turning points sit at $\pm a$ with $a^2=2E/(m\omega^2)$, and
+
+$$
+\int_{-a}^{a}\sqrt{2m\left(E-\tfrac12m\omega^2x^2\right)}\,dx = m\omega\int_{-a}^{a}\sqrt{a^2-x^2}\,dx = m\omega\cdot\frac{\pi a^2}{2} = \frac{\pi E}{\omega}
+$$
+
+using the standard result that the integral of $\sqrt{a^2-x^2}$ across
+its full range is the area of a half-disc, $\pi a^2/2$. Setting that
+equal to $(n+\tfrac12)\pi\hbar$ and cancelling the $\pi$:
+
+$$
+\frac{E}{\omega} = \left(n+\tfrac12\right)\hbar \quad\Longrightarrow\quad E_n = \left(n+\tfrac12\right)\hbar\omega
+$$
+
+which is the exact spectrum, at every $n$, with no approximation left
+over. Nothing about semiclassical validity was invoked: the action
+integral for a quadratic potential happens to be exactly linear in $E$,
+and a linear condition has an exact solution. Any residual disagreement
+in the table below is therefore the grid's fault and not the method's.
 
 ## Physical Interpretation
 
-WKB is a *semiclassical* approximation. It's built entirely from the
-classical momentum $p(x)$, with quantum mechanics entering only through
-the $\hbar$ in the quantization condition. It tends to work best when
-the potential varies slowly on the scale of the local de Broglie
-wavelength, physically the "large quantum number" or "correspondence
-principle" regime where a quantum system starts behaving classically.
-The harmonic oscillator is a special case where WKB happens to be exact
-at *every* $n$, not just asymptotically for large $n$: a genuine,
-checkable mathematical fact about this specific potential's shape, not a
-general property of WKB.
+WKB is a semiclassical method in a literal sense: it is built from the
+classical momentum $p(x)$, and quantum mechanics enters only through the
+$\hbar$ on the right-hand side of the quantization condition. It works
+best when the potential varies slowly over one de Broglie wavelength,
+which is the large-quantum-number regime where a system starts to behave
+classically.
+
+That framing makes the harmonic oscillator look like a lucky accident,
+and the calculation above shows it is not luck but a property of
+quadratic potentials, provable in three lines. It is worth separating the
+two claims: WKB is *asymptotically* good for generic potentials at large
+$n$, and *exactly* right for this one at every $n$, for a reason that has
+nothing to do with the asymptotics.
 
 ## Worked Example
 
 **Compute the WKB-quantized energies for the harmonic oscillator
 ($m=\omega=1$) at $n=0,1,2,3$, and compare to the exact
 $E_n=(n+\frac12)\hbar\omega$.**
+
+Computed on a grid of spacing $dx=0.02$ (the resolution the engine's own
+test suite uses; the coarser $dx=0.025$ grid that draws the potential
+diagram above gives slightly different residuals, which is itself the
+point):
 
 | $n$ | Exact | WKB (this engine) | Difference |
 |---|---|---|---|
@@ -143,10 +185,14 @@ $E_n=(n+\frac12)\hbar\omega$.**
 | 2 | 2.5000 | 2.5003 | 0.00031 |
 | 3 | 3.5000 | 3.4996 | 0.00038 |
 
-Every WKB value matches the exact answer to within $\sim0.04\%$ (the
-small residual differences are pure grid-resolution numerical error in
-the Riemann-sum action integral and bisection, not a limitation of WKB
-itself: WKB is mathematically exact for the harmonic oscillator).
+Every WKB value matches to within about $0.05\%$, the worst case being
+$n=0$ at $0.00026/0.5\approx0.05\%$. Those residuals are grid-resolution
+error in the Riemann-sum action integral and the bisection, as the closed
+form above establishes; the method itself contributes nothing to them.
+The direct check is that changing the grid changes them: on the coarser
+$dx=0.025$ grid the same four differences come out
+$0.00035, 0.00043, 0.00041, 0.00057$, moving with the discretization
+rather than with $n$.
 
 The table's four energies are exactly the ones the action integral
 $\int_{x_1}^{x_2}p(x)dx$ is evaluated over. Watching the local classical
@@ -164,15 +210,15 @@ again:
   options={[
     { label: "n = 0 (smallest quantum number)", value: "n0" },
     { label: "n = 3 (largest quantum number)", value: "n3" },
-    { label: "None in particular — all four errors should be about the same tiny size", value: "same" },
+    { label: "None in particular: all four errors should be about the same tiny size", value: "same" },
   ]}
   correctValue="same"
-  explanation="The 'large n is more accurate' rule of thumb is real for a generic potential, but it doesn't show up here: the errors run 0.00026, 0.00008, 0.00031, 0.00038 for n=0 through 3 — no downward trend at all, just grid-resolution noise scattered near zero. That's because the harmonic oscillator is one of the rare potentials where WKB is exact at every n, not just asymptotically, so there's no large-n convergence to see. The usual rule of thumb applies to potentials where WKB is only approximately right, which this one isn't."
+  explanation="The 'large n is more accurate' rule of thumb is real for a generic potential, but it doesn't show up here. The errors run 0.00026, 0.00008, 0.00031, 0.00038 for n=0 through 3: no downward trend at all, just grid-resolution noise scattered near zero. That's because the harmonic oscillator is one of the rare potentials where WKB is exact at every n, not just asymptotically, so there's no large-n convergence to see. The usual rule of thumb applies to potentials where WKB is only approximately right, which this one isn't."
 />
 
 <InteractiveSection
   title="Step through n, watch the action integral grow"
-  description="Step through the energy level n = 0 to 3, the same four levels as the table above. Each curve is the local classical momentum p(x), computed from the same harmonic oscillator potential, but shown only across the classically allowed region. Watch the turning points spread apart and the peak momentum grow as n increases — that growing area under the curve is exactly the action integral the quantization condition sets equal to (n+½)πħ."
+  description="Step through the energy level n = 0 to 3, the same four levels as the table above. Each curve is the local classical momentum p(x), computed from the same harmonic oscillator potential, but shown only across the classically allowed region. Watch the turning points spread apart and the peak momentum grow as n increases. That growing area under the curve is the action integral the quantization condition sets equal to (n+½)πħ."
 >
   <ParametricCurve
     frames={wkbMomentumFrames}
@@ -211,9 +257,10 @@ points is not optional bookkeeping.
    what does this imply about how the action integral $\int p\,dx$
    behaves as $E$ grows? (Hint: this behavior is exactly what
    `wkbQuantizedEnergy`'s bisection search relies on.)
-4. Why is WKB's near-perfect harmonic-oscillator result described here
-   as a "genuine, checkable fact about this potential," rather than
-   general evidence that WKB is always this accurate?
+4. The closed-form action integral above gave $\pi E/\omega$, linear in
+   $E$. Explain how that linearity is what makes the WKB condition exact
+   here, and what would have to be true of a potential for the same
+   argument to fail.
 
 <PracticeLinks problems={practiceProblems} />
 

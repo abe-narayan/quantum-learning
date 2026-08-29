@@ -23,6 +23,10 @@ export const rabiProbabilityAtTime: NumericProblem = {
     value: 0.75,
     tolerance: 0.01,
     incorrectFeedback: "P = cos²(ωt/2). Substitute ωt = π/3, so the angle inside is π/6.",
+    nearMisses: [
+      { value: 0.25, feedback: "0.25 is cos²(π/3), using ωt where the formula wants ωt/2. Halving the angle is what makes the period 2π/ω rather than 4π/ω." },
+      { value: Math.sqrt(3) / 2, tolerance: 0.01, feedback: "√3/2 is cos(π/6), the amplitude. The probability squares it." },
+    ],
   },
   hints: [
     { text: "The formula from the lesson is P(t) = cos²(ωt/2)." },

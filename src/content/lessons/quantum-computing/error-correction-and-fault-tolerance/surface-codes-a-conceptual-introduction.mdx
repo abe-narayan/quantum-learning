@@ -14,7 +14,7 @@ export const lessonMeta = {
   module: "surface-codes-a-conceptual-introduction",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 20,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map"],
   objectives: [
     "Describe the surface code's 2D lattice structure and its two types of local stabilizers",
@@ -24,26 +24,22 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Local stabilizers, arbitrarily large grids">
-The Shor code needs 9-qubit-wide stabilizers and no way to improve its distance without a redesign. The surface code fixes both: every stabilizer touches only 4 neighboring qubits, however large the grid grows.
+The Shor code needs stabilizers spanning six qubits at a time and offers no way to improve its distance without a redesign. The surface code fixes both: every stabilizer touches only 4 neighboring qubits, however large the grid grows.
 </LessonHook>
 
 ## Motivation
 
-The Shor code needs 9-qubit-wide stabilizers and offers no way to improve
-its distance without redesigning the whole code. The **<Term id="surface-codes">surface code</Term>**,
-the leading candidate for real, large-scale fault-tolerant quantum
-computing, fixes both problems: every stabilizer touches only 4
-neighboring qubits on a 2D grid, and distance grows simply by making the
-grid bigger, with no fundamental redesign.
+The Shor code has two problems that only show up when you try to build it.
+Its $X$-type stabilizers span six of its nine qubits at once, two whole
+blocks of three, which means gates between qubits that are nowhere near
+each other on a chip. And there is no dial to turn: wanting more
+protection means designing a different code.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/8/83/QuEra_Aquila_Magneto-Optical_Trap.jpg"
-  alt="The magneto-optical trap of QuEra's neutral-atom quantum computer, used to arrange and control large 2D arrays of qubits"
-  caption="The magneto-optical trap of QuEra's neutral-atom quantum computer, a real platform (alongside superconducting devices like Google's) used to arrange large 2D qubit arrays and demonstrate logical, topologically-protected qubits, the same local-lattice idea this lesson describes conceptually."
-  credit="QuEra Computing, Inc., via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:QuEra_Aquila_Magneto-Optical_Trap.jpg"
-  license="CC BY 4.0"
-/>
+The **<Term id="surface-codes">surface code</Term>** fixes both, and that is why it, rather than
+anything in the last four lessons, is what fault-tolerance roadmaps are
+built around. Every stabilizer touches 4 neighbouring qubits on a 2D grid,
+however large the grid becomes, and protection increases by making the grid
+bigger with the same pattern repeated.
 
 ## Mathematical Development
 
@@ -68,7 +64,7 @@ once, exactly the local overlap that lets neighboring stabilizers jointly
 pin down where an error occurred. Every other vertex and face in a larger
 grid has the identical local pattern, just repeated:
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
   <svg width={300} height={280} viewBox="0 0 300 280" role="img" aria-label="A 3 by 3 vertex surface-code lattice: physical qubits on edges, a Z-type vertex stabilizer highlighted at the center touching 4 qubits, and an X-type face stabilizer highlighted at top left touching a different 4 qubits, sharing 2 qubits with the vertex stabilizer">
     <line x1={60} y1={60} x2={150} y2={60} className="stroke-border" strokeWidth={2} />
     <line x1={150} y1={60} x2={240} y2={60} className="stroke-border" strokeWidth={2} />
@@ -112,17 +108,18 @@ grid has the identical local pattern, just repeated:
 
 ### Try it: the vertex and face mechanisms, already simulated
 
-The two stabilizer types pictured above are not a new mechanism. The
-vertex stabilizer's all-Z pattern is exactly the Z-type parity check
-Lesson 2's 3-qubit bit-flip code already used to catch X errors; the
-face stabilizer's all-X pattern is exactly Lesson 3's phase-flip code
-catching Z errors, this platform's real `runBitFlipCorrectionCycle` and
-`runPhaseFlipCorrectionCycle` engine, unchanged, just relabeled as
-"vertex" and "face" once the qubits are laid out on a 2D grid instead of
-a line. Inject an error into each below and watch that same engine run,
-at the 3-qubit scale it actually simulates.
+The two stabilizer types pictured above are not a new mechanism. The vertex
+stabilizer's all-Z pattern is the Z-type parity check Lesson 2's bit-flip
+code used to catch X errors. The face stabilizer's all-X pattern is Lesson
+3's phase-flip code catching Z errors. Both are this platform's
+`runBitFlipCorrectionCycle` and `runPhaseFlipCorrectionCycle`, unchanged,
+relabelled "vertex" and "face" once the qubits are laid out on a grid
+instead of a line.
 
-<InteractiveSection title="The vertex and face mechanisms, already simulated" description="First: the Z-type stabilizer mechanism the surface code's vertex stabilizers generalize, catching X errors. Second: the X-type mechanism the face stabilizers generalize, catching Z errors. Inject an error on each and confirm the syndrome and recovery, exactly the local, 4-qubit stabilizer idea above, running at the scale this platform actually builds and verifies.">
+Inject an error into each below and watch the same engine run, at the
+3-qubit scale it does simulate.
+
+<InteractiveSection title="The vertex and face mechanisms, already simulated" description="First, the Z-type mechanism the surface code's vertex stabilizers generalize, catching X errors. Second, the X-type mechanism the face stabilizers generalize, catching Z errors. Inject an error on each and confirm the syndrome and the recovery. This is the local stabilizer idea above, running at the scale this platform builds and verifies.">
   <div className="flex flex-col gap-6">
     <LazySyndromeExplorer mode="bit-flip" />
     <LazySyndromeExplorer mode="phase-flip" />
@@ -134,10 +131,12 @@ at the 3-qubit scale it actually simulates.
 A surface code's <Term id="code-distance">distance</Term> equals the grid's linear size (roughly, the
 shorter of its two dimensions): a $d\times d$ grid gives a
 distance-$d$ code, using $O(d^2)$ physical qubits for 1 logical qubit.
-Unlike the Shor code, where reaching a larger distance means an entirely
-different, hand-designed construction, a surface code's distance is a
-single tunable parameter: build a bigger grid, get a more robust code,
-using the same stabilizer *pattern*, just repeated.
+Where reaching a larger distance with the Shor code means a different,
+hand-designed construction, a surface code's distance is one tunable
+parameter. Build a bigger grid, get a more robust code, with the same
+stabilizer *pattern* repeated. Engineering effort goes into making more of
+the same thing rather than into inventing a new thing, which is the
+difference between a research result and a manufacturing plan.
 
 ### Why locality matters for real hardware
 
@@ -148,19 +147,22 @@ specified; this platform's engine has no notion of physical qubit
 easily as any other. Real hardware is not like this: physical qubits sit
 at fixed locations, and a two-qubit gate is far easier (and far less
 error-prone) between physically adjacent qubits than between distant
-ones. A stabilizer that only ever needs 4 *neighboring* physical qubits,
-never a long-range interaction across the whole device, is directly
-implementable on hardware with only local connectivity, which is exactly
-why surface codes, not the Shor code, are what real superconducting and
-other qubit-platform roadmaps are built around (a fact this course's
-Quantum Hardware pillar develops further).
+ones. A stabilizer needing only 4 *neighbouring* qubits, and never a
+long-range interaction across the device, is implementable on hardware with
+purely local connectivity.
+
+That is the reason surface codes, and not the Shor code, are what
+superconducting and neutral-atom roadmaps are built around. It is a
+constraint invisible from inside this course's simulator, where any two
+qubit indices interact as easily as any others, and decisive the moment you
+build anything.
 
 ### Scope: conceptual only
 
-Actually simulating even a small surface code (say, distance 3, needing
-roughly 9 physical qubits plus additional stabilizer-measurement
-ancillas, arranged and connected on an actual 2D pattern) is substantially
-more engineering than this course's `errorCorrection.ts` builds. Real
+Simulating even a small surface code (distance 3, needing roughly 9
+physical qubits plus stabilizer-measurement ancillas, arranged and
+connected on a real 2D pattern) is substantially more engineering than this
+course's `errorCorrection.ts` builds. Real
 implementations also need a nontrivial *decoding* algorithm (commonly
 <Term id="mwpm-decoding">minimum-weight perfect matching</Term>) to interpret many simultaneous syndrome
 measurements, itself a serious piece of software distinct from the
@@ -174,21 +176,19 @@ claiming a working simulated implementation that doesn't exist here.
 The surface code's core insight is architectural, not purely
 mathematical: trade some qubit efficiency (more physical qubits per
 logical qubit than a hypothetical "optimal" code) for a stabilizer
-structure that real, physically-constrained hardware can actually
-measure, exactly the kind of tradeoff the Quantum Hardware pillar's
-courses (built on the different but related question of what physical
-qubits can and can't easily do) explore from the engineering side.
+structure that physically-constrained hardware can measure at all. That is
+the kind of tradeoff the Quantum Hardware pillar explores from the
+engineering side.
 
-This isn't purely conceptual, either. In December 2024, Google's Willow
-chip ran exactly the distance-scaling experiment this lesson describes
-in the abstract: distance-3, distance-5, and distance-7 surface-code
-patches on the same device, each just a bigger grid of the identical
-local stabilizer pattern above. The logical error rate dropped roughly
-in half with each distance increase, the first real demonstration that
-growing a surface code actually helps rather than adding more noise
-than it corrects, a milestone specifically because it confirmed the
-scaling behavior this lesson's "distance is a single tunable parameter"
-claim predicts, on real hardware, not just on paper.
+None of this is only conceptual. In December 2024, Google's Willow chip ran
+the distance-scaling experiment this lesson describes: distance-3,
+distance-5 and distance-7 surface-code patches on the same device, each a
+bigger grid of the same local stabilizer pattern. The logical error rate
+dropped roughly in half with each distance increase.
+
+That halving is the whole claim. It is the measured version of "distance is
+a single tunable parameter", and it is the difference between a code that
+works on paper and a code you would build a machine around.
 
 <PredictBeforeReveal
   question="Both the Shor code and a surface code can be built at distance 3, using roughly the same qubit count. Which one keeps its qubit-efficiency edge as you push to much larger distance, say 11?"

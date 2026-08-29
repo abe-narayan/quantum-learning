@@ -50,6 +50,10 @@ export const syndromeForQubit0Error: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "The syndrome directly encodes which parities the error disturbed.",
     whyCorrect: "Matches the engine's actual syndrome extraction exactly.",
-    whyWrong: ["Any answer other than (1,0) doesn't match this specific error's effect on the two parity checks."],
+    whyWrong: [
+      { optionId: "b", text: "Reports no error at all, but qubits 0 and 1 no longer agree." },
+      { optionId: "c", text: "The signature of an error on qubit 1, which sits in both parity checks and so trips both." },
+      { optionId: "d", text: "The signature of an error on qubit 2, which trips only the second check." },
+    ],
   },
 };

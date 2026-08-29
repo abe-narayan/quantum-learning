@@ -50,12 +50,58 @@ const PIPELINE_STEPS = [
  */
 function CompilationPipeline() {
   return (
+    // No right-edge `mask-image` fade. The one that was here
+    // (`linear-gradient(to right, black 88%, transparent)`) was static, so it
+    // did not track scroll position and did not know whether there was
+    // anything left to scroll to. Two consequences, both bad: at desktop
+    // widths the four steps fit with room to spare — 4 × 10.5rem plus arrows
+    // is well inside the container — and the fade dimmed the tail of the
+    // last card's text anyway, for no reason; and on a phone, once the reader
+    // scrolled to the end, the fade was still over the rightmost card, so
+    // "Bitstrings" could never be read at full opacity no matter what they
+    // did. Content the reader cannot reach is a worse trade than a visible
+    // scrollbar. The cards are `shrink-0` inside `overflow-x-auto`, so a
+    // narrow viewport clips the last one mid-card, which is itself the
+    // clearest possible signal that the row continues.
+    //
+    // ...but "the reader can scroll to it" was only ever true with a mouse or
+    // a trackpad. This strip holds four `min-w-[10.5rem]` (168px) cards with
+    // `gap-3` and a ~14px arrow between each, so its minimum content width is
+    // 4 × 168 + 3 × 38 ≈ 786px against the ~288px of column a 320px viewport
+    // leaves — and it contains no link, no button, no focusable descendant of
+    // any kind. A `div` with `overflow-x: auto` is focusable by default only
+    // in Firefox, so on a phone or in a keyboard-only session three of the
+    // four pipeline stages were simply unreachable: WCAG 2.1.1. Worse than
+    // the usual case, too, because `html, body { overflow-x: clip }`
+    // (globals.css §"Full-bleed overhang") means there is no page-level
+    // scrollbar to hint that the row continues — the clipped fourth card is
+    // the only signal, and it is invisible to anyone not looking at pixels.
+    //
+    // The fix is `src/mdx-components.tsx`'s `Table` wrapper, one role weaker:
+    // `tabIndex={0}` makes it a real tab stop, and a name tells whoever lands
+    // on it what they just took focus of and that it moves. `role="group"`
+    // rather than `Table`'s `role="region"` deliberately — `region` is a
+    // landmark, worth spending on a wide data table a reader may want to find
+    // from a landmark list, but this is a four-box caption under a live
+    // instrument and does not belong in that list. The visible focus ring is
+    // the global `:focus-visible` rule in globals.css (2px pillar outline,
+    // 2px offset), which is exactly what `Table`'s explicit utilities
+    // recreate; nothing here opts out of it, so it needs no restatement.
+    //
+    // The name says "scrollable" in words, and uses a comma rather than the
+    // em dash the rest of this file's prose would take: several screen
+    // readers pronounce "—" outright ("em dash") instead of pausing on it, so
+    // punctuation that reads well on screen can read badly aloud in an
+    // accessible name.
     <div
-      className="flex flex-nowrap items-center gap-3 overflow-x-auto pb-2 [mask-image:linear-gradient(to_right,black_88%,transparent)]"
+      role="group"
+      aria-label="Compilation pipeline stages, scrollable"
+      tabIndex={0}
+      className="flex flex-nowrap items-center gap-3 overflow-x-auto pb-2"
     >
       {PIPELINE_STEPS.map((step, index) => (
         <div key={step.label} className="flex shrink-0 items-center gap-3">
-          <div className="min-w-[10.5rem] rounded-lg border border-pillar-edge bg-pillar-wash px-4 py-3">
+          <div className="min-w-[10.5rem] rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-4 py-3">
             <p className="font-tech text-[0.65rem] uppercase tracking-[0.12em] text-pillar-text">
               {String(index + 1).padStart(2, "0")}
             </p>

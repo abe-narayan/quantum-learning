@@ -173,7 +173,7 @@ export function CompareStatesExplorer() {
 
       <div
         aria-live="polite"
-        className="mt-3 rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+        className="mt-3 rounded-panel border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
       >
         Tilted {Math.round((angles.theta * 180) / Math.PI)}° from |0⟩ and turned{" "}
         {Math.round((angles.phi * 180) / Math.PI)}° around: measuring this qubit gives 0 about{" "}

@@ -45,10 +45,15 @@ export const superdenseNonOrthogonalMessagesConsequence: MultipleChoiceProblem =
       { description: "If two of Alice's four messages produced non-orthogonal joint states, Bob's decode-then-measure circuit would sometimes yield outcomes consistent with either message." },
       { description: "That ambiguity means Bob could no longer recover both classical bits with certainty for those two messages." },
     ],
-    finalAnswer: "Non-orthogonal encodings would make two of the four messages sometimes indistinguishable to Bob's measurement — option (b).",
+    finalAnswer: "Non-orthogonal encodings would make two of the four messages sometimes indistinguishable to Bob's measurement.",
   },
   explanation: {
     correctIdea: "Orthogonality of the four joint states is exactly what makes them perfectly distinguishable by a single measurement.",
     whyCorrect: "This is a general fact about quantum measurement, not specific to superdense coding: only orthogonal states can be perfectly discriminated.",
+    whyWrong: [
+      { optionId: "a", text: "Grants perfect discrimination without orthogonality, which no measurement can deliver for overlapping states." },
+      { optionId: "c", text: "Changes the qubit count. Alice still sends one qubit; what degrades is Bob's ability to read it reliably." },
+      { optionId: "d", text: "Reaches for no-cloning, which is about copying an unknown state rather than telling two known states apart." },
+    ],
   },
 };

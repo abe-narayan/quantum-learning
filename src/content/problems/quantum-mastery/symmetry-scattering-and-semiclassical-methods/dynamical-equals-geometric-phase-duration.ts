@@ -32,6 +32,10 @@ export const dynamicalEqualsGeometricPhaseDuration: NumericProblem = {
     value: T,
     tolerance: 0.02,
     incorrectFeedback: "Set ω₀T/2 = π/2 and solve for T (with ω₀=1).",
+    nearMisses: [
+      { value: Math.PI / 2, tolerance: 0.02, feedback: "π/2 is the geometric phase magnitude itself. The dynamical phase is ω₀T/2, so solving for T undoes the factor of a half." },
+      { value: 2 * Math.PI, tolerance: 0.02, feedback: "2π doubles rather than halves. From ω₀T/2 = π/2 with ω₀ = 1, T comes out at π." },
+    ],
   },
   hints: [
     { text: "The geometric phase magnitude at θ=60° is π(1−cos60°)=π/2 (the lesson's own worked value)." },

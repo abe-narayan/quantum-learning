@@ -66,7 +66,7 @@ export const lessonMeta = {
   A quantum phase always splits into a part that blows up in the
   classical limit, carrying no new information, and a part that stays
   exactly finite, purely geometric, and survives as a real physical
-  effect. WKB and the adiabatic theorem turn out to be the same split in
+  effect. <Term id="wkb-approximation">WKB and the adiabatic theorem turn out to be</Term> the same split in
   disguise.
 </LessonHook>
 
@@ -78,7 +78,7 @@ The Adiabatic Theorem and Berry Phase showed a slowly-driven quantum state
 tracking its instantaneous eigenstate, picking up a geometric phase along
 the way. Neither, on its own, looks like it's about *symmetry* in the way
 Clebsch-Gordan and Wigner-Eckart obviously are. But both are instances of
-exactly the same underlying phenomenon — the divergent part, in either
+exactly the same underlying phenomenon: the divergent part, in either
 case, is physically nothing more than oscillations piling up faster and
 faster. This capstone makes that convergence explicit.
 
@@ -100,7 +100,7 @@ says the classical action integral (in units of $\hbar$) is quantized. As
 $\hbar\to0$ at fixed classical action, $n\to\infty$: the *same* classical
 trajectory corresponds to an enormous, and enormously precise, quantum
 number. The WKB phase $\frac1\hbar\int p\,dx$ diverges in this limit,
-accumulating an unbounded number of oscillations, exactly the sense in
+accumulating an unbounded number of oscillations, the sense in
 which "the wave nature stops mattering for gross features" and a sharp
 classical trajectory emerges.
 
@@ -109,8 +109,8 @@ E_n(t')\,dt'$, behaves identically: the *slower* a loop is traversed
 (deeper into the regime where the adiabatic theorem itself is valid), the
 larger $\theta_n$ grows, unboundedly. But the Berry (geometric) phase
 $\gamma_n$ derived alongside it does **not** grow with the loop's
-duration at all, it depends only on the path's shape in parameter space.
-This is the exact same split WKB exhibits: an unbounded, "counts how much
+duration at all; it depends only on the path's shape in parameter space.
+This is the same split WKB exhibits: an unbounded, "counts how much
 classical time/action has passed" piece, and a bounded, purely geometric
 residue.
 
@@ -122,12 +122,12 @@ residue.
     { label: "Both stay fixed, since the loop's shape never changes", value: "both-fixed" },
   ]}
   correctValue="split"
-  explanation="θ_n=−(1/ħ)∫E_n dt keeps accumulating for as long as the loop takes, so a longer T means a strictly larger dynamical phase, with no upper bound. γ, being a line integral over the path alone, never sees T at all — it sits at exactly π/2 for this θ regardless of duration, the same split the plot below makes numerically explicit."
+  explanation="θ_n=−(1/ħ)∫E_n dt keeps accumulating for as long as the loop takes, so a longer T means a strictly larger dynamical phase, with no upper bound. γ, being a line integral over the path alone, never sees T at all; it sits at exactly π/2 for this θ regardless of duration, the same split the plot below makes numerically explicit."
 />
 
 <InteractiveSection
   title="Watch one grow, one stay fixed"
-  description="Both curves use The Adiabatic Theorem and Berry Phase's own θ=60° example (ω₀=ħ=1). The dynamical phase (brand) grows linearly as the loop is traversed more slowly, exactly the divergence WKB's action phase also exhibits as ħ→0. The Berry phase (accent) sits at a fixed π/2 for every duration shown, precisely because it depends only on the loop's shape, never on how long that loop takes."
+  description="Both curves use The Adiabatic Theorem and Berry Phase's own θ=60° example (ω₀=ħ=1). The dynamical phase (brand) grows linearly as the loop is traversed more slowly, the same divergence WKB's action phase exhibits as ħ→0. The Berry phase (accent) sits at a fixed π/2 for every duration shown, precisely because it depends only on the loop's shape, never on how long that loop takes."
 >
   <ParametricCurve
     frames={phaseComparisonFrames}
@@ -145,7 +145,7 @@ classical theorem, cited here rather than re-derived, from Hamiltonian
 mechanics rather than quantum theory). Old quantum theory's Bohr-Sommerfeld
 rule simply quantized this classical invariant in units of $\hbar$; WKB
 derives the *same* condition properly, as the leading semiclassical
-approximation to the true Schrödinger equation, exactly matching what
+approximation to the true Schrödinger equation, matching what
 The WKB Approximation built.
 
 Berry phase has an equally direct classical shadow: **Hannay's angle**,
@@ -154,9 +154,9 @@ variable conjugate to $I$, when the same slow, closed loop in parameter
 space is traversed classically instead of quantum mechanically (cited
 here as the classical analogue, well beyond this course's scope to
 derive, but the existence of a classical counterpart is itself the
-point: Berry phase is not an artifact of quantization, it is a geometric
-fact about slowly-varied systems that quantum mechanics inherits, not
-invents).
+point: Berry phase is not an artifact of quantization but a geometric
+fact about slowly-varied systems that quantum mechanics inherits rather
+than invents).
 
 ## Physical Interpretation
 
@@ -242,17 +242,13 @@ plot makes explicit.
 
 ## Further Exploration
 
-This closes **Symmetry, Scattering & Semiclassical Methods**, and with
-it, the Quantum Mastery pillar's mathematical-physics thread that began
-with Hilbert Space & Spectral Theory's rigorous foundations. Together,
-the two courses turn every "cited, not derived" gap the core curriculum
-was honest about, degenerate perturbation theory, general angular-momentum
-coupling, geometric phases, squeezed light, three-dimensional scattering,
-into genuine, checked derivations.
-
 <NextDiscovery>
-  This closes Symmetry, Scattering & Semiclassical Methods. Together
-  with Hilbert Space & Spectral Theory, the two courses turn every
-  "cited, not derived" gap the core curriculum was honest about into
-  genuine, checked derivations.
+  This closes **Symmetry, Scattering & Semiclassical Methods**, and with
+  it the Quantum Mastery pillar's mathematical-physics thread that began
+  in Hilbert Space & Spectral Theory. Between them the two courses take
+  five results the core curriculum was honest about citing rather than
+  proving (degenerate perturbation theory, general angular-momentum
+  coupling, geometric phase, squeezed light, three-dimensional
+  scattering) and derive each one, with the hypotheses stated and the
+  numbers checked against this platform's own engine.
 </NextDiscovery>

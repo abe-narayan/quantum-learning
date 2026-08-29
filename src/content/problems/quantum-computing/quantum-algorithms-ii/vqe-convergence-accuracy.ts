@@ -25,8 +25,10 @@ export const vqeConvergenceAccuracy: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 0.01,
-    incorrectFeedback: "The lesson states this converges to within 10⁻¹² of the exact value — essentially exact for any practical purpose.",
+    tolerance: 0.95,
+    toleranceType: "relative",
+    incorrectFeedback:
+      "This is an order-of-magnitude question, so a rounded decimal like 0.01 will not do. The lesson states the optimizer converges to within about 10⁻¹² of the exact value: submit a number of that size.",
   },
   hints: [
     { text: "The lesson explicitly states the convergence precision." },

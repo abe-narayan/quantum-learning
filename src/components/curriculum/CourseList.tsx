@@ -142,7 +142,7 @@ export function CourseList({
             key={course.slug}
             as="article"
             className={cn(
-              "isolate overflow-hidden border-l-2 border-l-pillar-edge p-5 transition-colors duration-[--dur-fast] ease-[--ease-instrument] sm:p-6",
+              "isolate overflow-hidden border-l-2 border-l-pillar-edge p-5 transition-colors duration-(--dur-fast) ease-instrument sm:p-6",
               // `border-l-pillar`, not `border-l-pillar-accent`: the pillar
               // ramp is exposed to Tailwind as `pillar`/`pillar-edge`/
               // `pillar-wash`/… (globals.css §"Pillar ramp"), and `pillar`
@@ -221,7 +221,7 @@ export function CourseList({
                 className="h-1 w-full overflow-hidden rounded-full bg-surface-muted"
               >
                 <div
-                  className="h-full rounded-full bg-pillar transition-[width] duration-[--dur-slow] ease-[--ease-instrument]"
+                  className="h-full rounded-full bg-pillar transition-[width] duration-(--dur-slow) ease-instrument"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -240,14 +240,14 @@ export function CourseList({
                   <li
                     key={module.slug}
                     className={cn(
-                      "overflow-hidden rounded-lg border text-sm",
+                      "overflow-hidden rounded-(--radius-tight) border text-sm",
                       lesson ? "border-border bg-surface-muted/40" : "border-border/60 bg-transparent"
                     )}
                   >
                     {lesson ? (
                       <Link
                         href={`/lessons/${lesson.slug}`}
-                        className="group/module relative z-10 flex min-h-11 items-center justify-between gap-3 px-3 py-2 transition-colors duration-[--dur-fast] ease-[--ease-mech] hover:bg-surface-muted focus-visible:bg-surface-muted"
+                        className="group/module relative z-10 flex min-h-11 items-center justify-between gap-3 px-3 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
                       >
                         <span className="flex min-w-0 items-baseline gap-2">
                           <span className="font-tech text-[0.65rem] text-subtle-foreground">
@@ -274,7 +274,7 @@ export function CourseList({
                           <span
                             aria-hidden="true"
                             data-decorative=""
-                            className="font-tech text-[0.7rem] text-pillar-text opacity-0 transition-opacity duration-[--dur-fast] group-hover/module:opacity-100"
+                            className="font-tech text-[0.7rem] text-pillar-text opacity-0 transition-opacity duration-(--dur-fast) group-hover/module:opacity-100"
                           >
                             →
                           </span>

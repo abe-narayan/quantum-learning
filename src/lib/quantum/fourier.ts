@@ -14,9 +14,9 @@ import { Complex } from "./complex";
  * and `ifft` the standard normalized inverse,
  *   x_n = (1/N) * sum_m X_m * exp(+2*pi*i*m*n/N),
  * so that `ifft(fft(x))` recovers `x` exactly (up to floating point). This
- * raw pair is what physics.ts's `positionToMomentum`/`momentumToPosition`
- * apply the actual physical normalization on top of — see there for why the
- * physical convention has an extra dx/sqrt(2*pi) factor.
+ * raw pair is what this file's own `positionToMomentum`/`momentumToPosition`
+ * wrappers apply the actual physical convention on top of — see there for
+ * both the dx/sqrt(2*pi) normalization and the centered-grid phase.
  */
 export function fft(input: readonly Complex[]): Complex[] {
   assertPowerOfTwoLength(input.length, "fft");
@@ -111,30 +111,53 @@ export function momentumGrid(n: number, dx: number): { k: number[]; dk: number }
 }
 
 /**
+ * The (-1)^m alternating sign that converts between the raw, index-based
+ * DFT and a transform referred to the *centered* position grid built by
+ * `wavefunction.ts`'s `createGrid` (x_n = n*dx - L/2). It is its own
+ * inverse, which is why both `positionToMomentum` and
+ * `momentumToPosition` apply the identical helper.
+ *
+ * Where it comes from: exp(-i*k_m*x_n) = exp(-i*k_m*n*dx) * exp(+i*k_m*L/2),
+ * and the first factor is exactly the raw DFT kernel. The second factor is
+ * independent of n, so it pulls straight out of the sum, and since
+ * k_m*L/2 = pi*m (for both the positive bins m and the wrapped negative
+ * bins m-N, because N is even), it is exactly (-1)^m.
+ */
+function centeredGridSigns(values: readonly Complex[]): Complex[] {
+  return values.map((value, m) => (m % 2 === 0 ? value : value.scale(-1)));
+}
+
+/**
  * Forward position -> momentum transform, in natural units (hbar = 1) so
  * momentum equals wavenumber k:
  *
  *   phi(k_m) = (dx / sqrt(2*pi)) * sum_n psi(x_n) * exp(-i*k_m*x_n)
  *
- * The position grid is assumed centered (x_n = n*dx - L/2, as built by
- * `wavefunction.ts`'s `createGrid`) rather than starting at x=0. This
- * doesn't need an extra phase correction: shifting where the coordinate
- * origin is *labeled* doesn't change the sequence of amplitude values
- * psi_n, and the Fourier transform only depends on that sequence and the
- * spacing dx — not on what x-value each index is captioned with. So this
- * is exactly (dx/sqrt(2*pi)) times the raw, index-based DFT, with no x_min
- * phase factor needed. (Physically: translating the *origin* is not the
- * same operation as translating the *wavefunction* — only the latter would
- * introduce a momentum-space phase.) Verified numerically in fourier.test.ts
- * via round-trip and Parseval checks.
+ * The position grid is the *centered* one `wavefunction.ts`'s `createGrid`
+ * builds (x_n = n*dx - L/2), and the x_n above are those actual, centered
+ * coordinates — the same ones `Wavefunction1D.expectationPosition` sums
+ * against. That consistency is the whole point of `centeredGridSigns`: the
+ * raw index-based DFT computes the transform as if the grid started at
+ * x=0, which differs from the formula above by exp(+i*k_m*L/2) = (-1)^m.
+ *
+ * Dropping that factor is tempting, because it is invisible to every
+ * quantity built from |phi(k)|^2 alone — the momentum probability density,
+ * <p>, <p^2>, Parseval, and therefore every number `Wavefunction1D`
+ * currently reports. But it is not invisible to phi itself, and it is
+ * genuinely wrong: a real wavefunction centered at x=0 (a stationary
+ * Gaussian, any even-parity eigenstate) has a real, even phi(k), and
+ * without this correction the engine returns one whose sign alternates
+ * bin to bin. That is the failure this factor prevents, and the reason
+ * the position and momentum representations here are referred to one and
+ * the same coordinate origin rather than two silently different ones.
  */
 export function positionToMomentum(amplitudes: readonly Complex[], dx: number): Complex[] {
   const scale = dx / Math.sqrt(2 * Math.PI);
-  return fft(amplitudes).map((value) => value.scale(scale));
+  return centeredGridSigns(fft(amplitudes)).map((value) => value.scale(scale));
 }
 
-/** Inverse of `positionToMomentum` — see there for the normalization convention. */
+/** Inverse of `positionToMomentum` — see there for the normalization and centered-grid conventions. */
 export function momentumToPosition(amplitudes: readonly Complex[], dx: number): Complex[] {
   const scale = Math.sqrt(2 * Math.PI) / dx;
-  return ifft(amplitudes).map((value) => value.scale(scale));
+  return ifft(centeredGridSigns(amplitudes)).map((value) => value.scale(scale));
 }

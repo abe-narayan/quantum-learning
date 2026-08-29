@@ -22,6 +22,10 @@ export const groupVelocityCalculation: NumericProblem = {
     value: 2,
     tolerance: 0.01,
     incorrectFeedback: "v_g = p0/m directly.",
+    nearMisses: [
+      { value: 8, feedback: "8 multiplies p₀ by m. A velocity comes from dividing momentum by mass." },
+      { value: 0.5, feedback: "0.5 is m/p₀, the ratio inverted." },
+    ],
   },
   hints: [{ text: "Use v_g = p0/m directly — no other formula is needed." }],
   solution: {

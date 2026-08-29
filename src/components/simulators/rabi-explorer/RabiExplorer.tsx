@@ -234,11 +234,28 @@ export function RabiExplorer() {
             matches the qubit&rsquo;s own (<span className="font-mono text-pillar">Δ</span>).
           </p>
 
-          <div
-            aria-live="polite"
-            className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
-          >
+          {/*
+            The visible narration is deliberately NOT the live region here,
+            unlike the other instruments on this bench. This is the only one
+            with a continuous auto-play loop: Play advances `sampleIndex` every
+            40ms, which rewrites this whole sentence 25 times a second. A
+            `polite` region on the visible node meant a screen reader spent the
+            entire playback being interrupted by a half-read sentence, over and
+            over, and never got a usable reading of any of them.
+
+            So the visible text updates freely at 25Hz for the eye, and a
+            separate sr-only region carries the same sentence for the ear —
+            emptied while playing, refilled the moment playback stops. The
+            reader hears one clean announcement of where the trajectory
+            actually got to, instead of two hundred fragments of where it was
+            passing through. Scrubbing the slider by hand still announces
+            normally, because that is paced by the reader, not by a timer.
+          */}
+          <div className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {narration}
+          </div>
+          <div aria-live="polite" className="sr-only">
+            {isPlaying ? "" : narration}
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
@@ -256,7 +273,7 @@ export function RabiExplorer() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+          <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
             <div className="overflow-x-auto">
               <KatexMath
                 tex={`P(1) = ${p1.toFixed(4)} \\qquad \\Omega_{\\text{eff}} = \\sqrt{\\Delta^2+4V^2} = ${omegaEff.toFixed(3)}`}

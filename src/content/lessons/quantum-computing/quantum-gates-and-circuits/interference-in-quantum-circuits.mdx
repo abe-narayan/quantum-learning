@@ -33,15 +33,20 @@ export const afterPhase = applySingleQubitGate(afterFirstH, PAULI_Z, 1);
 export const afterSecondH = applySingleQubitGate(applySingleQubitGate(afterPhase, HADAMARD, 0), HADAMARD, 1);
 
 <LessonHook eyebrow="Why this matters">
-Back in the first course, H|+⟩=|0⟩ was a small, striking fact: two amplitudes that individually gave 50/50 probabilities combined, through a second H, into a completely definite outcome. This lesson asks whether the same trick scales up — and shows it does.
+In the first course, H|+⟩=|0⟩ turned two amplitudes that each gave 50/50 probabilities into one definite outcome. This lesson asks whether the trick scales past a single qubit. It does, and that is the whole engine of every algorithm in the courses ahead.
 </LessonHook>
 
 ## Motivation
 
-That was <Term id="phase-interference">interference</Term> on a single qubit. This lesson shows, with a
-fully worked circuit, that the same trick scales up: uniform
-randomness across *four* outcomes can be turned into one certain
-outcome, using nothing but Hadamards and a phase gate.
+$H|+\rangle=|0\rangle$ was <Term id="phase-interference">interference</Term> on a single qubit. This lesson runs a
+fully worked circuit showing the same trick at larger scale: uniform
+randomness across *four* outcomes turned into one certain outcome, using
+nothing but Hadamards and a phase gate.
+
+That pattern is worth recognizing now, because every algorithm in the two
+courses ahead has the same three-part shape. Spread amplitude over many
+possibilities, arrange phases so the wrong ones cancel, then collapse the
+superposition and read off what survived.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/6/69/Interference_electrons_double-slit_at_10cm.png"
@@ -122,11 +127,10 @@ $$
 using the single-qubit facts $H|+\rangle=|0\rangle$ and $H|-\rangle=|1\rangle$
 from the last course, applied independently to each factor since this is
 still a plain product state throughout. **All the probability that was
-spread uniformly across four outcomes has concentrated onto exactly
-one**, with certainty, not because any measurement narrowed things down,
-but purely because the phases introduced by that single $Z$ gate caused
-constructive interference on $|01\rangle$ and destructive interference
-(exact cancellation) everywhere else.
+spread uniformly across four outcomes has concentrated onto one**, with
+certainty. No measurement narrowed anything down. The phases introduced by
+a single $Z$ gate produced constructive interference on $|01\rangle$ and
+exact cancellation everywhere else.
 
 <PredictBeforeReveal
   question="Starting from |00⟩: apply H to both qubits (uniform 4-way superposition), then Z to qubit 1 only, then H to both qubits again. How many of the four outcomes end up with nonzero probability?"
@@ -134,10 +138,10 @@ constructive interference on $|01\rangle$ and destructive interference
     { label: "All four, still uniform", value: "four" },
     { label: "Two outcomes, 50/50", value: "two" },
     { label: "Exactly one outcome, with certainty", value: "one" },
-    { label: "Zero — the state cancels entirely", value: "zero" },
+    { label: "Zero: the state cancels entirely", value: "zero" },
   ]}
   correctValue="one"
-  explanation="The Z gate turns |+⟩⊗|+⟩ into |+⟩⊗|−⟩, still uniform probabilities but with a relative phase now in place. The second H⊗H then collides those phases: H|+⟩=|0⟩ and H|−⟩=|1⟩, giving exactly |01⟩ with certainty. All the probability that was spread over four outcomes concentrates onto one, purely from interference — no measurement, no entanglement needed."
+  explanation="The Z gate turns |+⟩⊗|+⟩ into |+⟩⊗|−⟩: still uniform probabilities, but with a relative phase now in place. The second H⊗H collides those phases, and since H|+⟩=|0⟩ and H|−⟩=|1⟩, the result is |01⟩ with certainty. All the probability that was spread over four outcomes concentrates onto one, from interference alone. No measurement, no entanglement."
 />
 
 <InteractiveSection title="Four outcomes collapse to one" description="Apply H to both qubits, then Z to qubit 1 only, then H to both again, the exact sequence just derived above. Watch all four probabilities collapse onto exactly one outcome, purely from interference, with no measurement and no entanglement involved anywhere in the sequence.">
@@ -146,14 +150,13 @@ constructive interference on $|01\rangle$ and destructive interference
 
 ### This didn't require entanglement, but interference can also act on entangled states
 
-Notice every state in this derivation was a product state; interference
-here is really just two independent copies of the single-qubit story
-running in parallel. Interference on *entangled* states is also
-possible and was already in front of you: the Bell-states lesson's
-calculation $(H\otimes H)|\Phi^+\rangle=|\Phi^+\rangle$ is exactly this,
-phases rearranging inside an entangled state, reproducing the same
+Every state in this derivation was a product state, so the interference
+here is two independent copies of the single-qubit story running side by
+side. Interference on *entangled* states also happens, and you have already
+seen a case: the Bell-states lesson's $(H\otimes H)|\Phi^+\rangle=|\Phi^+\rangle$
+is phases rearranging inside an entangled state, reproducing the same
 correlated pattern rather than concentrating onto one outcome. Both are
-"interference"; they differ in what structure the state has going in.
+interference. They differ in what structure the state had going in.
 
 ## Physical Interpretation
 
@@ -203,7 +206,7 @@ guaranteed $|01\rangle$. Interference requires the amplitudes to stay
    than doing nothing, is what causes concentration onto $|01\rangle$
    specifically rather than back onto $|00\rangle$.
 3. Is $|+\rangle\otimes|+\rangle$, on its own, "interfering"? Why or why
-   not, what has to happen for interference to actually occur?
+   not: what has to happen before interference occurs?
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -212,8 +215,8 @@ guaranteed $|01\rangle$. Interference requires the amplitudes to stay
 - $H\otimes H$, a $Z$ on one qubit, $H\otimes H$ again takes a uniform
   4-way superposition to a single definite outcome, purely through phase
   interference.
-- This particular example needs no entanglement. It's two parallel
-  copies of single-qubit interference.
+- This example needs no entanglement. It is two parallel copies of
+  single-qubit interference.
 - Interference is the general mechanism: circuits are designed so unwanted
   outcomes' amplitudes cancel and the desired outcome's amplitude survives
   until measurement.

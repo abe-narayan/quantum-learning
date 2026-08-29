@@ -63,7 +63,7 @@ export const lessonMeta = {
 <LessonHook eyebrow="Query complexity is not time complexity">
   A quantum algorithm can be provably, exponentially faster at asking an
   oracle questions and still leave open whether quantum computers are
-  faster at solving problems at all — $\mathsf{BPP} = \mathsf{BQP}$
+  faster at solving problems at all: $\mathsf{BPP} = \mathsf{BQP}$
   remains unproven either way.
 </LessonHook>
 
@@ -80,14 +80,18 @@ unconditional **time complexity** separation between classical and quantum
 computation (the actual, still-open question of whether $\mathsf{BPP} =
 \mathsf{BQP}$).
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/8/83/QuEra_Aquila_Magneto-Optical_Trap.jpg"
-  alt="The magneto-optical trap of QuEra's neutral-atom quantum computer, used to arrange and control large 2D arrays of qubits"
-  caption="BQP is formally defined over circuit families like the ones a real machine such as this one actually runs. The oracle-relative separations this lesson proves (Deutsch-Jozsa, Simon's, Grover's/BBBV) are a precise but distinct, weaker kind of statement about idealized black-box query access — not a claim about what hardware like this achieves on a concrete, structured problem."
-  credit="QuEra Computing, Inc., via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:QuEra_Aquila_Magneto-Optical_Trap.jpg"
-  license="CC BY 4.0"
-/>
+One scoping remark before the definitions, because it governs how every
+result below should be read. $\mathsf{BQP}$ is defined over uniform
+circuit families, which is a statement about concrete, structured
+problems. The separations this lesson proves (Deutsch–Jozsa, Simon's,
+Grover/BBBV) are statements about *idealized black-box query access*.
+Those are different claims, and the second is the weaker one: a query
+separation says a quantum machine wins when the only way to learn about
+the input is to ask an oracle, which is not the situation any real
+problem or any real machine is in. The distinction is the subject of the
+relativization discussion at the end, and it is the single most common
+place where a correct theorem gets quoted as a stronger claim than it
+supports.
 
 ## Mathematical Development
 
@@ -120,7 +124,7 @@ $\mathsf{BPP}$ (classical, randomized, bounded-error polynomial time) is
 defined identically but with classical circuits. Whether
 $\mathsf{BPP}=\mathsf{BQP}$ (whether quantum computers are ever more
 powerful than classical ones for *any* decision problem, given unlimited
-polynomial time) is a genuinely open question in unrelativized
+polynomial time) is an open question in unrelativized
 complexity theory. Nothing in this course proves an answer either way;
 what this lesson proves is exactly what the algorithms already built
 *do* and *don't* say about it.
@@ -130,7 +134,7 @@ what this lesson proves is exactly what the algorithms already built
 Deutsch-Jozsa, Simon's algorithm, and Grover's algorithm are not analyzed
 in the time-complexity model above. They're analyzed in the **query
 (oracle) model**: the algorithm is given black-box access to an unknown
-function $f$ via an oracle gate — exactly `applyBitOracle`'s
+function $f$ via an oracle gate — `applyBitOracle`'s
 $|x\rangle|y\rangle\to|x\rangle|y\oplus f(x)\rangle$, from Quantum
 Algorithms I — and its cost is measured purely by the number of oracle
 calls (**queries**), with unlimited free classical or quantum computation
@@ -163,7 +167,7 @@ balanced when the queried half looked constant (exactly half of $2^n$
 values seen so far, all equal, is consistent with either promise until
 one more, differently-valued query is seen), so no deterministic
 algorithm can *certify* an answer with fewer than $2^{n-1}+1$ queries in
-the worst case. This is a genuine, fully rigorous theorem.
+the worst case. This is a fully rigorous theorem.
 
 But it depends entirely on requiring **zero error**. Allow a classical
 algorithm bounded error ($\geq2/3$ success, matching $\mathsf{BQP}$'s own
@@ -184,12 +188,12 @@ constant number of random queries already gives bounded-error success.
 ### Simon's algorithm: a separation that survives randomization
 
 Simon's problem is a strictly stronger result (proved in the
-prerequisite lesson): for the genuinely 2-to-1 promise $f(x)=f(x\oplus
+prerequisite lesson): for the 2-to-1 promise $f(x)=f(x\oplus
 s)$, the **randomized, bounded-error** classical query complexity is
 $\Theta(2^{n/2})$ (the birthday-paradox collision bound), while the
 quantum bounded-error query complexity is $O(n)$. Unlike
 Deutsch-Jozsa's gap, this one does *not* evaporate when classical
-algorithms are allowed to guess and accept small error. It is a genuine
+algorithms are allowed to guess and accept small error. It is an
 exponential separation between randomized classical and quantum query
 complexity, for this specific oracle problem.
 
@@ -242,7 +246,7 @@ Combined with
 Grover's algorithm's constructive $O(\sqrt N)$ upper bound (derived,
 gate by gate, in Quantum Algorithms I), this makes Grover's algorithm
 **query-optimal for black-box search**, not merely "the best known": a
-genuine theorem with a matching upper and lower bound. Primary source:
+theorem with a matching upper and lower bound. Primary source:
 C. H. Bennett, E. Bernstein, G. Brassard, and U. Vazirani, "Strengths
 and Weaknesses of Quantum Computing," *SIAM J. Comput.* **26**(5),
 1510–1523 (1997), also available as arXiv:quant-ph/9701001.
@@ -276,13 +280,13 @@ technical analysis on its own):*
 **What BBBV establishes:** no quantum algorithm, however clever, can
 search an *unstructured* $N$-item space (one where the only access to
 its contents is a marking oracle) faster than $\Theta(\sqrt N)$, for
-every possible instance. This is a genuine, unconditional theorem in the
+every possible instance. This is an unconditional theorem in the
 query model. **What it does not establish:** that quantum computers
 cannot solve $\mathsf{NP}$-complete problems efficiently in general. A
 concrete $\mathsf{NP}$-complete instance (a 3-SAT formula, say) is not a
 black box: its clauses are explicit, structured, and available for a
-smart algorithm (quantum or classical) to exploit directly, exactly the
-kind of structure the oracle model deliberately hides. BBBV rules out a
+smart algorithm (quantum or classical) to exploit directly, the kind of
+structure the oracle model deliberately hides. BBBV rules out a
 *generic*, structure-blind quantum speedup better than quadratic; it
 says nothing about whether some structure-exploiting quantum algorithm
 could solve $\mathsf{NP}$-complete problems in polynomial time (whether
@@ -291,7 +295,7 @@ widely disbelieved without proof, as $\mathsf{P}=\mathsf{NP}$ itself).
 
 <ParametricCurve
   frames={groverCurveFrames}
-  ariaLabel="log10 of classical worst-case query count N=2^n versus log10 of optimalGroverIterations(n), the real BBBV-matching query count computed by this platform's own Grover engine, plotted against n from 2 to 20 on a log y-axis, showing both curves as straight lines with the quantum line at exactly half the slope of the classical line"
+  ariaLabel="log10 of classical worst-case query count N=2^n versus log10 of optimalGroverIterations(n), the real BBBV-matching query count computed by this platform's own Grover engine, plotted against n from 2 to 20 on a log y-axis. The classical curve is an exact straight line of slope log10(2); the quantum curve settles onto a straight line of exactly half that slope from n=4 onward, with a visible kink over the first segment where rounding the iteration count to a whole number (1 iteration at n=2, 3 at n=4) still matters"
 />
 
 Both curves above come from real arithmetic, log-transformed on the
@@ -304,9 +308,17 @@ never exceeds a few hundred while the classical curve exceeds a
 million; the log $y$-axis instead turns both into straight lines,
 making $\Theta(\sqrt N)$-vs-$\Theta(N)$ visible as a geometric fact
 rather than an optical illusion of scale: the quantum line's slope is
-exactly half the classical line's slope, since
-$\log_{10}(\sqrt N)=\tfrac12\log_{10}(N)$. That's the
-$\Theta(\sqrt N)$-vs-$\Theta(N)$ separation BBBV proves is the best
+half the classical line's slope, since
+$\log_{10}(\sqrt N)=\tfrac12\log_{10}(N)$. One honest caveat about the
+plotted curve, as opposed to the underlying scaling: the engine returns
+a *whole* number of iterations, $\lfloor\tfrac\pi4\sqrt N\rfloor$, so the
+quantum curve is only exactly straight once that rounding stops
+mattering. It is, from $n=4$ on: the measured segment slopes are
+$0.1505=\tfrac12\log_{10}2$ to four decimal places, apart from two
+one-iteration rounding wobbles. Over the very first segment, where the
+count is 1 at $n=2$ and 3 at $n=4$, the rounding is a large fraction of
+the count and the curve visibly bends. That separation is what
+BBBV proves is the best
 *any* black-box quantum algorithm can ever do, not merely what this
 one algorithm happens to achieve.
 
@@ -325,8 +337,8 @@ query counting is the ledger that makes its value precise. But the
 ledger only tracks queries to a black box: it's silent about everything
 a real algorithm gets to do once the box is opened and its contents
 become an ordinary, structured mathematical object. That silence is
-exactly why the model is *provable* at all, not a flaw in it: black-box
-lower bounds are a genuinely different, more tractable mathematical
+why the model is *provable* at all, not a flaw in it: black-box
+lower bounds are a different, more tractable mathematical
 object than lower bounds against every possible algorithm exploiting
 every possible structure, which is precisely what an unconditional
 $\mathsf{BPP}$-vs-$\mathsf{BQP}$ proof would require, and which nobody
@@ -340,7 +352,7 @@ currently knows how to do for any problem.
     { label: "A small constant, around 8", value: "constant" },
   ]}
   correctValue="constant"
-  explanation="Only 8 random queries. If f is balanced, the probability all k random queries happen to agree (falsely looking constant) is 2^-(k-1), so k=8 already pushes failure below 1%. The exponential Deutsch-Jozsa gap is entirely a demand-for-certainty artifact — it evaporates the moment classical algorithms are allowed the same kind of bounded error BQP already permits quantum ones."
+  explanation="Only 8 random queries. If f is balanced, the probability all k random queries happen to agree (falsely looking constant) is 2^-(k-1), so k=8 already pushes failure below 1%. The exponential Deutsch-Jozsa gap is entirely a demand-for-certainty artifact; it evaporates the moment classical algorithms are allowed the same kind of bounded error BQP already permits quantum ones."
 />
 
 ## Worked Example
@@ -370,9 +382,9 @@ quantum resource involved at all.
 
 <Callout type="warning">
 **Treating an oracle separation as proof that $\mathsf{BPP}\neq\mathsf{BQP}$.**
-Simon's algorithm's gap is a genuine, rigorous, *unconditional* fact,
+Simon's algorithm's gap is a rigorous, *unconditional* fact,
 but unconditional within the query-complexity model relative to a
-specific black-box oracle. The Baker-Gill-Solovay relativization barrier
+specific black-box oracle. <Term id="oracle-relativization-barrier">The Baker-Gill-Solovay relativization barrier</Term>
 means no argument of this shape can resolve the un-relativized question,
 which remains open.
 </Callout>
@@ -383,7 +395,7 @@ algorithm ever beats classical for search-like problems."** BBBV's bound
 is specific to *unstructured*, black-box search. Concrete, structured
 search-like problems remain fair game for algorithms (quantum or
 classical) that exploit structure the oracle model hides by
-construction. This is exactly the room Shor's algorithm operates in,
+construction. This is the room Shor's algorithm operates in,
 exploiting number-theoretic structure no black-box bound forbids.
 </Callout>
 
@@ -413,7 +425,7 @@ exploiting number-theoretic structure no black-box bound forbids.
   quantum circuit class; whether it equals $\mathsf{BPP}$ is open.
 - Deutsch-Jozsa's exponential gap requires exact, zero-error classical
   algorithms specifically, and vanishes once bounded error is allowed,
-  a genuinely *promise-and-error*-dependent result.
+  a *promise-and-error*-dependent result.
 - Simon's algorithm's exponential gap survives classical randomization,
   a strictly stronger separation, but both are still **oracle**
   separations, subject to the Baker-Gill-Solovay relativization barrier:
@@ -429,13 +441,10 @@ exploiting number-theoretic structure no black-box bound forbids.
 
 ## Further Exploration
 
-[Hamiltonian Simulation and Trotterization](/lessons/quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization)
-turns from what's provably true about query complexity
-to what's provably true, with a real, derived error bound, about
-simulating physical time evolution itself.
-
 <NextDiscovery>
-  The course turns from what's provably true about query
-  complexity to what's provably true, with a real, derived error bound,
-  about simulating physical time evolution itself.
+  [Hamiltonian Simulation and Trotterization](/lessons/quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization)
+  turns from what is provable about query complexity to what is provable
+  about simulating physical time evolution, where the bound is not a
+  separation but an explicit, derived error estimate with a gate count
+  attached.
 </NextDiscovery>

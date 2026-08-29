@@ -1,6 +1,8 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PAULI_X, IDENTITY } from "@/lib/quantum/gates";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
@@ -27,6 +29,15 @@ export const subsystemPresets = [
     ]
   }
 ];
+
+export const productCoeffMatrix = new Matrix([
+  [new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)],
+  [new Complex(0), new Complex(0)]
+]);
+export const bellCoeffMatrix = new Matrix([
+  [new Complex(Math.SQRT1_2), new Complex(0)],
+  [new Complex(0), new Complex(Math.SQRT1_2)]
+]);
 
 export const tensorCountingM = 2;
 
@@ -72,9 +83,9 @@ unavoidable rather than a special feature of two-qubit systems.
 </Callout>
 
 <LessonHook eyebrow="Why this matters">
-  Entanglement isn't a delicate, rare effect physicists engineer with
-  difficulty. A pure dimension count shows it's the *generic* state of
-  any combined system — product states are the special case.
+  Entanglement is not a delicate, rare effect physicists engineer with
+  difficulty. A dimension count shows it is the *generic* state of any
+  combined system. Product states are the special case.
 </LessonHook>
 
 ## Motivation
@@ -84,18 +95,15 @@ a measuring device, need to be describable *together*, as one combined
 system, without losing the ability to describe superpositions across
 them. Simply pairing up states the way a Cartesian product would (treat
 "system A in state $i$, system B in state $j$" as one of $nm$ classical
-combinations) throws away exactly the linear structure, the ability to
-superpose, that makes the theory quantum. The construction that keeps
+combinations) throws away the one thing that makes the theory quantum:
+the ability to superpose across the two systems. The construction that keeps
 that structure is the **<Term id="tensor-product">tensor product</Term>**.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
-  alt="Formal black-and-white portrait photograph of Erwin Schrödinger, taken around his 1933 Nobel Prize"
-  caption="Erwin Schrödinger, who in 1935 coined Verschränkung — entanglement — for exactly the failure to factor this lesson derives from pure dimension counting: 'the characteristic trait of quantum mechanics,' as he put it, not a minor wrinkle in it."
-  credit="Nobel Foundation / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Erwin_Schr%C3%B6dinger_(1933).jpg"
-  license="Public domain"
-/>
+Schrödinger named the phenomenon in 1935, calling it *Verschränkung*, and
+described it as "the characteristic trait of quantum mechanics" rather
+than a wrinkle in it. This lesson shows why that emphasis was warranted:
+the failure to factor is not an exotic case, it is what a dimension count
+predicts for almost every state.
 
 ## Intuition
 
@@ -145,7 +153,7 @@ $$
 u\otimes v = (1\cdot0,\ 1\cdot1,\ 1\cdot(-1),\ 2\cdot0,\ 2\cdot1,\ 2\cdot(-1)) = (0,1,-1,0,2,-2) \in \mathbb{C}^6
 $$
 
-matching $\dim(\mathbb{C}^2\otimes\mathbb{C}^3)=2\cdot3=6$ exactly. This
+matching $\dim(\mathbb{C}^2\otimes\mathbb{C}^3)=2\cdot3=6$. This
 construction doesn't care that $u$ and $v$ have different dimensions, or
 that neither is $2$. The qubit case ($\mathbb{C}^2\otimes\mathbb{C}^2$)
 is the smallest, most familiar example, not the general rule.
@@ -169,11 +177,11 @@ and equal to $1$, only when both indices match.
 An operator acting on subsystem $A$ alone, leaving subsystem $B$
 untouched, is represented as $A\otimes I$, defined on simple tensors by
 $(A\otimes I)(|u\rangle\otimes|v\rangle) = (A|u\rangle)\otimes|v\rangle$
-and extended linearly to the rest of the space. This is exactly what
-"apply a gate to qubit 0 only, leaving qubit 1 alone" means, if you've
-seen quantum circuits: $A\otimes I$ acting on the whole two-qubit space.
+and extended linearly to the rest of the space. This is what "apply a gate
+to qubit 0 only, leaving qubit 1 alone" means, if you've seen quantum
+circuits: $A\otimes I$ acting on the whole two-qubit space.
 
-<InteractiveSection title="See which qubit the gate actually hits" description="Toggle which qubit Pauli-X targets. X ⊗ I and I ⊗ X are both real 4×4 matrices built from the same two 2×2 pieces, but land in different positions entirely — the tensor-product ordering is exactly what encodes which subsystem a gate acts on.">
+<InteractiveSection title="See which qubit the gate actually hits" description="Toggle which qubit Pauli-X targets. X ⊗ I and I ⊗ X are both real 4×4 matrices built from the same two 2×2 pieces, but their nonzero entries land in different positions. The ordering of the tensor product is what encodes which subsystem a gate acts on.">
   <MatrixGridExplorer
     presets={subsystemPresets}
     ariaLabel="Toggle which qubit a Pauli-X gate targets to see the resulting four by four tensor product matrix change"
@@ -197,18 +205,21 @@ exception, but the mathematically generic situation, with product states
 as the special, measure-zero case.
 
 <InsightBlock>
-  Dimension counting alone shows entanglement is what *most* vectors in
-  a composite space are, not a fragile add-on that needs special
-  circumstances to appear. A product state is the exception that
-  requires a special coincidence; entanglement is the default.
+  This counting is also the reason simulating quantum systems on a
+  classical computer is hard. If every state factored, you could store
+  $N$ subsystems ($N$ counts subsystems here, not dimensions) by storing
+  each one separately, at a cost growing linearly in $N$. Because a
+  generic state does not factor, you have to store all $nm\cdots$
+  coefficients of the full product space, which for $N$ qubits is $2^N$
+  numbers: the memory required doubles with each qubit added.
 </InsightBlock>
 
 If you've seen the Bell state
 $\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ proven non-factorizable by
 direct contradiction in the Quantum Computing track, this dimension count
 is the structural reason that kind of proof was always going to succeed:
-there simply isn't enough room in the space of simple products to reach
-every vector.
+there is not enough room in the space of simple products to reach every
+vector.
 
 <InteractiveSection title="Watch the gap widen" description="Drag the subsystem dimension n from 2 to 8, holding the other subsystem fixed at m=2. The product-state parameter count n+m-1 climbs by 1 each step you take in n, while dim(V⊗W)=nm climbs by m=2 each step, twice as fast, so the gap between the two bars keeps widening as n grows: a direct picture of simple tensors becoming a shrinking slice of the whole space.">
   <BarChartExplorer
@@ -244,7 +255,7 @@ $|u\rangle\otimes|v\rangle$ for some $u,v\in\mathbb{C}^2$?**
     { label: "Can't tell without trying every u, v", value: "unsure" },
   ]}
   correctValue="no"
-  explanation="No u, v work, for any complex entries — this is the Bell state, the standard example of entanglement. The dimension-counting argument above already told you to expect this: simple tensors are a thin slice of a 4-dimensional space, and this particular vector misses that slice. The elimination below shows exactly where the attempt breaks down."
+  explanation="No u, v work, for any complex entries. This is the Bell state, the standard example of entanglement. The dimension-counting argument above already told you to expect this: simple tensors are a thin slice of a 4-dimensional space, and this particular vector misses that slice. The elimination below shows where the attempt breaks down."
 />
 
 Suppose it were, with $u=(u_0,u_1)$, $v=(v_0,v_1)$. Then $u\otimes v =
@@ -255,6 +266,34 @@ $u_0=0$ (then $u_0v_0=0\ne\tfrac1{\sqrt2}$, contradiction) or $v_1=0$
 (then $u_1v_1=0\ne\tfrac1{\sqrt2}$, also a contradiction). No $u,v$ work,
 confirming, by direct computation this time rather than dimension
 counting alone, that this state is entangled.
+
+### A faster test for two qubits
+
+That elimination generalizes into a check you can run by eye. Write a
+two-qubit state's four coefficients $c_{00},c_{01},c_{10},c_{11}$ as a
+$2\times2$ array, with the first qubit's index labelling the row:
+
+<MatrixGrid
+  matrix={productCoeffMatrix}
+  label="|0⟩⊗|+⟩ coefficients"
+  compareTo={bellCoeffMatrix}
+  compareLabel="Bell state coefficients"
+  ariaLabel="Two two-by-two coefficient arrays side by side. The left one, for the product state, has 0.71 in both entries of its top row and zeros in its bottom row. The right one, for the Bell state, has 0.71 on the two diagonal entries and zeros off the diagonal."
+/>
+
+If the state factors as $u\otimes v$, then $c_{ij}=u_iv_j$, so the second
+row of the array is $u_1/u_0$ times the first: the two rows are
+proportional, and the determinant $c_{00}c_{11}-c_{01}c_{10}$ vanishes.
+The left array passes that test, $(0.71)(0)-(0.71)(0)=0$, and indeed
+$|0\rangle\otimes|+\rangle$ factors by construction. The right array gives
+$(0.71)(0.71)-0=0.5\ne0$, so no $u,v$ can reproduce it, which is the
+elimination above compressed into a single number.
+
+That number has a name once you meet it again: $2|c_{00}c_{11} -
+c_{01}c_{10}|$ is the **concurrence** of a two-qubit *pure* state, a
+standard measure of how entangled it is (mixed states, which this course
+has not met yet, get a longer definition that reduces to this one). It
+runs from $0$ for every product state to $1$ for the Bell state above.
 
 ## Common Mistakes
 
@@ -267,9 +306,11 @@ of entanglement.
 <Callout type="warning">
 **Getting the Kronecker ordering backwards.** This course (matching the
 Quantum Computing track's convention) always lists the first system's
-index as the more significant one: all of the first system's
-combinations with the second system's index $0$, then all of the second
-system's index $1$, and so on.
+index as the more significant one: hold the first index at $0$ and run
+the second index through all of its values, then move the first index to
+$1$ and run the second through again, and so on. For $u\otimes v$ with
+$u\in\mathbb{C}^2$ that reads $(u_0v_0,\ u_0v_1,\ \ldots,\ u_1v_0,\
+u_1v_1,\ \ldots)$, never the other way round.
 </Callout>
 
 ## Practice Questions

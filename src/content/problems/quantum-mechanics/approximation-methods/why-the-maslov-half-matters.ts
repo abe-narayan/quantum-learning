@@ -33,17 +33,21 @@ export const whyTheMaslovHalfMatters: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Setting n=0 in ∫p dx=nπℏ requires the action integral to be exactly 0, which happens only at E=0 (the bottom of the potential) — missing the true zero-point energy entirely.",
   },
   hints: [
-    { text: "For n=0, the correct condition is ∫p dx=(0+1/2)πℏ=πℏ/2, not 0." },
-    { text: "Dropping the +1/2 would require ∫p dx=0 at n=0, which only happens when the turning points coincide (E at the potential's minimum)." },
-    { text: "This would predict E=0, missing the real zero-point energy of 0.5ℏω entirely." },
+    { text: "Substitute n = 0 into the modified condition and read off what it demands of the action integral." },
+    { text: "The action integral ∫p dx runs between the two classical turning points. Ask what energy makes it vanish." },
+    { text: "Turning points coincide at the bottom of the well, so compare the energy that forces against the oscillator's true ground state." },
   ],
   solution: {
-    steps: [{ description: "Without +1/2, n=0 requires ∫p dx=0, forcing E to the potential minimum (E=0) — missing the actual zero-point energy of 0.5ℏω." }],
-    finalAnswer: "(a) It would incorrectly predict E=0 instead of 0.5ℏω",
+    steps: [{ description: "Setting n = 0 in ∫p dx = nπℏ demands ∫p dx = 0. The integral runs between the classical turning points, and it vanishes only when they coincide, which happens at the bottom of the well. So the modified condition predicts E = 0, missing the oscillator's zero-point energy of 0.5ℏω." }],
+    finalAnswer: "It would predict E = 0 for the ground state, missing the oscillator's zero-point energy of 0.5ℏω.",
   },
   explanation: {
-    correctIdea: "The Maslov correction is precisely what gives WKB a nonzero, correct zero-point energy for a confined system — omitting it isn't a small error, it's qualitatively wrong at n=0.",
-    whyCorrect: "Directly follows from setting n=0 in both the correct and (incorrectly) modified quantization conditions.",
-    whyWrong: ["Claiming the effect only matters for large n has it backwards — the FRACTIONAL error from omitting +1/2 actually shrinks at large n, since n itself grows; the absolute effect is a fixed shift, most noticeable at small n."],
+    correctIdea: "The Maslov half is what keeps WKB's lowest level off the bottom of the well. Dropping it is not a small numerical slip; it removes the zero-point energy.",
+    whyCorrect: "Follows from setting n = 0 in both the correct and the modified quantization conditions.",
+    whyWrong: [
+      { optionId: "b", text: "Has it backwards. The shift is a fixed absolute amount, so it is proportionally largest at small n and fades at large n." },
+      { optionId: "c", text: "Overshoots. The condition forces E down to the potential minimum, which is zero here, not below it." },
+      { optionId: "d", text: "Confuses the two sides of the condition. The integral stays well defined; only the value it is set equal to changes." },
+    ],
   },
 };

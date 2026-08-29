@@ -1,15 +1,52 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { StateVector } from "@/lib/quantum/state";
+import { Complex } from "@/lib/quantum/complex";
+import { rotationZ } from "@/lib/quantum/gates";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"
 );
 
+export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+
+export const minusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(-Math.SQRT1_2)]);
+
+export const PRECESSION_STEPS = 161;
+
+export const precessionSamples = Array.from({ length: PRECESSION_STEPS }, (_, i) => {
+  const omegaT = (i / (PRECESSION_STEPS - 1)) * 4 * Math.PI;
+  const evolved = plusState.applyMatrix(rotationZ(omegaT));
+  return {
+    omegaT,
+    pPlus: plusState.innerProduct(evolved).magnitudeSquared(),
+    pMinus: minusState.innerProduct(evolved).magnitudeSquared(),
+  };
+});
+
+export const precessionFrames = [
+  {
+    paramLabel: "H = (ħω/2)Z acting on |ψ(0)⟩ = |+⟩, over two full revivals",
+    series: [
+      {
+        label: "P(+) = |⟨+|ψ(t)⟩|²",
+        color: "brand",
+        points: precessionSamples.map((s) => ({ x: s.omegaT, y: s.pPlus })),
+      },
+      {
+        label: "P(−) = |⟨−|ψ(t)⟩|²",
+        color: "accent",
+        points: precessionSamples.map((s) => ({ x: s.omegaT, y: s.pMinus })),
+      },
+    ],
+  },
+];
+
 export const lessonMeta = {
   title: "Time Evolution and the Schrödinger Equation",
   description:
-    "Deriving what unitary evolution must look like: the Hamiltonian, the Schrödinger equation, and a worked two-level example computed with the exact rotation machinery already built for the Bloch sphere.",
+    "Deriving what unitary evolution must look like: the Hamiltonian, the Schrödinger equation, and a worked two-level example computed with the same rotation machinery already built for the Bloch sphere.",
   course: "classical-to-quantum",
   module: "time-evolution-and-the-schrodinger-equation",
   order: 1,
@@ -24,32 +61,50 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  The Schrödinger equation isn't a separate postulate to memorize. Demand
-  only that evolution stay unitary, and ordinary calculus forces it into
-  existence.
+  Demand only that evolution keep states normalized, then ask what the
+  smallest possible time step is allowed to look like. The Schrödinger
+  equation is what falls out; nobody has to postulate it.
 </LessonHook>
 
 ## Motivation
 
 Postulate 4 said evolution is unitary, without saying which unitary
-operator, or how it depends on time. This lesson derives the answer: the
-generator of continuous unitary evolution is forced to be <Term id="hermitian-operator">Hermitian</Term>,
-which leads directly to the Schrödinger equation, not as a separate
-postulate to memorize, but as a consequence of unitarity plus ordinary
-calculus.
+operator, or how it depends on time. That looks like a gap in the theory,
+and it is a smaller one than it appears. Unitarity is a strong enough
+constraint on its own: applied to an infinitesimal time step, it forces
+the <Term id="hermitian-operator">Hermitian</Term> structure on the generator, and everything else in this
+lesson follows from calculus applied to that one fact.
+
+<Callout type="note">
+**Calculus starts here, and is assumed rather than taught.** Every lesson
+up to this one was built from algebra, trigonometry and linear algebra.
+This one is the first that needs single-variable calculus, and this
+curriculum has no calculus lesson to send you to, so it is worth naming
+exactly what is used: a first-order Taylor expansion with a big-$O$
+remainder, $f(\varepsilon) = f(0) + f'(0)\varepsilon + O(\varepsilon^2)$,
+applied to an operator-valued function of the time step; the limit
+$\lim_{N\to\infty}(1+x/N)^N = e^x$; and the derivative
+$\frac{d}{dt}e^{\lambda t} = \lambda e^{\lambda t}$. Nothing beyond
+those three, and all three sit in the first half of any introductory
+calculus text. If they are new, the *results* of this lesson still stand
+on their own and every later lesson uses only those results, but the
+derivations below will read as assertions rather than arguments, which
+is worth knowing before you decide they are.
+</Callout>
 
 ## Intuition
 
 Think of evolving a state for a very short time $dt$ as a tiny nudge,
 $U(dt) \approx I + (\text{something}) \cdot dt$. Unitarity constrains what
-that "something" is allowed to be, and the constraint turns out to force
-it into exactly the same Hermitian-operator mold every <Term id="observable">observable</Term> already
-lives in.
+that "something" is allowed to be, and the constraint pushes it into the
+same Hermitian-operator mold every <Term id="observable">observable</Term> already lives in. That
+coincidence is what eventually lets the generator be identified with
+energy rather than being some unrelated bookkeeping object.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
   alt="Portrait photograph of Erwin Schrödinger from 1933"
-  caption="Erwin Schrödinger, whose 1926 equation for how a quantum state evolves in time is exactly what this lesson derives from unitarity plus ordinary calculus."
+  caption="Erwin Schrödinger in 1933. He wrote his 1926 wave equation down by analogy with classical wave optics; the route taken in this lesson, from unitarity to the same equation, was worked out afterwards and needs no wave analogy at all."
   credit="Nobel Foundation / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Erwin_Schr%C3%B6dinger_(1933).jpg"
   license="Public domain"
@@ -72,20 +127,35 @@ $$
 
 For this to equal $I$ at first order, the $dt$ term must vanish:
 $H^\dagger = H$, so **the generator of unitary evolution must be
-Hermitian.** This is exactly why the Postulates lesson could already
-identify $H$ (once the physical identification below is made) with
-energy: Hermitian operators are precisely what Postulate 2 reserves for
-observables.
+Hermitian.** Nothing was assumed about $H$ beforehand; unitarity of the
+time step alone put it in the one class of operators Postulate 2 reserves
+for observables. That is what makes it possible, a few lines below, to
+identify $H$ with a measurable quantity rather than treating it as an
+abstract generator.
 
 ### From the generator to the Schrödinger equation
 
-Chaining infinitesimal steps (or, equivalently, solving the differential
-equation this construction implies) gives the finite-time evolution
-operator:
+To reach a finite time $t$, chain $N$ of these steps of length $t/N$ and
+let $N$ grow:
 
 $$
-U(t) = e^{-iHt/\hbar}
+U(t) = \lim_{N\to\infty}\left(I - \frac{i H t}{N\hbar}\right)^{N} = e^{-iHt/\hbar}
 $$
+
+That limit is the operator version of $\lim_{N\to\infty}(1+x/N)^N = e^x$,
+and it is legitimate here for two reasons, both worth naming. Every
+factor in the product is the same operator, so ordering never becomes an
+issue. And the $O(dt^2)$ term dropped from each individual step does not
+quietly accumulate: each of the $N$ steps discards something of size
+$O(1/N^2)$, so the whole product discards $N\cdot O(1/N^2)=O(1/N)$, which
+goes to zero along with everything else. Chopping time finer really does
+converge, rather than trading one error for $N$ of them. (If $H$ itself
+depended on time, the factors would differ and would generally fail to
+commute; the exponential would then have to be replaced by a time-ordered
+product. This course keeps $H$ constant, and works throughout in
+finite-dimensional spaces, where the exponential's power series converges
+unconditionally; for an unbounded $H$ on an infinite-dimensional space
+the same result holds but is Stone's theorem, not a power series.)
 
 Differentiate both sides of $|\psi(t)\rangle = U(t)|\psi(0)\rangle$ with
 respect to $t$, using $\frac{d}{dt}e^{-iHt/\hbar} =
@@ -100,9 +170,9 @@ Rearranged, this is the **time-dependent Schrödinger equation**:
 
 <EquationReveal
   terms={[
-    { id: "ihbar", symbol: "iħ d/dt", gloss: "The rate of change of the state, scaled by ħ and rotated a quarter-turn by i — this side is pure calculus, no physics input yet." },
-    { id: "psi", symbol: "|ψ(t)⟩", gloss: "The state vector at time t — everything knowable about the system at that instant." },
-    { id: "H", symbol: "H", gloss: "The Hamiltonian — the Hermitian generator of evolution, physically identified with total energy." },
+    { id: "ihbar", symbol: "iħ d/dt", gloss: "The rate of change of the state, scaled by ħ and rotated a quarter-turn by i. This side is pure calculus; no physics has entered it." },
+    { id: "psi", symbol: "|ψ(t)⟩", gloss: "The state vector at time t: everything knowable about the system at that instant." },
+    { id: "H", symbol: "H", gloss: "The Hamiltonian: the Hermitian generator of evolution, identified physically with the system's total energy." },
   ]}
 >
 $$
@@ -133,13 +203,13 @@ $$
 U(t) = e^{-iHt/\hbar} = e^{-i(\omega t/2)(\hat n\cdot\vec\sigma)} = \cos\!\left(\frac{\omega t}{2}\right)I - i\sin\!\left(\frac{\omega t}{2}\right)(\hat n\cdot\vec\sigma)
 $$
 
-This is **exactly** the `rotationAboutAxis` function already built in
-this platform's quantum engine for the Bloch Sphere Explorer, so no new
-code is needed to compute it, only the substitution $\theta=\omega t$.
-Time evolution under a two-level Hamiltonian *is* a rotation of the Bloch
-sphere at constant angular velocity $\omega$ about the axis $\hat n$: if
-you've used the Bloch Sphere Explorer's rotation gates, you've already
-computed this exact evolution operator, one discrete step at a time.
+Read the right-hand side again and compare it to the definition of
+`rotationAboutAxis` in this platform's quantum engine: they are the same
+formula, with $\theta = \omega t$. Time evolution under a two-level
+Hamiltonian *is* rotation of the Bloch sphere at constant angular
+velocity $\omega$ about the axis $\hat n$. Anyone who has clicked the
+Bloch Sphere Explorer's rotation gates has been computing this evolution
+operator already, one discrete step at a time.
 
 ## Physical Interpretation
 
@@ -147,9 +217,10 @@ A state that starts as an <Term id="eigenvalue-eigenvector">eigenstate</Term> of
 for all time (the next lesson, Stationary States, proves this directly
 from the formula for $U(t)$ above). A state that starts as a
 superposition of two different-energy eigenstates instead **precesses**:
-its measurement probabilities for other observables oscillate in time at
-a frequency set by the energy difference between those eigenstates,
-exactly the rotation picture just derived.
+its measurement probabilities for other observables oscillate at a
+frequency set by the energy *difference* between those eigenstates. The
+difference is what matters, not the individual energies, which is the
+same observation that made the overall phase unobservable in Postulate 1.
 
 ## Worked Example
 
@@ -180,8 +251,24 @@ Bloch sphere's equator at angular frequency $\omega$, returning to
 $|+\rangle$ exactly (probability $1$) at $t=0, \tfrac{2\pi}{\omega},
 \tfrac{4\pi}{\omega},\ldots$
 
-The rotation formula above is exactly what the Bloch Sphere Explorer's
-gate buttons already compute, one discrete step at a time:
+Plotting that result makes the periodicity concrete. The two curves below
+are $|\langle+|\psi(t)\rangle|^2$ and $|\langle-|\psi(t)\rangle|^2$,
+computed by evolving $|+\rangle$ with the platform's own `rotationZ` and
+taking inner products, not by evaluating $\cos^2$ by hand:
+
+<ParametricCurve
+  frames={precessionFrames}
+  ariaLabel="Two probability curves plotted against omega times t from 0 to 4 pi. The probability of measuring the plus state starts at 1, falls to 0 at omega t equals pi, returns to 1 at 2 pi, and repeats. The probability of measuring the minus state is its mirror image, starting at 0 and peaking at 1 at omega t equals pi. The two always sum to 1."
+/>
+
+The state is never partly lost along the way: the two curves sum to $1$
+at every instant, which is unitarity showing up as a visible property of
+the plot. At $\omega t = \pi$ the system is certain to be found in
+$|-\rangle$, having started certain to be found in $|+\rangle$, with no
+measurement performed anywhere in between.
+
+The same rotation formula is what the Bloch Sphere Explorer's gate
+buttons compute, one discrete step at a time:
 
 <PredictBeforeReveal
   question="U(t) depends on t only through the product ωt. If you click the same small Z-rotation gate five times in a row below, each click applying the same fixed time step, how should the vector's steps around the equator compare to each other?"
@@ -192,7 +279,7 @@ gate buttons already compute, one discrete step at a time:
     { label: "Unpredictable, different-sized steps", value: "random" },
   ]}
   correctValue="equal"
-  explanation="Equal time steps mean equal increments of ωt, and U(t) turns the Bloch vector by an angle proportional to ωt. So every click sweeps out exactly the same angle as the last — that's the concrete meaning of 'constant angular velocity' in the derivation above. Five clicks trace five identical steps around the equator, not a curve that speeds up, slows down, or wanders."
+  explanation="Equal time steps mean equal increments of ωt, and U(t) turns the Bloch vector by an angle proportional to ωt. Every click therefore sweeps out the same angle as the last, which is the concrete meaning of 'constant angular velocity' in the derivation above. Five clicks trace five identical steps around the equator, rather than a path that speeds up, slows down, or wanders."
 />
 
 <InteractiveSection
@@ -236,16 +323,16 @@ one eigenstate.
   $H^\dagger=H$: the generator of time evolution must be Hermitian.
 - This gives $U(t)=e^{-iHt/\hbar}$, and differentiating it gives the
   Schrödinger equation $i\hbar\,d|\psi\rangle/dt = H|\psi\rangle$.
-- For a two-level system, $U(t)$ is exactly the existing
-  `rotationAboutAxis` function: time evolution under a qubit Hamiltonian
-  is Bloch-sphere precession, reusing code rather than needing new math.
+- For a two-level system, $U(t)$ *is* `rotationAboutAxis` with
+  $\theta=\omega t$: evolution under a qubit Hamiltonian is Bloch-sphere
+  precession, so no new mathematics is needed to compute it.
 
 ## Further Exploration
 
 <ChallengePrompt prompt="For H = (ħω/2)X instead of Z (so n̂ = x̂), with the system starting in |0⟩, use the rotation formula to find |ψ(t)⟩.">
-  Same rotation formula as the worked example, $U(t)=\cos(\omega
-  t/2)I-i\sin(\omega t/2)X$ this time — apply it to $|0\rangle$ using
-  $X|0\rangle=|1\rangle$.
+  Same rotation formula as the worked example, now with $X$ in place of
+  $Z$: $U(t)=\cos(\omega t/2)I-i\sin(\omega t/2)X$. Apply it to
+  $|0\rangle$ using $X|0\rangle=|1\rangle$.
 </ChallengePrompt>
 
 <NextDiscovery>

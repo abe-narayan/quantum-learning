@@ -53,11 +53,17 @@ export function PrerequisiteReadout({ prerequisites }: { prerequisites: LessonMe
   const completedSlugs = useCompletedLessonSlugs();
 
   if (prerequisites.length === 0) {
+    // A genuine on-ramp. The second sentence is for the reader who arrived
+    // here directly (hero CTA, navbar Start, a shared link) and suspects
+    // they were supposed to do some other track first: they weren't, and
+    // saying so here costs one line.
     return (
-      <div className="mt-6 flex items-center gap-2 text-pillar-text">
+      <div className="mt-6 flex items-start gap-2 text-pillar-text">
         <CheckGlyph done />
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">No prerequisites.</span> This is a starting point.
+          <span className="font-medium text-foreground">No prerequisites.</span> This is a
+          starting point: you have not skipped anything, and no other lesson or track comes
+          before it.
         </p>
       </div>
     );

@@ -25,6 +25,10 @@ export const coherentStateMeanPhotonNumber: NumericProblem = {
     value: meanN,
     tolerance: 0.01,
     incorrectFeedback: "⟨N⟩=|α|² for a coherent state, directly from |cₙ|²=e^(−|α|²)|α|^(2n)/n! being a Poisson distribution with mean |α|².",
+    nearMisses: [
+      { value: 2, feedback: "2 is α itself. The Poisson mean is |α|², so square it." },
+      { value: 16, feedback: "16 is |α|⁴, which is ⟨N⟩², the mean squared. The mean itself is |α|², so square α once, not twice." },
+    ],
   },
   hints: [{ text: "⟨N⟩=|α|² exactly, the mean of the Poisson distribution |cₙ|²=e^(−|α|²)|α|^(2n)/n!." }],
   solution: {

@@ -16,7 +16,26 @@ export function AmplitudeBars({ state, markedIndices }: { state: StateVector; ma
 
   return (
     <div className="space-y-2">
-      <div className="flex items-end gap-1 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4" style={{ height: 220 }}>
+      {/* `tabIndex={0}` + `role="group"`. Every bar column is
+          `min-w-[2.25rem]` (36px), and this chart draws one column per basis
+          state — 2ⁿ of them, so a 4-qubit search is 16 columns = 576px against
+          a stage that is ~256px wide on a 320px phone. It genuinely scrolls,
+          and an `overflow-x-auto` div is focusable by default in no browser
+          except Firefox: a keyboard-only reader watching amplitude
+          amplification could see |00…0⟩ and its neighbours and had no way to
+          reach the marked state, which is the one bar the whole simulator is
+          about. Nothing inside is focusable, so this is not a redundant stop —
+          it is the only one.
+          The name restates what the caption below already says in visible
+          text, so a reader landing here knows what the bars encode without
+          having to leave and come back. */}
+      <div
+        role="group"
+        aria-label="Amplitude bars, one per basis state, scrollable horizontally. Bar height is amplitude magnitude; the percentage above each bar is that state's measurement probability."
+        tabIndex={0}
+        className="flex items-end gap-1 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4"
+        style={{ height: 220 }}
+      >
         {amplitudes.map((amp, index) => {
           const isMarked = markedIndices.includes(index);
           const barHeight = (Math.abs(amp) / maxAbs) * 90;

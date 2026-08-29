@@ -171,7 +171,14 @@ export default async function CoursePage({ params }: CoursePageProps) {
           reading column: what is this, how hard/long, what do I need,
           where do I start.
           ------------------------------------------------------------- */}
-      <Section width="reading" className="pt-4 sm:pt-8">
+      {/* `tight`, not `className="pt-4 sm:pt-8"`: `Section` writes its
+          vertical padding as an inline `style`, which always beats a class on
+          the same element, so that override compiled fine and applied to
+          nothing — the page opened with the full `--rhythm-section` (72px at
+          320px, 136px on a wide desktop) where 16px was asked for. `tight` is
+          the prop that actually reduces it. Same dead override as /learn's
+          hero, error.tsx and not-found.tsx. */}
+      <Section width="reading" tight>
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <Link href="/learn" className="tech-label text-muted-foreground transition-colors hover:text-foreground">
             Learn
@@ -235,7 +242,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
               <Link
                 href={`/lessons/${firstLesson.slug}`}
-                className="group inline-flex min-h-14 max-w-full flex-col justify-center rounded-xl border-2 border-pillar-edge bg-pillar-wash px-6 py-3 transition-[background-color,transform] hover:bg-pillar-wash/70 motion-safe:hover:-translate-y-0.5"
+                className="group inline-flex min-h-14 max-w-full flex-col justify-center rounded-panel border-2 border-pillar-edge bg-pillar-wash px-6 py-3 transition-[background-color,transform] hover:bg-pillar-wash/70 motion-safe:hover:-translate-y-0.5"
               >
                 <span className="tech-label text-sm text-pillar-text">
                   Start the first lesson{" "}
@@ -302,7 +309,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
                   <li key={prereq.slug}>
                     <Link
                       href={`/courses/${prereq.slug}`}
-                      className="-mx-2 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-md px-2 py-2.5 transition-colors hover:bg-surface-muted"
+                      className="-mx-2 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-(--radius-tight) px-2 py-2.5 transition-colors hover:bg-surface-muted"
                     >
                       <span className="text-sm font-medium text-foreground">{prereq.title}</span>
                       <span className="flex shrink-0 items-center gap-3">
@@ -485,7 +492,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
                       {lesson ? (
                         <Link
                           href={`/lessons/${lesson.slug}`}
-                          className="group -mx-2 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-md px-2 py-3 transition-colors hover:bg-surface-muted"
+                          className="group -mx-2 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-(--radius-tight) px-2 py-3 transition-colors hover:bg-surface-muted"
                         >
                           <span className="flex min-w-0 items-baseline gap-3">
                             {number}

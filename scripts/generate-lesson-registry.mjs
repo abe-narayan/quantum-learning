@@ -25,11 +25,23 @@
  *
  * Run via `npm run generate:lesson-registry`, or automatically before
  * `dev`/`build`/`test` via the `predev`/`prebuild`/`pretest` npm lifecycle
- * hooks (alongside the other generators).
+ * hooks (alongside the other generators), and before `typecheck` via
+ * `pretypecheck` — `tsc` reads this generated `.ts` file, so it must exist
+ * and be current for a typecheck to mean anything.
  */
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { walk, compareSlugs, extractObjectLiteral } from "./lib/extract.mjs";
+// LESSON_META_KEY_RE is imported, never re-declared: generate-search-index.mjs
+// extracts the same block from the same files, and the two selecting
+// different blocks would put different metadata on the lesson page and in
+// search with nothing to notice. See scripts/lib/extract.mjs's header.
+import {
+  walk,
+  compareSlugs,
+  extractObjectLiteral,
+  writeGenerated,
+  LESSON_META_KEY_RE,
+} from "./lib/extract.mjs";
 
 const ROOT = process.cwd();
 const LESSONS_ROOT = path.join(ROOT, "src/content/lessons");
@@ -75,7 +87,7 @@ async function main() {
   for (const slug of slugs) {
     const filePath = path.join(LESSONS_ROOT, `${slug}.mdx`);
     const source = await readFile(filePath, "utf8");
-    const meta = extractObjectLiteral(source, /export const lessonMeta\s*=\s*\{/, filePath, "lessonMeta");
+    const meta = extractObjectLiteral(source, LESSON_META_KEY_RE, filePath, "lessonMeta");
     validateMeta(meta, filePath);
     metas.push({ ...meta, slug });
   }
@@ -100,7 +112,7 @@ import type { LessonMetaWithSlug } from "./types";
 export const LESSON_METAS: LessonMetaWithSlug[] = ${JSON.stringify(metas, null, 2)};
 `;
 
-  await writeFile(OUTPUT, contents, "utf8");
+  await writeGenerated(OUTPUT, contents);
   console.log(
     `generate-lesson-registry: wrote ${metas.length} lessons to ${path.relative(ROOT, OUTPUT)}`
   );

@@ -24,6 +24,10 @@ export const traceDistanceAtHalfDamping: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "Substitute gamma=0.5 directly: sqrt(1-0.5)=sqrt(0.5)≈0.707107, then (1-0.707107)^2≈0.085786, plus gamma^2=0.25, square root, times 0.5.",
+    nearMisses: [
+      { value: 0.579471, tolerance: 0.002, feedback: "That is the square root before the factor of 1/2. Trace distance carries that half in front." },
+      { value: 0.25, feedback: "0.25 is gamma/2, ignoring the second term under the root. The coherence loss contributes as well." },
+    ],
   },
   hints: [
     { text: "sqrt(1-gamma) at gamma=0.5 is sqrt(0.5) ≈ 0.707107." },

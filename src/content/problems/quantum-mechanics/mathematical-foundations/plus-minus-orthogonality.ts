@@ -22,12 +22,16 @@ export const plusMinusOrthogonality: NumericProblem = {
     type: "numeric",
     value: 0,
     tolerance: 0.01,
-    incorrectFeedback: "Expand both bra and ket in the |0⟩, |1⟩ basis and use ⟨0|0⟩=⟨1|1⟩=1, ⟨0|1⟩=⟨1|0⟩=0.",
+    incorrectFeedback: "Expand both states in the computational basis and use orthonormality. The most common slip is dropping the minus sign in the second state's expansion; keep it and watch what happens to the surviving terms.",
+    nearMisses: [
+      { value: 1, feedback: "1 is what you get by dropping the minus sign in |−⟩, which turns the calculation into ⟨+|+⟩. With the sign kept, the two surviving terms cancel." },
+      { value: 0.5, feedback: "0.5 keeps only one of the two surviving terms. Both ⟨0|0⟩ and ⟨1|1⟩ contribute, with opposite signs." },
+    ],
   },
   hints: [
-    { text: "Write ⟨+| = (1/√2)(⟨0|+⟨1|) and expand the product with |−⟩ term by term." },
-    { text: "Use orthonormality: ⟨0|0⟩=1, ⟨0|1⟩=0, ⟨1|0⟩=0, ⟨1|1⟩=1." },
-    { text: "Two of the four terms cancel against the other two." },
+    { text: "Expand the bra and the ket in the computational basis and multiply out, keeping all four cross terms. Do not drop the minus sign carried by the second state." },
+    { text: "Orthonormality kills the two cross terms immediately, leaving the two like-with-like terms, one from each half of the expansion." },
+    { text: "Look at the signs on the two surviving terms: equal in size, opposite in sign. Combine them." },
   ],
   solution: {
     steps: [

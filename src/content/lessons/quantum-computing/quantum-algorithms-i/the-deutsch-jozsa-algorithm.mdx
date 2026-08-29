@@ -17,11 +17,13 @@ export const deutschJozsaP00 = (f) =>
     (s) => applySingleQubitGate(s, HADAMARD, 0),
     (s) => applySingleQubitGate(s, HADAMARD, 1),
     (s) => applySingleQubitGate(s, HADAMARD, 2),
+    (s) => applySingleQubitGate(s, HADAMARD, 3),
     (s) => applyBitOracle(s, f),
     (s) => applySingleQubitGate(s, HADAMARD, 0),
     (s) => applySingleQubitGate(s, HADAMARD, 1),
+    (s) => applySingleQubitGate(s, HADAMARD, 2),
   ]
-    .reduce((s, step) => step(s), StateVector.basis(3, 1))
+    .reduce((s, step) => step(s), StateVector.basis(4, 1))
     .probabilities()
     .slice(0, 2)
     .reduce((a, b) => a + b, 0);
@@ -69,7 +71,7 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="One query, always correct">
-Classically, distinguishing a constant function from a balanced one with certainty can take exponentially many queries in the worst case. Deutsch-Jozsa does it with exactly one.
+Classically, distinguishing a constant function from a balanced one with certainty can take exponentially many queries in the worst case. Deutsch-Jozsa does it with a single query.
 </LessonHook>
 
 ## Motivation
@@ -90,10 +92,10 @@ breaking the pattern.
     { label: "Exactly one, always correct", value: "one" },
   ]}
   correctValue="one"
-  explanation="One query, full stop. Phase kickback marks every |x⟩ with (-1)^f(x) in a single call to U_f, and the second Hadamard layer converts that global phase pattern into an amplitude that lands on exactly ±1 (constant) or exactly 0 (balanced), derived below. There's no partial credit or repeated sampling involved: the promise itself guarantees a clean either/or answer from one query."
+  explanation="One query, and the answer is certain rather than probable. Phase kickback marks every |x⟩ with (-1)^f(x) in a single call to U_f, and the second Hadamard layer converts that phase pattern into an amplitude landing on ±1 (constant) or 0 (balanced), derived below. No repeated sampling, no error probability to drive down: the promise guarantees a clean either/or from one query. This is the largest separation between classical and quantum query counts you will meet in this course, and it is worth knowing up front that it depends entirely on the promise."
 />
 
-That's exactly what <Term id="deutsch-jozsa">Deutsch-Jozsa</Term> achieves: exactly **one** query
+That is what <Term id="deutsch-jozsa">Deutsch-Jozsa</Term> achieves: **one** query
 to $U_f$, using the phase-kickback trick from last lesson plus a second
 layer of Hadamards to turn phases back into a directly measurable answer.
 
@@ -124,12 +126,30 @@ input register again. Measure the input register.
 ### Tracking the amplitude on |0...0⟩
 
 After phase kickback, the input register is
-$\frac{1}{\sqrt{2^n}}\sum_x(-1)^{f(x)}|x\rangle$. The key fact about
-$H^{\otimes n}$ needed next: $H^{\otimes n}|x\rangle =
-\frac{1}{\sqrt{2^n}}\sum_z(-1)^{x\cdot z}|z\rangle$, where $x\cdot z$ is the
-bitwise dot product mod 2 (this is $H^{\otimes n}$'s general action on any
-basis state, a direct generalization of $H|0\rangle=|+\rangle$,
-$H|1\rangle=|-\rangle$ combined bit by bit). Applying this to every term:
+$\frac{1}{\sqrt{2^n}}\sum_x(-1)^{f(x)}|x\rangle$. One identity unlocks the
+rest of the derivation: how $H^{\otimes n}$ acts on an arbitrary basis
+state $|x\rangle$. Build it up from the single-qubit rules you already
+know.
+
+<DerivationSteps>
+  <DerivationStep annotation="Restate the n=1 case as one formula. H|0⟩ = (|0⟩+|1⟩)/√2 and H|1⟩ = (|0⟩−|1⟩)/√2; the minus sign appears only on the |1⟩ component of H|1⟩, that is, only when x = z = 1, which the exponent xz encodes.">
+$$
+H|x\rangle = \frac{1}{\sqrt{2}}\sum_{z\in\{0,1\}}(-1)^{xz}|z\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Work n=2 by tensoring the n=1 formula with itself. Multiplying the two sums multiplies the signs, so the exponents add: each two-bit output |z₁z₂⟩ picks up (−1) raised to x₁z₁ + x₂z₂.">
+$$
+H^{\otimes 2}|x_1x_2\rangle = \big(H|x_1\rangle\big)\otimes\big(H|x_2\rangle\big) = \frac{1}{2}\sum_{z_1,z_2}(-1)^{x_1z_1+x_2z_2}|z_1z_2\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="The same tensoring, n times: one factor of 1/√2 per qubit (multiplying to 2^{−n/2}) and one sign per bit position, accumulating to the bitwise dot product x·z = x₁z₁ + ⋯ + xₙzₙ mod 2. This general pattern is the Hadamard transform of a basis state.">
+$$
+H^{\otimes n}|x\rangle = \frac{1}{\sqrt{2^n}}\sum_z(-1)^{x\cdot z}|z\rangle
+$$
+  </DerivationStep>
+</DerivationSteps>
+
+Applying this identity to every term of the post-kickback state:
 
 $$
 H^{\otimes n}\left(\frac{1}{\sqrt{2^n}}\sum_x(-1)^{f(x)}|x\rangle\right) = \frac{1}{2^n}\sum_x\sum_z(-1)^{f(x)}(-1)^{x\cdot z}|z\rangle
@@ -140,7 +160,7 @@ $x$, that factor is always $1$, leaving
 
 <EquationReveal
   terms={[
-    { id: "n", symbol: "2^n", gloss: "The number of possible n-bit inputs — also the number of terms in the sum." },
+    { id: "n", symbol: "2^n", gloss: "The number of possible n-bit inputs, and so the number of terms in the sum." },
     { id: "sum", symbol: "Σ_x (-1)^f(x)", gloss: "A sum of +1s and -1s, one per input x, with sign set by f(x)." },
   ]}
 >
@@ -149,12 +169,12 @@ $$
 $$
 </EquationReveal>
 
-### Constant vs. balanced, resolved exactly
+### Constant vs. balanced, resolved
 
 If $f$ is constant, every term $(-1)^{f(x)}$ is the same sign, so the sum
 is $\pm2^n$, giving amplitude $\pm1$, probability $|{\pm1}|^2=1$ of
 measuring $|0\rangle^{\otimes n}$, **with certainty**. If $f$ is balanced,
-exactly half the terms are $+1$ and half are $-1$ by the promise itself, so
+half the terms are $+1$ and half are $-1$ by the promise itself, so
 the sum is exactly $0$: probability $0$ of measuring
 $|0\rangle^{\otimes n}$, **also with certainty**. There is no ambiguous
 middle case, because the promise ruled it out from the start. One
@@ -165,9 +185,9 @@ $$
 $$
 
 Both cases are verified directly against the engine (`applyBitOracle` +
-`HADAMARD` composed exactly as derived above): a balanced function built
-from `balancedFunction` gives $P(0^n)=0$ exactly; either constant function
-gives $P(0^n)=1$ exactly, not approximately, to floating-point precision.
+`HADAMARD` composed as derived above): a balanced function built
+from `balancedFunction` gives $P(0^n)=0$; either constant function
+gives $P(0^n)=1$, to floating-point precision, not approximately.
 Running the full circuit for real, for both cases, makes the "no middle
 ground" claim visible rather than just asserted:
 
@@ -176,19 +196,20 @@ ground" claim visible rather than just asserted:
     { label: "constant f", value: p00Constant, highlight: true },
     { label: "balanced f", value: p00Balanced },
   ]}
+  maxValue={1}
   ariaLabel="Probability of measuring the all-zeros outcome, for a constant function versus a balanced function"
 />
 
-One bar sits at exactly 1, the other at exactly 0, nothing in between,
-for the same reason the algebra above gives exactly $\pm1$ or exactly $0$.
+One bar sits at 1, the other at 0, nothing in between,
+for the same reason the algebra above gives $\pm1$ or $0$.
 
 This holds for every constant or balanced function on $n=3$ inputs, not
-just the one pair shown above. Nine real oracles, run through the exact
-same circuit:
+just the one pair shown above. Nine real oracles, run through the same
+circuit:
 
 <InteractiveSection
   title="Nine oracles, one clean split at P(000)"
-  description="Step through nine real oracles on n=3 inputs, both constant functions and every balanced parity mask from 001 through 111, run through the same circuit: three Hadamards, applyBitOracle, two Hadamards, then read off P(000). Every constant oracle lands exactly on 1, every balanced oracle lands exactly on 0, no matter which mask defines it."
+  description="Step through nine real oracles on n=3 inputs, both constant functions and every balanced parity mask from 001 through 111, run through the same circuit on a 4-qubit register (3 inputs plus the phase-kickback ancilla): four Hadamards, applyBitOracle, three Hadamards on the input register, then read off P(000). Every constant oracle lands on 1, every balanced oracle lands on 0, no matter which mask defines it."
 >
   <BarChartExplorer
     frames={djOracleFrames}
@@ -198,36 +219,38 @@ same circuit:
   />
 </InteractiveSection>
 
-Every constant frame reads $P(000)=1$ exactly; every balanced frame, no
+Every constant frame reads $P(000)=1$; every balanced frame, no
 matter which of the seven nonzero 3-bit masks defines it, reads
-$P(000)=0$ exactly. The promise, not the specific choice of $f$, is what
-forces this: any of these seven balanced masks gives a genuinely different
+$P(000)=0$. The promise, not the specific choice of $f$, is what
+forces this: each of these seven balanced masks defines a different
 function, yet all seven land on the identical amplitude-cancellation result
 the derivation predicted.
 
 ## Physical Interpretation
 
-The classical lower bound is about *worst-case adversarial inputs*; the
-quantum algorithm sidesteps it entirely by never querying individual
-inputs at all. It queries the oracle exactly once, in superposition, and
-lets <Term id="phase-interference">interference</Term> between all $2^n$ branches (constructive for constant
-$f$, perfectly destructive for balanced $f$) decide the global answer.
-Nothing about any *individual* $f(x)$ is ever learned; only the global
-constant-or-balanced fact is, which is exactly what the promise problem
-asked for.
+The classical lower bound is about *worst-case adversarial inputs*, and the
+quantum algorithm sidesteps it by never querying an individual input. It
+queries the oracle once, in superposition, and lets <Term id="phase-interference">interference</Term> between all
+$2^n$ branches decide: constructive for constant $f$, perfectly
+destructive for balanced $f$.
+
+Notice what is not learned. No individual value $f(x)$ is ever recovered.
+The algorithm answers the global question and nothing else, which is
+exactly what the promise problem asked for and is also, honestly, why
+Deutsch-Jozsa is a demonstration rather than a useful tool.
 
 ## Worked Example
 
 **Run Deutsch-Jozsa on the balanced function $f(x)=x_1\oplus x_2$ (parity
 of the two input bits) for $n=2$. Confirm $P(00)=0$.**
 
-$f(00)=0,\,f(01)=1,\,f(10)=1,\,f(11)=0$, two 0s, two 1s: genuinely
-balanced. Sum: $(-1)^0+(-1)^1+(-1)^1+(-1)^0 = 1-1-1+1=0$. Amplitude on
-$|00\rangle$ is $0/4=0$, so $P(00)=0$ exactly: measuring anything *but*
-$|00\rangle$ correctly reports "balanced." This is exactly the
-`balancedFunction(0b10)`-style construction (parity against a fixed
-bitmask) this course's engine uses, and the $0$ result matches the
-engine's output exactly.
+$f(00)=0,\,f(01)=1,\,f(10)=1,\,f(11)=0$, two 0s, two 1s: balanced, as
+the promise requires. Sum: $(-1)^0+(-1)^1+(-1)^1+(-1)^0 = 1-1-1+1=0$. Amplitude on
+$|00\rangle$ is $0/4=0$, so $P(00)=0$: measuring anything *but*
+$|00\rangle$ correctly reports "balanced." This is exactly
+`balancedFunction(0b11)` (parity against a fixed bitmask, here both input
+bits) as this course's engine builds it, and the $0$ result matches the
+engine's output.
 
 ## Common Mistakes
 
@@ -235,8 +258,8 @@ engine's output exactly.
 **Thinking Deutsch-Jozsa works for an arbitrary (non-promised) function.**
 It doesn't: a function that's neither constant nor balanced can land
 anywhere between amplitude $-1$ and $1$ on $|0\rangle^{\otimes n}$, giving
-no reliable answer at all. The promise is what makes the two cases exactly
-$0$ and exactly $\pm1$, with nothing in between.
+no reliable answer at all. The promise is what pins the two cases to
+$0$ and $\pm1$, with nothing in between.
 </Callout>
 
 <Callout type="warning">
@@ -264,12 +287,12 @@ measurable probability difference.
 
 ## Summary
 
-- Deutsch-Jozsa distinguishes constant from balanced $f$ with exactly one
+- Deutsch-Jozsa distinguishes constant from balanced $f$ with one
   oracle query, versus up to $2^{n-1}+1$ classically.
 - The amplitude on $|0\rangle^{\otimes n}$ after the full circuit is
-  exactly $\frac{1}{2^n}\sum_x(-1)^{f(x)}$, derived from $H^{\otimes n}$'s
+  $\frac{1}{2^n}\sum_x(-1)^{f(x)}$, derived from $H^{\otimes n}$'s
   general action, not asserted.
-- This amplitude is exactly $\pm1$ (constant) or exactly $0$ (balanced),
+- This amplitude is $\pm1$ (constant) or $0$ (balanced),
   no ambiguous middle case, because the promise rules it out.
 - Both cases are checked directly against the engine, not just derived on
   paper.

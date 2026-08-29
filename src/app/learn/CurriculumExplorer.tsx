@@ -122,7 +122,7 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
                 <button
                   type="button"
                   onClick={() => setFilter("all")}
-                  className="inline-flex min-h-11 items-center rounded-full border border-border-strong px-3.5 text-sm font-medium text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:text-pillar-text"
+                  className="inline-flex min-h-11 items-center rounded-full border border-border-strong px-3.5 text-sm font-medium text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
                 >
                   Show all {COURSES.length} courses
                 </button>
@@ -149,7 +149,7 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
                     key={slug}
                     href={`#${slug}`}
                     data-pillar={slug}
-                    className="inline-flex min-h-11 items-center rounded-full border border-border px-3 font-tech text-[0.7rem] uppercase tracking-wide text-muted-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:text-pillar-text"
+                    className="inline-flex min-h-11 items-center rounded-full border border-border px-3 font-tech text-[0.7rem] uppercase tracking-wide text-muted-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
                   >
                     {i + 1}. {pillarVisual(slug).short}
                   </a>
@@ -164,7 +164,7 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
                     key={slug}
                     href={`#${slug}`}
                     data-pillar={slug}
-                    className="inline-flex min-h-11 items-center rounded-full border border-border-strong px-3 font-tech text-[0.7rem] font-medium uppercase tracking-wide text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:text-pillar-text"
+                    className="inline-flex min-h-11 items-center rounded-full border border-border-strong px-3 font-tech text-[0.7rem] font-medium uppercase tracking-wide text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
                   >
                     {i + 5}. {pillarVisual(slug).short}
                   </a>
@@ -276,7 +276,7 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
                   // hold, and offers the way back. A bare "No courses" here
                   // reads as a broken page — this pillar plainly has courses,
                   // the reader just narrowed them away.
-                  <p className="rounded-[var(--radius-panel)] border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
+                  <p className="rounded-panel border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
                     {filter === "all" ? (
                       <>No courses in {pillar.title} yet.</>
                     ) : (

@@ -47,7 +47,11 @@ export function GroverAmplitudeSweep({
   const optimal = useMemo(() => optimalGroverIterations(n, markedIndices.length), [n, markedIndices.length]);
   const upperBound = maxIterations ?? optimal * 2 + 2;
 
-  const [k, setK] = useState(0);
+  // First contact opens at k = 1, one real iteration in: the marked bar is
+  // already visibly taller than the rest, so the figure shows the phenomenon
+  // (amplification) rather than the featureless uniform start. Stepping back
+  // to k = 0 still shows the uniform reference state.
+  const [k, setK] = useState(1);
   const [playing, setPlaying] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -107,11 +111,27 @@ export function GroverAmplitudeSweep({
       />
 
       <div className="flex flex-wrap items-center gap-2 panel-inset p-3">
+        {/* `aria-disabled` rather than the native `disabled` attribute, on both
+            step buttons. These are the primary keyboard interaction with this
+            figure, and the natural way to use a stepper is to hold Enter until
+            you reach the end — at which point a natively-disabled button stops
+            being focusable *while it currently holds focus*, and every browser
+            drops focus to <body>. The reader's next Tab then restarts from the
+            top of the page, so walking the sweep to k = 0 or to the last
+            iteration silently ejects you from the figure you were reading.
+            `aria-disabled` announces the identical "dimmed, unavailable" state
+            to a screen reader while keeping the element focusable, so focus
+            stays exactly where the reader put it; the handler no-ops and
+            `aria-disabled:pointer-events-none` reproduces the dead-to-the-mouse
+            behaviour. */}
         <button
           type="button"
-          onClick={() => handleStep(-1)}
-          disabled={k === 0}
-          className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          onClick={() => {
+            if (k === 0) return;
+            handleStep(-1);
+          }}
+          aria-disabled={k === 0}
+          className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted aria-disabled:pointer-events-none aria-disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar"
           aria-label="One fewer iteration"
         >
           ← k
@@ -120,7 +140,7 @@ export function GroverAmplitudeSweep({
           <button
             type="button"
             onClick={handlePlayPause}
-            className="rounded-md border border-brand bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="min-h-11 rounded-(--radius-tight) border border-brand bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label={playing ? "Pause" : "Play through every iteration"}
           >
             {playing ? "Pause" : k >= upperBound ? "Replay" : "Play"}
@@ -128,9 +148,12 @@ export function GroverAmplitudeSweep({
         )}
         <button
           type="button"
-          onClick={() => handleStep(1)}
-          disabled={k >= upperBound}
-          className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          onClick={() => {
+            if (k >= upperBound) return;
+            handleStep(1);
+          }}
+          aria-disabled={k >= upperBound}
+          className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted aria-disabled:pointer-events-none aria-disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar"
           aria-label="One more iteration"
         >
           k →
@@ -145,7 +168,7 @@ export function GroverAmplitudeSweep({
             setPlaying(false);
             setK(Number(e.target.value));
           }}
-          className="ml-1 min-w-[8rem] flex-1 accent-brand"
+          className="ml-1 h-11 min-w-[8rem] flex-1 accent-brand"
           aria-label="Grover iteration count k"
           aria-valuetext={`k = ${k}`}
         />
@@ -154,8 +177,32 @@ export function GroverAmplitudeSweep({
         </span>
       </div>
 
-      <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      {/*
+        The visible narration is deliberately NOT the live region, the same
+        split `RabiExplorer` and `WavefunctionSimulation` already use for their
+        auto-play loops. Pressing Play here advances `k` every 700ms for up to
+        `optimal * 2 + 2` steps, and this sentence is rewritten on every one of
+        them. As a `polite` region on the visible node that meant a screen
+        reader spent the whole sweep being cut off mid-sentence by the next
+        iteration's announcement and never completed a single one — strictly
+        worse than silence, because it also blocks anything else the reader
+        tries to do while it runs.
+
+        So the visible text updates freely for the eye, and a separate sr-only
+        region carries the same sentence for the ear — emptied for the duration
+        of playback, refilled the moment the sweep stops (whether it ran out at
+        `upperBound` or the reader pressed Pause). The reader hears one clean
+        statement of where amplitude amplification actually ended up instead of
+        a dozen fragments of where it was passing through. Stepping with the
+        buttons or scrubbing the slider still announces immediately, because
+        both of those set `playing` false — that pacing belongs to the reader,
+        not to a timer.
+      */}
+      <div className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         P(marked) = {markedProbability.toFixed(3)} after {k} iteration{k === 1 ? "" : "s"}. {phase}
+      </div>
+      <div aria-live="polite" className="sr-only">
+        {playing ? "" : `P(marked) = ${markedProbability.toFixed(3)} after ${k} iteration${k === 1 ? "" : "s"}. ${phase}`}
       </div>
     </div>
   );

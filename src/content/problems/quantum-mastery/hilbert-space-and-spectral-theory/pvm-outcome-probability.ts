@@ -35,6 +35,10 @@ export const pvmOutcomeProbability: NumericProblem = {
     value: probability,
     tolerance: 0.01,
     incorrectFeedback: "E(1.5)=P₁ projects onto span{|0⟩,|1⟩} only — sum the squared amplitudes on just those two basis states.",
+    nearMisses: [
+      { value: 1, feedback: "1 includes the λ = 2 eigenspace. E(1.5) collects only eigenvalues at or below 1.5, and 2 is above it." },
+      { value: 1 / 3, tolerance: 0.005, feedback: "1/3 counts one basis state. The λ = 1 eigenspace is two-dimensional here, spanning |0⟩ and |1⟩." },
+    ],
   },
   hints: [
     { text: "E(1.5) includes every eigenvalue ≤ 1.5, which for this operator is only λ=1 (λ=2 is excluded)." },

@@ -22,6 +22,11 @@ export const finiteWellGroundStateCalculation: NumericProblem = {
     value: -2.788155,
     tolerance: 0.001,
     incorrectFeedback: "This requires solving the transcendental equation numerically (bisection) — it has no closed form. Use the platform's finiteSquareWellGroundStateEnergy approach: find k where tan(k*a) = sqrt(2*V0-k^2)/k, then E = k^2/2 - V0.",
+    nearMisses: [
+      { value: 2.788155, tolerance: 0.001, feedback: "The sign is wrong. A bound state sits below the V = 0 asymptote outside the well, so its energy is negative on this reference." },
+      { value: Math.PI ** 2 / (2 * 16), tolerance: 0.005, feedback: "That is the infinite well's ground state for the same width, which ignores V₀ entirely. A finite well leaks into the walls, lowering k and hence the energy." },
+      { value: -3, feedback: "−3 is the well's floor. The ground state sits above it by the zero-point energy k²/2." },
+    ],
   },
   hints: [
     { text: "This cannot be solved algebraically — it requires the bisection method from this lesson." },
@@ -29,7 +34,7 @@ export const finiteWellGroundStateCalculation: NumericProblem = {
   ],
   solution: {
     steps: [
-      { description: "Bisecting on $g(k)=k\\tan(ka)-\\sqrt{2V_0-k^2}$ for $a=2,V_0=3$ converges to $k\\approx1.0209$." },
+      { description: "Bisecting on $g(k)=k\\tan(ka)-\\sqrt{2V_0-k^2}$ for $a=2,V_0=3$ converges to $k\\approx0.6509$, on the first tangent branch $ka<\\pi/2$." },
       { description: "$E = k^2/2 - V_0 \\approx -2.7882$." },
     ],
     finalAnswer: "$E \\approx -2.7882$",

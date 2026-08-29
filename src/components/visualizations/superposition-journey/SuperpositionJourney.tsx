@@ -157,7 +157,14 @@ export function SuperpositionJourney() {
             prefersReducedMotion={prefersReducedMotion}
           />
 
-          <div className="mt-4 overflow-x-auto panel-inset px-4 py-3">
+          {/* No `overflow-x-auto` here: the only child is a block-level
+              `.katex-display`, which fills this content box and carries its own
+              horizontal scroll (globals.css §6), so this box never had anything to
+              scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+              y axis to `auto` too, which would silently clip a tall equation. The tab
+              stop the slab needs now lives on `.katex-display` itself; see
+              `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+          <div className="mt-4 panel-inset px-4 py-3">
             <KatexMath tex={stateLatex} display />
           </div>
 
@@ -188,7 +195,7 @@ export function SuperpositionJourney() {
               disabled={isMeasuring}
               onChange={(event) => handleAlphaChange(Number(event.target.value))}
               aria-label="Alpha, the amplitude of ket 0"
-              className="mt-2 w-full accent-brand disabled:opacity-50"
+              className="mt-2 h-11 w-full accent-brand disabled:opacity-50"
             />
           </label>
           <p className="mt-1.5 text-xs text-muted-foreground">
@@ -196,17 +203,17 @@ export function SuperpositionJourney() {
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <Button onClick={handleMeasure} disabled={isMeasuring}>
+            <Button className="min-h-11" onClick={handleMeasure} disabled={isMeasuring}>
               Measure
             </Button>
-            <Button variant="secondary" onClick={handleReset} disabled={isMeasuring}>
+            <Button variant="secondary" className="min-h-11" onClick={handleReset} disabled={isMeasuring}>
               Reset
             </Button>
           </div>
 
           <div
             aria-live="polite"
-            className="mt-4 rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
+            className="mt-4 rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
           >
             {narration}
           </div>
@@ -227,7 +234,7 @@ export function SuperpositionJourney() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl border border-accent/30 bg-accent/5 p-4">
+      <div className="mt-6 rounded-panel border border-accent/30 bg-accent/5 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">Try this</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-foreground">
           <li>

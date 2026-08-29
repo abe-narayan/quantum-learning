@@ -25,13 +25,17 @@ export const trotterStepsForTargetError: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 2,
-    incorrectFeedback: "Solve n ≥ t²‖[A,B]‖/(2ε) directly, then round up to the nearest integer.",
+    tolerance: 0.5,
+    incorrectFeedback: "Solve n ≥ t²‖[A,B]‖/(2ε) directly, then round up to the nearest integer. Rounding down leaves the bound unmet, so 282 does not qualify even though it is closer to the raw 282.84.",
+    nearMisses: [
+      { value: 566, tolerance: 2, feedback: "566 drops the factor of 2 in the denominator. The bound is t²‖[A,B]‖/(2ε), so halving the denominator doubles the step count needlessly." },
+      { value: 141, tolerance: 2, feedback: "141 halves the answer once too often, as if the denominator were 4ε. The derived bound has 2ε." },
+    ],
   },
   hints: [
     { text: "Rearrange the bound: n ≥ t²‖[A,B]‖/(2ε)." },
     { text: "Plug in t=1, ‖[A,B]‖≈5.656854, ε=0.01." },
-    { text: "5.656854 / 0.02 ≈ 282.8 — round up, since n must be an integer and the bound must be at or below ε." },
+    { text: "Divide the commutator norm by twice the target error, then round up: n is a whole number of steps, and rounding down would leave the bound unsatisfied." },
   ],
   solution: {
     steps: [
@@ -42,7 +46,7 @@ export const trotterStepsForTargetError: NumericProblem = {
     finalAnswer: `n = ${value}`,
   },
   explanation: {
-    correctIdea: "The derived bound directly determines the minimum step count for any target accuracy — a real, checkable resource estimate, not a qualitative guess.",
+    correctIdea: "The derived bound directly determines the minimum step count for any target accuracy: a real, checkable resource estimate, not a qualitative guess.",
     whyCorrect: "This is exactly the kind of quantitative resource-scaling calculation the lesson's derivation makes possible.",
     whyWrong: ["Rounding down, or forgetting the factor of 2 from t²/(2n), both give an n that doesn't actually satisfy the bound."],
   },

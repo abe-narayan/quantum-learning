@@ -23,12 +23,24 @@ export const qspD2DegreeCollapseImaginaryPart: NumericProblem = {
     value: 1,
     tolerance: 0.001,
     incorrectFeedback:
-      "With phi0=phi2=0, phi1=pi/2, the two exponents in the general formula are phi0+phi1+phi2=pi/2 and phi0-phi1+phi2=-pi/2, so e^{i pi/2}=i and e^{-i pi/2}=-i are exact negatives of each other. The x^2 pieces then cancel: P(x) = i x^2 - (-i)(1-x^2) = i x^2 + i - i x^2 = i for every x, so Im(P(x)) = 1.",
+      "Track the two exponents separately: with these phases they come out opposite, so the two coefficients are negatives of one another and the x² pieces cancel when you expand. If your answer depends on x, recheck that cancellation. If your imaginary part came out negative, a sign slipped in the second term of the closed form.",
+    nearMisses: [
+      {
+        value: -1,
+        feedback:
+          "A sign slipped. The closed form subtracts the second term, and that term's coefficient is already -i, so the two minus signs combine to give +i(1-x²), not -i(1-x²).",
+      },
+      {
+        value: 0,
+        feedback:
+          "The x² terms cancel, but the constant does not. After the cancellation P(x) = i(x² + 1 - x²) = i, so a nonzero imaginary part survives.",
+      },
+    ],
   },
   hints: [
-    { text: "Plug phi0=0, phi1=pi/2, phi2=0 into the general d=2 formula's two exponents: phi0+phi1+phi2 and phi0-phi1+phi2." },
-    { text: "e^{i pi/2}=i and e^{-i pi/2}=-i are exact negatives of one another." },
-    { text: "When the two coefficients are negatives, the x^2 terms cancel exactly: i x^2 - (-i)(1-x^2) = i x^2 + i - i x^2 = i, independent of x." },
+    { text: "Substitute the given phases into the two exponents of the closed form: the plain sum of the three phases, and the alternating combination with the middle phase negated. Compare what the two exponents come out to." },
+    { text: "The two exponents are pi/2 and -pi/2, so the coefficients e^{i pi/2}=i and e^{-i pi/2}=-i are exact negatives of one another." },
+    { text: "When the two coefficients are negatives, expand P(x) and watch the x² terms cancel. What remains is a purely imaginary constant, and its imaginary part is your answer." },
   ],
   solution: {
     steps: [

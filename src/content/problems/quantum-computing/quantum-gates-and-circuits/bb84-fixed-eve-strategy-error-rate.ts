@@ -50,6 +50,10 @@ export const bb84FixedEveStrategyErrorRate: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "A fixed eavesdropping strategy is exactly as detectable as a random one, as long as it's uncorrelated with Alice's basis choice — which it is, since Eve can't know Alice's random pick in advance.",
     whyCorrect: "The error-rate derivation only ever used the marginal probability that Eve's basis disagrees with Alice's, and that marginal probability is $1/2$ regardless of whether Eve's guesses are fixed or randomized.",
-    whyWrong: ["Assuming a deterministic strategy must behave differently from a randomized one ignores that Alice's basis choice — the only source of randomness that matters here — is unaffected by what Eve does."],
+    whyWrong: [
+      { optionId: "a", text: "Counts only the half of the qubits where Eve happens to be right. On the other half she is guaranteed wrong, and the average is what the sifted-key error rate reports." },
+      { optionId: "b", text: "Treats determinism as extra disturbance. Alice does not know Eve's strategy and picks independently of it, so the mismatch probability is unmoved." },
+      { optionId: "d", text: "Reads Eve's determinism as removing the randomness. Alice's basis choice supplies all the randomness the average needs." },
+    ],
   },
 };

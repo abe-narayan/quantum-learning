@@ -21,8 +21,28 @@ export const zeroEigenvalueStillCp: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["psd", "positive semi-definite", "non-negative", ">= 0", "greater than or equal"],
-      ["rank", "minimal kraus", "fewer kraus operators", "not all eigenvectors needed"],
+      [
+        "psd",
+        "positive semi-definite",
+        "semi-definite",
+        "semidefinite",
+        "non-negative",
+        "nonnegative",
+        "not strictly positive",
+        "greater than or equal",
+        "at or above zero",
+        "zero is allowed",
+        "zeros are allowed",
+        "zero eigenvalues are allowed",
+        "allows zero",
+        "permits zero",
+        "allowed to be zero",
+      ],
+      {
+        phrases: ["rank", "minimal kraus", "fewer kraus operators", "not all eigenvectors needed", "fewer than", "contributes nothing", "no contribution", "drops out"],
+        missingFeedback:
+          "You have the right condition: semi-definite, not strictly positive. Add what a zero eigenvalue means in practice: its reconstructed Kraus operator is scaled by √0, so it contributes nothing, and the channel simply needs fewer Kraus operators than the maximum d².",
+      },
     ],
     incorrectFeedback:
       "Complete positivity requires the Choi matrix to be positive SEMI-definite, i.e. all eigenvalues >= 0 -- zero eigenvalues are explicitly allowed by this condition, and correspond to Kraus operators the channel simply doesn't need (its minimal Kraus rank is smaller than d^2).",

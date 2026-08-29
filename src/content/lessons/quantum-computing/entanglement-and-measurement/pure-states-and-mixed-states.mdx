@@ -5,6 +5,8 @@ import { LazyDensityMatrixExplorer } from "@/components/simulators/density-matri
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { MatrixGrid } from "@/components/visualizations/MatrixGrid";
+import { pureStateDensityMatrix, convexCombination, purity } from "@/lib/quantum/densityMatrix";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/entanglement-and-measurement/pure-states-and-mixed-states"
@@ -31,6 +33,14 @@ export const zeroState = StateVector.zero(1);
 export const oneState = StateVector.basis(1, 1);
 export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
 
+export const rhoPlus = pureStateDensityMatrix(plusState);
+export const rhoMix = convexCombination([
+  { probability: 0.5, density: pureStateDensityMatrix(zeroState) },
+  { probability: 0.5, density: pureStateDensityMatrix(oneState) },
+]);
+export const purityPlus = purity(rhoPlus);
+export const purityMix = purity(rhoMix);
+
 <LessonHook eyebrow="Why this matters">
 The last lesson's ρ=|ψ⟩⟨ψ| agreed with |ψ⟩ on every prediction. That raises the natural next question: is ρ just decoration, or can it express something |ψ⟩ cannot? It can.
 </LessonHook>
@@ -40,25 +50,21 @@ The last lesson's ρ=|ψ⟩⟨ψ| agreed with |ψ⟩ on every prediction. That r
 Lesson 1 built $\rho=|\psi\rangle\langle\psi|$ from a single known state
 vector.
 
-Suppose a qubit is prepared as $|0\rangle$ with probability 0.5
-and $|1\rangle$ with probability 0.5: not a superposition, a *classical*
-coin flip deciding which pure state you actually got, with no
-superposition ever formed. There is no single ket for this: it isn't
-$\alpha|0\rangle+\beta|1\rangle$ for any $\alpha,\beta$, because that
-*is* a superposition, a specific quantum state, not a description of
-"I don't know which of two states this is." The <Term id="density-matrices">density matrix</Term> is about
-to turn out to be exactly the right tool for this, and, once qubits get
-entangled starting a few lessons from now, exactly the tool needed to
-describe one qubit of an entangled pair.
+Now suppose a technician flips a coin and prepares a qubit as $|0\rangle$
+on heads and $|1\rangle$ on tails, then hands it to you without saying
+which. This is not a superposition. A definite pure state was prepared;
+you were not told which one.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
-  alt="Portrait photograph of physicist Erwin Schrödinger from 1933"
-  caption="Erwin Schrödinger, the year he shared the Nobel Prize for the wave function this lesson's density matrix generalizes, precisely to describe classical uncertainty like the 50/50 mixture below, which no single wave function can express."
-  credit="Nobel Foundation"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Erwin_Schr%C3%B6dinger_(1933).jpg"
-  license="Public domain"
-/>
+There is no ket for this situation. It is not
+$\alpha|0\rangle+\beta|1\rangle$ for any $\alpha,\beta$, because that
+expression *is* a superposition, a specific quantum state, rather than a
+description of ignorance about which state you hold. The state-vector
+formalism has no way to write it down.
+
+The <Term id="density-matrices">density matrix</Term> does, and the payoff is larger than this toy example
+suggests. A few lessons from now, one qubit of an entangled pair will turn
+out to need exactly this kind of description, with nobody flipping any
+coins.
 
 ## Mathematical Development
 
@@ -91,7 +97,7 @@ now shown to survive mixing (a third property, positivity, also survives
 mixing, since a sum of positive-semidefinite matrices is
 positive-semidefinite, but proving that in general needs machinery this
 course doesn't build; the engine's `validateDensityMatrix` checks it
-exactly for the 2×2 case this course actually uses).
+directly for the 2×2 case this course uses).
 
 ### The classical mixture, computed
 
@@ -103,7 +109,7 @@ $$
 = \begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}
 $$
 
-This is exactly $I/2$: the **maximally mixed state**, the density
+This is $I/2$ itself: the **maximally mixed state**, the density
 matrix furthest from describing any single definite pure state. It says:
 "measured in the computational basis, 0 and 1 are equally likely" and
 nothing more.
@@ -120,10 +126,23 @@ $$
 \rho_{\text{mix}} = \begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}
 $$
 
+Both matrices below come from the engine, one through
+`pureStateDensityMatrix` and one through `convexCombination`. The
+highlighted diagonals are what a computational-basis measurement can see:
+
+<MatrixGrid
+  matrix={rhoPlus}
+  label="ρ for |+⟩ (a pure superposition)"
+  compareTo={rhoMix}
+  compareLabel="ρ for the 50/50 classical mixture"
+  highlightDiagonal
+  ariaLabel="Two 2x2 density matrices side by side. Both have 0.5 on each diagonal entry. The pure state |+⟩ has 0.5 in both off-diagonal positions; the classical mixture has 0 in both."
+/>
+
 **Identical diagonal entries.** Both predict $P(0)=P(1)=0.5$ in the
 computational basis, so a single computational-basis measurement can
 never tell them apart. But the **off-diagonal entries differ**: $0.5$
-for $|+\rangle$, exactly $0$ for the mixture. Those off-diagonal terms
+for $|+\rangle$, $0$ for the mixture. Those off-diagonal terms
 are called **coherences**, and they carry real physical content: measure
 $X$ instead of $Z$. $|+\rangle$ is an <Term id="eigenvalue-eigenvector">eigenstate</Term> of $X$ with eigenvalue
 $+1$, so it gives $P(+)=1$ deterministically in the $X$ basis. The
@@ -141,12 +160,60 @@ $$
 \text{Tr}(\rho_{|+\rangle}^2) = 1 \qquad \text{Tr}(\rho_{\text{mix}}^2) = 0.5
 $$
 
-$\text{Tr}(\rho^2)=1$ exactly for every pure state (proven next lesson);
-anything less signals a genuine mixture, with $\text{Tr}(\rho^2)=1/d$ the
-minimum, reached exactly at maximally mixed. Both numbers above are
-computed by the engine's `purity` function and checked as regression
-tests. Lesson 6 derives *why* $\text{Tr}(\rho^2)$ behaves this way in
-general, not just for this one pair of examples.
+$\text{Tr}(\rho^2)=1$ for every pure state and nothing else (proven next
+lesson). Anything less signals a mixture, with $\text{Tr}(\rho^2)=1/d$ the
+minimum, reached only by the maximally mixed state. Both numbers above come
+from the engine's `purity` function and are checked as regression tests.
+Lesson 6 derives *why* $\text{Tr}(\rho^2)$ behaves this way in general,
+rather than for this one pair of examples.
+
+### The Bloch ball, derived
+
+The explorer below, and several interactives later in this course,
+describe a mixed state as a point that pulls inward off the Bloch
+sphere's surface. That picture deserves a derivation, and a few lines of
+Pauli algebra deliver it. Write a general qubit density matrix in the
+basis $\{I,\sigma_x,\sigma_y,\sigma_z\}$, which spans the 2×2 Hermitian
+matrices with real coefficients:
+
+<DerivationSteps>
+  <DerivationStep annotation="Any 2×2 Hermitian matrix is a real combination of I and the three Pauli matrices. Fixing the I coefficient at 1/2 (forced by the trace, next step) leaves three real numbers: the Bloch vector r = (r_x, r_y, r_z).">
+$$
+\rho = \tfrac12\left(I + r_x\sigma_x + r_y\sigma_y + r_z\sigma_z\right) = \tfrac12\left(I + \vec r\cdot\vec\sigma\right)
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Each Pauli matrix is traceless, so the trace condition costs nothing: it holds automatically for every r.">
+$$
+\operatorname{Tr}(\rho) = \tfrac12\left(\operatorname{Tr} I + \textstyle\sum_i r_i\operatorname{Tr}\sigma_i\right) = \tfrac12(2+0) = 1
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Use Tr(sigma_i sigma_j) = 2 delta_ij: distinct Paulis multiply to a traceless matrix, and each Pauli squares to I. So r is not an abstract label; each component is a measurable expectation value.">
+$$
+\langle\sigma_i\rangle = \operatorname{Tr}(\rho\,\sigma_i) = \tfrac12\operatorname{Tr}\sigma_i + \tfrac12\textstyle\sum_j r_j\operatorname{Tr}(\sigma_j\sigma_i) = \tfrac12(2r_i) = r_i
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Square the expansion. The anticommutation relation sigma_i sigma_j + sigma_j sigma_i = 2 delta_ij I kills every cross term, leaving (r·sigma)^2 = |r|^2 I.">
+$$
+\rho^2 = \tfrac14\left(I + 2\,\vec r\cdot\vec\sigma + |\vec r|^2 I\right)
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Take the trace. The Pauli term drops out (traceless again), leaving purity as a function of the Bloch vector's length alone.">
+$$
+\operatorname{Tr}(\rho^2) = \tfrac14\left(2 + 0 + 2|\vec r|^2\right) = \frac{1+|\vec r|^2}{2}
+$$
+  </DerivationStep>
+</DerivationSteps>
+
+Read the last line in both directions. $\operatorname{Tr}(\rho^2)=1$
+forces $|\vec r|=1$: pure states sit on the sphere's surface.
+$\operatorname{Tr}(\rho^2)<1$ forces $|\vec r|<1$: every mixed state
+lives strictly inside the ball. Both examples above check out.
+$\rho_{|+\rangle}$ has $\vec r=(1,0,0)$, on the surface, while
+$\rho_{\text{mix}}=I/2$ has $\vec r=0$, dead center, giving
+$\operatorname{Tr}(\rho^2)=(1+0)/2=0.5$ as computed. Positivity is what
+closes the ball: the eigenvalues of $\rho$ work out to
+$(1\pm|\vec r|)/2$, nonnegative only when $|\vec r|\leq1$, so a point
+outside the unit ball is not a state at all.
 
 ## Physical Interpretation
 
@@ -154,11 +221,10 @@ A quantum superposition and a classical mixture are not two words for the
 same idea. $|+\rangle$ is one definite quantum state, in which "0 or 1"
 has no fixed answer until measured, and <Term id="phase-interference">interference</Term> (the X
 measurement above) is fully available. $\rho_{\text{mix}}$ describes a
-qubit that *actually is* $|0\rangle$ or actually is $|1\rangle$ the whole
-time (you, the observer, just don't know which), and no measurement in
-any basis reveals any interference at all, because there is
-none to reveal. The density matrix is the first tool this course has built that
-can tell these two situations apart at all.
+qubit that *is* $|0\rangle$ or *is* $|1\rangle$ the whole time, with you
+not knowing which, and no measurement in any basis shows interference,
+because there is none to show. The density matrix is the first tool this
+course has built that can tell these two situations apart.
 
 <PredictBeforeReveal
   question="A 50/50 mixture of |0⟩,|1⟩ and a 50/50 mixture of |+⟩,|−⟩ are both prepared. Where do their Bloch-sphere points land?"
@@ -169,10 +235,10 @@ can tell these two situations apart at all.
     { label: "Same spot, but off-center", value: "same-offcenter" },
   ]}
   correctValue="same-center"
-  explanation="Both mixtures compute to ρ=I/2, the exact same matrix, so both land at the exact same point: dead center. As the worked example shows, this holds for mixing any orthogonal pair with equal weight, in any basis — the maximally mixed state has no memory of which basis produced it."
+  explanation="Both mixtures compute to ρ=I/2, the same matrix, so both land at the same point: dead center. As the worked example shows, this holds for mixing any orthogonal pair with equal weight, in any basis. The maximally mixed state has no memory of which basis produced it."
 />
 
-<InteractiveSection title="Two different mixtures, one center point" description="Try the two 50/50 presets below (mixing |0⟩,|1⟩, then mixing |+⟩,|−⟩) and watch the Bloch-sphere point land on the exact same spot both times, dead center: ρ=I/2. Then drag the weight slider away from 0.5 on either preset and watch the point move smoothly off-center, back toward the surface; purity and entropy update live as it does.">
+<InteractiveSection title="Two different mixtures, one center point" description="Try the two 50/50 presets below (mixing |0⟩,|1⟩, then mixing |+⟩,|−⟩) and watch the Bloch-sphere point land on the same spot both times, dead center: ρ=I/2. Then drag the weight slider away from 0.5 on either preset and watch the point move smoothly off-center, back toward the surface; purity and entropy update live as it does.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
@@ -187,9 +253,9 @@ $|-\rangle\langle-|=\begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix}$.
 Averaging: $\rho=\tfrac12\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}+\tfrac12\begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix}=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$.
 A 50/50 mixture of $|+\rangle,|-\rangle$ is *also* the maximally mixed
 state: the same $\rho$ as a 50/50 mixture of $|0\rangle,|1\rangle$. This
-is a genuine, physically meaningful fact, not a coincidence of notation:
-$I/2$ has no memory of *which* basis it was "mixed in," because it truly
-is featureless in every basis simultaneously. There is no experiment
+is a physical fact, not a coincidence of notation. $I/2$ has no memory of
+*which* basis it was "mixed in," because it is featureless in every basis
+at once. There is no experiment
 that can tell a $\{|0\rangle,|1\rangle\}$-prepared maximally mixed qubit
 from a $\{|+\rangle,|-\rangle\}$-prepared one: they are the same
 physical state.
@@ -219,9 +285,11 @@ a different basis (or, equivalently, by their different <Term id="von-neumann-en
 2. Compute $\text{Tr}(\rho^2)$ for the state in question 1, and confirm
    it's strictly between 0.5 and 1.
 3. A qubit is $|+\rangle$ with probability $p$ and $|-\rangle$ with
-   probability $1-p$. Show that $\rho=I/2$ for *every* value of $p$, not
-   just $p=0.5$. (This is a stronger and slightly different fact than the
-   worked example above; check it holds for general $p$.)
+   probability $1-p$. Predict, then verify: for which values of $p$ does
+   $\rho$ equal $I/2$? (Compute $\rho$ for general $p$ and find its
+   off-diagonal entry; the worked example above is the special case where
+   that entry vanishes. Locate the state's Bloch vector for general $p$
+   too.)
 4. Explain why no single measurement, in any one fixed basis, can ever
    distinguish $\rho_{\text{mix}}=I/2$ from any other $I/2$-producing
    mixture.
@@ -237,7 +305,7 @@ a different basis (or, equivalently, by their different <Term id="von-neumann-en
   too (verified directly by the engine for the 2×2 case).
 - $|+\rangle$ and a 50/50 mixture of $|0\rangle,|1\rangle$ share every
   computational-basis prediction but differ in their off-diagonal
-  coherence terms and in $\text{Tr}(\rho^2)$: genuinely different
+  coherence terms and in $\text{Tr}(\rho^2)$: different
   physical states, distinguishable by measuring in a different basis.
 - The maximally mixed state $I/2$ results from mixing *any* orthogonal
   pair with equal weight, in any basis: it has no memory of which basis
@@ -248,6 +316,6 @@ a different basis (or, equivalently, by their different <Term id="von-neumann-en
 <NextDiscovery>
 [Convex Combinations and Physical Mixtures](/lessons/quantum-computing/entanglement-and-measurement/convex-combinations-and-physical-mixtures) generalizes
 today's 50/50 examples to arbitrary probability weights and arbitrary
-numbers of components, and pins down exactly which matrices can arise
+numbers of components, and pins down which matrices can arise
 this way.
 </NextDiscovery>

@@ -28,6 +28,11 @@ export const blochXCoordinateCalculation: NumericProblem = {
     value: blochVector.x,
     tolerance: 0.01,
     incorrectFeedback: "Compute sin(2π/3) and cos(π/3) separately first, then multiply them.",
+    nearMisses: [
+      { value: Math.cos(theta) * Math.cos(phi), tolerance: 0.01, feedback: "You used cos θ where the formula wants sin θ. cos θ is the z-coordinate; x uses sin θ to set the distance from the polar axis." },
+      { value: Math.sin(theta), tolerance: 0.01, feedback: "sin θ alone says how far from the polar axis the point sits, but not which direction round the equator. The cos φ factor supplies that." },
+      { value: Math.sin(theta) * Math.sin(phi), tolerance: 0.01, feedback: "sin θ sin φ is the y-coordinate. The x-coordinate takes the cosine of φ." },
+    ],
   },
   hints: [
     { text: "sin(2π/3) = sin(120°) = √3/2." },

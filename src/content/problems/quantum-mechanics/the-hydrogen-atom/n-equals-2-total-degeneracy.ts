@@ -28,11 +28,16 @@ export const nEquals2TotalDegeneracy: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "Sum 2l+1 for l=0 (giving 1 state, the 2s) and l=1 (giving 3 states, the 2p states with m=-1,0,1).",
+    nearMisses: [
+      { value: 3, feedback: "3 counts the 2p states only. The 2s state shares the same energy and has to be included." },
+      { value: 2, feedback: "2 counts the allowed l values. Each l carries 2l+1 states of its own, so the sum is larger." },
+      { value: 8, feedback: "8 includes the factor of 2 from spin. The prompt asks for the degeneracy ignoring spin." },
+    ],
   },
   hints: [
     { text: "For n=2, allowed l values are 0 and 1 (l runs from 0 to n-1)." },
     { text: "l=0 contributes 2(0)+1=1 state; l=1 contributes 2(1)+1=3 states." },
-    { text: "1+3=4=n², matching the general n² degeneracy rule." },
+    { text: "Add the two contributions. As a check, the total should match the general n² degeneracy rule." },
   ],
   solution: {
     steps: [

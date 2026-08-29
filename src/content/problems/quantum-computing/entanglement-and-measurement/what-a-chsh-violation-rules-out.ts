@@ -21,16 +21,38 @@ export const whatAChshViolationRulesOut: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["local hidden variable", "local hidden-variable", "lhv", "local", "every local"],
-      ["nonlocal", "bohmian", "not ruled out", "untouched"],
+      ["local hidden variable", "local hidden-variable", "local hidden var", "lhv", "every local", "all local", "any local", "local theor", "local model", "local realis", "locally realistic"],
+      {
+        phrases: [
+          "nonlocal",
+          "non-local",
+          "bohm",
+          "de broglie",
+          "pilot wave",
+          "pilot-wave",
+          "not ruled out",
+          "untouched",
+          "unaffected",
+          "says nothing about",
+          "still allowed",
+          "still viable",
+          "doesn't rule out",
+          "does not rule out",
+          "cannot rule out",
+          "left standing",
+          "survive",
+        ],
+        missingFeedback:
+          "You have named what the violation excludes. The question also asks what escapes: theories that drop the locality assumption, such as Bohmian mechanics, were never covered by the proof, so a measured |S|>2 leaves them standing.",
+      },
     ],
-    incorrectFeedback: "Recall exactly what the CHSH inequality proof assumed — a class of theories defined by a specific property, not 'classical physics' in general.",
-    partialFeedback: "Good start — name both halves explicitly: which category is excluded, and which specific alternative survives.",
+    incorrectFeedback: "Recall what the CHSH inequality proof assumed: a class of theories defined by one specific property, not 'classical physics' in general.",
+    partialFeedback: "Good start. Name both halves explicitly: which category is excluded, and which specific kind of alternative escapes.",
   },
   hints: [
-    { text: "The CHSH inequality was proven for the entire category of local hidden-variable (LHV) models, not one specific model." },
-    { text: "A measured |S|>2 therefore rules out every theory in that category at once, without needing to check each one individually." },
-    { text: "Nonlocal hidden-variable theories, like Bohmian mechanics, were never covered by the proof, so they're untouched." },
+    { text: "What defining assumption did the CHSH derivation make about how each side's outcome may depend on the measurement settings? The proof covers every theory sharing that assumption." },
+    { text: "A measured |S|>2 therefore condemns an entire category of models at once. Which category, defined by which property?" },
+    { text: "Now think of hidden-variable theories that reject that assumption. Did the derivation ever constrain them?" },
   ],
   solution: {
     steps: [

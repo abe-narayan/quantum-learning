@@ -17,19 +17,19 @@ export const gradientVarianceAtN4Recall: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "In this lesson's own real gradient-variance measurement (4n layers, 300 random parameter draws), approximately what variance was measured at n=4 qubits?",
-    inputHint: "order of magnitude, as a decimal",
+    inputHint: "as a decimal, to about two significant figures",
   },
   answer: {
     type: "numeric",
     value,
     tolerance: 0.01,
     toleranceType: "relative",
-    incorrectFeedback: "The lesson's table lists the measured variance at each qubit count from n=2 to n=6 — check the n=4 row.",
+    incorrectFeedback: "The lesson's table lists the measured variance at each qubit count from n=2 to n=6. Check the n=4 row and enter it to about two significant figures.",
   },
   hints: [
     { text: "The lesson's table lists variance at n=2,3,4,5,6." },
     { text: "It's the middle row, between n=3's ≈0.069 and n=5's ≈0.017." },
-    { text: "The value is approximately 0.027, i.e. 2.7×10⁻²." },
+    { text: "Read the n=4 row of the table. As a check, it should sit between its two neighbors and continue the table's rough halving trend per added qubit." },
   ],
   solution: {
     steps: [{ description: "The lesson's real, seeded computation measured gradient variance ≈2.707×10⁻² at n=4 qubits (16 layers, 128 parameters, 300 samples)." }],

@@ -22,7 +22,11 @@ export const whyOutcomeIndependentDisturbance: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["both", "either eigenstate", "|+> and |->"],
-      ["equal superposition", "50/50 in the Z basis", "same magnitude"],
+      {
+        phrases: ["equal superposition", "50/50 in the Z basis", "same magnitude", "same magnitudes", "equal magnitude", "only a sign", "only the sign", "sign differs", "squaring"],
+        missingFeedback:
+          "You have said both X outcomes have to be considered. Add why they agree: |+⟩ and |−⟩ carry the same magnitudes on |0⟩ and |1⟩ and differ only by a relative sign, which the Born rule's squaring erases.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that both X-eigenstates (|+> and |->) are being considered, and that both happen to be equal-magnitude superpositions of |0> and |1>, giving the same Z-probabilities either way.",
   },

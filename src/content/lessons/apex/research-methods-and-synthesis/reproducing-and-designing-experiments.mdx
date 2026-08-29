@@ -52,7 +52,7 @@ export const lessonMeta = {
   module: "reproducing-and-designing-experiments",
   order: 4,
   difficulty: "master",
-  estimatedMinutes: 24,
+  estimatedMinutes: 55,
   prerequisites: ["apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims"],
   objectives: [
     "Identify the components a real quantum-computing experimental claim needs to be genuinely reproducible: exact circuit specification, exact hardware/simulator and its calibration data, exact classical post-processing/error-mitigation pipeline, and honest statistical uncertainty reporting",
@@ -177,6 +177,22 @@ distribution (central limit theorem), which justifies the standard
 $$
 \hat p \pm 1.96\,\text{SE}(\hat p)
 $$
+
+<Callout type="warning">
+**Where this formula stops describing a real experiment.** $\text{SE}(\hat
+p)$ accounts for one error source only: the randomness of sampling a
+fixed distribution $N$ times. It says nothing about whether the
+distribution being sampled is the one the paper claims. Calibration
+drift, readout bias, crosstalk, and leakage all shift $p$ itself, and
+none of them shrink with $N$. Past some shot count, a reported
+uncertainty is dominated by that systematic floor rather than by shot
+noise, and a paper quoting a $10^{-4}$ statistical error bar on a device
+whose calibration moved between the first and last shot is quoting the
+wrong number. The honest form of the claim states both: a statistical
+uncertainty from the shot count, and a systematic uncertainty estimated
+some other way — typically by repeating the whole experiment after a
+recalibration and seeing how far the answer moves.
+</Callout>
 
 <Callout type="warning">
 The $1.96$ factor is the two-sided 95% critical value of the standard

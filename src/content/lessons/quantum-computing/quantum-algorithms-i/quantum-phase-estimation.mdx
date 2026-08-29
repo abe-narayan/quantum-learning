@@ -6,7 +6,6 @@ import { phaseEstimation } from "@/lib/quantum/qft";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
-import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/quantum-phase-estimation"
@@ -66,14 +65,10 @@ $U$ does to that eigenstate. **<Term id="quantum-phase-estimation">Quantum phase
 $\varphi$ out into an ordinary qubit register, as a binary fraction, using
 nothing but controlled-$U$ applications and the inverse QFT.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
-  alt="A NIST ion-trap apparatus: a square gold chip surrounded by gold wire mesh, used to trap and manipulate individual beryllium ions for quantum information experiments"
-  caption="A real NIST ion-trap apparatus, used to hold individual ions in precisely controlled quantum states. Reading out a physical quantity this precisely, here an eigenphase to many bits of accuracy, is exactly the kind of measurement problem phase estimation is built to solve on qubit hardware."
-  credit="Y. Colombe / NIST"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
-  license="Public Domain (U.S. Government work)"
-/>
+This is the most reused subroutine in the subject. Shor's algorithm is
+phase estimation applied to a modular-multiplication unitary; quantum
+chemistry's energy estimates are phase estimation applied to a
+time-evolution unitary. Learning it once buys both.
 
 ## Mathematical Development
 
@@ -91,14 +86,14 @@ Drawn as a circuit, at $t=3$ precision qubits (the same $t$ used in every
 worked example below): three Hadamards, a staircase of controlled-$U^{2^k}$
 applications each reaching down to the eigenstate wire, largest power
 first, then the inverse QFT spanning only the precision register.
-`StaticCircuitDiagram` can't draw this shape directly — its `GateInstruction`
-type has no abstract "controlled-$U^{2^k}$" box or register-spanning "QFT"
-box — so it's drawn here directly, matching the derivation's own qubit
-ordering and inverse-QFT convention exactly (not the "QFT" period-finding's
-schematic draws, which is deliberately the forward transform on a
-periodic, not phase, state):
+`StaticCircuitDiagram` cannot draw this shape, since its `GateInstruction`
+type has no abstract "controlled-$U^{2^k}$" box and no register-spanning
+"QFT" box. It is drawn directly below instead, following the derivation's
+own qubit ordering and inverse-QFT convention (not the forward "QFT" the
+period-finding schematic draws, which acts on a periodic rather than a
+phase state):
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
   <svg width={492} height={252} viewBox="0 0 492 252" role="img" aria-label="Quantum phase estimation circuit with t=3 precision qubits: a Hadamard on each precision qubit, then a staircase of controlled-U^(2^k) applications reaching the eigenstate register (qubit 0 controlling the largest power, U^(2^2), down to qubit 2 controlling U^(2^0)), then the inverse QFT box spanning the three precision qubits" className="min-w-full">
     <line x1={96} y1={28} x2={492} y2={28} className="stroke-border" strokeWidth={2} />
     <text x={4} y={32} className="fill-muted-foreground text-xs font-mono">q0</text>
@@ -147,7 +142,7 @@ applying $U^{2^{t-1-q}}$ just raises the eigenvalue to that power). Summing
 the contributions from every qubit whose bit is set in $x$ reproduces
 exactly $e^{2\pi i\varphi x}$, because $x=\sum_q b_q2^{t-1-q}$ (the
 ordinary binary expansion, MSB-first, matching this platform's own
-`StateVector.basis` indexing) is precisely the sum of the individual bit
+`StateVector.basis` indexing) is the sum of the individual bit
 contributions. So after all controlled-$U$ applications:
 
 $$
@@ -177,15 +172,15 @@ rotation), not an arbitrary black-box $U$.
 
 ## Physical Interpretation
 
-Phase estimation is the QFT run in reverse on a phase that's already been
-"written" onto a register by repeated controlled-$U$ applications, the
-same <Term id="phase-interference">interference</Term> machinery Deutsch-Jozsa used to read out a global
-constant-or-balanced fact, generalized to read out an arbitrary real number
-(to $t$-bit precision) instead of one bit. It's the component every
-period-finding algorithm (Shor's algorithm, in the next course) is built
-from — the [period-finding explorer](/simulators#period-finding-explorer)
-runs that end-to-end circuit live, for anyone who wants to see where this
-component ends up before the next course derives it.
+Phase estimation is the QFT run in reverse on a phase already written onto
+a register by repeated controlled-$U$ applications. It is the same
+<Term id="phase-interference">interference</Term> machinery Deutsch-Jozsa used to read out one global bit,
+generalized to read out a real number to $t$-bit precision.
+
+Every period-finding algorithm, Shor's included, is built from this
+component. The [period-finding explorer](/simulators#period-finding-explorer)
+runs that end-to-end circuit live if you want to see where this piece ends
+up before the next course derives it.
 
 ## Worked Example
 
@@ -208,6 +203,7 @@ as derived, not merely close.
     highlight: x === 3,
     caption: `${(qpeExactProbs[x * 2 + 1] * 100).toFixed(1)}%`
   }))}
+  maxValue={1}
   ariaLabel="Precision-register measurement probability for phi=3/8, t=3, showing a single certain spike at outcome 3"
 />
 
@@ -237,7 +233,7 @@ binary) at the same $t=3$ tests this directly:
     { label: "The circuit fails to produce a valid probability distribution", value: "fails" },
   ]}
   correctValue="smeared"
-  explanation="The derivation's exact cancellation only happens when φN is an integer. For φ=1/3, t=3 (φN=8/3≈2.667), the amplitude is largest at the two integers straddling 8/3 — outcomes 2 and 3 — with a tail of smaller but nonzero probability on the other outcomes too, exactly the pattern the chart below shows. More precision qubits would sharpen this peak, never eliminate the smear entirely, since 1/3 has no finite binary expansion."
+  explanation="The derivation's cancellation is exact only when φN is an integer. For φ=1/3 with t=3, φN=8/3≈2.667, so the amplitude is largest at the two integers straddling it, outcomes 2 and 3, with a tail of smaller but nonzero probability elsewhere. That is the pattern the chart below shows. Adding precision qubits sharpens the peak but never removes the smear, because 1/3 has no finite binary expansion. Real applications live in this regime, not the exact one."
 />
 
 <BarChart
@@ -247,6 +243,7 @@ binary) at the same $t=3$ tests this directly:
     highlight: x === Math.round((1 / 3) * 8),
     caption: `${(qpeSmearedProbs[x * 2 + 1] * 100).toFixed(1)}%`
   }))}
+  maxValue={1}
   ariaLabel="Precision-register measurement probability for phi=1/3, t=3, showing probability smeared across several neighboring outcomes instead of one certain spike"
 />
 
@@ -275,10 +272,10 @@ of them, not just $k=3$:
   />
 </InteractiveSection>
 
-Every frame has exactly one bar at probability $1.0$ and seven bars at
-exactly $0$, with the spike tracking $k$ one-for-one: the same certainty
-this lesson derived algebraically, now checked at all eight exactly
-representable phases, not just the one worked out by hand above.
+Every frame has one bar at probability $1.0$ and seven at $0$, with the
+spike tracking $k$ one for one. That is the certainty this lesson derived
+algebraically, checked at all eight representable phases rather than at the
+single one worked out by hand.
 
 ## Practice Questions
 

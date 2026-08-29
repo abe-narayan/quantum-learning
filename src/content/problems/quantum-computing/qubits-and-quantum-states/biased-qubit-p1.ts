@@ -2,7 +2,7 @@ import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import type { NumericProblem } from "@/lib/problems/types";
 
-const state = new StateVector([new Complex(0.6), new Complex(0, 0.8)]);
+const state = new StateVector([new Complex(0.28), new Complex(0, 0.96)]);
 const probabilityOfOne = state.probabilities()[1];
 
 export const biasedQubitP1: NumericProblem = {
@@ -20,34 +20,39 @@ export const biasedQubitP1: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "A qubit is in the state $|\\psi\\rangle = 0.6|0\\rangle + 0.8i|1\\rangle$. What is the probability of measuring 1?",
+      "A qubit is in the state $|\\psi\\rangle = 0.28|0\\rangle + 0.96i|1\\rangle$ (normalized: $0.28^2 + 0.96^2 = 1$). What is the probability of measuring 1?",
     inputHint: "as a decimal between 0 and 1",
   },
   answer: {
     type: "numeric",
     value: probabilityOfOne,
     tolerance: 0.01,
-    incorrectFeedback: "The imaginary unit on the |1⟩ amplitude doesn't change the probability calculation — |0.8i|² is still just 0.8².",
+    incorrectFeedback: "The imaginary unit on the |1⟩ amplitude doesn't change the probability calculation — |0.96i|² is still just 0.96².",
+    nearMisses: [
+      { value: 0.0784, feedback: "0.0784 is P(0), from the amplitude on |0⟩. The question asks for the |1⟩ outcome." },
+      { value: 0.96, feedback: "0.96 is |β|, the amplitude's magnitude. The Born rule squares it." },
+      { value: -0.9216, feedback: "A probability cannot be negative. Squaring a complex amplitude means multiplying by its conjugate, so (0.96i)(0.96i)* = +0.9216." },
+    ],
   },
   hints: [
     { text: "The Born rule says P(1) = |β|², where β is the amplitude on |1⟩." },
-    { text: "Here β = 0.8i. Its magnitude is |0.8i| = 0.8 — the imaginary unit doesn't add extra length." },
-    { text: "Square 0.8." },
+    { text: "Here β = 0.96i. Its magnitude is |0.96i| = 0.96 — the imaginary unit doesn't add extra length." },
+    { text: "Square 0.96." },
   ],
   solution: {
     steps: [
-      { description: "Identify the amplitude on $|1\\rangle$: $\\beta = 0.8i$." },
-      { description: "Its modulus is $|\\beta| = |0.8i| = 0.8$ — multiplying by $i$ rotates a complex number but doesn't change its length." },
-      { description: "Apply the Born rule.", latex: "P(1) = |\\beta|^2 = 0.8^2 = 0.64" },
+      { description: "Identify the amplitude on $|1\\rangle$: $\\beta = 0.96i$." },
+      { description: "Its modulus is $|\\beta| = |0.96i| = 0.96$ — multiplying by $i$ rotates a complex number but doesn't change its length." },
+      { description: "Apply the Born rule.", latex: "P(1) = |\\beta|^2 = 0.96^2 = 0.9216" },
     ],
-    finalAnswer: "$P(1) = 0.64$",
+    finalAnswer: "$P(1) = 0.9216$",
   },
   explanation: {
     correctIdea: "Squaring a complex amplitude means multiplying by its own conjugate, which discards phase entirely — only the modulus matters for a probability.",
-    whyCorrect: "|0.8i|² = (0.8i)(0.8i)* = (0.8i)(-0.8i) = 0.64, the same result you'd get from ignoring the i and squaring 0.8 directly.",
+    whyCorrect: "|0.96i|² = (0.96i)(0.96i)* = (0.96i)(-0.96i) = 0.9216, the same result you'd get from ignoring the i and squaring 0.96 directly. It also checks out against normalization: P(0) + P(1) = 0.0784 + 0.9216 = 1.",
     whyWrong: [
-      "Squaring 0.8i without conjugating (treating it as an ordinary real square) would incorrectly give -0.64, a negative number that can't be a probability at all.",
-      "Using 0.6 (the amplitude on |0⟩) instead of 0.8 answers a different question — P(0), not P(1).",
+      "Squaring 0.96i without conjugating (treating it as an ordinary real square) would incorrectly give -0.9216, a negative number that can't be a probability at all.",
+      "Using 0.28 (the amplitude on |0⟩) instead of 0.96 answers a different question — P(0), not P(1).",
     ],
   },
 };

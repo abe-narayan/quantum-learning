@@ -21,16 +21,16 @@ export const whyProofNeedsTwoQubits: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["four amplitudes", "a,b,c,d", "only four", "2-qubit", "two-qubit"],
-      ["3-qubit", "three qubit", "eight amplitude", "different formula", "more terms"],
+      ["four amplitudes", "4 amplitudes", "four-amplitude", "a,b,c,d", "only four", "2-qubit", "two-qubit", "two qubit"],
+      ["3-qubit", "three qubit", "three-qubit", "eight amplitude", "8 amplitude", "2^3", "different formula", "different derivation", "more terms", "bigger sum", "larger sum"],
     ],
-    incorrectFeedback: "Think about how many amplitudes a 3-qubit state has, and whether the four-variable a,b,c,d setup from this lesson still applies.",
-    partialFeedback: "Good direction — be explicit that the proof's algebra was built entirely around exactly four amplitudes.",
+    incorrectFeedback: "Count the ingredients this lesson's derivation starts from, then count what the larger state would supply. Compare the two counts.",
+    partialFeedback: "Good direction. Be explicit about the exact number of variables the proof's algebra was built around, and why the bigger system breaks that count.",
   },
   hints: [
-    { text: "The proof's every step used exactly four amplitudes: a, b, c, d." },
-    { text: "A 3-qubit state has 8 amplitudes, not 4." },
-    { text: "Even splitting 'qubit 0' from 'qubits 1 and 2' would need a different (and more involved) index-sum derivation." },
+    { text: "Count the variables the proof's algebra manipulates from its first line to its last. Where did that count come from?" },
+    { text: "Now count what a state of one more qubit would hand you. Do the counts agree?" },
+    { text: "Even keeping subsystem A as one qubit, the partner system grows. What does that do to the partial-trace bookkeeping?" },
   ],
   solution: {
     steps: [
@@ -40,8 +40,8 @@ export const whyProofNeedsTwoQubits: ConceptualProblem = {
     finalAnswer: "The proof's algebra is built entirely around exactly four amplitudes, which only exist for a 2-qubit state.",
   },
   explanation: {
-    correctIdea: "The identity's derivation is not a general argument dressed up in small numbers — it genuinely used the specific 2-qubit, 4-amplitude structure at every step.",
+    correctIdea: "The identity's derivation is not a general argument dressed up in small numbers. It genuinely used the specific 2-qubit, 4-amplitude structure at every step.",
     whyCorrect: "A 3-qubit state's reduced single-qubit density matrix would need summing over the other two qubits' 4 basis combinations, a structurally different calculation.",
-    whyWrong: ["Saying only 'because there's no general eigensolver' skips the more basic issue — even setting up the same style of proof needs a different amplitude count from the start."],
+    whyWrong: ["Saying only 'because there's no general eigensolver' skips the more basic issue: even setting up the same style of proof needs a different amplitude count from the start."],
   },
 };

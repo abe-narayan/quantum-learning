@@ -29,7 +29,7 @@ export const localHamiltonianPropagationTermNullSpaceMc: MultipleChoiceProblem =
     optionFeedback: {
       b: "This pairs clock=0, computation=|0> with clock=1, computation=|0> -- but U1|0>=|1>, not |0>, so the computational register did NOT correctly transition. This is exactly the lesson's 'wrong transition slice,' with energy 0.5, not 0.",
       c: "This pairs clock=0, computation=|1> with clock=1, computation=|1> -- but U1|1>=|0>, not |1>, so this is not a valid U1-transition of any single |phi> consistently across both terms.",
-      d: "The magnitudes match a valid transition, but the relative minus sign breaks the cancellation the propagation term relies on: the cross terms (built from U1 acting between clock values) only cancel the diagonal terms when the two amplitudes have the SAME relative sign, as in option (a).",
+      d: "The magnitudes match a valid transition, but the relative minus sign breaks the cancellation the propagation term relies on: the cross terms (built from U1 acting between clock values) only cancel the diagonal terms when the two amplitudes have the SAME relative sign, as in (|0,0> + |1,1>)/sqrt(2).",
     },
     defaultIncorrectFeedback:
       "The propagation term's zero-energy (ground) space consists exactly of states of the form (|t-1>|phi> + |t>*U_t|phi>)/sqrt(2) for some |phi>. Check which option actually has this form with U1=X.",
@@ -42,10 +42,10 @@ export const localHamiltonianPropagationTermNullSpaceMc: MultipleChoiceProblem =
   solution: {
     steps: [
       { description: "The propagation term's zero-energy subspace is spanned by states (|t-1>|phi> + |t>U_t|phi>)/sqrt(2) for arbitrary |phi>, verified directly in the lesson by matrix computation." },
-      { description: "With U1=X, taking |phi>=|0> gives U1|phi>=|1>, so the valid zero-energy state is (|0,0> + |1,1>)/sqrt(2), option (a)." },
-      { description: "The lesson's own computed values confirm this: toyPropagationEnergyOnCorrectSlice (option a's state) is ~0, while toyPropagationEnergyOnWrongSlice (option b's state) is exactly 0.5." },
+      { description: "With U1=X, taking |phi>=|0> gives U1|phi>=|1>, so the valid zero-energy state is (|0,0> + |1,1>)/sqrt(2)." },
+      { description: "The lesson's own computed values confirm this: toyPropagationEnergyOnCorrectSlice, the correctly-transitioning slice (|0,0> + |1,1>)/sqrt(2), is ~0, while toyPropagationEnergyOnWrongSlice, the unchanged-register slice (|0,0> + |1,0>)/sqrt(2), is 0.5." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "(|0,0> + |1,1>) / sqrt(2)",
   },
   explanation: {
     correctIdea:
@@ -53,9 +53,9 @@ export const localHamiltonianPropagationTermNullSpaceMc: MultipleChoiceProblem =
     whyCorrect:
       "This is the lesson's own directly-verified computation: H_prop,1 annihilates (|0,0>+|1,1>)/sqrt(2) exactly, because it correctly encodes 'clock 1's register is U1 applied to clock 0's register.'",
     whyWrong: [
-      "Option (b) leaves the computational register unchanged across the clock transition, which U1=X does not do.",
-      "Option (c) pairs the wrong output of U1 with the input |1>.",
-      "Option (d) has the right magnitudes but the wrong relative sign, breaking the exact cancellation between the diagonal and cross terms.",
+      { optionId: "b", text: "Leaves the computational register unchanged across the clock transition, which U1=X does not do." },
+      { optionId: "c", text: "Pairs the wrong output of U1 with the input |1>." },
+      { optionId: "d", text: "Has the right magnitudes but the wrong relative sign, breaking the cancellation between the diagonal and cross terms." },
     ],
   },
 };

@@ -32,19 +32,23 @@ export const pulseDurationForPiOver2: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.05,
-    incorrectFeedback: "Compute (π/2)/(2×2π×20×10⁶) in seconds, then convert to nanoseconds.",
+    incorrectFeedback: "Two checks: keep the factor of 2 in the denominator (dropping it doubles the answer), and convert the result from seconds to nanoseconds at the end.",
+    nearMisses: [
+      { value: 12.5, tolerance: 0.1, feedback: "12.5 ns is t = θ/Ω, dropping the factor of 2 in the denominator. It is also the full π-pulse duration at this Ω." },
+      { value: 3.125, tolerance: 0.05, feedback: "That halves the answer once too often. θ = π/2 is already the half rotation; the formula t = θ/(2Ω) handles the rest." },
+    ],
   },
   hints: [
+    { text: "Everything is substitution once the pieces are lined up: the rotation angle θ, the Rabi frequency Ω, and a unit conversion at the end. Keep rad/s and Hz distinct as you go." },
     { text: "t = θ/(2Ω) = (π/2)/(2×2π×20×10⁶)." },
-    { text: "Simplify: t = π/(8π×20×10⁶) = 1/(160×10⁶)." },
-    { text: "≈6.25 ns." },
+    { text: "Simplify: the π factors cancel, leaving t = 1/(160×10⁶) seconds. Convert that to nanoseconds." },
   ],
   solution: {
     steps: [{ description: "t = (π/2)/(2×2π×20×10⁶) = 1/(160×10⁶) ≈ 6.25 ns." }],
     finalAnswer: "≈6.25 ns",
   },
   explanation: {
-    correctIdea: "This is exactly half the duration of a full π rotation at the same Ω — a direct application of the linear relationship between θ and t.",
+    correctIdea: "This is exactly half the duration of a full π rotation at the same Ω, a direct application of the linear relationship between θ and t.",
     whyCorrect: "Verified against exactTwoLevelTransitionProbability at this duration, giving P₁=sin²(π/4)=0.5 exactly, matching the expected half-population-transfer for a π/2 rotation.",
     whyWrong: ["Using t=θ/Ω instead of t=θ/(2Ω) (forgetting the factor of 2) would double the correct answer to ≈12.5 ns."],
   },

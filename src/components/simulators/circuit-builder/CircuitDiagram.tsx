@@ -5,6 +5,19 @@ import type { GateInstruction } from "@/lib/quantum/circuitBuilder";
 const ROW_HEIGHT = 56;
 const COLUMN_WIDTH = 64;
 const LABEL_WIDTH = 40;
+/**
+ * Half-width of the invisible tap target drawn behind every clickable gate
+ * group. The painted symbols are small on purpose — a 36px gate box and a
+ * 10px CNOT control dot are the standard circuit notation, and inflating them
+ * would stop the diagram looking like a circuit diagram — but they were also
+ * the whole of the hit area, which put a finger-sized tap well under the 44px
+ * floor. A transparent rect behind each group takes the taps instead: the
+ * notation keeps its size, the target does not. 22 (44px wide) fits inside
+ * COLUMN_WIDTH/2 = 32, so adjacent columns still never overlap.
+ */
+const HIT_HALF_WIDTH = 22;
+/** Same idea vertically. ROW_HEIGHT/2 = 28, so neighbouring wires stay distinct. */
+const HIT_HALF_HEIGHT = 22;
 
 function instructionLabel(instr: GateInstruction): string {
   if (instr.gate === "CNOT" || instr.gate === "CZ" || instr.gate === "SWAP") return instr.gate;
@@ -81,11 +94,49 @@ export function CircuitDiagram({
   const height = numQubits * ROW_HEIGHT;
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+    // Deliberately NO `tabIndex={0}` on this scroll container, unlike the
+    // static `StaticCircuitDiagram`/`PeriodFindingSchematic` wrappers it
+    // otherwise resembles. This one is wide for the same reason (`width` grows
+    // with the gate count and the `<svg>` is `min-w-full`), but every gate in
+    // it is already a `role="button" tabIndex={0}` group: tabbing through the
+    // circuit walks gate to gate, and each focus move scrolls its gate into
+    // view for free, so a keyboard-only reader reaches the far end of the
+    // circuit by using the circuit. Adding a stop on the container would put a
+    // redundant landing point in front of that walk on every simulator step —
+    // exactly the tab-order noise the affordance is supposed to be worth.
+    // (The empty-circuit case has no gates and also no overflow: `width` is
+    // then `LABEL_WIDTH + COLUMN_WIDTH`, well inside the stage.)
+    <div className="overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
       <svg
         width={width}
         height={height}
-        role="img"
+        // `role="group"`, not `role="img"` — the same correction
+        // `BlochSphereCanvas` documents, and for a sharper reason here. Every
+        // gate below is a `<g role="button" tabIndex={0} aria-label="Jump to
+        // right after …">`. `img` is a children-presentational role: Chrome
+        // and Safari prune the entire subtree of an `img` from the
+        // accessibility tree, so those gate buttons lost their roles and their
+        // labels while keeping their DOM tab stops. The result was the worst
+        // of both worlds — a screen-reader user tabbed onto N *silent* focus
+        // stops (one per gate, growing as they build the circuit), heard
+        // nothing about what any of them did, and the only announcement in the
+        // whole widget was this container's static summary. `img` also claims
+        // "static graphic, nothing to operate here", which is a false promise
+        // about a diagram whose entire purpose is to be clicked through.
+        //
+        // `group` is the role for a container of related graphics that are
+        // themselves operable: it exposes children normally, so each gate's
+        // `role="button"` and its "Jump to right after H on qubit 0" label
+        // reach the reader. `aria-roledescription` keeps the useful half of
+        // what `img` conveyed — the reader hears "quantum circuit" instead of
+        // a bare "group" — without asserting the subtree is inert.
+        //
+        // NOTE for `src/lib/design/__tests__/scrollRegions.test.ts`: the
+        // wrapper's excuse for having no tab stop depends on this. It is only
+        // true because the gates are real, announced buttons; under `img` the
+        // excuse described a DOM that the accessibility tree did not have.
+        role="group"
+        aria-roledescription="quantum circuit"
         aria-label={ariaLabel ?? summarizeCircuitForAria(numQubits, instructions)}
         className="min-w-full"
       >
@@ -133,6 +184,13 @@ export function CircuitDiagram({
                 onKeyDown={(event) => handleStepKeyDown(event, onSelectStep, col)}
               >
                 <rect
+                  x={cx - HIT_HALF_WIDTH}
+                  y={rowY(q) - HIT_HALF_HEIGHT}
+                  width={HIT_HALF_WIDTH * 2}
+                  height={HIT_HALF_HEIGHT * 2}
+                  fill="transparent"
+                />
+                <rect
                   x={cx - 18}
                   y={rowY(q) - 18}
                   width={36}
@@ -167,6 +225,15 @@ export function CircuitDiagram({
               onClick={() => onSelectStep(col + 1)}
               onKeyDown={(event) => handleStepKeyDown(event, onSelectStep, col)}
             >
+              {/* Spans both wires plus the connecting line, so the whole
+                  two-qubit symbol is one target rather than two ~10px dots. */}
+              <rect
+                x={cx - HIT_HALF_WIDTH}
+                y={top - HIT_HALF_HEIGHT}
+                width={HIT_HALF_WIDTH * 2}
+                height={bottom - top + HIT_HALF_HEIGHT * 2}
+                fill="transparent"
+              />
               <line x1={cx} y1={top} x2={cx} y2={bottom} className="stroke-pillar" strokeWidth={2} />
               {instr.gate === "CNOT" && (
                 <>

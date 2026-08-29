@@ -30,6 +30,11 @@ export const pPlusForKnownAmplitudes: NumericProblem = {
     value: pPlus,
     tolerance: 0.01,
     incorrectFeedback: "Recompute $\\langle+|\\psi\\rangle$ directly, then square its magnitude. Measuring in the X-basis in this course is the same as applying H, then reading the computational-basis probability of |0⟩.",
+    nearMisses: [
+      { value: 0.25, feedback: "0.25 is P(0), the computational-basis probability |α|². The X-basis question asks for the overlap with |+⟩ instead." },
+      { value: (0.5 + Math.sqrt(3) / 2) / Math.SQRT2, tolerance: 0.005, feedback: "That is ⟨+|ψ⟩, the overlap itself. The Born rule squares it to give a probability." },
+      { value: 1 - ((0.5 + Math.sqrt(3) / 2) / Math.SQRT2) ** 2, tolerance: 0.005, feedback: "That is P(−). The two X-basis outcomes sum to 1, so check which one uses α + β rather than α − β." },
+    ],
   },
   hints: [
     { text: "Measuring in the X-basis is exactly the same operation as applying H first, then measuring in the computational basis (the lesson's Interactive Experiment uses this directly)." },

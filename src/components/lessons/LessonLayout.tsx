@@ -104,9 +104,50 @@ export function LessonLayout({
     : [];
   const checkpointProblems = finishedCourse ? getCourseCheckpointProblems(finishedCourse.slug) : [];
 
+  // ============================================================
+  // `related` and `prerequisites` overlap, on purpose — merge, don't filter
+  // ============================================================
+  // 42 of the corpus's 125 `related[]` entries (across 38 of the 107 lessons
+  // that author any) name a lesson that is already in the same lesson's
+  // `prerequisites`. At a third of the corpus that is an authoring
+  // convention, not 42 typos: an author who has just written "this lesson
+  // requires X" reaches for `related` precisely because that is the only
+  // field with a `note`, and the note is where they explain *what X gives
+  // this lesson*. `apex/algorithmic-frontiers/quantum-signal-processing`'s
+  // entry for `block-encodings-and-linear-combinations-of-unitaries` is a
+  // three-clause explanation of how block encoding, QSP and QSVT compose;
+  // nothing else on the page says it.
+  //
+  // Rendered naively that produced the same lesson twice inside one
+  // disclosure panel — once as a bare title under "Requires", once with its
+  // note under "Related elsewhere", where the heading is also simply false
+  // for a same-course prerequisite.
+  //
+  // Two fixes were available. Filtering `related` against `prerequisites`
+  // is one line and deletes the duplicate — along with all 42 of the
+  // hand-written notes, which are the single most useful text in this
+  // block and the only place any prerequisite is explained rather than
+  // merely named. That trades a cosmetic duplicate for a real content loss,
+  // and it loses it silently, on exactly the entries an author cared enough
+  // to gloss.
+  //
+  // So: merge instead. A `related` entry whose slug is also a prerequisite
+  // becomes that prerequisite's reason-for-being, attached to the "Requires"
+  // entry; only entries that are genuinely elsewhere stay under "Related
+  // elsewhere". Each lesson is now named exactly once, every note survives,
+  // and the section headings become true. The lookup is by slug against the
+  // already-resolved prerequisite list, so a `related` entry pointing at a
+  // slug that no longer exists still falls out the same way it always did
+  // (see linkIntegrity.test.ts).
+  const relatedNotesBySlug = new Map((meta.related ?? []).map((entry) => [entry.slug, entry.note]));
+
   const prerequisites = meta.prerequisites
     .map((prereqSlug) => allLessons.find((lesson) => lesson.slug === prereqSlug))
-    .filter((lesson): lesson is LessonMetaWithSlug => Boolean(lesson));
+    .filter((lesson): lesson is LessonMetaWithSlug => Boolean(lesson))
+    .map((lesson) => ({ lesson, note: relatedNotesBySlug.get(lesson.slug) }));
+
+  /** Just the lessons, for the components that only need the link + title. */
+  const prerequisiteLessons = prerequisites.map((entry) => entry.lesson);
 
   // Reverse index of prerequisites, computed for free from data every lesson
   // already carries: other-course lessons that list this one as a
@@ -116,9 +157,13 @@ export function LessonLayout({
     (lesson) => lesson.prerequisites.includes(slug) && lesson.course !== meta.course,
   );
 
-  // Hand-curated cross-links (see `related` on LessonMeta). Only populated
-  // for a small, explicitly verified set of lessons.
+  // Hand-curated cross-links (see `related` on LessonMeta), minus the ones
+  // that were folded into `prerequisites` above — those are the same lesson
+  // and their notes are already being rendered there. What is left is what
+  // the heading claims: lessons that are genuinely somewhere else in the
+  // graph, neither required by nor requiring this one.
   const relatedElsewhere = (meta.related ?? [])
+    .filter((entry) => !meta.prerequisites.includes(entry.slug))
     .map((entry) => {
       const lesson = allLessons.find((candidate) => candidate.slug === entry.slug);
       return lesson ? { lesson, note: entry.note } : null;
@@ -135,7 +180,9 @@ export function LessonLayout({
     // (brand-family) ramp when no `data-pillar` is set.
     <PillarScope pillar={course?.pillar}>
       <ReadingProgressBar containerId={LESSON_PROSE_ID} />
-      <Container className="pb-20 pt-10 sm:pt-14">
+      {/* `data-difficulty` feeds the earned master-density shift in
+          globals.css (tighter prose leading on master lessons only). */}
+      <Container data-difficulty={meta.difficulty} className="pb-20 pt-10 sm:pt-14">
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <Link href="/learn" className="tech-label text-muted-foreground transition-colors hover:text-foreground">
             Learn
@@ -194,7 +241,7 @@ export function LessonLayout({
             reader. Only `LessonObjectives` gained a fold, and only on
             advanced/master lessons — see its doc comment for why that
             reader, and not the beginner, is the one who can spare it. */}
-        <div className="mt-6 max-w-3xl">
+        <div className="mt-6 max-w-[46rem]">
           <SectionTitle level={1} size="xl">
             {meta.title}
           </SectionTitle>
@@ -215,7 +262,7 @@ export function LessonLayout({
               docs/UX_REVIEW.md P2-6 for why it can't just move back to being
               that wall). Full cross-course detail stays in LessonMetaStrip's
               disclosure below the body. */}
-          <PrerequisiteReadout prerequisites={prerequisites} />
+          <PrerequisiteReadout prerequisites={prerequisiteLessons} />
 
           <LessonObjectives
             className="mt-5"
@@ -226,10 +273,12 @@ export function LessonLayout({
 
         <TableOfContentsMobile containerId={LESSON_PROSE_ID} />
 
-        {/* Two-column at `lg`: prose keeps its own `max-w-3xl` regardless of
-            which branch of `has-[nav:empty]` is active, so this grid switching
-            between one and two columns never reflows the reading column
-            itself — only whether the rail's space is reserved. */}
+        {/* Two-column at `lg`: prose keeps its own `max-w-[46rem]` regardless
+            of which branch of `has-[nav:empty]` is active, so this grid
+            switching between one and two columns never reflows the reading
+            column itself — only whether the rail's space is reserved. 46rem is
+            the site's stated reading measure (docs/DESIGN_SYSTEM.md), shared
+            by the pre-content stack above so the columns align. */}
         <div className="mt-12 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-10 lg:has-[nav:empty]:grid-cols-1">
           <div
             id={LESSON_PROSE_ID}
@@ -245,7 +294,7 @@ export function LessonLayout({
               // with no `@custom-variant dark` redefinition anywhere in this
               // repo — so it would only ever track the OS preference and
               // invert wrongly whenever an explicit choice disagrees with it.
-              "prose prose-neutral max-w-3xl prose-a:text-pillar-text",
+              "prose prose-neutral max-w-[46rem] prose-a:text-pillar-text",
               // h2 = section-moment: display face, real weight/spacing, the
               // biggest thing in the prose body short of the page's own h1.
               "prose-h2:font-display prose-h2:mt-16 prose-h2:mb-4 prose-h2:text-3xl prose-h2:font-semibold prose-h2:tracking-tight",
@@ -278,9 +327,9 @@ export function LessonLayout({
           relatedElsewhere={relatedElsewhere}
         />
 
-        <FadeRule className="mt-14 max-w-3xl" />
+        <FadeRule className="mt-14 max-w-[46rem]" />
 
-        <div className="mt-10 max-w-3xl">
+        <div className="mt-10 max-w-[46rem]">
           <LessonCompleteToggle slug={slug} />
         </div>
 
@@ -296,7 +345,7 @@ export function LessonLayout({
         />
 
         {finishedCourse && checkpointProblems.length > 0 ? (
-          <div className="mt-10 max-w-3xl">
+          <div className="mt-10 max-w-[46rem]">
             <LazyCourseCheckpoint courseTitle={finishedCourse.title} problems={checkpointProblems} />
           </div>
         ) : null}

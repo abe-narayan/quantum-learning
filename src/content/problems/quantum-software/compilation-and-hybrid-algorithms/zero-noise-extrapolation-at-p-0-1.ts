@@ -29,6 +29,11 @@ export const zeroNoiseExtrapolationAtP01: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "First compute ⟨O⟩(1)=(0.9)^1 and ⟨O⟩(3)=(0.9)^3, then plug both into (3⟨O⟩(1)-⟨O⟩(3))/2.",
+    nearMisses: [
+      { value: 1, feedback: "The true ideal value is 1, but a two-point linear fit to an exponential decay cannot reach it exactly. The small shortfall is the O(p²) curvature the fit discards." },
+      { value: 0.9, tolerance: 0.002, feedback: "0.9 is the raw λ=1 measurement, before any extrapolation." },
+      { value: 0.729, tolerance: 0.002, feedback: "0.729 is the λ=3 measurement, the deliberately noisier one. Extrapolation combines both to reach back toward λ=0." },
+    ],
   },
   hints: [
     { text: "⟨O⟩(1) = (1-0.1)^1 = 0.9." },

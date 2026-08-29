@@ -22,6 +22,11 @@ export const harmonicOscillatorEnergyLevel: NumericProblem = {
     value: 10.5,
     tolerance: 0.01,
     incorrectFeedback: "Don't forget the +1/2 — E_n = ħω(n + 1/2), not ħω·n.",
+    nearMisses: [
+      { value: 9, feedback: "9 is ħω·n, dropping the zero-point offset. Every level sits half a quantum above that, including the ground state." },
+      { value: 3.5, feedback: "3.5 is (n + 1/2) on its own. It still has to be multiplied by ħω = 3." },
+      { value: 1.5, feedback: "1.5 is the ground-state energy ħω/2. The question asks for the n = 3 level." },
+    ],
   },
   hints: [
     { text: "E_3 = 3 × (3 + 0.5)." },

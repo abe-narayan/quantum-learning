@@ -28,6 +28,11 @@ export const diffusionOnNonUniformState: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "Diffusion only fixes |s⟩ exactly — |00⟩ is a different state, so there's no guarantee it's left unchanged.",
+    nearMisses: [
+      { value: 1, feedback: "Probability 1 would mean diffusion is the identity. It fixes |s⟩ alone; on |00⟩ it returns |s⟩ − |00⟩, whose |00⟩ amplitude is −1/2." },
+      { value: 0, feedback: "The |00⟩ amplitude does not vanish: 2|s⟩⟨s| − I sends |00⟩ to |s⟩ − |00⟩, leaving −1/2 on |00⟩. Square that magnitude." },
+      { value: 0.5, feedback: "0.5 is the surviving amplitude's magnitude, not its square. The probability is that magnitude squared." },
+    ],
   },
   hints: [
     { text: "The 'fixes |s⟩ exactly' guarantee only applies to |s⟩ itself, not to an arbitrary input like |00⟩." },

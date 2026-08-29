@@ -33,12 +33,16 @@ export const piPulseDuration25Mhz: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.1,
-    incorrectFeedback: "Compute π/(2×2π×25×10⁶) in seconds, then convert to nanoseconds.",
+    incorrectFeedback: "Check the factor of 2 in the denominator: using π/Ω instead of π/(2Ω) doubles the answer. Then check units: the formula gives seconds, and the question asks for nanoseconds.",
+    nearMisses: [
+      { value: 20, tolerance: 0.1, feedback: "20 ns is t = π/Ω, missing the factor of 2 in the denominator." },
+      { value: 40, tolerance: 0.2, feedback: "40 ns is 1/(25 MHz), the drive period. The π-pulse takes a quarter of that at this Ω convention." },
+    ],
   },
   hints: [
-    { text: "t_π = π/(2Ω) = π/(2×2π×25×10⁶)." },
-    { text: "The 2π factors cancel: t_π = 1/(4×25×10⁶) = 1/(10⁸) s." },
-    { text: "= 10 ns." },
+    { text: "You are handed both the formula and Ω, quoted as 2π times a frequency in MHz. The plan: substitute, cancel the 2π factors, and only then handle the unit conversion to nanoseconds." },
+    { text: "t_π = π/(2Ω). With Ω = 2π×25 MHz, the π in the numerator cancels against the 2π inside Ω, leaving t_π = 1/(4×25 MHz)." },
+    { text: "Evaluate 1/(4×25 MHz) = 1/(100 MHz), then express that time in nanoseconds." },
   ],
   solution: {
     steps: [{ description: "t_π = π/(2×2π×25×10⁶) = 1/(4×25×10⁶) = 10⁻⁸ s = 10 ns." }],

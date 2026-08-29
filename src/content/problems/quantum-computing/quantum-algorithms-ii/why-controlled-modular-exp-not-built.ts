@@ -20,8 +20,20 @@ export const whyControlledModularExpNotBuilt: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["same output", "exact state", "identical result", "mathematically equivalent"],
-      ["interference", "qft step", "downstream", "what actually matters"],
+      [
+        "same output",
+        "same amplitudes",
+        "same state",
+        "exact state",
+        "identical result",
+        "identical",
+        "mathematically equivalent",
+        "equivalent",
+        "indistinguishable",
+        "no difference",
+        "exactly what",
+      ],
+      ["interference", "qft step", "qft", "downstream", "what actually matters", "the mechanism", "real mechanism", "still genuine", "fully real"],
     ],
     incorrectFeedback: "Consider: is the QFT-based extraction step (the actual interference mechanism) any less real just because the state feeding into it was built directly?",
     partialFeedback: "Good — be explicit that the interference/QFT step, the actual mechanism of interest, is fully genuine either way.",

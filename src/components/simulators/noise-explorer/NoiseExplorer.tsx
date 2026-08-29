@@ -135,9 +135,13 @@ export function NoiseExplorer() {
     }
   }, []);
 
+  const startingPreset = useMemo(
+    () => STATE_PRESETS.find((p) => p.id === presetId) ?? STATE_PRESETS[0],
+    [presetId]
+  );
+
   const trajectory = useMemo(() => {
-    const preset = STATE_PRESETS.find((p) => p.id === presetId) ?? STATE_PRESETS[0];
-    const rho0 = pureStateDensityMatrix(blochStateFromAngles(preset.angles));
+    const rho0 = pureStateDensityMatrix(blochStateFromAngles(startingPreset.angles));
     const kraus = channel === "amplitude-damping" ? amplitudeDampingChannel(strength) : dephasingChannel(strength);
     const rhos = [rho0];
     let rho = rho0;
@@ -146,7 +150,7 @@ export function NoiseExplorer() {
       rhos.push(rho);
     }
     return rhos;
-  }, [presetId, channel, strength]);
+  }, [startingPreset, channel, strength]);
 
   const clampedSteps = Math.min(steps, trajectory.length - 1);
   const rho = trajectory[clampedSteps];
@@ -173,6 +177,52 @@ export function NoiseExplorer() {
   function handleStrengthChange(v: number) {
     setStrength(v);
   }
+
+  /**
+   * ---------------------------------------------------------------
+   * Where this channel actually settles, for *this* starting state
+   * ---------------------------------------------------------------
+   * This block replaces a hardcoded `outcomeId="fixed-point"` that graded
+   * the prediction wrong in the instrument's own default configuration.
+   *
+   * Amplitude damping has one fixed point, |0⟩, no matter where the state
+   * started, so "north pole" is always the answer there. Dephasing does not:
+   * it drives x and y to zero and leaves z exactly where it was, so its
+   * resting place is (0, 0, z₀). Four of the six starting presets (|+⟩, |−⟩,
+   * |+i⟩, |−i⟩ — including |+⟩, the one the instrument opens on) sit on the
+   * equator with z₀ = 0, and for those the vector really does end at the
+   * centre of the sphere. The old code told a reader who answered "centre"
+   * from |+⟩ that they were wrong.
+   *
+   * The two options are also chosen per starting state, not just graded
+   * differently, because "in to the z-axis keeping its height" and "in to the
+   * centre" are the *same* destination when z₀ = 0 — offering both would make
+   * one of two identical answers wrong.
+   *
+   * z₀ = cos(θ) is read off the preset's own Bloch angles (see
+   * `blochStateFromAngles` in lib/quantum/bloch.ts), not measured off the
+   * numerical trajectory: at the low end of the strength slider 40 steps is
+   * nowhere near convergence, so the endpoint of the computed trajectory is
+   * not the fixed point and cannot be used to identify it.
+   */
+  const startsOnEquator = Math.abs(Math.cos(startingPreset.angles.theta)) < 1e-9;
+  const predictOptions =
+    channel === "amplitude-damping"
+      ? [
+          { id: "fixed-point", label: "North pole (|0⟩)" },
+          { id: "center", label: "Center of the sphere" },
+        ]
+      : startsOnEquator
+        ? [
+            { id: "center", label: "All the way in to the center" },
+            { id: "fixed-point", label: "It stays out on the equator" },
+          ]
+        : [
+            { id: "center", label: "All the way in to the center" },
+            { id: "fixed-point", label: "In to the z-axis, keeping the height it started at" },
+          ];
+  const predictCorrectId =
+    channel === "amplitude-damping" ? "fixed-point" : startsOnEquator ? "center" : "fixed-point";
 
   const narration =
     clampedSteps === 0
@@ -204,7 +254,7 @@ export function NoiseExplorer() {
             <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
           </div>
 
-          <div aria-live="polite" className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          <div aria-live="polite" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {narration}
           </div>
 
@@ -218,18 +268,11 @@ export function NoiseExplorer() {
           <Predict
             key={`${presetId}-${channel}`}
             question="Keep stepping this channel forward — where does the Bloch vector eventually settle?"
-            options={
-              channel === "amplitude-damping"
-                ? [
-                    { id: "fixed-point", label: "North pole (|0⟩)" },
-                    { id: "center", label: "Center of the sphere" },
-                  ]
-                : [
-                    { id: "fixed-point", label: "Its original point on the z-axis" },
-                    { id: "center", label: "Center of the sphere" },
-                  ]
-            }
-            outcomeId={clampedSteps >= MAX_STEPS ? "fixed-point" : null}
+            options={predictOptions}
+            // Resolved only once the reader has scrubbed to the end of the
+            // trajectory. The question is about the limit, not the current
+            // frame, so it must not answer itself the moment the panel appears.
+            outcomeId={clampedSteps >= MAX_STEPS ? predictCorrectId : null}
           />
 
           <SimulatorFraming

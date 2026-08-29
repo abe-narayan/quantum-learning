@@ -26,7 +26,18 @@ export const capstoneLandscapeHardwareClaimClassification: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["physical qubit", "logical qubit", "physical vs logical", "distinguish physical and logical"],
-      ["threshold theorem", "below threshold", "error rate below threshold", "code distance"],
+      {
+        phrases: [
+          "threshold theorem",
+          "below threshold",
+          "below the threshold",
+          "error rate below threshold",
+          "code distance",
+          "physical error rate",
+        ],
+        missingFeedback:
+          "You have separated physical from logical qubits. Name the condition that decides whether the headline is earned: the threshold theorem only delivers suppression once the achieved physical error rate is below threshold and a sufficient code distance is actually run, and a raw qubit count reports neither number.",
+      },
       [
         "qubit count alone",
         "not sufficient",

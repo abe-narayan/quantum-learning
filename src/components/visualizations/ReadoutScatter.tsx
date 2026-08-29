@@ -167,13 +167,31 @@ export function ReadoutScatter({
     <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={`${ariaLabel} Currently: ${frame.paramLabel}, fidelity approximately ${(frame.fidelity * 100).toFixed(1)} percent.`}>
-          {/* axes */}
-          <line x1={PAD} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
-          <line x1={PAD} y1={PAD} x2={PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
-          <text x={WIDTH - PAD} y={HEIGHT - PAD + 16} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          {/* The I and Q axes. Was `stroke-border`, the panel-edge token -
+              1.41:1 on `--surface-muted`, under the 3:1 WCAG 2.1 SC 1.4.11
+              floor - which left the frame a reader is meant to locate the
+              two clusters within all but invisible on the dark theme.
+              `--axis` clears 3:1 on every panel depth in both themes. */}
+          <line x1={PAD} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-axis" strokeWidth={1.25} />
+          <line x1={PAD} y1={PAD} x2={PAD} y2={HEIGHT - PAD} className="stroke-axis" strokeWidth={1.25} />
+          {/* 10 -> 16 -> 17 units. The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+              (320 less Container's `px-4` gutters), but this SVG renders inside
+              `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+              radius and fill and no padding at all — the `p-4` does. Subtract
+              2 x (16px padding + 1px border) = 34px.
+              So the scale is 254/480 = 0.529, not the 0.6 the 16-unit pass
+              assumed: `text-[10px]` painted at 5.29px and 16 units at
+              **8.47px** — the 16 was chosen to land at "9.6px" and actually
+              landed under the floor. 17 units gives 9.00px. These name the
+              plane the whole figure lives in, so they are must-read.
+              Nothing had to move for the extra unit: "I (in-phase)" is ~102
+              units at 17 and ends at the right pad, "Q (quadrature)" is ~119
+              and starts at x = 28, and "decision boundary" sits centred near
+              x = 240 on the same baseline as Q with ~20 units of clearance. */}
+          <text x={WIDTH - PAD} y={HEIGHT - PAD + 20} textAnchor="end" fontSize={17} className="fill-axis">
             I (in-phase)
           </text>
-          <text x={PAD - 8} y={PAD - 8} textAnchor="start" className="fill-muted-foreground text-[10px]">
+          <text x={PAD - 8} y={PAD - 10} textAnchor="start" fontSize={17} className="fill-axis">
             Q (quadrature)
           </text>
 
@@ -187,7 +205,7 @@ export function ReadoutScatter({
             strokeWidth={1.5}
             strokeDasharray="5 4"
           />
-          <text x={xOf(0)} y={PAD - 8} textAnchor="middle" className="fill-foreground/70 text-[10px]">
+          <text x={xOf(0)} y={PAD - 10} textAnchor="middle" fontSize={17} className="fill-foreground/80">
             decision boundary
           </text>
 

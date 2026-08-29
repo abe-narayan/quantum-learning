@@ -75,9 +75,11 @@ Every hardware press release leads with T1 and T2, and it's easy to nod along wi
 ## Motivation
 
 Every time a hardware company announces a new chip, the press release
-leads with two numbers: <Term id="t1-t2-coherence-times">T1 and T2</Term>, usually in microseconds, sometimes
-now creeping into milliseconds for the best trapped-ion and
-neutral-atom systems. Reporters repeat them, and competitors get
+leads with two numbers: <Term id="t1-t2-coherence-times">T1 and T2</Term>, usually in microseconds for
+superconducting devices, stretching all the way to seconds for
+hyperfine trapped-ion qubits (with neutral atoms typically somewhat
+shorter, though still far beyond any superconducting chip). Reporters
+repeat them, and competitors get
 compared by them. Physical Qubit Platforms and Advanced
 Topics in Quantum Mechanics already built everything needed to define
 both numbers precisely and compute with them directly, so this lesson
@@ -155,14 +157,12 @@ field is enough). This is why realistic devices often report $T_2<2T_1$
 substantially; dephasing processes with no direct T1 analogue are
 common (Sources of Noise's flux-noise example).
 
-T1 and T2 are not notation invented for qubits. Felix Bloch introduced
-both time constants in 1946 to describe nuclear spin relaxation, the
-foundation of NMR spectroscopy, and the same two numbers are measured in
-every voxel of a clinical MRI scan today (T1-weighted and T2-weighted are
-standard scan types), decades before either label appeared on a
-superconducting-qubit datasheet. A qubit's T1 and T2 are the same
-physical relaxation and dephasing processes Bloch defined, just measured
-on a different physical system.
+Bloch's 1946 definitions carry over without amendment. "T1-weighted" and
+"T2-weighted" are standard clinical MRI scan types, and each voxel of
+such a scan reports the same two constants this lesson computes, for
+protons in tissue rather than a qubit's energy levels. Nothing about the
+definitions changed on the way to a superconducting datasheet; only the
+system being measured did.
 
 <Callout type="note">
 **Reading a T1/T2 number in a press release.** A quoted T1 or T2 is a

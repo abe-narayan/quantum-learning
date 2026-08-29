@@ -52,7 +52,7 @@ export function ContinueLearningClient({ lessons }: { lessons: OrderedLesson[] }
   return (
     <Link
       href={`/lessons/${next.slug}`}
-      className="mt-6 flex items-center justify-between gap-3 rounded-xl border border-brand/30 bg-brand/5 px-4 py-3 transition-colors hover:border-brand/50"
+      className="mt-6 flex items-center justify-between gap-3 rounded-panel border border-brand/30 bg-brand/5 px-4 py-3 transition-colors hover:border-brand/50"
     >
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-brand">Continue learning</p>

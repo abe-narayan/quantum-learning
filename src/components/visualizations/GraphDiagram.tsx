@@ -57,7 +57,17 @@ export function GraphDiagram({
   const byId = new Map(nodes.map((n) => [n.id, n]));
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
+    // `tabIndex={0}`. `QAOAExplorer` documents the overflow from the other
+    // side: this component "renders a fixed 300px-wide SVG with no responsive
+    // className of its own — at a 320px viewport, after this instrument's own
+    // padding, the stage has less room than that". Same inside a lesson
+    // column. So this wrapper really scrolls, and an `overflow-x-auto` div is
+    // focusable by default only in Firefox: a keyboard-only reader could not
+    // reach the rightmost graph nodes, which in the Max-Cut figures is where
+    // the cut edges are. No `role`/`aria-label` here — the `<svg>` is already
+    // `role="img"` with the label, and naming the wrapper would announce the
+    // figure twice.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {edges.map((e, i) => {
           const a = byId.get(e.from);
@@ -74,7 +84,14 @@ export function GraphDiagram({
               y2={pb.y}
               strokeWidth={e.cut ? 3 : 1.5}
               strokeDasharray={e.cut ? "6 4" : undefined}
-              className={e.cut ? "stroke-accent" : "stroke-border"}
+              // Uncut edges are not background: a Max-Cut figure is read by counting
+              // how many of the graph's edges the partition cuts, which requires
+              // seeing the uncut ones too. On `stroke-border` — the panel-edge token,
+              // 1.41:1 on `--surface-muted` — the denominator of that count was
+              // invisible and the figure degenerated into "some dashed teal lines".
+              // `stroke-axis` clears WCAG 2.1 SC 1.4.11's 3:1; cut edges stay louder
+              // still by colour, by dashing, and by twice the stroke width.
+              className={e.cut ? "stroke-accent" : "stroke-axis"}
             />
           );
         })}

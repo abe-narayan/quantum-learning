@@ -30,24 +30,27 @@ export const lessonMeta = {
     },
     {
       slug: "quantum-hardware/control-and-readout/qubit-readout-techniques",
-      note: "This lesson's idealized, instantaneous projective measurement, contrasted there against how a real device actually reads out a qubit (indirectly, imperfectly).",
+      note: "This lesson's idealized, instantaneous projective measurement, contrasted there against how a real device reads out a qubit: indirectly, and imperfectly.",
     },
   ],
 };
 
 <LessonHook eyebrow="A menu of possible questions">
-The computational basis is just one choice of two special points on an entire sphere of possible states — "is this |+⟩ or |−⟩?" is an equally legitimate question to ask a qubit, with its own menu of answers.
+The computational basis picks out two points on a whole sphere of states. "Is this |+⟩ or |−⟩?" is an equally legitimate question to ask a qubit, and it comes with its own menu of answers.
 </LessonHook>
 
 ## Motivation
 
 The <Term id="born-rule">Born rule</Term> ($P(0)=|\alpha|^2$, $P(1)=|\beta|^2$) has been used
-informally since Lesson 1. What hasn't been asked yet: what if you wanted
-to measure something other than "is this 0 or 1"? A qubit lives on an
-entire sphere of possible states; the computational basis is just one
-choice of two special points on it. This lesson makes the measurement
-postulate general enough to answer that, and along the way, gives a much
-sharper picture of what a "measurement" actually is.
+informally since Lesson 1. Here is the question it leaves open: what if you
+wanted to ask a qubit something other than "are you 0 or 1"? A qubit lives
+on a whole sphere of states, and the computational basis is two points on
+it. Nothing about the sphere singles those two out.
+
+This lesson generalizes the measurement postulate to any pair of points you
+like. The payoff arrives in the X-basis calculation, where the relative
+phase $\varphi$, invisible to every measurement you have made so far,
+becomes something you can read off a detector.
 
 ## Intuition
 
@@ -62,14 +65,14 @@ overlaps with each possible answer.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/51/Stern-Gerlach_experiment.svg"
   alt="Diagram of the Stern-Gerlach experiment: a beam of silver atoms passes through an inhomogeneous magnetic field and splits into two discrete spots on a detector, instead of the smeared-out classical prediction"
-  caption="The 1922 Stern–Gerlach experiment is the historical prototype of exactly this idea: choosing a magnet orientation is choosing a measurement basis, and silver atoms come out in only two discrete spots, never a continuous smear, just as a qubit measurement always yields one of two sharp outcomes."
+  caption="The Stern-Gerlach experiment from Lesson 1, seen from a new angle: the magnet's orientation is the measurement basis. Turn the magnet and you are asking the atom a different question, with its own two answers, which is what this lesson generalizes."
   credit="Tatoute / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Stern-Gerlach_experiment.svg"
   license="CC BY-SA 4.0"
 />
 
 <HistoricalMoment date="1922">
-The Stern–Gerlach experiment sends a beam of silver atoms through an inhomogeneous magnetic field. It splits into two discrete spots on a detector, never a continuous smear — the historical prototype of a measurement always yielding one of two sharp outcomes.
+The Stern-Gerlach experiment sends a beam of silver atoms through an inhomogeneous magnetic field. It splits into two discrete spots on a detector, never a continuous smear. Rotating the magnet does not add outcomes; it changes which two you get.
 </HistoricalMoment>
 
 ## Mathematical Development
@@ -78,13 +81,13 @@ The Stern–Gerlach experiment sends a beam of silver atoms through an inhomogen
 
 Choose any **orthonormal basis** $\{|e_0\rangle, |e_1\rangle\}$: any pair
 of states with $\langle e_0|e_0\rangle=\langle e_1|e_1\rangle=1$ and
-$\langle e_0|e_1\rangle=0$, exactly the orthonormality property Dirac
+$\langle e_0|e_1\rangle=0$, which is the orthonormality property Dirac
 notation gave us. Measuring $|\psi\rangle$ "in this basis" means:
 
 <EquationReveal
   terms={[
     { id: "Pei", symbol: "P(e_i)", gloss: "The probability of getting outcome e_i when you measure." },
-    { id: "ei", symbol: "|e_i⟩", gloss: "One of the two basis states of the chosen measurement — the 'menu' of possible answers." },
+    { id: "ei", symbol: "|e_i⟩", gloss: "One of the two basis states of the chosen measurement: an item on the menu of possible answers." },
     { id: "psi", symbol: "|ψ⟩", gloss: "The state being measured, before collapse." },
   ]}
 >
@@ -120,13 +123,15 @@ $$
 P(+) = \left|\frac{\alpha+\beta}{\sqrt2}\right|^2 = \frac{|\alpha+\beta|^2}{2}
 $$
 
-This behaves differently from the computational-basis case.
-Expand $|\alpha+\beta|^2 = |\alpha|^2+|\beta|^2+2\operatorname{Re}(\alpha^*\beta) = 1 + 2\operatorname{Re}(\alpha^*\beta)$,
-so $P(+)$ depends on the *relative phase* between $\alpha$ and $\beta$
-(through $\operatorname{Re}(\alpha^*\beta)$), not just their individual
-sizes. Two states with identical $P(0),P(1)$ can have completely different
-$P(+),P(-)$. This is interference showing up in a measurement probability,
-concretely, for the first time in this course.
+This behaves differently from the computational-basis case. Expand
+$|\alpha+\beta|^2 = |\alpha|^2+|\beta|^2+2\operatorname{Re}(\alpha^*\beta) = 1 + 2\operatorname{Re}(\alpha^*\beta)$,
+and $P(+)$ turns out to depend on the *relative phase* between $\alpha$ and
+$\beta$ (through $\operatorname{Re}(\alpha^*\beta)$), not only on their
+individual sizes. So two states with identical $P(0)$ and $P(1)$ can have
+entirely different $P(+)$ and $P(-)$: $|+\rangle$ and $|-\rangle$ are both
+50/50 in the Z basis, but one gives $P(+)=1$ and the other $P(+)=0$. This
+is the first place in the course where interference appears as a number a
+detector could report.
 
 ### Why one measurement isn't enough
 
@@ -145,10 +150,26 @@ you cannot "measure again more carefully."
 Choosing a measurement basis is choosing which physical property to
 observe (for a real qubit, e.g. photon polarization, this might mean
 literally orienting a polarizing filter one way vs. another). The
-outcome's randomness isn't error or noise to be engineered away. The
-measurement postulate says it's a fundamental feature of the theory.
+outcome's randomness is not error or noise to be engineered away. The
+postulate puts it in the theory at the ground floor, and nothing in
+quantum mechanics predicts which outcome a given run will give.
 
 ## Interactive Experiment
+
+The experiment below needs one gate, the **Hadamard gate** $H$, a lesson
+ahead of where it is properly introduced. Two facts about it are enough
+here, and they are the two the next lesson starts from: $H$ is
+linear, so it acts on a superposition term by term, and on the two basis
+states it does
+
+$$
+H|0\rangle = |+\rangle = \tfrac{1}{\sqrt2}(|0\rangle+|1\rangle), \qquad H|1\rangle = |-\rangle = \tfrac{1}{\sqrt2}(|0\rangle-|1\rangle)
+$$
+
+That is everything the prediction needs: apply those two rules to
+$|+\rangle = \tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, collect terms, and
+read off what the Born rule then says about a $Z$-basis measurement of
+the result. It is a two-line calculation, not a guess.
 
 <PredictBeforeReveal
   question="Prepare |+⟩, apply an H gate to it, then measure in the computational (Z) basis. What outcome do you expect?"
@@ -159,7 +180,7 @@ measurement postulate says it's a fundamental feature of the theory.
     { label: "Random, with different odds each run", value: "random" },
   ]}
   correctValue="0"
-  explanation="H sends |+⟩ to |0⟩ exactly — a deterministic rotation, not a random one. So measuring afterward always reads 0. This is the trick behind 'measure in the X basis': applying H first, then measuring in Z, is mathematically the same as measuring directly in the {|+⟩,|−⟩} basis, and here it turns a state that was 50/50 in the Z basis into a certain outcome."
+  explanation="H sends |+⟩ to |0⟩. That is a deterministic rotation, not a random one, so measuring afterward always reads 0. This is the trick behind 'measure in the X basis': applying H and then measuring in Z is mathematically the same as measuring directly in the {|+⟩,|−⟩} basis, and here it converts a state that was 50/50 in the Z basis into a certain outcome."
 />
 
 <InteractiveSection title="Measure in Z, then fake an X-basis measurement" description={`Prepare |+⟩ using the preset, then click Measure several times in a row (using Reset or the preset button to re-prepare |+⟩ between clicks, since each measurement collapses the state). You should see roughly even 0s and 1s. The simulator's Measure button always measures in the computational (Z) basis, but you can measure in the X-basis with the tools you already have: apply H, then Measure. Try it from |+⟩: H sends |+⟩ to |0⟩ exactly (the next lesson derives why), so measuring afterward is deterministic, a clean way to see that "measure in the X basis" and "rotate then measure in Z" are the same operation.`}>
@@ -182,13 +203,13 @@ $$
   </DerivationStep>
 </DerivationSteps>
 
-and by the same logic $P(-)=\frac12$ too. Even though $|{+i}\rangle$ sits
-on the equator just like $|+\rangle$, measuring it in the X-basis is
-completely random. That makes sense geometrically, since $|{+i}\rangle$ is
-$90°$ of longitude away from $|+\rangle$, as far from it as possible while
-staying on the equator.
+and by the same logic $P(-)=\frac12$. Even though $|{+i}\rangle$ sits on
+the equator like $|+\rangle$, measuring it in the X basis is a coin flip.
+The geometry says the same thing: $|{+i}\rangle$ is $90°$ of longitude from
+$|+\rangle$, so its Bloch vector is perpendicular to the X axis and has no
+preference for either X-basis outcome.
 
-<InteractiveSection title="Sweeping the relative phase" description={`Switch the explorer below to two-amplitude mode. P(0)=|α|² and P(1)=|β|² above never move, since relative phase is invisible in the state's own basis — but the P(+) and P(−) bars beneath, computed from the formula P(+) = (1+2Re(α*β))/2 just derived above, trace out a continuous (1+cos φ)/2 curve as you drag the relative-phase slider through a full turn. Try landing near φ=90° (the |+i⟩ case just worked out by hand) and check the bars read close to 50/50, then push toward φ=0° or φ=180° to see P(+) sweep all the way to 1 or down to 0.`}>
+<InteractiveSection title="Sweeping the relative phase" description={`Switch the explorer below to two-amplitude mode. P(0)=|α|² and P(1)=|β|² never move, since relative phase is invisible in the state's own basis. The P(+) and P(−) bars beneath, computed from the formula P(+) = (1+2Re(α*β))/2 derived above, trace out a continuous (1+cos φ)/2 curve as you drag the relative-phase slider through a full turn. Try landing near φ=90° (the |+i⟩ case just worked out by hand) and check the bars read close to 50/50, then push toward φ=0° or φ=180° to see P(+) sweep all the way to 1 or down to 0.`}>
   <LazyComplexAmplitudeExplorer twoAmplitudeVariant="basis-change" />
 </InteractiveSection>
 

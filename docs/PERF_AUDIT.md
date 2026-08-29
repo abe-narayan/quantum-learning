@@ -63,11 +63,32 @@ only reports uncompressed bytes):
 | Shared baseline (all 18 route templates) | 505.3 KB | 153.5 KB | framework + `PillarScope`/`QuantumField`/`Reveal`/`useScrollProgress` glue |
 | `/` (homepage) | **2032.0 KB** | **569.3 KB** | outlier — see below |
 | `/lessons/[...slug]` | 1000.3 KB | 306.6 KB | narrative components + one `Lazy*` simulator per lesson |
-| `/problems/[slug]` | 987.2 KB | 302.2 KB | `ProblemView` + KaTeX-bearing content |
+| `/problems/[slug]` | 987.2 KB | 302.2 KB | `ProblemView` + KaTeX-bearing content — **superseded, see below** |
 | `/learn` | 772.4 KB | 240.1 KB | `CurriculumExplorer` client island |
 | six pillar pages (`/mechanics`, `/computing`, `/hardware`, `/software`, `/mastery`, `/apex`) | 753–758 KB | 234–236 KB | consistent with each other, as expected |
 | `/current-quantum`, `/glossary`, `/about`, `/map` | 709–759 KB | 220–236 KB | |
 | `/problems`, `/simulators`, `/lessons` (index pages), `/_not-found` | 505–565 KB | 153–173 KB | near the shared baseline — correctly lean |
+
+> **Resolved 2026-08-29 — `/problems/[slug]` no longer ships KaTeX.** The
+> "KaTeX-bearing content" in that row was not content at all: `ProblemView`
+> was a client component, and `AnswerInput`/`HintPanel`/`SolutionPanel`
+> render authored strings through `ScrollableMathText` → `MathText` →
+> `katex`. None of those four files declares `"use client"` itself, so they
+> were dragged across the boundary by their importer — which is exactly why
+> the two by-name katex guards (`mdx-components.tsx`, `LessonLayout.tsx`)
+> never saw it, and why §C's client-boundary pass, which checked *declared*
+> boundaries, called it a PASS. `ProblemView` is now a Server Component that
+> renders the problem's math to KaTeX HTML strings
+> (`components/problems/renderProblemMath.ts`) and hands them to
+> `ProblemViewClient`, whose subtree only injects strings
+> (`RenderedMathText.tsx`). Re-measured on the source graph: the route's
+> eager client graph is **86.6 KB → 13.8 KB gzip**, i.e. 74 KB of
+> `katex.min.js` off all 547 problem pages, bought for ~568 bytes gzip of
+> prerendered HTML per page in the flight payload (median 163B, max 2.8KB).
+> The First Load JS column above predates the change and has not been
+> re-measured with a build. See ARCHITECTURE.md §7b and
+> `clientBoundary.test.ts`, whose `KATEX_IN_EAGER_CLIENT_GRAPH` map is now
+> empty.
 
 **The one real outlier is `/`.** It carries a chunk unique to it —
 `3tvejfsoycrgn.js`, 1286 KB raw / 338 KB gzip, confirmed (by content —

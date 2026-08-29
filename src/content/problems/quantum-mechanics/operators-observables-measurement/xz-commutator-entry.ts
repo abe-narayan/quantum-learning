@@ -21,10 +21,14 @@ export const xzCommutatorEntry: NumericProblem = {
     type: "numeric",
     value: 2,
     tolerance: 0.001,
-    incorrectFeedback: "Compute XZ and ZX as 2x2 matrix products first, then subtract entry-by-entry before taking the magnitude.",
+    incorrectFeedback: "Compute the two products XZ and ZX in full first, then subtract entry by entry, and only then take the magnitude. If you got a magnitude of one, you probably stopped at a single product instead of subtracting.",
+    nearMisses: [
+      { value: 1, feedback: "1 is the magnitude of that entry in XZ or in ZX alone. The commutator subtracts them, and since they carry opposite signs there, the difference doubles rather than cancelling." },
+      { value: 0, feedback: "A vanishing commutator would mean X and Z share an eigenbasis. They do not: XZ and ZX differ in every off-diagonal entry." },
+    ],
   },
   hints: [
-    { text: "XZ = [[0,-1],[1,0]], ZX = [[0,1],[-1,0]] — compute these first." },
+    { text: "XZ = [[0,-1],[1,0]] and ZX = [[0,1],[-1,0]]. Compute these first." },
     { text: "Subtract to get [X,Z], then take the magnitude of the top-right entry." },
   ],
   solution: {
@@ -37,7 +41,7 @@ export const xzCommutatorEntry: NumericProblem = {
   },
   explanation: {
     correctIdea: "[X,Z] is nonzero, confirming X and Z don't commute and therefore share no common eigenbasis.",
-    whyCorrect: "Direct matrix subtraction, matching the platform's own gates.ts matrices exactly.",
-    whyWrong: ["Computing only XZ or only ZX (forgetting to subtract) misses that it's the *difference* that matters — either product alone is nonzero even when the operators do commute."],
+    whyCorrect: "Direct matrix subtraction, matching the engine's gates.ts matrices exactly.",
+    whyWrong: ["Computing only XZ or only ZX (forgetting to subtract) misses that it's the difference that matters: either product alone is nonzero even when the operators do commute."],
   },
 };

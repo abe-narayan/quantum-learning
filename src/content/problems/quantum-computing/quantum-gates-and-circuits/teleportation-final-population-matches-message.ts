@@ -44,6 +44,11 @@ export const teleportationFinalPopulationMatchesMessage: NumericProblem = {
     tolerance: 0.01,
     incorrectFeedback:
       "The whole point of the correction table is that Bob's qubit, after the right correction, is exactly $|\\psi\\rangle$ again — its measurement statistics should match the original message state exactly.",
+    nearMisses: [
+      { value: 0.36, feedback: "0.36 is P(0) for the message state. The question asks for P(1), which is |0.8i|²." },
+      { value: 0.8, feedback: "0.8 is the magnitude of the |1⟩ amplitude. The Born rule squares it." },
+      { value: 0.5, feedback: "A half would mean Bob's qubit came out unbiased, which is what an uncorrected branch looks like. Applying the table's correction restores the original amplitudes." },
+    ],
   },
   hints: [
     { text: "You don't need to redo the full derivation — the lesson already states the correction recovers $|\\psi\\rangle$ exactly for this branch." },

@@ -138,3 +138,60 @@ describe("expectationPotential / expectationEnergy", () => {
     expect(() => psi.expectationPotential([0, 0, 0])).toThrow(/grid.n/);
   });
 });
+
+describe("position and momentum are two views of the same wavefunction", () => {
+  // These tie `Wavefunction1D`'s position-space sums to its momentum-space
+  // ones. The two halves go through completely different machinery (a plain
+  // Riemann sum over grid.x on one side, an FFT plus the momentum grid on
+  // the other), so they are exactly the pair where a convention could drift
+  // apart while each side's own tests kept passing.
+  const grid = createGrid(512, 0.05);
+
+  it("satisfies the Heisenberg uncertainty relation, with a Gaussian packet saturating it at exactly 1/2", () => {
+    // A minimum-uncertainty (Gaussian) packet has Dx*Dp = hbar/2 = 1/2 in
+    // these natural units, whatever its width or momentum — the strongest
+    // available cross-check that Dx and Dp are measured in conjugate units
+    // on grids that genuinely correspond.
+    for (const width of [0.4, 0.8, 1.5]) {
+      for (const momentum of [0, 1.3, -2.1]) {
+        const psi = Wavefunction1D.gaussianPacket(grid, { center: 0, width, momentum });
+        const product = Math.sqrt(psi.variancePosition()) * Math.sqrt(psi.varianceMomentum());
+        expect(product, `width=${width} p=${momentum}`).toBeGreaterThan(0.5 - 1e-3);
+        expect(product, `width=${width} p=${momentum}`).toBeCloseTo(0.5, 2);
+      }
+    }
+  });
+
+  it("keeps the uncertainty product above 1/2 for a non-Gaussian (two-packet) superposition", () => {
+    const left = Wavefunction1D.gaussianPacket(grid, { center: -3, width: 0.6, momentum: 0 });
+    const right = Wavefunction1D.gaussianPacket(grid, { center: 3, width: 0.6, momentum: 0 });
+    const superposed = Wavefunction1D.superposition([
+      { psi: left, coefficient: Complex.ONE },
+      { psi: right, coefficient: Complex.ONE },
+    ]);
+    const product = Math.sqrt(superposed.variancePosition()) * Math.sqrt(superposed.varianceMomentum());
+    expect(product).toBeGreaterThan(0.5);
+  });
+
+  it("leaves the momentum distribution unchanged when a packet is translated, while <x> follows the shift", () => {
+    // Translating a wavefunction changes phi(k) only by a phase, so every
+    // momentum *moment* is shift-invariant while every position moment
+    // moves with it. Getting this wrong in either direction would mean the
+    // two representations were referred to different coordinate origins.
+    const reference = Wavefunction1D.gaussianPacket(grid, { center: 0, width: 0.7, momentum: 1.1 });
+    for (const center of [-4, -1.5, 2.5]) {
+      const shifted = Wavefunction1D.gaussianPacket(grid, { center, width: 0.7, momentum: 1.1 });
+      expect(shifted.expectationPosition(), `center=${center}`).toBeCloseTo(center, 6);
+      expect(shifted.expectationMomentum(), `center=${center}`).toBeCloseTo(reference.expectationMomentum(), 6);
+      expect(shifted.varianceMomentum(), `center=${center}`).toBeCloseTo(reference.varianceMomentum(), 6);
+    }
+  });
+
+  it("gives a free packet the kinetic energy <p^2>/2m = (<p>^2 + Dp^2)/2m its own momentum statistics imply", () => {
+    for (const momentum of [0, 0.8, -1.7]) {
+      const psi = Wavefunction1D.gaussianPacket(grid, { center: 0, width: 0.9, momentum });
+      const expected = (psi.expectationMomentum() ** 2 + psi.varianceMomentum()) / 2;
+      expect(psi.expectationKineticEnergy(), `p=${momentum}`).toBeCloseTo(expected, 9);
+    }
+  });
+});

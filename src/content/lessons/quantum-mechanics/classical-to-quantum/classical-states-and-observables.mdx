@@ -26,6 +26,10 @@ export const classicalEnergyFrame = (p) => ({
 
 export const classicalEnergyFrames = Array.from({ length: 21 }, (_, i) => classicalEnergyFrame(i * 0.2));
 
+export const classicalEnergyMax = Math.max(
+  ...classicalEnergyFrames.flatMap((f) => f.bars.map((b) => b.value))
+);
+
 export const phaseSpaceFrames = classicalEnergyFrames.map((f, i) => ({
   paramLabel: f.paramLabel,
   x: oscillatorX,
@@ -57,7 +61,7 @@ Drop a ball. At any instant, everything there is to know about it, where it is, 
 
 Eleven lessons of linear algebra built a powerful mathematical toolkit
 without saying much about physics at all. Before applying that toolkit,
-this lesson pins down exactly what it's replacing: what "state" and
+this lesson pins down what it is replacing: what "state" and
 "<Term id="observable">observable</Term>" meant *before* quantum mechanics, so the differences that are
 coming aren't differences of degree, but differences of kind.
 
@@ -74,8 +78,17 @@ coming aren't differences of degree, but differences of kind.
 
 That confidence, that a system has a definite, complete state at every
 instant, and every physical quantity is just some function of that
-state, is the classical picture, and it held up for centuries because it
-matches everyday experience almost perfectly.
+state, is the classical picture. It held up for centuries because it
+matches everyday experience: a thrown ball lands where the numbers say
+it will, and when it doesn't, you look for the wind you forgot to
+measure rather than doubting that the ball had a trajectory.
+
+Two commitments are hiding in that sentence, and both will fail later.
+First, the state is complete: nothing about the ball is left over once
+you have listed $x$ and $p$. Second, the state exists whether or not
+anyone looks. Measuring is reading off a value that was already sitting
+there. Neither commitment survives contact with an electron, so it helps
+to see them stated plainly while they still feel obvious.
 
 ## Mathematical Development
 
@@ -121,10 +134,11 @@ $$
 Given the state $(x,p)$, every observable's value is completely
 determined. There's no step where "measuring" $E$ could give an
 ambiguous or probabilistic answer. This is the feature quantum mechanics
-is going to remove, and it's worth naming precisely, because "observable"
-is going to mean something structurally different very soon: not a
-function you plug numbers into, but an operator acting on a vector, as
-the Mathematical Foundations course already built.
+removes, and the word "observable" survives the transition while its
+meaning changes underneath: not a function you plug numbers into, but an
+operator acting on a vector, as the Mathematical Foundations course
+already built. Keep both readings of the word in view; confusing them is
+the source of most early misreadings of the quantum formalism.
 
 ### Determinism
 
@@ -152,13 +166,14 @@ probability, from the Greek for knowledge.
 
 The classical picture, definite states, observables as their functions,
 probability as ignorance, is an extraordinarily accurate description of
-ordinary objects, not a wrong one. The entire point of this course is to
-locate precisely where and why it stops being accurate, and the answer is
-not "classical mechanics needs a small correction." As the next lesson
-shows, some experimentally-measured probabilities cannot be explained by
-*any* underlying definite state, however unknown. A fundamentally
-different kind of probability is required, not just better bookkeeping
-for the classical kind.
+ordinary objects, not a wrong one. This course's job is to locate where
+and why it stops being accurate, and the answer is not "classical
+mechanics needs a small correction." As the next lesson shows, some
+experimentally-measured probabilities cannot be explained by *any*
+underlying definite state, however unknown. That rules out the entire
+strategy of patching the classical picture with hidden variables: what is
+needed is a different kind of probability, not better bookkeeping for the
+classical kind.
 
 ## Worked Example
 
@@ -180,14 +195,15 @@ about evaluating a function at a known point.
     { label: "It stays exactly 2, unchanged", value: "unchanged" },
   ]}
   correctValue="unchanged"
-  explanation="½kx² depends only on x, which is held fixed at 1, so it stays exactly 2 no matter what p does. Only the kinetic term p²/2m responds to the slider below — a direct look at why E(x,p) is a function of the whole state, not one dial that moves everything at once."
+  explanation="½kx² depends only on x, which is held fixed at 1, so it stays at 2 no matter what p does. Only the kinetic term p²/2m responds to the slider below. That is what it means for E to be a function of the whole state rather than one dial that moves everything at once."
 />
 
 <InteractiveSection title="Slide p, watch E(x,p) respond deterministically" description="x is held fixed at 1. Drag p and watch the kinetic term, potential term, and total energy recompute instantly, with no spread and no probability distribution anywhere. p = 2 is marked, reproducing the worked example's E = 4 exactly.">
   <BarChartExplorer
     frames={classicalEnergyFrames}
     sliderLabel="p (momentum)"
-    ariaLabel="Kinetic energy, potential energy, and total energy of the classical oscillator recomputed live as momentum p varies, with p equals 2 highlighted matching the worked example"
+    ariaLabel="Kinetic energy, potential energy, and total energy of the classical oscillator recomputed live as momentum p varies, on a fixed vertical scale so the potential bar visibly holds still at 2 while the kinetic bar grows, with p equals 2 highlighted matching the worked example"
+    maxValue={classicalEnergyMax}
   />
 </InteractiveSection>
 

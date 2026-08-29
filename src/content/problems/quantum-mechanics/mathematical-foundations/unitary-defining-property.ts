@@ -33,7 +33,9 @@ export const unitaryDefiningProperty: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "The defining property of a unitary operator is U†U=I, which is exactly what forces inner-product preservation.",
   },
   hints: [
-    { text: "Start from the definition U†U=I and see what it implies about ⟨Uu|Uv⟩." },
+    { text: "Write down the defining condition first: what equation does every unitary operator satisfy?" },
+    { text: "Move one U across the inner product using the adjoint: ⟨Uu|Uv⟩ = ⟨u|U†U|v⟩." },
+    { text: "Substitute the defining condition for U†U and see what is left." },
   ],
   solution: {
     steps: [
@@ -47,6 +49,10 @@ export const unitaryDefiningProperty: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Inner-product preservation is the defining consequence of unitarity, derived directly from U†U=I.",
     whyCorrect: "The derivation above shows it's a direct algebraic consequence of the definition, not an extra assumption.",
-    whyWrong: ["Real eigenvalues and Hermiticity are Hermitian-operator properties; unitary operators are guaranteed invertible, not the opposite."],
+    whyWrong: [
+      { optionId: "b", text: "Borrows a Hermitian property. A unitary operator's eigenvalues have modulus 1, so i is a perfectly legitimate one." },
+      { optionId: "c", text: "Treats two independent properties as one. The S gate is unitary and not Hermitian." },
+      { optionId: "d", text: "States the opposite of the definition. U†U = I hands you the inverse directly: U⁻¹ = U†." },
+    ],
   },
 };

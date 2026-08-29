@@ -22,7 +22,11 @@ export const whyReflectionAlwaysPositive: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["k1 != k2", "different wavenumbers", "k1 equals k2 only when V0=0"],
-      ["squared", "nonzero numerator squared is positive"],
+      {
+        phrases: ["squared", "square", "nonzero numerator squared is positive", "strictly positive", "never zero", "cannot vanish", "always positive"],
+        missingFeedback:
+          "You have said k₁ and k₂ differ for any real step. Finish the argument: R is that nonzero difference squared, and the square of a nonzero real number is strictly positive, so R can approach zero at large E without ever reaching it.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that k1 and k2 are only equal when V0=0 (any step at all makes them different), and that squaring a nonzero difference always gives a strictly positive result.",
   },

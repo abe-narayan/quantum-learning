@@ -1,6 +1,7 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/building-qubit-circuits"
@@ -14,7 +15,7 @@ export const lessonMeta = {
   module: "building-qubit-circuits",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 30,
+  estimatedMinutes: 25,
   prerequisites: [
     "quantum-computing/qubits-and-quantum-states/global-and-relative-phase",
     "quantum-computing/qubits-and-quantum-states/quantum-gates",
@@ -27,23 +28,19 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Nine lessons have built, piece by piece, everything needed to describe a single qubit and everything that can happen to it. This lesson doesn't introduce anything new — it's where those pieces get used together.
+Nine lessons have built, piece by piece, everything needed to describe a single qubit and everything that can happen to it. This lesson introduces nothing new. It is where those pieces get used together.
 </LessonHook>
 
 ## Motivation
 
-Those nine lessons' pieces get used together here,
-analyzing sequences of gates the way you'll do constantly once circuits
-with many qubits enter the picture in the next course.
+Every piece from the last nine lessons gets used together here: analyzing
+sequences of gates, which is what you will spend most of your time doing
+once circuits with many qubits enter the picture in the next course.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="An IBM Quantum System One, showing the gold chandelier-like cryostat that houses and wires a superconducting quantum processor"
-  caption="Real quantum hardware running circuits like the ones in this lesson: an IBM Quantum System One. The gold cylinder is a dilution refrigerator; the wiring inside carries the microwave pulses that implement each gate in a sequence."
-  credit="Onri Jay Benally / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
-/>
+There is also a specific result to reach. Three gates, $H$ then $Z$ then
+$H$, combine into a fourth gate you already know, and the reason they do
+is the reason a small handful of gates turns out to be enough to build
+anything at all.
 
 ## Intuition
 
@@ -108,7 +105,7 @@ $$
 />
 
 The diagram above is drawn left to right in the order the gates are
-*applied* ($H$, then $Z$, then $H$), which is exactly why the operator
+*applied* ($H$, then $Z$, then $H$), which is why the operator
 product for this same circuit is written right to left as $HZH$: the
 leftmost box in the picture ($H$, applied first) ends up as the
 rightmost factor in the product, and the rightmost box ($H$, applied
@@ -116,26 +113,51 @@ last) ends up as the leftmost factor. Same three gates, same order of
 application, two different reading directions depending on whether
 you're looking at the picture or the algebra.
 
-This is an actual, checkable fact about these three matrices, not a
-coincidence of notation. Geometrically it says: a $\pi$ rotation about
-the diagonal $H$-axis, sandwiching a $\pi$ rotation about $z$, nets out to
-exactly a $\pi$ rotation about $x$. Composing rotations about different
-axes can produce a rotation about a third axis entirely, the same fact
-that (in the next course) makes it possible to build *any* gate from just
-a small, fixed set of "universal" ones.
+This is a checkable fact about these three matrices, not a coincidence of
+notation. Geometrically it says that a $\pi$ rotation about $z$, sandwiched
+between two $\pi$ rotations about the diagonal $H$-axis, nets out to a
+$\pi$ rotation about $x$. Composing rotations about different axes can
+produce a rotation about a third axis entirely, which is the fact that (in
+the next course) makes it possible to build *any* gate from a small, fixed
+set of "universal" ones.
+
+Watching the state accumulate makes the identity concrete in a different
+way from the matrix algebra. Step the circuit below one gate at a time and
+read the amplitude bars: $|0\rangle$ splits into an even superposition
+under $H$, the $Z$ leaves both bars at one half (it changed a sign, not a
+probability), and the second $H$ collects everything onto $|1\rangle$.
+
+<CircuitStateStepper
+  numQubits={1}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "Z", targets: [0] },
+    { gate: "H", targets: [0] },
+  ]}
+  ariaLabel="The one-qubit circuit H, Z, H stepped gate by gate from |0⟩, with amplitude-squared bars after each gate: |0⟩ certain, then 50/50 across |0⟩ and |1⟩, still 50/50 after Z, then |1⟩ certain."
+  markedIndex={1}
+/>
+
+The middle two steps are the interesting ones. After $H$ and after $ZH$ the
+bars are identical, because $Z$ only flipped the sign of the $|1\rangle$
+amplitude, and a sign is invisible to $|\cdot|^2$. Nothing observable
+happened at that step. Yet delete the $Z$ and the circuit ends on
+$|0\rangle$ instead of $|1\rangle$. A relative phase that no measurement
+could see at the time decided the final outcome once the last $H$ made the
+two amplitudes interfere. Every algorithm in this pillar works this way.
 
 ### Predicting outcomes through a circuit
 
 To find what a circuit does to a specific input, apply gates one at a
 time, right to left, tracking the state (or its Bloch coordinates) at
-each step, exactly like narrating a path across the sphere. For
+each step, the way you would narrate a path across the sphere. For
 $HZH|0\rangle$: first $H|0\rangle=|+\rangle$; then $Z|+\rangle=|-\rangle$
 (check: $Z$ flips the sign of the $|1\rangle$ coefficient, turning
 $\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$ into
 $\frac{1}{\sqrt2}(|0\rangle-|1\rangle)=|-\rangle$); then $H|-\rangle=|1\rangle$
 (the Quantum Gates lesson noted $H|1\rangle=|-\rangle$, and $H$ is its own
 inverse, so $H|-\rangle=|1\rangle$). Total: $|0\rangle \to |1\rangle$,
-exactly what $X|0\rangle$ gives directly, confirming $HZH=X$ a second way,
+what $X|0\rangle$ gives directly, confirming $HZH=X$ a second way,
 state by state instead of matrix by matrix.
 
 ## Physical Interpretation
@@ -149,7 +171,7 @@ measure."
 
 ## Interactive Experiment
 
-<InteractiveSection title="Reproduce HZH = X yourself" description="Reproduce HZH yourself: starting from |0⟩, apply H, then Z, then H. Confirm the state panel shows exactly |1⟩ (that is, α=0, β=1), matching the direct application of X to |0⟩, without resetting in between to compare. Then try predicting, on paper, the result of a different three-gate sequence of your choosing before running it.">
+<InteractiveSection title="Reproduce HZH = X yourself" description="Starting from |0⟩, apply H, then Z, then H. Confirm the state panel reads α=0, β=1, matching what X does to |0⟩ in a single step. Then predict, on paper, the result of a different three-gate sequence of your choosing before you run it.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -161,10 +183,9 @@ measured in the computational basis.**
 $H|1\rangle = |-\rangle = \frac{1}{\sqrt2}(|0\rangle-|1\rangle)$.
 $P(0)=\left|\frac{1}{\sqrt2}\right|^2=\frac12$,
 $P(1)=\left|{-\frac{1}{\sqrt2}}\right|^2=\frac12$: an even coin flip,
-despite starting from a completely definite state. (Compare: $H|+\rangle$
-gives $|0\rangle$ exactly, $P(0)=1$. The *same* gate can turn certainty
-into randomness or randomness into certainty, entirely depending on what
-it's applied to.)
+despite starting from a definite state. Compare $H|+\rangle$, which gives
+$|0\rangle$ with $P(0)=1$. The same gate turns certainty into randomness
+or randomness into certainty, depending only on what it is applied to.
 
 ## Common Mistakes
 
@@ -194,7 +215,7 @@ entirely, a good exercise). Order is meaningful.
    this course.
 5. Starting from $|+\rangle$, find a two-gate sequence (using only gates
    from this course) that returns the state to $|+\rangle$ but is not
-   simply "do nothing."
+   the identity in disguise.
 
 <PracticeLinks problems={practiceProblems} />
 

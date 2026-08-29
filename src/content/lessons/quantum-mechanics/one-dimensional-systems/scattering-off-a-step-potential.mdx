@@ -30,7 +30,7 @@ export const stepWaveFrames = stepWaveRatios.map((ratio) => ({
 export const lessonMeta = {
   title: "Scattering Off a Step Potential",
   description:
-    "A particle with more than enough energy to classically cross a step still partially reflects, quantum mechanically -- derived in closed form from plane-wave boundary matching, with probability conservation checked algebraically.",
+    "A particle with more than enough energy to classically cross a step still partially reflects, quantum mechanically. Derived in closed form from plane-wave boundary matching, with probability conservation checked algebraically.",
   course: "one-dimensional-systems",
   module: "scattering-off-a-step-potential",
   order: 1,
@@ -46,8 +46,8 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   Give a quantum particle more than enough energy to clear a step and it
-  still, some of the time, bounces back — a departure from classical
-  mechanics that never goes away, no matter how much energy it has.
+  still, some of the time, bounces back. No amount of extra energy
+  removes the effect; it only shrinks it.
 </LessonHook>
 
 ## Motivation
@@ -60,14 +60,11 @@ derives exactly how much, from nothing but plane waves and boundary
 matching, and this time the result is fully closed-form; no numerics
 needed.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/5/5a/First_STM.jpg"
-  alt="The first scanning tunneling microscope, built at IBM Zurich in 1981, an instrument whose atomic-resolution imaging depends on exactly this kind of wavefunction behavior at a potential discontinuity"
-  caption="The scanning tunneling microscope (IBM Zurich, 1981; Nobel Prize 1986) resolves individual atoms by exploiting how sharply a matter wave's behavior changes across a potential discontinuity -- the same boundary physics this lesson derives for a simple step."
-  credit="J Brew / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:First_STM.jpg"
-  license="CC BY-SA 2.0"
-/>
+The result is not a curiosity confined to textbook potentials. Wherever a
+material's conduction-band edge jumps at an interface, an electron
+crossing it meets a step of exactly this kind, and the reflection derived
+below is a standard ingredient in modelling carrier injection across a
+semiconductor heterojunction.
 
 ## Intuition
 
@@ -127,12 +124,48 @@ $$
   </DerivationStep>
 </DerivationSteps>
 
+### The probability current
+
+Amplitudes alone can't be converted straight into probabilities here,
+because the two sides of the step carry probability at different
+speeds. The right bookkeeping quantity is the **probability current**
+$j$, and it comes from asking how $|\psi|^2$ can change in time at all:
+
+<DerivationSteps>
+  <DerivationStep annotation="Differentiate the probability density and substitute the time-dependent Schrödinger equation for each factor. The V terms cancel because V is real.">
+    $$
+    \frac{\partial|\psi|^2}{\partial t} = \psi^*\frac{\partial\psi}{\partial t} + \psi\frac{\partial\psi^*}{\partial t} = \frac{i\hbar}{2m}\left(\psi^*\frac{\partial^2\psi}{\partial x^2} - \psi\frac{\partial^2\psi^*}{\partial x^2}\right)
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="The bracket is a total x-derivative, so the density obeys a continuity equation: probability drains out of a region only by flowing through its edges, at rate j.">
+    $$
+    \frac{\partial|\psi|^2}{\partial t} = -\frac{\partial j}{\partial x}, \qquad j \equiv \frac{\hbar}{m}\,\mathrm{Im}\!\left(\psi^*\frac{\partial\psi}{\partial x}\right)
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Evaluate j for a single plane wave ψ = Ae^(ikx): the derivative pulls down ik, and Im(ik|A|²) = k|A|². Flux is amplitude-squared times speed, with ħk/m playing the role of velocity.">
+    $$
+    j = \frac{\hbar k}{m}|A|^2
+    $$
+  </DerivationStep>
+</DerivationSteps>
+
 ### Reflection and transmission probabilities
 
-The reflection probability is simply $R=|r|^2$. The transmission
-probability needs an extra factor of $k_2/k_1$, accounting for the
-different *probability flux*: a wave with smaller wavenumber carries
-probability more slowly, so equal amplitude doesn't mean equal flux.
+Now apply that plane-wave result to the three waves in the problem. The
+incident wave (amplitude 1) carries $j_{\text{inc}}=\hbar k_1/m$, the
+reflected wave carries $|j_{\text{ref}}|=\hbar k_1|r|^2/m$ back toward
+the source, and the transmitted wave carries
+$j_{\text{tr}}=\hbar k_2|t|^2/m$. Reflection and transmission
+probabilities are ratios of currents, not of amplitudes:
+
+$$
+R = \frac{|j_{\text{ref}}|}{j_{\text{inc}}} = |r|^2, \qquad T = \frac{j_{\text{tr}}}{j_{\text{inc}}} = \frac{k_2}{k_1}|t|^2
+$$
+
+The factor $k_2/k_1$ is not a convention. The transmitted wave moves
+slower ($k_2<k_1$), so equal amplitude-squared would carry less
+probability per unit time, and the current ratio corrects for it.
+Substituting $r$ and $t$ from the boundary matching:
 
 $$
 R = \left(\frac{k_1-k_2}{k_1+k_2}\right)^{\!2}, \qquad T = \frac{k_2}{k_1}|t|^2 = \frac{4k_1k_2}{(k_1+k_2)^2}
@@ -146,7 +179,7 @@ R+T = \frac{(k_1-k_2)^2+4k_1k_2}{(k_1+k_2)^2} = \frac{k_1^2+2k_1k_2+k_2^2}{(k_1+
 $$
 
 using $(k_1-k_2)^2+4k_1k_2=k_1^2-2k_1k_2+k_2^2+4k_1k_2=k_1^2+2k_1k_2+k_2^2=(k_1+k_2)^2$,
-a genuine algebraic identity, not an assumption.
+an algebraic identity, not an assumption.
 
 Plotted against the energy ratio $E/V_0$, the shape of this falloff is
 worth seeing directly:
@@ -160,7 +193,7 @@ worth seeing directly:
     { label: "R starts increasing again once E is large enough", value: "increases" },
   ]}
   correctValue="asymptotic"
-  explanation="R = [(k1−k2)/(k1+k2)]² is zero only when k1 = k2, which requires V0 = 0 (no step at all). For any actual step, k1 ≠ k2 at every finite energy, so R stays strictly positive — it just gets small as E/V0 grows, since k2 → k1 in that limit. The curve below shows exactly this: it approaches the axis but never touches it."
+  explanation="R = [(k1−k2)/(k1+k2)]² is zero only when k1 = k2, which requires V0 = 0 (no step at all). For any actual step, k1 ≠ k2 at every finite energy, so R stays strictly positive. It just gets small as E/V0 grows, since k2 → k1 in that limit. The curve below shows this directly: it approaches the axis but never touches it."
 />
 
 <ParametricCurve
@@ -183,10 +216,9 @@ worth seeing directly:
   ariaLabel="Reflection probability R versus energy ratio E over V0 for a fixed step height, showing R falling toward but never reaching zero"
 />
 
-$R$ drops fast as $E/V_0$ grows past 1, but the curve only approaches
-the axis asymptotically. It never actually touches $R=0$ at any finite
-energy, the visual form of the $R>0$ claim the next section makes
-explicit.
+$R$ drops fast as $E/V_0$ grows past 1, but the curve only approaches the
+axis asymptotically. It never touches $R=0$ at any finite energy, which
+is the $R>0$ claim of the next section drawn rather than argued.
 
 That curve is the *aggregate* reflection probability; the actual
 mechanism producing it is a standing-wave ripple in $|\psi(x)|^2$ for
@@ -208,11 +240,12 @@ $|t|^2\to1$ line, the spatial picture of $R\to0$ only asymptotically.
 
 $R=0$ only in the trivial case $k_1=k_2$ (no step at all, $V_0=0$).
 Otherwise $R>0$ always: however small the step, however large the
-particle's energy above it, *some* reflection survives. This is exactly
+particle's energy above it, *some* reflection survives. This is directly
 analogous to a light wave partially reflecting at any interface between
 media with different refractive indices, however similar those indices
-are. It's the same physics, a wave equation with a discontinuous
-coefficient, producing the same qualitative behavior.
+are. The underlying situation is identical in both cases: a wave equation
+whose coefficient jumps discontinuously, and a wave that cannot cross the
+jump without leaving part of itself behind.
 
 ## Worked Example
 
@@ -231,9 +264,9 @@ T = 1-R \approx 0.98387
 $$
 
 So even with the particle's energy $2.5\times$ the step height, about
-$1.6\%$ of an incident beam still reflects: small, but never zero, and
-exactly what this platform's `stepPotentialScattering` function computes
-and its test suite confirms sums to exactly 1 with $R$.
+$1.6\%$ of an incident beam still reflects: small, but never zero. The
+engine's `stepPotentialScattering` function computes these same
+numbers, and its test suite confirms $R+T=1$.
 
 ## Common Mistakes
 
@@ -256,8 +289,8 @@ a small-energy artifact that a fast enough particle escapes.
 2. Show that $R\to0$ as $V_0\to0$ directly from the boxed formula (not by
    re-deriving from scratch).
 3. Explain briefly why $t=2k_1/(k_1+k_2)$ can be *greater* than 1
-   (amplitude, not probability) without violating anything: what
-   physical quantity is actually guaranteed to be $\le1$?
+   (amplitude, not probability) without violating anything. Which
+   physical quantity is the one guaranteed to be $\le1$?
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -268,18 +301,20 @@ a small-energy artifact that a fast enough particle escapes.
 - $R=r^2$ and $T=(k_2/k_1)t^2$ satisfy $R+T=1$ exactly, an algebraic
   identity.
 - Quantum particles partially reflect off *any* potential step, however
-  much energy they have above it: a genuine, persistent departure from
-  classical mechanics.
+  much energy they have above it. The effect shrinks with energy but
+  never vanishes.
 
 ## Further Exploration
 
 <ChallengePrompt prompt="Physical Interpretation showed R→0 only asymptotically as E/V0→∞. What happens to R in the OPPOSITE limit, as E approaches V0 from above (just barely enough energy to classically cross)?">
   Take $k_2=\sqrt{2(E-V_0)}$ to zero in the boxed $R$ formula, with $k_1$
-  staying fixed at $\sqrt{2V_0}$ — no new derivation needed, just the limit.
+  fixed at $\sqrt{2V_0}$. No new derivation is needed, only the limit.
 </ChallengePrompt>
 
 <NextDiscovery>
   [Resonant Transmission Through a Barrier](/lessons/quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier) extends this
-  two-region result to a full barrier, with a striking consequence:
-  special energies where a barrier becomes perfectly, exactly transparent.
+  two-region result to a full barrier, where the two interfaces interfere
+  with each other and produce something a single step cannot: energies at
+  which the barrier becomes perfectly transparent, transmitting every
+  incident particle.
 </NextDiscovery>

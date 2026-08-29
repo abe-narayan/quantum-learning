@@ -23,6 +23,11 @@ export const expectationValueCalculation: NumericProblem = {
     value: 0.2,
     tolerance: 0.01,
     incorrectFeedback: "For a diagonal Hermitian operator, ⟨ψ|Z|ψ⟩ = |α|²·(top eigenvalue) + |β|²·(bottom eigenvalue) — weight each eigenvalue by the corresponding probability.",
+    nearMisses: [
+      { value: Math.sqrt(0.6) - Math.sqrt(0.4), tolerance: 0.01, feedback: "That weights the eigenvalues by the amplitudes rather than the probabilities. Square each entry before weighting." },
+      { value: 1, feedback: "1 would require all the weight on the +1 eigenvalue. Here 0.4 of it sits on −1, which pulls the average down." },
+      { value: 0, feedback: "0 is the unweighted average of +1 and −1. The two outcomes are not equally likely: 0.6 against 0.4." },
+    ],
   },
   hints: [
     { text: "Since Z is diagonal, ⟨ψ|Z|ψ⟩ = |α|²(+1) + |β|²(-1) where |ψ⟩=(α,β)." },

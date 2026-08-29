@@ -7,7 +7,15 @@ import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { getPillar } from "@/lib/content/curriculum";
 import { pillarVisual } from "@/lib/design/pillars";
 import { type ConceptNode, type SimulatorId } from "@/lib/content/concepts";
-import { getEntriesForLesson, type CurrentQuantumEntry } from "@/lib/content/currentQuantum/registry";
+// Meta-only, deliberately: this panel renders a date, a category chip and a
+// title, and nothing else from an entry. `registry.ts`/`data.ts` carry the
+// summary prose, citations and image metadata for the full cards, and are
+// server-only — importing them here would ship the whole collection into the
+// concept map's client chunk. See `metaRegistry.ts`'s header.
+import {
+  getCurrentQuantumMetaForLesson,
+  type CurrentQuantumEntryMeta,
+} from "@/lib/content/currentQuantum/metaRegistry";
 import { formatEntryDate } from "@/components/currentQuantum/dateUtils";
 import type { Difficulty } from "@/lib/content/types";
 
@@ -66,10 +74,10 @@ export function ConceptDetailPanel({
   // `node` (and therefore `node.lessonSlugs`) is a referentially stable
   // object per concept (see ConceptMapExplorer.tsx's memoized `graph`), so
   // this only recomputes when the selected concept actually changes.
-  const relatedCurrentQuantumEntries: CurrentQuantumEntry[] = useMemo(() => {
-    const seen = new Map<string, CurrentQuantumEntry>();
+  const relatedCurrentQuantumEntries: CurrentQuantumEntryMeta[] = useMemo(() => {
+    const seen = new Map<string, CurrentQuantumEntryMeta>();
     for (const slug of node.lessonSlugs) {
-      for (const entry of getEntriesForLesson(slug)) {
+      for (const entry of getCurrentQuantumMetaForLesson(slug)) {
         if (!seen.has(entry.slug)) seen.set(entry.slug, entry);
       }
     }
@@ -82,11 +90,23 @@ export function ConceptDetailPanel({
     <div data-pillar={node.pillar} className="flex h-full flex-col overflow-y-auto p-5">
       <div className="flex items-start justify-between gap-3">
         <span className="flex flex-wrap items-center gap-2.5">
-          <span
-            aria-label={pillarInfo?.title ?? node.pillar}
-            className="inline-flex items-center gap-1.5 rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-pillar-text"
-          >
-            {visual.short}
+          {/* The pillar badge shows the short label ("Computing") because the
+              chip is 2.5rem of chrome next to a difficulty mark, but the
+              accessible name has to be the pillar's real title ("Quantum
+              Computing") — and an `aria-label` on this `<span>` could never
+              deliver it. No `role` means the implicit `generic` role, which
+              ARIA prohibits naming, so the attribute was dropped by every
+              major screen reader and the full pillar name simply never
+              reached the reader; all they heard was the abbreviation, with
+              nothing saying it was a pillar at all. Swapping the two — the
+              visible short form `aria-hidden`, the full title as real
+              `sr-only` text — puts the intended name in the tree without
+              changing a pixel, and without the double announcement
+              ("Computing, Quantum Computing") that leaving both visible to AT
+              would produce. */}
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-pillar-text">
+            <span aria-hidden="true">{visual.short}</span>
+            <span className="sr-only">{pillarInfo?.title ?? node.pillar} pillar</span>
           </span>
           {difficulty ? <DifficultyMark difficulty={difficulty} /> : null}
         </span>
@@ -116,7 +136,7 @@ export function ConceptDetailPanel({
             same `id`, so this link is never a guess or a fabricated route. */}
         <Link
           href={`/glossary#${node.id}`}
-          className="inline-flex min-h-11 items-center text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar-accent"
+          className="inline-flex min-h-11 items-center text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar"
         >
           Full glossary entry →
         </Link>
@@ -134,7 +154,7 @@ export function ConceptDetailPanel({
               <li key={lesson.slug}>
                 <Link
                   href={`/lessons/${lesson.slug}`}
-                  className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-[--radius-tight] border border-border bg-surface-muted/40 px-3 py-2 text-sm text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-pillar-wash"
+                  className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-(--radius-tight) border border-border bg-surface-muted/40 px-3 py-2 text-sm text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-pillar-wash"
                 >
                   <span className="min-w-0">{lesson.title}</span>
                   <span aria-hidden="true" className="shrink-0 text-pillar-text opacity-60 transition-opacity group-hover:opacity-100">
@@ -164,7 +184,7 @@ export function ConceptDetailPanel({
               <li key={entry.slug}>
                 <Link
                   href={`/current-quantum#${entry.slug}`}
-                  className="block rounded-[--radius-tight] border border-border bg-surface-muted/50 p-3 transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-surface-muted"
+                  className="block rounded-(--radius-tight) border border-border bg-surface-muted/50 p-3 transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-surface-muted"
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="tech-label text-[0.65rem]">{formatEntryDate(entry.date)}</span>
@@ -199,7 +219,7 @@ export function ConceptDetailPanel({
                   <button
                     type="button"
                     onClick={() => onSelectConcept(prereq.id)}
-                    className="group flex min-h-11 w-full items-center gap-3 rounded-[--radius-tight] border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-pillar-wash"
+                    className="group flex min-h-11 w-full items-center gap-3 rounded-(--radius-tight) border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-pillar-wash"
                   >
                     <span
                       aria-hidden="true"
@@ -239,7 +259,7 @@ export function ConceptDetailPanel({
                   <button
                     type="button"
                     onClick={() => onSelectConcept(dependent.id)}
-                    className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-[--radius-tight] border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-pillar-wash"
+                    className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-(--radius-tight) border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-pillar-wash"
                   >
                     <span className="min-w-0 truncate">{dependent.title}</span>
                     <span className="flex shrink-0 items-center gap-2.5">

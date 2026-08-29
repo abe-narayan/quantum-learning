@@ -21,7 +21,11 @@ export const coherenceDecayRateHalfPopulation: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["anticommutator", "1/2", "half", "sigma_minus dagger sigma_minus"],
+      {
+        phrases: ["anticommutator", "1/2", "half", "sigma_minus dagger sigma_minus", "prefactor", "one of the two terms", "only one term"],
+        missingFeedback:
+          "You have located the coherence in the off-diagonal entry. The factor of 1/2 still needs its source: of the two terms in the anticommutator, only ρ|1⟩⟨1| reaches the (0,1) slot, so the entry picks up ρ₀₁ rather than 2ρ₀₁, and the Lindblad equation's own −1/2 prefactor is then what survives.",
+      },
       ["off-diagonal", "rho_01", "coherence"],
     ],
     incorrectFeedback:

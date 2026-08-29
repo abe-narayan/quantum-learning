@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { getAllProblems, getProblem, getProblemsForLesson } from "../registry";
+import { getAllProblems, getCourseCheckpointProblems, getProblem, getProblemsForLesson } from "../registry";
+import { PROBLEMS } from "../registry.generated";
+import { conceptGroupPhrases, PROBLEM_DIFFICULTY_RANK } from "../types";
 import { getCourse } from "@/lib/content/curriculum";
 import { LESSON_METAS } from "@/lib/content/lessonMeta.generated";
 import { StateVector } from "@/lib/quantum/state";
@@ -79,6 +81,168 @@ describe("problem registry integrity", () => {
       expect(problem.meta.lesson).toBe(lesson);
     }
   });
+
+  it("getProblemsForLesson ramps monotonically by difficulty, stably within a rung, for every lesson", () => {
+    const lessons = new Set(
+      problems.map((p) => p.meta.lesson).filter((l): l is string => Boolean(l))
+    );
+    for (const lesson of lessons) {
+      const list = getProblemsForLesson(lesson);
+
+      // Monotone: never a harder problem before an easier one.
+      for (let i = 1; i < list.length; i++) {
+        const prev = PROBLEM_DIFFICULTY_RANK[list[i - 1].meta.difficulty];
+        const next = PROBLEM_DIFFICULTY_RANK[list[i].meta.difficulty];
+        expect(next, `${lesson}: ${list[i].meta.slug} ramps down after ${list[i - 1].meta.slug}`).toBeGreaterThanOrEqual(prev);
+      }
+
+      // Stable: equal-difficulty problems keep their PROBLEMS relative order.
+      const registryIndex = new Map(PROBLEMS.map((p, i) => [p.meta.slug, i]));
+      for (let i = 1; i < list.length; i++) {
+        if (list[i - 1].meta.difficulty === list[i].meta.difficulty) {
+          expect(registryIndex.get(list[i - 1].meta.slug)!).toBeLessThan(registryIndex.get(list[i].meta.slug)!);
+        }
+      }
+    }
+  });
+
+  it("getCourseCheckpointProblems still samples over unsorted course order (not the difficulty sort)", () => {
+    // The checkpoint's even spacing deliberately runs over content-path
+    // order so the sample spans the course's material (see the function's
+    // doc comment) — and so returning students keep seeing the same five
+    // problems. This pins that the per-lesson difficulty sort did not
+    // leak into the sampling.
+    const courses = new Set(problems.map((p) => p.meta.course));
+    for (const course of courses) {
+      const courseProblems = PROBLEMS.filter((p) => p.meta.course === course);
+      const count = 5;
+      const step = courseProblems.length / count;
+      const expected =
+        courseProblems.length <= count
+          ? courseProblems
+          : Array.from({ length: count }, (_, i) => courseProblems[Math.floor(i * step)]);
+      expect(getCourseCheckpointProblems(course).map((p) => p.meta.slug)).toEqual(
+        expected.map((p) => p.meta.slug)
+      );
+    }
+  });
+});
+
+/**
+ * ============================================================
+ * Multiple-choice integrity
+ * ============================================================
+ * The whole multiple-choice pipeline addresses options by `id`:
+ * `validateMultipleChoice` grades by id, `optionFeedback` is keyed by id, the
+ * object form of a `whyWrong` entry points at one by id, and the display
+ * letters are a seeded shuffle keyed on nothing but the slug. That indirection
+ * is what makes shuffling the options safe — but it also means every one of
+ * those references is an unchecked string. A typo'd id does not throw and does
+ * not render wrong; it silently degrades:
+ *
+ *   - a bad `correctOptionId` makes a problem *unanswerable* (every choice
+ *     grades incorrect, and no student can tell why),
+ *   - a bad `optionFeedback` key silently downgrades targeted feedback to the
+ *     generic fallback,
+ *   - a bad `whyWrong.optionId` drops the option-letter chip in the solution.
+ *
+ * None of that is visible in review, and the last two are invisible at
+ * runtime too. These checks are the only thing standing between an authoring
+ * typo and a broken problem, so they run over the whole corpus.
+ */
+describe("multiple-choice problems — every id-keyed reference resolves", () => {
+  const multipleChoice = getAllProblems().filter(
+    (problem): problem is Extract<typeof problem, { question: { type: "multiple-choice" } }> =>
+      problem.question.type === "multiple-choice"
+  );
+
+  it("finds multiple-choice problems in the corpus", () => {
+    expect(multipleChoice.length).toBeGreaterThan(50);
+  });
+
+  it("gives every problem at least two distinct, non-empty option ids", () => {
+    for (const problem of multipleChoice) {
+      const ids = problem.question.options.map((option) => option.id);
+      // A one-option "choice" is not a question, and duplicate ids make
+      // grading ambiguous — `.find` would silently pick the first.
+      expect(ids.length, problem.meta.slug).toBeGreaterThan(1);
+      expect(new Set(ids).size, `${problem.meta.slug} has duplicate option ids`).toBe(ids.length);
+      for (const option of problem.question.options) {
+        expect(option.id.length, problem.meta.slug).toBeGreaterThan(0);
+        expect(option.text.trim().length, `${problem.meta.slug} option "${option.id}"`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("points correctOptionId at a real option in every problem", () => {
+    for (const problem of multipleChoice) {
+      if (problem.answer.type !== "multiple-choice") continue;
+      const ids = new Set(problem.question.options.map((option) => option.id));
+      expect(
+        ids.has(problem.answer.correctOptionId),
+        `${problem.meta.slug}: correctOptionId "${problem.answer.correctOptionId}" is not one of [${[...ids].join(", ")}] — this problem cannot be answered correctly`
+      ).toBe(true);
+    }
+  });
+
+  it("keys optionFeedback only by real, incorrect option ids", () => {
+    for (const problem of multipleChoice) {
+      if (problem.answer.type !== "multiple-choice") continue;
+      const ids = new Set(problem.question.options.map((option) => option.id));
+      for (const key of Object.keys(problem.answer.optionFeedback ?? {})) {
+        expect(ids.has(key), `${problem.meta.slug}: optionFeedback key "${key}" is not a real option id`).toBe(true);
+        // Feedback on the *correct* option is unreachable: `validateMultipleChoice`
+        // returns "Correct." before it ever consults the map. Authoring it means
+        // the author expected a message the student can never see.
+        expect(
+          key,
+          `${problem.meta.slug}: optionFeedback is keyed on the correct option "${key}", which is unreachable`
+        ).not.toBe(problem.answer.correctOptionId);
+      }
+    }
+  });
+
+  it("gives every problem a non-empty defaultIncorrectFeedback to fall back to", () => {
+    for (const problem of multipleChoice) {
+      if (problem.answer.type !== "multiple-choice") continue;
+      // Reached whenever a wrong option has no targeted feedback — i.e. for
+      // most wrong answers in most problems.
+      expect(problem.answer.defaultIncorrectFeedback.trim().length, problem.meta.slug).toBeGreaterThan(0);
+    }
+  });
+});
+
+/**
+ * The object form of `whyWrong` (see `WhyWrongEntry` in ../types.ts) is what
+ * lets a solution say "Option B confuses the two registers" correctly even
+ * though B is assigned by a per-slug shuffle. Its one failure mode is an
+ * `optionId` that does not resolve: `SolutionPanel` then drops the letter chip
+ * and renders the text alone — deliberately, because a blank chip is worse,
+ * but it means the mistake leaves no trace on the page. Checked here for every
+ * problem, including non-multiple-choice ones, where an option reference is
+ * meaningless by construction.
+ */
+describe("whyWrong option references resolve to real options", () => {
+  it("names a real option id in every object-form entry", () => {
+    for (const problem of getAllProblems()) {
+      const entries = problem.explanation?.whyWrong ?? [];
+      const ids = new Set(
+        problem.question.type === "multiple-choice" ? problem.question.options.map((option) => option.id) : []
+      );
+      for (const entry of entries) {
+        if (typeof entry === "string") continue;
+        expect(entry.text.trim().length, `${problem.meta.slug}: an object-form whyWrong entry has no text`).toBeGreaterThan(0);
+        expect(
+          ids.has(entry.optionId),
+          `${problem.meta.slug}: whyWrong names option "${entry.optionId}", which ${
+            ids.size === 0
+              ? "cannot exist — this is not a multiple-choice problem, so use the plain string form"
+              : `is not one of [${[...ids].join(", ")}]`
+          }`
+        ).toBe(true);
+      }
+    }
+  });
 });
 
 describe("demonstration problems — expected answers match the real quantum engine", () => {
@@ -130,7 +294,7 @@ describe("demonstration problems — expected answers match the real quantum eng
     if (problem?.answer.type !== "conceptual") throw new Error("expected a conceptual problem");
 
     for (const group of problem.answer.requiredConceptGroups) {
-      expect(group.length).toBeGreaterThan(0);
+      expect(conceptGroupPhrases(group).length).toBeGreaterThan(0);
     }
   });
 });

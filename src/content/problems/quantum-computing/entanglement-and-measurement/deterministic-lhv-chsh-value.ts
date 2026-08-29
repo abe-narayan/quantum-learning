@@ -32,6 +32,11 @@ export const deterministicLhvChshValue: NumericProblem = {
     value: S,
     tolerance: 0.01,
     incorrectFeedback: "Compute each of the four E terms first (each is just a product of two fixed ±1 outcomes), then combine with the CHSH signs.",
+    nearMisses: [
+      { value: 4, feedback: "4 adds the four correlators' magnitudes and drops their signs. Two of them are −1 here, and once those signs are carried through the combination the total is capped at 2." },
+      { value: 0, feedback: "0 comes from adding all four terms. CHSH subtracts the last one, and subtracting E(a',b') = −1 adds 1 rather than removing it." },
+      { value: 2 * Math.SQRT2, tolerance: 0.05, feedback: "2√2 is the Tsirelson bound, the quantum maximum. A deterministic local model cannot reach it; work the four fixed ±1 products through instead." },
+    ],
   },
   hints: [
     { text: "E(a,b) = A(a)·B(b) = (+1)(+1) = 1." },

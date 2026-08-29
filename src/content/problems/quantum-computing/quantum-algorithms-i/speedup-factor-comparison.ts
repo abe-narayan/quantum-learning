@@ -26,6 +26,11 @@ export const speedupFactorComparison: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "Compute 2^15 + 1 directly.",
+    nearMisses: [
+      { value: 2 ** (n - 1), feedback: "2^15 is the number of inputs that can still leave the answer ambiguous. One more query is needed to settle it, hence the +1." },
+      { value: 2 ** n, feedback: "2^16 is the full input count. The classical worst case only needs to check just over half of them, 2^(n-1) + 1." },
+      { value: 2 ** n + 1, feedback: "The exponent is n−1, not n: the ambiguity is resolved once you have seen one more than half the inputs." },
+    ],
   },
   hints: [
     { text: "The formula is 2^(n-1)+1 with n=16." },

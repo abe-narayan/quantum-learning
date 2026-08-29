@@ -35,28 +35,33 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="A number on the other side of the wall">
-The last lesson proved no local hidden-variable model can push S past 2. A real entangled qubit pair, measured at the right angles, reaches 2√2 — a value classical correlation has no way to produce.
+The last lesson proved no local hidden-variable model can push S past 2. An entangled qubit pair, measured at the right angles, reaches 2√2. Classical correlation has no way to produce that number.
 </LessonHook>
 
 ## Motivation
 
-The last lesson proved $|S|\leq2$ for *every* local hidden-variable
-model: a hard mathematical wall. This lesson computes what quantum
-mechanics actually predicts for a specific entangled state and specific
-measurement choices, using the density-matrix machinery this course has
-built, and finds a number on the other side of that wall.
+The last lesson proved $|S|\leq2$ for *every* local hidden-variable model.
+That is a wall, not an estimate, and it holds no matter how baroque the
+hidden variables are.
+
+This lesson computes what quantum mechanics predicts for one specific
+entangled state at one specific set of measurement angles, using the
+density-matrix machinery this course has built. The answer lands on the
+other side of the wall, by a margin large enough to survive real
+experimental error, which is why the argument became an experiment rather
+than staying a philosophical dispute.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Alain-Aspect-ForMemRS.jpg"
   alt="Portrait photograph of physicist Alain Aspect, a Foreign Member of the Royal Society recognized for his pioneering Bell-inequality experiments with entangled photons"
-  caption="Alain Aspect, whose 1982 experiments were among the first real laboratory tests of exactly this kind of inequality — repeated many times since, closing progressively more loopholes, and confirming the S=2√2 quantum violation this lesson derives by hand."
+  caption="Alain Aspect, photographed for the Royal Society on his election as a Foreign Member."
   credit="The Royal Society"
   creditUrl="https://commons.wikimedia.org/wiki/File:Alain-Aspect-ForMemRS.jpg"
   license="CC BY-SA 4.0"
 />
 
 <HistoricalMoment date="1982">
-Alain Aspect's experiments are among the first real laboratory tests of this kind of inequality — repeated many times since, closing progressively more loopholes, and confirming the S=2√2 quantum violation this lesson derives by hand.
+Alain Aspect's experiments are among the first real laboratory tests of this kind of inequality. Repeated many times since, with progressively more loopholes closed, the tests keep confirming the S=2√2 quantum violation this lesson derives by hand.
 </HistoricalMoment>
 
 ## Mathematical Development
@@ -74,11 +79,11 @@ $$
 E(a,b) = \langle M_a\otimes M_b\rangle = \text{Tr}\big[\rho\,(M_a\otimes M_b)\big]
 $$
 
-This is exactly Lesson 9's generalized Born-rule expectation-value
+This is Lesson 9's generalized Born-rule expectation-value
 formula, applied to the two-outcome product observable $M_a\otimes M_b$,
 the same quantity a local hidden-variable model calls
 $E(a,b)=\int A(a,\lambda)B(b,\lambda)p(\lambda)\,d\lambda$ (both are
-"the average of the product of two $\pm1$ outcomes"), which is exactly
+"the average of the product of two $\pm1$ outcomes"), which is
 why the two theories' predictions for $S$ can be directly compared.
 `correlationExpectation` implements $\text{Tr}[\rho(M_a\otimes M_b)]$
 directly.
@@ -128,14 +133,14 @@ $$
 
 $2\sqrt2>2$: **the CHSH inequality is violated**, by an entangled
 quantum state, at this specific and fully specified measurement
-configuration. `chshValue` computes exactly this and returns
+configuration. `chshValue` computes this and returns
 $2.8284271247461903$ for $|\Phi^+\rangle$ at these angles, matching
 $2\sqrt2$ to floating-point precision, and additionally confirmed (by a
 fine-grained numerical search over $\theta_b,\theta_{b'}$ with
 $\theta_a,\theta_{a'}$ held fixed) to be the true maximum reachable by
 *any* choice of $B,B'$ for this state, not merely a locally good guess.
 
-<InteractiveSection title="Run the experiment yourself" description="Four sliders, one live |Φ+⟩ pair, and the real chshValue engine computing S on every drag — nothing here is precomputed. First, set a=0°, a′=90°, b=45°, b′=−45° (the 'quantum-optimal' preset lands on exactly this) and confirm the gauge reads S=2.8284, matching the by-hand derivation above. Then swap Bob's two angles to b=−45°, b′=45° — the same physical settings, just relabeled — and confirm S collapses to 0, reproducing the Worked Example below. Finally, drag freely through the rest of the angle space: no combination ever pushes the gauge past the 2√2 mark on either side, exactly what Tsirelson's bound predicts.">
+<InteractiveSection title="Run the experiment yourself" description="Four sliders, one live |Φ+⟩ pair, and the real chshValue engine computing S on every drag; nothing here is precomputed. First, set a=0°, a′=90°, b=45°, b′=−45° (the 'quantum-optimal' preset lands on this) and confirm the gauge reads S=2.8284, matching the by-hand derivation above. Then swap Bob's two angles to b=−45°, b′=45° (the same physical settings, just relabeled) and confirm S collapses to 0, reproducing the Worked Example below. Finally, drag freely through the rest of the angle space: no combination ever pushes the gauge past the 2√2 mark on either side, just as Tsirelson's bound predicts.">
   <LazyCHSHBellTestExplorer />
 </InteractiveSection>
 
@@ -158,18 +163,18 @@ model, $\rho(\eta)=(1-\eta)\,\rho_{\Phi^+}+\eta\,(I/4)$) and recompute
 $S$ at the same fixed angles as $\eta$ (noise) increases. Before reading
 the numbers off, use the exact value already derived above,
 $S=2\sqrt2\approx2.828$ at $\eta=0$, to predict how much noise that
-margin over the classical bound of 2 can actually absorb.
+margin over the classical bound of 2 can absorb.
 
 <PredictBeforeReveal
-  question="At η=0.3 — thirty percent of the state replaced by the maximally mixed state — does the S=2√2 violation survive, or has it already given out?"
+  question="At η=0.3, with thirty percent of the state replaced by the maximally mixed state, does the S=2√2 violation survive, or has it already given out?"
   options={[
     { label: "Still comfortably above 2", value: "above" },
     { label: "Still above 2, but only barely", value: "barely" },
     { label: "Exactly 2, right at the boundary", value: "boundary" },
-    { label: "Already below 2 — no violation left", value: "below" },
+    { label: "Already below 2, with no violation left", value: "below" },
   ]}
   correctValue="below"
-  explanation="S=1.980 at η=0.3, per the table below — already under the classical bound of 2, not just close to it. The actual crossing happens earlier, somewhere between η=0.2 (S=2.263) and η=0.3, so by η=0.3 the violation is already gone, not merely weakened. The 2.828 margin at η=0 looks generous, but it erodes fast: roughly a third of it is gone by η=0.1 alone. The ParametricCurve further down confirms this isn't an artifact of the five sampled points — at the standard angles, S decays smoothly through exactly this window."
+  explanation="S=1.980 at η=0.3, per the table below: under the classical bound, not merely close to it. The crossing happens earlier, between η=0.2 (S=2.263) and η=0.3. The 2.828 margin at η=0 looks generous but erodes fast, losing roughly a third of its excess over 2 by η=0.1 alone. This is why Bell tests are hard experiments: the signal you are hunting is fragile against exactly the noise real apparatus produces."
 />
 
 | $\eta$ | $S$ |
@@ -185,7 +190,7 @@ somewhere between $\eta=0.2$ and $\eta=0.3$; past that point, this
 particular experiment can no longer rule out a local hidden-variable
 explanation, even though the state is still entangled for a wide range
 of $\eta$ beyond that point (mixing in noise reduces both <Term id="von-neumann-entropy-purity">purity</Term> and the
-*strength* of the correlation that can be extracted from it, exactly the
+*strength* of the correlation that can be extracted from it, the very
 kind of quantitative connection this course's entropy and concurrence
 lessons were building toward). All five values above are computed
 directly from `chshValue` and `convexCombination`, not estimated.
@@ -214,7 +219,7 @@ setting, is worth seeing continuously:
 />
 
 At the standard angles, $S$ starts at $2\sqrt2$ and decays smoothly,
-crossing the classical bound between $\eta=0.2$ and $0.3$, exactly the
+crossing the classical bound between $\eta=0.2$ and $0.3$, the same
 table above. Switch to the swapped-Bob configuration and the curve is
 flat at 0 for every $\eta$: a bad choice of angles can't be rescued by
 adding more or less noise, because it never violated the bound in the
@@ -224,13 +229,15 @@ first place.
 
 A CHSH violation, observed in a real laboratory (this has been done,
 repeatedly, closing progressively more loopholes over decades), rules
-out *every* local hidden-variable explanation simultaneously: not by
-refuting one specific classical model, but by exceeding a bound that
-Lesson 10 proved holds for the entire category. This is the precise,
-falsifiable, and already-tested sense in which entanglement is not
-classical correlation with unknown extra detail. It's a strictly
-stronger kind of correlation, quantitatively bounded away from anything
-locality permits.
+out *every* local hidden-variable explanation at once. Not by refuting one
+particular classical model, but by exceeding a bound the last lesson
+proved holds for the whole category, including models nobody has thought
+of yet.
+
+This is the falsifiable, already-tested sense in which entanglement is not
+classical correlation with some extra detail hidden inside it. It is a
+stronger kind of correlation, bounded away by a measurable margin from
+anything locality permits.
 
 ## Worked Example
 
@@ -243,11 +250,12 @@ S = \cos(0-(-\tfrac\pi4)) + \cos(0-\tfrac\pi4) + \cos(\tfrac\pi2-(-\tfrac\pi4)) 
 = \cos\tfrac\pi4+\cos\tfrac\pi4+\cos\tfrac{3\pi}4-\cos\tfrac\pi4
 $$
 
-$=\cos(\pi/4)+\cos(3\pi/4) = \frac{\sqrt2}2-\frac{\sqrt2}2=0$. Simply
-swapping which angle is called $b$ versus $b'$ changes which correlations
-get a $+$ and which get a $-$ in $S$'s definition: the *maximum*
-achievable violation depends on getting this assignment right, not just
-on using the same four physical measurement angles.
+$=\cos(\pi/4)+\cos(3\pi/4) = \frac{\sqrt2}2-\frac{\sqrt2}2=0$. Swapping
+which angle is called $b$ versus $b'$ changes which correlations get a $+$
+and which get a $-$ in $S$'s definition. The four physical measurement
+angles are the same as before; the violation is gone entirely. Which
+angle plays which role in the expression is part of the experiment, not a
+labelling convention.
 
 ## Common Mistakes
 

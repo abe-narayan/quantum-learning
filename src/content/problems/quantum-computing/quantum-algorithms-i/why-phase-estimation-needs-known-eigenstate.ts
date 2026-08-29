@@ -20,28 +20,28 @@ export const whyPhaseEstimationNeedsKnownEigenstate: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["eigenvalue", "e^{2\\pi i", "single phase", "phase to pull out"],
-      ["superposition of eigenstates", "mixture of phases", "not a single phase", "multiple eigenvalues"],
+      ["eigenvalue", "eigenphase", "single phase", "one phase", "single number", "phase to pull out", "factors out", "factor out", "e^{2", "e^(2"],
+      ["superposition of eigenstates", "superposition of several", "several eigenstates", "multiple eigenstates", "combination of eigenstates", "mixture of phases", "not a single phase", "no single phase", "multiple eigenvalues", "different phases", "different eigenphases", "own phase", "many phases"],
     ],
-    incorrectFeedback: "Think about what U^power does to a state that is a superposition of several different eigenstates, each with its own eigenphase.",
-    partialFeedback: "Good — now be explicit about what happens to the derivation's key step (a single phase factoring out) once multiple eigenphases are involved.",
+    incorrectFeedback: "Split the arbitrary input into pieces that U treats simply, then ask what the algorithm tries to read out and whether that readout is still well defined.",
+    partialFeedback: "Good. Now spell out which step of the derivation silently assumed the input was special, and what replaces the clean readout when it is not.",
   },
   hints: [
-    { text: "The derivation's key step was: applying U^power to an eigenstate multiplies by a single number, e^{2πiφ·power}." },
-    { text: "A general (non-eigenstate) input is a superposition of several eigenstates, each with a different eigenphase." },
-    { text: "U^power would multiply each component by its own phase — no single φ to read out." },
+    { text: "Find the step in the derivation where applying U^power leaves the input register essentially untouched. What special property of the input makes that possible?" },
+    { text: "Now expand an arbitrary input in the eigenbasis of U. How does U^power act on each term?" },
+    { text: "Ask what the precision register is correlated with at the end. Is there one well-defined quantity for it to record?" },
   ],
   solution: {
     steps: [
-      { description: "The derivation relies on U^power|ψ⟩=e^{2πiφ·power}|ψ⟩ — a single number factoring out, unchanged in direction." },
+      { description: "The derivation relies on U^power|ψ⟩=e^{2πiφ·power}|ψ⟩: a single number factoring out, with the state's direction unchanged." },
       { description: "For a general input (a superposition of eigenstates with different eigenphases), each component would pick up its own distinct phase." },
       { description: "The precision register would then end up in a superposition over several different phase estimates, not a single well-defined answer." },
     ],
-    finalAnswer: "A non-eigenstate input has no single eigenphase to read out — the circuit would produce a mixture of estimates instead of one clean answer.",
+    finalAnswer: "A non-eigenstate input has no single eigenphase to read out. The circuit would produce a mixture of estimates instead of one clean answer.",
   },
   explanation: {
     correctIdea: "Phase estimation fundamentally estimates the phase of one eigenstate at a time; a superposition of eigenstates just runs several phase estimations in superposition simultaneously.",
     whyCorrect: "This is precisely why every worked example in this course supplies a known, exact eigenstate rather than an arbitrary input.",
-    whyWrong: ["Saying 'it would just fail' without explaining the mechanism misses that it doesn't error — it produces a physically meaningful but different (mixed) result."],
+    whyWrong: ["Saying 'it would just fail' without explaining the mechanism misses that it doesn't error. It produces a physically meaningful but different (mixed) result."],
   },
 };

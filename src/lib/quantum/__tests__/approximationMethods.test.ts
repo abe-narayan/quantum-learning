@@ -150,3 +150,45 @@ describe("exactTwoLevelTrajectory: single-pass RK4 trajectory for the Rabi/Qubit
     expect(() => exactTwoLevelTrajectory(0, 0, 1, 1, 0)).toThrow();
   });
 });
+
+describe("WKB quantization against a spectrum it is known to get exactly right", () => {
+  // The Bohr-Sommerfeld condition integral p dx = (n+1/2)*pi (hbar=1, two
+  // soft turning points) is not merely a good approximation for the
+  // harmonic oscillator — it reproduces E_n = omega*(n+1/2) exactly. That
+  // makes the oscillator the one potential where WKB has a *reference
+  // answer* rather than a plausibility check, and it pins down every
+  // constant at once: the factor of 2m under the root, the half-integer in
+  // the quantization condition, and the fact that the integral runs over
+  // the classically allowed region only (not the whole grid).
+  const grid = createGrid(2048, 0.03);
+
+  it("reproduces omega*(n+1/2) for the harmonic oscillator, for n = 0..4", () => {
+    for (const omega of [0.7, 1, 1.8]) {
+      const potential = harmonicOscillatorPotential(grid, omega);
+      for (let n = 0; n <= 4; n++) {
+        const energy = wkbQuantizedEnergy(grid, potential, n, { eMin: 1e-3, eMax: 40 });
+        expect(energy, `omega=${omega} n=${n}`).toBeCloseTo(omega * (n + 0.5), 2);
+      }
+    }
+  });
+
+  it("gives the harmonic oscillator's action integral its exact closed form pi*E/omega", () => {
+    // integral p dx over the allowed region is pi*E/omega for V = omega^2 x^2/2,
+    // independent of E's size — the identity that makes the level spacing
+    // come out uniform.
+    const omega = 1.2;
+    const potential = harmonicOscillatorPotential(grid, omega);
+    for (const energy of [0.5, 2, 5]) {
+      expect(wkbActionIntegral(grid, potential, energy), `E=${energy}`).toBeCloseTo((Math.PI * energy) / omega, 2);
+    }
+  });
+
+  it("orders its levels: each successive n gives a strictly higher energy, uniformly spaced for the oscillator", () => {
+    const potential = harmonicOscillatorPotential(grid, 1);
+    const levels = Array.from({ length: 5 }, (_, n) => wkbQuantizedEnergy(grid, potential, n, { eMin: 1e-3, eMax: 40 }));
+    for (let n = 1; n < levels.length; n++) {
+      expect(levels[n]).toBeGreaterThan(levels[n - 1]);
+      expect(levels[n] - levels[n - 1]).toBeCloseTo(1, 2);
+    }
+  });
+});

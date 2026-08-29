@@ -60,17 +60,17 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Making the notation precise">
-$\langle\phi|\psi\rangle$ looks like decoration, but it's a single number that plays the same role for quantum states that an ordinary dot product plays for vectors — and pinning it down now makes every later calculation faster and harder to get wrong.
+$\langle\phi|\psi\rangle$ looks like decoration. It is a single number, and it plays the role for quantum states that the dot product plays for ordinary vectors.
 </LessonHook>
 
 ## Motivation
 
 We've been writing $|0\rangle$, $|1\rangle$, and
-$|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$ since the first lesson without
-ever asking what the $|\cdot\rangle$ symbol actually *means* as notation, or
-what rules it follows. Time to make that precise. The notation itself isn't
-deep, but pinning it down now makes everything after this lesson faster to
-write and harder to get wrong.
+$|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$ since the first lesson
+without asking what the $|\cdot\rangle$ symbol means or what rules it
+follows. The notation is not deep, and this is a short lesson. But every
+calculation from here on is written in it, and the half-hour spent now is
+repaid in every derivation that follows.
 
 ## Intuition
 
@@ -80,13 +80,13 @@ $\psi$." Physicists write vectors this way instead of with an arrow
 notation earns its keep the moment you introduce its partner, the **bra**
 $\langle\psi|$. A bra and a ket combine to form
 $\langle\phi|\psi\rangle$: read left-to-right, it looks like a
-"bra-c-ket," which is exactly where the names come from. That combined
+"bra-c-ket," which is where the names come from. That combined
 object is a single number (in general, complex), and it plays the role
 ordinary dot products play for real vectors.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/50/Paul_Dirac%2C_1933.jpg"
-  alt="Photograph of physicist Paul Dirac from 1933"
+  alt="Paul Dirac in 1933, framed from the chest up and facing the camera, wearing a dark suit jacket over a white dress shirt against a plain, unadorned background"
   caption="Paul Dirac (1902–1984), who invented the bra–ket notation this lesson is built around, photographed the year he shared the Nobel Prize in Physics for his foundational work in quantum mechanics."
   credit="Nobel Foundation / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Paul_Dirac,_1933.jpg"
@@ -101,7 +101,11 @@ Paul Dirac, who invented the bra–ket notation this lesson is built around, sha
 
 ### From column vectors to kets
 
-Recall the <Term id="computational-basis">computational basis</Term> states as column vectors:
+So far the two <Term id="computational-basis">computational basis</Term>
+states have been names, $|0\rangle$ and $|1\rangle$, with amplitudes
+attached to them. Written out as **column vectors** — a column vector
+being nothing more than a list of numbers stacked vertically, one slot
+per basis state — they are:
 
 $$
 |0\rangle = \begin{pmatrix}1\\0\end{pmatrix}, \qquad |1\rangle = \begin{pmatrix}0\\1\end{pmatrix}
@@ -120,8 +124,9 @@ $$
 |\psi\rangle = \begin{pmatrix}\alpha\\\beta\end{pmatrix} \quad\Longrightarrow\quad \langle\psi| = \begin{pmatrix}\alpha^* & \beta^*\end{pmatrix}
 $$
 
-The conjugation is exactly what makes the next step work, not optional
-decoration.
+The conjugation is what makes the next step work, and it is not optional
+decoration: without it, $\langle\psi|\psi\rangle$ could come out complex,
+and there would be no way to read it as a length.
 
 ### The inner product
 
@@ -166,9 +171,48 @@ $$
 \langle\phi|\psi\rangle = (\phi_0^*\langle0| + \phi_1^*\langle1|)(\psi_0|0\rangle+\psi_1|1\rangle) = \phi_0^*\psi_0\langle0|0\rangle + \phi_0^*\psi_1\langle0|1\rangle + \phi_1^*\psi_0\langle1|0\rangle + \phi_1^*\psi_1\langle1|1\rangle
 $$
 
-The two cross terms vanish by orthonormality, leaving exactly
-$\phi_0^*\psi_0+\phi_1^*\psi_1$, the same formula, derived rather than
-just stated.
+The two cross terms vanish by orthonormality, leaving
+$\phi_0^*\psi_0+\phi_1^*\psi_1$: the same formula as before, this time
+derived rather than stated.
+
+### Matrices between a bra and a ket
+
+Two lessons from now, and in nearly every lesson after that, a *matrix*
+appears wedged between a bra and a ket: $\langle\phi|A|\psi\rangle$.
+Nothing new is needed to read it, only one more piece of the same
+arithmetic, so it is worth putting on the table here.
+
+A $2\times2$ matrix acting on a ket produces another ket. Each row of the
+matrix is paired off against the column vector, entry by entry, and the
+products are added:
+
+$$
+A|\psi\rangle = \begin{pmatrix}A_{00}&A_{01}\\A_{10}&A_{11}\end{pmatrix}\begin{pmatrix}\psi_0\\\psi_1\end{pmatrix} = \begin{pmatrix}A_{00}\psi_0 + A_{01}\psi_1\\A_{10}\psi_0 + A_{11}\psi_1\end{pmatrix}
+$$
+
+Row 0 of the matrix meets the whole column to make entry 0 of the answer;
+row 1 meets the whole column to make entry 1. That is the entire rule.
+A concrete instance, with the matrix that swaps the two entries:
+
+$$
+\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix} = \begin{pmatrix}0\cdot1 + 1\cdot0\\1\cdot1 + 0\cdot0\end{pmatrix} = \begin{pmatrix}0\\1\end{pmatrix}
+$$
+
+so that matrix sends $|0\rangle$ to $|1\rangle$.
+
+Now $\langle\phi|A|\psi\rangle$ is read right to left and needs no new
+rule at all: first $A|\psi\rangle$, which is a ket, then the ordinary
+bra-times-ket inner product of $\langle\phi|$ with that ket. The result
+is a single number, exactly as $\langle\phi|\psi\rangle$ was:
+
+$$
+\langle\phi|A|\psi\rangle = \langle\phi|\,\bigl(A|\psi\rangle\bigr) = \phi_0^*(A_{00}\psi_0 + A_{01}\psi_1) + \phi_1^*(A_{10}\psi_0 + A_{11}\psi_1)
+$$
+
+In practice the fastest route is usually neither of those: expand
+$|\psi\rangle$ in the basis, apply $A$ to each basis ket separately, and
+let orthonormality kill the cross terms, exactly as in the distributed
+inner product above. That is the method the next few lessons use.
 
 ### Norm, revisited
 
@@ -193,7 +237,7 @@ Order matters.
 $\langle\phi|\psi\rangle$ measures how much $|\psi\rangle$ "overlaps" with
 $|\phi\rangle$, geometrically something like a (complex-valued) cosine of
 the angle between them. When we get to measurement in a few lessons, this
-overlap will turn out to be exactly the probability <Term id="amplitude">amplitude</Term> for finding
+overlap will turn out to be the probability <Term id="amplitude">amplitude</Term> for finding
 a system prepared in state $|\psi\rangle$ to instead look like $|\phi\rangle$
 once measured. For now, treat orthonormality as the algebraic fact that
 makes every other calculation in this course tractable: whenever a term
@@ -215,7 +259,7 @@ case fill in the whole range, not just one example of it.
   />
 </InteractiveSection>
 
-The bar heights above are exactly what "cosine of the angle between them" means once you draw $|0\rangle$ and $|1\rangle$ as fixed perpendicular axes and $|\psi\rangle$ as a vector between them: $\langle0|\psi\rangle$ and $\langle1|\psi\rangle$ are just $|\psi\rangle$'s projections onto those two axes, the same $\theta$ at every step.
+The bar heights above are what "cosine of the angle between them" means once you draw $|0\rangle$ and $|1\rangle$ as fixed perpendicular axes and $|\psi\rangle$ as a vector between them: $\langle0|\psi\rangle$ and $\langle1|\psi\rangle$ are just $|\psi\rangle$'s projections onto those two axes, the same $\theta$ at every step.
 
 <InteractiveSection title="The same sweep, drawn as a vector" description="Same θ, same five steps as the bar chart above. |0⟩ and |1⟩ sit fixed as perpendicular axes; |ψ⟩ swings between them as θ goes from 0 to 90°. Its projection onto the |0⟩ axis is ⟨0|ψ⟩ and its projection onto the |1⟩ axis is ⟨1|ψ⟩, the same numbers the bar chart plots, now visible as literal cosine and sine legs of the angle θ.">
   <VectorDiagramExplorer
@@ -254,8 +298,9 @@ $$
 </DerivationSteps>
 
 This number, $\tfrac{1}{\sqrt2}$, will resurface directly in the
-Measurement lesson: it's the probability *amplitude* for measuring $|+\rangle$
-and finding "0," and squaring it gives the actual probability, $\tfrac12$.
+Measurement lesson: it is the probability *amplitude* for measuring
+$|+\rangle$ and finding "0," and squaring it gives the probability,
+$\tfrac12$.
 
 ## Common Mistakes
 

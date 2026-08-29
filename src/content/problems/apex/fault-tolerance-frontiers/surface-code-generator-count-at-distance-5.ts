@@ -23,7 +23,23 @@ export const surfaceCodeGeneratorCountAtDistance5: NumericProblem = {
     value: 40,
     tolerance: 0,
     incorrectFeedback:
-      "Total stabilizers = (X-stabilizers) + (Z-stabilizers) = d(d-1) + d(d-1) = 2d(d-1). At d=5: 2*5*4 = 40. (Equivalently, n-1 = (2*25-10+1)-1 = 41-1 = 40, confirming exactly 1 logical qubit is encoded, exactly as the lesson verified at d=3.)",
+      "Total stabilizers = X-type plus Z-type, each d(d-1), so 2d(d-1) at d=5. Cross-check against n-1 with n = 2d^2-2d+1: the two routes must agree, since exactly 1 logical qubit is encoded at every distance.",
+    nearMisses: [
+      {
+        value: 41,
+        feedback:
+          "41 is n, the data-qubit count at d=5. One qubit's worth of freedom is left unconstrained to hold the logical qubit, so the independent generator count is n-1.",
+      },
+      {
+        value: 20,
+        feedback: "20 is d(d-1), the count of one stabilizer type. The question asks for X-type and Z-type together.",
+      },
+      {
+        value: 24,
+        feedback:
+          "24 = d^2 - 1 uses the rotated code's n = d^2. This problem fixes the unrotated convention, n = 2d^2 - 2d + 1; the two are not interchangeable.",
+      },
+    ],
   },
   hints: [
     { text: "The lesson showed the general d-dependence: n = 2d^2-2d+1 data qubits, and X-stabilizers and Z-stabilizers each number d(d-1)." },

@@ -32,21 +32,33 @@
  * literal* at build time — the generated `PROBLEMS` array is still a plain
  * synchronous static array.
  *
- * Run via `npm run generate:registry`, or automatically before `dev`/`build`
- * via the `predev`/`prebuild` npm lifecycle hooks.
+ * Run via `npm run generate:registry`, or automatically via every npm
+ * lifecycle hook that needs it: `predev`, `prebuild`, and `pretest` (which
+ * each run the full `generate`), plus `pretypecheck`, which runs THIS script
+ * and the lesson registry but deliberately not the search index — `tsc` reads
+ * the two generated `.ts` files and never `public/search-index.json`.
  */
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { walk, compareSlugs, extractObjectLiteral } from "./lib/extract.mjs";
+// PROBLEM_META_KEY_RE lives in scripts/lib/extract.mjs and is imported here
+// rather than declared, because generate-search-index.mjs extracts the SAME
+// `meta:` block from the SAME 547 files. When the pattern was duplicated in
+// both scripts, "these must stay identical" was a comment enforced by
+// nobody — and only this generator's output is drift-tested
+// (src/lib/problems/__tests__/metaRegistry.test.ts), so a divergence would
+// have surfaced as a search index quietly built from the wrong blocks.
+// scripts/__tests__/crossGenerator.test.ts asserts the agreement directly.
+import {
+  walk,
+  compareSlugs,
+  extractObjectLiteral,
+  writeGenerated,
+  PROBLEM_META_KEY_RE,
+} from "./lib/extract.mjs";
 
 const ROOT = path.join(process.cwd(), "src/content/problems");
 const OUTPUT = path.join(process.cwd(), "src/lib/problems/registry.generated.ts");
 const META_OUTPUT = path.join(process.cwd(), "src/lib/problems/problemMeta.generated.ts");
-
-// Anchored to a line that *starts* (modulo indentation) with `meta:` — a
-// bare /\bmeta:\s*\{/ would happily match e.g. `optionFeedback: { meta: ...`
-// or a `meta:` key nested in some other object earlier in the file.
-const META_KEY_RE = /^\s*meta:\s*\{/m;
 
 const EXPORT_RE = /^export const (\w+)\s*:/gm;
 
@@ -130,7 +142,7 @@ async function main() {
     }
     entries.push({ slug, identifier: exportMatches[0][1] });
 
-    const meta = extractObjectLiteral(source, META_KEY_RE, filePath, "meta");
+    const meta = extractObjectLiteral(source, PROBLEM_META_KEY_RE, filePath, "meta");
     validateMeta(meta, filePath);
     const prior = metaSlugSeenIn.get(meta.slug);
     if (prior) {
@@ -215,8 +227,8 @@ import type { ProblemMeta } from "./types";
 export const PROBLEM_METAS: ProblemMeta[] = ${JSON.stringify(metas, null, 2)};
 `;
 
-  await writeFile(OUTPUT, contents, "utf8");
-  await writeFile(META_OUTPUT, metaContents, "utf8");
+  await writeGenerated(OUTPUT, contents);
+  await writeGenerated(META_OUTPUT, metaContents);
   console.log(
     `generate-problem-registry: wrote ${entries.length} problems to ${path.relative(process.cwd(), OUTPUT)} ` +
       `and ${metas.length} metas to ${path.relative(process.cwd(), META_OUTPUT)}`

@@ -43,7 +43,7 @@ export const lessonMeta = {
   module: "bosons-and-fermions",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 25,
+  estimatedMinutes: 20,
   prerequisites: ["quantum-mechanics/identical-particles/indistinguishability"],
   objectives: [
     "Construct the normalized symmetric and antisymmetric combinations of two single-particle states",
@@ -53,21 +53,27 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Every particle in the universe belongs to one of exactly two families — and which family decides whether it can pile into a laser beam or a superfluid with a billion identical companions, or whether it insists on its own private quantum state the way electrons do.
+Every particle in three-dimensional space belongs to one of two families, and the choice is made by a single sign. One sign lets a billion particles pile into the same state, which is what a laser beam and a superfluid are. The other forbids even two, which is why matter is solid.
 </LessonHook>
 
 ## Motivation
 
-The
-previous lesson showed a bare product state isn't a valid
-two-identical-particle state at all. Here we build the two combinations
-that are: the symmetric sum (bosons) and the antisymmetric difference
-(fermions), and check both directly against the exchange operator
-rather than trusting the algebra that built them.
+The previous lesson ruled out the obvious candidate: a bare product state
+carries a fact about which particle is where, so it cannot describe two
+identical particles. It also showed that whatever does describe them must
+be a $\pm1$ eigenstate of exchange.
+
+That is a strong enough constraint to make the construction almost
+forced. From two single-particle states there are exactly two ways to
+combine them without privileging either particle: add the two orderings,
+or subtract them. This lesson builds both, checks their eigenvalues
+against the exchange operator rather than against the algebra that
+produced them, and finds that the second construction fails in one
+specific case. That failure is the Pauli exclusion principle.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Liquid_helium_lambda_point_transition.jpg"
-  alt="Photograph of liquid helium violently boiling, then suddenly falling still as it crosses the lambda point into its superfluid phase"
+  alt="Liquid helium in a glass flask shown either side of the lambda point: first churning with bubbles throughout its volume, then entirely still with a flat, mirror-like surface"
   caption="Liquid helium-4, cooled through the 2.2 K lambda point: the violent boiling abruptly stops as the liquid transitions to a superfluid. This is a macroscopic, directly photographed consequence of helium-4 atoms being bosons: below the transition, a large fraction condense into the very same symmetric quantum state this lesson constructs algebraically as |ψ_S⟩."
   credit="Alfred Leitner"
   creditUrl="https://commons.wikimedia.org/wiki/File:Liquid_helium_lambda_point_transition.jpg"
@@ -82,9 +88,12 @@ $$
 |\psi_S\rangle = \mathcal N\big(|a\rangle\otimes|b\rangle + |b\rangle\otimes|a\rangle\big)
 $$
 
-with $\mathcal N$ a <Term id="normalization">normalization</Term> constant. Applying $P_{12}$ swaps the
-two terms, which simply reproduces the same sum: $P_{12}|\psi_S\rangle=+|\psi_S\rangle$,
-a genuine $+1$ <Term id="eigenvalue-eigenvector">eigenstate</Term>, for *any* choice of $a,b$, including $a=b$.
+with $\mathcal N$ a <Term id="normalization">normalization</Term> constant, equal to $1/\sqrt2$ when $a$ and
+$b$ are orthonormal and distinct. Applying $P_{12}$ swaps the two terms,
+and a sum is unchanged by reordering it:
+$P_{12}|\psi_S\rangle=+|\psi_S\rangle$. This is a $+1$ <Term id="eigenvalue-eigenvector">eigenstate</Term> for every
+choice of $a$ and $b$, $a=b$ included, where the two terms coincide and
+the result is just $|a\rangle\otimes|a\rangle$.
 
 ### Antisymmetric combination: fermions
 
@@ -92,36 +101,49 @@ $$
 |\psi_A\rangle = \mathcal N\big(|a\rangle\otimes|b\rangle - |b\rangle\otimes|a\rangle\big)
 $$
 
-Applying $P_{12}$ swaps the two terms and flips their relative sign back:
-$P_{12}|\psi_A\rangle=-|\psi_A\rangle$, a genuine $-1$ eigenstate,
-*except* when $a=b$: then the two terms are identical and cancel
-exactly, giving the zero vector, not a valid (normalizable) state at
-all. This is the <Term id="pauli-exclusion-principle">Pauli exclusion principle</Term>, previewed here and made the
-whole subject of the next lesson.
+Applying $P_{12}$ swaps the two terms, which reverses the sign of the
+difference: $P_{12}|\psi_A\rangle=-|\psi_A\rangle$, a $-1$ eigenstate.
+
+With one exception. Set $a=b$ and the two terms become identical, so the
+difference is the zero vector. Zero is not a state: it cannot be
+normalized, and $\mathcal N$ would have to be infinite. The construction
+has not produced a state with some special property; it has failed to
+produce a state at all, which is the formalism's way of saying the
+configuration does not exist. This is the <Term id="pauli-exclusion-principle">Pauli exclusion principle</Term>,
+and the next lesson is about how much of chemistry hangs on it.
 
 ### Checking the construction against the operator
 
-This platform's `symmetrize`/`antisymmetrize` functions build exactly
-these combinations (with `normalizeVector` handling the division), and
-`exchangeParticles` independently swaps the combined vector's two
-particle-labels. Feeding `symmetrize(a,b)` through `exchangeParticles`
-and comparing the result to `symmetrize(a,b)` itself (expecting exact
-equality), and doing the same for `antisymmetrize(a,b)` against its own
-*negative*, both hold to floating-point precision. That's a numerical
-check of the eigenvalue claim using a function that doesn't know how
-`symmetrize`/`antisymmetrize` were built, rather than just re-tracing
-the algebra that built them.
+This platform's `symmetrize` and `antisymmetrize` build these two
+combinations, with `normalizeVector` supplying $\mathcal N$, while
+`exchangeParticles` swaps a combined vector's particle labels without
+knowing where that vector came from.
+
+Running `symmetrize(a,b)` through `exchangeParticles` returns the input
+unchanged; running `antisymmetrize(a,b)` through it returns the input's
+negative. Both hold to floating-point precision. Because the swapping
+function has no knowledge of how the two combinations were constructed,
+this tests the eigenvalue claim rather than retracing the algebra that
+motivated it.
 
 ## Physical Interpretation
 
-**The spin-statistics theorem** (a deep result from relativistic quantum
-field theory, well beyond this course's scope, stated here as an
-experimentally-confirmed fact) says: particles with integer spin
-($0,1,2,\ldots$, photons, the recently-covered spin-1 case from
-Angular Momentum & Spin) are bosons; particles with half-integer spin
-($\frac12,\frac32,\ldots$, electrons, protons, neutrons) are fermions.
-This course takes the connection as given and explores its
-consequences, rather than deriving it.
+Nothing so far says which particles take which sign. The algebra permits
+both and is silent about the assignment.
+
+The **spin-statistics theorem** settles it: particles with integer spin
+($0,1,2,\dots$: photons, and the spin-1 case from Angular Momentum &
+Spin) are bosons, and particles with half-integer spin
+($\tfrac12,\tfrac32,\dots$: electrons, protons, neutrons) are fermions.
+The proof belongs to relativistic quantum field theory and is well beyond
+this course; it needs special relativity, which is a clue in itself, since
+nothing in the exchange argument above mentioned either spin or
+relativity.
+
+Taken as given, the rule is worth noticing for how much it fixes. Spin
+was derived in an earlier course from a commutator, exchange symmetry in
+the last lesson from a relabelling, and the theorem welds two apparently
+unrelated results into one.
 
 <PredictBeforeReveal
   question="ψ_A = antisymmetrize(e0, e1). What do you expect exchangeParticles(ψ_A) to return?"
@@ -131,7 +153,7 @@ consequences, rather than deriving it.
     { label: "The zero vector", value: "zero" },
   ]}
   correctValue="negative"
-  explanation="Every entry of ψ_A comes back with its sign flipped: exchangeParticles(ψ_A) = −ψ_A exactly, to floating-point precision. That's the −1 eigenvalue that defines a fermion — not asserted, but read straight off the numbers."
+  explanation="Every entry comes back with its sign flipped: exchangeParticles(ψ_A) = −ψ_A, to floating-point precision. That is the −1 eigenvalue defining a fermion, read off the numbers rather than asserted. The zero-vector option is the right answer to a different question: it is what antisymmetrize(e0, e0) returns, with both particles in the same state."
 />
 
 ## Worked Example
@@ -141,13 +163,17 @@ confirm `antisymmetrize(e0,e1)` is a genuine $-1$ eigenstate.**
 
 `antisymmetrize(e0,e1)` gives the normalized vector proportional to
 $|0\rangle\otimes|1\rangle-|1\rangle\otimes|0\rangle$. Applying
-`exchangeParticles` to this result gives exactly the *negative* of the
-input, matching to floating-point precision (`maxDiff` between
-`antisymmetrize(e0,e1)` and $-$`exchangeParticles(antisymmetrize(e0,e1))`
-is exactly 0 in this platform's test suite), a direct numerical
-confirmation of the $-1$ eigenvalue.
+`exchangeParticles` to that result gives the negative of the input. The
+platform's test suite reports a maximum entrywise difference of $0$
+between `antisymmetrize(e0,e1)` and
+$-$`exchangeParticles(antisymmetrize(e0,e1))`, so the $-1$ eigenvalue is
+confirmed numerically and not merely by construction.
 
-<InteractiveSection title="Compare the two constructions directly" description="Switch between ψ_S and ψ_A, both built from the same e0, e1. Exchange leaves ψ_S's grid completely unchanged (+1); for ψ_A, every entry flips sign (−1) — read the numbers off the grid yourself rather than trusting the algebra alone.">
+Now repeat it with `antisymmetrize(e0,e0)`. Every entry cancels and the
+result is the zero vector, which no normalization can rescue. Two
+fermions in the same single-particle state have no state to occupy.
+
+<InteractiveSection title="Compare the two constructions directly" description="Switch between ψ_S and ψ_A, both built from the same e0 and e1. Exchange leaves ψ_S's grid unchanged, the +1 eigenvalue. For ψ_A every entry flips sign, the −1 eigenvalue. Both grids have their weight off the diagonal, since a ≠ b here; the diagonal cells are where a = b would sit, and they are exactly the cells the antisymmetric construction cannot fill.">
   <ExchangeDiagramExplorer
     presets={eigenstatePresets}
     ariaLabel="Choose between the symmetric and antisymmetric combinations of e0 and e1 to see each one's coefficient grid before and after exchange"
@@ -165,10 +191,10 @@ rather than assuming a fixed $1/\sqrt2$ factor.
 </Callout>
 
 <Callout type="note">
-**Thinking symmetrization/antisymmetrization is a choice experimenters
-make.** It's dictated entirely by the particle species (boson vs.
-fermion) via the spin-statistics connection, not a modeling choice
-applied differently depending on the situation.
+**Thinking symmetrization or antisymmetrization is a modelling choice.**
+The particle species fixes it through the spin-statistics connection.
+There is no regime, temperature, or approximation in which an electron
+pair may be treated as symmetric.
 </Callout>
 
 ## Practice Questions

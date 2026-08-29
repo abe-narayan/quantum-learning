@@ -46,7 +46,10 @@ export const lessonMeta = {
   order: 1,
   difficulty: "advanced",
   estimatedMinutes: 20,
-  prerequisites: ["quantum-software/simulating-quantum-systems/tensor-network-methods"],
+  prerequisites: [
+    "quantum-software/simulating-quantum-systems/state-vector-simulation",
+    "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
+  ],
   objectives: [
     "Explain how a noisy simulator interleaves ideal unitary evolution with a Kraus-channel noise model",
     "Compute the difference between an ideal and noisy circuit's output for a concrete example",
@@ -54,8 +57,8 @@ export const lessonMeta = {
   ],
   related: [
     {
-      slug: "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
-      note: "This lesson's noise channels are the same Kraus-operator formalism, applied to circuit simulation.",
+      slug: "quantum-software/simulating-quantum-systems/tensor-network-methods",
+      note: "The previous lesson in this course's sequence, but not a dependency: nothing here uses tensor networks. The machinery this lesson actually leans on is the density-matrix/Kraus formalism listed as a prerequisite.",
     },
   ],
 };
@@ -66,17 +69,19 @@ Every simulation this course has discussed so far assumed an ideal, noiseless ci
 
 ## Motivation
 
-This lesson builds and runs one directly,
-reusing Advanced Topics in Quantum Mechanics' Kraus-channel machinery
-exactly as-is.
+A noise simulator predicts what a real, imperfect device will output
+before any scarce hardware time gets spent. This lesson builds and
+runs one directly, reusing Advanced Topics in Quantum Mechanics'
+Kraus-channel machinery exactly as-is: ideal gate evolution and a
+noise channel, alternating after every gate.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Measuring_a_qubit_leaves_no_room_for_error.jpg/1280px-Measuring_a_qubit_leaves_no_room_for_error.jpg"
-  alt="Engineers assembling the cryogenic dilution-refrigerator hardware used to cool and measure superconducting quantum processors, at the FMN Laboratory"
-  caption="Engineers assembling the cryogenic hardware that will run real, physically noisy qubits. A noise simulator's entire job is predicting what dephasing and readout error like this will do to a circuit's output before ever consuming time on hardware like this."
-  credit="Sergey Kushlevich / FMN Laboratory, Bauman Moscow State Technical University"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Measuring_a_qubit_leaves_no_room_for_error.jpg"
-  license="CC BY 4.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/1/12/Quantum_refrigerator_at_UCL_%2817626619658%29.jpg"
+  alt="A dilution refrigerator at UCL, used to cool samples to within a fraction of a degree of absolute zero"
+  caption="A dilution refrigerator at UCL. Everything this lesson models as a Kraus channel — dephasing, relaxation, readout error — is what happens to a qubit inside a machine like this, and the whole point of simulating it first is to spend the answer, not the fridge time, on finding out."
+  credit="UCL Mathematical & Physical Sciences, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_refrigerator_at_UCL_(17626619658).jpg"
+  license="CC BY 2.0"
 />
 
 ## Engineering Development
@@ -86,7 +91,7 @@ exactly as-is.
 A noisy circuit simulator alternates two steps for every gate: (1) apply
 the gate's IDEAL <Term id="unitary-evolution">unitary evolution</Term> to a density matrix
 (`evolveDensityMatrix`, $\rho\to U\rho U^\dagger$), then (2) apply a
-<Term id="kraus-operators-cptp-maps">noise channel</Term> (Advanced Topics in Quantum Mechanics' `applyKrausChannel`)
+<Term id="noise-decoherence">noise channel</Term> (Advanced Topics in Quantum Mechanics' `applyKrausChannel`)
 modeling whatever physical error process (Noise, Decoherence & Scaling's
 T1/T2, or others) affects the real device between operations. This
 platform's `runNoisyCircuit` implements exactly this two-step loop,
@@ -106,17 +111,17 @@ $P(0)\approx0.9$ (not $1.0$), and purity drops to $\approx0.82$, a
 directly computed illustration of what "noise degrades circuit
 fidelity" means numerically, not just qualitatively.
 
-The Noise & Decoherence Explorer below runs the *same* dephasing channel
-this lesson uses, but applies it repeatedly to a fixed state rather than
-interleaving it between gates, so its numbers won't reproduce this
-lesson's $\approx0.82$. Starting it from $|0\rangle$ specifically would
-show no decay at all: dephasing leaves a computational-basis state
-untouched (there's no coherence for it to destroy), which is why this
-lesson's demonstration needs the $H$ gates first, to rotate into a
-state dephasing can actually act on.
+Those numbers come from this page's own live runs, not from a quoted
+result. The bars below re-run `runNoisyCircuit` right here, so the
+demonstration can be watched rather than taken on trust:
 
-<InteractiveSection title="Watch purity fall under repeated dephasing" description="Start from |+⟩, pick Dephasing, and step forward. Watch purity fall the same qualitative way this lesson's H-then-noise-then-H sequence does, even though the exact numbers won't match (no gates are interleaved here, just repeated channel steps on a fixed state).">
-  <LazyNoiseExplorer />
+<InteractiveSection title="The demonstration, computed live" description="Each frame re-runs this platform's own runNoisyCircuit from |0⟩ with 1, 2, or 3 noisy H gates (dephasing λ=0.2 interleaved after every gate, exactly as runNoisyCircuit's loop does). Slide to 2 gates: that is this section's H-then-H circuit, coming back to only P(0)≈0.9 with purity ≈0.82 instead of returning cleanly to |0⟩. Keep an eye on what purity does between 1 and 2 gates; the worked example below picks that oddity up." mode="observe">
+  <BarChartExplorer
+    sliderLabel="Noisy H gates applied"
+    ariaLabel="P(0), P(1), and purity after 1, 2, or 3 noisy H gates, showing purity flat between 1 and 2 gates then dropping at 3 gates"
+    maxValue={1}
+    frames={noiseSimFrames}
+  />
 </InteractiveSection>
 
 ### An honest scope limitation
@@ -165,13 +170,22 @@ overall.
   explanation="It stays flat at ≈0.82. The second H rotates the state back in a way that partially undoes the first H's alignment with the dephasing channel's preferred axis, so this particular step doesn't cost any additional purity — even though a third noisy H gate then drops purity again, to ≈0.70. Noise accumulation trends downward overall, but not gate-by-gate without exception."
 />
 
-<InteractiveSection title="Purity across the worked example, computed live" description="Each step re-runs this platform's own runNoisyCircuit from |0⟩ with 1, 2, or 3 noisy H gates (dephasing λ=0.2 interleaved after every gate, exactly as runNoisyCircuit's loop does). Slide across gate counts: purity drops from 1 to ≈0.82 after the first gate, stays at ≈0.82 after the second (the non-monotonic step this section asks about), then drops again to ≈0.70 after the third.">
-  <BarChartExplorer
-    sliderLabel="Noisy H gates applied"
-    ariaLabel="P(0), P(1), and purity after 1, 2, or 3 noisy H gates, showing purity flat between 1 and 2 gates then dropping at 3 gates"
-    maxValue={1}
-    frames={noiseSimFrames}
-  />
+One question the worked example leaves open: is this behavior specific
+to dephasing, or would an energy-loss channel act the same way? The
+Noise & Decoherence Explorer below exists for exactly this kind of
+qualitative question. It applies a channel repeatedly to a fixed state,
+with no gates interleaved, so its numbers won't reproduce this lesson's
+$\approx0.82$ and $\approx0.70$; treat it as a map of what each channel
+type does, and to which states it does it. Start from $|0\rangle$ with
+phase scrambling (T2) selected and nothing decays at all: a
+computational-basis state has no coherence for dephasing to destroy,
+which is exactly why this lesson's demonstration needed its $H$ gates
+first, to rotate into a state the noise could act on. Then switch to
+energy loss (T1) starting from $|1\rangle$ and watch the same state
+decay immediately.
+
+<InteractiveSection title="Explore the channel types qualitatively" description="Pick a starting state and a channel (energy loss T1, or phase scrambling T2), then step the channel forward. Look for which state-and-channel pairs lose purity and which sit still. The exact numbers won't match this lesson's runNoisyCircuit results, since no gates are interleaved here; the payoff is qualitative, a feel for what each channel type attacks." mode="observe">
+  <LazyNoiseExplorer />
 </InteractiveSection>
 
 ## Common Mistakes

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
+import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -24,6 +25,38 @@ import { describe, expect, it } from "vitest";
  */
 
 const SRC = path.resolve(import.meta.dirname, "../../..");
+
+/**
+ * Gzipped size of what a module actually *ships*, with comments removed first.
+ *
+ * The budgets below existed for a while measured against raw source, and that
+ * was quietly the wrong quantity. Comments are stripped by the bundler and
+ * reach no browser, but they are 14–74% of the gzipped source of the modules
+ * budgeted here (`lib/problems/types.ts` is 74%; `field/regimes.ts` 54%;
+ * `curriculum.ts` 30%). Measuring them made these tests a tax on the one thing
+ * this codebase most wants people to do: a fifteen-line comment explaining why
+ * a prerequisite edge was removed pushed `curriculum.ts` from 15.8 to 16.1 KB
+ * and failed a "these ship to the browser" assertion, over bytes that ship
+ * nowhere.
+ *
+ * A guard that punishes documentation gets documentation deleted, or gets its
+ * number raised until it no longer guards anything. So the numbers now track
+ * payload. They are correspondingly *smaller* than the old raw-source figures
+ * and no looser: what is left is data, and data is what regresses.
+ *
+ * The stripper is deliberately blunt — block comments and whole-line `//` —
+ * rather than a real parser. It is measuring a budget, not generating code, so
+ * a `//` inside a string literal costing us a few bytes of imagined payload is
+ * a rounding error, and blunt means it cannot itself break.
+ */
+function payloadKb(absolutePath: string): number {
+  const source = readFileSync(absolutePath, "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .split("\n")
+    .filter((line) => !line.trimStart().startsWith("//"))
+    .join("\n");
+  return gzipSync(Buffer.from(source)).length / 1024;
+}
 
 /**
  * Modules that must never reach a client bundle, and why.
@@ -64,6 +97,23 @@ const SERVER_ONLY: Record<string, string> = {
   // gzip) are for server components to slice; client surfaces get exactly
   // the fields they need as props (slug→title maps etc.).
   "lib/content/lessonMeta.generated.ts": "the generated all-lesson meta array behind lib/content/lessons",
+  // Was a CLIENT_DATA_BUDGET_KB entry at 20KB until it outgrew it (21.3KB
+  // gzip, and climbing with every entry added). The fix was the same split
+  // the problem corpus already uses: `currentQuantum/metaRegistry.ts` now
+  // holds the slug/date/title/category/lesson of each entry — everything a
+  // *link* to one needs — while `data.ts` keeps the summary prose, "why this
+  // matters" line, source citation, image metadata and the editorial
+  // provenance comments, keyed by slug. `registry.ts` joins the two.
+  // `ConceptDetailPanel` (the one client surface that ever needed any of
+  // this, to print a date and a title in a mini-card) now imports the meta
+  // registry, so the prose half has no client reader at all — and "must not
+  // reach a client bundle" is a stronger, non-renegotiable promise than a
+  // number that has to be raised every time an entry is added. The light
+  // half keeps a budget below.
+  "lib/content/currentQuantum/data.ts":
+    "every entry's summary/whyThisMatters/citation/image metadata; import metaRegistry.ts for slug/date/title/category",
+  "lib/content/currentQuantum/registry.ts":
+    "joins the meta to the prose, so it drags data.ts along; the meta-only twin is metaRegistry.ts",
   content: "raw lesson/problem content modules",
 };
 
@@ -71,24 +121,36 @@ const SERVER_ONLY: Record<string, string> = {
  * Data modules that a genuinely interactive client component may import —
  * a search box, a filter, or the concept map cannot work without the data it
  * filters — but which must not silently balloon. Sizes are gzipped source,
- * measured; the budget is deliberately close to current so that a large
- * addition forces a conversation rather than sliding in.
+ * measured with `payloadKb` (comments excluded, since they ship nowhere);
+ * the budget is deliberately close to current so that a large addition forces
+ * a conversation rather than sliding in.
  */
 const CLIENT_DATA_BUDGET_KB: Record<string, number> = {
-  "lib/content/curriculum.ts": 16,
-  "lib/content/concepts.ts": 18,
+  "lib/content/curriculum.ts": 12,
+  "lib/content/concepts.ts": 14,
   // `lib/content/glossary.ts` used to sit here at a 20KB budget. It has moved
   // to SERVER_ONLY instead — see the note there. A size budget was the right
   // guard while a client component imported it; now that none does, "must not
   // reach a client bundle at all" is both true and a stronger promise than any
   // number, and it does not have to be renegotiated every time the glossary
   // grows a term.
-  // Reached from `ConceptDetailPanel` via `currentQuantum/registry`'s
-  // `getEntriesForLesson`, which closes over the whole entry list. Mitigated
-  // by the concept map being `ssr:false` and code-split, so it never blocks
-  // first paint — but it is real client weight and was invisible until a
-  // cross-cutting sweep measured it, which is exactly why it belongs here.
-  "lib/content/currentQuantum/data.ts": 20,
+  // Reached from `ConceptDetailPanel` via
+  // `currentQuantum/metaRegistry`'s `getCurrentQuantumMetaForLesson`, which
+  // closes over the whole meta list. Mitigated by the concept map being
+  // `ssr:false` and code-split, so it never blocks first paint — but it is
+  // real client weight, which is why it belongs here.
+  //
+  // This replaces the 20KB budget that `currentQuantum/data.ts` used to
+  // hold. That module carried the whole collection — prose, citations,
+  // image metadata — because the panel imported the full registry to print
+  // a date and a title; it hit 21.3KB gzip and failed. Splitting the five
+  // link-shaped fields out into `metaRegistry.ts` took the client-reachable
+  // half to 4.5KB and moved `data.ts` to SERVER_ONLY (see the note there).
+  // The number below is deliberately close to that 4.5KB: the whole point
+  // of the split is that this half grows by ~0.15KB per entry instead of
+  // ~0.7KB, so a budget this tight still allows years of entries while
+  // catching anyone who tries to move a prose field back across.
+  "lib/content/currentQuantum/metaRegistry.ts": 4,
 };
 
 /**
@@ -103,6 +165,116 @@ const ALLOWED: Record<string, string> = {
   "lib/content/progress": "client-side progress storage; belongs on the client by design",
   "lib/problems/progress": "client-side progress storage; belongs on the client by design",
 };
+
+/**
+ * A size cap for every `ALLOWED` exception, because "small and purpose-built"
+ * is a claim about today that nothing was checking.
+ *
+ * `components/layout/problemPillarIndex.ts` is the reason this map exists.
+ * It is exempt from SERVER_ONLY on the grounds that it carries no problem
+ * bodies — true, and still beside the point for a browser: it is one row per
+ * problem, it is imported by `Navbar`, `Navbar` is in the root layout, so
+ * every visitor on every one of the 821 routes downloads all 547 rows. At
+ * ~15 bytes gzip per slug it grows with the problem corpus forever, and an
+ * exemption with no number attached cannot notice. `CLIENT_DATA_BUDGET_KB`
+ * already makes this argument for the modules a client component may import;
+ * an exception to "must never reach the client" deserves it at least as much.
+ *
+ * A prefix that names a directory is measured as the sum of every
+ * client-reachable module under it, so splitting a file in two does not
+ * launder its weight.
+ */
+const ALLOWED_BUDGET_KB: Record<string, number> = {
+  // 8.4KB today. The cap allows roughly another 100 problems before someone
+  // has to decide whether the navbar's pillar tint is worth a table that
+  // large, or whether `detectPillar` should fetch it on `/problems/*` only.
+  "components/layout/problemPillarIndex.ts": 9,
+  "lib/content/types.ts": 1,
+  "lib/problems/types.ts": 2,
+  "lib/content/progress": 3,
+  "lib/problems/progress": 3,
+};
+
+/**
+ * Ceiling on the *sum* of every non-component module a client component can
+ * reach — the number no per-module budget can see.
+ *
+ * Each cap above answers "is this one module too big"; none of them answers
+ * "how much data does this app ship in total", and that is the quantity that
+ * actually regresses. It regresses by addition, not by growth: ten new 3KB
+ * modules, each obviously fine on its own, each below every budget, each
+ * added by a different person. Measured at 90.1KB gzip of payload across 85
+ * modules when this was written (the earlier 160.3KB figure counted comment
+ * text, which ships nowhere — see `payloadKb`); the ceiling leaves ~11%, about
+ * five more simulators' worth of `lib/quantum` kernels, or one new content
+ * registry, before it has to be raised on purpose.
+ */
+const CLIENT_DATA_TOTAL_CEILING_KB = 100;
+
+/**
+ * The other thing this app ships to a browser, which none of the budgets above
+ * can see: `public/search-index.json`.
+ *
+ * It is not a module, so the import-graph walk never reaches it, and it is not
+ * in any bundle — the overlay fetches it lazily, once, the first time a reader
+ * opens search (`lib/search/fetchIndex.ts`). That makes it *cheaper* than a
+ * bundled module, and not free: it is fetched **whole**, so every byte in it
+ * is paid by every reader who ever uses search, and there is no code-splitting
+ * story that makes half of it arrive.
+ *
+ * It got a budget when lesson bodies became searchable. Before that the index
+ * carried a title, a description and an href per entry — 403KB raw / 100.7KB
+ * gzip across 1,076 entries — and it could not answer the queries a stuck
+ * reader types: `power series`, `factorial`, `half angle` and `theta/2` all
+ * returned nothing about concepts the site teaches. The fix adds a bounded set
+ * of the terms each lesson teaches (`lib/search/lessonKeywords.ts`), measured
+ * at 526KB raw / 131.6KB gzip.
+ *
+ * The numbers below are what makes that a decision rather than a slope. For
+ * scale, the alternative that was measured and rejected — appending each
+ * lesson's deduplicated vocabulary, which is *still* not the full prose —
+ * lands at 1.27MB raw / 316KB gzip, and would blow through both of these by
+ * more than a factor of two.
+ *
+ * Raise them only with the per-lesson cap (`LESSON_KEYWORD_BUDGET`) and the
+ * generator's own `MAX_INDEX_BYTES`, which fails the build rather than the
+ * test suite, in the same change.
+ */
+const SEARCH_INDEX_PATH = "public/search-index.json";
+const SEARCH_INDEX_RAW_CEILING_KB = 560;
+const SEARCH_INDEX_GZIP_CEILING_KB = 140;
+
+/**
+ * Routes whose eager client graph reaches the `katex` runtime today.
+ *
+ * **Empty, and meant to stay that way.** `katex.min.js` is 268KB raw / 74KB
+ * gzip, and the whole point of `rehypeKatexHtml.mjs` is that this site
+ * renders math to HTML at build time and does not need it in a browser.
+ *
+ * All three chains the audit found are now closed. Two were lesson-side and
+ * are pinned by name below (`mdx-components.tsx`, `LessonLayout.tsx`). The
+ * third, and the largest by page count, was `/problems/[slug]`:
+ * `ProblemView` (then a client component) -> `SolutionPanel` -> `KatexMath`,
+ * plus `ProblemView` -> `AnswerInput` -> `ScrollableMathText` -> `MathText`,
+ * on all 547 problem pages. Note what those chains have in common: not one
+ * of `SolutionPanel`, `AnswerInput`, `ScrollableMathText` or `MathText`
+ * carries a `"use client"` directive of its own — each was dragged over the
+ * boundary by its importer, which is why the two by-name tests never saw it.
+ *
+ * It was fixed the way the lesson corpus already does it: `ProblemView` is
+ * now a Server Component that renders the problem's math to KaTeX HTML
+ * strings (`components/problems/renderProblemMath.ts`) and hands them to
+ * `ProblemViewClient`, whose subtree only injects strings
+ * (`components/problems/RenderedMathText.tsx`). Measured: ~568 bytes gzip
+ * added to the average page's flight payload, 74.1KB gzip of JS removed from
+ * every one of them.
+ *
+ * An entry here is debt, not a licence: it records a chain that exists, with
+ * its fix written down. Adding one is a conversation; the test below fails
+ * the moment an entry stops matching reality, so a fixed chain cannot leave
+ * an excuse behind for the next route.
+ */
+const KATEX_IN_EAGER_CLIENT_GRAPH: Record<string, string> = {};
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -255,6 +427,97 @@ function externalPackagesReachableFrom(entry: string): Map<string, string[]> {
 }
 
 const CLIENT_FILES = ALL_FILES.filter((file) => /^\s*["']use client["']/.test(read(file)));
+const CLIENT_SET = new Set(CLIENT_FILES.map(rel));
+
+/** Every module a `"use client"` file can reach through static imports —
+ *  i.e. everything that ends up in *some* client chunk, eager or lazy. */
+function clientReachableModules(): Set<string> {
+  const reachable = new Set<string>();
+  for (const file of CLIENT_FILES) {
+    const seen = new Set<string>();
+    const queue = [file];
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (seen.has(current)) continue;
+      seen.add(current);
+      reachable.add(rel(current));
+      for (const specifier of importsOf(read(current))) {
+        const resolved = resolve(current, specifier);
+        if (resolved) queue.push(resolved);
+      }
+    }
+  }
+  return reachable;
+}
+
+/** Every route-level entry the App Router compiles a page from, plus the
+ *  global MDX mapping, which is spliced into all 219 lesson pages. */
+const ROUTE_ENTRIES = ALL_FILES.map(rel).filter(
+  (file) =>
+    (file.startsWith("app/") && /\/(page|layout)\.tsx$/.test(file)) || file === "mdx-components.tsx",
+);
+
+/**
+ * Bare package specifiers in one route's EAGER client graph — what a visitor
+ * downloads before they interact with anything on that page.
+ *
+ * Unlike `externalPackagesReachableFrom`, this respects the server/client
+ * boundary instead of over-approximating past it: it walks the server modules
+ * from the route entry, stops at each `"use client"` file (that file, and
+ * everything statically below it, is the client bundle), and collects
+ * packages from there down. The difference is not cosmetic — the
+ * over-approximating walk reports `katex` for `app/courses/[slug]/page.tsx`,
+ * where `MathText` renders entirely on the server and no KaTeX ever reaches a
+ * browser. A guard that cries wolf on a correct page is a guard someone
+ * eventually deletes.
+ *
+ * Dynamic `import()` is not an edge here, for the same reason it is not one
+ * in `externalPackagesReachableFrom`: it starts a separate chunk that is
+ * fetched after paint, so a `Lazy*` wrapper contributes its own thin imports
+ * and not its payload.
+ */
+function eagerClientPackagesForRoute(routeFile: string): Map<string, string[]> {
+  const clientEntries: Array<{ file: string; via: string[] }> = [];
+  const seenServer = new Set<string>();
+  const serverQueue: Array<{ file: string; via: string[] }> = [
+    { file: routeFile, via: [routeFile] },
+  ];
+
+  while (serverQueue.length > 0) {
+    const { file, via } = serverQueue.shift()!;
+    if (seenServer.has(file)) continue;
+    seenServer.add(file);
+    if (CLIENT_SET.has(file)) {
+      clientEntries.push({ file, via });
+      continue;
+    }
+    const full = path.join(SRC, file);
+    for (const specifier of importsOf(read(full))) {
+      const resolved = resolve(full, specifier);
+      if (resolved) serverQueue.push({ file: rel(resolved), via: [...via, rel(resolved)] });
+    }
+  }
+
+  const found = new Map<string, string[]>();
+  const seen = new Set<string>();
+  const clientQueue = [...clientEntries];
+  while (clientQueue.length > 0) {
+    const { file, via } = clientQueue.shift()!;
+    if (seen.has(file)) continue;
+    seen.add(file);
+    const full = path.join(SRC, file);
+    for (const specifier of importsOf(read(full))) {
+      const resolved = resolve(full, specifier);
+      if (resolved) {
+        clientQueue.push({ file: rel(resolved), via: [...via, rel(resolved)] });
+      } else if (!specifier.startsWith(".") && !specifier.startsWith("@/") && !found.has(specifier)) {
+        found.set(specifier, [...via, specifier]);
+      }
+    }
+  }
+
+  return found;
+}
 
 describe("client bundle boundary", () => {
   it("finds the client components (guards the guard)", () => {
@@ -279,8 +542,7 @@ describe("client bundle boundary", () => {
     ).toEqual([]);
   });
 
-  it("keeps client-importable data modules inside their size budget", async () => {
-    const { gzipSync } = await import("node:zlib");
+  it("keeps client-importable data modules inside their size budget", () => {
     const over: string[] = [];
 
     for (const [relativePath, budgetKb] of Object.entries(CLIENT_DATA_BUDGET_KB)) {
@@ -289,7 +551,7 @@ describe("client bundle boundary", () => {
         over.push(`${relativePath} no longer exists — update CLIENT_DATA_BUDGET_KB`);
         continue;
       }
-      const gzipped = gzipSync(readFileSync(full)).length / 1024;
+      const gzipped = payloadKb(full);
       if (gzipped > budgetKb) {
         over.push(`${relativePath} is ${gzipped.toFixed(1)}KB gzipped, over its ${budgetKb}KB budget`);
       }
@@ -299,6 +561,58 @@ describe("client bundle boundary", () => {
       over,
       "these ship to the browser for interactive filtering/search; if one has genuinely outgrown its budget, raise it deliberately or split the module",
     ).toEqual([]);
+  });
+
+  it("keeps every budgeted data module actually reachable from a client component", () => {
+    // Guards the guard, and guards the *architecture*. A size budget is only
+    // the right instrument while a client component genuinely imports the
+    // module; the moment none does, "must not reach a client bundle at all"
+    // is both true and stronger, and the entry belongs in SERVER_ONLY
+    // instead (that is exactly the move `lib/content/glossary.ts` made, and
+    // the move `currentQuantum/data.ts` made when its prose half was split
+    // out of `currentQuantum/metaRegistry.ts`).
+    //
+    // Without this, a budget entry can go quietly vacuous: someone removes
+    // the last client importer, the module keeps a number nobody is paying,
+    // and the next person to add a client importer inherits a budget that
+    // was set for a payload that no longer resembles theirs.
+    const reachable = new Set<string>();
+    for (const file of CLIENT_FILES) {
+      const seen = new Set<string>();
+      const queue = [file];
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        if (seen.has(current)) continue;
+        seen.add(current);
+        reachable.add(rel(current));
+        for (const specifier of importsOf(read(current))) {
+          const resolved = resolve(current, specifier);
+          if (resolved) queue.push(resolved);
+        }
+      }
+    }
+
+    const orphaned = Object.keys(CLIENT_DATA_BUDGET_KB).filter((module) => !reachable.has(module));
+
+    expect(
+      orphaned,
+      "no client component imports these any more; move them to SERVER_ONLY rather than leaving an unpaid budget behind",
+    ).toEqual([]);
+  });
+
+  it("lets the concept map panel read entry meta without the Current Quantum prose", () => {
+    // The specific regression this split exists to prevent, pinned to the
+    // one client surface involved so a failure names the real mistake
+    // instead of "something, somewhere, reached data.ts". `ConceptDetailPanel`
+    // renders a date, a category chip and a title per related entry; the
+    // summary/citation/image half must stay on the server.
+    const panel = path.join(SRC, "components/map/ConceptDetailPanel.tsx");
+
+    expect(read(panel)).toContain("currentQuantum/metaRegistry");
+    expect(
+      findServerOnlyReachableFrom(panel),
+      "ConceptDetailPanel must reach currentQuantum/metaRegistry, never registry.ts or data.ts",
+    ).toBeNull();
   });
 
   it("keeps katex out of the eager graph of the global MDX component mapping", () => {
@@ -328,9 +642,11 @@ describe("client bundle boundary", () => {
 
   it("keeps katex out of the eager graph of LessonLayout", () => {
     // The other katex-to-every-lesson chain the audit found: LessonLayout
-    // statically imported CourseCheckpoint -> ProblemView -> Solution/Hint
-    // panels -> KatexMath -> katex, even though the checkpoint renders only
-    // on a course's final lesson. It now goes through LazyCourseCheckpoint's
+    // statically imported CourseCheckpoint, which reaches katex (it is the
+    // one surface that still renders problem math in the browser — a Client
+    // Component cannot render the Server Component that does it for
+    // /problems/[slug]), even though the checkpoint renders only on a
+    // course's final lesson. It now goes through LazyCourseCheckpoint's
     // dynamic boundary. Same overapproximation caveat as above — this walk
     // also crosses LessonLayout's server-only imports (the problem registry),
     // which never ship to the client; that only makes a pass stronger.
@@ -342,6 +658,193 @@ describe("client bundle boundary", () => {
       external.get("katex")?.join(" -> "),
       "katex must not be statically reachable from LessonLayout; keep the checkpoint/problem chain behind LazyCourseCheckpoint",
     ).toBeUndefined();
+  });
+
+  it("keeps katex out of the problem page's client boundary", () => {
+    // The third chain, pinned by name like the two above so a regression
+    // names the real mistake instead of only a route. `ProblemViewClient` is
+    // the `"use client"` file for /problems/[slug]: everything statically
+    // below it is downloaded on all 547 problem pages before the reader
+    // touches anything. Its math arrives as KaTeX HTML strings rendered by
+    // the `ProblemView` Server Component wrapper
+    // (`components/problems/renderProblemMath.ts`), so the panels below it
+    // must reach only `RenderedMathText`, never `ScrollableMathText`,
+    // `MathText` or `KatexMath`.
+    //
+    // Uses the overapproximating walk deliberately: it does not stop at the
+    // client boundary, so it also catches a *lazily* reachable katex that the
+    // route-level test would forgive. Nothing under this file should need the
+    // runtime at all.
+    const external = externalPackagesReachableFrom(
+      path.join(SRC, "components/problems/ProblemViewClient.tsx"),
+    );
+
+    // Guards the guard: this subtree unquestionably reaches react and next.
+    expect(external.size).toBeGreaterThan(1);
+
+    expect(
+      external.get("katex")?.join(" -> "),
+      "katex must not be reachable from ProblemViewClient; problem math is rendered to HTML strings by the ProblemView server wrapper — render new math there and pass runs down, never import a renderer here",
+    ).toBeUndefined();
+  });
+
+  it("adds no route that ships the katex runtime to the browser", () => {
+    // The generalisation of the tests above. Those name entry points by hand,
+    // which is exactly as much coverage as someone remembered to write:
+    // `app/problems/[slug]/page.tsx` reached katex through `ProblemView` for
+    // the whole life of the problem system, and neither of the original two
+    // tests could see it because neither was looking at that route. This one
+    // asks every route the same question, so the list of pages paying for
+    // KaTeX can only shrink.
+    //
+    // Known debt lives in KATEX_IN_EAGER_CLIENT_GRAPH with its chain and its
+    // fix written down. It is empty: fixing the last entry was a two-line
+    // diff there (delete the entry); adding one is a conversation.
+    const offenders: string[] = [];
+
+    for (const route of ROUTE_ENTRIES) {
+      const chain = eagerClientPackagesForRoute(route).get("katex");
+      if (!chain) continue;
+      if (route in KATEX_IN_EAGER_CLIENT_GRAPH) continue;
+      offenders.push(`${route}\n    via ${chain.join(" -> ")}`);
+    }
+
+    expect(
+      offenders,
+      "this route's client bundle now contains the 268KB KaTeX runtime; lesson math is rendered to HTML at build time by rehypeKatexHtml.mjs — render this page's math on the server too, or put the component that needs it behind a lazy boundary like LazyCourseCheckpoint",
+    ).toEqual([]);
+  });
+
+  it("keeps the recorded katex debt honest in both directions", () => {
+    // Guards the guard above. Without this, the exception map is a licence
+    // that outlives the problem: someone moves the problem page's math to the
+    // server, the entry stays, and the next route to reach for `KatexMath`
+    // inherits a documented excuse for a chain that no longer exists.
+    const stale = Object.keys(KATEX_IN_EAGER_CLIENT_GRAPH).filter(
+      (route) => !eagerClientPackagesForRoute(route).has("katex"),
+    );
+
+    expect(
+      stale,
+      "these routes no longer reach katex — delete them from KATEX_IN_EAGER_CLIENT_GRAPH so the guard starts holding them to it",
+    ).toEqual([]);
+  });
+
+  it("never reaches a generated registry from a client component", () => {
+    // The generated registries are the load-bearing half of the build-memory
+    // fix (docs/DEPLOYMENT.md): `lessonMeta.generated.ts` and
+    // `problemMeta.generated.ts` exist so that a page can list the corpus
+    // without importing 219 compiled MDX modules, and `registry.generated.ts`
+    // statically imports all 547 problem bodies. They are corpus-shaped by
+    // construction — 296KB, 288KB and 94KB of source — and every one of them
+    // is named individually in SERVER_ONLY today.
+    //
+    // "Named individually" is the weakness. These files are written by
+    // `scripts/generate-*.mjs`, and the next one someone adds will be
+    // corpus-shaped for exactly the same reason and on nobody's list. The
+    // naming convention is the invariant, so assert on the convention.
+    const leaks = [...clientReachableModules()]
+      .filter((file) => /\.generated\.tsx?$/.test(file))
+      .sort();
+
+    // Guards the guard: if the convention is ever abandoned, this test would
+    // pass by having nothing to check.
+    expect(
+      ALL_FILES.map(rel).filter((file) => /\.generated\.tsx?$/.test(file)).length,
+      "no *.generated.ts modules found — either the generators changed their naming convention (update this test) or scripts/generate-*.mjs has not been run",
+    ).toBeGreaterThan(0);
+
+    expect(
+      leaks,
+      "a client component reaches a generated content registry; these are whole-corpus modules built for server rendering — pass the fields the client needs down as props instead",
+    ).toEqual([]);
+  });
+
+  it("keeps each SERVER_ONLY exception inside a budget of its own", () => {
+    // `ALLOWED` is the escape hatch from "must never reach a client bundle",
+    // and until now it was the only list here with no numbers on it. That
+    // made it the cheapest place for weight to accumulate: an exemption
+    // granted once on the grounds that a module was small, and then never
+    // re-examined as the corpus it mirrors tripled.
+    const over: string[] = [];
+    const reachable = clientReachableModules();
+
+    for (const prefix of Object.keys(ALLOWED)) {
+      const budgetKb = ALLOWED_BUDGET_KB[prefix];
+      // A missing budget is the next test's failure, not a silent pass here.
+      if (budgetKb === undefined) continue;
+      const members = [...reachable].filter(
+        (file) => file === prefix || file.startsWith(`${prefix}/`),
+      );
+      if (members.length === 0) continue;
+      const gzipped = members.reduce((total, file) => total + payloadKb(path.join(SRC, file)), 0);
+      if (gzipped > budgetKb) {
+        over.push(
+          `${prefix} is ${gzipped.toFixed(1)}KB gzipped across ${members.length} module(s), over its ${budgetKb}KB budget`,
+        );
+      }
+    }
+
+    expect(
+      over,
+      "an exception to SERVER_ONLY has outgrown the 'small and purpose-built' claim that earned it; shrink it, split it, or raise the number deliberately",
+    ).toEqual([]);
+  });
+
+  it("gives every SERVER_ONLY exception a budget (guards the guard)", () => {
+    const unbudgeted = Object.keys(ALLOWED).filter((prefix) => !(prefix in ALLOWED_BUDGET_KB));
+
+    expect(
+      unbudgeted,
+      "a new ALLOWED entry has no size cap; add one to ALLOWED_BUDGET_KB, measured with gzipSync, close to its current size",
+    ).toEqual([]);
+  });
+
+  it("keeps the total client-reachable data payload under a ceiling", () => {
+    // The quantity no per-module budget can see. Every check above is
+    // local — is *this* module too big, is *this* import allowed — and a
+    // payload regresses globally: a dozen individually reasonable modules,
+    // each waved through by a different reviewer, each genuinely fine.
+    //
+    // Scoped to `.ts` (not `.tsx`) so this measures data and logic rather
+    // than markup, which is what the budgets in this file are all about, and
+    // what actually grows with the content corpus.
+    const modules = [...clientReachableModules()].filter((file) => file.endsWith(".ts")).sort();
+    const totalKb = modules.reduce((total, file) => total + payloadKb(path.join(SRC, file)), 0);
+
+    // Guards the guard: a broken walk would report zero and pass forever.
+    expect(modules.length).toBeGreaterThan(40);
+
+    expect(
+      totalKb,
+      `client-reachable data modules now total ${totalKb.toFixed(1)}KB gzip across ${modules.length} modules, over the ${CLIENT_DATA_TOTAL_CEILING_KB}KB ceiling; find what grew (each module's size is printed by the budget test above) before raising this number`,
+    ).toBeLessThanOrEqual(CLIENT_DATA_TOTAL_CEILING_KB);
+  });
+
+  it("keeps the lazily-fetched search index under its transfer budget", () => {
+    // Measured on the bytes as served, gzipped — this file is JSON, not
+    // source, so `payloadKb`'s comment-stripping has nothing to do here and
+    // the raw figure is the real one a CDN stores.
+    const file = path.join(SRC, "..", SEARCH_INDEX_PATH);
+    expect(existsSync(file), `${SEARCH_INDEX_PATH} is missing — run \`npm run generate\``).toBe(true);
+
+    const bytes = readFileSync(file);
+    const rawKb = bytes.length / 1024;
+    const gzipKb = gzipSync(bytes).length / 1024;
+
+    // Guards the guard: an empty or truncated index would pass both ceilings
+    // while breaking search outright.
+    expect(rawKb, `${SEARCH_INDEX_PATH} is suspiciously small — is it truncated?`).toBeGreaterThan(200);
+
+    expect(
+      rawKb,
+      `${SEARCH_INDEX_PATH} is ${rawKb.toFixed(1)}KB raw, over its ${SEARCH_INDEX_RAW_CEILING_KB}KB ceiling; every reader who opens search downloads it whole`,
+    ).toBeLessThanOrEqual(SEARCH_INDEX_RAW_CEILING_KB);
+
+    expect(
+      gzipKb,
+      `${SEARCH_INDEX_PATH} is ${gzipKb.toFixed(1)}KB gzip, over its ${SEARCH_INDEX_GZIP_CEILING_KB}KB ceiling; the per-lesson cap is LESSON_KEYWORD_BUDGET in lib/search/lessonKeywords.ts`,
+    ).toBeLessThanOrEqual(SEARCH_INDEX_GZIP_CEILING_KB);
   });
 
   it("keeps every App Router page a server component", () => {

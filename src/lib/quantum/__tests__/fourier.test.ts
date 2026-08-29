@@ -74,6 +74,54 @@ describe("momentumGrid", () => {
 });
 
 describe("positionToMomentum / momentumToPosition", () => {
+  // These two tests pin the *phase* convention, not just the magnitudes.
+  // Every other check in this file (round trip, Parseval, the Gaussian
+  // width comparison) is blind to a per-bin phase, so an earlier version of
+  // `positionToMomentum` that returned the raw index-based DFT — off by
+  // exp(+i*k_m*L/2) = (-1)^m from the centered-grid transform it documents,
+  // and therefore referred to a different coordinate origin than
+  // `Wavefunction1D.expectationPosition` uses — passed all of them.
+  it("computes the transform against the centered grid's own x coordinates, not the raw index-based DFT", () => {
+    const n = 32;
+    const dx = 0.25;
+    const x = Array.from({ length: n }, (_, i) => i * dx - (n * dx) / 2);
+    const { k } = momentumGrid(n, dx);
+    const psi = randomComplexArray(n);
+    const phi = positionToMomentum(psi, dx);
+
+    for (let m = 0; m < n; m++) {
+      // The literal defining sum, with the actual (centered) x values.
+      let expected = Complex.ZERO;
+      for (let j = 0; j < n; j++) {
+        expected = expected.add(psi[j].mul(Complex.fromPolar(1, -k[m] * x[j])));
+      }
+      expected = expected.scale(dx / Math.sqrt(2 * Math.PI));
+      expect(phi[m].re).toBeCloseTo(expected.re, 9);
+      expect(phi[m].im).toBeCloseTo(expected.im, 9);
+    }
+  });
+
+  it("gives a real, even phi(k) for a real wavefunction centered at x=0", () => {
+    // A stationary Gaussian is real and even about x=0, so its Fourier
+    // transform must be real and even too — a basic parity fact, and the
+    // most visible symptom when the centered-grid phase is dropped (phi's
+    // sign then alternates from bin to bin).
+    const n = 64;
+    const dx = 0.25;
+    const x = Array.from({ length: n }, (_, i) => i * dx - (n * dx) / 2);
+    const psi = x.map((xi) => new Complex(Math.exp(-(xi * xi) / 2), 0));
+    const phi = positionToMomentum(psi, dx);
+
+    for (let m = 0; m < n; m++) {
+      expect(phi[m].im).toBeCloseTo(0, 9);
+      expect(phi[m].re).toBeGreaterThan(-1e-9); // a Gaussian's transform is positive everywhere
+    }
+    // Even in k: bin m and bin n-m carry opposite k of equal magnitude.
+    for (let m = 1; m < n / 2; m++) {
+      expect(phi[m].re).toBeCloseTo(phi[n - m].re, 9);
+    }
+  });
+
   it("round-trips a random state exactly", () => {
     const n = 32;
     const dx = 0.25;

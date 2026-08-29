@@ -26,6 +26,11 @@ export const modulusOf3Minus4i: NumericProblem = {
     value: modulus,
     tolerance: 0.01,
     incorrectFeedback: "Use |z| = √(a² + b²), where a is the real part and b is the imaginary part (including its sign doesn't matter since it gets squared).",
+    nearMisses: [
+      { value: 25, feedback: "25 is |z|², the sum of the squares. The modulus is its square root." },
+      { value: -1, feedback: "−1 is 3 + (−4), adding the parts without squaring them. The modulus is a distance in the plane, so it squares, adds, then takes the root." },
+      { value: 7, feedback: "7 adds the magnitudes 3 and 4 directly. Distance in the plane combines perpendicular components by Pythagoras, not by addition." },
+    ],
   },
   hints: [
     { text: "The modulus formula is |z| = √(zz*) = √(a² + b²)." },

@@ -24,7 +24,7 @@ export const hydrogenDegeneracyFrames = [1, 2, 3, 4, 5, 6].map((n) => ({
 export const lessonMeta = {
   title: "Hydrogen Energy Levels",
   description:
-    "Solving the radial equation for the Coulomb potential gives Eₙ=−13.6 eV/n², quantized by the bound-state boundary condition alone, independent of l, and reproduced exactly by this platform's verified hydrogenEnergyLevel() function.",
+    "Solving the radial equation for the Coulomb potential gives Eₙ=−13.6 eV/n², quantized by the bound-state boundary condition alone, independent of l, and reproduced exactly by the course engine's verified hydrogenEnergyLevel() function.",
   course: "the-hydrogen-atom",
   module: "hydrogen-energy-levels",
   order: 1,
@@ -39,7 +39,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-hardware/physical-qubit-platforms/neutral-atoms",
-      note: "Neutral-atom qubits' 'Rydberg blockade' gate excites an atom to exactly this lesson's high-n hydrogen-like states; Eₙ=-13.6 eV/n² is why large n gives such an enormous, strongly-interacting orbit.",
+      note: "Neutral-atom qubits' 'Rydberg blockade' gate excites an atom into the high-n hydrogen-like states this lesson derives; Eₙ=-13.6 eV/n² is why large n gives such an enormous, strongly-interacting orbit.",
     },
   ],
 };
@@ -52,8 +52,8 @@ Heat hydrogen gas and it doesn't glow across a smooth rainbow. It emits at a han
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/2/21/Visible_spectrum_of_hydrogen.jpg"
-  alt="A photograph of the visible hydrogen emission spectrum, showing four discrete colored lines (Hα red, Hβ cyan, Hγ blue, Hδ violet) against a black background"
-  caption="The actual photographed Balmer series: four discrete visible lines, not a continuous rainbow, exactly the discreteness this lesson derives from Eₙ=−13.6 eV/n². The red line, Hα, is the n=3→2 transition computed in the Worked Example below."
+  alt="Four narrow bright lines on an otherwise black band. A red line sits alone toward one end, well separated from the rest; a cyan line, a blue-violet line and a fainter violet line follow, packed progressively closer together toward the violet end. Between the lines the band is completely dark, with no continuous colour anywhere."
+  caption="The actual photographed Balmer series: four discrete visible lines, not a continuous rainbow, the discreteness this lesson derives from Eₙ=−13.6 eV/n². The red line, Hα, is the n=3→2 transition computed in the Worked Example below."
   credit="Wikimedia Commons / Jan Homann"
   creditUrl="https://commons.wikimedia.org/wiki/File:Visible_spectrum_of_hydrogen.jpg"
   license="CC BY-SA 3.0"
@@ -65,7 +65,7 @@ nothing but the <Term id="schrodinger-equation">Schrödinger equation</Term> and
 the radial equation from the previous lesson for hydrogen's specific
 Coulomb potential $V(r)=-e^2/4\pi\epsilon_0r$ (subject to the bound-state
 requirement that $u(r)\to0$ as $r\to\infty$) forces $E$ to only a
-discrete, countable set of values, exactly the discreteness Balmer saw
+discrete, countable set of values, the discreteness Balmer saw
 and couldn't explain. This lesson states that result and unpacks what it
 means physically; the next lesson uses the actual radial wavefunctions
 (already built and verified in this course's engine) to see the states
@@ -77,10 +77,10 @@ The infinite square well forced only certain wavelengths to fit between
 two walls; here, the walls are gone, but the requirement is just as
 rigid. A generic solution to the radial equation blows up as $r\to\infty$,
 which isn't <Term id="normalization">normalizable</Term> and can't describe a bound electron. Only for
-special values of $E$ does the blow-up cancel and the wavefunction
-actually decay to zero at infinity instead. That cancellation is a
+special values of $E$ does the blow-up cancel and the wavefunction decay
+to zero at infinity instead. That cancellation is a
 knife-edge condition, satisfied only at a discrete ladder of energies, not
-a continuum, for exactly the same reason a guitar string can only vibrate
+a continuum, for the same reason a guitar string can only vibrate
 at certain frequencies: a boundary condition that must be satisfied
 exactly, not approximately, leaves only a countable set of solutions.
 
@@ -89,30 +89,90 @@ exactly, not approximately, leaves only a countable set of solutions.
 ### The quantization condition
 
 Solving $-\dfrac{\hbar^2}{2m}\dfrac{d^2u}{dr^2}+\left[-\dfrac{e^2}{4\pi\epsilon_0r}+\dfrac{l(l+1)\hbar^2}{2mr^2}\right]u=Eu$
-with $u(0)=0$ and $u(r)\to0$ as $r\to\infty$ is a standard (if lengthy)
-bound-state ODE calculation: the same *category* of problem as the
-finite square well in Wave Mechanics, just with a different
-$V_{\text{eff}}(r)$. The result is that normalizable solutions exist only
-for a specific discrete set of energies:
+with $u(0)=0$ and $u(r)\to0$ as $r\to\infty$ is the same *category* of
+problem as the finite square well in Wave Mechanics, just with a
+different $V_{\text{eff}}(r)$. The full calculation is lengthy, but the
+logic that forces quantization fits in a sketch. Here is that logic,
+with the boundary conditions doing all the work:
+
+<DerivationSteps>
+  <DerivationStep annotation="Bound states have E < 0. Package the energy as a decay constant κ and switch to the dimensionless radius ρ.">
+    $$
+    \kappa = \frac{\sqrt{-2mE}}{\hbar}, \qquad \rho = \kappa r
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Far from the proton both potential terms die off and the equation collapses. The growing exponential solution is discarded: it cannot be normalized.">
+    $$
+    \frac{d^2u}{d\rho^2} \approx u \quad\Rightarrow\quad u \sim e^{-\rho} \ \text{ as } \rho\to\infty
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Near the origin the centrifugal term dominates instead. The other solution behaves like ρ to the power −l, blows up at r = 0, and is discarded too.">
+    $$
+    \frac{d^2u}{d\rho^2} \approx \frac{l(l+1)}{\rho^2}\,u \quad\Rightarrow\quad u \sim \rho^{\,l+1} \ \text{ as } \rho\to0
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Factor out both required behaviors. Whatever is left over is carried by v(ρ).">
+    $$
+    u(\rho) = \rho^{\,l+1}\,e^{-\rho}\,v(\rho)
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Try a power series for v. Substituting it into the radial equation turns the ODE into a recursion: each coefficient follows from the one before it.">
+    $$
+    v(\rho) = \sum_{j=0}^{\infty} c_j\,\rho^j
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="The recursion. ρ₀ packages the Coulomb strength together with the energy (through κ); everything follows from c₀.">
+    $$
+    c_{j+1} = \frac{2(j+l+1)-\rho_0}{(j+1)(j+2l+2)}\,c_j, \qquad \rho_0 \equiv \frac{me^2}{2\pi\epsilon_0\hbar^2\kappa}
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="The generic disaster: at large j this is the coefficient ratio of the series for e raised to 2ρ. A never-ending series rebuilds the growing exponential step 2 threw out, and u is not normalizable after all.">
+    $$
+    \frac{c_{j+1}}{c_j} \;\longrightarrow\; \frac{2}{j} \quad\Rightarrow\quad v(\rho) \sim e^{2\rho}
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="The only escape: the numerator must vanish at some finite j, cutting the series off into a polynomial. That forces ρ₀ to be an even integer and defines the integer n.">
+    $$
+    \rho_0 = 2(j_{\max}+l+1) \equiv 2n, \qquad n = 1, 2, 3, \ldots
+    $$
+  </DerivationStep>
+  <DerivationStep annotation="Unpack ρ₀ = 2n through the definitions of ρ₀ and κ. Nothing chose n except the demand that the series terminate.">
+    $$
+    \kappa = \frac{me^2}{4\pi\epsilon_0\hbar^2\,n} \quad\Rightarrow\quad E = -\frac{\hbar^2\kappa^2}{2m} = -\frac{me^4}{32\pi^2\epsilon_0^2\hbar^2}\cdot\frac{1}{n^2}
+    $$
+  </DerivationStep>
+</DerivationSteps>
+
+That sketch is the complete reason the energies are discrete. What it
+defers is the rest of the solution: the terminating polynomials $v(\rho)$
+are the associated Laguerre polynomials, and assembling them into
+normalized radial wavefunctions $R_{nl}(r)$ is real work this course does
+not repeat. The next lesson imports the pre-verified
+`radial1s`/`radial2s`/`radial2p` functions instead. The result:
+normalizable solutions exist only for a specific discrete set of
+energies,
 
 $$
 E_n = -\frac{m e^4}{32\pi^2\epsilon_0^2\hbar^2}\cdot\frac1{n^2} = -\frac{13.6\text{ eV}}{n^2}, \qquad n=1,2,3,\ldots
 $$
 
-where $n$ (the **principal quantum number**) is a positive integer that
-emerges from the same kind of boundary-condition counting argument the
-<Term id="quantum-harmonic-oscillator">harmonic oscillator</Term> and finite well used, except here the messy
+where $n$ (the **principal quantum number**) is the integer the
+series-termination condition manufactured in step 8, the same kind of
+boundary-condition counting argument the
+<Term id="quantum-harmonic-oscillator">harmonic oscillator</Term> and finite well used. Here the messy
 combination of physical constants collapses to the clean number
 $13.6\text{ eV}$, called **one Rydberg** ($\text{Ry}$).
 
 ### Why the energy doesn't depend on l or m
 
-A striking feature specific to the pure $1/r$ Coulomb potential: $E_n$
-depends *only* on $n$, not on $l$ (despite $l$ appearing explicitly in
-the effective potential solved above) or $m$. This is a special
-"accidental" degeneracy of the exact Coulomb form: for $n\geq2$,
-states with different $l$ (and hence different-shaped radial
-wavefunctions) share exactly the same energy. Combined with the $2l+1$
+Look back at the derivation and something should be nagging. The
+parameter $l$ appeared explicitly in the effective potential, sat inside
+the recursion relation, and helped define $n = j_{\max}+l+1$. Yet the
+final energy contains no $l$ at all. States with different $l$, and
+therefore genuinely different-shaped radial wavefunctions, land on the
+same energy for every $n\geq2$. Nothing in the argument required that;
+it is a property of the exact $1/r$ form, traditionally called an
+"accidental" degeneracy. Combined with the $2l+1$
 degeneracy in $m$ from Angular Momentum & Spin, the total degeneracy of
 level $n$ is $n^2$ (summing $2l+1$ over $l=0,\ldots,n-1$, a direct
 algebra exercise, not a new physical input).
@@ -125,17 +185,19 @@ algebra exercise, not a new physical input).
     frames={hydrogenDegeneracyFrames}
     sliderLabel="Principal quantum number n"
     ariaLabel="Bar chart of the degeneracy 2l+1 for each l value at fixed n, summing to the total n-squared degeneracy of hydrogen energy level n"
+    maxValue={11}
   />
 </InteractiveSection>
 
 ## Physical Interpretation
 
-$-13.6\text{ eV}$ is the ionization energy of hydrogen: exactly the
-energy needed to free a ground-state electron completely (to $E=0$, the
-threshold of an unbound state). As $n\to\infty$, $E_n\to0^-$: the
-levels crowd together approaching the ionization threshold, exactly the
+$E_1=-13.6\text{ eV}$ fixes the ionization energy of hydrogen, which is
+its magnitude $+13.6\text{ eV}$: the energy that must be *supplied* to
+free a ground-state electron completely, lifting it from $E_1$ up to
+$E=0$, the threshold of an unbound state. As $n\to\infty$, $E_n\to0^-$: the
+levels crowd together approaching the ionization threshold, the
 "Rydberg series" pattern seen in hydrogen's real emission spectrum.
-`hydrogenEnergyLevel(n)` in this platform's engine computes exactly this
+`hydrogenEnergyLevel(n)` in the course engine computes this
 formula and was verified against $E_1=-13.6$, $E_2=-3.4$, $E_4=-0.85$ eV.
 
 <PredictBeforeReveal
@@ -146,7 +208,7 @@ formula and was verified against $E_1=-13.6$, $E_2=-3.4$, $E_4=-0.85$ eV.
     { label: "The same: every consecutive-n drop releases equal energy", value: "same" },
   ]}
   correctValue="smaller"
-  explanation="Smaller. The worked example below gives E(3→2) ≈ 1.89 eV, while E(2→1) = E_2 − E_1 = −3.40 − (−13.6) = 10.2 eV, over five times larger. Levels crowd together at high n exactly because each successive gap shrinks, which is why the visible Balmer lines (all landing on n=2) get closer together toward shorter wavelengths, while the Lyman series (landing on n=1) is spread out much further in energy."
+  explanation="Smaller. The worked example below gives E(3→2) ≈ 1.89 eV, while E(2→1) = E_2 − E_1 = −3.40 − (−13.6) = 10.2 eV, over five times larger. Levels crowd together at high n because each successive gap shrinks, which is why the visible Balmer lines (all landing on n=2) get closer together toward shorter wavelengths, while the Lyman series (landing on n=1) is spread out much further in energy."
 />
 
 ## Worked Example
@@ -165,7 +227,7 @@ $$
 confirmed directly: `hydrogenEnergyLevel(3) - hydrogenEnergyLevel(2)`
 $\approx1.89\text{ eV}$, matching the well-known Balmer-alpha transition.
 
-The levels crowding together as $n$ grows, exactly as described above,
+The levels crowding together as $n$ grows, as described above,
 is easiest to see plotted rather than just stated:
 
 <EnergyLevelDiagram

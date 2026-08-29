@@ -103,8 +103,31 @@ export function ExchangeDiagram({
   ariaLabel: string;
 }) {
   return (
+    // `role="group"`, not `role="img"` — the directory-wide policy. `img`
+    // makes every descendant presentational, and `ExchangeDiagramContent`'s
+    // descendants are not a picture: two grids of real amplitudes, the
+    // `beforeLabel`/`afterLabel` captions naming ψ and P₁₂ψ, the "Rows/columns:
+    // particle 1 / particle 2 in state …" basis legend, and — the one that
+    // matters most — the verdict badge, which is the figure's whole punchline
+    // ("−1 eigenstate (antisymmetric — fermions)", "Zero vector — this state
+    // does not exist (Pauli exclusion)"). The caller's `ariaLabel` is a fixed
+    // sentence written once in the MDX body; it cannot carry the amplitudes
+    // and it does not restate the verdict, so `img` was handing a screen
+    // reader the caption and throwing away the conclusion.
+    //
+    // `group` keeps the same `aria-label` — still announced on entry — and
+    // leaves the numbers, the legend and the verdict readable. The ⇄ glyph is
+    // already `aria-hidden`, so nothing is announced twice.
+    //
+    // Deliberately NO `tabIndex={0}` on this scroll container: it does not
+    // overflow. `vectorToExchangeGrid` is called with the single-particle
+    // dimension (2 in spin-qubits.mdx, 3 in bosons-and-fermions.mdx), so each
+    // `MatrixCellGrid` is at most 3 × 3.5rem = 168px, and the two panels sit
+    // in a `flex-wrap` row that stacks them rather than overflowing on a
+    // narrow screen. Adding a tab stop here would be pure tab-order noise for
+    // every keyboard user on the page, with nothing to scroll when they land.
     <div
-      role="img"
+      role="group"
       aria-label={ariaLabel}
       className="not-prose space-y-4 overflow-x-auto panel-inset p-4"
     >

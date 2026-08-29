@@ -111,7 +111,7 @@ export const lessonMeta = {
   module: "quantum-signal-processing",
   order: 2,
   difficulty: "master",
-  estimatedMinutes: 28,
+  estimatedMinutes: 75,
   prerequisites: ["apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"],
   objectives: [
     "Explain the quantum signal processing (QSP) protocol: alternating a fixed 'signal' rotation W(x) with tunable Z-rotations produces a single-qubit unitary whose top-left entry is a controllable polynomial P(x)",
@@ -292,9 +292,26 @@ Every layer of QSP does the same two things: $W(x)$ is a "measurement" of the si
   classical numerical problem for these new phases."
 </InsightBlock>
 
-A striking fraction of "what quantum algorithm solves problem $X$" questions in current research reduce to two separate sub-problems: (1) what polynomial (or, after the next lesson generalizes this to matrices, what function) approximates the operation you actually want — a truncated Jacobi–Anger/Chebyshev expansion approximates $e^{-iHt}$ for Hamiltonian simulation, a carefully shaped odd polynomial approximates $1/x$ for matrix inversion, a smoothed sign function approximates an eigenvalue filter — and (2) how to realize that exact polynomial via QSP. This lesson is entirely about why (2) has a clean answer: the achievability theorem above says that essentially any polynomial satisfying the stated degree/parity/boundedness/completeness conditions is realizable, exactly, by *some* phase sequence, turning "redesign a circuit for this new function" into "solve one classical numerical problem for these new phases." That reframing, more than any single algorithm built from it, is why QSP (and its full-matrix generalization, QSVT, next) is often described as the master key underlying modern quantum algorithms.
+A large fraction of "what quantum algorithm solves problem $X$" questions in current research reduce to two separate sub-problems: (1) what polynomial (or, after the next lesson generalizes this to matrices, what function) approximates the operation you actually want — a truncated Jacobi–Anger/Chebyshev expansion approximates $e^{-iHt}$ for Hamiltonian simulation, a carefully shaped odd polynomial approximates $1/x$ for matrix inversion, a smoothed sign function approximates an eigenvalue filter — and (2) how to realize that exact polynomial via QSP. This lesson is entirely about why (2) has a clean answer: the achievability theorem above says that essentially any polynomial satisfying the stated degree/parity/boundedness/completeness conditions is realizable, exactly, by *some* phase sequence, turning "redesign a circuit for this new function" into "solve one classical numerical problem for these new phases." That reframing, more than any single algorithm built from it, is why QSP (and its full-matrix generalization, QSVT, next) is often described as the master key underlying modern quantum algorithms.
 
-Being honest about scope: finding the actual phase sequence $\phi_0,\dots,\phi_d$ for a given target $(P,Q)$ is itself a real, nontrivial computational problem, distinct from the existence theorem this lesson states. It is not derived here, but it is a *solved* problem, with known, numerically stable classical algorithms (e.g. via optimization over the phases, or via an explicit factorization procedure recovering them one at a time from $P$ and $Q$'s roots) that run in time polynomial in $d$. The point of separating the two is exactly the point of the previous paragraph: the existence theorem is what makes "just compute the phases classically" a meaningful thing to be able to say at all.
+Being honest about scope: finding the actual phase sequence $\phi_0,\dots,\phi_d$ for a given target $(P,Q)$ is itself a real, nontrivial computational problem, distinct from the existence theorem this lesson states. It is not derived here, but it is a *solved* problem, with known classical algorithms (via optimization over the phases, or via an explicit factorization procedure recovering them one at a time from $P$ and $Q$'s roots) that run in time polynomial in $d$. The point of separating the two is the point of the previous paragraph: the existence theorem is what makes "just compute the phases classically" a meaningful thing to be able to say at all.
+
+The word "solved" deserves one qualification, because it is the standard place a QSP-based construction meets reality. The straightforward root-finding route is numerically unstable: the polynomial's roots cluster badly, and at the degrees a useful Hamiltonian-simulation or matrix-inversion polynomial actually needs (hundreds to thousands), double precision is not enough and the recovered phases drift. Practical implementations either work in extended precision or use optimization-based methods designed around the instability.
+
+<ResearchConnection
+  title="The two halves of QSP, in their original papers"
+  source="Low & Chuang, Phys. Rev. Lett. 118, 010501 (2017) (arXiv:1606.02685); Dong, Meng, Whaley & Lin, Phys. Rev. A 103, 042419 (2021) (arXiv:2002.11649)"
+  url="https://arxiv.org/abs/1606.02685"
+>
+  Low and Chuang's paper is where the alternating construction above is
+  turned into an algorithm with a proven query complexity: Hamiltonian
+  simulation with cost $O(t\lVert H\rVert + \log(1/\varepsilon)/\log\log(1/\varepsilon))$,
+  optimal in $t$ and near-optimal in $\varepsilon$. Dong, Meng, Whaley
+  and Lin's is the other half, and the one a practitioner hits first: an
+  optimization-based phase-factor evaluation that stays stable at degrees
+  where the direct factorization method fails. Reading the second makes
+  the first usable.
+</ResearchConnection>
 
 ## Worked Example
 

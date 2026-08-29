@@ -111,13 +111,25 @@ function AxisLine({
   return (
     <g opacity={depthOpacity(b.depth)}>
       <line x1={a.sx} y1={a.sy} x2={b.sx} y2={b.sy} style={{ stroke: "var(--muted-foreground)" }} strokeWidth={1} />
+      {/* 11 -> 15 units. This SVG renders `w-full` on a 400-unit viewBox
+          inside a `SimulatorInstrument` (`p-4 sm:p-5` on a 1px-bordered
+          `.instrument`), so on a 320px phone its box is 320 − 32 − 2 ×
+          (16 + 1) = 254px and authored type scales by 254/400 = 0.635. The
+          axis names painted at 11 × 0.635 = 6.99px — under the ~9px floor,
+          and they are the only thing distinguishing the x, y and z axes of a
+          sphere the reader is being asked to rotate. 15 units gives 9.53px.
+          The dy offsets grow with the type (−8/+14 -> −11/+19) so the gap
+          between an axis tip and its label stays proportional instead of
+          closing up as the glyphs get taller; a single character at 15 units
+          in the mono face is ~9 units wide, so the ±4.5 half-width around an
+          axis tip at 52..348 stays well inside the 400-unit box. */}
       {label ? (
         <text
           x={b.sx}
           y={b.sy}
-          dy={b.sy > a.sy ? 14 : -8}
+          dy={b.sy > a.sy ? 19 : -11}
           textAnchor="middle"
-          className="font-mono text-[11px]"
+          className="font-mono text-[15px]"
           style={{ fill: "var(--muted-foreground)" }}
         >
           {label}
@@ -217,7 +229,24 @@ export function BlochSphereCanvas({
   return (
     <svg
       viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`}
-      role="img"
+      // `role="group"`, not `role="img"`. This element is `tabIndex={0}` and
+      // handles four arrow keys, so `img` was an outright false promise: it
+      // tells assistive tech "static graphic, nothing to operate here", and a
+      // focusable image is a shape screen readers have no interaction model
+      // for — the reader lands on a tab stop whose role says it cannot be a
+      // tab stop, and nothing in the exposed semantics says arrow keys do
+      // anything. `img` also forces every descendant presentational, which is
+      // why the pole labels below were silently dropped from the tree.
+      //
+      // `group` is the role for "a focusable container of related graphics you
+      // operate as one thing", and `aria-roledescription` restores the useful
+      // half of what `img` was communicating — the reader hears "interactive
+      // Bloch sphere" rather than a bare "group" — without claiming the thing
+      // is inert. The `aria-label` still carries the vector's coordinates and
+      // the operating instructions, so the announcement on focus is unchanged
+      // in substance and now honest about being operable.
+      role="group"
+      aria-roledescription="interactive Bloch sphere"
       tabIndex={0}
       aria-label={`Bloch sphere with the qubit state vector at approximately x=${blochPoint.x.toFixed(2)}, y=${blochPoint.y.toFixed(2)}, z=${blochPoint.z.toFixed(2)}. Drag, or focus and use the arrow keys, to rotate the view.`}
       className={cn(
@@ -255,25 +284,42 @@ export function BlochSphereCanvas({
         // Near pitch=0 the poles sit at their most extreme projected height (the
         // ±1.28 axis tip is ~189px from center vs. the ~200px half-height of the
         // 400×400 viewBox), leaving only ~11px of headroom before the viewBox
-        // edge clips the label — so these offsets stay smaller than the old
-        // -8/+14 to keep both kets fully on-screen at low pitch, not just at the
-        // default/extreme pitch values where there's plenty of room.
+        // edge clips the label.
+        //
+        // The old answer was to shrink the offsets (-6/+11 rather than the
+        // axis labels' -8/+14). That does not survive the type rising from 11
+        // to 15 units — see the AxisLine note above for the 254px measurement
+        // that forced it — because at 15 units the ascent alone is ~11 units,
+        // so at pitch 0 a baseline at north.sy − 6 = 5 puts the cap tops at
+        // −6 and SVG clips them away with no scrollbar and no symptom.
+        //
+        // So the offsets go back to matching the axis labels and the result is
+        // *clamped* to the box instead. `Math.max`/`Math.min` against the
+        // glyph's own ascent and descent is a bound, not a guess: the label can
+        // never leave the viewBox at any pitch, and at every pitch except the
+        // extreme it sits exactly where the un-clamped offset would put it
+        // (at the default pitch of 0.32 the north tip projects to sy ≈ 20.6,
+        // so the clamp is already inactive by a hair). The worst case it
+        // permits is the ket resting on its own axis tip at pitch 0, which is
+        // legible; the worst case it replaces was the ket being invisible.
+        const ASCENT = 13;
+        const DESCENT = 5;
         return (
           <>
             <text
               x={north.sx}
-              y={north.sy - 6}
+              y={Math.max(north.sy - 11, ASCENT)}
               textAnchor="middle"
-              className="font-mono text-[11px]"
+              className="font-mono text-[15px]"
               style={{ fill: "var(--foreground)" }}
             >
               |0⟩
             </text>
             <text
               x={south.sx}
-              y={south.sy + 11}
+              y={Math.min(south.sy + 19, VIEW_SIZE - DESCENT)}
               textAnchor="middle"
-              className="font-mono text-[11px]"
+              className="font-mono text-[15px]"
               style={{ fill: "var(--foreground)" }}
             >
               |1⟩

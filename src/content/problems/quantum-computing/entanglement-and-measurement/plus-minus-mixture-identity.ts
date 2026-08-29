@@ -62,6 +62,10 @@ export const plusMinusMixtureIdentity: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "The off-diagonal terms of |+⟩⟨+| and |−⟩⟨−| are opposite in sign and cancel under averaging.",
     whyCorrect: "This matches Convex Combinations and Physical Mixtures' general result: any orthonormal basis, mixed 50/50, gives I/2.",
-    whyWrong: ["Option c forgets to include |−⟩⟨−|'s negative off-diagonal contribution."],
+    whyWrong: [
+      { optionId: "b", text: "Keeps the result pure. Mixing two distinct pure states, each with nonzero probability, gives a mixed state." },
+      { optionId: "c", text: "Is |+⟩⟨+| written out, dropping |−⟩⟨−|'s negative off-diagonal contribution, so the coherences never cancel." },
+      { optionId: "d", text: "Has trace 0. Every density matrix has trace 1." },
+    ],
   },
 };

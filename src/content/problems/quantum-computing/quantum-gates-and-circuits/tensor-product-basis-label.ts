@@ -52,6 +52,10 @@ export const tensorProductBasisLabel: MultipleChoiceProblem = {
     correctIdea: "The tensor product of two basis states concatenates their labels.",
     whyCorrect:
       "Multiplying out the definition component-by-component shows the result is 1 exactly at the index whose binary label is the two inputs written in order.",
-    whyWrong: ["Reversing the order (|10⟩) mixes up which qubit is qubit 0 — order matters for the tensor product."],
+    whyWrong: [
+      { optionId: "00", text: "Takes the second factor as |0⟩. It is |1⟩." },
+      { optionId: "10", text: "Reverses the two factors. The first ket written is qubit 0, the left digit of the label." },
+      { optionId: "11", text: "Would need both factors to be |1⟩." },
+    ],
   },
 };

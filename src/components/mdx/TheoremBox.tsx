@@ -30,6 +30,21 @@ const PROVENANCE_STYLES: Record<Provenance, string> = {
   derived: "border-accent/40 bg-accent/10 text-accent",
 };
 
+/** The tombstone, `∎` — the mark this component's own readers already use to
+ *  close a proof, and the one glyph that can only mean "theorem" here. Drawn
+ *  rather than typed for the same reason `DefinitionBox`'s `≝` is: at 13px a
+ *  font-substituted or missing codepoint would be the entire signal. Paired
+ *  with that `≝`, definition and theorem are now separated by shape, so the
+ *  two panels stop being the same box with a differently-tinted word at the
+ *  top — see the note in DefinitionBox.tsx. */
+function TheoremGlyph() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true" data-decorative="" className="shrink-0">
+      <rect x="2.6" y="2.6" width="7.8" height="7.8" rx="0.9" fill="currentColor" />
+    </svg>
+  );
+}
+
 /**
  * Formal theorem statement, styled as a distinct sibling of `Callout`: a
  * full-border header-strip panel (not a colored tint) rather than a rounded,
@@ -52,13 +67,21 @@ export function TheoremBox({
   return (
     <div
       className={cn(
-        "not-prose my-8 overflow-hidden rounded-[var(--radius-panel)] border border-border border-l-2 border-l-pillar-edge bg-surface",
+        "not-prose my-8 overflow-hidden rounded-panel border border-border border-l-2 border-l-pillar-edge bg-surface",
         className
       )}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5 border-b border-border bg-surface-muted px-5 py-3">
         <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <TechLabel className="text-brand">Theorem</TechLabel>
+          {/* `items-center` inside a baseline-aligned row (an SVG has no
+              baseline, so it would otherwise hang above the text), and
+              `text-brand` repeated on the label because `.tech-label`
+              declares its own `color` — see the matching note in
+              DefinitionBox.tsx. */}
+          <span className="flex items-center gap-1.5 text-brand">
+            <TheoremGlyph />
+            <TechLabel className="text-brand">Theorem</TechLabel>
+          </span>
           {title && (
             <span className="font-display text-base font-semibold text-foreground sm:text-lg">
               {title}

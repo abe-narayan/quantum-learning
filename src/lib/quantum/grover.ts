@@ -51,10 +51,13 @@ export function groverIteration(state: StateVector, markedIndices: Iterable<numb
 }
 
 /**
- * The (real-valued, unrounded) optimal iteration count
- * ⌊(π/4)√(N/M)⌋ for N basis states and M marked items — the standard result
- * from treating each iteration as a rotation by angle 2θ where sinθ=√(M/N)
- * in the 2D span of "marked" and "unmarked" superpositions.
+ * The optimal iteration count ⌊(π/4)√(N/M)⌋ for N basis states and M marked
+ * items, as an integer (at least 1) — the standard result from treating each
+ * iteration as a rotation by angle 2θ where sinθ=√(M/N) in the 2D span of
+ * "marked" and "unmarked" superpositions. `Math.round(x - 0.5)` is the floor
+ * here; it is written that way rather than as `Math.floor` so that a value
+ * sitting a floating-point hair below an integer still rounds to it instead
+ * of dropping a whole iteration.
  */
 export function optimalGroverIterations(n: number, markedCount = 1): number {
   const N = 2 ** n;

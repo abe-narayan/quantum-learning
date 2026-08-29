@@ -68,9 +68,27 @@ export function PresetToggle({
           onClick={() => onChange(i)}
           onKeyDown={handleKeyDown}
           className={cn(
+            "inline-flex min-h-11 items-center rounded-full border px-4 py-1.5 text-xs font-medium transition-colors",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            // Selected state moved off the fixed `bg-brand` onto the pillar
+            // identity channel, matching `simulators/shared/controls.tsx`'s
+            // `PillGroup` — the same control, one directory over, already on
+            // the pillar tokens. `--pillar-*` defaults to --brand's own hue
+            // family, so an unscoped page looks unchanged; inside a
+            // `[data-pillar]` lesson the figure's controls now pick up that
+            // pillar's tint instead of asserting a colour the rest of the
+            // page isn't using. `text-brand-foreground` (not
+            // `text-pillar-text`) is the on-fill pairing: `--pillar-text` is
+            // the readable-on-background variant and would be near-invisible
+            // sitting on `bg-pillar`.
+            //
+            // The border is now unconditional. Previously only the
+            // *unselected* pill had one, so selecting a pill silently shrank
+            // it by 2px and nudged every pill after it — a 2px reflow on
+            // every click of a control whose whole job is being clicked.
             i === index
-              ? "inline-flex min-h-11 items-center rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-brand-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              : "inline-flex min-h-11 items-center rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              ? "border-pillar bg-pillar text-brand-foreground"
+              : "border-border bg-surface text-muted-foreground hover:bg-surface-muted",
             disabled && "pointer-events-none opacity-50"
           )}
         >

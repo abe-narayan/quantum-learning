@@ -78,3 +78,60 @@ describe("raising/lowering operators", () => {
     expect(maxDiff(sum, angularMomentumX(j))).toBeLessThan(1e-9);
   });
 });
+
+describe("the angular momentum algebra itself", () => {
+  // The six matrix elements above check *construction*; these check the
+  // defining relations the construction is supposed to satisfy. They are
+  // what would catch a wrong ladder coefficient, a wrong basis ordering, or
+  // a sign slip in Jy's 1/(2i) — none of which the j=1/2 Pauli comparisons
+  // can see, since at j=1/2 almost every coefficient is 1.
+  it("obeys [Jx, Jy] = iJz for every implemented j", () => {
+    for (const j of [0.5, 1, 1.5, 2, 2.5, 3]) {
+      const expected = angularMomentumZ(j).scale(new Complex(0, 1));
+      const actual = commutator(angularMomentumX(j), angularMomentumY(j));
+      expect(maxDiff(actual, expected), `j=${j}`).toBeLessThan(1e-9);
+    }
+  });
+
+  it("obeys [Jy, Jz] = iJx and [Jz, Jx] = iJy, the other two cyclic relations", () => {
+    for (const j of [0.5, 1, 1.5, 2]) {
+      expect(
+        maxDiff(commutator(angularMomentumY(j), angularMomentumZ(j)), angularMomentumX(j).scale(new Complex(0, 1))),
+        `[Jy,Jz] at j=${j}`
+      ).toBeLessThan(1e-9);
+      expect(
+        maxDiff(commutator(angularMomentumZ(j), angularMomentumX(j)), angularMomentumY(j).scale(new Complex(0, 1))),
+        `[Jz,Jx] at j=${j}`
+      ).toBeLessThan(1e-9);
+    }
+  });
+
+  it("gives J² = j(j+1)I exactly, for every implemented j", () => {
+    for (const j of [0.5, 1, 1.5, 2, 2.5, 3]) {
+      const dimension = Math.round(2 * j + 1);
+      const expected = Matrix.identity(dimension).scale(j * (j + 1));
+      expect(maxDiff(totalAngularMomentumSquared(j), expected), `j=${j}`).toBeLessThan(1e-9);
+    }
+  });
+
+  it("makes Jx, Jy and Jz Hermitian, so each is a genuine observable", () => {
+    for (const j of [0.5, 1, 1.5, 2, 2.5]) {
+      expect(angularMomentumX(j).isHermitian(1e-12), `Jx at j=${j}`).toBe(true);
+      expect(angularMomentumY(j).isHermitian(1e-12), `Jy at j=${j}`).toBe(true);
+      expect(angularMomentumZ(j).isHermitian(1e-12), `Jz at j=${j}`).toBe(true);
+    }
+  });
+
+  it("makes J- the adjoint of J+, as the ladder operators of a Hermitian algebra must be", () => {
+    for (const j of [0.5, 1, 1.5, 2]) {
+      expect(maxDiff(angularMomentumRaising(j).dagger(), angularMomentumLowering(j)), `j=${j}`).toBeLessThan(1e-12);
+    }
+  });
+
+  it("commutes J² with Jz, the statement that j and m are simultaneously measurable", () => {
+    for (const j of [0.5, 1, 1.5, 2]) {
+      const zero = Matrix.zeros(Math.round(2 * j + 1), Math.round(2 * j + 1));
+      expect(maxDiff(commutator(totalAngularMomentumSquared(j), angularMomentumZ(j)), zero), `j=${j}`).toBeLessThan(1e-9);
+    }
+  });
+});

@@ -36,19 +36,23 @@ export const simonOracleOutputS10X3: NumericProblem = {
     value: fOfX,
     tolerance: 0.001,
     incorrectFeedback:
-      "Compute $x\\oplus s$ first ($11 \\oplus 10 = 01$), then take $\\min$ of $x$ and that value, interpreting both as binary integers.",
+      "The most common slip is treating $\\oplus$ as ordinary subtraction. XOR works bit by bit with no borrowing: each output bit records whether the two input bits differ. Compute $x\\oplus s$ that way first, convert both candidates to decimal, then take the smaller.",
+    nearMisses: [
+      { value: 3, feedback: "3 is x itself. The oracle takes the minimum of the pair {x, x⊕s}, and x⊕s = 1 is the smaller of the two." },
+      { value: 2, feedback: "2 is the hidden string s. The oracle's output is min(x, x⊕s), so XOR x with s first, then compare." },
+    ],
   },
   hints: [
-    { text: "$x\\oplus s = 11 \\oplus 10 = 01$ (binary)." },
-    { text: "$f(x) = \\min(x, x\\oplus s)$, comparing the two as integers: $\\min(3, 1)$." },
-    { text: "The smaller of the two is $1$, i.e. binary $01$." },
+    { text: "Two operations, in order: first the bitwise XOR of x with the hidden string, then a comparison. Keep the binary strings and their decimal readings clearly separate as you work." },
+    { text: "XOR is bitwise with no carrying: each output bit says whether the corresponding input bits differ. Compute $x\\oplus s$ bit by bit for $x=11$ and $s=10$." },
+    { text: "Now take $\\min(x, x\\oplus s)$, comparing both as decimal integers, and report the smaller one in decimal." },
   ],
   solution: {
     steps: [
       { description: "$x=11$ (decimal 3), $s=10$ (decimal 2).", latex: "x\\oplus s = 11\\oplus10 = 01 \\;(\\text{decimal } 1)" },
       { description: "$f(x)=\\min(x,x\\oplus s)=\\min(3,1)$.", latex: `f(11) = ${fOfX}` },
     ],
-    finalAnswer: `$f(11) = ${fOfX}$ (binary $01$), pairing with $x=01$, whose $x\\oplus s=11$ gives the same output — confirming the 2-to-1 property for this pair.`,
+    finalAnswer: `$f(11) = ${fOfX}$ (binary $01$), pairing with $x=01$, whose $x\\oplus s=11$ gives the same output, confirming the 2-to-1 property for this pair.`,
   },
   explanation: {
     correctIdea: "f(x)=min(x, x⊕s) always pairs x with x⊕s under the same output value, the defining 2-to-1 structure of Simon's oracle.",

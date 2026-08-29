@@ -23,7 +23,19 @@ export const molecularSimulationPhaseEstimationOverlapCaveat: ConceptualProblem 
     requiredConceptGroups: [
       ["initial state", "trial state", "starting state", "input state", "prepared state"],
       ["overlap", "ground state overlap", "amplitude squared", "|<", "probability of projecting"],
-      ["exponentially small", "exponentially small success", "vanishes exponentially", "shrinks exponentially"],
+      {
+        phrases: [
+          "exponentially small",
+          "exponentially small success",
+          "vanishes exponentially",
+          "shrinks exponentially",
+          "exponentially many repetitions",
+          "exponentially many shots",
+          "exponential number of repetitions",
+        ],
+        missingFeedback:
+          "You have identified the overlap assumption. Now say what breaks when it fails: for a poor reference state the squared overlap can be exponentially small in system size, so the number of repetitions needed to see the ground energy even once grows exponentially, and the exponential cost returns through state preparation rather than through the circuit.",
+      },
       ["state preparation", "finding a good", "not automatic", "unsolved", "open problem", "no general recipe"],
     ],
     incorrectFeedback:

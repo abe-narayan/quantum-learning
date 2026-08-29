@@ -24,15 +24,22 @@ export const shellCapacityNEquals4: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.5,
-    incorrectFeedback: "Compute 2×4² directly.",
+    incorrectFeedback: "If you got 16, you counted the orbitals but forgot that each one holds two electrons of opposite spin. Also check the order of operations: square n first, then multiply by 2.",
+    nearMisses: [
+      { value: 16, feedback: "16 is n², the orbital count. Each orbital takes two electrons of opposite spin." },
+      { value: 64, feedback: "64 is (2n)², doubling before squaring. Square n first, then double." },
+      { value: 8, feedback: "8 is 2n. The degeneracy of a shell grows as n², not linearly." },
+    ],
   },
   hints: [
-    { text: "2n² with n=4." },
-    { text: "4²=16, then 2×16." },
-    { text: "=32." },
+    { text: "The formula is named in the prompt, so the real work is understanding what it encodes: a shell with principal quantum number n contains n² orbitals, and the exclusion principle lets each orbital hold two electrons of opposite spin." },
+    { text: "Substitute n = 4 into 2n². Square first, then double." },
   ],
   solution: {
-    steps: [{ description: "2(4)²=2(16)=32." }],
+    steps: [
+      { description: "The n=4 shell contains n² = 4² = 16 orbitals." },
+      { description: "Each orbital holds 2 electrons (spin up and spin down), so the capacity is 2×16 = 32." },
+    ],
     finalAnswer: "32",
   },
   explanation: {

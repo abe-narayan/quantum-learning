@@ -16,7 +16,7 @@ export const decayFrames = [
     paramLabel: "",
     series: [
       {
-        label: "|ψ₀(x)|² (ground harmonic oscillator state, ψ,ψ′ both actually in L²(ℝ))",
+        label: "|ψ₀(x)|² (ground harmonic oscillator state, with ψ and ψ′ both in L²(ℝ))",
         color: "brand",
         points: decayGrid.x.map((x, i) => ({ x, y: groundDensity[i] })),
       },
@@ -64,16 +64,15 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/the-hydrogen-atom/the-radial-equation",
-      note: "The radial equation's boundary condition u(0)=0 is exactly a domain choice of the kind this lesson makes precise — the physically forced condition for the radial momentum-like operator to be self-adjoint on a half-line, not an ad hoc requirement.",
+      note: "The radial equation's boundary condition u(0)=0 is a domain choice of the kind this lesson makes precise — the physically forced condition for the radial momentum-like operator to be self-adjoint on a half-line, not an ad hoc requirement.",
     },
   ],
 };
 
 <LessonHook eyebrow="Where the finite-dimensional check quietly fails">
-  Momentum on a half-line passes the textbook Hermiticity check cleanly —
-  and still has no self-adjoint version at all, not with any boundary
-  condition. The gap between "symmetric" and "self-adjoint" is where that
-  happens.
+  Momentum on a half-line passes the textbook Hermiticity check cleanly
+  and is still not a legitimate observable. The gap between "symmetric"
+  and "self-adjoint" is where that happens.
 </LessonHook>
 
 ## Motivation
@@ -97,7 +96,7 @@ half-line case in full.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
   alt="John von Neumann, Los Alamos identification photograph"
-  caption="Von Neumann built the rigorous theory of symmetric versus self-adjoint operators and the deficiency-index machinery this lesson uses directly to show the half-line momentum operator has no self-adjoint extension at all — a genuine mathematical obstruction, not a coincidence of a badly chosen boundary condition."
+  caption="Von Neumann built the rigorous theory of symmetric versus self-adjoint operators and the deficiency-index machinery this lesson uses to show the half-line momentum operator has no self-adjoint extension at all. The obstruction is in the operator, not in a badly chosen boundary condition."
   credit="Los Alamos National Laboratory / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
   license="Public domain"
@@ -120,20 +119,20 @@ the boundary-term calculation come out looking symmetric.
 
 ## Mathematical Development
 
-### $L^2(\mathbb R)$ is a genuine Hilbert space
+### Why $L^2(\mathbb R)$ qualifies as a Hilbert space
 
 $L^2(\mathbb R)=\{\psi:\mathbb R\to\mathbb C \mid \int|\psi(x)|^2dx<\infty\}$
 with inner product $\langle\phi|\psi\rangle=\int\phi^*(x)\psi(x)\,dx$ is a
-Hilbert space, meaning: it's an inner product space (immediate from the
+<Term id="hilbert-space">Hilbert space</Term>, meaning: it's an inner product space (immediate from the
 integral's linearity and conjugate symmetry), it's **complete** (every
 Cauchy sequence of $L^2$ functions converges to an $L^2$ function: the
-Riesz–Fischer theorem, a genuine, nontrivial real-analysis result **cited
-here, not proved**: proving completeness of $L^2$ requires the Lebesgue
+Riesz–Fischer theorem, a nontrivial real-analysis result **cited
+here, not proved**, since proving completeness of $L^2$ requires the Lebesgue
 integral's convergence theorems, outside this course's scope), and it's
 **separable** (it has a countable orthonormal basis). Separability is
 concrete and checkable: the harmonic-oscillator eigenstates
 $\{\psi_n\}_{n=0}^\infty$ this platform already computes via
-`harmonicOscillatorEigenstate` are exactly such a countable orthonormal
+`harmonicOscillatorEigenstate` are such a countable orthonormal
 basis (Hermite functions), so separability isn't an abstract promise:
 it's the same basis Wave Mechanics already used to expand any state as
 $\sum_nc_n\psi_n$.
@@ -148,18 +147,23 @@ be the right *kind* of statement to make.
 
 ### Formally Hermitian ("symmetric") vs. actually self-adjoint
 
-An operator $A$ with domain $D(A)\subset\mathcal H$ is **symmetric** if
+An operator $A$ with dense domain $D(A)\subset\mathcal H$ is **symmetric** if
 $\langle\phi|A\psi\rangle=\langle A\phi|\psi\rangle$ for all
-$\phi,\psi\in D(A)$, exactly the integration-by-parts check
+$\phi,\psi\in D(A)$, the same integration-by-parts check
 Position and Momentum Operators already did for $\hat p$. The **adjoint**
 $A^\dagger$ is a possibly *larger*-domain operator: $D(A^\dagger)$ is the
 set of $\phi$ for which *some* $\chi$ satisfies
 $\langle\phi|A\psi\rangle=\langle\chi|\psi\rangle$ for every
-$\psi\in D(A)$, and then $A^\dagger\phi\equiv\chi$. $A$ is
+$\psi\in D(A)$, and then $A^\dagger\phi\equiv\chi$. Density of $D(A)$ is
+what makes that last step legitimate: if $D(A)$ were not dense, two
+different $\chi$ could agree against every $\psi\in D(A)$ and differ on
+the orthogonal complement, leaving $A^\dagger\phi$ undefined. Every
+operator in this lesson is densely defined, and the hypothesis is worth
+naming because it is the one silently supplied in finite dimensions. $A$ is
 **self-adjoint** only if $D(A)=D(A^\dagger)$ *exactly*, not merely
 $D(A)\subseteq D(A^\dagger)$, which is all "symmetric" guarantees. In
 finite dimensions $D(A)=D(A^\dagger)=\mathbb C^n$ automatically for any
-matrix, so this distinction is invisible; that's precisely why Hermitian
+matrix, so this distinction is invisible; that is why Hermitian
 Operators never needed to make it.
 
 Picture $D(A)$ and $D(A^\dagger)$ as two regions: symmetry only ever
@@ -170,7 +174,7 @@ coincide exactly, no leftover room at all. The two operators this
 lesson works out land on opposite sides of that line:
 
 <div className="not-prose grid grid-cols-1 gap-4 overflow-x-auto sm:grid-cols-2">
-  <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-muted/40 p-4">
+  <div className="flex flex-col items-center gap-2 rounded-panel border border-border bg-surface-muted/40 p-4">
     <svg width={240} height={180} viewBox="0 0 240 180" role="img" aria-label="Self-adjoint case: D of p-hat and D of p-hat-dagger coincide exactly, drawn as one shared rectangle labeled from both the top and the bottom" className="max-w-full">
       <rect x={40} y={45} width={160} height={90} rx={10} className="fill-brand/10 stroke-brand" strokeWidth={2.5} />
       <rect x={44} y={49} width={152} height={82} rx={8} className="fill-none stroke-accent" strokeWidth={1.5} strokeDasharray="5 4" />
@@ -181,11 +185,11 @@ lesson works out land on opposite sides of that line:
     </svg>
     <span className="text-center text-sm text-muted-foreground">
       Whole line, derived above: $D(\hat p)=D(\hat p^\dagger)=H^1(\mathbb R)$
-      exactly — the two domains coincide, so $\hat p$ is
+      exactly: the two domains coincide, so $\hat p$ is
       self-adjoint, not merely symmetric.
     </span>
   </div>
-  <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-muted/40 p-4">
+  <div className="flex flex-col items-center gap-2 rounded-panel border border-border bg-surface-muted/40 p-4">
     <svg width={240} height={200} viewBox="0 0 240 200" role="img" aria-label="Merely symmetric case: D of p-hat drawn as a smaller rectangle strictly inside the larger rectangle D of p-hat-dagger, with the gap between them called out as unclosable because the deficiency indices are unequal" className="max-w-full">
       <rect x={20} y={30} width={200} height={140} rx={12} className="fill-accent/10 stroke-accent" strokeWidth={2} />
       <rect x={68} y={70} width={104} height={62} rx={8} className="fill-brand/20 stroke-brand" strokeWidth={2.5} />
@@ -219,7 +223,7 @@ on shrinking intervals and still have finite $\int|\psi|^2$). What
 actually forces the vanishing is $\psi'\in L^2$ *as well*:
 
 <DerivationSteps>
-  <DerivationStep annotation="Product rule for d/dx|ψ|², valid for any ψ regardless of domain — the identity holds for real or complex ψ.">
+  <DerivationStep annotation="Product rule for d/dx|ψ|², valid for any ψ regardless of domain. The identity holds for real or complex ψ.">
     $$
     \frac{d}{dx}|\psi(x)|^2=\psi'(x)\psi^*(x)+\psi(x)\psi'^*(x)=2\,\mathrm{Re}\big(\psi'(x)\psi^*(x)\big)
     $$
@@ -234,14 +238,14 @@ actually forces the vanishing is $\psi'\in L^2$ *as well*:
     |\psi(x)|^2-|\psi(0)|^2=\int_0^x2\,\mathrm{Re}\big(\psi'\psi^*\big)\,dt
     $$
   </DerivationStep>
-  <DerivationStep annotation="So |ψ(x)|² tends to some limit L ≥ 0. If L > 0, |ψ(x)|² would stay bounded away from zero for all large x, making ∫|ψ|²dx diverge — contradicting ψ ∈ L²(ℝ). So L = 0.">
+  <DerivationStep annotation="So |ψ(x)|² tends to some limit L ≥ 0. If L > 0, |ψ(x)|² would stay bounded away from zero for all large x, making ∫|ψ|²dx diverge, contradicting ψ ∈ L²(ℝ). So L = 0.">
     $$
     \psi(x)\to0 \ \text{ as } x\to\pm\infty, \qquad \text{for every } \psi\in H^1(\mathbb R)
     $$
   </DerivationStep>
 </DerivationSteps>
 
-This is a genuine derivation from the two hypotheses $\psi,\psi'\in L^2$, not an assumption smuggled in by calling $\psi$ "well-behaved."
+Both hypotheses were used, and neither can be dropped: $\psi\in L^2$ rules out a nonzero limit in the last step, $\psi'\in L^2$ is what makes the integral converge in the first place. The vanishing is a consequence of the domain, not a politeness assumed by calling $\psi$ "well-behaved."
 
 With that lemma established, the boundary term vanishes outright (both
 $\phi,\psi\to0$), confirming $\hat p$ is symmetric on $H^1(\mathbb R)$:
@@ -260,7 +264,7 @@ $$
 
 </EquationReveal>
 
-### Why the full-line $\hat p$ is actually self-adjoint, not just symmetric
+### Why the full-line $\hat p$ is self-adjoint, not merely symmetric
 
 Symmetry alone leaves open whether $D(\hat p^\dagger)$ might be
 *strictly larger* than $H^1(\mathbb R)$. It isn't, and the cleanest way
@@ -286,12 +290,34 @@ symmetric domain $D(\hat p)=\{\psi\in H^1(0,\infty):\psi(0)=0\}$
 (the natural guess: a Dirichlet condition at the one boundary point,
 directly mirroring the well-worn "wavefunction vanishes at a wall").
 Whether *any* choice of domain makes this operator self-adjoint is
-settled by von Neumann's **deficiency-index theorem** (cited here, a
-genuine and deep result of functional analysis not re-derived in full):
-count the dimensions of the solution spaces of
-$\hat p^\dagger\psi=+i\psi$ and $\hat p^\dagger\psi=-i\psi$ inside
-$L^2(0,\infty)$; call these dimensions $n_+,n_-$, the **deficiency
-indices**. A self-adjoint extension exists *only if* $n_+=n_-$.
+settled by von Neumann's deficiency-index theorem.
+
+<TheoremBox title="von Neumann's deficiency-index criterion" provenance="cited">
+
+Let $A$ be a **densely defined symmetric** operator on a Hilbert space
+$\mathcal H$, and define its **deficiency indices**
+
+$$
+n_+ = \dim\ker(A^\dagger - i), \qquad n_- = \dim\ker(A^\dagger + i).
+$$
+
+Then $A$ admits a self-adjoint extension **if and only if** $n_+=n_-$.
+When $n_+=n_-=n\geq1$, the self-adjoint extensions are in one-to-one
+correspondence with the unitary maps $\ker(A^\dagger-i)\to\ker(A^\dagger+i)$,
+an $n^2$-real-parameter family. When $n_+=n_-=0$, $A$ is already
+essentially self-adjoint and the extension is unique.
+
+The hypotheses are only *densely defined* and *symmetric*. Nothing about
+boundedness, and nothing about which boundary condition was tried; a
+mismatch $n_+\ne n_-$ therefore rules out every domain at once, not just
+the one in front of you. Statement and proof: von Neumann (1929);
+Reed–Simon, *Methods of Modern Mathematical Physics* II, §X.1.
+
+</TheoremBox>
+
+So the question "is there a self-adjoint momentum on the half-line?"
+reduces to counting $L^2(0,\infty)$ solutions of
+$\hat p^\dagger\psi=+i\psi$ and $\hat p^\dagger\psi=-i\psi$.
 
 <PredictBeforeReveal
   question="The Dirichlet domain ψ(0)=0 already makes p̂ symmetric on the half-line. Before computing n₊ and n₋: does the symmetric check that already passed mean a self-adjoint extension is guaranteed to exist?"
@@ -301,7 +327,7 @@ indices**. A self-adjoint extension exists *only if* $n_+=n_-$.
     { label: "Only if the wall is at x=0 specifically", value: "wall" },
   ]}
   correctValue="no"
-  explanation="Symmetric only guarantees D(p̂)⊆D(p̂†); von Neumann's theorem needs the deficiency indices n₊,n₋ equal, and the computation below shows n₊=1, n₋=0 for this exact operator. No boundary condition fixes that mismatch — the half-line momentum operator has no self-adjoint extension at all."
+  explanation="Symmetric only guarantees D(p̂)⊆D(p̂†); von Neumann's theorem needs the deficiency indices n₊,n₋ equal, and the computation below shows n₊=1, n₋=0 for this exact operator. No boundary condition fixes that mismatch: the half-line momentum operator has no self-adjoint extension at all."
 />
 
 **Compute the deficiency indices directly.**
@@ -329,8 +355,8 @@ indices**. A self-adjoint extension exists *only if* $n_+=n_-$.
   ariaLabel="e to the minus x, normalizable on the half-line, versus e to the plus x, not normalizable and clamped at 8 for legibility since it actually diverges to infinity — the two candidate deficiency-subspace solutions for momentum on a half-line"
 />
 
-(the plotted $e^{+x}$ curve is clamped at $8$ for legibility — it
-actually diverges to infinity, which is exactly why this function
+(the plotted $e^{+x}$ curve is clamped at $8$ for legibility, because it
+actually diverges to infinity, which is why this function
 isn't normalizable). So the $\psi'=-\psi$ equation (eigenvalue $+i$)
 has exactly one $L^2(0,\infty)$ solution ($n_+=1$), while $\psi'=+\psi$
 (eigenvalue $-i$) has none ($n_-=0$). **$n_+\ne n_-$**: by von Neumann's theorem,
@@ -341,31 +367,34 @@ condition. Every domain choice leaves it merely symmetric at best.
 ## Physical Interpretation
 
 <InsightBlock>
-  Self-adjointness is exactly the
-  hypothesis a Hamiltonian needs to generate a genuinely unitary time
-  evolution. There is no self-adjoint "momentum toward the wall" operator
-  for a particle confined by a hard, one-sided wall, and that's a real
-  mathematical obstruction, not a modeling choice to work around.
+  Choosing a domain is choosing a boundary condition, and a boundary
+  condition is physics. That is why domain bookkeeping cannot be deferred:
+  an operator can pass every algebraic test you can write down and still
+  fail to describe anything, because the failure lives in a place the
+  algebra never looks.
 </InsightBlock>
 
-This is not a technicality kept separate from physics: self-adjointness
-is exactly the hypothesis Stone's theorem needs to generate a properly
-unitary time evolution $e^{-iAt/\hbar}$ (cited, not proved here: Stone's
-theorem is itself a substantial functional-analysis result). A merely
-symmetric operator can fail to generate *any* consistent unitary
-evolution, meaning probability wouldn't reliably be conserved if you
-tried to use it as a Hamiltonian or a generator of translations. The
-half-line result above has a genuine physical reading: **there is no
+<Term id="self-adjoint-operator">Self-adjointness</Term> is the hypothesis
+Stone's theorem needs, and the theorem is worth stating rather than gesturing at:
+every strongly continuous one-parameter unitary group $U(t)$ on
+$\mathcal H$ has the form $U(t)=e^{-iAt/\hbar}$ for a unique
+**self-adjoint** $A$, and conversely every self-adjoint $A$ generates
+one. (Cited, not proved here; Reed–Simon II, §VIII.4.) Symmetry is not
+enough for either direction. A merely symmetric operator can fail to
+generate *any* consistent unitary evolution, so probability would not be
+reliably conserved if you tried to use it as a Hamiltonian or a
+generator of translations.
+
+The half-line result therefore reads physically: **there is no
 self-adjoint "momentum toward the wall" operator for a particle
-confined to a half-line by a hard, impenetrable wall.** This isn't a
-platform limitation to work around; it reflects that "momentum" as a
-*generator of translations* doesn't make sense on a space with an
-inaccessible edge on only one side (translating far enough in the
-$-x$ direction runs the particle straight through the wall, which
-isn't a symmetry of the half-line at all). Physically sensible momentum
-operators exist only on spaces without a one-sided edge: the whole
-line, or a *periodic* interval (both directions structurally
-equivalent), never a genuine half-line.
+confined to a half-line by a hard, impenetrable wall.** That is not a
+gap to work around. Momentum *is* the generator of translations, and
+translations are not a symmetry of a space with an inaccessible edge on
+one side; pushing far enough in the $-x$ direction runs the particle
+through the wall. The deficiency count $n_+\ne n_-$ is the analytic
+signature of that broken symmetry. Momentum survives on spaces with no
+one-sided edge, the whole line or a periodic interval, where both
+directions are structurally alike.
 
 ## Worked Example
 
@@ -379,7 +408,7 @@ $\psi_0\in D(\hat p)=H^1(\mathbb R)$ by the actual hypotheses of the lemma, not 
 
 <ParametricCurve
   frames={decayFrames}
-  ariaLabel="Probability density of the harmonic oscillator ground state, a genuine H-1 function, computed by the platform's real engine and shown decaying to zero at both ends"
+  ariaLabel="Probability density of the harmonic oscillator ground state, an H-1 function, computed by the platform's engine and shown decaying to zero at both ends"
 />
 
 $|\psi_0(x)|^2$, computed directly by this platform's
@@ -398,8 +427,7 @@ self-adjointness check.** That calculation only ever shows $A$ is
 requires $D(A)=D(A^\dagger)$ exactly, a domain question that's
 automatically settled (and hence invisible) in finite dimensions, but
 a real open question on a function space, as the half-line example shows: a
-domain can be symmetric and still admit no self-adjoint extension at
-all.
+domain can be symmetric and still admit no self-adjoint extension.
 </Callout>
 
 <Callout type="warning">
@@ -422,7 +450,7 @@ without tending to any limit at all.
    derivation breaks.
 3. A periodic interval $[0,L]$ with the boundary condition
    $\psi(0)=\psi(L)$ (not $\psi(0)=\psi(L)=0$) turns out to admit a
-   genuine one-parameter family of self-adjoint extensions of $\hat p$,
+   one-parameter family of self-adjoint extensions of $\hat p$,
    $\{\psi:\psi(L)=e^{i\theta}\psi(0)\}$ for each real $\theta$. Using
    this lesson's boundary-term argument, explain in one sentence why
    *this* boundary condition (unlike the half-line's) makes the term
@@ -432,20 +460,20 @@ without tending to any limit at all.
 
 ## Summary
 
-- $L^2(\mathbb R)$ is a genuine Hilbert space: complete (Riesz–Fischer,
+- $L^2(\mathbb R)$ is a Hilbert space: complete (Riesz–Fischer,
   cited) and separable (the Hermite/harmonic-oscillator basis, concrete).
 - A **symmetric** operator satisfies $\langle\phi|A\psi\rangle=\langle
   A\phi|\psi\rangle$ on its domain $D(A)$; it's **self-adjoint** only if
   $D(A)=D(A^\dagger)$ exactly, a strictly stronger condition invisible in
   finite dimensions.
-- $\hat p=-i\hbar\,d/dx$ on the whole line is genuinely self-adjoint on
+- $\hat p=-i\hbar\,d/dx$ on the whole line is self-adjoint on
   $D(\hat p)=H^1(\mathbb R)$, derivable via the Fourier-transform
   equivalence to a self-adjoint multiplication operator; every $H^1$
-  function provably vanishes at $\pm\infty$, which is exactly what makes
+  function provably vanishes at $\pm\infty$, which is what makes
   the earlier boundary-term calculation legitimate rather than assumed.
 - $\hat p$ on a half-line has unequal deficiency indices ($n_+=1$,
   $n_-=0$, computed directly), so by von Neumann's theorem it has **no**
-  self-adjoint extension at all, a genuine, worked case where the
+  self-adjoint extension at all, a worked case where the
   informal "check $A=A^\dagger$" recipe would have missed a real
   mathematical obstruction.
 
@@ -453,8 +481,8 @@ without tending to any limit at all.
 
 <NextDiscovery>
   [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators)
-  shows exactly why self-adjointness (not mere symmetry) is the
-  hypothesis needed for a genuine spectral decomposition to exist at all,
+  shows why self-adjointness (not mere symmetry) is the
+  hypothesis a spectral decomposition needs in order to exist at all,
   and derives how that general theorem reduces to Spectral Decomposition
   and Degeneracy's finite-dimensional $A=\sum_i\lambda_iP_i$ in the
   discrete-spectrum case.

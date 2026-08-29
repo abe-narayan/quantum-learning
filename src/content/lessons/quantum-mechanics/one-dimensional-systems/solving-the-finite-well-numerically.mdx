@@ -14,7 +14,7 @@ export const finiteWellKAt = (v0, i) => 0.02 + (i / 80) * (finiteWellKUpper(v0) 
 export const lessonMeta = {
   title: "Solving the Finite Well Numerically",
   description:
-    "The graphical method for a transcendental equation with no closed form, made precise with bisection -- a real, tested numerical root-finder, applied to a specific worked well and cross-checked against the infinite-well limit.",
+    "The graphical method for a transcendental equation with no closed form, made precise with bisection: a real, tested numerical root-finder, applied to a specific worked well and cross-checked against the infinite-well limit.",
   course: "one-dimensional-systems",
   module: "solving-the-finite-well-numerically",
   order: 1,
@@ -35,19 +35,23 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  Some equations physics hands you have no algebraic way to isolate the
-  answer. That isn't a dead end — it's exactly the kind of problem
-  numerical methods were built for.
+  Some equations physics hands you offer no algebraic way to isolate the
+  answer. That is not a dead end. It is the situation numerical methods
+  were built for, and the answer comes out to six decimal places.
 </LessonHook>
 
 ## Motivation
 
-The last lesson derived a real physical result, $k\tan(ka)=\kappa$, with
-no algebraic way to isolate $E$. That doesn't mean the problem is stuck;
-it means it's the kind of equation numerical methods exist for. This
-lesson solves it directly, the same way the split-operator method from
-Wave Mechanics was a legitimate numerical technique rather than a
-workaround.
+The last lesson derived a real physical result, $k\tan(ka)=\kappa$, and
+then admitted there is no algebraic way to isolate $E$ from it. That is a
+statement about algebra, not about physics. The energy is a definite
+number; the equation simply does not surrender it to symbol manipulation.
+
+Wave Mechanics already made this move once, when it evolved the
+Schrödinger equation numerically because no closed-form propagator was
+available. The same standard applies here: a numerical answer is a real
+answer when the method is provably convergent and its error is bounded.
+Bisection is both.
 
 ## Intuition
 
@@ -67,7 +71,7 @@ solution** every introductory course shows a picture of.
     { label: "There's no longer any crossing at all", value: "none" },
   ]}
   correctValue="larger"
-  explanation="The quarter-circle κ(k)=√(2V0−k²) grows with V0 while the tangent branch k·tan(ka) stays fixed (it depends only on the width a, never on V0), pushing their crossing point to larger k — a deeper well pulls the bound state to a larger wavenumber. Drag the slider below from V0=1 up to V0=12 and watch the crossing move right."
+  explanation="The quarter-circle κ(k)=√(2V0−k²) grows with V0 while the tangent branch k·tan(ka) stays fixed (it depends only on the width a, never on V0), pushing their crossing point to larger k. A deeper well pulls the bound state to a larger wavenumber. Drag the slider below from V0=1 up to V0=12 and watch the crossing move right."
 />
 
 <ParametricCurve
@@ -121,18 +125,17 @@ Theorem guarantees a root. Bisection just repeatedly evaluates $g$ at
 the midpoint of a shrinking bracket and keeps the half containing the
 sign change, converging geometrically fast (each step halves the
 uncertainty). This platform's `finiteSquareWellGroundStateEnergy`
-function implements exactly this, tested directly against the
-quantization condition it's supposed to solve.
+function is that loop, tested against the quantization condition it is
+supposed to solve.
 
-There isn't a dedicated preset for this well in the Wavefunction
-Explorer, and deliberately so: without a general numerical eigensolver
-(this platform's documented, honest limitation), there's no closed-form
+The Wavefunction Explorer has no preset for this well, by design. Without
+a general numerical eigensolver, which this platform documents as a
+limitation rather than papering over, there is no closed-form
 <Term id="eigenvalue-eigenvector">eigenstate</Term> to hand the simulator the way the infinite well and harmonic
-oscillator presets do. Bisection is a different, complementary numerical
-technique, the same one the graphical crossing above already showed you
-by hand: it solves one transcendental equation for a single number
-rather than evolving a full <Term id="wavefunction">wavefunction</Term>, and it's exactly as legitimate
-a piece of numerical physics for that narrower job.
+oscillator presets do. Bisection does a narrower job: it solves one
+transcendental equation for one number rather than evolving a full
+<Term id="wavefunction">wavefunction</Term>. For that job it is the right tool, and it is the same
+tool the graphical crossing above already applied by eye.
 
 ### A worked well
 
@@ -143,12 +146,12 @@ $$
 k \approx 1.1863, \qquad E \approx -4.2964
 $$
 
-**Verify this actually satisfies the quantization condition**: computing
-$k\tan(ka)$ and $\kappa=\sqrt{-2E}$ from the *unrounded* bisection output
-(not the truncated decimals above, which accumulate rounding error in a
-tangent function this sensitive) gives agreement to better than $10^{-6}$,
-exactly what this platform's own test suite checks directly, rather
-than trusting a by-hand verification with rounded inputs.
+**Does that satisfy the quantization condition?** Computing $k\tan(ka)$
+and $\kappa=\sqrt{-2E}$ from the *unrounded* bisection output (not the
+truncated decimals above, which accumulate rounding error in a tangent
+function this sensitive) gives agreement to better than $10^{-6}$. That
+comparison is what this platform's test suite asserts, rather than a
+by-hand check on rounded inputs.
 
 ### Comparing to the infinite well
 
@@ -207,8 +210,8 @@ never higher.
 ## Practice Questions
 
 1. For $a=2,V_0=3$, this platform's engine finds the ground state at
-   $E\approx-2.7882$. Confirm this is between $-V_0$ and $0$, as
-   required for a genuine bound state.
+   $E\approx-2.7882$. Confirm this is between $-V_0$ and $0$, as any
+   bound state must be.
 2. Explain in one sentence why bisection needs a *confirmed sign change*
    in its starting bracket, and what could go wrong if you picked a
    bracket without checking this first.
@@ -235,20 +238,20 @@ never higher.
 
 <ChallengePrompt prompt="The interactive above varies V0 at fixed width a=1. Without recomputing anything, would WIDENING the well instead (larger a, same V0=5) push the ground-state k to a larger or smaller value?">
   Same graphical picture: the quarter-circle κ=√(2V0−k²) doesn't depend
-  on $a$, but the tangent branch's divergence point, at $ka=\pi/2$, does —
-  track how that point moves as $a$ grows.
+  on $a$, but the tangent branch's divergence point, at $ka=\pi/2$, does.
+  Track how that point moves as $a$ grows.
 </ChallengePrompt>
 
 <NextDiscovery>
   Up next, [Scattering Off a Step Potential](/lessons/quantum-mechanics/one-dimensional-systems/scattering-off-a-step-potential) moves from bound states to
-  *unbound* ones, and a genuinely strange result: quantum particles
-  partially reflect off a step even when they have more than enough energy
-  to classically sail over it.
+  *unbound* ones, and to a result with no classical counterpart: quantum
+  particles partially reflect off a step even when they carry more than
+  enough energy to sail over it.
 
   For the general theorem behind why boundary-matching problems like this
   one always come with guaranteed real eigenvalues and orthogonal
-  eigenfunctions — proving it once for the whole class of problem rather
-  than case by case — see
+  eigenfunctions, proved once for the whole class of problem rather than
+  case by case, see
   [Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
   in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
 </NextDiscovery>

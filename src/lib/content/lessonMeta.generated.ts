@@ -23,7 +23,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "amplitude-estimation-without-phase-estimation",
     "order": 4,
     "difficulty": "master",
-    "estimatedMinutes": 26,
+    "estimatedMinutes": 50,
     "prerequisites": [
       "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
       "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"
@@ -52,7 +52,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "applications-eigenvalues-and-linear-systems",
     "order": 5,
     "difficulty": "master",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 55,
     "prerequisites": [
       "apex/algorithmic-frontiers/the-quantum-singular-value-transformation"
     ],
@@ -76,7 +76,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "block-encodings-and-linear-combinations-of-unitaries",
     "order": 1,
     "difficulty": "master",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 65,
     "prerequisites": [
       "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"
     ],
@@ -100,7 +100,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "capstone-the-toolbox-that-ate-quantum-algorithms",
     "order": 6,
     "difficulty": "master",
-    "estimatedMinutes": 24,
+    "estimatedMinutes": 55,
     "prerequisites": [
       "apex/algorithmic-frontiers/applications-eigenvalues-and-linear-systems",
       "apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation"
@@ -125,7 +125,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "quantum-signal-processing",
     "order": 2,
     "difficulty": "master",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 75,
     "prerequisites": [
       "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"
     ],
@@ -149,7 +149,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-quantum-singular-value-transformation",
     "order": 3,
     "difficulty": "master",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 70,
     "prerequisites": [
       "apex/algorithmic-frontiers/quantum-signal-processing"
     ],
@@ -172,12 +172,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: Resource Estimation for a Real Algorithm",
-    "description": "Chains this course's code-distance scaling law, magic-state distillation cost, and lattice-surgery overhead into one complete, honestly-caveated physical-qubit estimate for a small toy circuit, then names exactly which parts of that pipeline are the same methodology real published estimates use.",
+    "description": "Chains this course's code-distance scaling law, magic-state distillation cost, and lattice-surgery overhead into one complete, explicitly-caveated physical-qubit estimate for a small toy circuit, then names which parts of that pipeline are the same methodology real published estimates use.",
     "course": "fault-tolerance-frontiers",
     "module": "capstone-resource-estimation-for-a-real-algorithm",
     "order": 6,
     "difficulty": "master",
-    "estimatedMinutes": 26,
+    "estimatedMinutes": 60,
     "prerequisites": [
       "apex/fault-tolerance-frontiers/lattice-surgery",
       "apex/fault-tolerance-frontiers/the-threshold-theorem"
@@ -202,7 +202,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "decoding-surface-codes",
     "order": 2,
     "difficulty": "master",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 80,
     "prerequisites": [
       "apex/fault-tolerance-frontiers/surface-codes-in-depth"
     ],
@@ -214,23 +214,23 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "apex/fault-tolerance-frontiers/surface-codes-in-depth",
-        "note": "That lesson built the lattice, the two stabilizer types, and the defect-pair mechanic this lesson's entire decoding graph is made of — nothing here introduces a new physical mechanism, only an algorithm for reading the syndrome it produces."
+        "note": "That lesson built the lattice, the two stabilizer types, and the defect-pair mechanic this lesson's entire decoding graph is made of; nothing here introduces a new physical mechanism, only an algorithm for reading the syndrome it produces."
       },
       {
         "slug": "quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map",
-        "note": "The general recovery procedure there (measure, look up, correct) used a small lookup table because the 3-qubit code's syndrome space was tiny; MWPM is exactly what 'look up the syndrome' has to become once the syndrome space is combinatorially large."
+        "note": "The general recovery procedure there (measure, look up, correct) used a small lookup table because the 3-qubit code's syndrome space was tiny; MWPM is what 'look up the syndrome' has to become once the syndrome space is combinatorially large."
       }
     ],
     "slug": "apex/fault-tolerance-frontiers/decoding-surface-codes"
   },
   {
     "title": "Lattice Surgery",
-    "description": "Two separate surface-code patches have no natural transversal two-qubit gate between them—this lesson derives the real fix, lattice surgery's merge and split operations, and shows how a sequence of them, plus an ancilla patch and classically-controlled Pauli corrections, assembles a full logical CNOT from nothing but the same local stabilizer measurements the code already needs for error correction.",
+    "description": "Two separate surface-code patches have no natural transversal two-qubit gate between them. This lesson derives the real fix, lattice surgery's merge and split operations, and shows how a sequence of them, plus an ancilla patch and classically-controlled Pauli corrections, assembles a full logical CNOT from nothing but the same local stabilizer measurements the code already needs for error correction.",
     "course": "fault-tolerance-frontiers",
     "module": "lattice-surgery",
     "order": 3,
     "difficulty": "master",
-    "estimatedMinutes": 27,
+    "estimatedMinutes": 65,
     "prerequisites": [
       "apex/fault-tolerance-frontiers/surface-codes-in-depth"
     ],
@@ -242,7 +242,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "apex/fault-tolerance-frontiers/surface-codes-in-depth",
-        "note": "This lesson reuses that lesson's exact lattice convention—vertex (Z-type) and face (X-type) stabilizers, plus the rough/smooth boundary classification where X_L and Z_L strings terminate—and does nothing more exotic than adding or removing stabilizers along one of those boundaries."
+        "note": "This lesson reuses that lesson's lattice convention (vertex Z-type and face X-type stabilizers, plus the rough/smooth boundary classification where X_L and Z_L strings terminate) and does nothing more exotic than adding or removing stabilizers along one of those boundaries."
       },
       {
         "slug": "quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding",
@@ -258,7 +258,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "magic-states-and-distillation",
     "order": 4,
     "difficulty": "master",
-    "estimatedMinutes": 27,
+    "estimatedMinutes": 65,
     "prerequisites": [
       "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead",
       "apex/fault-tolerance-frontiers/surface-codes-in-depth",
@@ -266,7 +266,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     ],
     "objectives": [
       "State the Gottesman-Knill theorem precisely: circuits built only from Clifford gates (H, S, CNOT) and Pauli measurements can be efficiently simulated classically, so Clifford gates alone are NOT universal for quantum computation, however fault-tolerantly you implement them",
-      "Explain why the surface code (and most topological codes) admit transversal, fault-tolerant Clifford gates 'for free' but NOT a fault-tolerant transversal T gate (a no-go result, the Eastin-Knill theorem, stated precisely)",
+      "Explain why the surface code admits fault-tolerant Clifford operations (CNOT via lattice surgery, S and H by less direct routes) but NOT a fault-tolerant transversal T gate (a no-go result, the Eastin-Knill theorem, stated precisely)",
       "Describe magic-state injection and distillation: preparing many noisy copies of a 'magic state' (e.g. the T-state |T> = (|0> + e^{i pi/4}|1>)/sqrt(2)) and using a Clifford-only circuit plus post-selection to purify fewer, higher-fidelity copies, exponentially suppressing error with each distillation round"
     ],
     "related": [
@@ -279,12 +279,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Surface Codes in Depth",
-    "description": "Surface Codes: A Conceptual Introduction described a 2D lattice of local stabilizers in the abstract. This lesson builds one explicit distance-3 patch by hand—every qubit, every stabilizer, every commutation check, and both logical operators, computed rather than gestured at.",
+    "description": "Surface Codes: A Conceptual Introduction described a 2D lattice of local stabilizers in the abstract. This lesson builds one explicit distance-3 patch by hand: every qubit, every stabilizer, every commutation check, and both logical operators, computed rather than gestured at.",
     "course": "fault-tolerance-frontiers",
     "module": "surface-codes-in-depth",
     "order": 1,
     "difficulty": "master",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 70,
     "prerequisites": [
       "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism",
       "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction"
@@ -297,7 +297,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction",
-        "note": "That lesson's 3x3-vertex picture (Z on vertices, X on faces, both weight 4) is exactly the convention this lesson makes fully explicit, with real boundaries, real qubit labels, and every commutation check carried out by hand."
+        "note": "That lesson's 3x3-vertex picture (Z on vertices, X on faces, both weight 4) is the convention this lesson makes fully explicit, with real boundaries, real qubit labels, and every commutation check carried out by hand."
       },
       {
         "slug": "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism",
@@ -313,7 +313,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-threshold-theorem",
     "order": 5,
     "difficulty": "master",
-    "estimatedMinutes": 26,
+    "estimatedMinutes": 65,
     "prerequisites": [
       "apex/fault-tolerance-frontiers/decoding-surface-codes",
       "apex/fault-tolerance-frontiers/magic-states-and-distillation"
@@ -338,7 +338,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "capstone-what-we-know-and-dont",
     "order": 5,
     "difficulty": "master",
-    "estimatedMinutes": 24,
+    "estimatedMinutes": 90,
     "prerequisites": [
       "apex/quantum-complexity-theory/the-local-hamiltonian-problem",
       "apex/quantum-complexity-theory/query-complexity-and-lower-bounds"
@@ -363,7 +363,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "complexity-classes-p-np-and-bqp",
     "order": 1,
     "difficulty": "master",
-    "estimatedMinutes": 27,
+    "estimatedMinutes": 65,
     "prerequisites": [
       "quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity"
     ],
@@ -387,7 +387,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "qma-and-quantum-verification",
     "order": 2,
     "difficulty": "master",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 75,
     "prerequisites": [
       "apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp"
     ],
@@ -411,7 +411,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "query-complexity-and-lower-bounds",
     "order": 4,
     "difficulty": "master",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 75,
     "prerequisites": [
       "apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp"
     ],
@@ -435,7 +435,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-local-hamiltonian-problem",
     "order": 3,
     "difficulty": "master",
-    "estimatedMinutes": 29,
+    "estimatedMinutes": 80,
     "prerequisites": [
       "apex/quantum-complexity-theory/qma-and-quantum-verification",
       "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"
@@ -464,7 +464,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "capstone-the-quantum-computing-landscape-today",
     "order": 5,
     "difficulty": "master",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 90,
     "prerequisites": [
       "apex/research-methods-and-synthesis/reproducing-and-designing-experiments",
       "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm"
@@ -489,7 +489,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "distinguishing-theorem-from-heuristic",
     "order": 2,
     "difficulty": "master",
-    "estimatedMinutes": 24,
+    "estimatedMinutes": 75,
     "prerequisites": [
       "apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper",
       "apex/quantum-complexity-theory/capstone-what-we-know-and-dont"
@@ -514,7 +514,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "evaluating-quantum-advantage-claims",
     "order": 3,
     "difficulty": "master",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 60,
     "prerequisites": [
       "apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic",
       "apex/simulation-and-compilation-frontiers/when-classical-simulation-works"
@@ -539,7 +539,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "how-to-read-a-quantum-computing-paper",
     "order": 1,
     "difficulty": "master",
-    "estimatedMinutes": 24,
+    "estimatedMinutes": 75,
     "prerequisites": [
       "apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms"
     ],
@@ -563,7 +563,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "reproducing-and-designing-experiments",
     "order": 4,
     "difficulty": "master",
-    "estimatedMinutes": 24,
+    "estimatedMinutes": 55,
     "prerequisites": [
       "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims"
     ],
@@ -587,7 +587,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "capstone-from-algorithm-to-qubit-count",
     "order": 6,
     "difficulty": "master",
-    "estimatedMinutes": 26,
+    "estimatedMinutes": 70,
     "prerequisites": [
       "apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation",
       "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"
@@ -616,7 +616,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "clifford-t-synthesis-and-resource-counting",
     "order": 3,
     "difficulty": "master",
-    "estimatedMinutes": 27,
+    "estimatedMinutes": 50,
     "prerequisites": [
       "quantum-software/compilation-and-hybrid-algorithms/gate-decomposition",
       "apex/fault-tolerance-frontiers/magic-states-and-distillation"
@@ -645,7 +645,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "noise-aware-compilation-and-resource-estimation",
     "order": 4,
     "difficulty": "master",
-    "estimatedMinutes": 27,
+    "estimatedMinutes": 45,
     "prerequisites": [
       "quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation",
       "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"
@@ -670,7 +670,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "quantum-simulation-of-molecules",
     "order": 5,
     "difficulty": "master",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 35,
     "prerequisites": [
       "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"
     ],
@@ -698,7 +698,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "tensor-networks-and-matrix-product-states",
     "order": 1,
     "difficulty": "master",
-    "estimatedMinutes": 29,
+    "estimatedMinutes": 55,
     "prerequisites": [
       "quantum-software/simulating-quantum-systems/tensor-network-methods"
     ],
@@ -726,7 +726,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "when-classical-simulation-works",
     "order": 2,
     "difficulty": "master",
-    "estimatedMinutes": 27,
+    "estimatedMinutes": 80,
     "prerequisites": [
       "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
       "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"
@@ -755,7 +755,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "bells-theorem-and-local-hidden-variables",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 40,
     "prerequisites": [
       "quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices"
     ],
@@ -768,7 +768,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: Analyzing Quantum Correlations",
-    "description": "Every tool this course built, applied end to end to one unfamiliar entangled state: purity, entropy, concurrence, partial trace, and a genuine (if partial) CHSH violation, plus an honest demonstration of exactly where this engine's scope ends.",
+    "description": "Every tool this course built, applied end to end to one unfamiliar entangled state: purity, entropy, concurrence, partial trace, and a real if partial CHSH violation, plus a demonstration of where this engine's scope ends.",
     "course": "entanglement-and-measurement",
     "module": "capstone-analyzing-quantum-correlations",
     "order": 1,
@@ -804,7 +804,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Convex Combinations and Physical Mixtures",
-    "description": "The general N-component mixture, and the sharpest fact about density matrices yet: completely different preparation recipes can produce the exact same ρ, and no experiment can ever tell them apart.",
+    "description": "The general N-component mixture, and the sharpest fact about density matrices yet: different preparation recipes can produce the same ρ, and no experiment can tell them apart.",
     "course": "entanglement-and-measurement",
     "module": "convex-combinations-and-physical-mixtures",
     "order": 1,
@@ -822,7 +822,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Entanglement Entropy for Pure Bipartite States",
-    "description": "Combining the last two lessons into the standard entanglement measure, with a rigorous counterexample proving exactly why it stops being valid the moment the global state is mixed.",
+    "description": "Combining the last two lessons into the standard entanglement measure, with a counterexample showing why it stops being valid the moment the global state is mixed.",
     "course": "entanglement-and-measurement",
     "module": "entanglement-entropy-for-pure-states",
     "order": 1,
@@ -865,7 +865,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "From State Vectors to Density Matrices",
-    "description": "The operator ρ=|ψ⟩⟨ψ| that carries exactly the same information as a state vector, derived, not just defined, and cross-checked against every expectation value this platform has computed so far.",
+    "description": "The operator ρ=|ψ⟩⟨ψ| that carries the same information as a state vector, derived rather than defined, and cross-checked against every expectation value this platform has computed so far.",
     "course": "entanglement-and-measurement",
     "module": "from-state-vectors-to-density-matrices",
     "order": 1,
@@ -919,7 +919,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Purity, von Neumann Entropy, and Information",
-    "description": "The standard measure of mixedness, von Neumann entropy, built from a density matrix's actual eigenvalues via an exact closed-form solver for the 2×2 case, and shown to reduce exactly to classical Shannon entropy when ρ happens to be diagonal.",
+    "description": "The standard measure of mixedness, von Neumann entropy, built from a density matrix's eigenvalues via a closed-form 2×2 solver, and shown to reduce to classical Shannon entropy when ρ is diagonal.",
     "course": "entanglement-and-measurement",
     "module": "purity-entropy-and-information",
     "order": 1,
@@ -991,7 +991,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Stabilizer Formalism Basics",
-    "description": "The bit-flip code's syndrome measurements, renamed and generalized: Z0Z1 and Z1Z2 are exactly the code's stabilizer generators, and a syndrome bit flipping from 0 to 1 is exactly the statement that an error anticommutes with that generator.",
+    "description": "The bit-flip code's syndrome measurements, renamed and generalized: Z0Z1 and Z1Z2 are the code's stabilizer generators, and a syndrome bit flipping from 0 to 1 is the statement that an error anticommutes with that generator.",
     "course": "error-correction-and-fault-tolerance",
     "module": "stabilizer-formalism-basics",
     "order": 1,
@@ -1020,7 +1020,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "surface-codes-a-conceptual-introduction",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map"
     ],
@@ -1063,7 +1063,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "objectives": [
       "Describe the Shor code's concatenated construction: phase-flip encoding, then bit-flip encoding each resulting qubit",
       "Explain why concatenation corrects a Y error, which neither 3-qubit code alone corrects",
-      "State exactly why this platform simulates the two 3-qubit codes but not the full 9-qubit Shor code"
+      "State why the course's engine simulates the two 3-qubit codes but not the full 9-qubit Shor code"
     ],
     "slug": "quantum-computing/error-correction-and-fault-tolerance/the-shor-code-combining-both"
   },
@@ -1074,7 +1074,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-three-qubit-bit-flip-code",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-computing/error-correction-and-fault-tolerance/why-quantum-errors-are-different"
     ],
@@ -1086,7 +1086,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized",
-        "note": "Measuring the syndrome ancillas here leaves the encoded α,β completely undisturbed precisely because it is a degenerate projective measurement in that lesson's generalized sense, not a measurement of the logical qubit itself."
+        "note": "Measuring the syndrome ancillas here leaves the encoded α,β undisturbed because it is a degenerate projective measurement in that lesson's generalized sense, not a measurement of the logical qubit itself."
       }
     ],
     "slug": "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code"
@@ -1098,7 +1098,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-three-qubit-phase-flip-code",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 20,
     "prerequisites": [
       "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code"
     ],
@@ -1111,7 +1111,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Why Quantum Errors Are Different",
-    "description": "Three obstacles classical error correction never faces: no-cloning rules out simple redundancy, a continuum of possible errors replaces two discrete ones, and measurement destroys the very superposition being protected, each derived from principles this platform has already proven.",
+    "description": "Three obstacles classical error correction never faces: no-cloning rules out simple redundancy, a continuum of possible errors replaces two discrete ones, and measurement destroys the very superposition being protected, each derived from principles proven in earlier courses.",
     "course": "error-correction-and-fault-tolerance",
     "module": "why-quantum-errors-are-different",
     "order": 1,
@@ -1129,7 +1129,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: Comparing Quantum Advantage",
-    "description": "Deutsch-Jozsa's exponential separation and Grover's quadratic one, side by side: what each algorithm actually proves, what it needs to be true to matter, and why 'quantum computers are exponentially faster' is not a fair summary of either.",
+    "description": "Deutsch-Jozsa's exponential separation and Grover's quadratic one, side by side: what each algorithm proves, what has to be true for it to matter, and why 'quantum computers are exponentially faster' is not a fair summary of either.",
     "course": "quantum-algorithms-i",
     "module": "capstone-comparing-quantum-advantage",
     "order": 1,
@@ -1194,14 +1194,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     ],
     "objectives": [
       "Derive U_f|x⟩|−⟩=(−1)^f(x)|x⟩|−⟩ directly from the oracle's defining relation",
-      "Explain why the ancilla qubit's own state is left completely unchanged by this process",
+      "Explain why the ancilla qubit's own state is left unchanged by this process",
       "Connect the bit-oracle and phase-oracle engine primitives via this identity, not just by definition"
     ],
     "slug": "quantum-computing/quantum-algorithms-i/phase-kickback"
   },
   {
     "title": "Quantum Parallelism and the Oracle Model",
-    "description": "Applying a Hadamard to every qubit puts every possible input into superposition at once, and why that alone doesn't let you read out a function's values on all of them, setting up exactly the problem the rest of this course solves.",
+    "description": "Applying a Hadamard to every qubit puts every possible input into superposition at once, and why that alone doesn't let you read out a function's values on all of them, which is the problem the rest of this course solves.",
     "course": "quantum-algorithms-i",
     "module": "quantum-parallelism-and-the-oracle-model",
     "order": 1,
@@ -1243,7 +1243,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Simon's Algorithm",
-    "description": "A hidden XOR-mask string s recovered from measurements that always land orthogonal to s, derived from the same H-oracle-H structure as Deutsch-Jozsa but with a genuinely 2-to-1 oracle, then solved via linear algebra over F₂ — the direct conceptual ancestor of Shor's period-finding.",
+    "description": "A hidden XOR-mask string s recovered from measurements that always land orthogonal to s, derived from the same H-oracle-H structure as Deutsch-Jozsa but with a 2-to-1 oracle, then solved by linear algebra over F₂: the direct ancestor of Shor's period-finding.",
     "course": "quantum-algorithms-i",
     "module": "simons-algorithm",
     "order": 1,
@@ -1362,14 +1362,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "shors-algorithm-factoring-via-period-finding",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage"
     ],
     "objectives": [
       "State the order-finding problem and Shor's classical reduction from factoring to it",
       "Derive why a^(r/2) mod N, when r is even and not −1, yields nontrivial factors of N",
-      "Identify exactly which part of the algorithm is classical and which needs a quantum speedup"
+      "Identify which part of the algorithm is classical and which needs a quantum speedup"
     ],
     "slug": "quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding"
   },
@@ -1393,7 +1393,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Variational Principle and Ansatz Circuits",
-    "description": "Every state's energy expectation value sits above the true ground energy, a short, complete proof that motivates a fundamentally different kind of quantum algorithm: search over circuit parameters with a classical optimizer, rather than a fixed sequence of gates.",
+    "description": "Every state's energy expectation value sits above the true ground energy, a short, complete proof that motivates a different kind of quantum algorithm: search over circuit parameters with a classical optimizer, rather than a fixed sequence of gates.",
     "course": "quantum-algorithms-ii",
     "module": "the-variational-principle-and-ansatz-circuits",
     "order": 1,
@@ -1458,7 +1458,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "bb84-quantum-key-distribution",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 40,
     "prerequisites": [
       "quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem"
     ],
@@ -1470,14 +1470,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-hardware/physical-qubit-platforms/photonic-qubits",
-        "note": "Real BB84 systems send exactly this protocol's Z/X-basis qubits as a single photon's polarization; this lesson's abstract H-and-measure engine is, physically, the polarization optics that platform describes."
+        "note": "Real BB84 systems send this protocol's Z/X-basis qubits as a single photon's polarization. What this lesson calls 'apply H, then measure' is, in that hardware, a waveplate and a polarizing beamsplitter."
       }
     ],
     "slug": "quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution"
   },
   {
     "title": "Bell States and Entanglement",
-    "description": "Deriving (|00⟩ + |11⟩)/√2 from H and CNOT, proving it can't be a product state, and showing precisely why it isn't ordinary classical correlation.",
+    "description": "Deriving (|00⟩ + |11⟩)/√2 from H and CNOT, proving it can't be a product state, and finding the measurement that separates it from ordinary classical correlation.",
     "course": "quantum-gates-and-circuits",
     "module": "bell-states-and-entanglement",
     "order": 1,
@@ -1494,7 +1494,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum",
-        "note": "That lesson proves this platform's Bell state |Ψ⁻⟩ is not merely analogous to but literally identical to the total-spin-zero singlet of two combined spin-1/2 particles, verified as the same J²=0 eigenstate."
+        "note": "That lesson proves the Bell state |Ψ⁻⟩ is not merely analogous to but identical to the total-spin-zero singlet of two combined spin-1/2 particles, verified as the same J²=0 eigenstate."
       }
     ],
     "slug": "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement"
@@ -1520,7 +1520,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Controlled Gates and CNOT",
-    "description": "The general controlled-U operation, worked out completely for CNOT: matrix, truth table, and why SWAP is three CNOTs.",
+    "description": "The general controlled-U operation, worked out in full for CNOT: matrix, truth table, and why SWAP is three CNOTs.",
     "course": "quantum-gates-and-circuits",
     "module": "controlled-gates-and-cnot",
     "order": 1,
@@ -1591,14 +1591,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-software/simulating-quantum-systems/state-vector-simulation",
-        "note": "This lesson's 2^n-amplitude state vector, examined explicitly as the exact technique every simulation on this platform has used since day one."
+        "note": "This lesson's 2^n-amplitude state vector, examined explicitly as the exact technique every simulation you've run on the site has used since day one."
       }
     ],
     "slug": "quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors"
   },
   {
     "title": "Quantum Circuit Notation",
-    "description": "How to read and write multi-qubit circuit diagrams, and how they correspond exactly to the operator products from the last course.",
+    "description": "How to read and write multi-qubit circuit diagrams, and how they correspond to the operator products from the last course.",
     "course": "quantum-gates-and-circuits",
     "module": "quantum-circuit-notation",
     "order": 1,
@@ -1640,13 +1640,13 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "superdense-coding",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 40,
     "prerequisites": [
       "quantum-computing/quantum-gates-and-circuits/quantum-teleportation"
     ],
     "objectives": [
       "Derive the four Bell states Alice's four possible gates produce from a shared pair",
-      "Explain why Bob's CNOT-then-H decode circuit is exactly the inverse of the Bell-pair preparation circuit",
+      "Explain why Bob's CNOT-then-H decode circuit is the inverse of the Bell-pair preparation circuit",
       "Explain why sending one qubit can carry two classical bits without violating any communication bound, since a second qubit was already spent distributing the pair"
     ],
     "slug": "quantum-computing/quantum-gates-and-circuits/superdense-coding"
@@ -1695,12 +1695,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Universal Quantum Computation",
-    "description": "The promise Qubits & Quantum States made and never cashed in: why single-qubit gates alone can't reach every circuit, why adding just CNOT is (in principle) enough for all of them, why real hardware wants a small discrete set instead of a continuous one, and why that discrete set needs one non-Clifford gate, verified directly by checking T against the Clifford group's defining property and building a real Toffoli gate from Clifford+T alone.",
+    "description": "Why single-qubit gates alone can't reach every circuit, why adding CNOT is enough in principle, why real hardware wants a fixed discrete set instead, and why that set needs one non-Clifford gate; with T checked against the Clifford property and a Toffoli built from Clifford+T alone.",
     "course": "quantum-gates-and-circuits",
     "module": "universal-quantum-computation",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 55,
     "prerequisites": [
       "quantum-computing/quantum-gates-and-circuits/building-quantum-circuits",
       "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement"
@@ -1736,7 +1736,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "building-qubit-circuits",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-computing/qubits-and-quantum-states/global-and-relative-phase",
       "quantum-computing/qubits-and-quantum-states/quantum-gates"
@@ -1798,12 +1798,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Global Phase vs. Relative Phase",
-    "description": "A precise proof of which phases are physically real and which aren't, probably the single most common confusion in quantum computing.",
+    "description": "A proof of which phases are physically real and which aren't, and how to tell them apart by calculation rather than by feel.",
     "course": "qubits-and-quantum-states",
     "module": "global-and-relative-phase",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-computing/qubits-and-quantum-states/single-qubit-rotations"
     ],
@@ -1837,7 +1837,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
       },
       {
         "slug": "quantum-hardware/control-and-readout/qubit-readout-techniques",
-        "note": "This lesson's idealized, instantaneous projective measurement, contrasted there against how a real device actually reads out a qubit (indirectly, imperfectly)."
+        "note": "This lesson's idealized, instantaneous projective measurement, contrasted there against how a real device reads out a qubit: indirectly, and imperfectly."
       }
     ],
     "slug": "quantum-computing/qubits-and-quantum-states/measurement-and-probability"
@@ -1892,7 +1892,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Single-Qubit Rotations",
-    "description": "The general rotation formula that every single-qubit gate is secretly an instance of, and what Rx, Ry, Rz actually compute.",
+    "description": "The general rotation formula that every single-qubit gate is an instance of, and what Rx, Ry, Rz compute.",
     "course": "qubits-and-quantum-states",
     "module": "single-qubit-rotations",
     "order": 1,
@@ -1916,7 +1916,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Bloch Sphere",
-    "description": "Deriving the geometric picture of a qubit: where θ and φ come from, and what the sphere's surface actually represents.",
+    "description": "Deriving the geometric picture of a qubit: where θ and φ come from, and what the sphere's surface represents.",
     "course": "qubits-and-quantum-states",
     "module": "the-bloch-sphere",
     "order": 1,
@@ -1940,17 +1940,23 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "What Is a Qubit?",
-    "description": "Why quantum computers need a new unit of information, and what a qubit actually is mathematically.",
+    "description": "Why quantum computers need a new unit of information, and what a qubit is mathematically.",
     "course": "qubits-and-quantum-states",
     "module": "what-is-a-qubit",
     "order": 1,
     "difficulty": "foundational",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 30,
     "prerequisites": [],
     "objectives": [
       "Explain why a classical bit can't describe a quantum system",
       "Write a qubit state in Dirac notation and check it's normalized",
       "Compute measurement probabilities from a qubit's amplitudes"
+    ],
+    "related": [
+      {
+        "slug": "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment",
+        "note": "The experiment this lesson leans on for motivation, done properly: where the two discrete outcomes come from, and why measuring spin along a second axis erases the first answer."
+      }
     ],
     "slug": "quantum-computing/qubits-and-quantum-states/what-is-a-qubit"
   },
@@ -1979,7 +1985,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "control-electronics",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 22,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-hardware/control-and-readout/cryogenic-systems"
     ],
@@ -2003,7 +2009,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "cryogenic-systems",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms"
     ],
@@ -2087,7 +2093,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "scaling-challenges",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 22,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-hardware/noise-decoherence-and-scaling/crosstalk"
     ],
@@ -2105,7 +2111,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "sources-of-noise",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-hardware/control-and-readout/calibration"
     ],
@@ -2117,7 +2123,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition",
-        "note": "The abstract mathematics behind this lesson's 'incoherent error' category: a numerical demonstration of exactly why environmental coupling is irreversible and can't be recalibrated away."
+        "note": "The abstract mathematics behind this lesson's 'incoherent error' category: a numerical demonstration of why environmental coupling is irreversible and can't be recalibrated away."
       }
     ],
     "slug": "quantum-hardware/noise-decoherence-and-scaling/sources-of-noise"
@@ -2148,17 +2154,17 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: Comparing Qubit Platforms",
-    "description": "No single platform wins on every axis: putting superconducting circuits, trapped ions, neutral atoms, photons, and spin qubits side by side on coherence time, gate speed, connectivity, and scalability makes the actual engineering tradeoff space visible at once.",
+    "description": "No single platform wins on every axis: putting superconducting circuits, trapped ions, neutral atoms, photons, and spin qubits side by side on coherence time, gate speed, two-qubit gate fidelity, connectivity, and scalability makes the actual engineering tradeoff space visible at once.",
     "course": "physical-qubit-platforms",
     "module": "capstone-comparing-qubit-platforms",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-hardware/physical-qubit-platforms/spin-qubits"
     ],
     "objectives": [
-      "Compare all five platforms on the same four axes: coherence time, gate speed, connectivity, and scalability path",
+      "Compare all five platforms on the same five axes: coherence time, gate speed, two-qubit gate fidelity, connectivity, and scalability path",
       "Explain why no platform dominates on every axis simultaneously",
       "Identify which platform a given application's priorities (e.g. long computations vs. fast iteration) would favor"
     ],
@@ -2171,7 +2177,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "neutral-atoms",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 18,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-hardware/physical-qubit-platforms/trapped-ions"
     ],
@@ -2183,7 +2189,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels",
-        "note": "A 'Rydberg state' is literally a hydrogen-like high-n state named for this lesson's Rydberg energy unit; the same Eₙ=-13.6 eV/n² physics is why exciting an atom's outer electron to large n gives it the enormous, strongly-interacting orbit Rydberg blockade depends on."
+        "note": "A 'Rydberg state' is a hydrogen-like high-n state named for this lesson's Rydberg energy unit; the same Eₙ=-13.6 eV/n² physics is why exciting an atom's outer electron to large n gives it the enormous, strongly-interacting orbit Rydberg blockade depends on."
       }
     ],
     "slug": "quantum-hardware/physical-qubit-platforms/neutral-atoms"
@@ -2195,7 +2201,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "photonic-qubits",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 18,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-hardware/physical-qubit-platforms/neutral-atoms"
     ],
@@ -2214,12 +2220,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Spin Qubits",
-    "description": "A qubit encoded directly in a single electron's (or nucleus's) spin, confined in a semiconductor quantum dot: literally Angular Momentum & Spin's spin-1/2 two-level system, built into solid-state hardware small enough that fabrication tooling from the existing semiconductor industry applies almost directly.",
+    "description": "A qubit encoded directly in a single electron's (or nucleus's) spin, confined in a semiconductor quantum dot: Angular Momentum & Spin's spin-1/2 two-level system itself, built into solid-state hardware small enough that fabrication tooling from the existing semiconductor industry applies almost directly.",
     "course": "physical-qubit-platforms",
     "module": "spin-qubits",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 18,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-hardware/physical-qubit-platforms/photonic-qubits"
     ],
@@ -2231,7 +2237,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/wave-mechanics/the-infinite-square-well",
-        "note": "The exact confinement mechanism (a particle trapped by a potential barrier, forcing discrete energy levels) behind a quantum dot, here worked out exactly for the idealized box instead of real electrode voltages."
+        "note": "The confinement mechanism behind a quantum dot (a particle trapped by a potential barrier, forcing discrete energy levels), worked out exactly for the idealized box instead of real electrode voltages."
       }
     ],
     "slug": "quantum-hardware/physical-qubit-platforms/spin-qubits"
@@ -2255,7 +2261,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
-        "note": "A transmon qubit's energy levels are literally an anharmonic version of this oscillator."
+        "note": "A transmon qubit's energy levels are an anharmonic version of this oscillator."
       }
     ],
     "slug": "quantum-hardware/physical-qubit-platforms/superconducting-qubits"
@@ -2267,7 +2273,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "trapped-ions",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-hardware/physical-qubit-platforms/superconducting-qubits"
     ],
@@ -2325,7 +2331,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: What Scale Actually Requires",
-    "description": "Synthesizing BQP's oracle-relative separations, Trotterization's derived error bound, and barren plateaus' exponential trainability wall into one honest account of exactly what separates every toy result this platform verifies exactly from genuine at-scale quantum advantage, and what real research is doing about each wall.",
+    "description": "Synthesizing BQP's oracle-relative separations, Trotterization's derived error bound, and barren plateaus' exponential trainability wall into one honest account of what separates every toy result this platform verifies exactly from at-scale quantum advantage, and what real research is doing about each wall.",
     "course": "advanced-algorithms-and-complexity",
     "module": "capstone-what-scale-actually-requires",
     "order": 6,
@@ -2340,14 +2346,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     ],
     "objectives": [
       "Synthesize BQP's oracle-relative separations, Trotterization's error bound, and barren plateaus' variance scaling into one account of what scale requires",
-      "Explain precisely why every exactly-verified toy result on this platform sits on the near side of all three walls",
+      "Explain why every exactly-verified toy result on this platform sits on the near side of all three walls",
       "State, honestly and without exaggeration in either direction, what real research is doing about each wall"
     ],
     "slug": "quantum-mastery/advanced-algorithms-and-complexity/capstone-what-scale-actually-requires"
   },
   {
     "title": "Hamiltonian Simulation and Trotterization",
-    "description": "Deriving the first-order Trotter-Suzuki product formula and a genuine Taylor-series error bound for simulating e^{-iHt} when H's terms don't commute, then verifying both the mechanism and the O(1/n) error scaling numerically on a real 2-qubit Ising Hamiltonian against exact matrix exponentiation.",
+    "description": "Deriving the first-order Trotter-Suzuki product formula and a Taylor-series error bound for simulating e^{-iHt} when H's terms don't commute, then verifying both the mechanism and the O(1/n) error scaling numerically on a real 2-qubit Ising Hamiltonian against exact matrix exponentiation.",
     "course": "advanced-algorithms-and-complexity",
     "module": "hamiltonian-simulation-and-trotterization",
     "order": 2,
@@ -2360,7 +2366,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     ],
     "objectives": [
       "Derive the first-order Trotter-Suzuki single-step error via direct Taylor expansion of matrix exponentials",
-      "Prove a genuine total-error bound over n steps via a submultiplicativity lemma for products of unitaries",
+      "Prove a total-error bound over n steps via a submultiplicativity lemma for products of unitaries",
       "Verify the derivation numerically on a real 2-qubit Hamiltonian, comparing Trotterization against exact matrix exponentiation"
     ],
     "slug": "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"
@@ -2386,7 +2392,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Quantum Walks",
-    "description": "Deriving the coined discrete-time quantum walk on a line via a coin operator and conditional shift, deriving its momentum-space dispersion relation to show the spreading is genuinely ballistic (∝t) rather than the classical walk's diffusive (∝√t), verified numerically against a real classical random walk, plus the continuous-time walk's exact identity with Hamiltonian simulation of a graph's adjacency matrix.",
+    "description": "Deriving the coined discrete-time quantum walk on a line via a coin operator and conditional shift, deriving its momentum-space dispersion relation to show the spreading is ballistic (∝t) rather than the classical walk's diffusive (∝√t), verified numerically against a real classical random walk, plus the continuous-time walk's exact identity with Hamiltonian simulation of a graph's adjacency matrix.",
     "course": "advanced-algorithms-and-complexity",
     "module": "quantum-walks",
     "order": 3,
@@ -2421,7 +2427,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "objectives": [
       "State precisely which four heuristic shortcuts from the earlier (non-Master) curriculum this course made rigorous, and what each one turned out to actually require",
       "Explain why none of those shortcuts ever produced a wrong physical prediction, using this course's own theorems as the reason rather than luck",
-      "Identify a genuine case (self-adjoint extensions) where informal reasoning alone would not have been enough, and why the main curriculum never ran into it"
+      "Identify a case (self-adjoint extensions) where informal reasoning alone would not have been enough, and why the main curriculum never ran into it"
     ],
     "related": [
       {
@@ -2446,7 +2452,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "objectives": [
       "Derive directly that the momentum eigenfunction φ_p(x)=e^{ipx/ħ} has infinite L² norm, hence is not a Hilbert-space vector",
       "Build the Gelfand triple Φ ⊂ H ⊂ Φ′ and state precisely what kind of object |p⟩ actually is",
-      "Verify ⟨p|p′⟩=δ(p−p′) as a genuine delta-sequence limit, not an asserted identity"
+      "Verify ⟨p|p′⟩=δ(p−p′) as a delta-sequence limit, not an asserted identity"
     ],
     "related": [
       {
@@ -2471,7 +2477,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "objectives": [
       "Derive the resolvent R(E)=(E−H)⁻¹=Σₙ Pₙ/(E−Eₙ) directly from the spectral theorem and identify its poles as bound-state energies",
       "Derive the free-particle and infinite-square-well Green's functions in closed form from a jump condition, and verify the well's poles reproduce the exact known energy levels",
-      "Derive the Sokhotski–Plemelji imaginary-part identity and connect it to why the continuous spectrum shows up as a branch cut rather than isolated poles"
+      "Derive the Sokhotski–Plemelj imaginary-part identity and connect it to why the continuous spectrum shows up as a branch cut rather than isolated poles"
     ],
     "related": [
       {
@@ -2501,7 +2507,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/the-hydrogen-atom/the-radial-equation",
-        "note": "The radial equation's boundary condition u(0)=0 is exactly a domain choice of the kind this lesson makes precise — the physically forced condition for the radial momentum-like operator to be self-adjoint on a half-line, not an ad hoc requirement."
+        "note": "The radial equation's boundary condition u(0)=0 is a domain choice of the kind this lesson makes precise — the physically forced condition for the radial momentum-like operator to be self-adjoint on a half-line, not an ad hoc requirement."
       }
     ],
     "slug": "quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness"
@@ -2576,7 +2582,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction",
-        "note": "Surface codes are also CSS codes, built the same way from a different (topological, not Hamming) pair of classical codes -- this lesson's machinery is exactly what's conceptually gestured at there."
+        "note": "Surface codes are also CSS codes, built the same way from a different (topological, not Hamming) pair of classical codes; this lesson's machinery is what is conceptually gestured at there."
       }
     ],
     "slug": "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism"
@@ -2601,14 +2607,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mastery/quantum-information-theory/the-lindblad-master-equation",
-        "note": "The Lindblad equation generates a continuous family of CP maps; every snapshot of it has a Choi matrix obeying exactly this lesson's positivity condition."
+        "note": "The Lindblad equation generates a continuous family of CP maps; every snapshot of it has a Choi matrix obeying this lesson's positivity condition."
       }
     ],
     "slug": "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi"
   },
   {
     "title": "Relative Entropy and Mixed-State Entanglement",
-    "description": "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute -- built here and evaluated explicitly on a state that's actually mixed, not pure in disguise.",
+    "description": "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute, built here and evaluated explicitly on a state that is actually mixed, not pure in disguise.",
     "course": "quantum-information-theory",
     "module": "relative-entropy-and-mixed-state-entanglement",
     "order": 5,
@@ -2626,7 +2632,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure",
-        "note": "That lesson names the general mixed-state formula and explicitly refuses to implement it -- this is the lesson that closes the gap."
+        "note": "That lesson names the general mixed-state formula and explicitly refuses to implement it; this is the lesson that closes the gap."
       }
     ],
     "slug": "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"
@@ -2652,7 +2658,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
-        "note": "The 'teleportation channel' built here is a completely positive, trace-preserving map in exactly that lesson's sense -- built from projectors and corrections rather than a Kraus sum, but no less a genuine channel."
+        "note": "That lesson gives the test this one's construction has to pass: the 'teleportation channel' built here is assembled from projectors, a partial trace and conditional corrections rather than from a Kraus sum, so complete positivity is something to check rather than assume, and the Choi criterion is what checks it."
       }
     ],
     "slug": "quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding"
@@ -2677,7 +2683,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity",
-        "note": "Uhlmann's fidelity theorem is proved by optimizing over exactly the purifications this lesson constructs."
+        "note": "That lesson is where the purifications built here start doing work: Uhlmann's theorem characterises fidelity as a maximum of overlaps over all purifications of two states, so the 'every purification differs from every other by a unitary on B' freedom proved here is precisely the set that maximisation ranges over. Without that classification the maximum would be over an unspecified collection."
       }
     ],
     "slug": "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification"
@@ -2728,7 +2734,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
-        "note": "The Choi matrix built there for these same two channels gives a second, independent way to see how much they disturb a state."
+        "note": "This lesson measures how far a channel moves one input state; that lesson supplies the object that characterises the channel independently of any input, the Choi matrix, built there for these same two channels at the same strengths. Read together they answer 'how much damage on this state' and 'what kind of map is doing the damage' from the same numbers."
       }
     ],
     "slug": "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity"
@@ -2753,14 +2759,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
-        "note": "This capstone's depolarizing channel is exactly the kind of completely positive, trace-preserving map that lesson's Choi-matrix machinery certifies as physical; this lesson reuses that same Choi-state construction, applied to a maximally entangled input, to prove the entanglement-breaking threshold below."
+        "note": "This capstone's depolarizing channel is the kind of completely positive, trace-preserving map that lesson's Choi-matrix machinery certifies as physical; this lesson reuses that same Choi-state construction, applied to a maximally entangled input, to prove the entanglement-breaking threshold below."
       }
     ],
     "slug": "quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise"
   },
   {
     "title": "Entanglement Distillation and Typical Subspaces",
-    "description": "Turns Schmidt Decomposition and Purification's abstract entanglement entropy into an operational quantity: the typical-subspace argument behind entanglement concentration, computed concretely, that says exactly how many near-perfect Bell pairs n copies of a partially-entangled state actually yield.",
+    "description": "Turns Schmidt Decomposition and Purification's abstract entanglement entropy into an operational quantity: the typical-subspace argument behind entanglement concentration, computed concretely, that says exactly how many near-perfect Bell pairs n copies of a partially-entangled state yield.",
     "course": "quantum-shannon-theory",
     "module": "entanglement-distillation-and-typical-subspaces",
     "order": 5,
@@ -2778,7 +2784,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification",
-        "note": "The n-copy joint Schmidt coefficients this lesson builds a typical subspace out of are exactly what that lesson's SVD-based theorem guarantees exist for any bipartite pure state, applied here to |psi>^⊗n itself."
+        "note": "The n-copy joint Schmidt coefficients this lesson builds a typical subspace out of are what that lesson's SVD-based theorem guarantees exist for any bipartite pure state, applied here to |psi>^⊗n itself."
       }
     ],
     "slug": "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces"
@@ -2819,7 +2825,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
       "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"
     ],
     "objectives": [
-      "Define quantum mutual information I(A:B) = S(A) + S(B) - S(AB) and compute it for a genuine worked bipartite state",
+      "Define quantum mutual information I(A:B) = S(A) + S(B) - S(AB) and compute it for a worked bipartite state",
       "Define conditional quantum entropy S(A|B) = S(AB) - S(B) and show, with a real example, that it can be NEGATIVE for entangled states, unlike its classical counterpart",
       "Define coherent information I(A>B) = -S(A|B) and explain why its sign controls whether a channel can be used to reliably send quantum information"
     ],
@@ -2858,7 +2864,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Data-Processing Inequality",
-    "description": "Quantum relative entropy can only shrink under a physical channel, S(N(rho)||N(sigma)) <= S(rho||sigma)—derived here as the exact reason correlated information can never be manufactured by processing, only lost, and checked numerically on a dephased Bell pair.",
+    "description": "Quantum relative entropy can only shrink under a physical channel, S(N(rho)||N(sigma)) <= S(rho||sigma). That is the exact reason correlated information can never be manufactured by processing, only lost, and it is checked here numerically on a dephased Bell pair.",
     "course": "quantum-shannon-theory",
     "module": "the-data-processing-inequality",
     "order": 4,
@@ -2979,7 +2985,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Adiabatic Theorem and Berry Phase",
-    "description": "A Hamiltonian that changes slowly enough keeps a system in its instantaneous eigenstate — proved here directly from the time-dependent Schrödinger equation. Applied to a spin-1/2 dragged around a cone by a slowly rotating field, the same derivation produces Berry's famous geometric phase, computed here as a real discretized loop integral and matched to −½ the solid angle traced.",
+    "description": "A Hamiltonian that changes slowly enough keeps a system in its instantaneous eigenstate, proved here directly from the time-dependent Schrödinger equation. Applied to a spin-1/2 dragged around a cone by a slowly rotating field, the same derivation produces Berry's famous geometric phase, computed here as a real discretized loop integral and matched to −½ the solid angle traced.",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "module": "the-adiabatic-theorem-and-berry-phase",
     "order": 1,
@@ -3054,7 +3060,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "decoherence-and-the-quantum-to-classical-transition",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators"
     ],
@@ -3066,7 +3072,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-hardware/noise-decoherence-and-scaling/sources-of-noise",
-        "note": "This lesson's abstract, irreversible coherence loss is exactly what that lesson's 'incoherent error' category names, catalogued by real physical origin (amplitude damping, dephasing) in actual hardware."
+        "note": "Catalogues where the amplitude-damping and dephasing channels used here come from physically in real devices, and what an engineer can do about each one."
       }
     ],
     "slug": "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"
@@ -3106,7 +3112,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-path-integral-formulation",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 35,
     "prerequisites": [
       "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"
     ],
@@ -3124,7 +3130,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "addition-of-angular-momentum",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 35,
     "prerequisites": [
       "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"
     ],
@@ -3136,7 +3142,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement",
-        "note": "The spin-0 singlet this lesson derives from atomic physics is not merely analogous to that lesson's Bell state |Ψ⁻⟩, it is the identical vector, verified here as the same J²=0 eigenstate."
+        "note": "Builds |Ψ⁻⟩ from a Hadamard and a CNOT. That construction and this lesson's spin-0 singlet produce the same vector, which this lesson verifies by checking it is a J²=0 eigenstate."
       }
     ],
     "slug": "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum"
@@ -3166,7 +3172,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "capstone-from-abstract-algebra-to-the-hydrogen-atom",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum"
     ],
@@ -3184,7 +3190,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "ladder-operators-and-the-angular-momentum-spectrum",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 35,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-mechanics/angular-momentum-and-spin/angular-momentum-commutation-relations"
     ],
@@ -3202,7 +3208,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "orbital-angular-momentum-and-spherical-harmonics",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum"
     ],
@@ -3215,17 +3221,17 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Spin-1/2 Systems",
-    "description": "This platform's qubit engine, built since Course 1, already is the j=1/2 representation of the angular momentum algebra: Sx,Sy,Sz are exactly (ħ/2)X,(ħ/2)Y,(ħ/2)Z, and the Bloch sphere already shown was always secretly a spin-1/2 direction all along.",
+    "description": "The qubit engine built in Course 1 already is the j=1/2 representation of the angular momentum algebra: Sx,Sy,Sz equal (ħ/2)X,(ħ/2)Y,(ħ/2)Z entry for entry, and the Bloch sphere point has been a physical spin direction from the start.",
     "course": "angular-momentum-and-spin",
     "module": "spin-one-half-systems",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 20,
     "prerequisites": [
       "quantum-mechanics/angular-momentum-and-spin/orbital-angular-momentum-and-spherical-harmonics"
     ],
     "objectives": [
-      "Identify the Pauli spin operators Sx,Sy,Sz as (ħ/2) times the Pauli matrices, exactly the j=1/2 case of Jx,Jy,Jz",
+      "Identify the Pauli spin operators Sx,Sy,Sz as (ħ/2) times the Pauli matrices, the j=1/2 case of Jx,Jy,Jz",
       "Explain why spin-1/2, unlike orbital angular momentum, has no position-space wavefunction restriction",
       "Reinterpret the Bloch sphere (Qubits & Quantum States) as the physical spin direction for a spin-1/2 particle"
     ],
@@ -3239,7 +3245,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Stern-Gerlach Experiment",
-    "description": "The 1922 experiment that first revealed spin quantization directly: a silver atom beam splitting into exactly two spots, not a continuous smear, reproduced here as a sequence of qubit measurements along different axes, using machinery this platform already built.",
+    "description": "The 1922 experiment that first showed spin quantization directly: a silver atom beam splitting into two spots rather than a continuous smear, reproduced here as a sequence of qubit measurements along different axes.",
     "course": "angular-momentum-and-spin",
     "module": "the-stern-gerlach-experiment",
     "order": 1,
@@ -3257,7 +3263,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Variational Method",
-    "description": "⟨H⟩ for ANY normalized trial wavefunction is guaranteed ≥ the true ground energy, a one-line inequality that turns 'guess a wavefunction, minimize over its parameters' into a rigorous approximation method, verified here by minimizing a Gaussian trial's ⟨H⟩ on the harmonic oscillator and landing within 0.001% of the exact answer.",
+    "description": "⟨H⟩ for ANY normalized trial wavefunction is guaranteed ≥ the true ground energy, a one-line inequality that turns 'guess a wavefunction, then minimize over its parameters' into a rigorous approximation method, checked here by minimizing a Gaussian trial's ⟨H⟩ on the harmonic oscillator and landing within 0.004% of the exact answer.",
     "course": "approximation-methods",
     "module": "the-variational-method",
     "order": 1,
@@ -3274,19 +3280,19 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits",
-        "note": "The identical inequality ⟨ψ|H|ψ⟩ ≥ E₀, proved the same way, minimized over an ansatz circuit's parameters instead of a Gaussian's width."
+        "note": "Takes the inequality proved here, ⟨ψ|H|ψ⟩ ≥ E₀, and minimizes it over an ansatz circuit's parameters rather than a Gaussian's width. Same theorem, same proof, different family of trial states."
       }
     ],
     "slug": "quantum-mechanics/approximation-methods/the-variational-method"
   },
   {
     "title": "The WKB Approximation",
-    "description": "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within 0.06% at this platform's grid resolution — a route through classical mechanics and de Broglie wavelengths, unrelated to perturbation theory or the variational method, arriving at (nearly) the same answer anyway.",
+    "description": "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within ~0.05% at the engine's grid resolution. A route through classical mechanics and de Broglie wavelengths, unrelated to perturbation theory or the variational method, arriving at (nearly) the same answer anyway.",
     "course": "approximation-methods",
     "module": "the-wkb-approximation",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-mechanics/approximation-methods/the-variational-method"
     ],
@@ -3424,7 +3430,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "position-and-momentum",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
     ],
@@ -3442,7 +3448,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "stationary-states",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"
     ],
@@ -3460,7 +3466,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "superposition-interference-and-phase",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 20,
     "prerequisites": [
       "quantum-mechanics/classical-to-quantum/position-and-momentum"
     ],
@@ -3478,7 +3484,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-postulates-of-quantum-mechanics",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-mechanics/classical-to-quantum/why-complex-amplitudes"
     ],
@@ -3497,7 +3503,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Quantum Harmonic Oscillator",
-    "description": "The single most important solvable system in quantum mechanics, built entirely algebraically from ladder operators: a real derivation of the integer, equally-spaced energy spectrum, with zero calculus.",
+    "description": "The most reused solvable system in quantum mechanics, built entirely from ladder operators: a full derivation of the integer, equally-spaced energy spectrum, with no calculus anywhere.",
     "course": "classical-to-quantum",
     "module": "the-quantum-harmonic-oscillator",
     "order": 1,
@@ -3514,14 +3520,14 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-hardware/control-and-readout/cryogenic-systems",
-        "note": "This lesson's equally-spaced ħω energy ladder is exactly what the Bose-Einstein occupation formula there plugs into to compute why a real qubit needs millikelvin cooling to stay in its ground state."
+        "note": "Supplies the ħω level spacing that the Bose-Einstein occupation formula there needs, which is how that lesson computes why a real qubit must be cooled to millikelvin temperatures to stay in its ground state."
       }
     ],
     "slug": "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
   },
   {
     "title": "Time Evolution and the Schrödinger Equation",
-    "description": "Deriving what unitary evolution must look like: the Hamiltonian, the Schrödinger equation, and a worked two-level example computed with the exact rotation machinery already built for the Bloch sphere.",
+    "description": "Deriving what unitary evolution must look like: the Hamiltonian, the Schrödinger equation, and a worked two-level example computed with the same rotation machinery already built for the Bloch sphere.",
     "course": "classical-to-quantum",
     "module": "time-evolution-and-the-schrodinger-equation",
     "order": 1,
@@ -3544,7 +3550,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "why-complex-amplitudes",
     "order": 1,
     "difficulty": "foundational",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability"
     ],
@@ -3562,7 +3568,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "bosons-and-fermions",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 20,
     "prerequisites": [
       "quantum-mechanics/identical-particles/indistinguishability"
     ],
@@ -3575,7 +3581,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Indistinguishability",
-    "description": "Two identical quantum particles literally cannot be tracked as 'particle 1' vs 'particle 2': swapping their labels must leave every physical prediction unchanged, which forces the combined wavefunction to be either exactly symmetric or exactly antisymmetric under exchange.",
+    "description": "Two identical quantum particles cannot be tracked as 'particle 1' and 'particle 2': swapping their labels must leave every physical prediction unchanged, which forces the combined wavefunction to be either symmetric or antisymmetric under exchange.",
     "course": "identical-particles",
     "module": "indistinguishability",
     "order": 1,
@@ -3598,7 +3604,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "multi-electron-atoms-introduction",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-mechanics/identical-particles/the-pauli-exclusion-principle"
     ],
@@ -3616,7 +3622,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "the-pauli-exclusion-principle",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-mechanics/identical-particles/bosons-and-fermions"
     ],
@@ -3658,11 +3664,11 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "complex-numbers-for-physics",
     "order": 1,
     "difficulty": "foundational",
-    "estimatedMinutes": 35,
+    "estimatedMinutes": 40,
     "prerequisites": [],
     "objectives": [
       "Perform arithmetic with complex numbers in rectangular and polar form",
-      "Derive Euler's formula from the power series for e^x, cos θ, and sin θ (all three stated in this lesson — no calculus required) and use it to multiply complex numbers by adding phases",
+      "Derive Euler's formula from the power series for e^x, cos θ, and sin θ (all three stated in this lesson, with no calculus required) and use it to multiply complex numbers by adding phases",
       "Explain, at least informally, why physics needs complex numbers rather than treating them as a bookkeeping trick"
     ],
     "related": [
@@ -3752,7 +3758,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-computing/qubits-and-quantum-states/quantum-gates",
-        "note": "Every quantum gate is exactly this lesson's object: a linear operator, represented as a matrix acting on a state vector."
+        "note": "Every quantum gate is an instance of this lesson's object: a linear operator, represented as a matrix acting on a state vector."
       }
     ],
     "slug": "quantum-mechanics/mathematical-foundations/linear-operators"
@@ -3843,7 +3849,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Vector Spaces",
-    "description": "Vectors as anything you can add and scale: axioms, span, linear independence, basis, dimension, change of basis, and the complex vector spaces quantum mechanics actually uses.",
+    "description": "Vectors as anything you can add and scale: axioms, span, linear independence, basis, dimension, change of basis, and the complex vector spaces quantum mechanics is built on.",
     "course": "mathematical-foundations",
     "module": "vector-spaces",
     "order": 1,
@@ -3861,12 +3867,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "One-Dimensional Systems Challenge",
-    "description": "A synthesis capstone connecting the finite well's bound states to the step and barrier's scattering states -- and to every 1D potential this platform has now solved, bound or unbound, exactly or numerically.",
+    "description": "A synthesis capstone connecting the finite well's bound states to the step and barrier's scattering states, and to every 1D potential the two courses have now solved, bound or unbound, exactly or numerically.",
     "course": "one-dimensional-systems",
     "module": "one-dimensional-systems-challenge",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 22,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-mechanics/one-dimensional-systems/resonant-transmission-through-a-barrier"
     ],
@@ -3879,7 +3885,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Resonant Transmission Through a Barrier",
-    "description": "Extending the step-potential result to a full barrier reveals something the step alone couldn't: special energies where the barrier becomes perfectly transparent, exactly analogous to anti-reflective optical coatings.",
+    "description": "Extending the step-potential result to a full barrier reveals something the step alone couldn't: special energies where the barrier becomes perfectly transparent, on the same interference mechanism as anti-reflective optical coatings.",
     "course": "one-dimensional-systems",
     "module": "resonant-transmission-through-a-barrier",
     "order": 1,
@@ -3898,7 +3904,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Scattering Off a Step Potential",
-    "description": "A particle with more than enough energy to classically cross a step still partially reflects, quantum mechanically -- derived in closed form from plane-wave boundary matching, with probability conservation checked algebraically.",
+    "description": "A particle with more than enough energy to classically cross a step still partially reflects, quantum mechanically. Derived in closed form from plane-wave boundary matching, with probability conservation checked algebraically.",
     "course": "one-dimensional-systems",
     "module": "scattering-off-a-step-potential",
     "order": 1,
@@ -3916,7 +3922,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Solving the Finite Well Numerically",
-    "description": "The graphical method for a transcendental equation with no closed form, made precise with bisection -- a real, tested numerical root-finder, applied to a specific worked well and cross-checked against the infinite-well limit.",
+    "description": "The graphical method for a transcendental equation with no closed form, made precise with bisection: a real, tested numerical root-finder, applied to a specific worked well and cross-checked against the infinite-well limit.",
     "course": "one-dimensional-systems",
     "module": "solving-the-finite-well-numerically",
     "order": 1,
@@ -3940,7 +3946,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Finite Square Well: Setting Up the Equation",
-    "description": "Unlike the infinite well's hard walls, a finite-depth well lets the wavefunction leak into the classically forbidden region -- deriving the resulting transcendental quantization condition from boundary matching alone.",
+    "description": "Unlike the infinite well's hard walls, a finite-depth well lets the wavefunction leak into the classically forbidden region. Deriving the resulting transcendental quantization condition from boundary matching alone.",
     "course": "one-dimensional-systems",
     "module": "the-finite-square-well-setting-up-the-equation",
     "order": 1,
@@ -3959,7 +3965,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Complete Sets of Commuting Observables",
-    "description": "When one observable's eigenvalue doesn't fully pin down a state, a second compatible observable can resolve the ambiguity -- built here as a concrete, computable construction, not just a name.",
+    "description": "When one observable's eigenvalue doesn't fully pin down a state, a second compatible observable can resolve the ambiguity, built here as a concrete, computable construction rather than a name.",
     "course": "operators-observables-measurement",
     "module": "complete-sets-of-commuting-observables",
     "order": 1,
@@ -3977,7 +3983,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Degeneracy in Practice: A Worked System",
-    "description": "Every idea from this course applied to one real, familiar system -- a Bell state -- using two-qubit observables to build an honest complete set of commuting observables and watch it resolve degeneracy exactly.",
+    "description": "Every idea from this course applied to one familiar system, a Bell state, using two-qubit observables to build a complete set of commuting observables and watch it resolve a degeneracy.",
     "course": "operators-observables-measurement",
     "module": "degeneracy-in-practice",
     "order": 1,
@@ -4001,20 +4007,20 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "operators-observables-measurement-challenge",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 24,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-mechanics/operators-observables-measurement/degeneracy-in-practice"
     ],
     "objectives": [
       "Map every generalized result from this course onto the specific postulate it generalizes",
       "Solve synthesis problems combining spectral decomposition, compatibility, and the measurement postulate",
-      "Identify what remains genuinely open for future courses that need degenerate spectra"
+      "Identify what remains open for future courses that need degenerate spectra"
     ],
     "slug": "quantum-mechanics/operators-observables-measurement/operators-observables-measurement-challenge"
   },
   {
     "title": "Sequential Measurements and Incompatibility",
-    "description": "A fully worked, numeric measure-then-measure-then-measure-again sequence on a single qubit, showing exactly how an incompatible measurement destroys an earlier certainty.",
+    "description": "A fully worked, numeric measure-then-measure-then-measure-again sequence on a single qubit, tracking step by step how an incompatible measurement destroys an earlier certainty.",
     "course": "operators-observables-measurement",
     "module": "sequential-measurements-and-incompatibility",
     "order": 1,
@@ -4074,7 +4080,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Energy-Time Uncertainty Relation",
-    "description": "Deriving Delta E * Delta t >= hbar/2 honestly -- time isn't an operator, so this isn't a special case of the general commutator bound, but a direct consequence of Ehrenfest's theorem applied to it.",
+    "description": "Deriving Delta E * Delta t >= hbar/2 honestly. Time is not an operator, so this is not a special case of the general commutator bound; it follows instead from Ehrenfest's theorem applied to an arbitrary observable.",
     "course": "operators-observables-measurement",
     "module": "the-energy-time-uncertainty-relation",
     "order": 1,
@@ -4087,13 +4093,13 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "objectives": [
       "Explain why time cannot appear in the general uncertainty relation the way position and momentum do",
       "Define a characteristic evolution timescale for an arbitrary observable and derive the energy-time bound from it",
-      "Show that a stationary state's infinite characteristic timescale is exactly consistent with its zero energy uncertainty"
+      "Show that a stationary state's infinite characteristic timescale is consistent with its zero energy uncertainty"
     ],
     "slug": "quantum-mechanics/operators-observables-measurement/the-energy-time-uncertainty-relation"
   },
   {
     "title": "The Measurement Postulate, Generalized",
-    "description": "Restating Born's rule with projectors instead of raw coefficients -- correct whether or not the measured eigenvalue is degenerate, and reducing exactly to the familiar |c_i|^2 form when it isn't.",
+    "description": "Restating Born's rule with projectors instead of raw coefficients: correct whether or not the measured eigenvalue is degenerate, and reducing exactly to the familiar |c_i|^2 form when it isn't.",
     "course": "operators-observables-measurement",
     "module": "the-measurement-postulate-generalized",
     "order": 1,
@@ -4106,7 +4112,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "objectives": [
       "State the measurement postulate using projectors and show it reduces to |c_i|^2 in the nondegenerate case",
       "Compute a measurement probability and the post-measurement collapsed state for a degenerate eigenvalue",
-      "Explain why collapse is described by the projector, not by simply picking one eigenvector arbitrarily"
+      "Explain why collapse is described by the projector rather than by picking one eigenvector out of the degenerate subspace"
     ],
     "related": [
       {
@@ -4154,7 +4160,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Hydrogen Energy Levels",
-    "description": "Solving the radial equation for the Coulomb potential gives Eₙ=−13.6 eV/n², quantized by the bound-state boundary condition alone, independent of l, and reproduced exactly by this platform's verified hydrogenEnergyLevel() function.",
+    "description": "Solving the radial equation for the Coulomb potential gives Eₙ=−13.6 eV/n², quantized by the bound-state boundary condition alone, independent of l, and reproduced exactly by the course engine's verified hydrogenEnergyLevel() function.",
     "course": "the-hydrogen-atom",
     "module": "hydrogen-energy-levels",
     "order": 1,
@@ -4171,7 +4177,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-hardware/physical-qubit-platforms/neutral-atoms",
-        "note": "Neutral-atom qubits' 'Rydberg blockade' gate excites an atom to exactly this lesson's high-n hydrogen-like states; Eₙ=-13.6 eV/n² is why large n gives such an enormous, strongly-interacting orbit."
+        "note": "Neutral-atom qubits' 'Rydberg blockade' gate excites an atom into the high-n hydrogen-like states this lesson derives; Eₙ=-13.6 eV/n² is why large n gives such an enormous, strongly-interacting orbit."
       }
     ],
     "slug": "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels"
@@ -4225,7 +4231,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     ],
     "objectives": [
       "Derive <x> and <x^2> as integrals from the abstract expectation-value postulate",
-      "Compute position variance and connect it to the platform's variancePosition() implementation",
+      "Compute position variance and connect it to the engine's variancePosition() implementation",
       "Generalize to <f(x)> for an arbitrary function of position"
     ],
     "slug": "quantum-mechanics/wave-mechanics/expectation-values-in-position-space"
@@ -4250,7 +4256,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Momentum Space and the Fourier Transform",
-    "description": "The momentum-space wavefunction phi(k) as a basis change, exactly like the finite-dimensional basis changes from Mathematical Foundations, computed here by a real, tested numerical Fourier transform, not a black box.",
+    "description": "The momentum-space wavefunction phi(k) as a basis change, of the same kind as the finite-dimensional basis changes from Mathematical Foundations, computed here by a real, tested numerical Fourier transform rather than a black box.",
     "course": "wave-mechanics",
     "module": "momentum-space-and-the-fourier-transform",
     "order": 1,
@@ -4274,7 +4280,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Numerically Evolving Quantum States",
-    "description": "How the Wavefunction Explorer actually integrates the Schrodinger equation forward in time -- the split-operator Fourier method, why it's built from a Taylor-expandable approximation, and the honest numerical trade-offs that come with it.",
+    "description": "How the Wavefunction Explorer integrates the Schrödinger equation forward in time: the split-operator Fourier method, why it is built from a Taylor-expandable approximation, and the numerical trade-offs that come with it.",
     "course": "wave-mechanics",
     "module": "numerically-evolving-quantum-states",
     "order": 1,
@@ -4292,7 +4298,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Probability Density and Normalization",
-    "description": "Making the Born rule precise for continuous position: what normalization actually requires, how it's preserved under time evolution, and how the platform's numerical engine enforces both.",
+    "description": "Making the Born rule precise for continuous position: what normalization requires, how it survives time evolution, and how the platform's numerical engine enforces both.",
     "course": "wave-mechanics",
     "module": "probability-density-and-normalization",
     "order": 1,
@@ -4310,7 +4316,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Harmonic Oscillator in Position Space",
-    "description": "A second, independent derivation of the harmonic oscillator's energy spectrum, this time by direct substitution into the position-space Schrodinger equation, confirming the ladder-operator result from the last course by an entirely different route.",
+    "description": "A second, independent derivation of the harmonic oscillator's energy spectrum, this time by direct substitution into the position-space Schrödinger equation, confirming the ladder-operator result from the last course by an entirely different route.",
     "course": "wave-mechanics",
     "module": "the-harmonic-oscillator-in-position-space",
     "order": 1,
@@ -4321,7 +4327,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
       "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
     ],
     "objectives": [
-      "Verify by direct substitution that the Gaussian ground state solves the position-space Schrodinger equation with E_0 = hbar*omega/2",
+      "Verify by direct substitution that the Gaussian ground state solves the position-space Schrödinger equation with E_0 = hbar*omega/2",
       "Connect the position-space eigenstates to the ladder-operator treatment from the last course as two representations of the same physics",
       "Identify the physical potential V(x) = (1/2) m omega^2 x^2 the abstract H = hbar*omega(N+1/2) from the last course was standing in for"
     ],
@@ -4329,7 +4335,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Infinite Square Well",
-    "description": "Solving the time-independent Schrodinger equation exactly for a particle confined between infinite walls, a complete derivation of quantized energies and normalized eigenstates from boundary conditions alone.",
+    "description": "Solving the time-independent Schrödinger equation exactly for a particle confined between infinite walls, a complete derivation of quantized energies and normalized eigenstates from boundary conditions alone.",
     "course": "wave-mechanics",
     "module": "the-infinite-square-well",
     "order": 1,
@@ -4339,21 +4345,21 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
       "quantum-mechanics/wave-mechanics/free-particle-wave-packets"
     ],
     "objectives": [
-      "Set up and solve the time-independent Schrodinger equation for the infinite square well",
+      "Set up and solve the time-independent Schrödinger equation for the infinite square well",
       "Derive the boundary conditions that force quantized energy levels E_n = n^2*pi^2*hbar^2/(2mL^2)",
       "Normalize the resulting eigenstates and verify orthogonality between different levels"
     ],
     "related": [
       {
         "slug": "quantum-hardware/physical-qubit-platforms/spin-qubits",
-        "note": "This lesson's confinement-forces-quantization mechanism is exactly what a fabricated quantum dot uses to confine a single electron whose spin becomes the qubit."
+        "note": "A fabricated quantum dot confines a single electron by this lesson's mechanism, and the spin of that trapped electron is what becomes the qubit."
       }
     ],
     "slug": "quantum-mechanics/wave-mechanics/the-infinite-square-well"
   },
   {
     "title": "The Position and Momentum Operators",
-    "description": "Redeeming the last course's preview: deriving p-hat = -i*hbar*d/dx from the plane-wave eigenfunction requirement, and reproving the canonical commutator [x,p]=i*hbar directly, this time from calculus rather than assertion.",
+    "description": "Redeeming the last course's preview: deriving p-hat = -i*hbar*d/dx from the plane-wave eigenfunction requirement, and reproving the canonical commutator [x,p]=i*hbar from calculus rather than assertion.",
     "course": "wave-mechanics",
     "module": "the-position-and-momentum-operators",
     "order": 1,
@@ -4382,7 +4388,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
       "quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"
     ],
     "objectives": [
-      "Derive the position-space Schrodinger equation from the abstract time-evolution postulate and the explicit p-hat operator",
+      "Derive the position-space Schrödinger equation from the abstract time-evolution postulate and the explicit p-hat operator",
       "Identify the kinetic and potential energy terms in the resulting Hamiltonian",
       "Explain, at a physical level, how the Wavefunction Explorer numerically integrates this equation forward in time"
     ],
@@ -4390,7 +4396,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Tunneling and the Finite Barrier",
-    "description": "Solving the Schrodinger equation inside a classically forbidden region to show the wavefunction decays exponentially rather than vanishing outright -- the mechanism behind quantum tunneling, verified live via the simulator's transmission/reflection accounting.",
+    "description": "Solving the Schrödinger equation inside a classically forbidden region to show the wavefunction decays exponentially rather than vanishing outright, which is the mechanism behind quantum tunneling, verified live via the simulator's transmission/reflection accounting.",
     "course": "wave-mechanics",
     "module": "tunneling-and-the-finite-barrier",
     "order": 1,
@@ -4400,7 +4406,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
       "quantum-mechanics/wave-mechanics/wave-packet-dynamics-and-dispersion"
     ],
     "objectives": [
-      "Solve the Schrodinger equation inside a classically forbidden region (E < V) and show it gives exponential, not oscillatory, behavior",
+      "Solve the Schrödinger equation inside a classically forbidden region (E < V) and show it gives exponential, not oscillatory, behavior",
       "Explain why a finite-width barrier lets some amplitude survive to the far side, unlike an infinitely thick one",
       "Verify numerically that transmitted and reflected probability sum to 1, confirming no probability is created or destroyed"
     ],
@@ -4408,12 +4414,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Wave Mechanics Challenge",
-    "description": "A synthesis capstone connecting every idea in this course -- the wavefunction, momentum space, the position-space Schrodinger equation, and the solvable systems -- into a single coherent picture, alongside the finite-dimensional postulates from the last course.",
+    "description": "A synthesis capstone connecting every idea in this course (the wavefunction, momentum space, the position-space Schrödinger equation, and the solvable systems) into a single coherent picture, alongside the finite-dimensional postulates from the last course.",
     "course": "wave-mechanics",
     "module": "wave-mechanics-challenge",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 26,
+    "estimatedMinutes": 30,
     "prerequisites": [
       "quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states"
     ],
@@ -4426,7 +4432,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Wave Packet Dynamics and Dispersion",
-    "description": "Deriving Ehrenfest's theorem (why <x> obeys Newton's law on average), and explaining -- from the momentum-space phase evolution directly -- why a free wave packet inevitably spreads over time.",
+    "description": "Deriving Ehrenfest's theorem (why <x> obeys Newton's law on average), and explaining, from the momentum-space phase evolution directly, why a free wave packet spreads over time.",
     "course": "wave-mechanics",
     "module": "wave-packet-dynamics-and-dispersion",
     "order": 1,
@@ -4491,7 +4497,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "hybrid-workflows",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 18,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-software/compilation-and-hybrid-algorithms/gate-decomposition"
     ],
@@ -4509,7 +4515,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "quantum-compilation-and-transpilation",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 22,
+    "estimatedMinutes": 20,
     "prerequisites": [
       "quantum-software/simulating-quantum-systems/noise-simulation"
     ],
@@ -4527,7 +4533,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "quantum-error-mitigation",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 28,
+    "estimatedMinutes": 35,
     "prerequisites": [
       "quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows"
     ],
@@ -4540,7 +4546,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "related": [
       {
         "slug": "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
-        "note": "The depolarizing channel this lesson's zero-noise extrapolation derivation uses is a Kraus channel in exactly that lesson's sense, and applyKrausChannel/applyChannelRepeatedly (built there, reused by Noise Simulation) is what this lesson's E(1), E(3) numbers were checked against."
+        "note": "The depolarizing channel this lesson's zero-noise extrapolation derivation uses is a Kraus channel in that lesson's sense, and applyKrausChannel/applyChannelRepeatedly (built there, reused by Noise Simulation) is what this lesson's E(1), E(3) numbers were checked against."
       },
       {
         "slug": "quantum-software/simulating-quantum-systems/noise-simulation",
@@ -4559,12 +4565,12 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Variational Algorithm Implementation",
-    "description": "Closing the loop this entire pillar built toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) finds ⟨Z⟩'s minimum at exactly θ=π, value -1, matching exactGroundStateEnergy(Z) exactly, and extends to a two-parameter Hamiltonian, converging to within 0.04% of the true ground energy by grid search alone.",
+    "description": "Closing the loop this pillar has been building toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) finds ⟨Z⟩'s minimum at θ=π, value -1, matching exactGroundStateEnergy(Z) to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
     "course": "compilation-and-hybrid-algorithms",
     "module": "variational-algorithm-implementation",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 25,
+    "estimatedMinutes": 20,
     "prerequisites": [
       "quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows"
     ],
@@ -4582,7 +4588,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "circuit-representation-in-code",
     "order": 1,
     "difficulty": "foundational",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 15,
     "prerequisites": [
       "quantum-computing/quantum-gates-and-circuits/building-quantum-circuits"
     ],
@@ -4600,7 +4606,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "quantum-sdks-overview",
     "order": 1,
     "difficulty": "foundational",
-    "estimatedMinutes": 18,
+    "estimatedMinutes": 20,
     "prerequisites": [
       "quantum-software/programming-quantum-computers/circuit-representation-in-code"
     ],
@@ -4674,7 +4680,8 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "difficulty": "advanced",
     "estimatedMinutes": 20,
     "prerequisites": [
-      "quantum-software/simulating-quantum-systems/tensor-network-methods"
+      "quantum-software/simulating-quantum-systems/state-vector-simulation",
+      "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators"
     ],
     "objectives": [
       "Explain how a noisy simulator interleaves ideal unitary evolution with a Kraus-channel noise model",
@@ -4683,8 +4690,8 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     ],
     "related": [
       {
-        "slug": "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
-        "note": "This lesson's noise channels are the same Kraus-operator formalism, applied to circuit simulation."
+        "slug": "quantum-software/simulating-quantum-systems/tensor-network-methods",
+        "note": "The previous lesson in this course's sequence, but not a dependency: nothing here uses tensor networks. The machinery this lesson actually leans on is the density-matrix/Kraus formalism listed as a prerequisite."
       }
     ],
     "slug": "quantum-software/simulating-quantum-systems/noise-simulation"
@@ -4696,7 +4703,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "state-vector-simulation",
     "order": 1,
     "difficulty": "intermediate",
-    "estimatedMinutes": 18,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-software/programming-quantum-computers/simulators-vs-real-hardware"
     ],
@@ -4720,7 +4727,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
     "module": "tensor-network-methods",
     "order": 1,
     "difficulty": "advanced",
-    "estimatedMinutes": 20,
+    "estimatedMinutes": 25,
     "prerequisites": [
       "quantum-software/simulating-quantum-systems/computational-cost-and-scaling"
     ],

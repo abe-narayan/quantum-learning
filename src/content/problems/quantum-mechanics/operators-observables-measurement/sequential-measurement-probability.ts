@@ -22,6 +22,10 @@ export const sequentialMeasurementProbability: NumericProblem = {
     value: 0.5,
     tolerance: 0.001,
     incorrectFeedback: "After the X measurement, the state collapses to an X-eigenstate, which is an equal superposition of |0> and |1> — recompute P(Z=0) from there, not from the original |0>.",
+    nearMisses: [
+      { value: 1, feedback: "1 is the answer if the X measurement is ignored. It does change the state: whichever outcome it gives, the system lands on |+⟩ or |−⟩, neither of which is |0⟩." },
+      { value: 0.25, feedback: "0.25 would come from multiplying two halves. Only the final Z measurement is being asked about, and both X branches give the same P(Z=0)." },
+    ],
   },
   hints: [{ text: "Whichever X-eigenstate results, it's an equal superposition of |0> and |1> in the Z basis." }],
   solution: {

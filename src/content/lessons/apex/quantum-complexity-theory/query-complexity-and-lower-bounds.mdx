@@ -53,7 +53,7 @@ export const lessonMeta = {
   module: "query-complexity-and-lower-bounds",
   order: 4,
   difficulty: "master",
-  estimatedMinutes: 28,
+  estimatedMinutes: 75,
   prerequisites: ["apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp"],
   objectives: [
     "Explain the query (black-box) complexity model precisely: an algorithm's cost is measured only in oracle queries, all other computation is free, and state why this model is the right setting for PROVING (not just conjecturing) lower bounds",
@@ -293,6 +293,55 @@ $T=\Omega(\sqrt N)$ — the *same* bound, reached by a completely
 different mathematical route: classical approximation theory, with no
 state vectors, inner products, or adversary matrices anywhere in the
 argument.
+
+<ResearchConnection
+  title="The two techniques, in their own papers"
+  source="Ambainis, Journal of Computer and System Sciences 64, 750 (2002) (arXiv:quant-ph/0002066); Beals, Buhrman, Cleve, Mosca & de Wolf, Journal of the ACM 48, 778 (2001) (arXiv:quant-ph/9802049)"
+  url="https://arxiv.org/abs/quant-ph/0002066"
+>
+  Ambainis' paper states the adversary method in its original relational
+  form and applies it to several functions beyond OR, which is the fastest
+  way to see that the $\Gamma$ above is a *choice* and that choosing it
+  well is where the work is. Beals et al. prove the degree-$2T$ fact in
+  half a page and then spend the paper on its consequences, including the
+  result worth knowing alongside Grover's optimality: for total Boolean
+  functions, quantum and deterministic classical query complexity are
+  polynomially related, so no total function admits more than a polynomial
+  quantum speedup in this model. Exponential query separations therefore
+  require promise problems, which is why every one you have seen — Deutsch-Jozsa,
+  Simon, period-finding — comes with a promise attached.
+</ResearchConnection>
+
+### Where each technique stops
+
+Both proofs above are complete and both are limited, in different ways
+worth naming rather than leaving as an impression that lower-bound
+technique is a solved subject.
+
+The adversary bound as stated is the **positive-weight** version:
+$\Gamma$ has nonnegative entries. That restriction carries a known
+ceiling, the certificate-complexity barrier, which says the method can
+never certify a bound larger than $\sqrt{C_0(f)\,C_1(f)}$, where $C_b$ is
+the certificate complexity of $f$'s $b$-instances. For a function with
+small certificates on both sides, the positive-weight method cannot prove
+a strong bound no matter how cleverly $\Gamma$ is chosen; the obstruction
+is in the method, not in the function. Allowing $\Gamma$ to carry negative
+entries removes the barrier (Høyer, Lee and Špalek, STOC 2007), and the
+resulting general adversary bound was later shown to characterize
+bounded-error quantum query complexity up to constant factors for every
+Boolean function (Reichardt, FOCS 2009): a method introduced as one
+lower-bound technique among several turned out to be, up to constants,
+the whole answer. That is why "the adversary method" in current papers
+usually means the negative-weight version, not the one computed above.
+
+The polynomial method has an unrelated limitation: approximate degree can
+be strictly smaller than query complexity. Ambainis exhibited functions
+where the polynomial method provably cannot reach the true bound, so the
+two techniques are not merely different routes to the same place. Each is
+the only available route for some functions.
+
+None of this weakens the $\mathrm{OR}_N$ result. Both methods are tight
+there, which is exactly why it is the example to learn them on.
 
 | Technique | What it tracks | Key inequality | Attribution |
 |---|---|---|---|

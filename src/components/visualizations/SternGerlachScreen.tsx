@@ -36,8 +36,16 @@ const modes = [
 ];
 
 function Label({ x, y, children }: { x: number; y: number; children: string }) {
+  // This SVG carries an intrinsic `width` and no `w-full`, so it renders at
+  // its natural 480 units inside `overflow-x-auto` and the viewBox scale is
+  // 1.0 — 10 authored units was a literal 10px, on the legibility floor
+  // rather than under it, which is why these needed only a nudge to 12
+  // rather than the ~2x other figures in this directory required.
+  // `fill-axis` replaces `fill-muted-foreground`: these name the apparatus
+  // (oven, poles, screen) and are read as part of the figure, not as caption
+  // prose.
   return (
-    <text x={x} y={y} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">
+    <text x={x} y={y} textAnchor="middle" fontSize={12} className="fill-axis font-mono">
       {children}
     </text>
   );
@@ -59,7 +67,20 @@ export function SternGerlachScreen({ ariaLabel }: { ariaLabel: string }) {
     <div className="not-prose space-y-4 panel-inset p-4">
       <PresetToggle options={modes} index={index} onChange={setIndex} ariaLabel={ariaLabel} />
 
-      <div className="overflow-x-auto">
+      {/* `tabIndex={0}`. The comment on `Label` above already establishes what
+          makes this necessary: this SVG "renders at its natural 480 units
+          inside `overflow-x-auto` and the viewBox scale is 1.0" — it is 480
+          real pixels wide with no `w-full` to shrink it, against a ~256px
+          content box on a 320px phone, so this wrapper is scrolled on every
+          phone and most tablets. A scroll container is focusable by default
+          only in Firefox, so without this a keyboard-only reader saw the oven
+          and the magnet poles and could never reach the screen at the right
+          end — which is the entire result the apparatus exists to produce.
+          No `role`/`aria-label` on the wrapper: the `<svg>` is already
+          `role="img"` with the mode-specific label, and naming this too would
+          announce the figure twice (the same call `rehypeKatexHtml.mjs` makes
+          for display math). */}
+      <div tabIndex={0} className="overflow-x-auto">
         <svg
           width={WIDTH}
           height={HEIGHT}

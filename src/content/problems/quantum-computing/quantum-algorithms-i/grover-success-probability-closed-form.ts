@@ -27,17 +27,25 @@ export const groverSuccessProbabilityClosedForm: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "First find θ=arcsin(1/√32)≈0.1781 rad, then evaluate sin²(9θ).",
+    incorrectFeedback: "Two checks. The sine's argument is the odd multiple of θ that k iterations produce, not kθ itself. And the probability is the squared sine, not the sine. An answer far below certainty usually means the odd multiple went missing.",
+    nearMisses: [
+      {
+        value: Math.sin(4 * Math.asin(1 / Math.sqrt(32))) ** 2,
+        tolerance: 0.01,
+        feedback: "That uses kθ as the rotation angle. Each iteration turns the state by 2θ starting from θ, so after k iterations the angle is (2k+1)θ.",
+      },
+      { value: 1 / 32, tolerance: 0.005, feedback: "1/32 is the success probability with no iterations at all. Four iterations are what amplify it to near certainty." },
+    ],
   },
   hints: [
-    { text: "θ = arcsin(1/√32) ≈ 0.1781 radians." },
-    { text: "(2k+1) = 2(4)+1 = 9, so compute sin²(9 × 0.1781)." },
-    { text: "9θ ≈ 1.603 radians ≈ 91.9°." },
+    { text: "Two ingredients go into the closed form: the per-iteration rotation angle θ, set by the database size, and the odd multiple of θ that k iterations build up. Find both before touching the sine." },
+    { text: "θ = arcsin(N^(-1/2)) with N = 32, which is about 0.1777 radians." },
+    { text: "With k = 4, the sine's argument is 9θ ≈ 1.599 radians, just past a right angle. Take the sine and square it." },
   ],
   solution: {
     steps: [
-      { description: "θ = arcsin(1/√32) ≈ 0.1781 rad." },
-      { description: "P = sin²(9θ) ≈ sin²(1.603) ≈ 0.9992." },
+      { description: "θ = arcsin(1/√32) ≈ 0.1777 rad." },
+      { description: "P = sin²(9θ) ≈ sin²(1.599) ≈ 0.9992." },
     ],
     finalAnswer: `P ≈ ${value.toFixed(4)}`,
   },

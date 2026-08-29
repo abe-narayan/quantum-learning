@@ -33,17 +33,21 @@ export const possibleExchangeEigenvalues: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Use λ²=1 (from P₁₂²=I applied to an eigenstate) to narrow down the possible eigenvalues.",
   },
   hints: [
-    { text: "If P₁₂ψ=λψ, then P₁₂²ψ=λ²ψ." },
-    { text: "But P₁₂²=I, so P₁₂²ψ=ψ, meaning λ²ψ=ψ, so λ²=1." },
-    { text: "λ²=1 has exactly two solutions: λ=+1 or λ=−1." },
+    { text: "Start from an eigenstate: suppose P₁₂ψ = λψ, and apply P₁₂ a second time." },
+    { text: "That gives P₁₂²ψ = λ²ψ. Now use the fact you were given about P₁₂²." },
+    { text: "You are left with an equation in λ alone. Solve it over the complex numbers." },
   ],
   solution: {
-    steps: [{ description: "P₁₂²=I forces λ²=1 for any eigenvalue λ, giving exactly λ=+1 or λ=−1." }],
-    finalAnswer: "(a) +1 and −1",
+    steps: [{ description: "Applying P₁₂ twice to an eigenstate gives λ²ψ, and P₁₂² = I gives ψ. So λ² = 1, whose only solutions are λ = +1 and λ = −1. Those two eigenvalues are what bosons and fermions are." }],
+    finalAnswer: "+1 and −1, the only solutions of λ² = 1.",
   },
   explanation: {
-    correctIdea: "This is exactly the algebraic argument the lesson's Mathematical Development section makes, and is the reason bosons/fermions are the only two possibilities.",
-    whyCorrect: "λ²=1 has precisely two real solutions.",
-    whyWrong: ["Any answer including a value other than ±1 contradicts the λ²=1 constraint derived directly from P₁₂²=I."],
+    correctIdea: "One algebraic constraint, P₁₂² = I, is what leaves exactly two kinds of identical particle. There is no third option to look for.",
+    whyCorrect: "λ² = 1 has precisely two solutions.",
+    whyWrong: [
+      { optionId: "b", text: "Applies the weaker constraint. Unitarity gives |λ| = 1; squaring to the identity gives λ² = 1, which is stronger." },
+      { optionId: "c", text: "Allows a zero eigenvalue on an operator that is its own inverse, and an invertible operator has none." },
+      { optionId: "d", text: "Drops the constraint entirely. Among the reals, λ² = 1 admits only ±1." },
+    ],
   },
 };

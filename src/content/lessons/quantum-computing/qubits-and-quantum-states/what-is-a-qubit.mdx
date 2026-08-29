@@ -1,3 +1,7 @@
+import { SternGerlachScreen } from "@/components/visualizations/SternGerlachScreen";
+import { BarChart } from "@/components/visualizations/BarChart";
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { LazySuperpositionJourney } from "@/components/visualizations/superposition-journey/LazySuperpositionJourney";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
@@ -8,25 +12,51 @@ export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/what-is-a-qubit"
 );
 
+export const lopsidedState = new StateVector([new Complex(0.6), new Complex(0, 0.8)]);
+export const equalState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
+
+export const lopsidedBars = [
+  { label: "P(0), equal", value: equalState.probabilities()[0], caption: "50%" },
+  { label: "P(1), equal", value: equalState.probabilities()[1], caption: "50%" },
+  {
+    label: "P(0), 0.6|0⟩+0.8i|1⟩",
+    value: lopsidedState.probabilities()[0],
+    caption: `${(lopsidedState.probabilities()[0] * 100).toFixed(0)}%`,
+    highlight: true,
+  },
+  {
+    label: "P(1), 0.6|0⟩+0.8i|1⟩",
+    value: lopsidedState.probabilities()[1],
+    caption: `${(lopsidedState.probabilities()[1] * 100).toFixed(0)}%`,
+    highlight: true,
+  },
+];
+
 export const lessonMeta = {
   title: "What Is a Qubit?",
   description:
-    "Why quantum computers need a new unit of information, and what a qubit actually is mathematically.",
+    "Why quantum computers need a new unit of information, and what a qubit is mathematically.",
   course: "qubits-and-quantum-states",
   module: "what-is-a-qubit",
   order: 1,
   difficulty: "foundational",
-  estimatedMinutes: 20,
+  estimatedMinutes: 30,
   prerequisites: [],
   objectives: [
     "Explain why a classical bit can't describe a quantum system",
     "Write a qubit state in Dirac notation and check it's normalized",
     "Compute measurement probabilities from a qubit's amplitudes",
   ],
+  related: [
+    {
+      slug: "quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment",
+      note: "The experiment this lesson leans on for motivation, done properly: where the two discrete outcomes come from, and why measuring spin along a second axis erases the first answer.",
+    },
+  ],
 };
 
 <LessonHook eyebrow="Why this matters">
-A qubit doesn't have a definite value sitting in reserve before you measure it — it can be in an actual combination of "0" and "1" at once, a precise mathematical fact about the system, not a polite way of saying "we don't know which one it is yet."
+A qubit does not keep a definite value in reserve, waiting for you to look. It can be in a combination of "0" and "1" at once. That is a claim about the system itself, not a polite way of saying we don't yet know which one it is.
 </LessonHook>
 
 ## Motivation
@@ -37,31 +67,55 @@ waiting, whether or not anything ever reads it. That assumption is so basic
 to how we think about information that it's easy to forget it's an
 assumption at all.
 
-Shrink the question down to a single electron and the assumption breaks.
-Physicists studying things like an electron's spin or a photon's
-polarization found exactly that. A qubit is the unit of information
-built to describe it.
+Shrink the question down to a single atom and the assumption stops working.
+In 1922, Otto Stern and Walther Gerlach fired a beam of silver atoms through
+a magnet whose field was stronger at the top than at the bottom. Each atom
+carries a tiny magnetic compass needle, and classical physics is unambiguous
+about what should happen: the needles point in all directions, so the beam
+should be deflected by every amount between "fully up" and "fully down" and
+smear into a continuous band on the far screen.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
-  alt="Google's Sycamore superconducting quantum processor chip, mounted with its array of individually wired qubits"
-  caption="A real physical qubit: Google's Sycamore superconducting processor. Each of its metallic loops is one qubit, cooled to near absolute zero, whose state is exactly the α|0⟩ + β|1⟩ this lesson describes mathematically."
-  credit="Google"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
-  license="CC BY 3.0"
-/>
+<InteractiveSection title="What the beam does on the screen" description="Toggle between the smear classical physics predicts and the two spots Stern and Gerlach actually recorded. Nothing lands in between.">
+  <SternGerlachScreen ariaLabel="Schematic of the Stern-Gerlach apparatus: an atom beam through an inhomogeneous magnet onto a screen, toggling between a continuous classical smear across the whole screen and the two discrete spots that were observed." />
+</InteractiveSection>
+
+They got two spots. Not a band, not a bright middle with faint edges: two,
+with nothing between them. Measure that atom's compass needle along any axis
+you like and you get one of two answers, and only two.
+
+Here is the part that rules out the easy explanation. Take the atoms from the
+upper spot, so every one of them measured "up" along the vertical axis, and
+send them through a second magnet turned on its side. Half come out left,
+half right. Now take the "left" half and measure vertically again. Half are
+up and half are down. The vertical answer you carefully sorted for is gone.
+No fixed label the atom was carrying all along can survive that, because a
+label wouldn't change when you asked an unrelated question.
+
+So a two-outcome system with no fixed answer in storage needs a unit of
+information a bit cannot supply. That unit is the **qubit**.
+
+Qubits are not only silver atoms. Today they are superconducting loops
+etched onto chips, single ions held in electromagnetic traps, and
+polarized photons in optical fibre, among others (the
+[Physical Qubit Platforms](/courses/physical-qubit-platforms) course covers
+each in turn). The mathematics below describes all of them at once, which
+is why it is worth learning before any particular hardware.
 
 ## Intuition
 
 A useful (if imperfect) way to start: imagine a coin that hasn't landed yet.
-While it's spinning in the air, it isn't heads, and it isn't tails. It's in
-a mixture of both possibilities. A qubit's superposition is similar in
-spirit, but stronger. A spinning coin's outcome is merely *unknown*: it
-will turn out to have been heads or tails all along, once it lands. A
-qubit's superposition is a system whose state really is a mathematical
-combination of $|0\rangle$ and $|1\rangle$, and that combination has
-consequences you can measure, like interference between the two
-possibilities, that a "maybe heads, maybe tails" coin could never produce.
+While it's spinning in the air, it isn't heads and it isn't tails; it's in a
+mixture of both possibilities. A qubit's <Term id="superposition">superposition</Term> is similar in spirit,
+but stronger, and the difference is the one the sideways magnet exposed. The
+spinning coin's outcome is only *unknown*. Once it lands, it will turn out to
+have been heads or tails all along, and a slow-motion camera could have told
+you which. The silver atom has no such answer to be photographed. Its state
+is a mathematical combination of the two outcomes, written $|0\rangle$ and
+$|1\rangle$ (the notation is set up properly in the next section; for now
+read them as labels for "up" and "down"), and that combination has
+measurable consequences of its own, like <Term id="phase-interference">interference</Term>
+between the two possibilities, which a "maybe heads, maybe tails" coin
+could never produce.
 
 <Callout type="note">
 Superposition is not classical uncertainty. A classical bit you haven't
@@ -79,10 +133,10 @@ of these two:
 
 <EquationReveal
   terms={[
-    { id: "psi", symbol: "|ψ⟩", gloss: "The qubit's state — everything there is to know about it." },
-    { id: "alpha", symbol: "α", gloss: "The amplitude on |0⟩ — a complex number, not a probability itself." },
+    { id: "psi", symbol: "|ψ⟩", gloss: "The qubit's state: everything there is to know about it." },
+    { id: "alpha", symbol: "α", gloss: "The amplitude on |0⟩. A complex number, and not a probability itself." },
     { id: "zero", symbol: "|0⟩", gloss: "The basis state corresponding to the classical bit value 0." },
-    { id: "beta", symbol: "β", gloss: "The amplitude on |1⟩ — a complex number, not a probability itself." },
+    { id: "beta", symbol: "β", gloss: "The amplitude on |1⟩. A complex number, and not a probability itself." },
     { id: "one", symbol: "|1⟩", gloss: "The basis state corresponding to the classical bit value 1." },
   ]}
 >
@@ -93,7 +147,7 @@ $$
 
 where $\alpha$ and $\beta$ are complex numbers called <Term id="amplitude">amplitudes</Term>. For
 this to describe a physically valid state, the amplitudes must satisfy the
-normalization condition:
+<Term id="normalization">normalization</Term> condition:
 
 $$
 |\alpha|^2 + |\beta|^2 = 1
@@ -102,28 +156,37 @@ $$
 This condition exists because $|\alpha|^2$ and $|\beta|^2$ will turn out to
 be *probabilities*, and probabilities have to add up to 1.
 
+<Callout type="note">
+If complex numbers are new to you, keep going: every calculation in this
+lesson works if you treat $\alpha$ and $\beta$ as ordinary numbers, and the
+bars in $|\alpha|^2$ as "square the size, ignore the sign." The next lesson
+builds the complex case from scratch; nothing here depends on it yet.
+</Callout>
+
 ## Physical Interpretation
 
-The connection between the math and what you can actually observe is the
+The connection between the math and what you can observe is the
 <Term id="born-rule">Born rule</Term>: if you measure a qubit in state $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$,
 you get outcome 0 with probability $|\alpha|^2$ and outcome 1 with
 probability $|\beta|^2$. Measurement is the one place where the smooth,
 continuous evolution of $\alpha$ and $\beta$ gives way to a single, random,
 classical outcome: the superposition <Term id="wavefunction-collapse">collapses</Term>.
 
-This is why normalization matters physically, not just mathematically: it's
-exactly the statement that "probability of 0" plus "probability of 1" must
-equal 1.
+That is why normalization is a physical requirement rather than a
+bookkeeping convention. It is the statement that "probability of 0" plus
+"probability of 1" must come to 1. The Stern-Gerlach screen makes the same
+point: every atom lands somewhere, so the two spot intensities have to
+account for the whole beam.
 
 ## See It Collapse
 
 The Born rule is the most important idea in this lesson, so before moving on,
 watch it happen. The tool below shows a single qubit's amplitudes turning
-into probabilities in real time, and lets you measure it for real: each click
-samples an outcome using exactly the probabilities shown, then snaps the
-state to a single definite ket.
+into probabilities in real time, and lets you measure it: each click samples
+an outcome using the probabilities shown, then snaps the state to a single
+definite ket.
 
-<InteractiveSection title="Amplitudes to probabilities to collapse" description="Set α with the slider — β is fixed by normalization. Then press Measure several times without touching the slider: you're re-preparing the same superposition each time, so the running tally shows just how random measurement really is, even though the probabilities never change.">
+<InteractiveSection title="Amplitudes to probabilities to collapse" description="Set α with the slider; β is then fixed by normalization. Press Measure several times without touching the slider. You are re-preparing the same superposition each time, so the running tally shows how random each individual outcome is even though the probabilities never move.">
   <LazySuperpositionJourney />
 </InteractiveSection>
 
@@ -131,7 +194,10 @@ state to a single definite ket.
 
 Every qubit state can be pictured as a point on the surface of a sphere, the
 <Term id="bloch-sphere-term">Bloch sphere</Term>, where the north pole is $|0\rangle$, the south pole is
-$|1\rangle$, and every other point is some superposition of the two.
+$|1\rangle$, and every other point is some superposition of the two. The
+closer a point sits to a pole, the larger that outcome's probability; the
+equator, exactly halfway between the poles, is where the two are equally
+likely.
 
 <PredictBeforeReveal
   question="Start from |0⟩ and apply a Hadamard gate (the gate below turns the vector to point straight out to the equator). If you then measure many times, what fraction of measurements will read |1⟩?"
@@ -142,10 +208,10 @@ $|1\rangle$, and every other point is some superposition of the two.
     { label: "100%", value: "100" },
   ]}
   correctValue="50"
-  explanation="A Hadamard gate takes |0⟩ to the equal superposition (1/√2)|0⟩ + (1/√2)|1⟩. By the Born rule, P(1) = |1/√2|² = 1/2, so measurement reads |1⟩ on about half of your attempts and |0⟩ on the other half, never something in between, even though before you measured, the state was a genuine combination of both."
+  explanation="A Hadamard gate takes |0⟩ to the equal superposition (1/√2)|0⟩ + (1/√2)|1⟩. By the Born rule, P(1) = |1/√2|² = 1/2, so measurement reads |1⟩ on about half your attempts and |0⟩ on the other half. Never something in between, even though the state you measured was a combination of both. This is the Stern-Gerlach screen again: two spots, no smear."
 />
 
-<InteractiveSection title="Apply a gate, then measure" description="Try it yourself: apply a gate below and watch α, β, and the measurement probabilities update as the vector moves. Then hit Measure a few times from the same state and notice the outcomes are random, but always land on 0 or 1 with exactly the probabilities shown.">
+<InteractiveSection title="Apply a gate, then measure" description="Apply a gate below and watch α, β, and the measurement probabilities update as the vector moves. Then hit Measure a few times from the same state: the outcomes are random, but they always land on 0 or 1 with the probabilities shown.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -171,8 +237,10 @@ $$
 </DerivationSteps>
 
 So this qubit, when measured, gives 0 or 1 with equal 50% probability: an
-**equal superposition**. This is exactly the state a Hadamard gate produces
-from $|0\rangle$, which you'll meet in the next course.
+**equal superposition**. It is the state a <Term id="hadamard-gate">Hadamard gate</Term>
+produces from $|0\rangle$, and it is, up to the sign on one amplitude, the state the
+Stern-Gerlach atoms were in after the sideways magnet, when the vertical
+measurement came back half up and half down.
 
 ## Common Mistakes
 
@@ -188,8 +256,23 @@ others later on.
 **Treating superposition as "50/50 either way."** The coefficients don't have
 to be equal. $|\psi\rangle = 0.6|0\rangle + 0.8i|1\rangle$ is a valid,
 normalized qubit state ($0.6^2 + 0.8^2 = 1$) with a 36% chance of measuring 0
-and a 64% chance of measuring 1.
+and a 64% chance of measuring 1. (The $i$ in $0.8i$ is the imaginary unit,
+$i = \sqrt{-1}$, coming in the next lesson. For the probabilities, only the
+amplitude's size matters, and $|0.8i| = 0.8$.)
 </Callout>
+
+The two cases side by side, with every bar computed by squaring the
+amplitudes exactly as the Born rule says:
+
+<BarChart
+  bars={lopsidedBars}
+  maxValue={1}
+  ariaLabel="Four bars. The equal superposition gives 50 percent for outcome 0 and 50 percent for outcome 1. The state 0.6|0⟩ + 0.8i|1⟩ gives 36 percent for outcome 0 and 64 percent for outcome 1, a lopsided split rather than an even one."
+/>
+
+Both states are superpositions. Only one of them is a fair coin. A qubit
+in superposition is described by two numbers you get to choose, and the
+even split is one point in that range rather than the meaning of the word.
 
 ## Practice Questions
 

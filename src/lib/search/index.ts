@@ -144,6 +144,20 @@ function titleCase(value: string): string {
 }
 
 /**
+ * A lesson's metadata plus the bounded term set extracted from its `.mdx`
+ * body by `scripts/generate-search-index.mjs` (via
+ * `lib/search/lessonKeywords.ts`).
+ *
+ * Declared here rather than added to `LessonMetaWithSlug` because it is not
+ * lesson metadata: nothing on the site reads it, no lesson author writes it,
+ * and it exists solely to be carried into `search-index.json`. Optional so
+ * that every existing caller of `buildSearchIndex` — including the unit tests,
+ * which hand it hand-written fixtures — still compiles and simply produces
+ * entries without the field.
+ */
+type IndexedLesson = LessonMetaWithSlug & { keywords?: string };
+
+/**
  * Builds the flat, site-wide search index from already-resolved lesson,
  * problem, and course metadata, plus the hardcoded simulator list above.
  *
@@ -164,7 +178,7 @@ function titleCase(value: string): string {
  * `src/components/search/SearchOverlay.tsx`.
  */
 export function buildSearchIndex(
-  lessons: LessonMetaWithSlug[],
+  lessons: IndexedLesson[],
   problems: ProblemMeta[],
   courses: Course[],
   terms: GlossaryTerm[],
@@ -181,6 +195,16 @@ export function buildSearchIndex(
   // which *course* it sits in tells them whether it's the page they mean.
   const courseTitleBySlug = new Map(courses.map((course) => [course.slug, course.title]));
 
+  // The lesson body's term set rides along here and nowhere else. It is the
+  // only reason a stuck reader's query ("power series", "half angle",
+  // "theta/2") reaches the lesson that teaches it — see
+  // `lib/search/lessonKeywords.ts` for what is extracted, the 600-character
+  // per-lesson cap that keeps this file's growth linear in lesson *count*,
+  // and why problems are given no such field.
+  //
+  // Omitted rather than emitted empty when a caller has none, so the JSON
+  // stays byte-identical to what it was for every entry kind that has no
+  // keywords, and `SearchEntry.keywords` reads as genuinely optional.
   const lessonEntries: SearchEntry[] = lessons.map((lesson) => ({
     type: "lesson",
     title: lesson.title,
@@ -188,6 +212,7 @@ export function buildSearchIndex(
     href: `/lessons/${lesson.slug}`,
     pillar: coursePillarBySlug.get(lesson.course),
     course: courseTitleBySlug.get(lesson.course),
+    ...(lesson.keywords ? { keywords: lesson.keywords } : {}),
   }));
 
   const problemEntries: SearchEntry[] = problems.map((problem) => {

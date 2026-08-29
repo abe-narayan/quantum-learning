@@ -4,7 +4,8 @@ import { DailyPuzzleClient, type DailyPuzzlePreview } from "./DailyPuzzleClient"
 /**
  * "Problem of the Day": a deterministic, backend-free daily pick. Every
  * visitor on the same calendar date sees the same problem — the date
- * string is hashed to an index into the full problem list, so there's no
+ * string is hashed to an index into the beginner/intermediate subset of the
+ * problem list (see `pickToday` in DailyPuzzleClient), so there's no
  * server, no database, and no build-time computation involved.
  *
  * Server half only: builds a lean preview of every problem (slug, title,

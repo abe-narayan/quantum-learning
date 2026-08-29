@@ -52,14 +52,15 @@ export const tFourthPowerEqualsZ: MultipleChoiceProblem = {
       { description: "At $k=4$: $e^{i4\\pi/4}=e^{i\\pi}=-1$, so $T^4=\\text{diag}(1,-1)$.", latex: "T^4 = \\text{diag}(1,-1) = Z" },
       { description: "This matches the lesson's own $T^2=S$, $S^2=Z$ chain: $T^4=(T^2)^2=S^2=Z$, and this platform's own T_GATE and PAULI_X-style matrix objects confirm $T^4$ equals Z's matrix exactly (to machine precision), not merely up to phase." },
     ],
-    finalAnswer: "(a) Yes — $T^4=Z$ exactly",
+    finalAnswer: "Yes: $T^4=\\text{diag}(1,-1)=Z$, matching entry for entry with no phase tolerance needed.",
   },
   explanation: {
-    correctIdea: "T's phase angle ($\\pi/4$) is a rational multiple of $\\pi$, so finite integer powers of T land exactly on other named gates: $T^2=S$, $T^4=Z$, $T^8=I$.",
-    whyCorrect: "Diagonal unitary powers just raise the phase entry to that power; $e^{i\\pi/4}$ raised to the 4th power is exactly $e^{i\\pi}=-1$, Z's second diagonal entry, with no rounding or phase ambiguity involved.",
+    correctIdea: "T's phase angle, $\\pi/4$, is a rational multiple of $\\pi$, so finite integer powers of T land on other named gates: $T^2=S$, $T^4=Z$, $T^8=I$.",
+    whyCorrect: "Powers of a diagonal unitary just raise each phase entry to that power, and $e^{i\\pi/4}$ to the fourth is $e^{i\\pi}=-1$, which is Z's second diagonal entry.",
     whyWrong: [
-      "Claiming T has infinite order misreads T's angle as irrational; $\\pi/4$ is a rational multiple of $\\pi$, so T has finite order (8), unlike a generic single-qubit rotation.",
-      "Stopping at $T^2=S$ instead of going to the fourth power under-applies the given identity chain.",
+      { optionId: "b", text: "Adds a phase tolerance nothing needs. The two matrices agree entry for entry." },
+      { optionId: "c", text: "Stops at $T^2=S$. Two more applications carry $S$ to $S^2=Z$." },
+      { optionId: "d", text: "Reads T's angle as irrational. $\\pi/4$ is a rational multiple of $\\pi$, so T has order 8." },
     ],
   },
 };

@@ -71,7 +71,7 @@ export const lessonMeta = {
   module: "quantum-simulation-of-molecules",
   order: 5,
   difficulty: "master",
-  estimatedMinutes: 28,
+  estimatedMinutes: 35,
   prerequisites: ["quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"],
   objectives: [
     "State the electronic structure problem precisely: finding the ground-state energy of a molecular Hamiltonian (electrons in the Coulomb field of fixed nuclei, the Born-Oppenheimer approximation), and explain why this is believed classically hard for all but small/special molecules",
@@ -272,6 +272,23 @@ is a real qubit and gate count" is exactly the skill this course's own
 capstone,
 [From Algorithm to Qubit Count](/lessons/apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count),
 builds next, on a toy-scale version of precisely this kind of estimate.
+
+<ResearchConnection
+  title="The FeMoco estimates, and how far they moved"
+  source="Reiher, Wiebe, Svore, Wecker & Troyer, PNAS 114, 7555 (2017) (arXiv:1605.03590); von Burg, Low, Häner, Steiger, Reiher, Roetteler & Troyer, Phys. Rev. Research 3, 033055 (2021) (arXiv:2007.14460)"
+  url="https://arxiv.org/abs/1605.03590"
+>
+  Reiher et al. is the paper that made FeMoco the field's standard
+  benchmark molecule, with a full logical-qubit and T-count estimate for
+  phase estimation on a realistic active space. Then read von Burg et al.
+  on a comparable problem and notice what changed: not the molecule and
+  not the algorithm's asymptotics, but the Hamiltonian representation
+  (a factorized, low-rank form) and the simulation subroutine
+  (qubitization rather than Trotterization), which together moved the
+  gate count by several orders of magnitude. That is why this section
+  quotes a range rather than a number, and why a resource estimate should
+  be read as a statement about a *pipeline* rather than about a molecule.
+</ResearchConnection>
 
 ## Why This Matters
 

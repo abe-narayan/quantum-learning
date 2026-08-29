@@ -56,7 +56,7 @@ export const finiteWellKFrames = finiteWellHalfWidths.map((a) => ({
 export const lessonMeta = {
   title: "The Finite Square Well: Setting Up the Equation",
   description:
-    "Unlike the infinite well's hard walls, a finite-depth well lets the wavefunction leak into the classically forbidden region -- deriving the resulting transcendental quantization condition from boundary matching alone.",
+    "Unlike the infinite well's hard walls, a finite-depth well lets the wavefunction leak into the classically forbidden region. Deriving the resulting transcendental quantization condition from boundary matching alone.",
   course: "one-dimensional-systems",
   module: "the-finite-square-well-setting-up-the-equation",
   order: 1,
@@ -74,15 +74,16 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-The infinite square well's walls are a convenient idealization: no real potential is actually infinite. Make the walls finite, and the <Term id="wavefunction">wavefunction</Term> no longer vanishes exactly at the boundary.
+The infinite square well's walls are an idealization: no real potential is infinite. Make the walls finite and the <Term id="wavefunction">wavefunction</Term> stops vanishing at the boundary, which costs you the closed-form answer.
 </LessonHook>
 
 ## Motivation
 
-That well has depth $V_0$ rather than $\infty$. The
+This lesson swaps the infinite well's hard walls for walls of finite
+depth $V_0$, and the wavefunction responds by leaking into them. The
 Tunneling and the Finite Barrier lesson already showed *why* a classically
 forbidden region allows a nonzero, exponentially decaying wavefunction
-rather than a zero one, and this lesson applies that exact mechanism to a
+rather than a zero one; this lesson applies that same mechanism to a
 *bound* state instead of a barrier.
 
 <ExternalFigure
@@ -100,8 +101,9 @@ Picture the well the same way as before, a dip in potential energy from
 $-a$ to $a$, but now only $V_0$ deep, not infinitely deep. A particle
 with energy $E$ satisfying $-V_0<E<0$ (bound, but not infinitely
 confined) has real oscillatory behavior *inside* the well and
-exponentially decaying behavior *outside* it, on both sides, no longer
-forced to exactly zero at $x=\pm a$, just small.
+exponentially decaying behavior *outside* it, on both sides. At
+$x=\pm a$ the wavefunction is no longer forced to zero; it is only
+small.
 
 ## Mathematical Development
 
@@ -188,9 +190,9 @@ equation in one unknown ($E$, or equivalently $k$). But with a
 trigonometric function tangled together with a square root, there's no
 algebraic manipulation that isolates $E$. This is qualitatively different
 from the infinite well, where the boundary condition ($\sin(kL)=0$) was
-solvable in closed form ($kL=n\pi$) precisely *because* the outside
-region was simply forbidden entirely, removing the $\kappa$ side of the
-equation altogether.
+solvable in closed form ($kL=n\pi$) *because* the outside region was
+forbidden outright, which removed the $\kappa$ side of the equation
+altogether.
 
 ## Physical Interpretation
 
@@ -211,7 +213,7 @@ qualitatively different prediction from the systems already solved.
     { label: "k stays fixed no matter how deep the well gets", value: "fixed" },
   ]}
   correctValue="levels"
-  explanation="Worked out below: as V0 → ∞, κ → ∞ forces tan(ka) → ∞, which happens exactly at ka → π/2, i.e. k → π/(2a) — the infinite well's own ground-state wavenumber. Drag the slider in the interactive further down and watch finiteSquareWellGroundStateEnergy trace out exactly this approach for each half-width a."
+  explanation="Worked out below: as V0 → ∞, κ → ∞ forces tan(ka) → ∞, which happens at ka → π/2, i.e. k → π/(2a). That is the infinite well's own ground-state wavenumber. Drag the slider in the interactive further down and watch finiteSquareWellGroundStateEnergy trace out that approach for each half-width a."
 />
 
 ## Worked Example
@@ -227,14 +229,15 @@ since it stays near the infinite well's finite value), $\kappa\to\infty$.
 The equation $k\tan(ka)=\kappa$ then forces $\tan(ka)\to\infty$, which
 happens exactly when $ka\to\pi/2$, i.e. $k\to\pi/(2a)$. Comparing to the infinite well's
 formula $k_n=n\pi/(2a)$ for a well of full width $2a$ (Infinite Square
-Well lesson, relabeled to this well's centered convention): this is
-exactly $n=1$, the ground state. The finite well's transcendental
-equation correctly reduces to the already-solved infinite-well result in
-the appropriate limit, a genuine consistency check.
+Well lesson, relabeled to this well's centered convention): that is the
+$n=1$ case, the ground state. The finite well's transcendental equation
+reduces to the already-solved infinite-well result in the appropriate
+limit, which is the consistency check any correct generalization has to
+pass.
 
 <InteractiveSection
   title="Slide a, watch k bend toward the infinite-well line"
-  description="Slide the well's half-width a and watch the ground-state wavenumber k bend toward the dashed π/(2a) line as the well deepens — exactly the infinite-well limit this Worked Example derives, now checked directly against finiteSquareWellGroundStateEnergy for every depth along the curve."
+  description="Slide the well's half-width a and watch the ground-state wavenumber k bend toward the dashed π/(2a) line as the well deepens. That is the infinite-well limit the Worked Example derives, checked here against finiteSquareWellGroundStateEnergy at every depth along the curve."
 >
   <ParametricCurve
     frames={finiteWellKFrames}
@@ -281,14 +284,15 @@ a different sign.
 - The even-parity condition $k\tan(ka)=\kappa$ (with
   $k=\sqrt{2(E+V_0)}$, $\kappa=\sqrt{-2E}$) is transcendental: no
   algebraic solution for $E$ exists.
-- As $V_0\to\infty$, the equation correctly reduces to the infinite
-  well's closed-form ground-state result, a genuine consistency check
-  between two courses' derivations.
+- As $V_0\to\infty$, the equation reduces to the infinite well's
+  closed-form ground-state result, a consistency check across two
+  courses' derivations.
 
 ## Further Exploration
 
 <NextDiscovery>
-[Solving the Finite Well Numerically](/lessons/quantum-mechanics/one-dimensional-systems/solving-the-finite-well-numerically) actually finds a bound
-state's energy for specific well parameters, and comparing directly to
-the infinite-well limit.
+This lesson stopped at an equation nobody can solve by hand.
+[Solving the Finite Well Numerically](/lessons/quantum-mechanics/one-dimensional-systems/solving-the-finite-well-numerically)
+finds the bound-state energy anyway, for concrete well parameters, and
+compares the answer against the infinite-well limit derived above.
 </NextDiscovery>

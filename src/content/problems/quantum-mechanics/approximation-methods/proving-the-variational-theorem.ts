@@ -20,9 +20,9 @@ export const provingTheVariationalTheorem: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["expand", "sum", "c_n", "eigenbasis"],
-      ["E_n", "E_0", "greater than or equal", "≥", ">="],
-      ["sum of", "|c_n|²", "normalization", "= 1"],
+      ["expand", "expansion", "sum", "eigenbasis", "eigenstate basis", "energy eigenstates", "expansion coefficients"],
+      ["greater than or equal", "at least e_0", "no smaller than", "lowest eigenvalue", "smallest eigenvalue", "ground energy is the smallest", "every e_n is at least", "none of them is below"],
+      ["sum of", "normalization", "normalized", "sums to 1", "sums to one", "sum to 1", "sum to one", "squared coefficients sum", "total weight is 1"],
     ],
     incorrectFeedback: "Write out the expansion ψ_trial=Σc_n|n⟩, compute ⟨H⟩ in terms of |c_n|² and E_n, and use E_n≥E_0 for every n plus Σ|c_n|²=1.",
     partialFeedback: "Good — make sure every piece (expansion, E_n≥E_0, normalization) appears explicitly in the argument.",

@@ -1,10 +1,29 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
+import { matrixToCells } from "@/components/visualizations/MatrixGrid";
+import { PAULI_X, PAULI_Y, PAULI_Z, HADAMARD, S_GATE, T_GATE } from "@/lib/quantum/gates";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/quantum-gates"
 );
+
+export const unitarityPresets = [
+  { label: "X", gate: PAULI_X },
+  { label: "Y", gate: PAULI_Y },
+  { label: "Z", gate: PAULI_Z },
+  { label: "H", gate: HADAMARD },
+  { label: "S", gate: S_GATE },
+  { label: "T", gate: T_GATE },
+].map(({ label, gate }) => ({
+  label,
+  panels: [
+    { label: `${label}`, cells: matrixToCells(gate) },
+    { label: `${label}†`, cells: matrixToCells(gate.dagger()) },
+    { label: `${label}†${label}`, cells: matrixToCells(gate.dagger().mul(gate)), highlightDiagonal: true },
+  ],
+}));
 
 export const lessonMeta = {
   title: "Quantum Gates",
@@ -35,17 +54,11 @@ Everything up to now has described qubit states: points on the sphere. This less
 
 ## Motivation
 
-These are <Term id="quantum-gates">quantum gates</Term>, and every quantum circuit
-you'll ever see is just a sequence of them.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/6/64/4_Qubit_Chip%2C_10.1103.PhysRevX.5.021027_%28A._Wallraff%2C_2015%29.png"
-  alt="Micrograph of a superconducting 4-qubit chip, showing the qubits, coplanar waveguide resonators, and microwave drive lines used to apply gates"
-  caption="A real 4-qubit superconducting chip from a 2015 ETH Zürich experiment. The thin drive lines snaking across the chip carry the microwave pulses that physically implement gates like the ones in this lesson."
-  credit="Y. Salathé et al. (A. Wallraff group) / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:4_Qubit_Chip,_10.1103.PhysRevX.5.021027_(A._Wallraff,_2015).png"
-  license="CC BY-SA 3.0"
-/>
+The operations that move a qubit from one Bloch-sphere point to another
+are <Term id="quantum-gates">quantum gates</Term>, and every quantum circuit
+you'll ever see is a sequence of them. There are only six you need for now,
+and one structural rule they all obey. The rule comes first, because it is
+what rules out most matrices you could write down.
 
 ## Intuition
 
@@ -54,7 +67,7 @@ most of them are irreversible: given the output of an AND gate, you can't
 recover its two inputs. Quantum gates are different by requirement: they
 must be **reversible**, which turns out to mean every quantum gate is a
 *rotation* of the <Term id="bloch-sphere-term">Bloch sphere</Term>. Rotations never destroy information.
-Rotate one way, then rotate back, and you're exactly where you started.
+Rotate one way, then rotate back, and you are where you started.
 That single constraint shapes everything about how quantum gates behave.
 
 ## Mathematical Development
@@ -74,15 +87,25 @@ $$
 For this to equal $\langle\psi|\psi\rangle$ for *every* state
 $|\psi\rangle$, we need $U^\dagger U = I$. A matrix satisfying this is
 called **<Term id="unitary-operator">unitary</Term>**. Unitary matrices are automatically invertible (with
-$U^{-1}=U^\dagger$), which is exactly the reversibility property from the
-intuition above: undoing a gate is just applying its conjugate
-transpose.
+$U^{-1}=U^\dagger$), which is the reversibility property from the intuition
+above: undoing a gate means applying its conjugate transpose.
+
+That test is worth seeing performed rather than asserted. Below, each of
+this lesson's six gates is shown next to its conjugate transpose and next
+to the product $U^\dagger U$, all three computed from the platform's own
+gate definitions. The third panel comes out as the identity every time,
+including for $T$, whose entries are not even real:
+
+<MatrixGridExplorer
+  presets={unitarityPresets}
+  ariaLabel="For each of the gates X, Y, Z, H, S and T: the gate matrix, its conjugate transpose, and their product, which is the 2x2 identity matrix in every case."
+  digits={2}
+/>
 
 ### The gates
 
-Each gate below is unitary (check $U^\dagger U=I$ yourself as practice for
-any of them), acts on a single qubit, and has a specific geometric meaning
-as a rotation of the Bloch vector by some angle about some axis.
+Each gate below acts on a single qubit and has a geometric meaning as a
+rotation of the Bloch vector by some angle about some axis.
 
 **$X$: bit flip.**
 
@@ -90,7 +113,7 @@ $$
 X = \begin{pmatrix}0&1\\1&0\end{pmatrix}, \qquad X|0\rangle=|1\rangle, \quad X|1\rangle=|0\rangle
 $$
 
-Swaps the two basis states, exactly like a classical NOT gate. Rotates the
+Swaps the two basis states, which is what a classical NOT gate does. Rotates the
 Bloch vector by $\pi$ about the $x$-axis.
 
 **$Y$.**
@@ -101,9 +124,10 @@ $$
 
 Rotates by $\pi$ about the $y$-axis. Notice $Y|0\rangle = i|1\rangle$, not
 plain $|1\rangle$: an extra phase factor $i$ appears that $X|0\rangle$
-didn't have. Geometrically $X|0\rangle$ and $Y|0\rangle$ land at the exact
-same point on the sphere. The next lesson explains precisely why that
-extra $i$ doesn't matter.
+didn't have. Geometrically, though, $X|0\rangle$ and $Y|0\rangle$ land on
+the same point of the sphere. Hold onto that discrepancy: two states with
+different amplitudes and identical physics is the subject of the
+global-phase lesson two steps from here.
 
 **$Z$: phase flip.**
 
@@ -122,12 +146,21 @@ $$
 H = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}, \qquad H|0\rangle=|+\rangle, \quad H|1\rangle=|-\rangle
 $$
 
-Let's verify $H|0\rangle$ directly:
-$H|0\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}(|0\rangle+|1\rangle) = |+\rangle$.
+Let's verify $H|0\rangle$ directly, writing out the matrix-vector product
+from Dirac Notation in full — row 0 of $H$ against the whole column to
+make entry 0, row 1 against the whole column to make entry 1:
+
+$$
+H|0\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\cdot1 + 1\cdot0\\1\cdot1 + (-1)\cdot0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}(|0\rangle+|1\rangle) = |+\rangle
+$$
+
+Every other gate application in this lesson is the same three lines of
+arithmetic with different entries, which is why the results below are
+stated rather than each worked out.
 $H$ is the gate that *creates* <Term id="superposition">superposition</Term> from a definite state, and
 since it's its own inverse ($H^2=I$, worth checking), it also *removes*
 superposition: $H|+\rangle=|0\rangle$. Geometrically, $H$ rotates by $\pi$
-about the diagonal axis exactly between the $x$- and $z$-axes, the only
+about the diagonal axis halfway between the $x$- and $z$-axes, the only
 one of these six gates whose axis isn't a coordinate axis.
 
 **$S$ and $T$: phase gates.**
@@ -138,7 +171,7 @@ $$
 
 Both leave $|0\rangle$ alone and multiply $|1\rangle$'s coefficient by a
 phase: $i=e^{i\pi/2}$ for $S$, $e^{i\pi/4}$ for $T$. In the canonical
-Bloch form, multiplying $\beta$ by $e^{i\delta}$ is exactly adding
+Bloch form, multiplying $\beta$ by $e^{i\delta}$ adds
 $\delta$ to $\varphi$: $S$ rotates by $\pi/2$ about the $z$-axis (a
 quarter turn), $T$ by $\pi/4$ (an eighth turn). Unlike $X,Y,Z,H$, neither
 is its own inverse: $S^2=Z$ (two quarter-turns make a half-turn) and
@@ -183,7 +216,7 @@ $$
 Bloch coordinates use $\alpha=0,\beta=i$:
 $x=2\operatorname{Re}(\alpha^*\beta)=0$, $y=2\operatorname{Im}(\alpha^*\beta)=0$,
 $z=|\alpha|^2-|\beta|^2 = 0-1=-1$. That's $(0,0,-1)$, the south pole,
-exactly where $X|0\rangle=|1\rangle$ also lands. Same point, different
+where $X|0\rangle=|1\rangle$ also lands. Same point, different
 amplitudes: $i|1\rangle$ vs. plain $|1\rangle$.
 
 ## Common Mistakes
@@ -209,7 +242,7 @@ answer, write out $|\psi\rangle$ as an explicit column vector first.
 2. Compute $Z|+\rangle$. What state is this, in terms of
    $|0\rangle,|1\rangle$?
 3. Verify $S^2=Z$ by multiplying $S$'s matrix by itself.
-4. Which gate(s) from this lesson leave $|0\rangle$ completely unchanged?
+4. Which gate(s) from this lesson leave $|0\rangle$ unchanged?
    Explain geometrically why that has to be true for those gates
    specifically.
 5. Predict, without a calculator, what $T^8|1\rangle$ equals. Justify it

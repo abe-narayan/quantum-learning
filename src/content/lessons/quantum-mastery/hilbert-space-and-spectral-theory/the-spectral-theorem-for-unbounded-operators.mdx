@@ -104,7 +104,7 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="One theorem, not two">
-  The position operator has no eigenvalues in the ordinary sense at all —
+  The position operator has no eigenvalues in the ordinary sense at all:
   its spectrum fills the real line continuously. The discrete formula
   $A=\sum_i\lambda_iP_i$ was never the whole theorem; it's what the real
   theorem below looks like when the spectrum happens to be a staircase.
@@ -119,10 +119,11 @@ $\hat x$ has *no* eigenvalues in $L^2(\mathbb R)$ at all in the ordinary
 sense (Continuous Spectra and Rigged Hilbert Space, next lesson, makes
 this precise); its "eigenvalues" fill the entire real line continuously.
 A sum over discrete $\lambda_i$ literally cannot be the right statement
-for such an operator. This lesson gives the one theorem that correctly
-covers both cases at once. The payoff is that the discrete formula was
-never a separate fact — just this general theorem evaluated on a
-spectrum with no continuous part.
+for such an operator. This lesson gives the
+<Term id="spectral-theorem-pvm">one theorem</Term> that covers both cases
+at once, and the payoff is that the discrete formula was never a separate
+fact: it is this general theorem evaluated on a spectrum with no
+continuous part.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/7/79/Hilbert.jpg"
@@ -138,11 +139,11 @@ spectrum with no continuous part.
 Replace "eigenvalue $\lambda_i$ with projector $P_i$" by "**every** real
 number $\lambda$ gets an infinitesimal projector $dE(\lambda)$," and
 replace the sum $\sum_i\lambda_iP_i$ by an integral $\int\lambda\,dE(\lambda)$.
-The object $E(\lambda)$, a projector for *each* real number $\lambda$,
+The object $E(\lambda)$, a <Term id="projector">projector</Term> for *each* real number $\lambda$,
 built to project onto "the part of the space with spectral value $\le
 \lambda$", is called a **projection-valued measure** (PVM), and it's
 the single object that makes both the discrete and continuous cases
-literal instances of one formula, exactly the way a Riemann–Stieltjes
+literal instances of one formula, the same way a Riemann–Stieltjes
 integral $\int f\,dG$ unifies a sum (when $G$ is a staircase function)
 and an ordinary integral (when $G$ is differentiable) into one notation.
 
@@ -170,43 +171,57 @@ $\lambda\to-\infty$ to $I$ at $\lambda\to+\infty$.
 
 <TheoremBox title="Spectral theorem (PVM form)" provenance="cited">
 
-Every self-adjoint operator $A$ on a
-Hilbert space $\mathcal H$ has a unique projection-valued measure $E$
-such that
+**Hypotheses.** $\mathcal H$ is a complex Hilbert space and $A$ is a
+**densely defined self-adjoint** operator on it. Self-adjoint, in the
+last lesson's sense: $D(A)=D(A^\dagger)$, not merely $D(A)\subseteq
+D(A^\dagger)$. No boundedness is assumed.
+
+**Conclusion.** There is a unique projection-valued measure $E$ on the
+Borel sets of $\mathbb R$, supported on the spectrum $\sigma(A)$, with
 
 $$
 A=\int_{-\infty}^{\infty}\lambda\,dE(\lambda), \qquad D(A)=\left\{\psi\in\mathcal H:\int\lambda^2\,d\langle\psi|E(\lambda)\psi\rangle<\infty\right\}
 $$
 
+where the integral is read weakly: $\langle\phi|A\psi\rangle=\int\lambda\,d\langle\phi|E(\lambda)\psi\rangle$
+for all $\phi\in\mathcal H$, $\psi\in D(A)$.
+
+**Corollary (Borel functional calculus).** For any Borel $f:\mathbb R\to\mathbb C$
+the same measure defines $f(A)=\int f(\lambda)\,dE(\lambda)$. Taking
+$f(\lambda)=e^{-i\lambda t/\hbar}$ is where $e^{-iHt/\hbar}$ acquires a
+meaning for an unbounded $H$, and it is the half of Stone's theorem the
+last lesson cited.
+
+Bounded case: Hilbert (1906). Unbounded case: von Neumann (1929).
+Reed–Simon, *Methods of Modern Mathematical Physics* I, §VIII.3.
+
 </TheoremBox>
 
-This is a substantial theorem of functional analysis (the general
-proof, for the unbounded case, is due to von Neumann); it is **stated
-here, not proved**, exactly as Hermitian Operators stated (rather than
-fully proved the existence half of) the finite-dimensional spectral
-theorem. What *is* derived below, in full, is the connection that makes
-this abstract statement earn its keep: showing precisely how it
-reproduces the already-proven finite-dimensional result.
+Stated here, not proved, the same way Hermitian Operators stated rather
+than fully proved the existence half of the finite-dimensional spectral
+theorem. What *is* derived below in full is the connection that makes
+the abstract statement earn its keep: how it reproduces the
+already-proven finite-dimensional result.
 
-Note the theorem's hypothesis is **self-adjoint**, not merely symmetric,
-exactly the distinction the last lesson built. A merely symmetric
-operator is not guaranteed a PVM at all (the half-line momentum operator,
-having no self-adjoint extension, correspondingly has no single
-canonical spectral resolution); self-adjointness is precisely the
-hypothesis this theorem needs.
+The load-bearing hypothesis is **self-adjoint**, not merely symmetric,
+which is the distinction the last lesson built. A symmetric operator has
+no PVM guaranteed to it. The half-line momentum operator makes that
+concrete: having no self-adjoint extension, it has no canonical spectral
+resolution either, so there is no well-defined "momentum toward the wall"
+measurement statistic to compute. The two lessons meet at that point.
 
 ### Reduction to the discrete case, derived explicitly
 
 Suppose $A$'s spectrum is purely discrete: eigenvalues $\lambda_1<
 \lambda_2<\cdots$ with orthogonal projectors $P_1,P_2,\ldots$ onto their
-(possibly degenerate) eigenspaces, $\sum_iP_i=I$, exactly Spectral
-Decomposition and Degeneracy's setup. Define
+(possibly degenerate) eigenspaces, $\sum_iP_i=I$, the setup Spectral
+Decomposition and Degeneracy established. Define
 
 $$
 E(\lambda)\equiv\sum_{i:\,\lambda_i\le\lambda}P_i
 $$
 
-This is a genuine PVM: it's non-decreasing in $\lambda$ (each term is a
+This satisfies every PVM axiom: it's non-decreasing in $\lambda$ (each term is a
 projector, and projectors onto orthogonal subspaces add without
 cancellation), it equals $0$ below $\lambda_1$ and $I$ at and above the
 largest eigenvalue, and it satisfies the consistency condition (a direct
@@ -230,7 +245,7 @@ for this staircase measure directly:
     \int\lambda\,d\langle\psi|E(\lambda)\psi\rangle=\sum_i\lambda_i\|P_i\psi\|^2=\sum_i\lambda_i\langle\psi|P_i|\psi\rangle=\left\langle\psi\left|\sum_i\lambda_iP_i\right|\psi\right\rangle
     $$
   </DerivationStep>
-  <DerivationStep annotation="This holds for every ψ, so the operators themselves agree — exactly Spectral Decomposition and Degeneracy's formula, now derived as the special case where the spectral measure happens to be a staircase.">
+  <DerivationStep annotation="This holds for every ψ, so the operators themselves agree — Spectral Decomposition and Degeneracy's formula, now derived as the special case where the spectral measure happens to be a staircase.">
     $$
     A=\int\lambda\,dE(\lambda)=\sum_i\lambda_iP_i
     $$
@@ -272,24 +287,23 @@ two courses' separately-stated rules, now visibly the same fact.
 ## Physical Interpretation
 
 <InsightBlock>
-  "Discrete observable" and "continuous observable" were never two
-  different kinds of physics needing two different postulates — every
-  observable's measurement statistics come from one object, its PVM,
-  and whether it happens to be a staircase, absolutely continuous, or a
-  mix of both is a fact about the specific operator, not the postulate.
+  The measure, not the operator, is where the discrete/continuous
+  distinction lives. Two postulates collapse into one because the thing
+  that differs between them was never the physics; it was the shape of
+  $\langle\psi|E(\lambda)\psi\rangle$.
 </InsightBlock>
 
-The unification above is the whole point of doing this rigorously rather
-than treating "discrete observable" and "continuous observable" as two
-different kinds of physics needing two different postulates. They were
-never different: every observable's measurement statistics come from
-*one* object, its PVM, and whether that PVM happens to be a staircase
-(discrete spectrum) or absolutely continuous (like position) or a mix of
-both (like a hydrogen atom's Hamiltonian, which has a discrete part,
-the bound states, and a continuous part, the ionized/scattering
-states, previewed in Green's Functions and Resolvents next) is a fact
-about the *specific operator*, not a fact requiring a different
-postulate each time.
+Every observable's measurement statistics come from a single object, its
+PVM. Whether that PVM is a staircase (discrete spectrum), absolutely
+continuous (position), or a mix of the two is a fact about the specific
+operator rather than a fact demanding its own postulate. The hydrogen
+Hamiltonian is the case worth holding onto: its spectrum has a discrete
+part below zero energy (the bound states, $E_n=-13.6\,\text{eV}/n^2$)
+and a continuous part above (the ionized scattering states), so a single
+$E(\lambda)$ for a single operator climbs in jumps and then rises
+smoothly. Green's Functions and Resolvents, next, reads both parts off
+the same resolvent: the jumps are poles, the smooth rise is a branch
+cut.
 
 ## Worked Example
 
@@ -339,12 +353,12 @@ Riemann–Stieltjes integral above integrates against:
   ariaLabel="Step function plot of the expectation value of E(lambda) in the equal-superposition test state, flat at 0 below lambda=1, jumping to the norm-squared of P1 psi at lambda=1, then jumping to 1 at lambda=2"
 />
 
-This is exactly the staircase from the definition
+This is the staircase from the definition
 $E(\lambda)=\sum_{\lambda_i\le\lambda}P_i$: flat at $0$ below every
 eigenvalue, a jump of $\|P_1\psi\|^2$ exactly at $\lambda=1$, flat again,
 then a jump of $\|P_2\psi\|^2$ exactly at $\lambda=2$ up to $1$
 (completeness, $E(\infty)=I$, so $\langle\psi|I|\psi\rangle=\|\psi\|^2=1$).
-The Riemann–Stieltjes sum over exactly those two jumps,
+The Riemann–Stieltjes sum over those two jumps,
 weighted by $\lambda$, reconstructs $N$ directly:
 
 <MatrixGridExplorer
@@ -360,10 +374,10 @@ example, not just abstractly.
 
 <Callout type="note">
 **Thinking the PVM form of the spectral theorem is a *different, more
-advanced* result from the finite-dimensional one.** It's the same
-theorem at a more general level of generality; the finite-dimensional
-$A=\sum\lambda_iP_i$ is derived above as an exact special case (a
-staircase-measure PVM), not replaced or superseded.
+advanced* result from the finite-dimensional one.** It is the same
+theorem stated at a level of generality that admits continuous spectra;
+the finite-dimensional $A=\sum\lambda_iP_i$ is derived above as an exact
+special case (a staircase-measure PVM), not replaced or superseded.
 </Callout>
 
 <Callout type="warning">

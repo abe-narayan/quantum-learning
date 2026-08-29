@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { PILLARS } from "@/lib/content/curriculum";
 import type { Pillar } from "@/lib/content/types";
-import type { CurrentQuantumCategory, CurrentQuantumEntry } from "@/lib/content/currentQuantum/registry";
+import type { CurrentQuantumCategory, CurrentQuantumEntry } from "@/lib/content/currentQuantum/types";
 import { cn } from "@/lib/utils";
 import { CurrentQuantumCard } from "./CurrentQuantumCard";
 import { CATEGORY_META } from "./categoryIcons";
@@ -34,7 +34,7 @@ const CATEGORY_OPTIONS: CategoryFilter[] = [
 // end at `focus-visible:outline-none` with nothing replacing the outline, so a
 // keyboard user tabbing through fifteen filters had no visible focus at all.
 const FILTER_CHIP =
-  "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-medium transition-colors duration-[--dur-fast] ease-[--ease-instrument] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-medium transition-colors duration-(--dur-fast) ease-instrument focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 const FILTER_CHIP_ACTIVE = "border-pillar-edge bg-pillar-wash text-pillar-text";
 const FILTER_CHIP_IDLE =
   "border-border bg-surface text-muted-foreground hover:border-border-strong hover:bg-surface-muted hover:text-foreground";

@@ -23,6 +23,11 @@ export const combinedT2FromTwoProcesses: NumericProblem = {
     value: 4.44,
     tolerance: 0.02,
     incorrectFeedback: "Compute 1/(2*5) + 1/8 first, then take the reciprocal of the sum.",
+    nearMisses: [
+      { value: 1 / (1 / 5 + 1 / 8), tolerance: 0.02, feedback: "That drops the factor of 2 on the T₁ term. Amplitude damping contributes only half its rate to dephasing, which is why the bound is T₂ ≤ 2T₁." },
+      { value: 13, tolerance: 0.05, feedback: "13 adds the two time constants. Rates add, not times, so add the reciprocals and invert at the end." },
+      { value: 10, tolerance: 0.05, feedback: "10 μs is 2T₁, the upper bound T₂ could reach with no pure dephasing at all. Here there is pure dephasing, so T₂ falls below it." },
+    ],
   },
   hints: [
     { text: "1/(2*T1) = 1/10 = 0.1 per microsecond." },

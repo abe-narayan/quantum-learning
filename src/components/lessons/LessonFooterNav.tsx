@@ -5,13 +5,13 @@ import type { Course, LessonMetaWithSlug, PillarInfo } from "@/lib/content/types
 import { cn } from "@/lib/utils";
 
 const CARD_INTERACTIVE =
-  "panel group flex min-h-11 flex-col justify-center gap-1.5 px-5 py-4 transition-[border-color,background-color,transform] duration-[--dur-fast] ease-[--ease-instrument] hover:border-pillar-edge hover:bg-surface-muted motion-safe:hover:-translate-y-0.5";
+  "panel group flex min-h-11 flex-col justify-center gap-1.5 px-5 py-4 transition-[border-color,background-color,transform] duration-(--dur-fast) ease-instrument hover:border-pillar-edge hover:bg-surface-muted motion-safe:hover:-translate-y-0.5";
 
 /** A next-step link inside the "course complete" panel. Block-level and
  *  44px-tall so the whole row is the target, rather than a short run of
  *  underlined text a thumb has to find. */
 const NEXT_STEP_ROW =
-  "flex min-h-11 items-center justify-between gap-3 rounded-lg px-3 py-2 -mx-3 text-sm text-pillar-text transition-colors hover:bg-surface-muted";
+  "flex min-h-11 items-center justify-between gap-3 rounded-(--radius-tight) px-3 py-2 -mx-3 text-sm text-pillar-text transition-colors hover:bg-surface-muted";
 
 /** Cap on how many "unlocks" lessons the footer names directly — beyond
  *  this, the full cross-course list (with pillar annotation) is still in
@@ -82,12 +82,29 @@ export function LessonFooterNav({
   const showFallbackCard = !nextLesson && !finishedCourse;
 
   return (
-    <nav aria-label="Lesson navigation" className="mt-12 max-w-3xl">
+    // `max-w-[46rem]` is the lesson page's reading measure
+    // (docs/DESIGN_SYSTEM.md); `max-w-3xl` is 48rem and left this nav's right
+    // edge 32px outside the `FadeRule` and completion instrument directly
+    // above it. See the matching note in LessonMetaStrip.tsx.
+    <nav aria-label="Lesson navigation" className="mt-12 max-w-[46rem]">
       <TechLabel className="text-subtle-foreground">What&rsquo;s next</TechLabel>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
         {prevLesson ? (
           <Link href={`/lessons/${prevLesson.slug}`} className={CARD_INTERACTIVE}>
-            <span className="tech-label text-subtle-foreground">← Previous lesson</span>
+            {/* The arrow is a direction cue for the eye, not a word. Left
+                bare it was announced literally — VoiceOver reads "←" as
+                "left arrow", so this card opened with "left arrow previous
+                lesson" — and the sr-only cost of that is paid on every one
+                of the 219 lesson pages. Marked decorative, matching the
+                bare "→" glyphs already handled that way further down this
+                file; "Previous lesson" plus the title carries the whole
+                meaning on its own. */}
+            <span className="tech-label text-subtle-foreground">
+              <span aria-hidden="true" data-decorative="">
+                {"← "}
+              </span>
+              Previous lesson
+            </span>
             <p className="font-display text-base font-medium text-foreground group-hover:text-pillar-text">
               {prevLesson.title}
             </p>
@@ -101,7 +118,12 @@ export function LessonFooterNav({
             href={`/lessons/${nextLesson.slug}`}
             className={cn(CARD_INTERACTIVE, "items-end border-l-2 border-l-pillar-edge text-right sm:col-start-2")}
           >
-            <span className="tech-label text-pillar-text">Next lesson →</span>
+            <span className="tech-label text-pillar-text">
+              Next lesson
+              <span aria-hidden="true" data-decorative="">
+                {" →"}
+              </span>
+            </span>
             <p className="font-display text-base font-medium text-foreground group-hover:text-pillar-text">
               {nextLesson.title}
             </p>
@@ -146,7 +168,12 @@ export function LessonFooterNav({
             href={fallbackHref}
             className={cn(CARD_INTERACTIVE, "items-end border-l-2 border-l-pillar-edge text-right sm:col-start-2")}
           >
-            <span className="tech-label text-subtle-foreground">Continue →</span>
+            <span className="tech-label text-subtle-foreground">
+              Continue
+              <span aria-hidden="true" data-decorative="">
+                {" →"}
+              </span>
+            </span>
             <p className="font-display text-base font-medium text-foreground group-hover:text-pillar-text">
               {fallbackLabel}
             </p>

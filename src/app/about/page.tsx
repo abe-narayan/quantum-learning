@@ -11,6 +11,7 @@ import { GLOSSARY_TERMS } from "@/lib/content/glossary";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { buildSearchIndex } from "@/lib/search";
+import { START_LEARNING_HREF } from "@/lib/nav";
 import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
 import { buildBreadcrumbSchema } from "@/lib/structuredData";
 
@@ -70,7 +71,14 @@ export default async function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <Section width="reading" className="pt-4 sm:pt-8">
+      {/* `tight`, not `className="pt-4 sm:pt-8"`: `Section` writes its
+          vertical padding as an inline `style`, which always beats a class on
+          the same element, so that override compiled fine and applied to
+          nothing — the page opened with the full `--rhythm-section` (72px at
+          320px, 136px on a wide desktop) where 16px was asked for. `tight` is
+          the prop that actually reduces it. Same dead override as /learn's
+          hero, error.tsx and not-found.tsx. */}
+      <Section width="reading" tight>
         <Reveal>
           <Eyebrow>About</Eyebrow>
           <SectionTitle level={1} size="xl" className="mt-4">
@@ -86,9 +94,9 @@ export default async function AboutPage() {
             <Link href="/learn" className="text-pillar-text hover:underline">
               {PILLARS.length} tracks
             </Link>{" "}
-            — Quantum Mechanics, Computing, Hardware, Software, then Quantum Mastery and Apex — in a
-            fixed order, because each one genuinely depends on the one before it. There are no
-            accounts, no paywall, and no streaks or points — the lessons you have finished are
+            (Quantum Mechanics, Computing, Hardware, Software, then Quantum Mastery and Apex) in a
+            fixed order, because each one builds on the one before it. There are no
+            accounts, no paywall, and no streaks or points. The lessons you have finished are
             remembered in your own browser and sent nowhere.
           </p>
         </Reveal>
@@ -234,11 +242,22 @@ export default async function AboutPage() {
           </Panel>
         </Reveal>
 
+        {/* Same contract as the Navbar and the homepage hero: the button
+            labelled "Start learning" goes to the on-ramp lesson
+            (START_LEARNING_HREF), never to /learn. It pointed at /learn here,
+            which meant the one loud button on the About page answered "start
+            learning" with another index to choose from — the exact failure
+            the shared constant exists to prevent (see its comment in
+            src/lib/nav.ts). /learn is still one click away as the secondary
+            action, under the label the rest of the site gives it. */}
         <Reveal delay={160} className="mt-10 flex flex-wrap justify-center gap-3 text-center">
-          <Button href="/learn" size="lg">
+          <Button href={START_LEARNING_HREF} size="lg">
             Start learning
           </Button>
-          <Button href="/simulators" size="lg" variant="secondary">
+          <Button href="/learn" size="lg" variant="secondary">
+            Browse the curriculum
+          </Button>
+          <Button href="/simulators" size="lg" variant="ghost">
             Try a simulator first
           </Button>
         </Reveal>

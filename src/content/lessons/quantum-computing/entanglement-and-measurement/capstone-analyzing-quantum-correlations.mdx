@@ -14,7 +14,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Capstone: Analyzing Quantum Correlations",
   description:
-    "Every tool this course built, applied end to end to one unfamiliar entangled state: purity, entropy, concurrence, partial trace, and a genuine (if partial) CHSH violation, plus an honest demonstration of exactly where this engine's scope ends.",
+    "Every tool this course built, applied end to end to one unfamiliar entangled state: purity, entropy, concurrence, partial trace, and a real if partial CHSH violation, plus a demonstration of where this engine's scope ends.",
   course: "entanglement-and-measurement",
   module: "capstone-analyzing-quantum-correlations",
   order: 1,
@@ -75,18 +75,15 @@ Eleven lessons built a toolkit, one idea at a time. This capstone runs the entir
 
 ## Motivation
 
-That toolkit is for describing quantum states beyond what a state
-vector can express, and the state below is one none of the earlier
-lessons used.
+The last eleven lessons built a toolkit for describing quantum states
+beyond what a state vector can express. Each tool arrived attached to the
+example that motivated it, which is good for learning and bad for
+confidence: it is easy to mistake "I followed that derivation" for "I could
+run that analysis myself."
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/b/b9/IBM_Q_system_%2827274387309%29.jpg"
-  alt="IBM's 20-qubit quantum computing hardware, photographed at an IBM Q facility"
-  caption="A real quantum computer. Every quantity this capstone computes by hand — concurrence, entropy, a CHSH value — is exactly what hardware like this measures on an actual physical qubit pair."
-  credit="IBM (photo: Connie Zhou)"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_system_(27274387309).jpg"
-  license="Public domain"
-/>
+So the state below appears in none of the earlier lessons, and every tool
+gets pointed at it in turn. Two of them will disagree in an instructive
+way, and one will fail outright, which is the part worth reading closely.
 
 ## The state
 
@@ -96,11 +93,11 @@ $$
 
 <QuantumStateDisplay state={capstoneState} label="|ψ⟩ = √0.7|00⟩ + √0.3 e^(iπ/3)|11⟩" />
 
-Unlike every earlier worked example in this course, this state has both
-an unequal amplitude split ($0.7/0.3$, not $0.5/0.5$) *and* a nontrivial
-<Term id="global-relative-phase">relative phase</Term> ($e^{i\pi/3}$, not just $\pm1$), a genuine test that
-every formula in this course handles complex amplitudes correctly, not
-just the real-valued special cases used for teaching clarity earlier.
+Unlike every earlier worked example in this course, this state has both an
+unequal amplitude split ($0.7/0.3$, not $0.5/0.5$) *and* a nontrivial
+<Term id="global-relative-phase">relative phase</Term> ($e^{i\pi/3}$, not $\pm1$). Those two features are
+deliberate. They test whether the formulas handle complex amplitudes, and
+not only the real-valued special cases chosen earlier for clarity.
 
 ## Mathematical Development
 
@@ -135,7 +132,7 @@ $\text{Tr}(\rho_A^2)=0.58$, matching `purity(reducedA)` exactly.
 
 ### Mixing in noise: which tools still apply
 
-Build a global state that's actually mixed,
+Build a global state that is genuinely mixed,
 $\rho_{\text{noisy}}=0.8\,\rho_\psi+0.2\,(I/4)$, and ask what can still
 be computed. `purity(reducedA)` and `vonNeumannEntropy` on the *reduced*
 state still work: reduced states are always $2\times2$ for a 2-qubit
@@ -177,12 +174,12 @@ test.
 <PredictBeforeReveal
   question="Using the Lesson 11 angle configuration derived for the maximally entangled |Φ+⟩ (C=1), what will S come out to for this state (C≈0.92)?"
   options={[
-    { label: "No violation — S stays at or below 2", value: "none" },
+    { label: "No violation: S stays at or below 2", value: "none" },
     { label: "A real but small violation, just above 2", value: "small" },
     { label: "The full Tsirelson bound, S=2√2≈2.83", value: "full" },
   ]}
   correctValue="small"
-  explanation="chshValue gives S≈2.0623 for this state at the Lesson-11 angles: a real violation of the classical bound, but only barely — nowhere near 2√2. That tracks C≈0.92: strongly entangled, but the Lesson-11 angles were optimized for a Bell state (C=1), not this one, so both the entanglement itself and the angle choice leave something on the table."
+  explanation="chshValue gives S≈2.0623 at the Lesson-11 angles: a real violation of the classical bound, but barely, and nowhere near 2√2. That tracks C≈0.92. Two separate things cost you here. The state is not maximally entangled, and the Lesson-11 angles were optimized for a Bell state rather than this one, so the angle choice leaves something on the table too."
 />
 
 Using the standard angle configuration from Lesson 11
@@ -211,17 +208,16 @@ different native scales (the exact numbers are in each caption).
     { label: "Reduced mixedness", value: capstoneMixedness / 0.5, caption: `${capstoneMixedness.toFixed(2)} (max 0.5)`, highlight: true },
     { label: "CHSH S / max", value: capstoneChshFraction, caption: "S≈2.062 (bound 2, max 2.83)" }
   ]}
-  ariaLabel="Four entanglement-related metrics for this capstone state, each shown as a fraction of its own maximum"
+  maxValue={1}
+  ariaLabel="Four entanglement-related metrics for this capstone state, each shown as a fraction of its own maximum, all four drawn against a common full-height scale of 1"
 />
 
-Holding $\theta_a=0,\theta_{a'}=\pi/2,\theta_{b'}=-\pi/4$ exactly as
-above and sweeping only $\theta_b$, `chshValue` recomputes $S$ live at
-every step: it passes exactly through $S\approx2.0623$ at
-$\theta_b=\pi/4$ (the Lesson 11 configuration quoted above), confirming
-the two numbers agree, but nearby angles do better, peaking around
-$\theta_b=\pi/8$ at $S\approx2.13$, direct numerical evidence for this
-lesson's own claim that a search over the angles beats the
-Lesson-11-derived configuration for this particular state.
+Holding $\theta_a=0,\theta_{a'}=\pi/2,\theta_{b'}=-\pi/4$ fixed and
+sweeping only $\theta_b$, `chshValue` recomputes $S$ at every step. The
+curve passes through $S\approx2.0623$ at $\theta_b=\pi/4$, confirming the
+Lesson 11 number, and then keeps climbing: it peaks near $\theta_b=\pi/8$
+at $S\approx2.13$. That is numerical evidence for the claim above, that a
+search over angles beats the Lesson-11 configuration for this state.
 
 <InteractiveSection title="Sweep θ_b, watch S move past 2.0623" description="A, A', and B' held fixed at the Lesson 11 configuration; only θ_b sweeps continuously from -π/4 to 2π/3. The curve is S(θ_b), computed live at 41 points by the real chshValue engine. Read off where it crosses 2.0623 (the Lesson 11 configuration, marked by the dashed line) and where, nearby, it climbs a little higher.">
   <ParametricCurve
@@ -233,16 +229,16 @@ Lesson-11-derived configuration for this particular state.
 
 ## Physical Interpretation
 
-Every number in this analysis is internally consistent with every other
-one: high (but not maximal) concurrence goes with high (but not maximal)
-entanglement entropy, goes with a real (but not maximal) CHSH violation:
-three independently-built tools, agreeing on the same qualitative
-picture from three different directions, exactly as a coherent theory
-should. And the honesty boundaries (what happens when a pure-state tool
-meets a mixed input, what happens when a $2\times2$-only tool meets a
-$4\times4$ matrix) aren't failures of the engine; they're the engine
-correctly refusing to compute something it was never built to compute
-correctly.
+Every number in this analysis agrees with every other one. High but not
+maximal concurrence goes with high but not maximal entanglement entropy,
+which goes with a real but not maximal CHSH violation: three
+independently-built tools converging on the same picture from three
+directions, which is what a coherent theory looks like from the inside.
+
+The boundaries matter as much as the agreements. A pure-state tool handed
+a mixed input, or a $2\times2$-only tool handed a $4\times4$ matrix, does
+not quietly return a plausible-looking number. It refuses, which is the
+behaviour you want from anything you plan to trust.
 
 ## Common Mistakes
 
@@ -296,8 +292,8 @@ entangled state.
   `concurrenceOfPureState`) require a pure global `StateVector` by their
   very type signature.
 - Attempting `vonNeumannEntropy` on a full $4\times4$ mixed global state
-  throws: a real, engine-enforced boundary at exactly the dimension
-  this platform's closed-form eigensolver stops covering.
+  throws, an engine-enforced boundary at the dimension where this
+  platform's closed-form eigensolver stops.
 - A strongly (but not maximally) entangled state gives a real (but
   weaker than $2\sqrt2$) CHSH violation. The three measures built in
   this course agree quantitatively, not just qualitatively.

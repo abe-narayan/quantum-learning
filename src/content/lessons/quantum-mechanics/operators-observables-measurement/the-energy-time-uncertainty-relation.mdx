@@ -21,7 +21,7 @@ export const boundFrame = (deltaEHalves) => ({
 export const lessonMeta = {
   title: "The Energy-Time Uncertainty Relation",
   description:
-    "Deriving Delta E * Delta t >= hbar/2 honestly -- time isn't an operator, so this isn't a special case of the general commutator bound, but a direct consequence of Ehrenfest's theorem applied to it.",
+    "Deriving Delta E * Delta t >= hbar/2 honestly. Time is not an operator, so this is not a special case of the general commutator bound; it follows instead from Ehrenfest's theorem applied to an arbitrary observable.",
   course: "operators-observables-measurement",
   module: "the-energy-time-uncertainty-relation",
   order: 1,
@@ -34,14 +34,14 @@ export const lessonMeta = {
   objectives: [
     "Explain why time cannot appear in the general uncertainty relation the way position and momentum do",
     "Define a characteristic evolution timescale for an arbitrary observable and derive the energy-time bound from it",
-    "Show that a stationary state's infinite characteristic timescale is exactly consistent with its zero energy uncertainty",
+    "Show that a stationary state's infinite characteristic timescale is consistent with its zero energy uncertainty",
   ],
 };
 
 <LessonHook eyebrow="Why this matters">
-  Energy-time uncertainty gets quoted constantly, but it can't come from
-  a commutator the way position-momentum does — there is no time
-  operator to commute with anything.
+  Energy-time uncertainty gets quoted constantly, but it cannot come from
+  a commutator the way position-momentum does. There is no time operator
+  to commute with anything.
 </LessonHook>
 
 ## Motivation
@@ -53,12 +53,12 @@ $\Delta E\,\Delta t\gtrsim\hbar/2$, is quoted constantly but can't come
 from that same route: in ordinary quantum mechanics (fixed Hamiltonian,
 no relativity), **time is a parameter, not an operator**. There's no
 $\hat t$ to take a commutator with $\hat H$. This lesson derives the
-relation honestly, from a genuinely different starting point.
+relation honestly, from a different starting point.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/df/Cmglee_Cambridge_Science_Festival_2016_sodium_lines.jpg"
   alt="The bright yellow-orange sodium D emission lines (589 nm and 590 nm) produced by salt-soaked wicks burning in a flame"
-  caption="A real emission line, like sodium's D lines shown here, always has some finite width, not a perfectly sharp wavelength -- exactly the natural linewidth this lesson's bound predicts for any state with a finite lifetime (a short evolution timescale forces a nonzero energy spread)."
+  caption="A real emission line, like sodium's D lines shown here, always has some finite width, not a perfectly sharp wavelength: the natural linewidth this lesson's bound predicts for any state with a finite lifetime (a short evolution timescale forces a nonzero energy spread)."
   credit="Cmglee / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Cmglee_Cambridge_Science_Festival_2016_sodium_lines.jpg"
   license="CC BY-SA 3.0"
@@ -83,7 +83,7 @@ $$
 \Delta t_A \equiv \frac{\Delta A}{\left|\,d\langle A\rangle/dt\,\right|}
 $$
 
-Literally, "how long it takes $\langle A\rangle$ to change by one
+In words: "how long it takes $\langle A\rangle$ to change by one
 standard deviation, at its current rate of change." A large $\Delta t_A$
 means $\langle A\rangle$ is changing slowly (relative to its own spread);
 a small one means it's changing fast.
@@ -113,15 +113,26 @@ $$
   </DerivationStep>
 </DerivationSteps>
 
-Derived, not asserted, and honest about what $\Delta t$ actually means:
-not an uncertainty in a measured time, but the shortest timescale on
-which *any* observable of the system can change appreciably.
+Derived, not asserted, and explicit about what $\Delta t$ means here: not
+an uncertainty in a measured time, but the shortest timescale on which
+*any* observable of the system can change appreciably.
+
+<PredictBeforeReveal
+  question="Push the bound you just derived to its extreme: a state with ΔE = 0, an exact energy eigenstate. Can the mean ⟨A⟩ of any observable change at all?"
+  options={[
+    { label: "Yes, but only slowly, at a rate proportional to ΔE", value: "slowly" },
+    { label: "Yes, but only for observables that commute with H", value: "commuting" },
+    { label: "No: every expectation value is frozen, for every observable", value: "frozen" },
+  ]}
+  correctValue="frozen"
+  explanation="Step 3 of the derivation reads ΔE·ΔA ≥ (ℏ/2)|d⟨A⟩/dt|. Set ΔE = 0 and the left side vanishes, forcing |d⟨A⟩/dt| = 0 for every observable with finite spread. Equivalently, Δt_A = ∞ for every A. This is the stationary-state result from two courses ago, rederived from the uncertainty bound alone, and the next section unpacks that agreement."
+/>
 
 ## Physical Interpretation
 
 A state with a very sharply defined energy ($\Delta E$ small) must have
 *every* observable's expectation value changing slowly, a large
-$\Delta t_A$ for every choice of $A$. Taken to its limit, this is exactly
+$\Delta t_A$ for every choice of $A$. Taken to its limit, this is
 the stationary-state result already known from two earlier courses:
 
 - **From Classical to Quantum**'s Stationary States lesson: an energy
@@ -134,11 +145,24 @@ the stationary-state result already known from two earlier courses:
   already. The energy-time relation and the stationary-state result are
   not two separate facts. One is the extreme limit of the other.
 
-A short lifetime forces a visibly smeared energy level, which shows up
-directly in what gets emitted: the excited level itself broadens into a
-band, and the emission line built from it broadens right along with it,
-this is the natural linewidth named in the sodium-D-line photo above,
-made quantitative below.
+A short lifetime forces a smeared energy level, and that smearing shows up
+in what gets emitted: the excited level broadens into a band, and the
+emission line built from it broadens with it. This is the natural
+linewidth named in the sodium-D-line photo above.
+
+The numbers are unforgiving in both directions. Sodium's excited $3p$
+state lives about $\tau=16$ ns, giving
+$\Delta E \gtrsim \hbar/(2\tau) \approx 3\times10^{-27}$ J, or roughly
+$2\times10^{-8}$ eV. Read as a frequency spread that is $\Delta E/h
+\approx 5$ MHz, and the measured natural linewidth, the emission line's
+full width at half maximum $1/(2\pi\tau)\approx10$ MHz, is exactly twice
+it. The bound fixes the scale; the factor of two comes from the
+Lorentzian shape an exponentially decaying state emits, and $\Delta E$
+here is the half-width. Against an optical frequency near
+$5\times10^{14}$ Hz, that $10$ MHz width makes the line sharp to about
+two parts in $10^{8}$. A state that lived a thousand times more briefly would
+be a thousand times blurrier. Spectroscopic sharpness and long excited
+lifetimes are the same fact.
 
 <LinewidthDiagram ariaLabel="Two linked panels: an excited energy level drawn as a soft band above a sharp ground state line, and below it a Lorentzian emission-line profile. A slider sets the lifetime delta t sub A; a shorter lifetime widens both the band and the emission peak, a longer lifetime narrows both, with delta E fixed at h-bar over two delta t sub A." />
 
@@ -157,14 +181,15 @@ $$
 $$
 
 Compare to $\hbar/2=0.5$: $0.333 < 0.5$. **This would violate the
-bound**, meaning such a state (with exactly these numbers) cannot
-actually exist as a valid <Term id="quantum-state">quantum state</Term>. In practice, if $\Delta E=0.5$
-is fixed, self-consistency forces $\Delta A/|d\langle A\rangle/dt|\ge1$
-for every observable. The relation is a genuine constraint on what
-combinations of these quantities are physically possible, not just a
-computed check.
+bound**, so no valid <Term id="quantum-state">quantum state</Term> can have exactly these three
+numbers together. Rearranged, $\Delta E=0.5$ forces
+$\Delta t_A = \Delta A/|d\langle A\rangle/dt| \ge \hbar/(2\Delta E) = 1$
+for every observable, and the stated $\Delta t_A = 0.667$ falls short of
+that. The relation constrains which combinations of these quantities can
+occur at all; it is not merely an arithmetic check performed after the
+fact.
 
-<InteractiveSection title="Find the minimum allowed Δt_A for a given ΔE" description="Drag ΔE and watch the line ΔE · Δt_A sweep. The reference line marks ℏ/2 — everywhere the curve sits below it is physically forbidden, so the crossing point is exactly the minimum Δt_A this ΔE allows. A larger ΔE pushes that minimum smaller, matching this lesson's own practice question.">
+<InteractiveSection title="Find the minimum allowed Δt_A for a given ΔE" description="Drag ΔE and watch the line ΔE · Δt_A sweep. The reference line marks ℏ/2. Everywhere the curve sits below it is physically forbidden, so the crossing point is the minimum Δt_A this ΔE allows. A larger ΔE pushes that minimum smaller, matching this lesson's own practice question.">
   <ParametricCurve
     frames={Array.from({ length: 9 }, (_, i) => boundFrame(i + 1))}
     sliderLabel="ΔE"
@@ -179,15 +204,15 @@ computed check.
 **Treating $\Delta t$ as "the uncertainty in a measured time," the way
 $\Delta x$ is the uncertainty in a measured position.** Time is never a
 measurement outcome with a probability distribution in this framework.
-$\Delta t_A$ is a *timescale derived from* $A$'s dynamics, a
-fundamentally different kind of quantity.
+$\Delta t_A$ is a *timescale derived from* $A$'s dynamics, which is a
+different kind of quantity entirely.
 </Callout>
 
 <Callout type="warning">
 **Trying to derive this the same way as $\Delta x\Delta p\ge\hbar/2$,
 via $[\hat E,\hat t]$.** There is no $\hat t$ operator to commute with
 anything in ordinary (non-relativistic, fixed-Hamiltonian) quantum
-mechanics. This is exactly why the derivation had to go through
+mechanics. This is why the derivation had to go through
 Ehrenfest's theorem instead.
 </Callout>
 
@@ -214,9 +239,9 @@ Ehrenfest's theorem instead.
 - $\Delta t_A\equiv\Delta A/|d\langle A\rangle/dt|$ is a timescale, not an
   uncertainty in a measured quantity.
 - The relation's extreme limit ($\Delta E=0 \Rightarrow \Delta
-  t_A=\infty$) exactly reproduces the already-proven fact that stationary
-  states never change, a genuine consistency check across three
-  separate derivations in this platform's courses.
+  t_A=\infty$) reproduces the already-proven fact that stationary
+  states never change, a consistency check across three
+  separate derivations in three different courses.
 
 ## Further Exploration
 

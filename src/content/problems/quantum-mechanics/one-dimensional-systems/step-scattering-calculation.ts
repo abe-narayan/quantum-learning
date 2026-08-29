@@ -22,6 +22,11 @@ export const stepScatteringCalculation: NumericProblem = {
     value: 0.005155,
     tolerance: 0.0005,
     incorrectFeedback: "Compute k1=sqrt(2E), k2=sqrt(2(E-V0)), then R=((k1-k2)/(k1+k2))^2.",
+    nearMisses: [
+      { value: 0.0718, tolerance: 0.001, feedback: "That is the amplitude ratio (k₁−k₂)/(k₁+k₂). The reflection probability squares it." },
+      { value: 0.994845, tolerance: 0.001, feedback: "That is the transmission probability T = 1 − R. The question asks for the reflected share." },
+      { value: 0, feedback: "A step still reflects even when E exceeds V₀: the wavenumber changes discontinuously, and that mismatch alone produces reflection. Only k₁ = k₂ would give zero." },
+    ],
   },
   hints: [
     { text: "k1 = sqrt(16) = 4, k2 = sqrt(12) ≈ 3.4641." },

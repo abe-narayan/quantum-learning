@@ -22,7 +22,7 @@ export const lessonMeta = {
   module: "capstone-what-we-know-and-dont",
   order: 5,
   difficulty: "master",
-  estimatedMinutes: 24,
+  estimatedMinutes: 90,
   prerequisites: [
     "apex/quantum-complexity-theory/the-local-hamiltonian-problem",
     "apex/quantum-complexity-theory/query-complexity-and-lower-bounds",
@@ -111,7 +111,7 @@ polynomial method (Lesson 4).
 |---|---|---|
 | $\mathsf{P}\subseteq\mathsf{BQP}\subseteq\mathsf{PSPACE}$ | Lesson 1 | A classical circuit is a special case of a quantum one (first containment); a quantum circuit's amplitudes are computable in polynomial space via a reusable path-sum (second) |
 | $\mathsf{NP}\subseteq\mathsf{QMA}\subseteq\mathsf{PSPACE}$ | Lesson 2 | A classical certificate is a valid basis-state quantum witness (first containment); the same space-efficient path-sum idea, plus a space-efficient maximization over witnesses (second) |
-| Local Hamiltonian is $\mathsf{QMA}$-complete | Lesson 3 | Kitaev's theorem: a full reduction from an arbitrary $\mathsf{QMA}$ verifier circuit to a local Hamiltonian's ground-state energy, in both directions |
+| Local Hamiltonian is $\mathsf{QMA}$-complete | Lesson 3 | Kitaev's theorem. Containment in $\mathsf{QMA}$ was derived in full (the ground state is its own witness); $\mathsf{QMA}$-hardness rests on Kitaev's history-state construction, whose architecture Lesson 3 laid out and verified on a small case while citing the spectral analysis that completes the proof |
 | Grover's $\Theta(\sqrt N)$ is optimal (black-box) | Lesson 4 | Proved twice, by independent techniques (the adversary method and the polynomial method), that no black-box quantum algorithm beats quadratic speedup for unstructured search |
 
 These four results share the property that makes them Tier 1: nothing
@@ -210,18 +210,20 @@ stronger than its own evidence independently supports.
 
 <ResearchConnection
   title="The Sycamore 'quantum supremacy' experiment"
-  source="Google, 2019 (Sycamore superconducting processor)"
-  url="https://www.nature.com/articles/s41586-019-1666-5"
+  source="Arute et al., Nature 574, 505 (2019) (arXiv:1910.11333)"
+  url="https://arxiv.org/abs/1910.11333"
 >
-  A quantum processor sampled from a specific random circuit's output
-  distribution in a way estimated, at the time, to take a then-best
-  classical supercomputer thousands of years, versus about 200 seconds on
-  the quantum hardware. IBM subsequently argued a cleverer classical
-  technique — trading disk space for the raw memory brute-force
-  state-vector simulation requires — could approximate the same sampling
-  task, narrowing the claimed classical-hardness margin, and similar
-  narrowing or contesting of specific instances has continued
-  industry-wide since.
+  A 53-qubit superconducting processor sampled from a specific random
+  circuit's output distribution in a way estimated, at the time, to take
+  a then-best classical supercomputer thousands of years, versus about
+  200 seconds on the quantum hardware. Pednault et al.
+  ([arXiv:1910.09534](https://arxiv.org/abs/1910.09534)) argued within
+  weeks that a cleverer classical technique — trading secondary storage
+  for the raw memory a brute-force state-vector simulation requires —
+  could reproduce the same task in days, and Pan, Chen and Zhang
+  (Phys. Rev. Lett. 129, 090502 (2022)) later did so with tensor-network
+  contraction. Similar narrowing of specific instances has continued
+  since.
 </ResearchConnection>
 
 Google's 2019 Sycamore experiment, already pictured elsewhere on this
@@ -251,6 +253,23 @@ $\mathsf{P}\neq\mathsf{NP}$ itself. That is a genuine, named theoretical
 basis for random circuit sampling's classical hardness — and it is
 *itself* resting on an unproven, if strongly believed, assumption, exactly
 the same Tier 2 shape as everything else in this lesson's middle column.
+
+<ResearchConnection
+  title="The hardness argument, with its assumptions on the surface"
+  source="Bouland, Fefferman, Nirkhe & Vazirani, Nature Physics 15, 159 (2019) (arXiv:1803.04402)"
+  url="https://arxiv.org/abs/1803.04402"
+>
+  The version of the argument a real experiment has to lean on, and it
+  needs two assumptions rather than the one just described. A hardware
+  device samples *approximately*, not exactly, and the collapse argument
+  above is an exact-sampling argument; closing that gap requires
+  additionally assuming that computing a random circuit's output
+  probability is hard on *average*, not merely in the worst case. This
+  paper proves a worst-case-to-average-case reduction that narrows the
+  distance between the two, which is a real theorem and is not the same
+  as removing the assumption. Tiering the claim honestly means naming
+  both dependencies, not just the famous one.
+</ResearchConnection>
 
 **What the experiment does establish.** Strong empirical evidence
 consistent with $\mathsf{BQP}$ (or more precisely, the class of problems a
@@ -364,8 +383,8 @@ computers."**
 
 ## The Three-Tier Map
 
-<div className="not-prose my-8 grid gap-4 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4 sm:grid-cols-3">
-  <div className="rounded-lg border border-brand/40 bg-brand/5 p-4">
+<div className="not-prose my-8 grid gap-4 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4 sm:grid-cols-3">
+  <div className="rounded-(--radius-tight) border border-brand/40 bg-brand/5 p-4">
     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Tier 1 — Proven</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>P ⊆ BQP ⊆ PSPACE</li>
@@ -374,7 +393,7 @@ computers."**
       <li>Grover's Θ(√N) is optimal in the black-box model (adversary + polynomial methods)</li>
     </ul>
   </div>
-  <div className="rounded-lg border border-warning/40 bg-warning/5 p-4">
+  <div className="rounded-(--radius-tight) border border-warning/40 bg-warning/5 p-4">
     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-warning">Tier 2 — Strongly-evidenced conjectures</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>P ≠ NP</li>
@@ -384,7 +403,7 @@ computers."**
       <li>Random circuit sampling is classically hard (polynomial-hierarchy argument)</li>
     </ul>
   </div>
-  <div className="rounded-lg border border-accent/40 bg-accent/5 p-4">
+  <div className="rounded-(--radius-tight) border border-accent/40 bg-accent/5 p-4">
     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Tier 3 — Genuinely open</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>Is BQP ⊆ NP?</li>
@@ -402,6 +421,86 @@ columns and nowhere else. Any new claim you encounter should be sortable
 into this same layout — and if it can't be sorted cleanly, that itself is
 usually a sign the claim was stated imprecisely rather than that the
 framework has a gap.
+
+## The Frontier: Where the Map Is Moving
+
+The map above is not static. Two results from the past decade show how new
+work enters it, and each is easy to mis-tier if you skim the headlines.
+Both slot into the same three columns.
+
+### The quantum PCP conjecture: open, with one necessary step now proven
+
+<DefinitionBox title="The quantum PCP conjecture (open)">
+
+There exists a universal constant $\varepsilon > 0$ such that estimating a
+local Hamiltonian's ground-state energy to within $\varepsilon m$, where
+$m$ is the number of local terms, is $\mathsf{QMA}$-hard. Lesson 3's
+completeness result holds for a promise gap that shrinks like
+$1/\mathrm{poly}(n)$; the conjecture asks whether the hardness survives
+when the gap is a constant fraction of the total energy scale. It is the
+quantum analogue of the classical PCP theorem's jump from exact to
+approximate constraint satisfaction, and it is open in both directions:
+no proof, and no refutation.
+
+</DefinitionBox>
+
+The conjecture sits in Tier 3, and it comes with a built-in test. If it is
+true (and $\mathsf{QMA}\neq\mathsf{NP}$), then there must exist families
+of local Hamiltonians whose every low-energy state is hard to prepare: if
+some state below energy $\varepsilon m$ could be produced by a
+constant-depth circuit, a classical description of that circuit would
+serve as an $\mathsf{NP}$ witness for the energy estimate, and the
+hardness would collapse. Freedman and Hastings named this necessary
+consequence the NLTS ("no low-energy trivial states") conjecture. For
+years, nobody could prove even that.
+
+<ResearchConnection
+  title="NLTS Hamiltonians from good quantum codes"
+  source="Anshu, Breuckmann & Nirkhe, STOC 2023 (arXiv:2206.13228, 2022)"
+  url="https://arxiv.org/abs/2206.13228"
+>
+  In 2022, Anshu, Breuckmann, and Nirkhe proved the NLTS conjecture: the
+  local Hamiltonians built from constant-rate, linear-distance quantum LDPC
+  codes have the property that every state below a constant fraction of
+  the total energy requires circuit depth that grows with system size.
+</ResearchConnection>
+
+Tier the pair carefully. NLTS is now Tier 1: a proven theorem, and it will
+stay proven no matter what happens next. The quantum PCP conjecture stays
+Tier 3: proving a necessary consequence removes one way the conjecture
+could have died, but it is not a proof, and the field still lacks a
+consensus belief either way. A headline reading "major step toward quantum
+PCP" is accurate; a headline reading "quantum PCP nearly proven" is not.
+
+### Classical verification: the QMA thread, made practical
+
+Lesson 2's verification story had one apparent limit built in: the
+verifier is a quantum circuit. A skeptic with only a classical computer
+seemingly cannot check a quantum device's answer without trusting another
+quantum device. In 2018, Urmila Mahadev showed that this limit is not
+fundamental.
+
+<ResearchConnection
+  title="Classical verification of quantum computations"
+  source="Mahadev, FOCS 2018 (arXiv:1804.01082)"
+  url="https://arxiv.org/abs/1804.01082"
+>
+  A classical polynomial-time verifier can interactively verify the result
+  of any polynomial-time quantum computation. The protocol turns the
+  quantum prover into a trusted measurement device, and its soundness
+  rests on the assumption that the learning-with-errors (LWE) problem is
+  intractable for efficient quantum computers.
+</ResearchConnection>
+
+Where does this sit on the map? Split it the way the framework demands.
+The protocol and its analysis are Tier 1: proven theorems. The guarantee
+it delivers is conditional on LWE's quantum hardness, a cryptographic
+assumption of the same shape as "factoring has no efficient classical
+algorithm" in the Tier 2 table: unbroken after years of attack, widely
+believed, unproven. So the precise claim is: *if* LWE is quantumly hard,
+a classical skeptic can verify a quantum computation. That conditional
+structure is not a weakness to hide. It is the same honest form every
+Tier 2 row in this lesson already takes.
 
 ## Common Mistakes
 

@@ -22,12 +22,17 @@ export const steaneCodespaceDimension: NumericProblem = {
     type: "numeric",
     value: 2,
     tolerance: 0.001,
-    incorrectFeedback: "k = n - (number of independent generators) = 7 - 6 = 1, so the codespace dimension is 2^1.",
+    incorrectFeedback: "First find k, the count of logical qubits: n minus the number of independent generators. The codespace dimension is then two raised to k, not k itself and not the full ambient dimension.",
+    nearMisses: [
+      { value: 1, feedback: "1 is k, the number of logical qubits. The codespace dimension is 2^k." },
+      { value: 128, feedback: "128 = 2^7 is the full ambient Hilbert space. Each of the 6 generators halves it." },
+      { value: 64, feedback: "64 halves the ambient space once. Six independent generators halve it six times." },
+    ],
   },
   hints: [
     { text: "k = n - (number of independent stabilizer generators)." },
     { text: "k = 7 - 6 = 1." },
-    { text: "Codespace dimension is 2^k." },
+    { text: "The codespace dimension is two raised to the power of the k you found." },
   ],
   solution: {
     steps: [

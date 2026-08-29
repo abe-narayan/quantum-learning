@@ -60,7 +60,7 @@ export const lessonMeta = {
   module: "clifford-t-synthesis-and-resource-counting",
   order: 3,
   difficulty: "master",
-  estimatedMinutes: 27,
+  estimatedMinutes: 50,
   prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/gate-decomposition", "apex/fault-tolerance-frontiers/magic-states-and-distillation"],
   objectives: [
     "Explain why T-count (the number of T gates in a Clifford+T circuit) is the dominant resource metric for fault-tolerant algorithm cost, directly connecting to the magic-state-distillation prerequisite's 'factories dominate cost' finding",
@@ -233,6 +233,23 @@ roughly $2^{T}$ distinct fixed-precision targets, so *some* circuit of
 length $\Theta(\log(1/\epsilon))$ must exist for counting reasons alone,
 and Ross-Selinger's contribution is an efficient classical algorithm that
 actually *finds* a near-optimal one, not merely an existence argument.
+
+<ResearchConnection
+  title="Both synthesis results, in their own papers"
+  source="Dawson & Nielsen, Quantum Information and Computation 6, 81 (2006) (arXiv:quant-ph/0505030); Ross & Selinger, Quantum Information and Computation 16, 901 (2016) (arXiv:1403.2975)"
+  url="https://arxiv.org/abs/1403.2975"
+>
+  Dawson and Nielsen's tutorial is where the $c\approx3.97$ figure above
+  comes from, and it is short enough to read in an afternoon; the
+  recursive construction is easier to hold in your head than its
+  reputation suggests. Ross and Selinger is the paper that made
+  $R_z$ synthesis a solved practical problem, and the honest caveat to
+  carry from it is in its own framing: the near-optimality guarantee is
+  conditional on a number-theoretic conjecture about the density of
+  certain primes, with an unconditional fallback that is slightly worse.
+  A synthesis result quoted as "provably optimal" without that clause is
+  quoting it slightly too strongly.
+</ResearchConnection>
 This lesson cites that scaling result and its attribution rather than
 re-deriving the ring-theoretic search algorithm itself, which is genuinely
 a lesson (and a paper) of its own.

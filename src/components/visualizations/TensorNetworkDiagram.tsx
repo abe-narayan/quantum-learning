@@ -95,16 +95,55 @@ export function TensorNetworkDiagram({ n = 20, ariaLabel }: { n?: number; ariaLa
 
   return (
     <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
+      {/* `role="group"`, not `role="img"`. `img` makes every descendant
+          presentational, and both SVGs inside this wrapper are already
+          `aria-hidden` — so the role was not hiding a picture, it was hiding
+          the four `<p>` captions that are the only words attached to the two
+          panels: "2ⁿ amplitudes, fully connected" / "no structure exploited"
+          for the dense side, and "one small tensor per qubit" / "linked by
+          bond dimension D = …" for the MPS side. Those four lines *are* the
+          comparison the figure is making, and the last one carries the live D
+          value the slider changes, so a screen-reader user got the summary
+          sentence and then nothing that responded to the control.
+
+          `group` keeps the same `aria-label` — the summary is still announced
+          on entry — while leaving the captions in the tree. The SVGs stay
+          `aria-hidden`, so nothing is read twice. */}
+      {/* `tabIndex={0}` completes the fix the role change above started. The
+          right-hand MPS panel's SVG has an intrinsic `width={RIGHT_WIDTH}`
+          (280) and no responsive class, so on a 320px phone — a ~256px content
+          box inside `panel-inset p-4` — that one flex item is wider than the
+          row and `flex-wrap` cannot help, because wrapping only moves items
+          between lines, it never shrinks one. This container therefore really
+          scrolls, and an `overflow-x-auto` div is focusable by default in no
+          browser except Firefox, so a keyboard-only reader could not reach the
+          right edge of the MPS chain. The name is already on this element, so
+          the new stop announces itself. */}
       <div
-        role="img"
+        role="group"
         aria-label={`${ariaLabel}. Currently showing bond dimension D = ${d.toLocaleString()}.`}
+        tabIndex={0}
         className="flex flex-wrap items-start justify-center gap-8 overflow-x-auto"
       >
         <div className="flex flex-col items-center">
           <svg width={LEFT_WIDTH} height={LEFT_HEIGHT} viewBox={`0 0 ${LEFT_WIDTH} ${LEFT_HEIGHT}`} aria-hidden="true">
-            <circle cx={LEFT_CENTER.x} cy={LEFT_CENTER.y} r={LEFT_RADIUS} className="fill-muted-foreground/15 stroke-border" strokeWidth={1.5} />
+            {/* The blob's outline is the plotted region of the left panel —
+                the "one flat, fully-connected object" the right panel is
+                being contrasted against — so it is load-bearing and moves
+                onto `--axis` (≥3:1 on every panel depth) from `--border`,
+                the panel-edge token that measured 1.41:1 on
+                `--surface-muted`. The 28 chords inside it are a different
+                call: they carry no per-chord meaning — the comment on
+                LEFT_RING_POINTS says so outright, they are a stand-in for
+                "everything connects to everything" — and at 0.75 units,
+                28 of them, they read as texture. So they go to
+                `--axis-grid`, the token built to sit deliberately below the
+                3:1 floor, rather than to `--axis`: drawing decorative fill
+                at full axis contrast would make it shout over the outline
+                that actually bounds the region. */}
+            <circle cx={LEFT_CENTER.x} cy={LEFT_CENTER.y} r={LEFT_RADIUS} className="fill-muted-foreground/15 stroke-axis" strokeWidth={1.5} />
             {ringChords.map((chord, i) => (
-              <line key={i} x1={chord.a.x} y1={chord.a.y} x2={chord.b.x} y2={chord.b.y} className="stroke-border/70" strokeWidth={0.75} />
+              <line key={i} x1={chord.a.x} y1={chord.a.y} x2={chord.b.x} y2={chord.b.y} className="stroke-axis-grid" strokeWidth={0.75} />
             ))}
             {ringPoints.map((p, i) => (
               <circle key={i} cx={p.x} cy={p.y} r={3} className="fill-muted-foreground" />
@@ -136,7 +175,11 @@ export function TensorNetworkDiagram({ n = 20, ariaLabel }: { n?: number; ariaLa
               ) : (
                 <g key={i}>
                   <circle cx={x} cy={CHAIN_Y} r={NODE_R} className="fill-brand" />
-                  <text x={x} y={CHAIN_Y + 4} textAnchor="middle" className="fill-brand-foreground text-[10px] font-semibold">
+                  {/* These SVGs carry intrinsic width attributes and no `w-full`, so
+                    the viewBox scale is 1.0 and 10 authored units was a literal
+                    10px - on the floor, not under it. 12 clears it and still fits
+                    inside the 26-unit-diameter node circle. */}
+                  <text x={x} y={CHAIN_Y + 4} textAnchor="middle" fontSize={12} className="fill-brand-foreground font-semibold">
                     {i === 0 ? "q₁" : i === 1 ? "q₂" : i === 2 ? "q₃" : "qₙ"}
                   </text>
                 </g>
@@ -157,7 +200,7 @@ export function TensorNetworkDiagram({ n = 20, ariaLabel }: { n?: number; ariaLa
         />
       )}
 
-      <div aria-live="polite" className="rounded-lg border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" className="rounded-(--radius-tight) border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         With <span className="font-mono">n = {n}</span> qubits and{" "}
         <span className="font-mono">D = {d.toLocaleString()}</span>, the MPS chain stores about{" "}
         <span className={cn("font-mono font-semibold", mpsBytes >= stateVectorBytes ? "text-warning" : "text-accent")}>

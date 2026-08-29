@@ -33,19 +33,24 @@ export const kineticTermForm: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Apply p-hat = -i*hbar*d/dx twice and simplify i^2 = -1 carefully.",
   },
   hints: [
-    { text: "Compute p-hat^2 = (-i*hbar*d/dx)(-i*hbar*d/dx) step by step." },
-    { text: "Remember i^2 = -1." },
+    { text: "Write down p-hat in position space, then square it: p-hat^2 = (-i*hbar*d/dx)(-i*hbar*d/dx)." },
+    { text: "Collect the two constant factors and the two derivatives separately." },
+    { text: "Simplify (-i)^2 using i^2 = -1, then divide the whole thing by 2m." },
   ],
   solution: {
     steps: [
       { description: "$\\hat p^2 = (-i\\hbar)^2\\dfrac{d^2}{dx^2} = -\\hbar^2\\dfrac{d^2}{dx^2}$, using $i^2=-1$." },
       { description: "Divide by $2m$: $\\hat T = -\\dfrac{\\hbar^2}{2m}\\dfrac{d^2}{dx^2}$." },
     ],
-    finalAnswer: "Option (a): $-\\dfrac{\\hbar^2}{2m}\\dfrac{d^2}{dx^2}$",
+    finalAnswer: "$-\\dfrac{\\hbar^2}{2m}\\dfrac{d^2}{dx^2}$",
   },
   explanation: {
     correctIdea: "Applying p-hat twice and simplifying i^2=-1 gives a real, negative-signed second-derivative operator.",
     whyCorrect: "This exactly matches the derivation in the lesson.",
-    whyWrong: ["The other options either get the sign wrong, use only a single derivative, or leave a spurious factor of i in the final operator."],
+    whyWrong: [
+      { optionId: "b", text: "Loses the minus sign, which comes from (-i)^2 = -1 and not from anywhere else." },
+      { optionId: "c", text: "Squares the constant but not the derivative, leaving one power of d/dx where two belong." },
+      { optionId: "d", text: "Stops halfway through the simplification, keeping an i that the second factor of -i has already cancelled." },
+    ],
   },
 };

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FrameSlider } from "./FrameSlider";
+import { PresetToggle } from "./PresetToggle";
 
 const M_OPTIONS: { label: string; m: number }[] = [
   { label: "m = 0", m: 0 },
@@ -98,14 +99,64 @@ export function PhaseWindingCircle({ ariaLabel }: { ariaLabel: string }) {
   return (
     <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
-        <svg width={VIEW} height={VIEW} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img" aria-label={ariaLabel}>
-          <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" className="stroke-border" strokeWidth={1} strokeDasharray="2 3" />
-          <line x1={CENTER - RADIUS - 8} y1={CENTER} x2={CENTER + RADIUS + 8} y2={CENTER} className="stroke-border/50" strokeWidth={1} />
-          <line x1={CENTER} y1={CENTER - RADIUS - 8} x2={CENTER} y2={CENTER + RADIUS + 8} className="stroke-border/50" strokeWidth={1} />
+        {/* Was the bare `ariaLabel` prop, unchanged across every m and every
+            φ — so a screen-reader user scrubbing a full lap heard nothing
+            about the one thing the figure exists to show. The state now
+            rides along with the picture. */}
+        <svg
+          width={VIEW}
+          height={VIEW}
+          viewBox={`0 0 ${VIEW} ${VIEW}`}
+          role="img"
+          aria-label={`${ariaLabel} Unit circle in the complex plane with m = ${m} and φ = ${formatMultipleOfPi(phi)}. The marker sits at angle mφ = ${formatMultipleOfPi(angle)} from the start point.${statusText ? ` ${statusText}` : ""}`}
+        >
+          {/* The unit circle is the figure's entire frame of reference — the
+              claim being made is "does the marker come back to the SAME
+              point on this circle", which is unaskable if the circle isn't
+              visible. Load-bearing, so `--axis` (≥3:1 on every panel depth)
+              rather than `--border` (1.41:1 on `--surface-muted`).
+
+              The two cross-hairs are `--axis` as well, and deliberately not
+              `--axis-grid`, which they briefly were. `--axis-grid` is for
+              *optional background ruling* — the ruling a reader may use and
+              never has to — and sits below 3:1 on purpose (2.21:1 on
+              `--surface-muted` in dark, 1.66:1 on paper). These two lines are
+              not that: they are the real and imaginary axes of the complex
+              plane this figure plots e^{imφ} on, they are named as such by the
+              "Re" and "Im" labels immediately below, and the cos + i·sin
+              readout under the figure asks the reader to connect the marker's
+              horizontal position to a real part and its vertical position to an
+              imaginary one. An axis you label and read components off is an
+              axis. Labelling a line at 4.5:1 that points at a line at 2.2:1 is
+              the specific failure this reverts. They stay subordinate to the
+              unit circle by weight (1 against 1.25) and by the circle's dash,
+              not by being under the perception floor. */}
+          <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" className="stroke-axis" strokeWidth={1.25} strokeDasharray="2 3" />
+          <line x1={CENTER - RADIUS - 8} y1={CENTER} x2={CENTER + RADIUS + 8} y2={CENTER} className="stroke-axis" strokeWidth={1} />
+          <line x1={CENTER} y1={CENTER - RADIUS - 8} x2={CENTER} y2={CENTER + RADIUS + 8} className="stroke-axis" strokeWidth={1} />
+          {/* Axis names. The figure plots e^{imφ} on the complex plane and
+              never said so — a reader who hasn't already internalised
+              "horizontal = real part" had no way to connect the marker's
+              position to the cos + i·sin readout printed underneath. */}
+          {/* "Re" sits on the LEFT arm of the horizontal axis, not the right:
+              the right arm is where the φ = 0 start marker and its label
+              live, and the two collided there. */}
+          <text x={CENTER - RADIUS - 8} y={CENTER - 6} textAnchor="start" fontSize={11} className="fill-axis font-mono">
+            Re
+          </text>
+          <text x={CENTER + 5} y={CENTER - RADIUS - 10} textAnchor="start" fontSize={11} className="fill-axis font-mono">
+            Im
+          </text>
 
           {/* Start point, φ = 0 */}
           <circle cx={startPoint.x} cy={startPoint.y} r={5} className="fill-none stroke-foreground" strokeWidth={1.5} />
-          <text x={startPoint.x + 8} y={startPoint.y - 8} className="fill-muted-foreground text-[9px] font-mono">
+          {/* Intrinsic 220-unit SVG with no `w-full`, so viewBox scale is 1.0
+              and 9 authored units painted at a literal 9px. 12 clears the
+              10px floor; "start" is the label the whole "did it come back?"
+              question hangs on, so it is must-read text. Anchored *inward*
+              from the marker — at 12 units the word is ~36 wide and, placed
+              outward from x = 192 in a 220-unit box, ran off the edge. */}
+          <text x={startPoint.x - 9} y={startPoint.y - 10} textAnchor="end" fontSize={12} className="fill-foreground font-mono">
             start
           </text>
 
@@ -118,24 +169,18 @@ export function PhaseWindingCircle({ ariaLabel }: { ariaLabel: string }) {
         </svg>
       </div>
 
-      <div role="radiogroup" aria-label="Value of m" className="flex flex-wrap gap-1.5">
-        {M_OPTIONS.map((opt, i) => (
-          <button
-            key={opt.label}
-            type="button"
-            role="radio"
-            aria-checked={i === mIndex}
-            onClick={() => setMIndex(i)}
-            className={
-              i === mIndex
-                ? "rounded-full bg-brand px-2.5 py-1 text-xs font-medium text-brand-foreground"
-                : "rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-surface-muted"
-            }
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
+      {/* Was a hand-rolled `role="radiogroup"` / `role="radio"` row: it
+          claimed the radio-group role but had no arrow-key handling and no
+          roving tabindex, so it announced one interaction model and
+          implemented another, and its pills were ~24px tall. `PresetToggle`
+          is that control with the ARIA Authoring Practices pattern already
+          in it at a 44px target. */}
+      <PresetToggle
+        options={M_OPTIONS.map((opt) => ({ label: opt.label }))}
+        index={mIndex}
+        onChange={setMIndex}
+        ariaLabel="Value of m"
+      />
 
       <FrameSlider
         label="φ (angle walked around the axis)"

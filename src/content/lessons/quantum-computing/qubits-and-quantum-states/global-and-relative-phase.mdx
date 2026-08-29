@@ -3,20 +3,36 @@ import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-am
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { Complex } from "@/lib/quantum/complex";
+import { StateVector } from "@/lib/quantum/state";
+import { crossBasisProbability } from "@/lib/quantum/amplitude";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/global-and-relative-phase"
 );
 
+export const phaseSweepPoints = Array.from({ length: 61 }, (_, i) => {
+  const delta = (i / 60) * 2 * Math.PI;
+  const alpha = new Complex(1 / Math.SQRT2, 0);
+  const beta = Complex.fromPolar(1 / Math.SQRT2, delta);
+  const state = new StateVector([alpha, beta]);
+  return {
+    delta,
+    pPlus: crossBasisProbability(alpha, beta),
+    pZero: state.probabilities()[0],
+  };
+});
+
 export const lessonMeta = {
   title: "Global Phase vs. Relative Phase",
   description:
-    "A precise proof of which phases are physically real and which aren't, probably the single most common confusion in quantum computing.",
+    "A proof of which phases are physically real and which aren't, and how to tell them apart by calculation rather than by feel.",
   course: "qubits-and-quantum-states",
   module: "global-and-relative-phase",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 20,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-computing/qubits-and-quantum-states/single-qubit-rotations"],
   objectives: [
     "Prove that a global phase changes no measurement probability in any basis",
@@ -26,14 +42,22 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Two lessons ago, Y|0⟩=i|1⟩ landed on exactly the same Bloch point as X|0⟩=|1⟩. Last lesson, Rz(2π)=−I turned out to do nothing physically despite the matrix having an unmistakable overall minus sign. This is where both facts finally get proven.
+Two lessons ago, Y|0⟩=i|1⟩ landed on the same Bloch point as X|0⟩=|1⟩. Last lesson, Rz(2π)=−I did nothing physical despite the matrix carrying an unmistakable overall minus sign. Two loose ends, one explanation.
 </LessonHook>
 
 ## Motivation
 
-Both facts have been used without being proven, until now — this is
-where the difference between "phase that doesn't matter" and "phase
-that matters enormously" gets made completely precise.
+You have twice been asked to accept a result on faith. $Y|0\rangle$ and
+$X|0\rangle$ differ by a factor of $i$, yet sit at the same point on the
+Bloch sphere. $R_z(2\pi) = -I$ flips the sign of every amplitude, yet no
+experiment can detect that it ran. In both cases the state's numbers changed
+and the physics did not.
+
+That should bother you. The amplitudes are supposed to be the complete
+description of the state, so how can two different sets of numbers describe
+the same thing? The answer is that a phase can enter a state in two
+structurally different ways, and only one of them is a change of state at
+all. This lesson draws that line and proves where it falls.
 
 ## Intuition
 
@@ -51,13 +75,14 @@ Bloch sphere (a different $\varphi$), and that rotation is measurable.
 <AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Mach-Zehnder_interferometer.svg"
   alt="Schematic of a Mach-Zehnder interferometer, showing a light beam split into two paths by a beamsplitter, redirected by two mirrors, and recombined at a second beamsplitter after picking up a relative phase"
-  caption="A Mach-Zehnder interferometer, the classic real-world device for making relative phase visible: a phase shift in one arm changes which detector the recombined beam lights up, exactly the kind of observable effect a relative-phase δ produces on a qubit."
+  caption="A Mach-Zehnder interferometer, the standard laboratory device for making relative phase visible: a phase shift in one arm changes which detector the recombined beam lights up, which is the kind of observable effect a relative-phase δ produces on a qubit."
   pins={[
-    { id: "bs1", x: 24, y: 34, label: "First beamsplitter — splits the incoming beam into two paths." },
-    { id: "mirror-a", x: 73, y: 34, label: "Mirror — redirects one path toward the second beamsplitter." },
-    { id: "mirror-b", x: 24, y: 90, label: "Mirror — redirects the other path toward the second beamsplitter." },
-    { id: "bs2", x: 73, y: 90, label: "Second beamsplitter — recombines the two paths; which detector lights up depends on the relative phase between them." },
+    { id: "bs1", x: 24, y: 34, label: "First beamsplitter: splits the incoming beam into two paths." },
+    { id: "mirror-a", x: 73, y: 34, label: "Mirror redirecting one path toward the second beamsplitter." },
+    { id: "mirror-b", x: 24, y: 90, label: "Mirror redirecting the other path toward the second beamsplitter." },
+    { id: "bs2", x: 73, y: 90, label: "Second beamsplitter: recombines the two paths. Which detector lights up depends on the relative phase between them." },
   ]}
+  aspect="aspect-[468/283]"
   credit="Ansgar Hellwig / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Mach-Zehnder_interferometer.svg"
   license="Public domain"
@@ -68,19 +93,19 @@ Bloch sphere (a different $\varphi$), and that rotation is measurable.
 <PredictBeforeReveal
   question="Multiply an entire qubit state by e^{iγ} for some nonzero γ (a global phase). How many measurement probabilities, in any basis you could pick, change?"
   options={[
-    { label: "None — every probability stays exactly the same", value: "none" },
+    { label: "None. Every probability stays the same", value: "none" },
     { label: "Only in the computational basis", value: "comp-only" },
     { label: "Only in bases other than computational", value: "other-only" },
     { label: "All of them shift, by an amount depending on γ", value: "all" },
   ]}
   correctValue="none"
-  explanation="Zero, in any basis, for any γ. That isn't a lucky coincidence for one particular measurement, it's a theorem: the proof below shows P(e_i) = |⟨e_i|ψ⟩|² is left completely unchanged because |e^{iγ}| = 1 divides straight out of the modulus-squared. A relative phase, by contrast, does move probabilities, as the next section shows."
+  explanation="Zero, in any basis, for any γ. That is not a coincidence about one particular measurement; it is a theorem. The proof below shows P(e_i) = |⟨e_i|ψ⟩|² is untouched because |e^{iγ}| = 1 divides straight out of the modulus-squared. A relative phase, by contrast, does move probabilities, as the next section shows."
 />
 
 ### Global phase is unobservable
 
 **Claim:** for any orthonormal basis $\{|e_0\rangle,|e_1\rangle\}$ and any
-real $\gamma$, measuring $e^{i\gamma}|\psi\rangle$ gives the exact same
+real $\gamma$, measuring $e^{i\gamma}|\psi\rangle$ gives the same
 probabilities as measuring $|\psi\rangle$.
 
 **Proof.** By the <Term id="born-rule">measurement postulate</Term>,
@@ -90,11 +115,11 @@ P(e_i) = |\langle e_i|(e^{i\gamma}|\psi\rangle)|^2 = |e^{i\gamma}|^2|\langle e_i
 $$
 
 using $|e^{i\gamma}|=1$ for any real $\gamma$, since a phase factor never
-changes a modulus. The right-hand side is exactly the probability computed
-from $|\psi\rangle$ alone, with no $\gamma$ in it anywhere. Since this
-holds for *every* basis, not just the computational one, global phase is
-unobservable by any measurement whatsoever, not "hard to detect," but
-provably, permanently invisible.
+changes a modulus. The right-hand side is the probability computed from
+$|\psi\rangle$ alone, with no $\gamma$ in it anywhere. Since this holds for
+*every* basis, not just the computational one, global phase is unobservable
+by any measurement whatsoever. Not "hard to detect": provably, permanently
+invisible.
 
 The same fact shows up geometrically: the Bloch-vector formulas
 $x=2\operatorname{Re}(\alpha^*\beta)$, $y=2\operatorname{Im}(\alpha^*\beta)$,
@@ -107,22 +132,22 @@ been using has no "global phase" control: there is nothing for such a
 control to do.
 
 The Bloch sphere shows the *consequence* of that proof: nothing moves. The
-amplitude picture below shows the *mechanism*: drag γ and both arrows sweep
-around the plane together, in lockstep, while P(0), P(1), and the α*β
-cross-term underneath stay completely frozen. Drag δ instead and only β's
-arrow moves — that's the difference between "rotating the whole picture"
-and "rotating one part of it relative to the other" made visible amplitude
-by amplitude, not just point by point on the sphere.
+amplitude picture below shows the *mechanism*. Drag γ and both arrows sweep
+around the plane together, in lockstep, while P(0), P(1), and the $\alpha^*\beta$
+cross-term underneath stay frozen. Drag δ instead and only β's arrow moves.
+That is the difference between rotating the whole picture and rotating one
+part of it against the other, made visible amplitude by amplitude rather
+than point by point on the sphere.
 
-<InteractiveSection title="Two arrows, two kinds of rotation" description="Switch the explorer below to two-amplitude mode. Drag γ (global phase) and watch both α's and β's arrows sweep around the complex plane together — P(0), P(1), and α*β underneath never change. Then drag δ (relative phase) and watch only β's arrow move, while α*β rotates right along with it. That difference is the entire proof above, seen directly at the amplitude level instead of on the Bloch sphere.">
+<InteractiveSection title="Two arrows, two kinds of rotation" description="Switch the explorer below to two-amplitude mode. Drag γ (global phase) and watch α's and β's arrows sweep around the complex plane together, while P(0), P(1), and α*β underneath never change. Then drag δ (relative phase) and watch only β's arrow move, with α*β rotating along with it. That difference is the whole proof above, seen at the amplitude level instead of on the Bloch sphere.">
   <LazyComplexAmplitudeExplorer twoAmplitudeVariant="global-vs-relative" />
 </InteractiveSection>
 
 ### Relative phase is observable
 
 Multiply only $\beta$ this time: $\beta \to e^{i\delta}\beta$. In the
-computational basis, this changes nothing,
-$|e^{i\delta}\beta|^2=|\beta|^2$, which is exactly why relative phase was
+computational basis this changes nothing, since
+$|e^{i\delta}\beta|^2=|\beta|^2$, which is why relative phase stayed
 invisible for the first several lessons of this course, where every
 measurement was implicitly in the computational basis. But recall the
 X-basis result from the Measurement lesson:
@@ -137,12 +162,45 @@ $$
 P(+)_{\text{new}} = \frac{1+2\operatorname{Re}(e^{i\delta}\alpha^*\beta)}{2}
 $$
 
-This depends on $\delta$ (take $\alpha=\beta=\tfrac{1}{\sqrt2}$:
-$P(+)$ ranges from $1$ at $\delta=0$ down to $0$ at $\delta=\pi$, as
-$\operatorname{Re}(e^{i\delta})$ sweeps from $1$ to $-1$). Relative phase
-is measurable, just not in the computational basis. This is precisely
-the $\varphi$ coordinate on the Bloch sphere, and precisely what $S$, $T$,
-and $R_z$ manipulate.
+This depends on $\delta$. Take $\alpha=\beta=\tfrac{1}{\sqrt2}$: as
+$\operatorname{Re}(e^{i\delta})$ sweeps from $1$ to $-1$, $P(+)$ runs from
+$1$ at $\delta=0$ down to $0$ at $\delta=\pi$. Relative phase is measurable,
+just not in the computational basis. It is the $\varphi$ coordinate on the
+Bloch sphere, and it is what $S$, $T$, and $R_z$ manipulate.
+
+Plotting both bases against $\delta$ at once puts the two claims of this
+lesson side by side. Every point below is computed by the same
+`crossBasisProbability` routine the platform's amplitude tooling uses,
+evaluated on the state $\tfrac{1}{\sqrt2}\left(|0\rangle + e^{i\delta}|1\rangle\right)$:
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        {
+          label: "X basis: P(+)",
+          color: "accent",
+          points: phaseSweepPoints.map((p) => ({ x: p.delta, y: p.pPlus })),
+        },
+        {
+          label: "Z basis: P(0)",
+          color: "brand",
+          points: phaseSweepPoints.map((p) => ({ x: p.delta, y: p.pZero })),
+        },
+      ],
+    },
+  ]}
+  xAxisLabel="relative phase δ (radians)"
+  yAxisLabel="measurement probability"
+  ariaLabel="Two curves plotted against relative phase δ from 0 to 2π for the state (|0⟩ + e^{iδ}|1⟩)/√2. The X-basis probability P(+) starts at 1, falls to 0 at δ = π, and returns to 1 at δ = 2π. The Z-basis probability P(0) is a flat horizontal line at 0.5 across the entire range."
+/>
+
+The flat line is why relative phase can hide: measure in the computational
+basis and you learn nothing about $\delta$, no matter what value it takes.
+The curve is why it is nonetheless real. One change of basis and the same
+$\delta$ swings a probability across its entire range. A global phase would
+leave *both* curves flat.
 
 ### Resolving the two open threads
 
@@ -154,19 +212,21 @@ point.
 
 **$R_z(2\pi)=-I$:** multiplies both $\alpha$ and $\beta$ by $-1$ equally,
 a global phase ($\gamma=\pi$) applied to the whole state, not a relative
-one. Unobservable, exactly as the simulator showed.
+one. Unobservable, as the simulator showed.
 
 ## Physical Interpretation
 
 Global phase is a redundancy in the mathematical description: the same
 physical state can be written infinitely many ways, differing by
 $e^{i\gamma}$, and no experiment can prefer one writing over another.
-Relative phase is the opposite: it is exactly the information <Term id="phase-interference">interference</Term>
-depends on, and it's what every phase gate in this course was built to
-manipulate. Conflating the two, dismissing *any* phase as "just a
-global phase, ignore it," is probably the single most common conceptual
-error in quantum computing, and everything in this lesson exists to make
-sure you can always tell them apart with a calculation, not a guess.
+Relative phase is the opposite: it is the information <Term id="phase-interference">interference</Term>
+depends on, and it is what every phase gate in this course was built to
+manipulate. Conflating the two by dismissing *any* phase as "just a global
+phase, ignore it" is a common and expensive mistake; algorithms like
+Deutsch-Jozsa and Grover do all their real work in the phases that get
+dismissed. The point of this lesson is that you never have to guess which
+kind you are looking at. Check whether the factor multiplies every
+amplitude or only some of them.
 
 ## Interactive Experiment
 

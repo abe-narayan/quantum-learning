@@ -25,15 +25,15 @@ export const psi1sNormalizationFromFactors: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Each factor (radial and angular) is separately normalized to 1 — multiplying two numbers each ≈1 gives a result ≈1.",
+    incorrectFeedback: "The radial and angular factors are each separately normalized, and the full 3D norm is their product. A result far from that product points at one of the underlying checks, not at ψ = R·Y itself.",
   },
   hints: [
-    { text: "radialNormSquared(radial1s) ≈ 1, verified in a previous lesson." },
-    { text: "sphericalHarmonicNormSquared({l:0,m:0}) ≈ 1, verified in Angular Momentum & Spin." },
-    { text: "1 × 1 = 1." },
+    { text: "No new integral is needed here: both factors were normalized separately in earlier lessons. The question is what happens to normalization when two independently normalized factors are multiplied." },
+    { text: "The 3D integral factorizes into the radial integral times the angular integral, so the full norm is the product of the two verified norms." },
+    { text: "Multiply the two verified norms together. Each sits as close to its ideal value as numerical integration allows, and so does their product." },
   ],
   solution: {
-    steps: [{ description: "1 (radial norm) × 1 (angular norm) = 1 — the full 3D wavefunction is automatically normalized." }],
+    steps: [{ description: "1 (radial norm) × 1 (angular norm) = 1: the full 3D wavefunction is automatically normalized." }],
     finalAnswer: "≈1.0",
   },
   explanation: {

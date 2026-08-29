@@ -32,8 +32,14 @@
 const WIDTH = 480;
 const HEIGHT = 380;
 const PLOT = { x: 70, y: 30, w: 370, h: 290 };
-/** Where the Clifford/non-Clifford divide sits within the plot, as a fraction of its width. */
-const CLIFFORD_BAND_FRACTION = 0.24;
+/** Where the Clifford/non-Clifford divide sits within the plot, as a fraction of its width.
+ *  Widened from 0.24 to 0.30 when the band's label was raised from 9.5 to 12 units for
+ *  legibility: "Gottesman-Knill" is a single 15-character unbreakable word, ~99 units
+ *  wide at 12 units, and it overflowed a 0.24-fraction (89-unit) band into the hard
+ *  region. The x axis here is categorical — the comment on `xFor` already notes that
+ *  horizontal position within the non-Clifford side is layout, not a quantity — so the
+ *  divide's exact fraction carries no claim and is free to follow the type. */
+const CLIFFORD_BAND_FRACTION = 0.3;
 /** Where the low-entanglement band's top sits, as a fraction of the plot's height (from the top). */
 const BOUNDED_BAND_FRACTION = 0.3;
 
@@ -60,10 +66,14 @@ const LABEL_FILL: Record<NonNullable<SimulabilityPoint["color"]>, string> = {
   muted: "fill-muted-foreground",
 };
 
-/** Greedy word-wrap for the narrow Clifford band's SVG label. `MAX_CHARS` is
- *  tuned to the band width at the component's fixed 9.5px type size; a word
- *  longer than that is left on its own line rather than broken mid-word. */
-function wrapLabel(label: string, maxChars = 18): string[] {
+/** Greedy word-wrap for the two band labels, which SVG `<text>` will not wrap
+ *  for us. `maxChars` is a per-band character budget: at the 12-unit type the
+ *  bands now use, a character averages ~6.6 units, so the Clifford band's ~111
+ *  units takes ~13 characters and the wider bounded-entanglement band's ~259
+ *  units takes ~30. (Both budgets were previously computed against 9.5-unit
+ *  type, which resolved to roughly 5px on a 320px phone.) A word longer than
+ *  the budget is left on its own line rather than broken mid-word. */
+function wrapLabel(label: string, maxChars = 13): string[] {
   const lines: string[] = [];
   let current = "";
   for (const word of label.split(/\s+/).filter(Boolean)) {
@@ -124,7 +134,11 @@ export function ClassicalSimulabilityMap({
           height={boundedBandY - PLOT.y}
           className="fill-danger/10"
         />
-        <text x={PLOT.x + cliffordBandW + (PLOT.w - cliffordBandW) / 2} y={PLOT.y + 20} textAnchor="middle" className="fill-danger text-[11px] font-bold">
+        {/* 11 -> 13 units. This 480-unit viewBox renders `w-full` into roughly a 256px
+            column on a 320px phone, so 11 units resolved to about 5.9px on screen.
+            13 units keeps the 34-character label (~245 units) inside the 259-unit hard
+            region while reaching ~7px. */}
+        <text x={PLOT.x + cliffordBandW + (PLOT.w - cliffordBandW) / 2} y={PLOT.y + 20} textAnchor="middle" className="fill-danger text-[13px] font-bold">
           {hardLabel}
         </text>
 
@@ -132,9 +146,9 @@ export function ClassicalSimulabilityMap({
         <rect x={PLOT.x} y={PLOT.y} width={cliffordBandW} height={PLOT.h} className="fill-brand/10" />
         <text
           x={PLOT.x + cliffordBandW / 2}
-          y={PLOT.y + PLOT.h / 2 - 8}
+          y={PLOT.y + PLOT.h / 2 - 24}
           textAnchor="middle"
-          className="fill-brand text-[9.5px] font-semibold"
+          className="fill-brand text-[12px] font-semibold"
         >
           {/* Wrapped from the prop rather than hardcoded: SVG `<text>` has no
               automatic wrapping, and this band is narrow, so the label has to
@@ -143,42 +157,70 @@ export function ClassicalSimulabilityMap({
               while its two sibling label props worked — a prop that looks
               supported and isn't. */}
           {wrapLabel(cliffordBandLabel).map((line, index) => (
-            <tspan key={line} x={PLOT.x + cliffordBandW / 2} dy={index === 0 ? "0" : "12"}>
+            <tspan key={line} x={PLOT.x + cliffordBandW / 2} dy={index === 0 ? "0" : "14"}>
               {line}
             </tspan>
           ))}
         </text>
 
-        {/* Bounded-entanglement band: bottom, right of the Clifford band. */}
+        {/* Bounded-entanglement band: bottom, right of the Clifford band. Its label is
+            now wrapped too: at 12 units the 45-character string is ~297 units wide and
+            would have run out of the 259-unit band, and silently clipping the words
+            "(any gate set)" would have thrown away the half of the sentence that says
+            the criterion is independent of the gate set — the whole point of the figure. */}
         <rect x={PLOT.x + cliffordBandW} y={boundedBandY} width={PLOT.w - cliffordBandW} height={boundedBandH} className="fill-accent/10" />
         <text
           x={PLOT.x + cliffordBandW + (PLOT.w - cliffordBandW) / 2}
-          y={PLOT.y + PLOT.h - 10}
+          y={PLOT.y + PLOT.h - 24}
           textAnchor="middle"
-          className="fill-accent text-[9.5px] font-semibold"
+          className="fill-accent text-[12px] font-semibold"
         >
-          {boundedBandLabel}
+          {wrapLabel(boundedBandLabel, 30).map((line, index) => (
+            <tspan key={line} x={PLOT.x + cliffordBandW + (PLOT.w - cliffordBandW) / 2} dy={index === 0 ? "0" : "14"}>
+              {line}
+            </tspan>
+          ))}
         </text>
 
-        {/* Axes — stroke-border at 1px, matching every other cartesian plot in this directory (DiscretizationLimit, ExpectationTrace, LossVsDecoherence, ParametricCurve, PotentialDiagram, …). */}
-        <line x1={PLOT.x} y1={PLOT.y} x2={PLOT.x} y2={PLOT.y + PLOT.h} className="stroke-border" strokeWidth={1} />
-        <line x1={PLOT.x} y1={PLOT.y + PLOT.h} x2={PLOT.x + PLOT.w} y2={PLOT.y + PLOT.h} className="stroke-border" strokeWidth={1} />
-        <text x={PLOT.x + PLOT.w / 2} y={HEIGHT - 6} textAnchor="middle" className="fill-foreground text-[11px] font-semibold">
+        {/* The two band boundaries. Which side of the vertical divide a dot sits on IS
+            the Gottesman-Knill verdict, and whether a dot is above or below the
+            horizontal one IS the bond-dimension verdict — so both edges are the
+            "outline of a plotted region" the `--axis` token exists for. Previously the
+            regions were delimited only by a 10%-opacity fill wash, which on
+            `--surface-muted` is well under 3:1 against its neighbour: a reader could
+            not reliably see where "easy" stopped and "hard" started, which is the one
+            thing this figure is for. */}
+        <line x1={PLOT.x + cliffordBandW} y1={PLOT.y} x2={PLOT.x + cliffordBandW} y2={PLOT.y + PLOT.h} className="stroke-axis" strokeWidth={1} strokeDasharray="4 3" />
+        <line x1={PLOT.x + cliffordBandW} y1={boundedBandY} x2={PLOT.x + PLOT.w} y2={boundedBandY} className="stroke-axis" strokeWidth={1} strokeDasharray="4 3" />
+
+        {/* Axes. Were `stroke-border`, the panel-edge token — 1.41:1 on `--surface-muted`,
+            under WCAG 2.1 SC 1.4.11's 3:1 for meaningful graphical objects. The old
+            comment here justified that by consistency with the other cartesian plots in
+            this directory; those have all moved to `stroke-axis` for the same reason. */}
+        <line x1={PLOT.x} y1={PLOT.y} x2={PLOT.x} y2={PLOT.y + PLOT.h} className="stroke-axis" strokeWidth={1} />
+        <line x1={PLOT.x} y1={PLOT.y + PLOT.h} x2={PLOT.x + PLOT.w} y2={PLOT.y + PLOT.h} className="stroke-axis" strokeWidth={1} />
+        {/* Axis names 11 -> 13 units (~7px at a 320px phone, up from ~5.9px). The
+            horizontal name is 35 characters, ~252 units at 13, which still centres
+            inside the 480-unit box; the rotated one is ~144 units against 290 of plot
+            height, and its ascenders reach x = 18 - 13 = 5, inside the viewBox. */}
+        <text x={PLOT.x + PLOT.w / 2} y={HEIGHT - 6} textAnchor="middle" className="fill-foreground text-[13px] font-semibold">
           Gate set: Clifford-only → arbitrary
         </text>
         <text
           x={18}
           y={PLOT.y + PLOT.h / 2}
           textAnchor="middle"
-          className="fill-foreground text-[11px] font-semibold"
+          className="fill-foreground text-[13px] font-semibold"
           transform={`rotate(-90 18 ${PLOT.y + PLOT.h / 2})`}
         >
           Entanglement (ebits)
         </text>
-        <text x={PLOT.x + 4} y={PLOT.y + 12} className="fill-muted-foreground text-[10px]">
+        {/* The two y-axis endpoints: 10 -> 13 units. These are the values a reader reads
+            a dot's height against, so they are the figure's only quantitative scale. */}
+        <text x={PLOT.x + 4} y={PLOT.y + 14} className="fill-muted-foreground text-[13px]">
           {maxEbits.toFixed(1)} (max)
         </text>
-        <text x={PLOT.x + 4} y={PLOT.y + PLOT.h - 6} className="fill-muted-foreground text-[10px]">
+        <text x={PLOT.x + 4} y={PLOT.y + PLOT.h - 6} className="fill-muted-foreground text-[13px]">
           0
         </text>
 
@@ -187,24 +229,33 @@ export function ClassicalSimulabilityMap({
           const cx = xFor(point);
           const cy = yFor(point.entanglementEbits);
           const color = point.color ?? (point.isClifford ? "brand" : "accent");
-          const labelAbove = cy > PLOT.y + 40;
+          // Flip the label stack below the dot when the dot is too near the top of the
+          // plot for a two-line stack to fit above it. The clearance needed grew with
+          // the type (a 13-unit name plus an 11-unit note plus leading is ~40 units),
+          // so the threshold moved from 40 to 46.
+          const labelAbove = cy > PLOT.y + 46;
           return (
             <g key={i}>
               <circle cx={cx} cy={cy} r={7} className={DOT_FILL[color]} stroke="var(--surface)" strokeWidth={1.5} />
+              {/* Circuit name 10 -> 13 units, note 9 -> 11. At the old sizes these
+                  resolved to ~5.3px and ~4.8px on a 320px phone — the labels that say
+                  *which circuit each dot is* were the least readable marks in the
+                  figure. The offsets also grew: the note used to sit at `cy - 2`, i.e.
+                  directly on top of the r=7 dot it annotates, so the two overlapped. */}
               <text
                 x={cx}
-                y={labelAbove ? cy - 14 : cy + 20}
+                y={labelAbove ? cy - 26 : cy + 24}
                 textAnchor="middle"
-                className={`text-[10px] font-semibold ${LABEL_FILL[color]}`}
+                className={`text-[13px] font-semibold ${LABEL_FILL[color]}`}
               >
                 {point.label}
               </text>
               {point.note && (
                 <text
                   x={cx}
-                  y={labelAbove ? cy - 2 : cy + 32}
+                  y={labelAbove ? cy - 13 : cy + 38}
                   textAnchor="middle"
-                  className={`text-[9px] ${LABEL_FILL[color]}`}
+                  className={`text-[11px] ${LABEL_FILL[color]}`}
                 >
                   {point.note}
                 </text>

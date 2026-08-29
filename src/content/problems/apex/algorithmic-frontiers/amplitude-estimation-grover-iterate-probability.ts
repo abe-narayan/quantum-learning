@@ -31,6 +31,18 @@ export const amplitudeEstimationGroverIterateProbability: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "Compute (2m+1)θ = 5·(π/12) = 75°, then square its sine: sin²(75°).",
+    nearMisses: [
+      {
+        value: Math.sin(theta) ** 2,
+        feedback:
+          "That is sin²θ, the starting amplitude a before any iterate runs. The (2m+1) factor is what the two iterates buy you: the rotation angle is 5θ, not θ.",
+      },
+      {
+        value: Math.sin((2 * m + 1) * theta),
+        tolerance: 0.005,
+        feedback: "That is sin(75°) itself. The closed form returns a probability, so the sine still has to be squared.",
+      },
+    ],
   },
   hints: [
     { text: "θ=π/12=15°, so (2m+1)θ at m=2 is 5θ=75°." },

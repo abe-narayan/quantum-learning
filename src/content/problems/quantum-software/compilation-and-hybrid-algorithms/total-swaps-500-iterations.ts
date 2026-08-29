@@ -26,10 +26,14 @@ export const totalSwaps500Iterations: NumericProblem = {
     value,
     tolerance: 5,
     incorrectFeedback: "Multiply 500 iterations by 4 SWAPs per iteration.",
+    nearMisses: [
+      { value: 4, tolerance: 0.5, feedback: "4 is the per-iteration overhead. Every one of the 500 iterations pays it again." },
+      { value: 504, tolerance: 0.5, feedback: "504 adds the two figures. The overhead recurs each iteration, so the counts multiply." },
+    ],
   },
   hints: [
-    { text: "500 × 4." },
-    { text: "= 2000." },
+    { text: "The overhead compounds: every one of the 500 iterations pays the same 4-SWAP cost." },
+    { text: "Multiply the iteration count by the per-iteration overhead." },
   ],
   solution: {
     steps: [{ description: "500 × 4 = 2000 total SWAP gates." }],

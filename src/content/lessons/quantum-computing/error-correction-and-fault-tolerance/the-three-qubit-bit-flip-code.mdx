@@ -15,7 +15,7 @@ export const lessonMeta = {
   module: "the-three-qubit-bit-flip-code",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 30,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/why-quantum-errors-are-different"],
   objectives: [
     "Derive the encoding circuit α|0⟩+β|1⟩ → α|000⟩+β|111⟩ from two CNOTs",
@@ -25,31 +25,47 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized",
-      note: "Measuring the syndrome ancillas here leaves the encoded α,β completely undisturbed precisely because it is a degenerate projective measurement in that lesson's generalized sense, not a measurement of the logical qubit itself.",
+      note: "Measuring the syndrome ancillas here leaves the encoded α,β undisturbed because it is a degenerate projective measurement in that lesson's generalized sense, not a measurement of the logical qubit itself.",
     },
   ],
 };
 
 <LessonHook eyebrow="The smallest code that catches it">
-A stray interaction flips a qubit's |0⟩ to |1⟩ or back, and unless something catches it, everything computed downstream is simply wrong — using nothing beyond CNOT and partial measurement, this lesson builds a code that catches it.
+A stray interaction flips a qubit's |0⟩ to |1⟩, and everything computed downstream is wrong. This lesson builds the smallest code that catches it, using nothing beyond CNOT and partial measurement.
 </LessonHook>
 
 ## Motivation
 
-Bit flips happen. This lesson builds the smallest code that
-catches it: protection against a single $X$ (bit-flip) error on any one
-of three <Term id="physical-qubit">physical qubits</Term> — CNOT and partial
-measurement, both already fully built and tested on this platform, are
-all it needs.
+Bit flips happen. This lesson builds the smallest code that catches one: a
+single $X$ error on any of three <Term id="physical-qubit">physical qubits</Term>, detected and reversed.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/4_Qubit_Chip%2C_10.1103.PhysRevX.5.021027_%28A._Wallraff%2C_2015%29.png/1280px-4_Qubit_Chip%2C_10.1103.PhysRevX.5.021027_%28A._Wallraff%2C_2015%29.png"
-  alt="A real 4-qubit superconducting chip with coplanar waveguide resonators and control lines, from a 2015 ETH Zurich experiment"
-  caption="A real 4-qubit superconducting chip: physical wiring like this delivers exactly the CNOT gates and partial measurements this lesson's bit-flip code is built from."
-  credit="Y. Salathé et al., Physical Review X 5, 021027 (2015), via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:4_Qubit_Chip,_10.1103.PhysRevX.5.021027_(A._Wallraff,_2015).png"
-  license="CC BY-SA 3.0"
+Notice what it will need, and what it will not. CNOT and partial
+measurement, both built and tested in earlier courses. No new gate, no new
+postulate, nothing this pillar has not already derived. The whole content
+of the code is *which* qubits get connected to which, and that is what the
+circuit below encodes.
+
+Here is the entire scheme in one picture. The first two CNOTs spread one
+logical qubit across three physical ones; the next four write two parity
+checks into a pair of ancillas; then only the ancillas are measured.
+
+<StaticCircuitDiagram
+  numQubits={5}
+  instructions={[
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "CNOT", targets: [0, 2] },
+    { gate: "CNOT", targets: [0, 3] },
+    { gate: "CNOT", targets: [1, 3] },
+    { gate: "CNOT", targets: [1, 4] },
+    { gate: "CNOT", targets: [2, 4] },
+    { gate: "MEASURE", targets: [3] },
+    { gate: "MEASURE", targets: [4] },
+  ]}
+  ariaLabel="Five-qubit circuit for the three-qubit bit-flip code. Qubits 0 to 2 are data, qubits 3 and 4 are ancillas. Two CNOTs from qubit 0 onto qubits 1 and 2 encode the logical state. Then CNOTs from qubits 0 and 1 onto ancilla 3, and from qubits 1 and 2 onto ancilla 4, write the two parity checks. Only the two ancillas are measured; the three data qubits are never measured."
 />
+
+The data wires reach the end unmeasured. That is the point of the whole
+construction, and everything below explains why it works.
 
 ## Mathematical Development
 
@@ -74,11 +90,10 @@ Append two ancilla qubits (indices 3,4), and extract two parities via
 CNOTs into them: $\text{CNOT}(0,3),\text{CNOT}(1,3)$ puts qubit 0
 $\oplus$ qubit 1's value onto ancilla 3; $\text{CNOT}(1,4),\text{CNOT}(2,4)$
 puts qubit 1 $\oplus$ qubit 2's value onto ancilla 4. For the *unerrored*
-codeword, both parities are always $0$ (all three data bits agree, in
-each term of the superposition). Measuring the two ancillas — an actual
-partial measurement, via `measureQubit`, exactly as built in Quantum
-Gates & Circuits — gives a **syndrome** $(s_1,s_2)$ without ever directly
-measuring the three data qubits.
+codeword both parities are $0$, since all three data bits agree in each
+term of the superposition. Measuring the two ancillas (a real partial
+measurement, via `measureQubit`, as built in Quantum Gates & Circuits)
+gives a **syndrome** $(s_1,s_2)$ without measuring the three data qubits.
 
 ### The decode table
 
@@ -101,12 +116,12 @@ cases, on an arbitrary $\alpha,\beta$, not just checked once.
   question="Injecting an X error on qubit 1 and extracting the syndrome requires measuring the two ancilla qubits. Does that measurement collapse or disturb the encoded superposition's α and β amplitudes at all?"
   options={[
     { label: "Yes, it partially collapses α and β", value: "collapses" },
-    { label: "No, α and β survive completely untouched", value: "untouched" },
+    { label: "No, α and β survive untouched", value: "untouched" },
     { label: "It depends on which qubit the error hit", value: "depends" },
-    { label: "The syndrome can't be measured without measuring the data qubits directly", value: "cant-measure" },
+    { label: "The syndrome can't be measured without measuring the data directly", value: "cant-measure" },
   ]}
   correctValue="untouched"
-  explanation="Both branches of α|010⟩+β|101⟩ (the errored state) give the identical syndrome (1,1): the ancilla measurements depend only on whether pairs of data qubits agree, never on α or β individually. So the encoded superposition survives measurement completely untouched, exactly what the Explorer below shows: inject the error, watch (1,1) light up, then check the recovered amplitude table matches the original α, β exactly."
+  explanation="Both branches of the errored state α|010⟩+β|101⟩ give the identical syndrome (1,1), because the ancilla measurements depend on whether pairs of data qubits agree and never on α or β individually. A measurement that returns the same answer on every branch cannot collapse anything, so the encoded superposition survives untouched. The Explorer below shows it: inject the error, watch (1,1) light up, then check the recovered amplitudes against the original α and β."
 />
 
 <InteractiveSection title="Syndrome (1,1) points straight at qubit 1" description="Inject an X error on qubit 1. Watch both syndrome bits light up as (1,1). Confirm the decode table points at qubit 1, then check the recovered state's amplitude table matches the original exactly.">
@@ -115,20 +130,28 @@ cases, on an arbitrary $\alpha,\beta$, not just checked once.
 
 ### Why this doesn't collapse the logical information
 
-The syndrome only depends on whether data qubits *agree*, never on their
-individual values. Both terms $|000\rangle$ and $|111\rangle$ give
-syndrome $(0,0)$ identically, so measuring it reveals nothing about
-whether the state was closer to $|000\rangle$ or $|111\rangle$ (i.e.
-nothing about $\alpha$ vs. $\beta$). This is exactly the "measure only
-the syndrome, never the data" principle the previous lesson described in
-the abstract, now built and checked concretely.
+The syndrome depends only on whether data qubits *agree*, never on their
+individual values. Both $|000\rangle$ and $|111\rangle$ give syndrome
+$(0,0)$, so measuring it reveals nothing about whether the state leans
+toward $|000\rangle$ or $|111\rangle$, which is to say nothing about
+$\alpha$ versus $\beta$.
+
+That is the whole trick, and it is worth stating as a general principle:
+a measurement extracts only what its outcomes distinguish. Design the
+measurement so the outcomes are identical across the branches you want to
+protect, and the protected structure survives.
 
 ## Physical Interpretation
 
-Three physical qubits, entangled together, do the job no single qubit
-could: store one logical qubit's information so that any single bit-flip
-error, on any one of the three, is both detectable and exactly reversible,
-without ever looking directly at the protected superposition itself.
+Three physical qubits, entangled, do what no single qubit can: hold one
+logical qubit's information so that a bit flip on any one of the three is
+both detectable and reversible, with nobody ever looking at the protected
+superposition.
+
+The cost is visible in the same sentence. Three physical qubits for one
+logical one, plus two ancillas, to survive one error of one type. That
+ratio is the reason fault tolerance is expensive, and it gets worse before
+it gets better.
 
 ## Worked Example
 
@@ -147,19 +170,19 @@ confirmed by direct engine computation to floating-point precision.
 ## Common Mistakes
 
 <Callout type="warning">
-**Measuring the data qubits directly to check for errors.** This would
-collapse $\alpha|000\rangle+\beta|111\rangle$ to either $|000\rangle$ or
-$|111\rangle$ outright, destroying the encoded superposition, exactly
-what syndrome extraction is built to avoid.
+**Measuring the data qubits directly to check for errors.** That collapses
+$\alpha|000\rangle+\beta|111\rangle$ onto $|000\rangle$ or $|111\rangle$
+and destroys the encoded superposition, which is the failure mode syndrome
+extraction exists to avoid.
 </Callout>
 
 <Callout type="warning">
 **Expecting this code to correct a phase-flip ($Z$) error.** It doesn't.
 A $Z$ error on any data qubit leaves every parity unchanged (the
 relative sign between $|000\rangle$ and $|111\rangle$ isn't something
-$Z_0Z_1$ or $Z_1Z_2$-style parity checks detect), so this specific code
-is silent to it entirely. The next lesson builds the code that catches
-exactly this case.
+$Z_0Z_1$ or $Z_1Z_2$-style parity checks detect), so this code is silent
+to it. The next lesson builds the code that catches this case, and the one
+after that combines the two.
 </Callout>
 
 ## Practice Questions

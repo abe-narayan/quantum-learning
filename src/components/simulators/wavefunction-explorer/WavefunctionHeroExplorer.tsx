@@ -96,7 +96,7 @@ function WavefunctionHeroSimulation({
 
   return (
     <>
-      <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface-muted/40 p-3">
+      <div className="mt-4 overflow-hidden rounded-panel border border-border bg-surface-muted/40 p-3">
         <WavefunctionCanvas grid={setup.grid} psi={displayedPsi} potential={setup.potential} mode="density" />
       </div>
 
@@ -138,7 +138,7 @@ export function WavefunctionHeroExplorer() {
   const setup = useMemo(() => preset.build(defaultParamValues(preset)), [preset]);
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-6 sm:p-8">
+    <div className="rounded-panel border border-border bg-surface p-6 sm:p-8">
       <p className="text-sm font-semibold uppercase tracking-wide text-pillar">Wavefunction explorer</p>
       <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
         Watch the Schrödinger equation solve itself
@@ -151,10 +151,19 @@ export function WavefunctionHeroExplorer() {
             type="button"
             onClick={() => setPresetId(p.id)}
             aria-pressed={p.id === presetId}
+            // Two fixes over the previous class strings, which differed only
+            // in colour:
+            //   - `min-h-11`: at `py-1.5` around 12px text these stood about
+            //     28px tall, the smallest tap targets on the homepage.
+            //   - a focus-visible ring: there was none at all, on either
+            //     state, so a keyboard reader tabbing across the three presets
+            //     had nothing but the browser default to go on.
+            // The border is now on both states so selecting one no longer
+            // shifts the row by 2px, matching `visualizations/PresetToggle`.
             className={
               p.id === presetId
-                ? "rounded-full bg-pillar px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors"
-                : "rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted"
+                ? "inline-flex min-h-11 items-center rounded-full border border-pillar bg-pillar px-4 py-1.5 text-xs font-medium text-brand-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                : "inline-flex min-h-11 items-center rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             }
           >
             {HERO_PRESET_LABELS[p.id]}

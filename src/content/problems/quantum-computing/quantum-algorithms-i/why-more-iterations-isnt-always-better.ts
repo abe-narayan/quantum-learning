@@ -20,16 +20,16 @@ export const whyMoreIterationsIsntAlwaysBetter: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["periodic", "oscillat", "sin", "past \\u03c0/2", "past pi/2"],
-      ["decreases", "goes back down", "overshoot"],
+      ["periodic", "oscillat", "sine", "sin(", "sin²", "sin^2", "sin squared", "past π/2", "past pi/2", "beyond π/2", "beyond pi/2", "past 90"],
+      ["decreas", "goes back down", "go back down", "comes back down", "back toward", "overshoot", "gets worse", "drops", "falls", "shrinks", "rotates past", "rotate past", "moves away", "away from the marked"],
     ],
-    incorrectFeedback: "Think about what sin²(x) does as x continues increasing past π/2 — does it keep growing?",
-    partialFeedback: "Good — now be explicit that this is a periodic oscillation, not a plateau or continued increase.",
+    incorrectFeedback: "The closed form is a familiar trig function of the iteration count. Ask what that function does when its argument keeps growing, instead of assuming it climbs forever.",
+    partialFeedback: "Good. Now be explicit about the shape of the curve: does it flatten out at the top, or come down the other side?",
   },
   hints: [
-    { text: "sin²(x) increases from 0 toward 1 as x goes from 0 to π/2." },
-    { text: "Past x=π/2, sin²(x) starts decreasing again, back toward 0 at x=π." },
-    { text: "(2k+1)θ keeps growing linearly with k, so it eventually overshoots π/2." },
+    { text: "Sketch the success probability as a function of the total rotation angle. What shape does the curve have?" },
+    { text: "Where on that curve does the optimal iteration count land you? What lies just past that point?" },
+    { text: "Each extra iteration adds the same fixed angle. What happens to the success probability once the total angle passes the peak?" },
   ],
   solution: {
     steps: [
@@ -37,7 +37,7 @@ export const whyMoreIterationsIsntAlwaysBetter: ConceptualProblem = {
       { description: "Continuing to increase k pushes the angle past π/2, where sin² decreases back toward 0." },
       { description: "So extra iterations past the optimum move the state past the 'closest to marked' point and back away from it." },
     ],
-    finalAnswer: "Because sin² is periodic, not monotonically increasing — past the optimal angle, more iterations rotate the state away from the marked item, not toward it.",
+    finalAnswer: "Because sin² is periodic, not monotonically increasing. Past the optimal angle, more iterations rotate the state away from the marked item, not toward it.",
   },
   explanation: {
     correctIdea: "Each Grover iteration is a fixed-angle rotation, and rotations overshoot a target just like in ordinary geometry.",

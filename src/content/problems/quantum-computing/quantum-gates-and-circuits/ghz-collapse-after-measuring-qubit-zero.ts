@@ -35,9 +35,12 @@ export const ghzCollapseAfterMeasuringQubitZero: MultipleChoiceProblem = {
       "You measure qubit 0 of the GHZ state $\\frac{1}{\\sqrt2}(|000\\rangle+|111\\rangle)$ and get outcome 1. What does the full 3-qubit state become?",
     options: [
       { id: "a", text: `$${ketLatex(measured.collapsed)}$` },
-      { id: "b", text: "$|100\\rangle$" },
-      { id: "c", text: "An equal superposition of $|100\\rangle$, $|101\\rangle$, $|110\\rangle$, and $|111\\rangle$." },
-      { id: "d", text: "$\\frac{1}{\\sqrt2}(|000\\rangle+|111\\rangle)$, unchanged." },
+      { id: "b", text: "$(1.00)|100\\rangle$" },
+      {
+        id: "c",
+        text: "$(0.50)|100\\rangle + (0.50)|101\\rangle + (0.50)|110\\rangle + (0.50)|111\\rangle$",
+      },
+      { id: "d", text: "$(0.71)|000\\rangle + (0.71)|111\\rangle$, unchanged." },
     ],
   },
   answer: {
@@ -66,7 +69,9 @@ export const ghzCollapseAfterMeasuringQubitZero: MultipleChoiceProblem = {
     correctIdea: "Because the GHZ state's only two possibilities have all three qubits agreeing, measuring even one qubit instantly determines the definite state of all three.",
     whyCorrect: "This is exactly the three-party correlation the lesson describes: measuring any one qubit of a GHZ state tells you, with certainty, what the other two are.",
     whyWrong: [
-      "Options that leave qubits 1 and 2 undetermined ignore that the GHZ state has zero amplitude on any branch where the qubits disagree — there's nothing left to be uncertain about once qubit 0's outcome is known.",
+      { optionId: "b", text: "Flips qubit 0 and leaves the other two behind. The GHZ state has no branch where the three qubits disagree, so this term had zero amplitude to begin with." },
+      { optionId: "c", text: "Leaves qubits 1 and 2 undetermined. Three of those four terms were never in the state at all." },
+      { optionId: "d", text: "Treats measurement as leaving the state alone. It projects onto the branch consistent with the outcome." },
     ],
   },
 };

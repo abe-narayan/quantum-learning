@@ -339,11 +339,23 @@ function SimulatorMount({ id, children }: { id: string; children: ReactNode }) {
         {sim.lesson ? (
           <>
             {" "}
+            {/* No `whitespace-nowrap`. It was there to stop the trailing
+                arrow orphaning onto a line of its own, but it applied to the
+                whole lesson title, which is content of unbounded length —
+                "Grover's Algorithm: Amplitude Amplification →" is already
+                ~255px at this size, inside a 288px column at 320px, and the
+                next title added could be longer. The root is clipped
+                (`overflow-x: clip`, globals.css), so the failure is not a
+                scrollbar the reader can undo, it is the end of the link
+                silently disappearing off the right edge. A non-breaking space
+                binds the arrow to the last word only, which is all the
+                original rule was actually protecting. */}
             <Link
               href={sim.lesson.href}
-              className="whitespace-nowrap text-pillar-text underline decoration-dotted underline-offset-2 hover:decoration-solid"
+              className="text-pillar-text underline decoration-dotted underline-offset-2 hover:decoration-solid"
             >
-              {sim.lesson.title} →
+              {sim.lesson.title}
+              {" →"}
             </Link>
           </>
         ) : null}
@@ -442,7 +454,7 @@ function SimulatorNav() {
                       // description and level stay visible; they are context,
                       // not the name.
                       aria-label={sim.label}
-                      className="flex min-h-11 flex-col gap-1 rounded-xl border border-border bg-surface p-3 transition-colors hover:border-pillar-edge hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="flex min-h-11 flex-col gap-1 rounded-panel border border-border bg-surface p-3 transition-colors hover:border-pillar-edge hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-pillar" />

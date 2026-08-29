@@ -5,7 +5,7 @@ import { Eyebrow, Lede, Readouts, SectionTitle } from "@/components/ui/Typograph
 import { Panel, Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import { NAV_ITEMS } from "@/lib/nav";
+import { NAV_ITEMS, START_LEARNING_HREF } from "@/lib/nav";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -25,7 +25,16 @@ const QUICK_LINKS = ["/learn", "/problems", "/simulators", "/glossary"]
 
 export default function NotFound() {
   return (
-    <Section width="reading" className="pt-4 sm:pt-8">
+    // `tight`, not `className="pt-4 sm:pt-8"`. That class did nothing at all:
+    // `Section` sets its vertical padding through an inline `style`, which
+    // always beats a class on the same element, so this page has been opening
+    // with the full `--rhythm-section` — 72px at 320px wide, where the author
+    // asked for 16px, and 136px on a wide desktop. On a 568px-tall phone that
+    // is an eighth of the viewport spent on air above a 404, the one page
+    // where the reader most needs the way out on screen without scrolling.
+    // `tight` is the prop that actually reduces it (to `--rhythm-block`).
+    // The same dead override was on /learn's hero until it was found there.
+    <Section width="reading" tight>
       <Reveal>
         <Eyebrow>404 · Not found</Eyebrow>
         <SectionTitle level={1} size="xl" className="mt-4">
@@ -50,10 +59,15 @@ export default function NotFound() {
         </Instrument>
       </Reveal>
 
+      {/* "Start learning" means the on-ramp lesson everywhere else on the
+          site (Navbar, homepage hero, About) — it pointed at /learn here, so
+          a visitor who had just hit a dead end and took the offered way out
+          landed on another index to choose from rather than in a lesson.
+          /learn is still in the quick links below, under its own name. */}
       <Reveal delay={120} className="mt-8 flex flex-wrap gap-3">
-        <Button href="/">Back to home</Button>
-        <Button href="/learn" variant="secondary">
-          Start learning
+        <Button href={START_LEARNING_HREF}>Start learning</Button>
+        <Button href="/" variant="secondary">
+          Back to home
         </Button>
       </Reveal>
 

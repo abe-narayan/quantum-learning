@@ -148,11 +148,47 @@ export function Reveal({
       element.setAttribute("data-revealed", "true");
     }, revealAfterMs);
 
-    const unobserve = observe(element, (isIntersecting) => {
+    // Two hazards live in these next few lines, and both were real.
+    //
+    // 1. **Temporal dead zone.** `unobserve` used to be a `const` initialised
+    //    by `observe(...)` and *called from inside the callback passed to that
+    //    same call*. On the normal path that is safe, because the
+    //    IntersectionObserver callback is asynchronous and the binding is
+    //    long since assigned. But `observe` has a documented synchronous
+    //    path — when `IntersectionObserver` is undefined it calls
+    //    `handler(true)` immediately so content reveals rather than staying
+    //    invisible — and on that path `if (!repeat) unobserve()` ran while
+    //    the binding was still uninitialised and threw a ReferenceError out
+    //    of the effect. The one branch written to keep content visible in an
+    //    old browser or a jsdom test was the one branch that crashed.
+    //
+    // 2. **Double release.** The callback released the subscription on first
+    //    intersection (`if (!repeat) unobserve()`) and the cleanup released
+    //    it again on unmount, so `observedCount` in the shared-observer
+    //    bookkeeping above went one negative per revealed element. It is
+    //    only ever compared against `=== 0`, so once it went negative the
+    //    shared IntersectionObserver was never disconnected and never reset —
+    //    on a long lesson with 60 revealed elements, every one of them left
+    //    the page's observer alive across client navigations.
+    //
+    // A `release` flag fixes both: the binding is mutable so it can be read
+    // before assignment, and whoever gets there first is the only one who
+    // releases.
+    let unobserve: (() => void) | undefined;
+    let released = false;
+
+    function release() {
+      if (released) return;
+      released = true;
+      unobserve?.();
+      unobserve = undefined;
+    }
+
+    unobserve = observe(element, (isIntersecting) => {
       if (isIntersecting) {
         element.setAttribute("data-revealed", "true");
         window.clearTimeout(timer);
-        if (!repeat) unobserve();
+        if (!repeat) release();
       } else if (repeat) {
         element.setAttribute("data-revealed", "false");
       }
@@ -160,7 +196,7 @@ export function Reveal({
 
     return () => {
       window.clearTimeout(timer);
-      unobserve();
+      release();
     };
   }, [repeat, revealAfterMs]);
 

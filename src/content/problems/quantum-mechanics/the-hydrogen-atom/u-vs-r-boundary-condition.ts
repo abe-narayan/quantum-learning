@@ -33,9 +33,9 @@ export const uVsRBoundaryCondition: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Compute radial1s(0) directly, and separately check that u(r)=r·radial1s(r) does go to 0 as r→0.",
   },
   hints: [
-    { text: "radial1s(r)=2e^{-r}, so radial1s(0)=2e^0=2." },
-    { text: "u(r)=r·R(r), so u(0)=0·R(0)=0 regardless of what finite value R(0) takes." },
-    { text: "u(0)=0 is automatically satisfied whenever R(0) is finite — it does not force R(0)=0." },
+    { text: "Evaluate radial1s at r=0 before reasoning about the boundary condition." },
+    { text: "Now substitute that value into u(r) = r·R(r) at r=0 and see whether the condition is in tension with it." },
+    { text: "A product is zero as soon as one factor is. Ask which factor is doing the work here." },
   ],
   solution: {
     steps: [
@@ -43,11 +43,15 @@ export const uVsRBoundaryCondition: MultipleChoiceProblem = {
       { description: "u(r) = r·radial1s(r), so u(0) = 0 × 2 = 0 — the boundary condition holds automatically." },
       { description: "This confirms u(0)=0 constrains u, not R — R(0) can be (and for 1s, is) nonzero." },
     ],
-    finalAnswer: "(a) R(0)=2, finite and nonzero, with u(0)=0·2=0 still satisfied",
+    finalAnswer: "R(0) = 2, finite and nonzero, and u(0) = 0·2 = 0 holds anyway.",
   },
   explanation: {
-    correctIdea: "This is exactly the Common Mistakes point from the lesson, checked against the actual verified radial1s function rather than left abstract.",
-    whyCorrect: "Direct evaluation of the real engine function radial1s(0)=2 confirms R(0)≠0 while u(0)=0 still holds.",
-    whyWrong: ["Concluding R(0) must be 0 conflates the constraint on u with a (false) constraint on R directly."],
+    correctIdea: "The boundary condition constrains u, and the factor of r in u = rR satisfies it on its own. R is free to be finite and nonzero at the origin.",
+    whyCorrect: "Evaluating radial1s(0) = 2 gives a nonzero R(0) while u(0) = 0 still holds.",
+    whyWrong: [
+      { optionId: "b", text: "Transfers the constraint from u to R. The factor of r already forces u to vanish, so R is unconstrained by it." },
+      { optionId: "c", text: "Reads R = u/r as an indeterminate form. Near the origin u behaves like r·R(0), so the ratio tends to R(0), a finite number." },
+      { optionId: "d", text: "Concludes the wavefunction is wrong from a tension that is not there. R(0) ≠ 0 and u(0) = 0 sit together without difficulty." },
+    ],
   },
 };

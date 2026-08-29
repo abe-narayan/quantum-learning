@@ -14,7 +14,7 @@ export const lessonMeta = {
   module: "the-three-qubit-phase-flip-code",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 25,
+  estimatedMinutes: 20,
   prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code"],
   objectives: [
     "Derive Z=HXH and use it to explain why conjugating the bit-flip code by H produces a phase-flip code",
@@ -24,24 +24,19 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-A single algebraic identity does the entire job: surround every step of the bit-flip code with Hadamards, and get a phase-flip code for free — no new design needed.
+One algebraic identity does the whole job. Surround every step of the bit-flip code with Hadamards and a phase-flip code falls out, with no new design work at all.
 </LessonHook>
 
 ## Motivation
 
-Rather than design a second code from scratch, this lesson gets one for
-free: a single algebraic identity turns the entire bit-flip code,
-encoding, syndrome extraction, decode table, into a phase-flip code, just
-by surrounding every step with Hadamards.
+The last lesson's code is blind to phase errors, so the obvious next move
+is to design a second code that catches them. Don't. Designing codes is
+hard, and this one is already written.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
-  alt="A NIST ion-trapping apparatus: two beryllium ions held above a gold chip, surrounded by copper shielding and gold mesh"
-  caption="A trapped-ion qubit platform at NIST, a physically different substrate from superconducting chips, but subject to the identical X/Z error model this course's codes are built to correct."
-  credit="Y. Colombe / NIST"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
-  license="Public Domain (U.S. government work)"
-/>
+A single identity, $HXH=Z$, turns the entire bit-flip code (encoding,
+syndrome extraction, decode table, all of it) into a phase-flip code by
+surrounding every step with Hadamards. Nothing about the circuit's
+structure changes. Only the basis it operates in does.
 
 ## Mathematical Development
 
@@ -66,10 +61,16 @@ runs both directions).
 If $U$ is any circuit built from $X$ gates and <Term id="cnot-controlled-gates">CNOTs</Term> (like the bit-flip
 code's encoder and error), then $H^{\otimes n}UH^{\otimes n}$ replaces
 every $X$ in $U$ with $HXH=Z$, because inserting $HH=I$ between every
-pair of gates in $U$ converts each one individually. Applying $H$ to
-every qubit before and after the *entire* bit-flip pipeline therefore
-converts an $X$-error-correcting code into a $Z$-error-correcting code,
-with identical CNOT structure and an identical decode table underneath.
+pair of gates in $U$ conjugates each one individually. (The CNOTs get
+conjugated too, and they do not come back unchanged:
+$H^{\otimes 2}\,\text{CNOT}(0,1)\,H^{\otimes 2}=\text{CNOT}(1,0)$,
+control and target exchanged. That is why the implementation below sandwiches the pipeline
+between two Hadamard layers instead of rewriting its gates one by one:
+the CNOTs it runs in between are then literally the bit-flip code's own.)
+Applying $H$ to every qubit before and after the *entire* bit-flip
+pipeline therefore converts an $X$-error-correcting code into a
+$Z$-error-correcting code, with the identical CNOT structure running
+underneath and an identical decode table read off it.
 `encodePhaseFlipCode` and `runPhaseFlipCorrectionCycle` implement exactly
 this: encode via `encodeBitFlipCode`, then $H$ on every qubit; correct by
 un-Hadamarding, running the ordinary bit-flip correction cycle, then
@@ -91,7 +92,7 @@ numerical error) for all three qubit positions, plus the no-error case.
     { label: "It can't be predicted without re-deriving the whole circuit", value: "cant" },
   ]}
   correctValue="same"
-  explanation="Conjugating by H turns every X in the circuit into a Z (via HXH=Z) without touching the CNOT structure or the decode table itself. A Z error on qubit 1, once un-Hadamarded, looks to the underlying circuit exactly like the X error on qubit 1 the bit-flip code already knows how to read: syndrome (1,1), same table entry, no new lookup needed. Try it below."
+  explanation="Conjugating by H turns every X in the circuit into a Z, via HXH=Z, without touching the CNOT structure or the decode table. Once un-Hadamarded, a Z error on qubit 1 looks to the underlying circuit like the X error on qubit 1 that the bit-flip code already knows how to read: syndrome (1,1), same table entry, no new lookup. Try it below."
 />
 
 <InteractiveSection title="Same syndrome machinery, conjugated by H" description="Inject a Z error on qubit 2 this time. The syndrome bits still come from the same underlying CNOT structure, just conjugated by H on every qubit. Confirm the decode table still points at the errored qubit, and that the corrected state matches the original.">
@@ -100,11 +101,13 @@ numerical error) for all three qubit positions, plus the no-error case.
 
 ## Physical Interpretation
 
-The phase-flip code isn't a second, independently-designed piece of
-engineering. It's the *same* code, viewed in a rotated <Term id="basis">basis</Term>. This is a
-recurring and powerful pattern in quantum information: many "different"
-constructions turn out to be the same one, conjugated by a fixed
-change of basis, once you know which conjugation to apply.
+The phase-flip code is not a second piece of engineering. It is the *same*
+code, viewed in a rotated <Term id="basis">basis</Term>.
+
+This pattern recurs throughout quantum information, and it is worth
+learning to look for. Two constructions that appear unrelated often turn
+out to be one construction seen from two angles, and finding the
+conjugation that connects them saves the work of building the second.
 
 ## Worked Example
 
@@ -119,11 +122,10 @@ forward one algebraically rather than recomputed from scratch.
 ## Common Mistakes
 
 <Callout type="note">
-**Assuming the phase-flip code needs an entirely separate derivation.**
-It doesn't. Every step (encoding, syndrome CNOTs, decode table) is
-identical to the bit-flip code's, conjugated by $H$. Rederiving it from
-scratch would duplicate work the $HXH=Z$ identity already does in one
-line.
+**Assuming the phase-flip code needs a separate derivation.** It does not.
+Encoding, syndrome CNOTs and decode table are all identical to the
+bit-flip code's, conjugated by $H$. Deriving it from scratch duplicates
+work the $HXH=Z$ identity does in one line.
 </Callout>
 
 <Callout type="warning">

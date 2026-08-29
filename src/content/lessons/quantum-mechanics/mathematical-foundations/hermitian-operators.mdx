@@ -51,8 +51,8 @@ always a real number; nobody has ever measured $3+2i$ volts. If
 physical <Term id="observable">observables</Term> are represented by operators, and eigenvalues are the
 possible outcomes (previewed last lesson), those operators had better be
 restricted to ones whose <Term id="eigenvalue-eigenvector">eigenvalues</Term> are guaranteed real. That restriction
-has a name, **<Term id="hermitian-operator">Hermitian</Term>**, and this lesson proves it's exactly the right
-one, rather than just asserting it.
+has a name, **<Term id="hermitian-operator">Hermitian</Term>**, and this lesson proves that it does the job,
+rather than asserting it.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/55/Charles_Hermite_circa_1901_edit.jpg"
@@ -67,10 +67,10 @@ one, rather than just asserting it.
 
 A real number equals its own conjugate. **Hermitian** operators are the
 matrix generalization of that idea: an operator that, in a precise sense,
-equals its own conjugate transpose. The two theorems below pin down
-exactly how tight that link is: the algebraic condition $A=A^\dagger$
-turns out to be strong enough, on its own, to force every eigenvalue
-real and every pair of distinct eigenvectors orthogonal.
+equals its own conjugate transpose. The two theorems below show how much
+that buys: the algebraic condition $A=A^\dagger$ is strong enough, on its
+own, to force every eigenvalue real and every pair of eigenvectors with
+distinct eigenvalues orthogonal.
 
 ## Mathematical Development
 
@@ -96,7 +96,7 @@ $A$ is **Hermitian** (or self-adjoint) if $A = A^\dagger$.
     { label: "Only for operators on real (not complex) vector spaces", value: "real-only" },
   ]}
   correctValue="guaranteed"
-  explanation="Strictly guaranteed, with no exceptions, for any Hermitian operator on any complex inner product space. The derivation below needs nothing beyond A=A† and the inner product axioms — it never assumes anything about the specific operator beyond Hermiticity."
+  explanation="Strictly guaranteed, with no exceptions, for any Hermitian operator on any complex inner product space. The derivation below needs nothing beyond A=A† and the inner product axioms, and never assumes anything about the specific operator beyond Hermiticity."
 />
 
 Let $A|v\rangle=\lambda|v\rangle$, $v\ne0$, $A$ Hermitian. Consider
@@ -186,19 +186,23 @@ Probability and Quantum States lesson.
 
 ## Physical Interpretation
 
-Hermiticity is not an arbitrary mathematical restriction. It's exactly
-the algebraic condition equivalent to "every possible measurement outcome
-is a real number, and states with different definite outcomes are
-perfectly distinguishable." That's why every observable in quantum
-mechanics, position, momentum, energy, spin, is represented by a
-Hermitian operator, without exception.
+Hermiticity is not an arbitrary mathematical restriction. The two theorems
+above turn a single algebraic condition, $A=A^\dagger$, into two physical
+guarantees at once: every possible measurement outcome is a real number,
+and states with different definite outcomes are perfectly distinguishable
+(orthogonal, in the sense of the Inner Products lesson). That is why every
+observable in quantum mechanics, position, momentum, energy, spin, is
+represented by a Hermitian operator, without exception.
 
-This is also why real detectors are built the way they are. A photon
-counter, an energy analyzer, a magnetometer, every one of them reports a
-real number on its readout, never an imaginary one. That's not an
-engineering achievement so much as a mathematical guarantee: Hermiticity
-of the underlying observable is exactly the condition that rules out an
-imaginary reading in the first place.
+The logic runs from the laboratory to the mathematics, not the other way
+around. A photon counter, an energy analyzer, and a magnetometer all
+report real numbers, so any operator proposed as the representative of
+what they measure has to have real eigenvalues, and Hermiticity is the
+condition that delivers that. Where a non-Hermitian operator does appear
+in physics, as with the effective Hamiltonians used to model a system
+leaking particles to its surroundings, the imaginary part is not a
+measurement outcome. It is a decay rate, and the model is understood as an
+approximation to a larger Hermitian description.
 
 ## Worked Example
 
@@ -232,7 +236,7 @@ Hermitian**, confirming the prediction: $S$'s bottom-right entry, $i$,
 isn't real, so it already fails the diagonal check before the
 off-diagonal entries even matter.
 
-<InteractiveSection title="Check M = M† for yourself" description="Switch between three real gates and compare M to M† entry by entry. Pauli-Y and Pauli-Z match exactly (Hermitian); the S gate's bottom-right entry flips sign under the dagger and never matches (not Hermitian).">
+<InteractiveSection title="Check M = M† for yourself" description="Switch between three standard quantum gates and compare M to M† entry by entry. Pauli-Y and Pauli-Z match exactly (Hermitian), Pauli-Y despite its imaginary off-diagonal entries; the S gate's bottom-right entry flips sign under the dagger and never matches (not Hermitian).">
   <MatrixGridExplorer
     presets={hermitianPresets}
     ariaLabel="Choose an operator to compare its matrix directly against its conjugate transpose, checking whether the two match entry by entry"
@@ -289,9 +293,9 @@ It's the fastest way to rule out a candidate.
 
 ## Further Exploration
 
-<ChallengePrompt prompt="Pauli-X's eigenvectors are |+⟩ (eigenvalue +1) and |−⟩ (eigenvalue −1) — established in the Eigenvalues and Eigenvectors lesson. Verify directly that ⟨+|−⟩=0, confirming the orthogonality theorem proved above for this specific pair.">
-  Just compute the inner product directly from $|+\rangle=(1,1)/\sqrt2$
-  and $|-\rangle=(1,-1)/\sqrt2$ — no need to redo the general proof.
+<ChallengePrompt prompt="Pauli-X's eigenvectors are |+⟩ (eigenvalue +1) and |−⟩ (eigenvalue −1), established in the Eigenvalues and Eigenvectors lesson. Verify directly that ⟨+|−⟩=0, confirming the orthogonality theorem proved above for this specific pair.">
+  Compute the inner product directly from $|+\rangle=(1,1)/\sqrt2$ and
+  $|-\rangle=(1,-1)/\sqrt2$. There is no need to redo the general proof.
 </ChallengePrompt>
 
 <NextDiscovery>

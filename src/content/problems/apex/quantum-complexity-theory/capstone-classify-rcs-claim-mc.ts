@@ -57,17 +57,17 @@ export const capstoneClassifyRcsClaimMc: MultipleChoiceProblem = {
       { description: "This places the underlying theoretical claim in Tier 2 (strongly-evidenced conjecture), not Tier 1 (proven theorem): the experiment is empirical evidence consistent with the conjecture, for one specific engineered task." },
       { description: "Subsequent classical algorithms narrowing or contesting specific instances' hardness margins are a normal part of testing a Tier 2 claim, not evidence the whole enterprise is invalid." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Strong empirical evidence for a Tier 2 conjecture on one engineered task, resting on the polynomial hierarchy not collapsing, and not an unconditional proof.",
   },
   explanation: {
     correctIdea:
       "A random circuit sampling experiment is genuine, strong empirical evidence for a real but unproven complexity-theoretic conjecture, on one specific task -- not a proof, and not noise.",
     whyCorrect:
-      "Option (a) correctly names the conjecture at stake, the real theoretical basis for it (the polynomial hierarchy not collapsing), and correctly declines to call the experiment an unconditional proof, exactly matching this capstone's worked example.",
+      "The Tier 2 reading names the conjecture at stake, names the real theoretical basis for it (the polynomial hierarchy not collapsing), and declines to call the experiment an unconditional proof: this capstone's worked example, step for step.",
     whyWrong: [
-      "(b) conflates an empirical demonstration with a mathematical proof, ignoring that the classical-hardness argument itself rests on an unproven assumption.",
-      "(c) overcorrects: contested or narrowed hardness margins are healthy self-correction, not proof the original result was meaningless.",
-      "(d) misidentifies random circuit sampling as an NP-complete decision problem it is not, and misapplies it to an unrelated open question.",
+      { optionId: "b", text: "Conflates an empirical demonstration with a mathematical proof, ignoring that the classical-hardness argument itself rests on an unproven assumption." },
+      { optionId: "c", text: "Overcorrects. Contested or narrowed hardness margins are healthy self-correction, not proof the original result was meaningless." },
+      { optionId: "d", text: "Misidentifies random circuit sampling as an NP-complete decision problem, then applies it to an unrelated open question." },
     ],
   },
 };

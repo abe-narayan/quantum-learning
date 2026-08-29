@@ -38,20 +38,20 @@ export const recoverOmegaFromScan: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.05,
-    incorrectFeedback: "Use Ω=π/(2t_π), then convert to MHz by dividing by 2π.",
+    incorrectFeedback: "Solve the peak condition Ω = π/(2 t_π) using the observed peak time, then divide by 2π to convert rad/s to Hz. An answer far from the hidden value usually means the 2π conversion was skipped.",
   },
   hints: [
-    { text: "Ω = π/(2×13.89 ns)." },
-    { text: "This gives Ω in rad/s; divide by 2π to get frequency in Hz, then convert to MHz." },
-    { text: "Should recover very close to 18 MHz — the true (hidden) value." },
+    { text: "The scan hands you the observed π-pulse time. The peak condition ties that time to Ω; solve it for Ω before doing any unit conversion." },
+    { text: "Ω = π/(2 t_π) with t_π ≈ 13.89 ns. This gives rad/s; divide by 2π for Hz, then scale to MHz." },
+    { text: "Convert to MHz and compare with the value the prompt says was hidden. A good calibration should land on it to within scan resolution." },
   ],
   solution: {
-    steps: [{ description: "Ω=π/(2×13.89ns)≈2π×18.0 MHz — the calibration recovers the true hidden frequency to within scan resolution." }],
+    steps: [{ description: "Ω=π/(2×13.89ns)≈2π×18.0 MHz: the calibration recovers the true hidden frequency to within scan resolution." }],
     finalAnswer: "≈18.0 MHz",
   },
   explanation: {
     correctIdea: "This is exactly the lesson's own worked calibration procedure, confirming the recovered value matches the true (otherwise hidden) Ω.",
     whyCorrect: "Matches the engine's own scan-and-invert procedure over exactTwoLevelTransitionProbability data.",
-    whyWrong: ["A recovered value far from 18 MHz would indicate either a scan-range or peak-finding error — not what this platform's properly-scoped scan produces."],
+    whyWrong: ["A recovered value far from 18 MHz would indicate either a scan-range or peak-finding error, which a properly scoped scan does not produce."],
   },
 };

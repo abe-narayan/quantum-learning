@@ -48,7 +48,7 @@ export const simonFrames = simonHiddenStrings.map((s, i) => ({
 export const lessonMeta = {
   title: "Simon's Algorithm",
   description:
-    "A hidden XOR-mask string s recovered from measurements that always land orthogonal to s, derived from the same H-oracle-H structure as Deutsch-Jozsa but with a genuinely 2-to-1 oracle, then solved via linear algebra over F₂ — the direct conceptual ancestor of Shor's period-finding.",
+    "A hidden XOR-mask string s recovered from measurements that always land orthogonal to s, derived from the same H-oracle-H structure as Deutsch-Jozsa but with a 2-to-1 oracle, then solved by linear algebra over F₂: the direct ancestor of Shor's period-finding.",
   course: "quantum-algorithms-i",
   module: "simons-algorithm",
   order: 1,
@@ -68,10 +68,14 @@ Deutsch-Jozsa's speedup settles a somewhat contrived promise that a classical co
 
 ## Motivation
 
-That contrived promise is constant vs. balanced — the classical escape
-hatch is concrete: guess a handful of random inputs, and if $f$ were
-balanced, agreement across all of them would be exponentially unlikely.
-Given $f:\{0,1\}^n\to\{0,1\}^n$
+Deutsch-Jozsa's promise is constant versus balanced, and its classical
+escape hatch is concrete: guess a handful of random inputs, and if $f$ were
+balanced, agreement across all of them would be exponentially unlikely. A
+classical computer that tolerates a one-in-a-billion error rate solves
+Deutsch-Jozsa in a few queries, which takes most of the shine off the
+one-query result.
+
+Simon's problem closes that hatch. Given $f:\{0,1\}^n\to\{0,1\}^n$
 *promised* to satisfy $f(x)=f(x\oplus s)$ for exactly one nonzero hidden
 string $s$, a genuinely **2-to-1** function, not merely balanced, finding
 $s$ classically requires $\Theta(2^{n/2})$ queries even with randomization
@@ -157,7 +161,7 @@ one of them.
     { label: "Every z except s itself", value: "except-s" },
   ]}
   correctValue="orthogonal"
-  explanation="Only z with z·s ≡ 0 (mod 2) can ever come up, each with probability 1/2^(n-1) — for n=2 that's exactly 2 of the 4 possible strings, each at probability 1/2, and the other two at exactly 0. This is the boxed result derived above, not a rough tendency: the destructive interference is exact, so a non-orthogonal z has probability precisely zero, never 'unlikely but possible.'"
+  explanation="Only z with z·s ≡ 0 (mod 2) can come up, each with probability 1/2^(n-1). For n=2 that is 2 of the 4 possible strings at probability 1/2 each, and the other two at 0. Note that this is the boxed result rather than a tendency: the destructive interference is exact, so a non-orthogonal z has probability zero, not 'unlikely but possible.' That exactness is what lets you treat each measured z as a hard linear constraint on s."
 />
 
 Checked directly against the engine: for $n=2$, $s=01$,

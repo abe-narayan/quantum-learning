@@ -31,18 +31,18 @@ export const hxhIdentity: MultipleChoiceProblem = {
     prompt: "Compute $HXH|1\\rangle$ (apply the rightmost $H$ first, then $X$, then the outer $H$). What state results?",
     options: [
       { id: "a", text: `$${ketLatex(result)}$` },
-      { id: "b", text: "$|1\\rangle$" },
-      { id: "c", text: "$|0\\rangle$" },
-      { id: "d", text: "$-|0\\rangle$" },
+      { id: "b", text: "$(1.00)|1\\rangle$" },
+      { id: "c", text: "$(1.00)|0\\rangle$" },
+      { id: "d", text: "$(-1.00)|0\\rangle$" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That would mean HXH does nothing to |1⟩, but tracking the three gates step by step actually picks up a sign flip.",
+      b: "That would mean HXH acts as the identity on |1⟩. Retrace the middle step: check what X does to |−⟩ before the second H is applied.",
       c: "H alone would send |1⟩ to |−⟩, not to |0⟩ — you may be skipping the X and second H steps.",
-      d: "Close on the sign, but check which basis state — HXH sends |1⟩ back to (a phase of) itself, not to |0⟩.",
+      d: "The sign is right, but the basis state is not. Recheck the last step: apply H to whatever X|−⟩ came out to be, and read off which basis state that lands on.",
     },
     defaultIncorrectFeedback: "Track the state through each gate individually: |1⟩ → (H) → (X) → (H), the same method the lesson uses for HZH=X.",
   },
@@ -63,8 +63,9 @@ export const hxhIdentity: MultipleChoiceProblem = {
     correctIdea: "HXH = Z (up to how you track it): applying the identity to |1⟩ specifically gives −|1⟩, matching Z|1⟩=−|1⟩ exactly.",
     whyCorrect: "This is a genuine identity, checkable the same step-by-step way the lesson verifies HZH=X, just with the roles of X and Z swapped.",
     whyWrong: [
-      "Stopping partway through the three-gate sequence and reporting an intermediate state.",
-      "Dropping the sign that appears from X acting on |−⟩ — the −1 is a real part of the result, not something to discard as 'just a phase' (it's the whole difference between this answer and |1⟩ itself).",
+      { optionId: "b", text: "Drops the sign X produces when it acts on |−⟩. That −1 is the entire difference between this and the right answer." },
+      { optionId: "c", text: "Stops after the first H, or confuses where the sequence lands. H alone sends |1⟩ to |−⟩, not to |0⟩." },
+      { optionId: "d", text: "Carries the sign through but attaches it to the wrong basis state. HXH sends |1⟩ back to |1⟩, negated." },
     ],
   },
 };

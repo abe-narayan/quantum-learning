@@ -97,6 +97,15 @@ if `PageHeader` is meant to be kept in reserve, say so explicitly and cite
 where it's expected to be used next, rather than leaving a comment that
 misdescribes the site as it stands.
 
+> **Resolved 2026-08-29.** All three parts of the fix landed, the first
+> option: `src/components/ui/PageHeader.tsx` and its test are deleted (the
+> path in the finding above therefore no longer resolves — that is expected,
+> not rot), `auditedNoHardcodedColors.test.ts`'s owned-file list no longer
+> mentions it, and `ApexHero.tsx`'s opening comment now describes the
+> `Eyebrow`/`SectionTitle`/`Lede` sequence. `grep -rn PageHeader src/`
+> returns nothing. One cosmetic residue: that test's header still reads
+> "the five owned `ui/` primitives" while naming four.
+
 ### P2-new-2 · The Hardware pillar's own apparatus photos are still the clearest unconverted case for `AnnotatedFigure` — and it's the same gap the original review named
 
 `docs/NARRATIVE_COMPONENTS.md` (added this round) explicitly names Quantum

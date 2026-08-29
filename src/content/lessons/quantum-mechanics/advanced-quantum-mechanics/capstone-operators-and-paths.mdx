@@ -61,7 +61,7 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Where this leaves us">
-Decoherence explains why coherent superpositions don't survive contact with an environment — a real, checkable fact. It does not explain why a measurement yields one definite outcome rather than a probabilistic mixture of possibilities. That remains open.
+Decoherence explains why coherent superpositions do not survive contact with an environment, and this course computed that decay rather than asserting it. It does not explain why a measurement yields one definite outcome rather than a mixture of possibilities. That question is still open, and saying so is part of the subject.
 </LessonHook>
 
 ## Motivation
@@ -78,7 +78,7 @@ open questions leaves us.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f4/Solvay_conference_1927_restored.jpg"
   alt="The 1927 Solvay Conference group photograph, showing 29 leading physicists including Einstein, Bohr, Curie, Heisenberg, Schrödinger, and Dirac gathered in Brussels"
-  caption="The 1927 Solvay Conference, where the foundational debates about what quantum mechanics means (not just how to calculate with it) began in earnest. A century later, this course's honest statement that decoherence doesn't resolve the measurement problem is still the same open question these physicists argued over."
+  caption="The fifth Solvay Conference, Brussels, 1927. The formalism was essentially finished by this point and the argument in the room was about what it meant, with Einstein and Bohr on opposite sides of it. A century of decoherence theory has sharpened the question considerably and has not closed it, which is why this capstone ends where it does."
   credit="Benjamin Couprie (original photograph); restoration by Wilfredor / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Solvay_conference_1927_restored.jpg"
   license="Public domain"
@@ -96,21 +96,26 @@ one-operator case. Nothing here contradicts what came before; it's a
 strict extension, verified directly (trace-preservation condition)
 rather than assumed.
 
-Both decoherence channels this course built started from the very same
-$|+\rangle$ state, yet drive it toward completely different long-run
-fates. Watch what each one does to the SAME starting state as the
-coupling strength $\eta$ (used as both channel's parameter) changes:
+Both decoherence channels this course built start from the same
+$|+\rangle$ and drive it to different long-run fates. Dephasing settles
+at purity $0.5$; amplitude damping dips and then returns to $1$, because
+it drains the qubit toward $|0\rangle$, which is itself a pure state.
+
+That return is worth interrogating, because it is easy to read the wrong
+conclusion off it.
 
 <PredictBeforeReveal
-  question="Apply amplitude damping to |+⟩ many, many times. What happens to its purity in the long run?"
+  question="Amplitude damping eventually returns the qubit to a pure state, |0⟩. Does that mean the channel is reversible, so that some operation could recover the original |+⟩?"
   options={[
-    { label: "It settles at 0.5, like dephasing does", value: "half" },
-    { label: "It climbs back up toward 1", value: "one" },
-    { label: "It drops toward 0", value: "zero" },
+    { label: "Yes: it ends on a pure state, so no information was lost", value: "reversible" },
+    { label: "No: every input state ends at |0⟩, so nothing distinguishes them afterwards", value: "irreversible" },
+    { label: "Only for small γ, where the state has not moved far", value: "small-gamma" }
   ]}
-  correctValue="one"
-  explanation="Purity climbs back to 1. Amplitude damping doesn't just scramble phase, it drains population toward |0⟩, a specific pure state. Once the qubit is (almost) entirely in |0⟩, it's (almost) pure again. Dephasing, with no preferred population target, gets stuck at the maximally mixed 0.5 instead. Same Kraus-operator machinery, opposite long-run purity behavior."
+  correctValue="irreversible"
+  explanation="Irreversible, and the reason is worth holding onto: purity is not information. Amplitude damping sends |+⟩, |−⟩, |1⟩ and everything else to the same |0⟩, so the map is many-to-one and no operation can invert it. A unitary is one-to-one by construction and could never do this. Purity recovering says the environment stopped being correlated with the qubit; it says nothing about the qubit's original state surviving anywhere reachable."
 />
+
+Watch both channels at once as the coupling strength $\eta$ varies:
 
 <InteractiveSection
   title="Slide η, watch the two fates diverge"
@@ -123,12 +128,16 @@ coupling strength $\eta$ (used as both channel's parameter) changes:
   />
 </InteractiveSection>
 
-Dephasing destroys phase only, so the state it settles into is a true
-statistical mixture (purity 0.5, exactly the maximally mixed state).
-Amplitude damping destroys phase AND drains population toward a specific
-pure state, so <Term id="von-neumann-entropy-purity">purity</Term> actually recovers to 1 in the long run. That's a
-real structural difference between the two channels, not just two
-examples of "decoherence" with the same eventual behavior.
+Dephasing destroys phase alone, so it settles into a genuine statistical
+mixture at <Term id="von-neumann-entropy-purity">purity</Term> $0.5$, the maximally mixed qubit. Amplitude damping
+destroys phase *and* drains population toward one specific pure state, so
+its purity recovers to $1$.
+
+The two are structurally different, not two labels for the same process,
+and the pair makes a useful point about vocabulary. "Decoherence" is
+sometimes used as a synonym for purity loss, and these two channels show
+why that identification fails: both destroy the superposition
+irreversibly, and only one of them leaves a mixed state behind.
 
 ### From operators to paths
 
@@ -143,25 +152,37 @@ equivalence in general.
 
 ### What decoherence resolves, and what it doesn't
 
-Stated plainly, one more time, because the two get blurred so often:
-decoherence (this course's Kraus-channel demonstration) explains why
-*coherent superpositions* don't survive contact with an environment, a
-real, checkable, and important physical fact. It does *not*, by itself,
-explain why a measurement yields one *definite* outcome rather than a
-probabilistic mixture of possibilities. That remains an open question in
-the foundations of quantum mechanics: interpretations like Copenhagen,
-many-worlds, or objective collapse models each answer it differently,
-and this course takes no position on which is correct.
+The two claims get blurred often enough to be worth separating one final
+time.
+
+Decoherence explains why coherent superpositions do not survive contact
+with an environment. That is a computed, checkable result, and this
+course produced the numbers.
+
+It does not explain why a measurement yields one definite outcome. After
+full decoherence the state is a probabilistic mixture, and a mixture is a
+description of not knowing which outcome occurred, not an account of one
+occurring. Getting from "one of these, unknown" to "this one" requires
+something the formalism above does not supply.
+
+What fills the gap is a choice of interpretation, and the candidates
+disagree with each other rather than refining each other. Copenhagen
+treats collapse as primitive; many-worlds denies that a unique outcome
+needs explaining, since every branch is realized; objective-collapse
+models modify the dynamics and are, unlike the others, experimentally
+testable in principle. This course takes no position, and the honest
+summary is that a century of work has made the question sharper without
+settling it.
 
 ## Where This Goes Next
 
-- **Kraus operators and decoherence** reappear directly in Quantum
-  Computing's **Error Correction & Fault Tolerance** (why errors need
-  correcting at all) and Quantum Hardware's **Noise, Decoherence & Scaling**
-  (T1/T2 times, literally the amplitude-damping and dephasing timescales
-  this course just built). This course's engine functions
-  (`amplitudeDampingChannel`, `dephasingChannel`) are built generally
-  enough to be reused there directly, not re-derived.
+- **Kraus operators and decoherence** reappear in Quantum Computing's
+  **Error Correction & Fault Tolerance**, which is the answer to why
+  errors need correcting at all, and in Quantum Hardware's **Noise,
+  Decoherence & Scaling**, where $T_1$ and $T_2$ are the timescales of the
+  amplitude-damping and dephasing channels built here. The engine
+  functions `amplitudeDampingChannel` and `dephasingChannel` are reused
+  there directly rather than rebuilt.
 - **The path integral** underlies modern approaches to quantum
   simulation and certain quantum algorithm analyses, previewed but not
   developed further in this platform's current scope.
@@ -169,9 +190,9 @@ and this course takes no position on which is correct.
 ## Common Mistakes
 
 <Callout type="mistake">
-**Treating decoherence as "solving" the measurement problem.** As stated
-repeatedly in this course: decoherence explains coherence loss, not
-outcome selection. Claiming otherwise overstates what was actually shown.
+**Treating decoherence as "solving" the measurement problem.** Decoherence
+explains coherence loss, not outcome selection. It is a strong result and
+it does not reach that far.
 </Callout>
 
 <Callout type="note">

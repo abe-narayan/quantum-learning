@@ -23,7 +23,7 @@ export function InsightBlock({ children, className }: { children: ReactNode; cla
   return (
     <div
       className={cn(
-        "not-prose my-8 flex gap-3 rounded-[var(--radius-panel)] border border-pillar-edge bg-pillar-wash p-5 sm:p-6",
+        "not-prose my-8 flex gap-3 rounded-panel border border-pillar-edge bg-pillar-wash p-5 sm:p-6",
         className
       )}
     >

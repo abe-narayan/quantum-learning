@@ -23,6 +23,9 @@ export const compositeSystemDimension: NumericProblem = {
     value: 12,
     tolerance: 0.001,
     incorrectFeedback: "The tensor product's dimension is the product (not the sum) of the two factors' dimensions.",
+    nearMisses: [
+      { value: 7, feedback: "7 adds the two dimensions. A basis of the tensor product pairs every basis vector of A with every basis vector of B, so the counts multiply." },
+    ],
   },
   hints: [
     { text: "dim(V⊗W) = dim(V) · dim(W), not dim(V) + dim(W)." },

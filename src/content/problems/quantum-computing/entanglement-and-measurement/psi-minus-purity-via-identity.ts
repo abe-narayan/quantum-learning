@@ -30,18 +30,22 @@ export const psiMinusPurityViaIdentity: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "Compute ad-bc first (remember a=d=0 here), then apply the identity.",
+    nearMisses: [
+      { value: 1, feedback: "Purity 1 would mean qubit A is left in a pure state, so the two qubits are unentangled. You most likely dropped the minus sign on c, which makes ad − bc collapse to 0." },
+      { value: 0.25, feedback: "Check the identity's factor of 2: the impurity is 2|ad−bc|², which is 0.5 here, not 0.25." },
+    ],
   },
   hints: [
     { text: "ad = 0 since a=d=0 for |Ψ−⟩." },
     { text: "bc = (1/√2)(-1/√2) = -0.5." },
-    { text: "ad-bc = 0-(-0.5) = 0.5, so |ad-bc|=0.5 — the maximal value." },
+    { text: "Combine: ad-bc = -bc, which comes out positive and at its maximal possible size. Substitute into the identity and solve for Tr(ρ_A²), remembering the identity gives the impurity, not the purity itself." },
   ],
   solution: {
     steps: [
       { description: "$ad-bc = 0 - \\left(\\tfrac{1}{\\sqrt2}\\right)\\left(-\\tfrac{1}{\\sqrt2}\\right) = 0.5$." },
       { description: "$1-\\text{Tr}(\\rho_A^2) = 2(0.5)^2 = 0.5$, so $\\text{Tr}(\\rho_A^2)=0.5$." },
     ],
-    finalAnswer: "Tr(ρ_A²) = 0.5 — |Ψ−⟩ is maximally entangled, just like the other three Bell states.",
+    finalAnswer: "Tr(ρ_A²) = 0.5: |Ψ−⟩ is maximally entangled, just like the other three Bell states.",
   },
   explanation: {
     correctIdea: "|Ψ−⟩ has |ad-bc|=0.5, the maximum possible, giving the same maximally mixed reduced state as any Bell state.",

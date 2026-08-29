@@ -42,11 +42,15 @@ export const classicalVarianceIndependenceMc: MultipleChoiceProblem = {
       { description: "Classical: x_T = sum of T i.i.d. ±1 steps, so Var(x_T) = T·Var(single step) = T exactly, for any T." },
       { description: "Quantum: ⟨x²⟩/T² → 1−1/√2 is a limiting statement from the momentum-space dispersion relation's stationary-phase analysis, exact only in the T→∞ limit." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Independent steps make the classical variance add exactly at every T; the quantum result comes from a stationary-phase argument valid only as T→∞.",
   },
   explanation: {
     correctIdea: "Different mathematical machinery produces different degrees of exactness: elementary independence gives an exact finite-T formula; stationary-phase analysis gives an asymptotic one.",
     whyCorrect: "The lesson's own numerical table shows quantum/T² only converging toward the cited constant as T grows (0.2995 at T=10 vs 0.2929 at T=160), directly confirming this is asymptotic, not exact at finite T.",
-    whyWrong: ["Options b, c, and d each misstate which result is exact and which is a limit."],
+    whyWrong: [
+      { optionId: "b", text: "Demotes the classical result to an approximation. Var(x_T)=T is an algebraic consequence of independent-step variance addition, true at every T including T=1." },
+      { optionId: "c", text: "Promotes the quantum result to exactness. The numerics show quantum/T² converging toward 0.2929 rather than sitting there at small T." },
+      { optionId: "d", text: "Calls the difference cosmetic. One result holds for all T; the other is a limiting behavior." },
+    ],
   },
 };

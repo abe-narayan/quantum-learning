@@ -6,7 +6,8 @@ import { ScrollableMathText } from "./ScrollableMathText";
 import type { Problem } from "@/lib/problems/types";
 import type { ProblemProgress } from "@/lib/problems/progress/types";
 import { useProblemsProgress } from "@/lib/problems/progress";
-import { ProblemView } from "./ProblemView";
+import { prerenderProblemMath } from "./renderProblemMath";
+import { ProblemViewClient } from "./ProblemViewClient";
 
 /**
  * A bounded, "checkpoint" framing over the existing Problems system — not a
@@ -19,6 +20,17 @@ import { ProblemView } from "./ProblemView";
  * new persistence. Self-contained: rendered inside `LessonLayout`'s own
  * `PillarScope`, so it inherits that course's pillar identity for free and
  * declares no `data-pillar` of its own.
+ *
+ * KaTeX note. `/problems/[slug]` renders each problem's math on the server
+ * (the `ProblemView` Server Component wrapper) so the runtime never reaches
+ * that route's browser bundle. This component cannot use that wrapper — it is
+ * a Client Component, and a Client Component cannot render a Server Component
+ * — so it calls `prerenderProblemMath` itself and renders `ProblemViewClient`
+ * directly. That keeps `katex` inside the checkpoint's own chunk, which
+ * `LazyCourseCheckpoint`'s dynamic `import()` already holds off every lesson
+ * page's eager graph (pinned by the LessonLayout case in
+ * `src/lib/design/__tests__/clientBoundary.test.ts`). Rendering only happens
+ * for the one problem that is open.
  */
 export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: string; problems: Problem[] }) {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
@@ -54,11 +66,11 @@ export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: strin
           const solved = progress[index]?.solved ?? false;
           const panelId = `checkpoint-${problem.meta.slug}`;
           return (
-            <div key={problem.meta.slug} className="rounded-[--radius-tight] border border-border bg-surface">
+            <div key={problem.meta.slug} className="rounded-(--radius-tight) border border-border bg-surface">
               <button
                 type="button"
                 onClick={() => setOpenSlug(isOpen ? null : problem.meta.slug)}
-                className="flex min-h-11 w-full items-center justify-between gap-3 rounded-[--radius-tight] px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+                className="flex min-h-11 w-full items-center justify-between gap-3 rounded-(--radius-tight) px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
                 aria-expanded={isOpen}
                 // Only while the panel is mounted — it is rendered
                 // conditionally below, and an `aria-controls` IDREF that
@@ -89,7 +101,7 @@ export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: strin
               {isOpen ? (
                 <div id={panelId} className="space-y-4 border-t border-border p-4">
                   <ScrollableMathText text={problem.question.prompt} className="text-sm leading-relaxed text-foreground" />
-                  <ProblemView problem={problem} />
+                  <ProblemViewClient problem={problem} math={prerenderProblemMath(problem)} />
                 </div>
               ) : null}
             </div>

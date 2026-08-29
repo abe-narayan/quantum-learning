@@ -155,7 +155,7 @@ function LessonLink({
       <Link
         href={`/lessons/${lessonSlug}`}
         aria-label={label}
-        className="relative z-[1] inline-flex min-h-11 max-w-[9rem] shrink-0 items-center gap-1.5 rounded-[--radius-tight] border border-border bg-surface px-2.5 text-[0.6875rem] text-subtle-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:bg-surface-raised hover:text-pillar-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+        className="relative z-[1] inline-flex min-h-11 max-w-[9rem] shrink-0 items-center gap-1.5 rounded-(--radius-tight) border border-border bg-surface px-2.5 text-[0.6875rem] text-subtle-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-surface-raised hover:text-pillar-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
       >
         <span className="font-tech shrink-0 uppercase tracking-[0.1em]">Lesson</span>
         {lessonTitle ? (
@@ -171,7 +171,7 @@ function LessonLink({
     <Link
       href={`/lessons/${lessonSlug}`}
       aria-label={label}
-      className="relative z-[1] inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-[--radius-tight] text-xs text-subtle-foreground underline-offset-4 transition-colors duration-[--dur-fast] hover:text-pillar-text hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+      className="relative z-[1] inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-(--radius-tight) text-xs text-subtle-foreground underline-offset-4 transition-colors duration-(--dur-fast) hover:text-pillar-text hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
     >
       <span className="font-tech shrink-0 uppercase tracking-[0.1em]">Lesson</span>
       <span aria-hidden="true" className="truncate">
@@ -260,7 +260,7 @@ export function ProblemCard({
           <Link
             href={`/problems/${problem.slug}`}
             aria-label={cardLabel(problem, solved, ready)}
-            className="rounded-[--radius-tight] after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+            className="rounded-(--radius-tight) after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
           >
             {problem.title}
           </Link>
@@ -305,7 +305,7 @@ export function ProblemCard({
             hover only strengthens it rather than creating it. */}
         <span
           aria-hidden="true"
-          className="text-subtle-foreground transition-colors duration-[--dur-fast] group-hover:text-pillar-text"
+          className="text-subtle-foreground transition-colors duration-(--dur-fast) group-hover:text-pillar-text"
         >
           Open &rarr;
         </span>
@@ -357,7 +357,7 @@ export function ProblemRow({
         area is now the row rectangle itself, so the floor is structural: the
         44px is on the element the pointer actually hits.
       */
-      className="group relative -mx-3 flex min-h-11 items-center gap-3 rounded-[var(--radius-tight)] border-l-2 border-l-transparent px-3 py-2.5 transition-colors duration-[--dur-fast] ease-[--ease-instrument] hover:border-l-pillar-edge hover:bg-surface-muted/60 has-[a:focus-visible]:border-l-pillar has-[a:focus-visible]:bg-surface-muted/60"
+      className="group relative -mx-3 flex min-h-11 items-center gap-3 rounded-(--radius-tight) border-l-2 border-l-transparent px-3 py-2.5 transition-colors duration-(--dur-fast) ease-instrument hover:border-l-pillar-edge hover:bg-surface-muted/60 has-[a:focus-visible]:border-l-pillar has-[a:focus-visible]:bg-surface-muted/60"
     >
       <RowStatusMark solved={solved} />
 
@@ -372,7 +372,7 @@ export function ProblemRow({
             <Link
               href={`/problems/${problem.slug}`}
               aria-label={cardLabel(problem, solved, ready)}
-              className="rounded-[--radius-tight] text-sm font-medium text-foreground after:absolute after:inset-0 after:content-[''] group-hover:text-pillar-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+              className="rounded-(--radius-tight) text-sm font-medium text-foreground after:absolute after:inset-0 after:content-[''] group-hover:text-pillar-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
             >
               {problem.title}
             </Link>
@@ -401,7 +401,7 @@ export function ProblemRow({
           intensifies it. */}
       <span
         aria-hidden="true"
-        className="shrink-0 text-sm text-subtle-foreground transition-colors duration-[--dur-fast] group-hover:text-pillar-text"
+        className="shrink-0 text-sm text-subtle-foreground transition-colors duration-(--dur-fast) group-hover:text-pillar-text"
       >
         &rarr;
       </span>

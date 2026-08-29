@@ -6,6 +6,7 @@ import { pillarVisual } from "@/lib/design/pillars";
 import { CONCEPT_NODES } from "@/lib/content/concepts";
 import type { GlossaryEntry, GlossaryTerm } from "@/lib/content/glossary";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { SearchShortcutHint } from "@/components/search/SearchShortcutHint";
 import { GlossaryStartHere } from "@/components/glossary/GlossaryStartHere";
 
 const PILLAR_LABEL: Record<GlossaryTerm["pillar"], string> = {
@@ -170,7 +171,19 @@ export function GlossaryFilter({
             animated canvas field (src/components/field/QuantumField.tsx)
             would force a recomposite on every scroll frame. See
             Navbar.tsx's own comment for the full rationale. */}
-        <div className="sticky top-16 z-10 -mx-4 bg-surface px-4 py-3 sm:mx-0 sm:px-0">
+        {/* Sticky, but not on a viewport too short to spare the room. This
+            bar is ~118px tall on a phone (12px padding, a 41px field, the
+            21px count line, the 32px A-Z strip, 12px padding) and it sits
+            under the 64px navbar, so the two together own 182px of chrome.
+            On a 360px-tall phone in landscape that is 51% of the viewport
+            spent on controls, leaving under two glossary entries visible —
+            the reader can no longer scan the list the bar exists to help
+            them scan. Above 34rem (544px) of viewport height the bar costs
+            at most a third of the screen and stays sticky, which is the case
+            it was designed for. `static`, not `hidden`: the filter and the
+            jump list are still there on a short screen, they just scroll
+            with the page like everything else. */}
+        <div className="sticky top-16 z-10 -mx-4 bg-surface px-4 py-3 [@media(max-height:34rem)]:static sm:mx-0 sm:px-0">
           <label className="block">
             <span className="sr-only">Filter glossary terms</span>
             <input
@@ -178,17 +191,35 @@ export function GlossaryFilter({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={`Filter ${terms.length} terms…`}
-              className="w-full rounded-[--radius-tight] border border-border bg-surface px-4 py-2.5 text-sm text-foreground placeholder:text-subtle-foreground focus-visible:outline-none focus-visible:border-pillar-accent"
+              // `.input-instrument` (globals.css §8) carries the shared field
+              // identity; focus now comes from the sitewide `:focus-visible`
+              // pillar outline instead of a one-off border tint.
+              // `text-base` below `sm` (like AnswerInput): iOS Safari zooms
+              // the whole page on focusing any field under 16px.
+              className="input-instrument w-full px-4 py-2.5 text-base sm:text-sm"
             />
           </label>
-          <p className="mt-2 tech-label">
+          {/* `role="status"`: typing repaints the whole A-Z silently
+              otherwise. Already mounted from first paint (the reliability
+              condition Feedback.tsx documents), so only the semantics were
+              missing. */}
+          <p role="status" aria-live="polite" className="mt-2 tech-label">
             {filtered.length === terms.length ? `${terms.length} terms` : `${filtered.length} of ${terms.length} terms`}
           </p>
 
           {/* Mobile alphabet strip — same anchors as the desktop rail, in a
               horizontally scrolling row contained by its own overflow-x-auto
-              so it can never cause page-level horizontal scroll. */}
-          <div className="mt-2 -mx-1 flex gap-0.5 overflow-x-auto px-1 lg:hidden" aria-label="Jump to letter">
+              so it can never cause page-level horizontal scroll.
+
+              A `<nav>`, not a `<div>`. It carried `aria-label="Jump to
+              letter"` on a bare div, where the attribute does nothing:
+              `aria-label` needs a role to attach to, and a generic div has
+              none — so the label was silently dropped and the phone-width
+              A-Z was an unnamed run of 26 single-letter links. This is the
+              same element the desktop rail already is, with the same name;
+              only one of the two is ever in the accessibility tree, since
+              the other is `display: none` at any given width. */}
+          <nav className="mt-2 -mx-1 flex gap-0.5 overflow-x-auto px-1 lg:hidden" aria-label="Jump to letter">
             {ALPHABET.map((letter) =>
               presentLetters.has(letter) ? (
                 <a
@@ -208,14 +239,37 @@ export function GlossaryFilter({
                 </span>
               )
             )}
-          </div>
+          </nav>
         </div>
 
         {filtered.length > 0 ? (
           <div className="mt-2">
             {[...groups.entries()].map(([letter, letterTerms]) => (
               <section key={letter} aria-labelledby={letterAnchorId(letter)}>
-                <div id={letterAnchorId(letter)} className="scroll-mt-40 flex items-baseline gap-3 border-b border-border pb-1.5 pt-8 first:pt-4">
+                {/* `scroll-mt-40` used to be here and did nothing at all.
+                    globals.css declares `[id] { scroll-margin-top: 6rem }`
+                    *outside* any cascade layer, and unlayered CSS beats every
+                    layered rule regardless of specificity — Tailwind's
+                    utilities all live in `@layer utilities`, so every
+                    `scroll-mt-*` on an element that also carries an `id` is
+                    silently overridden. (The same hazard globals.css itself
+                    documents for `.tech-label`'s colour, one section up from
+                    the `[id]` rule.) The site-wide fix is to wrap that rule
+                    in `@layer base`; until then an inline style is the only
+                    declaration that outranks it.
+
+                    The offset itself comes from a custom property so it can
+                    still vary by viewport — a utility setting `--anchor-top`
+                    is not competing with anything. 12rem clears the 64px
+                    navbar plus this page's ~118px sticky filter bar; on a
+                    short viewport that bar is `static` (see above), so only
+                    the navbar has to be cleared and the offset drops to 5rem
+                    rather than throwing away half a landscape screen. */}
+                <div
+                  id={letterAnchorId(letter)}
+                  style={{ scrollMarginTop: "var(--anchor-top)" }}
+                  className="[--anchor-top:12rem] flex items-baseline gap-3 border-b border-border pb-1.5 pt-8 first:pt-4 [@media(max-height:34rem)]:[--anchor-top:5rem]"
+                >
                   <h2 className="font-display text-2xl font-semibold text-pillar-text">{letter}</h2>
                   <span className="tech-label">
                     {letterTerms.length} term{letterTerms.length === 1 ? "" : "s"}
@@ -234,6 +288,18 @@ export function GlossaryFilter({
                         key={term.id}
                         id={term.id}
                         data-pillar={term.pillar}
+                        // Same dead-`scroll-mt` story as the letter heading
+                        // above, and this is the anchor that actually carries
+                        // traffic: every `<Term>` gloss, the homepage's
+                        // "Dirac notation, in the glossary →", the Start here
+                        // cards, and every glossary hit in site search deep
+                        // link to `/glossary#<id>`. With the utility dead the
+                        // browser used globals.css's 6rem, and 6rem lands the
+                        // entry 86px underneath this page's own sticky filter
+                        // bar — the reader arrives at a highlighted row they
+                        // cannot see and has to scroll up to find what they
+                        // clicked.
+                        style={{ scrollMarginTop: "var(--anchor-top)" }}
                         // The `:target` treatment is what makes a deep link
                         // land *visibly*. `/glossary#dirac-notation` (from
                         // MechanicsSection, from lessons, from every `<Term>`
@@ -244,7 +310,7 @@ export function GlossaryFilter({
                         // sends readers into the list by anchor too. The
                         // transparent left border and negative margin are
                         // always present so lighting it up shifts nothing.
-                        className="-ml-4 scroll-mt-40 border-l-2 border-transparent py-5 pl-4 target:border-pillar-accent target:bg-pillar-wash"
+                        className="-ml-4 [--anchor-top:12rem] border-l-2 border-transparent py-5 pl-4 target:border-pillar target:bg-pillar-wash [@media(max-height:34rem)]:[--anchor-top:5rem]"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
                           <dt className="font-display text-lg font-semibold tracking-tight text-foreground">
@@ -260,11 +326,24 @@ export function GlossaryFilter({
                               reference. */}
                           <div className="flex shrink-0 items-center gap-3">
                             <DifficultyMark difficulty={term.level} />
-                            <span
-                              aria-label={PILLAR_LABEL[term.pillar]}
-                              className="rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-pillar-text"
-                            >
-                              {visual.short}
+                            {/* `PILLAR_LABEL` is the whole point of this chip
+                                for a screen-reader user — and as an
+                                `aria-label` on a bare `<span>` it never
+                                reached one. A span with no `role` is
+                                `generic`, ARIA prohibits naming a generic
+                                element, so the attribute was silently dropped
+                                and each of the ~150 entries announced only
+                                `visual.short` ("Computing"), with nothing to
+                                say it named a pillar. The short form is the
+                                one that has to be *visible* (this sits on a
+                                cramped row beside the difficulty mark), so the
+                                two swap roles: the abbreviation is hidden from
+                                AT, the full label is real `sr-only` text.
+                                Identical treatment to the same badge in
+                                map/ConceptDetailPanel.tsx. */}
+                            <span className="rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-pillar-text">
+                              <span aria-hidden="true">{visual.short}</span>
+                              <span className="sr-only">{PILLAR_LABEL[term.pillar]} pillar</span>
                             </span>
                           </div>
                         </div>
@@ -285,7 +364,7 @@ export function GlossaryFilter({
                                 key={relatedId}
                                 href={`#${relatedId}`}
                                 onClick={crossReference(relatedId)}
-                                className="text-sm text-muted-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar-accent"
+                                className="text-sm text-muted-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar"
                               >
                                 {titlesById.get(relatedId) ?? relatedId}
                               </a>
@@ -298,7 +377,7 @@ export function GlossaryFilter({
                             <Link
                               key={lesson.slug}
                               href={`/lessons/${lesson.slug}`}
-                              className="text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar-accent"
+                              className="text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar"
                             >
                               {lesson.title}
                             </Link>
@@ -306,7 +385,7 @@ export function GlossaryFilter({
                           {term.simulatorId ? (
                             <Link
                               href={simulatorHref(term.simulatorId)}
-                              className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar-accent"
+                              className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar"
                             >
                               Try the simulator
                             </Link>
@@ -314,7 +393,7 @@ export function GlossaryFilter({
                           {conceptIds.has(term.id) ? (
                             <Link
                               href={`/map?concept=${term.id}`}
-                              className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar-accent"
+                              className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar"
                             >
                               See how this connects on the map
                             </Link>
@@ -331,12 +410,15 @@ export function GlossaryFilter({
           <div className="mt-8 text-sm text-muted-foreground">
             <p>No terms match &ldquo;{query}&rdquo;.</p>
             <p className="mt-2">
-              Try{" "}
-              <span className="tech-value rounded border border-border px-1 py-0.5 text-xs">Ctrl K</span>{" "}
-              to search lessons, problems and simulators by name, or browse the{" "}
+              {/* Resolved per platform rather than hardcoded: this line is
+                  read by someone who has just failed to find a term and is
+                  being told how to search properly, and "Ctrl K" on a Mac
+                  reads as "this site has no shortcut for you". */}
+              Try <SearchShortcutHint /> to search lessons, problems and simulators by name, or
+              browse the{" "}
               <Link
                 href="/map"
-                className="text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar-accent"
+                className="text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar"
               >
                 concept map
               </Link>{" "}

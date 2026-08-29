@@ -95,18 +95,54 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
     <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-          <text x={WIDTH / 2} y={16} textAnchor="middle" className="fill-muted-foreground text-[11px] font-mono">
-            3 groups of 3: inner bit-flip boundaries nested inside one outer phase-flip boundary
+          {/* THE SCALE FACTOR HERE WAS WRONG, AND EVERY SIZE BELOW WITH IT.
+              The previous note computed the effective type size from a
+              "~288px lesson column". 288px is the *page column* on a 320px
+              phone (320 less Container's `px-4` gutters) — but this SVG does
+              not render into the page column, it renders into `panel-inset
+              p-4`, and `panel-inset` (globals.css) supplies border, radius
+              and fill but no padding: the `p-4` does. So the real box is
+              288 − 2 × (16px padding + 1px border) = **254px**, and every
+              figure in the old note was ~13% optimistic.
+
+              Corrected: authored type scales by 254/520 = 0.4885. The 14 and
+              15 unit sizes the last pass installed painted at **6.84px and
+              7.33px** — it moved them off the floor by the wrong measure and
+              they stayed under it. 19 and 20 units give 9.28px and 9.77px.
+
+              The two header lines and the outer caption were shortened again
+              to match: in the mono face (0.6em advance) 19 units is 11.4
+              units per character, so 520 units of viewBox holds ~45
+              characters edge to edge and comfortably holds ~38. Text that
+              overruns an SVG viewBox is silently clipped, not scrolled, and
+              a sentence with its tail cut off teaches nothing — "inside a"
+              carries the nesting the words "inner"/"outer" were carrying,
+              and the boxes themselves carry the rest. */}
+          <text x={WIDTH / 2} y={22} textAnchor="middle" fontSize={19} className="fill-axis font-mono">
+            3 groups of 3 physical qubits
+          </text>
+          <text x={WIDTH / 2} y={46} textAnchor="middle" fontSize={19} className="fill-axis font-mono">
+            bit-flip boxes inside a phase-flip box
           </text>
 
-          {/* outer phase-flip boundary, around all three groups */}
+          {/* Outer phase-flip boundary, around all three groups. The
+              un-fired boundaries are NOT decoration: the nesting itself is
+              the lesson, so the reader must be able to see all four boxes at
+              once and register which single one is highlighted. Drawing the
+              three-quarters of the structure that isn't currently firing in
+              `--border` (the panel-edge token, 1.41:1 on `--surface-muted`,
+              under the 3:1 WCAG 2.1 SC 1.4.11 floor) meant the "nested"
+              claim was invisible on the dark theme until you happened to
+              pick the error type that lit a given box. `--axis` clears 3:1
+              on every panel depth and still sits well below the accent
+              highlight, so the fired/not-fired distinction survives. */}
           <rect
             x={outerRect.x}
             y={outerRect.y}
             width={outerRect.width}
             height={outerRect.height}
             rx={14}
-            className={outerFires ? "fill-accent/10 stroke-accent" : "fill-none stroke-border"}
+            className={outerFires ? "fill-accent/10 stroke-accent" : "fill-none stroke-axis"}
             strokeWidth={outerFires ? 2.5 : 1.5}
             strokeDasharray="8 5"
           />
@@ -121,20 +157,30 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
                   width={group.rect.width}
                   height={group.rect.height}
                   rx={10}
-                  className={fired ? "fill-accent/15 stroke-accent" : "fill-none stroke-border"}
+                  className={fired ? "fill-accent/15 stroke-accent" : "fill-none stroke-axis"}
                   strokeWidth={fired ? 2.5 : 1.5}
                   strokeDasharray="5 4"
                 />
-                <text x={group.cx} y={group.rect.y - 8} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-mono">
+                <text x={group.cx} y={group.rect.y - 10} textAnchor="middle" fontSize={20} className="fill-axis font-mono">
                   group {group.index + 1}
                 </text>
+                {/* Shortened from "inner: bit-flip protected". At the type
+                    size this figure now needs, three copies of a 25-character
+                    string centred 170 units apart overlap each other; the
+                    full phrasing survives once, in the caption under the
+                    whole row, where it only has to fit once. At 20 units the
+                    surviving 8 characters are 96 units wide, centred on
+                    clusters at x = 90, 260 and 430 — 74 units of clear space
+                    between neighbours, and the leftmost edge at x = 42 stays
+                    inside the outer boundary at x = 32. */}
                 <text
                   x={group.cx}
-                  y={group.rect.y + group.rect.height + 14}
+                  y={group.rect.y + group.rect.height + 18}
                   textAnchor="middle"
-                  className={fired ? "fill-accent text-[9.5px] font-semibold" : "fill-muted-foreground text-[9.5px] font-mono"}
+                  fontSize={20}
+                  className={fired ? "fill-accent font-semibold" : "fill-axis font-mono"}
                 >
-                  inner: bit-flip protected
+                  bit-flip
                 </text>
 
                 {group.qubits.map((q) => {
@@ -143,7 +189,7 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
                     <g key={q.index}>
                       {isTarget && <circle cx={q.x} cy={q.y} r={13} className="fill-none stroke-accent" strokeWidth={2.5} />}
                       <circle cx={q.x} cy={q.y} r={8} className="fill-brand" />
-                      <text x={q.x + 20} y={q.y + 4} className="fill-muted-foreground text-[9.5px] font-mono">
+                      <text x={q.x + 20} y={q.y + 7} fontSize={19} className="fill-axis font-mono">
                         q{q.index}
                       </text>
                     </g>
@@ -153,13 +199,25 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
             );
           })}
 
+          {/* Re-shortened from "outer: phase-flip protected (spans all 3
+              groups)". That was 47 characters, which the old note sized at
+              ~423 units — correct arithmetic for 15 units, but 15 units was
+              itself set from the wrong 288px column (see the header note).
+              At the 20 units this figure actually needs, 47 characters is
+              47 × 0.6 × 20 = 564 units in the mono face: 44 units WIDER than
+              the whole 520-unit viewBox, so the string would have been
+              clipped at both ends with no scrollbar and no other symptom.
+              The 37 characters kept are 444 units, centred at x = 260, so
+              they run 38..482 and clear the outer boundary's own 32..488.
+              "spans all 3" is what the drawn box already says. */}
           <text
             x={WIDTH / 2}
-            y={outerRect.y + outerRect.height + 20}
+            y={outerRect.y + outerRect.height + 26}
             textAnchor="middle"
-            className={outerFires ? "fill-accent text-[11px] font-semibold" : "fill-muted-foreground text-[11px] font-mono"}
+            fontSize={20}
+            className={outerFires ? "fill-accent font-semibold" : "fill-axis font-mono"}
           >
-            outer: phase-flip protected (spans all 3 groups)
+            outer: phase-flip protected (3 groups)
           </text>
         </svg>
       </div>
@@ -194,7 +252,7 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
         </section>
       </div>
 
-      <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {outcomeText(errorType, targetQubit)}
       </div>
     </div>

@@ -2,8 +2,11 @@ import { PILLARS } from "./curriculum";
 import type { Pillar } from "./types";
 
 /**
- * One of the 13 real simulator anchors on `/simulators` (each `<section>`
- * there is addressable as `/simulators#${simulatorId}`).
+ * A real simulator anchor on `/simulators` (each `<section>` there is
+ * addressable as `/simulators#${simulatorId}`). The page carries fourteen;
+ * the thirteen below are the ones a concept or glossary term points at —
+ * `compare-states-explorer` is reachable only from `/simulators` itself and
+ * is deliberately absent rather than listed and unused.
  */
 export type SimulatorId =
   | "bloch-sphere"
@@ -35,10 +38,15 @@ export type ConceptNode = {
 };
 
 /**
- * ~20-25 hand-picked, load-bearing concepts spanning all four pillars. Every
- * `lessonSlugs` entry was cross-checked against the real file paths under
- * `src/content/lessons/` (and matches the slug format `getAllLessonsMeta()`
- * derives from them: the path relative to that root, minus `.mdx`).
+ * The load-bearing concepts of the curriculum — 59 of them, spanning all six
+ * pillars (it began as ~25 across the first four and grew with the Mastery
+ * and Apex courses). Every `lessonSlugs` entry was cross-checked against the
+ * real file paths under `src/content/lessons/` (and matches the slug format
+ * `getAllLessonsMeta()` derives from them: the path relative to that root,
+ * minus `.mdx`).
+ *
+ * These are also the source of 59 of the 258 `/glossary` entries — see
+ * `glossary.ts`, which reads this file and must never edit it.
  */
 export const CONCEPT_NODES: ConceptNode[] = [
   // ---------------------------------------------------------------------
@@ -48,7 +56,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "superposition",
     title: "Superposition",
     definition:
-      "A quantum system can exist in a combination of basis states at once, with complex amplitudes rather than classical probabilities — the idea every other concept on this map ultimately builds on.",
+      "A quantum system's state can be a weighted combination of basis states, written with complex amplitudes rather than classical probabilities — which is what lets contributions cancel as well as add, and the idea every other concept on this map ultimately builds on.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/classical-to-quantum/superposition-interference-and-phase"],
     prerequisiteIds: [],
@@ -57,7 +65,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "measurement",
     title: "Measurement",
     definition:
-      "Measuring a quantum system collapses its superposition to a single outcome, with probabilities given by the squared magnitude of each amplitude (the Born rule).",
+      "Measurement returns exactly one outcome from a state that held several, with probability given by the squared magnitude of that outcome's amplitude (the Born rule), and leaves the system in the state matching what was seen — so an immediate repeat returns the same answer.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized"],
     prerequisiteIds: ["superposition"],
@@ -66,7 +74,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "phase-interference",
     title: "Phase & Interference",
     definition:
-      "Complex amplitudes carry a phase, and adding amplitudes with different phases lets probabilities constructively or destructively interfere — the mechanism nearly every quantum algorithm exploits for advantage.",
+      "Complex amplitudes carry a phase, so contributions to the same outcome can reinforce or cancel before the Born rule squares them — leaving that outcome more or less likely than either contribution alone, which is the mechanism nearly every quantum algorithm exploits for advantage.",
     pillar: "quantum-mechanics",
     lessonSlugs: [
       "quantum-mechanics/classical-to-quantum/why-complex-amplitudes",
@@ -149,7 +157,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "bell-states",
     title: "Bell States",
     definition:
-      "The four maximally entangled two-qubit states; testing their correlations against the CHSH inequality is the clearest experimental proof that nature isn't locally classical.",
+      "The four maximally entangled two-qubit states, the simplest being (|00⟩+|11⟩)/√2: neither qubit has a definite value on its own, yet measuring both always gives matching results. Testing their correlations against the CHSH inequality is the clearest experimental proof that nature isn't locally classical.",
     pillar: "quantum-computing",
     lessonSlugs: [
       "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement",
@@ -222,7 +230,10 @@ export const CONCEPT_NODES: ConceptNode[] = [
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-algorithms-ii/qaoa-and-combinatorial-optimization"],
     simulatorId: "qaoa-explorer",
-    prerequisiteIds: ["quantum-circuits"],
+    // The cost and mixer layers *are* e^(-iγC) and e^(-iβB): a reader who has
+    // not met a Hamiltonian generating time evolution cannot read the ansatz,
+    // so the edge is a real dependency and not just course ordering.
+    prerequisiteIds: ["quantum-circuits", "hamiltonians-time-evolution"],
   },
   {
     id: "quantum-error-correction",
@@ -315,7 +326,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "self-adjoint-operator",
     title: "Self-Adjoint Operators",
     definition:
-      "An operator is self-adjoint only when its domain matches its adjoint's exactly, not merely when ⟨φ|Aψ⟩=⟨Aφ|ψ⟩ holds — a distinction invisible for finite-dimensional matrices but essential on the infinite-dimensional spaces quantum mechanics actually uses, since self-adjointness alone guarantees a genuine spectral decomposition and unitary time evolution.",
+      "An operator that equals its own adjoint, domain included: A = A† demands that the domains of A and A† match, not merely that ⟨φ|Aψ⟩=⟨Aφ|ψ⟩ holds. The distinction is invisible for finite-dimensional matrices but essential on the infinite-dimensional spaces quantum mechanics actually uses, since self-adjointness alone guarantees a genuine spectral decomposition and unitary time evolution.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness"],
     prerequisiteIds: ["wave-mechanics"],
@@ -324,7 +335,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "spectral-theorem-pvm",
     title: "Spectral Theorem (Projection-Valued Measures)",
     definition:
-      "Every self-adjoint operator equals ∫λ dE(λ) for a unique projection-valued measure E — the general theorem that reduces to the familiar finite-dimensional A=Σλᵢ Pᵢ exactly when E happens to be a staircase, and extends Born's rule to a single statement covering both discrete and continuous spectra at once.",
+      "Every self-adjoint operator can be written as an integral over its spectrum, A=∫λ dE(λ), for a unique projection-valued measure E. When the spectrum is discrete this reduces to the familiar A=Σλᵢ Pᵢ, and the same statement extends Born's rule to cover discrete and continuous spectra at once.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators",
@@ -384,7 +395,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "css-stabilizer-codes",
     title: "CSS Codes & General Stabilizer Formalism",
     definition:
-      "General [[n,k,d]] stabilizer codes, and the CSS construction that builds one directly from two nested classical linear codes — the machinery behind the Steane [[7,1,3]] code and every large-scale fault-tolerant proposal, including surface codes, extending the 3-qubit bit-flip code's syndrome idea to codes that correct arbitrary single-qubit errors.",
+      "General stabilizer codes, written [[n,k,d]] for n physical qubits encoding k logical qubits at code distance d, and the CSS construction that builds one directly from two nested classical linear codes. This is the machinery behind the Steane [[7,1,3]] code and every large-scale fault-tolerant proposal, including surface codes, extending the 3-qubit bit-flip code's syndrome idea to codes that correct arbitrary single-qubit errors.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/quantum-information-theory/css-codes-and-the-general-stabilizer-formalism",
@@ -424,7 +435,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "barren-plateaus",
     title: "Barren Plateaus",
     definition:
-      "A variational circuit's parameter-shift gradient has exactly zero mean everywhere, but for sufficiently deep, expressive ansätze measured against a global cost function, its variance shrinks exponentially in qubit count (a concentration-of-measure effect) — the reason gradient-based training of large variational circuits can stall even when nothing else is wrong.",
+      "Averaged over random parameter initializations a variational circuit's gradient has zero mean, and for sufficiently deep, expressive ansätze measured against a global cost function its variance shrinks exponentially in qubit count (a concentration-of-measure effect) — the reason gradient-based training of large variational circuits can stall even when nothing else is wrong.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability",
@@ -465,7 +476,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "entanglement-distillation-typical-subspaces",
     title: "Entanglement Distillation & Typical Subspaces",
     definition:
-      "Many copies of a partially-entangled pure state concentrate almost all their probability weight on a typical subspace of dimension ≈2^(nS(ρ)); projecting onto it and relabeling (entanglement concentration) distills ≈nS(ρ) near-perfect Bell pairs via LOCC alone, giving entanglement entropy an operational, protocol-defined meaning.",
+      "A protocol that converts many weakly entangled pairs into fewer near-perfect Bell pairs using only local operations and classical communication (LOCC). Given n copies of a partially-entangled pure state whose reduced density matrix on one side is ρ, almost all the probability weight concentrates on a typical subspace of dimension ≈2^(nS(ρ)); projecting onto it and relabeling (entanglement concentration) distills ≈nS(ρ) near-perfect Bell pairs, giving entanglement entropy an operational, protocol-defined meaning.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces"],
     prerequisiteIds: ["schmidt-decomposition", "entanglement", "data-processing-inequality"],
@@ -499,7 +510,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-signal-processing",
     title: "Quantum Signal Processing (QSP)",
     definition:
-      "Alternates a fixed single-qubit signal rotation W(x) with tunable phase gates e^{iφZ}; the resulting unitary's top-left entry is a controllable polynomial P(x) of degree ≤d, and essentially any polynomial meeting degree/parity/boundedness conditions is achievable by choosing the phases alone.",
+      "Computes a polynomial of a number x on a quantum computer using only one qubit. Alternating the fixed rotation W(x) = e^{i·arccos(x)·X}, whose angle encodes the signal x, with tunable phase gates e^{iφZ} yields a unitary whose top-left entry is a controllable polynomial P(x) of degree ≤d, and essentially any polynomial meeting degree/parity/boundedness conditions is achievable by choosing the phases alone.",
     pillar: "apex",
     lessonSlugs: ["apex/algorithmic-frontiers/quantum-signal-processing"],
     prerequisiteIds: ["block-encoding-lcu", "phase-interference"],
@@ -562,7 +573,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "magic-state-distillation",
     title: "Magic-State Distillation",
     definition:
-      "Because the Eastin-Knill theorem forbids a fault-tolerant transversal T gate on any code that also corrects arbitrary single-qubit errors, universal fault-tolerant computation instead injects a non-Clifford 'magic state' via a Clifford-only teleportation-style circuit; distillation protocols (e.g. 15-to-1) consume many noisy copies to output fewer copies at cubically suppressed error, making the injected resource affordable.",
+      "Because the Eastin-Knill theorem rules out a *universal* transversal gate set on any error-detecting code — and the surface code's transversal gates are exactly the Cliffords — universal fault-tolerant computation instead injects a non-Clifford 'magic state' via a Clifford-only teleportation-style circuit; distillation protocols (e.g. 15-to-1) consume many noisy copies to output fewer copies at cubically suppressed error, making the injected resource affordable.",
     pillar: "apex",
     lessonSlugs: [
       "apex/fault-tolerance-frontiers/magic-states-and-distillation",
@@ -601,7 +612,12 @@ export const CONCEPT_NODES: ConceptNode[] = [
       "The k-Local Hamiltonian problem asks whether a Hamiltonian built from polynomially many terms, each acting on at most a constant k qubits, has ground-state energy below one threshold or above another, given an inverse-polynomial promise gap. It is QMA-complete (Kitaev's theorem, via a 'history state' reduction), making it the quantum analogue of Cook-Levin's NP-completeness of 3-SAT, with hardness surviving down to 2-local terms and physically realistic 2D lattice models.",
     pillar: "apex",
     lessonSlugs: ["apex/quantum-complexity-theory/the-local-hamiltonian-problem"],
-    prerequisiteIds: ["qma-quantum-verification", "hamiltonian-simulation-trotterization"],
+    // Nothing in the QMA-completeness statement uses Trotterization; what it
+    // genuinely needs is the notion of a Hamiltonian and its ground-state
+    // energy. The old edge to `hamiltonian-simulation-trotterization` recorded
+    // where "Hamiltonian" happens to be reintroduced in the Apex course, not a
+    // dependency. (Depth is unchanged either way.)
+    prerequisiteIds: ["qma-quantum-verification", "hamiltonians-time-evolution"],
   },
   {
     id: "quantum-query-lower-bound-methods",
@@ -704,7 +720,7 @@ const MARGIN_Y = 100;
 
 /**
  * Computes a deterministic, non-force-directed layout for `CONCEPT_NODES`:
- * x is the concept's pillar (one of 4 columns), y is its longest-path depth
+ * x is the concept's pillar (one column per pillar, six of them), y is its longest-path depth
  * in the prerequisite DAG (computed via Kahn's algorithm — concepts with no
  * prerequisites sit at the top, deeper concepts sit lower). No layout
  * library or force simulation involved.

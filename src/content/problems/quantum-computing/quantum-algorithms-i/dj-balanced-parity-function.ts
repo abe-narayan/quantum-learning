@@ -63,6 +63,10 @@ export const djBalancedParityFunction: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Deutsch-Jozsa's derivation guarantees exactly 0 probability on |0...0⟩ for any balanced function, this one included.",
     whyCorrect: "Verified directly against the engine's actual circuit execution, not just the general formula.",
-    whyWrong: ["Any nonzero-but-not-1 answer misunderstands that the promise (constant XOR balanced) rules out intermediate probabilities entirely."],
+    whyWrong: [
+      { optionId: "b", text: "The no-interference guess, as if the four outcomes were equally likely. Deutsch-Jozsa's interference drives the answer to one end or the other." },
+      { optionId: "c", text: "An intermediate value the promise rules out. Under constant-or-balanced, the amplitude on |00⟩ is all or nothing." },
+      { optionId: "d", text: "The constant-function outcome. Parity is balanced, so the ± terms cancel rather than reinforce." },
+    ],
   },
 };

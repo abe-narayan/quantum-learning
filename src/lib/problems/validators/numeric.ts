@@ -6,6 +6,13 @@ import type { ValidationResult } from "./types";
  * that isn't a plain numeric literal (e.g. "1/2", "sqrt(2)") is rejected
  * as unparseable rather than executed. Students are expected to submit a
  * decimal value, same as any numeric-answer field in a textbook.
+ *
+ * When the submission is wrong, `answer.nearMisses` (if authored) is
+ * checked next: each entry is a recognizable mistake (sign flip, forgot to
+ * square, ...) with its own feedback and an optional tolerance window
+ * defaulting to the answer's own. Checked only *after* the correct-answer
+ * test fails, so a near miss can never shadow the real answer; first
+ * matching entry wins, keeping the result deterministic.
  */
 export function validateNumeric(answer: NumericAnswer, rawAnswer: string): ValidationResult {
   const trimmed = rawAnswer.trim();
@@ -24,6 +31,15 @@ export function validateNumeric(answer: NumericAnswer, rawAnswer: string): Valid
 
   if (error <= allowedError) {
     return { status: "correct", message: "Correct." };
+  }
+
+  for (const nearMiss of answer.nearMisses ?? []) {
+    const nearMissTolerance = nearMiss.tolerance ?? answer.tolerance;
+    const nearMissAllowedError =
+      toleranceType === "relative" ? Math.abs(nearMiss.value) * nearMissTolerance : nearMissTolerance;
+    if (Math.abs(parsed - nearMiss.value) <= nearMissAllowedError) {
+      return { status: "incorrect", message: nearMiss.feedback };
+    }
   }
 
   return { status: "incorrect", message: answer.incorrectFeedback };

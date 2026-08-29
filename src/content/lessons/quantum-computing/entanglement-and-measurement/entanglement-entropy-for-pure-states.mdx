@@ -11,7 +11,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Entanglement Entropy for Pure Bipartite States",
   description:
-    "Combining the last two lessons into the standard entanglement measure, with a rigorous counterexample proving exactly why it stops being valid the moment the global state is mixed.",
+    "Combining the last two lessons into the standard entanglement measure, with a counterexample showing why it stops being valid the moment the global state is mixed.",
   course: "entanglement-and-measurement",
   module: "entanglement-entropy-for-pure-states",
   order: 1,
@@ -35,24 +35,23 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Two pieces are now on the table: for a 2-qubit pure state, the reduced state's mixedness is equivalent to entanglement, and von Neumann entropy is the standard way to quantify mixedness. Combining them gives entanglement entropy — but the word "pure" is not decoration, and this lesson proves why it can't be dropped.
+Two pieces are on the table. For a 2-qubit pure state, a reduced state's mixedness is equivalent to entanglement, and von Neumann entropy quantifies mixedness. Put them together and you have a number that measures entanglement. The word "pure" in the first piece is load-bearing, and this lesson shows what breaks without it.
 </LessonHook>
 
 ## Motivation
 
-Lesson 5 proved the first piece; Lesson 6 built the second. Combining
-them gives **entanglement entropy**, but the word "pure" in the first
-piece is not decoration, and this lesson proves why it can't be
-dropped.
+Lesson 5 proved that a reduced state's mixedness is equivalent to
+entanglement for 2-qubit pure states, and Lesson 6 built von Neumann
+entropy to quantify mixedness. Composing the two gives **entanglement
+entropy**: a single number, in bits, saying how entangled a pure
+bipartite state is.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
-  alt="NIST apparatus for trapping and entangling two beryllium ions used as qubits"
-  caption="NIST's ion-trap apparatus, used to entangle pairs of trapped ions. Entanglement entropy is the quantity that measures how tied together two such particles' fates are, even though this lesson only ever computes it on paper."
-  credit="Y. Colombe/NIST"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
-  license="Public domain (U.S. government work)"
-/>
+Both halves of that sentence deserve scrutiny, and one of them is a trap.
+"How entangled" implies a graded quantity rather than a yes/no flag, which
+turns out to be right. "Pure bipartite state" looks like a technical
+precondition that could probably be relaxed later, which turns out to be
+wrong. Drop it and the formula reports maximal entanglement for a state
+with none, as the counterexample below shows.
 
 ## Mathematical Development
 
@@ -80,17 +79,17 @@ $$
 E(|00\rangle) = 0 \qquad E(|{+}0\rangle) = 0 \qquad E(|\Phi^+\rangle) = 1 \text{ bit} \qquad E(|\psi(\theta)\rangle) = -\cos^2\theta\log_2\cos^2\theta - \sin^2\theta\log_2\sin^2\theta
 $$
 
-Product states give exactly 0 (Lesson 5's theorem: pure reduced state
-$\Rightarrow$ zero entropy). Bell states give exactly 1 bit (maximally
-mixed reduced state). The partially entangled family
+Product states give 0 (Lesson 5's theorem: pure reduced state implies zero
+entropy). Bell states give 1 bit (maximally mixed reduced state). The
+partially entangled family
 $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$
 interpolates continuously between the two, since Lesson 4 already found
-$\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$ directly. This
-is a genuine graded measure, not a binary "entangled or not" flag, and
-it increases monotonically as $\theta$ moves from $0$ toward $\pi/4$
-(verified directly in `entanglement.test.ts`). Plotted across the full
-family, the climb from $0$ toward $\pi/4$ and the mirrored descent back
-to $0$ by $\pi/2$ are visible directly, not just asserted:
+$\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$. So this is a
+graded measure rather than a binary flag, and it increases monotonically
+as $\theta$ moves from $0$ toward $\pi/4$ (checked in
+`entanglement.test.ts`). Plotted across the family, the climb toward
+$\pi/4$ and the mirrored descent back to $0$ by $\pi/2$ are visible rather
+than asserted:
 
 <ParametricCurve
   frames={[
@@ -105,7 +104,7 @@ to $0$ by $\pi/2$ are visible directly, not just asserted:
       ]
     }
   ]}
-  referenceLines={[{ y: 1, label: "1 bit — Bell state (θ=π/4)" }]}
+  referenceLines={[{ y: 1, label: "1 bit: Bell state at θ=π/4" }]}
   ariaLabel="Entanglement entropy E(theta) plotted as a function of theta from 0 to pi/2, rising monotonically from 0 to 1 bit at theta equals pi/4 then falling back to 0"
 />
 
@@ -115,60 +114,58 @@ to $0$ by $\pi/2$ are visible directly, not just asserted:
 
 ### Why "pure" cannot be dropped: a counterexample
 
-Try applying the same formula, $S(\rho_A)$, to a *mixed* 2-qubit global
-state and see what goes wrong. Take $\rho_{AB}=I/4$, the maximally mixed
-state on two qubits — which is $(I/2)\otimes(I/2)$, a plain product of
-two independent qubits, with zero entanglement by construction. Predict
-what its reduced entropy reports before computing it.
+Apply the same formula, $S(\rho_A)$, to a *mixed* 2-qubit global state and
+watch it break. Take $\rho_{AB}=I/4$, the maximally mixed state on two
+qubits, which factors as $(I/2)\otimes(I/2)$: a product of two independent
+qubits, with zero entanglement by construction. Predict what its reduced
+entropy reports before computing it.
 
 <PredictBeforeReveal
-  question="ρ_AB = I/4 is a product state — provably zero entanglement, no correlation between the two qubits at all. What will S(ρ_A) report?"
+  question="ρ_AB = I/4 is a product state, with provably zero entanglement and no correlation between the two qubits. What will S(ρ_A) report?"
   options={[
     { label: "0 bits, correctly reflecting zero entanglement", value: "zero" },
     { label: "Something between 0 and 1 bit", value: "partial" },
-    { label: "1 bit — the same reading as a maximally entangled Bell state", value: "max" },
+    { label: "1 bit, the same reading as a maximally entangled Bell state", value: "max" },
   ]}
   correctValue="max"
-  explanation="S(ρ_A) comes out to a full 1 bit — indistinguishable from a Bell state's reading — even though I/4 has provably zero entanglement. Reduced entropy, applied to a mixed global state, can't tell 'mixed because entangled' apart from 'mixed because the whole preparation was already a classical mixture.' That's exactly why the definition above required the global state to be pure."
+  explanation="S(ρ_A) comes out to a full 1 bit, indistinguishable from a Bell state's reading, even though I/4 has provably zero entanglement. Applied to a mixed global state, reduced entropy cannot tell 'mixed because entangled' apart from 'mixed because the preparation was already a classical mixture.' That is why the definition above required the global state to be pure."
 />
 
 Its reduced state, computed by the same <Term id="partial-trace">partial trace</Term> as always, is
-$\rho_A=\text{Tr}_B(I/4)=I/2$ (verified directly against the engine),
-giving $S(\rho_A)=1$ bit, the *same* value as a maximally entangled
-Bell state. Reduced entropy just reported "maximal entanglement" for a
-state that has provably none at all.
+$\rho_A=\text{Tr}_B(I/4)=I/2$ (verified against the engine), giving
+$S(\rho_A)=1$ bit: the same value as a maximally entangled Bell state.
+The formula has just reported maximal entanglement for a state with none.
 
 ### Diagnosing the failure
 
-The problem is that $S(\rho_A)$, computed from a mixed global state,
-conflates two genuinely different sources of uncertainty that a pure
-global state doesn't have to distinguish between:
+$S(\rho_A)$, computed from a mixed global state, conflates two different
+sources of uncertainty:
 
-1. Uncertainty about qubit A *because it's entangled with qubit B*
-   (genuine entanglement).
-2. Uncertainty about qubit A *because the whole preparation was already
-   a classical mixture, with no entanglement involved at all*, exactly
-   what happened with $I/4$, where the mixedness came entirely from
-   preparing each qubit independently as a mixed state.
+1. Uncertainty about qubit A *because it is entangled with qubit B*. This
+   is the entanglement you wanted to measure.
+2. Uncertainty about qubit A *because the preparation was already a
+   classical mixture*. This is what happened with $I/4$, where the
+   mixedness came from preparing each qubit independently as a mixed
+   state, with no entanglement anywhere.
 
-For a pure global state, source 2 is impossible by definition: there's
-no leftover global uncertainty to confuse with entanglement, which is
-exactly what made Lesson 5's proof work. For a mixed global state, the
-two sources add together in $S(\rho_A)$ with no way to separate them
-back out from $\rho_A$ alone. This is a real, structural limitation, not
-a minor technicality: it's the reason a genuine measure of mixed-state
-entanglement (like the mixed-state Wootters concurrence, mentioned but
-not implemented in the next lesson) needs fundamentally more machinery
-than "just take the reduced entropy."
+For a pure global state, source 2 cannot occur. There is no leftover
+global uncertainty to confuse with entanglement, which is what made
+Lesson 5's proof work. For a mixed global state, the two sources add
+together in $S(\rho_A)$, and $\rho_A$ alone does not contain enough
+information to separate them again.
+
+This is a structural limitation, not a technicality, and it is why a real
+measure of mixed-state entanglement (the mixed-state Wootters concurrence,
+mentioned but not implemented in the next lesson) needs substantially more
+machinery than "take the reduced entropy."
 
 ## Physical Interpretation
 
-Entanglement entropy is the right tool exactly when there is no
-independent, non-entanglement source of mixedness to confuse it with,
-guaranteed only when the full system starts in a definite, known pure
-state. The moment the global state itself carries classical uncertainty,
-reduced entropy stops being a reliable signal of entanglement
-specifically, as the $I/4$ counterexample proves outright.
+Entanglement entropy is the right tool when there is no independent source
+of mixedness to confuse it with, and that is guaranteed only when the full
+system starts in a definite, known pure state. The moment the global state
+carries classical uncertainty of its own, reduced entropy stops tracking
+entanglement specifically, as the $I/4$ counterexample shows.
 
 ## Worked Example
 
@@ -197,7 +194,7 @@ for exactly this reason, not a general density matrix.
 **Treating "entangled" as binary once entropy is nonzero.** Entanglement
 entropy is graded: $0.469$ bits (the worked example above) reflects
 partial entanglement, meaningfully less than a Bell state's full 1 bit,
-not simply "entangled, like any other entangled state."
+not merely "entangled, like any other entangled state."
 </Callout>
 
 ## Practice Questions

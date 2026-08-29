@@ -100,18 +100,18 @@ export const lessonMeta = {
 
 Addition of Angular Momentum combined two spin-$\tfrac12$ particles by
 direct inspection: four candidate states, checked by hand against $\vec
-J^{\,2}$ and $J_z$. That approach doesn't scale, real problems need $l=1$
+J^{\,2}$ and $J_z$. That approach doesn't scale. Real problems need $l=1$
 electrons coupled to spin, two different orbital angular momenta coupled
 to each other, arbitrary $j_1,j_2$. This lesson derives the **general**
 machinery: a recursion relation that generates every Clebsch-Gordan
-coefficient for any $j_1\otimes j_2$, then a theorem, Wigner-Eckart, that
+coefficient for any $j_1\otimes j_2$, then <Term id="clebsch-gordan-wigner-eckart">a theorem, Wigner-Eckart, that</Term>
 turns "does this transition happen at all" into a question answerable
 from symmetry alone.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Wigner.jpg"
   alt="Portrait photograph of physicist Eugene Wigner, taken in 1963, the year he won the Nobel Prize in Physics"
-  caption="Eugene Wigner, whose 1927 theorem this lesson proves: that any spherical tensor operator's matrix elements between angular-momentum eigenstates factor into a Clebsch-Gordan coefficient (all the angular dependence) times a single reduced matrix element (all the operator-specific physics)."
+  caption="Eugene Wigner in 1963, the year he received the Nobel Prize in Physics. The theorem derived in this lesson carries his name and Carl Eckart's."
   credit="Nobel Foundation, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Wigner.jpg"
   license="Public domain"
@@ -176,8 +176,8 @@ combination is already fixed by the ladder result, and the state
 **orthogonal** to it (within that 2-dimensional same-$m$ subspace) is, by
 construction, annihilated by lowering into anything outside its own
 multiplet, making it the top state of the *next* multiplet,
-$j=j_1+j_2-1$. Repeating, ladder down, peel off the orthogonal
-complement, start the next $j$, generates every multiplet down to
+$j=j_1+j_2-1$. Repeating (ladder down, peel off the orthogonal
+complement, start the next $j$) generates every multiplet down to
 $j=|j_1-j_2|$ (the triangle rule's lower bound, the same bound Addition
 of Angular Momentum found by exhaustive counting for $j_1=j_2=\tfrac12$).
 The one remaining freedom at each new top state (an overall phase) is
@@ -220,7 +220,7 @@ $j=\tfrac12$ multiplet: $\left|\tfrac12,\tfrac12\right\rangle=\sqrt{\tfrac23}|1,
 Continuing the recursion on both multiplets generates all six states.
 Building all six as explicit vectors and checking them against this
 platform's own total $\vec J^{\,2}$ and $J_z$ (built from
-`angularMomentumX/Y/Z` at $j_1=1$ and $j_2=\tfrac12$, exactly the
+`angularMomentumX/Y/Z` at $j_1=1$ and $j_2=\tfrac12$, the same
 approach Addition of Angular Momentum used, generalized to unequal
 $j_1,j_2$) confirms every coefficient, to floating-point precision:
 
@@ -234,7 +234,7 @@ $j_1,j_2$) confirms every coefficient, to floating-point precision:
 | $|1/2,-1/2\rangle$ | $0.75$ | $-0.5$ |
 
 $3.75=\tfrac32\cdot\tfrac52$, $0.75=\tfrac12\cdot\tfrac32$: both
-$j(j+1)$, exactly, not approximately. These are precisely the
+$j(j+1)$, exactly, not approximately. These are the
 coefficients Degenerate Perturbation Theory used to build its coupled
 basis $U$, here actually derived rather than borrowed.
 
@@ -246,12 +246,12 @@ basis $U$, here actually derived rather than borrowed.
     { label: "Both have exactly two contributing product states", value: "both-two" },
   ]}
   correctValue="one-two"
-  explanation="mⱼ=+3/2 with m₁∈{1,0,−1} and m₂∈{+½,−½} has only one solution, m₁=1,m₂=+½, so |3/2,+3/2⟩ is forced to equal that single product state exactly (coefficient 1, no superposition). mⱼ=+1/2 has two solutions, (m₁,m₂)=(1,−½) and (0,+½), so |3/2,+1/2⟩ is a genuine two-term superposition — exactly the √(2/3), √(1/3) split the recursion below derives."
+  explanation="mⱼ=+3/2 with m₁∈{1,0,−1} and m₂∈{+½,−½} has only one solution, m₁=1,m₂=+½, so |3/2,+3/2⟩ is forced to equal that single product state exactly (coefficient 1, no superposition). mⱼ=+1/2 has two solutions, (m₁,m₂)=(1,−½) and (0,+½), so |3/2,+1/2⟩ is a two-term superposition — exactly the √(2/3), √(1/3) split the recursion below derives."
 />
 
 <InteractiveSection
   title="Step through each coupled state's CG decomposition"
-  description="Each frame is one |j,mj⟩ coupled state; the bars show its real, computed Clebsch-Gordan coefficients against the six uncoupled |mL,mS⟩ product states. Exactly two bars are nonzero for the interior states (a genuine superposition); exactly one for the stretched states |3/2,±3/2⟩, matching the 'unique top state' argument above."
+  description="Each frame is one |j,mj⟩ coupled state; the bars show its real, computed Clebsch-Gordan coefficients against the six uncoupled |mL,mS⟩ product states. Exactly two bars are nonzero for the interior states (a superposition); exactly one for the stretched states |3/2,±3/2⟩, matching the 'unique top state' argument above."
 >
   <BarChartExplorer
     frames={cgBarFrames}
@@ -315,7 +315,7 @@ automatically, with zero additional calculation.
 
 <InsightBlock>
   Whether a transition is allowed is a symmetry question, answerable from
-  Clebsch-Gordan vanishing conditions alone — no radial integral has to
+  Clebsch-Gordan vanishing conditions alone: no radial integral has to
   be evaluated to know a transition is forbidden.
 </InsightBlock>
 
@@ -329,7 +329,7 @@ $(-1)^l$, so the full matrix element's integrand has parity
 $(-1)^{l+l'+1}$; it vanishes unless $l+l'$ is odd, which combined with the
 triangle rule above leaves exactly $\Delta l=\pm1$. This parity argument
 is a separate ingredient from Wigner-Eckart itself, worth stating honestly
-rather than folding silently into "the selection rule.") This is exactly
+rather than folding silently into "the selection rule.") This is
 the electric-dipole selection rule underlying every atomic transition
 this platform's Hydrogen Atom course used, now derived from symmetry
 rather than asserted.

@@ -46,20 +46,14 @@ Proving an algorithm can't be wrong in one direction is one thing. Proving it ac
 
 ## Motivation
 
-The last lesson showed <Term id="vqe">VQE</Term>'s cost function can never dip below the
-true ground energy — a real guarantee, but not yet a demonstration
-that the algorithm gets anywhere close to it. This lesson runs the
-real optimizer on a specific <Term id="hamiltonians-time-evolution">Hamiltonian</Term>, not a hand-picked success
-story.
+The last lesson showed <Term id="vqe">VQE</Term>'s cost function cannot dip below the true
+ground energy. That is a guarantee about what the algorithm cannot do, and
+a guarantee of that shape is compatible with the algorithm being useless:
+a program that always returns $+1000$ also never falls below the floor.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/IQM_Quantum_Computer_Espoo_Finland.jpg/1280px-IQM_Quantum_Computer_Espoo_Finland.jpg"
-  alt="A working IQM superconducting quantum computer installed in Espoo, Finland"
-  caption="A real, working superconducting quantum computer (IQM, Espoo, Finland) — the class of NISQ-era hardware the hybrid optimization loop run in this lesson is actually built to target."
-  credit="Ragsxl"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IQM_Quantum_Computer_Espoo_Finland.jpg"
-  license="CC BY-SA 4.0"
-/>
+So this lesson checks the other direction. A specific <Term id="hamiltonians-time-evolution">Hamiltonian</Term>, the
+real optimizer, its real convergence history, and the exact answer computed
+independently for comparison.
 
 ## Mathematical Development
 
@@ -83,10 +77,10 @@ computed independently via `exactGroundStateEnergy`, not asserted.
   options={[
     { label: "It uses close to all 80 iterations to converge tightly", value: "full" },
     { label: "It stops well short, once its step size shrinks enough", value: "early" },
-    { label: "It stops immediately — the starting point is already optimal", value: "immediate" },
+    { label: "It stops immediately, since the starting point is already optimal", value: "immediate" },
   ]}
   correctValue="early"
-  explanation="The run halts after 28 iterations, fewer than half the 80-iteration budget, once its step size shrinks below 1e-6 — a second, real stopping condition distinct from the iteration cap, and the one that actually ends this run."
+  explanation="The run halts after 28 iterations, fewer than half the 80-iteration budget, once its step size shrinks below 1e-6. That is a second stopping condition, separate from the iteration cap, and it is the one that ends this run. Worth noticing because on a real problem the iteration cap usually is the binding constraint, and hitting it means you stopped early rather than converged."
 />
 
 `runVqe(H, 80)` starts at $(\theta,\varphi)=(\pi/2,0)$ (the state
@@ -99,8 +93,8 @@ than halfway to its 80-step budget without ever coming close to using it.
 The cost history decreases monotonically (proven structurally: the
 optimizer only ever accepts a strictly better candidate, checked directly
 in this course's tests) and converges to an energy within $10^{-12}$ of
-$-1$, far tighter than needed for any practical purpose — and it's exactly
-that shrinking step size, not the iteration cap, that ends the run.
+$-1$, far tighter than any practical purpose requires. The shrinking step
+size, not the iteration cap, is what ends the run.
 
 This is the actual history array `runVqe` returned for this exact
 Hamiltonian, not a smoothed illustration:
@@ -122,21 +116,19 @@ Hamiltonian, not a smoothed illustration:
   ariaLabel="VQE cost function versus iteration, converging to the exact ground energy"
 />
 
-Every step either strictly improves the cost or shrinks the search step;
-the curve never dips below the dashed $E_0$ line, exactly what the
+Every step either strictly improves the cost or shrinks the search step,
+and the curve never dips below the dashed $E_0$ line, which is what the
 variational principle from the last lesson guarantees.
 
 ### The landscape underneath that descent
 
-The curve above only shows cost against iteration count, one number per
-step. It doesn't show what the pattern search was actually walking
-around inside: the full two-parameter surface $\langle\psi(\theta,
-\varphi)|H|\psi(\theta,\varphi)\rangle$ it was descending. Unlike the
-last lesson's $H=Z$ (whose energy ignores $\varphi$ entirely), this
-Hamiltonian has a genuine off-diagonal $X$ term, so both parameters
-matter: $\varphi$ now actually shifts the cost, rather than being
-completely free the way it was for $H=Z$'s $\varphi$-independent
-landscape:
+The curve above shows cost against iteration count, one number per step. It
+does not show the terrain the pattern search was walking across: the
+two-parameter surface $\langle\psi(\theta,\varphi)|H|\psi(\theta,\varphi)\rangle$
+it was descending. Unlike the last lesson's $H=Z$, whose energy ignores
+$\varphi$ altogether, this Hamiltonian has an off-diagonal $X$ term, so
+both parameters move the cost and the landscape is a genuine surface
+rather than a curve extruded sideways:
 
 <CostLandscapeHeatmap
   grid={toyLandscapeGrid}
@@ -153,8 +145,8 @@ continuous optimum). That is a genuinely *different* point from where
 `runVqe` actually converged, $\theta\approx
 {toyVqeResult.params.theta.toFixed(2)}$, $\varphi\approx
 {toyVqeResult.params.phi.toFixed(2)}$, itself reaching energy
-{toyVqeResult.energy.toFixed(4)}, essentially exactly $-1$. Two
-different search strategies, an exhaustive grid and an adaptive local
+{toyVqeResult.energy.toFixed(4)}, which is $-1$ to four decimal places.
+Two different search strategies, an exhaustive grid and an adaptive local
 one, landing in two different corners of the same surface, both close to
 the same floor: exactly the multiple-minimizers point the second Common
 Mistake below makes concrete, not a contradiction between them.
@@ -170,12 +162,16 @@ direction shows further improvement.
 
 ## Physical Interpretation
 
-This is the entire VQE idea, stripped to its smallest working case: a
-quantum circuit measures an energy, a classical loop nudges the circuit's
-parameters toward lower energy, and because of the variational
-principle from the last lesson, every step of that process is
-trustworthy in the sense that it's always searching from *above* the true
-answer, never mistakenly below it.
+This is the whole VQE idea at its smallest working scale. A quantum circuit
+measures an energy, a classical loop nudges the circuit's parameters toward
+a lower one, and the variational principle means the search always
+approaches the answer from above.
+
+Scaling it up changes the difficulty but not the shape. The two things that
+get harder are building an ansatz expressive enough to contain a good state
+(here trivial, since two angles cover the whole Bloch sphere) and
+optimizing over many more parameters without stalling. Both are open
+research problems; neither shows up in a single qubit.
 
 ## Worked Example
 

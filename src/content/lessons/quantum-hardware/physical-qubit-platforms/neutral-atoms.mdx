@@ -18,7 +18,7 @@ export const lessonMeta = {
   module: "neutral-atoms",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 18,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/physical-qubit-platforms/trapped-ions"],
   objectives: [
     "Explain how optical tweezers trap a neutral (uncharged) atom, in contrast to an ion trap's electric fields",
@@ -28,7 +28,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels",
-      note: "A 'Rydberg state' is literally a hydrogen-like high-n state named for this lesson's Rydberg energy unit; the same Eₙ=-13.6 eV/n² physics is why exciting an atom's outer electron to large n gives it the enormous, strongly-interacting orbit Rydberg blockade depends on.",
+      note: "A 'Rydberg state' is a hydrogen-like high-n state named for this lesson's Rydberg energy unit; the same Eₙ=-13.6 eV/n² physics is why exciting an atom's outer electron to large n gives it the enormous, strongly-interacting orbit Rydberg blockade depends on.",
     },
   ],
 };
@@ -91,8 +91,8 @@ largest qubit counts of any platform to date.
 ### Rydberg blockade: how two-qubit gates work
 
 Neutral atoms don't have a shared mechanical mode the way trapped ions
-do, so they need a completely different trick for two-qubit gates.
-Instead, two-qubit gates typically use **Rydberg blockade**: briefly
+do, so they need a different trick for two-qubit gates. Instead,
+two-qubit gates typically use **Rydberg blockade**: briefly
 exciting an atom to a highly excited ("Rydberg") state, whose enormously
 large electron orbit creates a strong interaction with any *nearby*
 atom also being excited, strong enough to shift the neighbor's energy
@@ -119,9 +119,9 @@ physics rather than an abstract circuit element.
 Atom A's expanded Rydberg orbital is what creates the blockade radius
 around it; atom B, sitting inside that radius, has its energy levels
 shifted enough that the same laser can no longer excite it to |r⟩ &mdash;
-its excitation attempt is suppressed, not merely weaker. Crucially, this
-is a *distance-limited* effect, not a blanket property of "being a
-nearby atom": drag the slider above to pull atom B away from atom A and
+its excitation attempt is suppressed, not merely weaker. The effect is
+*distance-limited*, not a blanket property of "being a nearby atom":
+drag the slider above to pull atom B away from atom A and
 find the separation at which its excitation stops being suppressed and
 starts succeeding. That crossover, right at the blockade radius r_b, is
 the boundary a real Rydberg-blockade gate is engineered around &mdash;
@@ -156,9 +156,30 @@ It's also why this is the platform with actual paying customers today:
 QuEra's Aquila system has been cloud-accessible for years, Pasqal sells
 neutral-atom systems directly to industrial and government labs in
 Europe, and Atom Computing and Harvard/QuEra collaborations have pushed
-past 1,000 and then 3,000 atoms in a single array. The same
-reconfigurable-tweezer argument this lesson makes about scaling is
-exactly the argument each of those roadmaps is selling.
+past 1,000 and then 3,000 atoms in a single array. The
+reconfigurable-tweezer argument this lesson makes about scaling is the
+argument each of those roadmaps is selling.
+
+### What this platform is bad at
+
+Set against that, three costs are real and specific to tweezer arrays:
+
+- **Atoms fall out.** A tweezer holds an atom for seconds, not
+  indefinitely, and a trap that loses its atom mid-circuit produces a
+  qubit that is neither $|0\rangle$ nor $|1\rangle$ but *absent* — a
+  leakage error, which error-correcting codes handle worse than a plain
+  bit flip. Loaded-site imaging and mid-circuit reloading exist to deal
+  with this, and both cost time.
+- **The duty cycle is slow.** Loading, imaging, and rearranging an array
+  into the requested geometry happens between shots, and takes far
+  longer than the gates do. A neutral-atom device can be enormous and
+  still return fewer shots per second than a small superconducting chip.
+- **Gate fidelity trails the leaders.** The Rydberg-blockade entangling
+  gate is harder to make clean than a trapped ion's motional gate or a
+  transmon's coupler, and published two-qubit fidelities for this
+  platform have historically sat behind both. Scale and fidelity are
+  separate axes; this platform leads on the first, not yet on the
+  second.
 
 ## Worked Example
 
@@ -166,8 +187,8 @@ exactly the argument each of those roadmaps is selling.
 gate as directly as an ion's shared vibrational mode?**
 
 An ordinary (non-excited) neutral atom has essentially no long-range
-interaction with its neighbors. That absence of interaction is exactly
-what made it easy to trap densely in the first place, but it also means
+interaction with its neighbors. That absence of interaction is what made
+it easy to trap densely in the first place, but it also means
 two ordinary neutral atoms sitting near each other don't naturally
 influence one another's quantum state. Rydberg blockade solves this by
 *temporarily* creating a strong interaction on demand (via the Rydberg
@@ -216,6 +237,9 @@ light.
 - Two-qubit gates use Rydberg blockade: a temporary, deliberately
   induced strong interaction between neighboring excited atoms, not an
   always-on coupling like trapped ions' shared vibrational mode.
+- The bill comes as atom loss (a leakage error, not a bit flip), a slow
+  load-image-rearrange cycle between shots, and entangling-gate
+  fidelities that have historically trailed both ions and transmons.
 
 ## Further Exploration
 

@@ -24,12 +24,17 @@ export const qpeTailBoundAtJ5: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "Plug j=5 into 1/(4(|j|−1/2)²): compute (5−0.5)²=20.25 first, then 1/(4×20.25).",
+    incorrectFeedback: "Check the half-step correction: the denominator uses |j|−1/2, not |j|. The order of operations matters too: square the bracketed quantity before multiplying by 4. If your bound came out larger than a few percent, one of those two steps went astray.",
+    nearMisses: [
+      { value: 0.01, tolerance: 0.0002, feedback: "0.01 = 1/(4·5²) uses |j| where the derivation uses |j| − 1/2. The half-step makes the bound slightly looser, not tighter." },
+      { value: 1 / (4 * 5.5 ** 2), tolerance: 0.0002, feedback: "The half-step is subtracted, not added: the denominator uses |j| − 1/2 = 4.5." },
+      { value: 0.05, tolerance: 0.002, feedback: "0.05 is 1/(4|j|), missing the square. The bound falls off quadratically with distance from the best estimate." },
+    ],
   },
   hints: [
-    { text: "|j|−1/2 = 5−0.5 = 4.5." },
-    { text: "(4.5)² = 20.25." },
-    { text: "1/(4×20.25) = 1/81." },
+    { text: "The bound is given in the prompt, so the work is substitution. First be clear on what j means: how many steps the measured outcome sits from the best estimate. Then note the half-step subtraction inside the parentheses before plugging anything in." },
+    { text: "With j = 5, the bracketed quantity is |j| − 1/2 = 4.5." },
+    { text: "Square 4.5, multiply the result by 4, then take the reciprocal. Expect a small probability, on the order of one percent." },
   ],
   solution: {
     steps: [

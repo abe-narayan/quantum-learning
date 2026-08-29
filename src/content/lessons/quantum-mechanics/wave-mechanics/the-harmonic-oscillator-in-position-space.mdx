@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "The Harmonic Oscillator in Position Space",
   description:
-    "A second, independent derivation of the harmonic oscillator's energy spectrum, this time by direct substitution into the position-space Schrodinger equation, confirming the ladder-operator result from the last course by an entirely different route.",
+    "A second, independent derivation of the harmonic oscillator's energy spectrum, this time by direct substitution into the position-space Schrödinger equation, confirming the ladder-operator result from the last course by an entirely different route.",
   course: "wave-mechanics",
   module: "the-harmonic-oscillator-in-position-space",
   order: 1,
@@ -21,14 +21,14 @@ export const lessonMeta = {
     "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
   ],
   objectives: [
-    "Verify by direct substitution that the Gaussian ground state solves the position-space Schrodinger equation with E_0 = hbar*omega/2",
+    "Verify by direct substitution that the Gaussian ground state solves the position-space Schrödinger equation with E_0 = hbar*omega/2",
     "Connect the position-space eigenstates to the ladder-operator treatment from the last course as two representations of the same physics",
     "Identify the physical potential V(x) = (1/2) m omega^2 x^2 the abstract H = hbar*omega(N+1/2) from the last course was standing in for",
   ],
 };
 
 <LessonHook eyebrow="Why this matters">
-The last course solved the harmonic oscillator entirely algebraically — ladder operators, a commutator, pure linear algebra — with a promise that the connection to the physical potential ½mω²x² would come once continuous position was developed. This lesson is that promise kept.
+The last course solved the harmonic oscillator with ladder operators, a commutator, and nothing but linear algebra, promising that the connection to the physical potential ½mω²x² would come once continuous position was developed. This lesson is that promise kept.
 </LessonHook>
 
 ## Motivation
@@ -38,8 +38,9 @@ the physical potential $\tfrac12m\omega^2x^2$ is made precise once
 continuous position is developed." Keeping it means a second,
 independent derivation of the *same* energy spectrum, this time by
 direct substitution into the position-space Schrödinger equation. The
-two routes agreeing exactly is real evidence the physics is being
-described consistently across the whole platform.
+two routes agreeing is evidence that the physics is being described
+consistently, and it also tells you something the algebra alone could
+not: which potential the abstract $H$ was standing in for all along.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/8/8b/Charles_Hermite.jpg"
@@ -64,7 +65,7 @@ minimum; a Gaussian is the natural guess, and this lesson checks it works.
 ### The candidate ground state
 
 Guess $\psi_0(x) = \left(\dfrac{m\omega}{\pi\hbar}\right)^{1/4}
-e^{-m\omega x^2/(2\hbar)}$, the exact formula
+e^{-m\omega x^2/(2\hbar)}$, which is the formula
 `harmonicOscillatorEigenstate(grid, 0, omega, mass)` evaluates on the
 grid.
 
@@ -96,23 +97,56 @@ $$
 -\frac{\hbar^2}{2m}\psi_0'' + \frac12m\omega^2x^2\psi_0 = \frac{\hbar\omega}{2}\,\psi_0
 $$
 
-precisely the time-independent Schrödinger equation with <Term id="eigenvalue-eigenvector">eigenvalue</Term>
-$E_0=\hbar\omega/2$. This is exactly the ladder-operator result's ground
+the time-independent Schrödinger equation with <Term id="eigenvalue-eigenvector">eigenvalue</Term>
+$E_0=\hbar\omega/2$. This matches the ladder-operator result's ground
 state energy, now confirmed by direct calculus, with no reference to
 $a,a^\dagger$ anywhere in this derivation.
+
+### One rung up: verifying $n=1$
+
+The same check works one level higher. The first excited state is the
+ground state's Gaussian multiplied by $x$ (odd, with a single node at
+the origin): $\psi_1(x) = C\,x\,e^{-m\omega x^2/(2\hbar)}$. Writing
+$a\equiv m\omega/\hbar$ to keep the algebra readable:
+
+$$
+\psi_1' = C\left(1 - ax^2\right)e^{-ax^2/2}, \qquad \psi_1'' = C\left(a^2x^3 - 3ax\right)e^{-ax^2/2} = \left(a^2x^2-3a\right)\psi_1
+$$
+
+Substituting into the Schrödinger equation, the $x^2$ terms cancel by
+the same mechanism as before ($\tfrac{\hbar^2a^2}{2m} = \tfrac12 m\omega^2$),
+and only the constant term survives:
+
+$$
+-\frac{\hbar^2}{2m}\psi_1'' + \frac12m\omega^2x^2\psi_1 = \frac{3a\hbar^2}{2m}\,\psi_1 = \frac{3\hbar\omega}{2}\,\psi_1
+$$
+
+$E_1 = 3\hbar\omega/2$ drops out, again matching the ladder: one
+quantum $\hbar\omega$ above the ground state.
+
+<PredictBeforeReveal
+  question="The infinite well's levels spread apart as n grows (Eₙ ∝ n²). You now have the oscillator's E₀ = ħω/2 and E₁ = 3ħω/2. As n keeps climbing, what happens to the gaps between adjacent oscillator levels?"
+  options={[
+    { label: "They widen with n, like the infinite well's", value: "widen" },
+    { label: "They stay the same size, ħω, all the way up", value: "even" },
+    { label: "They shrink with n, crowding toward a limit", value: "shrink" },
+  ]}
+  correctValue="even"
+  explanation="The full spectrum is Eₙ = ħω(n + ½), so every gap is ħω regardless of n: a perfectly even ladder, which is what makes the ladder-operator picture work at all (a† adds one fixed quantum ħω wherever you start). Physically, the parabola widens as energy grows, so higher states get more room to fit their extra oscillations; a hard-walled box never widens, which is why its levels race apart as n² instead."
+/>
 
 ### The excited states
 
 The higher eigenstates $\psi_n(x) \propto H_n(\sqrt{m\omega/\hbar}\,x)\,
 e^{-m\omega x^2/(2\hbar)}$ (Hermite polynomials $H_n$ multiplying the same
 Gaussian envelope, `harmonicOscillatorEigenstate` implements $n=0..3$
-via exactly this closed form) can be checked the same way, each giving
+via this closed form) can be checked the same way, each giving
 $E_n=\hbar\omega(n+\tfrac12)$, the identical, equally-spaced ladder
-derived purely algebraically last course. Two totally different
-derivations (raising/lowering operators on an abstract <Term id="hilbert-space">Hilbert space</Term>;
-direct substitution into a differential equation) landing on the exact
-same spectrum is not a coincidence. It's the same physical system,
-correctly described in two different mathematical languages.
+derived purely algebraically last course. Two unrelated derivations
+(raising and lowering operators on an abstract <Term id="hilbert-space">Hilbert space</Term>; direct
+substitution into a differential equation) landing on the same spectrum is
+not a coincidence. It is one physical system described in two
+mathematical languages.
 
 Set next to the infinite well's ladder from the last lesson, the contrast
 is immediate:
@@ -122,20 +156,20 @@ is immediate:
   ariaLabel="Harmonic oscillator energy levels for omega=2, showing perfectly even spacing"
 />
 
-Every rung here sits exactly $\omega$ above the last, unlike the well's
-widening gaps. Same diagram component, a completely different spectrum: a
-quadratic confining potential produces evenly-spaced levels, a hard
-box does not.
+Every rung here sits $\omega$ above the last, where the well's gaps
+widened without limit. The same diagram component draws two different
+spectra because the potentials differ: a quadratic well produces evenly
+spaced levels, a hard box does not.
 
 ## Physical Interpretation
 
 The Gaussian shape reflects the classical turning points: the harmonic
 potential rises steeply away from $x=0$, so the wavefunction decays
 smoothly into the classically forbidden region, visibly different from
-the infinite well's abrupt, hard cutoff to exactly zero (compare the two
+the infinite well's abrupt, hard cutoff to zero (compare the two
 Explorer presets directly).
 
-<InteractiveSection title="Soft tails vs. hard walls" description="Compare the Harmonic Oscillator presets' shapes to the Infinite Well's. The harmonic ground state's Gaussian tails extend smoothly outward (classically forbidden but quantum-mechanically present, however small), where the well's eigenstates are hard-clipped to exactly zero at the boundary. Both are numerically confirmed stationary, and both match their respective analytical energies in the comparison panel.">
+<InteractiveSection title="Soft tails vs. hard walls" description="Compare the Harmonic Oscillator presets' shapes to the Infinite Well's. The harmonic ground state's Gaussian tails extend smoothly outward (classically forbidden but quantum-mechanically present, however small), where the well's eigenstates are hard-clipped to zero at the boundary. Both are numerically confirmed stationary, and both match their respective analytical energies in the comparison panel.">
   <LazyWavefunctionExplorer initialPresetId="harmonic-ground" />
 </InteractiveSection>
 
@@ -153,7 +187,7 @@ E_1-E_0 = 2 = \omega, \qquad E_2-E_1 = 2 = \omega \;\checkmark
 $$
 
 matching `harmonicOscillatorEnergyLevel(n, omega)` and the last
-course's algebraic result exactly.
+course's algebraic result.
 
 ## Common Mistakes
 
@@ -161,7 +195,7 @@ course's algebraic result exactly.
 **Thinking this derivation and the ladder-operator one describe
 different physical systems.** They're the same oscillator; the different
 mathematical routes are a feature, not a coincidence to be suspicious of.
-Cross-checking a result by an independent method is exactly how physics
+Cross-checking a result by an independent method is how physics
 confirms understanding.
 </Callout>
 
@@ -188,7 +222,9 @@ differentiating the exponent.
 
 - Direct substitution of the Gaussian ansatz $\psi_0(x)\propto
   e^{-m\omega x^2/(2\hbar)}$ into the position-space Schrödinger equation
-  gives $E_0=\hbar\omega/2$ exactly, with the $x^2$ terms cancelling.
+  gives $E_0=\hbar\omega/2$, with the $x^2$ terms cancelling; the same
+  substitution for $\psi_1\propto x\,e^{-m\omega x^2/(2\hbar)}$ gives
+  $E_1=3\hbar\omega/2$.
 - Excited states multiply the same Gaussian envelope by Hermite
   polynomials, reproducing $E_n=\hbar\omega(n+\tfrac12)$.
 - This confirms, via an entirely independent method, the energy spectrum
@@ -198,7 +234,7 @@ differentiating the exponent.
 
 <NextDiscovery>
 [Wave Packet Dynamics and Dispersion](/lessons/quantum-mechanics/wave-mechanics/wave-packet-dynamics-and-dispersion) returns to the free
-particle to work out exactly how (and how fast) a localized packet spreads
+particle to work out how (and how fast) a localized packet spreads
 over time.
 
 The [full Wavefunction Explorer](/simulators#wavefunction-explorer) has

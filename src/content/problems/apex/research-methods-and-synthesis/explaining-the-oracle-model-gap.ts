@@ -24,7 +24,24 @@ export const explainingTheOracleModelGap: ConceptualProblem = {
     requiredConceptGroups: [
       ["oracle", "black box", "black-box", "query access", "query model"],
       ["explicit", "unconditional", "not proven", "does not extend", "doesn't extend", "narrower", "different setting"],
-      ["20 qubit", "small scale", "small-scale", "asymptotic", "doesn't prove", "does not prove", "not proof", "corroborat", "consistent with"],
+      {
+        phrases: [
+          "20 qubit",
+          "small scale",
+          "small-scale",
+          "fixed size",
+          "asymptotic",
+          "doesn't prove",
+          "does not prove",
+          "not proof",
+          "corroborat",
+          "consistent with",
+          "only tests",
+          "cannot establish",
+        ],
+        missingFeedback:
+          "Part (a) is covered. Part (b) is still missing: say why numerics run at n ≤ 20 cannot carry the claim. They sample one small, fixed range of sizes inside the same oracle construction the theorem already covers, so they corroborate it there without establishing anything about large n or about the explicit-Hamiltonian setting.",
+      },
     ],
     incorrectFeedback:
       "Address both halves explicitly: name the specific restriction (black-box/oracle query access) that Theorem 4.2's classical lower bound depends on, and separately explain why numerics at a fixed small size (n<=20) can't by themselves establish an asymptotic or broader-setting claim.",

@@ -30,6 +30,11 @@ export const productStateNotEigenstate: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "P₁₂|0⟩⊗|1⟩ = |1⟩⊗|0⟩, a completely different basis vector from |0⟩⊗|1⟩ — compute the norm of their difference.",
+    nearMisses: [
+      { value: 0, feedback: "Zero would mean the exchange left the state alone, making it an eigenstate. Swapping the two particles here produces a different basis vector entirely." },
+      { value: 2, feedback: "2 is the squared distance. The norm takes the square root of the sum of squared components." },
+      { value: 1, feedback: "Each of the two vectors contributes a component of magnitude 1 in a different slot, so the squared distance is 1² + 1², not 1." },
+    ],
   },
   hints: [
     { text: "|0⟩⊗|1⟩ has a 1 in the '(particle1=0, particle2=1)' slot; its exchange has a 1 in the '(particle1=1, particle2=0)' slot instead." },

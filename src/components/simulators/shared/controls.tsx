@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import { useId, useRef, type ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { TechValue } from "@/components/ui/Typography";
@@ -149,6 +149,19 @@ export function SimulatorSlider({
 }) {
   const autoId = useId();
   const inputId = id ?? autoId;
+  // The hint is rendered as a plain sibling paragraph below the track, which
+  // means nothing connected it to the input it explains. That is tolerable for
+  // "The relative phase between |0⟩ and |1⟩", and not tolerable at all for the
+  // case this control actually has: `ThreeComponentMixtureExplorer` disables
+  // its p₁ slider when p₀ has taken all the weight and puts the *reason* —
+  // "p₀ has taken all of the weight … Lower p₀ to free some up" — in the hint.
+  // A disabled input is out of the tab order, so a screen-reader user reached
+  // a control they could not operate (or never reached it at all) with the
+  // explanation sitting in unassociated text nearby. `aria-describedby` makes
+  // the hint part of the control's own announcement, which is what WCAG 3.3.2
+  // is asking for and what turns "unavailable" into "unavailable, and here is
+  // how to make it available again".
+  const hintId = `${inputId}-hint`;
   const display = formatValue ? formatValue(value) : String(value);
 
   return (
@@ -172,6 +185,7 @@ export function SimulatorSlider({
         disabled={disabled}
         onChange={(event) => onChange(Number(event.target.value))}
         aria-valuetext={valueText ? valueText(value) : undefined}
+        aria-describedby={hint ? hintId : undefined}
         // `h-11` (44px) rather than the browser default ~16px: a range input
         // centres its track vertically inside whatever height it's given, so
         // this buys the full touch target the mobile audit asks for without
@@ -180,7 +194,11 @@ export function SimulatorSlider({
         // overrides it.
         className="mt-1 h-11 w-full accent-[var(--pillar-accent)] disabled:opacity-50"
       />
-      {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
+      {hint ? (
+        <p id={hintId} className="mt-1 text-xs text-muted-foreground">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -245,24 +263,66 @@ export function PillGroup({
   disabled?: boolean;
   className?: string;
 }) {
+  // ARIA Authoring Practices roving tabindex for `role="radio"` groups, same
+  // pattern as `visualizations/PresetToggle.tsx`: only the selected option is
+  // in the Tab order, and arrow keys move *and* select the adjacent option
+  // (wrapping), mirroring native radio buttons.
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const selectedIndex = options.findIndex((option) => option.id === value);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+    const count = options.length;
+    if (count === 0) return;
+
+    let delta = 0;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") delta = 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") delta = -1;
+    else return;
+
+    event.preventDefault();
+    const current = selectedIndex === -1 ? 0 : selectedIndex;
+    const nextIndex = (current + delta + count) % count;
+    onChange(options[nextIndex].id);
+    buttonRefs.current[nextIndex]?.focus();
+  };
+
   return (
     <div role="radiogroup" aria-label={label} className={cn("flex flex-wrap gap-2", className)}>
-      {options.map((option) => (
+      {options.map((option, i) => (
         <button
           key={option.id}
+          ref={(el) => {
+            buttonRefs.current[i] = el;
+          }}
           type="button"
           role="radio"
           aria-checked={value === option.id}
+          tabIndex={i === selectedIndex || (selectedIndex === -1 && i === 0) ? 0 : -1}
           disabled={disabled}
           title={option.title}
           onClick={() => onChange(option.id)}
+          onKeyDown={handleKeyDown}
           className={cn(
-            "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+            // `border` is on the shared line, not the branches. Only the
+            // *unselected* pill used to carry one, so every selection shrank
+            // the chosen pill's border box by 2px in each axis and nudged
+            // every pill after it along the row — and, once a row wrapped,
+            // could move a pill onto another line. That is a reflow on every
+            // click of a control whose entire job is being clicked, and it
+            // reads as the layout flinching away from the pointer. It is also
+            // the exact defect `visualizations/PresetToggle.tsx` documents
+            // fixing in itself; this component is the same control one
+            // directory over and is used in 12 places, so it was the larger
+            // half of the same bug. The selected pill's border is drawn in
+            // `border-pillar` so the fill still reads as a solid shape rather
+            // than a filled pill inside a grey outline.
+            "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             "disabled:pointer-events-none disabled:opacity-50",
             value === option.id
-              ? "bg-pillar text-brand-foreground hover:opacity-90"
-              : "border border-border bg-surface text-foreground hover:bg-surface-muted"
+              ? "border-pillar bg-pillar text-brand-foreground hover:opacity-90"
+              : "border-border bg-surface text-foreground hover:bg-surface-muted"
           )}
         >
           {option.label}

@@ -167,7 +167,7 @@ export function TwoAmplitudeMode({
       </div>
 
       {variant === "global-vs-relative" ? (
-        <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
+        <div className="rounded-panel border border-border bg-surface-muted/60 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Global phase (γ) vs. relative phase (δ)
           </p>
@@ -182,7 +182,7 @@ export function TwoAmplitudeMode({
           </div>
         </div>
       ) : variant === "basis-change" ? (
-        <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
+        <div className="rounded-panel border border-border bg-surface-muted/60 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Measuring in the {"{"}|+⟩,|−⟩{"}"} basis instead
           </p>
@@ -199,7 +199,7 @@ export function TwoAmplitudeMode({
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
+        <div className="rounded-panel border border-border bg-surface-muted/60 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             If α and β both contribute to the same outcome
           </p>

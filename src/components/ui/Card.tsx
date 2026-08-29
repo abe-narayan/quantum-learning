@@ -21,7 +21,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-panel)] border border-border bg-surface p-6 shadow-sm",
+        "rounded-panel border border-border bg-surface p-6 shadow-sm",
         className
       )}
     >

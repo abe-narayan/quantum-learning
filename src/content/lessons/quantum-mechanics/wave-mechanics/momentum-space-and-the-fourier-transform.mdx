@@ -18,7 +18,7 @@ export const gaussianPacketFrames = Array.from({ length: 21 }, (_, i) => gaussia
 export const lessonMeta = {
   title: "Momentum Space and the Fourier Transform",
   description:
-    "The momentum-space wavefunction phi(k) as a basis change, exactly like the finite-dimensional basis changes from Mathematical Foundations, computed here by a real, tested numerical Fourier transform, not a black box.",
+    "The momentum-space wavefunction phi(k) as a basis change, of the same kind as the finite-dimensional basis changes from Mathematical Foundations, computed here by a real, tested numerical Fourier transform rather than a black box.",
   course: "wave-mechanics",
   module: "momentum-space-and-the-fourier-transform",
   order: 1,
@@ -39,20 +39,21 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  ψ(x) and φ(k) are the same state, written in two different bases —
-  exactly like |+⟩ and |0⟩,|1⟩ — not two different things about a
+  ψ(x) and φ(k) are one state written in two bases, the way |+⟩ and
+  |0⟩,|1⟩ describe one qubit. They are not two different things about a
   particle.
 </LessonHook>
 
 ## Motivation
 
 Mathematical Foundations proved that changing basis in a finite-dimensional
-<Term id="hilbert-space">Hilbert space</Term> is just re-expressing the same vector in different
-coordinates, with the new coefficients found via inner products against
-the new basis vectors. Momentum space is the *exact same idea*, with the
-momentum eigenfunctions $\phi_p(x)=e^{ipx/\hbar}$ from the last lesson as
-the new "basis." The only twist is that the basis is now a continuum, so
-the change-of-basis sum becomes an integral: the Fourier transform.
+<Term id="hilbert-space">Hilbert space</Term> re-expresses the same vector in different coordinates,
+with the new coefficients found by taking inner products against the new
+basis vectors. Momentum space is that same move, with the momentum
+eigenfunctions $\phi_p(x)=e^{ipx/\hbar}$ from the last lesson as the new
+"basis." One thing changes: the basis is now a continuum, so the
+change-of-basis sum becomes an integral. That integral is the Fourier
+transform.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Joseph_Fourier.jpg"
@@ -69,8 +70,8 @@ $\psi(x)$ answers "how much <Term id="amplitude">amplitude</Term> at each positi
 wavenumber $k=p/\hbar$, this platform's convention with $\hbar=1$) answers
 the *same physical state's* "how much amplitude at each momentum?" They
 are two different-basis descriptions of one vector $|\psi\rangle$.
-Neither is more fundamental, exactly as $|+\rangle$ isn't more fundamental
-than $|0\rangle,|1\rangle$.
+Neither is more fundamental, in the same way that $|+\rangle$ is no more
+fundamental than $|0\rangle,|1\rangle$.
 
 ## Mathematical Development
 
@@ -87,9 +88,10 @@ $$
 
 (natural units, $\hbar=1$, so momentum equals wavenumber $k$, the
 convention this whole course uses, consistent with the energy formulas
-already derived in the last course). The $1/\sqrt{2\pi}$ isn't arbitrary.
-It's exactly what makes the transform **<Term id="unitary-operator">unitary</Term>**: a basis change, not a
-distortion.
+already derived in the last course). The $1/\sqrt{2\pi}$ is not arbitrary.
+It is the factor that makes the transform **<Term id="unitary-operator">unitary</Term>**, so that moving to
+momentum space is a change of description rather than a distortion of the
+state. Parseval's theorem, next, is that statement made checkable.
 
 ### Parseval's theorem: the transform preserves norm
 
@@ -100,21 +102,20 @@ $$
 This is the continuous version of "changing basis preserves length" (a
 unitary matrix satisfies $\|Uv\|=\|v\|$). Total probability is 1 whether
 computed from $|\psi(x)|^2$ or from $|\phi(k)|^2$, because they describe
-the same state. This platform's `fourier.test.ts` verifies this identity
-numerically for the platform's actual FFT-based implementation, not just
-algebraically.
+the same state. This platform's `fourier.test.ts` verifies the identity
+numerically against the FFT-based implementation, not only algebraically.
 
-### How the platform actually computes this
+### How the platform computes this
 
-A literal integral over infinite continuous $x$ can't run on a computer.
+A literal integral over infinite continuous $x$ cannot run on a computer.
 The platform's `fourier.ts` module implements the **discrete** Fourier
-transform on the finite grid `Grid1D` already introduced: a genuine,
-hand-written, tested radix-2 FFT (`fft`/`ifft`), with the continuous
-formula above recovered as the grid spacing $\Delta x\to0$. The engine
-applies the exact normalization convention derived above (a factor of
-$\Delta x/\sqrt{2\pi}$ on top of the raw discrete transform) precisely so
-that the *numerical* Parseval identity holds to machine precision. This
-is directly, numerically checked in the test suite, not assumed.
+transform on the finite grid `Grid1D` already introduced: a hand-written,
+tested radix-2 FFT (`fft`/`ifft`), with the continuous formula above
+recovered as the grid spacing $\Delta x\to0$. The engine carries the
+normalization convention derived above into the discrete case (a factor of
+$\Delta x/\sqrt{2\pi}$ on top of the raw discrete transform), which is
+what makes the *numerical* Parseval identity hold to machine precision.
+The test suite checks that numerically rather than assuming it.
 
 ### Momentum-space uncertainty
 
@@ -123,10 +124,10 @@ Since $\hat p$ acts as multiplication by $\hbar k$ in momentum space
 in position space, provable, though not proven here, by transforming the
 eigenvalue equation from the last lesson), the momentum-space variance
 $(\Delta p)^2 = \langle p^2\rangle - \langle p\rangle^2$ is computed from
-$|\phi(k)|^2$ exactly as $(\Delta x)^2$ was computed from $|\psi(x)|^2$.
-This is exactly how `Wavefunction1D.expectationMomentum()` and
-`.expectationKineticEnergy()` are implemented: transform to momentum
-space, then take the same kind of weighted average as before.
+$|\phi(k)|^2$ by the same recipe that produced $(\Delta x)^2$ from
+$|\psi(x)|^2$. That recipe is how `Wavefunction1D.expectationMomentum()`
+and `.expectationKineticEnergy()` are implemented: transform to momentum
+space, then take the same weighted average as before.
 
 ## Physical Interpretation
 
@@ -140,12 +141,12 @@ re-derived from calculus two lessons ago, is *this* fact, restated.
 <PredictBeforeReveal
   question="If you narrow a wave packet's spatial width σ (localize it more tightly in x), what happens to its momentum-space width?"
   options={[
-    { label: "It narrows too — both get more localized", value: "narrows" },
-    { label: "It widens — position and momentum trade off", value: "widens" },
-    { label: "It's unaffected — the two are independent", value: "unaffected" },
+    { label: "It narrows too: both get more localized", value: "narrows" },
+    { label: "It widens: position and momentum trade off", value: "widens" },
+    { label: "It is unaffected; the two are independent", value: "unaffected" },
   ]}
   correctValue="widens"
-  explanation="It widens. This isn't a separate physical principle bolted onto the Fourier transform — it's an ordinary mathematical fact about Fourier transforms themselves: a function narrow in one domain is necessarily broad in the transform domain. The worked example below makes it exact: Δx·Δp = 1/2 no matter how σ is chosen, so shrinking one side of the product always grows the other."
+  explanation="It widens. This is not a separate physical principle bolted onto the Fourier transform. It is an ordinary mathematical fact about Fourier transforms: a function narrow in one domain is broad in the transform domain. The worked example below makes it exact. Δx·Δp = 1/2 no matter how σ is chosen, so shrinking one side of the product always grows the other."
 />
 
 <InteractiveSection title="Narrow one, widen the other" description="Switch the Wavefunction Explorer's view mode to |φ(k)|² on any preset. The free Gaussian packet's momentum-space view is a Gaussian too (the Fourier transform of a Gaussian is a Gaussian, verified numerically in this course's engine tests), centered exactly at the packet's momentum parameter. Try narrowing the packet's spatial width and watch its momentum-space width grow wider in direct proportion: the uncertainty principle, live.">
@@ -167,7 +168,7 @@ Gaussian packet exactly saturates the uncertainty bound $\Delta x\Delta
 p\ge\hbar/2$, the minimum-uncertainty state referenced (but not derived)
 in the last course.
 
-<InteractiveSection title="The uncertainty box: saturating ħ/2" description="A box of width Δx = σ and height Δp = 1/(2σ), the same construction as the Position and Momentum lesson's uncertainty box, now driven by this lesson's own Gaussian-packet formulas. Drag σ and watch the box narrow horizontally while it stretches vertically — its area Δx·Δp never changes, pinned at exactly 1/2 = ħ/2 (natural units), the worked example's saturation of the bound, shown geometrically rather than just stated.">
+<InteractiveSection title="The uncertainty box: saturating ħ/2" description="A box of width Δx = σ and height Δp = 1/(2σ), the same construction as the Position and Momentum lesson's uncertainty box, now driven by this lesson's own Gaussian-packet formulas. Drag σ and watch the box narrow horizontally while it stretches vertically. Its area Δx·Δp never changes, pinned at exactly 1/2 = ħ/2 in natural units, which is the worked example's saturation of the bound shown as a geometric constraint.">
   <PhaseSpacePanel
     mode="box"
     frames={gaussianPacketFrames}
@@ -181,8 +182,8 @@ in the last course.
 <Callout type="note">
 **Treating $\phi(k)$ as a separate, unrelated function from $\psi(x)$.**
 They're the *same state* in two bases. Every physical prediction (energy,
-momentum statistics, etc.) computed from either must agree, and the
-platform's engine tests check exactly this kind of cross-consistency.
+momentum statistics, and so on) computed from either must agree, and the
+platform's engine tests check that cross-consistency directly.
 </Callout>
 
 <Callout type="warning">
@@ -190,7 +191,7 @@ platform's engine tests check exactly this kind of cross-consistency.
 different textbooks.** Some references use $2\pi$ instead of $\sqrt{2\pi}$
 factors, or define $k$ vs. $p=\hbar k$ differently. The physics is
 identical, but the constants only match once conventions are pinned down,
-exactly as this lesson pins down the platform's.
+as this lesson pins down the platform's.
 </Callout>
 
 ## Practice Questions
@@ -209,8 +210,8 @@ exactly as this lesson pins down the platform's.
 ## Summary
 
 - $\phi(k)$ is $\psi(x)$ expressed in the momentum eigenbasis, the same
-  vector, different coordinates, exactly like any finite-dimensional
-  basis change.
+  vector in different coordinates, as in any finite-dimensional basis
+  change.
 - The Fourier transform pair with $1/\sqrt{2\pi}$ normalization is
   unitary: Parseval's theorem guarantees norm is preserved.
 - The platform computes this with a real, tested FFT on a finite grid,
@@ -221,19 +222,19 @@ exactly as this lesson pins down the platform's.
 ## Further Exploration
 
 <ChallengePrompt prompt="The worked example's Gaussian saturates Δx·Δp = ħ/2 exactly, the minimum the uncertainty principle allows. For a non-Gaussian wavefunction (say, a flat top-hat), would you expect Δx·Δp to still equal exactly ħ/2, or something larger?">
-  The lesson calls the Gaussian "the minimum-uncertainty state" — think
+  The lesson calls the Gaussian "the minimum-uncertainty state." Think
   about what that label implies for every other shape.
 </ChallengePrompt>
 
 <NextDiscovery>
   [The Schrödinger Equation in Position Space](/lessons/quantum-mechanics/wave-mechanics/the-schrodinger-equation-in-position-space) uses $\hat p$
   and $\hat x$ together to write down the equation governing how $\psi(x,t)$
-  actually evolves.
+  evolves in time.
 
   This lesson used the momentum eigenstate $\phi_p(x)=e^{ipx/\hbar}$ freely,
-  even though it isn't actually normalizable — a fully rigorous treatment
-  of exactly what kind of object $|p\rangle$ is (and why every calculation
-  built on it here was still valid) now exists in
+  even though it is not normalizable. A rigorous treatment of what kind of
+  object $|p\rangle$ is, and of why every calculation built on it here was
+  still valid, now exists in
   [Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space),
   part of the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
 </NextDiscovery>

@@ -20,16 +20,16 @@ export const whyRhoIsHermitian: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["dagger", "conjugate transpose", "adjoint"],
-      ["outer product", "reverses", "same", "|ψ⟩⟨ψ|"],
+      ["dagger", "conjugate transpose", "conjugate-transpose", "adjoint", "hermitian conjugate", "conjugate and transpose"],
+      ["outer product", "reverses", "reversing", "swap", "flips", "same ket", "same state", "same vector", "identical", "unchanged", "symmetric", "|ψ⟩⟨ψ|"],
     ],
-    incorrectFeedback: "Try again — focus on what taking the dagger of an outer product |a⟩⟨b| does in general.",
-    partialFeedback: "You're on the right track — be explicit about applying the general outer-product dagger rule to a=b=ψ.",
+    incorrectFeedback: "Try the general rule first: apply the operation to |a⟩⟨b| and see what comes out, then specialize.",
+    partialFeedback: "You're on the right track. Now specialize the general rule to the case a=b=ψ and compare the result with what you started from.",
   },
   hints: [
-    { text: "In general, (|a⟩⟨b|)† = |b⟩⟨a| — the dagger reverses the order and conjugates." },
-    { text: "Now set |a⟩=|b⟩=|ψ⟩ specifically, as in ρ=|ψ⟩⟨ψ|." },
-    { text: "What does |b⟩⟨a| become when a and b are the same ket?" },
+    { text: "Start from a general |a⟩⟨b|. What is (|a⟩⟨b|)†, according to the rule from the lesson?" },
+    { text: "Now set |a⟩=|b⟩=|ψ⟩, as in the definition of ρ." },
+    { text: "What does the rule's output become when the two kets coincide?" },
   ],
   solution: {
     steps: [

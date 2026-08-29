@@ -25,7 +25,25 @@ export const theoremVsHeuristicClassifySurfaceCodeThreshold: ConceptualProblem =
       ["heuristic", "empirical", "numerical", "simulation-based", "well-supported heuristic"],
       ["decoder", "noise model", "depends on the decoder", "decoder- and noise-model-dependent", "specific to a decoder"],
       ["not a proven theorem", "not proven", "no proof of the exact value", "unproven exact value", "the specific number is not proven"],
-      ["analytic derivation", "derive the exact threshold", "prove the exact value", "closed-form proof of p_th", "first principles derivation of the number"],
+      {
+        phrases: [
+          "analytic derivation",
+          "analytic",
+          "analytical",
+          "closed form",
+          "closed-form",
+          "first principles",
+          "first-principles",
+          "derive the exact threshold",
+          "derive the threshold",
+          "derive p_th",
+          "prove the exact value",
+          "proof of the value",
+          "rigorous derivation",
+        ],
+        missingFeedback:
+          "You have classified the claim correctly. The checklist's fourth question is still unanswered: name the specific result that would move the number up a tier. That is an analytic, first-principles derivation of the threshold value itself for a fully specified decoder and noise model, not more simulation and not the already-proven shape of the suppression law.",
+      },
     ],
     incorrectFeedback:
       "Separate the two claims. The scaling law's SHAPE, p_L ~ A(p/p_th)^((d+1)/2), rests on real theory (a mapping to the random-bond Ising model's Nishimori point) -- but that theory proves the functional FORM of the suppression, not a specific numerical value of p_th for any given decoder and noise model. The ~1% figure itself comes from simulating real surface-code patches with a specific decoder and noise model, and the lesson is explicit that p_th is 'genuinely decoder- and noise-model-dependent... not a single universal constant.' That makes the specific 1% claim Tier 2 (heuristic/empirical), resting on but not equal to a proven theoretical scaling law. Upgrading it would need an analytic, first-principles derivation of the exact threshold value for a fully specified decoder and noise model, not just the already-proven shape of the suppression curve.",

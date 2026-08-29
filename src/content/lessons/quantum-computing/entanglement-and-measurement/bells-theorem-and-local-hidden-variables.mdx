@@ -52,7 +52,7 @@ export const lessonMeta = {
   module: "bells-theorem-and-local-hidden-variables",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 30,
+  estimatedMinutes: 40,
   prerequisites: ["quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices"],
   objectives: [
     "State the local hidden-variable (LHV) model precisely, including exactly what 'local' means",
@@ -62,66 +62,68 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Settled with a number, not a philosophy">
-Einstein believed quantum mechanics had to be incomplete: that a measurement outcome was fixed in advance by some deeper layer of reality, not left genuinely open until someone looked. In 1964 John Bell found a way to settle the question — not with an argument, but with a number.
+Einstein believed quantum mechanics had to be incomplete: that a measurement outcome was fixed in advance by some deeper layer of reality, rather than left open until someone looked. In 1964 John Bell found a way to settle the question with a number instead of an argument.
 </LessonHook>
 
 ## Motivation
 
-It was a
-reasonable position, held by one of the greatest physicists who ever
-lived.
+Einstein's belief, that measurement outcomes are fixed in advance by some
+deeper layer of reality, was a reasonable position held by one of the
+greatest physicists who ever lived. For thirty years nobody could think of
+an experiment that would test it.
 
-Suppose Alice and Bob agree on any strategy they like before separating:
-coin flips, a shared secret code, an entire library of instructions
-distributed in advance. However clever that strategy, is there a limit
-to how correlated their measurement outcomes can be, once they're too
-far apart to communicate? There is, and it's a hard, provable ceiling.
-No scheme of this kind, however elaborate, can push a specific
-combination of four correlations past the number 2. Quantum mechanics,
-checked against this exact bound in the next lesson, blows straight
-through it, all the way to $2\sqrt2$: a number Einstein's picture of
-reality has no way to produce.
+Here is the question Bell asked instead. Suppose Alice and Bob agree on
+any strategy they like before separating: coin flips, a shared secret
+code, an entire library of instructions distributed in advance. However
+clever the strategy, is there a limit to how correlated their measurement
+outcomes can be once they are too far apart to communicate?
+
+There is, and it is a provable ceiling. No scheme of this kind, however
+elaborate, can push a particular combination of four correlations past the
+number 2. Quantum mechanics, checked against that bound in the next
+lesson, reaches $2\sqrt2$.
 
 Bell States and Entanglement, back in Quantum Gates & Circuits, already
-showed something suggestive: measuring both qubits of $|\Phi^+\rangle$
-in the $X$-basis still gives perfect correlation, and promised that no
-*predetermined* classical description of the two qubits could reproduce
-that in full generality. This lesson delivers the proof. It's entirely
-classical probability and combinatorics; no quantum mechanics appears
-anywhere in it, which is the point. It establishes a hard limit that
-*any* local, predetermined theory must obey, before quantum mechanics is
-checked against that limit next.
+showed something suggestive: measuring both qubits of $|\Phi^+\rangle$ in
+the $X$ basis still gives perfect correlation, and promised that no
+*predetermined* classical description could reproduce that in general.
+This lesson supplies the proof. It is classical probability and
+combinatorics, with no quantum mechanics in it anywhere, and that is the
+point. The bound has to be established without reference to the theory it
+will be used to test.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c3/John_bell_2.png"
   alt="Physicist John Stewart Bell photographed at CERN in 1982"
-  caption="John Stewart Bell, whose 1964 theorem is the classical-probability proof this lesson works through in full: the CHSH bound |S|≤2 that any local hidden-variable model must obey."
+  caption="John Stewart Bell at CERN, 1982."
   credit="CERN"
   creditUrl="https://commons.wikimedia.org/wiki/File:John_bell_2.png"
   license="CC BY 4.0"
 />
 
-Bell was not the first to worry about this. Einstein, Podolsky, and
-Rosen raised the same concern three decades earlier, in their 1935 paper
-arguing that quantum mechanics must be an incomplete description of
-reality; what specifically bothered Einstein was the instantaneous,
-correlated update of a distant particle's state, which he dismissed in a
-1947 letter to Max Born as *spukhafte Fernwirkung* ("spooky action at a
-distance"). Bell's own proof below, submitted to the short-lived journal
-*Physics Physique Fizika* in November 1964, drew fewer than a dozen
-citations in its first six years and sat largely unnoticed until Alain
-Aspect's experiments in the early 1980s put it to an actual experimental
-test — decades after Einstein's death, and decades after he had
-concluded quantum mechanics simply had to be missing something. Full
-citation: J. S. Bell, "On the Einstein Podolsky Rosen Paradox," *Physics
-Physique Fizika* **1**(3), 195–200 (1964).
+Bell was not the first to worry about this. Einstein, Podolsky, and Rosen
+raised the same concern three decades earlier, in their 1935 paper arguing
+that quantum mechanics must be an incomplete description of reality. What
+bothered Einstein was the instantaneous, correlated update of a distant
+particle's state, which he dismissed in a 1947 letter to Max Born as
+*spukhafte Fernwirkung*, spooky action at a distance.
+
+Bell's paper appeared in November 1964 and then waited. It drew fewer than
+a dozen citations in six years, and sat largely unnoticed until Alain
+Aspect's experiments in the early 1980s put it to a laboratory test:
+decades after Einstein's death, and decades after he had concluded quantum
+mechanics had to be missing something.
 
 <HistoricalMoment date="1935">
-Einstein, Podolsky, and Rosen publish the paper arguing that quantum mechanics must be an incomplete description of reality — the concern Bell's theorem, below, turns into a provable numerical bound three decades later.
+Einstein, Podolsky, and Rosen publish the paper arguing that quantum mechanics must be an incomplete description of reality. For three decades their concern stays philosophical: no one can think of an experiment that would settle it.
+</HistoricalMoment>
+
+<HistoricalMoment date="1964">
+John Bell, on leave from CERN, turns the EPR concern into mathematics: any local hidden-variable theory must satisfy a numerical inequality that quantum mechanics predicts can be broken. The CHSH bound this lesson proves, |S|≤2, is the form of his result that experimentalists would go on to test.
 </HistoricalMoment>
 
 <ResearchConnection title="On the Einstein Podolsky Rosen Paradox" source="J. S. Bell, Physics Physique Fizika 1(3), 195–200 (1964)" url="https://link.aps.org/doi/10.1103/PhysicsPhysiqueFizika.1.195">
-Submitted to a short-lived journal, drawing fewer than a dozen citations in its first six years, this paper sat largely unnoticed until Alain Aspect's experiments in the early 1980s put it to an actual experimental test — the proof this lesson walks through in full.
+The original paper, whose central argument this lesson walks through in full. Bell's own version uses a different (and slightly weaker) inequality; the CHSH form proved here, due to Clauser, Horne, Shimony and Holt in 1969, is the one experiments actually test.
 </ResearchConnection>
 
 ## Intuition
@@ -130,13 +132,12 @@ Picture Alice and Bob's shared strategy as a cheat sheet, $\lambda$,
 handed to both of them by the source before they separate. Each of them
 looks only at their own measurement setting and their own copy of the
 cheat sheet, never at what the other person chose or got. You might
-guess a rich enough cheat sheet could correlate their answers as
-strongly as you like. It can't: the specific combination of
-correlations defined below, called $S$, turns out to be boxed in at
-magnitude 2 no matter how the cheat sheet is designed or distributed.
-You can check this exhaustively yourself further down, stepping through
-all 16 possible deterministic cheat sheets and watching $S$ land on
-exactly $+2$ or $-2$, every single time.
+guess that a rich enough cheat sheet could correlate their answers as
+strongly as you like. It cannot. The combination of correlations defined
+below, called $S$, is boxed in at magnitude 2 however the cheat sheet is
+designed or distributed. You can check that exhaustively further down, by
+stepping through all 16 deterministic cheat sheets and watching $S$ land
+on $+2$ or $-2$ every time.
 
 ## Mathematical Development
 
@@ -169,7 +170,9 @@ $$
 S(\lambda) = A(a,\lambda)B(b,\lambda) + A(a,\lambda)B(b',\lambda) + A(a',\lambda)B(b,\lambda) - A(a',\lambda)B(b',\lambda)
 $$
 
-Before factoring this expression, predict how constrained it actually is.
+Before factoring this expression, predict how constrained it is. Four
+terms, each a product of two numbers from $\{+1,-1\}$, so the naive
+range is $-4$ to $+4$.
 
 <PredictBeforeReveal
   question="For one fixed deterministic λ, what values can S(λ) take?"
@@ -180,7 +183,7 @@ Before factoring this expression, predict how constrained it actually is.
     { label: "Depends on the measurement settings chosen", value: "depends" },
   ]}
   correctValue="pm2"
-  explanation="For any single fixed λ, S(λ) is always exactly +2 or -2, never anything in between and never anything outside that pair. That's a much tighter constraint than 'bounded by 4' — it's a hard, discrete fact about every deterministic hidden variable. The factoring below shows why: since every outcome is ±1, one of the two grouped terms always vanishes identically. This is precisely what makes the later result striking — a real entangled qubit pair, checked in the next lesson, produces S=2√2≈2.828, a value no fixed λ, and no averaging over any distribution of them, could ever reach."
+  explanation="For any single fixed λ, S(λ) is +2 or −2. Never anything between them, and never anything outside. That is far tighter than 'bounded by 4', and it is a discrete fact about every deterministic hidden variable. The factoring below shows why: since every outcome is ±1, one of the two grouped terms vanishes identically. Hold onto how rigid this is. A real entangled pair, checked next lesson, produces S=2√2≈2.828, which no fixed λ reaches and no averaging over a distribution of them can reach either."
 />
 
 Factor by grouping the two terms that share $A(a,\lambda)$ and the two
@@ -201,18 +204,17 @@ $$
 |S(\lambda)| = 2 \quad\text{for every single } \lambda
 $$
 
-not merely "at most 2": for any *one* fixed $\lambda$, this
-combination is always exactly $\pm2$, since every outcome is
-deterministic once $\lambda$ is fixed.
+Note that this says $|S(\lambda)| = 2$, not $\le 2$. For any one fixed
+$\lambda$, the combination hits $\pm2$ on the nose, because every outcome
+is determined once $\lambda$ is fixed.
 
-There are exactly $2^4=16$ ways to assign $\pm1$ to
-$A(a,\lambda),A(a',\lambda),B(b,\lambda),B(b',\lambda)$ (one full
-"deterministic hidden variable"). Step through all 16 below and watch
-the four correlation terms and their combination $S(\lambda)$: every
-single one lands at exactly $+2$ or $-2$, never anything in between and
-never anything outside that pair of values.
+There are $2^4=16$ ways to assign $\pm1$ to
+$A(a,\lambda),A(a',\lambda),B(b,\lambda),B(b',\lambda)$, which is to say
+16 possible deterministic hidden variables. Step through all of them below
+and watch the four correlation terms and their combination $S(\lambda)$.
+Every one lands on $+2$ or $-2$.
 
-<InteractiveSection title="Every deterministic λ, all 16 of them" description="Every possible assignment of ±1 to A(a),A(a'),B(b),B(b') for a fixed λ. Step through all 16 and check S(λ) is always exactly +2 or -2, matching the algebraic argument above exactly.">
+<InteractiveSection title="Every deterministic λ, all 16 of them" description="Every possible assignment of ±1 to A(a),A(a'),B(b),B(b') for a fixed λ. Step through all 16 and check S(λ) is always exactly +2 or -2, matching the algebraic argument above.">
   <BarChartExplorer
     frames={lhvSweepFrames}
     sliderLabel="λ (deterministic assignment)"
@@ -250,14 +252,15 @@ $$
 $$
 </EquationReveal>
 
-This is the **CHSH inequality**. It was derived using nothing but: (1)
-outcomes are $\pm1$, (2) each party's outcome depends only on its own
-setting and $\lambda$, and (3) $\lambda$ has *some* probability
-distribution. No assumption about what $\lambda$ physically is, how
-complicated it can be, or how it's distributed was ever needed. The
-bound holds for every LHV model without exception, which is exactly why
-a violation of it (checked with the actual engine in the next lesson) is
-so significant.
+This is the **CHSH inequality**. Look at what went into it: (1) outcomes
+are $\pm1$, (2) each party's outcome depends only on its own setting and
+$\lambda$, and (3) $\lambda$ has *some* probability distribution. Nothing
+about what $\lambda$ physically is, how complicated it may be, or how it
+is distributed was ever needed.
+
+That is what gives the bound its reach. It holds for every LHV model at
+once, including ones nobody has invented, which is why measuring a
+violation settles a question rather than refuting one model.
 
 ## Physical Interpretation
 
@@ -272,7 +275,7 @@ model someone happened to write down.
 **What this does not rule out:** hidden-variable theories that are
 *nonlocal*, where $A(a,\lambda)$ is allowed to depend on Bob's distant
 setting $b$ too. Bohmian mechanics is a real, actively-studied example
-of exactly such a theory, and it is not excluded by Bell's theorem,
+of just such a theory, and it is not excluded by Bell's theorem,
 because it does not satisfy the locality assumption the proof above
 depends on. Bell's theorem is a precise statement about *local*
 determinism specifically, not determinism in general.
@@ -287,7 +290,7 @@ at all). Compute $S$.**
 $E(a,b)=(+1)(+1)=1$ for every pair of settings, since the outcomes are
 always $+1$ regardless of setting, with no $\lambda$-averaging needed (a
 single deterministic case). So
-$S=1+1+1-1=2$: right at the boundary, not exceeding it, exactly as the
+$S=1+1+1-1=2$: right at the boundary, not exceeding it, just as the
 inequality requires ($|S|\leq2$, and this trivial model saturates it
 without violating it).
 
@@ -354,12 +357,12 @@ make a prediction.
 <PredictBeforeReveal
   question="A real pair of entangled qubits, measured at the right four angles: can the CHSH value S exceed 2?"
   options={[
-    { label: "No — 2 is a fact about correlation itself, not just local models", value: "no" },
+    { label: "No: 2 is a fact about correlation itself, not only about local models", value: "no" },
     { label: "Yes, but only by a little", value: "yes-little" },
     { label: "Yes, all the way up to 2√2 ≈ 2.83", value: "yes-2sqrt2" },
   ]}
   correctValue="yes-2sqrt2"
-  explanation="A real Bell pair reaches S=2√2≈2.828 exactly, the Tsirelson bound — well past the classical ceiling of 2, and the next lesson derives this number by hand from the density-matrix engine. Nothing above this lesson's proof is wrong: the proof shows |S|≤2 for every local hidden-variable model, full stop. Nature simply isn't a local hidden-variable model."
+  explanation="A real Bell pair reaches S=2√2≈2.828, the Tsirelson bound, well past the classical ceiling of 2. The next lesson derives that number by hand from the density-matrix engine. Nothing in this lesson's proof is wrong: it shows |S|≤2 for every local hidden-variable model. The conclusion is that nature is not a local hidden-variable model."
 />
 
 You don't have to wait for the derivation to see the number. The
@@ -367,7 +370,7 @@ interactive below runs the exact same `chshValue` engine on a real
 $|\Phi^+\rangle$ Bell pair, live: drag any of the four measurement
 angles and watch $S$ update.
 
-<InteractiveSection title="A real CHSH experiment, right now" description="All four angles start at 0°, where S stays inside the classical bound. Load the quantum-optimal preset (or find it yourself) and watch S climb past 2, toward 2√2 ≈ 2.83 — the exact violation the next lesson derives algebraically.">
+<InteractiveSection title="A real CHSH experiment, right now" description="All four angles start at 0°, where S stays inside the classical bound. Load the quantum-optimal preset (or find it yourself) and watch S climb past 2 toward 2√2 ≈ 2.83, the violation the next lesson derives algebraically.">
   <LazyCHSHBellTestExplorer />
 </InteractiveSection>
 

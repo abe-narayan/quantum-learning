@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
-import type { CurrentQuantumCategory } from "@/lib/content/currentQuantum/registry";
+import type { CurrentQuantumCategory } from "@/lib/content/currentQuantum/types";
 
 /**
  * One small line glyph per Current Quantum category — the non-color-only

@@ -39,12 +39,25 @@ export const definingRequirementXCheck: NumericProblem = {
     type: "numeric",
     value: reducedExpectation,
     tolerance: 0.01,
-    incorrectFeedback: "ρ_A is diagonal, and X has zero diagonal entries — think about what Tr(ρ_A X) must be for any diagonal ρ_A.",
+    incorrectFeedback: "If you got something θ-dependent, you likely computed the Z-observable case from the lesson instead. Look at the structure: ρ_A is diagonal while X carries all of its weight off the diagonal, and the trace only ever sees diagonal entries.",
+    nearMisses: [
+      {
+        value: Math.cos(2 * theta),
+        feedback:
+          "cos(2θ) is the answer for ⟨Z⊗I⟩, the case the lesson worked through. Z is diagonal so it survives the trace against a diagonal ρ_A; X is not, so it does not.",
+      },
+      {
+        value: 2 * Math.cos(theta) * Math.sin(theta),
+        tolerance: 0.005,
+        feedback:
+          "That is 2 sinθ cosθ, which would be ⟨X⊗X⟩: the coherence between |00⟩ and |11⟩ shows up only when both qubits are flipped. Acting with X on one qubit alone leaves nothing on ρ_A's diagonal.",
+      },
+    ],
   },
   hints: [
-    { text: "X = [[0,1],[1,0]] has zero on its own diagonal." },
-    { text: "ρ_A(0.3) = diag(cos²0.3, sin²0.3) is purely diagonal." },
-    { text: "Tr(ρ_A X) sums (ρ_A X)'s diagonal entries — and multiplying a diagonal matrix by X moves all mass off the diagonal." },
+    { text: "You could multiply everything out numerically, but look at the structure first. ρ_A is diagonal, while X has all of its weight off the diagonal. The trace only ever sees diagonal entries." },
+    { text: "Write out the product ρ_A X: multiplying a diagonal matrix by X swaps its columns, moving every entry off the diagonal." },
+    { text: "Tr(ρ_A X) sums the diagonal entries of ρ_A X. After the column swap, ask what is left on the diagonal to sum." },
   ],
   solution: {
     steps: [
@@ -56,6 +69,6 @@ export const definingRequirementXCheck: NumericProblem = {
   explanation: {
     correctIdea: "Multiplying a diagonal matrix by X (which has zero diagonal) always produces a result with zero diagonal, so its trace is 0.",
     whyCorrect: "This matches ⟨X⊗I⟩ computed directly on the global state, confirming the partial trace's defining requirement for this particular observable.",
-    whyWrong: ["Answering cos(2θ) confuses this with the Z-observable case worked out in the lesson — X behaves differently since it's off-diagonal."],
+    whyWrong: ["Answering cos(2θ) confuses this with the Z-observable case worked out in the lesson. X behaves differently since it's off-diagonal."],
   },
 };

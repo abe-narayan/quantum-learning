@@ -42,15 +42,23 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-"Orbital" is chemistry's word for what quantum mechanics actually produces: a specific ψₙₗₘ(r,θ,φ), fully determined by three quantum numbers.
+"Orbital" is chemistry's word for the object this course has been building all along: a specific ψₙₗₘ(r,θ,φ), fixed completely by three integers.
 </LessonHook>
 
 ## Motivation
 
-Nothing new needs deriving here: this lesson is
-about assembly: multiplying the previous lesson's radial functions by
-Angular Momentum & Spin's spherical harmonics and reading off what the
-resulting full <Term id="wavefunction">wavefunctions</Term> look like.
+Nothing new needs deriving here. This lesson is assembly work: multiply
+the previous lesson's radial functions by Angular Momentum & Spin's
+spherical harmonics and read off what the resulting
+<Term id="wavefunction">wavefunctions</Term> look like.
+
+Assembly is worth a lesson of its own because the pieces have been apart
+for a long time. The angular factors were settled two courses ago from
+commutation relations, with no atom in sight; the radial factors came out
+of a Coulomb boundary-value problem last lesson, with no angles in sight.
+Neither half is a picture of anything. Multiplied together, they are the
+electron cloud that every chemistry textbook draws, and the labels $s$,
+$p$, $d$ stop being nomenclature and become values of $l$.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/8/83/Hydrogen_discharge_tube.jpg"
@@ -89,10 +97,11 @@ $$
 |\psi_{nlm}(r,\theta,\varphi)|^2 = |R_{nl}(r)|^2\,|Y_l^m(\theta,\varphi)|^2
 $$
 
-This is a genuine product of two independently-normalized pieces, which is
-exactly why the combined 3D integral $\int|\psi_{nlm}|^2\,r^2\sin\theta\,dr\,d\theta\,d\varphi=1$
-automatically, without any new normalization work: each factor already
-integrates to 1 over its own variables.
+Because that is a product of two independently normalized pieces, the
+combined 3D integral
+$\int|\psi_{nlm}|^2\,r^2\sin\theta\,dr\,d\theta\,d\varphi$ comes out to
+$1$ with no new normalization work: each factor already integrates to $1$
+over its own variables.
 
 Both factors so far were only ever shown separately. Here is the actual
 product, $|R_{nl}(r)|^2|Y_l^m(\theta,\varphi)|^2$, plotted as a
@@ -105,14 +114,13 @@ electron-cloud picture, for the three $m=0$ states 1s, 2s, and 2p$_0$:
 
 The previous course's `mostProbableRadius1s()` function directly
 maximizes $r^2|R_{10}(r)|^2$ (not $|R_{10}(r)|^2$ alone: the $r^2$
-comes from the spherical volume element, and matters: the *density*
-$|R_{10}|^2$ is actually largest at $r=0$, but the *probability of
-finding the electron in a thin shell at radius r* is largest away from
-the origin, weighted by the shell's growing surface area $4\pi r^2$).
-The verified result is $r=1$ (in units where the Bohr radius $a_0=1$),
-exactly the Bohr model's ground-state radius, though arrived at by a
-completely different route (probability-density maximization, not a
-classical circular-orbit assumption).
+comes from the spherical volume element, and it matters: the *density*
+$|R_{10}|^2$ is largest at $r=0$, but the *probability of finding the
+electron in a thin shell at radius r* is largest away from the origin,
+weighted by the shell's growing surface area $4\pi r^2$). The verified
+result is $r=1$, in units where the Bohr radius $a_0=1$: numerically the
+Bohr model's ground-state radius, reached by maximizing a probability
+density rather than by assuming a circular orbit.
 
 The three radial functions look distinctly different once plotted, not
 just algebraically different:
@@ -137,20 +145,21 @@ just algebraically different:
 
 Compare 1s and 2p's radial profiles directly: 1s peaks once, close to
 the origin (at $r=1$, computed above); 2p peaks once too, but farther
-out and shorter, since its $r^2$ dependence at small $r$ (visible in
-`radial2p`'s explicit $r\,e^{-r/2}$ factor) suppresses it near the
-nucleus entirely, unlike 1s. 2s shows something neither does: a genuine
-**node**, a radius where the distribution touches zero before rising
-again, from the $(2-r)$ factor in `radial2s` changing sign.
+out and shorter, since the $r$ in `radial2p`'s explicit $r\,e^{-r/2}$
+makes the plotted $r^2|R|^2$ start off as $r^4$ near the origin rather
+than $r^2$, pushing its weight away from the nucleus in a way 1s's is
+not. 2s shows something neither does: a **node**,
+a radius where the distribution touches zero before rising again, coming
+from the $(2-r)$ factor in `radial2s` changing sign.
 
 ## Physical Interpretation
 
 The 1s and 2s orbitals ($l=0$) are spherically symmetric: $Y_0^0$ is a
 constant, so all angular dependence vanishes, and the "shape" is purely
 radial. The 2p orbitals ($l=1$) point in specific directions, following
-$Y_1^{-1},Y_1^0,Y_1^1$'s angular dependence; this directionality is
-exactly what determines molecular bond geometry in chemistry (though
-that application is well beyond this course's scope). The angular part
+$Y_1^{-1},Y_1^0,Y_1^1$'s angular dependence, and it is that
+directionality that sets molecular bond geometry in chemistry (an
+application well beyond this course's scope). The angular part
 alone, independent of which radial function it's paired with, looks like
 this:
 
@@ -174,7 +183,7 @@ lesson) and `sphericalHarmonicNormSquared({l:0,m:0})`$\approx1$
 <Callout type="note">
 **Confusing $|R_{nl}(r)|^2$ (radial probability density) with $r^2|R_{nl}(r)|^2$
 (radial distribution, probability per unit r).** The 1s density
-$|R_{10}(r)|^2$ actually peaks at $r=0$; only the $r^2$-weighted version
+$|R_{10}(r)|^2$ peaks at $r=0$; only the $r^2$-weighted version
 peaks at $r=1$ (the Bohr radius). Both are used, for different
 questions: "how dense is it right at a point" vs. "how likely is a
 measurement to land in this shell."
@@ -211,9 +220,9 @@ continuous distribution, not a trajectory.
   this course's verified radial functions and Angular Momentum & Spin's
   verified spherical harmonics; normalization comes for free.
 - The 1s state's most probable radius, found by direct numerical
-  maximization, is exactly the Bohr radius, a genuine, checkable
-  agreement between the full quantum treatment and the older Bohr model,
-  despite very different derivations.
+  maximization, equals the Bohr radius: a checkable numerical agreement
+  between the full quantum treatment and the older Bohr model, reached by
+  two unrelated arguments.
 
 ## Further Exploration
 

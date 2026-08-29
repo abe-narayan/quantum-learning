@@ -29,9 +29,21 @@ import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplor
 // no built-in overflow handling — a wide comparison table would otherwise
 // force the whole page to scroll horizontally on narrow viewports. Wrap
 // every table in its own horizontally-scrollable container instead.
+// `tabIndex={0}` for the same reason SolutionPanel's display-math container
+// documents: a scroll container is focusable-by-default only in Firefox, so
+// without it a keyboard-only reader can see the left edge of a wide table
+// and has no way to reach the rest. Unlike the KaTeX case (where a name
+// would flatten the emitted MathML), `role="region"` + a label is safe and
+// useful here: it tells a screen-reader user what the focus stop they just
+// landed on contains.
 function Table(props: ComponentPropsWithoutRef<"table">) {
   return (
-    <div className="overflow-x-auto">
+    <div
+      role="region"
+      aria-label="Scrollable table"
+      tabIndex={0}
+      className="overflow-x-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+    >
       <table {...props} />
     </div>
   );

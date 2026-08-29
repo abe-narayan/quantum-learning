@@ -45,14 +45,22 @@ $R_y(\theta)$ or $R_x(\theta)$, and every other named gate this
 platform uses (H, X, Y, Z, S, T) must be expressed as a sequence of
 these native rotations before it can run.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/IBM_QC.jpg/1280px-IBM_QC.jpg"
-  alt="IBM's 50-qubit quantum computing prototype and its gold-plated cryostat, exhibited at CES 2018"
-  caption="IBM's 50-qubit quantum computing prototype at CES 2018. Real hardware like this implements only a small native gate set (typically Rz and one other rotation axis); every other gate this lesson decomposes (H, X, Z, S, T) has to be translated into that set before it can actually run."
-  credit="Lars Ploughman / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_QC.jpg"
-  license="CC BY-SA 2.0"
+So the letter "H" in a circuit diagram is a name for something the
+device never receives. What it receives is this:
+
+<PipelineDiagram
+  ariaLabel="What happens to a Hadamard gate on the way to hardware: the written H becomes a decomposition into native rotations Rz then Ry, which become two timed control pulses"
+  steps={[
+    { label: "What you write", detail: "H" },
+    { label: "Decomposition", detail: "H = Ry(π/2) Rz(π)" },
+    { label: "What the device runs", detail: "Rz(π), then Ry(π/2)", highlight: true },
+    { label: "What the qubit sees", detail: "two timed control pulses" },
+  ]}
 />
+
+The rest of this lesson works out that middle step for every named gate
+this platform uses, and checks each decomposition against the gate's own
+matrix rather than asserting it.
 
 ## Engineering Development
 
@@ -247,8 +255,8 @@ requirement for every specific gate.
   (two-rotation), all confirmed to machine precision up to global
   phase.
 - "Equal up to global phase" is the physically correct equivalence for
-  checking decompositions, since global phase is fundamentally
-  unobservable.
+  checking decompositions, since global phase is unobservable by
+  construction.
 
 ## Further Exploration
 

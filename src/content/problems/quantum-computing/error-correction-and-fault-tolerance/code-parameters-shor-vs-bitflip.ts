@@ -44,6 +44,10 @@ export const codeParametersShorVsBitflip: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Distance and error-type coverage are different axes — the Shor code trades qubits for broader coverage, not a bigger distance number.",
     whyCorrect: "This matches the lesson's explicit statement and the underlying weight-3 undetectable-error argument for both codes.",
-    whyWrong: ["Options b, c, and d each misstate one of the two codes' actual parameters."],
+    whyWrong: [
+      { optionId: "b", text: "Ties distance to qubit count. The bit-flip code's distance is 3, not 1." },
+      { optionId: "c", text: "Gives the Shor code distance 9. Its extra six qubits buy coverage of both X and Z errors, not a larger distance." },
+      { optionId: "d", text: "Keeps n at 3 for both. The Shor code uses nine physical qubits even though its distance matches." },
+    ],
   },
 };

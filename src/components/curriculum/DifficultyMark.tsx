@@ -48,16 +48,24 @@ export const DIFFICULTY_HINT: Record<Difficulty, string> = {
 export function DifficultyMark({
   difficulty,
   className,
+  withHint = false,
 }: {
   difficulty: Difficulty;
   className?: string;
+  /** Render the hint as visible text after the label instead of leaving it
+   *  in the `title=` tooltip only. The tooltip is hover-gated, which means
+   *  it does not exist on touch devices — so any place a first-time reader
+   *  actually decides "can I start here?" (a lesson header, the /learn
+   *  fork) should pass this rather than trusting hover. */
+  withHint?: boolean;
 }) {
   const level = DIFFICULTY_LEVEL[difficulty];
 
   return (
     <span
-      className={cn("inline-flex items-center gap-2", className)}
-      title={DIFFICULTY_HINT[difficulty]}
+      className={cn("inline-flex flex-wrap items-center gap-x-2 gap-y-0.5", className)}
+      // The tooltip would be pure duplication once the hint is visible text.
+      title={withHint ? undefined : DIFFICULTY_HINT[difficulty]}
     >
       <span aria-hidden="true" data-decorative="" className="flex items-end gap-[3px]">
         {[1, 2, 3, 4].map((tick) => (
@@ -74,6 +82,14 @@ export function DifficultyMark({
       <span className="font-tech text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         {DIFFICULTY_LABEL[difficulty]}
       </span>
+      {withHint ? (
+        <span className="text-xs text-muted-foreground">
+          <span aria-hidden="true" data-decorative="">
+            ·{" "}
+          </span>
+          {DIFFICULTY_HINT[difficulty].toLowerCase()}
+        </span>
+      ) : null}
     </span>
   );
 }

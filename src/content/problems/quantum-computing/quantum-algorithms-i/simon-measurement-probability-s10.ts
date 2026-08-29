@@ -43,6 +43,14 @@ export const simonMeasurementProbabilityS10: NumericProblem = {
     tolerance: 0.01,
     incorrectFeedback:
       "First check whether $z=01$ satisfies $z\\cdot s\\equiv0\\pmod2$ for $s=10$ — if it's orthogonal to $s$, the nonzero probability is spread uniformly over the $2^{n-1}$ orthogonal strings.",
+    nearMisses: [
+      {
+        value: 0.25,
+        feedback:
+          "0.25 spreads probability over all four strings. Two of them, 10 and 11, are not orthogonal to s and interfere away to exactly zero, so the surviving weight is shared between two strings, not four.",
+      },
+      { value: 0, feedback: "Zero is the probability of a z that is not orthogonal to s. Check the dot product: 01 · 10 = 0, so this z survives." },
+    ],
   },
   hints: [
     { text: "$z\\cdot s \\bmod 2$ for $z=01$, $s=10$: the bitwise AND is $00$, so the dot product is $0$ — $z=01$ is orthogonal to $s$." },

@@ -7,6 +7,7 @@ import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, applySingleQubitGate } from "@/lib/quantum/gates";
 import { pureStateDensityMatrix, purity, eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
 import { amplitudeDampingChannel, dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
+import { densityMatrixToBlochVector } from "@/lib/quantum/bloch";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity"
@@ -34,7 +35,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi",
-      note: "The Choi matrix built there for these same two channels gives a second, independent way to see how much they disturb a state.",
+      note: "This lesson measures how far a channel moves one input state; that lesson supplies the object that characterises the channel independently of any input, the Choi matrix, built there for these same two channels at the same strengths. Read together they answer 'how much damage on this state' and 'what kind of map is doing the damage' from the same numbers.",
     },
   ],
 };
@@ -70,51 +71,78 @@ export const F_DP = fidelityPureVsMixed(plus, rhoDP);
 export const purityAD = purity(rhoAD);
 export const purityDP = purity(rhoDP);
 
-export const DAD = (g) => {
-  return 0.5 * Math.sqrt(g * g + (1 - Math.sqrt(1 - g)) ** 2);
-}
-export const FAD = (g) => {
-  return Math.sqrt(0.5 * (1 + Math.sqrt(1 - g)));
-}
+export const dampedPlusAt = (g) => applyKrausChannel(rho0, amplitudeDampingChannel(g));
+export const DAD = (g) => traceDistance2x2(rho0, dampedPlusAt(g));
+export const FAD = (g) => fidelityPureVsMixed(plus, dampedPlusAt(g));
+
+export const gammaSamples = Array.from({ length: 41 }, (_, i) => i / 40);
+export const fvgSamples = gammaSamples.map((g) => ({ g, D: DAD(g), F: FAD(g) }));
 
 export const fvgFrames = [
   {
     paramLabel: "",
     series: [
       {
-        label: "D(gamma) — trace distance",
+        label: "D(gamma) — trace distance, from the engine's own channel",
         color: "brand",
-        points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: DAD(i / 40) })),
+        points: fvgSamples.map((s) => ({ x: s.g, y: s.D })),
       },
       {
         label: "1 - F(gamma) — lower bound",
         color: "muted",
-        points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: 1 - FAD(i / 40) })),
+        points: fvgSamples.map((s) => ({ x: s.g, y: 1 - s.F })),
       },
       {
         label: "sqrt(1 - F(gamma)^2) — upper bound",
         color: "accent",
-        points: Array.from({ length: 41 }, (_, i) => ({ x: i / 40, y: Math.sqrt(1 - FAD(i / 40) ** 2) })),
+        points: fvgSamples.map((s) => ({ x: s.g, y: Math.sqrt(1 - s.F ** 2) })),
       },
     ],
   },
 ];
 
+export const closedFormD = (g) => 0.5 * Math.sqrt(g * g + (1 - Math.sqrt(1 - g)) ** 2);
+export const closedFormF = (g) => Math.sqrt(0.5 * (1 + Math.sqrt(1 - g)));
+export const closedFormMaxGap = Math.max(
+  ...fvgSamples.map((s) => Math.max(Math.abs(s.D - closedFormD(s.g)), Math.abs(s.F - closedFormF(s.g))))
+);
+
+export const bloch0 = densityMatrixToBlochVector(rho0);
+export const blochAD = densityMatrixToBlochVector(rhoAD);
+export const blochDP = densityMatrixToBlochVector(rhoDP);
+export const blochSeparation = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+export const halfSeparationAD = blochSeparation(bloch0, blochAD) / 2;
+export const halfSeparationDP = blochSeparation(bloch0, blochDP) / 2;
+export const blochIdentityResidual = Math.max(
+  Math.abs(halfSeparationAD - D_AD),
+  Math.abs(halfSeparationDP - D_DP)
+);
+
+export const blochCentre = 118;
+export const blochScale = 92;
+export const blochPx = (v) => ({
+  cx: blochCentre + blochScale * v.x,
+  cy: blochCentre - blochScale * v.z,
+});
+export const px0 = blochPx(bloch0);
+export const pxAD = blochPx(blochAD);
+export const pxDP = blochPx(blochDP);
+
 <LessonHook eyebrow="Two different meanings of 'close'">
   A hardware datasheet's "99.5% fidelity" and a security proof's
-  "indistinguishable states" are answering two genuinely different
-  questions — and this platform has quietly needed both all along.
+  "indistinguishable states" are answering two different
+  questions, and this platform has quietly needed both all along.
 </LessonHook>
 
 ## Motivation
 
 Ask "how close are two quantum states?" and it sounds like a single
 question, but this platform's engine has quietly needed two different
-answers to it all along. Trace distance and fidelity are those two
+answers to it all along. <Term id="trace-distance-fidelity">Trace distance and fidelity are those two</Term>
 answers: standard, non-equivalent, each carrying its own operational
 meaning. A precise pair of inequalities pins down exactly how they
 relate, a provable quantitative sandwich, well beyond the loose
-observation that both simply vanish together. Run them on channels
+observation that both vanish together. Run them on channels
 already sitting in this codebase, and "amplitude damping disturbs a
 state" stops being a qualitative claim and becomes an exact, computed
 number.
@@ -125,21 +153,10 @@ number comes from randomized benchmarking: running long random Clifford
 sequences and fitting how a survival probability decays, which is an
 estimate of an average gate fidelity, a close relative of the $F$
 defined below. Google's 2019 "quantum supremacy" claim rested on
-cross-entropy benchmarking, comparing a chip's actual output
-distribution against the ideal circuit's predicted one, the same
-distinguishability question Helstrom's formula answers here, just asked
-of an entire circuit's output statistics instead of one qubit's state.
-Neither of those results means anything without the two objects this
-lesson derives from first principles.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sycamore_Quantum_Chip.jpg/1280px-Sycamore_Quantum_Chip.jpg"
-  alt="Google's Sycamore superconducting quantum processor chip, mounted in its housing, on display at the Deutsches Museum in Munich"
-  caption="Sycamore, the processor behind Google's 2019 quantum-supremacy claim. The claim itself was a distinguishability argument: could the chip's measured output statistics be told apart from what a classical computer would predict for an easier, spoofable distribution? That's the same question trace distance and fidelity make precise below, just posed about an entire circuit rather than a single qubit."
-  credit="Coldupnorth / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Sycamore_Quantum_Chip.jpg"
-  license="CC BY-SA 4.0"
-/>
+cross-entropy benchmarking, which compares a chip's actual output
+distribution against the ideal circuit's predicted one. Neither of those
+results means anything without the two objects this lesson derives from
+first principles.
 
 <ResearchConnection
   title="Cross-entropy benchmarking and the 2019 quantum-supremacy claim"
@@ -203,13 +220,61 @@ as a bare matrix norm: it is exactly twice the largest bias any single
 measurement can achieve when distinguishing $\rho$ from $\sigma$ (the
 **Holevo–Helstrom bound**).
 
-### The qubit closed form
+### The qubit closed form, and what it is geometrically
 
 For a single qubit, $\Delta=\rho-\sigma$ is a Hermitian $2\times2$
 matrix, so $D(\rho,\sigma)=\frac12(|\mu_1|+|\mu_2|)$ is computed directly
 by this platform's own `eigenvaluesHermitian2x2` applied to $\Delta$: no
 new numerical machinery beyond what "Pure States and Mixed States"
 already built.
+
+In one qubit the answer also has a shape. Writing
+$\rho=\tfrac12(I+\vec r_\rho\cdot\vec\sigma)$ and likewise for $\sigma$,
+the difference is $\Delta=\tfrac12(\vec r_\rho-\vec r_\sigma)\cdot\vec\sigma$,
+a traceless Hermitian matrix whose eigenvalues are
+$\pm\tfrac12|\vec r_\rho-\vec r_\sigma|$. Summing their magnitudes and
+halving:
+
+$$
+D(\rho,\sigma) = \tfrac12\big|\vec r_\rho - \vec r_\sigma\big|
+$$
+
+**Trace distance on a qubit is half the ordinary Euclidean distance
+between two points of the Bloch ball.** The abstract trace norm, the
+Helstrom measurement bias, and a ruler laid across the ball are three
+descriptions of one number.
+
+This is a qubit fact, not a general one. For $d\geq3$ the state space is
+not a ball, its geometry is not Euclidean, and no comparable shortcut
+survives; the trace norm is then irreducibly a spectral computation. Enjoy
+the picture, but do not carry it up in dimension.
+
+<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
+  <svg width={236} height={236} viewBox="0 0 236 236" className="mx-auto max-w-full" role="img" aria-label="The x-z cross-section of the Bloch ball, drawn as a circle. Three points are marked. The input state ket plus sits on the circle at the far right, on the equator, because it is pure. Two interior points sit inside: the state after amplitude damping, displaced both inward and upward toward the north pole, and the state after dephasing, displaced straight inward along the equator toward the centre. A straight line segment is drawn from ket plus to each of the two outputs; the length of each segment, halved, is exactly that channel's trace distance from the input.">
+    <line x1={118} y1={18} x2={118} y2={218} className="stroke-border" strokeWidth={1} />
+    <line x1={18} y1={118} x2={218} y2={118} className="stroke-border" strokeWidth={1} />
+    <circle cx={118} cy={118} r={92} className="fill-muted-foreground/5 stroke-muted-foreground" strokeWidth={1.5} strokeDasharray="5 4" />
+    <line x1={px0.cx} y1={px0.cy} x2={pxAD.cx} y2={pxAD.cy} className="stroke-brand" strokeWidth={2} />
+    <line x1={px0.cx} y1={px0.cy} x2={pxDP.cx} y2={pxDP.cy} className="stroke-accent" strokeWidth={2} />
+    <circle cx={px0.cx} cy={px0.cy} r={4.5} className="fill-foreground" />
+    <circle cx={pxAD.cx} cy={pxAD.cy} r={4.5} className="fill-brand" />
+    <circle cx={pxDP.cx} cy={pxDP.cy} r={4.5} className="fill-accent" />
+    <text x={118} y={30} textAnchor="middle" className="fill-muted-foreground text-[10px]">|0⟩</text>
+    <text x={118} y={214} textAnchor="middle" className="fill-muted-foreground text-[10px]">|1⟩</text>
+    <text x={px0.cx - 6} y={px0.cy - 10} textAnchor="end" className="fill-foreground text-[10px]">|+⟩ (pure)</text>
+    <text x={pxAD.cx - 8} y={pxAD.cy - 8} textAnchor="end" className="fill-brand text-[10px]">after damping</text>
+    <text x={pxDP.cx - 8} y={pxDP.cy + 18} textAnchor="end" className="fill-accent text-[10px]">after dephasing</text>
+  </svg>
+</div>
+
+Every coordinate above comes from `densityMatrixToBlochVector` applied to
+the density matrices the worked example computes below. Damping pulls
+$|+\rangle$ inward *and* upward, because it has a preferred direction;
+dephasing pulls it straight in along the equator, because it does not.
+Half the length of each drawn segment is that channel's trace distance:
+{halfSeparationAD.toFixed(4)} and {halfSeparationDP.toFixed(4)},
+agreeing with the eigenvalue computation to within
+{blochIdentityResidual.toExponential(1)}.
 
 ### Uhlmann fidelity
 
@@ -237,7 +302,7 @@ $$
 \boxed{F(|\psi\rangle,\sigma) = \sqrt{\langle\psi|\sigma|\psi\rangle}}
 $$
 
-a fully derived shortcut (not cited), and exactly the quantity this
+a fully derived shortcut (not cited), and the quantity this
 lesson's own worked example below computes directly from the engine. As
 a sanity check on the general definition: if $\sigma=|\phi\rangle\langle\phi|$
 is also pure, this further reduces to $F=|\langle\psi|\phi\rangle|$, the
@@ -250,7 +315,7 @@ in general dimension, machinery well beyond what this lesson builds
 elsewhere, says $F(\rho,\sigma)=\max_{|\psi\rangle,|\phi\rangle}|\langle\psi|\phi\rangle|$,
 the maximum taken over every purification $|\psi\rangle_{AB}$ of $\rho$
 and every purification $|\phi\rangle_{AB}$ of $\sigma$ on a common
-extension $B$. Schmidt Decomposition and Purification proved exactly the
+extension $B$. Schmidt Decomposition and Purification proved the
 freedom this maximization ranges over: every purification of a fixed
 $\rho$ differs from any other only by a unitary on $B$, so Uhlmann's
 theorem is precisely "maximize the overlap over that unitary freedom."
@@ -308,7 +373,7 @@ $q=(\text{Tr}\,\Pi_+\sigma,\,\text{Tr}(I-\Pi_+)\sigma)$ with
 $D_{cl}(p,q)=D(\rho,\sigma)$ exactly, by construction. The one remaining
 step, that quantum fidelity never falls below the classical fidelity
 induced by *any* shared measurement, $F(\rho,\sigma)\geq F_{cl}(p,q)$,
-is a genuine theorem (provable via Uhlmann's theorem plus a
+is a theorem (provable via Uhlmann's theorem plus a
 Cauchy–Schwarz argument on the measurement's Kraus operators) that is
 **cited here, not re-derived**: proving it would require developing POVM
 formalism this platform's engine doesn't otherwise use. Granting it:
@@ -318,28 +383,34 @@ $\blacksquare$
 ## Physical Interpretation
 
 <InsightBlock>
-  Trace distance and fidelity agree at the extremes but track genuinely
-  different fine-grained information in between — which is exactly why
-  a serious comparison computes both rather than settling for one.
+  Fuchs–van de Graaf is a sandwich, not an identity, and the width of the
+  sandwich is the point. Two states can be equally hard to tell apart in
+  one shot and differ substantially in how well a reference system stayed
+  entangled with them.
 </InsightBlock>
 
-Trace distance answers one question, "how well can a single measurement
-tell these two states apart?", and Helstrom's formula makes that literal
-rather than metaphorical. Fidelity answers something else entirely: "how
-much do these two states overlap as vectors or operators?", or, by way
-of Uhlmann's theorem, "how well could a purifying reference system have
-stayed entangled with both?" The two agree at the extremes (both hit
-$0$ for identical states, both saturate at their extreme value for
-perfectly distinguishable ones) but carry different fine-grained
-information in between, which is exactly why a serious comparison
-computes both rather than settling for one.
+Trace distance answers "how well can a single measurement tell these two
+states apart?", and Helstrom's formula makes that literal rather than
+metaphorical. Fidelity answers something else: "how much do these two
+states overlap?", or, through Uhlmann's theorem, "how well could a
+purifying reference system have stayed entangled with both?" Both vanish
+together and both saturate together, which is why they are often used
+interchangeably; in between they are only loosely tied, which is what the
+inequalities quantify.
+
+The worked example makes the gap concrete. Amplitude damping at
+$\gamma={gamma}$ sits at $D={D_AD.toFixed(4)}$ with the bounds
+{(1 - F_AD).toFixed(4)} and {Math.sqrt(1 - F_AD ** 2).toFixed(4)} on
+either side, so knowing $F$ alone pins $D$ only to within a factor of
+about {(Math.sqrt(1 - F_AD ** 2) / (1 - F_AD)).toFixed(1)}. A datasheet
+that reports one number has reported less than it appears to.
 
 ## Worked Example
 
 **Quantify exactly how well this platform's own amplitude-damping and
 dephasing channels preserve $|+\rangle$.**
 
-<QuantumStateDisplay state={plus} label="Input state |+>" />
+<QuantumStateDisplay state={plus} label="Input state |+⟩" />
 
 Starting from $\rho_0=|+\rangle\langle+|$ (pure, $F=1$, $D=0$ trivially
 against itself), apply `amplitudeDampingChannel(0.3)` and
@@ -347,49 +418,47 @@ against itself), apply `amplitudeDampingChannel(0.3)` and
 platform:
 
 <PredictBeforeReveal
-  question="Same strength parameter, 0.3, fed to both channels acting on |+>. Which one leaves the state more mixed (lower purity Tr(rho^2))?"
+  question="Same strength parameter, 0.3, fed to both channels acting on |+⟩. Which one leaves the state more mixed (lower purity Tr(rho^2))?"
   options={[
     { label: "Amplitude damping — it changes the state's populations, a bigger structural shift", value: "ad" },
-    { label: "Dephasing — |+> has nothing but coherence, and that's exactly what dephasing removes", value: "dp" },
+    { label: "Dephasing — |+⟩ has nothing but coherence, and that's exactly what dephasing removes", value: "dp" },
     { label: "The same either way, since both use strength 0.3", value: "same" },
   ]}
   correctValue="dp"
-  explanation="Dephasing wins the purity comparison (Tr(rho_DP^2) ≈ 0.745 vs Tr(rho_AD^2) ≈ 0.895 below), even though its trace distance from |+> is smaller (D ≈ 0.150 vs D ≈ 0.171). |+> is pure coherence in the computational basis, so a channel that attacks coherence directly (dephasing) costs it more purity per unit of strength than one that only partially damps population toward |0>. Trace distance and purity are tracking different things, and this pair is exactly where they come apart."
+  explanation="Dephasing wins the purity comparison (Tr(rho_DP^2) ≈ 0.745 vs Tr(rho_AD^2) ≈ 0.895 below), even though its trace distance from |+⟩ is smaller (D ≈ 0.150 vs D ≈ 0.171). |+⟩ is pure coherence in the computational basis, so a channel that attacks coherence directly (dephasing) costs it more purity per unit of strength than one that only partially damps population toward |0⟩. Trace distance and purity are tracking different things, and this pair is where they come apart."
 />
 
-<MatrixGrid matrix={rhoAD} label="After amplitude damping, gamma=0.3" compareTo={rhoDP} compareLabel="After dephasing, lambda=0.3" ariaLabel="Density matrices after amplitude damping and after dephasing, both applied to |+> with strength 0.3" />
+<MatrixGrid matrix={rhoAD} label="After amplitude damping, gamma=0.3" compareTo={rhoDP} compareLabel="After dephasing, lambda=0.3" ariaLabel="Density matrices after amplitude damping and after dephasing, both applied to the plus state with strength 0.3" />
 
 Computed directly via `eigenvaluesHermitian2x2` on $\rho_0-\rho_{AD}$
 (trace distance) and the boxed pure-state fidelity shortcut:
 
-$$
-D(\rho_0,\rho_{AD}) \approx 0.1708, \qquad F(\rho_0,\rho_{AD}) \approx 0.9583, \qquad \text{Tr}(\rho_{AD}^2) \approx 0.895
-$$
+| Channel | $D$ | $F$ | $\text{Tr}(\rho^2)$ | $1-F$ (lower bound) | $\sqrt{1-F^2}$ (upper bound) |
+|---|---|---|---|---|---|
+| Amplitude damping, $\gamma={gamma}$ | {D_AD.toFixed(4)} | {F_AD.toFixed(4)} | {purityAD.toFixed(4)} | {(1 - F_AD).toFixed(4)} | {Math.sqrt(1 - F_AD ** 2).toFixed(4)} |
+| Dephasing, $\lambda={lambda}$ | {D_DP.toFixed(4)} | {F_DP.toFixed(4)} | {purityDP.toFixed(4)} | {(1 - F_DP).toFixed(4)} | {Math.sqrt(1 - F_DP ** 2).toFixed(4)} |
 
-$$
-D(\rho_0,\rho_{DP}) \approx 0.1500, \qquad F(\rho_0,\rho_{DP}) \approx 0.9220, \qquad \text{Tr}(\rho_{DP}^2) \approx 0.745
-$$
+Both rows satisfy Fuchs–van de Graaf with room on each side, and the two
+channels rank differently depending on which column is read. Dephasing
+gives the *smaller* trace distance yet the *larger* purity loss. The two
+channels are not interchangeable just because they share a strength
+parameter, and a single scalar "how noisy" figure would have hidden that.
 
-Both pairs satisfy Fuchs–van de Graaf exactly: for amplitude damping,
-$1-F\approx0.0417\leq D\approx0.1708\leq\sqrt{1-F^2}\approx0.2857$; for
-dephasing, $1-F\approx0.0780\leq D\approx0.1500\leq\sqrt{1-F^2}\approx0.3873$.
-Dephasing at $\lambda=0.3$ is a **worse** disturbance than amplitude
-damping at $\gamma=0.3$ by both measures simultaneously here ($D_{DP}<D_{AD}$
-but the purity drop $\text{Tr}(\rho_{DP}^2)=0.745$ is well below
-$\text{Tr}(\rho_{AD}^2)=0.895$): the two channels are not interchangeable
-just because they share a single strength parameter.
-
-Plotting $D(\gamma)$ against both Fuchs–van de Graaf bounds across every
-$\gamma$ (closed forms
-$D(\gamma)=\frac12\sqrt{\gamma^2+(1-\sqrt{1-\gamma})^2}$,
-$F(\gamma)=\sqrt{\tfrac12(1+\sqrt{1-\gamma})}$, derived directly from
-amplitude damping's Kraus operators applied to $|+\rangle\langle+|$, and
-matching the $\gamma=0.3$ numbers above exactly) shows the sandwich
-holding at every strength, not just the one value checked by hand:
+Sweeping $\gamma$ and plotting $D(\gamma)$ against both bounds shows the
+sandwich holding at every strength rather than at the one value checked
+by hand. Each point on the curve is produced by running
+`amplitudeDampingChannel(gamma)` on $|+\rangle\langle+|$ and measuring
+the result, not by evaluating a formula. The closed forms
+$D(\gamma)=\frac12\sqrt{\gamma^2+(1-\sqrt{1-\gamma})^2}$ and
+$F(\gamma)=\sqrt{\tfrac12(1+\sqrt{1-\gamma})}$ can be derived from the
+Kraus operators by hand, and they agree with the plotted engine output to
+within {closedFormMaxGap.toExponential(1)} across the whole sweep, which
+is the check worth having: derivation and implementation confirming each
+other rather than one standing in for the other.
 
 <ParametricCurve
   frames={fvgFrames}
-  ariaLabel="Trace distance D(gamma) for amplitude damping applied to |+>, sandwiched between the Fuchs-van de Graaf lower bound 1-F(gamma) and upper bound sqrt(1-F(gamma)^2), plotted for gamma from 0 to 1"
+  ariaLabel="Trace distance D(gamma) for amplitude damping applied to the plus state, sandwiched between the Fuchs-van de Graaf lower bound 1-F(gamma) and upper bound sqrt(1-F(gamma)^2), plotted for gamma from 0 to 1"
 />
 
 ## Common Mistakes
@@ -397,7 +466,7 @@ holding at every strength, not just the one value checked by hand:
 <Callout type="warning">
 **Using $F(\rho,\sigma)=\sqrt{\langle\psi|\sigma|\psi\rangle}$ when
 *neither* state is pure.** The boxed shortcut requires $\rho$ (or by
-symmetry $\sigma$) to be pure; for two genuinely mixed states, the full
+symmetry $\sigma$) to be pure; for two mixed states, the full
 definition $\text{Tr}\sqrt{\sqrt\rho\,\sigma\,\sqrt\rho}$ is needed, which
 this platform's engine cannot evaluate for a general mixed qubit pair
 (it would require a matrix square root the platform doesn't implement).
@@ -448,7 +517,7 @@ lower bound only in special cases.
 - Applied to this platform's real channels: amplitude damping at
   $\gamma=0.3$ gives $D\approx0.1708$, $F\approx0.9583$; dephasing at
   $\lambda=0.3$ gives $D\approx0.1500$, $F\approx0.9220$; both satisfy
-  the derived inequalities exactly, checked numerically and across the
+  the derived inequalities, checked numerically and across the
   full range of $\gamma$.
 
 ## Further Exploration

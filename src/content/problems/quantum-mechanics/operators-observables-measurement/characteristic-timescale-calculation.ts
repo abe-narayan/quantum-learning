@@ -22,6 +22,10 @@ export const characteristicTimescaleCalculation: NumericProblem = {
     value: 0.666667,
     tolerance: 0.001,
     incorrectFeedback: "Delta t_A = Delta A / |d<A>/dt| directly.",
+    nearMisses: [
+      { value: 1.5, tolerance: 0.002, feedback: "That is the ratio the other way up. The timescale is the spread divided by the rate: how long the rate needs to move ⟨A⟩ by one spread." },
+      { value: 6, feedback: "6 multiplies the two. A time comes from dividing a spread by a rate of change." },
+    ],
   },
   hints: [{ text: "Divide Delta A by the rate of change directly." }],
   solution: {

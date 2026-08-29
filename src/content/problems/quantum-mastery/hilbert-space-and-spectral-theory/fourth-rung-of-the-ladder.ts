@@ -26,6 +26,11 @@ export const fourthRungOfTheLadder: NumericProblem = {
     value: E3,
     tolerance: 0.01,
     incorrectFeedback: "Use E_n=n²π²/(8a²) directly with n=3, a=1.",
+    nearMisses: [
+      { value: Math.PI ** 2 / 8, tolerance: 0.01, feedback: "That is E₁. The level index enters squared, so E₃ is nine times larger." },
+      { value: (9 * Math.PI ** 2) / 32, tolerance: 0.01, feedback: "That substitutes the full width 2a where the formula wants the half-width a. This course uses a throughout." },
+      { value: 9, feedback: "9 is n². It still has to be multiplied by π²/(8a²)." },
+    ],
   },
   hints: [
     { text: "E_n=n²π²/(8a²), with n=3 and a=1." },

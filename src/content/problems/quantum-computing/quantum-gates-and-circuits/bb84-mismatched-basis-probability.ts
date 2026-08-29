@@ -32,6 +32,14 @@ export const bb84MismatchedBasisProbability: NumericProblem = {
     tolerance: 0.01,
     incorrectFeedback:
       "Apply $H$ to $|0\\rangle$ first (Bob's X-basis measurement), then read off the computational-basis probabilities of the result — don't skip the basis-change step.",
+    nearMisses: [
+      {
+        value: 0,
+        feedback:
+          "0 is the matching-basis answer: if Bob had measured in Z he would read Alice's bit 0 every time. The X-basis measurement destroys that determinism.",
+      },
+      { value: 1, feedback: "Certainty of reading 1 would mean the mismatched basis reliably inverts Alice's bit. It does something worse for Eve and better for security: it randomizes it." },
+    ],
   },
   hints: [
     { text: "Bob measuring in X means: apply $H$ to Alice's state, then measure in the computational basis." },

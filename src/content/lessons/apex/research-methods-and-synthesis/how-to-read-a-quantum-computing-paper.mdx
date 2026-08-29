@@ -13,7 +13,7 @@ export const lessonMeta = {
   module: "how-to-read-a-quantum-computing-paper",
   order: 1,
   difficulty: "master",
-  estimatedMinutes: 24,
+  estimatedMinutes: 75,
   prerequisites: ["apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms"],
   objectives: [
     "Identify the standard structural anatomy of a quantum-computing research paper (abstract's actual claim, the precise theorem/result statement, the assumptions/model section, numerical results vs. proven bounds, and the honest limitations/discussion section) and what to look for in each",
@@ -173,7 +173,7 @@ Here is a plausible abstract, in a genuinely typical register, for a
 paper extending ideas from this platform's own Algorithmic Frontiers
 and Quantum Complexity Theory courses:
 
-<div className="not-prose my-6 rounded-xl border border-border bg-surface-muted/40 p-5 text-sm italic text-muted-foreground">
+<div className="not-prose my-6 rounded-panel border border-border bg-surface-muted/40 p-5 text-sm italic text-muted-foreground">
 "We present a quantum algorithm for verifying whether a given local
 Hamiltonian instance has ground-state energy below a specified
 threshold, achieving an <strong className="not-italic text-foreground">exponential speedup</strong> over
@@ -194,10 +194,26 @@ alarm bell: an extraordinary-sounding one-sentence claim is a cue to
 go find the precise statement, not to accept or reject the sentence
 itself.
 
+Before reading on, commit to a guess. The gap between an abstract and a
+theorem is almost never a fabrication; it is almost always a *scope*
+clause the abstract had no room for. Which clause?
+
+<PredictBeforeReveal
+  question="The abstract above claims an 'exponential speedup' for verifying a local Hamiltonian's ground-state energy. If the paper is correct and honestly written, which qualification is most likely sitting in the numbered theorem that the abstract left out?"
+  options={[
+    { label: "The speedup holds only for a restricted family of Hamiltonians (say, 1D or commuting)", value: "family" },
+    { label: "The speedup is proven only relative to a query/oracle model, not against all classical algorithms", value: "oracle" },
+    { label: "The speedup is exponential in a parameter other than n, so it is smaller than it sounds", value: "param" },
+    { label: "The speedup holds only in the average case over random instances", value: "average" },
+  ]}
+  correctValue="oracle"
+  explanation="All four are real, common scope clauses worth knowing. But 'exponential speedup' stated with no model named is, in quantum algorithms specifically, most often an oracle separation: proven, rigorous, and true only against classical algorithms restricted to the same black-box access. The theorem below is exactly that case. The habit worth building is not guessing right — it is knowing that the sentence is incomplete until you have found which of these four (or which other) clause the theorem attaches, and refusing to repeat the claim before you do."
+/>
+
 Now here is a plausible version of what the paper's actual numbered
 result, buried in a results section, says:
 
-<div className="not-prose my-6 rounded-xl border-2 border-brand/40 bg-brand/5 p-5 text-sm">
+<div className="not-prose my-6 rounded-panel border-2 border-brand/40 bg-brand/5 p-5 text-sm">
 <p className="font-semibold text-brand">Theorem 4.2 (illustrative)</p>
 <p className="mt-2 text-muted-foreground">
 Let $O_H$ be a sparse-access oracle providing black-box query access to
@@ -252,10 +268,10 @@ theorem before you decide what was actually shown."
 
 ## Paper Anatomy at a Glance
 
-<div className="not-prose my-8 overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
   <div className="grid grid-cols-[minmax(180px,240px)_1fr] gap-x-5 gap-y-4 min-w-[560px]">
 
-    <div className="rounded-lg border-l-4 border-foreground/30 bg-surface p-3">
+    <div className="rounded-(--radius-tight) border-l-4 border-foreground/30 bg-surface p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Abstract</p>
       <div className="mt-2 space-y-1">
         <div className="h-2 w-full rounded bg-foreground/10" />
@@ -265,7 +281,7 @@ theorem before you decide what was actually shown."
     </div>
     <p className="self-center text-sm text-muted-foreground">The elevator pitch. Necessarily compressed. Note every strong word ("exponential," "novel," "advantage") as a claim still needing chapter and verse — don't treat this as the paper's content.</p>
 
-    <div className="rounded-lg border-l-4 border-foreground/30 bg-surface p-3">
+    <div className="rounded-(--radius-tight) border-l-4 border-foreground/30 bg-surface p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Introduction</p>
       <div className="mt-2 space-y-1">
         <div className="h-2 w-full rounded bg-foreground/10" />
@@ -275,7 +291,7 @@ theorem before you decide what was actually shown."
     </div>
     <p className="self-center text-sm text-muted-foreground">Motivates the problem and cites related work. Check: does it say precisely what's new here versus what's restated background?</p>
 
-    <div className="rounded-lg border-l-4 border-warning/60 bg-warning/5 p-3">
+    <div className="rounded-(--radius-tight) border-l-4 border-warning/60 bg-warning/5 p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-warning">Model / assumptions</p>
       <div className="mt-2 space-y-1">
         <div className="h-2 w-5/6 rounded bg-warning/20" />
@@ -285,7 +301,7 @@ theorem before you decide what was actually shown."
     </div>
     <p className="self-center text-sm text-muted-foreground">Most-skimmed, most-important. What oracle model, noise model, or idealization is assumed? This section sets the actual scope of everything that follows.</p>
 
-    <div className="rounded-lg border-2 border-brand/50 bg-brand/5 p-3">
+    <div className="rounded-(--radius-tight) border-2 border-brand/50 bg-brand/5 p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-brand">Precise claim (theorem / bound)</p>
       <div className="mt-2 space-y-1">
         <div className="h-2 w-full rounded bg-brand/25" />
@@ -295,7 +311,7 @@ theorem before you decide what was actually shown."
     </div>
     <p className="self-center text-sm text-muted-foreground">The paper's actual, checkable content: a numbered theorem, an algorithm with a stated complexity bound, or a numerical result with stated error bars.</p>
 
-    <div className="rounded-lg border-l-4 border-accent/60 bg-accent/5 p-3">
+    <div className="rounded-(--radius-tight) border-l-4 border-accent/60 bg-accent/5 p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-accent">Numerical results</p>
       <div className="mt-2 space-y-1">
         <div className="h-2 w-2/3 rounded bg-accent/20" />
@@ -304,7 +320,7 @@ theorem before you decide what was actually shown."
     </div>
     <p className="self-center text-sm text-muted-foreground">Small-scale simulation or hardware demonstration. Different kind of evidence than a proven bound — supportive, not a proof the asymptotic trend continues.</p>
 
-    <div className="rounded-lg border-2 border-danger/50 bg-danger/5 p-3">
+    <div className="rounded-(--radius-tight) border-2 border-danger/50 bg-danger/5 p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-danger">Discussion / limitations</p>
       <div className="mt-2 space-y-1">
         <div className="h-2 w-full rounded bg-danger/20" />
@@ -367,6 +383,96 @@ paper about what was *not* shown — exactly the sentence that would have
 resolved an abstract-vs-theorem ambiguity in thirty seconds, if you'd
 read it.
 </Callout>
+
+## Your First Real Read: Preskill's NISQ Paper
+
+The worked example above was built for teaching. Time to drop the
+training wheels. Here is a real, open-access paper, and it is one of the
+most cited in the field's history:
+
+<ResearchConnection
+  title="Quantum Computing in the NISQ era and beyond"
+  source="Preskill, Quantum 2, 79 (2018) (arXiv:1801.00862)"
+  url="https://quantum-journal.org/papers/q-2018-08-06-79/"
+>
+  The paper that named the current era. Preskill coined "NISQ" (Noisy
+  Intermediate-Scale Quantum) for the generation of devices with roughly
+  50 to 100 qubits, argued what they might and might not be good for,
+  and set expectations the field still measures itself against. It is
+  free to read, about 20 pages, and written to be understood.
+</ResearchConnection>
+
+Read it this week, with this lesson's anatomy questions in hand. Here is
+what each question turns up, so you can check your read against one
+worked pass. Everything below is paraphrase; the exact wording is in the
+paper, and part of the exercise is finding it.
+
+**What do the abstract's strong words commit the author to?** Run the
+abstract-first pass and something unusual happens: the strong words are
+mostly hedges. The abstract says NISQ devices *may* be able to perform
+tasks beyond today's classical computers, *will* be useful tools for
+exploring many-body physics, and states a negative claim outright: a
+100-qubit quantum computer will not change the world right away.
+Compression usually oversells. Here it undersells, on purpose, and that
+asymmetry is itself information about the author.
+
+**What is actually new here?** Not a theorem, not an algorithm, not an
+experiment. The contribution is a framing and a name. This is a
+perspective paper (it began as a keynote address), so the anatomy bends:
+there is no numbered Theorem 4.2 to find. The checkable content is
+instead a set of calibrated forecasts, and the right question becomes
+whether each forecast is tagged with the kind of evidence behind it.
+
+**Where is the model/assumptions section?** It is spread through the
+prose, and it is quantitative. The capability estimates assume two-qubit
+gate error rates near the percent level with no error correction, which
+is what caps a reliably executable circuit at something like a thousand
+gates. Change that assumption and every downstream forecast moves. That
+is the same load-bearing role the worked example's oracle-access clause
+played, wearing plainer clothes.
+
+**Which claims are proven, and which are heuristic?** The paper sorts
+its own claims with unusual care. The classical-hardness argument for
+sampling experiments is credited to complexity theory: real, citable,
+conditional. The hybrid algorithms (QAOA, VQE) get the opposite
+treatment: Preskill says plainly that nobody knows whether they will
+beat well-tuned classical methods on the same problems, and that the
+field will find out by trying. That is a heuristic honestly labeled as
+one, exactly the distinction the next lesson builds into a full method.
+
+**What do the limitations say?** They are everywhere rather than
+quarantined in one section. Quantum machine learning proposals get a
+specific structural caveat (input and output bottlenecks: loading
+classical data in, and reading only a few classical bits out, can
+erase the claimed advantage). Fault tolerance gets a sobering resource
+estimate: thousands of protected logical qubits would need physical
+qubit counts in the millions. Each caveat is attached to the claim it
+limits, at the moment the claim is made.
+
+**Did the strong claims survive?** Reading a 2018 forecast in the
+present has one advantage the worked example could not offer: you know
+some of what happened next. Sampling-based supremacy experiments
+arrived the following year, and their classical-hardness margins were
+then narrowed by better classical algorithms, both outcomes the paper's
+hedged framing had room for. No NISQ application has yet cleanly beaten
+classical methods on a commercially useful problem, which is the
+outcome Preskill declined to promise. A paper whose caution ages this
+well is a calibration standard worth keeping.
+
+<InsightBlock>
+  The anatomy is not a checklist for catching authors out. Applied to a
+  careful paper, it does something better: it shows you what calibrated
+  scientific writing looks like, so you recognize its absence.
+</InsightBlock>
+
+<ChallengePrompt prompt="Open today's arXiv quant-ph listing, pick one abstract containing a superlative — 'exponential', 'first', 'outperforms', 'advantage' — and find the numbered statement that cashes it out.">
+  Write two sentences: the abstract's claim, and the theorem's or the
+  experiment's claim, each in your own words. Then name the specific gap
+  between them: an oracle model, a restricted instance family, an assumed
+  error rate, a parameter regime, or nothing at all. Papers where the gap
+  is nothing at all exist, and finding one is worth as much as catching
+  an overclaim.
+</ChallengePrompt>
 
 ## Practice Questions
 

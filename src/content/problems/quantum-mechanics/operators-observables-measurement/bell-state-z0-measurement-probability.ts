@@ -22,6 +22,10 @@ export const bellStateZ0MeasurementProbability: NumericProblem = {
     value: 0.5,
     tolerance: 0.001,
     incorrectFeedback: "Z_0's +1 eigenspace is spanned by |00> and |01>. Sum |c|^2 over the Bell state's components in that subspace.",
+    nearMisses: [
+      { value: 1, feedback: "Certainty would require the state to be |00⟩ alone. The |11⟩ component carries equal weight and lies in the −1 eigenspace of Z₀." },
+      { value: 0.25, feedback: "0.25 spreads weight over all four basis states. Only |00⟩ and |11⟩ appear in |Φ⁺⟩, each with probability 1/2." },
+    ],
   },
   hints: [
     { text: "Z_0's +1-eigenspace is span{|00>, |01>}." },

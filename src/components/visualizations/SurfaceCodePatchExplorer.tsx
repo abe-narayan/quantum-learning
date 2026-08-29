@@ -150,21 +150,45 @@ function SinglePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
     <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-          <text x={WIDTH / 2} y={16} textAnchor="middle" className="fill-muted-foreground text-[11px] font-mono">
-            distance-3 unrotated surface code: 13 data qubits, 6 X-stabilizers, 6 Z-stabilizers
+          {/* Type sizes throughout this SVG were raised, and the divisor the
+              last pass used was wrong. The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+              (320 less Container's `px-4` gutters), but this SVG renders inside
+              `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+              radius and fill and no padding at all — the `p-4` does. Subtract
+              2 x (16px padding + 1px border) = 34px.
+              This viewBox is 400 wide, so the scale is 254/400 = 0.635, not
+              0.72: the old 9, 9.5 and 11 unit sizes painted at 5.7px, 6.0px
+              and 7.0px, and of the sizes that replaced them 15 units was fine
+              (9.53px) while **13 units painted at 8.26px** and stayed under
+              the floor. Everything is 15 now.
+
+              Nothing collides at 15: the boundary labels are ~105-112 units
+              of body face against a 72-unit lattice spacing, and the two
+              rotated "rough boundary" labels run vertically (their horizontal
+              extent is one cap height around x = 22 and x = 378).
+
+              The caption is split in two because it never fit: 82 characters
+              of monospace needed ~540 units inside a 400-unit box even at the
+              old size, so its tail was being clipped by the viewBox edge on
+              every screen, not just narrow ones. */}
+          <text x={WIDTH / 2} y={16} textAnchor="middle" fontSize={15} className="fill-axis font-mono">
+            distance-3 unrotated surface code
+          </text>
+          <text x={WIDTH / 2} y={34} textAnchor="middle" fontSize={15} className="fill-axis font-mono">
+            13 data qubits, 6 X- and 6 Z-stabilizers
           </text>
 
           {/* rough (left/right) vs smooth (top/bottom) boundary labels */}
-          <text x={px(0) - 34} y={py(2) + 4} textAnchor="middle" className="fill-accent text-[9.5px] font-semibold" transform={`rotate(-90 ${px(0) - 34} ${py(2) + 4})`}>
+          <text x={px(0) - 34} y={py(2) + 4} textAnchor="middle" fontSize={15} className="fill-accent font-semibold" transform={`rotate(-90 ${px(0) - 34} ${py(2) + 4})`}>
             rough boundary
           </text>
-          <text x={px(4) + 34} y={py(2) + 4} textAnchor="middle" className="fill-accent text-[9.5px] font-semibold" transform={`rotate(90 ${px(4) + 34} ${py(2) + 4})`}>
+          <text x={px(4) + 34} y={py(2) + 4} textAnchor="middle" fontSize={15} className="fill-accent font-semibold" transform={`rotate(90 ${px(4) + 34} ${py(2) + 4})`}>
             rough boundary
           </text>
-          <text x={px(2)} y={py(0) - 30} textAnchor="middle" className="fill-brand text-[9.5px] font-semibold">
+          <text x={px(2)} y={py(0) - 30} textAnchor="middle" fontSize={15} className="fill-brand font-semibold">
             smooth boundary
           </text>
-          <text x={px(2)} y={py(4) + 34} textAnchor="middle" className="fill-brand text-[9.5px] font-semibold">
+          <text x={px(2)} y={py(4) + 36} textAnchor="middle" fontSize={15} className="fill-brand font-semibold">
             smooth boundary
           </text>
 
@@ -180,7 +204,20 @@ function SinglePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
                   y1={py(s.y)}
                   x2={px(q.x)}
                   y2={py(q.y)}
-                  className={active ? (s.type === "X" ? "stroke-accent" : "stroke-brand") : "stroke-border"}
+                  // The stabilizer-to-qubit edges ARE the lattice: which
+                  // data qubits a stabilizer acts on is read entirely off
+                  // them, and this component's own docstring promises that
+                  // "the full lattice ... stays visible throughout, so the
+                  // highlighted piece is always seen in the context of the
+                  // whole patch". At `stroke-border` — the panel-edge token,
+                  // 1.41:1 on `--surface-muted`, under the 3:1 WCAG 2.1 SC
+                  // 1.4.11 floor — that context was not actually visible on
+                  // the dark theme, so every mode read as three or four
+                  // floating lines rather than as one piece of a lattice.
+                  // `--axis` clears 3:1 everywhere; the highlighted edges
+                  // stay distinguishable by being brand/accent coloured at
+                  // double the weight.
+                  className={active ? (s.type === "X" ? "stroke-accent" : "stroke-brand") : "stroke-axis"}
                   strokeWidth={active ? 2 : 1}
                 />
               );
@@ -235,7 +272,7 @@ function SinglePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
                   strokeDasharray={s.boundary ? "3 2" : undefined}
                 />
                 {active && (
-                  <text x={px(s.x)} y={py(s.y) - 16} textAnchor="middle" className={cn("text-[9.5px] font-semibold", isX ? "fill-accent" : "fill-brand")}>
+                  <text x={px(s.x)} y={py(s.y) - 18} textAnchor="middle" fontSize={15} className={cn("font-semibold", isX ? "fill-accent" : "fill-brand")}>
                     {s.id}
                   </text>
                 )}
@@ -254,7 +291,7 @@ function SinglePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
                   r={highlighted ? 11 : 8}
                   className={highlighted ? "fill-foreground stroke-2 stroke-warning" : "fill-foreground"}
                 />
-                <text x={px(q.x)} y={py(q.y) - 14} textAnchor="middle" className="fill-muted-foreground text-[9px] font-mono">
+                <text x={px(q.x)} y={py(q.y) - 16} textAnchor="middle" fontSize={15} className="fill-axis font-mono">
                   {q.id}
                 </text>
               </g>
@@ -270,7 +307,7 @@ function SinglePatchExplorer({ ariaLabel }: { ariaLabel: string }) {
         </div>
       </div>
 
-      <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {describeMode(mode)}
       </div>
     </div>
@@ -322,7 +359,13 @@ function LatticeSurgeryPatch({
 }) {
   return (
     <g transform={`translate(${offsetX},0)`}>
-      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-border" strokeWidth={2} />
+      {/* The patch outline. It is the object under discussion at every stage
+          of this toggle — "two independent patches" versus "one merged
+          patch" is a claim about these rectangles — so it moves off
+          `--border` (the panel-edge token, 1.41:1 on `--surface-muted`,
+          under the 3:1 WCAG 2.1 SC 1.4.11 floor) onto `--axis`, which clears
+          3:1 on every panel depth in both themes. */}
+      <rect x={40} y={90} width={60} height={120} className="fill-none stroke-axis" strokeWidth={2} />
       {PATCH_CORNERS.map(([cx, cy]) => (
         <circle key={`v-${cx}-${cy}`} cx={cx} cy={cy} r={4} className="fill-foreground" />
       ))}
@@ -330,7 +373,18 @@ function LatticeSurgeryPatch({
         <rect key={`q-${qx}-${qy}`} x={qx - 7} y={qy - 7} width={14} height={14} rx={3} className="fill-muted-foreground/10 stroke-muted-foreground" strokeWidth={1.5} />
       ))}
       <line x1={40} y1={150} x2={100} y2={150} className="stroke-brand" strokeWidth={2} strokeDasharray="6 3" />
-      <text x={70} y={238} textAnchor="middle" className="fill-muted-foreground text-[9.5px] font-medium">
+      {/* This panel's viewBox is 340 and it renders `w-full max-w-md`, so the
+          scale is (box / 340) — and the box is not the 288px the last pass
+          used. The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+          (320 less Container's `px-4` gutters), but this SVG renders inside
+          `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+          radius and fill and no padding at all — the `p-4` does. Subtract
+          2 x (16px padding + 1px border) = 34px.
+          At the real 254px the scale is 0.747, not 0.847: 9.5 units painted at
+          7.1px, 9 units at 6.7px, and the 12 units chosen to land "at 10.2px"
+          actually landed at **8.96px** — a rounding error away from the floor
+          rather than clear of it. 13 units gives 9.71px. */}
+      <text x={70} y={240} textAnchor="middle" fontSize={13} className="fill-axis font-medium">
         {logicalLabel}
       </text>
       {showBridge && (
@@ -369,7 +423,7 @@ function MergeSplitPatchExplorer({ ariaLabel }: { ariaLabel: string }) {
     <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
       <div className="overflow-x-auto">
         <svg width={340} height={300} viewBox="0 0 340 300" className="mx-auto w-full max-w-md" role="img" aria-label={ariaLabel}>
-          <text x={170} y={20} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">
+          <text x={170} y={22} textAnchor="middle" fontSize={15} className="fill-foreground font-semibold">
             {stage === "before" ? "Two independent patches" : stage === "merging" ? "Joint Z stabilizer measured" : "Split apart again"}
           </text>
 
@@ -389,17 +443,24 @@ function MergeSplitPatchExplorer({ ariaLabel }: { ariaLabel: string }) {
             <>
               <rect x={160} y={78} width={72} height={30} rx={6} className="fill-brand/15 stroke-brand" strokeWidth={2} />
               <line x1={40} y1={150} x2={300} y2={150} className="stroke-brand" strokeWidth={2.5} strokeDasharray="6 3" />
-              <text x={170} y={64} textAnchor="middle" className="fill-brand text-[9px] font-medium">
+              <text x={170} y={64} textAnchor="middle" fontSize={13} className="fill-brand font-medium">
                 seam vertex gains the bridge qubits
               </text>
-              <text x={170} y={238} textAnchor="middle" className="fill-brand text-[9.5px] font-medium">
+              <text x={170} y={262} textAnchor="middle" fontSize={13} className="fill-brand font-medium">
                 Z_L(merged) = Z_L1·Z_L2
               </text>
             </>
           )}
 
-          <text x={170} y={266} textAnchor="middle" className="fill-muted-foreground text-[9px]">
-            {merging ? "1 logical qubit, 1 code space" : "2 independent patches, gap: no shared stabilizers"}
+          {/* "independent" dropped from the second branch. At 13 units the
+              48-character original is ~324 units of body face centred at x =
+              170, i.e. 8..332 in a 340-unit viewBox — inside it only if the
+              face's average advance is exactly what was assumed, and clipped
+              at both ends if a fallback face is a hair wider. The 36 kept are
+              ~234 units (53..287), and the heading directly above this panel
+              already says "Two independent patches". */}
+          <text x={170} y={284} textAnchor="middle" fontSize={13} className="fill-axis">
+            {merging ? "1 logical qubit, 1 code space" : "2 patches, gap: no shared stabilizers"}
           </text>
         </svg>
       </div>
@@ -411,7 +472,7 @@ function MergeSplitPatchExplorer({ ariaLabel }: { ariaLabel: string }) {
         </div>
       </div>
 
-      <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {describeMergeStage(stage)}
       </div>
     </div>

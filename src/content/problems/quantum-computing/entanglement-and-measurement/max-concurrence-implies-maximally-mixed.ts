@@ -21,24 +21,24 @@ export const maxConcurrenceImpliesMaximallyMixed: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["solve", "plug in", "substitut", "c=1", "1=√"],
-      ["0.5", "exactly", "forces", "only solution"],
+      ["solv", "plug in", "plug c=1", "substitut", "insert", "set c=1", "c=1", "1=√", "1 = √", "square both sides", "squaring"],
+      ["0.5", "1/2", "one half", "a half", "exactly", "forces", "forced", "only solution", "unique", "single value", "one value", "no other value", "pinned down", "pins down"],
     ],
-    incorrectFeedback: "Substitute C=1 directly into the identity and solve for Tr(ρ_A²) — the algebra pins it down to a single exact value.",
-    partialFeedback: "Good start — finish by showing the algebra leaves no other possible value for Tr(ρ_A²).",
+    incorrectFeedback: "Treat the identity as an equation to be rearranged. What does setting C to its given value leave you with?",
+    partialFeedback: "Good start. Finish by showing the algebra leaves no other possibility for Tr(ρ_A²).",
   },
   hints: [
     { text: "Set C=1 in C=√(2(1-Tr(ρ_A²)))." },
     { text: "Square both sides: 1 = 2(1-Tr(ρ_A²))." },
-    { text: "Solve for Tr(ρ_A²) — there's only one solution." },
+    { text: "Rearrange for Tr(ρ_A²). How many answers does the equation permit?" },
   ],
   solution: {
     steps: [
       { description: "$1 = \\sqrt{2(1-\\text{Tr}(\\rho_A^2))}$" },
       { description: "Squaring: $1 = 2(1-\\text{Tr}(\\rho_A^2))$, so $1-\\text{Tr}(\\rho_A^2)=0.5$." },
-      { description: "$\\text{Tr}(\\rho_A^2) = 0.5$ — exactly, with no other value possible." },
+      { description: "$\\text{Tr}(\\rho_A^2) = 0.5$ exactly, with no other value possible." },
     ],
-    finalAnswer: "Tr(ρ_A²)=0.5 exactly, since the identity is an equation, not an inequality — it pins down a single value.",
+    finalAnswer: "Tr(ρ_A²)=0.5 exactly, since the identity is an equation, not an inequality. It pins down a single value.",
   },
   explanation: {
     correctIdea: "The identity relating C and Tr(ρ_A²) is an exact algebraic equation, so any specific C value forces exactly one Tr(ρ_A²) value.",

@@ -24,6 +24,11 @@ export const distillationRateFromEntanglementEntropy: NumericProblem = {
     tolerance: 1,
     incorrectFeedback:
       "The entanglement-concentration protocol's asymptotic rate is m ~ n*H(p) Bell pairs, where H(p) is the binary Shannon entropy of the Schmidt coefficients. Compute H(0.7) = -0.7 log2(0.7) - 0.3 log2(0.3) first, then multiply by n=500.",
+    nearMisses: [
+      { value: 500, tolerance: 1, feedback: "500 assumes each copy yields a full Bell pair. That holds only for a maximally entangled source, where H = 1 bit; here H(0.7) ≈ 0.88." },
+      { value: 350, tolerance: 1, feedback: "350 uses the Schmidt coefficient 0.7 as the per-copy rate. The rate is the entropy those coefficients carry, not the coefficient itself." },
+      { value: 0.881291, tolerance: 0.003, feedback: "That is H(0.7), the per-copy rate in ebits. Multiply by the 500 copies." },
+    ],
   },
   hints: [
     { text: "The lesson's key result: projecting onto the typical subspace and relabeling distills m ~ n*H(p) near-perfect Bell pairs, where H(p) is the source state's entanglement entropy S(rho_A)." },

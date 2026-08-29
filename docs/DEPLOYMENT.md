@@ -1,7 +1,10 @@
 # Deploying QuantumLearn (Vercel build notes)
 
-This site is pure SSG: `next build` prerenders all 821 routes (219 lessons,
-547 problems, 32 courses, catalogs) and `next start` serves them. The notes
+This site is pure SSG: `next build` prerenders every route — 219 lessons,
+547 problems, 32 courses and 15 catalog/landing pages, which is 813
+addressable pages and exactly the length `sitemap.ts` emits, plus
+`/_not-found` and the six metadata routes (favicon, apple-icon, manifest,
+opengraph-image, robots, sitemap) — and `next start` serves them. The notes
 below exist because the build's memory profile has bitten us on Vercel before
 — read them before changing the build pipeline, the math pipeline, or any
 "load the whole corpus" convenience.
@@ -39,6 +42,32 @@ controlled measurements (details in the git history and
   the corpus render tests, and the generated metadata registries
   (`lessonMeta.generated.ts` / `problemMeta.generated.ts`) that keep compiled
   MDX out of every non-lesson page (see docs/ARCHITECTURE.md).
+- **`rehype-katex` is still in `devDependencies`, and must stay there.** It
+  is imported by exactly one file — that fidelity test — which compiles the
+  same source through both pipelines and asserts the equation structure
+  matches. Removing the package does not shrink the build (it is not in the
+  pipeline any more); it deletes the only check that can tell you the
+  replacement still renders the same math. An earlier dependency audit
+  recommended dropping it as unused. That recommendation was wrong.
+
+## The other place math meets the client boundary: problem pages
+
+Lesson math is rendered at compile time by the plugin above. Problem content
+is not MDX at all — it is plain TypeScript data — so it never meets that
+plugin, and until 2026-08 it paid the KaTeX runtime in the browser instead:
+`ProblemView` was a client component, and `AnswerInput`/`HintPanel`/
+`SolutionPanel` reached `katex` through `ScrollableMathText` → `MathText`.
+None of those four files declares `"use client"` itself, so nothing about
+the source made the boundary visible.
+
+The same trick was applied: `ProblemView` is now a Server Component that
+renders the math to KaTeX HTML strings and hands them across, and the client
+subtree only injects strings. **The general rule this is the second instance
+of: if a string's math is known at build time, render it on the server; ship
+markup, never the renderer.** The renderer belongs in the browser only where
+the LaTeX itself changes with live state — a simulator's readout — which is
+why `KatexMath` still exists. Details in docs/ARCHITECTURE.md §7b; the
+boundary is enforced by `src/lib/design/__tests__/clientBoundary.test.ts`.
 
 ## Recommended Vercel project settings
 

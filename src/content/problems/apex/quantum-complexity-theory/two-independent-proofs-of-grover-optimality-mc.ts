@@ -57,17 +57,17 @@ export const twoIndependentProofsOfGroverOptimalityMc: MultipleChoiceProblem = {
       { description: "This makes Grover's Theta(sqrt(N)) optimality an unconditional, doubly-proven theorem -- unlike P != NP or P != BQP, which have no unconditional proof by any technique." },
       { description: "Both techniques remain query-complexity results relative to a black-box oracle, so neither extends to unconditional claims about NP subseteq BQP or to time-complexity separations for explicitly-given, structured problems." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "An unconditional theorem confirmed by two structurally independent techniques, still scoped to the black-box query model.",
   },
   explanation: {
     correctIdea:
       "Two structurally independent proof techniques landing on the same bound is genuinely stronger evidence of correctness than one proof alone, and is precisely what distinguishes a proven theorem from a widely-believed-but-unproven conjecture -- but the theorem's scope is still the black-box query model.",
     whyCorrect:
-      "Option (a) correctly identifies both the epistemic strength of independent confirmation and the precise, limited scope (query model, black-box oracle) that the theorem does not exceed.",
+      "Holding both halves at once is what the lesson asks for: the epistemic strength of independent confirmation, and the limited scope (query model, black-box oracle) that the theorem does not exceed.",
     whyWrong: [
-      "(b) is false: the two techniques' core objects (quantum state overlaps vs. real polynomial degree) and cited theorems (Ambainis's adversary bound vs. Nisan-Szegedy/Paturi degree bounds) are genuinely different.",
-      "(c) overreaches by applying a black-box query result to general, structured NP-complete instances, exactly the mistake the lesson's first Common Mistake callout warns against.",
-      "(d) conflates the query-complexity model (only oracle calls counted, everything else free) with time/circuit complexity against real, explicitly-given problems -- a fundamentally different and stronger kind of statement that neither technique makes.",
+      { optionId: "b", text: "Collapses the two techniques into one. Their core objects (quantum state overlaps versus real polynomial degree) and cited theorems (Ambainis's adversary bound versus Nisan-Szegedy/Paturi degree bounds) are different." },
+      { optionId: "c", text: "Overreaches by applying a black-box query result to general, structured NP-complete instances: the mistake the lesson's first Common Mistake callout warns against." },
+      { optionId: "d", text: "Conflates the query-complexity model, where only oracle calls are counted, with time and circuit complexity against explicitly-given problems. That is a stronger kind of statement neither technique makes." },
     ],
   },
 };

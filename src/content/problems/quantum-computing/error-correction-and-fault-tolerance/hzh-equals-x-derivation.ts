@@ -20,16 +20,16 @@ export const hzhEqualsXDerivation: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["multiply both sides", "left.multiply", "h\\(hxh\\)h"],
-      ["h.2.*=.*i", "hh=i", "identity"],
+      ["multiply both sides", "left multiply", "left-multiply", "multiply on the left", "multiply each side", "multiply by h", "h(hxh)h", "hhxhh", "sandwich", "conjugate"],
+      ["h²", "h^2", "h squared", "hh=i", "hh = i", "self-inverse", "self inverse", "own inverse", "identity"],
     ],
-    incorrectFeedback: "Multiply both sides of HXH=Z by H on the left and by H on the right, then simplify using HH=I.",
-    partialFeedback: "Good — now finish simplifying using H²=I to isolate X.",
+    incorrectFeedback: "Take the known equation HXH=Z and act on it with one more H at each end, then use the fact that H undoes itself.",
+    partialFeedback: "You made the right first move. Now clear the outer gates using the property that applying H twice does nothing, and read off the result.",
   },
   hints: [
-    { text: "Start with HXH=Z." },
-    { text: "Multiply both sides on the left by H and on the right by H: H(HXH)H = HZH." },
-    { text: "Simplify the left side using HH=I twice." },
+    { text: "You want an equation with Z sitting between two H's. What can you do to each side of HXH=Z to arrange that?" },
+    { text: "After that move, what does the other side look like? Group the H's that sit next to each other." },
+    { text: "What is H composed with itself? Use that twice to collapse one side down to X." },
   ],
   solution: {
     steps: [

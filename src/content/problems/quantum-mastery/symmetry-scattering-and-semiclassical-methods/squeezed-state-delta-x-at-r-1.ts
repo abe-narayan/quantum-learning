@@ -25,10 +25,15 @@ export const squeezedStateDeltaXAtR1: NumericProblem = {
     value: deltaX,
     tolerance: 0.002,
     incorrectFeedback: "Compute e^(−1) first, then divide by √2.",
+    nearMisses: [
+      { value: Math.exp(1) / Math.SQRT2, tolerance: 0.01, feedback: "That is Δp, the anti-squeezed quadrature. The exponent's sign decides which one is narrowed." },
+      { value: Math.exp(-1), tolerance: 0.005, feedback: "That is the squeeze factor e^(−r) alone. It still multiplies the coherent state's own width, 1/√2." },
+      { value: Math.SQRT1_2, tolerance: 0.005, feedback: "1/√2 is the unsqueezed coherent-state width, the r=0 case. Squeezing at r=1 shrinks it by e^(−1)." },
+    ],
   },
   hints: [
-    { text: "e^(−1)≈0.3679." },
-    { text: "Δx=0.3679/√2." },
+    { text: "e^(−1)≈0.3679, so squeezing at r=1 shrinks the position spread by that factor." },
+    { text: "Divide by √2, the coherent state's own Δx in these units. Sanity check: the answer should sit well below 1/√2≈0.7071, which is the unsqueezed value." },
   ],
   solution: {
     steps: [{ description: "Δx = e^(−1)/√2 ≈ 0.3679/1.4142 ≈ 0.2601." }],

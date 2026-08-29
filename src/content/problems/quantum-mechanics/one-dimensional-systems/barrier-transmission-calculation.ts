@@ -22,6 +22,10 @@ export const barrierTransmissionCalculation: NumericProblem = {
     value: 0.95156,
     tolerance: 0.0005,
     incorrectFeedback: "Compute k2=sqrt(2(E-V0)) first, then T = [1 + V0^2*sin^2(k2*L)/(4*E*(E-V0))]^(-1).",
+    nearMisses: [
+      { value: 0.0484, tolerance: 0.001, feedback: "That is R = 1 − T, the reflection probability. The question asks for transmission." },
+      { value: 1, feedback: "T = 1 happens only on resonance, where sin(k₂L) vanishes. Here k₂L ≈ 2.45 radians, so the sine is nowhere near zero and a little flux reflects." },
+    ],
   },
   hints: [
     { text: "k2 = sqrt(2*(6-3)) = sqrt(6) ≈ 2.4495." },
@@ -29,8 +33,8 @@ export const barrierTransmissionCalculation: NumericProblem = {
   ],
   solution: {
     steps: [
-      { description: "$k_2=\\sqrt6\\approx2.4495$, $\\sin(k_2\\cdot1)\\approx\\sin(2.4495)\\approx0.6367$." },
-      { description: "$T = \\left[1+\\dfrac{9\\times0.6367^2}{4\\times6\\times3}\\right]^{-1} \\approx 0.9516$." },
+      { description: "$k_2=\\sqrt6\\approx2.4495$, $\\sin(k_2\\cdot1)\\approx\\sin(2.4495)\\approx0.6382$." },
+      { description: "$T = \\left[1+\\dfrac{9\\times0.6382^2}{4\\times6\\times3}\\right]^{-1} \\approx 0.9516$." },
     ],
     finalAnswer: "$T \\approx 0.9516$",
   },

@@ -111,14 +111,34 @@ export function PartialTraceHighlight({
         ariaLabel="Which qubit to trace out"
       />
 
-      <div className="flex flex-wrap items-start gap-6 overflow-x-auto" aria-label={`${ariaLabel}: ${preset.label}, ${frame.paramLabel}`}>
+      {/* Was a bare `<div>` carrying an `aria-label`. `aria-label` on an
+          element with no role is ignored by assistive tech, so the composed
+          "preset, θ = 30°" name this went to the trouble of building was
+          reaching nobody — `role="group"` is the smallest role that supports
+          naming without adding a page landmark, and it makes the name real.
+
+          `tabIndex={0}`: the ρ_AB panel is `ml-[3.25rem]` of basis-row gutter
+          plus `repeat(4, minmax(3.25rem, 1fr))` = 4 × 52px, so ~260px against
+          a ~256px content box on a 320px phone — it overflows, narrowly but
+          really, and the column that falls off the right edge is |11⟩. An
+          `overflow-x-auto` div is focusable by default in no browser but
+          Firefox. The focusable cells inside are no substitute: they are the
+          2×2 reduced matrix in the *other* panel, which on a narrow screen has
+          already wrapped onto its own line, so tabbing to them scrolls
+          nothing and cannot bring ρ_AB's last column into view. */}
+      <div
+        role="group"
+        aria-label={`${ariaLabel}: ${preset.label}, ${frame.paramLabel}`}
+        tabIndex={0}
+        className="flex flex-wrap items-start gap-6 overflow-x-auto"
+      >
         <div className="space-y-1.5">
           <p className="tech-label">ρ_AB</p>
           <BasisRow labels={BASIS_LABELS_4} />
           <div className="flex">
             <BasisColumn labels={BASIS_LABELS_4} />
             <div
-              className="inline-grid gap-px overflow-hidden rounded-lg border border-border bg-border"
+              className="inline-grid gap-px overflow-hidden rounded-(--radius-tight) border border-border bg-border"
               style={{ gridTemplateColumns: "repeat(4, minmax(3.25rem, 1fr))" }}
             >
               {frame.rhoAB.map((row, r) =>
@@ -138,12 +158,45 @@ export function PartialTraceHighlight({
                       }
                       className={cn(
                         "flex items-center justify-center px-2 py-2.5 font-mono text-xs sm:text-sm transition-colors",
-                        !eligible && "bg-surface-muted/60 text-muted-foreground/40",
+                        // `text-muted-foreground`, not `text-muted-foreground/40`.
+                        // The /40 alpha composited these amplitudes to 2.17:1 on
+                        // the dark theme and 1.81:1 on light, against WCAG 1.4.3's
+                        // 4.5:1 — and they are not decoration: the argument this
+                        // figure makes is that these entries are *nonzero and yet
+                        // never reach ρ_A*, which you cannot check if you cannot
+                        // read them. Dropping the alpha lands at 7.04:1 / 5.97:1
+                        // while keeping the whole point of the dimming, because
+                        // the eligible cells beside them are on `text-foreground`:
+                        // the muted/foreground split is already a visible
+                        // hierarchy, and `bg-surface-muted/60` gives the excluded
+                        // cells a second, non-colour channel on top of it.
+                        !eligible && "bg-surface-muted/60 text-muted-foreground",
                         eligible && !isContribution && "bg-surface text-foreground",
                         isContribution && "bg-brand/15 font-semibold text-brand ring-2 ring-inset ring-brand"
                       )}
                     >
                       {formatAmplitudeLatex(cell, digits)}
+                      {/* The `title` above is a mouse-hover enhancement and
+                          nothing more. A `title` on a non-interactive `<div>`
+                          is not announced by any screen reader and cannot be
+                          summoned by a keyboard at all, so until this span the
+                          per-cell half of the figure's teaching content —
+                          which entries feed which reduced entry, and which are
+                          excluded outright — existed only for a reader holding
+                          a mouse. That is the exact claim the lesson's Worked
+                          Example turns on.
+                          Kept deliberately terse ("excluded" / "→ ρ entry
+                          (|0⟩,|0⟩)") rather than mirroring the full `title`
+                          sentence: this repeats sixteen times, and the rule
+                          behind it is stated once, visibly, in the legend
+                          below the grid, where a sighted keyboard-only reader
+                          can also get it. The short tag is the per-cell datum;
+                          the legend is the explanation. */}
+                      <span className="sr-only">
+                        {eligible
+                          ? ` — contributes to reduced entry (${BASIS_LABELS_2[keptBitOf(r)]},${BASIS_LABELS_2[keptBitOf(c)]})`
+                          : " — excluded from every reduced entry"}
+                      </span>
                     </div>
                   );
                 })
@@ -160,7 +213,7 @@ export function PartialTraceHighlight({
             <div
               role="group"
               aria-label={`${rhoALabel} — click a cell to highlight its contributing ρ_AB entries`}
-              className="inline-grid gap-px overflow-hidden rounded-lg border border-border bg-border"
+              className="inline-grid gap-px overflow-hidden rounded-(--radius-tight) border border-border bg-border"
               style={{ gridTemplateColumns: "repeat(2, minmax(3.25rem, 1fr))" }}
             >
               {rhoA.map((row, r) =>
@@ -174,8 +227,17 @@ export function PartialTraceHighlight({
                       aria-label={`(${rhoALabel.slice(0, 5)})_{${BASIS_LABELS_2[r]},${BASIS_LABELS_2[c]}} = ${formatAmplitudeLatex(cell, digits)}${isSelected ? ", selected" : ""}`}
                       onClick={() => setSelected(isSelected ? null : { row: r, col: c })}
                       className={cn(
-                        "flex items-center justify-center px-2 py-2.5 font-mono text-xs transition-colors sm:text-sm",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        // `min-h-11`. These four cells are the only interactive
+                        // controls in the figure, and `px-2 py-2.5` + `text-xs`
+                        // painted them ~36px tall — under the 44px WCAG 2.5.8
+                        // asks for, in a 2×2 grid where the neighbouring target
+                        // is one pixel away, so a mis-tap selects the wrong
+                        // reduced entry rather than missing. The columns are
+                        // already `minmax(3.25rem, …)` = 52px wide, so only the
+                        // vertical axis was short; `min-h` rather than `h` so a
+                        // longer formatted amplitude can still grow the row.
+                        "flex min-h-11 items-center justify-center px-2 py-2.5 font-mono text-xs transition-colors sm:text-sm",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                         isSelected
                           ? "bg-brand/15 font-semibold text-brand ring-2 ring-inset ring-brand"
                           : r === c
@@ -192,6 +254,21 @@ export function PartialTraceHighlight({
           </div>
         </div>
       </div>
+
+      {/* The dimming rule, stated once in visible prose. It used to live only
+          in the ρ_AB cells' `title` attributes, which means it was available
+          to a reader with a mouse and to nobody else — not to a keyboard-only
+          reader, not to a screen-reader user, not to anyone on a touch screen,
+          where `title` never fires at all. It is one rule, identical for every
+          dimmed cell, so it belongs in one sentence under the figure rather
+          than sixteen times inside it. Not `aria-live`: it changes only when
+          the reader flips which qubit is traced out, and that press already
+          re-announces the toggle. */}
+      <p className="text-xs text-muted-foreground">
+        Dimmed entries of ρ_AB are the ones whose {tracedQubit === 0 ? "qubit-0" : "qubit-1"} bra and ket indices
+        disagree. Summing over that index never pairs them with anything, so they contribute to no entry of{" "}
+        {rhoALabel.slice(0, 5)} at all — however large they are.
+      </p>
 
       <p className="text-xs text-muted-foreground" aria-live="polite">
         {selectionText}

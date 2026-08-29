@@ -31,6 +31,20 @@ export const decodingThresholdScalingRatio: NumericProblem = {
     toleranceType: "absolute",
     incorrectFeedback:
       "Compute each distance's exponent (d+1)/2 separately, evaluate 0.5 raised to each, then divide.",
+    nearMisses: [
+      {
+        value: Math.pow(pOverPth, 9) / Math.pow(pOverPth, 5),
+        feedback: "You used d itself as the exponent instead of (d+1)/2. Each step of distance buys half an extra power, not a whole one.",
+      },
+      {
+        value: pOverPth,
+        feedback: "0.5 is the ratio p/p_th, not the ratio of logical error rates. The exponent grows with d as well, so the suppression compounds.",
+      },
+      {
+        value: Math.pow(pOverPth, 3) / Math.pow(pOverPth, 5),
+        feedback: "You divided the wrong way round: 4 is p_L(5)/p_L(9). The larger distance has the smaller logical error rate, so p_L(9)/p_L(5) must be below 1.",
+      },
+    ],
   },
   hints: [
     { text: "The exponent is (d+1)/2, not d itself — for d=9 that's 5, and for d=5 that's 3." },

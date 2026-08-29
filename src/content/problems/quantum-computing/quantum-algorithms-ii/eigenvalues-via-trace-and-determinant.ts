@@ -20,23 +20,23 @@ export const eigenvaluesViaTraceAndDeterminant: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["lambda\\^2", "λ²", "characteristic equation", "quadratic"],
-      ["\\+1", "-1", "plus or minus 1", "±1"],
+      ["lambda^2", "lambda²", "lambda squared", "λ²", "λ^2", "characteristic equation", "characteristic polynomial", "quadratic"],
+      ["+1", "-1", "−1", "plus or minus 1", "plus or minus one", "plus and minus 1", "minus one", "±1", "± 1"],
     ],
-    incorrectFeedback: "Substitute trace=0 and det=−1 into λ²−(trace)λ+(det)=0 and solve the resulting quadratic.",
-    partialFeedback: "Good — now state the two resulting eigenvalues explicitly.",
+    incorrectFeedback: "Substitute the given trace and determinant into the equation from the prompt, then solve what remains.",
+    partialFeedback: "Good. Now state the two resulting eigenvalues explicitly.",
   },
   hints: [
-    { text: "The characteristic equation is λ² − (trace)λ + det = 0." },
-    { text: "With trace=0, det=−1: λ² − 1 = 0." },
-    { text: "λ² = 1 gives λ = ±1." },
+    { text: "Write the characteristic polynomial of a 2×2 matrix in terms of its trace and determinant." },
+    { text: "Substitute the two given numbers. How simple does the equation become?" },
+    { text: "Solve it, remembering that a square has two roots." },
   ],
   solution: {
     steps: [
       { description: "λ² − (0)λ + (−1) = 0, i.e. λ² = 1." },
       { description: "λ = +1 or λ = −1." },
     ],
-    finalAnswer: "Eigenvalues are +1 and −1, so E₀=−1 — matching both the shortcut formula and the engine's direct output.",
+    finalAnswer: "Eigenvalues are +1 and −1, so E₀=−1. This matches both the shortcut formula and the engine's direct output.",
   },
   explanation: {
     correctIdea: "The trace-and-determinant method is a completely general way to find 2×2 eigenvalues, independent of any Pauli-specific shortcut.",

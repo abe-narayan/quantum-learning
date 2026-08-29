@@ -1,15 +1,29 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { StateVector } from "@/lib/quantum/state";
+import { rotationX } from "@/lib/quantum/gates";
+import { stateToBlochVector } from "@/lib/quantum/bloch";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/single-qubit-rotations"
 );
 
+export const halfAngleSweep = Array.from({ length: 121 }, (_, i) => {
+  const angle = (i / 120) * 4 * Math.PI;
+  const rotated = new StateVector(rotationX(angle).apply(StateVector.zero(1).amplitudes));
+  return {
+    angle,
+    betaImaginary: rotated.amplitudes[1].im,
+    blochZ: stateToBlochVector(rotated).z,
+  };
+});
+
 export const lessonMeta = {
   title: "Single-Qubit Rotations",
   description:
-    "The general rotation formula that every single-qubit gate is secretly an instance of, and what Rx, Ry, Rz actually compute.",
+    "The general rotation formula that every single-qubit gate is an instance of, and what Rx, Ry, Rz compute.",
   course: "qubits-and-quantum-states",
   module: "single-qubit-rotations",
   order: 1,
@@ -30,34 +44,32 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="One family, not six gates">
-There's nothing physically special about rotating a qubit by exactly π/4 versus, say, 17° — the six named gates you've met so far are just convenient specific cases of one continuous family.
+Nothing physical distinguishes a rotation by π/4 from a rotation by 17°. The six named gates you've met so far are convenient cases of one continuous family, and hardware has always been able to run the rest of it.
 </LessonHook>
 
 ## Motivation
 
-Six named gates is a start, but it's a strange place to stop. There's
-nothing physically special about rotating by exactly $\pi/4$ versus, say,
-$17°$. This lesson replaces the six fixed gates with one continuous
-family, parametrized by any angle you like, and shows that the six gates
-from last lesson were just convenient specific cases all along.
+Six named gates is a start, but it's a strange place to stop. Nothing
+physical distinguishes a rotation by $\pi/4$ from a rotation by $17°$, and
+a microwave pulse of any duration you like is no harder to generate than a
+pulse of one particular duration. So the hardware was never restricted to
+six operations; only our vocabulary was. This lesson replaces the six fixed
+gates with one continuous family parametrized by any angle, and shows the
+six were special cases of it all along.
 
 ## Intuition
 
 If every gate is a rotation of the Bloch vector (last lesson's closing
-claim), then the natural next question is: what's the *general* rotation,
-by any angle $\theta$, about any axis $\hat n$? Ordinary 3D rotations
-have exactly this kind of general formula (Rodrigues' rotation formula, if
-you've seen it); single-qubit gates have a close cousin of it, built from
-the same three matrices, $X$, $Y$, $Z$, you already know.
+claim), then the next question is: what is the *general* rotation, by any
+angle $\theta$, about any axis $\hat n$? Ordinary 3D rotations have such a
+formula (Rodrigues' rotation formula, if you've seen it); single-qubit
+gates have a close cousin of it, built from the same three matrices $X$,
+$Y$, $Z$ you already know.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/e/ee/NMR-Spectrometer.JPG"
-  alt="A 300 MHz Bruker nuclear magnetic resonance spectrometer in a laboratory"
-  caption="An NMR spectrometer: the technology whose radiofrequency pulses rotate nuclear spins about chosen axes, the original physical setting Rx, Ry, and Rz rotations were developed for, decades before superconducting qubits existed."
-  credit="Andel Früh & Andreas Maccagnan / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:NMR-Spectrometer.JPG"
-  license="CC BY-SA 3.0"
-/>
+This family is older than quantum computing. Nuclear magnetic resonance
+spectroscopists have been rotating nuclear spins by arbitrary angles with
+radiofrequency pulses since the 1940s, and $R_x$, $R_y$, $R_z$ are the
+names for what those pulses do.
 
 ## Mathematical Development
 
@@ -79,18 +91,60 @@ $$
 </EquationReveal>
 
 This looks unmotivated until you notice its resemblance to Euler's
-formula, $e^{i\alpha}=\cos\alpha+i\sin\alpha$. That resemblance is exact:
-$R_{\hat n}(\theta) = e^{-i\theta(n_xX+n_yY+n_zZ)/2}$, and the reason the
-expansion terminates in just a cosine and a sine term (rather than an
-infinite matrix series) is that $(n_xX+n_yY+n_zZ)^2=I$ for any unit vector
-$\hat n$, a fact you can check directly by matrix multiplication for any
-particular $\hat n$, and which plays exactly the role $i^2=-1$ played in
+formula, $e^{i\alpha}=\cos\alpha+i\sin\alpha$. The resemblance is not an
+analogy: $R_{\hat n}(\theta) = e^{-i\theta(n_xX+n_yY+n_zZ)/2}$. The reason
+the expansion terminates in one cosine and one sine term rather than
+running on as an infinite matrix series is that $(n_xX+n_yY+n_zZ)^2=I$ for
+any unit vector $\hat n$, which you can check by matrix multiplication for
+any particular $\hat n$. That identity plays the role $i^2=-1$ plays in
 deriving Euler's formula itself.
 
-Once again, the half-angle $\theta/2$ shows up, the same phenomenon as the
-Bloch sphere's canonical form, for the same reason: rotating the physical Bloch
-vector by $\theta$ corresponds to a $\theta/2$ rotation "in amplitude
-space."
+Once again the half-angle $\theta/2$ appears, the same phenomenon as in the
+Bloch sphere's canonical form and for the same reason: rotating the
+physical Bloch vector by $\theta$ corresponds to a $\theta/2$ rotation in
+amplitude space.
+
+That claim has a consequence you can plot. Below, $R_x(\theta)$ is applied
+to $|0\rangle$ for angles from $0$ to $4\pi$, with the amplitude and the
+geometry read out by the platform's own `rotationX` and
+`stateToBlochVector`. The two curves run at different rates. The Bloch
+$z$-coordinate traces $\cos\theta$ and closes its cycle at $\theta=2\pi$,
+as any rotation of a sphere must. The amplitude on $|1\rangle$ traces
+$-\sin(\theta/2)$ and is only halfway through its own cycle at that point:
+it needs $4\pi$ to come home.
+
+<ParametricCurve
+  frames={[
+    {
+      paramLabel: "",
+      series: [
+        {
+          label: "Amplitude on |1⟩ (imaginary part)",
+          color: "accent",
+          points: halfAngleSweep.map((s) => ({ x: s.angle, y: s.betaImaginary })),
+        },
+        {
+          label: "Bloch z-coordinate",
+          color: "brand",
+          points: halfAngleSweep.map((s) => ({ x: s.angle, y: s.blochZ })),
+        },
+      ],
+    },
+  ]}
+  referenceLines={[{ y: 0, label: "zero" }]}
+  xAxisLabel="rotation angle θ (radians)"
+  yAxisLabel="amplitude component / z-coordinate"
+  ariaLabel="Two curves against rotation angle θ from 0 to 4π for R_x(θ) applied to |0⟩. The Bloch z-coordinate is a cosine of θ completing two full cycles over the range. The imaginary part of the amplitude on |1⟩ is a negative sine of θ/2, completing only one cycle over the same range, so it oscillates at half the rate of the geometry."
+/>
+
+That factor of two between the two curves is the half-angle, drawn. It also
+explains the sign in $R_z(2\pi)=-I$: at $\theta = 2\pi$ the sphere is back
+where it started while the amplitudes are only halfway around, sitting at
+minus their original values.
+
+Read off $\theta=\pi$ while you are here: $z=-1$, so the vector has swung
+from north pole to south pole, and the state is $|1\rangle$ up to a phase.
+That is the $X$ gate, recovered as one point on a continuous curve.
 
 ### The coordinate-axis special cases
 
@@ -109,10 +163,10 @@ $e^{-i\theta/2}$ and $\beta$ by $e^{i\theta/2}$, an overall phase
 difference of $\theta$ between them. Since only the <Term id="global-relative-phase">relative phase</Term>
 $\varphi$ is physical (next lesson makes this precise), $R_z(\theta)$'s
 entire effect is $\varphi \to \varphi+\theta$, leaving $\theta$-the-latitude
-completely fixed. $R_x$ and $R_y$ mix $\alpha$ and $\beta$ together, so in
-general they change both the Bloch $\theta$ and $\varphi$ at once,
-except when the state already sits exactly on the rotation's own axis, in
-which case (as with any rotation) nothing moves at all.
+fixed. $R_x$ and $R_y$ mix $\alpha$ and $\beta$ together, so in general they
+change both the Bloch $\theta$ and $\varphi$ at once. The exception is a
+state already sitting on the rotation's own axis, where (as with any
+rotation) nothing moves at all.
 
 ### Reconciling with the named gates
 
@@ -123,9 +177,9 @@ $$
 R_z\!\left(\frac{\pi}{2}\right) = \begin{pmatrix}e^{-i\pi/4}&0\\0&e^{i\pi/4}\end{pmatrix} = e^{-i\pi/4}\begin{pmatrix}1&0\\0&e^{i\pi/2}\end{pmatrix} = e^{-i\pi/4}\begin{pmatrix}1&0\\0&i\end{pmatrix} = e^{-i\pi/4}S
 $$
 
-$R_z(\pi/2)$ and $S$ differ by the overall factor $e^{-i\pi/4}$, exactly
-the kind of global phase the Bloch sphere derivation showed doesn't
-matter. The same pattern holds for every other named gate: $X=iR_x(\pi)$,
+$R_z(\pi/2)$ and $S$ differ by the overall factor $e^{-i\pi/4}$, the kind
+of global phase the Bloch sphere derivation showed doesn't matter. The
+same pattern holds for every other named gate: $X=iR_x(\pi)$,
 $Z=iR_z(\pi)$, and so on. "Six special gates" and "one continuous family
 of rotations" are the same physics, described at two different levels of
 generality.
@@ -141,7 +195,7 @@ phase that was never physical anyway). Six gates were a convenient,
 standard vocabulary; the rotation formula is the whole language.
 
 <InsightBlock>
-Every possible single-qubit operation is a rotation of the Bloch sphere, full stop — there is no single-qubit gate that does something the rotation formula can't describe.
+Every possible single-qubit operation is a rotation of the Bloch sphere. There is no single-qubit gate that does something the rotation formula cannot describe.
 </InsightBlock>
 
 ## Interactive Experiment
@@ -163,7 +217,7 @@ Every possible single-qubit operation is a rotation of the Bloch sphere, full st
 </InteractiveSection>
 
 The checks above (Rz fixing θ, Rx/Ry moving both angles, Rz fixing the
-poles) are the ones this lesson's math actually predicts, but the same
+poles) are the ones this lesson's math predicts, but the same
 tool lives on its own page as the platform's full
 [Bloch Sphere Explorer](/simulators#bloch-sphere). It's worth bookmarking:
 come back to it any time you want to check a rotation, a gate sequence, or

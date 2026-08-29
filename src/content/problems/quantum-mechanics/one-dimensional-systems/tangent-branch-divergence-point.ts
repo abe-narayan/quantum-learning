@@ -22,6 +22,10 @@ export const tangentBranchDivergencePoint: NumericProblem = {
     value: 0.785398,
     tolerance: 0.001,
     incorrectFeedback: "Solve k*a = pi/2 for k, with a=2.",
+    nearMisses: [
+      { value: Math.PI / 2, tolerance: 0.002, feedback: "That is π/2 itself, the value of ka at the divergence. Divide by the half-width a = 2 to isolate k." },
+      { value: Math.PI / 8, tolerance: 0.002, feedback: "You used the full width 4 rather than the half-width. The condition is stated in terms of a, which the prompt gives as 2." },
+    ],
   },
   hints: [{ text: "k = pi/(2a) directly." }],
   solution: {

@@ -23,12 +23,27 @@ export const lcuPrepareRegisterSize: NumericProblem = {
     value: 3,
     tolerance: 0,
     incorrectFeedback:
-      "You need the smallest integer k with 2^k >= 5. k=2 gives 2^2=4, only enough for 4 terms -- one short. k=3 gives 2^3=8, which is enough (with 3 basis states simply left at zero amplitude), so k=3.",
+      "You need the smallest integer k with 2^k >= 5. If you answered 5, you gave the number of terms rather than the qubit count: a k-qubit register indexes exponentially many terms, so the required k scales as a logarithm of m, not linearly.",
+    nearMisses: [
+      {
+        value: 2,
+        feedback:
+          "You rounded log2(5) down. Two qubits give only 4 basis states, one short of the 5 terms, so the fifth term would have nowhere to live: the rounding has to go up.",
+      },
+      {
+        value: 8,
+        feedback: "8 is the number of basis states a 3-qubit register provides. The question asks for the qubit count k, not 2^k.",
+      },
+      {
+        value: 5,
+        feedback: "5 is the number of terms m. A k-qubit register indexes 2^k of them, so the qubit count grows like log2(m), not like m.",
+      },
+    ],
   },
   hints: [
-    { text: "Count the basis states available to a k-qubit register: 2^k." },
-    { text: "You need 2^k >= m = 5." },
-    { text: "2^2=4 is too few, but 2^3=8 is enough." },
+    { text: "The register's job is to give each of the m terms its own basis state, so first count how many basis states a k-qubit register offers." },
+    { text: "You need the smallest k with 2^k >= m = 5." },
+    { text: "Check successive powers of two until one first reaches or passes 5. The answer is that exponent k, not the number of basis states it provides." },
   ],
   solution: {
     steps: [

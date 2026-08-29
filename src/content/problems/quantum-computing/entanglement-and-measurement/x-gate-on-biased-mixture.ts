@@ -60,6 +60,10 @@ export const xGateOnBiasedMixture: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "X conjugation swaps a diagonal density matrix's two entries, matching its action of flipping |0⟩↔|1⟩.",
     whyCorrect: "This is physically sensible: whatever probability was on |0⟩ moves to |1⟩ and vice versa, with no new coherence introduced.",
-    whyWrong: ["Option b would mean X acts as if it were the identity, which contradicts its defining action of flipping the two basis states."],
+    whyWrong: [
+      { optionId: "b", text: "Leaves ρ unchanged, which would make X the identity on a state that treats |0⟩ and |1⟩ differently." },
+      { optionId: "c", text: "Invents off-diagonal terms. Conjugating a diagonal matrix by X permutes its entries and creates no coherence." },
+      { optionId: "d", text: "Erases the bias, which is what a measurement or a noise channel would do. A unitary relabels the probabilities and keeps them." },
+    ],
   },
 };

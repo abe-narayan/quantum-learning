@@ -19,7 +19,7 @@ export const theoremVsHeuristicQaoaVsGroverMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "Being an empirically-supported heuristic rather than a proven theorem doesn't make a result untrustworthy or unscientific -- heuristic algorithms with strong numerical support are common and valuable throughout computer science (e.g. simulated annealing, many practical SAT solvers), and QAOA's status is exactly this well-established heuristic category. What would change its tier is a specific missing result (a proof of a matching worst-case approximation-ratio bound at general depth for practically relevant instance classes), not a sign the existing work is unsound.",
+        text: "A well-supported heuristic is a normal category, not an unscientific one: simulated annealing and practical SAT solvers sit there too. What would move QAOA's tier is one specific missing result, a matching worst-case approximation-ratio proof at general depth.",
       },
       {
         id: "b",
@@ -57,17 +57,17 @@ export const theoremVsHeuristicQaoaVsGroverMc: MultipleChoiceProblem = {
       { description: "Tier 2 is not a lesser or unscientific category; it is one of the most common and useful categories in all of computer science." },
       { description: "The precise, checklist-driven response names the specific missing result (a general worst-case approximation-ratio proof for practically relevant instance classes) rather than dismissing the existing heuristic evidence as untrustworthy." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "QAOA sits in the well-populated heuristic tier, and what would move it is a specific missing result: a matching worst-case approximation-ratio proof at general depth.",
   },
   explanation: {
     correctIdea:
       "A claim's tier (theorem vs. heuristic) says nothing by itself about whether the claim is trustworthy or worth pursuing -- it says what KIND of evidence supports it and what SPECIFIC result would strengthen it further.",
     whyCorrect:
-      "Option (a) correctly classifies QAOA's real-world performance as Tier 2, correctly cites the general pattern (heuristics are a normal, valuable category, not a failure), and correctly names the specific missing result needed to upgrade the tier -- exactly this lesson's checklist Question 4 in action.",
+      "Classifying QAOA's real-world performance as Tier 2, citing the general pattern (heuristics are a normal, valuable category, not a failure), and naming the specific missing result that would upgrade the tier is this lesson's checklist Question 4 in action.",
     whyWrong: [
-      "(b) conflates 'unproven' with 'untrustworthy,' the exact mirror-image mistake this lesson's Common Mistakes section flags.",
-      "(c) misstates what this platform's own QAOA content actually established -- two small worked examples and an explicit statement that general performance is an open, actively studied question, not a proof.",
-      "(d) misunderstands that Grover's optimality (black-box search) and QAOA's approximation ratio (combinatorial optimization) are unrelated claims about different problems, so one being proven has no bearing on whether the other is worth studying.",
+      { optionId: "b", text: "Conflates 'unproven' with 'untrustworthy,' the mirror-image mistake this lesson's Common Mistakes section flags." },
+      { optionId: "c", text: "Misstates what this platform's QAOA content established: two small worked examples plus an explicit statement that general performance is open, not a proof." },
+      { optionId: "d", text: "Treats Grover's optimality (black-box search) and QAOA's approximation ratio (combinatorial optimization) as claims about the same problem. One being proven has no bearing on whether the other is worth studying." },
     ],
   },
 };

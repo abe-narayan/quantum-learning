@@ -48,6 +48,11 @@ export const confusionMatrixCorrection9590: NumericProblem = {
     tolerance: 0.005,
     incorrectFeedback:
       "First find det(M) = (0.95)(0.90) − (0.10)(0.05), then use M⁻¹ = (1/det)[[0.90,−0.10],[−0.05,0.95]] applied to (0.30,0.70).",
+    nearMisses: [
+      { value: 0.7, feedback: "0.70 is the raw measured value. Readout correction exists precisely to undo the bias in it." },
+      { value: 0.235294, tolerance: 0.005, feedback: "That is the corrected P(true 0), the other component. The two sum to 1." },
+      { value: 0.645, tolerance: 0.005, feedback: "That applies M rather than M⁻¹, simulating a further round of readout noise instead of undoing it." },
+    ],
   },
   hints: [
     { text: "det(M) = (0.95)(0.90) − (0.10)(0.05) = 0.855 − 0.005 = 0.850." },

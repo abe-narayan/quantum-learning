@@ -32,6 +32,9 @@ export const measuringP1OnBiasedMixture: NumericProblem = {
     value,
     tolerance: 0.005,
     incorrectFeedback: "For a diagonal ρ, Tr(ρP₁) just picks out ρ's (1,1) diagonal entry.",
+    nearMisses: [
+      { value: 0.75, feedback: "0.75 is p₀, the weight on |0⟩. P₁ projects onto |1⟩, so it reads the other diagonal entry." },
+    ],
   },
   hints: [
     { text: "P₁ projects onto |1⟩ — it's diag(0,1)." },

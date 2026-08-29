@@ -47,12 +47,13 @@ const ACTIVE_MARK_CLASSES =
 
 // The one hover/focus/active convention every interactive element in this
 // file converges on: the same transition list + pressed-state scale used by
-// Button.tsx, and the same focus ring used by the skip-link in
-// src/app/layout.tsx (focus-visible:ring-2 ring-brand ring-offset-2
-// ring-offset-background) — kept identical everywhere rather than
-// reinvented per element.
+// Button.tsx, and the same pillar focus ring (`ring-2 ring-pillar
+// ring-offset-2 ring-offset-background`) used by Button.tsx, Footer.tsx and
+// the skip-link in src/app/layout.tsx — kept identical everywhere rather
+// than reinvented per element. (This note used to say the skip-link ringed
+// in `--brand`; it did, alone, and now matches the rest.)
 const INTERACTIVE_CLASSES =
-  "transition-[color,background-color,border-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "transition-[color,background-color,border-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /** A small pillar-tinted dot, used next to track links so the color-as-identity
  *  channel (globals.css §2) shows up even in compact chrome, not just on the
@@ -299,7 +300,22 @@ function MobileNavLink({ item, pathname, onNavigate }: { item: (typeof NAV_ITEMS
   );
 }
 
-export function Navbar() {
+export function Navbar({
+  startLessonMinutes,
+}: {
+  /**
+   * Authored length, in minutes, of the lesson `START_LEARNING_HREF` opens —
+   * resolved by the server component that renders this (`app/layout.tsx`) and
+   * passed in, because this is a Client Component and the lesson registry
+   * must never cross that boundary (docs/DESIGN_SYSTEM.md §10). The drawer's
+   * "First lesson · N min" line used to state a hardcoded 20 against a lesson
+   * authored at 30; `estimatedMinutes` is recalibrated corpus-wide, so the
+   * number has to come from the data or it drifts again. Optional so the
+   * line degrades to "First lesson · no math background needed" rather than
+   * to a wrong figure if the slug ever stops resolving.
+   */
+  startLessonMinutes?: number;
+}) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -376,7 +392,35 @@ export function Navbar() {
             className={cn("flex items-center rounded-[var(--radius-tight)]", INTERACTIVE_CLASSES)}
             onClick={() => setIsMenuOpen(false)}
           >
-            <Wordmark />
+            {/* The word is dropped below 400px, and the arithmetic is why.
+                Nothing in this row can shrink: the three icon controls carry
+                `shrink-0`, the Start button's padding and five-character label
+                are fixed, and "QuantumLearn" is one unbreakable word, so the
+                row's minimum width is the sum of its parts and the flex
+                container can only overflow.
+
+                Measured at 16px semibold: mark 32 + gap 10 + word ~104 = 146
+                on the left; Start (24px padding + ~32px label + 2px border)
+                ~58, three 40px controls, and three 6px gaps = ~196 on the
+                right; plus the `gap-4` between them = ~358px of content.
+                `Container` leaves 288px at 320px wide and 343px at 375px, so
+                the row overflowed by ~70px on an iPhone SE and ~15px on every
+                375px phone — and because `html, body { overflow-x: clip }`
+                absorbs it (globals.css), there was no scrollbar and no
+                symptom except the menu button being sliced off the right
+                edge. The hamburger is the only route to the navigation at
+                these widths, so the failure took the whole site's navigation
+                with it.
+
+                400px (`max-[25rem]`) is where the full row stops fitting
+                (358 + 32px of padding = 390), rounded up to the next clean
+                value. Above it nothing changes. The mark stays at every
+                width and keeps its link to the homepage, and the `<Link>`
+                has no other content, so its accessible name comes from the
+                word when it renders and from the mark's own alt-free
+                `aria-hidden` span when it doesn't — hence `sr-only` rather
+                than `hidden`, which would leave this link nameless. */}
+            <Wordmark labelClassName="max-[25rem]:sr-only" />
           </Link>
           {/* `sm:inline-flex lg:hidden`, not `sm:inline-flex`. This readout
               exists for the band where the nav links are folded into the
@@ -408,15 +452,22 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1.5">
-          <div className="hidden lg:block">
-            {/* Goes to the first lesson, not to /learn — see the comment on
-                START_LEARNING_HREF in src/lib/nav.ts. "Learn" is already in
-                the bar two inches to the left; this button's job is to make
-                the first lesson reachable in one click from every page. */}
-            <Button href={START_LEARNING_HREF} size="sm">
-              Start learning
-            </Button>
-          </div>
+          {/* Goes to the on-ramp lesson, not to /learn — see the comment on
+              START_LEARNING_HREF in src/lib/nav.ts. This button's job is to
+              make that lesson reachable in one click from every page — at
+              *every* width, not just desktop: hiding it below `lg` left
+              phones with no visible way to start except a link buried at the
+              bottom of the hamburger drawer. The header row is tight there
+              (wordmark + three icon buttons), so the label shortens to
+              "Start" rather than the button disappearing. */}
+          <Button
+            href={START_LEARNING_HREF}
+            size="sm"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <span className="lg:hidden">Start</span>
+            <span className="hidden lg:inline">Start learning</span>
+          </Button>
 
           <ThemeToggle />
 
@@ -483,6 +534,28 @@ export function Navbar() {
                 </div>
               ) : null}
 
+              {/* Start sits at the *top* of the drawer, not the bottom: a
+                  first-time visitor who opens the menu looking for a way in
+                  should not have to scroll past thirteen links to find the
+                  one primary action. It duplicates the header-row Start
+                  button deliberately — inside the open drawer, the header
+                  row reads as chrome, not as part of the menu — and carries
+                  the same one-line reassurance the hero gives it. */}
+              <div className="flex flex-col gap-1.5">
+                <Button
+                  href={START_LEARNING_HREF}
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Start learning
+                </Button>
+                <p className="text-center font-tech text-[0.6875rem] uppercase tracking-[0.12em] text-subtle-foreground">
+                  First lesson{startLessonMinutes ? ` · ${startLessonMinutes} min` : ""} · no math
+                  background needed
+                </p>
+              </div>
+
               <div className="flex flex-col gap-1">
                 {NAV_ITEMS.slice(0, 1).map((item) => (
                   <MobileNavLink key={item.href} item={item} pathname={pathname} onNavigate={() => setIsMenuOpen(false)} />
@@ -541,15 +614,6 @@ export function Navbar() {
                   ))}
                 </div>
               </div>
-
-              <Button
-                href={START_LEARNING_HREF}
-                size="sm"
-                className="w-full"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Start learning
-              </Button>
             </nav>
           </Container>
         </div>

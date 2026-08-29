@@ -20,7 +20,7 @@ export const accountingTableRecall: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["modular exponentiation", "controlled.*modular", "circuit itself"],
+      ["modular exponentiation", "controlled modular", "modular arithmetic", "circuit itself", "state-building circuit"],
       ["continued fractions", "recover r", "extract the period"],
     ],
     incorrectFeedback: "Recall the capstone's table specifically — it names two distinct missing pieces for Shor's algorithm.",

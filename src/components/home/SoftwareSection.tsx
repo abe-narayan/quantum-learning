@@ -46,10 +46,17 @@ export function SoftwareSection() {
           <SectionTitle id="software-heading" className="mt-3" size="lg">
             The layer between your code and a real qubit
           </SectionTitle>
+          {/* "State-vector engine" and "hybrid quantum-classical loop" are
+              both glossed in plain speech at first use rather than dropped:
+              the doubling list of numbers IS the concept, and naming it
+              without saying what it is would be jargon for jargon's sake. */}
           <Lede className="mt-4 max-w-2xl">
-            The state-vector engine underneath every simulator, the wall it hits around
-            30&ndash;50 qubits, and the compilation and hybrid quantum-classical loops that turn
-            an abstract circuit into something real hardware can run.
+            Every simulator on this site runs on a state-vector engine: a program that tracks
+            a quantum state as one long list of numbers, a list that doubles with each qubit
+            you add. This track covers that engine, the wall the doubling builds around
+            30&ndash;50 qubits, and the compilation and hybrid quantum-classical loops (your
+            classical code and a quantum processor taking turns) that turn an abstract
+            circuit into something real hardware can run.
           </Lede>
         </Reveal>
 

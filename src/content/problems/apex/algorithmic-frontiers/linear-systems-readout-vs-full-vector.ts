@@ -22,7 +22,25 @@ export const linearSystemsReadoutVsFullVector: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["small readout", "expectation value", "observable", "few measurements", "O(1) measurements"],
-      ["grows with n", "scales with n", "tomography", "cost of full readout", "erases the speedup", "exponential in n"],
+      {
+        phrases: [
+          "grows with n",
+          "scales with n",
+          "grows with the dimension",
+          "scales with the dimension",
+          "grows with the size",
+          "tomography",
+          "cost of full readout",
+          "erases the speedup",
+          "destroys the speedup",
+          "kills the speedup",
+          "exponential in n",
+          "every amplitude",
+          "all n amplitudes",
+        ],
+        missingFeedback:
+          "You have named the cheap readout but not the cost that makes the alternative expensive. Reconstructing all N amplitudes to fixed precision is a state-tomography problem whose cost grows with N, and that growth is what cancels the log₂N-qubit encoding's advantage.",
+      },
     ],
     incorrectFeedback:
       "Focus on the concrete asymmetry: extracting one expectation value like ⟨x|M|x⟩ costs O(1)-scale measurements regardless of N, while reading out all N amplitudes to fixed precision costs resources that grow with N, undoing the log₂N-qubit encoding's advantage.",

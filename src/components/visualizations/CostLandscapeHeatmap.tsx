@@ -83,14 +83,62 @@ export function CostLandscapeHeatmap({
 
   return (
     <div className="not-prose space-y-3 panel-inset p-4">
+      {/* The `role="img"` used to sit on this scroll wrapper, which is the one
+          shape of the defect that is not simply "delete the role": unlike the
+          matrix grids, this figure really *is* a picture — the cells are color
+          swatches with no text in them, and per-cell values for a 15×15 or
+          17×17 grid search are noise, not content. What the wrapper also
+          contained, and therefore erased, was the three axis captions: the
+          "θ = 0 at the top → θ = 2π at the bottom" line (added precisely
+          because "a reader locating the marked optimum had to leave the
+          picture to find out which axis was which") and the φ = 0 / φ = 2π
+          pair beneath the grid.
+          So the role moves DOWN onto the color field it correctly describes,
+          and the wrapper keeps the captions readable. Everything the label
+          asserted about the picture is still asserted, about the picture.
+
+          `tabIndex={0}` on the wrapper: `repeat(cols, minmax(1.5rem, 1fr))` is
+          24px per column, so this directory's real callers — a 15×15 grid in
+          variational-algorithm-implementation.mdx, 17×17 in
+          vqe-a-worked-toy-example.mdx — are 360px and 408px wide against a
+          ~256px content box on a 320px phone. It genuinely scrolls, and an
+          `overflow-x-auto` div is focusable by default only in Firefox, so
+          without the stop a keyboard-only reader could not reach the right
+          half of the landscape (which is where the second minimum lives in the
+          QAOA γ/β sweep). `role="group"` gives the new stop a name without
+          adding a page landmark for every heatmap — and a deliberately short,
+          affordance-shaped name rather than `ariaLabel`, which now belongs to
+          the color field below and would otherwise be spoken twice in a row
+          (the same split `mdx-components.tsx`'s table wrapper makes: the
+          scroll region says what it is, the content inside says what it
+          says).  */}
       <div
-        role="img"
-        aria-label={ariaLabel}
+        role="group"
+        aria-label="Cost landscape grid, scrollable horizontally"
+        tabIndex={0}
         className="overflow-x-auto"
       >
         <div className="inline-flex flex-col gap-1">
+          {/* The θ direction had no on-figure label at all: the grid showed φ = 0 and
+              φ = 2π under its columns, but which way θ ran across the rows was stated
+              only in the paragraph below the figure. A reader locating the marked
+              optimum had to leave the picture to find out which axis was which. */}
+          <div className="text-xs text-muted-foreground">
+            {thetaLabel} = 0 at the top &rarr; {thetaLabel} = {thetaMaxLabel} at the bottom
+          </div>
+          {/* The color field, and the only part of this component that is
+              honestly one figure: every child is a `title`-bearing swatch with
+              no text node in it, plus one `aria-hidden` marker dot on the best
+              cell. Flattening *this* subtree to a sentence loses nothing a
+              reader could otherwise reach, which is the whole test for whether
+              `role="img"` is a description or a deletion. (The per-cell
+              `title` strings are mouse-hover-only either way; the caption
+              below the figure already states the marked optimum's θ, φ and
+              value in text, so nothing here is reachable only by hover.) */}
           <div
-            className="inline-grid gap-px overflow-hidden rounded-lg border border-border bg-border"
+            role="img"
+            aria-label={ariaLabel}
+            className="inline-grid gap-px overflow-hidden rounded-(--radius-tight) border border-border bg-border"
             style={{ gridTemplateColumns: `repeat(${cols}, minmax(1.5rem, 1fr))` }}
           >
             {grid.map((row, r) =>
@@ -120,7 +168,12 @@ export function CostLandscapeHeatmap({
               })
             )}
           </div>
-          <div className="flex justify-between text-[10px] text-muted-foreground">
+          {/* 10px -> `text-xs` (12px). These are the figure's only axis-value labels —
+              the pair a reader uses to convert a column position into a real φ — and
+              at 10px they were the smallest text on the page. Unlike this directory's
+              SVG figures these are real CSS pixels, so this is a legibility margin
+              rather than a fix for viewBox scaling. */}
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>{phiLabel} = 0</span>
             <span>{phiLabel} = {phiMaxLabel} &rarr;</span>
           </div>

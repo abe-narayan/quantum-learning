@@ -17,19 +17,19 @@ export const noiseAwareCompilationSuccessProbabilityMc: MultipleChoiceProblem = 
     prompt:
       "The lesson's naive (identity) and noise-aware (mirrored) mappings both compile the same circuit into exactly 17 CNOT-equivalent two-qubit operations on the same 4-qubit linear-chain device, yet the naive mapping's estimated success probability (about 73.8%) is meaningfully lower than the noise-aware mapping's (about 83.8%). What best explains this gap?",
     options: [
-      { id: "fewer-gates", text: "The noise-aware compiler found a way to use fewer total gates." },
-      { id: "recalibrated", text: "The noise-aware compiler recalibrated the device's worst coupler before running." },
-      { id: "remapped-load", text: "The noise-aware compiler chose a logical-to-physical mapping that routes fewer of the circuit's operations through the device's known highest-error coupler, while keeping the total gate count identical." },
-      { id: "better-gate-set", text: "The noise-aware compiler used a more powerful native two-qubit gate that the naive compiler didn't have access to." },
+      { id: "fewer-gates", text: "The noise-aware compiler cancelled redundant SWAPs, so its 17 operations are cheaper ones." },
+      { id: "recalibrated", text: "The noise-aware compiler recalibrated the device's worst coupler before running the circuit." },
+      { id: "remapped-load", text: "The noise-aware mapping routes fewer operations through the device's worst coupler, at the same gate count." },
+      { id: "better-gate-set", text: "The noise-aware compiler targeted a native two-qubit gate with a lower error rate than CNOT." },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "remapped-load",
     optionFeedback: {
-      "fewer-gates": "Both mappings compile to exactly 17 CNOT-equivalent operations — the lesson holds gate count fixed specifically to isolate the effect of mapping choice alone.",
+      "fewer-gates": "Both mappings compile to 17 CNOT-equivalent operations, and the lesson holds that count fixed on purpose so that mapping choice is the only variable left. Cancelling SWAPs would have changed the count.",
       "recalibrated": "Recalibration is a genuinely different fix, for coherent errors (Noise, Decoherence & Scaling's coherent/incoherent classification). Noise-aware compilation doesn't change the hardware's error rates at all; both mappings run on the identical, unmodified device.",
-      "better-gate-set": "Nothing in the lesson's example changes which native gates are available. Both mappings use the same CNOTs and SWAPs; only which physical coupler each one runs on differs.",
+      "better-gate-set": "Nothing in the lesson's example changes which native gates are available. Both mappings use the same CNOTs and SWAPs; what differs is which physical coupler each one runs on.",
     },
     defaultIncorrectFeedback:
       "Compare the two mappings' operation tallies per coupler: naive puts 7 of 17 operations on the flagged worst coupler, while noise-aware puts only 2 of 17 there, with the same 8 on the middle coupler in both cases. Nothing about the gate count or the hardware itself changed.",
@@ -51,10 +51,12 @@ export const noiseAwareCompilationSuccessProbabilityMc: MultipleChoiceProblem = 
   explanation: {
     correctIdea:
       "Noise-aware compilation improves success probability by choosing, among mappings with equal gate count, the one that assigns heavily-used operations to a device's better-calibrated components.",
+    whyCorrect:
+      "The two mappings differ in one respect only: the naive one puts 7 of its 17 operations on the 3%-error coupler, the noise-aware one puts 2 there. Everything else, gate count and hardware alike, is held fixed.",
     whyWrong: [
-      "It does not reduce the algorithm's gate count — the lesson deliberately holds that fixed at 17 to isolate the mapping effect.",
-      "It does not change the device's physical error rates — that would be recalibration, a separate, hardware-level fix for coherent errors, not a compilation choice.",
-      "It does not require a different or more powerful gate set — both mappings use the same CNOTs and SWAPs.",
+      { optionId: "fewer-gates", text: "Changes the gate count, which the lesson holds fixed at 17 so that mapping is the only variable." },
+      { optionId: "recalibrated", text: "Changes the hardware. Recalibration is a separate fix, aimed at coherent errors, and both mappings run on the same unmodified device." },
+      { optionId: "better-gate-set", text: "Changes the gate set. Both mappings use the same CNOTs and SWAPs." },
     ],
   },
 };

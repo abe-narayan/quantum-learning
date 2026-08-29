@@ -52,19 +52,30 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Last lesson proved the angular part is already solved. This lesson does the actual reduction: substitute that fact into the full 3D Schrödinger equation and watch a full-blown partial differential equation in three variables collapse into a single ordinary differential equation in r alone.
+Last lesson proved the angular part is already solved. This lesson cashes that in: substitute it into the full 3D Schrödinger equation and a partial differential equation in three variables collapses to one ordinary differential equation in r.
 </LessonHook>
 
 ## Motivation
 
-That single ordinary differential equation in $r$ is one this
-platform can then solve using the exact same machinery One-Dimensional
-Systems already built.
+Two variables disappear in this lesson, and the reason they can is worth
+holding onto: the angular dependence of $\psi$ is not solved here so much
+as *already known*, fixed by the commutators of the last lesson before any
+calculation about hydrogen begins. Substituting a known $Y_l^m$ into the
+3D equation turns the entire angular part into a single number,
+$l(l+1)\hbar^2$, and what is left is an ordinary differential equation in
+$r$ alone.
+
+That leftover equation is worth more than its brevity suggests. A change
+of variable puts it into the exact shape of the 1D Schrödinger equation
+from Wave Mechanics, which means the boundary-condition machinery, the
+bound-state reasoning, and the effective-potential picture already built
+for one-dimensional problems all transfer to hydrogen without
+modification. Three dimensions, solved with one-dimensional tools.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/7/75/Hydrogen_maser.jpg"
   alt="A hydrogen maser atomic clock device, a metal cylindrical chamber with attached electronics used as a precision frequency standard"
-  caption="A hydrogen maser: an atomic clock whose stability rests on the same bound-state structure this radial equation produces, precise enough to serve as a timekeeping reference in radio astronomy, exactly as described below."
+  caption="A hydrogen maser. Its stability rests on the bound-state structure this radial equation produces, and it is steady enough to serve as a timekeeping reference in radio astronomy."
   credit="NASA/JPL-Caltech"
   creditUrl="https://commons.wikimedia.org/wiki/File:Hydrogen_maser.jpg"
   license="Attribution only, NASA/JPL-Caltech"
@@ -93,14 +104,14 @@ This is one ordinary differential equation in $r$ alone, for each fixed $l$.
 ### The centrifugal term, interpreted
 
 The extra piece, $\dfrac{l(l+1)\hbar^2}{2mr^2}$, is the **centrifugal
-term**: it adds to $V(r)$ exactly like a repulsive potential barrier
-near $r=0$, growing without bound as $r\to0$ for any $l>0$. Physically
+term**: it adds to $V(r)$ the way a repulsive potential barrier near
+$r=0$ would, growing without bound as $r\to0$ for any $l>0$. Physically
 this is the same effect as classical angular momentum: an orbiting
 particle with nonzero $L$ can never reach $r=0$, since that would require
-infinite angular velocity. This is precisely the "effective potential"
-concept One-Dimensional Systems used for scattering; here it isn't
-introduced as a separate trick, it falls directly out of the angular
-momentum substitution.
+infinite angular velocity. It is the "effective potential" concept
+One-Dimensional Systems used for scattering, arriving here not as a trick
+introduced for convenience but as a term that falls out of the angular
+momentum substitution on its own.
 
 ### Standard form via u(r) = rR(r)
 
@@ -112,8 +123,9 @@ $$
 -\frac{\hbar^2}{2m}\frac{d^2u}{dr^2} + \left[V(r)+\frac{l(l+1)\hbar^2}{2mr^2}\right]u = Eu
 $$
 
-This is **exactly** the 1D time-independent Schrödinger equation from Wave
-Mechanics, with an effective potential
+Compare that to the 1D time-independent Schrödinger equation from Wave
+Mechanics and the two are the same equation, symbol for symbol, with an
+effective potential
 $V_{\text{eff}}(r)=V(r)+\dfrac{l(l+1)\hbar^2}{2mr^2}$ and the boundary
 condition $u(0)=0$ (so that $R(r)=u(r)/r$ stays finite at the origin).
 Every tool this platform built for 1D problems (the general solving
@@ -128,27 +140,25 @@ specific $V_{\text{eff}}(r)$ for the Coulomb potential is new.
     { label: "R(0) diverges to infinity", value: "diverge" },
   ]}
   correctValue="nonzero"
-  explanation="No. u(r)=rR(r) can vanish at the origin simply because of the factor of r, while R(r) itself stays finite. The plot later in this lesson confirms this directly for the actual 1s wavefunction: u(r) heads to 0 linearly as r→0, but R(r) approaches R(0)=2, not zero. This is exactly why s-states have nonzero probability density right at the nucleus."
+  explanation="No. u(r)=rR(r) can vanish at the origin simply because of the factor of r, while R(r) itself stays finite. The plot later in this lesson confirms it for the real 1s wavefunction: u(r) heads to 0 linearly as r→0, but R(r) approaches R(0)=2, not zero. That is why s-states have nonzero probability density right at the nucleus, which in turn is why s-states are the ones that feel the nucleus at all, and the reason hyperfine structure exists."
 />
 
 ## Physical Interpretation
 
-Turning a 3D problem into a 1D one isn't a mathematical convenience
-specific to hydrogen: it's the direct payoff of Lesson 1's
-$[H,\vec L^{\,2}]=[H,L_z]=0$ result, applied mechanically. Every central
-potential reduces exactly this way; hydrogen's Coulomb $V(r)=-e^2/4\pi\epsilon_0r$
-is simply the specific effective potential the next lesson solves.
+Turning a 3D problem into a 1D one is not a convenience specific to
+hydrogen. It is the payoff of Lesson 1's $[H,\vec L^{\,2}]=[H,L_z]=0$
+result, applied mechanically. Every central potential reduces this way,
+and hydrogen's Coulomb $V(r)=-e^2/4\pi\epsilon_0r$ is the one effective
+potential the next lesson solves.
 
-This same radial equation is why hydrogen's emission lines are so
-precisely predictable that astronomers use them as a cosmic ruler: the
-Lyman-alpha line, from a transition this effective potential's bound
-states set the exact energy of, is routinely used to identify hydrogen
-gas in galaxies billions of light-years away, with its wavelength shift
-directly giving that galaxy's redshift. The same exactly-solvable
-structure also underlies the hydrogen maser, an atomic frequency
-reference stable enough to serve as a timekeeping standard in radio
-astronomy, both real applications resting on the same $u(0)=0$
-boundary-value problem solved here.
+Because this equation is exactly solvable, hydrogen's emission lines can
+be predicted to many decimal places, which is what makes them usable as a
+cosmic ruler. The Lyman-alpha line, whose energy the bound states of this
+effective potential fix, identifies hydrogen gas in galaxies billions of
+light-years away, and how far the observed wavelength has slid from the
+predicted one gives that galaxy's redshift directly. The same solvability
+underlies the hydrogen maser pictured above. Both applications rest on the
+$u(0)=0$ boundary-value problem set up here.
 
 ## Worked Example
 
@@ -160,10 +170,9 @@ $$
 
 using $l(l+1)=1(2)=2$. Near $r=0$, the $1/r^2$ centrifugal term
 dominates (grows faster than the $1/r$ Coulomb attraction), creating an
-effective repulsive barrier, consistent with $l=1$ states (unlike
-$l=0$) having zero probability density exactly at the nucleus, previewed
-here and confirmed directly in the next lesson's explicit radial
-wavefunctions.
+effective repulsive barrier, consistent with $l=1$ states (unlike $l=0$)
+having zero probability density at the nucleus itself. The next lesson's
+explicit radial wavefunctions confirm it.
 
 Plotting $V_\text{eff}(r)$ for each $l$ makes the growing barrier
 directly visible (atomic units, $V(r)=-1/r$):
@@ -171,15 +180,16 @@ directly visible (atomic units, $V(r)=-1/r$):
 <PotentialDiagram xValues={rGridEff} potential={vEffL0} ariaLabel="Effective potential for l=0: no centrifugal barrier" />
 
 $l=0$: no centrifugal term at all, so $V_\text{eff}=V(r)$ falls straight
-into the origin, unbounded below, exactly the bare Coulomb attraction.
+into the origin, unbounded below. This is the bare Coulomb attraction and
+nothing else.
 
 <PotentialDiagram xValues={rGridEff} potential={vEffL1} ariaLabel="Effective potential for l=1: a mild centrifugal barrier" />
 
 <PotentialDiagram xValues={rGridEff} potential={vEffL2} ariaLabel="Effective potential for l=2: a stronger centrifugal barrier" />
 
-$l=1$ and $l=2$: the curve now turns sharply *upward* near $r=0$ instead
-of falling to $-\infty$, and the turn gets steeper as $l$ grows, exactly
-the repulsive barrier keeping higher-$l$ electrons away from the
+$l=1$ and $l=2$: the curve turns sharply *upward* near $r=0$ instead of
+falling to $-\infty$, and the turn gets steeper as $l$ grows. That upturn
+is the repulsive barrier keeping higher-$l$ electrons away from the
 nucleus.
 
 ## Common Mistakes
@@ -194,15 +204,15 @@ states) have $V_{\text{eff}}=V(r)$ exactly; every $l>0$ state solves a
 **Confusing $R(r)$ and $u(r)=rR(r)$.** The boundary condition $u(0)=0$
 does *not* mean $R(0)=0$: for $l=0$, $R(0)$ can be (and is) nonzero,
 since $R(r)=u(r)/r$ can stay finite as $r\to0$ if $u(r)\to0$
-proportionally to $r$, which is exactly the $l=0$ radial wavefunction's
-behavior.
+proportionally to $r$, which is how the $l=0$ radial wavefunction
+behaves.
 </Callout>
 
 The actual $1s$ ($l=0$) and $2p$ ($l=1$) radial wavefunctions make this
 concrete right at the origin (atomic units, $r$ from 0 to 0.5). $l=0$
 and $l=1$ get separate plots below, since $R(r)$ near the origin is
-over an order of magnitude larger for $l=0$ than for $l=1$ — on one
-shared axis the $l=1$ curves would flatten into an invisible line:
+over an order of magnitude larger for $l=0$ than for $l=1$; on one shared
+axis the $l=1$ curves would flatten into an invisible line.
 
 <ParametricCurve
   frames={uAndRNearOriginFramesL0}
@@ -210,8 +220,8 @@ shared axis the $l=1$ curves would flatten into an invisible line:
 />
 
 For $l=0$, $u(r)\to0$ *linearly* as $r\to0$, so $R(r)=u(r)/r$ approaches
-the finite, nonzero value $R(0)=2$ — exactly the $u(0)=0$ boundary
-condition coexisting with a nonzero probability density at the nucleus.
+the finite, nonzero value $R(0)=2$. The $u(0)=0$ boundary condition and a
+nonzero probability density at the nucleus coexist without conflict.
 
 <ParametricCurve
   frames={uAndRNearOriginFramesL1}

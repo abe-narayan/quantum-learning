@@ -49,6 +49,10 @@ export const identifyHermitianMatrix: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Hermitian means A = A†; real diagonal entries are a necessary (but not sufficient) quick check.",
     whyCorrect: "Direct computation of the adjoint reproduces the original matrix exactly.",
-    whyWrong: ["Option (a) is the classic 'off by a sign' trap — swapping i and -i in the wrong spot breaks Hermiticity."],
+    whyWrong: [
+      { optionId: "a", text: "The classic off-by-a-sign trap: its conjugate transpose carries -i in the off-diagonal spots, so it does not equal its own adjoint." },
+      { optionId: "c", text: "Real but not symmetric. Transposing flips the off-diagonal signs, so the adjoint is not the matrix itself." },
+      { optionId: "d", text: "A Hermitian matrix needs real diagonal entries, and i is not real." },
+    ],
   },
 };

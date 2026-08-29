@@ -65,7 +65,7 @@ export function CHSHComparisonPanel({ sValue }: { sValue: number }) {
 
   return (
     <div
-      className="space-y-4 rounded-xl border border-border bg-surface-muted/40 p-4"
+      className="space-y-4 rounded-panel border border-border bg-surface-muted/40 p-4"
       aria-label="Classical versus quantum CHSH comparison"
     >
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

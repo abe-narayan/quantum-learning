@@ -29,9 +29,18 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
-The Bloch sphere's phase factor $e^{i\varphi}$, the difference between a Z gate and an S gate, and the reason quantum interference exists at all — all come down to amplitudes that are complex in the full sense, not real numbers wearing a plus or minus sign.
+<LessonHook eyebrow="The language of amplitudes">
+The Bloch sphere's phase factor $e^{i\varphi}$, the difference between a Z gate and an S gate, and the reason quantum interference exists at all: each comes down to amplitudes that are complex in the full sense, not real numbers wearing a plus or minus sign.
 </LessonHook>
+
+<Callout type="note">
+Already completed [Complex Numbers for Physics](/lessons/quantum-mechanics/mathematical-foundations/complex-numbers-for-physics)
+in the Quantum Mechanics track? You have this entire toolkit (and more:
+that lesson goes on to De Moivre and roots of unity). Skim the polar-form
+and Euler's-formula sections below to reconnect the notation to qubit
+amplitudes, then continue straight to
+[Dirac Notation](/lessons/quantum-computing/qubits-and-quantum-states/dirac-notation).
+</Callout>
 
 ## Motivation
 
@@ -40,10 +49,10 @@ we mostly left it at that: every example used real values like
 $\tfrac{1}{\sqrt2}$. That was deliberately gentle. It's about to stop being
 gentle.
 
-So before going further, we need the actual toolkit: how to add, multiply,
-and geometrically picture complex numbers. If you've seen this before,
-treat this lesson as a fast, quantum-flavored refresher. The polar form
-and Euler's formula sections are the parts that matter most going forward.
+So before going further we need the toolkit: how to add, multiply, and
+geometrically picture complex numbers. If you've seen this before, treat
+the lesson as a fast, quantum-flavored refresher. The polar form and
+Euler's formula sections are the parts that matter most going forward.
 
 ## Intuition
 
@@ -94,7 +103,7 @@ $$
 |z| = \sqrt{z z^*} = \sqrt{a^2+b^2}
 $$
 
-This is exactly why $|\alpha|^2$ and $|\beta|^2$ from the last lesson
+This is why $|\alpha|^2$ and $|\beta|^2$ from the last lesson
 are guaranteed to be real, non-negative numbers suitable for probabilities,
 no matter how complex $\alpha$ and $\beta$ get: $|\alpha|^2 = \alpha\alpha^*$
 by construction.
@@ -121,21 +130,84 @@ $$
 
 That combination, $\cos\theta + i\sin\theta$, can also be written as a
 single exponential, $e^{i\theta}$. This is **Euler's formula**, and the
-derivation is short enough to walk through rather than take on faith. The
-<Term id="taylor-series">Taylor series</Term> for $e^x$ works for complex inputs too, so substitute
-$x = i\theta$:
+derivation is short enough to walk through rather than take on faith,
+provided one borrowed tool is put on the table first.
+
+#### The three power series the derivation borrows
+
+A **power series** is a polynomial with infinitely many terms. Some
+functions can be written as one, and where they can, the infinite
+polynomial doesn't approximate the function: it equals it. Three such
+expansions are all the derivation uses, with $\theta$ in radians and
+$n!$ meaning $1\cdot2\cdots n$ (so $2!=2$, $3!=6$, $4!=24$):
+
+$$
+e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \cdots
+$$
+
+$$
+\cos\theta = 1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \cdots
+$$
+
+$$
+\sin\theta = \theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \cdots
+$$
+
+Where these three come from is calculus: a
+<Term id="taylor-series">power series of this kind</Term> is built from a
+function's derivatives at a single point, and proving that the infinite
+sum reproduces the function is a theorem. This lesson does not prove it,
+and does not need you to have seen the proof. What arithmetic alone can
+do is *check* it. Put $x=1$ into the first series and add the first seven
+terms:
+
+$$
+1 + 1 + \tfrac12 + \tfrac16 + \tfrac1{24} + \tfrac1{120} + \tfrac1{720} = 2.718055\ldots
+$$
+
+against $e = 2.718281\ldots$: three decimal places from seven terms, and
+every further term shrinks the gap. The same works for cosine. Take
+$\theta = 0.5$ and keep three terms: $1 - 0.125 + 0.0026041\ldots =
+0.8776041\ldots$, against $\cos 0.5 = 0.8775825\ldots$, agreeing to four
+decimal places; adding the next term, $-\theta^6/6!$, closes the gap to
+under $10^{-7}$.
+
+The derivation below takes one step past anything those checks cover: it
+substitutes a *complex* number, $i\theta$, into the series for $e^x$.
+That the series still converges for complex inputs, and that its terms
+may be regrouped into two separate real series without changing the sum,
+are results from complex analysis, used here on citation rather than
+proved. Everything after the substitution is ordinary algebra with
+$i^2=-1$.
+
+<Callout type="note">
+**If power series are new to you.** One fact carries the whole
+derivation: the three expansions above are exact, not approximations.
+Nothing in the next few lines differentiates, integrates, or takes a
+limit. It substitutes, applies $i^2=-1$, and sorts the terms into two
+groups. The machinery behind the three series (Taylor's theorem,
+convergence, radius of convergence) belongs to a first calculus course,
+and the [glossary entry on Taylor series](/glossary#taylor-series) is the
+short version. You can come back for it later without losing anything
+here.
+</Callout>
+
+With those three in hand, substitute $x = i\theta$ into the series for
+$e^x$:
 
 $$
 e^{i\theta} = 1 + i\theta + \frac{(i\theta)^2}{2!} + \frac{(i\theta)^3}{3!} + \frac{(i\theta)^4}{4!} + \cdots
 $$
 
-Using $i^2=-1, i^3=-i, i^4=1$ and regrouping into real and imaginary terms:
+Using $i^2=-1$, $i^3=-i$, $i^4=1$ and regrouping into real and imaginary
+terms, each group turns out to be one of the two series written out
+above, term for term:
 
 $$
 e^{i\theta} = \underbrace{\left(1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \cdots\right)}_{\cos\theta} \; + \; i\underbrace{\left(\theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \cdots\right)}_{\sin\theta}
 $$
 
-which is exactly $\cos\theta + i\sin\theta$. So:
+which is $\cos\theta + i\sin\theta$. So:
 
 $$
 e^{i\theta} = \cos\theta + i\sin\theta \qquad \Longrightarrow \qquad z = re^{i\theta}
@@ -159,7 +231,7 @@ by reading it in equations alone:
     { label: "It depends on the phases involved", value: "depends" },
   ]}
   correctValue="stays"
-  explanation="Moduli multiply: |z1 z2| = |z1||z2| = 1 × 1 = 1, regardless of the phases. Only the phase moves, to θ1+θ2; the point stays on the unit circle no matter how far you rotate it there. This is exactly why a phase gate, which only ever multiplies an amplitude by some e^{iθ}, never by itself changes a probability."
+  explanation="Moduli multiply: |z1 z2| = |z1||z2| = 1 × 1 = 1, regardless of the phases. Only the phase moves, to θ1+θ2; the point stays on the unit circle no matter how far you rotate it there. This is why a phase gate, which only ever multiplies an amplitude by some e^{iθ}, never by itself changes a probability."
 />
 
 ### Why polar form matters: multiplication adds phases
@@ -174,7 +246,7 @@ $$
 **Magnitudes multiply; phases add.** This one fact is the entire reason
 quantum computing cares about phase at all: applying a phase gate to a
 qubit multiplies an amplitude by $e^{i\theta}$ for some $\theta$, and this
-identity is exactly what tells you the *new* phase is the old phase plus
+identity is what tells you the *new* phase is the old phase plus
 $\theta$, with nothing about the probability (which depends on $r$)
 changing.
 
@@ -188,10 +260,10 @@ In quantum mechanics, an amplitude's **modulus** will always turn out to
 control a probability (through $|\alpha|^2$), while its **phase** carries
 information that never shows up in a probability by itself, only in how
 one amplitude compares to another. That split, "how much" versus "in what
-phase," is precisely $r$ and $\theta$ in $z = re^{i\theta}$. You'll see
-this made completely explicit when we reach the Bloch sphere: the
-$e^{i\varphi}$ you'll write there is not a decoration, it's literally this
-lesson's polar form.
+phase," is $r$ and $\theta$ in $z = re^{i\theta}$. You'll see this written
+out when we reach the Bloch sphere: the
+$e^{i\varphi}$ you'll write there is not a decoration, it is this
+lesson's polar form, unchanged.
 
 ## Worked Example
 
@@ -219,7 +291,7 @@ $$
 e^{i\pi/2} = \cos\!\left(\frac{\pi}{2}\right) + i\sin\!\left(\frac{\pi}{2}\right) = 0 + i(1) = i
 $$
 
-So $e^{i\pi/2} = i$ exactly, a fact you'll meet again the moment we define
+So $e^{i\pi/2} = i$, a fact you'll meet again the moment we define
 the $S$ gate.
 
 ## Common Mistakes

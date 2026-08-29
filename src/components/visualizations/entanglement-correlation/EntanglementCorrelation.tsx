@@ -170,7 +170,14 @@ export function EntanglementCorrelation() {
         prefersReducedMotion={prefersReducedMotion}
       />
 
-      <div className="mt-4 overflow-x-auto panel-inset px-4 py-3">
+      {/* No `overflow-x-auto` here: the only child is a block-level
+          `.katex-display`, which fills this content box and carries its own
+          horizontal scroll (globals.css §6), so this box never had anything to
+          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          y axis to `auto` too, which would silently clip a tall equation. The tab
+          stop the slab needs now lives on `.katex-display` itself; see
+          `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+      <div className="mt-4 panel-inset px-4 py-3">
         <KatexMath tex={stateLatex} display />
       </div>
 
@@ -202,7 +209,7 @@ export function EntanglementCorrelation() {
 
       <div
         aria-live="polite"
-        className="mt-4 rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
+        className="mt-4 rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
       >
         {narration}
       </div>
@@ -222,7 +229,7 @@ export function EntanglementCorrelation() {
         />
       </div>
 
-      <div className="mt-6 rounded-xl border border-warning/30 bg-warning/5 p-4">
+      <div className="mt-6 rounded-panel border border-warning/30 bg-warning/5 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-warning">Not a signal</p>
         <p className="mt-2 text-sm text-foreground">
           This correlation is genuinely stronger than any classical shared randomness can produce, but it

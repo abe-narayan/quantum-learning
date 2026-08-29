@@ -26,18 +26,23 @@ export const shotNoiseStandardDeviation10000: NumericProblem = {
     value,
     tolerance: 1,
     incorrectFeedback: "Compute √(10000 × 0.5 × 0.5).",
+    nearMisses: [
+      { value: 2500, tolerance: 2, feedback: "2500 is the variance np(1−p). The standard deviation is its square root." },
+      { value: 100, tolerance: 0.5, feedback: "100 is √n, missing the p(1−p) factor of 1/4, whose square root halves the result." },
+      { value: 0.005, tolerance: 0.0002, feedback: "0.005 is the relative uncertainty σ/n. The question asks for the standard deviation of the count itself." },
+    ],
   },
   hints: [
     { text: "np(1-p) = 10000 × 0.5 × 0.5 = 2500." },
-    { text: "√2500 = 50." },
+    { text: "Take the square root of 2500." },
   ],
   solution: {
     steps: [{ description: "σ = √(10000×0.5×0.5) = √2500 = 50." }],
     finalAnswer: "50",
   },
   explanation: {
-    correctIdea: "Doubling shots from 5000 to 10000 increases the ABSOLUTE standard deviation (from ≈35.4 to 50) but shrinks it as a FRACTION of total shots (from ≈0.71% to 0.5%) — statistical noise grows slower than shot count, the general √n scaling behind 'more shots = more precision.'",
+    correctIdea: "Doubling shots from 5000 to 10000 increases the absolute standard deviation (from ≈35.4 to 50) but shrinks it as a fraction of total shots (from ≈0.71% to 0.5%): statistical noise grows slower than shot count, the general √n scaling behind 'more shots = more precision.'",
     whyCorrect: "Direct application of the binomial standard deviation formula, matching the lesson's own methodology.",
-    whyWrong: ["Expecting the absolute standard deviation to SHRINK with more shots confuses absolute noise (which grows as √n) with relative/fractional noise (which shrinks as 1/√n)."],
+    whyWrong: ["Expecting the absolute standard deviation to shrink with more shots confuses absolute noise (which grows as √n) with relative/fractional noise (which shrinks as 1/√n)."],
   },
 };

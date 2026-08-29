@@ -1,4 +1,4 @@
-import type { Problem, ProblemMeta, Quiz } from "./types";
+import { compareProblemDifficulty, type Problem, type ProblemMeta, type Quiz } from "./types";
 import { PROBLEMS } from "./registry.generated";
 
 /**
@@ -35,8 +35,19 @@ export function getProblem(slug: string): Problem | undefined {
   return PROBLEMS.find((problem) => problem.meta.slug === slug);
 }
 
+/**
+ * A lesson's practice list, ordered easiest to hardest (stable within a
+ * difficulty rung, so authored/content-path order breaks ties). File-path
+ * order ramped arbitrarily — a lesson could open on its hardest problem —
+ * and a student working a list top to bottom deserves a monotone ramp.
+ * Must stay in lockstep with `getProblemMetaForLesson` in `metaRegistry.ts`
+ * (the meta-only twin the lesson pages actually render);
+ * `metaRegistry.test.ts` pins the two together.
+ */
 export function getProblemsForLesson(lessonSlug: string): Problem[] {
-  return PROBLEMS.filter((problem) => problem.meta.lesson === lessonSlug);
+  return PROBLEMS.filter((problem) => problem.meta.lesson === lessonSlug).sort((a, b) =>
+    compareProblemDifficulty(a.meta.difficulty, b.meta.difficulty)
+  );
 }
 
 export function getProblemsForCourse(courseSlug: string): Problem[] {
@@ -52,6 +63,13 @@ export function getProblemsForCourse(courseSlug: string): Problem[] {
  * whole course rather than clustering on whichever lesson happened to get
  * the most problems authored. No randomness, so static generation stays
  * reproducible and the same five problems show up on every visit.
+ *
+ * DELIBERATELY NOT difficulty-sorted (unlike `getProblemsForLesson`):
+ * content-path order groups problems lesson by lesson, so even spacing over
+ * it samples across the course's *material*. Sorting by difficulty first
+ * would make the even spacing sample across difficulty rungs instead
+ * (clustering picks by lesson) — and would silently swap out the checkpoint
+ * problems every returning student has already seen.
  */
 export function getCourseCheckpointProblems(courseSlug: string, count = 5): Problem[] {
   const courseProblems = getProblemsForCourse(courseSlug);

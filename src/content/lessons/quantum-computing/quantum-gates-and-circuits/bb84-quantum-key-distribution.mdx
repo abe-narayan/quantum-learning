@@ -47,7 +47,7 @@ export const lessonMeta = {
   module: "bb84-quantum-key-distribution",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 30,
+  estimatedMinutes: 40,
   prerequisites: ["quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem"],
   objectives: [
     "Derive why matching-basis measurement recovers Alice's bit with certainty and mismatched-basis measurement gives a random result",
@@ -57,29 +57,33 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-hardware/physical-qubit-platforms/photonic-qubits",
-      note: "Real BB84 systems send exactly this protocol's Z/X-basis qubits as a single photon's polarization; this lesson's abstract H-and-measure engine is, physically, the polarization optics that platform describes.",
+      note: "Real BB84 systems send this protocol's Z/X-basis qubits as a single photon's polarization. What this lesson calls 'apply H, then measure' is, in that hardware, a waveplate and a polarizing beamsplitter.",
     },
   ],
 };
 
 <LessonHook eyebrow="Detectable, not just secure">
-Can two people agree on a secret string of bits over a channel anyone might be listening to, in a way where listening in is provably detectable? BB84 answers yes — and the reason is exactly the no-cloning theorem.
+Can two people agree on a secret string of bits over a channel anyone might be listening to, in a way that makes listening detectable? BB84 says yes, and the reason is the no-cloning theorem.
 </LessonHook>
 
 ## Motivation
 
-The last lesson proved that an unknown qubit state can't be copied. That
-sounds like a purely mathematical curiosity until BB84, the first
-<Term id="qkd-bb84">quantum key distribution</Term> protocol, puts it to work: Eve cannot silently
-make a copy of each qubit, keep one, and pass the other along
-undisturbed. Every real quantum channel primitive
-this needs, encoding a bit in a basis, changing basis with $H$, and
-measuring, is already in this course's engine.
+The last lesson proved that an unknown qubit state cannot be copied, which
+reads like a mathematical curiosity until you notice what it forbids an
+eavesdropper from doing. Eve cannot make a quiet copy of each qubit, keep
+one, and pass the other along undisturbed. She has to interact with the
+only copy there is.
+
+BB84, the first <Term id="qkd-bb84">quantum key distribution</Term> protocol, turns that into a
+security guarantee you can put a number on. Every primitive it needs
+(encode a bit in a basis, change basis with $H$, measure) is already in
+this course's engine, so the whole protocol can be computed here rather
+than described.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/09/High-Speed_Quantum_Key_System_Wins_Research_Award_%285884514398%29.jpg"
   alt="NIST laboratory photograph of a high-speed fiber-optic quantum key distribution system"
-  caption="NIST's high-speed fiber-optic quantum key distribution hardware, an award-winning real-world implementation of exactly this lesson's protocol: encoding bits in conjugate bases and sending them, qubit by qubit, down an optical fiber."
+  caption="NIST's high-speed fiber-optic quantum key distribution hardware. It runs this lesson's protocol: bits encoded in conjugate bases and sent, one photon at a time, down an optical fiber."
   credit="NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:High-Speed_Quantum_Key_System_Wins_Research_Award_(5884514398).jpg"
   license="Public Domain (U.S. Government work)"
@@ -188,12 +192,12 @@ original Z basis, measures the qubit Eve actually sent him:
 
 <QuantumStateDisplay state={eveResendState} label={`Bob measures Eve's resent qubit in Z: P(0)=${bobAfterEveProbabilities[0].toFixed(2)}, P(1)=${bobAfterEveProbabilities[1].toFixed(2)}`} />
 
-Even though Alice's and Bob's bases agree, an event they would normally
-trust completely, Bob now has only a $50\%$ chance of reading back Alice's
-original bit. That's the whole mechanism: Eve's wrong-basis guess forces
-her to resend a state in the *wrong* basis relative to Alice and Bob's
-agreed one, and measuring a wrong-basis state is exactly the $50/50$ case
-derived above.
+Alice's and Bob's bases agree here, an event they would normally treat as
+reliable, and yet Bob has only a $50\%$ chance of reading back Alice's
+original bit. That is the whole mechanism. Eve's wrong-basis guess forces
+her to resend a state in the wrong basis relative to the one Alice and Bob
+agreed on, and measuring a wrong-basis state is the $50/50$ case derived
+above.
 
 <PredictBeforeReveal
   question="Eve intercepts and resends every qubit, guessing her interception basis at random each time. What fraction of the sifted key (positions where Alice's and Bob's bases already matched) do you expect to come out wrong?"
@@ -227,20 +231,20 @@ attack gives a $25\%$ mismatch rate on the sample, unmistakably above
 noise. They discard the sample and, if the error rate is too high, discard
 the whole key and try again over a cleaner channel.
 
-The basis-combination sweep above is exactly where this $25\%$ comes from:
-it is the real engine, `HADAMARD` and `.probabilities()`, computing Bob's
-actual outcome distribution for all four basis combinations, not an
-illustration of it. Revisit it with this derivation in mind: the
-"mismatch" bars (Alice Z/Bob X and Alice X/Bob Z) are precisely the
-$50/50$ distribution Eve inflicts on a sifted bit whenever she guesses her
-interception basis wrong.
+The basis-combination sweep above is where this $25\%$ comes from. Those
+bars are `HADAMARD` and `.probabilities()` computing Bob's outcome
+distribution for all four basis combinations, not an illustration of it.
+Revisit it with the derivation in mind: the mismatch bars (Alice Z/Bob X
+and Alice X/Bob Z) are the $50/50$ distribution Eve inflicts on a sifted
+bit whenever she guesses her interception basis wrong.
 
 ### Watching sifting and the error rate over a full round
 
-The single-qubit sweep above shows *one* qubit's four possible outcomes.
-The two claims that actually make BB84 work, sifting keeps roughly half
-the qubits, and Eve's presence shows up as an error rate on the *sifted*
-key, only become visible across many qubits at once. The table below runs
+The single-qubit sweep above shows one qubit's four possible outcomes. The
+two claims that make BB84 work (sifting keeps roughly half the qubits, and
+Eve shows up as an error rate on the *sifted* key) are statements about
+many qubits, and only become visible across a whole round. The table below
+runs
 a full round of $14$ simulated qubits through the real protocol above:
 Alice picks a random bit and basis for each one, Bob picks his own random
 basis, and, when the toggle is on, Eve intercepts every qubit with the
@@ -258,18 +262,19 @@ Eve switches on.
 
 ## Physical Interpretation
 
-Nothing about BB84 requires entanglement or anything exotic: every qubit
-Alice sends is in a definite, unentangled state; the security comes purely
-from the fact that $Z$-basis and $X$-basis are *conjugate*, non-commuting
-observables, exactly like position and momentum. Measuring one basis
-necessarily disturbs the other, which is the same physics the <Term id="heisenberg-uncertainty-principle">uncertainty
-principle</Term> expresses elsewhere in this curriculum. No-cloning closes the
-one loophole that would otherwise defeat this: without it, Eve could copy
-each qubit an unlimited number of times, measure the copies in every
-possible basis, and reconstruct the state exactly, all without ever
-touching the qubit Alice and Bob actually use. Because copying is
-impossible, Eve must gamble on a basis for the *one* real qubit in transit,
-and gambling wrong is what makes her detectable.
+Nothing about BB84 requires entanglement or anything exotic. Every qubit
+Alice sends is in a definite, unentangled state, and the security comes
+from one fact: the $Z$ and $X$ bases are *conjugate*, non-commuting
+observables, in the same sense position and momentum are. Measuring one
+disturbs the other, which is the physics the <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term>
+expresses elsewhere in this curriculum.
+
+No-cloning closes the one loophole that would otherwise defeat all of it.
+Without it, Eve could copy each qubit as many times as she liked, measure
+the copies in every basis, reconstruct the state, and never touch the qubit
+Alice and Bob use. Because copying is impossible, she has to gamble on a
+basis for the one real qubit in transit, and gambling wrong is what makes
+her visible.
 
 ## Worked Example
 
@@ -291,7 +296,7 @@ directly in the computational basis: probabilities $[0.5,0.5]$, a coin
 flip. Say she collapses to $|1\rangle$ and resends it unchanged (Z-basis
 encode of $1$).
   </DerivationStep>
-  <DerivationStep annotation="Bob still applies H, believing his basis matches Alice's — but the qubit he receives was re-prepared by Eve in the wrong basis.">
+  <DerivationStep annotation="Bob still applies H, believing his basis matches Alice's. But the qubit he receives was re-prepared by Eve in the wrong basis.">
 Bob, measuring in X as before, applies
 $H$ to $|1\rangle$: $H|1\rangle=|-\rangle$, probabilities $[0.5,0.5]$. Bob,
 who believes his basis matches Alice's, now has only even odds of reading
@@ -339,10 +344,9 @@ detectable disturbance.
 3. Why does comparing a random public sample of the sifted key (and
    discarding it afterward) work to detect eavesdropping, rather than
    Alice and Bob needing to inspect the entire key?
-4. The basis-combination sweep shows exactly $50/50$ for both mismatch
-   cases. Explain why this is also exactly Eve's own measurement
-   probability when she guesses the wrong basis, and why that's not a
-   coincidence.
+4. The basis-combination sweep shows $50/50$ for both mismatch cases.
+   Explain why that is also Eve's own measurement distribution when she
+   guesses the wrong basis, and why the two are the same calculation.
 
 <PracticeLinks problems={practiceProblems} />
 

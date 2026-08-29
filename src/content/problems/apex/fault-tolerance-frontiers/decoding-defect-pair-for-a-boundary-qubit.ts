@@ -58,9 +58,9 @@ export const decodingDefectPairForABoundaryQubit: MultipleChoiceProblem = {
     whyCorrect:
       "This is the defect-pair mechanic the whole decoding graph is built from: every possible single-qubit error corresponds to exactly one edge of the decoding graph, connecting its two endpoint defects.",
     whyWrong: [
-      "Option b confuses V02 with a different qubit (V01), which has different endpoints.",
-      "Option c overstates locality — surface-code stabilizers are local by design, precisely so a single error's effect stays confined to its immediate neighborhood.",
-      "Option d mismatches error type to stabilizer type — X errors are caught by Z-type (vertex) stabilizers, not X-type (face) ones.",
+      { optionId: "b", text: "Confuses V02 with a different qubit. N01 and N11 are V01's endpoints; each edge qubit has its own pair." },
+      { optionId: "c", text: "Overstates the reach of one error. Surface-code stabilizers are local by design, so a single error's signature stays confined to its immediate neighborhood." },
+      { optionId: "d", text: "Mismatches error type to stabilizer type. X errors are caught by the Z-type (vertex) stabilizers, not the X-type (face) ones." },
     ],
   },
 };

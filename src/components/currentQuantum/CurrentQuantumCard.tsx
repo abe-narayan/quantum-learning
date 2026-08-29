@@ -5,7 +5,7 @@ import { TechLabel } from "@/components/ui/Typography";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { PILLAR_VISUALS } from "@/lib/design/pillars";
-import type { CurrentQuantumEntry } from "@/lib/content/currentQuantum/registry";
+import type { CurrentQuantumEntry } from "@/lib/content/currentQuantum/types";
 import { cn } from "@/lib/utils";
 import { entryPillar } from "./entryPillar";
 import { CATEGORY_META } from "./categoryIcons";
@@ -101,7 +101,7 @@ export function CurrentQuantumCard({
       <Instrument
         className={cn(
           lessonTitle &&
-            "isolate transition-colors duration-[--dur-fast] ease-[--ease-instrument] has-[a[data-entry-link]:hover]:border-pillar-edge has-[a[data-entry-link]:focus-visible]:border-pillar-edge"
+            "isolate transition-colors duration-(--dur-fast) ease-instrument has-[a[data-entry-link]:hover]:border-pillar-edge has-[a[data-entry-link]:focus-visible]:border-pillar-edge"
         )}
         label={
           <span className="inline-flex items-center gap-1.5">
@@ -152,7 +152,7 @@ export function CurrentQuantumCard({
           />
         ) : null}
 
-        <div className="mt-4 rounded-[var(--radius-tight)] border-l-2 border-pillar-edge bg-pillar-wash px-4 py-3">
+        <div className="mt-4 rounded-(--radius-tight) border-l-2 border-pillar-edge bg-pillar-wash px-4 py-3">
           <TechLabel className="text-pillar-text">Why this matters</TechLabel>
           <p className="relative z-10 mt-1.5 text-sm leading-relaxed text-foreground">
             {entry.whyThisMatters}

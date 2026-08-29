@@ -27,6 +27,10 @@ export const dirichletKernelPeakHeight: NumericProblem = {
     value: peakHeight,
     tolerance: 0.05,
     incorrectFeedback: "Use D_L(0) = L/π directly with L=50.",
+    nearMisses: [
+      { value: 50, tolerance: 0.1, feedback: "50 is L, forgetting the 1/π. That factor is fixed by the kernel's normalization: its total area stays 1 for every L." },
+      { value: 50 * Math.PI, tolerance: 0.2, feedback: "π multiplies rather than divides here: the kernel is sin(qL)/(πq), so π sits in the denominator." },
+    ],
   },
   hints: [
     { text: "As q→0, sin(qL)/(πq) → L/π (L'Hôpital, or the small-angle approximation sin(qL)≈qL)." },

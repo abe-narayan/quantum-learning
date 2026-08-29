@@ -22,6 +22,11 @@ export const infiniteWellEnergyLevel: NumericProblem = {
     value: 0.548311,
     tolerance: 0.001,
     incorrectFeedback: "E_n = n^2*pi^2/(2*L^2). Substitute n=2, L=6 carefully — L is squared in the denominator.",
+    nearMisses: [
+      { value: (4 * Math.PI ** 2) / 12, tolerance: 0.005, feedback: "The width is squared in the denominator: 2L² = 72, not 2L = 12." },
+      { value: Math.PI ** 2 / 72, tolerance: 0.002, feedback: "That is E₁. The level index enters as n², so E₂ is four times larger." },
+      { value: (2 * Math.PI ** 2) / 72, tolerance: 0.002, feedback: "n enters squared, not linearly: the numerator is n²π² = 4π²." },
+    ],
   },
   hints: [
     { text: "E_n = n^2 * pi^2 / (2*L^2), with hbar=m=1." },

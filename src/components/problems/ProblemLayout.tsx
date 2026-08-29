@@ -50,7 +50,7 @@ export function ProblemLayout({
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <Link
             href="/problems"
-            className="tech-label inline-flex min-h-11 items-center rounded-[--radius-tight] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+            className="tech-label inline-flex min-h-11 items-center rounded-(--radius-tight) text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
           >
             Problems
           </Link>
@@ -75,7 +75,7 @@ export function ProblemLayout({
               </span>
               <Link
                 href={getCourseHref(course.slug)}
-                className="tech-label inline-flex min-h-11 items-center rounded-[--radius-tight] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+                className="tech-label inline-flex min-h-11 items-center rounded-(--radius-tight) text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
               >
                 {course.title}
               </Link>
@@ -119,9 +119,9 @@ export function ProblemLayout({
 
         {/* `min-w-0` + `ScrollableMathText`: problem prompts are plain strings
             with inline `$...$`, so they never pass through the MDX pipeline and
-            never meet `rehypeScrollableMath`. Without this a long bra-ket or
+            never meet `rehypeKatexHtml`. Without this a long bra-ket or
             matrix run pushes the whole document sideways at 320px. */}
-        <div className="mt-8 min-w-0 rounded-[--radius-panel] border border-border border-l-4 border-l-pillar-edge bg-surface-muted/60 p-6">
+        <div className="mt-8 min-w-0 rounded-panel border border-border border-l-4 border-l-pillar-edge bg-surface-muted/60 p-6">
           <ScrollableMathText text={problem.question.prompt} className="text-lg leading-relaxed text-foreground" />
         </div>
 
@@ -133,7 +133,7 @@ export function ProblemLayout({
             <div className="mt-8">
               <Link
                 href={`/lessons/${homeLesson.slug}`}
-                className="inline-flex min-h-11 items-center rounded-[--radius-tight] text-sm font-medium text-pillar-text hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+                className="inline-flex min-h-11 items-center rounded-(--radius-tight) text-sm font-medium text-pillar-text hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
               >
                 ← Back to &ldquo;{homeLesson.title}&rdquo;
               </Link>

@@ -54,13 +54,13 @@ export const magicStateEastinKnillTransversalGates: MultipleChoiceProblem = {
   solution: {
     steps: [
       {
-        description: "Eastin-Knill states: no quantum error-correcting code can have both (a) a universal set of transversal logical gates, and (b) the ability to correct arbitrary single-qubit errors.",
+        description: "Eastin-Knill states: no quantum error-correcting code can have both (i) a universal set of transversal logical gates, and (ii) the ability to correct arbitrary single-qubit errors.",
       },
       {
         description: "The surface code corrects arbitrary single-qubit errors (up to its distance), so by the theorem it cannot also have a universal transversal gate set. Since H, S, CNOT (Clifford) are already transversal, T (which would complete universality) is the gate that must fail to be transversal.",
       },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Eastin-Knill makes a transversal fault-tolerant T provably impossible on a code that corrects arbitrary single-qubit errors, not merely undiscovered.",
   },
   explanation: {
     correctIdea:
@@ -68,9 +68,9 @@ export const magicStateEastinKnillTransversalGates: MultipleChoiceProblem = {
     whyCorrect:
       "This is exactly why magic-state injection (a fundamentally different, non-transversal mechanism) exists as the standard workaround, rather than the field simply waiting for a better transversal T circuit.",
     whyWrong: [
-      "Option b mistakes a proven impossibility for a temporary limitation.",
-      "Option c confuses decoder throughput with the existence of a fault-tolerant circuit.",
-      "Option d gets the facts backwards: T is precisely the non-transversal gate.",
+      { optionId: "b", text: "Mistakes a proven impossibility for a temporary limitation. No lattice-surgery scheme can route around a no-go theorem." },
+      { optionId: "c", text: "Confuses decoder throughput with the existence of a fault-tolerant circuit. Speed is not the obstruction; structure is." },
+      { optionId: "d", text: "Gets the facts backwards. T is the one non-transversal gate here, which is why distillation exists at all." },
     ],
   },
 };

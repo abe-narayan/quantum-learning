@@ -24,6 +24,11 @@ export const stinespringEnvironmentOutcomeProbability: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "K1 = [[0, sqrt(gamma)], [0, 0]], so K1 rho K1-dagger has a single nonzero entry, gamma * rho_11, in its (0,0) position. Its trace is therefore just gamma * rho_11 = 0.4 * 0.5.",
+    nearMisses: [
+      { value: 0.4, feedback: "0.4 is gamma, the decay probability for a fully excited qubit. Here only half the population sits in |1⟩, so only half of that gamma is at risk." },
+      { value: Math.sqrt(0.4) * 0.5, tolerance: 0.002, feedback: "K₁ carries √gamma, but the probability is quadratic in the Kraus operator, so gamma itself appears in the trace." },
+      { value: 0.8, feedback: "0.8 is the complement, 1 − 0.2: the probability the environment stays in |0⟩ and no decay is recorded. The question asks for the branch in which a decay did occur." },
+    ],
   },
   hints: [
     { text: "The lesson showed Tr_E of the joint output, restricted to the environment finding outcome i, is exactly Tr[K_i rho K_i-dagger] -- the probability that branch occurred." },

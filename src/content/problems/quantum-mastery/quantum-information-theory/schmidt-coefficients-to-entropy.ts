@@ -24,6 +24,11 @@ export const schmidtCoefficientsToEntropy: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "Since ρ_A is already diagonal in the Schmidt basis with eigenvalues λ1, λ2, its von Neumann entropy is just the Shannon entropy of (0.8, 0.2): -0.8 log2(0.8) - 0.2 log2(0.2).",
+    nearMisses: [
+      { value: 1, feedback: "1 bit is the maximum for Schmidt rank 2, reached only by equal coefficients. A 0.8/0.2 split carries less." },
+      { value: 0.500402, tolerance: 0.002, feedback: "That is the same entropy in nats, from using the natural log. The question asks for bits, so use log base 2; dividing your answer by ln 2 converts it." },
+      { value: 2, feedback: "2 is the Schmidt rank, not the entropy. Entropy is bounded above by log₂(rank) = 1 bit here." },
+    ],
   },
   hints: [
     { text: "Schmidt Decomposition and Purification proved rho_A = sum_k lambda_k |u_k><u_k|, already diagonal in the Schmidt basis." },

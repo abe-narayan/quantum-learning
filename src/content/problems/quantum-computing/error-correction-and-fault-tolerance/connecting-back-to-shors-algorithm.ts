@@ -39,11 +39,15 @@ export const connectingBackToShorsAlgorithm: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "Shor's algorithm's single long circuit has no built-in mechanism to tolerate or average out mid-circuit errors, unlike VQE's repeated, classically-corrected loop." }],
-    finalAnswer: "(a)",
+    finalAnswer: "Shor's period-finding circuit must succeed in one long uninterrupted run, with no classical feedback loop to average errors out.",
   },
   explanation: {
     correctIdea: "This is the same circuit-depth/error-tolerance distinction Quantum Algorithms II's capstone drew, now explained by the actual threshold mechanism.",
     whyCorrect: "Ties this course's final lesson directly back to the previous course's own capstone conclusion.",
-    whyWrong: ["Options b, c, and d each contain a factual error about either algorithm's actual structure or error sensitivity."],
+    whyWrong: [
+      { optionId: "b", text: "Shor's algorithm is a quantum circuit built from qubits and gates, so error correction bears on it directly." },
+      { optionId: "c", text: "No quantum algorithm is immune to physical errors. VQE is more structurally tolerant of them, not exempt." },
+      { optionId: "d", text: "Contradicts this course's and Quantum Algorithms II's circuit-depth and error-tolerance comparison, which puts the two families far apart." },
+    ],
   },
 };

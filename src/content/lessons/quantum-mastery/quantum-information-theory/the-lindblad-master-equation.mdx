@@ -114,11 +114,11 @@ of decoherence and explicitly declined to build the continuous-time
 differential equation underneath it, noting that "no lesson in this
 course needs it." This course does. The **Lindblad master equation**
 (more precisely, the **GKLS equation**, after Gorini, Kossakowski,
-Sudarshan, and Lindblad) is the continuous-time generator of exactly the
-kind of Markovian, completely-positive evolution this platform's Kraus
-channels already implement at discrete steps, and this lesson proves
-the two pictures aren't just analogous, they're the *same* dynamics,
-sampled at different resolutions.
+Sudarshan, and Lindblad) is the continuous-time generator of the kind
+of Markovian, completely-positive evolution this platform's Kraus
+channels already implement at discrete steps. What this lesson proves is
+sharper than an analogy: one discrete Kraus step is an exact sample of
+the continuous flow, at any step size, not an approximation to it.
 
 Primary sources: V. Gorini, A.
 Kossakowski, and E. C. G. Sudarshan, "Completely Positive Dynamical
@@ -130,7 +130,7 @@ generator's general form independently and in the same year.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Planar_Ion_Trap%3B_Magnesium_Ions_%285884514798%29.jpg"
   alt="False-color fluorescence images of magnesium ions confined in NIST's planar ion trap, showing 1, 2, 3, 6, and 12 trapped ions"
-  caption="Real trapped-ion qubits like these are one of the physical platforms whose T1 (energy relaxation) and T2 (dephasing) times are measured directly against the Lindblad equation's predictions -- this lesson's amplitude-damping and dephasing generators are not abstractions, they describe exactly this kind of hardware."
+  caption="Real trapped-ion qubits like these are one of the physical platforms whose T1 (energy relaxation) and T2 (dephasing) times are measured directly against the Lindblad equation's predictions. This lesson's amplitude-damping and dephasing generators are not abstractions; they describe this kind of hardware."
   credit="Signe Seidelin and John Chiaverini / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Planar_Ion_Trap;_Magnesium_Ions_(5884514798).jpg"
   license="Public domain (U.S. government work)"
@@ -158,13 +158,13 @@ $$
 $$
 
 for some Hermitian $H$ (an effective Hamiltonian) and some set of
-**Lindblad (jump) operators** $\{L_k\}$.
+**<Term id="lindblad-master-equation">Lindblad (jump) operators</Term>** $\{L_k\}$.
 
 </TheoremBox>
 
 What *is* proved here directly
-is the converse, sufficiency direction: that this form genuinely
-generates valid CPTP dynamics, by connecting it explicitly to the
+is the converse, sufficiency direction: that this form does generate
+valid CPTP dynamics, by connecting it explicitly to the
 discrete Kraus picture already built and trusted on this platform.
 
 ### Sufficiency: recovering a Kraus form at first order in $dt$
@@ -181,7 +181,7 @@ Check trace-preservation to $O(dt)$: $K_0^\dagger K_0\approx I+\big(iH-\tfrac12\
 $\sum_{k\geq1}K_k^\dagger K_k=dt\sum_kL_k^\dagger L_k$, so
 $K_0^\dagger K_0+\sum_{k\geq1}K_k^\dagger K_k=I+O(dt^2)$: the
 trace-preservation condition Open Quantum Systems & Kraus Operators
-required, satisfied to first order. This is already a genuine Kraus sum
+required, satisfied to first order. This is already a Kraus sum
 (hence CP, by the easy direction of Quantum Channels: Kraus and Choi's
 theorem), confirming the boxed generator produces valid physical
 dynamics at every infinitesimal step.
@@ -189,14 +189,14 @@ dynamics at every infinitesimal step.
 ### Solving it exactly for amplitude damping
 
 <PredictBeforeReveal
-  question="Under pure amplitude damping (population decaying from |1> to |0> at rate Gamma), how fast do you expect the off-diagonal coherence rho01 to decay, relative to the population?"
+  question="Under pure amplitude damping (population decaying from |1⟩ to |0⟩ at rate Gamma), how fast do you expect the off-diagonal coherence rho01 to decay, relative to the population?"
   options={[
     { label: "The same rate, Gamma — it's all one decay process", value: "same" },
     { label: "Twice as fast, rate 2*Gamma — losing population should scramble phase even harder", value: "double" },
     { label: "Half as fast, rate Gamma/2", value: "half" },
   ]}
   correctValue="half"
-  explanation="The coherence decays at exactly half the population's rate, derived below directly from the Lindblad equation's own algebra, not assumed. That factor of two is exactly why pure amplitude damping alone gives T2 = 2*T1 rather than T2 = T1 — it's the best-case coherence time a purely population-decaying qubit can have, before any additional pure dephasing shortens it further."
+  explanation="The coherence decays at exactly half the population's rate, derived below directly from the Lindblad equation's own algebra, not assumed. That factor of two is why pure amplitude damping alone gives T2 = 2*T1 rather than T2 = T1. It is the best-case coherence time a purely population-decaying qubit can have, before any additional pure dephasing shortens it further."
 />
 
 Take $H=0$ and a single jump operator $L=\sqrt\Gamma\,\sigma_-$, where
@@ -260,7 +260,7 @@ $\rho_{11}$:
 
 <ParametricCurve
   frames={t2Frames}
-  ariaLabel="Continuous exponential decay of the coherence magnitude |rho01(t)| = |rho01(0)| e^(-t/2T1), plotted against the discrete Kraus channel stepped forward with gamma(dt) starting from |+><+|, for T1=2, showing the two curves coincide exactly"
+  ariaLabel="Continuous exponential decay of the coherence magnitude |rho01(t)| = |rho01(0)| e^(-t/2T1), plotted against the discrete Kraus channel stepped forward with gamma(dt) starting from the plus state, for T1=2, showing the two curves coincide exactly"
 />
 
 ### Deriving $T_2\leq2T_1$ from the generator's linearity
@@ -317,7 +317,7 @@ $\gamma(dt)=1-e^{-dt/T_1}\approx0.00049988$. Stepping
 `applyChannelRepeatedly` on $\rho=|1\rangle\langle1|$ gives
 $\rho_{11}(N\,dt)\approx0.367879441$, matching $e^{-1}\approx0.367879441$
 to 9 decimal places; this platform's own existing test suite already
-confirms exactly this (T1 & T2 Decoherence cites it for $N=10,100,1000$;
+confirms this (T1 & T2 Decoherence cites it for $N=10,100,1000$;
 here it's shown to hold for the coherence too, not only the population).
 Starting instead from $\rho=|+\rangle\langle+|$ and taking just **one**
 step of size $dt=0.001$: the off-diagonal entry shrinks from $0.5$ to
@@ -330,7 +330,7 @@ $0.5\,e^{-dt/(2T_1)}\approx0.499875$, matching
 **Thinking coherence decays at the same rate as population under pure
 amplitude damping.** The derivation above shows the coherence decay
 *rate* is exactly half the population decay rate ($\Gamma/2$ vs
-$\Gamma$), which is precisely why pure amplitude damping alone gives
+$\Gamma$), which is why pure amplitude damping alone gives
 $T_2=2T_1$, not $T_2=T_1$.
 </Callout>
 
@@ -370,7 +370,7 @@ argument, not what's being used for this specific numerical check.
   $\dot\rho=-i[H,\rho]+\sum_k(L_k\rho L_k^\dagger-\tfrac12\{L_k^\dagger L_k,\rho\})$
   is the most general Markovian, completely-positive generator (stated
   as a cited structural theorem); this lesson proved the converse:
-  that it genuinely generates valid Kraus-form dynamics at every
+  that it generates valid Kraus-form dynamics at every
   infinitesimal step.
 - Solved exactly for amplitude damping: $\rho_{11}(t)=\rho_{11}(0)e^{-t/T_1}$,
   $\rho_{01}(t)=\rho_{01}(0)e^{-t/(2T_1)}$, coherence decays at exactly
@@ -383,14 +383,10 @@ argument, not what's being used for this specific numerical check.
 
 ## Further Exploration
 
-[Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement)
-returns from open-system dynamics to a purely information-theoretic
-question: how to measure entanglement once a state's global purity, like
-the mixed states this lesson's channels produce, is gone.
-
 <NextDiscovery>
-  This returns from open-system dynamics to a purely
-  information-theoretic question: how to measure entanglement once a
-  state's global purity, like the mixed states this lesson's channels
-  produce, is gone.
+  [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement)
+  turns from open-system dynamics to a question this lesson creates:
+  Lindblad evolution manufactures mixed states, and entanglement measures
+  that were straightforward for pure states stop being straightforward
+  there. That lesson builds the ones that survive.
 </NextDiscovery>

@@ -38,12 +38,16 @@ export const wrongBasisForPerturbationMatrix: MultipleChoiceProblem = {
     { text: "This is why this course's worked example builds the x⁴ matrix directly in the harmonic oscillator's Fock (number) basis." },
   ],
   solution: {
-    steps: [{ description: "H' must be expressed as a matrix in H₀'s own eigenbasis, since every formula's indices label H₀'s eigenstates specifically." }],
-    finalAnswer: "(a) H₀'s own eigenbasis",
+    steps: [{ description: "The indices n and m in H'_mn are the same labels that appear in E_n^(0) and E_m^(0), and those are H₀'s eigenvalues. For the two to refer to the same states, H' must be written in H₀'s own eigenbasis." }],
+    finalAnswer: "H₀'s own eigenbasis, {|n⁽⁰⁾⟩}, since the same indices label the unperturbed energies in the denominators.",
   },
   explanation: {
-    correctIdea: "This setup step is easy to skip past, but is exactly why the worked example builds x⁴ using annihilationOperator/creationOperator (which act naturally in the Fock basis), rather than in some other representation.",
-    whyCorrect: "Matches the lesson's explicit 'Setup: H₀'s eigenbasis' section.",
-    whyWrong: ["Choosing an arbitrary basis would make ⟨m|H'|n⟩ meaningless relative to the specific E_n^(0), E_m^(0) values the formula needs."],
+    correctIdea: "The matrix indices and the energy labels in the denominators are the same indices, which pins the basis down: it has to be the one that diagonalizes H₀.",
+    whyCorrect: "Matches the lesson's 'Setup: H₀'s eigenbasis' section, and it is why the worked example builds x⁴ from the creation and annihilation operators, which act naturally in the Fock basis.",
+    whyWrong: [
+      { optionId: "b", text: "Fixes a basis in advance. Position is right only when H₀ happens to be diagonal there, which the harmonic oscillator's H₀ is not." },
+      { optionId: "c", text: "Drops the coupling between the matrix indices and the energy labels. Change basis and E_n^(0) no longer refers to the state H'_mn is indexed by." },
+      { optionId: "d", text: "Diagonalizes the wrong operator, and doing so would require solving the problem perturbation theory exists to avoid." },
+    ],
   },
 };

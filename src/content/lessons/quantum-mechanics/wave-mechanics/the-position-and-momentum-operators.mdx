@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "The Position and Momentum Operators",
   description:
-    "Redeeming the last course's preview: deriving p-hat = -i*hbar*d/dx from the plane-wave eigenfunction requirement, and reproving the canonical commutator [x,p]=i*hbar directly, this time from calculus rather than assertion.",
+    "Redeeming the last course's preview: deriving p-hat = -i*hbar*d/dx from the plane-wave eigenfunction requirement, and reproving the canonical commutator [x,p]=i*hbar from calculus rather than assertion.",
   course: "wave-mechanics",
   module: "the-position-and-momentum-operators",
   order: 1,
@@ -31,7 +31,22 @@ The earlier Position and Momentum lesson stated [x̂,p̂]=iħ and moved on, prom
 ## Motivation
 
 The "From Classical to Quantum" course's Position and Momentum lesson was
-explicit that it was only a *preview*.
+explicit that it was only a *preview*. It wrote down
+$[\hat x,\hat p]=i\hbar$, drew the uncertainty principle out of it, and
+said the justification would have to wait. The reason for the wait was
+concrete: $\hat p$ is a derivative, and a derivative has nothing to act on
+until states are functions of a continuous variable. Three lessons ago
+they became exactly that.
+
+So the debt can now be paid. Two operators are needed, and the lesson
+treats them very differently. Position is almost free: in a basis labelled
+by position, $\hat x$ can only multiply. Momentum is the interesting one,
+because nothing in the position basis obviously represents it, and this
+lesson does not postulate an answer. It states one physical fact about
+momentum, that a plane wave of wavelength $\lambda = h/p$ carries momentum
+$p$, and lets that fact determine the operator uniquely. The commutator
+then falls out of the product rule, and the uncertainty principle follows
+from the commutator with no further physics.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Bundesarchiv_Bild183-R57262%2C_Werner_Heisenberg.jpg"
@@ -64,7 +79,7 @@ $$
 This is what makes $\langle x\rangle = \int\psi^* (x\psi)\,dx = \int
 x|\psi|^2 dx$ from the last lesson consistent with the general
 $\langle\psi|\hat x|\psi\rangle$ definition: $\hat x$ acting as "multiply
-by $x$" is precisely what reproduces that formula.
+by $x$" is what turns the general sandwich into that integral.
 
 ### Deriving the momentum operator
 
@@ -106,9 +121,11 @@ $$
 $$
 
 confirming $\langle\phi|\hat p\psi\rangle = \langle\hat p\phi|\psi\rangle$,
-exactly the Hermiticity condition, and exactly why the factor of $i$ in
-$\hat p=-i\hbar\,d/dx$ isn't optional: a plain real derivative
-$d/dx$ alone is *anti*-Hermitian, and the $i$ is precisely what fixes that.
+which is the Hermiticity condition. It also shows why the factor of $i$ in
+$\hat p=-i\hbar\,d/dx$ is not optional. Integration by parts flips the
+sign of a derivative moved from one side of the inner product to the
+other, so $d/dx$ on its own is *anti*-Hermitian; multiplying by $i$
+supplies the compensating sign flip through the conjugation of the bra.
 
 ### Reproving the commutator
 
@@ -135,32 +152,40 @@ $$
 [\hat x,\hat p] = i\hbar\,\hat I
 $$
 
-exactly the relation the last course stated, now derived from two lines
-of calculus rather than asserted. The <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term>
+the relation the last course stated, now derived from two lines of
+calculus rather than asserted. The <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term>
 $\Delta x\,\Delta p \ge \tfrac12|\langle[\hat x,\hat p]\rangle| =
 \hbar/2$, proven in full generality in that course's Expectation Values
-and Uncertainty lesson, applies here completely unchanged. The abstract
-proof never needed to know $\hat p$'s explicit form, only that the
-commutator was $i\hbar$.
+and Uncertainty lesson, carries over with no changes at all: that proof
+never needed $\hat p$'s explicit form, only the value of the commutator.
 
 <PredictBeforeReveal
-  question="The calculation above applies x-hat then p-hat, in that order, to get [x-hat, p-hat] = i*hbar. If you instead compute [p-hat, x-hat] -- the operators in the opposite order -- what do you get?"
+  question="The calculation above applies x-hat then p-hat, in that order, to get [x-hat, p-hat] = i*hbar. If you instead compute [p-hat, x-hat], with the operators in the opposite order, what do you get?"
   options={[
     { label: "The same thing, +i*hbar", value: "same" },
     { label: "The sign flips: -i*hbar", value: "flip" },
-    { label: "Zero -- the operators end up commuting", value: "zero" },
+    { label: "Zero, because the operators end up commuting", value: "zero" },
   ]}
   correctValue="flip"
-  explanation="[p-hat, x-hat] = -[x-hat, p-hat] = -i*hbar, since swapping the order of a commutator always flips its sign by definition ([A,B] = -[B,A]). Redoing the product-rule calculation with the operators reversed confirms it directly, which is exactly Practice Question 2 below."
+  explanation="[p-hat, x-hat] = -[x-hat, p-hat] = -i*hbar, since swapping the order of a commutator flips its sign by definition ([A,B] = -[B,A]). Redoing the product-rule calculation with the operators reversed confirms it directly, and that is Practice Question 2 below."
 />
 
 ## Physical Interpretation
 
 $\hat x$ and $\hat p$ don't commute because "multiply by $x$" and "take a
-derivative" are fundamentally incompatible operations. A function sharply
-localized in $x$ (a spike) has wildly oscillating derivatives (high
-momentum content), and vice versa. This *is* the uncertainty principle,
-seen as a statement about ordinary calculus.
+derivative" interfere with each other: differentiating a product picks up
+a term the other order does not, and that leftover term *is* the
+commutator.
+
+The physical content is visible in the shapes involved. Squeeze a Gaussian
+packet to a width of $\sigma = 0.1$ nm, roughly an atomic radius, and its
+slopes steepen in proportion, so the momentum content it needs in order to
+be that narrow grows as $1/\sigma$. Putting numbers to it,
+$\Delta p \ge \hbar/(2\sigma) \approx 5.3\times10^{-25}\ \mathrm{kg\,m/s}$,
+which for an electron is a speed spread of around $580$ km/s. Confining an
+electron to an atom is what makes it fast. There is no way to have a
+narrow spike and a slowly varying derivative at once, and the uncertainty
+principle is that statement about calculus, read as physics.
 
 ## Worked Example
 
@@ -176,11 +201,11 @@ satisfy, by direct substitution.
 A true plane wave isn't normalizable, but a broad Gaussian packet
 built with a definite central momentum approximates one closely, and
 this platform's simulator computes its momentum expectation value by
-actually running the Fourier transform, not by reading off a label:
+running the Fourier transform, not by reading back a label you set:
 
 <InteractiveSection
   title="Set the momentum, watch ⟨p⟩ track it"
-  description="Try the Free Gaussian Packet preset and change its Momentum parameter. Watch the ⟨p⟩ readout track the value you set — the eigenvalue relation derived above, checked live against a real computed expectation value."
+  description="Try the Free Gaussian Packet preset and change its Momentum parameter. Watch the ⟨p⟩ readout track the value you set: the eigenvalue relation derived above, checked against a computed expectation value rather than an assumption."
 >
   <LazyWavefunctionExplorer />
 </InteractiveSection>
@@ -219,8 +244,8 @@ $x$ times $\hat p\psi$.
 - $\hat x$ acts by multiplication; $\hat p = -i\hbar\,d/dx$ is *derived*
   from requiring plane waves $e^{ipx/\hbar}$ to be its eigenfunctions with
   eigenvalue $p$.
-- The factor of $i$ is exactly what makes $\hat p$ Hermitian, via
-  integration by parts.
+- The factor of $i$ is what makes $\hat p$ Hermitian, as integration by
+  parts shows; without it the operator is anti-Hermitian.
 - $[\hat x,\hat p]=i\hbar$ follows from two lines of calculus (product
   rule), reproving what the last course previewed.
 - The uncertainty principle's proof from the last course applies

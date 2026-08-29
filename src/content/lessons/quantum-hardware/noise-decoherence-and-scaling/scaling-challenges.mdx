@@ -16,7 +16,7 @@ export const lessonMeta = {
   module: "scaling-challenges",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 22,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/noise-decoherence-and-scaling/crosstalk"],
   objectives: [
     "Compute how per-gate error compounds multiplicatively across a circuit of many sequential gates",
@@ -40,7 +40,7 @@ imperfect operations run back to back?
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Quantum_metamaterial_with_24_artificial_atoms.png/1280px-Quantum_metamaterial_with_24_artificial_atoms.png"
   alt="An electron micrograph of a real superconducting chip patterned with 24 transmon qubit 'artificial atoms', coupled through shared microwave resonators"
-  caption="A real 24-qubit chip. Raw qubit count like this is the incomplete metric this lesson warns about: every one of these qubits' gates still compounds error multiplicatively, the actual bottleneck this lesson's p^N table quantifies."
+  caption="A real 24-qubit chip. Raw qubit count like this is the incomplete metric this lesson warns about: every one of these qubits' gates still compounds error multiplicatively, which is the bottleneck the p^N table below quantifies."
   credit="FMN Laboratory, Bauman Moscow State Technical University"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_metamaterial_with_24_artificial_atoms.png"
   license="CC BY 4.0"
@@ -61,10 +61,13 @@ not a linear one.
 | 99% | 90.4% | 36.6% | $4.3\times10^{-5}$ |
 | 95% | 59.9% | 0.6% | $\approx0$ |
 
-A 99.9% per-gate fidelity is better than most current real hardware
-achieves, and it still drops to 36.8% overall success by 1000 gates,
-barely better than a coin flip's worth of confidence in the final
-answer. This single table is the quantitative core of why
+Where does 99.9% sit relative to real hardware? Single-qubit gates
+routinely exceed it on today's devices; it is *two-qubit* gates where
+most platforms still fall short of that mark, with trapped-ion systems
+having demonstrated two-qubit fidelities at or above 99.9%. And even
+granting 99.9% for every gate in the circuit, overall success still
+drops to 36.8% by 1000 gates, barely better than a coin flip's worth of
+confidence in the final answer. This single table is the quantitative core of why
 "quantum-supremacy"-scale algorithms need either extremely low error
 rates or active error correction, not just more qubits.
 
@@ -107,7 +110,26 @@ too, and a computation using many qubits for many sequential gates
 compounds error across both dimensions at once. Metrics like **quantum
 volume** (not derived in full here, but conceptually: a combined
 measure of qubit count, connectivity, and per-gate error together)
-exist precisely because raw qubit count alone is misleading.
+exist because raw qubit count alone is misleading.
+
+### Wiring is a scaling problem too
+
+Compounding error is the mathematical scaling wall; there's a plumbing
+one right behind it. In a superconducting system, each qubit needs its
+own dedicated control lines, roughly 2 to 3 per qubit (microwave
+drive, readout, and often a separate flux bias), and each is a
+physical coax cable running from room-temperature electronics down
+through every stage of the dilution refrigerator. Scale that to 1,000
+qubits and the fridge must swallow 2,000 to 3,000 coax lines. Every one
+of them conducts heat inward and must be thermally anchored, attenuated,
+and filtered at each of the staged cooling plates Cryogenic Systems
+described, and those stages have finite cooling power; the coldest ones
+have the least of it. Qubit counts can in principle be doubled by
+lithography, but the wiring, and the heat it carries, does not
+miniaturize the same way, which is why serious scaling roadmaps involve
+cryogenic control electronics, multiplexed readout lines, and other
+ways to break the one-cable-per-qubit-per-function relationship rather
+than simply thicker cable bundles.
 
 ### Where error correction fits in
 
@@ -117,9 +139,8 @@ this lesson's compounding-error problem: if the *physical* per-gate
 error rate is below a certain threshold, encoding logical qubits
 redundantly (Quantum Computing's bit-flip and Shor codes) can suppress
 the *logical* error rate arbitrarily far below the physical rate, at
-the cost of needing many physical qubits per logical qubit. This
-lesson's compounding-error table is precisely the motivating problem
-that result exists to solve.
+the cost of needing many physical qubits per logical qubit. This lesson's
+compounding-error table is the problem that result exists to solve.
 
 ## Physical Interpretation
 
@@ -138,8 +159,8 @@ $$
 0.999^N = 0.5 \implies N = \frac{\ln0.5}{\ln0.999} \approx 693
 $$
 
-Fewer than 700 gates, even at a fidelity most current hardware hasn't
-reached. This concretely illustrates why useful, deep quantum circuits
+Fewer than 700 gates, even at a fidelity most current hardware's
+two-qubit gates haven't reached. This concretely illustrates why useful, deep quantum circuits
 (many algorithms need thousands to millions of gates) are out of reach
 without either substantially better physical fidelities or active error
 correction.

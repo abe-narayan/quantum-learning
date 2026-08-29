@@ -1,6 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
-import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
 import { NestedCodeDiagram } from "@/components/visualizations/NestedCodeDiagram";
 
 export const practiceProblems = getProblemMetaForLesson(
@@ -20,42 +19,36 @@ export const lessonMeta = {
   objectives: [
     "Describe the Shor code's concatenated construction: phase-flip encoding, then bit-flip encoding each resulting qubit",
     "Explain why concatenation corrects a Y error, which neither 3-qubit code alone corrects",
-    "State exactly why this platform simulates the two 3-qubit codes but not the full 9-qubit Shor code",
+    "State why the course's engine simulates the two 3-qubit codes but not the full 9-qubit Shor code",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Two failure modes, one qubit">
 What happens when a single qubit suffers both an X error and a Z error at once, the two failure modes the last two lessons treated as entirely separate problems? Neither 3-qubit code alone handles it.
 </LessonHook>
 
 ## Motivation
 
-Neither 3-qubit code alone handles it: the
-bit-flip code is blind to phase errors, the phase-flip code is blind to
-bit errors. Peter Shor's 1995 code answers this by **concatenating** the
-two constructions: nine <Term id="physical-qubit">physical qubits</Term>, protecting against an
-arbitrary single-qubit error (any combination of $X$, $Y$, $Z$) on any
-one of them.
+A qubit hit by both an $X$ and a $Z$ error defeats each 3-qubit code
+separately. The bit-flip code is blind to phase errors; the phase-flip code
+is blind to bit errors. Between them they cover every error type, and
+neither can cover both at once.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png"
-  alt="Peter Shor speaking after receiving the 2017 Dirac Medal from the ICTP"
-  caption="Peter Shor, speaking at the 2017 ICTP Dirac Medal ceremony he received partly for the 1995 code this lesson builds: the first construction proven to correct an arbitrary single-qubit error."
-  credit="International Centre for Theoretical Physics (ICTP), via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Peter_Shor_2017_Dirac_Medal_Award_Ceremony.png"
-  license="CC BY 3.0"
-/>
+The natural response is to want a code that does both jobs. Shor's 1995
+answer is more economical than that: **concatenate** the two codes you
+already have. Nine <Term id="physical-qubit">physical qubits</Term>, protecting against an arbitrary
+single-qubit error, with no third mechanism invented.
 
 ## Intuition
 
-The fix is simple once you see it: encode against phase flips, then
-encode *each piece of that encoding* again against bit flips. Nest one
-code inside the other, and an error that slips past one layer gets
-caught by the other. The Physical Interpretation section below calls
-this "protecting the protectors," a strategy that outlives this
-particular code. The rest of this lesson is bookkeeping: how nine
-qubits split into three groups of three, and why that specific split
-catches every single-qubit error there is.
+The fix is short once you see it. Encode against phase flips, then encode
+*each piece of that encoding* again against bit flips. Nest one code inside
+the other, and an error that slips past one layer meets the other.
+
+The Physical Interpretation section calls this "protecting the protectors,"
+a strategy that outlives this particular code. The rest of the lesson is
+bookkeeping: how nine qubits split into three groups of three, and why that
+split catches every single-qubit error there is.
 
 ## Mathematical Development
 
@@ -85,7 +78,7 @@ three groups together), the nesting the rest of this lesson explains.
 ### Why this catches every single-qubit error
 
 An $X$ error on one physical qubit is caught by that qubit's own
-bit-flip group, exactly as in Lesson 2. The outer phase-flip structure
+bit-flip group, just as in Lesson 2. The outer phase-flip structure
 is irrelevant to it.
 
 A $Z$ error on one physical qubit flips the relative phase *within* its
@@ -111,12 +104,18 @@ care that an outer-level phase problem also exists, and vice versa.
   explanation="Y decomposes into an X part and a Z part acting on the same qubit. The inner bit-flip code only ever looks for X, so it catches the X part and fires group 1's inner boundary, oblivious to any phase problem. The outer phase-flip code only ever looks for Z, so it independently catches the Z part and fires the outer boundary. Neither mechanism needs to know the other exists; a Y error just happens to trip both wires at once. Try it below."
 />
 
-<NestedCodeDiagram ariaLabel="Nine qubits in three groups of three: each group boxed with a dashed inner bit-flip boundary, all three groups boxed with one larger dashed outer phase-flip boundary. A toggle for X, Z, or Y error and a target-qubit selector highlight which boundary fires: X lights the target's inner group boundary only, Z lights only the outer boundary, Y lights both at once." />
+<InteractiveSection
+  title="Trip each wire yourself"
+  description="Pick an error type (X, Z, or Y) and a target qubit, then watch which dashed boundary fires. X lights only the target group's inner bit-flip boundary. Z lights only the outer phase-flip boundary, whichever qubit you choose. Y lights both at once. Try Z on two qubits in different groups and notice the outer boundary reacts identically: the outer code cannot tell which qubit in a group was hit, and does not need to."
+  mode="predict"
+>
+  <NestedCodeDiagram ariaLabel="Nine qubits in three groups of three: each group boxed with a dashed inner bit-flip boundary, all three groups boxed with one larger dashed outer phase-flip boundary. A toggle for X, Z, or Y error and a target-qubit selector highlight which boundary fires: X lights the target's inner group boundary only, Z lights only the outer boundary, Y lights both at once." />
+</InteractiveSection>
 
 ### Scope: conceptual, not simulated
 
-This platform simulates the two 3-qubit codes exactly, with real
-CNOT-based encoding and genuine partial-measurement syndrome extraction.
+The course's engine simulates the two 3-qubit codes in full, with real
+CNOT-based encoding and partial-measurement syndrome extraction.
 The full 9-qubit Shor code needs the same ideas nested: bit-flip
 syndrome extraction *within* each group of 3, plus phase-flip syndrome
 extraction *across* the three groups, substantially more circuitry and
@@ -127,28 +126,19 @@ and verified separately, just nested.
 
 ## Physical Interpretation
 
-Concatenation is a general strategy, not specific to Shor's code:
-protect the protectors. A code that handles one error type, nested inside
-a code that handles the other, ends up handling both, and this same
-nesting idea, taken further (codes protecting codes protecting codes), is
-exactly how real fault-tolerant quantum computing scales, a theme the
-capstone returns to.
+Concatenation is a general strategy rather than a feature of Shor's code:
+protect the protectors. A code handling one error type, nested inside a
+code handling the other, handles both. Taken further, with codes protecting
+codes protecting codes, this is how fault-tolerant quantum computing
+scales, and the capstone puts numbers on what that costs.
 
-## Interactive Experiment
-
-The Shor code nests two mechanisms this platform already simulates
-exactly, individually: the inner bit-flip code (protecting each group of
-3 against X errors) and the outer phase-flip code (protecting across the
-3 groups against Z errors). Explore both real syndrome-extraction
-engines side by side, the same two pieces the construction above nests
-together.
-
-<InteractiveSection title="Both nested mechanisms, run separately" description="First: the inner bit-flip mechanism, protecting a single group of 3 physical qubits against X errors. Second: the outer phase-flip mechanism, protecting at the level of 3 logical groups against Z errors. Inject an error into each and confirm the syndrome and recovery. Concatenation nests exactly these two pieces; neither piece is new here.">
-  <div className="flex flex-col gap-6">
-    <LazySyndromeExplorer mode="bit-flip" />
-    <LazySyndromeExplorer mode="phase-flip" />
-  </div>
-</InteractiveSection>
+You have already run both nested mechanisms yourself, in their own
+lessons: the bit-flip syndrome explorer in Lesson 2, the phase-flip one
+in Lesson 3. Nothing about either engine changes inside the Shor code,
+so this lesson doesn't rerun them. They return two lessons from now, in
+[Surface Codes](/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction),
+carrying a new meaning: the same two parity-check mechanisms, relabeled
+as the vertex and face stabilizers of a 2D grid.
 
 ## Worked Example
 
@@ -156,12 +146,12 @@ together.
 first group of three.**
 
 That qubit's own inner bit-flip code doesn't detect it at all ($Z$ errors
-are exactly what Lesson 2's code is blind to, as established there). But
+are the ones Lesson 2's code is blind to, as established there). But
 $Z$ acting on any one of the three identical qubits in a
 $\alpha|000\rangle+\beta|111\rangle$-encoded group has the same effect on
 the group's overall relative phase regardless of *which* of the three
 qubits it hit, so the outer phase-flip code, watching the three groups
-as its own three "logical qubits," sees exactly a logical $Z$ error on
+as its own three "logical qubits," sees a logical $Z$ error on
 that one group, and corrects it using Lesson 3's mechanism at the
 group level.
 
@@ -176,7 +166,7 @@ coincidence, produces exactly 9.
 </Callout>
 
 <Callout type="note">
-**Believing this platform's engine could easily be extended to simulate
+**Believing the engine could easily be extended to simulate
 the full Shor code with minor changes.** The syndrome extraction alone
 needs bookkeeping across two nested levels (within-group and
 across-group): a substantially larger circuit, not a small addition to
@@ -196,7 +186,7 @@ what Lessons 2 and 3 already built.
    practice, even if Shor's code was historically first?
 4. Explain, in your own words, why this lesson's honesty about
    *not* simulating the 9-qubit circuit doesn't undermine confidence that
-   the construction actually works.
+   the construction works.
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -207,7 +197,7 @@ what Lessons 2 and 3 already built.
 - $X$ errors are caught within a group (inner code); $Z$ errors are caught
   across groups (outer code, acting on relative phase); $Y$ errors are
   caught by both simultaneously.
-- This platform simulates the two 3-qubit building blocks exactly but not
+- The course's engine simulates the two 3-qubit building blocks but not
   the full nested 9-qubit circuit, an explicit, documented scope
   boundary.
 

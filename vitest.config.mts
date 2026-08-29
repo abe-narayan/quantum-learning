@@ -46,7 +46,13 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["src/**/*.test.ts"],
+    // `scripts/` is included as well as `src/`: the three `generate-*.mjs`
+    // generators and their shared `lib/extract.mjs` brace-scanner are build
+    // infrastructure, not application code, but they are the only thing
+    // standing between a malformed meta block and a silently truncated
+    // registry — and a suite that never runs guards nothing. Their tests
+    // live in `scripts/__tests__/`.
+    include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
     // The lesson-corpus integrity test dynamically imports 150+ real MDX
     // modules (each of which imports its own visualizations/quantum-engine
     // code); give it real headroom instead of the 5s default.

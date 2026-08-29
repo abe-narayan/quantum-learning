@@ -33,18 +33,23 @@ export const observableOperatorType: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Think about what guarantees a measurement outcome comes out real.",
   },
   hints: [
-    { text: "Measurement outcomes must be real numbers." },
-    { text: "Which class of operator is proven, in the Hermitian Operators lesson, to always have real eigenvalues?" },
+    { text: "Postulate 3 says the possible outcomes of a measurement are the operator's eigenvalues." },
+    { text: "A measured quantity is a real number, so the constraint has to be one that rules out complex eigenvalues." },
+    { text: "The Hermitian Operators lesson proves exactly one class of operator always has real eigenvalues." },
   ],
   solution: {
     steps: [
-      { description: "Measurement outcomes are real numbers, and Hermitian operators are exactly the ones guaranteed to have real eigenvalues (Hermitian Operators lesson)." },
+      { description: "Postulate 3 identifies measurement outcomes with the operator's eigenvalues, and a measured quantity is a real number. Hermitian operators are the class proven to have real eigenvalues, so an observable must be Hermitian." },
     ],
-    finalAnswer: "Hermitian.",
+    finalAnswer: "Hermitian, since that is the class whose eigenvalues are guaranteed real.",
   },
   explanation: {
-    correctIdea: "Postulate 2's requirement traces directly back to the real-eigenvalue theorem for Hermitian operators.",
-    whyCorrect: "This is exactly why the theorem was proven before the postulates were stated.",
-    whyWrong: ["Unitary is the requirement for Postulate 4 (dynamics), a completely different postulate with a different justification."],
+    correctIdea: "Postulate 2's requirement traces back to the real-eigenvalue theorem for Hermitian operators, which is why that theorem is proven before the postulates are stated.",
+    whyCorrect: "Real measurement outcomes and real eigenvalues are the same requirement, and Hermiticity is what secures it.",
+    whyWrong: [
+      { optionId: "b", text: "Names the requirement Postulate 4 places on dynamics, which is a different postulate with a different justification." },
+      { optionId: "c", text: "Gives purely imaginary eigenvalues, the opposite of what a measured value needs." },
+      { optionId: "d", text: "Is far too weak. Most invertible operators have complex eigenvalues, which no apparatus could report." },
+    ],
   },
 };

@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Convex Combinations and Physical Mixtures",
   description:
-    "The general N-component mixture, and the sharpest fact about density matrices yet: completely different preparation recipes can produce the exact same ρ, and no experiment can ever tell them apart.",
+    "The general N-component mixture, and the sharpest fact about density matrices yet: different preparation recipes can produce the same ρ, and no experiment can tell them apart.",
   course: "entanglement-and-measurement",
   module: "convex-combinations-and-physical-mixtures",
   order: 1,
@@ -30,10 +30,17 @@ The last lesson's worked example already produced a strange result: a 50/50 mixt
 
 ## Motivation
 
-That's not a coincidence specific to those four states — it's the
-general rule, worth stating as its own fact rather than left as a
-one-off curiosity: **different physical preparation procedures can be
-completely indistinguishable.**
+The last lesson's worked example, where 50/50 mixtures of two different
+bases both produced $I/2$, was not a coincidence about those four states.
+It is the general rule, and it deserves stating on its own rather than
+being left as a curiosity: **different physical preparation procedures can
+produce states no experiment can tell apart.**
+
+Take that seriously for a moment. Two laboratories run visibly different
+protocols, using different equipment and different basis states, and hand
+you qubits. There is no measurement, however clever, that distinguishes
+one lab's output from the other's. That is a claim about what a quantum
+state is, and this lesson proves it.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/8/8b/Willard_Gibbs.jpg"
@@ -56,13 +63,13 @@ $$
 \rho = \sum_{i=1}^n p_i |\psi_i\rangle\langle\psi_i|
 $$
 
-This is exactly the same construction as last lesson's two-component
-case, just with $n$ terms instead of 2. The engine's `convexCombination`
-implements precisely this, checking both constraints (probabilities
-nonnegative, summing to 1) and rejecting a call that violates either
-(this is not pedantry: a set of "probabilities" that don't sum to 1, or
-that includes a negative one, does not correspond to any physical
-ensemble, and the function refuses to silently produce a matrix for it).
+This is last lesson's two-component construction with $n$ terms instead of
+2. The engine's `convexCombination` implements it, checking both
+constraints (probabilities nonnegative, summing to 1) and rejecting a call
+that violates either. That check is not pedantry: a set of "probabilities"
+that does not sum to 1, or that includes a negative entry, corresponds to
+no physical ensemble, and the function refuses to hand back a matrix for
+it.
 
 ### Two different ensembles, the same ρ, proven in general
 
@@ -76,9 +83,10 @@ $$
 $$
 
 The last equality is the **completeness relation**: for any orthonormal
-basis, $|a\rangle\langle a|+|b\rangle\langle b|=I$ (this platform proved
-and used this identity already, in Operators, Observables & Measurement,
-for computing expectation values from spectral decompositions). So
+basis, $|a\rangle\langle a|+|b\rangle\langle b|=I$, an identity derived
+back in The Bra-Ket Formalism (Mathematical Foundations) and in use ever
+since, whenever an expectation value is computed from a spectral
+decomposition. So
 *every* orthonormal basis, mixed 50/50, gives $I/2$: infinitely many
 different physical recipes ("flip a fair coin, prepare $|0\rangle$ or
 $|1\rangle$"; "flip a fair coin, prepare $|+\rangle$ or $|-\rangle$"; "flip
@@ -90,31 +98,29 @@ the identical <Term id="density-matrices">density matrix</Term>.
 If two different preparation recipes yield the same $\rho$, then by
 $\langle A\rangle=\text{Tr}(\rho A)$ (Lesson 1) they give *identical*
 predictions for every <Term id="observable">observable</Term>, every measurement, every experiment,
-with no exception. There is no possible experiment that could reveal
-which recipe was actually used. This is not a limitation of current
-technology; it is a statement about what "physical state" *means* in
-quantum mechanics. The ensemble, the story about coins and preparation,
-is not part of the physics. Only $\rho$ is. Two ensembles that produce
-the same $\rho$ are, physically, the same state, full stop.
+with no exception. No experiment reveals which recipe was used. This is
+not a limitation of current technology; it is a statement about what
+"physical state" *means* in quantum mechanics. The ensemble, the story
+about coins and preparation, is not part of the physics. Only $\rho$ is,
+and two ensembles producing the same $\rho$ are the same state.
 
-This has no classical counterpart: a classical probability distribution
-*does* remember its full history (a coin that is "70% heads" is a
-different distribution from a coin that's "30% heads," and mixtures of
-distinguishable classical outcomes never collide into the same
-distribution this way for a generic choice of bases). The quantum
-mixture's ability to "forget" its preparation recipe entirely, for a
-whole continuum of different bases, is a genuinely quantum phenomenon
-with nothing classical to compare it to.
+Classical probability does not behave this way. A distribution keeps its
+labels: "70% heads" and "30% heads" are different distributions, and
+mixtures over distinguishable classical outcomes do not collide the way
+these do. The quantum mixture forgets its preparation recipe across a
+whole continuum of bases, and there is no classical analogue to compare
+that to.
 
 ## Physical Interpretation
 
 Given a density matrix $\rho$, asking "but which ensemble was it *really*
-prepared from?" is not a question quantum mechanics answers; it's not
-a question quantum mechanics considers meaningful. $\rho$ is the state;
-full stop. This reframes what a density matrix *is*: not "a record of an
-experimenter's uncertainty about a hidden true ket," but the complete,
-final physical description, exactly on the same footing $|\psi\rangle$
-holds for pure states.
+prepared from?" is not a question quantum mechanics declines to answer. It
+is a question quantum mechanics says is not about physics. $\rho$ is the
+state, and the description ends there.
+
+That reframes what a density matrix is. Not a record of an experimenter's
+uncertainty about some hidden true ket, but the complete physical
+description, on the same footing $|\psi\rangle$ holds for pure states.
 
 ## Worked Example
 
@@ -135,7 +141,7 @@ mixture of non-mutually-orthogonal states has no reason to collapse to
 the maximally mixed state, and it doesn't here (verified directly
 against `convexCombination`'s output).
 
-<InteractiveSection title="The worked example, live: a genuine three-component mixture" description="p₀ and p₁ are independent sliders; p₊ is always whatever probability is left over, so ρ = p₀|0⟩⟨0| + p₁|1⟩⟨1| + p₊|+⟩⟨+| is a valid mixture at every position. Start on the 'Worked example' preset to reproduce the ρ computed above, then drag a slider and watch the Bloch point respond to all three components moving at once — not two components mixed pairwise, but the real three-term sum.">
+<InteractiveSection title="The worked example, live: a three-component mixture" description="p₀ and p₁ are independent sliders; p₊ is always whatever probability is left over, so ρ = p₀|0⟩⟨0| + p₁|1⟩⟨1| + p₊|+⟩⟨+| is a valid mixture at every position. Start on the 'Worked example' preset to reproduce the ρ computed above, then drag a slider and watch the Bloch point respond to all three components moving at once: not two components mixed pairwise, but the real three-term sum.">
   <LazyThreeComponentMixtureExplorer />
 </InteractiveSection>
 
@@ -148,10 +154,10 @@ against `convexCombination`'s output).
     { label: "Purity = 0, entropy is infinite", value: "zero" },
   ]}
   correctValue="max-mixed"
-  explanation="I/2's eigenvalues are both exactly 0.5, so Tr(ρ²) = 0.5²+0.5² = 0.5 — the lowest purity any single-qubit density matrix can have — and S(ρ) = -0.5log₂0.5 - 0.5log₂0.5 = 1 bit, the largest entropy a qubit can carry. That's confirmed directly from `purity` and `vonNeumannEntropy` in densityMatrix.ts applied to I/2. Contrast that with the non-orthogonal |0⟩/|+⟩ mixture you'll build in the explorer below: because the two components overlap instead of sitting orthogonal, that mixture's purity comes out well above 0.5 — mixed, but nowhere near as mixed as the maximally mixed case."
+  explanation="I/2's eigenvalues are both exactly 0.5, so Tr(ρ²) = 0.5²+0.5² = 0.5 (the lowest purity any single-qubit density matrix can have) and S(ρ) = -0.5log₂0.5 - 0.5log₂0.5 = 1 bit, the largest entropy a qubit can carry. That's confirmed directly from `purity` and `vonNeumannEntropy` in densityMatrix.ts applied to I/2. Contrast that with the non-orthogonal |0⟩/|+⟩ mixture you'll build in the explorer below: because the two components overlap instead of sitting orthogonal, that mixture's purity comes out well above 0.5: mixed, but nowhere near as mixed as the maximally mixed case."
 />
 
-<InteractiveSection title="Orthogonal vs. non-orthogonal mixtures, side by side" description="This explorer mixes exactly two components — enough to isolate the orthogonality question on its own. First load the 'mix-0-1' preset (50/50, orthogonal) and note the point sits exactly at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this is non-orthogonal, off-center, and behaves nothing like the orthogonal case. That's the same reason the three-component worked example above lands away from I/2 too.">
+<InteractiveSection title="Orthogonal vs. non-orthogonal mixtures, side by side" description="This explorer mixes just two components, enough to isolate the orthogonality question on its own. First load the 'mix-0-1' preset (50/50, orthogonal) and note the point sits exactly at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this is non-orthogonal, off-center, and behaves nothing like the orthogonal case. That's the same reason the three-component worked example above lands away from I/2 too.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
@@ -167,9 +173,9 @@ sum to 1.
 
 <Callout type="mistake">
 **Believing $\rho$ "secretly remembers" which ensemble prepared it.** It
-doesn't. That's precisely today's point. Two different ensembles giving
-the same $\rho$ are physically identical states, not merely
-experimentally hard to distinguish.
+does not, and that is this lesson's whole point. Two ensembles giving the
+same $\rho$ are the same physical state, not two states that happen to be
+hard to tell apart.
 </Callout>
 
 ## Practice Questions

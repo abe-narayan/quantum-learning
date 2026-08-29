@@ -180,7 +180,15 @@ export function EnergyLevelDiagram({
   const dotY = from && to ? yOf(from.energy) + (yOf(to.energy) - yOf(from.energy)) * dotT : undefined;
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
+    // `tabIndex={0}`. The `<svg>` has an intrinsic `width={WIDTH}` (340) and
+    // no `w-full`, so it paints at 340 real pixels inside a ~256px content box
+    // on a 320px phone and this wrapper takes the overflow. `overflow-x-auto`
+    // is focusable by default in no browser except Firefox, so a keyboard-only
+    // reader could not scroll to the right-hand energy labels and transition
+    // arrows — the numbers the diagram exists to let you read off. No
+    // `role`/`aria-label` on the wrapper: the `<svg>` is already `role="img"`
+    // with the label, and naming this too would announce the figure twice.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label={ariaLabel}>
         {levels.map((level, i) => {
           const y = yOf(level.energy);
@@ -220,7 +228,13 @@ export function EnergyLevelDiagram({
               <text
                 x={LEVEL_WIDTH / 2 + 6}
                 y={(yOf(from.energy) + yOf(to.energy)) / 2}
-                className="fill-foreground text-[10px] font-medium"
+                // 10 -> 11 units. This SVG has no `w-full`, so it renders at its
+                // intrinsic 340px and a unit is a real CSS pixel — 10px was legible
+                // rather than broken. But the transition caption names the physical
+                // process the animated dot is acting out, and it was the only text in
+                // the figure smaller than the level labels' 12px; matching them costs
+                // nothing at this width.
+                className="fill-foreground text-[11px] font-medium"
               >
                 {transition.caption}
               </text>

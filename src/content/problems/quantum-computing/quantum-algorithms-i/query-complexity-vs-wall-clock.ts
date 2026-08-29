@@ -20,16 +20,16 @@ export const queryComplexityVsWallClock: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["oracle", "build", "construct", "efficient circuit"],
-      ["real problem", "actual function", "practice", "hardware"],
+      ["oracle", "build", "construct", "compil", "implement", "synthesize", "efficient circuit", "error correction", "fault toler", "fault-toler", "overhead", "qubit count", "enough qubits"],
+      ["real problem", "real function", "real-world", "real world", "actual function", "actual problem", "actual task", "genuine task", "useful problem", "practice", "hardware", "error correction", "fault toler", "fault-toler", "overhead", "qubit count", "wall-clock", "wall clock", "runtime"],
     ],
-    incorrectFeedback: "Think about what it actually takes to turn a real-world function of interest into a working U_f circuit.",
-    partialFeedback: "Good — be specific that building an efficient oracle for a real function is itself a nontrivial, separate requirement.",
+    incorrectFeedback: "Ask what the query-count theorems quietly assume you already have, and what it takes to get one for a task someone cares about.",
+    partialFeedback: "Good. Be specific: name the thing the theorems treat as free, and say why obtaining it is a separate, nontrivial requirement.",
   },
   hints: [
-    { text: "Query complexity counts calls to U_f, not the cost of building U_f itself." },
-    { text: "For a toy function (parity, a marked index), building U_f is easy." },
-    { text: "For a genuine real-world function, constructing an efficient reversible U_f can be much harder." },
+    { text: "What does query complexity count, and what does it deliberately not count?" },
+    { text: "For toy functions like parity, the uncounted part is trivial. Is that still true for a function someone cares about outside the classroom?" },
+    { text: "Name the artifact you would have to engineer before the first query can even be made." },
   ],
   solution: {
     steps: [

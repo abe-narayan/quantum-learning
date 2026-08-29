@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Why Quantum Errors Are Different",
   description:
-    "Three obstacles classical error correction never faces: no-cloning rules out simple redundancy, a continuum of possible errors replaces two discrete ones, and measurement destroys the very superposition being protected, each derived from principles this platform has already proven.",
+    "Three obstacles classical error correction never faces: no-cloning rules out simple redundancy, a continuum of possible errors replaces two discrete ones, and measurement destroys the very superposition being protected, each derived from principles proven in earlier courses.",
   course: "error-correction-and-fault-tolerance",
   module: "why-quantum-errors-are-different",
   order: 1,
@@ -25,24 +25,27 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="A recipe that fails at every step">
-Classical error correction protects a bit by copying it. Every part of that strategy fails for a qubit — and the reasons are concrete, not exotic: no-cloning, continuous state space, and measurement collapse.
+Classical error correction protects a bit by copying it. Every step of that recipe fails for a qubit, and the reasons are ones this pillar has already proved: no-cloning, a continuous state space, and measurement collapse.
 </LessonHook>
 
 ## Motivation
 
-Store $0$ as $000$, and if noise flips one copy, majority vote recovers
-the original — that's the classical strategy. Each of its steps fails
-for a qubit, for reasons this platform has already proven: no-cloning,
-continuous state space, and measurement collapse, each one blocking a
-specific step of the classical recipe.
+Store $0$ as $000$; if noise flips one copy, majority vote recovers the
+original. That is the classical strategy, and it is three steps long. Copy.
+Look. Vote.
 
-That skepticism was not hindsight: before 1995, it was a widely held
-view among physicists that no analogue of classical error correction
-could work for quantum information at all, precisely because of the
-no-cloning theorem and the continuum of possible errors described below.
-Peter Shor's nine-qubit code (1995) and Andrew Steane's seven-qubit code
-(1996) were the first concrete constructions to show the three obstacles
-below actually have a solution.
+Every one of those steps is illegal for a qubit. You cannot copy an unknown
+state (no-cloning). You cannot look without destroying what you are
+protecting (measurement collapse). And "flipped or not" is not even the
+right question, because a qubit can be rotated by any angle at all rather
+than flipped outright.
+
+Three obstacles, three proofs you have already seen, all pointing the same
+way. That is why, before 1995, many physicists thought quantum error
+correction was impossible in principle rather than merely difficult. Peter
+Shor's nine-qubit code (1995) and Andrew Steane's seven-qubit code (1996)
+showed otherwise. This lesson states the obstacles precisely enough that
+the next few lessons' escape routes make sense.
 
 <HistoricalMoment date="1995">
 Peter Shor's nine-qubit code is the first concrete construction to show that quantum error correction is actually possible, despite no-cloning and a continuum of possible errors.
@@ -51,15 +54,6 @@ Peter Shor's nine-qubit code is the first concrete construction to show that qua
 <HistoricalMoment date="1996">
 Andrew Steane's seven-qubit code follows, a second, independent construction confirming quantum information really can be protected.
 </HistoricalMoment>
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sycamore_Quantum_Chip.jpg/1280px-Sycamore_Quantum_Chip.jpg"
-  alt="Google's Sycamore superconducting quantum processor chip, mounted and on museum display"
-  caption="Google's Sycamore chip, the same processor family behind the 2023 below-threshold surface-code demonstration this lesson cites: real hardware where the errors described below actually occur, and actually get corrected."
-  credit="Coldupnorth, via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Sycamore_Quantum_Chip.jpg"
-  license="CC BY-SA 4.0"
-/>
 
 ## Mathematical Development
 
@@ -84,14 +78,14 @@ not just a full $X$ flip, counts as an error. This looks like it needs
 infinitely many distinct correction procedures, one per possible
 rotation angle. It doesn't: any single-qubit error can be expanded as a
 linear combination of exactly four fixed operators, $I,X,Y,Z$ (the
-identity and the three <Term id="pauli-matrices">Pauli matrices</Term> this platform has used since Course
+identity and the three <Term id="pauli-matrices">Pauli matrices</Term> in use since Course
 1), a fact that follows from $I,X,Y,Z$ forming a basis for all
 $2\times2$ matrices. **Correcting against $X$ and $Z$ errors specifically
 (and therefore $Y=iXZ$, their combination) is enough to correct against
 an arbitrary, continuously-varying single-qubit error.** The reduction
 from "infinitely many possible errors" to "just these two" is the
 mathematical fact that makes quantum error correction possible at all, and
-exactly why this course builds a bit-flip ($X$) code and a phase-flip
+why this course builds a bit-flip ($X$) code and a phase-flip
 ($Z$) code separately, then combines them.
 
 <PredictBeforeReveal
@@ -103,7 +97,7 @@ exactly why this course builds a bit-flip ($X$) code and a phase-flip
     { label: "One generic 'undo whatever happened' gate", value: "one" },
   ]}
   correctValue="two"
-  explanation="Any single-qubit error is a linear combination of I, X, Y, Z, since those four matrices span all 2x2 operators. That already cuts infinity down to four. It cuts further because Y = iXZ (confirmed in the Worked Example below): a code built to correct X and Z errors corrects Y for free, since Y is just X and Z acting together. Two correction mechanisms, not four and not infinitely many, are what the diagram below shows."
+  explanation="Any single-qubit error is a linear combination of I, X, Y, Z, because those four matrices span all 2×2 operators. That cuts infinity to four immediately. It cuts further because Y = iXZ, confirmed in the Worked Example below: a code built to correct X and Z errors corrects Y for free. Two mechanisms, not four and not infinitely many. This is the single most surprising fact in error correction, and without it none of the rest would be possible."
 />
 
 <MeasurementTree
@@ -128,47 +122,46 @@ Example below.
 
 Classically, checking a stored bit's value is harmless. Reading a $0$
 doesn't change it. Directly measuring a qubit to "check" it collapses any
-superposition, destroying exactly the information being protected. The
+superposition, destroying the very information being protected. The
 fix, built concretely in the next two lessons: measure only a **syndrome**,
 a specific joint property (like whether two qubits agree) that reveals
 *which* error occurred without revealing *anything* about the encoded
 $\alpha,\beta$ themselves. This platform's `runBitFlipCorrectionCycle`
-implements this precisely: two ancilla qubits are measured, the three
-data qubits' encoded superposition is never directly touched, and the
-recovered state matches the original encoded state exactly, regardless of
-what $\alpha,\beta$ were, checked directly, not just argued.
+implements it: two ancilla qubits are measured, the three data qubits'
+encoded superposition is never touched directly, and the recovered state
+matches the original encoded state whatever $\alpha,\beta$ were. That is
+checked in the tests rather than argued in prose.
 
 ## Physical Interpretation
 
-Every one of these three obstacles has the same shape: a classical
-strategy exploits something quantum mechanics specifically forbids
-(perfect copying, discreteness, harmless observation). Quantum error
-correction is a different scheme, built from entanglement and syndrome
-extraction, not a patched-up version of the classical one, that
-happens to solve the same underlying problem (protect information from
-noise) using only what quantum mechanics actually allows.
+All three obstacles have the same shape. The classical strategy relies on
+something quantum mechanics forbids: perfect copying, discrete errors,
+harmless observation. So quantum error correction is not the classical
+scheme patched up. It is a different scheme, built from entanglement and
+syndrome extraction, that solves the same underlying problem using only
+what quantum mechanics permits.
 
-Solving these three obstacles in principle still leaves a practical
-question: a code only helps once the physical error rate is below a
-<Term id="quantum-threshold-theorem">threshold</Term>, below that line, adding more physical qubits per logical
-qubit makes things worse, not better. In 2023, Google reported a
-surface-code experiment in which a logical qubit's error rate went down
-as they increased the code's physical-qubit count, rather than up,
-reported as an experimental demonstration of operating below that
-threshold. It's a narrow result, one code family, one regime, not a
-claim that fault-tolerant quantum computing at scale is solved, but it's
-a real, measured instance of the threshold this lesson's obstacles make
-necessary.
+Solving the obstacles in principle leaves a practical question open. A code
+helps only once the physical error rate is below a <Term id="quantum-threshold-theorem">threshold</Term>; above that
+line, adding more physical qubits per logical qubit makes the logical qubit
+*worse*, because you have added more places for errors to occur than the
+code can fix.
+
+In 2023 Google reported a surface-code experiment where a logical qubit's
+error rate fell as they increased the code's physical-qubit count. That is
+one code family in one regime, not a claim that fault tolerance at scale is
+solved, but it is a measured instance of crossing the threshold this
+lesson's obstacles make necessary.
 
 ## Interactive Experiment
 
 Obstacle 3's fix, measure only a syndrome, is not a hypothetical. It is
-the real `runBitFlipCorrectionCycle` engine this platform actually runs.
+the real `runBitFlipCorrectionCycle` engine running in your browser.
 Try it directly: inject an error, watch the syndrome come out, and check
 that the corrected state's amplitudes still match the original encoding
 exactly, for the same $\alpha,\beta$ the lesson's text already claims.
 
-<InteractiveSection title="Watch a syndrome get measured without collapsing the data" description="Inject an X error on any of the three qubits. Read the syndrome (s1, s2), then check the corrected state's amplitude table against the original 0.6, 0.8 encoding it started from. The syndrome bits change with the injected error; for a single-qubit error, the recovered logical amplitudes never do, exactly the no-collapse claim above, checked directly instead of only argued.">
+<InteractiveSection title="Watch a syndrome get measured without collapsing the data" description="Inject an X error on any of the three qubits. Read the syndrome (s1, s2), then check the corrected state's amplitude table against the original 0.6, 0.8 encoding it started from. The syndrome bits change with the injected error; for a single-qubit error, the recovered logical amplitudes never do: the no-collapse claim above, checked directly instead of only argued.">
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 
@@ -196,11 +189,10 @@ combination of $I,X,Y,Z$.
 
 <Callout type="note">
 **Thinking syndrome measurement is "cheating" past the no-collapse
-requirement.** It doesn't collapse the encoded logical information at
-all. It's specifically designed to extract only error-location
-information, an engineering fact this course verifies directly: the
-corrected state matches the original exactly for arbitrary $\alpha,\beta$,
-not one hand-picked pair.
+requirement.** It does not collapse the encoded logical information. It is
+designed to extract error-location information and nothing else, a claim
+this course verifies directly: the corrected state matches the original for
+arbitrary $\alpha,\beta$, not for one hand-picked pair.
 </Callout>
 
 ## Practice Questions
@@ -229,7 +221,7 @@ not one hand-picked pair.
   $X$ and $Z$ specifically suffices for the continuum of possible errors.
 - Syndrome measurement extracts only error-location information, provably
   without collapsing the protected superposition, verified directly by
-  this platform's engine, not just asserted.
+  the engine, not just asserted.
 
 ## Further Exploration
 

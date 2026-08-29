@@ -13,7 +13,19 @@ const HEIGHT = 180;
  */
 export function HardwarePlatformSchematic({ variant, ariaLabel }: { variant: HardwarePlatformVariant; ariaLabel: string }) {
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
+    // `tabIndex={0}`. The note below this component already explains why this
+    // SVG is deliberately unresponsive — "Adding `w-full` here would scale
+    // these labels *down* to ~8px", so it keeps its intrinsic 320px width and
+    // "the `overflow-x-auto` wrapper takes the overflow on a narrower screen".
+    // That trade is right, but it was only ever honored for a mouse: an
+    // `overflow-x-auto` div is focusable by default in no browser except
+    // Firefox, so a keyboard-only reader got the left ~256px of a 320px
+    // schematic and no way to reach the right-hand labels (the tweezer array,
+    // the readout resonator — the parts that distinguish one platform from
+    // another). No `role`/`aria-label` on the wrapper: the `<svg>` inside
+    // already carries `role="img"` and the label, and naming both announces
+    // the figure twice.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {variant === "superconducting" && <SuperconductingSchematic />}
         {variant === "trapped-ion" && <TrappedIonSchematic />}
@@ -25,6 +37,17 @@ export function HardwarePlatformSchematic({ variant, ariaLabel }: { variant: Har
   );
 }
 
+/**
+ * Deliberately left at 10 units. Elsewhere in this directory a 10-unit label is a
+ * bug, because those figures set `className="w-full"` and a 460- or 480-unit
+ * viewBox shrinks to a ~256px phone column, turning 10 units into ~5.6px. This
+ * SVG has no `w-full`: it renders at its intrinsic 320px, so one unit is one CSS
+ * pixel and 10 units really is 10px, above the ~9px floor. The `overflow-x-auto`
+ * wrapper takes the overflow on a narrower screen. Adding `w-full` here would
+ * scale these labels *down* to ~8px — the trade this component already makes
+ * correctly, and the reason its longest label ("optical tweezer array (filled
+ * traps highlighted)", ~282 units) is sized to fit 320 exactly.
+ */
 function Label({ x, y, children }: { x: number; y: number; children: string }) {
   return (
     <text x={x} y={y} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">
@@ -36,6 +59,12 @@ function Label({ x, y, children }: { x: number; y: number; children: string }) {
 function SuperconductingSchematic() {
   return (
     <g>
+      {/* Substrate. Kept on `stroke-border` on purpose: it is already drawn by its
+          `--surface` fill standing against the darker `panel-inset` ground, so the
+          stroke here is a panel edge and nothing else — nothing in the schematic is
+          measured against it, and the qubit structure on top carries the content.
+          `--axis` is for marks a reader must perceive; promoting a filled container
+          to it would put a loud rectangle around the two things that matter. */}
       <rect x={20} y={20} width={280} height={140} rx={8} className="fill-surface stroke-border" strokeWidth={1} />
       <Label x={160} y={34}>
         chip substrate
@@ -72,7 +101,12 @@ function TrappedIonSchematic() {
       {ionXs.map((x, i) => (
         <circle key={i} cx={x} cy={85} r={9} className="fill-accent" />
       ))}
-      <line x1={70} y1={85} x2={270} y2={85} className="stroke-border" strokeWidth={1} strokeDasharray="2 3" />
+      {/* The trap axis threading the ion chain. Load-bearing: it is what the label
+          directly beneath it names, and "the ions share one motional mode" — the
+          physical fact this schematic exists to show — is carried by the line that
+          joins them. On `stroke-border` (1.41:1 on `--surface-muted`) the ions read as
+          five unrelated dots. `stroke-axis` clears WCAG 2.1 SC 1.4.11's 3:1. */}
+      <line x1={70} y1={85} x2={270} y2={85} className="stroke-axis" strokeWidth={1} strokeDasharray="2 3" />
       <Label x={160} y={110}>
         linear ion chain (shared motional mode)
       </Label>
@@ -99,7 +133,15 @@ function NeutralAtomSchematic() {
                 cx={startX + c * gap}
                 cy={startY + r * gap}
                 r={10}
-                className={isLoaded ? "fill-accent" : "fill-surface stroke-border"}
+                // The empty traps are half the information: the label says "filled
+                // traps highlighted", which is a claim about the *contrast* between
+                // loaded and unloaded sites, so a reader who cannot see the unloaded
+                // ones cannot see stochastic loading at all — they just see six atoms
+                // in an odd arrangement. `stroke-border` (1.41:1 on `--surface-muted`)
+                // left nine of the fifteen sites effectively blank; `stroke-axis`
+                // clears WCAG 2.1 SC 1.4.11's 3:1 while the filled traps stay louder
+                // by virtue of being solid `--accent`.
+                className={isLoaded ? "fill-accent" : "fill-surface stroke-axis"}
                 strokeWidth={1}
               />
             </g>
@@ -132,6 +174,10 @@ function PhotonicSchematic() {
       </Label>
 
       {/* head-on view of the same beam: field oscillation plane */}
+      {/* Kept on `stroke-border`: this dashed circle is a viewport, not a measurement.
+          It says "what follows is drawn head-on", and the two double-headed arrows
+          inside it are the whole content — nothing is read off the circle's edge, and
+          its `--surface` fill already separates it from the beam line behind it. */}
       <circle cx={205} cy={100} r={32} className="fill-surface stroke-border" strokeWidth={1} strokeDasharray="2 3" />
       <line
         x1={205}
@@ -181,6 +227,8 @@ function PhotonicSchematic() {
 function SpinQubitSchematic() {
   return (
     <g>
+      {/* Substrate, same reasoning as the superconducting one: a filled container, not
+          a mark anything is measured against, so it stays on the panel-edge token. */}
       <rect x={30} y={20} width={260} height={130} rx={4} className="fill-surface stroke-border" strokeWidth={1} />
       <Label x={160} y={34}>
         semiconductor substrate

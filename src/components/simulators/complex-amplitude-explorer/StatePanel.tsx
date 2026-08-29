@@ -14,7 +14,7 @@ export function StatePanel({ z, label }: { z: Complex; label?: string }) {
   const isValidProbability = probability <= 1 + 1e-9;
 
   return (
-    <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
+    <div className="rounded-panel border border-border bg-surface-muted/60 p-4">
       {label ? <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p> : null}
       <div className="mt-2 text-lg">
         <KatexMath tex={`z = ${formatAmplitudeLatex(z, 3)}`} />

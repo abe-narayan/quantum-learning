@@ -22,12 +22,17 @@ export const uncertaintyBoundYZ: NumericProblem = {
     type: "numeric",
     value: 1,
     tolerance: 0.01,
-    incorrectFeedback: "⟨[Y,Z]⟩ = 2i⟨X⟩. Take its magnitude, then multiply by ½.",
+    incorrectFeedback: "⟨[Y,Z]⟩ = 2i⟨X⟩. The common slips are forgetting to halve at the end, or mishandling the magnitude of the imaginary unit. The factor of two from the commutator and the half in front of the bound interact simply; track them separately.",
+    nearMisses: [
+      { value: 2, feedback: "2 is |⟨[Y,Z]⟩| before the bound's factor of 1/2 is applied." },
+      { value: 0.5, feedback: "0.5 halves ⟨X⟩ but drops the commutator's own factor of 2. Both factors are in play: [Y,Z] = 2iX, and the bound halves the result." },
+      { value: 0, feedback: "A zero bound would allow both Y and Z to be sharp at once. |+⟩ is an eigenstate of X, not of Y or Z, so ⟨X⟩ = 1 makes the bound as large as it can be." },
+    ],
   },
   hints: [
-    { text: "⟨[Y,Z]⟩ = 2i⟨X⟩ = 2i(1) = 2i." },
-    { text: "|2i| = 2." },
-    { text: "Multiply by ½." },
+    { text: "Everything reduces to substitution once you see the structure: the bound needs the commutator's expectation value, and the commutator is proportional to X, whose expectation in this state the prompt gives you." },
+    { text: "⟨[Y,Z]⟩ = 2i⟨X⟩. Substitute the given ⟨X⟩ and take the magnitude; the imaginary unit contributes nothing extra to it." },
+    { text: "Halve the magnitude you found, keeping the commutator's factor of two distinct from the half in front of the bound." },
   ],
   solution: {
     steps: [

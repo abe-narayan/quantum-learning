@@ -44,24 +44,20 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-This lesson doesn't just describe Shor's algorithm running — it runs it: N=15, worked by hand, step by step, through this platform's own engine.
+This lesson does not describe Shor's algorithm running. It runs it: N=15, worked by hand, step by step, through this platform's own engine.
 </LessonHook>
 
 ## Motivation
 
-$N=15$ is the standard first example for Shor's algorithm precisely
-because it's small enough to compute every step by hand *and* run through
-this platform's actual engine: a genuine end-to-end demonstration, not a
-description of one.
+$N=15$ is the standard first example for Shor's algorithm because it is
+small enough to compute every step by hand and to run through this
+platform's engine, which makes this an end-to-end demonstration rather
+than a description of one.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
-  alt="Two beryllium ions trapped roughly 40 micrometers above a gold chip in a NIST ion-trap quantum computing experiment"
-  caption="A real trapped-ion quantum register at NIST, the kind of physical hardware a period-finding circuit like this pipeline's would ultimately need to run on. (This particular photo is not from the first, 2001 factor-15 demonstration, which used a nuclear-magnetic-resonance system rather than trapped ions.)"
-  credit="NIST / Y. Colombe"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
-  license="Public domain (U.S. government work)"
-/>
+Two things are worth watching for as it runs. First, exactly one of the
+four steps is quantum. Second, one of the four possible measurement
+outcomes gives the wrong period and another gives no information, which is
+the kind of detail a clean summary of the algorithm leaves out.
 
 ## Mathematical Development
 
@@ -72,14 +68,15 @@ Pick $a=7$ (coprime to $15$; checked by $\gcd(7,15)=1$).
 ### Step 2: the quantum period-finding circuit
 
 With $t=6$ counting qubits, `periodFindingMeasurementDistribution(7, 15,
-6)` gives exactly four peaks, at outcomes $0,16,32,48$, each with
-probability $0.25$, and (numerically) zero everywhere else. This is the
-one genuinely quantum step: the <Term id="phase-interference">interference</Term> pattern from applying the
+6)` gives four peaks, at outcomes $0,16,32,48$, each with probability
+$0.25$, and numerically zero everywhere else. This is the one quantum step
+in the whole pipeline: the <Term id="phase-interference">interference</Term> pattern produced by applying the
 QFT to the counting register after the modular-exponentiation state was
 prepared.
 
 <BarChart
   bars={Array.from({ length: 16 }, (_, i) => ({ label: String(i * 4), value: periodDistribution[i * 4], highlight: periodDistribution[i * 4] > 0 }))}
+  maxValue={0.5}
   ariaLabel="Measurement probability at every fourth outcome of the period-finding distribution for a=7, N=15, t=6 counting qubits"
 />
 
@@ -94,13 +91,12 @@ fraction doesn't reduce as cleanly as this particular outcome does. For
 this specific worked example, the reduced fraction's denominator, $2$,
 undersells the true period. This is a known subtlety of continued
 fractions recovery ($k$ and $r$ can share a common factor, here $k=2,r=4$
-both divisible by $2$), and it's exactly why real implementations run the
-circuit several times and combine the results rather than trusting one
-shot. This
-platform's `classicalOrder(7, 15)` independently confirms the true
-period directly: $r=4$.
+both divisible by $2$), and it is why real implementations run the circuit
+several times and combine results rather than trusting one shot. This
+platform's `classicalOrder(7, 15)` confirms the true period independently:
+$r=4$.
 
-<InteractiveSection title="Not every outcome recovers r cleanly" description="Slide through each of the 4 equally-likely measurement outcomes (0, 16, 32, 48) and watch what a naive fraction reduction of x/64 alone would conclude about r, compared against the true r=4 from classicalOrder. x=16 and x=48 recover r=4 correctly. x=32 reduces to 1/2 and undersells r as 2, the exact subtlety described above. x=0 reduces to 0/1 and gives no usable information at all — a real, non-hypothetical reason single-shot measurements aren't trusted alone.">
+<InteractiveSection title="Not every outcome recovers r cleanly" description="Slide through each of the 4 equally-likely measurement outcomes (0, 16, 32, 48) and watch what a naive fraction reduction of x/64 alone would conclude about r, compared against the true r=4 from classicalOrder. x=16 and x=48 recover r=4 correctly. x=32 reduces to 1/2 and undersells r as 2, the exact subtlety described above. x=0 reduces to 0/1 and gives no usable information at all. Half the outcomes here are unhelpful, which is why real implementations repeat the circuit rather than trusting one shot.">
   <BarChartExplorer
     frames={measurementFrames}
     sliderLabel="which peak was measured"
@@ -120,7 +116,7 @@ period directly: $r=4$.
     { label: "There's not enough information yet", value: "unknown" },
   ]}
   correctValue="3-5"
-  explanation="gcd(4−1,15)=gcd(3,15)=3 and gcd(4+1,15)=gcd(5,15)=5 — the two prime factors of 15, computed, not looked up. This is the payoff every earlier lesson's abstract machinery was building toward: a real N, factored, end to end."
+  explanation="gcd(4−1,15)=gcd(3,15)=3 and gcd(4+1,15)=gcd(5,15)=5: the two prime factors of 15, computed rather than looked up. That is the payoff the previous lessons' machinery was built for. It is also, worth saying plainly, a number you could have factored in your head, and the honest version of this demonstration is that it shows the mechanism rather than any advantage."
 />
 
 From Lesson 1's reduction: $r=4$ is even, $a^{r/2}=7^2\bmod15=49\bmod15=4$,
@@ -133,14 +129,14 @@ $$
 
 ## Physical Interpretation
 
-Precisely one step in this pipeline needed a quantum computer: producing
-the period-finding measurement distribution's sharp peaks via
-interference. Every other step (picking $a$, checking $\gcd(a,N)=1$,
-interpreting the measured fraction, computing $a^{r/2}\bmod N$, running
-Euclid's algorithm twice) is ordinary classical computation a laptop
-performs instantly. This is the concrete, worked version of Lesson 1's
-abstract claim: <Term id="quantum-advantage-supremacy">quantum speedup</Term> lives in one specific, narrow subroutine,
-not throughout the whole algorithm.
+One step in this pipeline needed a quantum computer: producing the
+period-finding distribution's sharp peaks through interference. Every other
+step (picking $a$, checking $\gcd(a,N)=1$, interpreting the measured
+fraction, computing $a^{r/2}\bmod N$, running Euclid's algorithm twice) is
+classical computation a laptop performs instantly.
+
+This is the worked version of Lesson 1's claim: the <Term id="quantum-advantage-supremacy">quantum speedup</Term> lives
+in one narrow subroutine rather than throughout the algorithm.
 
 <PipelineDiagram
   steps={[

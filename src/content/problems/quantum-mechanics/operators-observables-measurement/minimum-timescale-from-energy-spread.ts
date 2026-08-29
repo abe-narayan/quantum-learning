@@ -22,6 +22,11 @@ export const minimumTimescaleFromEnergySpread: NumericProblem = {
     value: 0.25,
     tolerance: 0.001,
     incorrectFeedback: "Solve Delta E * Delta t_A >= hbar/2 for the minimum Delta t_A: Delta t_A >= hbar/(2*Delta E).",
+    nearMisses: [
+      { value: 1, feedback: "1 multiplies ΔE by ħ/2 instead of dividing. Isolating Δt from a product bound means dividing by ΔE." },
+      { value: 0.5, feedback: "0.5 is ħ/2, the bound itself. It still has to be divided by ΔE = 2." },
+      { value: 4, feedback: "4 inverts the relationship: a larger energy spread makes the minimum timescale shorter, not longer." },
+    ],
   },
   hints: [
     { text: "Start from the bound Delta E * Delta t_A >= hbar/2 (hbar=1)." },

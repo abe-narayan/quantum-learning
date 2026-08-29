@@ -38,12 +38,16 @@ export const noiseSourceCatalogCheck: MultipleChoiceProblem = {
     { text: "This lesson's catalog names flux noise as a concrete physical example of this kind of dephasing." },
   ],
   solution: {
-    steps: [{ description: "dephasingChannel models incoherent random phase kicks, such as those from fluctuating magnetic flux — an incoherent error source." }],
-    finalAnswer: "(a) Random phase kicks from fluctuating fields",
+    steps: [{ description: "dephasingChannel models random, incoherent phase kicks, such as those from fluctuating magnetic flux." }],
+    finalAnswer: "Random phase kicks from fluctuating fields, such as flux noise: an incoherent error.",
   },
   explanation: {
-    correctIdea: "This tests whether the reader connects the abstract engine function back to a specific, concrete physical mechanism named in this lesson's catalog.",
-    whyCorrect: "Matches the lesson's explicit catalog entry for dephasing.",
-    whyWrong: ["The other options are real noise sources covered elsewhere in this course, but none are what dephasingChannel specifically models."],
+    correctIdea: "dephasingChannel is the Kraus model for randomized phase, so it maps onto physical mechanisms that scramble phase without moving energy.",
+    whyCorrect: "Matches the lesson's catalog entry for dephasing.",
+    whyWrong: [
+      { optionId: "b", text: "Names a coherent error. A stale calibration is a deterministic offset, undone by recalibration rather than modeled as a random channel." },
+      { optionId: "c", text: "Names crosstalk, which is a unitary leak onto a neighbour and is modeled with the gate engine directly." },
+      { optionId: "d", text: "Names readout error, which happens in the classical discrimination step after the state is already measured." },
+    ],
   },
 };

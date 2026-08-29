@@ -22,6 +22,10 @@ export const secondResonantWidth: NumericProblem = {
     value: 2.5651,
     tolerance: 0.001,
     incorrectFeedback: "The n-th resonance occurs at L = n*pi/k2. Since n=1 gives L≈1.2825, n=2 is simply double that.",
+    nearMisses: [
+      { value: 1.2825, tolerance: 0.002, feedback: "That is the n=1 width, given in the prompt. The resonance condition k₂L = nπ is linear in n, so the next one sits at twice this." },
+      { value: 3.8477, tolerance: 0.002, feedback: "That is the n=3 width. Count the resonances in order: n=2 comes next after the one the prompt names." },
+    ],
   },
   hints: [{ text: "Resonances occur at k2*L = n*pi — the n=2 width is exactly twice the n=1 width." }],
   solution: {

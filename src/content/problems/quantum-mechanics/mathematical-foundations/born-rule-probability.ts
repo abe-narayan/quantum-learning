@@ -23,6 +23,10 @@ export const bornRuleProbability: NumericProblem = {
     value: 0.36,
     tolerance: 0.01,
     incorrectFeedback: "The Born rule is P(λ) = |⟨e|ψ⟩|², not ⟨e|ψ⟩ itself.",
+    nearMisses: [
+      { value: 0.6, feedback: "0.6 is the overlap itself. The Born rule squares it." },
+      { value: 0.64, feedback: "0.64 is P(−1), from the other overlap. The +1 outcome uses ⟨e₊|ψ⟩ = 0.6." },
+    ],
   },
   hints: [
     { text: "The Born rule: P(outcome) = |overlap with that eigenvector|²." },

@@ -107,7 +107,7 @@ function ApexStructure({ courses }: { courses: Course[] }) {
           {threads.map((thread) => (
             <div
               key={thread.slug}
-              className="rounded-[--radius-tight] border border-border px-3 py-2.5 text-center"
+              className="rounded-(--radius-tight) border border-border px-3 py-2.5 text-center"
             >
               <TechLabel className="leading-snug">{thread.title}</TechLabel>
             </div>
@@ -117,7 +117,7 @@ function ApexStructure({ courses }: { courses: Course[] }) {
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border-strong" />
           <span className="relative bg-surface px-2 text-subtle-foreground">↓</span>
         </div>
-        <div className="rounded-[--radius-tight] border border-pillar-edge bg-pillar-wash px-5 py-2.5 text-center">
+        <div className="rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-5 py-2.5 text-center">
           <TechLabel className="text-pillar-text">{synthesis.title}</TechLabel>
         </div>
       </div>
@@ -128,7 +128,7 @@ function ApexStructure({ courses }: { courses: Course[] }) {
           {threads.map((thread) => (
             <div
               key={thread.slug}
-              className="rounded-[--radius-tight] border border-border px-3 py-2.5 text-center"
+              className="rounded-(--radius-tight) border border-border px-3 py-2.5 text-center"
             >
               <TechLabel className="leading-snug">{thread.title}</TechLabel>
             </div>
@@ -138,7 +138,7 @@ function ApexStructure({ courses }: { courses: Course[] }) {
           <div className="absolute left-[12.5%] right-[12.5%] top-0 border-t border-border-strong" />
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border-strong" />
         </div>
-        <div className="mx-auto w-fit rounded-[--radius-tight] border border-pillar-edge bg-pillar-wash px-5 py-2.5 text-center">
+        <div className="mx-auto w-fit rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-5 py-2.5 text-center">
           <TechLabel className="text-pillar-text">{synthesis.title}</TechLabel>
         </div>
       </div>
@@ -188,7 +188,7 @@ export function ApexCourseIndex({
               key={course.slug}
               id={`course-${course.slug}`}
               className={cn(
-                "relative isolate scroll-mt-24 px-3 py-9 transition-colors duration-[--dur-fast] ease-[--ease-instrument] sm:py-11",
+                "relative isolate scroll-mt-24 px-3 py-9 transition-colors duration-(--dur-fast) ease-instrument sm:py-11",
                 // `pillar`, not `pillar-accent`: the ramp is exposed to
                 // Tailwind as `pillar`/`pillar-edge`/`pillar-wash`
                 // (globals.css §"Pillar ramp"), and `pillar-accent` is not a
@@ -207,7 +207,7 @@ export function ApexCourseIndex({
                     // anywhere in the row: the affordance has to predict what
                     // a click at the pointer's current position would do, and
                     // a lesson row opens the lesson, not the course.
-                    className="font-tech text-2xl leading-none text-subtle-foreground transition-colors duration-[--dur-fast] ease-[--ease-mech] group-has-[a[data-course-link]:hover]:text-pillar-text group-has-[a[data-course-link]:focus-visible]:text-pillar-text"
+                    className="font-tech text-2xl leading-none text-subtle-foreground transition-colors duration-(--dur-fast) ease-mech group-has-[a[data-course-link]:hover]:text-pillar-text group-has-[a[data-course-link]:focus-visible]:text-pillar-text"
                   >
                     §{n}
                   </span>
@@ -218,7 +218,7 @@ export function ApexCourseIndex({
                         <Link
                           href={getCourseHref(course.slug, authoredSlugs[0])}
                           data-course-link
-                          className="underline-offset-4 transition-colors duration-[--dur-fast] ease-[--ease-mech] after:absolute after:inset-0 after:content-[''] hover:text-pillar-text hover:underline focus-visible:text-pillar-text"
+                          className="underline-offset-4 transition-colors duration-(--dur-fast) ease-mech after:absolute after:inset-0 after:content-[''] hover:text-pillar-text hover:underline focus-visible:text-pillar-text"
                         >
                           {course.title}
                         </Link>
@@ -282,7 +282,7 @@ export function ApexCourseIndex({
                                 href={`/lessons/${lesson.slug}`}
                                 className={cn(
                                   "group/row flex min-h-11 min-w-0 flex-1 items-center justify-between gap-3 py-2",
-                                  "text-foreground transition-colors duration-[--dur-fast] ease-[--ease-mech]",
+                                  "text-foreground transition-colors duration-(--dur-fast) ease-mech",
                                   "hover:text-pillar-text focus-visible:text-pillar-text"
                                 )}
                               >
@@ -292,7 +292,7 @@ export function ApexCourseIndex({
                                   <span
                                     aria-hidden="true"
                                     data-decorative=""
-                                    className="opacity-0 transition-opacity duration-[--dur-fast] group-hover/row:opacity-100"
+                                    className="opacity-0 transition-opacity duration-(--dur-fast) group-hover/row:opacity-100"
                                   >
                                     →
                                   </span>

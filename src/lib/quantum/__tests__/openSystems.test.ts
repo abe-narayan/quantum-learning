@@ -98,3 +98,46 @@ describe("decayProbabilityForTimestep: connects discrete channels to continuous 
     expect(() => decayProbabilityForTimestep(1, 0)).toThrow();
   });
 });
+
+describe("the discrete channel model reproduces the continuous T1/T2 decay laws", () => {
+  // `decayProbabilityForTimestep` exists precisely so that N applications
+  // of a channel over total time N*dt reproduce exp(-N*dt/T) *exactly*, not
+  // approximately in a fine-stepping limit. These check both decay laws
+  // against that closed form at several step counts, which is what ties the
+  // Kraus-operator picture to the T1/T2 numbers hardware datasheets quote.
+  const excited = pureStateDensityMatrix(new StateVector([Complex.ZERO, Complex.ONE]));
+  const plus = pureStateDensityMatrix(new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]));
+
+  it("decays the excited-state population as exp(-t/T1), for any step count reaching the same total time", () => {
+    const T1 = 100;
+    for (const steps of [10, 50, 200]) {
+      const dt = 50 / steps; // total time 50, i.e. t/T1 = 0.5, however finely stepped
+      const rho = applyChannelRepeatedly(excited, amplitudeDampingChannel(decayProbabilityForTimestep(T1, dt)), steps);
+      expect(rho.get(1, 1).re, `steps=${steps}`).toBeCloseTo(Math.exp(-0.5), 9);
+    }
+  });
+
+  it("decays the off-diagonal coherence as exp(-t/T2), leaving populations untouched", () => {
+    const T2 = 80;
+    for (const totalTime of [20, 80, 160]) {
+      const steps = 40;
+      const dt = totalTime / steps;
+      const rho = applyChannelRepeatedly(plus, dephasingChannel(decayProbabilityForTimestep(T2, dt)), steps);
+      expect(rho.get(0, 1).re, `t=${totalTime}`).toBeCloseTo(0.5 * Math.exp(-totalTime / T2), 9);
+      // Pure dephasing is exactly that: no energy leaves the system.
+      expect(rho.get(0, 0).re, `t=${totalTime} population`).toBeCloseTo(0.5, 12);
+      expect(rho.get(1, 1).re, `t=${totalTime} population`).toBeCloseTo(0.5, 12);
+    }
+  });
+
+  it("drives amplitude damping to the ground state and dephasing to the fully-decohered diagonal, its two fixed points", () => {
+    const damped = applyChannelRepeatedly(excited, amplitudeDampingChannel(0.3), 200);
+    expect(damped.get(0, 0).re).toBeCloseTo(1, 9);
+    expect(damped.get(1, 1).re).toBeCloseTo(0, 9);
+    expect(purity(damped)).toBeCloseTo(1, 9); // |0><0| is pure: T1 decay ends somewhere definite
+
+    const decohered = applyChannelRepeatedly(plus, dephasingChannel(0.3), 200);
+    expect(decohered.get(0, 1).magnitude()).toBeCloseTo(0, 9);
+    expect(purity(decohered)).toBeCloseTo(0.5, 9); // T2 decay ends maximally mixed
+  });
+});

@@ -39,11 +39,15 @@ export const spinQubitScalabilitySource: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "Spin qubits' distinct scalability pitch is small device size enabling reuse of existing semiconductor fabrication tooling — not a coherence-time or gate-speed claim." }],
-    finalAnswer: "(a) Small device size compatible with existing semiconductor fabrication tooling",
+    finalAnswer: "Small device size compatible with existing semiconductor fabrication tooling",
   },
   explanation: {
     correctIdea: "This tests whether each platform's DISTINCT pitch (not a generic 'it's good') was actually absorbed — every platform in this course has a different central argument.",
     whyCorrect: "Matches the lesson's explicit 'Why small size matters' section.",
-    whyWrong: ["Options (b), (c), (d) each correctly describe a DIFFERENT platform's advantage from earlier lessons in this course, not spin qubits' specific pitch."],
+    whyWrong: [
+      { optionId: "b", text: "Longest coherence time is trapped ions' and neutral atoms' claim in this course, not spin qubits'." },
+      { optionId: "c", text: "Superconducting qubits and spin qubits are both fast, but raw gate speed is not the scalability argument this lesson makes." },
+      { optionId: "d", text: "All-to-all connectivity via a shared motional mode is trapped ions' advantage." },
+    ],
   },
 };

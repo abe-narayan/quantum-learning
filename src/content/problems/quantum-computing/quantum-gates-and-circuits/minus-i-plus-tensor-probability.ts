@@ -30,6 +30,10 @@ export const minusIPlusTensorProbability: NumericProblem = {
     value: probabilityOf11,
     tolerance: 0.01,
     incorrectFeedback: "Multiply the amplitudes on the |1⟩ term of each factor first, then take the squared magnitude of the product.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is |c₁₁| rather than |c₁₁|². The Born rule squares the magnitude, and here that magnitude is 1/2." },
+      { value: 0, feedback: "The −i does not cancel the amplitude: it is a phase of unit magnitude, so the |11⟩ term survives with magnitude 1/2." },
+    ],
   },
   hints: [
     { text: "The amplitude on |11⟩ in a tensor product is the product of each factor's amplitude on |1⟩." },

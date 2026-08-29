@@ -47,7 +47,17 @@ export function StaticCircuitDiagram({
   const height = numQubits * ROW_HEIGHT;
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
+    // `tabIndex={0}`. `width` here is computed from the gate count
+    // (`LABEL_WIDTH + columns * COLUMN_WIDTH`), and the `<svg>` is `min-w-full`
+    // — a floor, not a ceiling — so a circuit of more than a handful of gates
+    // is wider than the column and this wrapper is what scrolls. That is the
+    // canonical case for WCAG 2.1.1: an `overflow-x-auto` div is focusable by
+    // default in no browser but Firefox, so a keyboard-only reader could read
+    // the first few gates of a QFT or a Bell-pair circuit and had no way to
+    // reach the measurement at the end. No `role`/`aria-label` on the wrapper:
+    // the `<svg>` already carries `role="img"` and the circuit summary, and
+    // naming both would announce the figure twice.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={ariaLabel ?? "Circuit diagram"} className="min-w-full">
         {Array.from({ length: numQubits }, (_, q) => (
           <g key={`wire-${q}`}>
@@ -56,7 +66,13 @@ export function StaticCircuitDiagram({
               y1={q * ROW_HEIGHT + ROW_HEIGHT / 2}
               x2={width}
               y2={q * ROW_HEIGHT + ROW_HEIGHT / 2}
-              className="stroke-border"
+              // The qubit wires. A circuit diagram is its wires: which gate
+              // acts on which qubit is read entirely off them, so they are as
+              // load-bearing as a mark gets. They were on `--border`, the
+              // panel-edge token (1.41:1 on `--surface-muted`, under the 3:1
+              // WCAG 2.1 SC 1.4.11 floor); `--axis` clears 3:1 on every panel
+              // depth in both themes.
+              className="stroke-axis"
               strokeWidth={2}
             />
             <text x={4} y={q * ROW_HEIGHT + ROW_HEIGHT / 2 + 4} className="fill-muted-foreground text-xs font-mono">

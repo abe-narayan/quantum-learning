@@ -69,7 +69,7 @@ result was a *consequence*. This lesson proves the *reason* why.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Wolfgang_Pauli.jpg"
   alt="Portrait photograph of physicist Wolfgang Pauli, 1924"
-  caption="Wolfgang Pauli's spin matrices are this lesson's running example precisely because they make compatibility so easy to check by hand: X and Z fail this lesson's commutator test, while any single Pauli matrix trivially passes it against itself."
+  caption="Wolfgang Pauli's spin matrices serve as this lesson's running example because compatibility can be checked on them by hand in two lines: X and Z fail the commutator test, while any single Pauli matrix trivially passes it against itself."
   credit="CERN / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Wolfgang_Pauli.jpg"
   license="CC BY 4.0"
@@ -77,11 +77,12 @@ result was a *consequence*. This lesson proves the *reason* why.
 
 ## Intuition
 
-If two operators share a common eigenbasis, applying either one to a
-basis vector just rescales it, and rescaling commutes with rescaling,
-whatever order you do it in. The interesting content is the converse:
-commuting is not just a *consequence* of sharing a basis, it's
-*equivalent* to it.
+If two operators share a common eigenbasis, applying either one to a basis
+vector only rescales it, and rescaling commutes with rescaling in any
+order. That direction is easy. The content is in the converse: commuting
+is not merely a *consequence* of sharing a basis, it is *equivalent* to
+it, so a commutator you can compute in two lines settles a question about
+what can be measured together.
 
 ## Mathematical Development
 
@@ -113,9 +114,9 @@ using $AB=BA$ in the middle step. So $B|a\rangle$ is *also* an
 eigenvector of $A$ with eigenvalue $a$, but the eigenvalue $a$ is
 nondegenerate, so its eigenspace is only one-dimensional, meaning
 $B|a\rangle$ must be proportional to $|a\rangle$:
-$B|a\rangle=\mu|a\rangle$ for some scalar $\mu$. That's exactly the
-statement that $|a\rangle$ is *also* an eigenvector of $B$ (with
-eigenvalue $\mu$). Since this holds for every nondegenerate eigenvector of
+$B|a\rangle=\mu|a\rangle$ for some scalar $\mu$. That is the statement
+that $|a\rangle$ is *also* an eigenvector of $B$, with eigenvalue $\mu$.
+Since this holds for every nondegenerate eigenvector of
 $A$, $A$ and $B$ share an eigenbasis wherever $A$'s spectrum is
 nondegenerate.
 
@@ -123,9 +124,9 @@ nondegenerate.
 eigenspace of $A$ is itself Hermitian on that subspace, so it has *its
 own* <Term id="orthonormal-basis">orthonormal eigenbasis</Term> *within* the eigenspace, by the spectral
 theorem applied one dimension down. That basis is simultaneously an
-eigenbasis for $A$, trivially, and now the extra step makes it one for
-$B$ too. Not spelled out in full here, but this is exactly the tool the
-Complete Sets of Commuting Observables lesson uses next.)
+eigenbasis for $A$, trivially, and the extra step makes it one for $B$
+too. Not spelled out in full here; it is the tool the Complete Sets of
+Commuting Observables lesson picks up next.)
 
 ## Physical Interpretation
 
@@ -156,17 +157,30 @@ $\{|+\rangle,|-\rangle\}$, and neither $|0\rangle$ nor $|1\rangle$ is an
 eigenvector of $X$ (applying $X$ swaps them instead of rescaling either
 one).
 
-<InteractiveSection title="Check both orderings, for two different pairs" description="Switch between the X-Z pair and the X-Y pair. In both cases the two products differ — every distinct pair of Pauli matrices is mutually incompatible, not just the one pair worked out above.">
+<InteractiveSection title="Check both orderings, for two different pairs" description="Switch between the X-Z pair and the X-Y pair. In both cases the two products differ. Every distinct pair of Pauli matrices is mutually incompatible, not only the pair worked out above.">
   <MatrixGridExplorer
     presets={incompatiblePresets}
     ariaLabel="Choose a pair of Pauli operators to compare their product in both orders, confirming the two orders give different matrices"
   />
 </InteractiveSection>
 
-Non-commuting operators aren't just an algebraic curiosity, order changes
+Non-commuting operators are not an algebraic curiosity: the order changes
 the outcome physically. Start at $|\psi\rangle$ (an equal superposition on
-the equator), then apply a quarter-turn $X$-rotation and a quarter-turn
-$Z$-rotation to it, once in each order:
+the equator, pointing along $+y$), then apply a quarter-turn
+$X$-rotation and a quarter-turn $Z$-rotation to it, once in each order.
+Before looking, commit to where the two orderings land relative to each
+other.
+
+<PredictBeforeReveal
+  question="A qubit on the +y axis of the Bloch sphere gets a 90° X-rotation and a 90° Z-rotation, once in each order. How do the two final states compare?"
+  options={[
+    { label: "The same point: rotations always compose the same way", value: "same" },
+    { label: "Antipodal, so the two results are perfectly distinguishable", value: "antipodal" },
+    { label: "90° apart on the sphere", value: "ninety" },
+  ]}
+  correctValue="ninety"
+  explanation="90° apart. One order lands on −x, the other on +z. A 90° separation on the Bloch sphere is not orthogonality in Hilbert space: those two states overlap with probability (1 + cos 90°)/2 = 0.5, so no measurement tells them apart better than a coin flip half the time. Swapping the order of two operations produced a state that is different but not maximally different, which is the geometric content of [X,Z] being nonzero but finite."
+/>
 
 <InteractiveSection title="Same two rotations, opposite order, different landing point" description="All three spheres are draggable to inspect from any angle. The start state is identical on the left. The middle sphere applies X-rotation then Z-rotation; the right sphere applies Z-rotation then X-rotation, the same two quarter-turns, reversed. They land in different places on the sphere, the geometric picture behind [X,Z] ≠ 0: X and Z rotations don't commute, so neither do the observables that generate them.">
   <div className="not-prose grid grid-cols-1 gap-4 sm:grid-cols-3">

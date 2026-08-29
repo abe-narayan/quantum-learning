@@ -21,8 +21,8 @@ export type GlossaryTerm = {
  *
  * Why this is a second type rather than two more required fields on
  * `GlossaryTerm`: nothing *authors* them. They are attached by
- * `withMetadata()` from the tables below rather than repeated on ~145 object
- * literals — which is also the only thing that lets the ~60 terms sourced
+ * `withMetadata()` from the tables below rather than repeated on ~199 object
+ * literals — which is also the only thing that lets the 59 terms sourced
  * from `CONCEPT_NODES` (a file this module only reads, and must not edit)
  * carry them at all. So the authored shape and the rendered shape genuinely
  * differ, and `GlossaryTerm` keeps them optional so that either shape
@@ -61,7 +61,7 @@ function fromConceptNode(node: ConceptNode): GlossaryTerm {
 }
 
 /**
- * Terms beyond the ~25 already curated in `concepts.ts` for the `/map`
+ * Terms beyond the 59 already curated in `concepts.ts` for the `/map`
  * concept graph. These don't need a place in that dependency graph (no
  * `prerequisiteIds`), but a real glossary should cover more ground than a
  * map of only the most load-bearing ideas. Every `lessonSlugs` entry here
@@ -187,7 +187,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "single-qubit-gates",
     title: "Single-Qubit Gates",
     definition:
-      "2×2 unitary matrices — Pauli X/Y/Z, Hadamard, and general rotations — that act on one qubit, visualized as rotations of its Bloch vector around an axis.",
+      "The operations that act on one qubit at a time — X, Y, Z, Hadamard, and the continuous rotations between them. Every one is a rotation of that qubit's arrow on the Bloch sphere about some axis, which is why they are all reversible and why they can never, on their own, create entanglement between qubits. Written as matrices they are exactly the 2×2 unitaries.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/qubits-and-quantum-states/single-qubit-rotations"],
     simulatorId: "bloch-sphere",
@@ -204,7 +204,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "no-cloning-theorem",
     title: "No-Cloning Theorem",
     definition:
-      "It's provably impossible to build a unitary operation that copies an arbitrary unknown quantum state, a direct consequence of linearity that explains why quantum error correction and quantum cryptography have to work so differently from their classical counterparts.",
+      "The theorem that no physical operation can copy an arbitrary unknown quantum state. It follows from linearity alone — a machine that copies |0⟩ and |1⟩ correctly necessarily gets their superpositions wrong — and it is not a ban on all copying: known states, and any set of mutually orthogonal states, can be duplicated fine. What it rules out is making a backup of something you have not measured, which is why error correction cannot work by duplication and why an eavesdropper cannot silently clone a key.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem"],
   },
@@ -255,7 +255,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "deutsch-jozsa",
     title: "Deutsch-Jozsa Algorithm",
     definition:
-      "The first algorithm to prove a quantum computer can solve a problem — determining whether a function is constant or balanced — with exponentially fewer oracle calls than any classical deterministic algorithm.",
+      "An oracle algorithm that decides whether a function is constant or balanced in a single quantum query, where a classical deterministic algorithm can need exponentially many. David Deutsch introduced and solved the one-bit case in 1985, the first quantum algorithm to beat a classical one at anything; the 1992 generalization with Richard Jozsa extended it to n-bit inputs, where the exponential query gap appears.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm"],
   },
@@ -263,7 +263,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "simons-algorithm",
     title: "Simon's Algorithm",
     definition:
-      "Finds a hidden bitstring period of a function exponentially faster than any classical algorithm, and the algorithm whose structure directly inspired Shor's period-finding approach to factoring.",
+      "Recovers a hidden XOR mask: a secret bitstring s such that f(x) = f(x⊕s) for exactly one nonzero s. Each run of the circuit returns a random string orthogonal to s, so about n runs plus linear algebra over F₂ recover s exponentially faster than any classical algorithm; this structure directly inspired Shor's period-finding, which upgrades the XOR shift to a genuine modular period.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-algorithms-i/simons-algorithm"],
   },
@@ -271,7 +271,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "phase-kickback",
     title: "Phase Kickback",
     definition:
-      "When a controlled unitary acts on a target qubit that's an eigenstate of that unitary, the resulting phase appears on the control qubit instead — the trick that makes quantum phase estimation and most oracle-based algorithms work.",
+      "The trick of moving a phase from where a gate acts to somewhere it can be measured. If the target of a controlled-U is already an eigenstate of U, U cannot change it — so the eigenvalue e^(iθ) shows up instead as a relative phase on the *control* qubit, where interference can detect it. Phase estimation and every oracle algorithm that marks an answer with a minus sign run on this.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-algorithms-i/phase-kickback"],
   },
@@ -279,7 +279,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "quantum-phase-estimation",
     title: "Quantum Phase Estimation",
     definition:
-      "Estimates the phase eigenvalue of a unitary operator's eigenstate using the quantum Fourier transform, and serves as a subroutine inside Shor's algorithm and many other quantum algorithms.",
+      "An algorithm that reads out the phase a state picks up under a unitary. Given U and an eigenstate |u⟩ with U|u⟩ = e^(2πiφ)|u⟩, controlled powers of U write φ into a t-qubit register as a pattern of relative phases, and the inverse quantum Fourier transform converts that pattern into a t-bit binary estimate of φ. It is the subroutine inside Shor's algorithm and behind most quantum algorithms that extract an eigenvalue.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-algorithms-i/quantum-phase-estimation"],
   },
@@ -298,7 +298,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "stabilizer-formalism",
     title: "Stabilizer Formalism",
     definition:
-      "Describes certain quantum states and codes not by their state vector but by a set of operators that leave them unchanged, giving a compact, efficient way to design and analyze quantum error-correcting codes.",
+      "A way of specifying a quantum state by what leaves it alone rather than by writing it out. A state is pinned down uniquely by the group of Pauli operators that fix it — its stabilizers — which for n qubits takes n generators instead of 2ⁿ amplitudes. That compression is what makes error-correcting codes tractable to design, and what makes stabilizer circuits classically simulable.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics"],
   },
@@ -314,7 +314,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "von-neumann-entropy-purity",
     title: "Von Neumann Entropy & Purity",
     definition:
-      "Quantify how mixed a quantum state is: purity equals 1 only for a pure state, and von Neumann entropy equals 0 only for a pure state, rising as a system becomes more entangled with — or decohered by — its environment.",
+      "The two standard numbers for how mixed a state is. Purity is Tr(ρ²) — equal to 1 exactly for a pure state, falling to 1/d for the maximally mixed state in d dimensions; von Neumann entropy is S(ρ) = −Tr(ρ log₂ρ) — equal to 0 exactly for a pure state, rising to log₂d. The two track the same thing in opposite directions: purity falls and entropy rises as a system becomes more entangled with, or decohered by, anything outside it.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/entanglement-and-measurement/purity-entropy-and-information"],
   },
@@ -410,7 +410,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "stern-gerlach-experiment",
     title: "Stern-Gerlach Experiment",
     definition:
-      "Sent silver atoms through an inhomogeneous magnetic field and observed the beam split into discrete spots rather than a continuous smear — the historical experiment that first demonstrated spin quantization.",
+      "The 1922 experiment that first showed a quantum measurement has only discrete outcomes. A beam of silver atoms passing through an uneven magnetic field split into two separate spots, where a classical magnetic moment free to point in any direction would have smeared out continuously; the two spots are the two possible values of the electron's spin along the field axis.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"],
   },
@@ -418,7 +418,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "vector-space",
     title: "Vector Space",
     definition:
-      "A set of objects (vectors) closed under addition and scalar multiplication, satisfying axioms like associativity and distributivity — the abstract structure that quantum states live in, whether those vectors are arrows, functions, or columns of complex numbers.",
+      "Any collection of objects that can be added together and scaled by numbers without ever leaving the collection — that is essentially the whole requirement, plus a short list of arithmetic rules like associativity and distributivity. Arrows in space, functions, and columns of complex numbers all qualify, which is why the same linear algebra describes quantum states regardless of what they physically are.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/mathematical-foundations/vector-spaces"],
   },
@@ -426,7 +426,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "basis",
     title: "Basis",
     definition:
-      "A set of linearly independent vectors that spans an entire vector space, so every vector in that space can be written as a unique linear combination of them — the |0⟩, |1⟩ standard basis being the qubit's simplest example.",
+      "A fixed set of reference directions in which every vector of a space can be written, and written exactly one way — the way any point on a map is one distance east plus one distance north. Formally the set has to be linearly independent and has to span the space; a qubit's standard choice is {|0⟩, |1⟩}. Nothing physical singles out one basis over another, which is why every measurement must say which basis it is made in.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/mathematical-foundations/vector-spaces"],
   },
@@ -450,7 +450,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "eigenvalue-eigenvector",
     title: "Eigenvalue & Eigenvector",
     definition:
-      "For an operator A, a nonzero vector v is an eigenvector with eigenvalue λ if Av = λv — applying A to v only rescales it. In quantum mechanics, an observable's eigenvalues are its possible measurement outcomes, and its eigenvectors are the states that produce them with certainty.",
+      "A vector that an operator only stretches or shrinks and never turns: Av = λv, where the scale factor λ is its eigenvalue. In quantum mechanics this is the entire content of what a measurement can return — an observable's eigenvalues are the values that can come out, and its eigenvectors are the states that give one of them with certainty.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors"],
   },
@@ -490,7 +490,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "cauchy-schwarz-inequality",
     title: "Cauchy-Schwarz Inequality",
     definition:
-      "States that the magnitude of an inner product between two vectors never exceeds the product of their individual norms, |⟨φ|ψ⟩| ≤ ‖φ‖‖ψ‖ — the inequality underlying the Heisenberg uncertainty principle's general derivation.",
+      "The bound that two vectors can overlap by at most the product of their lengths: |⟨φ|ψ⟩| ≤ ‖φ‖‖ψ‖, with equality only when one is a scalar multiple of the other. It is what makes ‖ψ‖ behave like a length at all, and it is the single inequality the general Heisenberg uncertainty relation is derived from.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality"],
   },
@@ -498,7 +498,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "taylor-series",
     title: "Taylor Series",
     definition:
-      "Represents a smooth function as an infinite sum of terms built from its derivatives at a single point — the tool used to derive Euler's formula, e^(iθ) = cos θ + i sin θ, by comparing the series for e^x, sin x, and cos x term by term.",
+      "A way of rebuilding a smooth function from nothing but its value and its derivatives at one point, as an infinite sum of powers. It is how Euler's formula e^(iθ) = cos θ + i sin θ is proved — write out the series for e^x, sin x and cos x and the terms match up — and that identity is what turns quantum phases into rotations.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/mathematical-foundations/complex-numbers-for-physics"],
   },
@@ -534,7 +534,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "greens-functions-resolvents",
     title: "Green's Functions & Resolvents",
     definition:
-      "The resolvent R(E)=(E−H)⁻¹ packages every bound state and scattering state of a Hamiltonian into a single analytic function of complex energy E: its poles land exactly on the discrete bound-state energies, and its branch cut marks the continuous spectrum, via the Sokhotski–Plemelji identity.",
+      "A single function of complex energy that encodes a Hamiltonian's entire spectrum. The resolvent R(E)=(E−H)⁻¹ has poles exactly at the discrete bound-state energies and a branch cut along the continuous spectrum, and the Sokhotski–Plemelj identity extracts the spectral density from its boundary values just above the cut.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents"],
   },
@@ -542,7 +542,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "sturm-liouville-theory",
     title: "Sturm-Liouville Theory",
     definition:
-      "The general eigenvalue-problem theorem, (py′)′−qy+λwy=0 with boundary conditions killing a specific boundary term, that guarantees real eigenvalues and orthogonal eigenfunctions for any such problem — proving once, from a single boundary-term identity, why the infinite well, the harmonic oscillator, and the hydrogen radial equation all come with the same guarantees.",
+      "The single theorem behind why so many quantum eigenvalue problems come with real eigenvalues and orthogonal eigenfunctions. Any equation of the form (py′)′−qy+λwy=0, with boundary conditions killing a specific boundary term, carries those guarantees automatically, which is why the infinite well, the harmonic oscillator, and the hydrogen radial equation all behave the same way.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory"],
   },
@@ -594,7 +594,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "choi-jamiolkowski-isomorphism",
     title: "Choi-Jamiolkowski Isomorphism",
     definition:
-      "Turns an entire quantum channel into a single ordinary matrix, J(E)=Σᵢⱼ|i⟩⟨j|⊗E(|i⟩⟨j|), such that the channel is completely positive exactly when J(E)≥0 and trace-preserving exactly when tracing out its output half gives the identity — reducing 'is this map physically valid' to an ordinary linear-algebra check.",
+      "Turns an entire quantum channel into a single ordinary matrix, so that asking whether a map is physically valid becomes a linear-algebra check. The Choi matrix J(E)=Σᵢⱼ|i⟩⟨j|⊗E(|i⟩⟨j|) satisfies J(E)≥0 exactly when the channel is completely positive, and tracing out its output half gives the identity exactly when the channel preserves trace.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi"],
   },
@@ -602,7 +602,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "quantum-relative-entropy",
     title: "Quantum Relative Entropy",
     definition:
-      "S(ρ‖σ)=Tr(ρ log₂ρ)−Tr(ρ log₂σ), the quantum generalization of the classical Kullback-Leibler divergence, measuring how costly it is to mistake σ for the true state ρ; Klein's inequality guarantees it is never negative, and it vanishes only when ρ=σ exactly.",
+      "A measure of how costly it is to mistake one quantum state for another. Defined as S(ρ‖σ)=Tr(ρ log₂ρ)−Tr(ρ log₂σ), the quantum generalization of the classical Kullback-Leibler divergence, it is never negative by Klein's inequality and vanishes only when ρ=σ.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"],
   },
@@ -610,7 +610,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "mixed-state-concurrence",
     title: "Mixed-State Concurrence (Wootters Formula)",
     definition:
-      "The general two-qubit entanglement measure C(ρ)=max(0, √μ₁−√μ₂−√μ₃−√μ₄), built from the eigenvalues of R=ρρ̃ for ρ̃=(σy⊗σy)ρ*(σy⊗σy), that reduces exactly to the pure-state formula 2|ad−bc| and equals the entanglement of formation — the tool needed once a state is no longer pure.",
+      "How much entanglement a two-qubit state has once the state is mixed rather than pure. Wootters' formula C(ρ)=max(0, √μ₁−√μ₂−√μ₃−√μ₄), built from the eigenvalues of R=ρρ̃ for ρ̃=(σy⊗σy)ρ*(σy⊗σy), reduces to the pure-state formula 2|ad−bc| and determines the entanglement of formation, which is a monotonic function of it.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"],
   },
@@ -618,7 +618,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "oracle-relativization-barrier",
     title: "Relativization Barrier (Baker-Gill-Solovay)",
     definition:
-      "Oracles exist relative to which P=NP, and other oracles relative to which P≠NP, so no proof technique that works identically for every oracle can settle such questions unconditionally — the reason Deutsch-Jozsa's and Simon's algorithms' oracle-relative speedups, however rigorous, say nothing unconditional about BPP versus BQP for ordinary, structured problems.",
+      "A limit on what oracle results can prove. Oracles exist relative to which P=NP, and other oracles relative to which P≠NP, so no proof technique that works identically for every oracle can settle such questions unconditionally. This is why the oracle-relative speedups of Deutsch-Jozsa and Simon's algorithms, however rigorous, say nothing unconditional about BPP versus BQP for ordinary, structured problems.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity"],
   },
@@ -626,7 +626,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "quantum-phase-estimation-precision",
     title: "Phase Estimation Precision & Approximate QFT",
     definition:
-      "For a phase not exactly representable in a finite register, quantum phase estimation's measurement probability follows an exact closed form built from a geometric series, guaranteeing at least 4/π² success probability on the best t-bit estimate; dropping small-angle controlled-phase gates below a cutoff gives an approximate QFT with a provable, exponentially small error bound and far fewer gates.",
+      "Two guarantees about how precise phase estimation really is. First, for a phase not exactly representable in a finite register, the measurement probability follows an exact closed form built from a geometric series, guaranteeing at least 4/π² success probability on the best t-bit estimate. Second, dropping small-angle controlled-phase gates below a cutoff gives an approximate QFT with a provable, exponentially small error bound and far fewer gates.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
@@ -663,7 +663,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "kraus-operators-cptp-maps",
     title: "Kraus Operators & CPTP Maps",
     definition:
-      "The operators {K_i} satisfying ΣK_i†K_i=I that write any completely positive, trace-preserving (physical) quantum channel as E(ρ)=ΣK_iρK_i†; the Stinespring dilation theorem shows these operators are literally the blocks of a unitary acting on the system plus a fixed environment.",
+      "The standard way to write down what noise does to a quantum state. Any completely positive, trace-preserving (physical) quantum channel takes the form E(ρ)=ΣK_iρK_i† for operators {K_i} satisfying ΣK_i†K_i=I, and the Stinespring dilation theorem shows these Kraus operators are the blocks of a unitary acting on the system plus a fixed environment.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification"],
   },
@@ -679,7 +679,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "coherent-information",
     title: "Coherent Information",
     definition:
-      "I(A>B)=-S(A|B)=S(ρ_B)-S(ρ_{AB}) for a channel with reference system A and output B; its regularized maximum over channel uses equals the channel's quantum capacity by the Lloyd-Shor-Devetak theorem, and it can be negative, signaling a channel through which no quantum information survives.",
+      "The quantity that plays the role of capacity when what a channel carries is quantum information rather than classical bits. Defined as I(A>B)=-S(A|B)=S(ρ_B)-S(ρ_{AB}) for a channel with reference system A and output B, its regularized maximum over channel uses equals the channel's quantum capacity by the Lloyd-Shor-Devetak theorem; it can be negative, signaling a channel through which no quantum information survives.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures",
@@ -690,7 +690,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "holevo-quantity",
     title: "Holevo Quantity & Holevo's Theorem",
     definition:
-      "χ({p_i,ρ_i})=S(Σp_iρ_i)-Σp_iS(ρ_i) upper-bounds the classical information any single measurement can extract from an ensemble of quantum states (Holevo's theorem); its channel-optimized, regularized value equals the channel's classical capacity by the Holevo-Schumacher-Westmoreland theorem.",
+      "An upper bound on how much classical information can be read out of quantum states. The quantity χ({p_i,ρ_i})=S(Σp_iρ_i)-Σp_iS(ρ_i) bounds what any single measurement can extract from an ensemble of quantum states (Holevo's theorem), and its channel-optimized, regularized value equals the channel's classical capacity by the Holevo-Schumacher-Westmoreland theorem.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise"],
   },
@@ -709,7 +709,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "block-encoding",
     title: "Block Encoding",
     definition:
-      "A unitary U on a system register plus ancilla such that (⟨0|_anc⊗I)U(|0⟩_anc⊗I) = A for a matrix A with ‖A‖≤1; running U and post-selecting the ancilla on |0⟩ applies A to a state with probability ‖A|ψ⟩‖².",
+      "A way to load an arbitrary matrix into a quantum computer by hiding it inside a larger unitary. Formally, a unitary U on a system register plus ancilla block-encodes a matrix A with ‖A‖≤1 when (⟨0|_anc⊗I)U(|0⟩_anc⊗I) = A; running U and post-selecting the ancilla on |0⟩ then applies A to a state with probability ‖A|ψ⟩‖².",
     pillar: "apex",
     lessonSlugs: ["apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"],
   },
@@ -725,7 +725,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "signal-rotation",
     title: "Signal Rotation W(x)",
     definition:
-      "The fixed 2×2 unitary [[x, i√(1-x²)], [i√(1-x²), x]] = e^{i·arccos(x)·X} at the heart of quantum signal processing, whose interleaving with tunable phase gates produces a controllable polynomial in the signal x.",
+      "A single-qubit rotation whose angle encodes a number x, the repeatable building block for computing polynomials of x on a quantum computer. The fixed 2×2 unitary W(x) = [[x, i√(1-x²)], [i√(1-x²), x]] = e^{i·arccos(x)·X}, interleaved with tunable phase gates, produces a unitary whose top-left entry is a controllable polynomial in the signal x.",
     pillar: "apex",
     lessonSlugs: ["apex/algorithmic-frontiers/quantum-signal-processing"],
   },
@@ -733,7 +733,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "qsvt-polynomial",
     title: "QSVT Polynomial P(A)",
     definition:
-      "For a block-encoded matrix A=Σᵢσᵢ|uᵢ⟩⟨vᵢ| and a polynomial P realized via quantum signal processing, QSVT produces a block encoding of P(A):=Σᵢ P(σᵢ)|uᵢ⟩⟨vᵢ| — the same polynomial applied independently and simultaneously to every singular value of A.",
+      "One chosen polynomial applied to every singular value of a matrix at once. For a block-encoded matrix A=Σᵢσᵢ|uᵢ⟩⟨vᵢ| and a polynomial P realized via quantum signal processing, QSVT produces a block encoding of P(A):=Σᵢ P(σᵢ)|uᵢ⟩⟨vᵢ|, the same polynomial acting independently and simultaneously on each σᵢ.",
     pillar: "apex",
     lessonSlugs: ["apex/algorithmic-frontiers/the-quantum-singular-value-transformation"],
   },
@@ -741,7 +741,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "qubitization",
     title: "Qubitization",
     definition:
-      "Low and Chuang's technique (predating QSVT) of embedding a Hamiltonian's block encoding so that it decomposes into independent two-dimensional invariant subspaces, one per eigen/singular value, each behaving exactly like a single-qubit QSP signal rotation — the structural fact QSVT builds on and generalizes.",
+      "The structural fact that lets single-qubit signal-processing results lift to whole matrices. Low and Chuang's technique (predating QSVT) embeds a Hamiltonian's block encoding so that it decomposes into independent two-dimensional invariant subspaces, one per eigen/singular value, each behaving exactly like a single-qubit QSP signal rotation; QSVT builds on and generalizes this decomposition.",
     pillar: "apex",
     lessonSlugs: ["apex/algorithmic-frontiers/the-quantum-singular-value-transformation"],
   },
@@ -827,7 +827,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "eastin-knill-theorem",
     title: "Eastin–Knill Theorem",
     definition:
-      "A no-go result stating that no quantum error-correcting code can simultaneously have a universal set of transversal logical gates and the ability to correct arbitrary errors on any single physical qubit; for the surface code this forces Clifford gates to be transversal while the T gate provably cannot be.",
+      "A no-go result: on any code that detects arbitrary errors on a single physical qubit, the logical gates implementable transversally always form a *finite* group, so they can never be universal. No code gets universality for free — which is why surface-code architectures obtain the non-Clifford T gate by injecting a magic state rather than by applying it transversally.",
     pillar: "apex",
     lessonSlugs: ["apex/fault-tolerance-frontiers/magic-states-and-distillation"],
   },
@@ -835,7 +835,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "gottesman-knill-theorem",
     title: "Gottesman–Knill Theorem",
     definition:
-      "Any stabilizer circuit — built from Clifford gates (H, S, CNOT) and Pauli measurements/preparations starting from a computational-basis state — simulates classically in time polynomial in qubit count and circuit size, via an n×2n binary tableau updated by simple per-gate bit rules, regardless of how entangled the resulting state becomes; for the surface code this is exactly why Clifford gates alone can never demonstrate quantum advantage, forcing the non-Clifford T gate to be injected via magic-state distillation instead.",
+      "The theorem that stabilizer circuits are classically easy. Any circuit built from Clifford gates (H, S, CNOT) plus Pauli measurements, starting from a computational-basis state, can be simulated in time polynomial in qubit count and circuit size — by updating an n×2n binary tableau with simple per-gate bit rules — no matter how entangled the state it produces becomes. Entanglement is therefore not by itself what makes a quantum computer hard to simulate, which is exactly why a fault-tolerant architecture has to pay for the non-Clifford T gate via magic-state distillation.",
     pillar: "apex",
     lessonSlugs: [
       "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
@@ -846,7 +846,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "rough-smooth-boundary",
     title: "Rough & Smooth Boundaries",
     definition:
-      "The two distinct edge types of a finite surface-code patch — 'rough' where face (X-type) stabilizers are truncated to weight 2, 'smooth' where vertex (Z-type) stabilizers are truncated — between which the logical X̄ and Z̄ operators respectively run as boundary-to-boundary Pauli strings.",
+      "The two distinct edge types of a finite surface-code patch — 'rough' where face (X-type) stabilizers are the ones truncated at the edge, 'smooth' where vertex (Z-type) stabilizers are — between which the logical X̄ and Z̄ operators respectively run as boundary-to-boundary Pauli strings.",
     pillar: "apex",
     lessonSlugs: [
       "apex/fault-tolerance-frontiers/surface-codes-in-depth",
@@ -1328,7 +1328,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "oracle",
     title: "Oracle (Black-Box Function)",
     definition:
-      "A subroutine an algorithm is allowed to call but not look inside, used to state a problem in terms of how many *queries* a solution needs rather than how much total computation. On a quantum computer an oracle must be a unitary, so a function f is supplied reversibly as Uf|x⟩|y⟩ = |x⟩|y ⊕ f(x)⟩ — and because it is unitary it can be queried on a superposition of inputs. Oracle separations are provable but conditional: they bound query cost, not the cost of any particular real implementation.",
+      "A subroutine an algorithm is allowed to call but not look inside, used to state a problem in terms of how many *queries* a solution needs rather than how much total computation. On a quantum computer an oracle must be a unitary, so a function f is supplied reversibly as Uf|x⟩|y⟩ = |x⟩|y ⊕ f(x)⟩ — and because it is unitary it can be queried on a superposition of inputs. Oracle separations are rigorous but relative: they bound query cost inside this model, not the cost of any particular real implementation.",
     pillar: "quantum-computing",
     lessonSlugs: [
       "quantum-computing/quantum-algorithms-i/quantum-parallelism-and-the-oracle-model",
@@ -1496,7 +1496,7 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     id: "quantum-volume",
     title: "Quantum Volume",
     definition:
-      "A single-number benchmark for a whole device rather than one component: the largest n for which the machine can run random square circuits on n qubits, of depth n, and still beat a fixed statistical threshold. Because it folds qubit count, gate fidelity, connectivity and compiler quality into one figure, it resists the failure mode of quoting qubit count alone — but it saturates for large machines and says nothing about performance on any specific algorithm.",
+      "A single-number benchmark for a whole device rather than one component: the largest n for which the machine can run random square circuits on n qubits, of depth n, and still beat a fixed statistical threshold; IBM's convention reports the result as QV = 2ⁿ, so passing at n = 6 means a quantum volume of 64. Because it folds qubit count, gate fidelity, connectivity and compiler quality into one figure, it resists the failure mode of quoting qubit count alone, but it saturates for large machines and says nothing about performance on any specific algorithm.",
     pillar: "quantum-hardware",
     lessonSlugs: [
       "quantum-hardware/noise-decoherence-and-scaling/scaling-challenges",
@@ -1927,6 +1927,269 @@ const ADDITIONAL_GLOSSARY_TERMS: GlossaryTerm[] = [
     ],
     simulatorId: "noise-explorer",
   },
+
+  // ---------------------------------------------------------------------
+  // High-frequency terms the corpus glosses in passing
+  //
+  // Words the lesson prose leans on repeatedly across several courses
+  // without a home entry: helper qubits, the two basic error types, the
+  // named noise channels, and the acronyms (CHSH, LOCC) whose expansions a
+  // reader should be able to look up. Same house rule as above: readable
+  // cold by the end of sentence one, exact by the end of the entry.
+  // ---------------------------------------------------------------------
+
+  {
+    id: "ancilla",
+    title: "Ancilla Qubit",
+    definition:
+      "An extra helper qubit added to a circuit, prepared in a known state and used as workspace rather than to hold the data being computed on. Ancillas let a circuit learn about its data qubits without measuring them directly: syndrome extraction, phase kickback, and block encodings all park intermediate information on an ancilla and read or reuse it from there.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map",
+      "quantum-computing/quantum-algorithms-i/phase-kickback",
+    ],
+    simulatorId: "syndrome-explorer",
+  },
+  {
+    id: "dephasing",
+    title: "Dephasing",
+    definition:
+      "Noise that scrambles the phase relationship between |0⟩ and |1⟩ without changing which of them a measurement would find. It is the process behind the T2 coherence time: no energy is exchanged, but superpositions decay into classical mixtures, which is why T2 can be much shorter than T1 and why dephasing, rather than energy loss, often sets the practical limit on circuit depth.",
+    pillar: "quantum-hardware",
+    lessonSlugs: [
+      "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence",
+      "quantum-hardware/noise-decoherence-and-scaling/sources-of-noise",
+    ],
+    simulatorId: "noise-explorer",
+  },
+  {
+    id: "ground-state",
+    title: "Ground State",
+    definition:
+      "The lowest-energy state a quantum system can occupy. Measuring the energy of a system in its ground state always returns the smallest eigenvalue E₀ of its Hamiltonian; finding that state for molecules and materials is the goal of VQE and quantum phase estimation, and in superconducting hardware the qubit's |0⟩ is the transmon's own ground state.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: [
+      "quantum-mechanics/wave-mechanics/the-infinite-square-well",
+      "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
+      "quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits",
+    ],
+    simulatorId: "wavefunction-explorer",
+  },
+  {
+    id: "bit-flip-phase-flip-errors",
+    title: "Bit-Flip & Phase-Flip Errors",
+    definition:
+      "The two basic kinds of error a qubit can suffer: a bit flip (Pauli X) swaps |0⟩ and |1⟩ like a classical bit error, while a phase flip (Pauli Z) flips the sign between them, an error with no classical counterpart. Correcting both is enough to correct any single-qubit error at all, because an arbitrary single-qubit error can be written as a combination of the identity, X, Z, and their product Y; this discretization of continuous errors is what makes quantum error correction possible.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/error-correction-and-fault-tolerance/why-quantum-errors-are-different",
+      "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code",
+      "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-phase-flip-code",
+    ],
+    simulatorId: "syndrome-explorer",
+  },
+  {
+    id: "chsh-inequality",
+    title: "CHSH Inequality",
+    definition:
+      "A numerical test that separates quantum entanglement from every classical explanation. Four correlation measurements combine into one number S; any theory with local, pre-existing values obeys |S| ≤ 2, while quantum mechanics reaches 2√2 ≈ 2.83 on a Bell state (Tsirelson's bound), so a measured S above 2 is direct experimental evidence against local hidden variables.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/entanglement-and-measurement/the-chsh-inequality",
+      "quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables",
+    ],
+    simulatorId: "chsh-bell-test",
+  },
+  {
+    id: "amplitude-damping",
+    title: "Amplitude Damping",
+    definition:
+      "The noise channel describing energy loss: an excited qubit decays toward |0⟩, the way an atom emits a photon and falls to its ground state. With decay probability γ its Kraus operators are K₀ = [[1, 0], [0, √(1−γ)]] and K₁ = [[0, √γ], [0, 0]], and it is the channel behind the T1 relaxation time.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: [
+      "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
+      "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence",
+      "quantum-software/simulating-quantum-systems/noise-simulation",
+    ],
+    simulatorId: "noise-explorer",
+  },
+  {
+    id: "transversal-gate",
+    title: "Transversal Gate",
+    definition:
+      "A logical gate implemented by applying one physical gate to each qubit of a code block independently, with no physical gate touching two qubits of the same block. An error on one physical qubit can then spread to at most one qubit per block, so transversal gates are automatically fault-tolerant; the Eastin-Knill theorem proves no code can make a universal gate set transversal, which is why surface-code architectures inject T gates via magic states instead.",
+    pillar: "apex",
+    lessonSlugs: [
+      "apex/fault-tolerance-frontiers/magic-states-and-distillation",
+      "apex/fault-tolerance-frontiers/lattice-surgery",
+    ],
+  },
+  {
+    id: "locc",
+    title: "LOCC (Local Operations & Classical Communication)",
+    definition:
+      "What two separated parties can do without exchanging any quantum systems: local operations and classical communication, meaning each manipulates and measures their own qubits and they compare notes over an ordinary channel. Entanglement is precisely the resource LOCC cannot create or increase, which makes 'how many Bell pairs can LOCC extract' the operational basis of entanglement measures such as distillable entanglement and entanglement of formation.",
+    pillar: "quantum-mastery",
+    lessonSlugs: [
+      "quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces",
+      "quantum-mastery/quantum-shannon-theory/the-data-processing-inequality",
+      "quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement",
+    ],
+  },
+
+  // ---------------------------------------------------------------------
+  // Gaps found by sweeping the lesson corpus for bolded / <Term>-worthy
+  // vocabulary with no entry
+  //
+  // Each of these is a word the corpus teaches under its own heading — in
+  // several cases under its own *lesson* — and then had nowhere to send a
+  // reader who did not already have it. Frequency was the filter, not a
+  // target: `product state` appears in 26 lessons, `T gate` in 49,
+  // `syndrome` in 23, `entanglement entropy` in 11, and each of
+  // `concurrence` and `amplitude amplification` has a lesson named after
+  // it. Same house rule as the blocks above: readable cold by the end of
+  // the first sentence, exact by the end of the entry.
+  // ---------------------------------------------------------------------
+
+  {
+    id: "product-state",
+    title: "Product State (Separable State)",
+    definition:
+      "A multi-qubit state that *can* be split back into a definite state for each qubit separately — |ψ⟩ = |a⟩⊗|b⟩ — so describing the parts describes the whole and measuring one qubit tells you nothing about the other. It is the exact complement of entanglement: a pure state is entangled precisely when it is not a product state. For mixed states the corresponding word is *separable* (a probabilistic mixture of product states), and deciding whether a given mixed state is separable is computationally hard in general.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors",
+      "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement",
+      "quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed",
+    ],
+    simulatorId: "two-qubit-explorer",
+  },
+  {
+    id: "entanglement-entropy",
+    title: "Entanglement Entropy",
+    definition:
+      "The standard number for how entangled the two halves of a system are: throw one half away and measure how mixed what remains has become. Formally S(ρ_A) = −Tr(ρ_A log₂ρ_A) for the reduced state of half A, which is 0 for a product state and 1 for a Bell pair. It measures entanglement only when the *whole* state is pure — for a globally mixed state the same quantity also counts ordinary classical ignorance, which is why mixed states need measures like concurrence instead.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states",
+      "quantum-computing/entanglement-and-measurement/purity-entropy-and-information",
+      "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
+    ],
+    simulatorId: "density-matrix-explorer",
+  },
+  {
+    id: "concurrence",
+    title: "Concurrence",
+    definition:
+      "A single number from 0 to 1 saying how entangled two qubits are, computable straight from the amplitudes without any partial trace. For a pure state a|00⟩ + b|01⟩ + c|10⟩ + d|11⟩ it is C = 2|ad − bc|, which is 0 exactly for a product state and 1 for a Bell state. Its value for mixed states requires Wootters' formula, and it is defined for two qubits only — there is no equally clean generalization to larger systems.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure",
+      "quantum-computing/entanglement-and-measurement/capstone-analyzing-quantum-correlations",
+    ],
+    simulatorId: "two-qubit-explorer",
+  },
+  {
+    id: "ghz-state",
+    title: "GHZ State",
+    definition:
+      "The n-qubit generalization of a Bell pair, (|00…0⟩ + |11…1⟩)/√2 — every qubit correlated with every other, built by one Hadamard followed by a chain of CNOTs. Its entanglement is maximally fragile: losing or measuring a single qubit leaves the rest in an unentangled classical mixture, unlike the W state, which stays entangled. That fragility makes it the standard stress test for a device's multi-qubit coherence.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/quantum-gates-and-circuits/building-quantum-circuits",
+      "quantum-software/programming-quantum-computers/writing-your-first-circuit",
+    ],
+    simulatorId: "circuit-builder",
+  },
+  {
+    id: "amplitude-amplification",
+    title: "Amplitude Amplification",
+    definition:
+      "The mechanism underneath Grover's algorithm, stated on its own: given any circuit that prepares a state with some small amplitude on the outcomes you want, repeating a two-reflection step rotates amplitude toward those outcomes a fixed angle at a time, so a success probability p is reached in about 1/√p repetitions instead of the 1/p a classical retry loop needs. The quadratic gain is the whole speedup, and the count matters — overshooting the right number of repetitions rotates past the target and makes the answer *less* likely.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification",
+      "quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion",
+    ],
+    simulatorId: "grover-explorer",
+  },
+  {
+    id: "t-gate",
+    title: "T Gate (π/8 Gate)",
+    definition:
+      "The single-qubit gate that adds a 45° phase to |1⟩, diag(1, e^(iπ/4)) — the square root of the phase gate S. Its importance is entirely about what it is *not*: it is the standard non-Clifford gate, and Clifford gates alone are classically simulable, so Clifford+T is the usual universal set and the T gate is where a quantum computation's real power sits. In the surface code it also cannot be applied transversally and must be injected via a distilled magic state, which is why T-count, not total gate count, is the cost that resource estimates track.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/quantum-gates-and-circuits/universal-quantum-computation",
+      "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting",
+      "apex/fault-tolerance-frontiers/magic-states-and-distillation",
+    ],
+  },
+  {
+    id: "syndrome-measurement",
+    title: "Syndrome Measurement",
+    definition:
+      "The measurement that asks an encoded block \"did something go wrong, and where?\" without asking what the encoded state is. Ancilla qubits are entangled with the data so that measuring them returns only the parity checks — the *syndrome* — leaving the protected superposition untouched; the syndrome pattern then names which correction to apply. Learning nothing about the encoded data is the point, not a limitation: a measurement that revealed it would collapse the very state the code exists to protect.",
+    pillar: "quantum-computing",
+    lessonSlugs: [
+      "quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map",
+      "quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code",
+      "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics",
+    ],
+    simulatorId: "syndrome-explorer",
+  },
+
+  // ---------------------------------------------------------------------
+  // Notation the corpus reads with and never defines
+  //
+  // Three more sweep results, of a different kind from the block above:
+  // not concepts the lessons teach under a heading, but the machinery the
+  // *other entries in this file* are written in. The dagger appears in 50
+  // lessons and inside a dozen definitions here (U†U = I, A = A†, ΣK†K = I)
+  // with nowhere to send a reader who does not have it; "completeness
+  // relation" (12 lessons) and "spectral decomposition" (13, plus a lesson
+  // named after it) were reachable only via `spectral-theorem-pvm`, which
+  // is a master-level entry about unbounded operators and projection-valued
+  // measures — the right entry for a different reader. Same house rule:
+  // readable cold by the end of the first sentence, exact by the end.
+  // ---------------------------------------------------------------------
+
+  {
+    id: "adjoint",
+    title: "Adjoint (Conjugate Transpose, †)",
+    definition:
+      "For a matrix, the operator you get by transposing it and conjugating every entry, written A† and read \"A dagger\". What actually defines it is how it moves across an inner product — ⟨φ|Aψ⟩ = ⟨A†φ|ψ⟩ — which is also why a bra is written ⟨ψ| = (|ψ⟩)†: the bra is the ket's adjoint. The two operator families quantum mechanics is built from are named by it, Hermitian meaning A = A† and unitary meaning U† = U⁻¹.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: [
+      "quantum-mechanics/mathematical-foundations/bra-ket-formalism",
+      "quantum-mechanics/mathematical-foundations/hermitian-operators",
+      "quantum-mechanics/mathematical-foundations/unitary-operators",
+    ],
+  },
+  {
+    id: "completeness-relation",
+    title: "Completeness Relation (Resolution of the Identity)",
+    definition:
+      "The statement that an orthonormal basis's projectors add up to doing nothing at all: Σᵢ |eᵢ⟩⟨eᵢ| = I. Read the other way it is a licence to insert a basis anywhere in an expression for free, which is how ⟨φ|ψ⟩ becomes Σᵢ ⟨φ|eᵢ⟩⟨eᵢ|ψ⟩ and how a state gets expanded into components in the first place. It needs a basis that spans the whole space — sum over only some of the terms and you get a projector onto a subspace instead, which is exactly what one measurement outcome corresponds to.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: [
+      "quantum-mechanics/mathematical-foundations/bra-ket-formalism",
+      "quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality",
+      "quantum-computing/qubits-and-quantum-states/dirac-notation",
+    ],
+  },
+  {
+    id: "spectral-decomposition",
+    title: "Spectral Decomposition",
+    definition:
+      "Rewriting a Hermitian operator as a list of what measuring it can return: A = Σᵢ λᵢPᵢ, summed over the *distinct* eigenvalues λᵢ, where Pᵢ projects onto the entire eigenspace belonging to λᵢ. In that form the operator is nothing but \"which values can come out, and onto what does each one project\", so the Born rule reads straight off it. The more familiar Σᵢ λᵢ|eᵢ⟩⟨eᵢ|, summed over eigenvectors, is the same statement only when no eigenvalue is degenerate.",
+    pillar: "quantum-mechanics",
+    lessonSlugs: [
+      "quantum-mechanics/operators-observables-measurement/spectral-decomposition-and-degeneracy",
+      "quantum-mechanics/mathematical-foundations/hermitian-operators",
+      "quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized",
+    ],
+  },
 ];
 
 const AUTHORED_TERMS: GlossaryTerm[] = [
@@ -2019,6 +2282,9 @@ const TERM_LEVEL: Record<string, Difficulty> = {
   "rydberg-blockade": "foundational",
   "state-vector-simulator": "foundational",
   trace: "foundational",
+  "ground-state": "foundational",
+  "product-state": "foundational",
+  adjoint: "foundational",
 
   // Advanced, despite sitting under an introductory pillar.
   "classical-action": "advanced",
@@ -2155,6 +2421,84 @@ export const TERM_RELATIONS: Record<string, string[]> = {
   backend: ["sdks-programming", "state-vector-simulator", "shot"],
   "state-vector-simulator": ["quantum-circuit-simulation", "tensor-network-methods", "quantum-register"],
   "zero-noise-extrapolation": ["quantum-error-mitigation", "nisq", "shot"],
+
+  // High-frequency terms added alongside their entries.
+  ancilla: ["quantum-error-correction", "phase-kickback", "naimark-dilation-theorem", "block-encoding"],
+  dephasing: ["t1-t2-coherence-times", "noise-decoherence", "bit-flip-phase-flip-errors", "amplitude-damping"],
+  "ground-state": ["energy-eigenstate", "vqe", "electronic-structure-problem", "local-hamiltonian-problem"],
+  "bit-flip-phase-flip-errors": ["quantum-error-correction", "pauli-matrices", "stabilizer-formalism"],
+  "chsh-inequality": ["bells-theorem", "bell-states", "entanglement"],
+  "amplitude-damping": ["t1-t2-coherence-times", "kraus-operators-cptp-maps", "lindblad-master-equation"],
+  "transversal-gate": ["eastin-knill-theorem", "magic-state-distillation", "lattice-surgery-term", "clifford-group"],
+  locc: ["entanglement", "entanglement-distillation-typical-subspaces", "data-processing-inequality", "quantum-teleportation"],
+
+  // Corpus-gap terms added alongside their entries. Each one is deliberately
+  // wired both up and down: `concurrence` ↔ `mixed-state-concurrence` and
+  // `entanglement-entropy` ↔ `bond-dimension` are the beginner-to-research
+  // pairs this table exists for.
+  "product-state": ["entanglement", "tensor-product", "bell-states", "matrix-product-state"],
+  "entanglement-entropy": [
+    "entanglement",
+    "von-neumann-entropy-purity",
+    "schmidt-decomposition",
+    "bond-dimension",
+    "partial-trace",
+  ],
+  concurrence: ["entanglement-entropy", "mixed-state-concurrence", "bell-states", "entanglement"],
+  "ghz-state": ["bell-states", "entanglement", "quantum-register"],
+  "amplitude-amplification": [
+    "grovers-algorithm",
+    "oracle",
+    "phase-interference",
+    "maximum-likelihood-amplitude-estimation",
+  ],
+  "t-gate": [
+    "clifford-group",
+    "universal-gate-set",
+    "t-count-t-depth",
+    "magic-state-distillation",
+    "gottesman-knill-theorem",
+  ],
+  "syndrome-measurement": [
+    "quantum-error-correction",
+    "ancilla",
+    "stabilizer-formalism",
+    "bit-flip-phase-flip-errors",
+    "mwpm-decoding",
+  ],
+
+  // Notation terms. `spectral-decomposition` ↔ `spectral-theorem-pvm` is the
+  // beginner-to-research pair here: the finite-dimensional statement points up
+  // at the projection-valued-measure version that generalizes it, and back.
+  adjoint: ["hermitian-operator", "unitary-operator", "dirac-notation", "inner-product", "self-adjoint-operator"],
+  "completeness-relation": ["orthonormal-basis", "projector", "dirac-notation", "spectral-decomposition"],
+  "spectral-decomposition": [
+    "hermitian-operator",
+    "projector",
+    "degeneracy",
+    "eigenvalue-eigenvector",
+    "observable",
+    "spectral-theorem-pvm",
+  ],
+
+  // Duplicate-cluster cross-links: the hand-authored term and the concept-map
+  // node that covers the same ground point at each other, so a reader landing
+  // on either one can reach the other's framing.
+  povm: ["povms-generalized-measurement"],
+  "block-encoding": ["block-encoding-lcu", "linear-combination-of-unitaries"],
+  "linear-combination-of-unitaries": ["block-encoding-lcu"],
+  "matrix-product-state": ["matrix-product-states", "tensor-network-methods"],
+  "matrix-product-states": ["tensor-network-methods"],
+  "jordan-wigner-transformation": ["jordan-wigner-electronic-structure"],
+  "maximum-likelihood-amplitude-estimation": ["amplitude-estimation-qpe-free"],
+  "quantum-advantage-supremacy": ["quantum-advantage-claims"],
+  "surface-codes": ["surface-code-lattice"],
+  "mwpm-decoding": ["syndrome-defect-graph"],
+  "gottesman-knill-theorem": ["clifford-group", "classical-simulability-boundary"],
+  "clifford-group": ["classical-simulability-boundary"],
+  "stabilizer-formalism": ["css-stabilizer-codes"],
+  "magic-state-factory": ["magic-state-distillation"],
+  "quantum-phase-estimation": ["quantum-phase-estimation-precision"],
 };
 
 const AUTHORED_IDS = new Set(AUTHORED_TERMS.map((term) => term.id));

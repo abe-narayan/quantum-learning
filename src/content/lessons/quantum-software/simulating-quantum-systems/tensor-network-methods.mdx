@@ -18,7 +18,7 @@ export const lessonMeta = {
   module: "tensor-network-methods",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 20,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-software/simulating-quantum-systems/computational-cost-and-scaling"],
   objectives: [
     "Explain what a tensor network representation exploits (limited entanglement) that a generic state-vector cannot",
@@ -40,7 +40,12 @@ The 2^n wall assumes every amplitude is independent information that must be sto
 ## Motivation
 
 Computational Cost & Scaling's exponential wall assumed nothing special
-about the state being simulated.
+about the state being simulated: every one of the $2^n$ amplitudes was
+treated as independent information that must be stored. Many physically
+important states are far less generic than that. This lesson covers the
+main classical technique that exploits such structure, tensor networks,
+along with the precise condition (limited entanglement) that determines
+when the technique works and when it fails.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Frontier_supercomputer_%2852291130197%29.jpg"
@@ -92,8 +97,7 @@ simulation. A state with high (near-maximal) entanglement entropy
 requires bond dimensions that grow back toward the same $2^n$ cost this
 technique was trying to avoid. This is a real, principled
 tradeoff, not a limitation of current tensor-network techniques waiting
-to be engineered away: highly-entangled states fundamentally do not
-compress this way, by the same information-counting argument that
+to be engineered away: highly-entangled states do not compress this way, by the same information-counting argument that
 established the $2^n$ wall in the first place.
 
 Computational Cost & Scaling's own `stateVectorMemoryBytes` curve makes a
@@ -143,7 +147,7 @@ Plotting both curves on the same log scale over 10-50 qubits:
   />
 </InteractiveSection>
 
-This is exactly the tradeoff the rest of this lesson describes in words:
+This is the tradeoff the rest of this lesson describes in words:
 the MPS curve is only honest for states this bond dimension can actually
 capture. Raise the true entanglement past what $D=16$ can represent and
 the required $D$ climbs back toward $2^{n/2}$, and the accent curve
@@ -182,7 +186,7 @@ the entire purpose of using the technique.
 obsolete.** They exploit a SPECIFIC structural property (limited
 entanglement) present in many, but far from all, physically interesting
 states. Algorithm circuits specifically designed to generate
-entanglement are exactly the cases this technique doesn't help with.
+entanglement are the cases this technique doesn't help with.
 </Callout>
 
 <Callout type="note">

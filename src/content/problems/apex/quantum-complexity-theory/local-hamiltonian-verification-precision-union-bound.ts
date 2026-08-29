@@ -28,6 +28,19 @@ export const localHamiltonianVerificationPrecisionUnionBound: NumericProblem = {
     tolerance: 0.0000005,
     incorrectFeedback:
       "epsilon = (b-a)/(3m) = 0.02/(3*50) = 0.02/150. Divide the promise gap by 3 times the number of terms.",
+    nearMisses: [
+      {
+        value: promiseGap / termCount,
+        tolerance: 0.000002,
+        feedback:
+          "You divided by m but dropped the factor of 3. Without it the summed error can reach the full promise gap, leaving no margin either side of the decision threshold.",
+      },
+      {
+        value: promiseGap / 3,
+        tolerance: 0.00002,
+        feedback: "That is the whole error budget. It has to be shared across all m=50 terms, not handed to each term in full.",
+      },
+    ],
   },
   hints: [
     { text: "The lesson's argument splits a total error budget of (b-a)/3 evenly across all m terms." },

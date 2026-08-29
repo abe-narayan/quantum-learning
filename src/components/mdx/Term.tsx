@@ -184,9 +184,9 @@ export function Term({
           // legible in running prose while still reading as a definition
           // marker rather than a link (links are solid and pillar-coloured).
           "cursor-pointer border-b-2 border-dotted border-pillar-edge pb-px",
-          "hover:border-pillar-accent",
+          "hover:border-pillar",
           "has-[:focus-visible]:rounded-[2px] has-[:focus-visible]:outline",
-          "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-pillar-accent",
+          "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-pillar",
           "has-[:focus-visible]:outline-offset-2"
         )}
       >
@@ -221,7 +221,7 @@ export function Term({
         </span>
         <Link
           href={`/glossary#${term.id}`}
-          className="mt-1.5 inline-block text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar-accent"
+          className="mt-1.5 inline-block text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar"
         >
           Full glossary entry →
         </Link>

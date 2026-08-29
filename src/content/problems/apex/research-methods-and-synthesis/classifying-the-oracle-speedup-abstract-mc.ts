@@ -19,7 +19,7 @@ export const classifyingTheOracleSpeedupAbstractMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "The abstract's phrasing is technically accurate but incomplete: Theorem 4.2 is a real, correctly proved exponential separation in the black-box query model, and the abstract's unqualified wording risks readers assuming (incorrectly) that this is an unconditional result about explicitly-given Hamiltonians in general -- which, given that the problem is QMA-complete, it is not, and is not claimed to be.",
+        text: "The abstract is accurate but incomplete: Theorem 4.2 proves a real exponential separation in the black-box query model, and the unqualified wording invites a reader to take it as a result about explicitly given Hamiltonians, which it never claims.",
       },
       {
         id: "b",
@@ -57,17 +57,17 @@ export const classifyingTheOracleSpeedupAbstractMc: MultipleChoiceProblem = {
       { description: "The abstract's 'exponential speedup,' stated without this qualification, would naturally be read as applying more broadly -- including to the explicit-Hamiltonian setting, where the problem is QMA-complete and no such unconditional result is proven or claimed." },
       { description: "The numerical experiments (n<=20) test instances within the same oracle-access construction the theorem already covers; they are corroborating evidence for that proven claim, not independent evidence for a broader, unproven one." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "The abstract is accurate but incomplete: Theorem 4.2 is a real separation in the black-box query model, and the unqualified wording invites a broader reading the theorem never claims.",
   },
   explanation: {
     correctIdea:
       "A correctly proved oracle-model separation can still be described by an abstract in language broad enough to mislead a reader who never finds the numbered theorem -- the fix is reading the model/assumptions section, not doubting the theorem itself.",
     whyCorrect:
-      "Option (a) correctly locates the gap precisely where this lesson's anatomy predicts it: between an unqualified abstract sentence and a theorem whose black-box restriction is stated explicitly in its own hypotheses, without accusing the paper of error or dismissing the result.",
+      "This locates the gap where the lesson's anatomy predicts it: between an unqualified abstract sentence and a theorem whose black-box restriction sits in its own hypotheses, without accusing the paper of error or dismissing the result.",
     whyWrong: [
-      "(b) mistakes narrower scope for contradiction.",
-      "(c) lets small-scale numerics stand in for a proof extending to a setting the theorem never addressed.",
-      "(d) misapplies QMA-completeness (a fact about the explicit setting) to rule out a theorem proven in an entirely different, oracle-restricted setting.",
+      { optionId: "b", text: "Mistakes narrower scope for contradiction." },
+      { optionId: "c", text: "Lets small-scale numerics stand in for a proof extending to a setting the theorem never addressed." },
+      { optionId: "d", text: "Applies QMA-completeness, a fact about the explicit setting, to rule out a theorem proven in an oracle-restricted one." },
     ],
   },
 };

@@ -70,21 +70,25 @@ export const ghzCircuitFrames = [
 ];
 
 <LessonHook eyebrow="Why this matters">
-Nine lessons' worth of tools — tensor products, entanglement, CNOT, partial measurement, no-cloning, teleportation, interference — all get used at once here, on a three-qubit circuit that's new.
+Nine lessons' worth of tools (tensor products, entanglement, CNOT, partial measurement, no-cloning, teleportation, interference) all get used at once here, on a three-qubit circuit you have not seen.
 </LessonHook>
 
 ## Motivation
 
-Nine lessons have built a genuine toolkit: tensor products, <Term id="entanglement">entanglement</Term>,
-CNOT, partial measurement, no-cloning, teleportation, interference. This
-lesson doesn't introduce new mathematics. It uses everything at once, on
-a circuit you haven't seen yet, extending the two-qubit Bell state to
-three qubits for the first time.
+Nine lessons have built a toolkit: tensor products, <Term id="entanglement">entanglement</Term>, CNOT,
+partial measurement, no-cloning, teleportation, interference. This lesson
+introduces no new mathematics. It uses all of it at once on a circuit you
+have not seen yet, extending the two-qubit Bell state to three qubits.
+
+The three-qubit case is where a genuinely new question appears. Two
+entangled qubits either agree or they don't. Three can be correlated in
+ways that have no two-party analogue, and the state built below is the
+standard example.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/33/NIST_Physicists_Coax_Six_Atoms_into_Quantum_%27Cat%27_State_%285884514942%29.jpg"
   alt="NIST laboratory apparatus, with laser beams passing through an ion trap, used to entangle six beryllium ions into a multi-particle 'cat' state"
-  caption="A real six-ion 'cat' state, entangled in a NIST ion-trap apparatus — the same kind of multi-qubit entangled state (a direct generalization of the GHZ state built in this lesson) prepared and verified on physical hardware rather than only on paper."
+  caption="A six-ion 'cat' state entangled in a NIST ion-trap apparatus: the same family of multi-qubit entangled state as the GHZ state built below, scaled up by three qubits and verified on physical hardware."
   credit="NIST (photograph by Bill Pietsch, Astronaut 3 Media Group)"
   creditUrl="https://commons.wikimedia.org/wiki/File:NIST_Physicists_Coax_Six_Atoms_into_Quantum_%27Cat%27_State_(5884514942).jpg"
   license="Public Domain (U.S. Government work)"
@@ -97,10 +101,9 @@ useful in its own right, and good practice for verifying that two
 differently-drawn circuits compute the same thing. **Controlled Gates and
 CNOT** showed $\text{SWAP}=\text{CNOT}(0,1)\cdot\text{CNOT}(1,0)\cdot\text{CNOT}(0,1)$
 by tracking $|10\rangle$ through all three steps. That same
-step-by-step-tracking technique, apply one gate, note the new state,
-apply the next, is the general method for verifying *any* circuit
-identity, and it's exactly what the rest of this lesson does for a
-brand-new circuit.
+step-by-step-tracking technique, apply one gate, note the new state, apply
+the next, is the general method for verifying *any* circuit identity, and
+it is what the rest of this lesson does for a circuit you have not seen.
 
 ## Building a three-qubit entangled state
 
@@ -152,17 +155,17 @@ contradiction, one qubit more.
     { label: "They stay in superposition", value: "superposition" },
   ]}
   correctValue="11"
-  explanation="Every term in the state pairs qubit 0's value with the identical value on qubits 1 and 2 — there is no |1**0**0⟩ or |1**1**0⟩ term to collapse onto. Measuring qubit 0 as 1 leaves only the |111⟩ branch, so qubits 1 and 2 are both determined to be 1 with certainty, no further measurement needed."
+  explanation="Every term in the state pairs qubit 0's value with the same value on qubits 1 and 2. There is no |100⟩ or |110⟩ term to collapse onto, so measuring qubit 0 as 1 leaves only the |111⟩ branch, and qubits 1 and 2 are both determined to be 1 with certainty. One measurement settles three qubits."
 />
 
 **What happens on measurement?** Measure qubit 0:
 
 <QuantumStateDisplay state={ghzMeasured.collapsed} label={`Qubit 0 measured → outcome ${ghzMeasured.outcome}`} />
 
-All three qubits become exactly determined and equal: measuring *any
-one* of the three tells you, with certainty, what the other two are.
-Three-party correlation, from the same H-plus-CNOTs pattern that built a
-two-party one, extended by exactly one more CNOT.
+All three qubits become determined and equal: measuring *any one* of the
+three tells you with certainty what the other two are. Three-party
+correlation, from the same H-plus-CNOTs pattern that built a two-party one,
+plus a single extra CNOT.
 
 ## Common Mistakes, Revisited
 
@@ -178,7 +181,7 @@ getting this right.
 uses qubit 0 as the control for two separate CNOTs. This spreads
 *correlation*, not the qubit's unknown amplitude information. If qubit 0
 had started in an arbitrary unknown state instead of $|0\rangle$, the
-same circuit would still work exactly as derived (try it: replace
+same circuit would still work as derived (try it: replace
 $|000\rangle$ with $|\psi\rangle\otimes|00\rangle$ and redo the algebra),
 and it still wouldn't violate no-cloning, because the result is one
 *entangled* 3-qubit state, not three independent copies of $|\psi\rangle$.
@@ -225,8 +228,8 @@ might be far away.
   Bell pair to three parties using one extra CNOT from the same control
   qubit, with a matching extension to the entanglement and correlation
   arguments.
-- Analyzing any circuit, is it entangled, what does measurement do,
-  reuses the exact same techniques regardless of circuit size.
+- Analyzing any circuit, whether it is entangled and what measurement does
+  to it, reuses the same techniques regardless of circuit size.
 
 ## Further Exploration
 

@@ -36,6 +36,10 @@ export const qpeBestEstimateProbabilityPhi15: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "First find b=round(16/5)=3 and δ=16/5−3=0.2, then plug ε=δ/N=0.0125 and εN=δ=0.2 into the closed form.",
+    nearMisses: [
+      { value: 4 / Math.PI ** 2, tolerance: 0.01, feedback: "4/π² ≈ 0.405 is the worst-case floor, reached at δ = 0.5. Here δ = 0.2, so the actual probability sits well above the guarantee." },
+      { value: 1, feedback: "Certainty requires φN to be an integer. 16/5 = 3.2 is not, so some weight leaks to neighbouring outcomes." },
+    ],
   },
   hints: [
     { text: "φN = 16/5 = 3.2, so b = round(3.2) = 3, and δ = φN − b = 0.2." },

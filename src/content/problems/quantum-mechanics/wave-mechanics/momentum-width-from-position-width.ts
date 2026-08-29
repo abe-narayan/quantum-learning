@@ -22,6 +22,11 @@ export const momentumWidthFromPositionWidth: NumericProblem = {
     value: 0.333333,
     tolerance: 0.001,
     incorrectFeedback: "Delta k = 1/(2*sigma) directly — substitute sigma=1.5.",
+    nearMisses: [
+      { value: 3, feedback: "3 is 2σ. The relationship is inverse: a wider packet in position is narrower in momentum." },
+      { value: 1 / 1.5, tolerance: 0.002, feedback: "That is 1/σ, missing the factor of 2 in the denominator." },
+      { value: 0.75, feedback: "0.75 is σ/2. The width parameter belongs in the denominator, not the numerator." },
+    ],
   },
   hints: [
     { text: "Use the direct formula Delta k = 1/(2*sigma) derived from the Gaussian Fourier transform pair." },

@@ -14,6 +14,32 @@ current on-disk content is what's described below.
 
 Counts: **4 Blocker, 9 Serious, 9 Polish** = 22 findings.
 
+> **Status note, 2026-08-29.** This is a point-in-time record and the
+> findings below are left exactly as written. All five "Top five" items have
+> since been fixed, re-verified against the current tree:
+>
+> 1. `CourseList.tsx` — the stretched link is now an `::after` on the title
+>    anchor with the card's own static text raised above it in the stacking
+>    order; the description, prerequisites and captions are selectable again.
+> 2. `MechanicsSection.tsx` — the decorative SVG is `aria-hidden="true"` and
+>    the link carries a short `aria-label`, so its accessible name is a name.
+> 3. `.katex-display` — `src/lib/mdx/rehypeKatexHtml.mjs` injects
+>    `tabindex="0"` onto every display-math wrapper (and deliberately not
+>    onto inline math), guarded by `rehypeKatexHtml.test.ts`.
+> 4. Concept map pinch-to-zoom — implemented and guarded by
+>    `src/components/map/__tests__/pinch.test.ts`.
+> 5. `Term.tsx` — the checkbox trade-off is now documented explicitly as an
+>    accepted residual risk in the component's own docstring (fix option 1),
+>    and the pair is exposed as a term and its definition — a `<dfn>`
+>    (implicit ARIA `term`) around the phrase, `role="definition"` on the
+>    panel. There is no literal `role="term"` attribute to grep for.
+>
+> The Serious and Polish findings further down have **not** been re-verified
+> one by one in this pass; several are known fixed (Navbar Escape,
+> `IconButton`, linked prerequisites — see `SPRINT_BRIEF.md`). Re-check
+> against the code before acting on any specific line reference, as the
+> preamble to `docs/README.md` says.
+
 ## Top five
 
 1. **`CourseList.tsx`'s stretched course-title link silently sits on top of

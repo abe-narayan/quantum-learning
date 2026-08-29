@@ -70,7 +70,7 @@ completeness relation, which the rest of this course needs.
 </Callout>
 
 <LessonHook eyebrow="Why this matters">
-  A ket times a bra in the wrong order isn't a typo — swap $\langle
+  A ket times a bra in the wrong order is not a typo. Swap $\langle
   u|v\rangle$ for $|u\rangle\langle v|$ and a number turns into an
   operator.
 </LessonHook>
@@ -176,7 +176,7 @@ Probability and Quantum States lesson.
 Geometrically, $|0\rangle\langle0|$ drops any vector straight onto the
 $|0\rangle$ axis: $v=(0.6,0.8)$ lands at $|0\rangle\langle0|v=(0.6,0)$,
 discarding whatever component $v$ had along $|1\rangle$ and keeping only
-the part already lying along $|0\rangle$ — the "shadow" $v$ casts on that
+the part already lying along $|0\rangle$: the "shadow" $v$ casts on that
 axis.
 
 ### The completeness relation
@@ -199,9 +199,8 @@ $$
   explanation="It holds for every orthonormal basis of the space, not just the standard one. The derivation below never uses anything about {|e_i⟩} except orthonormality, and the interactive check further down confirms it numerically for the Hadamard basis {|+⟩, |−⟩} too."
 />
 
-Every remaining lesson in this course leans on this identity, so it's
-worth seeing where it actually comes from rather than filing it away as a
-rule.
+Every remaining lesson in this course leans on this identity, so it is
+worth seeing where it comes from rather than filing it away as a rule.
 
 <DerivationSteps>
   <DerivationStep annotation="Apply the left side to an arbitrary |ψ⟩, expanded in this basis as |ψ⟩ = Σⱼ cⱼ|eⱼ⟩, and just move the sum's bra-ket around.">
@@ -209,19 +208,19 @@ $$
 \left(\sum_i|e_i\rangle\langle e_i|\right)|\psi\rangle = \sum_i|e_i\rangle\langle e_i|\psi\rangle = \sum_i \langle e_i|\psi\rangle\,|e_i\rangle
 $$
   </DerivationStep>
-  <DerivationStep annotation="Since {eᵢ} is orthonormal, ⟨eᵢ|ψ⟩ = ⟨eᵢ|Σⱼ cⱼeⱼ⟩ = Σⱼ cⱼ⟨eᵢ|eⱼ⟩ = cᵢ — every term but j=i vanishes.">
+  <DerivationStep annotation="Since {eᵢ} is orthonormal, ⟨eᵢ|ψ⟩ = ⟨eᵢ|Σⱼ cⱼeⱼ⟩ = Σⱼ cⱼ⟨eᵢ|eⱼ⟩ = cᵢ, because every term but j=i vanishes.">
 $$
 \sum_i \langle e_i|\psi\rangle\,|e_i\rangle = \sum_i c_i|e_i\rangle
 $$
   </DerivationStep>
-  <DerivationStep annotation="This is exactly |ψ⟩ by how it was expanded in the first place — the completeness relation acts as the identity on every vector, so it equals the identity operator.">
+  <DerivationStep annotation="This is |ψ⟩ again, by how it was expanded in the first place. The completeness relation acts as the identity on every vector, so it equals the identity operator.">
 $$
 \sum_i c_i|e_i\rangle = |\psi\rangle
 $$
   </DerivationStep>
 </DerivationSteps>
 
-<InteractiveSection title="Check completeness for a second basis" description="The standard basis {|0⟩, |1⟩} isn't special: switch to the Hadamard basis {|+⟩, |−⟩} and confirm the two projectors still sum to the identity, exactly as the derivation above promises for any orthonormal basis.">
+<InteractiveSection title="Check completeness for a second basis" description="The standard basis {|0⟩, |1⟩} is not special: switch to the Hadamard basis {|+⟩, |−⟩} and confirm the two projectors still sum to the identity, as the derivation above promises for any orthonormal basis.">
   <MatrixGridExplorer
     presets={[standardBasisPreset, hadamardBasisPreset]}
     ariaLabel="Choose a basis to see its two rank-one projectors and their sum, which equals the identity matrix in both cases"
@@ -270,8 +269,8 @@ $$
 |0\rangle\langle0| + |1\rangle\langle1| = \begin{pmatrix}1&0\\0&0\end{pmatrix} + \begin{pmatrix}0&0\\0&1\end{pmatrix} = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I
 $$
 
-Matches the identity matrix exactly, confirming the general derivation
-above for this specific case.
+The result is the identity matrix, confirming the general derivation above
+in the simplest concrete case.
 
 ## Common Mistakes
 

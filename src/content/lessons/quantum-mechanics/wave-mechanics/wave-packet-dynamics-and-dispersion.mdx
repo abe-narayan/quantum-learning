@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Wave Packet Dynamics and Dispersion",
   description:
-    "Deriving Ehrenfest's theorem (why <x> obeys Newton's law on average), and explaining -- from the momentum-space phase evolution directly -- why a free wave packet inevitably spreads over time.",
+    "Deriving Ehrenfest's theorem (why <x> obeys Newton's law on average), and explaining, from the momentum-space phase evolution directly, why a free wave packet spreads over time.",
   course: "wave-mechanics",
   module: "wave-packet-dynamics-and-dispersion",
   order: 1,
@@ -25,8 +25,8 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  Leave a free wave packet alone and it doesn't just drift — it spreads,
-  inevitably, with no classical counterpart. This is exact unitary
+  Leave a free wave packet alone and it does more than drift. It spreads,
+  and nothing about a classical free particle does. This is exact unitary
   quantum mechanics, not noise or decoherence.
 </LessonHook>
 
@@ -44,7 +44,7 @@ A wave packet is a superposition of plane waves with a spread of momenta
 $\Delta p$ (<Term id="heisenberg-uncertainty-principle">uncertainty principle</Term>, unavoidable for any localized state).
 Different momentum components move at different velocities ($v=p/m$): the
 faster components pull ahead, the slower ones lag behind, and the
-packet inevitably stretches out, exactly like a group of runners with
+packet inevitably stretches out, like a group of runners with
 slightly different speeds spreading apart over a long race, even though
 each individual runner just moves in a straight line.
 
@@ -52,13 +52,27 @@ each individual runner just moves in a straight line.
 
 ### Ehrenfest's theorem
 
-For any <Term id="observable">observable</Term> $A$ with no explicit time dependence, differentiating
-$\langle A\rangle=\langle\psi|A|\psi\rangle$ and using $i\hbar\,d|\psi
-\rangle/dt=\hat H|\psi\rangle$ on each factor gives the general result
+For any <Term id="observable">observable</Term> $A$ with no explicit time dependence, the rate of
+change of $\langle A\rangle=\langle\psi|A|\psi\rangle$ follows from
+nothing but the product rule and the Schrödinger equation:
 
+<DerivationSteps>
+  <DerivationStep annotation="A carries no time dependence of its own, so the product rule puts all the time dependence in the two state factors.">
+$$
+\frac{d\langle A\rangle}{dt} = \left\langle\frac{d\psi}{dt}\Big|A\Big|\psi\right\rangle + \left\langle\psi\Big|A\Big|\frac{d\psi}{dt}\right\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Substitute the Schrödinger equation d|ψ⟩/dt = (−i/ħ)H|ψ⟩ into the ket, and its adjoint ⟨dψ/dt| = (+i/ħ)⟨ψ|H into the bra. The sign flip uses H being Hermitian.">
+$$
+\frac{d\langle A\rangle}{dt} = \frac{i}{\hbar}\langle\psi|\hat HA|\psi\rangle - \frac{i}{\hbar}\langle\psi|A\hat H|\psi\rangle
+$$
+  </DerivationStep>
+  <DerivationStep annotation="The two terms combine into a single commutator. This is Ehrenfest's theorem in its general form: dynamics of averages is governed by commutators with H.">
 $$
 \frac{d\langle A\rangle}{dt} = \frac{i}{\hbar}\langle[\hat H,A]\rangle
 $$
+  </DerivationStep>
+</DerivationSteps>
 
 Apply this to $A=\hat x$ with $\hat H=\hat p^2/2m+V(x)$. Since $V(x)$
 commutes with $\hat x$ (both just multiply by functions of $x$), only the
@@ -80,15 +94,15 @@ $$
 [\hat H,\hat x] = \frac{-2i\hbar\hat p}{2m} = \frac{-i\hbar\hat p}{m}
 $$
   </DerivationStep>
-  <DerivationStep annotation="Plug into the general Ehrenfest identity from above — the i and −i cancel, leaving the classical-looking result.">
+  <DerivationStep annotation="Plug into the general Ehrenfest identity from above. The i and −i cancel, leaving the classical-looking result.">
 $$
 \frac{d\langle x\rangle}{dt} = \frac{i}{\hbar}\left(\frac{-i\hbar}{m}\right)\langle\hat p\rangle = \frac{\langle p\rangle}{m}
 $$
   </DerivationStep>
 </DerivationSteps>
 
-exactly the group-velocity result from two lessons ago, now derived
-from the general time-evolution machinery rather than assumed.
+the group-velocity result from two lessons ago, now derived from the
+general time-evolution machinery rather than assumed.
 
 ### Why a free packet spreads
 
@@ -96,7 +110,7 @@ Each momentum component $\phi(k)$ evolves with its *own* phase,
 $e^{-i\hbar k^2t/(2m)}$ (from the free-particle energy $E(k)=\hbar^2
 k^2/(2m)$), a $k$-*dependent* rate, unlike a simple overall phase. Since
 different $k$-components drift apart at different rates $v(k)=\hbar
-k/m$, the packet's spatial envelope literally stretches as time passes.
+k/m$, the packet's spatial envelope stretches as time passes.
 Working through the resulting integral (standard, not reproduced in full
 here) gives the position variance's exact growth:
 
@@ -104,12 +118,13 @@ $$
 \sigma(t)^2 = \sigma_0^2 + \left(\frac{\hbar t}{2m\sigma_0}\right)^{\!2}
 $$
 
-starting at the initial width $\sigma_0$ and growing *quadratically* in
-$t$ for large $t$. This is exactly what `timeEvolution.test.ts` checks
+starting at the initial variance $\sigma_0^2$ and growing *quadratically*
+in $t$, so the width $\sigma(t)$ itself settles into plain linear growth
+once $t$ is large. This is what `timeEvolution.test.ts` checks
 numerically: a zero-momentum Gaussian packet evolved forward under the
-platform's split-operator method has its `variancePosition()` match this
-formula directly, confirming the simulator reproduces actual dispersive
-physics, not merely translation.
+engine's split-operator method has its `variancePosition()` match this
+formula directly. The simulator is reproducing dispersive physics, not
+merely sliding a fixed shape across the screen.
 
 ## Physical Interpretation
 
@@ -118,13 +133,13 @@ unitary quantum mechanics. A free particle's wavefunction spreading is as
 real and as inevitable as its average position advancing; both follow
 directly from the same Schrödinger equation. (A *bound* state, like the
 infinite well or <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term> eigenstates from the last two
-lessons, does *not* spread. Its probability density is exactly
-stationary, which is precisely what makes those states special.)
+lessons, does *not* spread. Its probability density is
+stationary, which is what makes those states special.)
 
-Ultrafast electron microscopy runs into this exact spreading as a real
+Ultrafast electron microscopy runs into this spreading as a real
 engineering problem: a pulse of free electrons, itself a matter-wave
 packet obeying this same free-particle Schrödinger equation, broadens
-in time as it travels down the microscope column, exactly the
+in time as it travels down the microscope column, the same
 $\sigma(t)$ growth derived above. Instrument designers correct for it
 with RF compression cavities that re-bunch the pulse just before it
 hits the sample, a direct, practical response to the same dispersive
@@ -134,7 +149,7 @@ electron or otherwise.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/da/Professor_Vanacore_with_an_ultrafast_TEM.jpg"
   alt="Professor Giovanni Maria Vanacore standing beside an ultrafast transmission electron microscope in the LUMES laboratory at EPFL"
-  caption="An ultrafast transmission electron microscope: its pulsed electron beams disperse in transit exactly as the sigma(t) formula above predicts, real engineering that RF compression cavities exist specifically to counteract."
+  caption="An ultrafast transmission electron microscope: its pulsed electron beams disperse in transit as the sigma(t) formula above predicts, real engineering that RF compression cavities exist specifically to counteract."
   credit="ASapozhnik"
   creditUrl="https://commons.wikimedia.org/wiki/File:Professor_Vanacore_with_an_ultrafast_TEM.jpg"
   license="CC BY-SA 4.0"
@@ -148,16 +163,16 @@ electron or otherwise.
     { label: "Grows, spreading out over time", value: "spread" },
   ]}
   correctValue="spread"
-  explanation="It spreads: σ(t)² = σ₀² + (ħt/(2mσ₀))², derived above from each momentum component's k-dependent phase e^{-iħk²t/(2m)}. The growth is quadratic in t for large t — exactly what the Worked Example below evaluates numerically (σ₀=1 grows to σ(5)≈2.69) and what timeEvolution.test.ts checks the platform's own split-operator simulator against."
+  explanation="It spreads: σ(t)² = σ₀² + (ħt/(2mσ₀))², derived above from each momentum component's k-dependent phase e^{-iħk²t/(2m)}. The variance grows quadratically in t, so the width itself grows linearly once t is large, which the Worked Example below evaluates numerically (σ₀=1 grows to σ(5)≈2.69) and which timeEvolution.test.ts checks the platform's own split-operator simulator against."
 />
 
-<InteractiveSection title="Spreading without leaking" description="Play the Free Gaussian Packet preset and watch the density curve visibly widen and flatten over time, even though the total probability (norm) stays exactly 1. Probability isn't lost, it's redistributed over a larger region, exactly as the formula above predicts.">
+<InteractiveSection title="Spreading without leaking" description="Play the Free Gaussian Packet preset and watch the density curve visibly widen and flatten over time, even though the total probability (norm) stays exactly 1. Probability is not lost; it is redistributed over a larger region, at the rate the formula above predicts.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
 
 <ExpectationTrace
   yLabel="σ(t)², for σ0=1, ħ=m=1"
-  annotation="Solid: σ(t)² = σ₀² + (t/2)², quadratic in t. Dashed: the pure (t/2)² growth term alone, with the constant σ₀² offset dropped -- the solid curve is just that same parabola shifted up by σ₀² = 1. At t=5, σ(5)² = 1 + 6.25 = 7.25, so σ(5) ≈ 2.69, matching the Worked Example below."
+  annotation="Solid: σ(t)² = σ₀² + (t/2)², quadratic in t. Dashed: the pure (t/2)² growth term with the constant σ₀² offset dropped, so the solid curve is that same parabola shifted up by σ₀² = 1. At t=5, σ(5)² = 1 + 6.25 = 7.25, so σ(5) ≈ 2.69, matching the Worked Example below."
   ariaLabel="Plot of the wave packet's position-variance sigma squared growing quadratically in time, alongside a dashed pure-quadratic reference curve offset by the initial variance"
   series={[
     {
@@ -193,9 +208,8 @@ $$
 \sigma(5) = \sqrt{7.25} \approx 2.69
 $$
 
-more than doubling the packet's width in 5 time units, matching the
-platform's own dispersion regression test (`timeEvolution.test.ts`)
-exactly.
+more than doubling the packet's width in 5 time units, and matching the
+platform's own dispersion regression test in `timeEvolution.test.ts`.
 
 ## Common Mistakes
 
@@ -239,10 +253,10 @@ rates.
 
 ## Further Exploration
 
-<ChallengePrompt prompt="The position spread σ(t) grows without bound for a free packet. What about the momentum spread Δp — does it grow, shrink, or stay exactly constant over time?">
-  Reread the "Why a free packet spreads" derivation: each momentum
-  component's amplitude picks up only a phase, $e^{-i\hbar k^2t/(2m)}$ —
-  does a pure phase change $|\phi(k)|^2$?
+<ChallengePrompt prompt="The position spread σ(t) grows without bound for a free packet. What about the momentum spread Δp: does it grow, shrink, or stay exactly constant over time?">
+  Reread the "Why a free packet spreads" derivation. Each momentum
+  component's amplitude picks up only a phase, $e^{-i\hbar k^2t/(2m)}$.
+  Does a pure phase change $|\phi(k)|^2$?
 </ChallengePrompt>
 
 <NextDiscovery>

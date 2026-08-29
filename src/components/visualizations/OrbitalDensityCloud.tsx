@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { radial1s, radial2s, radial2p } from "@/lib/quantum/hydrogenAtom";
 import { sphericalHarmonic } from "@/lib/quantum/sphericalHarmonics";
+import { PresetToggle } from "./PresetToggle";
 
 type OrbitalPreset = {
   key: string;
@@ -99,7 +100,16 @@ export function OrbitalDensityCloud({ ariaLabel }: { ariaLabel: string }) {
   return (
     <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
-        <svg width={VIEW} height={VIEW} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img" aria-label={ariaLabel}>
+        {/* The label now names the preset on screen. It was static while the
+            picture was not: a screen-reader user switching from 1s to 2p₀
+            was told the same thing about three visibly different figures. */}
+        <svg
+          width={VIEW}
+          height={VIEW}
+          viewBox={`0 0 ${VIEW} ${VIEW}`}
+          role="img"
+          aria-label={`${ariaLabel} Currently showing the ${preset.label} orbital: a shaded cross-section of ${preset.formula} through the z-axis, out to ${R_MAX} Bohr radii.`}
+        >
           {cells.map((cell, i) => (
             <rect
               key={i}
@@ -111,35 +121,46 @@ export function OrbitalDensityCloud({ ariaLabel }: { ariaLabel: string }) {
               style={{ opacity: cell.t }}
             />
           ))}
-          <line x1={CENTER} y1={4} x2={CENTER} y2={VIEW - 4} className="stroke-border" strokeWidth={1} strokeDasharray="2 3" />
-          <text x={CENTER + 4} y={16} className="fill-muted-foreground text-[9px] font-mono">
+          {/* The z-axis. Load-bearing: the whole point of the 2p₀ preset is
+              that its two lobes sit *along z*, which is unreadable without a
+              visible z. Moved off `--border` (the panel-edge token, 1.41:1
+              on `--surface-muted`) onto `--axis`, which clears the 3:1 WCAG
+              1.4.11 floor on every panel depth — and it has to survive being
+              drawn on top of a full-bleed density field, not just a flat
+              panel. */}
+          <line x1={CENTER} y1={4} x2={CENTER} y2={VIEW - 4} className="stroke-axis" strokeWidth={1.25} strokeDasharray="2 3" />
+          {/* Intrinsic 240-unit width with no `w-full`: viewBox scale is 1.0,
+              so 9 authored units was a literal 9px — under the 10px floor.
+              12 clears it. */}
+          <text x={CENTER + 5} y={18} fontSize={12} className="fill-axis font-mono">
             z
           </text>
         </svg>
       </div>
-      <div role="radiogroup" aria-label="Combined orbital density" className="flex flex-wrap gap-1.5">
-        {PRESETS.map((p, i) => (
-          <button
-            key={p.key}
-            type="button"
-            role="radio"
-            aria-checked={i === index}
-            onClick={() => setIndex(i)}
-            className={
-              i === index
-                ? "rounded-full bg-brand px-2.5 py-1 text-xs font-medium text-brand-foreground"
-                : "rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-surface-muted"
-            }
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
+      {/* Was a hand-rolled `role="radiogroup"` with `role="radio"` children,
+          no arrow-key handling, no roving tabindex, and ~24px-tall pills. It
+          announced as a radio group and then didn't behave as one.
+          `PresetToggle` already implements the ARIA Authoring Practices
+          pattern (single tab stop, arrows move and select with wrap) at a
+          44px target, so this defers to it rather than duplicating it. */}
+      <PresetToggle
+        options={PRESETS.map((p) => ({ label: p.label }))}
+        index={index}
+        onChange={setIndex}
+        ariaLabel="Combined orbital density"
+      />
       <p className="text-xs text-muted-foreground">
         Shading is {preset.formula}, this orbital&rsquo;s true combined density (radial × angular, both from the
-        platform&rsquo;s verified functions), normalized to its own peak value ({maxDensity.toExponential(2)}). Darker
-        regions are where the electron is more likely to be found; the picture is mirrored left-right because the
-        density has no φ-dependence for m=0 states.
+        platform&rsquo;s verified functions), normalized to its own peak value ({maxDensity.toExponential(2)}).{" "}
+        {/* The legend used to read "darker regions are where the electron is
+            more likely" — which is backwards on this platform's default dark
+            theme. Density is painted as per-cell *opacity* over `fill-brand`,
+            so high density is the most strongly coloured cell, which reads as
+            the brightest region on dark and the darkest on paper. Describing
+            the encoding (colour strength) instead of one theme's appearance
+            is correct in both. */}
+        The more strongly coloured a region, the more likely the electron is to be found there; the picture is mirrored
+        left-right because the density has no φ-dependence for m=0 states.
       </p>
     </div>
   );

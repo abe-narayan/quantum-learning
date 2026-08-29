@@ -75,7 +75,9 @@ export const doesThisStateFactor: MultipleChoiceProblem = {
     correctIdea: "A quick check against the 'obvious' candidate product states (built from $|\\pm\\rangle$) is useful, but only a full coefficient-matching argument proves factorization is impossible in general.",
     whyCorrect: "The contradiction ($b_0=b_1$ forced, yet $a_1b_0\\neq a_1b_1$ required) is airtight and doesn't depend on which candidate product states happen to have been tried.",
     whyWrong: [
-      "Each of the three 'yes' options is a genuine product state, but none of them reproduces the specific sign pattern $(+,+,+,-)$ this target state has.",
+      { optionId: "a", text: "A real product state, with all four coefficients positive. The target carries a minus on |11⟩." },
+      { optionId: "b", text: "A real product state whose minus signs land on |01⟩ and |11⟩, not on |11⟩ alone." },
+      { optionId: "d", text: "A real product state whose minus signs land on |10⟩ and |11⟩. A single minus sign on |11⟩ is the pattern no product state can produce." },
     ],
   },
 };

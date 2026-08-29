@@ -20,16 +20,16 @@ export const phaseFlipCodeStabilizers: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["x0x1", "x_0x_1", "x⊗x⊗i"],
-      ["x1x2", "x_1x_2", "i⊗x⊗x"],
+      ["x0x1", "x₀x₁", "x_0x_1", "x_0 x_1", "x0 x1", "x⊗x⊗i", "xxi"],
+      ["x1x2", "x₁x₂", "x_1x_2", "x_1 x_2", "x1 x2", "i⊗x⊗x", "ixx"],
     ],
-    incorrectFeedback: "Conjugating Z₀Z₁ by H on every qubit replaces each Z with HZH — what does HZH equal?",
-    partialFeedback: "Good — now give the second stabilizer generator as well.",
+    incorrectFeedback: "Conjugating Z₀Z₁ by H on every qubit replaces each Z with HZH. What does HZH equal?",
+    partialFeedback: "Good. Now give the second stabilizer generator as well.",
   },
   hints: [
     { text: "HZH = X (derived in an earlier practice question)." },
-    { text: "Conjugating Z₀Z₁ by H^⊗3 replaces each Z with X: X₀X₁." },
-    { text: "The same applies to Z₁Z₂, giving X₁X₂." },
+    { text: "Conjugating a product Z₀Z₁ by H on every qubit conjugates each factor separately. Apply the rule from the first hint to each factor." },
+    { text: "Do the same for the second generator." },
   ],
   solution: {
     steps: [
@@ -40,7 +40,7 @@ export const phaseFlipCodeStabilizers: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "This is exactly the same conjugation argument the phase-flip code's entire construction relies on, applied specifically to the stabilizer generators.",
-    whyCorrect: "Consistent with the phase-flip code correcting Z errors — X-type stabilizers are exactly what detects Z errors, by the same anticommutation logic as the bit-flip code.",
+    whyCorrect: "Consistent with the phase-flip code correcting Z errors: X-type stabilizers are exactly what detects Z errors, by the same anticommutation logic as the bit-flip code.",
     whyWrong: ["Keeping the stabilizers as Z₀Z₁, Z₁Z₂ unchanged ignores that the entire code, including its stabilizers, is conjugated by H."],
   },
 };

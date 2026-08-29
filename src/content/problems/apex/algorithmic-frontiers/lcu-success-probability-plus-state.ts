@@ -24,6 +24,18 @@ export const lcuSuccessProbabilityPlusState: NumericProblem = {
     tolerance: 0.01,
     incorrectFeedback:
       "Use the eigenstate relations X|+>=|+> and Z|+>=|-> to get A|+> = (X+Z)/2 |+> = (|+>+|->)/2. Expand |+> and |-> in the computational basis, simplify (the |1> components cancel), then take the squared norm of the result -- that norm-squared IS the success probability, exactly as this lesson derived (||alpha||_1 = 1 here, so there's no extra rescaling).",
+    nearMisses: [
+      {
+        value: Math.SQRT1_2,
+        feedback:
+          "1/sqrt(2) is the norm of A|+>, the amplitude. The post-selection probability is that norm squared, so square it once more.",
+      },
+      {
+        value: 0.25,
+        feedback:
+          "0.25 comes from squaring the coefficient 1/2 in (|+>+|->)/2 without noticing that |+>+|-> = sqrt(2)|0> carries a factor of sqrt(2) of its own.",
+      },
+    ],
   },
   hints: [
     { text: "The success probability of post-selecting the ancilla on |0> is exactly |A|psi>|^2 whenever ||alpha||_1 = 1, as here (alpha_0=alpha_1=1/2 sum to 1) -- this lesson derived that fact directly, not just asserted it." },

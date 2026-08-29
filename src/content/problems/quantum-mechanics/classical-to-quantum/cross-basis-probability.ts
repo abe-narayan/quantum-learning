@@ -23,6 +23,11 @@ export const crossBasisProbability: NumericProblem = {
     value: 0.75,
     tolerance: 0.01,
     incorrectFeedback: "cos(π/3) = 0.5. Substitute directly into (1+cosφ)/2.",
+    nearMisses: [
+      { value: 0.25, feedback: "0.25 is P(−), which uses (1 − cos φ)/2. The two outcomes sum to 1; check which sign the |+⟩ overlap carries." },
+      { value: 0.5, feedback: "0.5 is the φ = π/2 case, where the interference term vanishes. At φ = π/3 the cosine is positive, so P(+) rises above a half." },
+      { value: Math.PI / 3, tolerance: 0.01, feedback: "You substituted φ where the formula wants cos φ." },
+    ],
   },
   hints: [
     { text: "cos(π/3) = 0.5." },

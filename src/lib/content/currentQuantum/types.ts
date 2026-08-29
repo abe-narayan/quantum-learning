@@ -24,27 +24,47 @@ export type CurrentQuantumSource = {
 };
 
 /**
- * One real quantum-computing/physics development, connected back to a real
- * QuantumLearn lesson.
+ * The half of an entry that a *link* to that entry needs: identity, when it
+ * happened, what to call it, which bucket it sits in, and which lesson it
+ * hangs off. No prose, no source, no image.
  *
- * Modeled on `GlossaryTerm` (`src/lib/content/glossary.ts`) and `ProblemMeta`
- * (`src/lib/problems/types.ts`): a flat, hand-authored record with no nested
- * sub-objects beyond `source` (which is just {name, url}), so adding or
- * editing an entry by hand only ever means changing scalar string fields in
- * `data.ts`.
+ * WHY THIS IS ITS OWN TYPE: this is the only half that may cross into a
+ * client bundle. `ConceptDetailPanel` is a `"use client"` component that
+ * reverse-looks-up entries by lesson slug and renders date/category/title as
+ * a mini-card link — it needs exactly these five fields, and used to reach
+ * the whole corpus (prose, citations, image metadata and all) to get them.
+ * See `metaRegistry.ts` for the full reasoning and the rule that keeps it
+ * that way.
+ *
+ * Modeled on `ProblemMeta` (`src/lib/problems/types.ts`), which draws the
+ * same line for the same reason.
  */
-export type CurrentQuantumEntry = {
+export type CurrentQuantumEntryMeta = {
   /** URL-safe unique identifier, e.g. "google-willow-below-threshold-2024". */
   slug: string;
   /** ISO 8601 date (YYYY-MM-DD, or YYYY-MM when only a month is confirmed). */
   date: string;
   title: string;
-  /** One paragraph, in plain original prose (not copied from the source). */
-  summary: string;
   category: CurrentQuantumCategory;
-  source: CurrentQuantumSource;
   /** A real, existing lesson slug (validated against src/content/lessons/**\/*.mdx). */
   relatedLessonSlug: string;
+};
+
+/**
+ * The half of an entry that only a full card render needs: the prose, the
+ * citation, the difficulty readout and the optional figure. Server-only by
+ * construction — it lives in `data.ts`, keyed by slug, alongside the
+ * editorial provenance comments for each entry.
+ *
+ * Every field here is rendered by `CurrentQuantumCard`, which is only ever
+ * handed entries by a server component (`/current-quantum`,
+ * `RelatedCurrentQuantum`). If you find yourself wanting one of these fields
+ * on the client, pass it as a prop rather than importing `data.ts`.
+ */
+export type CurrentQuantumEntryBody = {
+  /** One paragraph, in plain original prose (not copied from the source). */
+  summary: string;
+  source: CurrentQuantumSource;
   /** One sentence connecting this real-world development to that lesson's actual content. */
   whyThisMatters: string;
   /** Optional — how advanced the underlying physics/CS is, matching `Difficulty` elsewhere. */
@@ -73,3 +93,19 @@ export type CurrentQuantumEntry = {
     license: string;
   };
 };
+
+/**
+ * One real quantum-computing/physics development, connected back to a real
+ * QuantumLearn lesson — meta and body rejoined.
+ *
+ * This is still the shape every renderer sees; the split above is a payload
+ * boundary, not a modelling change. `registry.ts` is the one place that
+ * performs the join (`getAllCurrentQuantumEntries`), and it is server-only.
+ *
+ * Modeled on `GlossaryTerm` (`src/lib/content/glossary.ts`) and `ProblemMeta`
+ * (`src/lib/problems/types.ts`): a flat, hand-authored record with no nested
+ * sub-objects beyond `source` (which is just {name, url}), so adding or
+ * editing an entry by hand only ever means changing scalar string fields in
+ * `metaRegistry.ts` and `data.ts`.
+ */
+export type CurrentQuantumEntry = CurrentQuantumEntryMeta & CurrentQuantumEntryBody;

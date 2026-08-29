@@ -30,12 +30,17 @@ export const crosstalkFidelityAt01: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.0001,
-    incorrectFeedback: "Compute cos²(0.05).",
+    incorrectFeedback: "Check the half-angle: the cosine takes ε/2, not ε. Forgetting the half makes the fidelity loss look about four times larger than it should.",
+    nearMisses: [
+      { value: Math.cos(0.1) ** 2, tolerance: 0.0005, feedback: "That is cos²(ε) without the half-angle. The spectator rotation by ε moves the Bloch vector by ε, and the overlap depends on half that angle." },
+      { value: Math.cos(0.05), tolerance: 0.0002, feedback: "That is the overlap amplitude cos(ε/2). Fidelity is its square." },
+      { value: 0.99938, tolerance: 0.0002, feedback: "That is the lesson's own ε = 0.05 answer. Doubling ε roughly quadruples the fidelity loss, so this ε = 0.1 case sits noticeably lower." },
+    ],
   },
   hints: [
-    { text: "F(0.1) = cos²(0.1/2) = cos²(0.05)." },
-    { text: "cos(0.05) ≈ 0.99875." },
-    { text: "0.99875² ≈ 0.99750." },
+    { text: "One substitution and one squaring. The only trap is the half-angle: the formula divides ε by two before taking the cosine." },
+    { text: "F = cos²(ε/2) with ε = 0.1, so evaluate cos(0.05) first." },
+    { text: "Square the cosine you found. The result should sit just below one, since a small spectator rotation loses only a little fidelity." },
   ],
   solution: {
     steps: [{ description: "F(0.1) = cos²(0.05) ≈ 0.9975." }],

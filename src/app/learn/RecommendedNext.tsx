@@ -128,7 +128,7 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
             className="h-1 w-full max-w-2xl overflow-hidden rounded-full bg-surface-muted"
           >
             <div
-              className="h-full rounded-full bg-brand transition-[width] duration-[--dur-slow] ease-[--ease-instrument]"
+              className="h-full rounded-full bg-brand transition-[width] duration-(--dur-slow) ease-instrument"
               style={{
                 width: `${nextStatus?.slugs.length ? Math.round((completedInCourse / nextStatus.slugs.length) * 100) : 0}%`,
               }}

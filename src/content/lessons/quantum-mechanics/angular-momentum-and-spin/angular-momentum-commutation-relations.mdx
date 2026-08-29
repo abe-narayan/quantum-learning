@@ -49,14 +49,16 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-$L_x,L_y,L_z$ turn out not to commute with each other — and the specific way they fail to commute is the algebraic seed this entire course grows from.
+$L_x$, $L_y$ and $L_z$ do not commute with one another. The specific way they fail to commute is the seed the entire rest of this course grows from.
 </LessonHook>
 
 ## Motivation
 
-Classically, angular momentum is $\vec L=\vec r\times\vec p$, nothing
-quantum about the definition itself. The new physics shows up only once
-$\vec r$ and $\vec p$ become operators.
+Classically, angular momentum is $\vec L=\vec r\times\vec p$. There is
+nothing quantum about that definition, and this lesson does not replace
+it. The only change is that $\vec r$ and $\vec p$ stop being numbers,
+and everything that follows is the consequence of that single
+substitution.
 
 Picture it concretely first: a particle at position $\vec r=(2,1)$ in the
 $xy$-plane, moving with momentum $\vec p=(0,1.5)$ (straight "up" the
@@ -73,7 +75,7 @@ perpendicular to both $\vec r$ and $\vec p$, not some blend of them:
 />
 
 $\vec L$ itself lives along the axis perpendicular to this page, which is
-exactly why quantum mechanically it takes three separate operators,
+why quantum mechanically it takes three separate operators,
 $L_x,L_y,L_z$, one per spatial direction, to describe it fully, and why
 those three operators' mutual commutation structure (derived below) is
 the real content of "angular momentum" once $\vec r$ and $\vec p$ become
@@ -82,7 +84,7 @@ operators.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/ee/NMR-Spectrometer.JPG"
   alt="A Bruker nuclear magnetic resonance (NMR) spectrometer, a large cylindrical superconducting magnet system used to probe nuclear spin precession"
-  caption="An NMR spectrometer: its superconducting magnet drives the same spin precession governed by the commutation algebra derived below, the physics underlying both chemical NMR spectroscopy and clinical MRI."
+  caption="A nuclear magnetic resonance spectrometer. Its superconducting magnet sets nuclear spins precessing, and the precession rate is fixed by the commutation algebra derived below. Chemical NMR spectroscopy and clinical MRI both read out that precession."
   credit="Wikimedia Commons / Andel Früh"
   creditUrl="https://commons.wikimedia.org/wiki/File:NMR-Spectrometer.JPG"
   license="CC BY-SA 2.5"
@@ -97,26 +99,60 @@ L_x=yp_z-zp_y,\qquad L_y=zp_x-xp_z,\qquad L_z=xp_y-yp_x
 $$
 
 This is the operator version of $\vec L=\vec r\times\vec p$'s components,
-built from position and momentum operators this platform has used since
+built from the position and momentum operators in use since
 Wave Mechanics.
 
 ### The one fact everything follows from
 
-Position and momentum operators on the *same* axis satisfy
-$[x,p_x]=i\hbar$ (derived in Wave Mechanics); operators on *different*
-axes always commute: $[x,y]=0$, $[p_x,p_y]=0$, $[x,p_y]=0$, and so on.
-There's nothing coupling independent spatial directions. Computing
-$[L_x,L_y]$ means expanding $(yp_z-zp_y)(zp_x-xp_z)-(zp_x-xp_z)(yp_z-zp_y)$
-into four cross terms; every term where the only position/momentum pair
-appearing together is a *different*-axis pair (like $y$ and $p_x$)
-vanishes immediately, since those operators commute and can be freely
-reordered to cancel between the two products. The **only** surviving
-piece comes from the one term containing $z$ and $p_z$ together, using
-$p_zz=zp_z-i\hbar$ to reorder it, and collapses to:
+Wave Mechanics lived on a line: one $\hat x$, one $\hat p$, one
+commutator. Stepping into 3D triples the cast, three position operators
+and three momenta, one pair per axis, and everything about how they
+interact fits in a single compact statement:
 
 $$
-[L_x,L_y] = i\hbar(xp_y-yp_x) = i\hbar L_z
+[x_i, p_j] = i\hbar\,\delta_{ij}
 $$
+
+Same-axis pairs ($i=j$) reproduce the familiar $[x,p_x]=i\hbar$ derived
+in Wave Mechanics. Different-axis pairs ($i\ne j$) commute, and so do
+positions with positions and momenta with momenta: $[x,y]=0$,
+$[p_x,p_y]=0$, $[x,p_y]=0$, and so on.
+Nothing couples independent spatial directions. That single fact does all
+the work below.
+
+<DerivationSteps>
+  <DerivationStep annotation="Substitute the definitions and expand the commutator bilinearly. A commutator is linear in each slot, so a difference of two terms in each slot gives four commutators.">
+$$
+[L_x,L_y] = [yp_z-zp_y,\ zp_x-xp_z] = [yp_z,zp_x] - [yp_z,xp_z] - [zp_y,zp_x] + [zp_y,xp_z]
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Kill the two middle terms. In [yp_z, xp_z] the operators are y, p_z, x, p_z: every pair is either the same operator or a different-axis pair, so all of them commute and the two products are equal. The same is true of z, p_y, z, p_x in the third term. Neither term contains a matched position-momentum pair, so neither survives.">
+$$
+[yp_z,xp_z] = 0, \qquad [zp_y,zp_x] = 0
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Evaluate the first surviving term. In [y p_z, z p_x], the y and the p_x commute with everything in sight, so they come out of the commutator and leave [p_z, z] = −iħ in the middle.">
+$$
+[yp_z,zp_x] = y\,[p_z,z]\,p_x = -i\hbar\,yp_x
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Same move on the last term: x and p_y come out, leaving [z, p_z] = +iħ. Note the opposite sign, which is where L_z's minus sign ultimately comes from.">
+$$
+[zp_y,xp_z] = x\,[z,p_z]\,p_y = i\hbar\,xp_y
+$$
+  </DerivationStep>
+  <DerivationStep annotation="Reassemble. The two surviving pieces are exactly the two terms of L_z, with the right relative sign.">
+$$
+[L_x,L_y] = -i\hbar\,yp_x + i\hbar\,xp_y = i\hbar(xp_y-yp_x) = i\hbar L_z
+$$
+  </DerivationStep>
+</DerivationSteps>
+
+Only one canonical commutator was used, $[z,p_z]=i\hbar$, and it appeared
+twice with opposite signs. If $\hbar$ were zero, the right-hand side would
+vanish and the three components would commute, which is the classical
+case: this identity is the whole quantum content of angular momentum,
+measured in units of $\hbar$.
 
 Every other <Term id="commutator">commutator</Term> combination follows the same pattern
 cyclically ($x\to y\to z\to x$):
@@ -127,18 +163,20 @@ $$
 
 ### Verified directly, not just derived
 
-`angularMomentumX`, `angularMomentumY`, `angularMomentumZ` (built from
-the ladder-operator matrix elements the next lesson derives, applicable
-to any $j$ including $j=1/2,1,3/2,\dots$) satisfy
-$[J_x,J_y]-i\hbar J_z=0$ to floating-point precision, checked directly
-for $j=1/2,1,3/2,2$, not just the orbital case this lesson derived by
-hand, confirming the same algebra holds for the abstract $J$ operators
-the rest of this course builds on (with $\hbar=1$ in this platform's
-convention).
+The derivation above used $\vec L=\vec r\times\vec p$, so strictly it
+covers orbital angular momentum only. The rest of this course applies the
+same algebra to spin, which has no $\vec r$ and no $\vec p$ at all, so
+that extension deserves a check rather than an assurance.
+
+The platform's `angularMomentumX`, `angularMomentumY` and
+`angularMomentumZ` build the matrices for any $j$, half-integer included.
+The explorer below computes $[J_x,J_y]$ by multiplying those matrices and
+puts the result next to $iJ_z$, with $\hbar=1$ in this platform's
+convention. They agree for every $j$ shown.
 
 <InteractiveSection
   title="Match [Jx,Jy] against iJz, entry by entry"
-  description="Pick a j value and compare [Jx,Jy], computed here by actually multiplying the real Jx and Jy matrices, against iJz side by side. They match exactly, entry by entry, for every j shown, not just the orbital case derived by hand above."
+  description="Pick a j value and compare [Jx,Jy], obtained by multiplying the real Jx and Jy matrices, against iJz beside it. The two agree entry by entry at every j, including the half-integer values that no orbital derivation could ever reach."
 >
   <MatrixGridExplorer
     presets={commPresets}
@@ -148,15 +186,27 @@ convention).
 
 ## Physical Interpretation
 
-$[L_x,L_y]\neq0$ means $L_x$ and $L_y$ **cannot be simultaneously known
-with arbitrary precision**, exactly the <Term id="heisenberg-uncertainty-principle">generalized uncertainty relation</Term>
-(Operators, Observables & Measurement) applied to angular momentum
-specifically. You can know $L_z$ and $\vec L^{\,2}$ (the total magnitude)
-simultaneously (shown in the next lesson), but never two different
-components of $\vec L$ at once. This is a distinct kind of
-uncertainty from position-momentum uncertainty, and it's the
-reason a classical picture of "the atom's angular momentum vector points
-in a definite direction" breaks down completely at the quantum level.
+$[L_x,L_y]\neq0$ means $L_x$ and $L_y$ **cannot both be sharp in the same
+state**: feed the commutator into the <Term id="heisenberg-uncertainty-principle">generalized uncertainty relation</Term>
+from Operators, Observables & Measurement and you get $\Delta L_x\,\Delta
+L_y \ge \tfrac{\hbar}{2}|\langle L_z\rangle|$ directly.
+
+That bound behaves differently from the position-momentum one. Its
+right-hand side depends on the state, through $\langle L_z\rangle$, so it
+can vanish: in a state with $\langle L_z\rangle = 0$ the inequality
+collapses to $\Delta L_x\,\Delta L_y \ge 0$ and constrains nothing. Read
+that as a statement about the bound, not a promise about the spreads. The
+$|1,0\rangle$ state has $\langle L_z\rangle=0$ and still has
+$\Delta L_x=\Delta L_y=\hbar$; the inequality has simply gone silent
+rather than reporting that both components are sharp. The $j=0$ state,
+with all three components zero at once, is the one state where every
+component really is sharp simultaneously.
+
+What survives generally is that $L_z$ and $\vec L^{\,2}$ can be known
+together, as the next lesson shows, while two different components
+cannot. So the classical image of an angular momentum vector pointing
+somewhere definite has to go: the length is knowable and one projection
+is knowable, and the direction is not.
 
 Before reading on, decide what you think happens if an atom's angular
 momentum is prepared with a definite $L_z$ and then $L_x$ is measured:
@@ -169,17 +219,16 @@ momentum is prepared with a definite $L_z$ and then $L_x$ is measured:
     { label: "The measurement fails because Lx doesn't exist yet", value: "fails" },
   ]}
   correctValue="spread"
-  explanation="Because [Lx,Lz]≠0, a state with a sharp Lz value is not an Lx eigenstate at all; it's a superposition of Lx eigenstates, so measuring Lx gives a genuine spread of outcomes governed by the Born rule, and the act of measuring it destroys the earlier certainty about Lz. This is the same incompatible-observables structure the Stern-Gerlach lesson later demonstrates experimentally with spin."
+  explanation="Because [Lx,Lz]≠0, a state with a sharp Lz value is not an Lx eigenstate; it is a superposition of Lx eigenstates, so measuring Lx draws from a spread of outcomes governed by the Born rule, and doing so destroys the earlier certainty about Lz. The Stern-Gerlach lesson later runs precisely this sequence as an experiment, with spin in place of orbital angular momentum."
 />
 
-This same algebra, with spin operators in place of orbital ones
-($[S_x,S_y]=i\hbar S_z$), is the physics behind nuclear magnetic
-resonance and MRI. A proton's spin, placed in an external magnetic field,
-precesses precisely because its spin operators obey this commutation
-structure; NMR spectroscopy and clinical MRI both work by driving that
-precession with a radiofrequency pulse and then measuring how the signal
-relaxes over time, turning the operator algebra derived above into an
-image of living tissue.
+The same algebra with spin operators in place of orbital ones,
+$[S_x,S_y]=i\hbar S_z$, is what makes nuclear magnetic resonance work. A
+proton in a magnetic field has $H \propto S_z$, and because $S_x$ does
+not commute with $S_z$, a spin prepared along $x$ cannot stay there: it
+precesses. NMR spectroscopy and clinical MRI drive that precession with a
+radiofrequency pulse and watch how the signal decays, which is how the
+commutator derived above ends up producing an image of soft tissue.
 
 ## Worked Example
 
@@ -188,11 +237,11 @@ $x\to y\to z\to x$ in the boxed result $[L_x,L_y]=i\hbar L_z$.**
 
 Applying the substitution $x\to y,\ y\to z,\ z\to x$ to
 $[L_x,L_y]=i\hbar L_z$ gives $[L_y,L_z]=i\hbar L_x$, the second boxed
-identity. Applying it again: $[L_z,L_x]=i\hbar L_y$, the third. The
-cyclic pattern reproduces exactly the two "remaining" identities from one
-derived case, since the original derivation never used any property
-special to the $x,y$ pair specifically (only that $x,y,z$ are mutually
-orthogonal axes).
+identity. Applying it again gives $[L_z,L_x]=i\hbar L_y$, the third. One
+derivation therefore covers all three, because nothing in it used any
+property peculiar to the $x,y$ pair; it used only that $x$, $y$ and $z$
+are mutually orthogonal and right-handed. Reverse the handedness of the
+coordinate system and every sign in the boxed identities flips.
 
 ## Common Mistakes
 

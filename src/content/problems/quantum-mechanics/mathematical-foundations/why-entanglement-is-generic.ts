@@ -17,7 +17,7 @@ export const whyEntanglementIsGeneric: MultipleChoiceProblem = {
     prompt:
       "Which best explains why not every vector in a tensor product space $V\\otimes W$ can be written as a simple product $|v\\rangle\\otimes|w\\rangle$?",
     options: [
-      { id: "a", text: "$V\\otimes W$ generally has more dimensions than there are free parameters in a single simple product" },
+      { id: "a", text: "$V\\otimes W$ has more dimensions than a simple product has free parameters, once both factors have dimension at least 2" },
       { id: "b", text: "Tensor products are only defined for equal-dimensional spaces" },
       { id: "c", text: "Vectors in $V\\otimes W$ must always be normalized" },
       { id: "d", text: "$V\\otimes W$ is not actually a vector space" },
@@ -34,8 +34,9 @@ export const whyEntanglementIsGeneric: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Think about counting free parameters: how many are needed to specify a simple product, versus a general vector in V⊗W?",
   },
   hints: [
-    { text: "A simple product |v⟩⊗|w⟩ is specified by roughly dim(V)+dim(W)-1 free parameters." },
-    { text: "V⊗W itself has dimension dim(V)·dim(W) — compare the two counts for dim≥2 spaces." },
+    { text: "Try counting. How many numbers do you need to pin down a general vector in V⊗W?" },
+    { text: "Now count how many you need to pin down a simple product: a direction in V, a direction in W, and one overall scale." },
+    { text: "Compare dim(V)·dim(W) against dim(V)+dim(W)−1 once both spaces have dimension at least 2." },
   ],
   solution: {
     steps: [
@@ -47,6 +48,10 @@ export const whyEntanglementIsGeneric: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Entanglement is a dimension-counting inevitability, not a special quirk of particular states.",
     whyCorrect: "For two qubits, nm=4 against n+m-1=3 — already a gap, which widens fast for larger systems.",
-    whyWrong: ["The tensor product's definition doesn't restrict to equal dimensions or impose normalization — those aren't the reason simple products are a minority."],
+    whyWrong: [
+      { optionId: "b", text: "Adds a restriction the definition does not have. The lesson's worked example tensors a 2-dimensional space with a 3-dimensional one." },
+      { optionId: "c", text: "Brings in a physical condition on states. Normalization is orthogonal to whether a vector factors; scaling a simple product leaves it simple." },
+      { optionId: "d", text: "Denies the structure the question is about. V⊗W has a basis and supports linear combinations like any other vector space." },
+    ],
   },
 };

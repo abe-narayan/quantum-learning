@@ -21,16 +21,16 @@ export const whyConcurrenceNeedsStatevector: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["amplitudes", "a,b,c,d", "pure-state formula", "determinant"],
-      ["mixed", "wrong answer", "not defined", "prevents"],
+      ["amplitudes", "a,b,c,d", "ad-bc", "ad - bc", "2|ad", "pure-state formula", "pure state formula", "determinant"],
+      ["mixed", "wrong answer", "not defined", "undefined", "meaningless", "prevent", "impossible", "cannot be called", "can't be called", "type error", "compile", "silently", "misuse", "no amplitudes"],
     ],
-    incorrectFeedback: "Think about what quantity concurrenceOfPureState's formula, C=2|ad-bc|, actually needs as its input — and what a mixed ρ doesn't have.",
-    partialFeedback: "You're close — connect this to the type system actively preventing a call that would silently compute a meaningless number.",
+    incorrectFeedback: "Ask what the function's formula reads off from its argument, and whether every density matrix can supply that.",
+    partialFeedback: "You're close. Add the design payoff: say what the strict signature rules out before the program ever runs.",
   },
   hints: [
-    { text: "C=2|ad-bc| needs the four amplitudes a,b,c,d of a pure state directly." },
-    { text: "A mixed density matrix has no such amplitudes — there's no 'a,b,c,d' to extract from a general ρ." },
-    { text: "Requiring a StateVector argument makes it impossible to accidentally call this function on a mixed state and get a meaningless number back." },
+    { text: "Look at the formula the function implements. What ingredients does it read directly from its input?" },
+    { text: "Does a general density matrix contain those ingredients? Consider what information is lost when a state is not pure." },
+    { text: "If the function accepted any matrix, what would happen when someone passed a state it cannot handle? What does the stricter signature do instead?" },
   ],
   solution: {
     steps: [

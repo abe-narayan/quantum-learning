@@ -117,7 +117,7 @@ export function ExternalFigure({
   return (
     <figure
       className={cn(
-        "not-prose my-6 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-surface-muted/40",
+        "not-prose my-6 overflow-hidden rounded-panel border border-border bg-surface-muted/40",
         wide && "sm:mx-0 lg:-mx-6 xl:-mx-10",
         className
       )}

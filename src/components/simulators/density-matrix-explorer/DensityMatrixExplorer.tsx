@@ -246,7 +246,7 @@ export function DensityMatrixExplorer() {
             Drag to rotate the view. A mixed state&rsquo;s point sits strictly inside the sphere, not on its surface.
           </p>
 
-          <div aria-live="polite" className="mt-4 rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          <div aria-live="polite" className="mt-4 rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {narration}
           </div>
 

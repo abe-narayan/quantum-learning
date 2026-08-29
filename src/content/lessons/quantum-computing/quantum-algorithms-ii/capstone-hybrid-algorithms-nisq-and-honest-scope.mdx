@@ -59,24 +59,20 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Two very different bets on hardware">
-A long, precise, fixed circuit needing everything to go right in one shot, versus short, repeated, error-tolerant circuits whose classical outer loop can partly compensate for imperfect hardware — Shor's algorithm and VQE/QAOA are betting on very different futures.
+One long, precise circuit that has to go right in a single shot, versus short circuits run thousands of times with a classical loop absorbing some of the damage. Shor's algorithm and VQE/QAOA are bets on different hardware futures.
 </LessonHook>
 
 ## Motivation
 
 This course built two structurally different families of quantum
-algorithm, Shor's and VQE/QAOA. This capstone makes the comparison
-explicit, and closes with a complete list of what this course actually
-built versus simulated versus left as a documented gap.
+algorithm. They differ in more than technique: they assume different
+machines, tolerate different failures, and offer different kinds of
+guarantee.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/IBM_Q_system_%28Fraunhofer_2%29.jpg/1280px-IBM_Q_system_%28Fraunhofer_2%29.jpg"
-  alt="An IBM Quantum System One installed at the Fraunhofer research site in Ehningen, Germany"
-  caption="A real IBM Quantum System One, installed at a Fraunhofer research site in Germany — current, actual NISQ-era hardware, the regime this capstone contrasts against the fault-tolerant machines Shor's algorithm needs at scale."
-  credit="IBM Research (photo by Holger Muench)"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_system_(Fraunhofer_2).jpg"
-  license="CC BY 2.0"
-/>
+This capstone puts them side by side on those three axes, and then does
+something a course rarely does to itself. It lists, algorithm by
+algorithm, which pieces this platform builds and runs, which it computes
+by shortcut, and which it declines to build at all.
 
 ## Mathematical Development
 
@@ -100,14 +96,14 @@ a single long, must-be-exactly-right circuit.
   question="Take the triangle's p=1-tuned parameters (γ=0.60, β=0.30) and repeat that exact same pair at every layer, p=1 through 6, without re-optimizing anything. Does expectedCutSize climb steadily toward the true max of 2 as p grows?"
   options={[
     { label: "Yes, more layers of the same good pair only helps", value: "climbs" },
-    { label: "No — it stays flat at the p=1 value", value: "flat" },
-    { label: "No — it swings up and down, sometimes landing below the p=1 baseline", value: "swings" },
+    { label: "No: it stays flat at the p=1 value", value: "flat" },
+    { label: "No: it swings up and down, sometimes below the p=1 baseline", value: "swings" },
   ]}
   correctValue="swings"
-  explanation="Repeating (γ=0.60, β=0.30) unchanged, expectedCutSize goes 1.999 (p=1) → 1.544 (p=2) → 1.460 (p=3) → 1.992 (p=4) → 1.592 (p=5) → 1.424 (p=6) — not a climb, a genuine swing, occasionally dropping below the 1.5 no-optimization baseline. Depth alone buys nothing; each depth needs its own re-optimized (γ,β), which is exactly what a real classical outer loop is for."
+  explanation="Repeating (γ=0.60, β=0.30) unchanged, expectedCutSize goes 1.999 (p=1), 1.544 (p=2), 1.460 (p=3), 1.992 (p=4), 1.592 (p=5), 1.424 (p=6). Not a climb but a swing, and at p=3 and p=6 it drops below the 1.5 baseline that random guessing achieves. Depth alone buys nothing. Each depth needs its own re-optimized (γ,β), which is what the classical outer loop is for, and which is also why deeper QAOA costs more classical work rather than less."
 />
 
-<InteractiveSection title="More layers isn't automatically better" description="Slide between four fixed (γ,β) pairs and watch expectedCutSize on the triangle graph as the same pair is repeated across p=1..6 real QAOA layers. The pair tuned for p=1 (γ=0.60, β=0.30) does not simply keep climbing toward 2 as p grows — extra layers only help when their parameters are actually re-optimized for that depth, the real reason 'more layers' is a tradeoff, not a free improvement, per this capstone's practice questions.">
+<InteractiveSection title="More layers isn't automatically better" description="Slide between four fixed (γ,β) pairs and watch expectedCutSize on the triangle graph as the same pair repeats across p=1 to 6 real QAOA layers. The pair tuned for p=1 (γ=0.60, β=0.30) does not keep climbing toward 2 as p grows. Extra layers help only when their parameters are re-optimized for that depth, which is why 'more layers' is a tradeoff rather than a free improvement.">
   <ParametricCurve
     frames={depthFrames}
     sliderLabel="fixed (γ,β) pair repeated at every layer"
@@ -148,14 +144,15 @@ more than it does.
 
 ## Physical Interpretation
 
-The honest version of "quantum computers will change everything" is
-narrower and more interesting than the slogan: different algorithms need
-different hardware regimes (NISQ-tolerant vs. fault-tolerant), different
-algorithms have different kinds of speedup guarantees (proven-optimal vs.
-promise-dependent vs. heuristic-with-no-guarantee), and this platform's
-own engine mirrors that honesty, building exactly the pieces that
-demonstrate each mechanism, and saying exactly which pieces it doesn't
-build.
+The accurate version of "quantum computers will change everything" is
+narrower and more interesting than the slogan. Different algorithms need
+different hardware regimes, NISQ-tolerant or fault-tolerant. Different
+algorithms come with different kinds of guarantee: proven optimal,
+promise-dependent, or heuristic with no guarantee at all. A claim that
+skips those distinctions is not a claim about anything.
+
+This platform's engine mirrors that. It builds the pieces that demonstrate
+each mechanism and says which pieces it does not build.
 
 ## Worked Example
 
@@ -165,21 +162,20 @@ depth argument above.**
 VQE's ansatz circuit here is exactly 2 gates deep ($R_y$ then $R_z$) run
 once per cost evaluation, repeated across many optimizer iterations. A
 single bad measurement barely perturbs the overall optimization
-trajectory, since the classical loop simply tries again with adjusted
+trajectory, since the classical loop tries again with adjusted
 parameters. Shor's period-finding circuit, by contrast, is one long
 circuit (Hadamards, many controlled modular multiplications, a QFT) that
 must produce a *single* usable measurement. An error partway through
 directly corrupts that one shot, with no built-in mechanism to average it
 away. This structural difference, not just historical accident, is why
 VQE is considered NISQ-friendly and Shor's algorithm is not. The contrast
-in how many independent chances each algorithm gets is real, drawn
-directly from this course's own worked examples, not illustrative: this
-is `runVqe` run again on the exact same $H=0.6Z+0.8X$ from the last
-lesson, and every candidate direction the pattern search actually
-evaluates — one initial evaluation plus four per-iteration candidates
-across every accepted-or-tried iteration — is a genuine circuit
-execution, computed here (`capstoneVqeCircuitExecutions` below), not
-asserted:
+in how many independent chances each algorithm gets is drawn from this
+course's own worked examples rather than invented for the comparison. What
+follows is `runVqe` on the same $H=0.6Z+0.8X$ as the last lesson, and every
+candidate direction the pattern search evaluates (one initial evaluation
+plus four per-iteration candidates, across every accepted-or-tried
+iteration) is a real circuit execution, counted here by
+`capstoneVqeCircuitExecutions`:
 
 <BarChart
   bars={[
@@ -189,14 +185,13 @@ asserted:
   ariaLabel={`Number of circuit executions each algorithm needs or uses: Shor's single required measurement versus VQE's ${capstoneVqeCircuitExecutions} circuit executions across one optimization run`}
 />
 
-Shor's gets exactly one shot at the whole answer; VQE's toy example got
-113 (1 initial evaluation, plus 4 candidate directions tried across each
-of the 28 accepted-or-tried pattern-search iterations), each one a fresh
-opportunity for the classical loop to route around whatever the previous
-shot's noise or imperfection left behind — far more chances than the 28
-accepted-or-tried iterations alone would suggest, since the pattern
-search actually runs the circuit for every candidate direction it tries,
-not just the ones it ends up keeping.
+Shor's algorithm gets one shot at the whole answer. VQE's toy example got
+113: one initial evaluation plus four candidate directions tried across
+each of the 28 pattern-search iterations, with each execution a fresh
+opportunity for the classical loop to route around whatever noise the
+previous one left behind. That is many more chances than the iteration
+count alone suggests, because the pattern search runs the circuit for every
+direction it tries, not only for the ones it keeps.
 
 ## Common Mistakes
 

@@ -23,12 +23,23 @@ export const areaLawMinimumBondDimension: NumericProblem = {
     value: 4,
     tolerance: 0.01,
     incorrectFeedback:
-      "chi Schmidt coefficients of equal size 1/chi give entropy exactly log2(chi) (this lesson's GHZ example: chi=2 gives exactly log2(2)=1 bit). Requiring log2(chi) >= 2 gives chi >= 2^2 = 4.",
+      "The key identity: a bond dimension chi carries at most log2(chi) bits of entropy, saturated by chi equal Schmidt coefficients (the lesson's GHZ example saturates it at one bit). Set log2(chi) against the entropy bound, solve for chi, and take the smallest integer that satisfies it.",
+    nearMisses: [
+      {
+        value: 2,
+        feedback:
+          "2 is the entropy bound in bits, and it is also the chi the lesson's GHZ example needed for one bit. Here chi has to satisfy log2(chi) >= 2, so chi = 2^2.",
+      },
+      {
+        value: 3,
+        feedback: "chi must satisfy log2(chi) >= 2, and log2(3) is about 1.58, short of the 2-bit bound. The smallest integer that clears it is 2^2.",
+      },
+    ],
   },
   hints: [
-    { text: "A cut with bond dimension chi can carry at most log2(chi) bits of entropy (chi equal Schmidt coefficients of size 1/chi saturate this, exactly like GHZ's chi=2 giving exactly 1 bit in this lesson's worked example)." },
-    { text: "2 bits of entropy needs log2(chi) >= 2, i.e. chi >= 2^2." },
-    { text: "chi_min = 2^2 = 4, and this bound is n-independent -- it is the same for n=10 and n=10,000, by the area law's own defining property." },
+    { text: "A cut with bond dimension chi can carry at most log2(chi) bits of entropy, saturated when all chi Schmidt coefficients are equal, as in this lesson's GHZ worked example." },
+    { text: "Two bits of entropy needs log2(chi) >= 2, i.e. chi >= 2^2." },
+    { text: "Solve the inequality for the smallest integer chi. Note the bound is n-independent: the same for n=10 and for n=10,000, by the area law's own defining property." },
   ],
   solution: {
     steps: [

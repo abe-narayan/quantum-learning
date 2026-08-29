@@ -26,11 +26,27 @@ export const qsvtPolynomialValueAtASingularValue: NumericProblem = {
     value,
     tolerance: 0.002,
     incorrectFeedback: "Substitute σ=0.5 directly into P(x)=1-x²/2+x⁴/24: compute x²=0.25 and x⁴=0.0625 first, then combine.",
+    nearMisses: [
+      {
+        value: 1 - (sigma * sigma) / 2,
+        tolerance: 0.0005,
+        feedback: "You stopped at the quadratic term. The x⁴/24 term is small but the question asks for three decimal places, and it moves the third one.",
+      },
+      {
+        value: 1,
+        feedback: "That treats P as the constant polynomial 1. Both correction terms contribute at σ=0.5.",
+      },
+      {
+        value: 1 + (sigma * sigma) / 2 + (sigma * sigma * sigma * sigma) / 24,
+        tolerance: 0.0005,
+        feedback: "The quadratic term is subtracted, not added: P(x) = 1 - x²/2 + x⁴/24, the alternating truncation of cos.",
+      },
+    ],
   },
   hints: [
     { text: "The QSVT main theorem says P(A) = Σᵢ P(σᵢ)|uᵢ⟩⟨vᵢ| — you just need P evaluated at this one σ, exactly as in single-qubit QSP." },
     { text: "σ=0.5, so σ²=0.25 and σ⁴=0.0625." },
-    { text: "P(0.5) = 1 - 0.25/2 + 0.0625/24 = 1 - 0.125 + 0.002604..." },
+    { text: "Divide σ² by 2 and σ⁴ by 24, then combine with the leading 1, watching the alternating signs: the quadratic term subtracts, the quartic adds back." },
   ],
   solution: {
     steps: [

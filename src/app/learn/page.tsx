@@ -7,6 +7,7 @@ import { Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { ContinueLearning } from "@/components/curriculum/ContinueLearning";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { LessonSearch } from "@/components/curriculum/LessonSearch";
 import { PillarLessonStrip } from "@/components/curriculum/PillarLessonStrip";
 import { getCourseHref } from "@/components/curriculum/courseHref";
@@ -32,27 +33,70 @@ const breadcrumbSchema = buildBreadcrumbSchema([
 export default async function LearnPage() {
   const lessons = await getAllLessonsMeta();
 
+  // The beginner-friendly entry point. "What Is a Qubit?" needs no math
+  // background and leads with physical intuition (spinning-coin analogy, a
+  // live Bloch-sphere demo) before any formalism — a genuinely different,
+  // equally valid way in for a reader who wants the "why" before the "how."
+  const intuitionLesson = lessons.find(
+    (lesson) => lesson.slug === "quantum-computing/qubits-and-quantum-states/what-is-a-qubit"
+  );
+
   // Derived from the actual prerequisite graph, not hardcoded: whichever
-  // course(s) require nothing else are the curriculum's true starting
-  // point(s). Currently exactly one (Mathematical Foundations) — every
-  // other course traces back to it, directly or transitively — but this
-  // stays honest automatically if that ever changes.
+  // course(s) require nothing else are the curriculum's true starting points.
+  //
+  // There are two of them, and this page is built around exactly that fact —
+  // the fork below offers both. `Qubits & Quantum States` (the intuition
+  // route) re-teaches complex numbers and Dirac notation from scratch in its
+  // own modules, so no lesson in it depends on a Mathematical Foundations
+  // lesson; it is a real root, not a course that merely looks like one. The
+  // rigorous route is therefore "the root that is not the intuition course"
+  // rather than `rootCourses[0]`, which would silently become whichever of
+  // the two happens to be declared first in `curriculum.ts`.
   const rootCourses = COURSES.filter((course) => course.prerequisites.length === 0);
-  const rootCourse = rootCourses[0];
+  const rootCourse =
+    rootCourses.find((course) => course.slug !== intuitionLesson?.course) ?? rootCourses[0];
   const firstLesson = rootCourse
     ? lessons
         .filter((lesson) => lesson.course === rootCourse.slug)
         .find((lesson) => lesson.module === rootCourse.modules[0]?.slug)
     : undefined;
 
-  // A second, beginner-friendly entry point alongside the prerequisite-graph
-  // root above. "What Is a Qubit?" needs no math background and leads with
-  // physical intuition (spinning-coin analogy, a live Bloch-sphere demo)
-  // before any formalism — a genuinely different, equally valid way in for a
-  // reader who wants the "why" before the "how."
-  const intuitionLesson = lessons.find(
-    (lesson) => lesson.slug === "quantum-computing/qubits-and-quantum-states/what-is-a-qubit"
-  );
+  // The length the hero's call to action promises, read off the lesson that
+  // call actually opens rather than written down. It was a hardcoded "20
+  // minutes" and was wrong for both doors of the fork below — `what-is-a-qubit`
+  // is 30 and `complex-numbers-for-physics` is 40 — which made the first
+  // number a new visitor is given on this page the one number that is not
+  // reading from the data. `estimatedMinutes` was recalibrated corpus-wide by
+  // a fitted rule and course `estimatedHours` now derives from it, so a
+  // constant here is guaranteed to drift again. The beginner door is the
+  // referent because the button says "New here?"; the rigorous root's first
+  // lesson is the fallback for the (unauthored-content) case where there is
+  // no intuition lesson to point at.
+  const introMinutes = intuitionLesson?.estimatedMinutes ?? firstLesson?.estimatedMinutes;
+
+  // How much of the curriculum actually hangs off the rigorous root, counted
+  // rather than asserted. This card used to claim "every course on this
+  // platform traces back … to Mathematical Foundations", which was a true
+  // statement about a one-root graph and becomes false the moment there are
+  // two — and it is the kind of claim that fails silently, since nothing
+  // renders the graph beside it. Counting the closure keeps the sentence
+  // correct whatever the prerequisite data says next.
+  const dependentCourseCount = rootCourse
+    ? COURSES.filter((course) => {
+        if (course.slug === rootCourse.slug) return false;
+        const seen = new Set<string>();
+        const queue = [...course.prerequisites];
+        while (queue.length > 0) {
+          const slug = queue.pop()!;
+          if (slug === rootCourse.slug) return true;
+          if (seen.has(slug)) continue;
+          seen.add(slug);
+          const prerequisite = COURSES.find((candidate) => candidate.slug === slug);
+          if (prerequisite) queue.push(...prerequisite.prerequisites);
+        }
+        return false;
+      }).length
+    : 0;
 
   const totalHours = COURSES.reduce((sum, course) => sum + course.estimatedHours, 0);
 
@@ -94,6 +138,23 @@ export default async function LearnPage() {
             quantum mechanics and computing from first principles, the hardware and software that
             make them real, and graduate-level mastery and research-depth work beyond that.
           </Lede>
+          {/* The one clear action for a newcomer, placed before the stats
+              readout: a first-time visitor's question is "where do I click?",
+              and the previous page shape answered it with four figures to
+              parse and no button until a section down. Anchor, not lesson
+              link, so the choice of entry point (the fork below) stays a
+              real choice. */}
+          {rootCourse || intuitionLesson ? (
+            <Button href="#ways-in" size="lg" className="mt-7">
+              {/* "a 30-minute lesson", not "start in 30 minutes": the number
+                  is now whatever the data says, and the phrasing has to stay
+                  true at 5 as well as at 40 — "start in 5 minutes" reads as a
+                  countdown, not a lesson length. */}
+              {introMinutes
+                ? `New here? Start with a ${introMinutes}-minute lesson`
+                : "New here? Start here"}
+            </Button>
+          ) : null}
         </Reveal>
         <Reveal delay={90}>
           <Readouts
@@ -123,7 +184,7 @@ export default async function LearnPage() {
           the first thing they see either way.
           ------------------------------------------------------------- */}
       {rootCourse || intuitionLesson || lessons.length > 0 ? (
-        <Section width="wide" tight>
+        <Section width="wide" tight id="ways-in">
           <RecommendedNext lessons={lessons} />
 
           <Reveal>
@@ -138,6 +199,20 @@ export default async function LearnPage() {
           </Reveal>
 
           <Reveal delay={80} className="relative mt-8 grid gap-5 sm:grid-cols-2">
+            {/* Both fork cards use the same stretched-link treatment as
+                CourseList's course cards: the card's one link (its Button)
+                carries an inset-0 overlay pseudo-element, anchored to the
+                `.instrument` (position: relative in globals.css), so the
+                whole card is clickable while the button stays the visible
+                affordance and the accessible name stays the button's own
+                text. `active:!scale-none` is load-bearing, not cosmetic:
+                Button's pressed-state scale would turn the link into a
+                containing block mid-press, snapping the overlay down to the
+                button's own box between pointerdown and pointerup and
+                silently swallowing any click that started elsewhere on the
+                card. Secondary links inside a stretched card get
+                `relative z-10` to stay clickable above the overlay, exactly
+                as CourseList does. */}
             {intuitionLesson ? (
               <div data-pillar="quantum-computing">
                 <Instrument
@@ -149,7 +224,16 @@ export default async function LearnPage() {
                     {intuitionLesson.title}
                   </SectionTitle>
                   <p className="mt-2 text-sm text-muted-foreground">{intuitionLesson.description}</p>
-                  <Button href={`/lessons/${intuitionLesson.slug}`} size="sm" className="mt-5">
+                  {/* `withHint`: the visible "no prior background needed"
+                      gloss, not the hover-only tooltip — this card is
+                      precisely where a beginner on a phone decides whether
+                      they're allowed to start here. */}
+                  <DifficultyMark difficulty={intuitionLesson.difficulty} withHint className="mt-3" />
+                  <Button
+                    href={`/lessons/${intuitionLesson.slug}`}
+                    size="lg"
+                    className="mt-5 before:absolute before:inset-0 before:content-[''] active:!scale-none"
+                  >
                     Start with &ldquo;{intuitionLesson.title}&rdquo;
                   </Button>
                 </Instrument>
@@ -177,24 +261,36 @@ export default async function LearnPage() {
                 <Instrument
                   className="h-full"
                   label="Prefer rigor first"
-                  footnote="The only course here that needs nothing else before it."
+                  footnote="Needs nothing before it. Derivations and proofs from the first page, not analogies."
                 >
                   <SectionTitle level={3} size="sm">
                     {rootCourse.title}
                   </SectionTitle>
+                  {/* The count is walked from the prerequisite graph above,
+                      not written down here. Both cards in this fork are real
+                      roots — neither requires anything first — so the honest
+                      difference between them is not "which one is the start"
+                      but how much of the curriculum each one carries, and
+                      that is a number the data can answer for itself. */}
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Every course on this platform traces back, directly or through its
-                    prerequisites, to {rootCourse.title}.
+                    The mathematics the physics is built on. {dependentCourseCount} of the{" "}
+                    {COURSES.length - 1} other courses trace back to it, directly or through their
+                    own prerequisites.
                   </p>
                   <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
                     {firstLesson ? (
-                      <Button href={`/lessons/${firstLesson.slug}`} size="sm" variant="secondary">
+                      <Button
+                        href={`/lessons/${firstLesson.slug}`}
+                        size="lg"
+                        variant="secondary"
+                        className="before:absolute before:inset-0 before:content-[''] active:!scale-none"
+                      >
                         Start with &ldquo;{firstLesson.title}&rdquo;
                       </Button>
                     ) : null}
                     <Link
                       href={getCourseHref(rootCourse.slug, firstLesson?.slug)}
-                      className="text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
+                      className="relative z-10 text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
                     >
                       View the full course →
                     </Link>

@@ -16,7 +16,7 @@ export const lessonMeta = {
   module: "orbital-angular-momentum-and-spherical-harmonics",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 30,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum"],
   objectives: [
     "Derive why single-valuedness under φ→φ+2π restricts orbital angular momentum to integer l only",
@@ -31,29 +31,34 @@ Solve the angular momentum algebra abstractly and nothing forbids half-integer v
 
 ## Motivation
 
-$j=\tfrac12$ is a perfectly good
-representation of the commutation relations, and electron spin uses
-exactly that one — but a particle actually
-orbiting in space, position, angle, a real <Term id="wavefunction">wavefunction</Term>
-$\psi(\theta,\varphi)$, is different. The reason has nothing to do with new
-physics being layered on top. It's a single, almost embarrassingly simple
-geometric fact about what a wavefunction is allowed to do when you walk
-all the way around a circle and arrive back where you started. This
-lesson derives exactly why, then builds the explicit position-space
-wavefunctions, $Y_l^m(\theta,\varphi)$, that the integer restriction makes
-possible.
+The previous lesson's algebra permitted $j=0,\tfrac12,1,\tfrac32,\dots$,
+and it meant it: $j=\tfrac12$ is a perfectly good representation of the
+commutation relations, and electron spin is built on that one.
+
+Orbital angular momentum is different, and not because extra physics gets
+layered on. The difference is that orbital angular momentum comes with a
+position-space <Term id="wavefunction">wavefunction</Term> $\psi(\theta,\varphi)$ attached, and a
+function of position has an obligation the abstract algebra never
+imposed: it has to agree with itself. Walk a full circle around the
+$z$-axis and you are standing where you started, so the function has to
+return the value it returned before.
+
+That one requirement cuts the allowed list in half. This lesson shows
+how, then builds the surviving position-space wavefunctions,
+$Y_l^m(\theta,\varphi)$.
 
 ## Intuition
 
-Walk one full lap around the $z$-axis and you end up at exactly the same
-physical point you started from, so any actual function
-of position has to return to the same value it started with. The
-candidate function $e^{im\varphi}$ only manages that if $m$ is a whole
-number: with a half-integer $m$, one full lap leaves the function
-pointing the opposite way in the complex plane, disagreeing with itself
-about what value it's supposed to take at a point it never actually left.
-That flat contradiction, not any additional physical law, is the entire
-content of the derivation below.
+The candidate function is $e^{im\varphi}$, and a full lap multiplies it by
+$e^{2\pi i m}$. For whole-number $m$ that factor is $1$ and the function
+is back where it started. For half-integer $m$ the factor is $-1$: the
+function has come back pointing the opposite way in the complex plane,
+disagreeing with itself about the value it takes at a point it never
+left.
+
+No additional physical law is needed to rule that out. It is a
+contradiction on its own terms, and the derivation below is that
+observation written carefully.
 
 <PredictBeforeReveal
   question="Walk all the way around the z-axis (φ → φ+2π) and arrive back at the same physical point. Does e^(im·φ) with m = 1/2 return to its starting value?"
@@ -63,7 +68,7 @@ content of the derivation below.
     { label: "It depends on which direction you walk around", value: "depends" },
   ]}
   correctValue="no"
-  explanation="e^(i(1/2)(φ+2π)) = e^(i(1/2)φ)·e^(iπ) = -e^(i(1/2)φ): the function comes back multiplied by -1, disagreeing with the value it started with at a point it never left. A genuine position-space wavefunction can't do that, which is exactly why half-integer m (and hence half-integer l) is excluded for orbital motion, even though the same value is perfectly fine for spin."
+  explanation="e^(i(1/2)(φ+2π)) = e^(i(1/2)φ)·e^(iπ) = −e^(i(1/2)φ). The function returns multiplied by −1, contradicting the value it started with at a point it never left. A position-space wavefunction cannot do that, which is why half-integer m, and therefore half-integer l, is excluded for orbital motion while remaining perfectly available to spin."
 />
 
 ## Mathematical Development
@@ -95,21 +100,28 @@ actually lands.
 
 <PhaseWindingCircle ariaLabel="Marker at angle m times phi on the unit circle, tracing e^(i m phi) as phi sweeps from 0 to 2 pi" />
 
-For integer $m$ the marker lands back exactly on the start point: the
-same physical point in space, the same wavefunction value, no
-contradiction. For half-integer $m$ it lands on the exact opposite point
-of the circle, $e^{i\pi}=-1$, which is a different value at a point the
-wavefunction never actually left. That's the whole contradiction,
-visible directly rather than only algebraically.
+For integer $m$ the marker returns to the start point: same physical
+location, same wavefunction value. For half-integer $m$ it lands
+diametrically opposite, at $e^{i\pi}=-1$, assigning a different value to a
+point the wavefunction never left. The algebra and the picture say the
+same thing, and the picture is harder to argue with.
 
 ### Why this argument doesn't apply to spin
 
-Spin has no position-space wavefunction to begin with. There's no
-$\varphi$-dependence to demand single-valuedness of, since spin isn't a
-function of position at all. This is exactly why half-integer $j$ (like
-electron spin, $j=\tfrac12$) is mathematically allowed by the commutation
-algebra and physically realized for spin, while being *excluded* for
-orbital motion specifically by this single-valuedness argument.
+Spin has no position-space wavefunction to begin with. There is no
+$\varphi$-dependence to demand single-valuedness of, because spin is not
+a function of position at all. So half-integer $j$ stays available, and
+nature uses it: the electron's intrinsic spin is $j=\tfrac12$, a value
+the orbital argument has just ruled out for motion through space.
+
+<Callout type="note">
+The single-valuedness argument given here is the standard one and gets
+the right answer, but it is a heuristic rather than the last word: the
+careful statement is that $\vec L=\vec r\times\vec p$, acting on
+square-integrable functions on three-dimensional space, admits only
+integer $l$. Nothing below depends on which version you prefer, and the
+intuition the phase-winding picture gives is the one worth carrying.
+</Callout>
 
 ### The spherical harmonics
 
@@ -124,42 +136,50 @@ $$
 with the analogous, more involved $l=2$ set implemented in
 `sphericalHarmonics.ts`. Both **normalization**
 ($\int|Y_l^m|^2\,d\Omega=1$) and **orthogonality** (different $(l,m)$
-pairs integrate to exactly $0$) are checked directly by numerical
-integration over the sphere ($d\Omega=\sin\theta\,d\theta\,d\varphi$), not
-assumed from the closed-form coefficients alone. Every one of the nine
-$Y_l^m$ for $l=0,1,2$ normalizes to $1.000$ (to the numerical grid's
-precision), and every distinct pair tested is orthogonal to
-$10^{-6}$ or better.
+pairs integrate to $0$) are checked by numerical integration over the
+sphere ($d\Omega=\sin\theta\,d\theta\,d\varphi$) rather than taken from
+the closed-form coefficients. All nine $Y_l^m$ for $l=0,1,2$ normalize to
+$1.000$ within the grid's precision, and every distinct pair tested is
+orthogonal to $10^{-6}$ or better.
+
+The orthogonality is not a lucky property of these particular functions.
+$\vec L^{\,2}$ and $L_z$ are Hermitian, and eigenfunctions of a Hermitian
+operator with distinct eigenvalues are orthogonal, as Operators,
+Observables & Measurement proved. The numerical check confirms the
+implementation, not the theorem.
 
 ## Physical Interpretation
 
 $Y_0^0$ is spherically symmetric (an $s$-orbital's angular shape,
 central to the next course's hydrogen atom); $Y_1^0$ is largest along the
-$z$-axis and vanishes at the equator (a $p_z$-orbital's characteristic
-two-lobed shape); $Y_1^{\pm1}$ peak at the equator. These aren't
-arbitrary functions. They're the *only* functions consistent with being
-simultaneous $\vec L^{\,2}$/$L_z$ eigenstates, which is exactly why atomic
-orbitals have the specific shapes they do.
+$z$-axis and vanishes at the equator (a $p_z$ orbital's two-lobed shape);
+$Y_1^{\pm1}$ peak at the equator instead. These are not a convenient
+choice of basis functions. They are the only functions that are
+simultaneous $\vec L^{\,2}$ and $L_z$ eigenstates, which is why atomic
+orbitals come in these shapes and not others, in every atom, without
+anyone choosing.
 
-Here's what these actually look like, computed directly from the
-$Y_l^m$ formulas above, not sketched by hand:
+The plot below is computed from the $Y_l^m$ formulas above rather than
+sketched:
 
 <OrbitalShapePlot ariaLabel="Orbital angular momentum shape, |Y_l^m(theta)|^2" />
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/cf/HAtomOrbitals.png"
   alt="Grid of computed hydrogen-atom orbital cross-sections: rows for principal quantum number n=1,2,3, columns for s, p, d (l=0,1,2), each shown as a black-to-white probability-density slice"
-  caption="Full hydrogen wavefunctions |ψ|² for several n and l (m=0), radial part times angular part together. The angular shape along each column, spherical for s, two-lobed for p, four-lobed for d, is exactly the |Y_l^m|² pattern above; it doesn't change with n, since the angular and radial parts of ψ separate cleanly for any central potential."
+  caption="Hydrogen wavefunctions |ψ|² for several n and l at m=0, radial and angular parts together. Read down a column and the angular shape never changes, spherical for s, two-lobed for p, four-lobed for d, while only the radial structure gains nodes as n rises. That separation is not specific to hydrogen: it holds for any central potential, which is why these angular shapes recur across the periodic table."
   credit="Wikimedia Commons / FlorianMarquardt"
   creditUrl="https://commons.wikimedia.org/wiki/File:HAtomOrbitals.png"
   license="CC BY-SA 3.0"
 />
 
-Compare $l=1,m=0$ (aligned along the $z$-axis, vanishing at the equator,
-exactly the $p_z$ shape described above) against $m=\pm1$ (the lobes
-rotate into the equatorial plane instead). The shape depends only on
-$\theta$; $m$ shows up here only through which direction the lobes point,
-never through the magnitude at a given $\theta$.
+Compare $l=1,m=0$ (aligned along $z$, vanishing at the equator: the $p_z$
+shape) against $m=\pm1$, whose lobes lie in the equatorial plane. The
+magnitude $|Y_l^m|$ depends only on $\theta$, so $m$ shows up in these
+plots as an orientation rather than as a change in size. Its
+$\varphi$-dependence lives entirely in the phase $e^{im\varphi}$, which
+$|Y_l^m|^2$ discards, and which is exactly the part that carries the
+angular momentum.
 
 ## Worked Example
 
@@ -171,18 +191,18 @@ $$
 \int|Y_1^0|^2\,d\Omega = \frac{3}{4\pi}\int_0^{2\pi}d\varphi\int_0^\pi\cos^2\theta\sin\theta\,d\theta = \frac{3}{4\pi}(2\pi)\left(\frac23\right) = \frac{3}{4\pi}\cdot\frac{4\pi}{3} = 1
 $$
 
-exactly $1$, confirming the coefficient $\sqrt{3/4\pi}$ was chosen
-correctly, matching `sphericalHarmonicNormSquared({l:1,m:0})`'s direct
-numerical output of $\approx1.0000308$ (the small residual is the grid
-integration's own discretization error, not a flaw in the formula).
+The answer is $1$, so the coefficient $\sqrt{3/4\pi}$ was the right
+choice. The platform's `sphericalHarmonicNormSquared({l:1,m:0})` returns
+$\approx1.0000308$; the residual is the integration grid's discretization
+error, and it shrinks with a finer grid rather than converging to
+something other than $1$.
 
 ## Common Mistakes
 
 <Callout type="note">
-**Assuming half-integer l is simply "not yet observed" rather than
-mathematically excluded.** It's excluded outright by single-valuedness.
-A half-integer-$l$ position-space wavefunction would be multi-valued —
-not merely unusual, but not a valid wavefunction at all.
+**Assuming half-integer $l$ is merely "not yet observed" rather than
+excluded.** A half-integer-$l$ position-space wavefunction would be
+multi-valued, which does not make it unusual; it makes it not a function.
 </Callout>
 
 <Callout type="note">

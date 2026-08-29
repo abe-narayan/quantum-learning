@@ -22,6 +22,11 @@ export const uncertaintyProductGaussian: NumericProblem = {
     value: 0.5,
     tolerance: 0.001,
     incorrectFeedback: "Delta x = sigma, and Delta p = Delta k = 1/(2*sigma) in these units. Multiply the two together.",
+    nearMisses: [
+      { value: 4, feedback: "4 is σ², using σ for both factors. Δp is inversely related to σ, so the σ dependence cancels in the product." },
+      { value: 0.25, feedback: "0.25 is Δp on its own. The product multiplies it by Δx = σ = 2." },
+      { value: 1, feedback: "1 would be ħ rather than ħ/2. A Gaussian saturates the bound exactly at ħ/2." },
+    ],
   },
   hints: [
     { text: "Delta x for a Gaussian packet is exactly its width parameter, sigma." },

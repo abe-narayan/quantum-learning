@@ -40,15 +40,15 @@ export const variationalEnergyNeverBelowExact: NumericProblem = {
   hints: [
     { text: "0.50002 - 0.5 = a very small positive number." },
     { text: "The variational theorem guarantees this difference is always ≥0, for any trial family." },
-    { text: "≈0.00002." },
+    { text: "Subtract the exact energy from the trial energy, keeping all five decimal places. The variational theorem tells you which sign to expect before you compute anything." },
   ],
   solution: {
     steps: [{ description: "0.50002 - 0.5 ≈ 0.00002, a tiny but non-negative number, consistent with the variational theorem." }],
     finalAnswer: "≈+0.00002 (small and positive)",
   },
   explanation: {
-    correctIdea: "The exact sign (non-negative) is the theorem's actual content — the SIZE of the gap depends on how good the trial family is, but the sign never flips.",
+    correctIdea: "The sign (non-negative) is the theorem's actual content: the size of the gap depends on how good the trial family is, but the sign never flips.",
     whyCorrect: "Matches the engine's own minimizeGaussianTrialEnergy result compared directly to harmonicOscillatorEnergyLevel(0,1).",
-    whyWrong: ["A negative answer here would indicate either a bug in the variational search or a violation of the variational theorem itself — worth flagging as a real error, not just an unusual result."],
+    whyWrong: ["A negative answer here would indicate either a bug in the variational search or a violation of the variational theorem itself, worth flagging as a real error rather than an unusual result."],
   },
 };

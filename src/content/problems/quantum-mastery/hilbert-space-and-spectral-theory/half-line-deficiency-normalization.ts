@@ -27,6 +27,11 @@ export const halfLineDeficiencyNormalization: NumericProblem = {
     tolerance: 0.01,
     incorrectFeedback:
       "Compute ∫₀^∞ e^{−2x} dx directly: it's a standard exponential integral, [-e^{-2x}/2]₀^∞.",
+    nearMisses: [
+      { value: 1, feedback: "1 is ∫₀^∞ e^{−x} dx, forgetting that the norm squares the function first: the integrand is e^{−2x}, which decays twice as fast." },
+      { value: 2, feedback: "2 inverts the fraction. Integrating e^{−2x} divides by 2 rather than multiplying." },
+      { value: 0, feedback: "A vanishing norm would mean ψ is not in L², and then it would not count toward n₊ at all. The integral converges to a nonzero value, which is the point." },
+    ],
   },
   hints: [
     { text: "|e^{-x}|^2 = e^{-2x} for real x." },

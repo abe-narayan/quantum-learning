@@ -24,6 +24,11 @@ export const mutualInformationClassicalCorrelation: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "rho_AB is already diagonal with eigenvalues (0.8, 0, 0, 0.2), so S(rho_AB) = -0.8log2(0.8) - 0.2log2(0.2). Tracing out either qubit leaves the same distribution (0.8, 0.2) on the other, so S(rho_A) = S(rho_B) = S(rho_AB) exactly -- making I(A:B) equal to that same single Shannon entropy.",
+    nearMisses: [
+      { value: 1.443856, tolerance: 0.003, feedback: "That is S(rho_A) + S(rho_B), with S(rho_AB) never subtracted. All three entropies coincide here, so one of them cancels." },
+      { value: 2, feedback: "2 bits is a Bell state's mutual information. This state is classically correlated, not entangled, and carries strictly less." },
+      { value: 0, feedback: "Zero mutual information would mean A and B are independent. They always agree here, which is as correlated as classical bits get." },
+    ],
   },
   hints: [
     { text: "rho_AB is diagonal in the computational basis, with eigenvalues 0.8, 0, 0, 0.2 -- read off S(rho_AB) directly as a Shannon entropy." },

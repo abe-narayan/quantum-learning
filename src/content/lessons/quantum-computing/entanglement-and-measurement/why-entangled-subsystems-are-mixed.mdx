@@ -50,22 +50,26 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Here is the strange fact the last lesson left sitting on the table: the 2-qubit state |Φ+⟩ is pure, completely specified, zero uncertainty about it whatsoever — and yet each of its two qubits, looked at on its own, is in the most uncertain single-qubit state there is.
+Here is the fact the last lesson left on the table. The 2-qubit state |Φ+⟩ is pure: fully specified, with no uncertainty about it at all. Yet each of its two qubits, taken alone, is in the most uncertain single-qubit state there is.
 </LessonHook>
 
 ## Motivation
 
-That state's <Term id="partial-trace">reduced density matrix</Term> works out to $\rho_A=I/2$: the whole
-is perfectly well-defined; either half alone is maximally undefined. That isn't a quirk of the specific 50/50 amplitudes
-in $|\Phi^+\rangle$. This lesson proves it's forced, for any 2-qubit pure
-state, by entanglement itself, and pins down an exact formula for how
-mixed a subsystem gets as a function of exactly how entangled the whole
-state is.
+The Bell state's <Term id="partial-trace">reduced density matrix</Term> works out to $\rho_A=I/2$. The whole
+is perfectly well-defined; either half alone is maximally undefined. Read
+slowly, that should sound like a contradiction: how can you know
+everything about a pair and nothing about either member?
+
+It is not a quirk of $|\Phi^+\rangle$'s 50/50 amplitudes. This lesson
+proves the effect is forced for any 2-qubit pure state, and produces an
+exact formula for how mixed a subsystem becomes as a function of how
+entangled the whole state is. The formula turns out to be one line, and it
+connects to the separability determinant this platform already computes.
 
 <ExternalFigure
   src="https://www.nist.gov/sites/default/files/images/2017/01/05/quantum_physics_quantum_computing_fourier_transform_beryllium_ions.jpg"
   alt="Colorized fluorescence photograph of three trapped beryllium ions illuminated by an ultraviolet laser"
-  caption="Real trapped, laser-cooled ions glowing under UV illumination at NIST. When particles like these are entangled, each one's own state is provably mixed: the exact identity this lesson derives."
+  caption="Trapped, laser-cooled ions glowing under UV illumination at NIST. Entangle two of these and neither one has a pure state of its own any more, by the identity this lesson derives."
   credit="NIST"
   creditUrl="https://www.nist.gov/image/quantumphysicsquantumcomputingfouriertransformberylliumionsjpg"
   license="Public domain (U.S. government work)"
@@ -74,12 +78,12 @@ state is.
 <PredictBeforeReveal
   question="A 2-qubit state a|00⟩+d|11⟩ is only weakly entangled: a=√0.99, d=√0.01. Is qubit 0's reduced-state purity Tr(ρ_A²) closer to 1 (nearly pure) or closer to 0.5 (nearly maximally mixed)?"
   options={[
-    { label: "Close to 1 — barely mixed at all", value: "near-one" },
-    { label: "Close to 0.5 — nearly maximally mixed", value: "near-half" },
-    { label: "Exactly 0.5, same as any entangled state", value: "exactly-half" },
+    { label: "Close to 1: barely mixed at all", value: "near-one" },
+    { label: "Close to 0.5: nearly maximally mixed", value: "near-half" },
+    { label: "Exactly 0.5, the same as any entangled state", value: "exactly-half" },
   ]}
   correctValue="near-one"
-  explanation="Tr(ρ_A²) = 1 − 2|ad−bc|² (the identity this lesson derives below), and here ad−bc = √0.99·√0.01 ≈ 0.0995, so Tr(ρ_A²) ≈ 1 − 2(0.0995)² ≈ 0.980: barely mixed, not close to the maximally mixed 0.5 a Bell state reaches. Mixedness isn't an on/off consequence of 'being entangled' — it's a continuous quantity, exactly as entangled as ad−bc says and no more."
+  explanation="Tr(ρ_A²) = 1 − 2|ad−bc|² (the identity derived below), and here ad−bc = √0.99·√0.01 ≈ 0.0995, so Tr(ρ_A²) ≈ 1 − 2(0.0995)² ≈ 0.980. Barely mixed, nowhere near the 0.5 a Bell state reaches. Mixedness is not an on/off consequence of being entangled. It is a continuous quantity, tracking |ad−bc| and nothing else."
 />
 
 ## Mathematical Development
@@ -142,16 +146,16 @@ determinant) for a Bell state, a product state, a partially entangled
 state, and an unstructured "random-looking" state; all four agree to
 floating-point precision.
 
-The mechanism behind the identity is visible directly in the partial
-trace itself: the $|00\rangle\langle11|$ cross term of $\rho_{AB}$, of
-size exactly $ad$, has mismatched bra/ket indices on *both* qubits, so it
-never survives into $\rho_A$ (or $\rho_B$) at all. It's precisely that
-excluded cross term, growing with $ad-bc$, that $\rho_A$ loses track of.
+The mechanism behind the identity is visible in the partial trace itself.
+The $|00\rangle\langle11|$ cross term of $\rho_{AB}$, of size $ad$, has
+mismatched bra and ket indices on *both* qubits, so it never survives into
+$\rho_A$ (or $\rho_B$). That excluded cross term, which grows with
+$ad-bc$, is what $\rho_A$ loses track of.
 For each state below, all three presets have the same amplitude pattern
 ($a|00\rangle+d|11\rangle$), so $\rho_A$ stays exactly diagonal
 throughout; what changes is how far that diagonal sits from $1{:}0$:
 
-<InteractiveSection title="Watch the excluded cross term grow with entanglement" description="The dimmed |00⟩⟨11| corner of ρ_AB (top-right) is permanently excluded — mismatched indices on both qubits — so it never reaches ρ_A no matter which reduced cell you select. Switch presets and watch that dimmed corner itself grow from 0 (product |00⟩) to ≈0.0995 (weakly entangled) to 0.5 (|Φ+⟩), while ρ_A's own diagonal is dragged from 1:0 toward the 0.5:0.5 the boxed identity's maximum-mixedness case predicts. Click ρ_A's own diagonal cells to confirm exactly which ρ_AB entries (all diagonal, all eligible) build each one.">
+<InteractiveSection title="Watch the excluded cross term grow with entanglement" description="The dimmed |00⟩⟨11| corner of ρ_AB (top-right) is permanently excluded, because its indices are mismatched on both qubits, so it never reaches ρ_A no matter which reduced cell you select. Switch presets and watch that dimmed corner grow from 0 (product |00⟩) to ≈0.0995 (weakly entangled) to 0.5 (|Φ+⟩), while ρ_A's diagonal is dragged from 1:0 toward the 0.5:0.5 the boxed identity predicts at maximum mixedness. Click ρ_A's diagonal cells to confirm which ρ_AB entries build each one.">
   <PartialTraceHighlight presets={survivalPresets} ariaLabel="The excluded off-diagonal cross term of the joint density matrix growing as the global state becomes more entangled, from a product state through a weakly entangled state to a maximally entangled Bell state, dragging the reduced state's diagonal toward 0.5/0.5" />
 </InteractiveSection>
 
@@ -166,11 +170,11 @@ $$
 \rho_A \text{ is pure} \iff |\psi\rangle_{AB} \text{ is a product state} \iff \rho_A \text{ is not mixed}
 $$
 
-Equivalently: **a 2-qubit pure state's reduced state is mixed if and
-only if the state is entangled.** Not "mixed states are somehow
-associated with entanglement" as a vague slogan, but a specific,
-provable, iff statement, with the exact amount of mixedness ($1-\text{Tr}(\rho_A^2)$)
-pinned to the exact amount the separability determinant is nonzero by.
+Equivalently: **a 2-qubit pure state's reduced state is mixed if and only
+if the state is entangled.** Not "mixed states are associated with
+entanglement" as a slogan, but an if-and-only-if, with the amount of
+mixedness ($1-\text{Tr}(\rho_A^2)$) pinned to how far the separability
+determinant sits from zero.
 
 ### Scope: this is a 2-qubit statement
 
@@ -179,34 +183,34 @@ It is not a general $n$-qubit argument. The underlying idea (a pure
 global state has a mixed reduced state exactly when there's entanglement
 across the cut) is true far more generally, provable with the <Term id="schmidt-decomposition">Schmidt
 decomposition</Term> for any bipartite split of any dimension, but that
-general proof needs a general eigendecomposition, which this platform
-does not implement (see `docs/ARCHITECTURE.md`). The identity boxed
-above is airtight for exactly the case this course actually uses: two
-qubits, one cut.
+general proof needs a general eigendecomposition, which this platform does
+not implement (see `docs/ARCHITECTURE.md`). The boxed identity is airtight
+for the case this course uses: two qubits, one cut.
 
 ## Physical Interpretation
 
-A reduced state's mixedness is not "our uncertainty leaking in" the way
-it was for the classical mixtures two lessons ago: the global state
-$|\psi\rangle_{AB}$ is completely known, with zero uncertainty about it
-whatsoever. The mixedness of $\rho_A$ is instead a direct, provable
+A reduced state's mixedness is not uncertainty leaking in, the way it was
+for the classical mixtures two lessons ago. The global state
+$|\psi\rangle_{AB}$ is fully known. The mixedness of $\rho_A$ is instead a
 signature of *correlation with something outside the subsystem being
-described*. This is the deepest sense in which entanglement is not
-classical correlation: even perfect, complete knowledge of the whole
-system does not give perfect knowledge of any one part of it, whenever
-that part is entangled with the rest.
+described*.
 
-Seeing this "correlation with something outside the subsystem" as an actual
-correlation, not just an algebraic byproduct of the <Term id="von-neumann-entropy-purity">purity</Term> identity, is
-easiest with the maximally entangled case the last lesson used: the Bell
-state $|\Phi^+\rangle=\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$. Alice and
-Bob each hold one qubit; alone, each one's qubit is exactly the maximally
-mixed $\rho_A=\rho_B=I/2$ this section just derived. The interactive below
-samples one real joint measurement of that same shared state at a time,
-built with the platform's actual engine (`HADAMARD` then `applyCNOT`, the
-same construction the CHSH lesson uses) rather than a hand-picked 50/50
-coin flip — watch both glyphs, held far apart, snap to the same outcome
-every single time:
+This is the sharpest sense in which entanglement is not classical
+correlation. Complete knowledge of the whole gives incomplete knowledge of
+each part, whenever the parts are entangled. Nothing in classical physics
+works that way: there, knowing the joint distribution exactly always
+determines each marginal exactly, and the marginals stay as sharp as the
+joint.
+
+Seeing that phrase as a real correlation, rather than an algebraic
+byproduct of the <Term id="von-neumann-entropy-purity">purity</Term> identity, is easiest in the maximally entangled case:
+$|\Phi^+\rangle=\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$. Alice and Bob
+each hold one qubit, and alone each holds the maximally mixed
+$\rho_A=\rho_B=I/2$ derived above. The interactive below samples one real
+joint measurement at a time, built with the platform's engine (`HADAMARD`
+then `applyCNOT`, the construction the CHSH lesson uses) rather than a
+hand-written coin flip. Watch both glyphs, held far apart, land on the
+same outcome every time:
 
 <InteractiveSection title="Measure a shared entangled pair" description="Alice and Bob each hold one qubit of the same |Φ+⟩ state. Press Measure both to sample one real joint outcome and watch the running tally: only 00 and 11 ever occur, never 01 or 10, for this specific Bell state.">
   <LazyEntanglementCorrelation />
@@ -226,10 +230,10 @@ intuition that this state is less entangled than a maximally entangled
 Bell pair (its amplitudes are $90\%/10\%$, not $50\%/50\%$).
 
 $\rho_A=\text{diag}(0.9,0.1)$ is itself just a Z-basis mixture of
-$|0\rangle$ and $|1\rangle$ weighted 90/10, exactly the kind of object
+$|0\rangle$ and $|1\rangle$ weighted 90/10, which is the kind of object
 the density matrix explorer builds directly:
 
-<InteractiveSection title="Rebuild ρ_A and check purity = 0.82" description="Build ρ from |0⟩ and |1⟩ weighted 90/10. Check that the purity reading matches 0.82 exactly: this is literally the reduced state ρ_A this worked example just computed by hand, not a different state that happens to look similar.">
+<InteractiveSection title="Rebuild ρ_A and check purity = 0.82" description="Build ρ from |0⟩ and |1⟩ weighted 90/10 and check the purity reading against 0.82. This is the same reduced state ρ_A the worked example computed by hand, not a different state that resembles it.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
@@ -238,16 +242,16 @@ the density matrix explorer builds directly:
 <Callout type="note">
 **Thinking any nonzero purity loss means "maximal" entanglement.**
 $1-\text{Tr}(\rho_A^2)$ ranges continuously from 0 (product state) to
-0.5 (maximally entangled, at $|ad-bc|=0.5$, the largest a normalized
-state allows). It's a graded quantity, not a yes/no flag.
+0.5 (maximally entangled, at $|ad-bc|=0.5$, the largest a normalized state
+allows). It is a graded quantity, not a yes/no flag.
 </Callout>
 
 <Callout type="note">
 **Assuming this proof generalizes automatically to 3+ qubits, or to
-mixed global states.** It doesn't, without further work this platform
-doesn't undertake (see the Scope note above). Overclaiming this here
-would be exactly the kind of unjustified generalization this course
-avoids elsewhere.
+mixed global states.** It does not, without further work this platform
+does not undertake (see the Scope note above). The 2-qubit proof uses the
+2-qubit reduced-density-matrix formula by name, and that formula changes
+the moment there is a third qubit.
 </Callout>
 
 ## Practice Questions

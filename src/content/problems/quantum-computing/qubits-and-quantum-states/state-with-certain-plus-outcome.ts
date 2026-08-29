@@ -41,7 +41,7 @@ export const stateWithCertainPlusOutcome: MultipleChoiceProblem = {
   hints: [
     { text: "P(+) = 1 means the state overlaps completely with |+⟩ — in other words, it IS |+⟩, up to a phase that doesn't matter." },
     { text: "Try each option's amplitudes in the X-basis formula and see which one gives exactly 1." },
-    { text: `Confirm numerically: applying H to |+⟩ and reading the |0⟩ probability gives ${pPlusForPlusState.toFixed(4)}.` },
+    { text: "Certainty in a basis means the state is already one of that basis's own states, so ask which option lives in the X basis." },
   ],
   solution: {
     steps: [
@@ -57,8 +57,9 @@ export const stateWithCertainPlusOutcome: MultipleChoiceProblem = {
     correctIdea: "Certainty in a given basis requires the state to BE one of that basis's own states.",
     whyCorrect: "|+⟩ measured in the X-basis is the trivial case: you're asking 'is this + or -?' of a state that already is +.",
     whyWrong: [
-      "|0⟩ and |1⟩ are certain outcomes in the computational (Z) basis, not the X-basis — mixing up which basis a state is 'aligned' with is the most common error here.",
-      "|−i⟩ is on the equator but at 90° of X-basis-relevant phase away from |+⟩, giving maximal uncertainty in the X-basis, the opposite of certainty.",
+      { optionId: "b", text: "Certain in the Z basis, not the X basis. Reading a pole as certain in every basis is the usual slip here." },
+      { optionId: "c", text: "The other pole, and equally split in the X basis for the same reason." },
+      { optionId: "d", text: "On the equator, so it has the right latitude, but a quarter turn round in φ, which gives maximal X-basis uncertainty rather than certainty." },
     ],
   },
 };

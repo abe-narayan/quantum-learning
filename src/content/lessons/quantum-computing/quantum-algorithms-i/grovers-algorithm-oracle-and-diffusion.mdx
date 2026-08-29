@@ -2,11 +2,35 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyGroverExplorer } from "@/components/simulators/grover-explorer/LazyGroverExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
-import { ExternalFigure } from "@/components/mdx/ExternalFigure";
+import { InteractiveSection } from "@/components/mdx/InteractiveSection";
+import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
+import { uniformSuperposition, groverDiffusion } from "@/lib/quantum/grover";
+import { applyPhaseOracle } from "@/lib/quantum/oracles";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion"
 );
+
+export const reflectionMarked = 5;
+export const reflectionStart = uniformSuperposition(3);
+export const reflectionAfterOracle = applyPhaseOracle(reflectionStart, [reflectionMarked]);
+export const reflectionAfterDiffusion = groverDiffusion(reflectionAfterOracle);
+
+export const reflectionStages = [
+  { label: "Start: uniform superposition", state: reflectionStart },
+  { label: "After the oracle (sign flipped on |101⟩)", state: reflectionAfterOracle },
+  { label: "After diffusion (one full iteration)", state: reflectionAfterDiffusion },
+];
+
+export const reflectionFrames = reflectionStages.map(({ label, state }) => ({
+  paramLabel: label,
+  bars: state.amplitudes.map((amp, i) => ({
+    label: `|${state.basisLabel(i)}⟩`,
+    value: amp.re,
+    caption: amp.re.toFixed(3),
+    highlight: i === reflectionMarked,
+  })),
+}));
 
 export const lessonMeta = {
   title: "Grover's Algorithm: Oracle and Diffusion",
@@ -31,38 +55,33 @@ Suppose someone hands you a list of one million unsorted items and asks you to f
 
 ## Motivation
 
-How many guesses should you expect
+Handed a million unsorted items and one condition to test, how many
+guesses should you expect
 to need? With no structure to
 exploit, up to a million checks in the worst case, half a million on
 average. That's the general fact for a "black box" that marks one
 specific item among $N=2^n$ unsorted possibilities: a classical algorithm
-needs $O(N)$ queries on average, full stop.
+needs $O(N)$ queries on average, with no way around it.
 
 <PredictBeforeReveal
   question="How does the number of oracle queries Grover's algorithm needs to find the marked item scale with N, compared to the classical O(N)?"
   options={[
     { label: "Linearly in N, same as classical, just a smaller constant", value: "linear" },
-    { label: "Quadratically in N — worse than classical", value: "quadratic" },
-    { label: "As √N — a quadratic speedup over classical", value: "sqrt" },
-    { label: "As log N — exponentially fewer queries", value: "log" },
+    { label: "Quadratically in N, which is worse than classical", value: "quadratic" },
+    { label: "As √N, a quadratic speedup over classical", value: "sqrt" },
+    { label: "As log N, exponentially fewer queries", value: "log" },
   ]}
   correctValue="sqrt"
-  explanation="Grover's algorithm needs O(√N) queries, not O(N). That's a quadratic speedup — for N=1,000,000 items, roughly 1,000 queries instead of up to a million. The next section derives the oracle and diffusion operator that make this scaling possible."
+  explanation="Grover needs O(√N) queries rather than O(N). For a million items that is roughly a thousand queries instead of up to a million: a real and useful speedup, and also a much smaller one than the exponential separations quantum computing is usually advertised on. Square-root speedups are what unstructured problems get, and this one is provably optimal, so the modest size of it is not a defect of the algorithm."
 />
 
-**<Term id="grovers-algorithm">Grover's algorithm</Term>** finds it in $O(\sqrt N)$ queries, exactly that
-quadratic speedup, and it's the *best possible* for unstructured search
-(proven elsewhere, not claimed here), not an artifact of insufficient
-cleverness.
+**<Term id="grovers-algorithm">Grover's algorithm</Term>** finds it in $O(\sqrt N)$ queries. That is the
+quadratic speedup, and it is provably the best possible for unstructured
+search (proven elsewhere, not claimed here), so the remaining gap is not
+waiting on someone cleverer.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/IBM_Q_system_%28Fraunhofer_2%29.jpg/1280px-IBM_Q_system_%28Fraunhofer_2%29.jpg"
-  alt="An IBM Quantum System One installation at the Fraunhofer facility in Ehningen, Germany, showing the gold dilution-refrigerator enclosure that houses the superconducting processor"
-  caption="An IBM Quantum System One installed at the Fraunhofer facility in Ehningen, Germany. The oracle and diffusion operators derived below are exactly the kind of circuit compiled down to gate pulses and run on machines like this one."
-  credit="IBM Research, via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_system_(Fraunhofer_2).jpg"
-  license="CC BY 2.0"
-/>
+This lesson builds the two operators the algorithm alternates between. The
+next one composes them and counts the iterations.
 
 ## Mathematical Development
 
@@ -70,7 +89,7 @@ cleverness.
 
 Grover's <Term id="oracle">oracle</Term> marks the target directly with a sign, using
 `applyPhaseOracle`: $|x\rangle\to-|x\rangle$ for the marked $x$, unchanged
-otherwise. This is exactly the phase-oracle form Phase Kickback derived
+otherwise. This is the phase-oracle form Phase Kickback derived
 from the bit-oracle model with the ancilla in $|-\rangle$, reused here
 directly, not redefined.
 
@@ -101,7 +120,37 @@ flipped, since $\langle0|k\rangle=0$). So $D$'s full circuit is: $H^{\otimes
 n}$, flip the sign of every basis state *except* $|0\rangle^{\otimes n}$,
 $H^{\otimes n}$ again.
 
-### A real bug this exact distinction caught
+### The two operators, applied to real amplitudes
+
+Words like "marks" and "amplifies" are easy to nod along to and hard to
+picture. Below is one full iteration on $n=3$ qubits with $|101\rangle$
+marked, showing the *signed amplitude* of each basis state at three
+stages, computed by `uniformSuperposition`, `applyPhaseOracle` and
+`groverDiffusion` themselves.
+
+Plotting amplitudes rather than probabilities is the point of the figure.
+The oracle's entire effect is a sign, and a probability plot would show
+the first two frames as identical.
+
+<InteractiveSection
+  title="One Grover iteration, amplitude by amplitude"
+  description="Three stages, eight amplitudes each. Start: all eight equal at 0.354. After the oracle: seven unchanged and the marked one flipped to −0.354, with every probability still 1/8. After diffusion: the marked amplitude has jumped to 0.884 while the other seven have shrunk to 0.177. Nothing was added to the marked state from outside; amplitude was moved to it from the other seven."
+>
+  <BarChartExplorer
+    frames={reflectionFrames}
+    sliderLabel="Stage"
+    ariaLabel="Signed amplitudes of all eight basis states across three stages of one Grover iteration on three qubits with |101⟩ marked: uniform at 0.354, then the marked amplitude flipped negative by the oracle, then the marked amplitude raised to 0.884 by diffusion while the other seven fall to 0.177"
+    maxValue={1}
+  />
+</InteractiveSection>
+
+The middle frame is where the mechanism hides. After the oracle every
+measurement probability is still $1/8$, so the marked item is no more
+likely than any other and measuring at that point would tell you nothing.
+The information sits in a sign, invisible to the Born rule, until
+diffusion converts it into a difference in magnitude.
+
+### A real bug this distinction caught
 
 An earlier version of `groverDiffusion` built the middle step by reusing
 `applyPhaseOracle(s, [0])`, which flips *only* index $0$ and leaves
@@ -113,9 +162,9 @@ full Grover iterations) passed anyway, since a global phase never affects
 Born-rule probabilities. The bug was caught only by testing the reflection
 *in isolation*: $D|s\rangle$ must equal $|s\rangle$ **exactly** (not
 $-|s\rangle$), and the buggy version failed that specific check. This is
-precisely why `grover.test.ts` tests `groverDiffusion(|s\rangle)=|s\rangle$`
-directly, not just Grover's end-to-end success rate: some bugs are
-invisible to outcome-only tests.
+why `grover.test.ts` tests `groverDiffusion(|s\rangle)=|s\rangle$`
+directly rather than only Grover's end-to-end success rate. Some bugs are
+invisible to outcome-only tests, and a global phase is the classic one.
 
 ## Physical Interpretation
 
@@ -143,7 +192,7 @@ sign flip.
 
 <Callout type="warning">
 **Building the reflection by flipping $|0\rangle$'s sign instead of
-everything else's.** This is exactly the bug described above: the
+everything else's.** This is the bug described above: the
 resulting operator is $-(2|0\rangle\langle0|-I)$, differing from the
 correct diffusion operator by an unobservable-in-aggregate but
 structurally wrong global phase.

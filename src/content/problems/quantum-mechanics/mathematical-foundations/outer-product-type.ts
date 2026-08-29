@@ -46,6 +46,10 @@ export const outerProductType: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Outer products (ket-then-bra) are operators; inner products (bra-then-ket) are numbers.",
     whyCorrect: "The shape arithmetic (column × row = matrix) settles it directly.",
-    whyWrong: ["Confusing |0⟩⟨1| with ⟨0|1⟩ is one of the most common notational slips in bra-ket notation — they are opposite kinds of object."],
+    whyWrong: [
+      { optionId: "a", text: "Reads the product in the other order. ⟨0|1⟩, a row times a column, is the number; this is a column times a row." },
+      { optionId: "b", text: "Keeps only the ket half. |0⟩ alone is the column; the bra on its right changes the shape of the result." },
+      { optionId: "d", text: "Keeps only the bra half, and a row times nothing is still a row." },
+    ],
   },
 };

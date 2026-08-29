@@ -22,14 +22,20 @@ export const shorsAlgorithmDoesNotProvePNeqBqp: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      [
-        "not np-complete",
-        "not known to be np-complete",
-        "np intersect conp",
-        "np ∩ conp",
-        "np and conp",
-        "easier than np-complete",
-      ],
+      {
+        phrases: [
+          "not np-complete",
+          "not known to be np-complete",
+          "np intersect conp",
+          "np ∩ conp",
+          "np and conp",
+          "easier than np-complete",
+          "np-intermediate",
+          "believed easier",
+        ],
+        missingFeedback:
+          "You have the missing hardness proof. The second gap is about where factoring sits: it is not known to be NP-complete, and is believed to lie in NP ∩ coNP, strictly easier. So even a proof of factoring's classical hardness would say nothing about NP-complete problems.",
+      },
       [
         "unproven",
         "not proven",
@@ -44,6 +50,12 @@ export const shorsAlgorithmDoesNotProvePNeqBqp: ConceptualProblem = {
         "prove factoring is not in p",
         "no classical polynomial-time algorithm has been proven impossible",
         "nobody has proven",
+        "no one has proven",
+        "never been proven",
+        "not been proven",
+        "no proof",
+        "open problem",
+        "has not been ruled out",
       ],
     ],
     incorrectFeedback:

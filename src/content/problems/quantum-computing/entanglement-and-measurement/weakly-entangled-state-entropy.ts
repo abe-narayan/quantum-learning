@@ -28,6 +28,15 @@ export const weaklyEntangledStateEntropy: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "The reduced state here is diag(0.99, 0.01) — apply Shannon entropy directly to that highly unbalanced pair.",
+    nearMisses: [
+      { value: 0, tolerance: 0.005, feedback: "Zero entropy means a product state. The |11⟩ term has small but nonzero amplitude, so a little entanglement survives." },
+      { value: 1, feedback: "1 bit is the Bell-state maximum, reached only by a balanced 50/50 split. A 99/1 split sits near the bottom of the range." },
+      {
+        value: -0.99 * Math.log(0.99) - 0.01 * Math.log(0.01),
+        tolerance: 0.003,
+        feedback: "That is the same entropy in nats. Bits require log base 2.",
+      },
+    ],
   },
   hints: [
     { text: "ρ_A = diag(0.99, 0.01) directly from the amplitudes' squared magnitudes." },

@@ -10,15 +10,17 @@ type ButtonSize = "sm" | "md" | "lg";
 // radius (the same `--radius-tight` every small control in the chrome now
 // uses) reads instead as a mechanical switch: precise corners, not a chip.
 const BASE_CLASSES =
-  "inline-flex items-center justify-center gap-2 rounded-[var(--radius-tight)] font-medium transition-[color,background-color,border-color,transform] duration-[--dur-fast] ease-[--ease-instrument] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-(--radius-tight) font-medium transition-[color,background-color,border-color,transform] duration-(--dur-fast) ease-instrument active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   // The inset highlight is the same "machined face catching light" move as
   // `.panel` in globals.css (a top highlight via inset box-shadow), scaled
   // down for a control this size — it's what keeps a flat brand-fill button
-  // from reading as a plain colored rectangle.
+  // from reading as a plain colored rectangle. Same `--panel-highlight`
+  // token as the panel/instrument surfaces, so all three catch identical
+  // light per theme instead of each hardcoding its own mix.
   primary:
-    "border border-transparent bg-brand text-brand-foreground shadow-[inset_0_1px_0_color-mix(in_srgb,white_22%,transparent)] hover:opacity-90",
+    "border border-transparent bg-brand text-brand-foreground shadow-[inset_0_1px_0_var(--panel-highlight)] hover:opacity-90",
   secondary: "border border-border-strong bg-surface text-foreground hover:border-pillar-edge hover:bg-surface-muted",
   ghost: "border border-transparent text-foreground hover:border-border hover:bg-surface-muted",
 };

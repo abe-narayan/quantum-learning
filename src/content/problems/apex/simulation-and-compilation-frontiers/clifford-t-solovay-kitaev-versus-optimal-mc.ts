@@ -57,7 +57,7 @@ export const cliffordTSolovayKitaevVersusOptimalMc: MultipleChoiceProblem = {
       { description: "Ross-Selinger instead exploits the specific number-theoretic structure of the ring Z[1/√2, i] that Rz(θ)-compiled Clifford+T circuits live in, to search directly for a near-optimal, Θ(log2(1/ε))-length sequence for that family." },
       { description: "These are different claims (efficiency vs. optimality), and the lesson's comparison at ε=10⁻¹⁰ shows the practical gap between them can span several orders of magnitude in T-count." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Solovay-Kitaev gives a generic, target-agnostic efficiency bound, not target-specific T-count optimality; Ross-Selinger specializes for Rz(θ) and gets far closer to optimal.",
   },
   explanation: {
     correctIdea:
@@ -65,9 +65,9 @@ export const cliffordTSolovayKitaevVersusOptimalMc: MultipleChoiceProblem = {
     whyCorrect:
       "This is precisely the lesson's 'Common Mistake' callout: Solovay-Kitaev proves efficient synthesis is always possible, but that is not the same claim as every synthesis method achieving near-optimal T-count in practice.",
     whyWrong: [
-      "Option b incorrectly restricts Solovay-Kitaev's applicability.",
-      "Option c contradicts the lesson's own computed numerical comparison.",
-      "Option d mischaracterizes Solovay-Kitaev as non-constructive, when its efficient classical search algorithm is one of its two core guarantees.",
+      { optionId: "b", text: "Restricts Solovay-Kitaev's applicability. The theorem covers any single-qubit unitary from a fixed universal gate set, Rz(θ) included." },
+      { optionId: "c", text: "Contradicts the lesson's computed numerical comparison, which puts the two methods several orders of magnitude apart in T-count at ε=10⁻¹⁰." },
+      { optionId: "d", text: "Mischaracterizes Solovay-Kitaev as non-constructive, when its efficient classical search algorithm is one of its two core guarantees." },
     ],
   },
 };

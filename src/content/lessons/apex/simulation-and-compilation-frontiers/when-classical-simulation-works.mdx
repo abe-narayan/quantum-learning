@@ -91,7 +91,7 @@ export const lessonMeta = {
   module: "when-classical-simulation-works",
   order: 2,
   difficulty: "master",
-  estimatedMinutes: 27,
+  estimatedMinutes: 80,
   prerequisites: [
     "apex/simulation-and-compilation-frontiers/tensor-networks-and-matrix-product-states",
     "quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics",
@@ -306,6 +306,44 @@ never has the chance to grow). Satisfying *neither* is what a genuine
 classical-hardness argument for a specific circuit actually requires.
 
 </DefinitionBox>
+
+<Callout type="warning">
+**Two sufficient conditions are not a complete list.** (a) and (b) are
+the two this course derives, and failing both is necessary for classical
+hardness. It is not sufficient, because other efficiently-simulable
+families exist that neither criterion detects. A circuit built from
+matchgates on a line — nearest-neighbor two-qubit gates of a particular
+form, corresponding to non-interacting fermions — is classically
+efficient despite being neither Clifford nor low-entanglement. A circuit
+with a *small number* of T gates on top of a Clifford backbone is
+simulable in time exponential in the T-count but polynomial in
+everything else, so "not Clifford" is a threshold rather than a switch.
+And a circuit whose interaction graph has low treewidth contracts
+efficiently as a tensor network even when a linear MPS cut would show
+large bond dimension, because "bond dimension" presumes a 1D ordering
+the circuit need not respect.
+
+The practical consequence for evaluating an advantage claim: showing a
+circuit clears (a) and (b) is a necessary check, not a proof of
+hardness. The strongest classical attacks on real sampling experiments
+came from the third route above, not from either of these two.
+</Callout>
+
+<ResearchConnection
+  title="The simulation algorithms behind all three routes"
+  source="Aaronson & Gottesman, Phys. Rev. A 70, 052328 (2004) (arXiv:quant-ph/0406196); Markov & Shi, SIAM J. Comput. 38, 963 (2008) (arXiv:quant-ph/0511069); Bravyi & Gosset, Phys. Rev. Lett. 116, 250501 (2016) (arXiv:1601.07601)"
+  url="https://arxiv.org/abs/quant-ph/0406196"
+>
+  Aaronson and Gottesman give the tableau algorithm this section
+  describes, in enough detail to implement. Markov and Shi prove the
+  treewidth result: a circuit whose interaction graph has treewidth $w$
+  simulates in time exponential in $w$ and linear in the circuit size,
+  which is the machinery every serious classical challenge to a sampling
+  experiment has been built on. Bravyi and Gosset give the T-count
+  route, simulating Clifford-plus-$t$-T-gates circuits in time scaling
+  roughly as $2^{0.47t}$: an exponential, but one with a small enough
+  base that circuits with a few dozen T gates are simulable outright.
+</ResearchConnection>
 
 ## Physical Interpretation
 

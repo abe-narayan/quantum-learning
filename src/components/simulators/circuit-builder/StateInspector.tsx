@@ -22,11 +22,36 @@ export function StateInspector({ state }: { state: StateVector }) {
     <div className="space-y-4">
       <h3 className="text-sm font-semibold text-foreground">State Vector</h3>
 
-      <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+      {/* No `overflow-x-auto` here: the only child is a block-level
+          `.katex-display`, which fills this content box and carries its own
+          horizontal scroll (globals.css §6), so this box never had anything to
+          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          y axis to `auto` too, which would silently clip a tall equation. The tab
+          stop the slab needs now lives on `.katex-display` itself; see
+          `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+      <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
         <KatexMath tex={`|\\psi\\rangle = ${ketLatex}`} display />
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      {/* `tabIndex={0}` + `role="group"`, matching `BB84RoundTable` and
+          `mdx-components.tsx`'s `Table` wrapper. `w-full` does not mean "fits":
+          the three columns floor near 300px on their min-content widths — the
+          ket, a formatted complex amplitude, and a probability cell holding a
+          `w-16` meter beside a `w-10` percentage — against a ~256px content
+          box on a 320px phone, and the ket column grows with qubit count
+          (`|1011⟩` at four qubits). An `overflow-x-auto` div is focusable by
+          default in no browser but Firefox, so a keyboard-only reader could
+          see the basis labels and never reach the amplitude and probability
+          columns that are the reason to open this panel.
+          `group` rather than `region`: a simulator readout is not top-level
+          page content, and one landmark per simulator would be landmark
+          clutter with no navigational payoff. */}
+      <div
+        role="group"
+        aria-label="State vector amplitudes and probabilities, scrollable horizontally"
+        tabIndex={0}
+        className="overflow-x-auto rounded-panel border border-border"
+      >
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-surface-muted/60 text-xs uppercase tracking-wide text-muted-foreground">

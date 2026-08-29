@@ -44,6 +44,10 @@ export const phaseOracleVsDiffusionRole: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Oracle and diffusion are two different reflections, about two different states — that's exactly what makes composing them a nontrivial rotation.",
     whyCorrect: "This distinction is the entire geometric picture the next lesson builds the closed-form success probability from.",
-    whyWrong: ["Confusing which operator reflects about what would make the 2D rotation picture in the next lesson not make sense."],
+    whyWrong: [
+      { optionId: "b", text: "Assigns the oracle's job to diffusion. Marking the target is the oracle's reflection, not this one." },
+      { optionId: "c", text: "Drops the Hadamards, which are what turn a reflection about |0…0⟩ into a reflection about |s⟩." },
+      { optionId: "d", text: "Names no single state. A reflection is defined about one vector, and here that vector is |s⟩." },
+    ],
   },
 };

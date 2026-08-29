@@ -22,6 +22,10 @@ export const harmonicGroundStateEnergy: NumericProblem = {
     value: 1.5,
     tolerance: 0.01,
     incorrectFeedback: "E_0 = hbar*omega/2. With hbar=1, E_0 = omega/2.",
+    nearMisses: [
+      { value: 3, feedback: "3 is ħω, the spacing between levels. The ground state sits half a spacing above the potential minimum." },
+      { value: 0, feedback: "0 would mean the oscillator can be at rest at the bottom of the well. The uncertainty principle forbids that, leaving ħω/2." },
+    ],
   },
   hints: [{ text: "Use E_0 = omega/2 directly (hbar=1)." }],
   solution: {

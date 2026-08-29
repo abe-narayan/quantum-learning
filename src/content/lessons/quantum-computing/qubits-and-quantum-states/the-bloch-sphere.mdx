@@ -1,4 +1,5 @@
 import { LazyBlochSphereExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereExplorer";
+import { LazyCompareStatesExplorer } from "@/components/simulators/compare-states/LazyCompareStatesExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 
@@ -9,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "The Bloch Sphere",
   description:
-    "Deriving the geometric picture of a qubit: where θ and φ come from, and what the sphere's surface actually represents.",
+    "Deriving the geometric picture of a qubit: where θ and φ come from, and what the sphere's surface represents.",
   course: "qubits-and-quantum-states",
   module: "the-bloch-sphere",
   order: 1,
@@ -30,33 +31,36 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Two numbers, one sphere">
-A qubit's physical state has exactly two real degrees of freedom — and two real numbers are exactly what it takes to locate a point on a sphere.
+A qubit's physical state has exactly two real degrees of freedom, and two real numbers are what it takes to locate a point on a sphere.
 </LessonHook>
 
 ## Motivation
 
-The last lesson ended with that claim. This lesson derives the
-connection directly from $\alpha|0\rangle+\beta|1\rangle$, rather than
-leaving it as an analogy.
+The last lesson counted the parameters and stopped there. Counting to two
+is not the same as producing the sphere, though, and the derivation below
+does the second thing: it starts from $\alpha|0\rangle+\beta|1\rangle$ and
+arrives at a latitude and a longitude, with nothing left over. The payoff
+is that from here on you can often answer a question by looking at a
+picture instead of multiplying matrices.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Felix_Bloch%2C_Stanford_University.jpg"
-  alt="Photograph of physicist Felix Bloch at Stanford University, 1961"
-  caption="Felix Bloch (1905–1983), photographed in 1961 at Stanford, where his work on nuclear induction and spin precession gave the geometric picture derived in this lesson its name."
+  alt="Black-and-white formal portrait of the physicist Felix Bloch, made by Stanford University's photographic department in 1961"
+  caption="Felix Bloch (1905–1983), photographed at Stanford in 1961."
   credit="Stanford University / Courtesy Stanford News Service / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Felix_Bloch,_Stanford_University.jpg"
   license="CC BY 3.0"
 />
 
 <HistoricalMoment date="1946" place="Stanford University">
-Felix Bloch's work on nuclear induction and spin precession gave the geometric picture derived in this lesson its name.
+Felix Bloch publishes the theory of nuclear induction: how nuclear spins tip and precess in a magnetic field. His equations track a magnetization vector moving on a sphere, and the geometric picture this lesson derives for a qubit inherits both the mathematics and his name.
 </HistoricalMoment>
 
 ## Intuition
 
 Picture a globe. Latitude tells you how far from the equator you are;
 longitude tells you which way you're facing around the vertical axis. The
-Bloch sphere reuses exactly this idea: the "latitude" angle $\theta$ will
+Bloch sphere reuses this idea: the "latitude" angle $\theta$ will
 turn out to control *how much* $|0\rangle$ versus $|1\rangle$, i.e. the
 measurement probabilities, while the "longitude" angle $\varphi$ carries
 the <Term id="global-relative-phase">relative phase</Term>, information invisible to a measurement in the
@@ -96,8 +100,8 @@ Writing $\beta'$'s remaining phase as $\varphi$:
 
 <EquationReveal
   terms={[
-    { id: "theta", symbol: "θ", gloss: "The latitude angle — controls how much |0⟩ versus |1⟩, i.e. the measurement probabilities." },
-    { id: "phi", symbol: "φ", gloss: "The longitude angle — carries the relative phase, invisible to a computational-basis measurement but physically real." },
+    { id: "theta", symbol: "θ", gloss: "The latitude angle. Controls how much |0⟩ versus |1⟩, i.e. the measurement probabilities." },
+    { id: "phi", symbol: "φ", gloss: "The longitude angle. Carries the relative phase: invisible to a computational-basis measurement, but physically real." },
     { id: "zero", symbol: "|0⟩", gloss: "The north pole of the sphere." },
     { id: "one", symbol: "|1⟩", gloss: "The south pole of the sphere." },
   ]}
@@ -133,21 +137,34 @@ $$
 x = \langle\psi|X|\psi\rangle, \quad y = \langle\psi|Y|\psi\rangle, \quad z = \langle\psi|Z|\psi\rangle
 $$
 
-using the <Term id="single-qubit-gates">Pauli matrices</Term> you'll meet properly in the Quantum Gates lesson.
-Working out $z$ for $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$: since
-$Z|0\rangle=|0\rangle$ and $Z|1\rangle=-|1\rangle$,
+A matrix wedged between a bra and a ket is the
+$\langle\phi|A|\psi\rangle$ form from Dirac Notation: apply the matrix to
+the ket first, then take the ordinary inner product of the bra with the
+result, and a single number comes out. The three matrices here are the
+<Term id="pauli-matrices">Pauli matrices</Term>, which you'll meet
+properly in the Quantum Gates lesson; all this section needs from them is
+what each does to the two basis states, which follows from writing them
+out:
+
+$$
+X = \begin{pmatrix}0&1\\1&0\end{pmatrix}, \qquad Y = \begin{pmatrix}0&-i\\i&0\end{pmatrix}, \qquad Z = \begin{pmatrix}1&0\\0&-1\end{pmatrix}
+$$
+
+Working out $z$ for $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$: reading
+$Z$'s columns off directly gives $Z|0\rangle=|0\rangle$ and
+$Z|1\rangle=-|1\rangle$, so
 
 $$
 \langle\psi|Z|\psi\rangle = \alpha^*\alpha\langle0|0\rangle - \beta^*\beta\langle1|1\rangle = |\alpha|^2 - |\beta|^2
 $$
 
-Substituting the canonical form, $|\alpha|^2-|\beta|^2 = \cos^2(\theta/2) - \sin^2(\theta/2) = \cos\theta$,
-exactly $z=\cos\theta$, as promised, via the double-angle identity.
+Substituting the canonical form and using the double-angle identity,
+$|\alpha|^2-|\beta|^2 = \cos^2(\theta/2) - \sin^2(\theta/2) = \cos\theta$,
+which is the $z=\cos\theta$ promised above.
 
 The $x$ computation follows the same pattern, using $X|0\rangle=|1\rangle$
-and $X|1\rangle=|0\rangle$ (again, matrices you'll meet properly in the
-Quantum Gates lesson), which swap $\alpha$ and $\beta$'s roles instead of
-leaving them alone:
+and $X|1\rangle=|0\rangle$ (read off $X$'s columns above the same way),
+which swap $\alpha$ and $\beta$'s roles instead of leaving them alone:
 
 $$
 \langle\psi|X|\psi\rangle = \alpha^*\beta\langle0|0\rangle + \beta^*\alpha\langle1|1\rangle = \alpha^*\beta + \beta^*\alpha = 2\operatorname{Re}(\alpha^*\beta)
@@ -164,8 +181,8 @@ $$
 x = 2\operatorname{Re}(\alpha^*\beta), \qquad y = 2\operatorname{Im}(\alpha^*\beta), \qquad z = |\alpha|^2-|\beta|^2
 $$
 
-work directly from *any* $\alpha,\beta$. You never actually need to remove
-the global phase by hand first, because (as you can check) these three
+work directly from *any* $\alpha,\beta$. You never need to remove the
+global phase by hand first, because (as you can check) these three
 formulas don't change if you multiply $\alpha,\beta$ by a common phase.
 That cancellation is the content of the next lesson, not a coincidence.
 
@@ -187,26 +204,25 @@ $\theta$ alone determines the measurement statistics
 ($P(0)=\cos^2(\theta/2)$, $P(1)=\sin^2(\theta/2)$, you'll derive this
 properly next lesson). $\varphi$ determines *nothing* about a
 computational-basis measurement by itself, yet it is not discardable
-information: it's what makes $|+\rangle$ and $|-\rangle$, same $\theta$,
-different $\varphi$, behave completely differently once gates get
-involved. Geometrically, latitude is "how much," longitude is "in what
-phase."
+information: it is what makes $|+\rangle$ and $|-\rangle$, same $\theta$
+and different $\varphi$, behave differently once gates get involved.
+Geometrically, latitude is "how much," longitude is "in what phase."
 
 ## Interactive Experiment
 
 <PredictBeforeReveal
-  question="Apply a Z rotation of π — the Z gate — to |+⟩, sitting at θ=π/2, φ=0 on the equator. Where does it end up?"
+  question="Apply a π rotation about the z-axis (the Z gate) to |+⟩, sitting at θ=π/2, φ=0 on the equator. Where does it end up?"
   options={[
-    { label: "The same point — Z leaves it fixed", value: "same" },
+    { label: "The same point: Z leaves it fixed", value: "same" },
     { label: "The south pole, θ=π", value: "south" },
-    { label: "θ=π/2, φ=π — the point labeled |−⟩", value: "minus" },
-    { label: "θ=π/2, φ=π/2 — the point labeled |+i⟩", value: "plusi" },
+    { label: "θ=π/2, φ=π, the point labeled |−⟩", value: "minus" },
+    { label: "θ=π/2, φ=π/2, the point labeled |+i⟩", value: "plusi" },
   ]}
   correctValue="minus"
-  explanation="Z|0⟩=|0⟩ and Z|1⟩=−|1⟩ — the same relations used above to compute z=|α|²−|β|² — send |+⟩=1/√2(|0⟩+|1⟩) to 1/√2(|0⟩−|1⟩)=|−⟩, exactly the equatorial point at φ=π listed in 'Reading the sphere' above, at the same θ=π/2. That matches the geometry too: a π rotation about the vertical (Z) axis should swing an equatorial point exactly halfway around to the opposite longitude, leaving latitude untouched — x=sinθcosφ flips from +1 to −1 while z=cosθ stays at 0. Try it below: load the |+⟩ preset and apply the Z gate."
+  explanation="Z|0⟩=|0⟩ and Z|1⟩=−|1⟩ (the same relations used above to compute z=|α|²−|β|²) send |+⟩=1/√2(|0⟩+|1⟩) to 1/√2(|0⟩−|1⟩)=|−⟩, the equatorial point at φ=π listed in 'Reading the sphere' above, at the same θ=π/2. That matches the geometry too: a π rotation about the vertical (Z) axis should swing an equatorial point halfway around to the opposite longitude, leaving latitude untouched: x=sinθcosφ flips from +1 to −1 while z=cosθ stays at 0. Try it below: load the |+⟩ preset and apply the Z gate."
 />
 
-<InteractiveSection title="Three checks against the sphere" description={`Try each of these directly in the simulator below, and check the numbers against what you just derived. Click through the six presets and read off θ and φ for each. Confirm they match the values listed in "Reading the sphere" above. Drag the θ slider from 0 to π with φ fixed at 0. Watch P(0) and P(1) trade off smoothly, and notice the vector stays in a single vertical half-plane the whole time. Now fix θ at 90° and sweep φ through a full turn. Notice P(0) and P(1) never change. The vector just sweeps around the equator at constant latitude, exactly as the formulas predict.`}>
+<InteractiveSection title="Three checks against the sphere" description={`Try each of these directly in the simulator below, and check the numbers against what you just derived. Click through the six presets and read off θ and φ for each. Confirm they match the values listed in "Reading the sphere" above. Drag the θ slider from 0 to π with φ fixed at 0. Watch P(0) and P(1) trade off smoothly, and notice the vector stays in a single vertical half-plane the whole time. Now fix θ at 90° and sweep φ through a full turn. Notice P(0) and P(1) never change. The vector just sweeps around the equator at constant latitude, just as the formulas predict.`}>
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -214,8 +230,12 @@ This same explorer, at full size with its own page, is the platform's
 flagship [Bloch Sphere Explorer](/simulators#bloch-sphere). Once the three
 checks above feel routine, it's worth going there directly: drag to any
 $(\theta,\varphi)$ you like, apply gates from the next lesson, and read
-off $\alpha$, $\beta$, and the measurement probabilities exactly as this
+off $\alpha$, $\beta$, and the measurement probabilities just as this
 lesson defines them.
+
+<InteractiveSection title="Three pictures, one state" description={`One last check before the worked example: the same state drawn three ways at once, as amplitudes, as a Bloch point, and as measurement probabilities. Before touching anything, predict: if you drag only the phase φ, which of the three panels will change? Then try it. Two of the three move; the probability bars hold perfectly still, which is the whole content of the phrase "relative phase is invisible to a single measurement in the computational basis."`}>
+  <LazyCompareStatesExplorer />
+</InteractiveSection>
 
 ## Worked Example
 

@@ -43,11 +43,15 @@ export const threeWallsClassificationMc: MultipleChoiceProblem = {
       { description: "Module 5's result describes how gradient variance scales with qubit count and circuit depth." },
       { description: "Both are derived, numerically-verified quantitative scaling laws — real costs to manage, not proofs that the underlying task is impossible." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Both are quantitative, derived scaling laws describing a real cost, not proofs that the underlying task is impossible.",
   },
   explanation: {
     correctIdea: "This capstone's central methodological point is the difference between a quantified cost and an impossibility proof.",
     whyCorrect: "Both lessons derived explicit formulas and verified them against real computation, giving actionable numbers rather than qualitative claims.",
-    whyWrong: ["Options b, c, and d each misclassify the nature or verification status of these two results."],
+    whyWrong: [
+      { optionId: "b", text: "Reads scaling laws as impossibility proofs. The capstone distinguishes the two, citing Shor's algorithm as evidence at least one wall isn't absolute." },
+      { optionId: "c", text: "Neither result concerns BPP versus BQP. That is Module 1's separate topic of oracle separations." },
+      { optionId: "d", text: "Both were verified numerically in this course: Module 2 against exact matrix exponentiation, Module 5 against a real ansatz's measured gradient variance." },
+    ],
   },
 };

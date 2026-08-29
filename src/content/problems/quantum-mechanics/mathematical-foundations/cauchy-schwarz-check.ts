@@ -23,6 +23,10 @@ export const cauchySchwarzCheck: NumericProblem = {
     value: 0.5,
     tolerance: 0.01,
     incorrectFeedback: "First compute ⟨u,v⟩ itself (a single number here, since both vectors are real), then square its magnitude.",
+    nearMisses: [
+      { value: Math.SQRT1_2, tolerance: 0.01, feedback: "1/√2 is ⟨u,v⟩ itself. The question asks for its squared magnitude." },
+      { value: 1, feedback: "1 is ‖u‖²‖v‖², the Cauchy-Schwarz upper bound. The actual overlap falls strictly below it, since u and v are not parallel." },
+    ],
   },
   hints: [
     { text: "⟨u,v⟩ = u1*·v1 + u2*·v2, with u=(1,0) and v=(1/√2, 1/√2)." },

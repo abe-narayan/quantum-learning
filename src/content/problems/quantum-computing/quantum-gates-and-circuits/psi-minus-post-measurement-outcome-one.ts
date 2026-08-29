@@ -37,7 +37,7 @@ export const psiMinusPostMeasurementOutcomeOne: MultipleChoiceProblem = {
       { id: "a", text: `$${ketLatex(collapsed)}$` },
       { id: "b", text: `$${ketLatex(stillSuperposed)}$` },
       { id: "c", text: `$${ketLatex(wrongOutcomeCollapse)}$` },
-      { id: "d", text: "$\\frac{1}{\\sqrt2}(|10\\rangle-|01\\rangle)$, unchanged" },
+      { id: "d", text: "$(-0.71)|01\\rangle + (0.71)|10\\rangle$, unchanged" },
     ],
   },
   answer: {
@@ -69,8 +69,9 @@ export const psiMinusPostMeasurementOutcomeOne: MultipleChoiceProblem = {
     correctIdea: "Measuring outcome 1 zeros out the |01⟩ term and renormalizes the surviving |10⟩ term, including its original minus sign.",
     whyCorrect: "The |10⟩ term's original amplitude, -1/√2, divided by √(1/2), gives exactly -1 — a global phase on |10⟩, physically the same measured state as |10⟩.",
     whyWrong: [
-      "Assuming the superposition survives (option b) ignores that observing an outcome is exactly what collapse means.",
-      "Picking the outcome-0 collapse (option c) applies the renormalization to the wrong surviving term.",
+      { optionId: "b", text: "Keeps the superposition alive, which ignores that observing an outcome is what collapse means." },
+      { optionId: "c", text: "This is the collapse for outcome 0: it renormalizes the |01⟩ term instead of the |10⟩ term." },
+      { optionId: "d", text: "Keeps both terms, contradicting the fact that an outcome was observed at all." },
     ],
   },
 };

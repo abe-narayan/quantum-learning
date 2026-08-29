@@ -44,6 +44,10 @@ export const gcdOf7And15: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "7 and 15 share no common factors, confirming 7 was a legitimate choice for the Shor's algorithm worked example.",
     whyCorrect: "This is exactly the coprimality check the worked example's Step 1 requires before proceeding.",
-    whyWrong: ["Any answer other than 1 would have meant a=7 was an invalid choice, requiring a different a before the pipeline could run."],
+    whyWrong: [
+      { optionId: "b", text: "Would need 7 to divide 15 evenly, and 15 = 2(7) + 1 leaves a remainder." },
+      { optionId: "c", text: "Would need 15 to divide 7, which is impossible for the larger of the two." },
+      { optionId: "d", text: "3 divides 15 but not 7, so it is not a common divisor." },
+    ],
   },
 };

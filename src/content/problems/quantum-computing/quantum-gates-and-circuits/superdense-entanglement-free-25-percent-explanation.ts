@@ -30,8 +30,33 @@ export const superdenseEntanglementFree25PercentExplanation: ConceptualProblem =
     type: "conceptual",
     requiredConceptGroups: [
       ["never entangled", "unentangled", "independently prepared", "product state"],
-      ["each qubit separately", "each factor on its own", "one qubit at a time", "independent probabilities"],
-      ["multiply the probabilities", "product of the two probabilities", "0.5 times 0.5", "0.5 × 0.5"],
+      [
+        "each qubit separately",
+        "each factor on its own",
+        "one qubit at a time",
+        "independent probabilities",
+        "independent",
+        "statistically independent",
+        "uncorrelated",
+        "tells you nothing about",
+        "on its own",
+        "separately",
+      ],
+      {
+        phrases: [
+          "multiply the probabilities",
+          "product of the two probabilities",
+          "multipl",
+          "product of the",
+          "product of two",
+          "0.5 times 0.5",
+          "0.5 × 0.5",
+          "0.5 x 0.5",
+          "half times a half",
+        ],
+        missingFeedback:
+          "You have said the two qubits are independent. Now use it: for independent outcomes the joint probability is the product of the two marginals, and 0.5 × 0.5 is where the 0.25 comes from.",
+      },
     ],
     incorrectFeedback:
       "Address why an unentangled product state means the two qubits' measurement outcomes are statistically independent, and why independent probabilities multiply rather than add or average.",

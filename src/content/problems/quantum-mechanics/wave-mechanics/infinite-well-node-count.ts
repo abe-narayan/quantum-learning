@@ -22,6 +22,10 @@ export const infiniteWellNodeCount: NumericProblem = {
     value: 4,
     tolerance: 0.001,
     incorrectFeedback: "sin(n*pi*x/L) crosses zero n-1 times strictly between the boundaries — count where n*pi*x/L equals pi, 2*pi, ..., (n-1)*pi.",
+    nearMisses: [
+      { value: 5, feedback: "5 is n itself, or the count with one boundary included. Both walls are forced zeros by the boundary conditions and do not count as internal nodes." },
+      { value: 6, feedback: "6 counts all n+1 zeros, including both walls. The question asks only for the ones strictly inside." },
+    ],
   },
   hints: [
     { text: "sin(theta) is zero at theta = 0, pi, 2*pi, 3*pi, ... — the endpoints theta=0 and theta=n*pi are the well's boundaries, not internal nodes." },

@@ -2,6 +2,7 @@ import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { angularMomentumZ, totalAngularMomentumSquared } from "@/lib/quantum/angularMomentum";
+import { hydrogenEnergyLevel } from "@/lib/quantum/hydrogenAtom";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
 export const practiceProblems = getProblemMetaForLesson(
@@ -19,6 +20,19 @@ export const hydrogenPresetForL = (l) => ({
 export const hydrogenLValues = [0, 1, 2, 3];
 export const hydrogenPresets = hydrogenLValues.map(hydrogenPresetForL);
 
+export const mStateCount = (l) => angularMomentumZ(l).rows;
+
+export const shellDegeneracy = (n) =>
+  Array.from({ length: n }, (_, l) => mStateCount(l)).reduce((sum, count) => sum + count, 0);
+
+export const hydrogenShells = [1, 2, 3, 4];
+
+export const hydrogenShellLevels = hydrogenShells.map((n) => ({
+  label: `n = ${n}: ${shellDegeneracy(n)} degenerate states (l = 0..${n - 1})`,
+  energy: hydrogenEnergyLevel(n),
+  highlight: n === 1,
+}));
+
 export const lessonMeta = {
   title: "Capstone: From Abstract Algebra to the Hydrogen Atom",
   description:
@@ -27,7 +41,7 @@ export const lessonMeta = {
   module: "capstone-from-abstract-algebra-to-the-hydrogen-atom",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 20,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum"],
   objectives: [
     "Summarize the logical chain from commutation relations to the quantized angular momentum spectrum",
@@ -37,16 +51,21 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-This course built one continuous argument: a commutation relation led to a discrete spectrum, which led to explicit functions and an explicit 2×2 representation — spin-½ — which turned out to already be sitting inside this platform's oldest, most-used machinery.
+This course built one continuous argument. A commutation relation forced a discrete spectrum; the spectrum produced explicit functions and an explicit 2×2 case, spin-½; and that case turned out to be sitting inside this platform's oldest and most-used machinery all along.
 </LessonHook>
 
 ## Motivation
 
-Concretely: $[L_x,L_y]=i\hbar L_z$ forces $j$ half-integer or
-integer, which produces the explicit $Y_l^m$ functions and an explicit
-$2\times2$ representation (spin-$\tfrac12$). This
-capstone connects the pieces, then previews exactly how the next course
-uses them.
+Six lessons ago the only thing on the table was $[L_x,L_y]=i\hbar L_z$,
+an identity about operators with no obvious physical payload. It forced
+$j$ to be an integer or a half-integer, which produced the explicit
+$Y_l^m$ functions on one branch and the $2\times2$ spin-$\tfrac12$ case on
+the other.
+
+This capstone puts the chain in one place and then does something more
+useful than summarizing: it shows how much of the hydrogen atom is
+already finished before the next course writes down a single differential
+equation.
 
 ## Mathematical Development
 
@@ -59,11 +78,17 @@ uses them.
 3. Single-valuedness under $\varphi\to\varphi+2\pi$ restricts *orbital*
    $l$ to integers only, giving the explicit $Y_l^m(\theta,\varphi)$
    (Lesson 3).
-4. $j=\tfrac12$, with no position-space restriction, is exactly this
-   platform's Pauli-matrix qubit engine (Lesson 4), physically realized
-   in the <Term id="stern-gerlach-experiment">Stern-Gerlach experiment</Term> (Lesson 5).
-5. Combining two spin-$\tfrac12$s reproduces, exactly, the Bell states
-   already built for an entirely different purpose (Lesson 6).
+4. $j=\tfrac12$, exempt from that restriction, *is* this platform's
+   Pauli-matrix qubit engine (Lesson 4), and it is what Stern and Gerlach
+   photographed (Lesson 5).
+5. Combining two spin-$\tfrac12$ particles reproduces the Bell states,
+   built years earlier in this curriculum for unrelated reasons
+   (Lesson 6).
+
+Read that chain backwards and it is one long consequence of a single
+commutator. Nothing physical was added after step 1 except the
+single-valuedness requirement in step 3, and that requirement is
+geometric rather than dynamical.
 
 ### What the Hydrogen Atom course reuses directly
 
@@ -72,24 +97,42 @@ depends only on the *distance* $r$ from the nucleus, not the direction:
 a **central potential**. For any central potential, $\vec L^{\,2}$ and
 $L_z$ both commute with $H$ (a fact the next course proves, building on
 this course's operators), so energy eigenstates can be chosen as
-simultaneous eigenstates of $H$, $\vec L^{\,2}$, and $L_z$, which means
-the *angular* part of every hydrogen wavefunction is *exactly* one of
-this course's $Y_l^m(\theta,\varphi)$ functions, unchanged, with only a
-still-to-be-solved radial function $R(r)$ multiplying it:
+simultaneous eigenstates of $H$, $\vec L^{\,2}$, and $L_z$. The angular
+part of every hydrogen wavefunction is therefore one of this course's
+$Y_l^m(\theta,\varphi)$ functions, unchanged, with only a
+still-to-be-found radial function $R(r)$ in front of it:
 
 $$
 \psi_{n,l,m}(r,\theta,\varphi) = R_{n,l}(r)\,Y_l^m(\theta,\varphi)
 $$
 
-This is the single biggest reason this course had to come before the
-Hydrogen Atom course, not after: the angular part of the problem is
-*entirely solved already*, by Lesson 3's explicit functions, before any
-radial equation is even written down.
+That is why this course had to come first. The angular half of the
+hydrogen problem is finished, by Lesson 3, before the next course writes
+down a radial equation.
 
-Every $m$ value at a given $l$ shares the same $\vec L^{\,2}$ <Term id="eigenvalue-eigenvector">eigenvalue</Term>,
-$l(l+1)\hbar^2$ (Lesson 2's formula), which is exactly why they end up
-energy-degenerate for any central potential: $H$ only sees $\vec L^{\,2}$
-and $r$, never $L_z$ directly.
+The payoff is not only qualitative. Every $m$ at a given $l$ shares the
+same $\vec L^{\,2}$ <Term id="eigenvalue-eigenvector">eigenvalue</Term> $l(l+1)\hbar^2$, and $H$ for a central
+potential sees $\vec L^{\,2}$ and $r$ but never $L_z$, so those $2l+1$
+states must be degenerate. Counting them gives the size of each hydrogen
+shell without solving anything:
+
+<EnergyLevelDiagram
+  levels={hydrogenShellLevels}
+  unit="eV"
+  ariaLabel="Hydrogen energy levels for n equal to 1 through 4, drawn at negative 13.6, negative 3.4, negative 1.51 and negative 0.85 electron volts, crowding together as n rises. Each level is labelled with its degeneracy: 1 state at n=1, 4 at n=2, 9 at n=3, and 16 at n=4."
+/>
+
+The degeneracy counts are $1, 4, 9, 16$: the sum $\sum_{l=0}^{n-1}(2l+1)$
+evaluates to $n^2$, and each $2l+1$ in that sum is the dimension of an
+angular momentum multiplet from Lesson 2. This course supplies every
+number in the labels. The next course supplies only the *positions* of
+the lines, through $E_n$, which is where the radial equation earns its
+keep.
+
+One honest caveat: the $n^2$ counting above ignores electron spin, which
+Lesson 4 showed doubles every count to $2n^2$. That factor of two is what
+makes the periodic table's rows come out $2, 8, 8, 18$ rather than
+$1, 4, 4, 9$.
 
 <PredictBeforeReveal
   question="For a fixed l, the 2l+1 states with different m all share the same L² eigenvalue. Does H (which depends only on r and L²) distinguish between them?"
@@ -99,12 +142,12 @@ and $r$, never $L_z$ directly.
     { label: "Only m=0 has a different energy from the rest", value: "m0-special" },
   ]}
   correctValue="degenerate"
-  explanation="H for any central potential depends only on r and L² (never on Lz directly), and every m at a fixed l shares the identical L² eigenvalue l(l+1)ħ². Since H can't tell the m states apart, all 2l+1 of them come out with exactly the same energy. This is precisely the m-degeneracy the matrix comparison below shows directly: Lz's diagonal changes with m, but L² doesn't move at all."
+  explanation="H for a central potential depends on r and L² and never on Lz, and every m at a fixed l carries the identical L² eigenvalue l(l+1)ħ². H therefore cannot tell the m states apart, and all 2l+1 come out at one energy. The matrix comparison below shows this directly: Lz's diagonal changes as you step through the states while L² does not move. Break the symmetry, for instance by switching on a magnetic field, and the degeneracy splits; that is the Zeeman effect."
 />
 
 <InteractiveSection
   title="Step through l, watch L² ignore m entirely"
-  description="Step through l = 0, 1, 2, 3. L² (right panel) stays exactly l(l+1) times the identity, the same number regardless of m: this is exactly why every m-state at a given l is energy-degenerate for any central potential. Lz's diagonal (left panel) shows the 2l+1 distinct m eigenvalues those degenerate states actually carry."
+  description="Step through l = 0, 1, 2, 3. L² on the right is l(l+1) times the identity, one number repeated down the diagonal no matter which m you are looking at, which is why every m-state at a given l shares an energy. Lz on the left shows the 2l+1 distinct m eigenvalues those degenerate states nevertheless carry. Degenerate in energy does not mean identical."
 >
   <MatrixGridExplorer
     presets={hydrogenPresets}
@@ -114,22 +157,19 @@ and $r$, never $L_z$ directly.
 
 ## Physical Interpretation
 
-Separating a 3D problem into "radial" and "angular" pieces is a direct
-consequence of the potential depending only on $r$, not a computational
-trick specific to hydrogen, and it works precisely because
-$\vec L^{\,2}$, $L_z$, and $H$ share a common eigenbasis whenever that
-symmetry holds. The angular momentum machinery this course built is the
-general tool; hydrogen is simply the first, and most famous, place it
-gets applied to a fully three-dimensional system.
+Splitting a three-dimensional problem into radial and angular pieces is
+not a trick that happens to work for hydrogen. It follows from the
+potential depending on $r$ alone, which makes $\vec L^{\,2}$, $L_z$ and
+$H$ commute and therefore share an eigenbasis. Any $V(r)$ gets the same
+treatment: the three-dimensional oscillator, a nucleus modelled as a
+uniform sphere, a quantum dot with rotational symmetry.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/4/41/Hydrogen_spectrum.svg"
-  alt="Hydrogen spectral series plotted by wavelength on a logarithmic scale, showing the Lyman, Balmer, Paschen, Brackett, Pfund, and Humphreys series of discrete emission lines"
-  caption="Hydrogen's actual emission spectrum: a finite set of sharp lines, not a continuum, one direct experimental consequence of energy depending only on n once R(r) is solved. This capstone's contribution was showing the angular part, Y_l^m, needs no further work to get here."
-  credit="Wikimedia Commons / OrangeDog"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Hydrogen_spectrum.svg"
-  license="CC BY-SA 3.0"
-/>
+What hydrogen adds is an accident. Its energies depend only on $n$ and
+not on $l$, so the $2l+1$ states of different $l$ within one shell are
+degenerate too, which is a stronger statement than anything this course
+proved. That extra degeneracy is specific to the $1/r$ potential and
+breaks the moment the potential deviates from it, which is exactly what
+happens in every atom heavier than hydrogen.
 
 ## Worked Example
 
@@ -137,13 +177,16 @@ gets applied to a fully three-dimensional system.
 harmonic appears in its wavefunction, without solving any radial
 equation.**
 
-$l=0$ has exactly one allowed $m$ value, $m=0$ (from Lesson 2's $2l+1$
-count). So the ground state's angular part is $Y_0^0=\frac{1}{2\sqrt\pi}$
-(a constant, independent of $\theta,\varphi$), predicting that the
-hydrogen ground state has **no angular dependence at all**, spherically
-symmetric, before any radial calculation is done. (The next course
-confirms this independently from the actual Schrödinger equation
-solution.)
+$l=0$ allows exactly one $m$ value, $m=0$, from Lesson 2's $2l+1$ count.
+The ground state's angular part is therefore $Y_0^0=\frac{1}{2\sqrt\pi}$,
+a constant. So the hydrogen ground state has **no angular dependence at
+all**: it is spherically symmetric, and that was settled without touching
+a radial equation.
+
+The prediction is testable in the ordinary way. A spherically symmetric
+ground state has no electric dipole moment and no preferred axis, so
+hydrogen in its ground state cannot be oriented by a weak field. The next
+course reaches the same conclusion from the Schrödinger equation.
 
 ## Common Mistakes
 
@@ -189,9 +232,12 @@ $R_{n,l}(r)$ and the resulting energy levels.
 - Central potentials (hydrogen included) separate into radial ×
   angular parts, with the angular part being exactly this course's
   $Y_l^m$ functions, no new derivation needed for that piece.
-- The singlet/Bell-state identity from Lesson 6 is a genuine, verified
-  mathematical fact connecting this course to Quantum Gates & Circuits,
-  not a coincidence of notation.
+- The $n^2$ degeneracy of each hydrogen shell is $\sum_{l=0}^{n-1}(2l+1)$,
+  built entirely from multiplet dimensions this course derived, and it
+  doubles to $2n^2$ once spin is included.
+- The singlet/Bell-state identity from Lesson 6 connects this course to
+  Quantum Gates & Circuits by an equality between vectors, not by
+  resemblance.
 
 ## Further Exploration
 

@@ -41,7 +41,26 @@ export function MatrixGridExplorer({
       {presets.length > 1 && (
         <PresetToggle options={presets} index={index} onChange={setIndex} ariaLabel={ariaLabel} />
       )}
-      <div role="img" aria-label={`${ariaLabel}: ${preset.label}`} className="flex flex-wrap items-start gap-6 overflow-x-auto">
+      {/* `role="group"` + `tabIndex={0}`, not `role="img"` — same reasoning as
+          `MatrixGrid`, which this shares `MatrixCellGrid` with, and with one
+          extra edge: the composed label ends in `preset.label`, so `img` made
+          the preset toggle announce a new figure *name* while erasing the only
+          thing the toggle actually changes — the entries. A reader pressing
+          through "Standard basis" → "Hadamard basis" heard the caption change
+          and could never reach a single number that had changed with it.
+          `group` keeps that live label (still spoken on entry and on focus)
+          and gives the cells back.
+
+          The tab stop is not decorative: the panels are `minmax(3.5rem, 1fr)`
+          columns, so any 4×4 preset is 224px and wider presets more, against a
+          ~256px content box on a 320px phone, and `overflow-x-auto` is
+          keyboard-reachable by default only in Firefox. */}
+      <div
+        role="group"
+        aria-label={`${ariaLabel}: ${preset.label}`}
+        tabIndex={0}
+        className="flex flex-wrap items-start gap-6 overflow-x-auto"
+      >
         {preset.panels.map((panel, i) => (
           <div key={i} className="space-y-2">
             {panel.label ? (

@@ -50,6 +50,37 @@ export const petStateCorrectionFrames = [
   { paramLabel: "λ = 0.01", bars: petStateCorrectionBars }
 ];
 
+export const petCurveLambdas = Array.from({ length: 51 }, (_, i) => (i / 50) * 0.12);
+
+export const petOrderCurveFrames = [
+  {
+    paramLabel: "Ground-state energy of H₀ + λx⁴ (ħ = m = ω = 1), by order in λ",
+    series: [
+      {
+        label: "E₀⁽⁰⁾ (unperturbed)",
+        color: "muted",
+        points: petCurveLambdas.map((lambda) => ({ x: lambda, y: petE0 })),
+      },
+      {
+        label: "through first order",
+        color: "brand",
+        points: petCurveLambdas.map((lambda) => ({
+          x: lambda,
+          y: petE0 + petFirstOrderForLambda(lambda),
+        })),
+      },
+      {
+        label: "through second order",
+        color: "warning",
+        points: petCurveLambdas.map((lambda) => ({
+          x: lambda,
+          y: petE0 + petFirstOrderForLambda(lambda) + petSecondOrderForLambda(lambda),
+        })),
+      },
+    ],
+  },
+];
+
 export const lessonMeta = {
   title: "Time-Independent Perturbation Theory",
   description:
@@ -68,31 +99,30 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Exactly solvable quantum systems are rare, prized specimens — nudge any of them even slightly and the exact solution disappears entirely. Perturbation theory asks a more modest question: if the easy version is already fully understood, can the answer to the almost-easy version be built as a correction, layered on top, order by order?
+Exactly solvable quantum systems are rare, and nudging one destroys its solvability outright. Perturbation theory asks a smaller question instead: if the easy version is fully understood, can the almost-easy version be reached by correcting it, one order at a time?
 </LessonHook>
 
 ## Motivation
 
-Take the free
-particle, the infinite well, the <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term>, hydrogen. Nudge any
-of them even slightly, a stray electric field, a whisper of anharmonicity,
-another electron's repulsion, and
-the Schrödinger equation for the nudged system generally has no
-closed-form answer at all. Perturbation theory doesn't try to solve the
-nudged problem from scratch. Hydrogen
-solved $H=p^2/2m-e^2/4\pi\epsilon_0r$ exactly, but almost nothing else of
-physical interest can be. If $H=H_0+H'$ with $H_0$ exactly solvable and
-$H'$ "small," the true energies and states can be built as a correction
-series in $H'$, one order at a time.
+The list of quantum systems with closed-form solutions is short enough to
+write out: the free particle, the infinite well, the <Term id="quantum-harmonic-oscillator">harmonic
+oscillator</Term>, hydrogen, and a handful of relatives. Everything of physical
+interest is somewhere off that list.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
-  alt="Portrait photograph of physicist Erwin Schrödinger, taken in 1933"
-  caption="Erwin Schrödinger, whose 1926 papers on quantum mechanics introduced the order-by-order energy and state correction formulas this lesson uses; the method is still commonly called Rayleigh-Schrödinger perturbation theory, crediting Lord Rayleigh's earlier, analogous treatment of coupled classical oscillators."
-  credit="Nobel Foundation"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Erwin_Schr%C3%B6dinger_(1933).jpg"
-  license="Public domain"
-/>
+And the list is fragile. Add a stray electric field to hydrogen, a
+whisper of anharmonicity to the oscillator, a second electron to the
+atom, and the closed form is gone. Not harder to find; gone.
+
+Perturbation theory declines to start over. If $H=H_0+H'$ with $H_0$
+solved and $H'$ small, it builds the answer as a series of corrections to
+$H_0$'s known energies and states, each order requiring nothing but
+matrix elements of $H'$ between states you already have. What "small"
+has to mean is the question the end of this lesson takes seriously.
+
+The method is usually called Rayleigh-Schrödinger perturbation theory:
+Schrödinger set it out in his 1926 papers, and Lord Rayleigh had worked
+the analogous problem for coupled classical oscillators decades earlier.
+The algebra transferred to quantum mechanics essentially unchanged.
 
 ## Intuition
 
@@ -122,10 +152,16 @@ $$
 E_n^{(1)} = \langle n^{(0)}|H'|n^{(0)}\rangle = H'_{nn}
 $$
 
-This is literally just the diagonal entry of $H'$ in the $H_0$
-eigenbasis: no sum, no derivation needed to *use* it, though the formula
-itself follows from expanding $(H_0+H')|\psi_n\rangle=E_n|\psi_n\rangle$
-in powers of $H'$ and collecting first-order terms.
+This is the diagonal entry of $H'$ in the $H_0$ eigenbasis, and nothing
+else: no sum to evaluate, no other states consulted. The formula follows
+from expanding $(H_0+H')|\psi_n\rangle=E_n|\psi_n\rangle$ in powers of
+$H'$ and collecting the first-order terms, but using it needs none of
+that.
+
+It is worth pausing on how cheap that is. To first order, the energy
+shift of a state is the average of the perturbation over the state you
+already had. The state's own change does not enter, because the piece of
+the state that moves is orthogonal to the piece you are averaging over.
 
 ### Second-order energy correction
 
@@ -167,14 +203,14 @@ Only $|2^{(0)}\rangle$ and $|4^{(0)}\rangle$ can mix in at all, so the
 question is just which one dominates:
 
 <PredictBeforeReveal
-  question="The first-order state correction formula weights each allowed neighbor by 1/(E₀⁽⁰⁾−Eₘ⁽⁰⁾) — a bigger energy gap means a smaller coefficient. |4⁽⁰⁾⟩ sits twice as far from the ground state as |2⁽⁰⁾⟩ in energy. Which mixing coefficient should come out larger, |c₂| or |c₄|?"
+  question="The first-order state correction weights each allowed neighbor by 1/(E₀⁽⁰⁾−Eₘ⁽⁰⁾), so a bigger energy gap means a smaller coefficient. |4⁽⁰⁾⟩ sits twice as far from the ground state as |2⁽⁰⁾⟩. Which mixing coefficient comes out larger, |c₂| or |c₄|?"
   options={[
     { label: "|c₂| (the closer neighbor)", value: "c2" },
     { label: "|c₄| (the farther neighbor)", value: "c4" },
     { label: "They should be equal", value: "equal" },
   ]}
   correctValue="c2"
-  explanation="|c₂|≈0.0106 versus |c₄|≈0.0031 in the chart below — the closer neighbor wins by more than a factor of 3, not just a factor of 2. The 1/gap weighting in the formula explains part of that, but H'_{mn}=⟨m|λx⁴|n⟩ itself is also larger for the nearer transition, so both factors push the same direction and compound."
+  explanation="|c₂|≈0.0106 against |c₄|≈0.0031 in the chart below: the closer neighbor wins by more than a factor of 3, not the factor of 2 the energy gaps alone would give. The 1/gap weighting supplies part of it, and the matrix element H'_{mn}=⟨m|λx⁴|n⟩ is itself larger for the nearer transition, so the two effects compound rather than compete."
 />
 
 <BarChartExplorer
@@ -182,27 +218,24 @@ question is just which one dominates:
   ariaLabel="Magnitude of the first-order state correction mixing coefficient |c_m| for each basis state m=1 through 7 mixed into the perturbed ground state, for the quartic anharmonic oscillator at lambda=0.01"
 />
 
-Only $|c_2|\approx0.0106$ and $|c_4|\approx0.0031$ are nonzero, and the
-closer neighbor wins by more than a factor of 3, the same "close,
-easily-perturbed neighbors matter far more than distant ones" pattern
-from the Intuition section above, now visible in an actual computed
-mixing coefficient rather than just asserted in words.
+Only $|c_2|\approx0.0106$ and $|c_4|\approx0.0031$ survive, and the closer
+neighbour wins by more than a factor of three. Both are small compared
+with the unperturbed state's own coefficient of $1$, which is what makes
+the series trustworthy here: the perturbed ground state is still
+overwhelmingly the unperturbed one.
 
 ## Physical Interpretation
 
-Perturbation theory is only as good as "$H'$ small" actually is, and
-that's easy to take on faith when there's nothing to check it against.
-The worked example below is different: the quartic oscillator's
-ground-state shift has an exact closed-form answer, so the
-perturbative machinery can be tested against it directly rather than
-just trusted.
+Perturbation theory is only as good as "$H'$ small" turns out to be, and
+that assumption is easy to accept when nothing is available to check it
+against. The worked example below is chosen because something is: the
+quartic oscillator's first-order shift has a closed-form value that can
+be derived without any perturbation theory at all.
 
-This is the same machinery Hydrogen's fine-structure treatment already
-leaned on informally (relativistic kinetic corrections and spin-orbit
-coupling both treated as a "small" $H'$ on top of the exactly-solved
-Coulomb $H_0$): the general $E_n^{(1)}=H'_{nn}$ formula derived here is
-exactly what made that earlier calculation legitimate rather than a
-lucky guess.
+The same machinery is what Hydrogen's fine-structure treatment was
+quietly using. Relativistic kinetic corrections and spin-orbit coupling
+were both handled there as a small $H'$ on top of the solved Coulomb
+$H_0$, and $E_n^{(1)}=H'_{nn}$ is the statement that licensed it.
 
 ## Worked Example
 
@@ -219,10 +252,11 @@ $$
 E_0^{(1)} = \lambda\langle0|x^4|0\rangle = \frac{3\lambda}{4}
 $$
 
-This platform's engine confirms this two independent ways: building the
-$x^4$ matrix from `positionOperator` (itself built from `annihilationOperator`/`creationOperator`)
-and reading off `firstOrderEnergyCorrection(H0diag, Hprime, 0)` gives
-$0.0075$ for $\lambda=0.01$, matching $\frac34(0.01)=0.0075$ exactly.
+Two routes, one answer. The platform builds the $x^4$ matrix from
+`positionOperator` (itself assembled from `annihilationOperator` and
+`creationOperator`) and reads off `firstOrderEnergyCorrection(H0diag,
+Hprime, 0)`, giving $0.0075$ at $\lambda=0.01$. The closed form gives
+$\tfrac34(0.01)=0.0075$. Neither calculation knows about the other.
 
 The corrections stack in order, each one a smaller nudge than the last:
 adding `secondOrderEnergyCorrection(H0diag, Hprime, 0)` on top gives the
@@ -251,7 +285,7 @@ perturbation strength:
 
 <InteractiveSection
   title="Slide λ until second order stops being small"
-  description="Slide λ from 0.002 up to 0.1 and watch both correction terms recomputed live from the same H0 and x⁴ matrices as the worked example above, only λ changes. The first-order term grows linearly in λ. The second-order term grows faster, and by λ=0.1 it is no longer a small correction next to the first-order term, a direct, numeric look at where H′ small stops being a safe assumption."
+  description="Slide λ from 0.002 up to 0.1. Both correction terms are recomputed from the same H0 and x⁴ matrices as the worked example; only λ changes. The first-order term grows linearly in λ, as its formula requires. The second-order term grows as λ², so it starts negligible and catches up, and by λ=0.1 it is no longer small beside the first-order term. That crossover is what 'H′ small' failing looks like numerically."
 >
   <BarChartExplorer
     frames={petLambdaFrames}
@@ -260,6 +294,22 @@ perturbation strength:
     maxValue={petMaxAbsCorrection}
   />
 </InteractiveSection>
+
+Plotted as total energy rather than as corrections, the same numbers show
+where the two orders part company:
+
+<ParametricCurve
+  frames={petOrderCurveFrames}
+  ariaLabel="Three curves of ground-state energy against the coupling strength lambda from 0 to 0.12. The unperturbed energy is a flat line at 0.5. The first-order result is a straight line rising from 0.5 with slope three quarters. The second-order result starts on top of it near lambda = 0 and bends downward away from it as lambda grows, visibly separating by lambda around 0.05."
+/>
+
+Near $\lambda=0$ the two approximations sit on top of each other, because
+the second-order term is $O(\lambda^2)$ and vanishes faster than the
+first. As $\lambda$ grows they separate, and the gap between consecutive
+orders is the practical diagnostic: while it is shrinking, the series is
+telling you something; once it stops shrinking, the next order would be
+no better and the method has run out. Nothing in the formulas announces
+this, which is why the check has to be made by hand.
 
 ## Common Mistakes
 
@@ -302,9 +352,11 @@ deliberately throws rather than silently returning $\pm\infty$ or NaN).
   $|n^{(1)}\rangle=\sum_{m\neq n}\frac{H'_{mn}}{E_n^{(0)}-E_m^{(0)}}|m^{(0)}\rangle$.
 - All three require $H'$ expressed in $H_0$'s eigenbasis, and
   non-degenerate $E_n^{(0)}$.
-- The quartic anharmonic oscillator's first-order shift,
-  $\frac34\lambda$, matches an independently-known exact matrix element
-  exactly, a real check on the machinery rather than a circular one.
+- The quartic anharmonic oscillator's first-order shift, $\frac34\lambda$,
+  agrees with an independently derived matrix element, which makes it a
+  check on the machinery rather than a restatement of it.
+- The series carries no built-in warning when it stops working. Comparing
+  consecutive orders, as the curve above does, is the available substitute.
 
 ## Further Exploration
 

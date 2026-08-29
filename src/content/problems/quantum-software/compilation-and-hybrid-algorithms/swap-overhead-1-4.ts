@@ -25,11 +25,16 @@ export const swapOverhead14: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "d = |1-4| = 3, so overhead = 2(3-1).",
+    nearMisses: [
+      { value: 6, feedback: "6 is 2d. Adjacent qubits need no swaps at all, so the formula uses d−1." },
+      { value: 2, feedback: "2 is d−1, the number of hops one way. The factor of 2 covers walking the qubit back afterwards." },
+      { value: 3, feedback: "3 is the distance d itself, not the swap count it costs." },
+    ],
   },
   hints: [
     { text: "d = |1-4| = 3." },
     { text: "overhead = 2(d-1) = 2(2)." },
-    { text: "= 4." },
+    { text: "Substitute your d into 2(d-1) and evaluate. Adjacent qubits would need no swaps at all; each extra step of distance adds two." },
   ],
   solution: {
     steps: [{ description: "d=3, overhead=2(3-1)=4 SWAP gates." }],

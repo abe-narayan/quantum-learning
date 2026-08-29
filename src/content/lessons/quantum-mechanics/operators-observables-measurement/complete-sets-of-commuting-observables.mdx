@@ -34,7 +34,7 @@ export const commutingPresets = [
 export const lessonMeta = {
   title: "Complete Sets of Commuting Observables",
   description:
-    "When one observable's eigenvalue doesn't fully pin down a state, a second compatible observable can resolve the ambiguity -- built here as a concrete, computable construction, not just a name.",
+    "When one observable's eigenvalue doesn't fully pin down a state, a second compatible observable can resolve the ambiguity, built here as a concrete, computable construction rather than a name.",
   course: "operators-observables-measurement",
   module: "complete-sets-of-commuting-observables",
   order: 1,
@@ -49,9 +49,9 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  Hydrogen's energy alone can't tell two different orbital shapes apart —
-  they share the same <Term id="eigenvalue-eigenvector">eigenvalue</Term>. Labeling a real quantum state honestly
-  takes more than one <Term id="observable">observable</Term>.
+  Hydrogen's energy cannot tell two different orbital shapes apart; they
+  share the same <Term id="eigenvalue-eigenvector">eigenvalue</Term>. Labeling a real quantum state takes more
+  than one <Term id="observable">observable</Term>.
 </LessonHook>
 
 ## Motivation
@@ -100,10 +100,9 @@ $(N,M)$ now uniquely labels every basis state:
 
 No single column has three different entries. $N$ alone can't
 distinguish $|0\rangle$ from $|1\rangle$, and (in this particular example)
-$M$ alone happens to distinguish everything on its own, but the *pair*
-$(N,M)$ always works together as a joint label, which is the property
-that generalizes to cases (like real physical systems) where no single
-observable would suffice alone.
+$M$ alone happens to distinguish everything on its own. What generalizes
+is the *pair* $(N,M)$ working as a joint label, because in real physical
+systems there is often no single observable that suffices by itself.
 
 ### What "complete" means
 
@@ -118,20 +117,20 @@ unresolved.
 
 ## Physical Interpretation
 
-This is exactly the structure behind labeling real quantum states with
+This is the structure behind labeling real quantum states with
 multiple **quantum numbers**. A preview, not derived here: the hydrogen
 atom's energy alone doesn't uniquely specify a state (many different
 orbital shapes share the same energy). It takes a complete set,
 conventionally $\{H, L^2, L_z\}$ (energy, total angular momentum
 squared, and one component of angular momentum), to fully label a state
 as $|n,l,m\rangle$. That's a future course's derivation; the *reason* it
-needs three compatible observables, not one, is exactly this lesson's
+needs three compatible observables, not one, is this lesson's
 idea.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Hydrogen_Density_Plots.png"
   alt="Grid of hydrogen electron probability density plots for several n, l, m quantum number combinations, showing distinct orbital shapes"
-  caption="Every orbital shape pictured here at a given n shares the same energy eigenvalue -- H alone can't tell them apart. It takes the pair L^2, L_z, resolving exactly the degeneracy this lesson's N, M example previews, to label which shape you're actually looking at."
+  caption="Every orbital shape pictured here at a given n shares the same energy eigenvalue, so H alone can't tell them apart. It takes the pair L^2, L_z, resolving the same kind of degeneracy this lesson's N, M example previews, to label which shape you're actually looking at."
   credit="PoorLeno / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png"
   license="Public domain"
@@ -149,18 +148,79 @@ $$
 MN = \begin{pmatrix}5&0&0\\0&-5&0\\0&0&7\end{pmatrix}\begin{pmatrix}1&0&0\\0&1&0\\0&0&2\end{pmatrix} = \begin{pmatrix}5&0&0\\0&-5&0\\0&0&14\end{pmatrix}
 $$
 
-$NM=MN$, so $[N,M]=0$, exactly as claimed. Diagonal matrices commuting
+$NM=MN$, so $[N,M]=0$, as claimed. Diagonal matrices commuting
 is not a coincidence specific to this example; it holds for *any* two
 diagonal matrices, since multiplying diagonal matrices only ever
 multiplies matching diagonal entries, an operation that plainly doesn't
 care about order.
 
-<InteractiveSection title="Confirm NM = MN for two different choices of M" description="N from the worked example, paired with either M or the alternative M' from the practice questions. Switch between them and check every entry of N×M against N×M' — both resolve N's degeneracy, and both commute with N.">
+<InteractiveSection title="Confirm NM = MN for two different choices of M" description="N from the worked example, paired with either M or a second, different diagonal M'. In each case compare the third panel (N × M) against the fourth (M × N) entry by entry: they agree, so the commutator vanishes. Both choices of M resolve N's degeneracy, and both commute with N.">
   <MatrixGridExplorer
     presets={commutingPresets}
     ariaLabel="Choose between two different diagonal matrices M and see that both commute with N by comparing the products in both orders"
   />
 </InteractiveSection>
+
+### A non-diagonal partner, worked in full
+
+Every $M$ so far has been diagonal in the same basis as $N$. That is
+convenient, but it is not required, and seeing why sharpens what
+$[N,M]=0$ demands. Consider
+
+$$
+\tilde M = \begin{pmatrix}0&5&0\\5&0&0\\0&0&7\end{pmatrix}
+$$
+
+which is Hermitian but plainly not diagonal: it mixes $|0\rangle$ and
+$|1\rangle$.
+
+<PredictBeforeReveal
+  question="N = diag(1,1,2) is diagonal and M̃ is not. Does [N, M̃] = 0 still hold?"
+  options={[
+    { label: "No: a non-diagonal matrix can never commute with a diagonal one", value: "never" },
+    { label: "Yes, because M̃ only mixes states inside N's degenerate eigenspace", value: "block" },
+    { label: "Only in the limit where the off-diagonal entries are small", value: "limit" },
+  ]}
+  correctValue="block"
+  explanation="Entry by entry, (NM̃ − M̃N)ᵢⱼ = (nᵢ − nⱼ)M̃ᵢⱼ, so a commuting M̃ may have a nonzero entry wherever nᵢ = nⱼ. The only off-diagonal entries M̃ uses sit in the |0⟩,|1⟩ block, where N's eigenvalues are equal (both 1), so every term (nᵢ − nⱼ)M̃ᵢⱼ vanishes. Non-diagonal freedom lives inside degenerate eigenspaces, and only there: if N's three eigenvalues were all distinct, commuting would force M̃ to be diagonal."
+/>
+
+**Confirm it by direct multiplication.** $N\tilde M$ scales the *rows*
+of $\tilde M$ by $(1,1,2)$; $\tilde M N$ scales the *columns* by
+$(1,1,2)$:
+
+$$
+N\tilde M = \begin{pmatrix}0&5&0\\5&0&0\\0&0&14\end{pmatrix} = \tilde M N
+$$
+
+The two off-diagonal $5$s sit in rows and columns where $N$'s
+eigenvalue is the same ($1$ and $1$), so scaling rows or columns makes
+no difference there, and the corner entry picks up the factor $2$
+either way. So $[N,\tilde M]=0$.
+
+**Does $\tilde M$ resolve the degeneracy?** Its upper block is
+$5\sigma_x$, with eigenvectors and eigenvalues
+
+$$
+|\pm\rangle = \frac{|0\rangle\pm|1\rangle}{\sqrt2}, \qquad \tilde M|\pm\rangle = \pm5|\pm\rangle, \qquad \tilde M|2\rangle = 7|2\rangle
+$$
+
+(check: $\tilde M(|0\rangle+|1\rangle)/\sqrt2 = (5|1\rangle+5|0\rangle)/\sqrt2 = +5|+\rangle$).
+The joint labels are again unique:
+
+| State | $N$ | $\tilde M$ |
+|---|---|---|
+| $\lvert+\rangle$ | 1 | 5 |
+| $\lvert-\rangle$ | 1 | $-5$ |
+| $\lvert2\rangle$ | 2 | 7 |
+
+So $\{N,\tilde M\}$ is a perfectly good CSCO. The difference from the
+diagonal example is *which* shared eigenbasis the pair selects:
+$\{|+\rangle,|-\rangle,|2\rangle\}$ rather than
+$\{|0\rangle,|1\rangle,|2\rangle\}$. Both are eigenbases of $N$
+(any basis of a degenerate eigenspace is), and the second observable is
+what picks one out. That is the CSCO idea in its full form: the set does
+not merely label a basis you already had, it *determines* the basis.
 
 ## Common Mistakes
 
@@ -205,9 +265,10 @@ suffices for a fully nondegenerate spectrum, and real physical systems
 
 ## Further Exploration
 
-<ChallengePrompt prompt="Every M this lesson used happens to be diagonal in the same basis as N. Must a second observable that resolves N's degeneracy always be diagonal in this basis too, or could a non-diagonal (but still N-commuting) operator work as well?">
-  Think about what $[N,M]=0$ actually requires — does it force $M$ to be
-  diagonal, or just to preserve $N$'s eigenspaces?
+<ChallengePrompt prompt="Try to build a non-diagonal Hermitian M that commutes with N = diag(1,2,3), all eigenvalues distinct. What goes wrong, and what does the failure tell you about where non-diagonal freedom lives?">
+  Use the entrywise identity from the worked example:
+  $(NM-MN)_{ij}=(n_i-n_j)M_{ij}$. With no repeated $n_i$, which entries
+  of $M$ are allowed to be nonzero?
 </ChallengePrompt>
 
 <NextDiscovery>

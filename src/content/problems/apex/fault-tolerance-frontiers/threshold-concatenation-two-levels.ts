@@ -23,7 +23,24 @@ export const thresholdConcatenationTwoLevels: NumericProblem = {
     value: 0.000128,
     tolerance: 0.000001,
     incorrectFeedback:
-      "Apply the recursion twice, not once: p_1 = c*p_0^2 = 200*(0.002)^2 = 0.0008, then p_2 = c*p_1^2 = 200*(0.0008)^2 = 0.000128.",
+      "Apply the recursion twice, not once: first get p_1 = c*p_0^2, then feed that p_1 (not p_0) back into the same formula for p_2. If your answer is off by orders of magnitude, check that c was multiplied in at both levels.",
+    nearMisses: [
+      {
+        value: 0.0008,
+        feedback: "That is p_1, the level-1 rate. The question asks for level 2, so feed p_1 back through p_(k+1) = c p_k^2 once more.",
+      },
+      {
+        value: 3.2e-9,
+        tolerance: 1e-10,
+        feedback:
+          "That is c p_0^4, with c applied only once. Every concatenation level pays its own factor of c; only the squaring compounds for free.",
+      },
+      {
+        value: 1.6e-11,
+        tolerance: 1e-12,
+        feedback: "That is p_0^4 with no factor of c at all. The gadget constant multiplies at each level, and it is what makes the threshold 1/c rather than 1.",
+      },
+    ],
   },
   hints: [
     { text: "Apply the recursion once to get p_1 from p_0, then apply it again to get p_2 from p_1 -- concatenation is genuinely iterative, not a one-shot formula." },

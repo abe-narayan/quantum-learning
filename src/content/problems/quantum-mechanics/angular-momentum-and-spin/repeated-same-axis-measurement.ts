@@ -19,7 +19,7 @@ export const repeatedSameAxisMeasurement: MultipleChoiceProblem = {
       { id: "a", text: "1 (certain)" },
       { id: "b", text: "0.5" },
       { id: "c", text: "0" },
-      { id: "d", text: "Depends on the atom's speed" },
+      { id: "d", text: "Between 0.5 and 1, depending on how far apart the two apparatuses sit" },
     ],
   },
   answer: {
@@ -28,22 +28,26 @@ export const repeatedSameAxisMeasurement: MultipleChoiceProblem = {
     optionFeedback: {
       b: "0.5 would apply if an incompatible-axis measurement occurred in between — here there's no intervening measurement at all.",
       c: "This would mean measuring twice always flips the outcome, which contradicts the state being an eigenstate after the first measurement.",
-      d: "Measurement outcomes here don't depend on classical details like speed — only on the quantum state and which observable is measured.",
+      d: "This imagines the state drifting back toward random while it flies. An Sz eigenstate is stationary under the free evolution between the magnets; nothing in the idealized setup rotates it, so the separation does not enter.",
     },
-    defaultIncorrectFeedback: "After the first measurement, the atom is in the |↑⟩ eigenstate exactly — what does measuring the same observable again on an eigenstate give?",
+    defaultIncorrectFeedback: "Write down the state the atom is in after the first measurement, then ask what measuring that same observable on that state gives.",
   },
   hints: [
-    { text: "After the first z-measurement gives 'up', the state collapses to exactly |↑⟩." },
-    { text: "|↑⟩ is already an eigenstate of Sz with eigenvalue +ħ/2." },
-    { text: "Measuring the same observable on its own eigenstate reproduces that same eigenvalue with certainty." },
+    { text: "Start by naming the state the atom is in the instant after the first apparatus reports 'up'." },
+    { text: "That state is an eigenstate of the observable the second apparatus measures." },
+    { text: "The Born rule on an eigenstate gives its own eigenvalue back, with what probability?" },
   ],
   solution: {
-    steps: [{ description: "|↑⟩ is already an Sz eigenstate, so measuring Sz again (with nothing in between) gives 'up' with certainty, P=1." }],
-    finalAnswer: "P = 1 (certain)",
+    steps: [{ description: "The first measurement collapses the atom into |↑⟩, an Sz eigenstate with eigenvalue +ħ/2. Nothing between the two magnets rotates that state, so the second Sz measurement acts on an eigenstate of the observable it measures and returns 'up' with probability 1." }],
+    finalAnswer: "P = 1: the atom is already in the Sz eigenstate the second apparatus measures.",
   },
   explanation: {
-    correctIdea: "This contrasts directly with the x-then-z sequence — without an intervening incompatible-observable measurement, there's no disturbance to erase the first result.",
-    whyCorrect: "This is exactly the lesson's Practice Question 3, confirming why the intervening x-measurement specifically is what breaks the correlation.",
-    whyWrong: ["Any answer other than certainty misses that measuring the same compatible observable twice, with nothing disturbing the state in between, simply confirms the same result."],
+    correctIdea: "Repeating a measurement on the state it just produced returns the same outcome, because collapse left the system in an eigenstate of that observable.",
+    whyCorrect: "Contrast this with the x-then-z sequence: it is the intervening incompatible measurement, not the passage of time, that erases the first result.",
+    whyWrong: [
+      { optionId: "b", text: "Imports the answer for the x-then-z sequence, where an incompatible measurement sits in between. Here nothing does." },
+      { optionId: "c", text: "Would mean a repeated measurement always flips its own result, which contradicts the state being an eigenstate." },
+      { optionId: "d", text: "Has the state relaxing in flight. An Sz eigenstate is stationary under the free evolution between the magnets." },
+    ],
   },
 };

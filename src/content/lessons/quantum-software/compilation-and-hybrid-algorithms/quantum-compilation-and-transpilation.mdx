@@ -15,7 +15,7 @@ export const lessonMeta = {
   module: "quantum-compilation-and-transpilation",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 22,
+  estimatedMinutes: 20,
   prerequisites: ["quantum-software/simulating-quantum-systems/noise-simulation"],
   objectives: [
     "Explain why a logical circuit's gates may not directly match a specific device's connectivity constraints",
@@ -38,14 +38,24 @@ gates between *specific*, physically adjacent qubit pairs. **<Term id="quantum-c
 is the compilation step that bridges this gap: rewriting a logical
 circuit into one a specific device's connectivity can actually execute.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/b/b9/IBM_Q_system_%2827274387309%29.jpg"
-  alt="Close-up of an IBM quantum processor prototype in its mounting hardware"
-  caption="A real IBM quantum processor. On hardware like this, two-qubit gates can only run between specific, physically adjacent qubit pairs — the connectivity constraint this lesson's SWAP-network transpilation exists to bridge."
-  credit="IBM España / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_system_(27274387309).jpg"
-  license="Public Domain"
+Transpilation is a stack, not a single rewrite. Each stage below narrows
+what the circuit is allowed to be, and the one this lesson concentrates
+on — routing, where the SWAP networks come from — is highlighted:
+
+<PipelineDiagram
+  ariaLabel="The transpilation stack: a logical circuit passes through gate-set translation, qubit layout, routing with SWAP insertion, optimization, and pulse scheduling before it reaches the device"
+  steps={[
+    { label: "Logical circuit", detail: "any gate, any qubit pair" },
+    { label: "Translate", detail: "to the device's native gate set" },
+    { label: "Layout", detail: "map logical qubits onto physical ones" },
+    { label: "Route", detail: "insert SWAPs for non-adjacent pairs", highlight: true },
+    { label: "Optimize", detail: "cancel and merge what it can" },
+    { label: "Schedule", detail: "emit timed control pulses" },
+  ]}
 />
+
+Only the "Route" box is forced on the circuit by the chip's wiring. The
+others would exist even on a hypothetical fully-connected device.
 
 ## Engineering Development
 
@@ -184,7 +194,7 @@ column shift right) exactly as $2(d-1)$ predicts:
 Transpilation is not a cosmetic renaming step. It can substantially
 change a circuit's real cost. A logical circuit that looks compact in
 terms of gate count can expand significantly once connectivity
-constraints are honestly accounted for, which is exactly why real
+constraints are honestly accounted for, which is why real
 device topology (Physical Qubit Platforms' connectivity comparison
 across platforms) matters for algorithm performance, not just raw qubit
 count or gate speed.

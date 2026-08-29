@@ -17,7 +17,7 @@ export const barrierShape = barrierPotential(barrierGrid, 0, 1, 5);
 export const lessonMeta = {
   title: "Tunneling and the Finite Barrier",
   description:
-    "Solving the Schrodinger equation inside a classically forbidden region to show the wavefunction decays exponentially rather than vanishing outright -- the mechanism behind quantum tunneling, verified live via the simulator's transmission/reflection accounting.",
+    "Solving the Schrödinger equation inside a classically forbidden region to show the wavefunction decays exponentially rather than vanishing outright, which is the mechanism behind quantum tunneling, verified live via the simulator's transmission/reflection accounting.",
   course: "wave-mechanics",
   module: "tunneling-and-the-finite-barrier",
   order: 1,
@@ -25,7 +25,7 @@ export const lessonMeta = {
   estimatedMinutes: 24,
   prerequisites: ["quantum-mechanics/wave-mechanics/wave-packet-dynamics-and-dispersion"],
   objectives: [
-    "Solve the Schrodinger equation inside a classically forbidden region (E < V) and show it gives exponential, not oscillatory, behavior",
+    "Solve the Schrödinger equation inside a classically forbidden region (E < V) and show it gives exponential, not oscillatory, behavior",
     "Explain why a finite-width barrier lets some amplitude survive to the far side, unlike an infinitely thick one",
     "Verify numerically that transmitted and reflected probability sum to 1, confirming no probability is created or destroyed",
   ],
@@ -37,8 +37,8 @@ Picture a ball rolled at a hill it doesn't have enough energy to climb. Classica
 
 ## Motivation
 
-No energy bookkeeping is
-violated to make this happen; what changes is what "can't get over"
+No energy bookkeeping is violated when a particle turns up beyond a
+barrier it lacked the energy to climb; what changes is what "can't get over"
 means for something described by a <Term id="wavefunction">wavefunction</Term> instead of a trajectory.
 Solve the Schrödinger equation honestly inside the "forbidden" region,
 and the wavefunction doesn't vanish there. It decays, smoothly and
@@ -89,11 +89,10 @@ resuming beyond the barrier (where $V=0$ again and $E>V$ once more)
 produces a transmitted wave with nonzero amplitude. The transmission
 probability falls off roughly as $e^{-2\kappa a}$, exponentially
 sensitive to both the barrier's height (through $\kappa$) and its width
-$a$, which is exactly why <Term id="quantum-tunneling">tunneling</Term> is dramatic for subatomic barriers
-and utterly negligible for everyday macroscopic ones (a wide barrier
-makes $e^{-2\kappa a}$ astronomically small). If the barrier were
-infinitely wide, $e^{-2\kappa a}\to0$ exactly, recovering the classical
-"never crosses" result as a limiting case.
+$a$. That exponential is why <Term id="quantum-tunneling">tunneling</Term> matters at subatomic barriers and
+disappears at everyday ones: doubling $a$ squares an already tiny number.
+If the barrier were infinitely wide, $e^{-2\kappa a}\to0$ exactly,
+recovering the classical "never crosses" result as a limiting case.
 
 ## Physical Interpretation
 
@@ -118,8 +117,8 @@ empty landscape.
 Everywhere outside the shaded bump, $V=0$ and the earlier lessons'
 oscillatory solutions apply; inside it, $V=V_0$ and this section's
 exponential solution takes over. The wavefunction has to be continuous
-across both edges, which is exactly the matching condition that lets a
-sliver of amplitude survive to the far side.
+across both edges, and that matching condition is what lets a sliver of
+amplitude survive to the far side.
 
 Two real devices depend directly on this exponential sensitivity to
 barrier width. A scanning tunneling microscope images individual atoms
@@ -133,7 +132,7 @@ own, one of the physical limits on how far that layer can be scaled down.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5a/First_STM.jpg"
-  alt="Photograph of the original 1981 scanning tunneling microscope built by Binnig and Rohrer at IBM Zurich, on display at the Deutsches Museum"
+  alt="A hand-built laboratory instrument standing on a plain base in a museum display, small enough to sit on a desk. Its core is a squat stack of circular metal plates held apart by spacers, a vibration-isolation mount, with the sample and probe assembly at the centre and loose wiring running out to the electronics. Nothing about it is machined for appearance; it reads as a prototype rather than a product."
   caption="The original scanning tunneling microscope, built at IBM Zurich in 1981: it images individual atoms by measuring the tunneling current derived above, a current exponentially sensitive to the vacuum gap's width."
   credit="J Brew (Flickr)"
   creditUrl="https://commons.wikimedia.org/wiki/File:First_STM.jpg"
@@ -151,10 +150,10 @@ own, one of the physical limits on how far that layer can be scaled down.
     { label: "It depends only on momentum, not the barrier", value: "momentum-only" },
   ]}
   correctValue="nonzero"
-  explanation="Inside the barrier ψ decays exponentially (Ce^{κx}+De^{-κx}), but decaying isn't vanishing: continuity of ψ and ψ' forces a nonzero, if small, amplitude to survive to the far side, giving real transmission roughly ~e^(-2κa). That's exactly what the Explorer's Tunneling preset below shows: a nonzero P(transmitted), splitting the packet's probability between transmission and reflection."
+  explanation="Inside the barrier ψ decays exponentially (Ce^{κx}+De^{-κx}), but decaying isn't vanishing: continuity of ψ and ψ' forces a nonzero, if small, amplitude to survive to the far side, giving real transmission of order e^(-2κa). That is what the Explorer's Tunneling preset below shows: a nonzero P(transmitted), splitting the packet's probability between transmission and reflection."
 />
 
-<InteractiveSection title="Raise the barrier, watch it shrink" description="The Wavefunction Explorer's Tunneling Through a Barrier preset sends a Gaussian packet at a rectangular barrier. Play it forward past the interaction and check the comparison panel: P(transmitted) and P(reflected) should sum to almost exactly 1 (probability conservation, nothing is created or destroyed by the barrier), split between the two outcomes in a ratio that depends sharply on the barrier's height and width, exactly as e^(-2κa) predicts. Try raising the barrier height and watch the transmitted fraction shrink.">
+<InteractiveSection title="Raise the barrier, watch it shrink" description="The Wavefunction Explorer's Tunneling Through a Barrier preset sends a Gaussian packet at a rectangular barrier. Play it forward past the interaction and check the comparison panel: P(transmitted) and P(reflected) should sum to almost exactly 1 (probability conservation, nothing is created or destroyed by the barrier), split between the two outcomes in a ratio that depends sharply on the barrier's height and width, as e^(-2κa) predicts. Try raising the barrier height and watch the transmitted fraction shrink.">
   <LazyWavefunctionExplorer initialPresetId="tunneling" />
 </InteractiveSection>
 
@@ -166,10 +165,31 @@ how much?**
 
 $\kappa=\sqrt{2m(V_0-E)}/\hbar$ increases (since $V_0$ increased), so
 $\kappa a$ increases, so $e^{-2\kappa a}$, the rough transmission scale,
-*decreases*, and it decreases exponentially fast in $\kappa$, meaning even
-a modest barrier-height increase can suppress transmission dramatically.
-This qualitative prediction is directly checkable: raise the Explorer's
-barrier height parameter and watch $P(\text{transmitted})$ fall sharply.
+*decreases*, and it decreases exponentially fast in $\kappa$, so even a
+modest increase in barrier height suppresses transmission sharply. This
+prediction is directly checkable: raise the Explorer's barrier height
+parameter and watch $P(\text{transmitted})$ fall.
+
+**Now with real numbers.** Take an electron facing a vacuum gap with
+$V_0-E = 4$ eV, roughly a metal's work function, which is the situation
+inside a scanning tunneling microscope:
+
+$$
+\kappa = \frac{\sqrt{2m_e(V_0-E)}}{\hbar} = \frac{\sqrt{2(9.11\times10^{-31})(6.41\times10^{-19})}}{1.055\times10^{-34}} \approx 1.02\times10^{10}\ \mathrm{m^{-1}} = 10.2\ \mathrm{nm^{-1}}
+$$
+
+At a gap of $a=0.5$ nm, $2\kappa a \approx 10.2$, giving
+$e^{-2\kappa a}\approx 3.7\times10^{-5}$: about one electron in $27{,}000$
+gets across. Now move the tip $1$ ångström closer, $a = 0.4$ nm. The
+exponent drops by $2\kappa(0.1\ \mathrm{nm}) \approx 2.05$, and the
+transmission rises by $e^{2.05}\approx 7.8$.
+
+Nearly an order of magnitude of current for a tenth of a nanometre of
+motion is what makes atomic-resolution imaging possible. An STM does not
+need a probe sharpened to atomic dimensions so much as it needs this
+exponential: whichever atom on the tip is closest to the surface carries
+almost all the current, so the instrument images with a single atom
+whether or not it was built to.
 
 ## Common Mistakes
 
@@ -219,7 +239,7 @@ the other, matching the correct probabilistic interpretation.
 
 <NextDiscovery>
 [Numerically Evolving Quantum States](/lessons/quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states)
-turns to *how* this platform's simulator actually integrates the
-Schrödinger equation forward in time, tying together every numerical
-claim made in this course.
+turns to *how* this platform's simulator integrates the Schrödinger
+equation forward in time, and to why the method it uses conserves norm
+exactly where simpler ones do not.
 </NextDiscovery>

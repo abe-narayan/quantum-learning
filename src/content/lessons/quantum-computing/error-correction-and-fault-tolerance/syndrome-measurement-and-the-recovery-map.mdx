@@ -30,10 +30,14 @@ Bit-flip code, phase-flip code, Shor code: three different constructions this co
 
 ## Motivation
 
-Every code this course has built follows the same four-step procedure.
-This lesson names that procedure explicitly and generally, then gives the
-standard notation, $[[n,k,d]]$, that lets any two codes' error-correcting
-power be compared at a glance.
+Every code this course has built follows the same four-step procedure. This
+lesson names that procedure in general terms and then gives the standard
+notation, $[[n,k,d]]$, that lets two codes be compared at a glance.
+
+The notation is worth the effort because it makes one thing impossible to
+hide. A code's distance has to be quoted against a specific error model,
+and the 3-qubit bit-flip code, which sounds like a distance-3 code, is
+distance 1 as a general quantum code. The parameters say so out loud.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Dilution_Refrigerator_%2839016294284%29.jpg"
@@ -51,7 +55,7 @@ power be compared at a glance.
 For any stabilizer code with generators $g_1,\dots,g_m$:
 
 1. **Measure every generator** $g_i$, obtaining a syndrome bit for each
-   (via ancilla-based measurement, exactly as Lesson 2 built, never
+   (via ancilla-based measurement, as Lesson 2 built, never
    measuring the data qubits directly).
 2. **Look up the syndrome** in a precomputed table mapping syndrome
    patterns to the most likely error.
@@ -61,7 +65,7 @@ For any stabilizer code with generators $g_1,\dots,g_m$:
    *exactly* the original encoded state, for any error the code was
    designed to handle.
 
-This is precisely `runBitFlipCorrectionCycle`'s four steps (extract
+This is `runBitFlipCorrectionCycle`'s four steps (extract
 syndrome via ancilla CNOTs and measurement, `decodeBitFlipSyndrome` looks
 up the table, apply $X$ to the identified qubit, return the corrected
 3-qubit state), described here in the vocabulary that generalizes to any
@@ -72,42 +76,50 @@ stabilizer code, not just this one.
 A quantum code is described by three numbers: $n$ (physical qubits used),
 $k$ (logical qubits protected), and $d$ (the code's **<Term id="code-distance">distance</Term>**, the
 minimum number of physical qubits an *undetectable* error must act on).
-The 3-qubit bit-flip code is $[[3,1,3]]$: $3$ physical qubits, $1$
-logical qubit, and distance $3$ (a weight-3 error, $X$ on all three
-qubits simultaneously, exactly flips the logical state undetected,
-since it maps $|000\rangle\leftrightarrow|111\rangle$ while leaving both
-$Z_0Z_1$ and $Z_1Z_2$ syndromes at $(0,0)$; no weight-1 or weight-2
-error does this). The Shor code is $[[9,1,3]]$, the same distance, at
-$9\times$ the physical qubit cost, since its distance-3 protection covers
-*both* error types ($X$ and $Z$), not just one.
+Against bit-flip errors alone, the 3-qubit code earns distance $3$: $3$
+physical qubits, $1$ logical qubit, and the cheapest undetectable $X$-type
+error has weight 3 ($X$ on all three qubits maps
+$|000\rangle\leftrightarrow|111\rangle$ while leaving both
+$Z_0Z_1$ and $Z_1Z_2$ syndromes at $(0,0)$; no weight-1 or weight-2 $X$
+error does this). As a general quantum code, though, its distance is only
+$1$. A single $Z$ on any one qubit commutes with both stabilizers, so the
+syndrome stays $(0,0)$, yet it sends
+$\alpha|000\rangle+\beta|111\rangle$ to
+$\alpha|000\rangle-\beta|111\rangle$: an undetectable weight-1 error that
+changes the logical state. This is the $Z$-blindness the course flagged
+when the code was first built, restated in code-parameter language, and it
+is why the Shor code exists. The Shor code is a true $[[9,1,3]]$, distance
+$3$ against *every* Pauli error type, at $3\times$ the physical qubit
+cost.
 
 <BarChart
   bars={[
     { label: "n=3, bit-flip", value: 3, caption: "3 physical qubits" },
     { label: "n=9, Shor", value: 9, caption: "9 physical qubits", highlight: true }
   ]}
-  ariaLabel="Physical qubit count for the 3,1,3 bit-flip code versus the 9,1,3 Shor code, same distance"
+  ariaLabel="Physical qubit count for the 3-qubit bit-flip code, distance 3 against bit flips only, versus the 9,1,3 Shor code, distance 3 against every Pauli error"
 />
 
-Same distance, $3\times$ the qubits: $n$ is a cost paid for broader
-error coverage, not a benefit that scales with the number itself.
+Distance $3$ against one error type versus distance $3$ against all of
+them, at $3\times$ the qubits: $n$ is a cost paid for broader error
+coverage, not a benefit that scales with the number itself.
 
 ### Distance and correctable error count
 
 A distance-$d$ code corrects any error affecting **fewer than $d/2$**
-physical qubits, the same relationship classical coding theory uses,
-here applying to quantum codes with the extra restriction to the
-$X$/$Z$/$Y$ error model established earlier. For $d=3$: corrects any
-single-qubit error ($1<3/2$), exactly what Lessons 2 and 3 verified
-directly; a genuine two-qubit error is not guaranteed correctable by a
-distance-3 code (consistent with the practice question, several lessons
-back, about simultaneous errors on two data qubits).
+physical qubits, the same relationship classical coding theory uses. The
+distance must be quoted for the error model in question: the bit-flip
+code's $d=3$ holds only against $X$ errors, so "corrects any single-qubit
+error ($1<3/2$)" means any single-qubit *bit-flip* error, which is what
+Lessons 2 and 3 verified directly. A two-qubit error is not guaranteed
+correctable by a distance-3 code (consistent with the practice question,
+several lessons back, about simultaneous errors on two data qubits).
 
 ## Physical Interpretation
 
 $[[n,k,d]]$ makes the fundamental tradeoff of quantum error correction
 explicit: larger $d$ (more error-correcting power) generally costs more
-physical qubits $n$ per logical qubit $k$, exactly the resource-overhead
+physical qubits $n$ per logical qubit $k$, the resource-overhead
 question the capstone returns to with concrete numbers for real
 fault-tolerant architectures.
 
@@ -117,28 +129,27 @@ the syndrome is being measured and decoded, so the correction has to be
 computed and applied before that error information goes stale. Google's
 2023 <Term id="surface-codes">surface-code</Term> experiments paired syndrome extraction with a
 classical decoder running fast enough to keep pace with the device's
-measurement rate, a genuine real-time computing problem sitting on top
-of the decode-table lookup this lesson builds, and one that gets
-significantly harder as $n$ grows and the lookup table this lesson uses
-stops being a table at all.
+measurement rate: a real-time computing problem sitting on top of the
+decode-table lookup this lesson builds, and one that gets harder as $n$
+grows and the lookup table stops being a table at all.
 
 ## Interactive Experiment
 
-The four-step recovery procedure above is exactly what the platform's
+The four-step recovery procedure above is what the simulator's
 real `runBitFlipCorrectionCycle` executes: measure every generator,
 decode the syndrome, apply the correction. Step through it yourself on
-the same $[[3,1,3]]$ bit-flip code this lesson's parameters describe.
+the same 3-qubit bit-flip code whose parameters this lesson pinned down.
 
-<InteractiveSection title="Run the general recovery procedure" description="Check a single qubit — 0, 1, or 2 — and read off the syndrome (s1, s2). Confirm it matches Lesson 2's decode table (non-(0,0) means an error was found), then check the recovered state's amplitude table against the uncorrupted encoded state: step 4's guarantee, exact recovery, holds for every qubit you try, not just one. Then check two qubits at once (e.g. 0 and 1) to drive the weight-2 scenario the Worked Example below derives by hand — watch the live amplitude table swap α and β exactly as predicted.">
+<InteractiveSection title="Run the general recovery procedure" description="Check a single qubit (0, 1, or 2) and read off the syndrome (s1, s2). Confirm it matches Lesson 2's decode table, then check the recovered state's amplitude table against the uncorrupted encoded state: step 4's exact-recovery guarantee holds for every qubit you try. Then check two qubits at once, say 0 and 1, to drive the weight-2 scenario the Worked Example derives by hand, and watch the amplitude table swap α and β as predicted.">
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 
-The four-step procedure is identical for the dual, phase-flip $[[3,1,3]]$
-code from Lesson 3, encode, inject, diagnose, correct, run here end to
+The four-step procedure is identical for the dual phase-flip code
+from Lesson 3, encode, inject, diagnose, correct, run here end to
 end on either code so the "any stabilizer code" claim above isn't only
 demonstrated for one of the two:
 
-<InteractiveSection title="The same four steps, either code" description="Switch between the bit-flip and phase-flip codes and step through encode → inject → diagnose → correct. The syndrome table and the correction step are structurally identical between the two, exactly the point Lesson 5's stabilizer formalism makes precise: this is one procedure, not two.">
+<InteractiveSection title="The same four steps, either code" description="Switch between the bit-flip and phase-flip codes and step through encode → inject → diagnose → correct. The syndrome table and the correction step are structurally identical between the two, the point Lesson 5's stabilizer formalism makes precise: this is one procedure, not two.">
   <ErrorCorrectionCycle ariaLabel="A logical qubit encoded, hit with a real bit-flip or phase-flip error, and corrected via real syndrome extraction, for either the bit-flip or the phase-flip three-qubit code." />
 </InteractiveSection>
 
@@ -151,13 +162,14 @@ demonstrated for one of the two:
     { label: "The syndrome comes out (0,0), so nothing happens at all", value: "silent" },
   ]}
   correctValue="worsens"
-  explanation="The syndrome for X0X1 is (0,1), which the decode table reads as a single X error on qubit 2, a qubit the actual error never touched. Applying the prescribed fix, X on qubit 2, doesn't undo anything: it adds a third error on top of the two already there, and X0X1X2 is exactly the undetectable weight-3 error that swaps the logical alpha and beta outright. A distance-3 code doesn't just fail to help above its rated weight, it can actively convert a survivable-looking situation into a full logical error, worked out below."
+  explanation="The syndrome for X0X1 is (0,1), which the decode table reads as a single X error on qubit 2, a qubit the actual error never touched. Applying the prescribed fix, X on qubit 2, doesn't undo anything: it adds a third error on top of the two already there, and X0X1X2 is the undetectable weight-3 X error that swaps the logical alpha and beta outright. A distance-3 code doesn't just fail to help above its rated weight, it can actively convert a survivable-looking situation into a full logical error, worked out below."
 />
 
 ## Worked Example
 
-**Confirm the bit-flip code's distance is exactly 3, not less, by
-checking what happens for a weight-1 and a weight-2 error.**
+**Confirm the bit-flip code's distance against $X$ errors is exactly 3,
+not less, by checking what happens for a weight-1 and a weight-2 $X$
+error.**
 
 A weight-1 error (single $X$) always flips at least one of $Z_0Z_1,Z_1Z_2$
 (shown directly in Lesson 5), always detected and correctly reversed, as
@@ -167,7 +179,7 @@ parity), but $Z_1Z_2$'s syndrome *does* flip (qubit 1 flipped, qubit 2
 didn't), giving syndrome $(0,1)$, which the decode table reads as "error
 on qubit 2." Applying the recovery procedure's prescribed fix, $X_2$, to
 the already-corrupted state gives a net applied error of
-$X_0X_1\cdot X_2=X_0X_1X_2$, exactly the weight-3 logical error
+$X_0X_1\cdot X_2=X_0X_1X_2$, the weight-3 logical error
 identified below, so "recovery" here doesn't fail gently: it actively
 converts a 2-qubit error into a full logical bit flip
 ($\alpha\leftrightarrow\beta$), confirmed directly by the engine (a
@@ -176,7 +188,9 @@ $0.8,0.6$, swapped). Only the weight-3 error $X_0X_1X_2$ on its own,
 with no recovery attempted, is truly undetectable at the syndrome stage
 ($Z_0Z_1$: both flip, parity preserved; $Z_1Z_2$: both flip, parity
 preserved) while still swapping $\alpha\leftrightarrow\beta$: an error
-that leaves no trace in the syndrome at all, confirming $d=3$.
+that leaves no trace in the syndrome at all, confirming $d=3$ within
+the bit-flip error model. (For the full-Pauli distance, remember the
+single-$Z$ error from the parameters section: undetected, weight 1.)
 
 ## Common Mistakes
 
@@ -196,13 +210,15 @@ a weight-2 error can make things categorically worse, not merely
 ratio of $d$ (or correctable error count) to $n$, which is what makes
 $[[9,1,3]]$ (Shor) less resource-efficient than later codes with the same
 distance but fewer physical qubits (not covered in this course, but named
-here as a real, active area this platform doesn't build).
+here as a real, active research area).
 </Callout>
 
 ## Practice Questions
 
-1. Confirm the phase-flip code (Lesson 3) is also $[[3,1,3]]$, using the
-   same distance argument with $X_0X_1X_2$ replaced by $Z_0Z_1Z_2$.
+1. Confirm the phase-flip code (Lesson 3) also has distance 3 against
+   its target errors, using the same argument with $X_0X_1X_2$ replaced
+   by $Z_0Z_1Z_2$. Then find the weight-1 error its stabilizers cannot
+   see, mirroring the bit-flip code's single-$Z$ blind spot.
 2. Using the "$d/2$" rule, how many simultaneous single-qubit errors
    could a hypothetical $[[5,1,5]]$ code correct?
 3. Explain why the weight-2 error $X_0X_1$ in the worked example is
@@ -219,14 +235,16 @@ here as a real, active area this platform doesn't build).
 ## Summary
 
 - The general recovery procedure: measure every stabilizer, look up the
-  syndrome, apply the matching correction, exactly what Lesson 2's
+  syndrome, apply the matching correction, which is what Lesson 2's
   circuit already implements.
 - $[[n,k,d]]$ notation: $n$ physical qubits, $k$ logical qubits, distance
-  $d$; the bit-flip and phase-flip codes are both $[[3,1,3]]$, and Shor's
-  code is $[[9,1,3]]$.
+  $d$. The bit-flip and phase-flip codes each reach distance 3 against
+  their target error type, but only distance 1 against the full Pauli
+  model; Shor's code is a true $[[9,1,3]]$.
 - A distance-$d$ code corrects any error affecting fewer than $d/2$
-  qubits, verified directly for the bit-flip code's weight-1 (corrected),
-  weight-2 (detected but miscorrected), and weight-3 (undetectable) cases.
+  qubits within its error model, verified directly for the bit-flip
+  code's weight-1 (corrected), weight-2 (detected but miscorrected), and
+  weight-3 (undetectable) $X$-error cases.
 
 ## Further Exploration
 

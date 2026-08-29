@@ -38,12 +38,16 @@ export const nisqMeaningCheck: MultipleChoiceProblem = {
     { text: "The lesson explicitly distinguishes this from a permanent limitation." },
   ],
   solution: {
-    steps: [{ description: "NISQ describes the current era: noisy, intermediate-scale devices without full error correction — a description of now, not an algorithm, platform, or permanent ceiling." }],
-    finalAnswer: "(a) The current era of hardware: tens to a few thousand qubits, without full error correction",
+    steps: [{ description: "NISQ names the current era: noisy, intermediate-scale devices without full error correction. It is a description of where hardware stands now, not an algorithm, a platform, or a permanent ceiling." }],
+    finalAnswer: "The current era of hardware: tens to a few thousand qubits, running without full error correction.",
   },
   explanation: {
-    correctIdea: "This tests basic recall of the lesson's defined term, guarding against common conflations (NISQ as an algorithm, or as a permanent limit).",
+    correctIdea: "NISQ is a label for a hardware capability regime, so it names a moment in the technology's development rather than a technique or a theoretical bound.",
     whyCorrect: "Matches the lesson's explicit definition.",
-    whyWrong: ["VQE/QAOA are algorithms SUITED to the NISQ era, not NISQ itself; and the lesson explicitly warns against treating NISQ as a permanent limitation."],
+    whyWrong: [
+      { optionId: "b", text: "Names an algorithm. VQE and QAOA were designed for the NISQ era, but the term describes the machines, not the code run on them." },
+      { optionId: "c", text: "Reads a snapshot as a ceiling. The lesson frames NISQ as where hardware is today, with fault tolerance as the stated destination." },
+      { optionId: "d", text: "Ties the term to one technology. Superconducting, trapped-ion and neutral-atom devices are all NISQ devices right now." },
+    ],
   },
 };

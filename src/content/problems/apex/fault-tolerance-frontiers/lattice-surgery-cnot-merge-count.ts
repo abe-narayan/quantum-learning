@@ -23,12 +23,12 @@ export const latticeSurgeryCnotMergeCount: NumericProblem = {
     value: 2,
     tolerance: 0,
     incorrectFeedback:
-      "Count the merge/split pairs only: one ZZ merge/split between C and A, and one XX merge/split between A and T. The final measurement of A is a single-patch operation, not a merge.",
+      "Two common miscounts. Including the final X-basis measurement of A, which touches a single patch and so is not a merge. Or counting each merge and its split as separate operations, when the prompt asks for merge-then-split pairs.",
   },
   hints: [
-    { text: "Step 2 of the protocol is one merge/split pair (a ZZ measurement between C and A)." },
-    { text: "Step 3 is a second, separate merge/split pair (an XX measurement between A and T)." },
-    { text: "Step 4 (measuring A directly) does not involve a second patch, so it isn't a merge at all." },
+    { text: "Go through the protocol's steps in order and ask of each one: does it join two patches along a shared boundary and then separate them again? Only those steps count." },
+    { text: "The joint parity measurements are the merges: a ZZ-type measurement between C and A, and an XX-type measurement between A and T." },
+    { text: "The final measurement of A involves no second patch, so it is not a merge. Count the operations that remain." },
   ],
   solution: {
     steps: [

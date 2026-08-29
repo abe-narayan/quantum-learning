@@ -49,6 +49,10 @@ export const nonInvertibleMatrix: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Invertibility fails exactly when some nonzero vector is sent to zero — information about that vector is destroyed.",
     whyCorrect: "The two rows of this matrix are identical, so it collapses the (1,-1) direction entirely.",
-    whyWrong: ["The other three matrices are all standard, easily-checked invertible examples (identity, a diagonal scaling, and a swap)."],
+    whyWrong: [
+      { optionId: "a", text: "The identity is its own inverse, so it undoes itself." },
+      { optionId: "c", text: "A uniform scaling by 2, undone by scaling by 1/2." },
+      { optionId: "d", text: "A swap of the two components, undone by swapping again." },
+    ],
   },
 };

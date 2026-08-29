@@ -16,7 +16,7 @@ export const lessonMeta = {
   module: "sources-of-noise",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 20,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/control-and-readout/calibration"],
   objectives: [
     "Distinguish coherent errors (miscalibration, systematic) from incoherent errors (genuine environmental decoherence)",
@@ -26,7 +26,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition",
-      note: "The abstract mathematics behind this lesson's 'incoherent error' category: a numerical demonstration of exactly why environmental coupling is irreversible and can't be recalibrated away.",
+      note: "The abstract mathematics behind this lesson's 'incoherent error' category: a numerical demonstration of why environmental coupling is irreversible and can't be recalibrated away.",
     },
   ],
 };
@@ -42,12 +42,12 @@ in Quantum Mechanics built the mathematics of open-system <Term id="coherence">d
 the abstract; Control & Readout hinted at specific error sources
 (readout error, miscalibration) without organizing them. This lesson
 does the sorting: it catalogs the real physical culprits and splits them
-into two categories that call for completely different fixes.
+into two categories that call for different fixes.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/4/48/Basic_Science_%2854395491965%29.jpg"
   alt="A neutral-atom quantum computing vacuum chamber at Sandia National Laboratories, showing objective lenses for single-atom traps and surrounding magnetic field coils"
-  caption="Real noise-mitigation hardware: at Sandia, a custom Faraday cage inside this vacuum chamber minimizes the stray electric field around trapped atoms. That's physical isolation, the fix this lesson prescribes for incoherent (environmental) errors, and a fundamentally different move than a coherent error's recalibration fix."
+  caption="Real noise-mitigation hardware: at Sandia, a custom Faraday cage inside this vacuum chamber minimizes the stray electric field around trapped atoms. That is physical isolation — the fix this lesson prescribes for incoherent (environmental) errors, and a different move from the recalibration that fixes a coherent one."
   credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
   creditUrl="https://commons.wikimedia.org/wiki/File:Basic_Science_(54395491965).jpg"
   license="Public Domain (U.S. Government work)"
@@ -159,6 +159,26 @@ encoding information so it survives some amount of unavoidable loss).
 Misidentify which category an error falls into and the engineering
 effort is wasted: recalibrating against a source that's actually
 environmental accomplishes nothing.
+
+### The catalog, per platform
+
+Several entries above (flux noise, thermal photons) are really
+superconducting-specific culprits. Each platform from Physical Qubit
+Platforms has its own characteristic short list:
+
+| Platform | Characteristic noise sources |
+|---|---|
+| Superconducting | Charge and flux noise, thermal photons leaking into the readout resonator, two-level-system (TLS) defects in the circuit's materials |
+| Trapped ions | Motional heating of the shared vibrational mode, laser phase and intensity noise on the drive beams |
+| Neutral atoms | Atom loss from the optical tweezer, photon scattering off the trap light itself |
+| Photonic | Photon loss (fiber, components, coupling), detector inefficiency |
+
+The photonic row deserves the flag Photonic Qubits promised this course
+would deliver: photon loss is an *erasure-type* channel, an error that
+announces which qubit vanished (the detector simply never fires) rather
+than silently flipping a bit or a phase, and error correction can
+exploit that located-ness in ways it cannot for the other rows'
+bit-flip and dephasing errors.
 
 ## Physical Interpretation
 

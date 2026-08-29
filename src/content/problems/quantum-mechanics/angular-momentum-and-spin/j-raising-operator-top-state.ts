@@ -28,12 +28,12 @@ export const jRaisingOperatorTopState: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "The boundedness argument specifically requires the top rung to be annihilated by J+ — otherwise m could exceed j.",
+    incorrectFeedback: "Think about what the boundedness derivation requires of the top rung: if J+ produced anything of nonzero length there, one more application would push m past its bound. Your numeric answer should reflect that requirement.",
   },
   hints: [
     { text: "The top rung, m=j, is defined by J+ annihilating it." },
     { text: "If J+ didn't annihilate it, applying J+ again would give m=j+1, violating m²≤j(j+1)." },
-    { text: "So the magnitude must be exactly 0." },
+    { text: "Combine the two previous hints: the algebra leaves J+ acting on the top rung only one consistent output. Report its magnitude." },
   ],
   solution: {
     steps: [{ description: "By the boundedness argument, J+ must annihilate the top rung exactly, so the resulting magnitude is 0." }],

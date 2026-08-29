@@ -27,13 +27,15 @@ export const zeroPointEnergy: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "This is the classical expectation (a particle at rest has zero energy), but it's not what quantum mechanics gives — the +1/2 term never vanishes.",
-      c: "This would be E_1, not E_0 — check the formula E_n = ħω(n+1/2) at n=0.",
-      d: "This is too large by a factor of 4 — check the formula at n=0.",
+      c: "This is the spacing between consecutive levels, E_{n+1} − E_n = ħω, not the height of the lowest one. The ground state sits half a spacing above the bottom of the well.",
+      d: "This is E_2 with the +1/2 dropped: ħω(2) rather than ħω(2+1/2). It also answers for the wrong level.",
     },
-    defaultIncorrectFeedback: "Substitute n=0 into E_n = ħω(n+1/2) directly.",
+    defaultIncorrectFeedback: "Substitute n=0 into E_n = ħω(n+1/2) directly, and keep the +1/2.",
   },
   hints: [
-    { text: "E_n = ħω(n + 1/2). Set n=0." },
+    { text: "The oscillator's energy levels follow one formula in n. Write it down first." },
+    { text: "E_n = ħω(n + 1/2), and the ground state is the n=0 level." },
+    { text: "Substitute n=0 and keep the +1/2, which is the term that survives." },
   ],
   solution: {
     steps: [
@@ -44,6 +46,10 @@ export const zeroPointEnergy: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "The ground state is never at zero energy — this is the zero-point energy, a genuine, measurable quantum effect.",
     whyCorrect: "Direct substitution of n=0 into the derived energy formula.",
-    whyWrong: ["Answering 0 assumes the ground state behaves like a classical particle at rest, which the ladder-operator derivation explicitly rules out."],
+    whyWrong: [
+      { optionId: "b", text: "The classical expectation, a particle at rest with no energy. The +1/2 is what the ladder-operator derivation adds, and it never vanishes." },
+      { optionId: "c", text: "The spacing between levels, E_{n+1} − E_n = ħω, rather than the height of the lowest one. The ground state sits half a spacing up." },
+      { optionId: "d", text: "Drops the +1/2 and reads off n=2, so it misses both the level and the zero-point term." },
+    ],
   },
 };

@@ -29,9 +29,9 @@ export const strongCouplingBreakdownGap: NumericProblem = {
     incorrectFeedback: "Use the lesson's table: perturbative ≈0.995, exact ≈0.363 for this (V,t) pair.",
   },
   hints: [
+    { text: "The first-order formula P = 4|V|²sin²(ωt/2)/ω² has no upper bound built into it, so at V=0.5 it can climb close to 1. The exact two-level solution is a Rabi oscillation, which shares its weight between the two levels." },
     { text: "From the lesson's worked-example table: perturbative ≈0.995, exact ≈0.363." },
-    { text: "0.995 - 0.363 ≈ 0.632." },
-    { text: "This is a large gap — first-order perturbation theory has clearly broken down here." },
+    { text: "Subtract in the order the prompt states, perturbative minus exact. Expect a gap of over half a probability unit: the size of it is what marks this as a breakdown rather than a small correction." },
   ],
   solution: {
     steps: [{ description: "0.995 - 0.363 ≈ 0.632, a large discrepancy — well outside what should be trusted as a small correction." }],

@@ -25,11 +25,15 @@ export const memoryFor25Qubits: NumericProblem = {
     value,
     tolerance: 1000,
     incorrectFeedback: "Compute 16 × 2^25.",
+    nearMisses: [
+      { value: 2 ** 25, tolerance: 1000, feedback: "That is the amplitude count. Each complex amplitude takes 16 bytes, two double-precision floats." },
+      { value: 8 * 2 ** 25, tolerance: 1000, feedback: "8 bytes covers one double. A complex amplitude needs two of them, real and imaginary." },
+    ],
   },
   hints: [
     { text: "2^25 = 33,554,432." },
-    { text: "16 × 33,554,432." },
-    { text: "= 536,870,912 bytes (about 512 MB)." },
+    { text: "Each complex amplitude takes 16 bytes (two doubles), so multiply the amplitude count by 16." },
+    { text: "Work the product out in full: the question asks for an exact byte count. Sanity check the scale against the lesson's ranges, which put 25 qubits at roughly half a gigabyte." },
   ],
   solution: {
     steps: [{ description: "16 × 2^25 = 16 × 33,554,432 = 536,870,912 bytes ≈ 512 MB." }],

@@ -16,7 +16,7 @@ export const lessonMeta = {
   module: "complexity-classes-p-np-and-bqp",
   order: 1,
   difficulty: "master",
-  estimatedMinutes: 27,
+  estimatedMinutes: 65,
   prerequisites: ["quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity"],
   objectives: [
     "Define P, NP, and BQP precisely as classes of decision problems (with the standard error-bounded/verifier definitions), and state the known containment relationships (P subseteq BQP, P subseteq NP, BQP subseteq PSPACE)",
@@ -149,7 +149,7 @@ open questions below, actually need.
     { label: "None — all three are genuinely open questions", value: "none" },
   ]}
   correctValue="none"
-  explanation="None of the three has been proven either way. NP⊆BQP is widely believed false, on real but black-box-limited evidence, not proof. BQP⊆NP has no strong heuristic pointing either direction at all. P=BQP is widely believed false, largely on the strength of Shor's algorithm — but belief, however strong, is not proof. This is exactly what makes P, NP, and BQP's relationship the sharpest case study in this course for the difference between 'proven' and 'believed.'"
+  explanation="None of the three has been proven either way. NP⊆BQP is widely believed false, on real but black-box-limited evidence, not proof. BQP⊆NP has no consensus belief at all; the one substantial piece of evidence, an oracle separation discussed below, is again black-box-limited. P=BQP is widely believed false, largely on the strength of Shor's algorithm — but belief, however strong, is not proof. Notice the pattern the rest of this lesson makes precise: every piece of evidence anyone has on these three questions lives in the query model, and the relativization barrier says query-model evidence cannot settle any of them."
 />
 
 Three questions about how $\mathsf{P}$, $\mathsf{NP}$, and
@@ -191,6 +191,35 @@ polynomial time. But the absence of a *known* certificate is not a proof
 that none exists. This question is the direct motivation for this
 course's next lesson, which builds $\mathsf{QMA}$ — the class where the
 certificate itself is allowed to be quantum.
+
+One qualification on "not even a strong heuristic argument," because the
+relativized picture has moved and the unrelativized one has not. There is
+now an oracle relative to which $\mathsf{BQP}\not\subseteq\mathsf{PH}$,
+and since $\mathsf{NP}\subseteq\mathsf{PH}$, that oracle also separates
+$\mathsf{BQP}$ from $\mathsf{NP}$. So there is evidence pointing one way
+after all, of exactly the kind this course keeps insisting on scoping:
+evidence in the black-box model, which by the relativization barrier
+cannot on its own settle the unrelativized question. The honest
+statement is therefore narrower than "no argument either way" and wider
+than "believed false": the question is open, and the one real piece of
+evidence bearing on it lives in a model where the answer is known not to
+transfer.
+
+<ResearchConnection
+  title="The oracle evidence on question (2)"
+  source="Aaronson & Ambainis, STOC 2015 (arXiv:1411.5729); Raz & Tal, STOC 2019"
+  url="https://arxiv.org/abs/1411.5729"
+>
+  Aaronson and Ambainis introduced the Forrelation problem, which is
+  easy for a quantum algorithm and provably hard for classical ones in
+  the query model, and conjectured it could separate $\mathsf{BQP}$ from
+  the polynomial hierarchy relative to an oracle. Raz and Tal proved that
+  conjecture, giving the first oracle separation of $\mathsf{BQP}$ from
+  $\mathsf{PH}$. Read the pair as a case study in how relativized
+  evidence accumulates: a well-chosen problem, a conjecture about it, a
+  proof years later, and a conclusion that is real, rigorous, and still
+  silent about the unrelativized world.
+</ResearchConnection>
 
 **(3) Is $\mathsf{P}=\mathsf{BQP}$?** This asks the most basic question
 of all: do quantum computers give *any* advantage over classical ones

@@ -7,7 +7,6 @@ import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { CircuitDiagramExplorer } from "@/components/visualizations/CircuitDiagramExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
-import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/phase-kickback"
@@ -67,29 +66,30 @@ export const lessonMeta = {
   prerequisites: ["quantum-computing/quantum-algorithms-i/quantum-parallelism-and-the-oracle-model"],
   objectives: [
     "Derive U_f|x⟩|−⟩=(−1)^f(x)|x⟩|−⟩ directly from the oracle's defining relation",
-    "Explain why the ancilla qubit's own state is left completely unchanged by this process",
+    "Explain why the ancilla qubit's own state is left unchanged by this process",
     "Connect the bit-oracle and phase-oracle engine primitives via this identity, not just by definition",
   ],
 };
 
 <LessonHook eyebrow="Why this matters">
-The last lesson's oracle writes f(x)'s value into a second qubit. That's the honest definition, but every algorithm from here on actually wants f(x)'s value somewhere else entirely: as a phase multiplying |x⟩ directly, with no second qubit needed at all.
+The last lesson's oracle writes f(x) into a second qubit. Every algorithm from here on wants it somewhere else: as a phase multiplying |x⟩ directly, with the second qubit left over and unchanged.
 </LessonHook>
 
 ## Motivation
 
 The last lesson's <Term id="oracle">oracle</Term>, $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$,
-is the *honest* definition. This lesson derives exactly when and why
-the phase substitution is legitimate.
+is the honest definition, and it puts $f(x)$ in the wrong place. A value
+sitting in a second register is a classical bit: measure it and you get
+one answer, exactly as in the last lesson's disappointment.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/3/32/Double-slit_experiment_results_Tanamura_4.jpg"
-  alt="Four panels from Tonomura's electron double-slit experiment, showing detected electron positions building up an interference pattern as the electron count grows from 11 to 200 to 6,000 to 140,000"
-  caption="Tonomura's real single-electron double-slit experiment: individual electron detections (left) accumulate into a genuine wave-interference pattern (right) as more electrons pass through. Phase kickback is what lets an algorithm turn a function's output into exactly this kind of interference term instead of a separately-stored bit."
-  credit="Dr. Tonomura / Wikimedia Commons (derivative by MikeRun)"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Double-slit_experiment_results_Tanamura_4.jpg"
-  license="CC BY-SA 3.0"
-/>
+What algorithms want instead is $f(x)$ expressed as a *phase* on
+$|x\rangle$, because phases are what interference acts on. Writing that
+down as a wish is easy. The question is whether the oracle you were given
+can be made to produce it, without a different oracle and without extra
+queries.
+
+It can, and the whole trick is choosing what to put in the output register
+before you call $U_f$. One line of algebra below does it.
 
 ## Mathematical Development
 
@@ -138,12 +138,12 @@ $$
 
 ### Why this is called "kickback"
 
-The ancilla started in $|-\rangle$ and **ends in $|-\rangle$, completely
-unchanged**. The phase $(-1)^{f(x)}$ that "should" have landed on the
-ancilla (the qubit $U_f$ actually acts on) instead shows up attached to
-$|x\rangle$, the register $U_f$ was never defined to modify directly. This
-is why it's called *kickback*: the effect of the computation gets kicked
-back onto the control-like register instead of staying on the target.
+The ancilla started in $|-\rangle$ and **ends in $|-\rangle$, unchanged**.
+The phase $(-1)^{f(x)}$ that should have landed on the ancilla, the qubit
+$U_f$ acts on, shows up attached to $|x\rangle$ instead: the register $U_f$
+was never defined to modify. Hence *kickback*. The effect of the
+computation is kicked back onto the control-like register rather than
+staying on the target.
 
 Equivalently: for fixed $x$, $U_f$ acts on the ancilla alone as
 $X^{f(x)}$, the identity when $f(x)=0$ and a bit flip when $f(x)=1$,
@@ -162,7 +162,7 @@ $$
 U_f\left(\sum_x c_x|x\rangle\right)|-\rangle = \left(\sum_x (-1)^{f(x)}c_x|x\rangle\right)|-\rangle
 $$
 
-The ancilla factors out completely and stays $|-\rangle$ throughout; after
+The ancilla factors out and stays $|-\rangle$ throughout; after
 this step it can be ignored (or discarded) entirely, and what remains is
 exactly `applyPhaseOracle`'s action: $\sum_x c_x|x\rangle \to \sum_x
 (-1)^{f(x)}c_x|x\rangle$, i.e. a sign flip on exactly the $x$ where $f(x)=1$.
@@ -182,12 +182,12 @@ them produces the clean phase pattern this lesson derived:
   question="Same oracle U_f (f(x)=x), same input register |+⟩, but the ancilla is prepared in |0⟩ instead of |−⟩. What happens to the output?"
   options={[
     { label: "Same phase pattern as |−⟩, since it's the same oracle", value: "same-phase" },
-    { label: "No phase at all — the ancilla just gets bit-flipped for some x", value: "bit-flip" },
+    { label: "No phase at all: the ancilla gets bit-flipped for some x", value: "bit-flip" },
     { label: "A random, unpredictable mix of amplitudes", value: "random" },
-    { label: "The whole state stays exactly |+⟩|0⟩, unchanged", value: "unchanged" },
+    { label: "The whole state stays |+⟩|0⟩, unchanged", value: "unchanged" },
   ]}
   correctValue="bit-flip"
-  explanation="With the ancilla in |0⟩, U_f does exactly what it was defined to do: write f(x) into the ancilla as an ordinary bit. There's no phase anywhere — the ancilla just ends up correlated with x (flipped to |1⟩ on the branch where f(x)=1), which is the honest bit-oracle behavior from the previous lesson, not kickback. Kickback only appears because |−⟩ specifically is the −1 eigenstate of the bit-flip-conditioned-on-f(x) operation; |0⟩ isn't an eigenstate of it at all."
+  explanation="With the ancilla in |0⟩, U_f does what it was defined to do: write f(x) into the ancilla as an ordinary bit. No phase appears anywhere. The ancilla ends up correlated with x, flipped to |1⟩ on the branch where f(x)=1, which is the honest bit-oracle behaviour from the previous lesson. Kickback appears only because |−⟩ is the −1 eigenstate of the bit-flip-conditioned-on-f(x) operation, and |0⟩ is not an eigenstate of it at all."
 />
 
 <InteractiveSection
@@ -210,18 +210,22 @@ Only the $|-\rangle$ frame shows the alternating $+,-,-,+$ sign pattern
 where $x=1$): the actual, computed signature of phase kickback, not merely
 asserted. The $|0\rangle$ and $|1\rangle$ frames instead show an ordinary
 bit flip (amplitude moves to a different basis state entirely, no sign
-change), and the $|+\rangle$ frame is left completely unchanged, since
+change), and the $|+\rangle$ frame is left unchanged, since
 $|+\rangle$ is the *other* eigenstate of the bit-flip-conditioned-on-$f(x)$
 operation, with eigenvalue $+1$ instead of $-1$.
 
 ## Physical Interpretation
 
-Phase kickback is the mechanism that turns "compute $f$" into "multiply
-each branch of a superposition by a sign depending on $f$," a *global*
-property of the whole superposition rather than a per-branch classical bit.
-Once $f(x)$'s value is a phase, it becomes something <Term id="phase-interference">interference</Term> (via
-Hadamards, or the QFT) can act on, which is precisely why this trick shows
-up as the very first step inside Deutsch-Jozsa and Grover's algorithm both.
+Phase kickback turns "compute $f$" into "multiply each branch of a
+superposition by a sign depending on $f$." The second form is a property of
+the whole superposition rather than a bit stored per branch, and that
+change of form is the entire point.
+
+Once $f(x)$ is a phase, <Term id="phase-interference">interference</Term> can act on it, via Hadamards or the
+QFT. Phases can cancel; bits in a register cannot. That is why this trick
+is the first step inside both Deutsch-Jozsa and Grover's algorithm, and why
+the previous lesson's dead end (one query, one random sample) does not
+apply to them.
 
 ## Worked Example
 
@@ -252,9 +256,9 @@ eigenstates never changes the state, only multiplies it by the eigenvalue.
 **Assuming this trick works for *any* ancilla state, not just $|-\rangle$
 or $|0\rangle$.** Preparing the ancilla in $|0\rangle$ gives the ordinary
 bit-flip oracle from the last lesson; preparing it in, say, $|+\rangle$
-gives neither a clean phase nor a clean bit flip: $|-\rangle$ is
-specifically the state that makes $X$ act as a $-1$ eigenvalue, which is
-exactly what this derivation needs.
+leaves the state alone, since $|+\rangle$ is $X$'s $+1$ eigenstate.
+$|-\rangle$ is the one preparation that turns the oracle's action into a
+$-1$, which is what this derivation needs.
 </Callout>
 
 ## Practice Questions
@@ -276,7 +280,7 @@ exactly what this derivation needs.
 
 - $U_f|x\rangle|-\rangle=(-1)^{f(x)}|x\rangle|-\rangle$, derived directly
   from $U_f$'s XOR definition, not asserted.
-- The ancilla, prepared in $|-\rangle$, is left completely unchanged; the
+- The ancilla, prepared in $|-\rangle$, is left unchanged; the
   effect of $f(x)$ is "kicked back" onto $|x\rangle$ as a phase instead.
 - By linearity, this extends to any superposition over $x$, reproducing
   exactly `applyPhaseOracle`'s action, verified directly against

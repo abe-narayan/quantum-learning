@@ -27,9 +27,32 @@ export const cliffordTRossSelingerTCountForEpsilon: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 5,
+    tolerance: 1,
     incorrectFeedback:
       "First compute log2(1/ε) for ε=10⁻⁶ (that's 6×log2(10) ≈ 19.93 bits), then multiply by the midpoint coefficient 3.5.",
+    nearMisses: [
+      {
+        value: midCoefficient * digitsOfPrecision,
+        tolerance: 0.4,
+        feedback:
+          "You used the 6 decimal digits directly as the bit count. Precision in bits is log2(1/ε) ≈ 19.93, about 3.32 times the digit count.",
+      },
+      {
+        value: bits,
+        tolerance: 0.4,
+        feedback: "That is log2(1/ε) on its own. The scaling still has to be multiplied by the coefficient 3.5.",
+      },
+      {
+        value: 3 * bits,
+        tolerance: 0.6,
+        feedback: "That uses the low end of the 3-to-4 coefficient range. The prompt asks for the midpoint, 3.5.",
+      },
+      {
+        value: 4 * bits,
+        tolerance: 0.6,
+        feedback: "That uses the high end of the 3-to-4 coefficient range. The prompt asks for the midpoint, 3.5.",
+      },
+    ],
   },
   hints: [
     { text: "log2(1/ε) = log2(10⁶) = 6 × log2(10)." },

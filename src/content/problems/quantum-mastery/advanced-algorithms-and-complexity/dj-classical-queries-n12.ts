@@ -23,13 +23,17 @@ export const djClassicalQueriesN12: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 1,
-    incorrectFeedback: "Use the exact worst-case formula 2^(n-1)+1 derived in the lesson, with n=12.",
+    tolerance: 0.5,
+    incorrectFeedback: "Use the exact worst-case formula 2^(n-1)+1 derived in the lesson, with n=12. The +1 is load-bearing here: this is an exact count, not an estimate.",
+    nearMisses: [
+      { value: 2048, feedback: "2048 is 2^(n−1), the number of queries that can still leave both promises live. One more is needed to settle it." },
+      { value: 4096, feedback: "4096 is 2^n, the full input count. A deterministic algorithm can stop once it has seen just over half of them." },
+    ],
   },
   hints: [
     { text: "The lesson derives the exact classical worst-case query count as 2^(n-1)+1." },
     { text: "With n=12, that's 2^11+1." },
-    { text: "2^11 = 2048." },
+    { text: "Evaluate 2^11, then add the one extra query that finally settles the promise." },
   ],
   solution: {
     steps: [
@@ -40,7 +44,7 @@ export const djClassicalQueriesN12: NumericProblem = {
   },
   explanation: {
     correctIdea: "A deterministic algorithm can't certify constant-vs-balanced until it has seen more than half of all 2^n inputs.",
-    whyCorrect: "Seeing exactly half of the inputs, all equal, is still consistent with either promise until one more, differently-valued query is seen — forcing 2^(n-1)+1 queries in the worst case.",
+    whyCorrect: "Seeing exactly half of the inputs, all equal, is still consistent with either promise until one more, differently-valued query is seen, forcing 2^(n-1)+1 queries in the worst case.",
     whyWrong: ["This exact bound applies only to zero-error classical algorithms; with bounded error, O(1) random queries suffice regardless of n, a very different number."],
   },
 };

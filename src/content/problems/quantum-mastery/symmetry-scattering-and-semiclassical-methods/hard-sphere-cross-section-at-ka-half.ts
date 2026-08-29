@@ -31,6 +31,10 @@ export const hardSphereCrossSectionAtKaHalf: NumericProblem = {
     value: sigma0,
     tolerance: sigma0 * 0.02,
     incorrectFeedback: "First find δ₀=−0.5, then σ₀=(4π/0.5²)sin²(0.5).",
+    nearMisses: [
+      { value: 4 * Math.PI, tolerance: 0.05, feedback: "4π is the ka→0 limit, 4πa² with a=1. At ka=0.5 the cross section has already fallen a little below it." },
+      { value: 16 * Math.PI, tolerance: 0.1, feedback: "16π is the prefactor 4π/k² alone. It still has to be multiplied by sin²δ₀ ≈ 0.23." },
+    ],
   },
   hints: [
     { text: "δ₀=−ka=−0.5 rad." },

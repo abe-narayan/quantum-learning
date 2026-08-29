@@ -55,7 +55,7 @@ export const onePlusVsPlusOneTensorOrder: MultipleChoiceProblem = {
   hints: [
     { text: "|1⟩ becomes qubit 0; |+⟩ becomes qubit 1 — the order they're written in is the order they combine in." },
     { text: "Expand |+⟩ = (|0⟩+|1⟩)/√2 and prepend '1' to each of its basis labels." },
-    { text: "The result should have nonzero amplitude only on |10⟩ and |11⟩, each 1/√2." },
+    { text: "Every basis label in the result starts with the same digit, since qubit 0 is definite here. Only qubit 1 varies." },
   ],
   solution: {
     steps: [
@@ -69,6 +69,10 @@ export const onePlusVsPlusOneTensorOrder: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Tensor product order matches the order the kets are written in: the first ket becomes qubit 0.",
     whyCorrect: "Distributing |1⟩ over |+⟩'s two terms and concatenating labels gives exactly the |10⟩, |11⟩ superposition.",
-    whyWrong: ["|+⟩⊗|1⟩ (option b) is a genuinely different state — its nonzero terms are |01⟩ and |11⟩ instead."],
+    whyWrong: [
+      { optionId: "b", text: "This is |+⟩⊗|1⟩, a different state: its nonzero terms are |01⟩ and |11⟩." },
+      { optionId: "c", text: "No superposition appears here, but |+⟩ is a superposition, so qubit 1 cannot hold a single definite value." },
+      { optionId: "d", text: "This is |0⟩⊗|+⟩. The first factor should be |1⟩." },
+    ],
   },
 };

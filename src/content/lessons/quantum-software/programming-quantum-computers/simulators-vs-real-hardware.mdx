@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { stateVectorAmplitudeCount, stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { ToggleView } from "@/components/mdx/ToggleView";
 
 export const formatMemoryBytes = (bytes) => (
   bytes < 1e6 ? `${(bytes / 1e3).toFixed(1)} KB`
@@ -42,18 +43,18 @@ A noiseless simulator strips away real hardware's physical error and access cons
 
 ## Motivation
 
-Writing Your First Circuit showed shot noise alone, using a perfect,
-noiseless simulator. This closing lesson adds back everything a
-simulator conveniently strips away, real hardware's actual physical
-error, practical access constraints, while also being honest about
-where simulators themselves hit a very different wall.
+Writing Your First Circuit showed shot noise alone, on a perfect,
+noiseless simulator. This closing lesson puts back what that simulator
+left out — physical error, and the practical constraints of getting time
+on a real device — and is equally honest about the wall simulators run
+into themselves.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="An IBM Quantum System One, a full commercial quantum computing system in its housing"
-  caption="An IBM Quantum System One. Everything this lesson calls 'real hardware' — queue time, a fixed physical qubit count, real physical error — comes from a device like this, not a simulator."
-  credit="Photo by OJB Quantum / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
+  src="https://upload.wikimedia.org/wikipedia/commons/c/c7/QuEra_System_Delivery_UKRI.jpg"
+  alt="QuEra's neutral-atom testbed system being delivered to the UK's National Quantum Computing Centre"
+  caption="A quantum computer arriving at the UK's National Quantum Computing Centre. This is what 'real hardware' means in this lesson: one physical machine, in one building, that has to be built, shipped, installed and then shared — which is where queue time comes from. A simulator is a process you start."
+  credit="QuEra Computing, Inc., via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:QuEra_System_Delivery_UKRI.jpg"
   license="CC BY 4.0"
 />
 
@@ -88,11 +89,11 @@ An ideal, noiseless simulator represents a state as a list of $2^n$
 complex <Term id="amplitude">amplitudes</Term> (this platform's own `StateVector`), doubling with
 every additional qubit. At $n=30$ qubits, that's over a billion
 amplitudes; well before $n=50$, the memory requirement exceeds any
-existing classical computer's capacity. This is the exact reason exact
-state-vector simulation cannot substitute for real hardware at large
-qubit counts — a completely different kind of limitation from anything
-on the "real hardware" side of this comparison, developed fully in
-Simulating Quantum Systems' Computational Cost & Scaling lesson.
+existing classical computer's capacity. That is why exact state-vector
+simulation cannot stand in for real hardware at large qubit counts — a
+different kind of limitation from anything on the "real hardware" side of
+this comparison, developed in full in Simulating Quantum Systems'
+Computational Cost & Scaling lesson.
 
 <Callout type="note">
 **A preview of the exact numbers.** That later lesson computes this
@@ -115,23 +116,24 @@ is an exact, computed curve, not a rough estimate.
 />
 
 <InteractiveSection title="Feel the exponential wall yourself" description="Slide n from 10 up to 50 qubits, then toggle between a log10 scale (readable at every n, but smooths the climb into a gentle slope) and a linear scale (unreadable at large n, but the one that actually looks like a wall). Captions always show the real numbers, computed live by this platform's own stateVectorAmplitudeCount and stateVectorMemoryBytes, the exact same functions behind the 16.8 MB, 17.2 GB, and 18.0 PB figures quoted above.">
-  <div className="not-prose flex flex-wrap items-center gap-2">
-    <input type="radio" id="svh-scale-linear" name="svh-scale" className="peer/linear sr-only" />
-    <label
-      htmlFor="svh-scale-linear"
-      className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/linear:border-transparent peer-checked/linear:bg-brand peer-checked/linear:text-brand-foreground peer-focus-visible/linear:outline-none peer-focus-visible/linear:ring-2 peer-focus-visible/linear:ring-brand peer-focus-visible/linear:ring-offset-2 peer-focus-visible/linear:ring-offset-background"
-    >
-      Linear scale
-    </label>
-    <input type="radio" id="svh-scale-log" name="svh-scale" defaultChecked className="peer/log sr-only" />
-    <label
-      htmlFor="svh-scale-log"
-      className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/log:border-transparent peer-checked/log:bg-brand peer-checked/log:text-brand-foreground peer-focus-visible/log:outline-none peer-focus-visible/log:ring-2 peer-focus-visible/log:ring-brand peer-focus-visible/log:ring-offset-2 peer-focus-visible/log:ring-offset-background"
-    >
-      Log scale
-    </label>
-    <div className="hidden w-full peer-checked/linear:block">
-      <div className="not-prose overflow-hidden rounded-xl">
+  <ToggleView
+    options={["Log scale", "Linear scale"]}
+    ariaLabel="Choose the vertical scale for the state-vector cost chart"
+  >
+    <BarChartExplorer
+      sliderLabel="Qubit count (n)"
+      ariaLabel="State-vector amplitude count and memory required, both on a log10 scale, as qubit count n grows from 10 to 50"
+      maxValue={Math.log10(stateVectorMemoryBytes(50))}
+      frames={stateVectorFrameQubitCounts.map((n) => ({
+        paramLabel: `n = ${n}`,
+        bars: [
+          { label: "Amplitudes (2ⁿ)", value: Math.log10(stateVectorAmplitudeCount(n)), caption: stateVectorAmplitudeCount(n).toExponential(2) },
+          { label: "Memory", value: Math.log10(stateVectorMemoryBytes(n)), caption: formatMemoryBytes(stateVectorMemoryBytes(n)), highlight: true },
+        ],
+      }))}
+    />
+    <div>
+      <div className="not-prose overflow-hidden rounded-panel">
         <BarChartExplorer
           sliderLabel="Qubit count (n)"
           ariaLabel="State-vector amplitude count and memory required, on a linear scale fixed to n=30's memory requirement, as qubit count n grows from 10 to 50; bars for n=35 and above run off the top of the chart"
@@ -147,26 +149,12 @@ is an exact, computed curve, not a rough estimate.
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Bars for n = 35 and above run off the top of this chart, clipped at
-        the border, that is the wall, not a rendering bug. The axis is fixed
-        to n = 30&apos;s memory requirement (about 17.2 GB) so nothing past
-        it fits on screen; fine, fine, fine, then gone.
+        the border. That is the wall, not a rendering bug: the axis is fixed
+        to n = 30&apos;s memory requirement (about 17.2 GB), so nothing past
+        it fits on screen. Fine, fine, fine, then gone.
       </p>
     </div>
-    <div className="hidden w-full peer-checked/log:block">
-      <BarChartExplorer
-        sliderLabel="Qubit count (n)"
-        ariaLabel="State-vector amplitude count and memory required, both on a log10 scale, as qubit count n grows from 10 to 50"
-        maxValue={Math.log10(stateVectorMemoryBytes(50))}
-        frames={stateVectorFrameQubitCounts.map((n) => ({
-          paramLabel: `n = ${n}`,
-          bars: [
-            { label: "Amplitudes (2ⁿ)", value: Math.log10(stateVectorAmplitudeCount(n)), caption: stateVectorAmplitudeCount(n).toExponential(2) },
-            { label: "Memory", value: Math.log10(stateVectorMemoryBytes(n)), caption: formatMemoryBytes(stateVectorMemoryBytes(n)), highlight: true },
-          ],
-        }))}
-      />
-    </div>
-  </div>
+  </ToggleView>
 </InteractiveSection>
 
 ## Physical Interpretation
@@ -185,14 +173,14 @@ being asked.
 **A researcher is debugging a new 4-qubit circuit's logic. Should they
 use a simulator or real hardware?**
 
-Simulator: at only 4 qubits ($2^4=16$ amplitudes), exact simulation is
-trivially cheap, gives exact (not sampled) results for easy debugging,
-runs instantly with no queue, and has zero physical error to confound
-whether a bug is in the circuit LOGIC or in hardware noise, exactly
-what's needed at this development stage. Real hardware becomes the
-right target only later, once the logic is verified and the actual
-question shifts to "how does this perform under real physical
-conditions."
+Simulator. At 4 qubits the state is 16 amplitudes ($2^4$), so exact
+simulation costs nothing worth measuring. It returns the ideal
+probabilities rather than sampled counts, it runs immediately with no
+queue, and — the decisive point at this stage — it contributes no
+physical error of its own, so any deviation from what the circuit should
+do is a bug in the circuit. Hardware becomes the right target later,
+once the logic is settled and the question changes to how the circuit
+holds up under real physical conditions.
 
 ## Common Mistakes
 

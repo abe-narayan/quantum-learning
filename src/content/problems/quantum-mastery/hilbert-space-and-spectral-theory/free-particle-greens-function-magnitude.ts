@@ -28,6 +28,11 @@ export const freeParticleGreensFunctionMagnitude: NumericProblem = {
     value: magnitude,
     tolerance: 0.005,
     incorrectFeedback: "Since |e^{ik|x-x'|}|=1 exactly (a pure phase), |G₀|=|−i/k|=1/k. Compute k=√(2×8) first.",
+    nearMisses: [
+      { value: 0.0625, tolerance: 0.002, feedback: "1/k² squares the magnitude. |G₀| is itself a magnitude, so it is the reciprocal of k, not of k²." },
+      { value: 4, feedback: "4 is k. The Green's function's magnitude is its reciprocal." },
+      { value: 0.125, tolerance: 0.002, feedback: "0.125 is 1/(2k) or 1/E; k = √(2E) = 4, so the magnitude is 1/4." },
+    ],
   },
   hints: [
     { text: "e^{ik|x-x'|} is a pure phase for real k, so its magnitude is exactly 1 regardless of x,x'." },

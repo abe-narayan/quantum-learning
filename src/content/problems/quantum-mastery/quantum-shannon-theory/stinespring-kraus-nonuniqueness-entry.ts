@@ -24,6 +24,11 @@ export const stinespringKrausNonuniquenessEntry: NumericProblem = {
     tolerance: 0.002,
     incorrectFeedback:
       "K0 has a (0,1) entry of 0 (it's diagonal), and K1 has a (0,1) entry of sqrt(0.4). Adding and dividing by sqrt(2): (0 + sqrt(0.4))/sqrt(2) = sqrt(0.2).",
+    nearMisses: [
+      { value: Math.sqrt(0.4), tolerance: 0.002, feedback: "That skips W's 1/√2 normalization. Each row of W carries it, so the mixed Kraus operator is (K₀+K₁)/√2." },
+      { value: 0, feedback: "0 is K₀'s own (0,1) entry. K₁ contributes there, and the rotation mixes the two." },
+      { value: 0.2, feedback: "0.2 is the square of the entry. The entry itself is √0.2." },
+    ],
   },
   hints: [
     { text: "K0 = diag(1, sqrt(0.6)) is diagonal, so its (0,1) entry is exactly 0." },

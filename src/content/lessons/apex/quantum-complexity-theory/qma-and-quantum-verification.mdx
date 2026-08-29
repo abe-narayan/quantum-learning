@@ -88,7 +88,7 @@ export const lessonMeta = {
   module: "qma-and-quantum-verification",
   order: 2,
   difficulty: "master",
-  estimatedMinutes: 28,
+  estimatedMinutes: 75,
   prerequisites: ["apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp"],
   objectives: [
     "Define QMA precisely: decision problems where a YES instance has a polynomial-size QUANTUM state (the 'quantum witness') that a polynomial-time quantum verifier circuit accepts with probability >= 2/3, while every witness for a NO instance is accepted with probability <= 1/3",
@@ -164,7 +164,7 @@ ones a well-behaved prover would send, must fail). Getting this backwards —
 checking only the witness Merlin was "supposed" to send — doesn't define a
 soundness condition at all; see the first Common Mistake below.
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
 <svg viewBox="0 0 760 300" width={760} className="w-full" role="img" aria-label="Two side-by-side panels contrasting QMA's completeness and soundness quantifiers. Left panel, titled 'x in L (completeness, existential)': Merlin picks one witness state, sends it to Arthur's verifier circuit V_n alongside the input x and blank ancillas, and a probability gauge shows the output qubit accepting with probability at least 2/3, satisfied by that one chosen witness. Right panel, titled 'x not in L (soundness, universal)': a cloud of many different, even entangled, candidate witness states funnels into the same verifier circuit V_n, and the probability gauge shows every single one of them accepted with probability at most 1/3, with no exceptions allowed.">
   <text x={190} y={24} textAnchor="middle" className="fill-brand text-[13px] font-semibold">x ∈ L — completeness (∃)</text>
   <text x={570} y={24} textAnchor="middle" className="fill-danger text-[13px] font-semibold">x ∉ L — soundness (∀)</text>
@@ -285,6 +285,25 @@ over all, including entangled, adversarial states. That argument is cited
 here, not re-derived: the point to take away is that the conclusion
 survives, but "just apply the classical Chernoff bound" is not, by itself,
 a valid proof of the soundness side the way it is for completeness.
+
+<ResearchConnection
+  title="QMA's amplification, and the survey that collects it"
+  source="Aharonov & Naveh, 'Quantum NP — A Survey' (arXiv:quant-ph/0210077); Marriott & Watrous, Computational Complexity 14, 122 (2005)"
+  url="https://arxiv.org/abs/quant-ph/0210077"
+>
+  Aharonov and Naveh's survey is the compact place to see this lesson's
+  definitions, the amplification argument, and the Local Hamiltonian
+  connection stated together with proofs. Marriott and Watrous is the
+  result that changes what you should believe about the cost: their
+  analysis achieves the same exponential gap amplification while keeping
+  the witness at its original size, by measuring the same single copy
+  repeatedly with a pair of projectors rather than consuming $k$ copies.
+  So the $k$-fold witness blow-up described above is a consequence of the
+  simplest amplification procedure, not an inherent price $\mathsf{QMA}$
+  charges — a distinction worth keeping straight, because the informal
+  claim "no-cloning makes QMA amplification expensive" is, stated that
+  way, false.
+</ResearchConnection>
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/6/6d/John_Watrous.jpg"

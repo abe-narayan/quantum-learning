@@ -22,6 +22,11 @@ export const kappaCalculation: NumericProblem = {
     value: 2.828427,
     tolerance: 0.001,
     incorrectFeedback: "kappa = sqrt(2*m*(V0-E))/hbar. With hbar=m=1, this is just sqrt(2*(V0-E)).",
+    nearMisses: [
+      { value: 2, feedback: "2 is √(V₀−E), missing the factor of 2 inside the root that comes from 2m/ħ²." },
+      { value: 4, feedback: "4 is the energy deficit V₀ − E. κ is the square root of twice that." },
+      { value: Math.sqrt(32), tolerance: 0.005, feedback: "That uses V₀ + E. Inside a barrier the decay constant is set by how far the energy falls short, V₀ − E." },
+    ],
   },
   hints: [
     { text: "First compute V0-E, the energy deficit." },

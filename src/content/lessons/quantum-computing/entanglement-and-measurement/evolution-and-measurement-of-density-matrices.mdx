@@ -62,16 +62,19 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-ρ can be evolved by a gate and measured, just like a state vector can — except in one case a state vector fundamentally can't handle: a state that has no state vector at all.
+ρ can be evolved by a gate and measured, the way a state vector can, and with the same formulas. The difference shows up in one case a state vector cannot reach: measuring a state that has no state vector at all.
 </LessonHook>
 
 ## Motivation
 
 Every density-matrix tool built so far in this course has described a
-*fixed* state. Real qubits get acted on by gates and measured. This
-lesson rebuilds both operations for $\rho$. For measurement, it
-reaches a case a state vector fundamentally cannot: measuring a state
-that has no state vector at all.
+*fixed* state, sitting still. Real qubits get acted on by gates and
+measured, so the formalism needs both operations before it is usable.
+
+Neither requires a new postulate. Both fall out of the state-vector rules
+you already have, extended to mixtures by linearity, and the derivations
+below are four lines each. The payoff is at the end, where the same
+formulas keep working on $I/2$, a state no ket describes.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Quantum_Computer_%283796519198%29.jpg"
@@ -156,32 +159,33 @@ both numbers: the probability of outcome 0, and what the state becomes
 afterward.
 
 <PredictBeforeReveal
-  question="ρ=I/2 has no state vector at all — total ignorance about the qubit's basis state. What happens when you measure P₀=|0⟩⟨0|?"
+  question="ρ=I/2 has no state vector at all: total ignorance about the qubit's basis state. What happens when you measure P₀=|0⟩⟨0|?"
   options={[
-    { label: "p₀ is undefined, since there's no |ψ⟩ to apply the Born rule to", value: "undefined" },
+    { label: "p₀ is undefined, since there is no |ψ⟩ to apply the Born rule to", value: "undefined" },
     { label: "p₀=0.5, but the post-measurement state stays mixed", value: "half-mixed" },
-    { label: "p₀=0.5, and the post-measurement state collapses to a pure state, |0⟩⟨0|", value: "half-pure" },
+    { label: "p₀=0.5, and the post-measurement state collapses to the pure state |0⟩⟨0|", value: "half-pure" },
   ]}
   correctValue="half-pure"
-  explanation="Both p=Tr(ρP) and the collapse formula ρ_after=PρP/p are defined for any valid density matrix, not just pure ones — that's exactly the point of rederiving them via the trace trick above. p₀ comes out to exactly 0.5, and the post-measurement state collapses all the way to the pure state |0⟩⟨0|, even though the state you started with had no state vector to begin with."
+  explanation="Both p=Tr(ρP) and the collapse formula ρ_after=PρP/p are defined for any valid density matrix, not only pure ones, which is the point of rederiving them through the trace trick above. p₀ comes out to 0.5, and the post-measurement state collapses all the way to the pure state |0⟩⟨0|, even though the state you began with had no state vector. Measurement can turn a mixed state pure; a unitary never can."
 />
 
 $$
 p_0 = \text{Tr}(P_0\,\rho) = \text{Tr}\!\left(|0\rangle\langle0|\cdot\tfrac12I\right) = \tfrac12
 $$
 
+Using $P_0 I P_0 = P_0$ (a projector times itself is itself):
+
 $$
-\rho_{\text{after}} = \frac{P_0\,(I/2)\,P_0}{0.5} = \frac{(I/2)}{0.5}\Big|_{P_0} = |0\rangle\langle0|
+\rho_{\text{after}} = \frac{P_0\,(I/2)\,P_0}{0.5} = \frac{\tfrac12 P_0}{0.5} = P_0 = |0\rangle\langle0|
 $$
 
-computed directly: after obtaining outcome 0, the state collapses to
-the exact pure state $|0\rangle\langle0|$, with probability exactly
-$0.5$. There is no $|\psi\rangle$ this calculation could have been done
-with instead: $I/2$ has no state vector, yet its measurement statistics
-and its post-measurement state are both completely well-defined, and
-both match the intuitive answer (measuring a "totally random" qubit in
-the computational basis gives 0 or 1 with 50/50 odds, and afterward you
-know exactly which one you got).
+So after outcome 0, the state collapses to the pure state
+$|0\rangle\langle0|$, and it does so with probability $0.5$. There is no
+$|\psi\rangle$ this calculation could have used instead. $I/2$ has no state
+vector, and yet its measurement statistics and its post-measurement state
+are both well-defined, and both match what intuition says: measuring a
+totally random qubit in the computational basis gives 0 or 1 on even odds,
+and afterward you know which one you got.
 
 Laid out as two short pipelines, evolution and measurement are each a
 handful of steps, not a wall of algebra to re-derive every time:
@@ -223,11 +227,10 @@ both computed live by this lesson's own `evolveDensityMatrix` and
 ## Physical Interpretation
 
 Gates and measurement extend to density matrices with no new physical
-postulates: every formula in this lesson is a direct algebraic
-consequence of the ordinary state-vector rules, extended to mixtures by
-linearity. What's new is scope: these formulas apply to states, like
-$I/2$ or one qubit of an entangled pair, that a state vector simply
-cannot represent at all.
+postulates. Every formula here is an algebraic consequence of the ordinary
+state-vector rules, extended to mixtures by linearity. What is new is
+scope: the formulas apply to states like $I/2$, or one qubit of an
+entangled pair, that no state vector represents.
 
 ## Worked Example
 
@@ -235,12 +238,11 @@ cannot represent at all.
 
 $H(I/2)H^\dagger = \tfrac12HH^\dagger = \tfrac12HH^{-1}=\tfrac12I$
 (since $H$ is both Hermitian and unitary, $H^\dagger=H^{-1}=H$, so
-$HH^\dagger=I$). The maximally mixed state is completely unchanged by
-any unitary gate at all, not just $H$. This makes physical sense: $I/2$
-represents total ignorance about which of any orthonormal basis's two
-states the qubit is in, and rotating "total ignorance" by any gate still
-leaves total ignorance, just possibly re-expressed in a different basis
-that looks identical to $I/2$ regardless.
+$HH^\dagger=I$). The maximally mixed state is unchanged by any unitary
+gate, not only by $H$. That makes physical sense. $I/2$ represents total
+ignorance about which of any orthonormal basis's two states the qubit is
+in, and rotating total ignorance leaves total ignorance, re-expressed in a
+basis that looks identical to $I/2$ anyway.
 
 ## Common Mistakes
 
@@ -252,10 +254,9 @@ matrix that generally isn't even a valid density matrix.
 </Callout>
 
 <Callout type="note">
-**Assuming Tr(ρP) needs ρ to come from a single ψ.** It doesn't: the
-derivation above shows $p=\text{Tr}(\rho P)$ holds for *any* valid
-density matrix, mixed or pure, which is exactly what makes the $I/2$
-example above meaningful.
+**Assuming Tr(ρP) needs ρ to come from a single ψ.** It does not. The
+derivation above shows $p=\text{Tr}(\rho P)$ holds for *any* valid density
+matrix, mixed or pure, which is what makes the $I/2$ example meaningful.
 </Callout>
 
 ## Practice Questions

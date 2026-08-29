@@ -55,7 +55,16 @@ export function PotentialDiagram({
   const wavefunctionPath = wavefunction ? pathFor(xValues, wavefunction, xOf, yOf) : null;
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
+    // `tabIndex={0}`. The marker-label comment further down already states the
+    // geometry: this SVG "renders at its natural 480 units inside
+    // `overflow-x-auto` and the viewBox scale is 1.0" — 480 real pixels, no
+    // `w-full`, against a ~256px content box on a 320px phone. So this wrapper
+    // scrolls on every phone, and an `overflow-x-auto` div is focusable by
+    // default only in Firefox: a keyboard-only reader could see the left wall
+    // of the well and never reach the right one, or the classical turning
+    // point the shaded region marks. No `role`/`aria-label` on the wrapper —
+    // the `<svg>` already carries `role="img"` and the label.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {shadedRegion && (
           <rect
@@ -66,8 +75,13 @@ export function PotentialDiagram({
             className="fill-accent/10"
           />
         )}
-        <line x1={PAD} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
-        <line x1={PAD} y1={PAD} x2={PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
+        {/* The x and V axes. The baseline in particular is what a
+            wavefunction's amplitude and a barrier's height are read against,
+            so it is load-bearing. Was `stroke-border`: the panel-edge token,
+            1.41:1 on `--surface-muted`, under the 3:1 WCAG 2.1 SC 1.4.11
+            floor. `--axis` clears 3:1 on every panel depth in both themes. */}
+        <line x1={PAD} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-axis" strokeWidth={1.25} />
+        <line x1={PAD} y1={PAD} x2={PAD} y2={HEIGHT - PAD} className="stroke-axis" strokeWidth={1.25} />
         {energyLine !== undefined && (
           <line
             x1={PAD}
@@ -84,7 +98,13 @@ export function PotentialDiagram({
         {markers.map((marker, i) => (
           <g key={i}>
             <circle cx={xOf(marker.x)} cy={yOf(potential[xValues.findIndex((x) => x >= marker.x)] ?? 0)} r={3.5} className="fill-foreground" />
-            <text x={xOf(marker.x)} y={HEIGHT - PAD + 14} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">
+            {/* This SVG carries an intrinsic `width` and no `w-full`, so it
+                renders at its natural 480 units inside `overflow-x-auto` and
+                the viewBox scale is 1.0 - 10 authored units is a literal
+                10px, right on the floor rather than under it, which is why
+                these marker labels only needed a nudge to 12 rather than the
+                1.6-2x other figures in this directory required. */}
+            <text x={xOf(marker.x)} y={HEIGHT - PAD + 16} textAnchor="middle" fontSize={12} className="fill-axis font-mono">
               {marker.label}
             </text>
           </g>

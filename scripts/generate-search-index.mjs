@@ -34,18 +34,46 @@
  * no filesystem or Next-specific runtime dependencies of its own (see the
  * doc comment on `buildSearchIndex` for why).
  *
+ * Since 2026-08 this script also reduces each lesson's `.mdx` **body** to a
+ * bounded set of the terms it teaches (`src/lib/search/lessonKeywords.ts`),
+ * because an index of titles and one-line descriptions could not answer the
+ * queries a stuck reader actually types — `power series`, `factorial`,
+ * `half angle`, `theta/2` all returned nothing, for concepts the corpus
+ * teaches. That extraction is text-only and stays inside the regime this
+ * whole file exists to preserve: the `.mdx` source is *read*, never imported,
+ * because importing 219 compiled MDX modules is what produced the 2026-08
+ * Vercel OOM (docs/DEPLOYMENT.md). Every lesson is already being read here
+ * for its `lessonMeta`; the keyword pass is another regex sweep over the same
+ * string and adds no I/O.
+ *
+ * The output is a file the browser downloads whole, so its size is checked
+ * here, not only in a test — see `MAX_INDEX_BYTES` below.
+ *
  * Run via `npm run generate:search-index`, or automatically before
  * `dev`/`build`/`test` via the `predev`/`prebuild`/`pretest` npm lifecycle
- * hooks (alongside `generate:registry`).
+ * hooks (alongside `generate:registry`). NOT run by `pretypecheck`: its
+ * output is JSON fetched at runtime, so `tsc` has nothing to say about it.
  */
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-// Shared with generate-lesson-registry.mjs — one implementation of the
-// walk + brace-scan + literal-eval technique (see scripts/lib/extract.mjs).
-import { walk, compareSlugs, extractObjectLiteral } from "./lib/extract.mjs";
+// Shared with generate-lesson-registry.mjs and generate-problem-registry.mjs —
+// one implementation of the walk + brace-scan + literal-eval technique, and
+// (critically) ONE definition of each key pattern. This script extracts the
+// same `lessonMeta` / `meta` blocks those two generators do; when the
+// patterns were duplicated per-file, nothing enforced that they still
+// selected the same block, and only the registries are drift-tested. See
+// scripts/lib/extract.mjs and scripts/__tests__/crossGenerator.test.ts.
+import {
+  walk,
+  compareSlugs,
+  extractObjectLiteral,
+  writeGenerated,
+  LESSON_META_KEY_RE,
+  PROBLEM_META_KEY_RE,
+} from "./lib/extract.mjs";
 
 /**
  * Lets this script `import()` the repo's plain-data `.ts` modules that use
@@ -85,7 +113,44 @@ const LESSONS_ROOT = path.join(ROOT, "src/content/lessons");
 const PROBLEMS_ROOT = path.join(ROOT, "src/content/problems");
 const OUTPUT = path.join(ROOT, "public/search-index.json");
 
-async function collectLessons() {
+/**
+ * Hard ceiling on the generated file, enforced at generation time.
+ *
+ * `public/search-index.json` is fetched *whole* by the search overlay the
+ * first time a reader opens it (`src/lib/search/fetchIndex.ts`), so its size
+ * is a real, user-visible cost and not a build-artifact statistic. It was
+ * 403KB raw / 100.7KB gzip for 1,076 entries before lesson keyword sets;
+ * adding them takes it to ~535KB / ~135KB. The ceiling below leaves a little
+ * over 4% of headroom, which at ~0.75KB per lesson is roughly thirty more
+ * lessons — enough that ordinary corpus growth does not trip it, tight enough
+ * that a change of *kind* (someone deciding the whole lesson body should go
+ * in after all) fails the generate step instead of quietly tripling what
+ * every reader downloads.
+ *
+ * The per-lesson budget in `lessonKeywords.ts` is the mechanism that keeps
+ * this true; this is the assertion that it still is. Both are mirrored by a
+ * gzip-measured test in `src/lib/design/__tests__/clientBoundary.test.ts`,
+ * which is where this project keeps its payload discipline — the check is
+ * here as well because a generator that can write a file no test has run
+ * against yet is exactly how the 2026-08 build memory regression reached
+ * Vercel.
+ */
+const MAX_INDEX_BYTES = 560 * 1024;
+
+/**
+ * The `objectives` of a lesson, as authored strings.
+ *
+ * `extractObjectLiteral` has already evaluated the whole `lessonMeta` literal,
+ * so this is only a shape guard: `objectives` is required by the lesson schema
+ * and every lesson has it, but the keyword extractor is handed corpus data and
+ * should not throw on a malformed one — a lesson with a broken `objectives`
+ * array is `validateLessonMeta`'s failure to report, not this script's.
+ */
+function objectivesOf(meta) {
+  return Array.isArray(meta.objectives) ? meta.objectives.filter((line) => typeof line === "string") : [];
+}
+
+async function collectLessons(extractLessonKeywords) {
   const slugs = (await walk(LESSONS_ROOT, ".mdx")).sort(compareSlugs);
   if (slugs.length === 0) {
     throw new Error(`No lesson files found under ${LESSONS_ROOT} — refusing to generate an empty search index.`);
@@ -95,8 +160,11 @@ async function collectLessons() {
   for (const slug of slugs) {
     const filePath = path.join(LESSONS_ROOT, `${slug}.mdx`);
     const source = await readFile(filePath, "utf8");
-    const meta = extractObjectLiteral(source, /export const lessonMeta\s*=\s*\{/, filePath, "lessonMeta");
-    lessons.push({ ...meta, slug });
+    const meta = extractObjectLiteral(source, LESSON_META_KEY_RE, filePath, "lessonMeta");
+    // The same string, swept a second time for the terms the lesson teaches.
+    // Note what is NOT happening: the module is not imported, compiled, or
+    // executed — see this file's header, and `lessonKeywords.ts`'s.
+    lessons.push({ ...meta, slug, keywords: extractLessonKeywords(source, objectivesOf(meta)) });
   }
   return lessons;
 }
@@ -111,17 +179,25 @@ async function collectProblems() {
   for (const slug of slugs) {
     const filePath = path.join(PROBLEMS_ROOT, `${slug}.ts`);
     const source = await readFile(filePath, "utf8");
-    // Line-anchored — must stay identical to generate-problem-registry.mjs's
-    // pattern, or the two generators could extract DIFFERENT blocks from the
-    // same file (the search index has no drift test; the meta registry does).
-    const meta = extractObjectLiteral(source, /^\s*meta:\s*\{/m, filePath, "meta");
+    const meta = extractObjectLiteral(source, PROBLEM_META_KEY_RE, filePath, "meta");
     problems.push(meta);
   }
   return problems;
 }
 
 async function main() {
-  const [lessons, problems] = await Promise.all([collectLessons(), collectProblems()]);
+  // Imported before the corpus walk because `collectLessons` needs it, and
+  // safe to `import()` here for the same reason `search/index.ts` is: the
+  // module has no imports at all, by construction (see its header), so plain
+  // Node's inability to resolve `@/...` never comes up.
+  const { extractLessonKeywords } = await import(
+    pathToFileURL(path.join(ROOT, "src/lib/search/lessonKeywords.ts")).href
+  );
+
+  const [lessons, problems] = await Promise.all([
+    collectLessons(extractLessonKeywords),
+    collectProblems(),
+  ]);
 
   // Both imported with explicit ".ts" extensions and no "@/..." aliases —
   // Node's native TypeScript support resolves plain relative/absolute
@@ -163,10 +239,40 @@ async function main() {
     throw new Error("buildSearchIndex() produced an empty index — refusing to write an empty search-index.json.");
   }
 
+  const serialized = JSON.stringify(index);
+  const bytes = Buffer.byteLength(serialized);
+  if (bytes > MAX_INDEX_BYTES) {
+    throw new Error(
+      `search-index.json would be ${(bytes / 1024).toFixed(1)}KB, over the ${MAX_INDEX_BYTES / 1024}KB ceiling. ` +
+        "Every reader who opens search downloads this file whole, so it is not free to grow. " +
+        "If the corpus genuinely got bigger, raise MAX_INDEX_BYTES here and the gzip budget in " +
+        "src/lib/design/__tests__/clientBoundary.test.ts together, deliberately. If a lesson's body " +
+        "started arriving in bulk, the per-lesson cap is LESSON_KEYWORD_BUDGET in src/lib/search/lessonKeywords.ts."
+    );
+  }
+
+  const withKeywords = index.filter((entry) => typeof entry.keywords === "string" && entry.keywords.length > 0);
+  if (withKeywords.length < lessons.length) {
+    throw new Error(
+      `Only ${withKeywords.length} of ${lessons.length} lessons produced a keyword set. ` +
+        "A lesson whose body yields no terms is either empty or has an .mdx preamble the body scan " +
+        "cannot find the end of — see bodyOf() in src/lib/search/lessonKeywords.ts."
+    );
+  }
+
   await mkdir(path.dirname(OUTPUT), { recursive: true });
-  await writeFile(OUTPUT, JSON.stringify(index), "utf8");
+  // Staged through a temp file and renamed into place (see `writeGenerated`).
+  // This destination in particular is the one that has failed with a bare
+  // `UNKNOWN: unknown error, open '…\public\search-index.json'` on Windows
+  // while the other two generators succeeded in the same run: `public/` is
+  // exactly the directory a running `next dev` (and every file watcher and
+  // antivirus scanner) keeps handles in, and the old truncating open needed
+  // exclusive access. A half-written search index is also uniquely bad — it
+  // is fetched as JSON at runtime, so a truncated file breaks the search
+  // overlay for real users rather than failing a build.
+  await writeGenerated(OUTPUT, serialized);
   console.log(
-    `generate-search-index: wrote ${index.length} entries (${terms.length} glossary terms, ${lessons.length} lessons, ${problems.length} problems) to ${path.relative(ROOT, OUTPUT)}`
+    `generate-search-index: wrote ${index.length} entries (${terms.length} glossary terms, ${lessons.length} lessons, ${problems.length} problems) to ${path.relative(ROOT, OUTPUT)} — ${(bytes / 1024).toFixed(1)}KB of ${MAX_INDEX_BYTES / 1024}KB`
   );
 }
 

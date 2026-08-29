@@ -21,27 +21,27 @@ export const localityAssumptionNonlocalHv: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["factor", "factoring", "b(b,\\lambda)", "depend only", "own setting"],
-      ["breaks", "no longer", "doesn't hold", "not valid"],
+      ["factor", "factoring", "b(b,lambda)", "b(b,λ)", "depend only", "depends only", "own setting", "independent of a", "independent of alice", "single value", "same value", "one value"],
+      ["break", "no longer", "doesn't hold", "does not hold", "not valid", "invalid", "fails", "falls apart", "cannot group", "can't group"],
     ],
-    incorrectFeedback: "Point to the exact algebraic step where the proof groups terms by A(a,λ) and A(a',λ) — what does it assume about B?",
-    partialFeedback: "You're close — be specific that the factoring step assumed B(b,λ) doesn't change depending on which A-setting is paired with it.",
+    incorrectFeedback: "Walk through the CHSH derivation line by line and find the one algebraic move that quietly makes an assumption about what Bob's outcome can see.",
+    partialFeedback: "You have identified the right step. Now say what it assumed about B, and what goes wrong with that assumption in your friend's model.",
   },
   hints: [
-    { text: "The proof factored S(λ) into A(a,λ)[B(b,λ)+B(b',λ)] + A(a',λ)[B(b,λ)-B(b',λ)]." },
-    { text: "This factoring implicitly assumes B(b,λ) is the same number whether it's paired with A(a,λ) or A(a',λ)." },
-    { text: "If B secretly depends on a too, there would be two different values of 'B(b,λ)' in that expression, and the factoring step is no longer valid." },
+    { text: "Write out the four-term combination S(λ) and try to pull A(a,λ) and A(a',λ) out in front of pairs of terms. What does that regrouping quietly require of B?" },
+    { text: "In the regrouped expression, the symbol B(b,λ) appears twice: once next to A(a,λ) and once next to A(a',λ). What must be true for both appearances to stand for one and the same number?" },
+    { text: "Suppose Bob's outcome could also see Alice's setting a. Are the two appearances of B(b,λ) still interchangeable?" },
   ],
   solution: {
     steps: [
       { description: "The proof's factoring step groups the four terms as A(a,λ)[B(b,λ)+B(b',λ)]+A(a',λ)[B(b,λ)-B(b',λ)]." },
-      { description: "This requires B(b,λ) to be the exact same value whether paired with A(a,λ) or A(a',λ) — i.e., independent of Alice's setting." },
+      { description: "This requires B(b,λ) to be the exact same value whether paired with A(a,λ) or A(a',λ). In other words, B must be independent of Alice's setting." },
       { description: "If Bob's outcome depends on a, there are really two different 'B(b,λ)' values, and the factoring (and hence |S(λ)|=2) breaks down." },
     ],
     finalAnswer: "The factoring step assumes B(b,λ) doesn't depend on a; a nonlocal model violates exactly that assumption, so the proof doesn't apply to it.",
   },
   explanation: {
-    correctIdea: "Locality is used at a specific algebraic step, not just as a philosophical label — removing it invalidates that step directly.",
+    correctIdea: "Locality is used at a specific algebraic step, not just as a philosophical label. Removing it invalidates that step directly.",
     whyCorrect: "This is precisely why Bohmian mechanics (a real nonlocal hidden-variable theory) isn't ruled out by Bell's theorem.",
     whyWrong: ["Saying 'nonlocal theories are just different' without identifying the specific broken step doesn't show why the proof's conclusion no longer follows."],
   },

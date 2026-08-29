@@ -97,7 +97,22 @@ export function ErrorCorrectionCycle({ ariaLabel }: { ariaLabel: string }) {
   ];
 
   return (
-    <div className="not-prose space-y-4 panel-inset p-4 sm:p-5" aria-label={ariaLabel}>
+    // `role="group"` so the `aria-label` is actually used. `aria-label` is
+    // ignored on an element with the implicit `generic` role — the ARIA spec
+    // prohibits naming `generic`, and every browser drops the name rather than
+    // exposing an unnamed-role element with a label. This `<div>` was the only
+    // element in the figure carrying a description of what the figure *is*, so
+    // the whole `ariaLabel` prop was being computed, passed down, and thrown
+    // away: a screen-reader user met the controls and the stage narration with
+    // no framing at all.
+    //
+    // `group`, not `img`, and the distinction matters here for the same reason
+    // it does in `simulators/circuit-builder/CircuitDiagram.tsx`: `img` is
+    // children-presentational, and this container holds two `PresetToggle`
+    // radiogroups plus a stage narration that a reader must be able to reach.
+    // `img` would have named the figure by silencing everything in it.
+    // (`DecoherenceBlochDecay` in this directory is already on this pattern.)
+    <div role="group" className="not-prose space-y-4 panel-inset p-4 sm:p-5" aria-label={ariaLabel}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <h3 className="tech-label">Code</h3>
@@ -147,32 +162,50 @@ export function ErrorCorrectionCycle({ ariaLabel }: { ariaLabel: string }) {
       </div>
 
       <div className="flex flex-wrap gap-2">
+        {/* `aria-disabled` rather than the native `disabled` attribute, on
+            Back and Advance both. Advancing is how a reader gets through this
+            figure at all — four presses of the same button, in place — and on
+            the fourth one a natively-disabled button stops being focusable
+            *while it currently holds focus*, so every browser drops focus to
+            <body>. That happens at the payoff stage, and the reader's next Tab
+            restarts from the top of the page rather than continuing into the
+            syndrome readout the last press just revealed. Keeping the element
+            focusable with `aria-disabled` announces the same "dimmed,
+            unavailable" state without moving focus; the handler no-ops and
+            `aria-disabled:pointer-events-none` reproduces the
+            dead-to-the-mouse behaviour. */}
         <button
           type="button"
-          onClick={handleBack}
-          disabled={stage === 0}
-          className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          onClick={() => {
+            if (stage === 0) return;
+            handleBack();
+          }}
+          aria-disabled={stage === 0}
+          className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted aria-disabled:pointer-events-none aria-disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar"
         >
           ← Back
         </button>
         <button
           type="button"
-          onClick={handleAdvance}
-          disabled={stage === STAGE_LABELS.length - 1}
-          className="rounded-md border border-brand bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-40"
+          onClick={() => {
+            if (stage === STAGE_LABELS.length - 1) return;
+            handleAdvance();
+          }}
+          aria-disabled={stage === STAGE_LABELS.length - 1}
+          className="min-h-11 rounded-(--radius-tight) border border-brand bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-disabled:pointer-events-none aria-disabled:opacity-40"
         >
           Advance →
         </button>
         <button
           type="button"
           onClick={handleReset}
-          className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar"
         >
           Reset
         </button>
       </div>
 
-      <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {stageDescription[stage]}
       </div>
 

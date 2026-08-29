@@ -22,8 +22,28 @@ export const thresholdDifferingValuesNotContradiction: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["rigorous", "proof", "adversarial", "worst-case", "proven"],
-      ["numerical", "simulation", "decoder", "specific noise model", "heuristic", "estimate"],
+      {
+        phrases: ["rigorous", "proof", "prove", "adversarial", "worst-case", "worst case", "proven", "theorem"],
+        missingFeedback:
+          "You have described the surface-code side. Say what kind of claim the concatenated-code number is: a rigorous theorem that has to hold against a worst-case (often adversarial) noise model, which is why the constant it can prove comes out small.",
+      },
+      {
+        phrases: [
+          "numerical",
+          "numerics",
+          "simulation",
+          "simulated",
+          "monte carlo",
+          "decoder",
+          "specific noise model",
+          "particular noise model",
+          "heuristic",
+          "estimate",
+          "empirical",
+        ],
+        missingFeedback:
+          "You have described the concatenated-code side. Say what kind of claim the surface-code number is: a numerical estimate from simulating one specific noise model with one specific decoder, which is not a worst-case guarantee and so comes out far more optimistic.",
+      },
     ],
     incorrectFeedback:
       "The concatenated-code threshold theorems are typically fully rigorous, adversarial-noise-model proofs, which tend to yield small, pessimistic constants; surface-code threshold values are typically numerical, simulation-based estimates for one specific noise model and decoder, which tend to be far more optimistic and hardware-relevant. Different assumptions and methods, not different physics.",

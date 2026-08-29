@@ -13,7 +13,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Controlled Gates and CNOT",
   description:
-    "The general controlled-U operation, worked out completely for CNOT: matrix, truth table, and why SWAP is three CNOTs.",
+    "The general controlled-U operation, worked out in full for CNOT: matrix, truth table, and why SWAP is three CNOTs.",
   course: "quantum-gates-and-circuits",
   module: "controlled-gates-and-cnot",
   order: 1,
@@ -73,15 +73,21 @@ export const swapCircuitFrames = [
 ];
 
 <LessonHook eyebrow="Why this matters">
-Every gate mentioned so far still acts on one qubit independently of the others. Nothing yet lets one qubit's value affect what happens to another. Controlled gates are that missing ingredient, and CNOT is the single most important one in this course.
+Every gate so far acts on one qubit independently of the others. Nothing yet lets one qubit's value affect what happens to another, which means nothing so far can build a state the last lesson called entangled.
 </LessonHook>
 
 ## Motivation
 
-Tensor products build multi-qubit states; the last lesson's circuit
-notation showed how to draw operations on them. This lesson supplies
-the piece that's still missing: **<Term id="cnot-controlled-gates">CNOT</Term>** (controlled-NOT), the
-single most important two-qubit gate in this course.
+Tensor products build multi-qubit states, and the last lesson's circuit
+notation showed how to draw operations on them. Both are still missing
+something. Every operation you can currently write is a tensor product of
+single-qubit gates, and a tensor product of single-qubit gates applied to a
+product state gives back a product state. The entangled two-thirds of the
+state space, which the counting argument said was there, remains
+unreachable.
+
+**<Term id="cnot-controlled-gates">CNOT</Term>** (controlled-NOT) is the gate that reaches it, and it is the
+two-qubit gate this course leans on hardest.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/31/Diagram_of_the_Cirac-Zoller_CNOT_gate.svg"
@@ -178,21 +184,21 @@ next lesson.
 
 $\text{CNOT}^2 = I$: applying the same conditional flip twice always
 undoes it, since flipping the target bit twice returns it to where it
-started, regardless of the control. This makes CNOT, like $X$, $Z$, $H$
-before it, reversible, exactly as every quantum gate must be.
+started, regardless of the control. That makes CNOT reversible, like $X$,
+$Z$, and $H$ before it, as every quantum gate must be.
 
 ## Physical Interpretation
 
 CNOT is the standard building block for creating correlation between
 qubits *deliberately*. Applied to a control that's already in
 superposition, it doesn't produce a definite outcome for the target. It
-produces a target whose value is now tied to the control's, in whatever
-proportion the control's amplitudes dictate. That's <Term id="entanglement">entanglement</Term>, built
-on demand, and it's exactly the next lesson's subject.
+produces a target whose value is tied to the control's, in whatever
+proportion the control's amplitudes dictate. That is <Term id="entanglement">entanglement</Term> built on
+demand, and it is the next lesson's subject.
 
 ## Interactive Experiment
 
-<InteractiveSection title="Confirm the truth table and the SWAP construction" description="Initialize each of |00⟩, |01⟩, |10⟩, |11⟩ in turn and press CNOT (control=qubit 0, target=qubit 1). Confirm all four truth-table rows this lesson derived: 00 to 00, 01 to 01, 10 to 11, 11 to 10. Then initialize |10⟩ again and press SWAP — the platform's real applySwap — and confirm the end state matches |01⟩, the same result the three-CNOT trace below reaches step by step.">
+<InteractiveSection title="Confirm the truth table and the SWAP construction" description="Initialize each of |00⟩, |01⟩, |10⟩, |11⟩ in turn and press CNOT (control=qubit 0, target=qubit 1). Confirm all four truth-table rows this lesson derived: 00 to 00, 01 to 01, 10 to 11, 11 to 10. Then initialize |10⟩ again, press SWAP (the platform's real applySwap), and confirm the end state matches |01⟩, the same result the three-CNOT trace below reaches step by step.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
@@ -222,7 +228,7 @@ the two-qubit basis state before revealing it.
     { label: "|00⟩", value: "00" },
   ]}
   correctValue="01"
-  explanation="Track it column by column: |10⟩ →(CNOT(0,1))→ |11⟩ →(CNOT(1,0))→ |01⟩ →(CNOT(0,1))→ |01⟩. The last CNOT is a no-op here because its control qubit (0) is now 0. The two qubits' values end up exchanged, exactly the SWAP identity being verified."
+  explanation="Track it column by column: |10⟩ →(CNOT(0,1))→ |11⟩ →(CNOT(1,0))→ |01⟩ →(CNOT(0,1))→ |01⟩. The last CNOT does nothing here because its control qubit (0) is now 0. The two qubits' values end up exchanged, which is the SWAP identity being verified."
 />
 
 Track $|10\rangle$ through all three steps:
@@ -235,8 +241,10 @@ Track $|10\rangle$ through all three steps:
 </div>
 
 $|10\rangle \to |11\rangle \to |01\rangle \to |01\rangle$: the qubits end
-up swapped, $|10\rangle\to|01\rangle$, exactly as claimed, using nothing
-but the CNOT you just derived, three times in a row.
+up swapped, $|10\rangle\to|01\rangle$, using nothing but the CNOT you just
+derived, three times in a row. This matters practically. On hardware where
+only neighbouring qubits can interact, moving a qubit across the chip means
+a chain of SWAPs, and every one of them costs three CNOTs.
 
 ## Common Mistakes
 

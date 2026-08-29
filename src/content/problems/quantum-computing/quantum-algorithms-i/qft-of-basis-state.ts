@@ -27,6 +27,10 @@ export const qftOfBasisState: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "Use QFT|j⟩=(1/√N)Σₖ e^{2πijk/N}|k⟩ with j=2, N=4, k=3.",
+    nearMisses: [
+      { value: -0.5, feedback: "−0.5 is the amplitude itself. The question asks for its imaginary part, and this amplitude is purely real." },
+      { value: 0.5, feedback: "Check the phase: e^{3πi} reduces to e^{iπ} = −1, so the amplitude is −0.5. Either way, the question asks for the imaginary part." },
+    ],
   },
   hints: [
     { text: "The k=3 term's phase is e^{2πi(2)(3)/4} = e^{3πi}." },

@@ -51,6 +51,10 @@ export const synthesisHermitianAndUnitary: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Combining the Hermitian Operators and Unitary Operators lessons: real+symmetric gives Hermitian, and M²=I combined with Hermiticity gives unitary too.",
     whyCorrect: "Pauli-X is the standard concrete example satisfying all the given conditions.",
-    whyWrong: ["Pauli-X serves as a counterexample to every other option: it's not the identity, it does have eigenvalue -1, and it's not diagonal."],
+    whyWrong: [
+      { optionId: "b", text: "Pauli-X is real, symmetric and squares to I without being the identity." },
+      { optionId: "c", text: "Pauli-X has eigenvalue −1, with eigenvector |−⟩. Squaring to I permits eigenvalues ±1, not just +1." },
+      { optionId: "d", text: "Pauli-X satisfies all three hypotheses and is not diagonal." },
+    ],
   },
 };

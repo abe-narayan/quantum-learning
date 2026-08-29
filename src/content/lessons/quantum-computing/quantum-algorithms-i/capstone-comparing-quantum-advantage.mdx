@@ -1,8 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
-import { ExternalFigure } from "@/components/mdx/ExternalFigure";
-import { Question } from "@/components/narrative/Question";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage"
@@ -11,7 +9,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Capstone: Comparing Quantum Advantage",
   description:
-    "Deutsch-Jozsa's exponential separation and Grover's quadratic one, side by side: what each algorithm actually proves, what it needs to be true to matter, and why 'quantum computers are exponentially faster' is not a fair summary of either.",
+    "Deutsch-Jozsa's exponential separation and Grover's quadratic one, side by side: what each algorithm proves, what has to be true for it to matter, and why 'quantum computers are exponentially faster' is not a fair summary of either.",
   course: "quantum-algorithms-i",
   module: "capstone-comparing-quantum-advantage",
   order: 1,
@@ -25,37 +23,23 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Two speedups, two shapes">
 Deutsch-Jozsa needs exactly one query, ever, no matter how large the problem grows. Grover needs roughly √N queries where a classical computer needs N. Both get called "quantum speedup." They're not the same kind.
 </LessonHook>
 
-<Question>
-Deutsch-Jozsa needs exactly one query, ever. Grover needs roughly √N where a classical computer needs N. Both get called "quantum speedup" — but are they the same kind of advantage, or something fundamentally different from each other?
-</Question>
-
 ## Motivation
 
-Are they the same
-kind of advantage at different sizes, or something more fundamentally
-different from each other?
+Put a number on each claim before comparing them. At $n=20$,
+Deutsch-Jozsa replaces $2^{19}+1 = 524{,}289$ worst-case classical
+queries with $1$. Grover replaces about a million with about $804$. One
+advantage annihilates the problem size; the other tames it. This
+capstone puts the two algorithms side by side and asks the question
+neither individual lesson addressed: faster at what, compared to what,
+and under what assumptions? The answer to each turns out to be far more
+specific than "quantum computers win."
 
-They're not the same kind. This lesson puts the two algorithms side by
-side and asks the question neither individual lesson addressed: faster
-at what, compared to what, and under what assumptions, because the
-honest answer to each turns out to be far more specific than "quantum
-computers win."
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
-  alt="Google's Sycamore superconducting quantum processor, the 53-qubit chip used in Google's 2019 quantum supremacy/advantage experiment"
-  caption="Google's Sycamore processor, the real chip behind the 2019 quantum supremacy claim. It's a useful reminder that a real 'quantum advantage' result is about a specific task on specific hardware, not a blanket claim that quantum computers are simply faster."
-  credit="Google, via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
-  license="CC BY 3.0"
-/>
-
-<HistoricalMoment date="2019">
-Google's 53-qubit Sycamore processor is used for the quantum supremacy claim: a specific task, on specific hardware, not a blanket claim that quantum computers are simply faster.
+<HistoricalMoment date="October 2019">
+Google announces that its 53-qubit Sycamore processor has sampled the output of random circuits faster than a classical supercomputer could simulate them. IBM disputes the classical cost estimate within days. The claim that survives the argument is narrow and real: one engineered sampling task, on one device, with nothing promised about useful problems. Read every "advantage" claim in this lesson with that same fine print in mind.
 </HistoricalMoment>
 
 ## Mathematical Development
@@ -70,12 +54,14 @@ Google's 53-qubit Sycamore processor is used for the quantum supremacy claim: a 
 Both numbers in the "quantum queries" column were *derived* in this
 course, not quoted: Deutsch-Jozsa's single query from the exact $\pm1$/$0$
 amplitude split, Grover's $O(\sqrt N)$ from the exact rotation-angle
-formula. Neither is asymptotic hand-waving. Plotting Grover's actual
-$\frac{\pi}{4}\sqrt N$ formula against the classical $N$ on one shared
-linear axis makes the *size* of the gap vivid, but it also buries
-Grover's own curve: next to $2^n$, even genuine $\sqrt N$ growth reads as
-a flat line sitting on the axis, which would wrongly suggest Grover's
-query count barely grows at all.
+formula. Neither is asymptotic hand-waving. The two charts below split
+one comparison into two jobs a single linear axis cannot do at once.
+This first chart's job: show the *size* of the gap. Plotting Grover's
+actual $\frac{\pi}{4}\sqrt N$ formula against the classical $N$ on one
+shared linear axis makes that gap vivid, but it also buries Grover's own
+curve: next to $2^n$, even true $\sqrt N$ growth reads as a flat line
+sitting on the axis, which would wrongly suggest Grover's query count
+barely grows at all.
 
 <ParametricCurve
   frames={[
@@ -109,11 +95,11 @@ rate, which this axis cannot show.
     { label: "An exponential curve, just with a smaller base", value: "exponential-shape" },
   ]}
   correctValue="concave"
-  explanation="On its own scale, π/4·√N is visibly a square-root curve: rising, concave, ever-slowing, never flat and never exponential. It only looked flat a moment ago because it was being compared directly against 2^n on the same axis — a genuine growth curve can still look negligible next to a big enough neighbor."
+  explanation="On its own scale, π/4·√N is visibly a square-root curve: rising, concave, ever-slowing, never flat and never exponential. It only looked flat a moment ago because it was being compared directly against 2^n on the same axis. A growth curve can still look negligible next to a big enough neighbor."
 />
 
-Rescaling to Grover's own range
-answers that separately:
+The second chart's job is different: show the *shape* of Grover's own
+growth, on a scale where it can be seen at all.
 
 <ParametricCurve
   frames={[
@@ -134,9 +120,9 @@ answers that separately:
 Seen on its own scale, Grover's curve is visibly the concave, ever-slowing
 shape of a square root, not a flat line: it grows, just far more slowly
 than $2^n$ does, and it never approaches Deutsch-Jozsa's flat, constant
-$1$ query either. Two genuinely different shapes of advantage, not two
-versions of the same thing — and neither chart alone tells the whole
-story: the first shows how large the gap to classical is, the second
+$1$ query either. Two different shapes of advantage, not two
+versions of the same thing. Neither chart alone tells the whole
+story: the first shows how large the gap to classical is; the second
 shows that Grover's queries still grow rather than being negligible.
 
 ### Why Deutsch-Jozsa's exponential gap depends entirely on the promise
@@ -158,36 +144,37 @@ algorithm found so far": it's been proven (a result outside this course's
 scope, due to Bennett, Bernstein, Brassard, and Vazirani) that **no**
 quantum algorithm can search an unstructured space of $N$ items in fewer
 than $\Omega(\sqrt N)$ oracle queries. Grover's algorithm doesn't just
-happen to be fast; unstructured search genuinely cannot go faster than
+happen to be fast; unstructured search cannot go faster than
 quadratically, quantum or otherwise. This is a meaningfully different, and
 stronger, kind of result than "we haven't found a better classical
 algorithm yet."
 
-### What "quantum advantage" actually requires
+### What "quantum advantage" requires beyond a query count
 
 Both results share a hidden assumption worth stating explicitly: the
 speedup is counted in **<Term id="query-complexity-black-box-model">oracle queries</Term>**, not real-world running time.
-Building a genuine quantum oracle for some function of interest (encoding
+Building a working quantum oracle for some function of interest (encoding
 "is this database entry a match," say) as an efficient reversible circuit
 is a separate, often much harder engineering problem than the query-count
 theorems address. A quadratic (or even exponential) query-count advantage
-doesn't automatically translate into a faster *wall-clock* algorithm for a
-real problem unless a genuinely efficient oracle exists for it. The gap
-between "provably fewer queries" and "actually useful today" is exactly
-where most of the difficulty in quantum algorithm design still lives.
+does not translate into a faster *wall-clock* algorithm for a real problem
+unless an efficient oracle exists for it. The gap between "provably fewer
+queries" and "useful today" is where most of the difficulty in quantum
+algorithm design still lives.
 
 ## Physical Interpretation
 
 <Term id="phase-interference">Interference</Term> is the entire mechanism behind both results: Deutsch-Jozsa's
 amplitude on $|0\rangle^{\otimes n}$ collapsing to exactly $0$ or $\pm1$,
 Grover's rotation concentrating amplitude on the marked state. Interference
-itself is a genuinely quantum resource with no classical analogue.
+is a quantum resource with no classical counterpart, and both speedups are
+spent out of that one account.
 
 What differs between the two algorithms is how much structure the *problem
 itself* offers for interference to exploit: an engineered promise (total,
-exponential advantage) versus a genuinely unstructured search (partial,
+exponential advantage) versus a truly unstructured search (partial,
 quadratic advantage, but provably the most available). That difference is
-exactly what the charts earlier in this lesson make visible: Grover's line
+what the charts earlier in this lesson make visible: Grover's line
 bends but never flattens the way Deutsch-Jozsa's constant, single-query
 line does, because unstructured search leaves interference less to work
 with, not because Grover's algorithm is doing anything wrong.
@@ -273,6 +260,6 @@ again.
 II: Advanced** reuses this course's machinery directly rather than
 starting over: Shor's algorithm applies phase estimation to period
 finding, and the variational algorithms, VQE and QAOA, introduce a
-fundamentally different, classically-assisted approach to quantum
+structurally different, classically-assisted approach to quantum
 computation.
 </NextDiscovery>

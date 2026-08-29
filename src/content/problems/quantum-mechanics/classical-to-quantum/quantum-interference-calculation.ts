@@ -23,6 +23,11 @@ export const quantumInterferenceCalculation: NumericProblem = {
     value: 0.09,
     tolerance: 0.005,
     incorrectFeedback: "Convert ψ2 to rectangular form first (cos120°=-0.5, sin120°≈0.866), add to ψ1, then square the magnitude of the sum.",
+    nearMisses: [
+      { value: 0.18, feedback: "0.18 is the classical prediction |ψ₁|² + |ψ₂|². The quantum answer adds the cross term 2|ψ₁||ψ₂|cos(120°), which is negative here and removes half of it." },
+      { value: 0.36, feedback: "0.36 is (0.3 + 0.3)², treating the second amplitude as if its phase were zero. At 120° the two amplitudes partly cancel instead." },
+      { value: 0.3, feedback: "0.3 is the magnitude of one amplitude. The answer is a probability, so it comes from squaring the magnitude of the summed amplitude." },
+    ],
   },
   hints: [
     { text: "ψ2 = 0.3(cos 120° + i sin 120°) = -0.15 + 0.2598i." },

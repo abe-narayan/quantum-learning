@@ -1,10 +1,23 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { PotentialDiagram } from "@/components/visualizations/PotentialDiagram";
+import { createGrid } from "@/lib/quantum/wavefunction";
+import { infiniteSquareWellEigenstate } from "@/lib/quantum/potentials";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory"
 );
+
+export const slHalfWidth = 1;
+export const slGrid = createGrid(2048, 4 / 2048);
+export const slStates = [1, 2, 3].map((n) => infiniteSquareWellEigenstate(slGrid, n, slHalfWidth));
+export const slOverlaps = [
+  { label: "\u27e8\u03c8\u2081|\u03c8\u2082\u27e9", value: slStates[0].innerProduct(slStates[1]).magnitude() },
+  { label: "\u27e8\u03c8\u2081|\u03c8\u2083\u27e9", value: slStates[0].innerProduct(slStates[2]).magnitude() },
+  { label: "\u27e8\u03c8\u2082|\u03c8\u2083\u27e9", value: slStates[1].innerProduct(slStates[2]).magnitude() },
+];
+export const slNorms = slStates.map((state) => state.innerProduct(state).magnitude());
+export const slLargestOverlap = Math.max(...slOverlaps.map((entry) => entry.value));
 
 export const slWellGrid = Array(240).fill(0).map((_, i) => -3 + (i / 239) * 6);
 export const slWellPotential = slWellGrid.map((x) => (Math.abs(x) <= 1 ? 0 : 8));
@@ -51,7 +64,7 @@ The Infinite Square Well, the Finite Square Well, the Harmonic Oscillator,
 and the Radial Equation all produced eigenvalue problems that were proved,
 separately, in each lesson, to have real energies and orthogonal
 eigenfunctions, each proof redoing essentially the same integration by
-parts. **Sturm-Liouville theory** is the observation that all four proofs
+parts. **<Term id="sturm-liouville-theory">Sturm-Liouville theory</Term>** is the observation that all four proofs
 are literally the same argument, applied to the same general class of
 differential operator, differing only in three functions ($p,q,w$) and a
 boundary condition. Prove the general theorem once, and every solved
@@ -96,7 +109,7 @@ at $a$ and $b$ that make a specific boundary term (derived below)
 vanish, most commonly Dirichlet ($y=0$), Neumann ($y'=0$), a mixed
 Robin condition, or (for a *singular* endpoint, where $p$ or $w$
 vanishes or the interval is unbounded) simply requiring $y$ stay finite
-or square-integrable there, exactly the domain-choice question Hilbert
+or square-integrable there, the domain-choice question Hilbert
 Spaces and Self-Adjointness raised in full generality.
 
 ### Lagrange's identity, derived
@@ -139,7 +152,7 @@ $$
 **Eigenfunctions belonging to different eigenvalues are orthogonal with
 respect to the weight $w$**, the direct Sturm-Liouville generalization
 of Hermitian Operators' finite-dimensional orthogonality theorem, proved
-by exactly the same "compute the same bracket two ways, subtract"
+by the same "compute the same bracket two ways, subtract"
 strategy, now with a boundary term instead of a discrete difference.
 
 ### Reality of eigenvalues, derived the same way
@@ -156,15 +169,45 @@ The same boundary conditions again kill the left side; since $w>0$ and
 $\int|y|^2w\,dx>0$ for $y\ne0$, this forces $\lambda^*=\lambda$:
 **every Sturm-Liouville eigenvalue is real.**
 
+One hypothesis in that argument is easy to miss. The step "$y^*$ solves
+the same equation" needs $p,q,w$ real, and the step "the same boundary
+conditions kill the left side" needs the *boundary conditions* to be real
+as well. A Robin condition $y'(a)=\alpha y(a)$ with complex $\alpha$ is
+not satisfied by $y^*$, the boundary term does not vanish, and the
+operator is not self-adjoint. Real coefficients and real boundary data
+are doing work here, not decoration.
+
+Stating both results together, with everything they assume:
+
+<TheoremBox title="Regular Sturm-Liouville theorem" provenance="derived">
+
+**Hypotheses.** A *finite* interval $[a,b]$; $p\in C^1$ and $q,w$
+continuous and real; $p(x)>0$ and $w(x)>0$ on all of $[a,b]$, endpoints
+included; real separated boundary conditions (Dirichlet, Neumann, or Robin
+with real coefficients) at each end.
+
+**Conclusions.** The eigenvalues are real, simple, and form an increasing
+sequence $\lambda_1<\lambda_2<\cdots\to+\infty$ with no finite
+accumulation point. Eigenfunctions for distinct eigenvalues are orthogonal
+in the weighted inner product $\int_a^b w\,y_my_n\,dx$, and together they
+form a complete orthogonal basis of $L^2([a,b],w\,dx)$. The spectrum is
+**purely discrete**.
+
+Orthogonality and reality are derived above; completeness is cited below.
+Standard reference: Coddington–Levinson, *Theory of Ordinary Differential
+Equations*, ch. 7–8.
+
+</TheoremBox>
+
 ### Completeness (cited)
 
 That the eigenfunctions additionally form a *complete* basis (every
 sufficiently nice function on $[a,b]$ expands in them, the direct
 generalization of "a Hermitian matrix's eigenvectors span the whole
 space") is the **Sturm-Liouville expansion theorem**, a substantially
-harder result requiring genuine functional-analytic machinery (compact
+harder result requiring substantial functional-analytic machinery (compact
 resolvent operators, building on Green's Functions and Resolvents'
-$(E-H)^{-1}$); **cited here, not proved**, exactly as the general
+$(E-H)^{-1}$); **cited here, not proved**, the same way the general
 spectral theorem was cited two lessons ago. What's been fully derived
 above (orthogonality, reality) is already everything Hermitian Operators
 proved for matrices; completeness is the one truly new ingredient,
@@ -194,7 +237,7 @@ $\hbar=m=1$): $-u''+\big[2V_{\text{eff}}(r)\big]u=2Eu$ rearranges to
 $-u''+2V_{\text{eff}}(r)u-2Eu=0$, i.e. Sturm-Liouville form with $p=1$,
 $q(r)=2V_{\text{eff}}(r)=2\big(V(r)+l(l+1)/2r^2\big)$, $w=1$, $\lambda=2E$,
 on the singular interval $(0,\infty)$, with boundary condition $u(0)=0$
-at the singular origin (exactly the physically-forced domain choice
+at the singular origin (the physically-forced domain choice
 Hilbert Spaces and Self-Adjointness's half-line discussion showed can be
 subtle; here $p(0)=1\ne0$, so this isn't the same pathology as the bare
 momentum operator, but it's the same *kind* of question: what condition
@@ -228,14 +271,38 @@ $q$ look nothing alike:
   ariaLabel="The hydrogen radial equation's (l=0) Sturm-Liouville potential contribution: an unbounded Coulomb attraction near the origin, rising toward zero at large r"
 />
 
-yet both eigenvalue problems are governed by exactly the same three
-lemmas (orthogonality, reality, completeness) proved once, above, from
-$p,q,w$ left completely general. The finite well and the harmonic
-oscillator fit the same template too ($p=1,w=1$ for both; $q(x)$ is a
-finite well shape or $\frac12m^2\omega^2x^2$ respectively), with
-matching/decay conditions playing the role of the boundary condition on
-the whole line, a domain choice, again, of exactly Hilbert Spaces and
-Self-Adjointness's kind.
+yet both inherit orthogonality and reality from the two proofs above,
+neither of which touched $q$. The finite well and the harmonic oscillator
+fit the same template ($p=1,w=1$ for both; $q(x)$ a finite-well shape or
+$\frac12m^2\omega^2x^2$), with matching and decay conditions playing the
+role of the boundary condition on the whole line: a domain choice, again,
+of the kind Hilbert Spaces and Self-Adjointness made precise.
+
+### Where the regular theorem stops, and hydrogen is the example
+
+Orthogonality and reality carry over to the singular problems unchanged.
+**Completeness does not**, and the difference is not a technicality.
+
+The regular theorem concluded a purely discrete spectrum. Hydrogen
+violates that conclusion. The radial problem on $(0,\infty)$ is singular
+at both ends (the interval is unbounded, and $q(r)$ blows up at the
+origin), and its spectrum has two parts: the bound states
+$E_n=-1/(2n^2)$ in atomic units, discrete and accumulating at $0$, plus a
+**continuous** spectrum filling $E\geq0$, the ionized scattering states.
+The bound states are orthogonal but *not complete*. No expansion in
+$\{u_n\}$ alone can represent a free electron. Completeness returns only
+when the scattering states are included, and the statement that then holds
+is the spectral theorem's $\int\lambda\,dE(\lambda)$ with both a staircase
+and a continuous part: the mixed spectrum sketched two lessons ago,
+appearing here in the course's own worked example.
+
+Two further conclusions of the regular theorem also lapse. The
+eigenvalues accumulate at $E=0$ instead of marching to $+\infty$, and
+"increasing sequence with no finite accumulation point" fails with them.
+The reliable summary is that what this lesson *proves* (orthogonality,
+reality) is robust under singularity, while what it *cites* (completeness
+of a discrete eigenbasis) is precisely what needs the finite interval and
+the non-vanishing $p,w$ at the endpoints.
 
 ## Physical Interpretation
 
@@ -247,7 +314,7 @@ potential. They're all forced by the *same* general mechanism: a
 self-adjoint boundary-value structure that makes one boundary term
 vanish, at which point orthogonality and reality follow from pure
 algebra, regardless of how complicated $q(x)$ (the potential) itself
-is. This is precisely why an eigenvalue-problem-solving strategy that
+is. This is why an eigenvalue-problem-solving strategy that
 worked for the harmonic oscillator was always a safe bet to try again on
 hydrogen: not optimism, a theorem.
 
@@ -258,18 +325,17 @@ using this platform's own `infiniteSquareWellEigenstate` engine
 function, independent of the general proof above.**
 
 For $a=1$, computing $\psi_1,\psi_2,\psi_3$ via
-`infiniteSquareWellEigenstate` on a real numerical grid and taking their
-pairwise `innerProduct`s directly: $\langle\psi_1|\psi_2\rangle$,
-$\langle\psi_1|\psi_3\rangle$, and $\langle\psi_2|\psi_3\rangle$ all come
-out on the order of $10^{-16}$ (floating-point roundoff around exactly
-zero), while each state's own norm is $1.000\ldots$ to the same
-precision. This is the Sturm-Liouville orthogonality theorem's
-prediction, $\int_{-a}^aw(x)\psi_m\psi_n\,dx=0$ for $m\ne n$ (here
-$w=1$), confirmed by a completely independent numerical computation,
-not the boundary-term algebra above, an actual sum over grid points,
-landing on exactly zero to machine precision, exactly this platform's
-established way of checking a derivation (compare the Chapman-Kolmogorov
-numerical check in Advanced Topics in Quantum Mechanics).
+`infiniteSquareWellEigenstate` on a {slGrid.n}-point grid and taking
+their pairwise `innerProduct`s at module scope, the three cross-overlaps
+come out at {slOverlaps.map((entry) => entry.label + " = " + entry.value.toExponential(2)).join(",  ")},
+with norms {slNorms.map((norm) => norm.toFixed(6)).join(", ")}. The
+largest cross-overlap is {slLargestOverlap.toExponential(2)}: roundoff
+around zero, not a small nonzero answer.
+
+That is the Sturm-Liouville orthogonality prediction
+$\int_{-a}^aw(x)\psi_m\psi_n\,dx=0$ for $m\ne n$ (here $w=1$), reached by
+summing over grid points rather than by the boundary-term algebra above.
+Two routes, no shared step, same answer.
 
 ## Common Mistakes
 
@@ -314,24 +380,24 @@ boundary conditions their respective domains force.
   \int w y_1y_2\,dx$, derived directly from the product rule, gives both
   orthogonality (different eigenvalues) and reality (applying the same
   identity to $y$ and $y^*$) in a few lines each.
-- Completeness of the eigenbasis is cited, the one deep
-  ingredient, paralleling the finite-dimensional spectral theorem's own
-  existence assumption.
+- Completeness of the eigenbasis is cited, the one deep ingredient, and
+  the one carrying the most hypotheses: a finite interval with $p,w>0$ at
+  both endpoints. Drop those and a discrete basis can be incomplete, as
+  hydrogen's scattering continuum shows.
 - The infinite well ($q=0$) and the hydrogen radial equation
   ($q=2V_{\text{eff}}(r)$) are the *same* Sturm-Liouville problem with
   different $q$ and boundary conditions, not two separately-lucky
   solvable systems, verified independently on the well's eigenfunctions
-  via this platform's real engine, to machine precision.
+  to machine precision. What they share is orthogonality and reality;
+  completeness of a purely discrete basis belongs to the regular case
+  only.
 
 ## Further Exploration
 
-The [capstone](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/capstone-what-rigor-buys-you)
-closes this course by asking directly which of the earlier curriculum's
-informal shortcuts turn out to be exactly right once made this precise,
-and why.
-
 <NextDiscovery>
-  The capstone closes this course by asking directly which of the
-  earlier curriculum's informal shortcuts turn out to be exactly right
-  once made this precise, and why.
+  The [capstone](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/capstone-what-rigor-buys-you)
+  closes this course by asking which of the earlier curriculum's informal
+  shortcuts turn out to be exactly right once made precise, which were
+  leaning on a hypothesis they never stated, and why the difference
+  matters.
 </NextDiscovery>

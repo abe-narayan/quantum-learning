@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { sphericalHarmonic, type SphericalHarmonicIndex } from "@/lib/quantum/sphericalHarmonics";
 import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { easeInOutCubic } from "@/components/simulators/bloch-sphere/useAnimatedBlochPoint";
+import { PresetToggle } from "./PresetToggle";
 
 const SUPPORTED: SphericalHarmonicIndex[] = [
   { l: 0, m: 0 },
@@ -152,32 +153,40 @@ export function OrbitalShapePlot({ ariaLabel }: { ariaLabel: string }) {
   return (
     <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
-        <svg width={VIEW} height={VIEW} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img" aria-label={ariaLabel}>
-          <line x1={CENTER} y1={10} x2={CENTER} y2={VIEW - 10} className="stroke-border" strokeWidth={1} strokeDasharray="2 3" />
-          <text x={CENTER + 4} y={16} className="fill-muted-foreground text-[9px] font-mono">
+        <svg width={VIEW} height={VIEW} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img" aria-label={`${ariaLabel} Polar cross-section of the angular probability density for l = ${l}, m = ${m}, drawn about a vertical z-axis.`}>
+          {/* The z-axis. It is the only spatial reference in the figure —
+              "which way is up" is what makes a p-orbital's dumbbell read as
+              oriented rather than as an abstract blob — so it is
+              load-bearing and belongs on `--axis` (≥3:1 on every panel
+              depth), not on `--border`, which measured 1.41:1 on
+              `--surface-muted` and effectively vanished on the dark theme. */}
+          <line x1={CENTER} y1={10} x2={CENTER} y2={VIEW - 10} className="stroke-axis" strokeWidth={1.25} strokeDasharray="2 3" />
+          {/* This SVG has an intrinsic width attribute and no `w-full`, so it
+              renders at its 220-unit natural size and the viewBox scale is
+              1.0 — 9 authored units painted at 9px, under the 10px floor
+              with no scaling penalty to hide behind. 12 puts the one axis
+              label in the figure comfortably above it. */}
+          <text x={CENTER + 5} y={18} fontSize={12} className="fill-axis font-mono">
             z
           </text>
           <path d={pathData} className="fill-brand/25 stroke-brand" strokeWidth={2} />
         </svg>
       </div>
-      <div role="radiogroup" aria-label="Orbital (l, m)" className="flex flex-wrap gap-1.5">
-        {SUPPORTED.map((idx, i) => (
-          <button
-            key={i}
-            type="button"
-            role="radio"
-            aria-checked={i === index}
-            onClick={() => setIndex(i)}
-            className={
-              i === index
-                ? "rounded-full bg-brand px-2.5 py-1 text-xs font-medium text-brand-foreground"
-                : "rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-surface-muted"
-            }
-          >
-            l={idx.l}, m={idx.m}
-          </button>
-        ))}
-      </div>
+      {/* Was a hand-rolled `role="radiogroup"` / `role="radio"` row with no
+          arrow-key handling and no roving tabindex: it announced itself to a
+          screen reader as a radio group and then behaved like nine separate
+          tab stops, and its `px-2.5 py-1 text-xs` pills were ~24px tall,
+          well under the 44px touch target. `PresetToggle` is the same
+          control with the ARIA Authoring Practices pattern already
+          implemented (only the selected option in the tab order; arrows move
+          *and* select, wrapping) — reusing it is strictly better than
+          re-deriving the pattern here. */}
+      <PresetToggle
+        options={SUPPORTED.map((idx) => ({ label: `l=${idx.l}, m=${idx.m}` }))}
+        index={index}
+        onChange={setIndex}
+        ariaLabel="Orbital (l, m)"
+      />
       <p className="text-xs text-muted-foreground">
         Peak |Y|<sup>2</sup> for this (l, m): {target.maxR.toFixed(4)}. Shape shown is a 2D cross-section through the z-axis; |Y
         <sub>l</sub><sup>m</sup>|² doesn&rsquo;t depend on the azimuthal angle φ, so this slice represents the full 3D shape.

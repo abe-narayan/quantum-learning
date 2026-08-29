@@ -22,7 +22,7 @@ export const lessonMeta = {
   module: "cryogenic-systems",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 20,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms"],
   objectives: [
     "State the thermal photon occupation formula and explain what a large vs. small n̄ means physically for a qubit",
@@ -162,11 +162,16 @@ the same plot:
 ### Staged cooling
 
 A dilution refrigerator cools in stages: roughly room temperature, then
-liquid nitrogen temperature ($\sim77$ K), a pulse-tube stage ($\sim4$ K,
-reachable with comparatively simple mechanical cooling), and finally the
-dilution stage itself (a fundamentally different cooling mechanism,
-based on the physics of mixing two isotopes of helium) reaching the
-millikelvin range. Each stage is progressively harder to build and more expensive
+two stages of a mechanical **pulse-tube cryocooler**, a first stage at
+roughly $50$ K anchoring the outer radiation shield, and a second at
+$\sim4$ K, and finally the dilution stage itself (a fundamentally
+different cooling mechanism, based on the physics of mixing two
+isotopes of helium) reaching the millikelvin range. Modern "dry"
+fridges, including every machine photographed in this course, cool
+those upper stages this way, with no cryogenic liquids to refill;
+older "wet" systems used a liquid-nitrogen bath at $77$ K for the same
+radiation-shield job, which is why many diagrams (including the one
+below) still carry that label. Each stage is progressively harder to build and more expensive
 to operate, a real engineering reason systems don't just try to jump
 straight to millikelvin in one step.
 
@@ -178,13 +183,32 @@ with $\bar n\approx0.10$), and finally the **mixing chamber** ($10$-$20$
 mK, matching this lesson's $15$ mK dilution-fridge-base figure), where the
 qubit chip itself is mounted:
 
-<DilutionRefrigeratorDiagram ariaLabel="Vertical cross-section of a dilution refrigerator's cooling stages, from 300 K room temperature down through 77 K, 4 K, the still, the cold plate, and the 10-20 mK mixing chamber where the qubit chip sits" />
+<DilutionRefrigeratorDiagram ariaLabel="Vertical cross-section of a dilution refrigerator's cooling stages, from 300 K room temperature down through the radiation shield (labeled 77 K here; around 50 K in a modern dry fridge), the 4 K pulse-tube stage, the still, the cold plate, and the 10-20 mK mixing chamber where the qubit chip sits" />
 
 Each plate is progressively colder and physically smaller, nested inside
 the one above it; hardware gets placed at whichever stage its own
 temperature tolerance allows, cheapest (room temperature) components as
 far out as possible, and only the qubit chip itself at the very
 coldest, hardest-to-reach stage.
+
+What actually removes heat at the bottom is a form of evaporative
+cooling, with a twist: the "evaporation" happens into another liquid.
+Cooled far enough, a mixture of the two helium isotopes separates into
+two liquid phases, a concentrated ³He-rich phase floating on a dilute
+phase that is mostly ⁴He with a small dissolved fraction of ³He. In
+the **mixing chamber**, the boundary between the two phases sits right
+where the qubit chip's plate is anchored, and every ³He atom that
+crosses from the concentrated phase into the dilute one absorbs heat,
+exactly as a molecule evaporating from a liquid into vapor does.
+Crucially, the dilute phase keeps accepting ³He even in the
+millikelvin range, so this evaporation-into-a-liquid keeps pumping
+heat where ordinary evaporation would have long since stalled. The
+**still** is what keeps the cycle going: warmed to its
+$\sim0.7$-$1$ K operating point, it preferentially boils ³He (the more
+volatile isotope) out of the dilute phase, and room-temperature pumps
+circulate that ³He back around the loop, down through the **cold
+plate**'s pre-cooling stage, to re-condense and cross the phase
+boundary again.
 
 ## Physical Interpretation
 
@@ -254,8 +278,11 @@ frequencies rather than much lower ones.
   (safe), but already $\approx16$ at 4 K. 4 K alone is insufficient,
   which is why dilution refrigerators exist as a distinct, harder cooling
   stage.
-- Staged cooling (room temp → 77 K → 4 K → millikelvin) reflects real
-  engineering cost tradeoffs, not an arbitrary design choice.
+- Staged cooling (room temp → ~50 K → 4 K → millikelvin) reflects real
+  engineering cost tradeoffs, not an arbitrary design choice; the final
+  dilution stage works by ³He "evaporating" across a liquid-liquid
+  phase boundary in the mixing chamber, with the still pumping ³He
+  around the loop.
 
 ## Further Exploration
 

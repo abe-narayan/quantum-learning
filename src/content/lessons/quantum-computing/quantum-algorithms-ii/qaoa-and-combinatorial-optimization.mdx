@@ -42,15 +42,20 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Splitting a graph, one phase at a time">
-Max-Cut asks you to split a graph's vertices into two groups to maximize the number of edges crossing between them — an NP-hard problem QAOA attacks with the same hybrid loop VQE uses for ground energies.
+Max-Cut asks you to split a graph's vertices into two groups so that as many edges as possible cross between them. It is NP-hard, and QAOA attacks it with the same hybrid loop VQE uses for ground energies.
 </LessonHook>
 
 ## Motivation
 
-**<Term id="qaoa">QAOA</Term>** — the quantum approximate optimization algorithm — is that
-same hybrid loop, a parameterized circuit and a classically-optimized
-cost, retargeted from finding a ground energy to combinatorial
-optimization. Max-Cut is the first, standard example.
+**<Term id="qaoa">QAOA</Term>** (the quantum approximate optimization algorithm) is VQE's hybrid
+loop, a parameterized circuit with a classically-optimized cost, pointed at
+combinatorial optimization instead of ground-state energy.
+
+The retargeting takes one idea: write the thing you want to maximize as a
+Hamiltonian whose eigenvalue on each candidate answer *is* that answer's
+score. Once you have that, "find the best coloring" and "find the lowest
+energy" are the same problem, and VQE's machinery transfers unchanged.
+Max-Cut is the standard first example, and the encoding takes two lines.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/9/98/A_Wafer_of_the_Latest_D-Wave_Quantum_Computers_%2839188583425%29.jpg"
@@ -134,7 +139,7 @@ $U_B$ for $p$ layers, starting from the uniform superposition
 (`qaoaCircuit`), is the full QAOA circuit; $p=1$ is the smallest
 nontrivial case this course's worked example uses.
 
-<InteractiveSection title="The mixer's pull is periodic, not one-directional" description="Slide β from 0 to π. At β=0 the mixer is the identity, so the state is exactly the cost-phased uniform superposition: still perfectly flat, 1/8 on every basis state, ⟨cut⟩ locked at the checkable baseline 1.5. β behaves like a rotation angle, not a dial that keeps helping the further you turn it: ⟨cut⟩ first climbs, peaking at β=π/8 (⟨cut⟩=1.875, real amplitude pulled onto the six 1-vs-2 split colorings, highlighted), then reverses, bottoming out at β=3π/8 (⟨cut⟩=0.375, weight pushed back onto the two uncut colorings 000 and 111), before returning to the baseline at β=π/2 and repeating the same climb-then-reverse cycle again on the way to π.">
+<InteractiveSection title="The mixer's pull is periodic, not one-directional" description="Slide β from 0 to π. At β=0 the mixer is the identity, so the state is the cost-phased uniform superposition: still flat at 1/8 on every basis state, with ⟨cut⟩ locked at the baseline 1.5. β is a rotation angle, not a dial that keeps helping the further you turn it. ⟨cut⟩ climbs to a peak at β=π/8 (⟨cut⟩=1.875, amplitude pulled onto the six 1-vs-2 split colorings, highlighted), then reverses and bottoms out at β=3π/8 (⟨cut⟩=0.375, weight pushed back onto the two uncut colorings 000 and 111), returns to the baseline at β=π/2, and repeats the cycle on the way to π. Same overshoot lesson as Grover.">
   <BarChartExplorer
     frames={mixerDemoFrames}
     sliderLabel="mixer angle β (γ fixed at π/4)"
@@ -148,13 +153,13 @@ nontrivial case this course's worked example uses.
 <PredictBeforeReveal
   question="Before any cost or mixer layers run, on the plain uniform superposition, what's the expected cut size for the 3-edge triangle graph?"
   options={[
-    { label: "0 — no bias toward any coloring yet", value: "zero" },
-    { label: "1.5 — half of the 3 edges, on average", value: "half" },
-    { label: "2 — the true maximum, by symmetry", value: "max" },
-    { label: "3 — every edge cut on average", value: "all" },
+    { label: "0, since there is no bias toward any coloring yet", value: "zero" },
+    { label: "1.5, half of the 3 edges on average", value: "half" },
+    { label: "2, the true maximum, by symmetry", value: "max" },
+    { label: "3, every edge cut on average", value: "all" },
   ]}
   correctValue="half"
-  explanation="Every basis state is equally likely (probability 1/8 each), and for any single edge exactly half of all colorings cut it. Summed over the triangle's 3 edges, the expected cut size is exactly 3 × 0.5 = 1.5, matching expectedCutSize's direct output on the uniform superposition below. This is the honest 'no optimization yet' floor every QAOA result in this lesson and the next has to beat."
+  explanation="Every basis state is equally likely at probability 1/8, and for any single edge exactly half of all colorings cut it. Summed over the triangle's 3 edges the expected cut size is 3 × 0.5 = 1.5, matching expectedCutSize's output on the uniform superposition below. Note that this baseline is also what random guessing achieves, so it is the number every QAOA result in this lesson and the next has to beat before it has shown anything."
 />
 
 Before running any optimization, check the *starting point*: the uniform
@@ -191,18 +196,16 @@ matching the general $|E|/2$ rule and the engine's direct output.
 
 <Callout type="warning">
 **Expecting the cost unitary alone to improve the measured cut size.**
-It's a pure phase operator. Measurement probabilities (and hence the
-expected cut size) are completely unchanged by $U_C$ on its own.
-Improvement only happens once the mixer lets those phases turn into
-amplitude changes.
+It is a pure phase operator, so measurement probabilities, and with them
+the expected cut size, are unchanged by $U_C$ alone. Improvement happens
+only once the mixer converts those phases into amplitude differences.
 </Callout>
 
 <Callout type="warning">
-**Assuming QAOA always finds the exact maximum cut.** It's a heuristic,
-approximate algorithm. The next lesson's worked example shows $p=1$
-QAOA reaching *close to* but not exactly the true maximum, and more
-layers ($p>1$) generally improve, but don't guarantee, further
-convergence.
+**Assuming QAOA always finds the exact maximum cut.** It is a heuristic,
+approximate algorithm with no optimality guarantee. The next lesson's
+worked example shows $p=1$ QAOA landing close to but not on the true
+maximum, and adding layers ($p>1$) usually helps without promising to.
 </Callout>
 
 ## Practice Questions

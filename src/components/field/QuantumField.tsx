@@ -37,8 +37,12 @@ import { REGIME_DESCRIPTIONS, REGIME_RENDERERS, type FieldFrame } from "./regime
  *   2. Scroll is read through the shared coalesced subscription
  *      (useScrollProgress.ts) and written to a ref — never to React state,
  *      which would re-render the app on every scroll event.
- *   3. The loop stops entirely when the tab is hidden and when the reader has
- *      not scrolled and the regime is static.
+ *   3. The loop stops entirely when the tab is hidden, and is never started
+ *      at all under `prefers-reduced-motion` (one static frame, repainted
+ *      only on resize). It does *not* idle out on a visible, unscrolled tab:
+ *      every regime is time-animated, so there is no "static regime" to
+ *      detect — a claim to the contrary used to sit here and described code
+ *      that has never existed.
  *   4. Backing-store resolution is capped at 2x (1.5x on phones) — an
  *      uncapped DPR on a 3x phone is ~9x the fill cost for a decorative layer.
  *   5. `detail` and `intensity` scale down on small screens and low
@@ -157,25 +161,44 @@ export function QuantumField() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    // One frame object for the life of the effect, rewritten in place each
+    // paint rather than rebuilt. The renderers in regimes.ts destructure it
+    // at entry and none of them retains it past its own call — `drawJourney`
+    // is the only one that passes it on, and it dispatches through
+    // `JOURNEY_SEQUENCE`, which is typed `Exclude<FieldRegime, "journey">`
+    // and so cannot re-enter — which is what makes reuse safe. Keep it that
+    // way: a renderer that stores the frame (to diff against the previous
+    // one, say) would now be storing a handle to the *current* frame.
+    const frame: FieldFrame = {
+      ctx,
+      width: 0,
+      height: 0,
+      time: 0,
+      scroll: 0,
+      scrollY: 0,
+      accent: colors.accent,
+      dim: colors.dim,
+      foreground: colors.foreground,
+      intensity: quality.intensity,
+      detail: quality.detail,
+    };
+
     function paint(now: number) {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
-      const frame: FieldFrame = {
-        ctx,
-        width,
-        height,
-        // Frozen at zero for reduced motion: the composition still draws (a
-        // still image of the physics is informative and beautiful), it simply
-        // does not evolve.
-        time: prefersReducedMotion ? 0 : (now - start) / 1000,
-        scroll: prefersReducedMotion ? 0 : scrollRef.current.progress,
-        scrollY: prefersReducedMotion ? 0 : scrollRef.current.scrollY,
-        accent: colors.accent,
-        dim: colors.dim,
-        foreground: colors.foreground,
-        intensity: quality.intensity,
-        detail: quality.detail,
-      };
+      frame.width = width;
+      frame.height = height;
+      // Frozen at zero for reduced motion: the composition still draws (a
+      // still image of the physics is informative and beautiful), it simply
+      // does not evolve.
+      frame.time = prefersReducedMotion ? 0 : (now - start) / 1000;
+      frame.scroll = prefersReducedMotion ? 0 : scrollRef.current.progress;
+      frame.scrollY = prefersReducedMotion ? 0 : scrollRef.current.scrollY;
+      frame.accent = colors.accent;
+      frame.dim = colors.dim;
+      frame.foreground = colors.foreground;
+      frame.intensity = quality.intensity;
+      frame.detail = quality.detail;
       REGIME_RENDERERS[regime](frame);
     }
 

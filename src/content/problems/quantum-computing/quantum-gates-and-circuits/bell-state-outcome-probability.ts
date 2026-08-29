@@ -29,6 +29,10 @@ export const bellStateOutcomeProbability: NumericProblem = {
     tolerance: 0.01,
     incorrectFeedback:
       "Only basis terms with nonzero amplitude in the state can be measured — check the amplitude on |11⟩ specifically.",
+    nearMisses: [
+      { value: 0.25, feedback: "0.25 spreads probability across all four two-qubit outcomes. |01⟩ and |10⟩ have zero amplitude here, so only two outcomes share the total." },
+      { value: Math.SQRT1_2, tolerance: 0.01, feedback: "1/√2 is the amplitude. The Born rule squares it to get a probability." },
+    ],
   },
   hints: [
     { text: "Which basis terms appear in |Φ+⟩ with nonzero amplitude?" },

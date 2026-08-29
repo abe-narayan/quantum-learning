@@ -28,15 +28,19 @@ export const wkbEnergyForNEquals2: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "The exact answer is E₂=(2+1/2)(1)=2.5; WKB should match this to within a small numerical-integration error.",
+    incorrectFeedback: "Two things to check. First the exact reference: the ladder formula gives Eₙ as n plus a half, times ℏω, in these units. Second, whether your WKB search bracketed that value: a result far from the exact eigenvalue means the root was missed, not that WKB fails here.",
   },
   hints: [
-    { text: "Exact: Eₙ=(n+1/2)ℏω, so E₂=2.5." },
-    { text: "WKB is exact for the harmonic oscillator (a special property of this potential)." },
-    { text: "Expect a WKB value extremely close to 2.5." },
+    { text: "Two numbers are in play: the exact eigenvalue from the oscillator's energy ladder, and the WKB prediction from the quantization condition. Compute the exact one first as your reference." },
+    { text: "The exact ladder is Eₙ = (n + 1/2)ℏω, evaluated with m = ω = 1." },
+    { text: "For the harmonic oscillator specifically, WKB happens to be exact. So expect the action-integral root to land on the exact eigenvalue, up to grid error." },
   ],
   solution: {
-    steps: [{ description: "Exact E₂=(2+1/2)(1)=2.5; WKB's bisection search on the action integral converges to essentially the same value, matching to within grid-resolution numerical error." }],
+    steps: [
+      { description: "Exact reference: E₂ = (2 + 1/2)(1) = 2.5." },
+      { description: "WKB's bisection search on the action integral converges to ≈2.5003 on this grid." },
+      { description: "The comparison: WKB agrees with the exact 2.5 to about one part in ten thousand, limited only by grid resolution. This is the same near-exact agreement as the lesson's other rows." },
+    ],
     finalAnswer: "≈2.5",
   },
   explanation: {

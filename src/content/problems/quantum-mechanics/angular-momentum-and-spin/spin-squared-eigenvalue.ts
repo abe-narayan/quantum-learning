@@ -25,11 +25,16 @@ export const spinSquaredEigenvalue: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "Compute (1/2)(1/2+1) directly.",
+    nearMisses: [
+      { value: 0.25, feedback: "0.25 is j², not j(j+1). The eigenvalue of S² always exceeds the square of the largest S_z value, which is why a spin can never point exactly along an axis." },
+      { value: 0.5, feedback: "0.5 is j itself, the spin label. The S² eigenvalue is j(j+1) in units of ħ²." },
+      { value: 1.5, feedback: "1.5 is j+1. Both factors are needed: multiply j by j+1." },
+    ],
   },
   hints: [
-    { text: "j(j+1) with j=1/2." },
-    { text: "(1/2)(3/2)." },
-    { text: "= 3/4." },
+    { text: "The general eigenvalue of J² is j(j+1), in units of ħ²." },
+    { text: "Substitute j = 1/2 into both factors: the second one is j+1, not j." },
+    { text: "Multiply the two. As a check, the answer should exceed j² = 1/4, which is why the spin vector never lies flat along z." },
   ],
   solution: {
     steps: [{ description: "(1/2)(3/2) = 3/4 = 0.75." }],

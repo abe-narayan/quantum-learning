@@ -27,14 +27,24 @@ export const capstoneNpNotSubsetBqpConjecture: ConceptualProblem = {
     requiredConceptGroups: [
       ["black-box", "black box", "oracle", "query model"],
       ["structured", "explicitly given", "not a black box", "explicit instance", "real 3-sat", "structure"],
-      [
-        "unconditional",
-        "circuit-complexity separation",
-        "relativization",
-        "baker-gill-solovay",
-        "extend the technique",
-        "no known way to extend",
-      ],
+      {
+        phrases: [
+          "unconditional",
+          "circuit-complexity separation",
+          "circuit complexity",
+          "circuit lower bound",
+          "relativization",
+          "relativizing",
+          "baker-gill-solovay",
+          "baker gill solovay",
+          "extend the technique",
+          "no known way to extend",
+          "non-relativizing",
+          "outside the black-box model",
+        ],
+        missingFeedback:
+          "You have said why the query lower bound does not transfer. The question also asks what would close the gap: an unconditional circuit-complexity separation, using a non-relativizing technique that works outside the oracle model. The Baker-Gill-Solovay barrier is why no query-style argument can be stretched to reach it.",
+      },
     ],
     incorrectFeedback:
       "The adversary and polynomial methods are rigorous, but they are proofs about the black-box (query) model specifically: they show no algorithm querying an oracle can beat quadratic speedup for generic unstructured search. An explicitly-given NP-complete instance, like a real 3-SAT formula, is not a black box -- its structure is fully visible, so a smart algorithm could in principle exploit it. Upgrading NP not-subset-BQP to a Tier 1 theorem would require an unconditional circuit-complexity separation technique that works outside the black-box model entirely, which nobody currently has (the Baker-Gill-Solovay relativization barrier is exactly why extending these query techniques that way is a genuinely open problem).",

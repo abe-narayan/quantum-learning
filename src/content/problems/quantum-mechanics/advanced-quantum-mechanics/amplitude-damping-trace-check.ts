@@ -27,12 +27,12 @@ export const amplitudeDampingTraceCheck: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "(1-γ)+γ always equals 1, for any γ.",
+    incorrectFeedback: "If your sum depends on γ, revisit the algebra: the γ pieces cancel when the two entries are added. That cancellation is the trace-preservation property itself, and it holds for every γ.",
   },
   hints: [
-    { text: "K₀†K₀'s (1,1) entry is (1-γ) = 1-0.4 = 0.6." },
-    { text: "K₁†K₁'s (1,1) entry is γ = 0.4." },
-    { text: "0.6+0.4=1.0." },
+    { text: "Before plugging in γ, look at the two entries you are adding as algebra. Trace preservation constrains what their sum can be, for any value of γ." },
+    { text: "The two entries are one-minus-γ and γ itself. Add them and watch the γ terms cancel." },
+    { text: "After the cancellation nothing γ-dependent survives. Evaluate what remains; plugging γ=0.4 into each piece first gives the same total." },
   ],
   solution: {
     steps: [{ description: "(1-0.4)+0.4 = 0.6+0.4 = 1.0, confirming the (1,1) entry of the trace-preservation identity." }],

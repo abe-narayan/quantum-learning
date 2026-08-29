@@ -24,11 +24,22 @@ export const qspD1PhaseSumRealPart: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "phi0+phi1 = pi/3, so e^{i(phi0+phi1)} = cos(pi/3) + i sin(pi/3) = 0.5 + i(root 3 / 2). Multiplying by x = 0.4 and taking the real part gives 0.4 x 0.5.",
+    nearMisses: [
+      {
+        value: 0.4 * Math.sin(Math.PI / 3),
+        feedback: "That is Im(P(0.4)), built from sin of the phase sum. The real part uses the cosine.",
+      },
+      {
+        value: 0.4,
+        feedback:
+          "0.4 is |P(0.4)|: the phase factor has unit modulus, so it leaves the magnitude at x. The real part is smaller, since e^{i pi/3} tilts the value off the real axis.",
+      },
+    ],
   },
   hints: [
     { text: "Start from the lesson's derived closed form P(x) = e^{i(phi0+phi1)} x, valid for any phase choice at d=1." },
     { text: "phi0 + phi1 = pi/6 + pi/6 = pi/3." },
-    { text: "Re(e^{i pi/3}) = cos(pi/3) = 0.5, so Re(P(0.4)) = 0.5 x 0.4." },
+    { text: "x is real, so Re(P(x)) = x cos(phi0+phi1). The sin(pi/3) piece is the imaginary part and is not what the question asks for." },
   ],
   solution: {
     steps: [

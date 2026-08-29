@@ -1,7 +1,17 @@
 const WIDTH = 460;
 const HEIGHT = 560;
 const PLATE_CENTER_X = 110;
-const LABEL_X = 230;
+/**
+ * Moved left from 230 to make room for larger label type. The stage text was
+ * authored at 10 units; this 460-unit viewBox renders `w-full`, so inside the
+ * `panel-inset p-4` of a 320px phone (a ~256px column) a unit is ~0.56px and
+ * 10 units resolved to ~5.6px on screen. At the 12/11 units the labels now use,
+ * the longest detail string ("qubit chip mounted here; base ≈ 15 mK", 37
+ * monospace characters ≈ 244 units at 11) would have run past the 460-unit right
+ * edge from x=230. From 214 it ends at ~458. The widest plate reaches x=200, so
+ * the leader lines still have somewhere to go.
+ */
+const LABEL_X = 214;
 
 type Stage = {
   y: number;
@@ -26,14 +36,20 @@ const STAGES: Stage[] = [
 
 function StageLabel({ y, temp, title, detail }: { y: number; temp: string; title: string; detail: string }) {
   return (
-    <text x={LABEL_X} y={y} className="text-[10px] font-mono">
+    // Temperature and stage name at 12 units, the descriptive detail at 11: the
+    // temperature is the number a reader takes away from this figure, the detail is
+    // supporting prose, and 11 is what keeps the longest detail string inside the
+    // viewBox from LABEL_X (see the note on LABEL_X). Leading opened 12 -> 14 to
+    // match. The tightest stage gap is 78 units and a three-line block is 28, so
+    // adjacent stages still do not collide.
+    <text x={LABEL_X} y={y} className="text-[12px] font-mono">
       <tspan x={LABEL_X} className="fill-brand font-semibold">
         {temp}
       </tspan>
-      <tspan x={LABEL_X} dy={12} className="fill-foreground">
+      <tspan x={LABEL_X} dy={14} className="fill-foreground">
         {title}
       </tspan>
-      <tspan x={LABEL_X} dy={12} className="fill-muted-foreground">
+      <tspan x={LABEL_X} dy={14} className="fill-muted-foreground text-[11px]">
         {detail}
       </tspan>
     </text>
@@ -53,8 +69,14 @@ export function DilutionRefrigeratorDiagram({ ariaLabel }: { ariaLabel: string }
   return (
     <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-        <text x={WIDTH / 2} y={18} textAnchor="middle" className="fill-muted-foreground text-[11px] font-mono">
-          dilution refrigerator: staged cooling, room temp &rarr; mixing chamber
+        {/* 11 -> 12 units. The old wording, "…staged cooling, room temp → mixing
+            chamber", is 64 monospace characters — ~461 units at 12, one unit wider
+            than the whole viewBox, so it was shortened rather than kept unreadably
+            small. "300 K → 15 mK" says the same thing as "room temp → mixing chamber"
+            in half the characters, and the six labelled plates below spell out which
+            stage is which anyway. */}
+        <text x={WIDTH / 2} y={18} textAnchor="middle" className="fill-muted-foreground text-[12px] font-mono">
+          dilution refrigerator: staged cooling, 300 K &rarr; 15 mK
         </text>
 
         {/* wiring bundle running down through every stage */}
@@ -67,7 +89,12 @@ export function DilutionRefrigeratorDiagram({ ariaLabel }: { ariaLabel: string }
               y1={s.y}
               x2={PLATE_CENTER_X + s.plateWidth / 2}
               y2={s.y}
-              className="stroke-border"
+              // The six plates ARE the data — this figure is a list of cooling stages
+              // and each plate is one of them. They were `stroke-border`, the
+              // panel-edge token (1.41:1 on `--surface-muted`), which put the only
+              // marks the diagram consists of below WCAG 2.1 SC 1.4.11's 3:1 for
+              // meaningful graphical objects. `stroke-axis` is the chart channel.
+              className="stroke-axis"
               strokeWidth={2.5}
             />
             {i < STAGES.length - 1 && (
@@ -77,7 +104,15 @@ export function DilutionRefrigeratorDiagram({ ariaLabel }: { ariaLabel: string }
                   y1={s.y}
                   x2={PLATE_CENTER_X - STAGES[i + 1].plateWidth / 2}
                   y2={STAGES[i + 1].y}
-                  className="stroke-border"
+                  // The tapering side walls are scaffolding, not data: the docstring
+                  // calls them a *suggestion* of the nested radiation shields, and
+                  // nothing is read off them — the stages themselves are the plates
+                  // and the labels. So they move to `--axis-grid`, the deliberately
+                  // subordinate channel, rather than to `--axis` alongside the plates.
+                  // Keeping them on `--border` would have left them invisible; putting
+                  // them on `--axis` would have made a decorative outline compete with
+                  // the six marks that matter.
+                  className="stroke-axis-grid"
                   strokeWidth={1}
                   strokeDasharray="2 3"
                 />
@@ -86,14 +121,18 @@ export function DilutionRefrigeratorDiagram({ ariaLabel }: { ariaLabel: string }
                   y1={s.y}
                   x2={PLATE_CENTER_X + STAGES[i + 1].plateWidth / 2}
                   y2={STAGES[i + 1].y}
-                  className="stroke-border"
+                  className="stroke-axis-grid"
                   strokeWidth={1}
                   strokeDasharray="2 3"
                 />
               </>
             )}
             <circle cx={PLATE_CENTER_X} cy={s.y} r={3} className="fill-accent" />
-            <line x1={PLATE_CENTER_X + s.plateWidth / 2} y1={s.y} x2={LABEL_X - 8} y2={s.y - 10} className="stroke-border" strokeWidth={1} />
+            {/* Leader line. Load-bearing: it is the only thing tying a temperature and
+                stage name to the plate it describes, and with six stages stacked this
+                closely, a reader who cannot see it cannot tell which label goes with
+                which plate. `stroke-border` left that association invisible. */}
+            <line x1={PLATE_CENTER_X + s.plateWidth / 2} y1={s.y} x2={LABEL_X - 8} y2={s.y - 10} className="stroke-axis" strokeWidth={1} />
             <StageLabel y={s.y - 6} temp={s.temp} title={s.title} detail={s.detail} />
           </g>
         ))}
@@ -101,15 +140,20 @@ export function DilutionRefrigeratorDiagram({ ariaLabel }: { ariaLabel: string }
         {/* HEMT amplifier icon at the 4 K stage, where low-noise readout amps typically sit */}
         <g transform={`translate(${PLATE_CENTER_X - 44}, ${STAGES[2].y - 30})`}>
           <path d="M0,-6 L0,6 L11,0 Z" className="fill-accent" />
-          <text x={-2} y={-10} textAnchor="end" className="fill-muted-foreground text-[9px] font-mono">
+          {/* 9 -> 11 units (~5px -> ~6.2px on a 320px phone). */}
+          <text x={-2} y={-10} textAnchor="end" className="fill-muted-foreground text-[11px] font-mono">
             amp
           </text>
         </g>
 
         {/* qubit chip at the mixing chamber, the coldest stage */}
-        <g transform={`translate(${PLATE_CENTER_X - 18}, ${lastY + 8})`}>
-          <rect x={0} y={0} width={36} height={16} rx={3} className="fill-accent/15 stroke-accent" strokeWidth={1.25} />
-          <text x={18} y={11} textAnchor="middle" className="fill-accent text-[9px] font-mono">
+        {/* The box widened 36 -> 42 units when its label went 9 -> 11: "qubit" is five
+            monospace characters, ~33 units at 11, and a 36-unit box left it touching
+            both walls. 42 units still sits inside the 48-unit mixing-chamber plate
+            above it, so the chip still reads as mounted *on* that stage. */}
+        <g transform={`translate(${PLATE_CENTER_X - 21}, ${lastY + 8})`}>
+          <rect x={0} y={0} width={42} height={18} rx={3} className="fill-accent/15 stroke-accent" strokeWidth={1.25} />
+          <text x={21} y={13} textAnchor="middle" className="fill-accent text-[11px] font-mono">
             qubit
           </text>
         </g>

@@ -57,17 +57,17 @@ export const quantumAdvantageWeakClassicalBaselineMc: MultipleChoiceProblem = {
       { description: "Here, a faster classical algorithm was already published before the announcement, so the comparison used a weaker baseline than the actual state of the art." },
       { description: "This means the advantage claim, as reported, has not established anything relative to the real best-known classical approach -- the correct next step is to re-run the comparison against the faster algorithm before accepting or rejecting the claim." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "The claim fails the checklist's baseline question: it was never benchmarked against the best known classical algorithm available at the time.",
   },
   explanation: {
     correctIdea:
       "A quantum advantage claim is only as strong as its classical baseline, and the checklist's second question exists specifically to catch a claim benchmarked against a weaker-than-best-known classical approach.",
     whyCorrect:
-      "Option (a) correctly identifies which checklist question is violated (the baseline question) and states the correct remedy: compare against the actual best known classical algorithm before drawing any conclusion.",
+      "Naming the violated checklist question (the baseline question) and the remedy that follows from it, comparing against the best known classical algorithm before drawing any conclusion, is the whole move the checklist asks for.",
     whyWrong: [
-      "(b) treats 'compared against some classical algorithm' as sufficient, collapsing the important distinction between a weak baseline and the genuine state of the art.",
-      "(c) jumps to a structural conclusion (one of the two named loopholes) that isn't warranted by the scenario -- the scenario is about the comparison being outdated, not necessarily about the task's own structure.",
-      "(d) conflates question 3's complexity-theoretic assumption with question 2's baseline-quality question; the two are independent parts of the checklist.",
+      { optionId: "b", text: "Treats 'compared against some classical algorithm' as sufficient, collapsing the distinction between a weak baseline and the state of the art." },
+      { optionId: "c", text: "Jumps to a structural conclusion the scenario does not warrant. The comparison being outdated says nothing about the task falling into one of the two named simulability loopholes." },
+      { optionId: "d", text: "Conflates question 3's complexity-theoretic assumption with question 2's baseline-quality question. They are independent parts of the checklist." },
     ],
   },
 };

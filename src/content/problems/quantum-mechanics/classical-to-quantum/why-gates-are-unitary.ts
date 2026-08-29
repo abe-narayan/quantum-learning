@@ -33,8 +33,9 @@ export const whyGatesAreUnitary: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Recall the Time Evolution lesson's identification of a gate as a fixed-duration step of U(t).",
   },
   hints: [
-    { text: "A gate is nothing but U(t) evaluated at one specific, useful time interval." },
-    { text: "Why did Postulate 4 require unitary evolution in the first place?" },
+    { text: "Ask what a gate is, physically, before asking what constraint it satisfies." },
+    { text: "A gate is U(t) evaluated at one fixed, useful time interval, so whatever constrains U constrains it." },
+    { text: "Postulate 4 required unitary evolution for a reason. Recall which quantity it was protecting." },
   ],
   solution: {
     steps: [
@@ -46,6 +47,10 @@ export const whyGatesAreUnitary: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "There is nothing quantum-computing-specific about the unitarity requirement — it's this course's Postulate 4, applied to a specific time interval.",
     whyCorrect: "This directly reuses the Time Evolution lesson's derivation rather than treating it as a separate rule.",
-    whyWrong: ["Confusing the Hermitian requirement (for observables) with the unitary requirement (for dynamics) is the most common synthesis mistake."],
+    whyWrong: [
+      { optionId: "b", text: "Gives a computational reason for a physical constraint. Ease of multiplication would not force anything." },
+      { optionId: "c", text: "Swaps the two postulates: real eigenvalues is what Hermiticity buys for observables, and unitarity is what dynamics needs." },
+      { optionId: "d", text: "Calls it a convention. Unitarity is necessary and sufficient for preserving total probability, so nothing else would do." },
+    ],
   },
 };

@@ -41,7 +41,7 @@ assuming a datasheet value.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/0b/DEFENSE_%2854394239497%29.jpg"
   alt="The central vacuum chamber and optics of Sandia National Laboratories' neutral-atom quantum computing apparatus, used to test a new method for detecting qubit errors"
-  caption="Real hardware used for exactly this kind of careful, repeated experimental characterization: Sandia National Laboratories' neutral-atom quantum computing apparatus, photographed during work on a new technique for detecting qubit errors, the same close, repeated measurement discipline a Rabi calibration scan requires."
+  caption="Sandia National Laboratories' neutral-atom apparatus, photographed during work on a new technique for detecting qubit errors. Calibration is this kind of work: sweep a parameter, measure carefully at each setting, and read a device constant back out of the curve — the same discipline a Rabi scan requires."
   credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
   creditUrl="https://commons.wikimedia.org/wiki/File:DEFENSE_(54394239497).jpg"
   license="Public Domain (U.S. Government work)"
@@ -58,6 +58,17 @@ $P_1(t)=\sin^2(\Omega t)$ (Control Electronics), scanning $t$ traces out
 the full oscillation, and the *duration of the first peak* directly
 gives $t_\pi=\pi/(2\Omega)$, from which $\Omega=\pi/(2t_\pi)$ follows
 immediately.
+
+<Callout type="warning">
+**Two Rabi conventions coexist in the wild.** This pillar's convention
+is $P_1(t)=\sin^2(\Omega t)$ with $t_\pi=\pi/(2\Omega)$; most published
+work defines $\Omega$ via $P_1(t)=\sin^2(\Omega t/2)$, making
+$t_\pi=\pi/\Omega$. A calibration scan itself is immune (the peak sits
+where it sits), but the $\Omega$ you report depends on which formula
+you invert. Compare a value extracted with this text's formulas against
+one quoted in a paper without converting, and the two will disagree by
+a factor of 2 even for a perfectly calibrated device.
+</Callout>
 
 ### A worked numerical calibration
 
@@ -89,6 +100,37 @@ calls.
 <InteractiveSection title="Recover Ω from a scan" description={`Try running a calibration scan yourself: pick a coupling strength V below, step through time, and find where P(1) first peaks. Recompute Ω from that peak time using t_π=π/(2V), then compare it to the slider's actual V value to check your recovered number. Then set a nonzero detuning and see why a calibration scan run at the wrong drive frequency would recover the wrong (and higher-than-true) Rabi frequency entirely.`}>
   <LazyRabiExplorer />
 </InteractiveSection>
+
+### Finding the resonance frequency: the Ramsey experiment
+
+The prediction above exposed the Rabi scan's blind spot: it silently
+assumes the drive is already on resonance, and a detuned scan reports
+an inflated $\Omega$ with no warning. The qubit's actual resonance
+frequency is itself a calibrated quantity, and the standard tool for
+measuring it is the **Ramsey experiment**. Apply a $\pi/2$ pulse to put
+the qubit on the equator, turn the drive *off* for a free-evolution
+time $\tau$, apply a second $\pi/2$ pulse, and measure. If the drive
+frequency misses the true qubit frequency by a detuning $\Delta$, the
+qubit's phase advances relative to the drive's at exactly that rate
+during the wait, so scanning $\tau$ traces out fringes:
+
+$$
+P_1(\tau) = \tfrac12\left(1+\cos(\Delta\tau)\right)
+$$
+
+The fringes oscillate at the detuning frequency $\Delta$ itself, so
+measuring the fringe frequency reveals precisely how far the drive sits
+from the qubit's true resonance. Adjust the drive frequency and repeat:
+the fringes slow down as $\Delta$ shrinks, and stop entirely on
+resonance. Run the Ramsey calibration first, zero the detuning, and
+only then run the Rabi scan; that ordering is what protects the scan
+from recovering the wrong, inflated generalized Rabi frequency
+$\Omega_R=\sqrt{\Omega^2+(\Delta/2)^2}$ the prediction above warned
+about. (That $\Delta/2$ is this pillar's $P_1=\sin^2(\Omega t)$
+convention showing through: in the literature's
+$P_1=\sin^2(\Omega t/2)$ convention the same quantity is written
+$\sqrt{\Omega^2+\Delta^2}$, with an $\Omega$ twice as large. The box
+above is not a pedantic aside.)
 
 ### Calibration must be repeated
 
@@ -160,6 +202,11 @@ gate.
 - Rabi calibration finds a device's actual $\Omega$ experimentally: scan
   pulse duration, locate the first population-transfer peak, invert
   $t_\pi=\pi/(2\Omega)$.
+- Ramsey calibration finds the resonance frequency: fringes from free
+  evolution oscillate at the detuning $\Delta$, so the fringe frequency
+  measures how far the drive sits from the qubit's true frequency, and
+  zeroing it protects the Rabi scan from recovering an inflated
+  $\Omega$.
 - Demonstrated numerically: recovering a hidden $\Omega=2\pi\times18\text{ MHz}$
   to within scan resolution purely from scanned `exactTwoLevelTransitionProbability`
   data.

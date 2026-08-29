@@ -33,18 +33,24 @@ export const whatPhaseProvides: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Think about how many distinct interference outcomes a sign bit can produce, versus a continuously adjustable angle.",
   },
   hints: [
-    { text: "A sign has exactly two values; interference varies smoothly as position changes." },
+    { text: "Count the distinct values a sign can take, then count the distinct values a phase angle can take." },
+    { text: "Interference between two amplitudes shows up in a cross term that depends on their relative phase." },
+    { text: "A real fringe pattern varies smoothly across the screen. Ask how many settings the interference term needs to reproduce that." },
   ],
   solution: {
     steps: [
       { description: "A real sign is a 2-valued choice — full constructive or full destructive interference only." },
       { description: "A complex phase θ∈[0,2π) is continuously adjustable, and the interference cross term depends on cos(θ), sweeping smoothly through every intermediate value." },
     ],
-    finalAnswer: "A complex phase supplies a continuum of interference strengths; a sign bit cannot.",
+    finalAnswer: "A continuum of interference strengths, which a two-valued sign cannot supply.",
   },
   explanation: {
-    correctIdea: "The experimentally observed smooth fringe pattern requires a continuously-adjustable parameter.",
-    whyCorrect: "This is exactly the lesson's central derivation, restated as a multiple-choice check.",
-    whyWrong: ["The other options describe things phase does NOT do — it never breaks normalization or makes |z|² negative."],
+    correctIdea: "The smooth fringe pattern seen in experiment needs an interference term that varies continuously, and a sign offers only two settings.",
+    whyCorrect: "Matches the lesson's central derivation: the cross term carries cos(θ), which sweeps every value between −1 and 1 as θ turns.",
+    whyWrong: [
+      { optionId: "b", text: "Probabilities stay |amplitude|² and so stay non-negative, whatever the phase." },
+      { optionId: "c", text: "Normalization constrains the magnitude |z|, which a phase leaves untouched." },
+      { optionId: "d", text: "Adds a second binary choice, which would give four settings rather than a continuum." },
+    ],
   },
 };

@@ -22,11 +22,11 @@ export const stationaryProbabilityCheck: NumericProblem = {
     type: "numeric",
     value: 1,
     tolerance: 0.001,
-    incorrectFeedback: "An energy eigenstate only accumulates an overall phase — a factor with |·|=1 — which never changes any measurement probability.",
+    incorrectFeedback: "An energy eigenstate only ever accumulates an overall phase, and a pure phase never changes any measurement probability. If your answer varies with t, you are treating the state as a superposition of different energies, which it is not.",
   },
   hints: [
-    { text: "|ψ(t)⟩ = e^{-iE_1t/ℏ}|1⟩ for some energy E_1 — the same vector |1⟩, times a phase." },
-    { text: "Global phase never changes a Born-rule probability." },
+    { text: "Ask what time evolution does to an energy eigenstate: it multiplies the state by a phase factor and nothing else. The vector itself never rotates into anything new." },
+    { text: "A global phase has unit modulus, so it drops out of every Born-rule probability. What does that leave for the probability of finding the initial state?" },
   ],
   solution: {
     steps: [
@@ -36,7 +36,7 @@ export const stationaryProbabilityCheck: NumericProblem = {
     finalAnswer: "$P = 1$ for every $t$.",
   },
   explanation: {
-    correctIdea: "This is the defining property of a stationary state — probabilities never change.",
+    correctIdea: "This is the defining property of a stationary state: probabilities never change.",
     whyCorrect: "The state vector accrues phase but stays proportional to |1⟩ forever, so measuring in the |1⟩ basis always gives certainty.",
     whyWrong: ["Assuming the probability decays or oscillates confuses this with a superposition of different energy eigenstates, which does precess."],
   },

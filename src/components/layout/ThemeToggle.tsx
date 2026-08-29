@@ -150,7 +150,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     <IconButton
       onClick={cycleTheme}
       className={cn(
-        "border border-transparent text-muted-foreground transition-[color,background-color,border-color] duration-[--dur-fast] ease-[--ease-instrument] hover:border-border hover:bg-surface-muted hover:text-foreground",
+        "border border-transparent text-muted-foreground transition-[color,background-color,border-color] duration-(--dur-fast) ease-instrument hover:border-border hover:bg-surface-muted hover:text-foreground",
         className
       )}
       aria-label={`Theme: ${THEME_LABEL[theme]}. Switch to ${THEME_LABEL[next]}.`}

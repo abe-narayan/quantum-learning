@@ -30,12 +30,28 @@ export const resourceEstimationCodeDistanceForTighterBudget: NumericProblem = {
     value,
     tolerance: 0,
     incorrectFeedback:
-      "First find the per-gate budget 0.01/(N_T+N_2), then solve (d+1)/2 ≥ ln(budget)/ln(p/p_th) for d, then round up to the nearest odd integer.",
+      "Most wrong answers here come from rounding: the raw d is fractional, and surface-code distance must be rounded up to an odd integer, not merely the nearest integer. Also check the budget step: the 1% failure allowance is shared across all 50 gates, not applied to each gate individually.",
+    nearMisses: [
+      {
+        value: 5,
+        feedback:
+          "d=5 rounds the raw 6.40 down. Check it against the budget: (0.1)^((5+1)/2) = 10⁻³, five times larger than the 2×10⁻⁴ allowance, so it fails.",
+      },
+      {
+        value: 6,
+        feedback: "6 is the next integer above 6.40's floor, but surface-code distance must be odd. Round up to the next odd value.",
+      },
+      {
+        value: 9,
+        feedback:
+          "9 is the capstone's own answer for its 600-gate circuit. This toy circuit has 50 gates, so its per-gate budget is looser and a smaller distance suffices.",
+      },
+    ],
   },
   hints: [
-    { text: "Total gates here are N_T+N_2 = 10+40 = 50, so the per-gate budget is 0.01/50 = 2×10⁻⁴ — looser than the capstone's own 1.667×10⁻⁵, since fewer gates need to each succeed." },
-    { text: "Solve (d+1)/2 ≥ ln(p_L^target)/ln(p/p_th) exactly as the capstone's Step 2 algebra does, just with this looser budget." },
-    { text: "The raw solution comes out just under 6.4; since d must be odd, round up to the next odd integer, not just the next integer." },
+    { text: "Two steps, the same as the capstone's. First split the overall failure budget evenly across every gate to get a per-gate budget. Then ask what code distance pushes the logical error rate below that budget." },
+    { text: "The per-gate budget is 0.01/(N_T+N_2) = 0.01/50 = 2×10⁻⁴, looser than the capstone's own 1.667×10⁻⁵ since fewer gates each need to succeed. Set (p/p_th)^((d+1)/2) ≤ that budget and take logs, as the capstone's Step 2 does." },
+    { text: "Solving gives a raw d that is not an integer. Surface-code distance must be an odd integer, so round up to the next odd value, not just the next integer." },
   ],
   solution: {
     steps: [
@@ -47,7 +63,7 @@ export const resourceEstimationCodeDistanceForTighterBudget: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "A looser per-gate error budget (from fewer total gates) requires a smaller code distance than the capstone's own 600-gate, d=9 result — exactly the same Step 1→Step 2 algebra, run on different inputs.",
+      "A looser per-gate error budget (from fewer total gates) requires a smaller code distance than the capstone's own 600-gate, d=9 result. It is the same Step 1→Step 2 algebra, run on different inputs.",
     whyCorrect:
       "This is the same derivation the capstone lesson performs, applied to a smaller N_T+N_2, showing explicitly that code distance is not a fixed platform constant but a computed consequence of the circuit's own gate count and target reliability.",
     whyWrong: [

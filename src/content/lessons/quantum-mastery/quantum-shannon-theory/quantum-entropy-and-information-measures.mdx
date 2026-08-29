@@ -1,6 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
-import { ExternalFigure } from "@/components/mdx/ExternalFigure";
 import { Complex } from "@/lib/quantum/complex";
 import { StateVector } from "@/lib/quantum/state";
 import { pureStateDensityMatrix, convexCombination, maximallyMixedState, vonNeumannEntropy } from "@/lib/quantum/densityMatrix";
@@ -21,7 +20,7 @@ export const lessonMeta = {
   estimatedMinutes: 28,
   prerequisites: ["quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement"],
   objectives: [
-    "Define quantum mutual information I(A:B) = S(A) + S(B) - S(AB) and compute it for a genuine worked bipartite state",
+    "Define quantum mutual information I(A:B) = S(A) + S(B) - S(AB) and compute it for a worked bipartite state",
     "Define conditional quantum entropy S(A|B) = S(AB) - S(B) and show, with a real example, that it can be NEGATIVE for entangled states, unlike its classical counterpart",
     "Define coherent information I(A>B) = -S(A|B) and explain why its sign controls whether a channel can be used to reliably send quantum information",
   ],
@@ -45,6 +44,18 @@ export const sAB_phiPlus = 0;
 export const mutualInfo_phiPlus = sA_phiPlus + sB_phiPlus - sAB_phiPlus;
 export const conditionalEntropy_phiPlus = sAB_phiPlus - sB_phiPlus;
 export const coherentInfo_phiPlus = -conditionalEntropy_phiPlus;
+
+export const entropyComparisonFrames = [
+  {
+    paramLabel: "Bell state |Φ⁺⟩ (entangled)",
+    bars: [
+      { label: "S(ρ_A)", value: sA_phiPlus, caption: `${sA_phiPlus.toFixed(2)} bits` },
+      { label: "S(ρ_B)", value: sB_phiPlus, caption: `${sB_phiPlus.toFixed(2)} bits` },
+      { label: "S(ρ_AB)", value: sAB_phiPlus, caption: `${sAB_phiPlus.toFixed(2)} bits` },
+      { label: "I(A:B)", value: mutualInfo_phiPlus, caption: `${mutualInfo_phiPlus.toFixed(2)} bits` },
+    ],
+  },
+];
 
 export const shannonEntropyBits = (probabilities) => {
   return probabilities.reduce((sum, prob) => sum + (prob > 1e-12 ? -prob * Math.log2(prob) : 0), 0);
@@ -114,6 +125,19 @@ export const findZeroCrossing = (points) => {
 }
 export const wernerCrossingP = findZeroCrossing(wernerSweepPoints);
 
+export const entropyComparisonAllFrames = [
+  entropyComparisonFrames[0],
+  {
+    paramLabel: "Classical mixture ½|00⟩⟨00| + ½|11⟩⟨11| (correlated, not entangled)",
+    bars: [
+      { label: "S(ρ_A)", value: sA_classical, caption: `${sA_classical.toFixed(2)} bits` },
+      { label: "S(ρ_B)", value: sB_classical, caption: `${sB_classical.toFixed(2)} bits` },
+      { label: "S(ρ_AB)", value: sAB_classical, caption: `${sAB_classical.toFixed(2)} bits` },
+      { label: "I(A:B)", value: mutualInfo_classical, caption: `${mutualInfo_classical.toFixed(2)} bits` },
+    ],
+  },
+];
+
 export const wernerFrames = [
   {
     paramLabel: "",
@@ -134,7 +158,7 @@ export const wernerFrames = [
 
 <LessonHook eyebrow="The one number that breaks classically">
   A perfectly valid quantum state can know less about itself than it
-  tells you about its partner — conditional entropy $S(A|B)$ can go
+  tells you about its partner: conditional entropy $S(A|B)$ can go
   negative, with nothing broken and nothing miscalculated.
 </LessonHook>
 
@@ -147,19 +171,33 @@ Mixed-State Entanglement proved $S(\rho\|\sigma)\geq0$. Both lessons ask
 question classical Shannon theory answers with mutual information and
 conditional entropy: given a joint system $AB$, how much does knowing
 $B$ tell you about $A$, and how much *uncertainty about $A$ remains*
-once $B$ is known? Every classical fact you'd expect to carry over does
-— except one, and that one exception is the entire reason this course
+once $B$ is known? Every classical fact you'd expect to carry over does,
+except one. That one exception is the entire reason this course
 exists as "Quantum" Shannon theory rather than a relabeled copy of the
 classical version.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
-  alt="Photograph of John von Neumann at Los Alamos"
-  caption="John von Neumann (1903-1957). Every quantity in this lesson — mutual information, conditional entropy, coherent information — is built by combining the entropy he defined, $S(\rho)=-\mathrm{Tr}(\rho\log_2\rho)$, evaluated on three different density matrices ($\rho_A$, $\rho_B$, $\rho_{AB}$) and added or subtracted. The surprising sign of $S(A|B)$ below is a fact about how those three numbers can relate to each other, not about von Neumann's formula itself."
-  credit="Los Alamos National Laboratory, via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
-  license="Public domain"
+The exception is visible before any of it is derived. Every quantity in
+this lesson is built by evaluating one function, $S(\rho)=-\text{Tr}(\rho\log_2\rho)$,
+on three density matrices ($\rho_A$, $\rho_B$, $\rho_{AB}$) and adding or
+subtracting. So the whole story is in how those three numbers can sit
+relative to one another. Two states, both perfectly valid, both computed
+with the same `vonNeumannEntropy` call:
+
+<BarChartExplorer
+  frames={entropyComparisonAllFrames}
+  sliderLabel="State"
+  ariaLabel="Two bar charts comparing entropies. For the Bell state, S of rho A is 1 bit, S of rho B is 1 bit, and S of rho AB is zero, so the joint bar is shorter than either single-system bar, and the mutual information is 2 bits. For the classical mixture, S of rho A is 1 bit, S of rho B is 1 bit, and S of rho AB is also 1 bit, so the joint bar is exactly as tall as each marginal, and the mutual information is 1 bit."
+  maxValue={2}
 />
+
+Look only at the third bar in each. For the classical mixture the joint
+entropy equals each marginal's, which is the ordinary situation: knowing
+the pair tells you as much as knowing either half, no more. For the Bell
+state the joint bar is at **zero** while both marginals are at $1$ bit:
+the whole is known exactly while each part is maximally uncertain. No
+classical joint distribution can do that, since $H(AB)\geq\max(H(A),H(B))$
+always. Every result in this lesson is a consequence of that one
+inversion.
 
 ## Mathematical Development
 
@@ -183,13 +221,13 @@ $$
 the direct quantum analogue of the classical $I(A:B)=H(A)+H(B)-H(AB)$,
 with each Shannon entropy replaced by von Neumann entropy of the
 corresponding (reduced) density matrix. It measures the *total*
-correlation between $A$ and $B$—classical and quantum combined —
+correlation between $A$ and $B$, classical and quantum combined,
 packed into a single number.
 
-**Worked example 1: the Bell state $|\Phi^+\rangle$.** Built exactly as
+**Worked example 1: the Bell state $|\Phi^+\rangle$.** Built the same way
 Entanglement Entropy for Pure Bipartite States built it, via
 `pureStateDensityMatrix` then `reducedDensityMatrixQubit0`/`1`, then
-this platform's own `vonNeumannEntropy`—reused directly here, not
+this platform's own `vonNeumannEntropy` — reused directly here, not
 reimplemented:
 
 $$
@@ -207,7 +245,7 @@ a Bell pair saturates the bound completely.
 **Worked example 2: a classically correlated mixed state.** Not every
 correlated state is entangled. Take
 $\rho_{AB}=\tfrac12|00\rangle\langle00|+\tfrac12|11\rangle\langle11|$ —
-a genuine classical mixture (via `convexCombination`, built the same
+a classical mixture (via `convexCombination`, built the same
 way Convex Combinations and Physical Mixtures established) of two
 *unentangled* basis states, with no coherence between them at all:
 
@@ -220,12 +258,12 @@ I(A:B) = 1 + 1 - 1 = 1 \text{ bit}
 $$
 
 Exactly the classical mutual information of two perfectly correlated
-coin flips—unsurprising, since this state *is* two perfectly
+coin flips, unsurprising since this state *is* two perfectly
 correlated classical bits with a density-matrix label. $I(A:B)=1$ sits
 strictly between the classically-correlated-but-unentangled case here
 and the maximally entangled Bell state's $I(A:B)=2$: mutual information
 alone cannot distinguish "correlated" from "entangled" (both give a
-nonzero number), which is exactly the gap the next quantity closes.
+nonzero number), which is the gap the next quantity closes.
 
 ### Conditional quantum entropy
 
@@ -245,7 +283,7 @@ $$
 
 again the direct analogue of classical $H(A|B)=H(AB)-H(B)$, interpreted
 the same way classically: the *remaining* uncertainty about $A$ once $B$
-is fully known. Classically, $H(A|B)\geq0$ always—you cannot know
+is fully known. Classically, $H(A|B)\geq0$ always: you cannot know
 *less than nothing*.
 
 <PredictBeforeReveal
@@ -256,7 +294,7 @@ is fully known. Classically, $H(A|B)\geq0$ always—you cannot know
     { label: "Negative — the classical floor doesn't have to hold quantum mechanically", value: "negative" },
   ]}
   correctValue="negative"
-  explanation="S(A|B) = 0 - 1 = -1 bit: negative, computed directly from this platform's own vonNeumannEntropy on a genuinely valid density matrix, not a typo or sign error. Classical joint uncertainty can never be less than either marginal's, but a pure entangled joint state can have strictly less entropy than one of its own reduced pieces — that's the entire reason this course is called 'Quantum' Shannon theory."
+  explanation="S(A|B) = 0 - 1 = -1 bit: negative, computed directly from this platform's own vonNeumannEntropy on a valid density matrix, not a typo or sign error. Classical joint uncertainty can never be less than either marginal's, but a pure entangled joint state can have strictly less entropy than one of its own reduced pieces. That inversion is what the rest of this course is built on."
 />
 
 Applied to the Bell state:
@@ -268,7 +306,7 @@ $$
 **Negative.** Not a typo, not a sign error, and not a different
 quantity that happens to share the classical name. This is computed
 from the exact same `vonNeumannEntropy` calls as every other number in
-this lesson, on a genuinely valid density matrix. For the classically
+this lesson, on a perfectly valid density matrix. For the classically
 correlated state above, by contrast, $S(A|B)=1-1=0$, non-negative, as
 the classical formula demands, because that state carries no
 entanglement at all. The sign of $S(A|B)$ is doing real physical work.
@@ -366,7 +404,7 @@ on the other three Bell vectors), so $\rho(p)$ is diagonal in the Bell
 basis too, with eigenvalues $\lambda_{\Psi^-}=\tfrac{1+3p}{4}$ and
 $\lambda_{\text{other}}=\tfrac{1-p}{4}$ (each of the other three Bell
 vectors), verified directly by applying $\rho(p)$ to all four Bell
-vectors and checking each is a genuine eigenvector. This is the same
+vectors and checking each is an eigenvector. This is the same
 "diagonalize via symmetry, not a general eigensolver" move Relative
 Entropy and Mixed-State Entanglement used on this exact state family.
 Feeding those eigenvalues through `shannonEntropyBits` (the same
@@ -394,19 +432,21 @@ move continuously.
 />
 
 Scanning the same computed grid this curve is drawn from, $S(A|B)$
-changes sign between $p=0.725$ ($S(A|B)\approx+0.061$) and $p=0.750$
-($S(A|B)\approx-0.007$); linear interpolation between those two
-computed points puts the crossing at $p\approx0.7476$. Compare that to
+changes sign between two adjacent sample points; linear interpolation
+between them puts the crossing at $p\approx{wernerCrossingP.toFixed(4)}$,
+computed by `findZeroCrossing` at module scope rather than read off the
+plot. Compare that to
 the *entanglement* threshold Relative Entropy and Mixed-State
 Entanglement's Werner-state concurrence found: $C(p)=\max(0,(3p-1)/2)$
 is already positive for any $p>1/3\approx0.333$. **The two thresholds
-are not the same.** Every Werner state with $p>1/3$ is genuinely
-entangled, but $S(A|B)$ only turns negative much later, past
-$p\approx0.7476$. Negative conditional entropy is a *sufficient*
-signature of entanglement, never a *necessary* one: there is a wide
-entangled-but-$S(A|B)\geq0$ regime ($1/3<p\lesssim0.7476$) sitting
-between the separable region and the region where the quantum-state-merging
-"bonus qubits" effect kicks in.
+are not the same.** Every Werner state with $p>1/3$ is entangled, but
+$S(A|B)$ turns negative only much later. Negative conditional entropy is
+a *sufficient* signature of entanglement, never a *necessary* one, and
+the gap between $1/3$ and {wernerCrossingP.toFixed(4)} is a wide band of
+states that are entangled while state merging still costs qubits rather
+than producing them. <Term id="coherent-information">Entanglement and usable coherent information</Term> are not
+the same resource, and this family is where that separation is easiest to
+see.
 
 ## Common Mistakes
 
@@ -428,8 +468,8 @@ against.
 **Assuming negative $S(A|B)$ and "entangled" are the same threshold.**
 This lesson's own sweep disproves it directly: the Werner state is
 entangled for every $p>1/3$ (via concurrence) but $S(A|B)$ stays
-non-negative until $p\approx0.7476$. Mutual information, conditional
-entropy, and concurrence are three genuinely different quantities that
+non-negative until the crossing computed above. Mutual information,
+conditional entropy, and concurrence are three different quantities that
 agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
 </Callout>
 
@@ -468,7 +508,7 @@ agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
   quantum capacity (LSD theorem), picked up again in this course's
   capstone.
 - Swept across the Werner-state family, $S(A|B)$ crosses zero near
-  $p\approx0.7476$, strictly later than the $p=1/3$ entanglement
+  $p\approx{wernerCrossingP.toFixed(4)}$, strictly later than the $p=1/3$ entanglement
   threshold from concurrence, proving negative conditional entropy is a
   sufficient, not necessary, signature of entanglement.
 

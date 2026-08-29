@@ -30,6 +30,11 @@ export const thetaPreservedUnderRz: NumericProblem = {
     value: theta,
     tolerance: 0.02,
     incorrectFeedback: "Recall which coordinate Rz changes and which one it leaves alone — the lesson states this as a directly testable, falsifiable claim.",
+    nearMisses: [
+      { value: 1.3, feedback: "1.3 is the rotation angle you applied. It advances the longitude φ, and leaves the latitude θ where it was." },
+      { value: Math.PI / 2 + 1.3, tolerance: 0.02, feedback: "You added the rotation angle to θ. Rz adds to φ instead; θ is measured from the very axis Rz turns about, so it cannot change." },
+      { value: 0, feedback: "θ = 0 is the north pole, |0⟩. |+⟩ sits on the equator and Rz keeps it there." },
+    ],
   },
   hints: [
     { text: "Rz(θ) is a rotation about the z-axis." },

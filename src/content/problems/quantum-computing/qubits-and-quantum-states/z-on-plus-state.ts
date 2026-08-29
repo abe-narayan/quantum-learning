@@ -31,8 +31,8 @@ export const zOnPlusState: MultipleChoiceProblem = {
     prompt: "Compute $Z|+\\rangle$ by matrix multiplication. What state is this?",
     options: [
       { id: "a", text: `$${ketLatex(result)}$` },
-      { id: "b", text: "$|0\\rangle$" },
-      { id: "c", text: "$|{+i}\\rangle$" },
+      { id: "b", text: "$(1.00)|0\\rangle$" },
+      { id: "c", text: "$(0.71)|0\\rangle + (0.71i)|1\\rangle$" },
       { id: "d", text: `$${ketLatex(plusState)}$` },
     ],
   },
@@ -49,7 +49,7 @@ export const zOnPlusState: MultipleChoiceProblem = {
   hints: [
     { text: "Z = diag(1, −1): it leaves the |0⟩ coefficient alone and multiplies the |1⟩ coefficient by −1." },
     { text: "|+⟩ = (1/√2)|0⟩ + (1/√2)|1⟩, so only the second term's sign flips." },
-    { text: "The result is (1/√2)|0⟩ − (1/√2)|1⟩ — recognize this as one of the six named states from earlier lessons." },
+    { text: "Once you have the resulting column vector, check it against the six named states from earlier lessons." },
   ],
   solution: {
     steps: [
@@ -62,8 +62,9 @@ export const zOnPlusState: MultipleChoiceProblem = {
     correctIdea: "Z rotates the Bloch vector by π about the z-axis, which fixes the poles but flips the sign of anything on the equator's real axis, sending |+⟩ to |−⟩.",
     whyCorrect: "Direct matrix multiplication confirms the sign flip only touches the |1⟩ coefficient, turning + into −.",
     whyWrong: [
-      "Assuming Z fixes every state, generalizing from the fact that it fixes the poles |0⟩ and |1⟩ specifically.",
-      "Confusing Z's real sign flip with S's imaginary phase factor — they act on the same coefficient differently.",
+      { optionId: "b", text: "Keeps only the |0⟩ term. Z leaves that coefficient alone but still acts on the |1⟩ term rather than deleting it." },
+      { optionId: "c", text: "Applies a factor of i to the |1⟩ coefficient, which is what S does. Z applies −1." },
+      { optionId: "d", text: "Leaves |+⟩ untouched, generalizing from Z fixing the poles. |+⟩ is neither pole." },
     ],
   },
 };

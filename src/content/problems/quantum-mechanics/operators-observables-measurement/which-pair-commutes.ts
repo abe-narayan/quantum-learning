@@ -41,11 +41,15 @@ export const whichPairCommutes: MultipleChoiceProblem = {
       { description: "The identity operator $I$ satisfies $IA=AI=A$ for any $A$, so $[I,A]=0$ always." },
       { description: "$Z$ and $I$ therefore commute trivially, while every pair of distinct Pauli operators anticommutes." },
     ],
-    finalAnswer: "Option (c): $Z$ and $I$",
+    finalAnswer: "$Z$ and $I$",
   },
   explanation: {
     correctIdea: "The identity operator is compatible with every observable, trivially.",
     whyCorrect: "IA = AI for any A is an immediate consequence of what the identity operator does.",
-    whyWrong: ["Any pair of genuinely distinct Pauli operators (X&Z, Y&Z, X&Y) anticommutes rather than commutes — a standard, directly-computable fact."],
+    whyWrong: [
+      { optionId: "a", text: "Two distinct Paulis. XZ = −ZX, so the pair anticommutes and shares no eigenbasis." },
+      { optionId: "b", text: "Two distinct Paulis again, with the same anticommuting relation." },
+      { optionId: "d", text: "Also two distinct Paulis. Any two of X, Y, Z anticommute." },
+    ],
   },
 };

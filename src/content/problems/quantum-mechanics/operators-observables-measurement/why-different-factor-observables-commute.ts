@@ -22,7 +22,11 @@ export const whyDifferentFactorObservablesCommute: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["different qubits", "different tensor factors", "independent subsystems"],
-      ["(AC)⊗(BD)", "act independently", "order doesn't matter across factors"],
+      {
+        phrases: ["(AC)⊗(BD)", "act independently", "order doesn't matter across factors", "tensor product rule", "multiplication rule", "same product either way", "both orders give", "factor by factor"],
+        missingFeedback:
+          "You have identified that the two operators live on different qubits. Now say why that settles it: (A⊗B)(C⊗D) = (AC)⊗(BD) multiplies factor by factor, so both orderings give X⊗Z and the commutator vanishes for any pair of single-qubit operators.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that X_0 and Z_1 act on different qubits (different tensor factors), and that the tensor-product multiplication rule (AC)⊗(BD) makes operators on independent factors commute regardless of what they individually do.",
   },

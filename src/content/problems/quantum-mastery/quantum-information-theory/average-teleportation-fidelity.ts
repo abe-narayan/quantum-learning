@@ -23,10 +23,15 @@ export const averageTeleportationFidelity: NumericProblem = {
     value: 0.9,
     tolerance: 0.005,
     incorrectFeedback: "(2*0.85+1)/3 = 2.7/3.",
+    nearMisses: [
+      { value: 0.85, feedback: "0.85 is the singlet fraction F_e itself. The Haar average maps it through (2F_e + 1)/3, which lifts it." },
+      { value: (2 * 0.85) / 3, tolerance: 0.005, feedback: "The +1 in the numerator is missing. It is what pins F_avg at 1/2 for a resource with no entanglement at all." },
+      { value: 0.5, feedback: "0.5 is the classical guessing fidelity, what F_e = 1/4 would give. This resource is far better than that." },
+    ],
   },
   hints: [
-    { text: "2*0.85 = 1.7" },
-    { text: "(1.7+1)/3 = 2.7/3." },
+    { text: "The formula is already given, so this is substitution: double the singlet fraction, add one, then divide by three." },
+    { text: "Sanity check the range before you compute: F_e = 1/4 (a useless separable resource) must map to 1/2, the classical guessing fidelity, and F_e = 1 must map to 1. Your answer should sit close to the top of that range." },
   ],
   solution: {
     steps: [

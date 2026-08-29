@@ -22,7 +22,26 @@ export const whyCollapseUsesWholeProjector: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["keeps only", "consistent with the outcome", "component within the eigenspace"],
-      ["no extra information", "doesn't discard", "measurement only reveals the eigenvalue"],
+      {
+        phrases: [
+          "no extra information",
+          "no more information",
+          "no further information",
+          "doesn't discard",
+          "does not discard",
+          "nothing is discarded",
+          "measurement only reveals the eigenvalue",
+          "only the eigenvalue",
+          "only reveals",
+          "only tells you the eigenvalue",
+          "which eigenvalue",
+          "nothing more",
+          "no reason to",
+          "keeps every",
+        ],
+        missingFeedback:
+          "You have described what the projector keeps. Say why it keeps all of it: the measurement reports only which eigenvalue occurred, and nothing in that report distinguishes directions inside the eigenspace, so there is no information that would justify discarding any of them.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that the projector keeps exactly the part of the state consistent with the observed outcome, and that a measurement of this observable reveals no information about *where* within the eigenspace the state is, so nothing beyond the projection should be discarded.",
   },

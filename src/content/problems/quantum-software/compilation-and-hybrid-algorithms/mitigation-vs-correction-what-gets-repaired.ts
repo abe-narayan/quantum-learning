@@ -21,7 +21,7 @@ export const mitigationVsCorrectionWhatGetsRepaired: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["no", "not less noisy", "not cleaner", "still noisy", "unchanged", "exactly as noisy"],
+      ["not less noisy", "no cleaner", "not cleaner", "still noisy", "unchanged", "exactly as noisy", "just as noisy", "as noisy as"],
       ["expectation value", "the number", "statistics", "post-processing", "classically corrected", "computed value"],
       ["extra qubits", "physical state", "quantum state itself", "ancilla", "syndrome", "repairs the state"],
     ],

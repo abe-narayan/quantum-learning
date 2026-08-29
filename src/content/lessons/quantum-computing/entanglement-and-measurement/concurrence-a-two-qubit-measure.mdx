@@ -49,21 +49,27 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Somewhere in this platform's existing code is a function that already computes a genuine entanglement measure, written long before this lesson, for what looks like an entirely unrelated purpose. Finding it, and proving why it works, is this lesson's actual subject.
+A function in this platform's code already computes an entanglement measure. It was written long before this lesson, for what looks like an unrelated purpose. Finding it, and proving why it works, is the subject here.
 </LessonHook>
 
 ## Motivation
 
-Entanglement entropy needed an eigenvalue calculation, small for a
-$2\times2$ reduced state, but an entirely different kind of computation
-than anything amplitude-based. **Concurrence** answers the same
-question (how entangled is this pure 2-qubit state?) with a formula
-built directly from the four amplitudes, no diagonalization required.
+Entanglement entropy needed an eigenvalue calculation. That is a small
+computation for a $2\times2$ reduced state, but it is a different kind of
+computation from anything amplitude-based, and it does not generalize
+cheaply.
+
+**Concurrence** answers the same question (how entangled is this pure
+2-qubit state?) with a formula built from the four amplitudes and no
+diagonalization at all. Having two independent routes to one physical
+quantity is worth more than it might sound: when they agree, as they will
+below, the agreement is evidence that "how entangled is this state" is a
+well-posed question rather than an artifact of one definition.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Fluxonium_Qubit.png"
   alt="Electron micrograph of a superconducting fluxonium qubit circuit with Josephson junctions"
-  caption="A real superconducting qubit circuit under an electron microscope. Concurrence is a formula computed from amplitudes on paper, but physical devices like this are what two-qubit states actually are in the lab."
+  caption="A superconducting fluxonium qubit under an electron microscope. Concurrence is computed from amplitudes on paper; two of these, coupled, are what those amplitudes describe."
   credit="Cottet, N., Xiong, H., Nguyen, L.B. et al."
   creditUrl="https://commons.wikimedia.org/wiki/File:Fluxonium_Qubit.png"
   license="CC BY-SA 4.0"
@@ -109,13 +115,12 @@ states: $C=1$, $\text{Tr}(\rho_A^2)=0.5$).
 
 The identity above was derived algebraically, but it's worth watching it
 hold numerically, for a family where $C$ and $\text{Tr}(\rho_A^2)$ are
-computed two completely independent ways. For
+computed two independent ways. For
 $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$, the
 left-most bar below comes straight from $C=2|ad-bc|$, the middle bar
 from the reduced density matrix's trace, and the right bar from plugging
-that same trace into the identity's right-hand side — with no reference
-to $C$ at all. Watch the right bar track the left one exactly as $\theta$
-sweeps.
+that same trace into the identity's right-hand side, with no reference to
+$C$ anywhere. Watch the right bar track the left one as $\theta$ sweeps.
 
 <InteractiveSection title="The identity, checked at every θ" description="Step θ from 0 to 90°. C(θ) (left bar) is computed directly from the amplitudes; √(2(1−Tr(ρ_A²))) (right bar) is computed from the reduced state's purity with no reference to C. They match at every step, confirming the boxed identity rather than just asserting it.">
   <BarChartExplorer
@@ -148,12 +153,12 @@ whether that shared structure makes them the same function.
 <PredictBeforeReveal
   question="C(θ) and E(θ) are both 0 at θ=0 and both maximal at θ=π/4. Does that mean C(θ)=E(θ) for every θ in between?"
   options={[
-    { label: "Yes — they're just two names for the same quantity", value: "same" },
-    { label: "No — they agree on the endpoints and on ordering, but differ in between", value: "different" },
-    { label: "No — they can even disagree on which states are entangled", value: "disagree" },
+    { label: "Yes: two names for the same quantity", value: "same" },
+    { label: "No: they agree on the endpoints and on ordering, but differ in between", value: "different" },
+    { label: "No: they can even disagree on which states are entangled", value: "disagree" },
   ]}
   correctValue="different"
-  explanation="C(θ)=|sin2θ| is built from a sine; E(θ) is a Shannon entropy built from a logarithm. Plotted below, both curves start at 0 and peak at θ=π/4, but C(θ) climbs faster near the endpoints — E(θ)'s slope vanishes at θ=0, so it stays flatter and only catches up to C near θ=π/4. They agree on which states are entangled and on which of two states is more entangled — they never disagree about that — but they are two independent, cross-checking measures, not duplicates of each other."
+  explanation="C(θ)=|sin2θ| is built from a sine; E(θ) is a Shannon entropy built from a logarithm. Plotted below, both curves start at 0 and peak at θ=π/4, but C climbs faster near the endpoints, because E's slope vanishes at θ=0 and it stays flatter until it catches up near π/4. They never disagree about which states are entangled, or about which of two states is more entangled. They are two independent cross-checking measures, not duplicates."
 />
 
 They agree on *which* states are entangled, and on the direction of
@@ -183,13 +188,12 @@ not just asserted:
 />
 
 Both curves start at 0, both reach their maximum at $\theta=\pi/4$, and
-both are 0 only at $\theta=0$, exactly the agreement predicted above, but
-$C(\theta)$ (built from a sine) rises faster near the endpoints than
-$E(\theta)$ (built from a logarithm) does: $E$'s slope vanishes at
-$\theta=0$, so it stays flatter before catching up to $C$ near
-$\theta=\pi/4$: two different functions that agree
-on the two things that matter for this course, zero vs. nonzero, and
-which of two states is more entangled.
+both vanish only at $\theta=0$, which is the agreement predicted above.
+Between the endpoints they separate. $C(\theta)$, built from a sine, rises
+faster near $\theta=0$ than $E(\theta)$, built from a logarithm, because
+$E$'s slope vanishes there and it stays flat before catching up. Two
+different functions, agreeing on the two things this course needs: zero
+versus nonzero, and which of two states is more entangled.
 
 ### Scope: pure two-qubit states only
 
@@ -304,7 +308,7 @@ after a unitary gate is applied to just one qubit of the pair; the next
 lesson's machinery will let you check.
 
 The general mixed-state Wootters concurrence this lesson names and
-explicitly declines to implement is built and actually computed, on a
-state that's mixed at the global level, in [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement) —
-the exact gap this lesson leaves open.
+declines to implement is built and computed, on a state that is mixed at
+the global level, in [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement),
+which closes the gap this lesson leaves open.
 </NextDiscovery>

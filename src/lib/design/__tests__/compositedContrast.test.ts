@@ -146,12 +146,18 @@ function linearFactor(layer: Extract<AtmosphereLayer, { kind: "linear-mix" }>, y
   return Math.min(1, Math.max(0, t));
 }
 
-type ThemeName = "dark" | "light";
+type ThemeName = "dark" | "light" | "system-light";
 
-/** The token block that defines a theme's ramp lightnesses and alphas. */
+/** The token block that defines a theme's ramp lightnesses and alphas.
+ *  `system-light` is the "follow my OS" duplicate of the light block inside
+ *  `@media (prefers-color-scheme: light)` — documented as verbatim-identical
+ *  to the explicit block, but a reader on the system setting gets *these*
+ *  values, so drift between the two blocks is only caught by checking both
+ *  (a --pillar-l-accent retune once landed in one block and not the other). */
 const THEME_SELECTOR: Record<ThemeName, string> = {
   dark: ":root {",
   light: ':root[data-theme="light"] {',
+  "system-light": ':root[data-theme="system"] {',
 };
 
 /**
@@ -180,7 +186,7 @@ type Environment = {
 
 function environments(): Environment[] {
   const out: Environment[] = [];
-  for (const theme of ["dark", "light"] as ThemeName[]) {
+  for (const theme of ["dark", "light", "system-light"] as ThemeName[]) {
     const base = tokensIn(GLOBALS_CSS, THEME_SELECTOR[theme]);
     for (const pillar of PILLAR_ORDER) {
       const visual = PILLAR_VISUALS[pillar];

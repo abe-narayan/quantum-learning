@@ -19,7 +19,7 @@ export const lessonMeta = {
   module: "trapped-ions",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 20,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/physical-qubit-platforms/superconducting-qubits"],
   objectives: [
     "Explain how an ion trap confines a charged atom using oscillating electric fields",
@@ -34,11 +34,14 @@ Suspend a single charged atom in empty space, no walls, no wires, nothing physic
 
 ## Motivation
 
-Holding it steady, for long enough, to entangle it with a neighbor on
-demand, is the hard part. A static electric field can't do this job
-alone; Earnshaw's theorem, a result from classical electrostatics,
-rules out trapping a charge in 3D with any static field configuration
-at all.
+A trapped-ion quantum computer starts from a single charged atom
+suspended in vacuum, and its first engineering problem is simply
+keeping that ion in place: steady enough, for long enough, that lasers
+can address its internal states repeatedly and entangle it with a
+neighbor on demand. That confinement is harder than it sounds. A
+static electric field can't do the job alone; Earnshaw's theorem, a
+result from classical electrostatics, rules out trapping a charge in
+3D with any static field configuration at all.
 
 <Question>
 So how does a trapped-ion quantum computer hold a single ion still enough to compute with it?
@@ -47,9 +50,9 @@ So how does a trapped-ion quantum computer hold a single ion still enough to com
 That engineering problem, and its solution, define the whole platform.
 Where a superconducting qubit is an entirely artificial circuit, a
 trapped-ion qubit uses a real atom, with the qubit encoded in two of its
-naturally-occurring internal energy levels. This is a fundamentally
-different engineering starting point, and it shows up directly in the
-platform's tradeoffs.
+naturally-occurring internal energy levels. That is a different
+engineering starting point, and it shows up directly in the platform's
+tradeoffs.
 
 <AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
@@ -73,17 +76,27 @@ platform's tradeoffs.
 
 The answer to the Motivation section's puzzle is a **Paul trap**: it
 confines the ion using rapidly oscillating (radio-frequency) electric
-fields rather than a static one, exactly because Earnshaw's theorem rules
-the static option out. The field oscillates fast enough that the ion
-feels an effective, time-averaged confining potential. Multiple ions
-in the same trap arrange themselves in a line, held apart by mutual
-Coulomb repulsion balanced against the trap's confinement:
+fields rather than a static one, because Earnshaw's theorem rules the
+static option out. The field oscillates fast enough that the ion feels
+an effective, time-averaged confining potential. Multiple ions in the
+same trap arrange themselves in a line, held apart by mutual Coulomb
+repulsion balanced against the trap's confinement:
 
 <HardwarePlatformSchematic variant="trapped-ion" ariaLabel="A linear chain of trapped ions held between RF electrodes, sharing a vibrational mode" />
 
 The chain's ions aren't independent; the dashed line through them above
 is the shared vibrational mode the next section relies on for two-qubit
 gates.
+
+Two physical conditions are worth fixing in mind, because they are the
+opposite of a superconducting chip's. The trap electrodes themselves sit
+near room temperature — no dilution refrigerator — but the ion has to be
+in ultra-high vacuum, below roughly $10^{-11}$ mbar, or a stray
+background-gas collision knocks it out of the trap mid-computation. And
+the "wiring" is optical: every gate, every state preparation, and every
+readout is a laser beam that has to be frequency-stabilized and pointed
+at one atom. The engineering burden moved from the fridge to the optics
+table; it did not go away.
 
 ### Why coherence times are so much longer
 
@@ -127,7 +140,7 @@ motion, which the *other* ion's internal state can then sense, entangling
 them regardless of physical separation along the chain. This gives
 trapped ions a real engineering advantage over most solid-state
 platforms: any ion can be entangled with any other in the same trap, not
-just its physical neighbors, a fundamentally different <Term id="qubit-routing-swap-overhead">connectivity
+just its physical neighbors, a different <Term id="qubit-routing-swap-overhead">connectivity
 graph</Term> from superconducting qubits' typically nearest-neighbor layout.
 The two connectivity graphs, drawn on the same five qubits, make the
 contrast concrete rather than just asserted in prose:
@@ -193,13 +206,19 @@ question the Noise, Decoherence & Scaling course returns to
 quantitatively.
 
 IonQ and Quantinuum (built on Honeywell's original ion-trap group) have
-staked entire product lines on this exact tradeoff, betting that fewer,
+staked entire product lines on this tradeoff, betting that fewer,
 longer-lived, fully-connected qubits beat a much larger but noisier and
 sparsely-wired array for near-term algorithms. Quantinuum's H-series
 systems have repeatedly reported among the highest published two-qubit
-<Term id="gate-fidelity">gate fidelities</Term> of any hardware platform, a direct commercial payoff of
-the atomic-level isolation this lesson's coherence-time argument
-predicts, not a separate engineering achievement layered on top of it.
+<Term id="gate-fidelity">gate fidelities</Term> of any hardware platform, a commercial payoff of the
+atomic-level isolation this lesson's coherence-time argument predicts
+rather than a separate engineering achievement layered on top of it.
+
+Treat any specific fidelity figure you read as dated, including that
+one. Which platform holds the two-qubit record has changed more than
+once, and a number quoted without a system name and a year is not worth
+much. When you see one, check what it was measured on, when, and whether
+it is a best pair or a median over the whole device.
 
 ## Worked Example
 
@@ -248,8 +267,9 @@ engineering constraint the Noise, Decoherence & Scaling course develops.
 ## Summary
 
 - Trapped ions use real atoms confined by oscillating electric fields
-  (a Paul trap), a fundamentally different physical starting point from
-  superconducting circuits.
+  (a Paul trap), a different physical starting point from superconducting
+  circuits: room-temperature electrodes, ultra-high vacuum, and lasers
+  in place of coaxial lines.
 - Coherence times reach seconds (vs. superconducting qubits' microseconds),
   at the cost of slower gates (microseconds, not nanoseconds).
 - The shared motional mode gives real all-to-all connectivity within

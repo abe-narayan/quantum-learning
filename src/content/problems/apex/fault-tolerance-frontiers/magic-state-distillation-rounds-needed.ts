@@ -31,6 +31,18 @@ export const magicStateDistillationRoundsNeeded: NumericProblem = {
     tolerance: 0,
     incorrectFeedback:
       "Apply ε_out = 35ε_in³ once to get ε₁, check it against 10⁻¹⁰, and if it's not yet below target, apply the same formula again to ε₁ to get ε₂.",
+    nearMisses: [
+      {
+        value: 1,
+        feedback:
+          "One round gives ε₁ = 35×10⁻⁶ ≈ 3.5×10⁻⁵, five orders of magnitude above the 10⁻¹⁰ target. The 35 prefactor also works against you at the first round.",
+      },
+      {
+        value: 3,
+        feedback:
+          "Round 2 already lands at ≈1.5×10⁻¹², below the target. Check ε₂ before assuming a third round is needed: cubic suppression moves fast once ε is small.",
+      },
+    ],
   },
   hints: [
     { text: "Compute ε₁ = 35 × (0.01)³ first, and compare it to 10⁻¹⁰." },

@@ -32,7 +32,7 @@ export function ComparisonPanel({
   if (boundary !== undefined) {
     const { left, right } = probabilityLeftAndRightOf(psi, boundary);
     return (
-      <div className="rounded-xl border border-border bg-surface-muted/60 p-4 text-sm">
+      <div className="rounded-panel border border-border bg-surface-muted/60 p-4 text-sm">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Transmission / reflection accounting</p>
         <dl className="mt-2 grid grid-cols-3 gap-3">
           <div>
@@ -65,7 +65,7 @@ export function ComparisonPanel({
   const fidelity = sameGrid ? psi.overlapProbability(psi0) : null;
 
   return (
-    <div className="rounded-xl border border-border bg-surface-muted/60 p-4 text-sm">
+    <div className="rounded-panel border border-border bg-surface-muted/60 p-4 text-sm">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Analytical vs. numerical</p>
       <dl className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div>

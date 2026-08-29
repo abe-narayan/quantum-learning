@@ -30,8 +30,21 @@ export const nearPureEntropyCalculation: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 0.02,
+    tolerance: 0.01,
     incorrectFeedback: "First find the eigenvalues via the quadratic formula, using a=0.6, d=0.4, z=0.48 — they should be close to 1 and 0, but not exactly.",
+    nearMisses: [
+      {
+        value: 0,
+        tolerance: 0.005,
+        feedback:
+          "Zero entropy would require an exactly pure ρ, which needs the off-diagonal entry to be √(0.6×0.4) ≈ 0.4899. Here it is 0.48, slightly less, so the smaller eigenvalue is small but nonzero and contributes most of the entropy.",
+      },
+      {
+        value: 0.971,
+        tolerance: 0.01,
+        feedback: "That is the entropy of diag(0.6, 0.4). The off-diagonal entries matter: you have to diagonalize first, and this ρ's eigenvalues are near 0.99 and 0.01, not 0.6 and 0.4.",
+      },
+    ],
   },
   hints: [
     { text: "Use λ± = (a+d)/2 ± √(((a-d)/2)² + z²) with a=0.6, d=0.4, z=0.48." },

@@ -99,6 +99,22 @@ export function CircuitBuilder() {
     setStep(0);
   };
 
+  /**
+   * Puts the mounting circuit back. It also forces the qubit count to 2,
+   * because `STARTING_CIRCUIT`'s CNOT targets qubits 0 and 1 and the reader
+   * may well be on the 3-qubit GHZ exercise when they reach for this — a
+   * "load the example" button that silently left three wires with a two-wire
+   * circuit on them would be the confusing outcome, not the helpful one.
+   */
+  const handleLoadBellCircuit = () => {
+    setNumQubits(2);
+    setInstructions(STARTING_CIRCUIT);
+    setStep(STARTING_CIRCUIT.length);
+    setTargetQubit(0);
+    setControlQubit(0);
+    setTwoQubitTarget(1);
+  };
+
   return (
     <SimulatorInstrument
       label="Circuit builder — build then run"
@@ -115,7 +131,8 @@ export function CircuitBuilder() {
             A quantum circuit is read left to right: each horizontal line is one qubit, and each box is an
             operation applied to it. Loaded here is the two-gate circuit that produces a Bell pair — the
             standard way to entangle two qubits. Drag the step slider to run it forwards and backwards, add
-            your own gates from the controls, or Clear and start from nothing.
+            your own gates from the controls, or Clear and start from nothing. Load Bell circuit brings this
+            example back whenever you want it.
           </p>
 
           <CircuitDiagram numQubits={numQubits} instructions={instructions} step={step} onSelectStep={setStep} />
@@ -130,7 +147,7 @@ export function CircuitBuilder() {
             />
           )}
 
-          <div aria-live="polite" className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          <div aria-live="polite" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {entanglementNote ?? DEFAULT_WHAT_TO_NOTICE}
           </div>
 
@@ -167,6 +184,7 @@ export function CircuitBuilder() {
           onApplyMeasurement={handleApplyMeasurement}
           onRemoveLast={handleRemoveLast}
           onClear={handleClear}
+          onLoadBellCircuit={handleLoadBellCircuit}
           canRemove={instructions.length > 0}
         />
       }

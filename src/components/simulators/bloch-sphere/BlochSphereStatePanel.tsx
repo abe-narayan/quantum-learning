@@ -11,7 +11,14 @@ export function BlochSphereStatePanel({ state, angles }: { state: StateVector; a
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+      {/* No `overflow-x-auto` here: the only child is a block-level
+          `.katex-display`, which fills this content box and carries its own
+          horizontal scroll (globals.css §6), so this box never had anything to
+          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          y axis to `auto` too, which would silently clip a tall equation. The tab
+          stop the slab needs now lives on `.katex-display` itself; see
+          `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+      <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
         <KatexMath tex={stateLatex} display />
       </div>
 

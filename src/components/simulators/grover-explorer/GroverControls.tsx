@@ -62,7 +62,12 @@ export function GroverControls({
           disabled={disabled}
           aria-label="Marked item — the one item the oracle recognizes"
           onChange={(e) => onMarkedIndexChange(Number(e.target.value))}
-          className="min-h-11 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className={
+            // text-base below sm keeps the effective font size at 16px on
+            // phones — iOS Safari auto-zooms the page on focusing any form
+            // control whose font is smaller than that.
+            "min-h-11 w-full rounded-(--radius-tight) border border-border bg-surface px-2 py-1.5 font-mono text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-sm"
+          }
         >
           {Array.from({ length: dimension }, (_, i) => (
             <option key={i} value={i}>

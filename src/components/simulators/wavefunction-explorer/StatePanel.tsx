@@ -23,7 +23,7 @@ export function StatePanel({
   const meanX = psi.expectationPosition();
 
   return (
-    <dl className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-surface-muted/60 p-4 text-sm sm:grid-cols-5">
+    <dl className="grid grid-cols-2 gap-3 rounded-panel border border-border bg-surface-muted/60 p-4 text-sm sm:grid-cols-5">
       <div>
         <dt className="text-xs text-muted-foreground">Time t</dt>
         <dd className="font-mono text-foreground">{t.toFixed(2)}</dd>

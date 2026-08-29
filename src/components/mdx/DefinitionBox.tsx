@@ -15,11 +15,40 @@ import { TechLabel } from "@/components/ui/Typography";
  * rather than stating a result about it. Same full-border header-strip
  * treatment as `TheoremBox` (distinct from `Callout`'s rounded, tinted
  * asides) so the two read as one "formal statement" family within Quantum
- * Mastery lessons; only the label color differs, so a scanning eye can tell
- * "this names something" from "this claims something" at a glance. The left
- * edge picks up the ambient lesson pillar so the panel still feels native to
- * whichever course it's in, without touching that note/claim distinction.
+ * Mastery lessons. The left edge picks up the ambient lesson pillar so the
+ * panel still feels native to whichever course it's in, without touching
+ * that names-vs-claims distinction.
+ *
+ * Within that family, definition and theorem used to be separated by the
+ * *hue of the label word* and nothing else — identical border, identical
+ * header strip, identical geometry, `text-accent` against `text-brand`.
+ * That is the failure mode `Callout` already solved with a glyph per
+ * severity: a reader scanning a Quantum Mastery lesson for "where was that
+ * defined?" had to stop and read every panel header, and a reader who
+ * cannot separate the two hues had no signal at all. Each now carries the
+ * mark its own discipline already uses — `≝` here for "is defined to be,"
+ * the tombstone `∎` on `TheoremBox` — so the two are told apart by shape
+ * before either word is read, and stay told apart in grayscale and in
+ * print.
  */
+
+/** The definitional-equality sign, `≝`: an equals rule with a mark above it.
+ *  Drawn rather than typed so it renders identically regardless of whether
+ *  the reader's font stack has the codepoint — at 13px a fallback box or a
+ *  substituted glyph from another face would be the whole signal. */
+function DefinitionGlyph() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true" data-decorative="" className="shrink-0">
+      <circle cx="6.5" cy="3.2" r="1.05" fill="currentColor" />
+      <path
+        d="M2 6.8h9M2 9.6h9"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 export function DefinitionBox({
   title,
   className,
@@ -32,13 +61,28 @@ export function DefinitionBox({
   return (
     <div
       className={cn(
-        "not-prose my-8 overflow-hidden rounded-[var(--radius-panel)] border border-border border-l-2 border-l-pillar-edge bg-surface",
+        "not-prose my-8 overflow-hidden rounded-panel border border-border border-l-2 border-l-pillar-edge bg-surface",
         className
       )}
     >
       <div className="border-b border-border bg-surface-muted px-5 py-3">
         <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <TechLabel className="text-accent">Definition</TechLabel>
+          {/* `items-center` on this inner span, not `items-baseline`: an SVG
+              has no baseline of its own, so a glyph placed directly in the
+              baseline-aligned row above would sit on its own bottom edge and
+              float above the label text. */}
+          <span className="flex items-center gap-1.5 text-accent">
+            <DefinitionGlyph />
+            {/* `text-accent` is repeated on the label rather than inherited
+                from the span above. `.tech-label` sets its own `color` inside
+                `@layer components`, and an inherited color from an ancestor
+                never beats a declaration on the element itself regardless of
+                layer order — dropping it here would have quietly returned
+                this label to muted grey. Same trap globals.css §"unlayered
+                CSS" documents. The span still needs the color too: it is what
+                the glyph's `currentColor` resolves against. */}
+            <TechLabel className="text-accent">Definition</TechLabel>
+          </span>
           {title && (
             <span className="font-display text-base font-semibold text-foreground sm:text-lg">
               {title}

@@ -44,6 +44,10 @@ export const singletMatchesBellState: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "This is a literal vector identity, not an approximation — verified directly via the J²=0 eigenstate computation.",
     whyCorrect: "Matches the lesson's explicit derivation exactly.",
-    whyWrong: ["Options b, c, and d each correspond to a different (non-singlet) two-qubit entangled state."],
+    whyWrong: [
+      { optionId: "b", text: "|Ψ⁺⟩ carries the plus sign, matching the triplet's m=0 state rather than the singlet." },
+      { optionId: "c", text: "|Φ⁺⟩ is built from |00⟩ and |11⟩, but the singlet uses |01⟩ and |10⟩." },
+      { optionId: "d", text: "|Φ⁻⟩ has the same wrong basis terms as |Φ⁺⟩, sign notwithstanding." },
+    ],
   },
 };

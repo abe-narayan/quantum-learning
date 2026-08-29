@@ -20,11 +20,11 @@ export const oracleReversibilityProof: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["xor", "⊕", "twice", "applied twice", "cancel"],
-      ["same value", "f(x) twice", "returns", "original"],
+      ["xor", "⊕", "twice", "cancel", "self-inverse", "self inverse", "own inverse", "undoes itself", "involution"],
+      ["same value", "f(x) twice", "returns", "original", "back to", "back where", "recover", "restores", "identity"],
     ],
-    incorrectFeedback: "Try applying U_f to its own output and see what happens to the y register.",
-    partialFeedback: "Good start — be explicit about XOR-ing the same value twice canceling out.",
+    incorrectFeedback: "Try applying U_f to its own output and watch what happens in the second register.",
+    partialFeedback: "Good start. Be explicit about what the second application does to the target register and why nothing of f survives there.",
   },
   hints: [
     { text: "Apply U_f once: y becomes y⊕f(x)." },
@@ -34,13 +34,13 @@ export const oracleReversibilityProof: ConceptualProblem = {
   solution: {
     steps: [
       { description: "Applying U_f twice gives y⊕f(x)⊕f(x)." },
-      { description: "Since f(x)⊕f(x)=0 for any value of f(x), this equals y — the original state." },
+      { description: "Since f(x)⊕f(x)=0 for any value of f(x), this equals y, the original state." },
     ],
     finalAnswer: "U_f applied twice always returns the original state, for any f, because XOR-ing the same value twice cancels.",
   },
   explanation: {
     correctIdea: "The extra output register makes the map injective (different (x,y) pairs never collide), which is exactly what reversibility requires.",
-    whyCorrect: "This works regardless of whether f itself is injective — the XOR trick is what supplies reversibility.",
-    whyWrong: ["Claiming f itself must be invertible misses the point of the oracle construction — it works for AND, OR, or any other non-invertible f."],
+    whyCorrect: "This works regardless of whether f itself is injective. The XOR trick is what supplies reversibility.",
+    whyWrong: ["Claiming f itself must be invertible misses the point of the oracle construction: it works for AND, OR, or any other non-invertible f."],
   },
 };

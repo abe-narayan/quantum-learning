@@ -2,9 +2,51 @@ import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-am
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { Complex } from "@/lib/quantum/complex";
+import { interferenceProbability, classicalSumProbability } from "@/lib/quantum/amplitude";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/classical-to-quantum/why-complex-amplitudes"
+);
+
+export const SWEEP_MAGNITUDE = 0.5;
+
+export const SWEEP_STEPS = 121;
+
+export const sweepAngles = Array.from({ length: SWEEP_STEPS }, (_, i) => (i / (SWEEP_STEPS - 1)) * 2 * Math.PI);
+
+export const sweepPairs = sweepAngles.map((theta) => ({
+  theta,
+  a: Complex.fromPolar(SWEEP_MAGNITUDE, 0),
+  b: Complex.fromPolar(SWEEP_MAGNITUDE, theta),
+}));
+
+export const phaseSweepFrames = [
+  {
+    paramLabel: `|ψ₁| = |ψ₂| = ${SWEEP_MAGNITUDE}, θ swept over one full turn`,
+    series: [
+      {
+        label: "|ψ₁ + ψ₂|² (amplitudes added first)",
+        color: "brand",
+        points: sweepPairs.map(({ theta, a, b }) => ({ x: theta, y: interferenceProbability(a, b) })),
+      },
+      {
+        label: "|ψ₁|² + |ψ₂|² (probabilities added)",
+        color: "muted",
+        points: sweepPairs.map(({ theta, a, b }) => ({ x: theta, y: classicalSumProbability(a, b) })),
+      },
+    ],
+  },
+];
+
+export const REAL_SAME_SIGN = interferenceProbability(
+  Complex.fromPolar(SWEEP_MAGNITUDE, 0),
+  Complex.fromPolar(SWEEP_MAGNITUDE, 0)
+);
+
+export const REAL_OPPOSITE_SIGN = interferenceProbability(
+  Complex.fromPolar(SWEEP_MAGNITUDE, 0),
+  Complex.fromPolar(SWEEP_MAGNITUDE, Math.PI)
 );
 
 export const lessonMeta = {
@@ -15,7 +57,7 @@ export const lessonMeta = {
   module: "why-complex-amplitudes",
   order: 1,
   difficulty: "foundational",
-  estimatedMinutes: 20,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability"],
   objectives: [
     "Explain why a signed real amplitude only supports two interference outcomes",
@@ -26,8 +68,8 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   A signed real number can only ever fully agree or fully cancel. The
-  double-slit pattern dims smoothly, not in one jump — so whatever an
-  <Term id="amplitude">amplitude</Term> is, a sign alone can't be enough.
+  double-slit pattern dims smoothly, not in one jump, so whatever an
+  <Term id="amplitude">amplitude</Term> is, a sign alone cannot be enough.
 </LessonHook>
 
 ## Motivation
@@ -39,7 +81,7 @@ real numbers can also add constructively ($(+1)+(+1)=2$) or destructively
 
 ## Intuition
 
-A signed real number has exactly one bit of "direction" information: its
+A signed real number carries one bit of "direction" information: its
 sign. Two same-signed amplitudes always reinforce fully; two
 opposite-signed amplitudes always cancel fully (if equal in magnitude).
 There's no in-between. But the actual double-slit fringe pattern varies
@@ -47,13 +89,13 @@ There's no in-between. But the actual double-slit fringe pattern varies
 smoothly dimming through every intermediate brightness, down to fully
 dark, then smoothly brightening again. A quantity with only two possible
 "directions" cannot produce a smooth continuum of outcomes. Something with
-a continuously adjustable direction can, and that's exactly what a
-complex number's phase is.
+a continuously adjustable direction can, and that is what a complex
+number's phase gives you.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/08/Newton_rings.jpg"
-  alt="Photograph of Newton's rings, concentric circular interference fringes between two glass surfaces"
-  caption="Newton's rings: as the gap between two glass surfaces grows smoothly outward from the center, the interference smoothly sweeps through every intermediate brightness, exactly the continuous knob a fixed-sign real amplitude cannot supply."
+  alt="Concentric bright and dark rings centred on the point where a curved glass surface touches a flat one, the rings crowding closer together the further out they sit"
+  caption="Newton's rings: as the gap between two glass surfaces grows smoothly outward from the center, the interference sweeps through every intermediate brightness. That smooth sweep is the continuous knob a fixed-sign real amplitude cannot supply."
   credit="Ulfbastel / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Newton_rings.jpg"
   license="Public domain"
@@ -73,7 +115,7 @@ algebra itself.
     { label: "Only at specific magnitude ratios", value: "ratio" },
   ]}
   correctValue="no"
-  explanation="No such knob exists for real amplitudes. The cross term 2ψ1ψ2 has a fixed sign for any fixed pair of real numbers — you can change its size, but a sign flip jumps straight from fully constructive to fully destructive with nothing continuous in between. The derivation below makes this precise, and it's exactly why a complex phase, which supplies that continuous knob directly, turns out to be necessary rather than a bookkeeping convenience."
+  explanation="No such knob exists for real amplitudes. The cross term 2ψ1ψ2 has a fixed sign for any fixed pair of real numbers. You can change its size, but flipping a sign jumps straight from fully constructive to fully destructive with nothing in between. The derivation below makes that precise, and it is why a complex phase, which supplies the continuous knob directly, is necessary rather than a bookkeeping convenience."
 />
 
 ### Real amplitudes can't produce partial interference
@@ -91,7 +133,7 @@ numbers. You can dial its *magnitude* by changing $\psi_1$ or $\psi_2$,
 but not smoothly sweep it from "fully constructive" through "no effect"
 to "fully destructive" using a *single* continuously-adjustable
 parameter that leaves the individual probabilities $\psi_1^2,\psi_2^2$
-unchanged. The experimentally observed fringe pattern needs exactly that:
+unchanged. The observed fringe pattern demands exactly that:
 a single knob, position on the screen, that continuously retunes the
 interference from bright to dark while the two paths' individual
 intensities stay essentially fixed.
@@ -104,15 +146,40 @@ complex $\psi_1$ only shifts where $\theta$ is measured from, not the
 shape of the argument). The cross term from the last lesson's expansion
 is $\psi_1^*\psi_2+\psi_2^*\psi_1 = 2\,\mathrm{Re}(\psi_1^*\psi_2) =
 2\psi_1|\psi_2|\cos\theta$, using $\mathrm{Re}(e^{i\theta})=\cos\theta$
-directly from Euler's formula. So the cross term becomes exactly
-proportional to $\cos\theta$, which sweeps continuously
-through every value in $[-1,1]$ as $\theta$ varies over a full turn,
-exactly the smooth constructive-to-destructive continuum the experiment
-shows, controlled by a single real parameter $\theta$ that leaves
-$|\psi_1|,|\psi_2|$ untouched. This is precisely why polar form and
-Euler's formula, built for their own sake in the Complex Numbers lesson,
+directly from Euler's formula. The cross term is therefore proportional
+to $\cos\theta$, which sweeps through every value in $[-1,1]$ as $\theta$
+turns once around the circle. That is the constructive-to-destructive
+continuum the experiment shows, driven by one real parameter that leaves
+$|\psi_1|$ and $|\psi_2|$ untouched. Polar form and Euler's formula,
+built for their own sake in the Complex Numbers lesson,
 turn out to be physically indispensable: the phase $\theta$ *is* the
-"knob" nature actually turns.
+knob nature turns.
+
+The plot below is the whole argument in one picture. The brand curve is
+$|\psi_1+\psi_2|^2$ as $\theta$ runs once around the circle, with both
+magnitudes pinned at $0.5$ the entire time. The flat grey line is the
+classical prediction $|\psi_1|^2+|\psi_2|^2$, which cannot move because
+nothing about the magnitudes changed. The two dashed lines mark the only
+two heights signed real amplitudes can produce: $1.0$ when the signs
+match, $0$ when they oppose. Everything the curve passes through between
+those dashed lines is territory reals cannot reach, and it is where most
+of a real fringe pattern lives.
+
+<ParametricCurve
+  frames={phaseSweepFrames}
+  referenceLines={[
+    { y: REAL_SAME_SIGN, label: "reals, same sign" },
+    { y: REAL_OPPOSITE_SIGN, label: "reals, opposite sign" },
+  ]}
+  ariaLabel="Combined probability of two equal-magnitude amplitudes plotted against their relative phase theta over one full turn. The quantum curve is a cosine rising from 0 at theta equals pi to a maximum of 1 at theta equals 0 and 2 pi, crossing the flat classical line at 0.5 when theta is pi over 2 and 3 pi over 2. Dashed reference lines at 1 and 0 mark the only two values signed real amplitudes can produce."
+/>
+
+Notice where the curve crosses the flat line: at $\theta=\pi/2$ and
+$\theta=3\pi/2$. The first of those is the $\theta=\pi/2$ row of the
+previous lesson's table, the one place quantum and classical agreed
+there; the second is its mirror image on the far side of the turn, which
+a three-row table had no way to show. Seeing the whole sweep makes clear
+that agreement happens at two isolated crossings, not over a region.
 
 ### Where the phase physically comes from
 
@@ -124,7 +191,7 @@ the same idea de Broglie's matter-wave picture and the Schrödinger
 equation (a later lesson in this course) make precise; for now, the
 important point is structural: *some* continuously-variable phase is
 required by the data, and complex numbers are the minimal, natural
-mathematical object with exactly that continuous phase built in.
+mathematical object that has such a phase built in.
 
 ## Physical Interpretation
 
@@ -218,8 +285,8 @@ above demonstrates directly.
 
 <ChallengePrompt prompt="The worked example used three equal, all-real amplitudes and found only 'fully constructive' was reachable by flipping signs. Now try genuinely complex ones: ψ1=0.4, ψ2=0.4e^(iπ/3), ψ3=0.4e^(i2π/3). Does this land at fully constructive, fully destructive, or somewhere in between?">
   Add the three complex numbers directly (Euler's formula for each), then
-  square the magnitude of the sum — same recipe as the two-amplitude
-  cross-term calculation, just with a third term.
+  square the magnitude of the sum. Same recipe as the two-amplitude
+  cross-term calculation, with a third term along for the ride.
 </ChallengePrompt>
 
 <NextDiscovery>

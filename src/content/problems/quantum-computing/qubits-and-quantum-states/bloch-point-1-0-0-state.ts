@@ -54,7 +54,9 @@ export const blochPoint100State: MultipleChoiceProblem = {
     correctIdea: "Each point on the Bloch sphere corresponds to exactly one state; (1,0,0) is |+⟩'s point specifically, not any other equatorial state.",
     whyCorrect: `Directly confirmed via this platform's engine: blochStateFromAngles({theta: π/2, phi: 0}) gives amplitudes (${formatAmplitudeLatex(plusState.amplitudes[0])}, ${formatAmplitudeLatex(plusState.amplitudes[1])}), and stateToBlochVector on that state returns (${plusBlochVector.x.toFixed(2)}, ${plusBlochVector.y.toFixed(2)}, ${plusBlochVector.z.toFixed(2)}), matching (1,0,0).`,
     whyWrong: [
-      "|-⟩ and the (1,0,0) state share the same θ (both on the equator) but differ in φ by π, landing on opposite sides of the sphere.",
+      { optionId: "b", text: "Sits at the north pole, (0,0,1). The prompt already places the state on the equator, where z=0." },
+      { optionId: "c", text: "Shares the equator but differs in φ by π, landing at (−1,0,0), the opposite side of the sphere." },
+      { optionId: "d", text: "Sits at (0,1,0): also on the equator, a quarter turn round from the point asked about." },
     ],
   },
 };

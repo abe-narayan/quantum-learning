@@ -105,9 +105,9 @@ export function HardwareSection() {
                 <Lede className="mt-4 max-w-none">
                   Every abstract qubit from Quantum Computing has to become a physical object
                   somewhere — this is that somewhere. Five competing physical platforms, the
-                  dilution fridges and control electronics that cool, drive, and measure them,
-                  and the noise and scaling limits that keep any one platform from winning
-                  outright.
+                  dilution fridges (refrigerators colder than deep space) and control
+                  electronics that cool, drive, and measure them, and the noise and scaling
+                  limits that keep any one platform from winning outright.
                 </Lede>
               </Reveal>
 
@@ -117,7 +117,8 @@ export function HardwareSection() {
                   Rabi Explorer
                 </Link>{" "}
                 — the same driven two-level system behind superconducting, trapped-ion, and
-                spin-qubit gates — and watch decoherence itself in the{" "}
+                spin-qubit gates — and watch decoherence (a qubit leaking its quantum behavior
+                into its surroundings until only classical noise is left) happen live in the{" "}
                 <Link href="/simulators#noise-explorer" className="font-medium text-pillar hover:underline">
                   Noise &amp; Decoherence Explorer
                 </Link>

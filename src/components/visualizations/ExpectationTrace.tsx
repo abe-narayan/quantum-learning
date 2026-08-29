@@ -11,6 +11,29 @@ export type TraceSeries = {
 const WIDTH = 480;
 const HEIGHT = 220;
 const PAD = 36;
+/**
+ * The left gutter is wider than the other three because the y tick values live
+ * in it, and it has been widened twice for the same reason: the type in it kept
+ * being sized against the wrong box.
+ *
+ * The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+ * (320 less Container's `px-4` gutters), but this SVG renders inside
+ * `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+ * radius and fill and no padding at all — the `p-4` does. Subtract
+ * 2 x (16px padding + 1px border) = 34px.
+ * So the scale is 254/480 = 0.529, not 0.6. The 10 units this figure started at
+ * painted at 5.29px; the 14 units the last pass raised them to painted at
+ * **7.41px**, still under the ~9px floor it was aiming for. 17 units gives
+ * 9.00px, and the y label 18 units gives 9.53px.
+ *
+ * 56 -> 70 follows from that directly. A six-character tick like "-12.34" is
+ * ~9.5 units per character in the body face at 17 units, so ~57 units wide;
+ * right-aligned 8 units clear of the axis it needs 65 units of gutter, and at 56
+ * its leading minus sign would have been clipped off the left edge of the
+ * viewBox. The plot gives up 14 of 388 units of width for it — under 4%, and far
+ * cheaper than numbers nobody can read.
+ */
+const PAD_LEFT = 70;
 
 const COLOR_CLASSES: Record<NonNullable<TraceSeries["color"]>, string> = {
   brand: "stroke-brand",
@@ -60,30 +83,44 @@ export function ExpectationTrace({
   const yMax = Math.max(...allPoints.map((p) => p.value));
   const xSpan = xMax - xMin || 1;
   const ySpan = yMax - yMin || 1;
-  const plotW = WIDTH - 2 * PAD;
+  const plotW = WIDTH - PAD_LEFT - PAD;
   const plotH = HEIGHT - 2 * PAD;
-  const xOf = (t: number) => PAD + ((t - xMin) / xSpan) * plotW;
+  const xOf = (t: number) => PAD_LEFT + ((t - xMin) / xSpan) * plotW;
   const yOf = (v: number) => PAD + (1 - (v - yMin) / ySpan) * plotH;
 
   return (
     <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-          <line x1={PAD} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
-          <line x1={PAD} y1={PAD} x2={PAD} y2={HEIGHT - PAD} className="stroke-border" strokeWidth={1} />
+          {/* The two axes carry the reading of every series drawn on top of them: the
+              x axis is where the quantity is zero-referenced from and the y axis marks
+              the left end of the domain. They were `stroke-border` — the panel-edge
+              token, 1.41:1 on `--surface-muted` — so they failed WCAG 2.1 SC 1.4.11's
+              3:1 floor for meaningful graphical objects and the plot read as curves
+              floating in an empty box. `stroke-axis` is the chart channel. */}
+          <line x1={PAD_LEFT} y1={HEIGHT - PAD} x2={WIDTH - PAD} y2={HEIGHT - PAD} className="stroke-axis" strokeWidth={1} />
+          <line x1={PAD_LEFT} y1={PAD} x2={PAD_LEFT} y2={HEIGHT - PAD} className="stroke-axis" strokeWidth={1} />
 
-          <text x={PAD} y={16} className="fill-foreground text-[11px]">{yLabel}</text>
+          {/* All four label sizes were raised again (yLabel 11 -> 15 -> 18 units,
+              ticks 10 -> 14 -> 17) for the reason spelled out on PAD_LEFT above:
+              the 15/14 pass divided by a 288px column this figure never had.
+              Fills stay on `--muted-foreground`/`--foreground`, which are 6.9:1
+              and higher — moving text onto the 3:1-floor `--axis` token would
+              lower its contrast, not raise it. `--axis` is a floor for *strokes*.
+              The y ticks' vertical nudge goes +5 -> +6, which is ~0.35em at the
+              new size and keeps them optically centred on their gridline. */}
+          <text x={PAD_LEFT} y={18} className="fill-foreground text-[18px]">{yLabel}</text>
 
-          <text x={PAD} y={HEIGHT - PAD + 16} className="fill-muted-foreground text-[10px]">
+          <text x={PAD_LEFT} y={HEIGHT - PAD + 18} className="fill-muted-foreground text-[17px]">
             {xLabel} = {xMin.toFixed(1)}
           </text>
-          <text x={WIDTH - PAD} y={HEIGHT - PAD + 16} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          <text x={WIDTH - PAD} y={HEIGHT - PAD + 18} textAnchor="end" className="fill-muted-foreground text-[17px]">
             {xLabel} = {xMax.toFixed(1)}
           </text>
-          <text x={PAD - 6} y={PAD + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          <text x={PAD_LEFT - 8} y={PAD + 6} textAnchor="end" className="fill-muted-foreground text-[17px]">
             {yMax.toFixed(2)}
           </text>
-          <text x={PAD - 6} y={HEIGHT - PAD} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          <text x={PAD_LEFT - 8} y={HEIGHT - PAD} textAnchor="end" className="fill-muted-foreground text-[17px]">
             {yMin.toFixed(2)}
           </text>
 

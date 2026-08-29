@@ -32,11 +32,19 @@ export const sameAxisPerfectCorrelation: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "θ_a-θ_b = 0 whenever both angles are equal, regardless of what that shared angle actually is.",
+    nearMisses: [
+      {
+        value: Math.cos(theta),
+        tolerance: 0.005,
+        feedback: "cos(0.9) uses the shared angle itself. The correlator depends on the difference θ_a − θ_b, which is 0 when both parties measure along the same axis.",
+      },
+      { value: 0, feedback: "Zero correlation is what you would get for axes a quarter turn apart. Here both angles are the same, so their difference vanishes." },
+    ],
   },
   hints: [
     { text: "E(a,a) = cos(θ_a - θ_a)." },
     { text: "θ_a - θ_a = 0 for any value of θ_a." },
-    { text: "cos(0) = 1." },
+    { text: "The cosine of a vanishing angle takes its maximum value. That maximum is your answer, whatever the shared axis was." },
   ],
   solution: {
     steps: [{ description: "$E(a,a) = \\cos(\\theta-\\theta) = \\cos(0) = 1$, for any shared angle θ." }],

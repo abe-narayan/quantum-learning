@@ -22,6 +22,10 @@ export const complexModulus: NumericProblem = {
     value: 5,
     tolerance: 0.01,
     incorrectFeedback: "Remember |z| = sqrt(z z*) = sqrt(a^2 + b^2), not a + b.",
+    nearMisses: [
+      { value: 7, feedback: "7 adds the parts. The modulus is a distance in the plane, so it uses Pythagoras: square, add, then take the root." },
+      { value: 25, feedback: "25 is |z|², the sum of the squares. Take its square root." },
+    ],
   },
   hints: [
     { text: "The modulus formula is |z| = sqrt(a^2 + b^2) for z = a + bi." },

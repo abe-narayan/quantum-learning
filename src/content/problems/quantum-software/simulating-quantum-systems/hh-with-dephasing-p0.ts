@@ -32,12 +32,17 @@ export const hhWithDephasingP0: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "This is exactly the lesson's own worked example — recall the specific P(0) value it reports.",
+    incorrectFeedback: "If you answered the ideal value, you ignored the interleaved dephasing: the coherence present between the two H gates is partially destroyed, so P(0) must land below the noiseless result. This is the lesson's own worked example.",
+    nearMisses: [
+      { value: 1, feedback: "1 is the noiseless result, since H·H = I. The interleaved dephasing damages the coherence that lives between the two Hadamards, so some weight leaks to |1⟩." },
+      { value: 0.8, tolerance: 0.005, feedback: "0.8 is the surviving coherence factor 1 − λ. P(0) is (1 + that factor)/2, since the second Hadamard turns the surviving X-coherence into a Z-population." },
+      { value: 0.5, feedback: "0.5 is full decoherence, what λ = 1 would give. At λ = 0.2 most of the coherence survives." },
+    ],
   },
   hints: [
     { text: "Without noise, H,H=I exactly, giving P(0)=1." },
     { text: "With dephasing interleaved, the circuit no longer returns perfectly to |0⟩." },
-    { text: "The lesson's worked example reports P(0)≈0.9." },
+    { text: "Re-derive the lesson's worked example: only the coherence present between the two H gates gets damaged, and the surviving coherence fixes how far below one P(0) lands." },
   ],
   solution: {
     steps: [{ description: "With dephasing (λ=0.2) interleaved after each H, P(0)≈0.9, not the ideal 1.0." }],
@@ -46,6 +51,6 @@ export const hhWithDephasingP0: NumericProblem = {
   explanation: {
     correctIdea: "This directly reproduces the lesson's central numerical demonstration of noise degrading an otherwise-perfect identity circuit.",
     whyCorrect: "Matches runNoisyCircuit's own computed output.",
-    whyWrong: ["Answering exactly 1.0 would ignore the noise entirely — that's the NO-noise (identity channel) case, not this dephasing scenario."],
+    whyWrong: ["Answering exactly 1.0 would ignore the noise entirely: that's the no-noise (identity channel) case, not this dephasing scenario."],
   },
 };

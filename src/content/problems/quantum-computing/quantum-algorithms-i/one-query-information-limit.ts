@@ -39,11 +39,15 @@ export const oneQueryInformationLimit: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "Immediate measurement collapses the state to one random (x, f(x)) pair — exactly the information one classical query gives, no more." }],
-    finalAnswer: "(a) — one (x, f(x)) pair, no more than a single classical query.",
+    finalAnswer: "One (x, f(x)) pair, no more than a single classical query.",
   },
   explanation: {
     correctIdea: "Superposition alone, without a deliberate interference step before measuring, gives no advantage over classical querying.",
     whyCorrect: "This is precisely the point the lesson makes: parallelism requires interference to become useful.",
-    whyWrong: ["Options b and c both require additional circuit structure (more gates before measurement) that a single query-then-measure sequence doesn't include."],
+    whyWrong: [
+      { optionId: "b", text: "Reading off the whole truth table would need the superposition to survive measurement. It doesn't: collapse keeps one branch and discards the rest." },
+      { optionId: "c", text: "Deciding constant versus balanced needs the interference circuit built in later lessons, not a query followed immediately by measurement." },
+      { optionId: "d", text: "The measured (x, f(x)) pair is information about f, just not more than one classical query's worth." },
+    ],
   },
 };

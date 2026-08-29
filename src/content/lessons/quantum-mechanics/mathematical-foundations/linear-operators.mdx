@@ -57,7 +57,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-computing/qubits-and-quantum-states/quantum-gates",
-      note: "Every quantum gate is exactly this lesson's object: a linear operator, represented as a matrix acting on a state vector.",
+      note: "Every quantum gate is an instance of this lesson's object: a linear operator, represented as a matrix acting on a state vector.",
     },
   ],
 };
@@ -72,13 +72,12 @@ export const lessonMeta = {
 
 Rotate a system, evolve it forward in time, apply a quantum gate: every
 one of these turns one <Term id="quantum-state">state vector</Term> into another, so physics needs a
-mathematical object that does exactly that. An enormous space of possible
-functions could do the job, but physics restricts itself to a narrow
-slice of them, the **linear** ones, and that restriction isn't a
-convenience. Linearity is exactly what lets a superposition be built from
-simpler pieces and have an operator act on the whole thing by acting on
-each piece separately. Lose linearity and superposition stops meaning
-anything.
+mathematical object that maps vectors to vectors. An enormous space of
+possible functions could do that job, but physics restricts itself to a
+narrow slice of them, the **linear** ones, and the restriction is not a
+convenience. Linearity is what lets a superposition be built from simpler
+pieces and then have an operator act on the whole thing by acting on each
+piece separately. Lose linearity and superposition stops meaning anything.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Arthur_Cayley.jpg"
@@ -94,9 +93,9 @@ anything.
 A linear operator is a rule for turning vectors into vectors that respects
 the vector-space structure: scale the input, and the output scales the
 same way; add two inputs, and the output adds the same way. That's a
-strong restriction (most functions you could dream up aren't linear), but
-it's exactly the restriction that makes an operator fully determined
-by what it does to a <Term id="basis">basis</Term>, rather than needing to be specified vector by
+strong restriction (most functions you could dream up aren't linear), and
+it buys something specific: a linear operator is fully determined by what
+it does to a <Term id="basis">basis</Term>, rather than needing to be specified vector by
 vector.
 
 ## Mathematical Development
@@ -121,20 +120,20 @@ $$
 />
 
 $v=(1,1)$ and $2v=(2,2)$ sit on the same line through the origin, one
-exactly twice as far out as the other — that's what "scale the input by
-$2$" looks like geometrically. Feeding both through
+twice as far out as the other. That is what "scale the input by $2$" looks
+like geometrically. Feeding both through
 $A=\begin{pmatrix}2&0\\0&3\end{pmatrix}$ (this lesson's own worked-example
 matrix, below) lands them at $Av=(2,3)$ and $A(2v)=(4,6)$: still one
-shared line through the origin, still exactly a factor of $2$ apart. That
-proportionality surviving the map, exactly, is what $A(2v)=2A(v)$ means as
-a picture rather than as symbols.
+shared line through the origin, still a factor of $2$ apart. That
+proportionality surviving the map is what $A(2v)=2A(v)$ means as a
+picture rather than as symbols.
 
 **Contrast.** A non-linear map need not preserve this. Take
 $h(x,y)=(x^2,y)$: it sends $v=(1,1)\mapsto h(v)=(1,1)$ but
 $2v=(2,2)\mapsto h(2v)=(4,2)$, while linearity would require
-$h(2v)=2h(v)=(2,2)$. Since $(4,2)\neq(2,2)$ — and the two images aren't
-even on the same line through the origin — squaring a coordinate breaks
-exactly the proportionality the diagram above shows $A$ preserving.
+$h(2v)=2h(v)=(2,2)$. Not only is $(4,2)\neq(2,2)$; the two images no
+longer sit on a common line through the origin. Squaring a coordinate
+destroys the proportionality the diagram above shows $A$ preserving.
 
 ### Matrix representation
 
@@ -146,8 +145,8 @@ $$
 A|v\rangle = \sum_j c_j A|e_j\rangle = \sum_j c_j \sum_i A_{ij}|e_i\rangle
 $$
 
-(expanding $A|e_j\rangle$ itself in the basis, using $A_{ij}=\langle
-e_i|A|e_j\rangle$ as exactly its $i$-th coordinate). So once every
+(expanding $A|e_j\rangle$ itself in the basis, where $A_{ij}=\langle
+e_i|A|e_j\rangle$ is its $i$-th coordinate). So once every
 $A_{ij}$ is known, $A$'s action on *every* vector is known: an operator
 on an $n$-dimensional space is completely specified by an $n\times n$
 grid of numbers.
@@ -159,7 +158,7 @@ Applying two operators in sequence, $A$ then $B$, written $(AB)|v\rangle
 $(AB)_{ik}=\langle e_i|AB|e_k\rangle$.
 
 <DerivationSteps>
-  <DerivationStep annotation="Insert the completeness relation Σⱼ|eⱼ⟩⟨eⱼ|=I (from the last lesson) directly between A and B — legal because inserting the identity operator never changes anything.">
+  <DerivationStep annotation="Insert the completeness relation Σⱼ|eⱼ⟩⟨eⱼ|=I (from the last lesson) directly between A and B. This is legal because inserting the identity operator never changes anything.">
 $$
 \langle e_i|AB|e_k\rangle = \langle e_i|A\Big(\sum_j|e_j\rangle\langle e_j|\Big)B|e_k\rangle
 $$
@@ -169,14 +168,14 @@ $$
 = \sum_j \langle e_i|A|e_j\rangle\langle e_j|B|e_k\rangle
 $$
   </DerivationStep>
-  <DerivationStep annotation="Both factors are just matrix elements by definition — this is exactly the ordinary matrix-multiplication formula.">
+  <DerivationStep annotation="Both factors are matrix elements by definition, and what remains is the ordinary matrix-multiplication formula.">
 $$
 = \sum_j A_{ij}B_{jk}
 $$
   </DerivationStep>
 </DerivationSteps>
 
-That final expression fell out of nowhere but completeness: "compose two
+That final expression came from nothing but completeness: "compose two
 operators" and "multiply their matrices" collapse into the same
 operation because inserting the identity was legal, not because matrix
 multiplication was defined to work out that way from the start.
@@ -197,8 +196,11 @@ Every gate in a quantum circuit, every <Term id="observable">observable</Term> i
 mathematical object representing a measurable quantity," and the operator
 governing how a state evolves in time are all linear operators. The next
 three lessons single out two special families, Hermitian and unitary,
-that carry specific physical meaning; every quantum-mechanical operator
-you'll ever meet belongs to at least one of them.
+that carry specific physical meaning; between them they account for every
+observable and every gate. They do not exhaust the linear operators
+physics uses, though: the raising and lowering operators the harmonic
+oscillator is solved with are linear and indispensable, and are neither
+Hermitian nor unitary.
 
 ## Worked Example
 
@@ -277,12 +279,13 @@ exactly when it sends some nonzero vector to zero.
 
 <ChallengePrompt prompt="Is g(x,y) = (y,x) (swapping the two coordinates) linear? Justify using the definition, and if so, write down its matrix in the standard basis.">
   Check $g(a\cdot u+b\cdot v)$ against $a\cdot g(u)+b\cdot g(v)$ directly,
-  the same test practice question 1 used — then read the matrix elements
+  the same test practice question 1 used, then read the matrix elements
   off $g$'s action on the basis vectors $e_1,e_2$.
 </ChallengePrompt>
 
 <NextDiscovery>
   Up next, [Eigenvalues and Eigenvectors](/lessons/quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors): the vectors an operator leaves
-  "directionally unchanged," which turn out to be exactly the states with
-  definite physical properties.
+  "directionally unchanged." Those turn out to be the states with definite
+  physical properties, and every measurement postulate in this pillar is
+  written in terms of them.
 </NextDiscovery>

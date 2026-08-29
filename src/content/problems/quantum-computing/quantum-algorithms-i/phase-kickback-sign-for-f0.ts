@@ -39,7 +39,7 @@ export const phaseKickbackSignForF0: NumericProblem = {
   hints: [
     { text: "The formula is (−1)^f(x)." },
     { text: "Here f(0)=1, so the exponent is 1." },
-    { text: "(−1)^1 = −1." },
+    { text: "Raise −1 to that exponent: an odd exponent leaves the sign flipped, an even one cancels it out." },
   ],
   solution: {
     steps: [{ description: "(−1)^f(0) = (−1)^1 = −1." }],

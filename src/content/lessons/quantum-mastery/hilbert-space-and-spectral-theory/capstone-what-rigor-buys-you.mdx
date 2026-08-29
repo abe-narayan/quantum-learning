@@ -73,7 +73,7 @@ export const convergencePresets = [
     label: "All four derivations",
     panels: [
       { label: "Direct solution: -y'' = 2Ey", cells: convergenceRowCells(directSolutionEnergies) },
-      { label: "Spectral theorem: <e_n| sum_i E_i P_i |e_n>", cells: convergenceRowCells(spectralTheoremEnergies) },
+      { label: "Spectral theorem: ⟨e_n| sum_i E_i P_i |e_n⟩", cells: convergenceRowCells(spectralTheoremEnergies) },
       { label: "Resolvent pole: sin(2ka) = 0", cells: convergenceRowCells(resolventPoleEnergies) },
       { label: "Sturm-Liouville (numerical FFT check)", cells: convergenceRowCells(sturmLiouvilleNumericalEnergies) },
     ],
@@ -99,7 +99,7 @@ export const lessonMeta = {
   objectives: [
     "State precisely which four heuristic shortcuts from the earlier (non-Master) curriculum this course made rigorous, and what each one turned out to actually require",
     "Explain why none of those shortcuts ever produced a wrong physical prediction, using this course's own theorems as the reason rather than luck",
-    "Identify a genuine case (self-adjoint extensions) where informal reasoning alone would not have been enough, and why the main curriculum never ran into it",
+    "Identify a case (self-adjoint extensions) where informal reasoning alone would not have been enough, and why the main curriculum never ran into it",
   ],
   related: [
     {
@@ -110,10 +110,9 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Did any of it matter?">
-  Every prediction the earlier curriculum made using informal shortcuts
-  was correct. This capstone answers why — not luck, but because the
-  systems this platform teaches sit exactly where the shortcut and the
-  rigorous theorem agree.
+  Five lessons of theorems, and not one answer from the earlier
+  curriculum changes. That is the result worth explaining, and it stops
+  holding one question to the side of anything this platform has asked.
 </LessonHook>
 
 ## Motivation
@@ -124,7 +123,7 @@ has been told, an uncomfortable question is due: **did any of it
 matter?** Every prediction the earlier curriculum made using the
 informal shortcuts was correct. This capstone answers *why*: not
 because physicists got lucky, but because the specific systems this
-platform teaches all happen to sit exactly in the regime where the
+platform teaches all happen to sit in the regime where the
 informal shortcut and the rigorous theorem agree. It closes by being
 honest about the one place they come apart.
 
@@ -149,8 +148,8 @@ self-adjoint multiplication operator, that this stronger condition
 actually holds on the whole line. The shortcut wasn't wrong; it was
 incomplete in a way that happened not to matter for $\hat p$ on
 $\mathbb R$, because the missing piece (domain equality) turns out to
-hold there. It's *not* incomplete in a way that doesn't matter
-everywhere; the half-line worked example proved that directly.
+hold there. Elsewhere the same incompleteness does matter: the half-line
+worked example proved that directly.
 
 ### 2. "Write $A=\sum_i\lambda_iP_i$ and move on."
 
@@ -177,38 +176,48 @@ calculation ever needed.
 
 ### 4. "Match $\psi,\psi'$ at the boundary, solve, done."
 
-The Finite Square Well and every other solved potential matched
-boundary conditions and moved directly to the answer. Sturm-Liouville
-Theory showed this always works, for any of these specific potentials,
-because each one is secretly the same self-adjoint boundary-value
-structure (Lagrange's identity's boundary term vanishing), guaranteeing
-real eigenvalues and orthogonal eigenfunctions *before* a single line of
-the specific potential's algebra is done. Green's Functions and
-Resolvents showed the same domain choice is exactly what places the
-resolvent's poles at genuine, physical bound-state energies.
+The Finite Square Well and every other solved potential matched boundary
+conditions and moved directly to the answer. Sturm-Liouville Theory
+showed why that works for each of these potentials: every one of them is
+the same self-adjoint boundary-value structure underneath (Lagrange's
+identity's boundary term vanishing), which forces real eigenvalues and
+orthogonal eigenfunctions *before* a single line of the specific
+potential's algebra is done. Green's Functions and Resolvents showed the
+same domain choice is what places the resolvent's poles at the physical
+bound-state energies.
+
+This is the one shortcut whose repair left a visible residue. Reality and
+orthogonality survive intact on a singular interval, but *completeness of
+a discrete eigenbasis does not*: hydrogen's bound states are orthogonal
+and are not a basis, because the scattering continuum above $E=0$ is
+missing from the list. Anyone who used "expand in the bound states" as a
+universal move was relying on a hypothesis the regular theorem supplies
+and the singular problem withholds. That shortcut is not merely
+incomplete but occasionally false, which separates it from the other
+three.
 
 ## Why none of it ever went wrong
 
 A single pattern runs across all four cases: **every boundary/domain
-condition the earlier curriculum picked by physical instinct,
-normalizable at infinity, finite at the origin, zero at a hard wall, is
-*exactly* the condition this course's theorems independently identify as
+condition the earlier curriculum picked by physical instinct (normalizable
+at infinity, finite at the origin, zero at a hard wall) is exactly the
+condition this course's theorems independently identify as
 the one making the operator self-adjoint.** That's not a coincidence to
 marvel at either; physically sensible conditions (finite total
 probability, finite energy) and mathematically self-adjoint conditions
 are pointing at the same target
-for exactly the reason Hilbert Spaces and Self-Adjointness's boundary-term
+for the reason Hilbert Spaces and Self-Adjointness's boundary-term
 derivations make explicit: both are, underneath, statements about a
 boundary contribution vanishing. Physical finiteness kills it by making
-the wavefunction small at the boundary; self-adjointness needs it killed
+the wavefunction small at the boundary; <Term id="self-adjoint-operator">self-adjointness needs it killed</Term>
 for the same algebraic reason. They agree because they're answering
 close to the same question from two directions.
 
 ## The one honest exception
 
-This agreement is not a theorem that always holds: Hilbert Spaces and
-Self-Adjointness's half-line momentum operator is the genuine
-counterexample, not a decorative one. A particle confined to a half-line
+This agreement is not a theorem that always holds. Hilbert Spaces and
+Self-Adjointness's half-line momentum operator is the counterexample,
+and it is not a decorative one. A particle confined to a half-line
 by a hard wall has *no* self-adjoint momentum operator at all, for any
 domain choice: deficiency indices $(1,0)$, unequal, no self-adjoint
 extension exists. The earlier curriculum never collided with this
@@ -289,24 +298,23 @@ of this course:
   ariaLabel="The infinite square well's first four energy levels, the same ladder this course reached from four independent directions: direct solution, the spectral theorem's discrete case, resolvent poles, and the Sturm-Liouville eigenvalue problem"
 />
 
-That kind of convergence, from genuinely different starting points onto
-the same numbers, is the actual texture of "this is true," in
-mathematics the same way independent replication is in an experimental
-science.
+Convergence from different starting points onto the same numbers is what
+"this is true" looks like in mathematics, for the same reason independent
+replication is what it looks like in an experimental science.
 
 ## Common Mistakes
 
 <Callout type="note">
 **Concluding this course means the earlier curriculum was "wrong" or
 "cheating."** It wasn't: every one of its predictions was correct, and
-this capstone spent its whole argument explaining precisely why. Rigor
+this capstone spent its whole argument explaining why. Rigor
 here means understanding *why* the shortcuts worked, not discovering
 they didn't.
 </Callout>
 
 <Callout type="note">
 **Concluding rigor never matters because it never changed an answer in
-this curriculum.** The half-line momentum operator is a genuine
+this curriculum.** The half-line momentum operator is a
 counterexample to that conclusion: a question just one step to the side
 of anything the main curriculum asked has no consistent answer at all,
 and only the rigorous framework built here reveals that in advance
@@ -333,38 +341,34 @@ rather than after a calculation quietly breaks.
 
 ## Summary
 
-- Four shortcuts from the earlier curriculum, "check $A=A^\dagger$,"
+- Four shortcuts from the earlier curriculum ("check $A=A^\dagger$,"
   "sum $\lambda_iP_i$," "use $|p\rangle$ freely," "match boundary
-  conditions", are each shown, lesson by lesson in this course, to be
+  conditions") are each shown, lesson by lesson in this course, to be
   the special case of a more general theorem that happens to hold for
   every system the main curriculum actually solved.
 - None of them ever produced a wrong prediction because the physically
   chosen boundary/domain conditions and the mathematically required
   self-adjoint ones coincide for every potential this platform teaches,
   not a coincidence, but not a guarantee either.
-- The half-line momentum operator is a genuine, worked case where no
-  self-adjoint extension exists at all, showing rigor's real value:
-  catching a future question instinct alone can't answer, not just
-  re-certifying past answers that were already right.
-- The infinite well's spectrum, reached from four independent
-  derivations across this course, lands on the same four numbers every
-  time: the mathematical texture of a genuinely secure result.
+- The half-line momentum operator is a worked case where no self-adjoint
+  extension exists at all, showing rigor's real value: catching a future
+  question instinct alone cannot answer, rather than re-certifying past
+  answers that were already right.
+- Completeness of a discrete eigenbasis is the one shortcut that can
+  actually fail. Hydrogen's bound states are orthogonal and are not a
+  basis, because the scattering continuum is missing from them.
+- The infinite well's spectrum, reached from four independent derivations
+  across this course, lands on the same four numbers every time.
 
 ## Further Exploration
 
-This closes Hilbert Space & Spectral Theory. From here, Symmetry,
-Scattering & Semiclassical Methods extends the rigor in a different
-direction (degenerate perturbation theory, the adiabatic theorem, a
-genuine partial-wave scattering treatment), while Rigorous Quantum
-Information Theory applies this same "make the heuristic precise"
-project to the density-matrix formalism Entanglement, Mixed States &
-Bell Tests used less formally. Either is a genuine next step; neither
-requires re-deriving anything this course already nailed down.
-
 <NextDiscovery>
-  Next: Symmetry, Scattering & Semiclassical Methods extends the rigor
-  in a different direction — degenerate perturbation theory, the
-  adiabatic theorem, a genuine partial-wave scattering treatment — while
-  Rigorous Quantum Information Theory applies this same "make the
-  heuristic precise" project to the density-matrix formalism.
+  This closes Hilbert Space & Spectral Theory, and two courses continue
+  the project from here. Symmetry, Scattering & Semiclassical Methods
+  extends it toward dynamics: degenerate perturbation theory, the
+  adiabatic theorem, and a full partial-wave scattering treatment.
+  Rigorous Quantum Information Theory applies the same "make the
+  heuristic precise" method to the density-matrix formalism that
+  Entanglement, Mixed States & Bell Tests handled informally. Neither
+  requires re-deriving anything settled here.
 </NextDiscovery>

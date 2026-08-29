@@ -38,6 +38,14 @@ export const forcedCloneStateProbability: NumericProblem = {
     tolerance: 0.01,
     incorrectFeedback:
       "Expand $U(|i\\rangle\\otimes|0\\rangle)$ using linearity first — it's a fixed combination of the two already-known outputs $U(|00\\rangle)$ and $U(|10\\rangle)$, not something new $U$ gets to choose.",
+    nearMisses: [
+      {
+        value: 0.25,
+        feedback:
+          "0.25 is P(11) for the genuine clone |i⟩⊗|i⟩, which is what a working cloner would have to produce. Linearity forces a different state, and the gap between the two is the no-cloning theorem.",
+      },
+      { value: Math.SQRT1_2, tolerance: 0.01, feedback: "1/√2 is the magnitude of the |11⟩ amplitude. The Born rule squares it." },
+    ],
   },
   hints: [
     { text: "Write $|i\\rangle\\otimes|0\\rangle = \\frac{1}{\\sqrt2}(|0\\rangle+i|1\\rangle)\\otimes|0\\rangle = \\frac{1}{\\sqrt2}(|00\\rangle+i|10\\rangle)$." },

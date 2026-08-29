@@ -22,6 +22,11 @@ export const synthesisBeatFrequencyCalculation: NumericProblem = {
     value: 0.148044,
     tolerance: 0.001,
     incorrectFeedback: "First find E_1 and E_2 using E_n = n^2*pi^2/(2*L^2), then subtract.",
+    nearMisses: [
+      { value: (5 * Math.PI ** 2) / 200, tolerance: 0.002, feedback: "That is E₂ + E₁. The beat frequency comes from the gap between the levels, not their total." },
+      { value: (4 * Math.PI ** 2) / 200, tolerance: 0.002, feedback: "That is E₂ alone. Subtract E₁ to get the gap that sets the oscillation." },
+      { value: Math.PI ** 2 / 200, tolerance: 0.002, feedback: "That is E₁ alone. The beat frequency is E₂ − E₁." },
+    ],
   },
   hints: [
     { text: "Compute E_1 = pi^2/(2*100) and E_2 = 4*pi^2/(2*100) separately." },

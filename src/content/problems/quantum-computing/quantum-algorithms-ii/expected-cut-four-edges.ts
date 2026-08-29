@@ -25,12 +25,16 @@ export const expectedCutFourEdges: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Use the |E|/2 rule from the lesson — half of the total edge count.",
+    incorrectFeedback: "The baseline rule says a uniform superposition cuts half of the edges on average. If you answered the full edge count, you assumed every edge is always cut; halve it instead.",
+    nearMisses: [
+      { value: 4, feedback: "4 is the total edge count, the cut you would get only if every edge were cut. A uniformly random colouring cuts each edge with probability 1/2." },
+      { value: 1, feedback: "Each edge contributes 1/2 to the expectation, and there are four edges. Multiply rather than taking a single edge's contribution." },
+    ],
   },
   hints: [
-    { text: "The rule is: expected cut size = |E|/2 for the uniform superposition, any graph." },
-    { text: "Here |E|=4." },
-    { text: "4/2 = 2." },
+    { text: "With no QAOA layers applied, the state is the uniform superposition, which colors each node independently at random. Ask what fraction of edges a uniformly random coloring cuts on average." },
+    { text: "The lesson's baseline rule: the expected cut size of the uniform superposition is half the total edge count |E|, on any graph." },
+    { text: "Count the edges of the 4-node cycle, then halve that count." },
   ],
   solution: {
     steps: [{ description: "Expected cut size = |E|/2 = 4/2 = 2." }],

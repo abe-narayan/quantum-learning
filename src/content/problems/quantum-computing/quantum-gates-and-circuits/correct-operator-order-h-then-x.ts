@@ -52,7 +52,9 @@ export const correctOperatorOrderHThenX: MultipleChoiceProblem = {
     correctIdea: "The leftmost gate in a diagram is applied first, which means it's the rightmost factor in the operator product.",
     whyCorrect: "Operators act on a ket by matrix multiplication from the left, so the first-applied operator must be closest to the ket, on the right of any product of two.",
     whyWrong: [
-      "Writing $H\\cdot X$ (option b) applies X first and H second — the reverse of what the diagram actually shows, and X and H don't commute, so this genuinely computes a different final state.",
+      { optionId: "b", text: "Writing $H\\cdot X$ applies X first and H second, the reverse of what the diagram shows. X and H don't commute, so this computes a different final state." },
+      { optionId: "c", text: "Gates compose by matrix product, not addition; adding them doesn't even preserve normalization." },
+      { optionId: "d", text: "No inverse appears anywhere here. Both gates are applied, neither is undone." },
     ],
   },
 };

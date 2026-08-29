@@ -10,6 +10,15 @@ import { PlaybackControls } from "./PlaybackControls";
 import { ComparisonPanel } from "./ComparisonPanel";
 
 /**
+ * How many animation frames the first-contact autoplay pass advances before
+ * pausing itself — the same bounded-pass convention (and the same budget)
+ * as WavefunctionHeroExplorer's AUTOPLAY_FRAME_LIMIT: long enough to show
+ * the physics actually develop, short enough to read as a proof-of-concept
+ * rather than a looping background animation.
+ */
+const AUTOPLAY_FRAME_LIMIT = 260;
+
+/**
  * Owns everything that evolves over time for one fixed configuration: the
  * current wavefunction, elapsed time, and the animation loop. Deliberately
  * mounted fresh (via a `key` on the config, in WavefunctionExplorer) every
@@ -57,6 +66,13 @@ export function WavefunctionSimulation({
   // stalls waiting on the observer's first callback.
   const [isVisible, setIsVisible] = useState(true);
 
+  // First-contact autoplay bookkeeping: one bounded pass starts on the first
+  // intersection, and any explicit interaction (Play/Pause, Step, Reset)
+  // hands full control back to the reader by dropping the frame budget.
+  const autoplayRef = useRef(false);
+  const autoplayFramesRef = useRef(0);
+  const hasAutoplayedRef = useRef(false);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
@@ -66,6 +82,22 @@ export function WavefunctionSimulation({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  // One bounded autoplay pass on first contact — the bench's "open
+  // mid-phenomenon" rule for an instrument whose whole point is time
+  // evolution. Runs once per mount (a preset/parameter change remounts via
+  // `key`, exactly like the homepage hero), is capped at
+  // AUTOPLAY_FRAME_LIMIT frames by the animation loop below, and is skipped
+  // entirely under reduced motion. Frames only advance while visible, so a
+  // below-the-fold embed effectively starts its pass on first scroll into
+  // view.
+  useEffect(() => {
+    if (prefersReducedMotion || !isVisible || hasAutoplayedRef.current) return;
+    hasAutoplayedRef.current = true;
+    autoplayRef.current = true;
+    autoplayFramesRef.current = 0;
+    setIsPlaying(true);
+  }, [isVisible, prefersReducedMotion]);
 
   useEffect(() => {
     if (!isPlaying || prefersReducedMotion || !isVisible) return;
@@ -79,6 +111,14 @@ export function WavefunctionSimulation({
       psiRef.current = next;
       setPsi(next);
       setT((prev) => prev + setup.dt * stepsThisFrame);
+      if (autoplayRef.current) {
+        autoplayFramesRef.current += 1;
+        if (autoplayFramesRef.current >= AUTOPLAY_FRAME_LIMIT) {
+          autoplayRef.current = false;
+          setIsPlaying(false);
+          return;
+        }
+      }
       frameId = requestAnimationFrame(frame);
     }
 
@@ -89,7 +129,13 @@ export function WavefunctionSimulation({
     };
   }, [isPlaying, isVisible, evolver, setup.stepsPerFrame, setup.dt, speed, prefersReducedMotion]);
 
+  function handleTogglePlay() {
+    autoplayRef.current = false;
+    setIsPlaying((v) => !v);
+  }
+
   function handleStep() {
+    autoplayRef.current = false;
     const next = evolver.step(psiRef.current);
     psiRef.current = next;
     setPsi(next);
@@ -97,6 +143,7 @@ export function WavefunctionSimulation({
   }
 
   function handleReset() {
+    autoplayRef.current = false;
     setIsPlaying(false);
     setPsi(setup.psi0);
     psiRef.current = setup.psi0;
@@ -137,7 +184,7 @@ export function WavefunctionSimulation({
 
       <PlaybackControls
         isPlaying={isPlaying}
-        onTogglePlay={() => setIsPlaying((v) => !v)}
+        onTogglePlay={handleTogglePlay}
         onStep={handleStep}
         onReset={handleReset}
         speed={speed}
@@ -145,11 +192,22 @@ export function WavefunctionSimulation({
         prefersReducedMotion={prefersReducedMotion}
       />
 
-      <div
-        aria-live="polite"
-        className="rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
-      >
+      {/*
+        The visible narration is deliberately not the live region. This
+        instrument steps on every animation frame — and it autoplays a bounded
+        260-frame pass on first contact without anyone pressing anything — so a
+        `polite` region attached here rewrote itself ~60 times a second and a
+        screen reader spent the whole run being cut off mid-sentence, never
+        completing one. Same split as RabiExplorer: the eye reads the live
+        sentence, the ear gets one clean announcement of where the evolution
+        actually stopped. Step and Reset still announce immediately, because
+        those leave `isPlaying` false.
+      */}
+      <div className="rounded-panel border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground">
         {narration}
+      </div>
+      <div aria-live="polite" className="sr-only">
+        {isPlaying ? "" : narration}
       </div>
 
       <StatePanel psi={psi} t={t} meanMomentum={meanMomentum} energy={kineticEnergy + psi.expectationPotential(setup.potential)} />

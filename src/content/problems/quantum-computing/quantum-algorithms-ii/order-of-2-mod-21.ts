@@ -27,16 +27,16 @@ export const orderOf2Mod21: NumericProblem = {
     incorrectFeedback: "Compute 2^1, 2^2, 2^3, ... mod 21 until you get back to 1.",
   },
   hints: [
-    { text: "2¹=2, 2²=4, 2³=8, 2⁴=16 mod 21." },
-    { text: "2⁵=32 mod 21=11, 2⁶=22 mod 21=1." },
-    { text: "r=6 is the first time you return to 1." },
+    { text: "The order r is defined as the first exponent at which the power cycles back to where it started. The plan: repeatedly double, reduce mod 21, and watch for the return." },
+    { text: "March through the powers: 2, 4, 8, 16 so far, none of them congruent to 1 mod 21. Each next power is double the previous one, reduced mod 21." },
+    { text: "Keep going past the fourth power; the sequence has not returned yet. Stop at the first exponent where the remainder is 1. That exponent is r." },
   ],
   solution: {
-    steps: [{ description: "2,4,8,16,11,1 — the sequence returns to 1 after 6 steps." }],
+    steps: [{ description: "2,4,8,16,11,1: the sequence returns to 1 after 6 steps." }],
     finalAnswer: `r = ${value}`,
   },
   explanation: {
-    correctIdea: "Order-finding is direct trial multiplication for small N — the quantum speedup only matters once N is too large for this to be practical.",
+    correctIdea: "Order-finding is direct trial multiplication for small N. The quantum speedup only matters once N is too large for this to be practical.",
     whyCorrect: "Matches classicalOrder's actual computation exactly.",
     whyWrong: ["Stopping early (e.g. at 2⁴=16 mod 21=16≠1) and guessing r=4 skips checking that the sequence hasn't actually returned to 1 yet."],
   },

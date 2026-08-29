@@ -22,11 +22,16 @@ export const wernerConcurrenceAtHalf: NumericProblem = {
     type: "numeric",
     value: 0.25,
     tolerance: 0.001,
-    incorrectFeedback: "(3*0.5-1)/2 = (1.5-1)/2 = 0.5/2.",
+    incorrectFeedback: "Two things to check. Evaluate 3p - 1 in full before dividing by 2. And apply the max(0, ·) only if the inside came out negative; at this p the state sits above the separability threshold, so the concurrence must be positive.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is 3p − 1 before the division by 2." },
+      { value: 0, feedback: "Zero would mean the state is separable. That happens only below p = 1/3; at p = 0.5 the bracket is positive, so the max leaves it alone." },
+      { value: 0.55, tolerance: 0.005, feedback: "0.55 is the lesson's p = 0.7 value. Less mixing weight on the singlet means less entanglement." },
+    ],
   },
   hints: [
-    { text: "3*0.5 - 1 = 0.5" },
-    { text: "0.5 / 2 = 0.25, and this is positive so the max(0,.) clipping doesn't activate." },
+    { text: "This is a substitution problem: the closed form C(p) is given in the prompt. The one conceptual care point is the max with zero, which asks whether the state at this value of p is entangled at all." },
+    { text: "Evaluate (3p - 1)/2 at p = 0.5, then check the sign. Only a negative inside would be clipped to zero by the max." },
   ],
   solution: {
     steps: [

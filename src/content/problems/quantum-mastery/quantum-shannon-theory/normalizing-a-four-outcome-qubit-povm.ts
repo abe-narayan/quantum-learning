@@ -24,6 +24,10 @@ export const normalizingAFourOutcomeQubitPovm: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "|0><0| + |1><1| = I (the computational basis resolves the identity), and separately |+><+| + |-><-| = I (the Hadamard basis also resolves the identity). So the unscaled sum of all four projectors is I + I = 2I, and c must be 1/2 to bring the total back down to I.",
+    nearMisses: [
+      { value: 1, feedback: "With c = 1 the four projectors sum to 2I, assigning total probability 2 to every state. The completeness relation demands exactly I." },
+      { value: 0.25, feedback: "1/4 divides by the outcome count. The right normalization depends on how the projectors overlap: these four form two complete bases, so their unscaled sum is 2I, not 4I." },
+    ],
   },
   hints: [
     { text: "Group the four projectors into two orthonormal-basis pairs: {|0>,|1>} and {|+>,|->}." },

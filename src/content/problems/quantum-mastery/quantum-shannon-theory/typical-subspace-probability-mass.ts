@@ -24,6 +24,11 @@ export const typicalSubspaceProbabilityMass: NumericProblem = {
     tolerance: 0.002,
     incorrectFeedback:
       "First find the mean np=4(0.9)=3.6 and standard deviation sqrt(np(1-p))=sqrt(4*0.9*0.1)=0.6, giving the typical range [3.0, 4.2], i.e. k=3 and k=4. Then sum P(3)+P(4) using the binomial formula.",
+    nearMisses: [
+      { value: 1, feedback: "1 sums every k from 0 to 4, the whole distribution. The typical set keeps only the k values within one standard deviation of the mean." },
+      { value: 0.6561, tolerance: 0.002, feedback: "That is P(4) alone. k=3 also falls inside the typical range [3.0, 4.2]." },
+      { value: 0.2916, tolerance: 0.002, feedback: "That is P(3) alone. k=4 is also inside the typical range." },
+    ],
   },
   hints: [
     { text: "Mean type: np = 4 * 0.9 = 3.6." },

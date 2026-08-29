@@ -21,7 +21,7 @@ export const rotatedBasisFrame = (thetaDeg) => ({
 export const lessonMeta = {
   title: "Vector Spaces",
   description:
-    "Vectors as anything you can add and scale: axioms, span, linear independence, basis, dimension, change of basis, and the complex vector spaces quantum mechanics actually uses.",
+    "Vectors as anything you can add and scale: axioms, span, linear independence, basis, dimension, change of basis, and the complex vector spaces quantum mechanics is built on.",
   course: "mathematical-foundations",
   module: "vector-spaces",
   order: 1,
@@ -36,16 +36,16 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  A list of stock prices, a musical chord, and a quantum state have
-  nothing in common — except that you can add two of them and scale one
-  by a number. That's all it takes to be a vector.
+  A list of stock prices, a musical chord, and a quantum state share
+  almost nothing. But you can add two of them and scale one by a number,
+  and that is the whole job description of a vector.
 </LessonHook>
 
 ## Motivation
 
 An arrow in 3D space is a vector. So is a list of stock prices, a
 polynomial, a musical chord, and, the case this course cares about, a
-<Term id="quantum-state">quantum state</Term>. These don't look alike, but they share exactly two
+<Term id="quantum-state">quantum state</Term>. These don't look alike, but they share the two
 operations that matter: you can add two of them, and you can scale one by
 a number. **<Term id="vector-space">Vector space</Term>** is the name for any set equipped with those two
 operations, obeying a short list of sensible rules. Once you accept that
@@ -57,7 +57,7 @@ throws at you.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Giuseppe_Peano.jpg"
   alt="Formal portrait photograph of the Italian mathematician Giuseppe Peano"
-  caption="Giuseppe Peano, whose 1888 Calcolo Geometrico gave the first clean axiomatic definition of a vector space — the same eight-axiom checklist this lesson opens with, applied there to arrows and here to anything that adds and scales."
+  caption="Giuseppe Peano, whose 1888 Calcolo Geometrico gave the first clean axiomatic definition of a vector space: the same eight-axiom checklist this lesson opens with, applied there to arrows and here to anything that adds and scales."
   credit="MacTutor History of Mathematics Archive, University of St Andrews / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Giuseppe_Peano.jpg"
   license="Public domain"
@@ -65,7 +65,7 @@ throws at you.
 
 ## Intuition
 
-Forget arrows for a moment. The only things you actually *do* with a
+Forget arrows for a moment. The only things you ever *do* with a
 vector are: add two of them to get a third, and stretch/shrink one by a
 number. If a collection of objects supports those two operations and they
 behave the way you'd expect (addition doesn't care about order, scaling by
@@ -76,9 +76,16 @@ of whether "vector" conjures an arrow in your head or not.
 
 ### The axioms
 
-A **vector space** over a field of scalars $F$ (for us, $F=\mathbb{R}$ or
-$F=\mathbb{C}$) is a set $V$ with an addition $+$ and a scalar
-multiplication, satisfying, for all $u,v,w\in V$ and $a,b\in F$:
+A **vector space** over a **field** of scalars $F$ is a set $V$ with an
+addition $+$ and a scalar multiplication, satisfying, for all
+$u,v,w\in V$ and $a,b\in F$, the eight axioms below. "Field" here is a
+piece of algebraic vocabulary that this course never needs in its general
+form: it means a number system in which you can add, subtract, multiply
+and divide by anything except zero, with the usual rules. For every
+purpose in this curriculum $F$ is either $\mathbb{R}$ (the real numbers)
+or $\mathbb{C}$ (the complex numbers), and reading "$F$" as "$\mathbb{R}$
+or $\mathbb{C}$, whichever the context calls for" loses nothing at all.
+The axioms:
 
 1. **Closure**: $u+v\in V$ and $av \in V$.
 2. **Commutativity**: $u+v=v+u$.
@@ -115,17 +122,18 @@ a_1v_1+\cdots+a_kv_k = 0 \quad\Longrightarrow\quad a_1=\cdots=a_k=0
 $$
 
 Equivalently: no vector in the set is a combination of the others; each
-one genuinely adds a new direction the others couldn't reach.
+one adds a direction the others cannot reach.
 Independence depends on *which scalars you're allowed to use*. Over
 $\mathbb{C}$, the vectors $(1,0)$ and $(i,0)$ are **dependent**,
 since $(i,0)=i\cdot(1,0)$, even though they look like "different" vectors:
-a complex scalar is exactly what's needed to turn one into the other.
+a complex scalar is all it takes to turn one into the other.
 
 ### Basis and dimension
 
 A **<Term id="basis">basis</Term>** is a linearly independent set that spans $V$. Two facts (both
 real theorems, stated here rather than proved in full): every vector space
-with a finite basis has a basis, and every basis of a given $V$ has the
+with a finite spanning set has a basis (discard redundant vectors from the
+spanning set until none is left), and every basis of a given $V$ has the
 same number of vectors. That number is the **dimension**, $\dim V$.
 
 ### Coordinates
@@ -136,7 +144,7 @@ independent, that expression is **unique**. If $v$ also equalled
 $c_1'e_1+\cdots+c_n'e_n$, subtracting gives
 $(c_1-c_1')e_1+\cdots+(c_n-c_n')e_n=0$, which by independence forces every
 $c_i=c_i'$. The numbers $(c_1,\ldots,c_n)$ are $v$'s **coordinates**
-relative to this basis. This is exactly what a column vector like
+relative to this basis. This is what a column vector like
 $\begin{pmatrix}\alpha\\\beta\end{pmatrix}$ already was in every earlier
 piece of quantum notation you may have seen: coordinates relative to the
 standard basis $\{(1,0),(0,1)\}$, nothing more.
@@ -152,8 +160,8 @@ $x e_1+y e_2 = x'e_1'+y'e_2'$ for $x',y'$, which works out to:
 
 <EquationReveal
   terms={[
-    { id: "prime", symbol: "(x′, y′)", gloss: "The same vector's coordinates in the rotated basis {e1′, e2′} — a description, not a new vector." },
-    { id: "matrix", symbol: "rotation matrix", gloss: "Built entirely from θ, the angle between the two bases — this is where the change of description comes from." },
+    { id: "prime", symbol: "(x′, y′)", gloss: "The same vector's coordinates in the rotated basis {e1′, e2′}: a description, not a new vector." },
+    { id: "matrix", symbol: "rotation matrix", gloss: "Built entirely from θ, the angle between the two bases. The whole change of description comes from that one number." },
     { id: "xy", symbol: "(x, y)", gloss: "The vector's coordinates in the original standard basis {e1, e2}." },
   ]}
 >
@@ -168,7 +176,7 @@ physical object versus its coordinates in a chosen basis, matters a great
 deal once operators enter the picture: a matrix representation always
 depends on a choice of basis, even though the underlying operator doesn't.
 
-<InteractiveSection title="Rotate the basis, not the vector" description="Drag the slider to rotate the basis {e1', e2'} (solid) away from the standard basis {e1, e2} (dashed). Watch v (gray) stay exactly where it is the whole time — only the axes you're describing it against move.">
+<InteractiveSection title="Rotate the basis, not the vector" description="Drag the slider to rotate the basis {e1', e2'} (solid) away from the standard basis {e1, e2} (dashed). Watch v (gray) stay put the whole time; only the axes you are describing it against move.">
   <VectorDiagramExplorer
     frames={Array.from({ length: 19 }, (_, i) => rotatedBasisFrame(i * 5))}
     sliderLabel="Basis rotation angle θ"
@@ -186,8 +194,8 @@ $\mathbb{R}$, restricting scalars to real numbers only, and by that
 measure its dimension **doubles**, because each complex coordinate needs
 two independent real numbers (its real and imaginary parts) to pin down.
 So $\dim_{\mathbb{C}}(\mathbb{C}^n) = n$ but
-$\dim_{\mathbb{R}}(\mathbb{C}^n) = 2n$. This is not pedantry: it's exactly
-why a single qubit's state space $\mathbb{C}^2$ is called
+$\dim_{\mathbb{R}}(\mathbb{C}^n) = 2n$. This is not pedantry. It is why a
+single qubit's state space $\mathbb{C}^2$ is called
 "2-dimensional" in quantum computing (complex dimension) while its
 geometric picture, the Bloch sphere, an ordinary 2-dimensional *surface*
 sitting in 3 real dimensions, comes from a different counting entirely
@@ -293,7 +301,10 @@ problem is asking for.
 </ChallengePrompt>
 
 <NextDiscovery>
-  [Inner Products and Orthogonality](/lessons/quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality) is next:
-  which adds the missing geometric structure (length and angle) that a
-  bare vector space doesn't have on its own.
+  A bare vector space has no notion of length and no notion of angle. You
+  can say that two vectors are independent, but not that they point in
+  different directions, and not how long either one is.
+  [Inner Products and Orthogonality](/lessons/quantum-mechanics/mathematical-foundations/inner-products-and-orthogonality)
+  adds that missing geometry, and with it the machinery behind
+  every probability quantum mechanics computes.
 </NextDiscovery>

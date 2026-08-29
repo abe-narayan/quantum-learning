@@ -193,9 +193,10 @@ measurement on a $d$-dimensional system can have **at most $d$
 outcomes** (a qubit gets at most 2), and it can never be optimal for
 telling apart two *non-orthogonal* quantum states, a problem that shows
 up the instant a real device (or an eavesdropper) has to guess which of
-several possible signal states it was handed. This lesson introduces the
-strictly more general object that removes both restrictions, and proves,
-not just states, why it is the right generalization.
+several possible signal states it was handed. The strictly more general
+object that removes both restrictions is the <Term id="povm">POVM</Term>,
+and this lesson proves rather than states why it is the right
+generalization.
 
 ## Mathematical Development
 
@@ -221,8 +222,8 @@ projector: $P(i)=\text{Tr}(E_i\rho)$.
 
 Nothing here says the $E_i$ are orthogonal, and nothing caps the number
 of outcomes at the Hilbert space dimension: a qubit can have a
-3-outcome, 4-outcome, or arbitrarily-many-outcome POVM, which is exactly
-the extra room the worked example below needs.
+3-outcome, 4-outcome, or arbitrarily-many-outcome POVM, which is the
+extra room the worked example below needs.
 
 ### Why $\sum_iE_i=I$ is exactly the right condition
 
@@ -238,7 +239,7 @@ exactly $E_i\geq0$.
 
 **Normalization.** $\sum_iP(i)=1$ must hold for every $\rho$, i.e.
 $\text{Tr}\big((\sum_iE_i)\rho\big)=\text{Tr}(\rho)=1$ for every density
-matrix. Exactly the argument Quantum Channels: Kraus and Choi used to
+matrix. This is the argument Quantum Channels: Kraus and Choi used to
 pin down trace-preservation from the Choi matrix: test this identity on
 the spanning set of basis matrices $\rho=|j\rangle\langle k|$ (extending
 by linearity past just density matrices). Writing $A\equiv\sum_iE_i$,
@@ -251,15 +252,33 @@ completeness relation.
 
 ### Naimark's dilation theorem
 
+Every POVM turns out to be a projective measurement in disguise, provided
+you are willing to enlarge the system. That is
+<Term id="naimark-dilation-theorem">Naimark's theorem</Term>, and it is
+what keeps the POVM formalism from being a separate postulate: it is the
+old postulate, read on a bigger space.
+
 <TheoremBox title="Naimark's dilation theorem" provenance="derived">
 
-Every POVM $\{E_i\}_{i=1}^n$ on a $d$-dimensional system $A$ can be
-realized as an ordinary projective (von Neumann) measurement on a larger
-system: adjoin an ancilla of dimension $d_{\text{anc}}$ with
-$n\leq d\cdot d_{\text{anc}}$, apply a fixed unitary $U$ to the joint
-$(d\cdot d_{\text{anc}})$-dimensional space, and measure the joint system
-in a fixed orthonormal basis. The resulting outcome statistics reproduce
-$P(i)=\text{Tr}(E_i\rho)$ exactly.
+**Hypotheses.** $A$ is a $d$-dimensional Hilbert space with $d$ finite,
+and $\{E_i\}_{i=1}^n$ is a POVM on it with **finitely many** outcomes.
+Nothing is assumed about the $E_i$ beyond positivity and completeness;
+in particular they need not be projectors, need not commute, and $n$ may
+exceed $d$.
+
+**Conclusion.** Adjoin an ancilla of dimension $d_{\text{anc}}$ with
+$n\leq d\cdot d_{\text{anc}}$. There is a unitary $U$ on the joint
+$(d\cdot d_{\text{anc}})$-dimensional space and a fixed orthonormal basis
+of it such that projectively measuring $U(|\psi\rangle\otimes|0\rangle)$
+in that basis reproduces $P(i)=\text{Tr}(E_i\rho)$ exactly, for every
+input state.
+
+Both finiteness hypotheses matter. The proof extends an isometry by
+completing an orthonormal basis, which is a finite-dimensional move; the
+general statement for continuous-outcome POVMs on infinite-dimensional
+spaces is still true but is a theorem about operator-valued measures and
+needs different machinery. Naimark (1940); see also Paulsen,
+*Completely Bounded Maps and Operator Algebras*, ch. 4.
 
 </TheoremBox>
 
@@ -286,7 +305,7 @@ SVD-based Schmidt decomposition proof already used, run here on an
 isometry instead of a single vector. If $n\leq d\cdot d_{\text{anc}}$,
 embed $\mathbb C^n$ into $\mathbb C^d\otimes\mathbb C^{d_{\text{anc}}}$
 (padding with zero rows for the unused basis vectors) so $U$ is a
-genuine unitary on system-plus-ancilla. For any state $|\psi\rangle$ of
+unitary on system-plus-ancilla. For any state $|\psi\rangle$ of
 $A$,
 
 $$
@@ -298,7 +317,7 @@ measurement on the enlarged space. $\blacksquare$
 
 A qubit ($d=2$) with $n=3$ outcomes needs $d\cdot d_{\text{anc}}\geq3$;
 a trivial "ancilla" of dimension 1 gives only $2<3$, so *some* ancilla is
-genuinely required, and a single **qubit** ancilla ($d_{\text{anc}}=2$,
+required, and a single **qubit** ancilla ($d_{\text{anc}}=2$,
 joint dimension 4) is already enough room. The worked example below
 builds this $n=3$, $d=2$, $d_{\text{anc}}=2$ case explicitly, with every
 matrix multiplied out and checked.
@@ -325,15 +344,15 @@ outcome statistics.
 </DefinitionBox>
 
 A single POVM element $E_i$ is consistent with *infinitely many*
-different instruments. Take any rank-1 $E=|v\rangle\langle v|$ (true of
+different <Term id="quantum-instrument">instruments</Term>. Take any rank-1 $E=|v\rangle\langle v|$ (true of
 every $E_i$ in this lesson's worked example): for **any** unit vector
 $|w\rangle$, $K=|w\rangle\langle v|$ satisfies
 $K^\dagger K=|v\rangle\langle w|w\rangle\langle v|=|v\rangle\langle v|=E$,
 so *every* choice of $|w\rangle$ gives a valid Kraus operator for the
 same $E$, yet each leaves the post-measurement state deterministically
 at $|w\rangle$, a different physical state for each choice, all
-completely invisible to the POVM. The concrete version of exactly this,
-with real numbers, appears in the worked example.
+completely invisible to the POVM. A concrete version of this, with real
+numbers, appears in the worked example.
 
 ## Physical Interpretation
 
@@ -420,8 +439,8 @@ sensible place for "I can't tell" to live. Summing all three:
 
 Given the actual state is $|\psi_1\rangle$:
 $P(E_1)=\text{Tr}(E_1\rho_1)={povmProbsPsi1[0].toFixed(3)}$,
-$P(E_2)=\text{Tr}(E_2\rho_1)={povmProbsPsi1[1].toFixed(3)}$ (exactly zero
-— unambiguous, as designed), and
+$P(E_2)=\text{Tr}(E_2\rho_1)={povmProbsPsi1[1].toFixed(3)}$ (exactly zero,
+unambiguous as designed), and
 $P(E_?)=\text{Tr}(E_?\rho_1)={povmProbsPsi1[2].toFixed(3)}$. Given the
 actual state is $|\psi_2\rangle$, by the mirrored construction:
 $P(E_1)={povmProbsPsi2[0].toFixed(3)}$ (exactly zero),
@@ -441,7 +460,7 @@ than $s=|\langle\psi_1|\psi_2\rangle|$.
     { label: "Yes, but only using two qubits instead of one", value: "twoqubit" },
   ]}
   correctValue="no"
-  explanation="No 2-outcome projective measurement can achieve zero misidentification here at all, regardless of basis — the derivation just below shows the two required projectors P1, P2 would have to be mutually orthogonal, which forces psi1 and psi2 to have already been orthogonal to begin with. Since s=0.6 means they weren't, only the extra 'inconclusive' outcome a POVM allows can make unambiguous discrimination possible."
+  explanation="No 2-outcome projective measurement can achieve zero misidentification here at all, regardless of basis. The derivation just below shows the two required projectors P1, P2 would have to be mutually orthogonal, which forces psi1 and psi2 to have already been orthogonal to begin with. Since s=0.6 means they weren't, only the extra 'inconclusive' outcome a POVM allows can make unambiguous discrimination possible."
 />
 
 ### Why no 2-outcome projective measurement can do this at all
@@ -457,7 +476,7 @@ $P_2=|\psi_1^\perp\rangle\langle\psi_1^\perp|=|1\rangle\langle1|$). But
 $P_1+P_2=I$ requires $|\psi_2^\perp\rangle\perp|\psi_1^\perp\rangle$,
 i.e. $\langle\psi_2^\perp|\psi_1^\perp\rangle=-\cos\theta=0$, true only
 when $\theta=90°$, i.e. when $\psi_1,\psi_2$ were already orthogonal to
-begin with. For this lesson's genuinely non-orthogonal pair
+begin with. For this lesson's non-orthogonal pair
 ($s=0.6\neq0$), **no** 2-outcome projective measurement can achieve zero
 misidentification probability, period; the POVM above is not merely
 *better* than projective measurement here, it is doing something
@@ -469,7 +488,7 @@ equal priors, a real, nonzero error rate on every single trial, traded
 here for this POVM's zero error rate at the cost of a 60% inconclusive
 rate.
 
-### Naimark dilation of this exact POVM
+### Naimark dilation of this POVM
 
 Since $E_1,E_2,E_3$ are each rank 1, take $M_i=\sqrt{E_i}$ in row form:
 $M_1=\sqrt\kappa\langle\psi_2^\perp|$,
@@ -479,7 +498,7 @@ Stacking them gives the $3\times2$ isometry $V$:
 
 <MatrixGrid matrix={isometryV} label="V (stacked M1; M2; M3)" compareTo={isometryCheck} compareLabel="V-dagger V" ariaLabel="The 3 by 2 isometry V built from the three POVM square-root operators, alongside V-dagger V verified equal to the 2x2 identity" />
 
-$V^\dagger V=I_2$ exactly, confirming $V$ is a genuine isometry — this is
+$V^\dagger V=I_2$ exactly, confirming $V$ is an isometry. This is
 the completeness relation $\sum E_i=I$, re-expressed. Padding $V$ with a
 fourth all-zero row (the unused, never-occurring fourth outcome) and
 completing its two orthonormal columns to a full orthonormal basis of
@@ -496,9 +515,9 @@ $\big({naimarkProbsPsi2[0].toFixed(3)},\ {naimarkProbsPsi2[1].toFixed(3)},\ {nai
 for $|\psi_2\rangle$, identical, to numerical precision, to the direct
 Born-rule numbers $\text{Tr}(E_i\rho)$ computed above from two completely
 independent calculations. The fourth basis outcome never fires for
-either state, consistent with this POVM genuinely needing only 3
-outcomes. **A qubit-dimensional POVM measurement really is nothing more
-than a projective measurement on a system plus one extra qubit.**
+either state, consistent with this POVM needing only 3
+outcomes. **A qubit-dimensional POVM measurement is nothing more than a
+projective measurement on a system plus one extra qubit.**
 
 ### The instrument: one POVM, many different post-measurement states
 
@@ -533,7 +552,7 @@ post-measurement directions are
 $K_{1,\text{Lüders}}|\psi_2\rangle\propto({postMeasDirectionLuders[0].re.toFixed(3)},\ {postMeasDirectionLuders[1].re.toFixed(3)})$
 versus
 $K_{1,\text{alt}}|\psi_2\rangle\propto({postMeasDirectionAlt[0].re.toFixed(3)},\ {postMeasDirectionAlt[1].re.toFixed(3)})$
-— genuinely different qubit states. A POVM alone cannot tell you which
+— different qubit states. A POVM alone cannot tell you which
 of these (or the infinitely many other valid choices) actually
 describes your hardware; only the full instrument does.
 
@@ -555,14 +574,15 @@ $s=0.6$ to reproduce the worked example above exactly.
 <BarChartExplorer
   frames={povmOutcomeFrames}
   sliderLabel="Overlap s"
-  ariaLabel="The three POVM outcome probabilities E1, E2, and inconclusive, given the true state is psi1, as the overlap s varies from 0.1 to 0.9"
+  ariaLabel="The three POVM outcome probabilities E1, E2, and inconclusive, given the true state is psi1, as the overlap s varies from 0.1 to 0.9, on a fixed 0 to 1 probability scale so the E1 bar is seen falling and the inconclusive bar rising as s grows"
+  maxValue={1}
 />
 
 As $s\to0$ (near-orthogonal states), the inconclusive rate vanishes and
 the POVM degenerates smoothly into an ordinary 2-outcome projective
 measurement. As $s\to1$ (nearly identical states), correct identification
 becomes rare and the measurement is forced to answer "inconclusive"
-almost every time — exactly the intuition that near-identical states are
+almost every time — the intuition that near-identical states are
 hard to tell apart, now attached to an exact formula rather than just a
 feeling.
 
@@ -570,7 +590,7 @@ feeling.
 
 <Callout type="mistake">
 **Assuming every POVM element must be a projector.** $E_1$ above has
-eigenvalues $\{0.625,\,0\}$ — it is $0.625$ times a rank-1 projector, not
+eigenvalues $\{0.625,\,0\}$: it is $0.625$ times a rank-1 projector, not
 a projector itself ($E_1^2=0.625\,E_1\neq E_1$). The only requirements
 are $E_i\geq0$ and $\sum_iE_i=I$; idempotence ($E_i^2=E_i$) and mutual
 orthogonality are extra properties that happen to hold for *projective*
@@ -582,9 +602,9 @@ measurements specifically, not for POVMs in general.
 $\sqrt{E_i}\,\rho\,\sqrt{E_i}/\text{Tr}(E_i\rho)$ or similarly derived
 from $E_i$ alone.** The instrument section above builds two different, equally
 valid Kraus realizations of the identical $E_1$ that leave the qubit in
-two different states. A POVM genuinely underdetermines the
-post-measurement state; only a full instrument (a specific choice of
-Kraus operators per outcome) fixes it. The "square-root" or Lüders
+two different states. A POVM underdetermines the post-measurement state;
+only a full instrument (a specific choice of Kraus operators per outcome)
+fixes it. The "square-root" or Lüders
 choice is a common *default*, not a fact forced by the POVM itself.
 </Callout>
 
@@ -612,7 +632,7 @@ choice is a common *default*, not a fact forced by the POVM itself.
   positive semi-definite operators summing to the identity; $E_i$ need
   not be orthogonal, and there can be more outcomes than the Hilbert
   space's dimension.
-- $\sum_iE_i=I$ is not a convention — it is the exact condition forced
+- $\sum_iE_i=I$ is not a convention. It is the exact condition forced
   by requiring $\text{Tr}(E_i\rho)$ to be a valid probability
   distribution for every physical state, proved the same way Quantum
   Channels: Kraus and Choi proved trace-preservation on the Choi matrix.
@@ -629,17 +649,13 @@ choice is a common *default*, not a fact forced by the POVM itself.
 
 ## Further Exploration
 
-[Stinespring Dilation and Channel Purification](/lessons/quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification)
-asks the same "enlarge, then restrict" question this lesson asked
-about measurement, but about an entire *channel*: every CPTP map is a
-unitary on a larger system followed by discarding part of it, the direct
-channel-level analog of the Naimark dilation proved here. For the
-Helstrom minimum-error bound used above as the point of comparison, see
-[Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity).
-
 <NextDiscovery>
-  Stinespring Dilation and Channel Purification asks the same
-  "enlarge, then restrict" question this lesson asked about measurement,
-  but about an entire channel: the direct channel-level analog of the
-  Naimark dilation proved here.
+  [Stinespring Dilation and Channel Purification](/lessons/quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification)
+  asks this lesson's "enlarge, then restrict" question about an entire
+  *channel* rather than a measurement: every CPTP map is a unitary on a
+  larger system followed by discarding part of it. The two dilations are
+  the same construction applied to two different objects, and the
+  isometry-extension step is line-for-line the one proved here. For the
+  Helstrom minimum-error bound used above as a point of comparison, see
+  [Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity).
 </NextDiscovery>

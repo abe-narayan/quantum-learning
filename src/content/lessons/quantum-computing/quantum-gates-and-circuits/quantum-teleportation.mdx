@@ -60,10 +60,10 @@ export const fullProtocolInstructions = [
 ];
 
 export const protocolStepLabels = [
-  "Step 1 of 8: prepare the shared pair — H on qubit 1",
-  "Step 2 of 8: prepare the shared pair — CNOT(1,2)",
-  "Step 3 of 8: Alice entangles her qubits — CNOT(0,1)",
-  "Step 4 of 8: Alice entangles her qubits — H on qubit 0",
+  "Step 1 of 8: prepare the shared pair (H on qubit 1)",
+  "Step 2 of 8: prepare the shared pair (CNOT(1,2))",
+  "Step 3 of 8: Alice entangles her qubits (CNOT(0,1))",
+  "Step 4 of 8: Alice entangles her qubits (H on qubit 0)",
   "Step 5 of 8: Alice measures qubit 0, producing classical bit m₀",
   "Step 6 of 8: Alice measures qubit 1, producing classical bit m₁",
   "Step 7 of 8: Bob applies X to qubit 2, but only if m₁ = 1",
@@ -90,21 +90,27 @@ export const protocolFrames = fullProtocolInstructions.map((_, i) => ({
 }));
 
 <LessonHook eyebrow="Moving a state, not copying it">
-Alice can put Bob in possession of a qubit in exactly the state she started with — without that qubit ever traveling between them, without either of them learning what its amplitudes are, and without violating no-cloning.
+Alice can put Bob in possession of a qubit in exactly the state she started with, without that qubit traveling between them, without either of them learning its amplitudes, and without violating no-cloning.
 </LessonHook>
 
 ## Motivation
 
-That claim sounds like it must be a trick, an approximation, or
-a hidden shortcut through some loophole in "no cloning." It's none of
-those: it's an exact, completely derivable protocol, built entirely from
-tools already in this course, that uses only a pre-shared <Term id="entanglement">entangled pair</Term>
-and two classical bits sent over an ordinary channel.
+Moving a qubit's state to Bob without the qubit traveling, and without
+anyone learning its amplitudes, sounds like it has to be a trick, an
+approximation, or a loophole in no-cloning. It is none of those. The
+protocol is exact, it uses only tools already in this course, and its whole
+cost is one pre-shared <Term id="entanglement">entangled pair</Term> plus two classical bits over an
+ordinary channel.
+
+The derivation below is the longest in this course, and worth doing in
+full. Every step is algebra you have already done; what is new is the
+regrouping in the middle, where Bob's qubit turns out to have been holding
+the message all along.
 
 <ExternalFigure
   src="https://www.nist.gov/sites/default/files/images/public_affairs/releases/nist_teleportation_iontrap-1.jpg"
   alt="Close-up photograph of a gold-electrode ion trap deposited onto an alumina chip, the physical device inside which NIST's 2004 atomic-state teleportation took place"
-  caption="The actual ion trap NIST used for its 2004 demonstration of teleporting an atomic qubit's state — the trap area is the horizontal opening near the center. This is the real hardware, not a schematic, behind a protocol otherwise developed here purely on paper."
+  caption="The ion trap NIST used for its 2004 demonstration of teleporting an atomic qubit's state; the trap area is the horizontal opening near the centre. This protocol has been run, not only derived."
   credit="NIST"
   creditUrl="https://www.nist.gov/news-events/news/2004/06/nist-demonstrates-teleportation-atomic-states-quantum-computing"
   license="Public Domain (U.S. Government work)"
@@ -184,7 +190,7 @@ which branch Alice is in is exactly what her two measurement outcomes
 will tell her.
 
 <InsightBlock>
-Bob's qubit is |ψ⟩ itself, or a simple, fixed transformation of it, in every single branch — which branch Alice is in is exactly what her two measurement outcomes tell her.
+Bob's qubit is |ψ⟩ itself, or a fixed transformation of it, in every branch. Which branch Alice is in is exactly what her two measurement outcomes tell her.
 </InsightBlock>
 
 <InteractiveSection title="Build the pre-measurement circuit yourself" description="Build the pre-measurement part of this exact protocol yourself, in 3-qubit mode: H on qubit 1 and CNOT(1,2) to prepare the shared Bell pair, then CNOT(0,1) and H on qubit 0, the two steps just derived above. Inspect the resulting state's amplitudes and check them against the four-branch formula above: all 8 basis states end up populated, with magnitude 0.3 wherever the formula has an α term and 0.4 wherever it has a β term, since α=0.6 and β=0.8i here.">
@@ -206,18 +212,17 @@ on it, so nothing leaks that way.
 Here is the whole protocol as one circuit, start to finish: the Bell-pair
 preparation on qubits 1 and 2, Alice's entangling $\text{CNOT}$ and
 Hadamard, her two measurements, and Bob's classical-conditioned
-correction. Step through it column by column below; each step names
-exactly which classical bit, if any, has to come out a particular way
-before that gate actually fires.
+correction. Step through it column by column below. Each step names which
+classical bit, if any, has to come out a particular way before that gate
+fires.
 
 <InteractiveSection title="Step through the full protocol" description="Move the slider one column at a time, from Bell-pair preparation through Alice's measurements to Bob's correction. The last two columns are the ones worth watching closely: X only fires if m1 = 1, and Z only fires if m0 = 1, so which of them actually run depends on which of the four branches Alice landed in.">
   <CircuitDiagramExplorer frames={protocolFrames} sliderLabel="Step" />
 </InteractiveSection>
 
-The last two gates, $X$ and $Z$ on qubit 2, are drawn as if always
-applied, but the step labels above spell out the truth: which of them
-actually fire depends on Alice's two classical bits, per the table just
-below.
+The last two gates, $X$ and $Z$ on qubit 2, are drawn as if always applied.
+The step labels spell out the truth: which of them fire depends on Alice's
+two classical bits, per the table below.
 
 ### Bob applies a correction
 
@@ -231,9 +236,9 @@ four states depending on Alice's outcomes $(m_0,m_1)$:
 | $10$ | $\alpha\vert0\rangle-\beta\vert1\rangle = Z\vert\psi\rangle$ | apply $Z$ |
 | $11$ | $-\beta\vert0\rangle+\alpha\vert1\rangle = XZ\vert\psi\rangle$ | apply $X$, then $Z$ |
 
-The same four rows, drawn as the branching process they actually are:
-two measurements, each 50/50, and a correction fixed by which of the
-four branches they land in.
+The same four rows, drawn as the branching process they are: two
+measurements, each 50/50, and a correction fixed by which of the four
+branches they land in.
 
 <MeasurementTree
   root={{
@@ -261,7 +266,7 @@ matching correction:
     { label: "A completely different state", value: "different" },
   ]}
   correctValue="exact"
-  explanation="The correction table above is exact, not probabilistic: each of the four branches is a fixed, known transformation of |ψ⟩ (identity, X, Z, or XZ), so undoing it with the matching gate recovers α=0.6, β=0.8i exactly, amplitudes and all, not just the right measurement odds. The QuantumStateDisplay panels below show this for the branch actually computed here: Bob's qubit before correction, after X, and after Z — landing precisely back on |ψ⟩."
+  explanation="The correction table is exact, not probabilistic. Each of the four branches is a fixed, known transformation of |ψ⟩ (identity, X, Z, or XZ), so undoing it with the matching gate recovers α=0.6 and β=0.8i, amplitudes and all, not merely the right measurement odds. The panels below show the branch computed here: Bob's qubit before correction, after X, and after Z, landing back on |ψ⟩."
 />
 
 <QuantumStateDisplay state={bobUncorrected} label="Bob's qubit, before correction" showProbabilities={false} />
@@ -305,9 +310,9 @@ consumed by her measurement; it does not survive alongside Bob's copy.
    $X(\beta|0\rangle+\alpha|1\rangle)$ recovers $\alpha|0\rangle+\beta|1\rangle$.
 2. Verify the $11$ row: show that applying $X$ then $Z$ to
    $-\beta|0\rangle+\alpha|1\rangle$ recovers $\alpha|0\rangle+\beta|1\rangle$.
-3. Suppose Alice's classical message is lost in transit. Describe exactly
-   what Bob's qubit looks like to him (hint: he doesn't know which of the
-   four branches he's in).
+3. Suppose Alice's classical message is lost in transit. Describe what
+   Bob's qubit looks like to him (hint: he does not know which of the four
+   branches he is in).
 4. Why does the protocol need a *pre-shared* Bell pair? Could Alice and
    Bob instead just send an unentangled pair of qubits and get the same
    result?

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { Instrument } from "@/components/ui/Panel";
 import { TechLabel, TechValue } from "@/components/ui/Typography";
@@ -27,10 +28,29 @@ function hashToIndex(key: string, length: number): number {
   return sum % length;
 }
 
+/** `ProblemDifficulty` rungs a homepage visitor can reasonably be handed
+ *  cold. This card sits on the front page, where "today's problem" is many
+ *  visitors' first contact with the problem corpus — a uniform pick over all
+ *  547 problems used to serve beginners a Master-level proof on the wrong
+ *  day. Advanced and Master problems stay one click away at /problems. */
+const DAILY_PICK_DIFFICULTIES = new Set(["beginner", "intermediate"]);
+
+/**
+ * Deterministic daily pick: the date string hashes to an index into the
+ * *filtered* beginner+intermediate subset, not the full list — same date,
+ * same problem, for every visitor, but never a Master problem on the
+ * homepage. The unfiltered fallback only exists so an (currently
+ * impossible) all-advanced corpus still renders a card rather than nothing;
+ * the "easier one" link in the render handles that case honestly.
+ */
 function pickToday(previews: readonly DailyPuzzlePreview[]): DailyPuzzlePreview | null {
   if (previews.length === 0) return null;
+  const approachable = previews.filter((preview) =>
+    DAILY_PICK_DIFFICULTIES.has(preview.difficulty)
+  );
+  const pool = approachable.length > 0 ? approachable : previews;
   const dateKey = new Date().toISOString().slice(0, 10);
-  return previews[hashToIndex(dateKey, previews.length)];
+  return pool[hashToIndex(dateKey, pool.length)];
 }
 
 const noopSubscribe = () => () => {};
@@ -102,6 +122,17 @@ export function DailyPuzzleClient({ previews }: { previews: DailyPuzzlePreview[]
           <Button href={`/problems/${problem.slug}`} className="mt-5">
             Solve today&rsquo;s problem
           </Button>
+          {/* Only reachable via pickToday's unfiltered fallback — kept so
+              that if the pick can ever be advanced/master again, a beginner
+              is offered a way out rather than a wall. */}
+          {problem.difficulty === "advanced" || problem.difficulty === "master" ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Today&rsquo;s pick runs deep.{" "}
+              <Link href="/problems" className="font-medium text-pillar hover:underline">
+                Prefer an easier one?
+              </Link>
+            </p>
+          ) : null}
         </>
       ) : (
         <div role="status">

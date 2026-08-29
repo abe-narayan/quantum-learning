@@ -51,7 +51,9 @@ export const conjugateSymmetryOfInnerProduct: MultipleChoiceProblem = {
     correctIdea: "⟨φ|ψ⟩ and ⟨ψ|φ⟩ are complex conjugates of each other, not equal in general — order in Dirac notation matters.",
     whyCorrect: "This directly follows from the bra being a conjugate-transpose: swapping which ket is the bra and which is the ket introduces exactly one extra conjugation.",
     whyWrong: [
-      "Assuming the two orderings give the same value only works when the inner product happens to be a real number, which 2+3i is not.",
+      { optionId: "b", text: "Treats the inner product as symmetric in its two arguments. The two orderings agree only when the value is real, and 2+3i is not." },
+      { optionId: "c", text: "Negates the whole number. Conjugation leaves the real part alone." },
+      { optionId: "d", text: "Flips the wrong sign: it negates the real part and keeps the imaginary one, the reverse of what conjugation does." },
     ],
   },
 };

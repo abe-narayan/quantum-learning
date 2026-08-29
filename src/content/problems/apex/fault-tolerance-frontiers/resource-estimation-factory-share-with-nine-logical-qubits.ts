@@ -19,7 +19,7 @@ export const resourceEstimationFactoryShareWithNineLogicalQubits: NumericProblem
   question: {
     type: "numeric",
     prompt:
-      "The capstone showed that when the magic-state factory and the compute register share the same code distance, the factory's share of the total physical qubit count is exactly 15/(15+L), where L is the number of logical qubits and 15 is the 15-to-1 distillation protocol's input-state count — independent of the code distance. If the toy algorithm needed L=9 logical qubits instead of the lesson's 6, what fraction of the total physical qubits would the factory occupy?",
+      "The capstone showed that when the magic-state factory and the compute register share the same code distance, the factory's share of the total physical qubit count is exactly 15/(15+L), where L is the number of logical qubits and 15 is the 15-to-1 distillation protocol's input-state count, independent of the code distance. If the toy algorithm needed L=9 logical qubits instead of the lesson's 6, what fraction of the total physical qubits would the factory occupy?",
     inputHint: "as a decimal between 0 and 1",
   },
   answer: {
@@ -27,17 +27,33 @@ export const resourceEstimationFactoryShareWithNineLogicalQubits: NumericProblem
     value,
     tolerance: 0.001,
     incorrectFeedback: "Compute 15/(15+9), not 15/9 or 9/(15+9).",
+    nearMisses: [
+      {
+        value: logicalQubitCount / (distillationInputStatesPerRound + logicalQubitCount),
+        feedback: "That is the compute register's share. The factory's share is the complement: 15/(15+L), not L/(15+L).",
+      },
+      {
+        value: distillationInputStatesPerRound / logicalQubitCount,
+        tolerance: 0.01,
+        feedback: "15/9 exceeds 1, so it cannot be a share of the total. The denominator is the whole system, 15+L, not L alone.",
+      },
+      {
+        value: 15 / 21,
+        tolerance: 0.005,
+        feedback: "That is the lesson's own L=6 answer. Substitute the new L=9 into 15/(15+L).",
+      },
+    ],
   },
   hints: [
     { text: "The capstone's Step 4 derivation shows the factory share is 15/(15+L), because both the factory's and the compute register's qubit counts scale with the same per-patch factor 2d²−1." },
     { text: "Substitute L=9: 15/(15+9) = 15/24." },
-    { text: "15/24 simplifies to 5/8 = 0.625." },
+    { text: "Evaluate 15/24 as a decimal. Sanity check: the share must come out smaller than in the lesson's own case, since a larger compute register claims a bigger slice of the total." },
   ],
   solution: {
     steps: [
       { description: "The capstone derived that, when factory and compute patches share a code distance, the total physical qubit count factors as (15+L)×(2d²−1), so the factory's share is 15/(15+L), independent of d." },
       { description: "With L=9 logical qubits: factory share = 15/(15+9) = 15/24." },
-      { description: "15/24 = 5/8 = 0.625, i.e. 62.5% — lower than the lesson's own L=6 case (5/7 ≈ 71.4%), since a larger compute register claims a larger slice of the same-sized factory." },
+      { description: "15/24 = 5/8 = 0.625, i.e. 62.5%. That is lower than the lesson's own L=6 case (5/7 ≈ 71.4%), since a larger compute register claims a larger slice of the same-sized factory." },
     ],
     finalAnswer: "15/24 = 0.625",
   },
@@ -47,7 +63,7 @@ export const resourceEstimationFactoryShareWithNineLogicalQubits: NumericProblem
     whyCorrect:
       "This directly reuses the capstone's own derived invariant 15/(15+L) rather than re-deriving the qubit counts from scratch, and correctly predicts that a larger logical-qubit count shrinks the factory's relative share even though the factory's absolute qubit cost hasn't changed.",
     whyWrong: [
-      "15/9 ≈ 1.667 is not a valid share (shares must be between 0 and 1) — it comes from forgetting to add 15 to the denominator.",
+      "15/9 ≈ 1.667 is not a valid share (shares must be between 0 and 1); it comes from forgetting to add 15 to the denominator.",
       "9/(15+9) = 0.375 is the compute register's share, not the factory's.",
     ],
   },

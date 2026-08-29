@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { REGIME_RENDERERS, type FieldFrame } from "@/components/field/regimes";
+import {
+  REGIME_ALPHA_CEILING,
+  REGIME_RENDERERS,
+  type FieldFrame,
+} from "@/components/field/regimes";
 
 /**
  * The background field is drawn imperatively to a canvas, which means none of
@@ -19,9 +23,16 @@ import { REGIME_RENDERERS, type FieldFrame } from "@/components/field/regimes";
  *   4. It never exceeds the alpha ceiling implied by `intensity`. The one
  *      hard rule of this feature is that the background may never compete
  *      with body text; that rule is enforced here rather than trusted.
+ *
+ * On (4): the ceiling is imported from the module it governs rather than
+ * restated here. It used to be a local `0.75`, which was loose enough to be
+ * no rule at all — `drawState` painted its state vector at 0.7, which
+ * composites to 5.09:1 over `--background` (body text is 4.5:1), through the
+ * reading column, and this suite passed the whole time. See the comment on
+ * `REGIME_ALPHA_CEILING` for where the number comes from.
  */
 
-const ALPHA_CEILING = 0.75;
+const ALPHA_CEILING = REGIME_ALPHA_CEILING;
 
 type Recorder = {
   ctx: CanvasRenderingContext2D;

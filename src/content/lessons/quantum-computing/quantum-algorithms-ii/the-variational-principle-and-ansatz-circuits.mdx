@@ -15,7 +15,7 @@ export const zExcitedEnergy = Math.max(zEigenA, zEigenB);
 export const lessonMeta = {
   title: "The Variational Principle and Ansatz Circuits",
   description:
-    "Every state's energy expectation value sits above the true ground energy, a short, complete proof that motivates a fundamentally different kind of quantum algorithm: search over circuit parameters with a classical optimizer, rather than a fixed sequence of gates.",
+    "Every state's energy expectation value sits above the true ground energy, a short, complete proof that motivates a different kind of quantum algorithm: search over circuit parameters with a classical optimizer, rather than a fixed sequence of gates.",
   course: "quantum-algorithms-ii",
   module: "the-variational-principle-and-ansatz-circuits",
   order: 1,
@@ -36,27 +36,23 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-VQE and QAOA never run a fixed circuit once and stop the way Shor's algorithm does — they run a parameterized circuit again and again, with a classical optimizer steering the parameters between runs toward a better answer.
+VQE and QAOA do not run a fixed circuit once and stop, the way Shor's algorithm does. They run a parameterized circuit again and again, with a classical optimizer steering the parameters between runs.
 </LessonHook>
 
 ## Motivation
 
-Shor's algorithm is a fixed sequence of gates, run once, with a classical
-post-processing step at the end. **<Term id="vqe">VQE (the variational quantum
-eigensolver)</Term>** and **QAOA** work completely differently: a
-parameterized circuit is run many times, with a *classical optimizer*
-adjusting its parameters between runs to improve some measured quantity,
-a genuinely hybrid loop, not a one-shot circuit. This lesson derives the
-mathematical fact that makes that loop meaningful at all.
+Shor's algorithm is a fixed sequence of gates, run once, with classical
+post-processing at the end. **<Term id="vqe">VQE (the variational quantum eigensolver)</Term>**
+and **QAOA** work differently: a parameterized circuit runs many times,
+with a *classical optimizer* adjusting its parameters between runs to
+improve a measured quantity.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a superconducting quantum computer enclosed in a nine-foot glass and steel case"
-  caption="IBM's Quantum System One: real NISQ-era hardware of exactly the kind VQE's ansatz circuits and classical-optimizer hybrid loop are designed to run on."
-  credit="Onri Jay Benally (OJB Quantum)"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
-  license="CC BY 4.0"
-/>
+Handing the steering wheel to an optimizer raises an obvious worry. What
+stops it from wandering somewhere meaningless and reporting a number that
+looks good? The answer is a theorem, proved below in four lines, which says
+the quantity being minimized has a hard floor at the true ground energy. An
+optimizer can fail to reach the floor. It cannot fall through it, and a
+reported value below it means a bug rather than a discovery.
 
 ## Mathematical Development
 
@@ -77,10 +73,9 @@ using $E_i\geq E_0$ for every $i$ in the inequality step. So
 with equality exactly when $|\psi\rangle=|\phi_0\rangle$** (any weight on
 a higher-energy eigenstate strictly increases the expectation value,
 unless that eigenstate happens to be degenerate with $E_0$). This is the
-**variational principle**: the ground energy is a genuine lower bound on
-every state's energy expectation value, and minimizing that expectation
-value over some family of states can only approach $E_0$ from above,
-never overshoot below it.
+**variational principle**: the ground energy is a lower bound on every
+state's energy expectation value, so minimizing that expectation over any
+family of states approaches $E_0$ from above and cannot overshoot below.
 
 ### The ansatz and the hybrid loop
 
@@ -93,29 +88,31 @@ not merely approximate it. The **hybrid loop**: measure
 $\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ on the quantum device
 (via `costFunction`, reusing `expectationValue` directly), feed that
 number to a classical optimizer, get updated parameters, repeat.
-`runVqe` implements this with pattern search (try a step in each parameter
+`runVqe` implements this with pattern search: try a step in each parameter
 direction, keep whichever improves the cost, shrink the step when nothing
-does), a genuine, if simple, optimizer, not a hardcoded answer.
+does. Simple, but a real optimizer rather than a hardcoded answer.
 
 ### Why the variational principle matters for an imperfect optimizer
 
-The variational principle guarantees `runVqe`'s output energy is *always*
-at least $E_0$, no matter how badly the optimizer performs or how few
-iterations it runs, a real safety property this course's tests check
-directly (`result.energy >= exact - 1e-6` for every Hamiltonian tried).
-The optimizer can fail to *reach* $E_0$; the variational principle
-guarantees it can never report something *below* $E_0$, which would signal
-a bug (in the ansatz, the cost function, or the optimizer) rather than a
-better answer.
+The variational principle guarantees `runVqe`'s output energy is at least
+$E_0$, however badly the optimizer performs and however few iterations it
+runs. That is a safety property, and this course's tests check it directly
+(`result.energy >= exact - 1e-6` for every Hamiltonian tried).
+
+The asymmetry is worth stating plainly. The optimizer can fail to *reach*
+$E_0$, and often does. It cannot report a value *below* $E_0$, so a number
+under the floor is evidence of a bug in the ansatz, the cost function, or
+the optimizer, and never of a better answer.
 
 ## Physical Interpretation
 
-VQE and QAOA are built for a different regime than Shor's algorithm: they
-tolerate imperfect answers (an approximate ground energy, a near-optimal
-cut) in exchange for using much shallower circuits. This is the reason
-this family of algorithms is the leading candidate for near-term ("<Term id="nisq">NISQ</Term>",
-covered in the capstone) hardware that can't yet run Shor's deep,
-long-coherence-time circuits reliably.
+VQE and QAOA are built for a different regime than Shor's algorithm. They
+accept imperfect answers, an approximate ground energy or a near-optimal
+cut, and buy much shallower circuits with that concession. Shallow circuits
+are what present-day hardware can actually finish before decoherence sets
+in, which is why this family is the leading candidate for near-term
+("<Term id="nisq">NISQ</Term>", covered in the capstone) devices that cannot yet run Shor's deep
+circuits reliably.
 
 ## Worked Example
 
@@ -136,17 +133,17 @@ floor $E_0$ sets. That isn't special to $\theta=\pi/2$.
   question="Sweep θ across its entire range, 0 to 2π (φ=0 fixed), for H=Z. Does the trial energy ⟨ψ(θ)|Z|ψ(θ)⟩ ever dip below E₀=−1 anywhere along the way?"
   options={[
     { label: "Yes, briefly, near the far side of the sweep", value: "dips" },
-    { label: "No — it touches −1 once and stays at or above it everywhere else", value: "floor" },
-    { label: "No — it stays strictly above −1 everywhere, never touching it", value: "never-touches" },
+    { label: "No: it touches −1 once and stays at or above it everywhere else", value: "floor" },
+    { label: "No: it stays strictly above −1 everywhere, never touching it", value: "never-touches" },
   ]}
   correctValue="floor"
-  explanation="The variational principle is an inequality, not a strict one: equality is possible, exactly when the trial state coincides with the true ground state. For this ansatz that happens once, at θ=π (giving |1⟩, energy exactly −1). Everywhere else on the sweep the curve sits strictly above the floor, never below it — a live picture of the proof above, not a separate claim."
+  explanation="The variational principle is a non-strict inequality, so equality is possible, and it happens exactly when the trial state coincides with the true ground state. For this ansatz that occurs once, at θ=π (giving |1⟩, energy −1). Everywhere else the curve sits strictly above the floor. The plot below is the proof rendered as a picture rather than a separate claim."
 />
 
 Sweeping $\theta$ across its *entire* range shows the trial energy
 staying at or above $E_0$ everywhere, never dipping below it even once:
 
-<InteractiveSection title="Never below the floor, touching it once" description="Drag θ from 0 to 2π. Watch ⟨ψ|H|ψ⟩ touch the E₀ line exactly at θ=π (the true minimizer) and never cross below it anywhere else, exactly what the variational principle guarantees.">
+<InteractiveSection title="Never below the floor, touching it once" description="Drag θ from 0 to 2π. Watch ⟨ψ|H|ψ⟩ touch the E₀ line at θ=π, the true minimizer, and never cross below it anywhere else, which is what the variational principle guarantees.">
   <ParametricCurve
     frames={[{
       paramLabel: "⟨ψ|H|ψ⟩ vs θ (φ=0 fixed)",

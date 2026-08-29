@@ -129,8 +129,6 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
   const allRows = useMemo(() => buildRows(lessons), [lessons]);
   const trimmed = query.trim().toLowerCase();
 
-
-
   const rows = useMemo(
     () =>
       allRows.filter(
@@ -218,7 +216,7 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
     <button
       type="button"
       onClick={clearAll}
-      className="inline-flex min-h-11 items-center rounded-full border border-border-strong px-3.5 text-sm font-medium text-foreground transition-colors duration-[--dur-fast] hover:border-pillar-edge hover:text-pillar-text"
+      className="inline-flex min-h-11 items-center rounded-full border border-border-strong px-3.5 text-sm font-medium text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
     >
       Show all {allRows.length} lessons
     </button>
@@ -250,7 +248,12 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="entanglement, error correction, Shor…"
-                className="w-full rounded-full border border-border bg-surface px-4 py-3 pr-11 text-sm text-foreground placeholder:text-subtle-foreground"
+                // `.input-instrument` (globals.css §8) carries the shared
+                // field identity — tight radius (no more SaaS pill), border,
+                // surface fill, placeholder voice; only sizing stays here.
+                // `text-base` below `sm` (like AnswerInput): iOS Safari zooms
+                // the whole page on focusing any field under 16px.
+                className="input-instrument w-full px-4 py-3 pr-11 text-base sm:text-sm"
               />
               {query ? (
                 <button
@@ -287,7 +290,7 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
       </Instrument>
 
       {rows.length === 0 ? (
-        <p className="mt-10 rounded-[var(--radius-panel)] border border-dashed border-border px-5 py-8 text-sm text-muted-foreground">
+        <p className="mt-10 rounded-panel border border-dashed border-border px-5 py-8 text-sm text-muted-foreground">
           No lesson matches those constraints yet. Widen the level or the pillar — or{" "}
           <button
             type="button"
@@ -317,9 +320,19 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
                       <h3 className="font-display text-base font-semibold text-foreground">
                         {course.title}
                       </h3>
+                      {/* Same touch-target treatment, and the same reason, as
+                          `LessonSearch`'s "Browse all" link: padding cancelled
+                          by negative margin grows the hit area past 44px
+                          without knocking this link off the baseline it shares
+                          with the course heading beside it. The name is
+                          repeated per course group, so it also carries the
+                          course title in `aria-label` — twenty identical
+                          "Course overview" links in a screen reader's link
+                          list are twenty links to nowhere in particular. */}
                       <Link
                         href={getCourseHref(course.courseSlug, course.rows[0]?.lesson.slug)}
-                        className="font-tech text-[0.7rem] uppercase tracking-wide text-pillar-text underline-offset-4 hover:underline"
+                        aria-label={`${course.title} — course overview`}
+                        className="-my-4 py-4 font-tech text-[0.7rem] uppercase tracking-wide text-pillar-text underline-offset-4 hover:underline"
                       >
                         Course overview →
                       </Link>
@@ -329,7 +342,7 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
                         <li key={row.lesson.slug}>
                           <Link
                             href={`/lessons/${row.lesson.slug}`}
-                            className="group flex min-h-11 flex-wrap items-center gap-x-4 gap-y-1 rounded-[--radius-tight] px-2.5 py-2 transition-colors duration-[--dur-fast] ease-[--ease-mech] hover:bg-surface-muted focus-visible:bg-surface-muted"
+                            className="group flex min-h-11 flex-wrap items-center gap-x-4 gap-y-1 rounded-(--radius-tight) px-2.5 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
                           >
                             <span className="flex min-w-0 flex-1 items-center gap-2.5">
                               <LessonCompletionMark slug={row.lesson.slug} />

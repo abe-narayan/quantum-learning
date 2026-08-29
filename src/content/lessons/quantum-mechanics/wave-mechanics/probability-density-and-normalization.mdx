@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Probability Density and Normalization",
   description:
-    "Making the Born rule precise for continuous position: what normalization actually requires, how it's preserved under time evolution, and how the platform's numerical engine enforces both.",
+    "Making the Born rule precise for continuous position: what normalization requires, how it survives time evolution, and how the platform's numerical engine enforces both.",
   course: "wave-mechanics",
   module: "probability-density-and-normalization",
   order: 1,
@@ -30,14 +30,16 @@ The last lesson derived ∫|ψ(x)|²dx = 1 from a continuum limit. This lesson t
 
 ## Motivation
 
-That claim about normalization surviving evolution is one this
-platform's numerical engine can actually be checked against, not just
-asserted.
+Normalization is a condition you impose once, at $t=0$. Nothing after
+that moment re-imposes it: the dynamics keep the total probability at 1
+on their own, and that is a claim you can check against a live numerical
+engine rather than take on faith. This lesson turns $\int|\psi|^2dx=1$
+into a working tool, then watches the norm hold under real evolution.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/32/Double-slit_experiment_results_Tanamura_4.jpg"
   alt="Four panels showing the buildup of a two-slit interference pattern from individual electron detections: 11, 200, 6000, and 140000 electrons"
-  caption="Tonomura's 1989 single-electron double-slit experiment: each dot is one detected electron, yet as enough of them accumulate the pattern traces out exactly the probability density this lesson works with."
+  caption="Tonomura's 1989 single-electron double-slit experiment: each dot is one detected electron, yet as enough of them accumulate the pattern traces out the probability density this lesson works with."
   credit="Dr. Akira Tonomura / Hitachi (via Belsazar and MikeRun, Wikimedia Commons)"
   creditUrl="https://commons.wikimedia.org/wiki/File:Double-slit_experiment_results_Tanamura_4.jpg"
   license="CC BY-SA 3.0"
@@ -45,7 +47,7 @@ asserted.
 
 ## Intuition
 
-$|\psi(x)|^2$ is a probability density exactly like a mass density or a
+$|\psi(x)|^2$ is a probability density in the same sense as a mass density or a
 population density: to get an actual probability (a plain number between
 0 and 1), you integrate the density over a region. The *total* probability
 integrated over all of space must be exactly 1, because the particle is
@@ -71,11 +73,11 @@ $$
 P(a \le x \le b) = \int_a^b |\psi(x)|^2\,dx
 $$
 
-which is literally what `Wavefunction1D.probabilityDensity()` returns
+which is what `Wavefunction1D.probabilityDensity()` returns
 pointwise, summed (as a Riemann sum, `probability * dx`) over the
-relevant grid points. This platform's `probabilityLeftAndRightOf`
+relevant grid points. The `probabilityLeftAndRightOf`
 function used by the Wavefunction Explorer's <Term id="quantum-tunneling">tunneling</Term> comparison is
-exactly this integral, split at the barrier.
+this same integral, split at the barrier.
 
 ### Why normalization survives time evolution
 
@@ -89,9 +91,9 @@ $$
 \langle\psi(t)|\psi(t)\rangle = \langle\psi(0)|U^\dagger(t)U(t)|\psi(0)\rangle = \langle\psi(0)|\psi(0)\rangle = 1
 $$
 
-using $U^\dagger U = I$. So if $\psi(0)$ starts normalized, it is
-*exactly* normalized at every later time: not approximately, not on
-average, exactly. The Wavefunction Explorer's split-operator time
+using $U^\dagger U = I$. So if $\psi(0)$ starts normalized, it stays
+normalized at every later time: not approximately, not on
+average, but as an identity. The Wavefunction Explorer's split-operator time
 evolution is built from three factors that are each individually a pure
 phase (multiplication by a unit-modulus number, either pointwise in
 position space or via a unitary Fourier transform), so the simulator's
@@ -110,25 +112,40 @@ floating-point precision.
 Norm conservation is probability conservation: the particle doesn't
 appear or disappear, get created or destroyed, as time passes. Any
 numerical method that lets the norm drift is quietly violating this, one
-of the reasons the split-operator method (built from exact-phase factors)
-is the right tool, rather than say a naive explicit finite-difference
-scheme, which does not automatically preserve norm and can even blow up.
+of the reasons the split-operator method, built from exact-phase factors,
+is the right tool here. A naive explicit finite-difference scheme does not
+preserve the norm on its own, and can diverge outright.
 
 ## Worked Example
 
 **$\psi(x) = A\,e^{-x^2/(2\sigma^2)}$ for a real constant $\sigma$. Find
 $A$, and find $P(-\sigma \le x \le \sigma)$.**
 
+<PredictBeforeReveal
+  question="Before computing: what should P(−σ ≤ x ≤ σ) come out to for this Gaussian wavefunction?"
+  options={[
+    { label: "About 0.68, the familiar ±1 standard deviation rule", value: "68" },
+    { label: "About 0.84", value: "84" },
+    { label: "About 0.95", value: "95" },
+  ]}
+  correctValue="84"
+  explanation="The 68% rule applies to the density's standard deviation, and the density here is |ψ(x)|² ∝ e^(−x²/σ²), whose standard deviation is σ/√2, not σ. Integrating out to ±σ therefore covers ±√2 standard deviations of the actual probability density, and the integral below evaluates to erf(1) ≈ 0.843. The σ in the wavefunction's exponent is not the σ of the probabilities it predicts."
+/>
+
 $\int_{-\infty}^{\infty} e^{-x^2/\sigma^2}\,dx = \sigma\sqrt{\pi}$ (a
 standard Gaussian integral), so normalization requires
 $|A|^2\sigma\sqrt\pi = 1$, giving $A = (\pi\sigma^2)^{-1/4}$. The region
 probability $P(-\sigma\le x\le\sigma) = \int_{-\sigma}^{\sigma}|\psi|^2 dx$
-evaluates (numerically, via the standard normal CDF) to
-$\mathrm{erf}(1) \approx 0.843$: $|\psi(x)|^2\propto e^{-x^2/\sigma^2}$ has
-standard deviation $\sigma/\sqrt2$, not $\sigma$, so integrating out to
-$\pm\sigma$ covers $\pm\sqrt2$ standard deviations rather than $\pm1$,
-here computed from an actual quantum probability
-density rather than pulled from a statistics table.
+evaluates to $\mathrm{erf}(1) \approx 0.843$.
+
+The width mismatch flagged in the prediction is worth stating once more in
+symbols, because it is the most common slip in this calculation. The
+wavefunction carries $\sigma$ in its exponent, but the density carries
+$\sigma/\sqrt2$: squaring $e^{-x^2/(2\sigma^2)}$ gives
+$e^{-x^2/\sigma^2}$, which is a Gaussian of standard deviation
+$\sigma/\sqrt2$. Integrating out to $\pm\sigma$ therefore covers
+$\pm\sqrt2$ standard deviations of the density, and $0.843$ is the
+familiar $68\%$ figure evaluated at $\sqrt2$ rather than at $1$.
 
 <InteractiveSection
   title="Drag the bounds, watch P(a ≤ x ≤ b) update"
@@ -147,15 +164,15 @@ $\psi(x)^*\psi(x)$, not $\psi(x)^2$.
 <Callout type="warning">
 **Assuming any function can be normalized.** If $\int|\psi|^2 dx$
 diverges (e.g. $\psi(x)=1$ for all $x$, a plane wave), no rescaling fixes
-it. Such states aren't literally normalizable and require special
+it. Such states aren't normalizable at all and require special
 handling (briefly touched on in the Free-Particle Wave Packets lesson).
 </Callout>
 
 ## Practice Questions
 
 1. For $\psi(x) = A$ on $[-2,3]$ and $0$ elsewhere, find $A$.
-2. Explain in one sentence why $U^\dagger U = I$ is exactly what's needed
-   to guarantee norm preservation.
+2. Explain in one sentence how $U^\dagger U = I$
+   guarantees norm preservation.
 3. If a numerical simulation of a normalized state showed
    $\|\psi(t)\|=0.998$ after some evolution, what would that most likely
    indicate about the *method* used, given the exact-unitarity argument

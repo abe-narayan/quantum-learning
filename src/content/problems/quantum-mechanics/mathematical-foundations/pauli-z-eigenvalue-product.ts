@@ -22,6 +22,10 @@ export const pauliZEigenvalueProduct: NumericProblem = {
     value: -1,
     tolerance: 0.001,
     incorrectFeedback: "The product of a matrix's eigenvalues always equals its determinant.",
+    nearMisses: [
+      { value: 0, feedback: "0 is the trace, which gives the sum of the eigenvalues. Their product is the determinant." },
+      { value: 1, feedback: "The signs matter: the eigenvalues are +1 and −1, so their product is negative." },
+    ],
   },
   hints: [
     { text: "The product of the eigenvalues of any matrix equals its determinant." },

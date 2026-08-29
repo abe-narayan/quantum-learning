@@ -25,11 +25,15 @@ export const shorCodeQubitCount: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.5,
-    incorrectFeedback: "Multiply the number of groups by the number of qubits per group.",
+    incorrectFeedback: "If you added the two numbers, you treated the codes as sitting side by side. Concatenation nests one code inside the other: every qubit of the outer code is itself a full inner code, so the counts multiply rather than add.",
+    nearMisses: [
+      { value: 6, feedback: "6 is 3 + 3, two codes side by side. Concatenation nests them: each of the 3 outer qubits becomes a whole 3-qubit inner block." },
+      { value: 3, feedback: "3 is one level of the structure. The Shor code stacks two levels, so count the qubits inside every outer block." },
+    ],
   },
   hints: [
-    { text: "3 groups, each with 3 qubits." },
-    { text: "3 × 3 = 9." },
+    { text: "Picture the structure the prompt describes: an outer phase-flip code whose qubits have each been replaced by a complete inner bit-flip code. Does that arrangement add the two counts or combine them some other way?" },
+    { text: "Concatenation multiplies. Total physical qubits = (number of outer groups) × (qubits in each group)." },
   ],
   solution: {
     steps: [{ description: "3 groups × 3 qubits/group = 9 physical qubits." }],

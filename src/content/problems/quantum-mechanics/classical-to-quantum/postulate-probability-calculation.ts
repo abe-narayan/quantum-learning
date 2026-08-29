@@ -23,6 +23,10 @@ export const postulateProbabilityCalculation: NumericProblem = {
     value: 0.25,
     tolerance: 0.01,
     incorrectFeedback: "P(+1) = |cos(π/3)|², not cos(π/3) itself. cos(π/3) = 0.5.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is cos(π/3), the amplitude. The Born rule squares it." },
+      { value: 0.75, feedback: "0.75 is P(−1) = sin²(π/3). The question asks for the +1 outcome, whose coefficient is the cosine." },
+    ],
   },
   hints: [
     { text: "cos(π/3) = 0.5." },

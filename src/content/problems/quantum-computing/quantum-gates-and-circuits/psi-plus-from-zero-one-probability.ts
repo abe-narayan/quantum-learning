@@ -29,6 +29,10 @@ export const psiPlusFromZeroOneProbability: NumericProblem = {
     value: probabilityOf01,
     tolerance: 0.01,
     incorrectFeedback: "Trace |01⟩ through H on qubit 0 first, then through CNOT(0,1), before applying the Born rule.",
+    nearMisses: [
+      { value: 0.25, feedback: "0.25 assumes all four outcomes are equally likely. |Ψ+⟩ has zero amplitude on |00⟩ and |11⟩, so its weight is split between two outcomes." },
+      { value: 1, feedback: "Certainty would mean the circuit left |01⟩ untouched. The Hadamard puts qubit 0 into superposition first, so the final state is entangled, not a single basis state." },
+    ],
   },
   hints: [
     { text: "H on qubit 0 of |01⟩ gives (|01⟩+|11⟩)/√2 — qubit 1 stays at 1 throughout this step." },

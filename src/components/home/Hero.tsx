@@ -9,6 +9,7 @@ import { CurriculumStrip } from "@/components/home/CurriculumStrip";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { PILLARS } from "@/lib/content/curriculum";
+import { START_LEARNING_HREF, START_LEARNING_SLUG } from "@/lib/nav";
 
 /**
  * 14 named tools on /simulators, plus the concept map and the density-matrix
@@ -34,10 +35,22 @@ const SIMULATOR_COUNT = "16+";
  * alone: a count of "6 Tracks" is only a figure until the six are named, and
  * naming them here is what stops the page's real contents from being
  * invisible until the visitor has scrolled past two full sections.
+ *
+ * The primary CTA goes to `START_LEARNING_HREF` — the same place the
+ * Navbar's identical "Start learning" button goes — so the loudest control
+ * on the page and the loudest control in the chrome keep one contract: same
+ * label, same destination, a page that starts teaching. Browsing lives on
+ * the secondary button, labeled as browsing.
  */
 export async function Hero() {
   const lessons = await getAllLessonsMeta();
   const problemCount = getAllProblemMeta().length;
+  // The reassurance line under "Start learning" used to read a hardcoded
+  // "20 min" while the lesson it points at is authored at 30 — and
+  // `estimatedMinutes` is recalibrated corpus-wide (course `estimatedHours`
+  // now derives from it), so any constant here is guaranteed to drift again.
+  // Read from the lesson `START_LEARNING_HREF` actually opens.
+  const startLesson = lessons.find((lesson) => lesson.slug === START_LEARNING_SLUG);
 
   return (
     <section className="relative overflow-hidden border-b border-border">
@@ -57,17 +70,27 @@ export async function Hero() {
                 This is a live quantum simulation. Not a diagram of one.
               </SectionTitle>
               <Lede className="mt-5">
-                Switch presets on the live simulation and watch a real wave packet — solved in
-                your browser by the same split-operator engine behind every Wave Mechanics
-                lesson — disperse, interfere with itself, and tunnel through a barrier it has
-                no classical business crossing.
+                Switch presets and watch a real quantum wave spread out, interfere with
+                itself, and pass through a barrier it has no classical business crossing.
+                It is computed live in your browser, by the same simulation engine every
+                Wave Mechanics lesson uses.
               </Lede>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button href="/learn" size="lg">
-                  Start learning
-                </Button>
-                <Button href="/simulators" size="lg" variant="secondary">
-                  Explore simulators
+              <p className="mt-4 text-muted-foreground">
+                QuantumLearn teaches quantum mechanics and quantum computing from scratch.
+                The first lesson assumes only school algebra.
+              </p>
+              <div className="mt-8 flex flex-wrap items-start gap-x-3 gap-y-4">
+                <div className="flex flex-col gap-2">
+                  <Button href={START_LEARNING_HREF} size="lg">
+                    Start learning
+                  </Button>
+                  <span className="font-tech text-[0.6875rem] uppercase tracking-[0.12em] text-subtle-foreground">
+                    First lesson{startLesson ? ` · ${startLesson.estimatedMinutes} min` : ""} · no
+                    math background needed
+                  </span>
+                </div>
+                <Button href="/learn" size="lg" variant="secondary">
+                  Browse the curriculum
                 </Button>
               </div>
               <ContinueLearning />

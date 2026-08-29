@@ -13,6 +13,12 @@ export const magicStateErrorAfterRoundOne = fifteenToOneOutputErrorRate(magicSta
 
 export const magicStateErrorAfterRoundTwo = fifteenToOneOutputErrorRate(magicStateErrorAfterRoundOne);
 
+export const distillationAcceptanceProbability = (epsilonIn) => Math.pow(1 - epsilonIn, 15);
+
+export const acceptanceAtRawRate = distillationAcceptanceProbability(magicStateInputErrorRate);
+
+export const acceptanceAtTenPercent = distillationAcceptanceProbability(0.1);
+
 export const magicStateDistillationBars = [
   {
     label: "ε₀ (raw input)",
@@ -40,11 +46,11 @@ export const lessonMeta = {
   module: "magic-states-and-distillation",
   order: 4,
   difficulty: "master",
-  estimatedMinutes: 27,
+  estimatedMinutes: 65,
   prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead", "apex/fault-tolerance-frontiers/surface-codes-in-depth", "apex/fault-tolerance-frontiers/lattice-surgery"],
   objectives: [
     "State the Gottesman-Knill theorem precisely: circuits built only from Clifford gates (H, S, CNOT) and Pauli measurements can be efficiently simulated classically, so Clifford gates alone are NOT universal for quantum computation, however fault-tolerantly you implement them",
-    "Explain why the surface code (and most topological codes) admit transversal, fault-tolerant Clifford gates 'for free' but NOT a fault-tolerant transversal T gate (a no-go result, the Eastin-Knill theorem, stated precisely)",
+    "Explain why the surface code admits fault-tolerant Clifford operations (CNOT via lattice surgery, S and H by less direct routes) but NOT a fault-tolerant transversal T gate (a no-go result, the Eastin-Knill theorem, stated precisely)",
     "Describe magic-state injection and distillation: preparing many noisy copies of a 'magic state' (e.g. the T-state |T> = (|0> + e^{i pi/4}|1>)/sqrt(2)) and using a Clifford-only circuit plus post-selection to purify fewer, higher-fidelity copies, exponentially suppressing error with each distillation round",
   ],
   related: [
@@ -57,28 +63,34 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   Clifford gates, no matter how perfectly and fault-tolerantly
-  implemented, can never be more than a classically-simulable subroutine
-  — universality needs a gate the surface code cannot make transversal,
-  and manufacturing it is expensive enough to dominate the entire
-  computation's resource budget.
+  implemented, can never be more than a classically-simulable
+  subroutine. Universality needs a gate the surface code cannot make
+  transversal, and manufacturing it is expensive enough to dominate the
+  entire computation's resource budget.
 </LessonHook>
 
 ## Motivation
 
-The prerequisite lattice-surgery lesson showed the surface code implementing
-H, S, and CNOT transversally and fault-tolerantly, essentially for free. It
-is tempting to assume the rest of a universal gate set follows the same
-way, just more lattice surgery. It does not, and the reason is not an
-engineering gap that better decoders or bigger codes will close: it is a
-theorem. The missing piece is specifically the **T gate**, which the
-surface code has no transversal way to apply, and **magic-state
-distillation** is the field's real, standard answer to that gap.
+The lattice-surgery lesson ended with a working fault-tolerant CNOT. It
+did not get there through a transversal shortcut: that lesson ruled out
+a transversal two-patch gate on a 2D nearest-neighbor layout, where the
+interior qubits of two side-by-side patches have no partners to pair
+with, and built the CNOT from merge and split operations instead. The
+obstruction there is architectural, not code-theoretic; two identical
+CSS blocks do admit a transversal CNOT given the long-range couplings a
+planar chip does not have. It is tempting to assume the rest of a
+universal gate set follows the same way, just more lattice surgery. It
+does not, and the reason is not an
+engineering gap that better decoders or bigger codes will close: it is
+a theorem. The missing piece is the **T gate**, which no Clifford-style
+machinery can supply, and **magic-state distillation** is the field's
+standard answer to that gap.
 
 ## Mathematical Development
 
 ### The Gottesman-Knill theorem
 
-Every code in this platform's error-correction course, the bit-flip code,
+Every code in the error-correction course, the bit-flip code,
 the phase-flip code, the Shor code, and the surface code, is built,
 encoded, and syndrome-measured using only **stabilizer circuits**: state
 preparation in a computational basis state, gates from the Clifford group
@@ -88,7 +100,7 @@ qubits, can be simulated on a classical computer in time polynomial in the
 number of qubits and gates. The simulation does not track the full
 $2^n$-dimensional state vector; it tracks how a list of $n$ Pauli
 stabilizer generators transforms under conjugation by each Clifford gate,
-exactly the bookkeeping this platform's own syndrome-measurement lessons
+the same bookkeeping the syndrome-measurement lessons
 already do by hand for 3- and 9-qubit codes, generalized to an efficient
 algorithm (the Aaronson-Gottesman "CHP" algorithm) that scales to
 arbitrarily many qubits.
@@ -107,28 +119,27 @@ T = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix}.
 $$
 Clifford gates together with T form a universal gate set (any unitary can
 be approximated to arbitrary precision by a Clifford+T circuit, the
-Solovay-Kitaev theorem's setting), which is exactly why "how many T gates"
+Solovay-Kitaev theorem's setting), which is why "how many T gates"
 becomes the right question to ask about an algorithm's real cost.
 
-It is worth checking, using this platform's own `T_GATE` and `S_GATE`
-matrices from `src/lib/quantum/gates.ts` and its real `Matrix.mul`
+It is worth checking, using the `T_GATE` and `S_GATE`
+matrices from `src/lib/quantum/gates.ts` and their real `Matrix.mul`
 multiplication, that T is not just *some* non-Clifford gate but a
 specific, minimal step outside the Clifford group: $T^2 = S$ and
-$S^2 = Z$. Multiplying the platform's actual matrices out confirms both
-exactly,
+$S^2 = Z$. Multiplying those matrices out confirms both,
 $$
 T^2 = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/2} \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix} = S, \qquad S^2 = \begin{pmatrix} 1 & 0 \\ 0 & i^2 \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix} = Z,
 $$
 so T really is "half of S, which is half of Z": a single application of T
 is a strictly finer phase rotation than any Clifford gate can produce on
-its own, which is exactly why it sits outside the group Gottesman-Knill
+its own, which is why it sits outside the group Gottesman-Knill
 covers.
 
 ### The Eastin-Knill theorem
 
-Given that, the natural fix looks easy: implement T transversally too,
-the same trick that made H, S, and CNOT fault-tolerant on the surface
-code. The **Eastin-Knill theorem** forecloses this. It states that no
+Given that, one hope remains: maybe some code, if not the planar
+surface code, could make an entire universal gate set transversal, T
+included. The **Eastin-Knill theorem** forecloses this. It states that no
 quantum error-correcting code can simultaneously have (a) a **universal**
 set of transversal logical gates and (b) the ability to detect and
 correct arbitrary errors on any single physical qubit. Transversal gates
@@ -139,14 +150,31 @@ says that convenience cannot extend to a full universal gate set on a code
 that still protects against arbitrary single-qubit errors: something has
 to give.
 
-For the surface code specifically, the trade lands exactly where the
-prerequisite lattice-surgery lesson left it: **H, S, and CNOT are
-transversal (or transversal via lattice surgery and boundary
-manipulations) and fault-tolerant; T is not.** No amount of surface-code
-engineering, bigger patches, cleverer boundaries, more careful lattice
-surgery, produces a transversal fault-tolerant T gate on this code family.
-A fundamentally different mechanism is required, one that does not route
-the logical T gate through a symmetric, transversal circuit at all.
+For the surface code, the ledger looks like this. **CNOT** is
+fault-tolerant via the merge-and-split protocol the lattice-surgery
+lesson built, needed precisely because the transversal route is closed.
+**S is not transversal on the surface code either.** Real proposals
+reach it by braiding twist defects, by fold-transversal gates that
+exploit the patch's diagonal symmetry, or by injecting and consuming a
+$|Y\rangle$ state; H likewise takes patch deformation or fold tricks
+rather than a qubit-by-qubit circuit. Every one of those routes stays
+inside the Clifford group, so fault-tolerant implementations exist for
+all of it. The **T gate** is different in kind: no amount of
+surface-code engineering, bigger patches, cleverer boundaries, more
+careful lattice surgery, produces a fault-tolerant transversal T gate
+on this code family. A fundamentally different mechanism is required,
+one that does not route the logical T gate through a symmetric,
+transversal circuit at all.
+
+<ResearchConnection title="How the surface code actually gets its Clifford gates" source="Brown, Laubscher, Kesselring & Wootton, Phys. Rev. X 7, 021029 (2017); Moussa, Phys. Rev. A 94, 042316 (2016)" url="https://arxiv.org/abs/1609.04673">
+  The twist-defect and code-deformation constructions for the full
+  Clifford group on planar surface codes are worked out in Brown et
+  al.'s unified framework; Moussa's folded-surface-code construction
+  ([arXiv:1603.02286](https://arxiv.org/abs/1603.02286)) gives the
+  fold-transversal alternative. Both are cited here rather than
+  re-derived: the point this lesson needs is only that these routes
+  exist and that all of them stop at the Clifford group.
+</ResearchConnection>
 
 ### Magic-state injection
 
@@ -165,8 +193,8 @@ data qubit, the ancilla is measured, and depending on the measurement
 outcome a Clifford (Pauli, or S) correction is applied to the data qubit.
 Every step after the ancilla is prepared, the controlled operation, the
 measurement, and the classically-controlled correction, is a Clifford
-operation implementable exactly as fault-tolerantly as H, S, and CNOT
-already are. The one non-Clifford ingredient, the T-ness itself, is
+operation with a known fault-tolerant implementation on the surface
+code. The one non-Clifford ingredient, the T-ness itself, is
 smuggled in entirely inside the ancilla's initial state. This is precisely
 why the ancilla's fidelity, not the injection circuit, becomes the
 bottleneck.
@@ -189,7 +217,7 @@ outputs 1 copy with error rate
   terms={[
     { id: "eout", symbol: "ε_out", gloss: "Error rate of the single purified magic state that comes out of one distillation round." },
     { id: "ein", symbol: "ε_in", gloss: "Error rate shared by each of the 15 noisy input copies." },
-    { id: "35", symbol: "35", gloss: "Leading-order coefficient specific to the [[15,1,3]] Reed-Muller-code-based protocol — not a universal constant." },
+    { id: "35", symbol: "35", gloss: "Leading-order coefficient specific to the [[15,1,3]] Reed-Muller-code-based protocol, not a universal constant." },
   ]}
 >
   $$
@@ -197,23 +225,23 @@ outputs 1 copy with error rate
   $$
 </EquationReveal>
 
-to leading order in small $\epsilon$, a genuine **cubic suppression**
-cited directly from the literature (Bravyi & Kitaev, and confirmed in
-later resource-estimation work on Reed-Muller-code-based factories); this
-platform cites the coefficient rather than re-deriving the full 15-qubit
-stabilizer circuit from scratch.
+to leading order in small $\epsilon$, a **cubic suppression**
+taken directly from the literature (Bravyi & Kitaev, confirmed in
+later resource-estimation work on Reed-Muller-code-based factories). The
+coefficient is cited here rather than re-derived from the full 15-qubit
+stabilizer circuit.
 
 <ResearchConnection title="The 15-to-1 magic-state distillation protocol" source="Bravyi & Kitaev, Phys. Rev. A 71, 022316 (2005)" url="https://arxiv.org/abs/quant-ph/0403025">
   The cubic suppression cited above, and the [[15,1,3]] Reed-Muller-code
   construction that produces it, is confirmed in later resource-estimation
-  work on Reed-Muller-code-based factories — the protocol most
+  work on Reed-Muller-code-based factories. This is the protocol most
   fault-tolerant architecture proposals still budget T gates against
   today.
 </ResearchConnection>
 
 Running a Clifford-only circuit on 15
 noisy inputs, with post-selection on a stabilizer-style check, to purify
-1 higher-fidelity output is exactly the same "detect, don't blindly trust"
+1 higher-fidelity output is the same "detect, don't blindly trust"
 logic as every syndrome-measurement circuit elsewhere in this course,
 applied here to a resource state instead of a data qubit.
 
@@ -224,12 +252,12 @@ independently-prepared noisy $|T\rangle$ copies go in, a Clifford-only
 circuit checks them against the $[[15,1,3]]$ Reed-Muller code's
 stabilizers and discards every run that fails the check, and exactly 1
 higher-fidelity $|T\rangle$ copy comes out the other side. No
-non-Clifford operation ever appears inside that box — the distillation
+non-Clifford operation ever appears inside that box: the distillation
 circuit itself is built entirely from the same Clifford gates and Pauli
 measurements Gottesman-Knill already covers; only the *raw material*
 going in and coming out is non-Clifford.
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
   <svg width={720} height={230} viewBox="0 0 720 230" className="w-full" role="img" aria-label="Diagram of one round of 15-to-1 magic state distillation. Fifteen small square icons labeled T, each with error rate epsilon approximately 0.01, feed via an arrow into a central box labeled 15-to-1 distillation circuit: Clifford gates only, plus a Reed-Muller 15,1,3 stabilizer check, post-select and discard on a failed check. A second arrow leads from that box to a single output square labeled T, with error rate epsilon approximately 3.5 times 10 to the minus 5, a cubic improvement. A caption below notes that feeding 15 of this round's outputs into a second copy of the same circuit drives the error down again to about 1.5 times 10 to the minus 12.">
     <text x={110} y={22} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">15 noisy copies</text>
     {Array.from({ length: 15 }).map((_, i) => {
@@ -275,13 +303,13 @@ going in and coming out is non-Clifford.
 <p className="mt-2 text-center text-xs text-muted-foreground">
   One round of 15-to-1 distillation: 15 noisy magic states go in, a
   Clifford-only circuit checks and discards, and one higher-fidelity copy
-  comes out — the physical mechanism behind the ε collapse charted below.
+  comes out. This is the physical mechanism behind the ε collapse charted below.
 </p>
 
 ## Physical Interpretation: Why This Matters
 
 <InsightBlock>
-  Distillation doesn't make T gates free — it trades many noisy copies
+  Distillation doesn't make T gates free. It trades many noisy copies
   for one clean enough to spend, and that trade is usually the single
   largest cost in the entire fault-tolerant computation.
 </InsightBlock>
@@ -293,7 +321,7 @@ a dedicated region of a fault-tolerant chip continuously running
 distillation rounds to keep a supply of high-fidelity T-states flowing to
 the computation, often dominates both the *total physical qubit count*
 and the *total runtime* of a fault-tolerant algorithm, more than the
-logical qubits actually doing the "real" computation. This is exactly why
+logical qubits actually doing the "real" computation. This is why
 the number of T gates an algorithm needs (its **T-count**) becomes the key
 resource-counting question in practice, the subject this course's own
 capstone lesson, **Capstone: Resource Estimation for a Real Algorithm**,
@@ -318,7 +346,7 @@ the first round's output.**
     { label: "About 1 in 10,000,000 (10⁻⁷)", value: "e-7" },
   ]}
   correctValue="e-5"
-  explanation="35 × (0.01)³ = 35 × 10⁻⁶ = 3.5×10⁻⁵ — about 1 in 30,000, well past what a naive linear suppression would give (1 in 1,000), but nowhere near 10⁻⁷ either. The cube is doing real work, though it takes a second round, computed below, to reach the far smaller error rates a long computation actually needs."
+  explanation="35 × (0.01)³ = 35 × 10⁻⁶ = 3.5×10⁻⁵, about 1 in 30,000: well past what a naive linear suppression would give (1 in 1,000), but nowhere near 10⁻⁷ either. The cube is doing real work, though it takes a second round, computed below, to reach the far smaller error rates a long computation actually needs."
 />
 
 Using $\epsilon_{\text{out}} \approx 35\,\epsilon_{\text{in}}^3$:
@@ -341,7 +369,7 @@ second round, feeding round 1's output back into the same protocol, takes
 it to roughly 1-in-700-billion. This is the double-exponential shape a
 cubic recursion always produces: $\epsilon_0 \to C\epsilon_0^3 \to
 C(C\epsilon_0^3)^3 = C^4\epsilon_0^9 \to \cdots$, the exponent on
-$\epsilon_0$ itself triples each round. That is the concrete, honest
+$\epsilon_0$ itself triples each round. That is the concrete
 reason "just a couple of distillation rounds" is enough to reach
 the extremely low logical error rates a long fault-tolerant computation
 needs, at the cost of the 15-to-1 (and $15^2$-to-1 for two rounds) qubit
@@ -353,6 +381,67 @@ overhead the factory has to pay for it.
     ariaLabel="Bar chart of -log10(error rate) after 0, 1, and 2 rounds of 15-to-1 magic state distillation, starting from epsilon_0 = 0.01: bars rise sharply from about 2 to about 4.5 to about 11.8, showing the cubic suppression compounding each round"
   />
 </InteractiveSection>
+
+### Three things $\epsilon_{\text{out}}\approx35\epsilon_{\text{in}}^3$ leaves out
+
+The formula is the protocol's leading-order output error *given that the
+round succeeded*. Three separate costs live outside it, and each one is
+where a real factory's budget actually goes.
+
+**Post-selection is not free.** The round succeeds only when the
+stabilizer check passes, which to leading order requires none of the 15
+inputs to have failed: acceptance probability roughly
+$(1-\epsilon_{\text{in}})^{15}$, or about
+{(acceptanceAtRawRate * 100).toFixed(0)}% at
+$\epsilon_{\text{in}}=0.01$. That is comfortable. At
+$\epsilon_{\text{in}}=0.1$ it falls to about
+{(acceptanceAtTenPercent * 100).toFixed(0)}%, so the factory discards
+four runs in five to produce each output.
+
+Throughput is not the only thing that degrades at that input rate,
+which is worth being precise about rather than blaming post-selection
+alone. The cubic law itself is losing its grip: $35\epsilon^3$ buys a
+$286$-fold suppression at $\epsilon_{\text{in}}=0.01$ ($10^{-2}$ down to
+$3.5\times10^{-5}$) but under a $3$-fold suppression at
+$\epsilon_{\text{in}}=0.1$ ($10^{-1}$ down to $3.5\times10^{-2}$). The
+reason is that the protocol has a break-even point at
+$35\epsilon^3=\epsilon$, i.e. $\epsilon^*=1/\sqrt{35}\approx0.17$, above
+which a round makes the state *worse*. An input rate of $0.1$ is already
+most of the way there, so the round is paying five-to-one in discarded
+states for a factor of three. Raw injected magic states have to start
+well below $\epsilon^*$, not merely below it, for the same reason
+hardware has to sit well below the error-correction threshold rather
+than just under it.
+
+**The inputs must fail independently.** The $\epsilon^3$ exponent counts
+the minimum number of input faults that can survive the check
+undetected, which presumes faults on distinct input states are
+uncorrelated. A shared calibration drift or a common control line that
+biases many injected states the same way violates that directly, and
+correlated input error degrades the exponent rather than the constant.
+This is the same assumption the threshold theorem's own two-fault
+counting makes, one level up.
+
+**The 15 inputs are 15 logical patches.** Each noisy $|T\rangle$ has to
+be injected into a protected patch before the Clifford circuit can act
+on it, so a single round's qubit cost is 15 patches at whatever code
+distance the factory runs at, plus routing. This course's own capstone
+computes exactly that number and finds the factory dominating the total,
+which is a consequence of this line, not of the error formula.
+
+<ResearchConnection
+  title="Distillation with the overhead taken seriously"
+  source="Bravyi & Haah, Phys. Rev. A 86, 052329 (2012) (arXiv:1209.2426)"
+  url="https://arxiv.org/abs/1209.2426"
+>
+  A family of triorthogonal-code distillation protocols with
+  substantially lower qubit overhead than 15-to-1, parameterized so that
+  the input-to-output ratio and the error suppression can be traded
+  against each other. The reason to read it after this lesson is that it
+  reframes distillation as an optimization over protocols rather than a
+  single fixed recipe, which is how resource estimates actually treat it:
+  15-to-1 is the canonical example and rarely the cheapest choice.
+</ResearchConnection>
 
 ## Common Mistakes
 
@@ -382,12 +471,13 @@ to this protocol.
 ## Practice Questions
 
 1. Why does the Gottesman-Knill theorem apply to every syndrome-extraction
-   circuit in this platform's error-correction course, and what does that
+   circuit in the error-correction course, and what does that
    imply about whether those circuits alone could ever demonstrate quantum
    advantage?
 2. State the Eastin-Knill theorem's two conditions that cannot both hold,
-   and explain concretely why H, S, and CNOT being transversal on the
-   surface code does not contradict it.
+   and explain concretely why the surface code's fault-tolerant Clifford
+   operations (CNOT via lattice surgery, S via twists, folds, or
+   $|Y\rangle$ injection) do not contradict it.
 3. If a magic-state factory needs an output error rate below $10^{-10}$
    and starts from a raw error rate of $\epsilon_0 = 0.01$, how many
    rounds of 15-to-1 distillation are required?
@@ -400,8 +490,10 @@ to this protocol.
   measurements) are efficiently classically simulable; Clifford gates
   alone can never be universal, however fault-tolerant.
 - **Eastin-Knill**: no code can have both a universal transversal gate set
-  and full single-qubit error correction; on the surface code this means
-  Clifford gates are transversal but T provably cannot be.
+  and full single-qubit error correction. On the surface code the whole
+  Clifford group is reachable fault-tolerantly (CNOT via lattice surgery,
+  S and H by twists, folds, or state injection), but T provably cannot
+  be made transversal.
 - **Magic-state injection** applies a logical T gate using only Clifford
   operations plus one consumed magic-state resource; **distillation**
   (e.g. the 15-to-1 protocol, $\epsilon_{\text{out}} \approx

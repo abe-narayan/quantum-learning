@@ -130,7 +130,7 @@ export const lessonMeta = {
   module: "the-local-hamiltonian-problem",
   order: 3,
   difficulty: "master",
-  estimatedMinutes: 29,
+  estimatedMinutes: 80,
   prerequisites: ["apex/quantum-complexity-theory/qma-and-quantum-verification", "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"],
   objectives: [
     "State the k-Local Hamiltonian problem precisely: given a Hamiltonian H = sum of terms each acting on at most k qubits, decide whether its ground-state energy is below a or above b (with b-a at least inverse-polynomial), promised one of the two holds",
@@ -395,17 +395,29 @@ $2$-Local Hamiltonian — Hamiltonians built entirely from terms acting on
 just *pairs* of qubits — is already $\mathsf{QMA}$-complete, using
 perturbation-theory "gadgets" to simulate higher-locality terms with
 combinations of $2$-local ones. Subsequent work pushed the result further,
-toward physically motivated, highly restricted models: results including
-Oliveira and Terhal's (the specific years and follow-on attributions here
-are cited with less certainty than the two results above, so treat this as
-"subsequent work," not a precisely dated claim) showed that
-$\mathsf{QMA}$-hardness survives even for qubits arranged on a
-**two-dimensional nearest-neighbor lattice** using only a small constant
-number of distinct interaction types, and a further line of work on
-"universal Hamiltonians" identified specific simple, physically realistic
-interaction families (variants of the Heisenberg-type spin couplings
-familiar from real solid-state qubit platforms) that remain
-$\mathsf{QMA}$-complete. Each tightening establishes something strictly
+toward physically motivated, highly restricted models: Oliveira and
+Terhal showed that $\mathsf{QMA}$-hardness survives even for qubits
+arranged on a **two-dimensional nearest-neighbor square lattice**, and a
+further line of work on "universal Hamiltonians" identified specific
+simple, physically realistic interaction families (variants of the
+Heisenberg-type spin couplings familiar from real solid-state qubit
+platforms) that remain $\mathsf{QMA}$-complete.
+
+<ResearchConnection
+  title="The tightening sequence, paper by paper"
+  source="Kempe, Kitaev & Regev, SIAM Journal on Computing 35, 1070 (2006) (arXiv:quant-ph/0406180); Oliveira & Terhal, Quantum Information and Computation 8, 900 (2008) (arXiv:quant-ph/0504050)"
+  url="https://arxiv.org/abs/quant-ph/0406180"
+>
+  Kempe, Kitaev and Regev's perturbation gadgets are the technical device
+  worth extracting: a $3$-local term is simulated by a cluster of $2$-local
+  terms whose low-energy subspace reproduces it, at the cost of large
+  coupling strengths and a shrunken promise gap. Oliveira and Terhal push
+  the same gadget technique onto a 2D square lattice. Both results tighten
+  the *hypothesis* of Kitaev's theorem rather than its conclusion, which
+  is the shape most follow-on work in Hamiltonian complexity takes.
+</ResearchConnection>
+
+Each tightening establishes something strictly
 stronger than the last — not just "some artificial 5-local construction is
 hard" but "hardness survives even when an experimentalist is handed
 essentially the simplest lattice geometry they could ask for." The same
@@ -513,7 +525,7 @@ at the locations where they act: the input term only at $t=0$, a
 propagation term straddling each adjacent pair of clock values, and the
 output term only at $t=T$.
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
 <svg viewBox="0 0 760 340" width={760} className="w-full" role="img" aria-label="A timeline of five clock values t=0 through t=4 connected by four gate boxes labeled U1 through U4, representing the history state as a superposition over every intermediate step of a verification circuit's execution. Above the timeline, the formula for the history state: the sum over t of the clock register value t tensored with the computational register after applying the first t gates, all divided by the square root of 5. Below the timeline, three colored annotations show where Kitaev's three penalty terms act: a brand-colored bracket under t=0 labeled the input term, checking that ancilla qubits start at all zeros; four accent-colored brackets, one spanning each adjacent pair of clock values, labeled propagation terms, each checking that the computational register at the later time correctly equals the gate applied to the register at the earlier time; and a danger-colored bracket under t=4 (the final clock value T) labeled the output term, checking that the verifier's designated answer qubit reads accept.">
   <text x={380} y={22} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">
     |η⟩ = (1/√5) Σ₍t=0..4₎ |t⟩_clock ⊗ |φₜ⟩_computation, where |φₜ⟩ = Uₜ⋯U₁|ψ⟩|0…0⟩

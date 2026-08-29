@@ -1,3 +1,4 @@
+import type { RefObject } from "react";
 import { cn } from "@/lib/utils";
 import type { ValidationResult } from "@/lib/problems/validators/types";
 
@@ -50,16 +51,53 @@ function StatusGlyph({ status }: { status: ValidationResult["status"] }) {
  * regions that were already present when the observer attached. Keeping the
  * empty wrapper mounted from first paint is what makes the announcement
  * dependable rather than incidental.
+ *
+ * `resultRef` exists so a caller can move focus onto the result box. Only
+ * `ProblemView` does, and only on the one transition where focus would
+ * otherwise be destroyed — see the comment on its effect.
  */
-export function Feedback({ result }: { result: ValidationResult | null }) {
+export function Feedback({
+  result,
+  resultRef,
+  submissionId,
+}: {
+  result: ValidationResult | null;
+  /** The rendered result box, for a caller that needs to focus it. Attached
+   *  to the inner box rather than the live-region wrapper so focusing it
+   *  cannot be confused with re-announcing it. */
+  resultRef?: RefObject<HTMLDivElement | null>;
+  /**
+   * A value that changes on every submission — the caller's submission
+   * counter. Used as the result box's `key`, and it is the only thing that
+   * makes a repeated wrong answer audible.
+   *
+   * A live region announces DOM *mutations*, and two wrong submissions
+   * usually produce byte-identical feedback: `validateNumeric` falls through
+   * to the one authored `incorrectFeedback` string for every wrong value that
+   * isn't a listed near miss, so a student adjusting 0.70 → 0.71 → 0.72 gets
+   * the same sentence three times. React reconciled that to no change at all,
+   * the region stayed silent, and a screen-reader user had no way to tell
+   * whether Submit had done anything. A changed `key` remounts the box, which
+   * is a real mutation, so every submission is announced exactly once —
+   * still once per submission, never once per render.
+   */
+  submissionId?: number;
+}) {
   return (
     /* An empty wrapper carries no margin and so no height: the always-mounted
        region costs nothing in layout until it has something to say. */
     <div role="status" aria-live="polite" className={result ? "mt-4" : undefined}>
       {result ? (
         <div
+          key={submissionId}
+          ref={resultRef}
+          // Programmatic focus only — never a tab stop of its own, so a
+          // keyboard reader working down the page is not made to stop on a
+          // paragraph they have already heard.
+          tabIndex={-1}
           className={cn(
-            "flex gap-2.5 rounded-[--radius-tight] border px-4 py-3 text-sm",
+            "flex gap-2.5 rounded-(--radius-tight) border px-4 py-3 text-sm",
+            "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2",
             STATUS_STYLES[result.status]
           )}
         >

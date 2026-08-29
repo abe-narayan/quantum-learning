@@ -16,7 +16,7 @@ export const lessonMeta = {
   module: "circuit-representation-in-code",
   order: 1,
   difficulty: "foundational",
-  estimatedMinutes: 20,
+  estimatedMinutes: 15,
   prerequisites: ["quantum-computing/quantum-gates-and-circuits/building-quantum-circuits"],
   objectives: [
     "Explain why real quantum SDKs separate circuit CONSTRUCTION from circuit EXECUTION",
@@ -36,6 +36,21 @@ built as a *description* of a circuit first (a list of instructions),
 which is only later sent off to be executed (on a simulator or real
 hardware). This lesson covers that software-engineering pattern
 directly.
+
+The payoff for keeping the circuit as data shows up the moment the
+target changes. A circuit written as immediate matrix applications is
+welded to whatever machine ran it; a circuit written as an instruction
+list is not, and can be re-aimed at a different backend without a line
+of it being rewritten.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Full_wafer_of_Intel_quantum_computers.jpg"
+  alt="A full silicon wafer containing dozens of Intel quantum processor chips, before dicing"
+  caption="A wafer of Intel quantum processor chips. No two of these chips have identical qubit frequencies, connectivity, or calibration, and none of them run 'H on qubit 0' natively. Keeping the circuit as data is what lets one instruction list be aimed at any of them — or at a simulator — with the translation left to a separate compilation step."
+  credit="Steve Jurvetson, via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:Full_wafer_of_Intel_quantum_computers.jpg"
+  license="CC BY 2.0"
+/>
 
 ## Engineering Development
 
@@ -78,12 +93,12 @@ runs.
 
 ## Physical Interpretation
 
-This lesson introduces no new physics whatsoever. `SINGLE_QUBIT_MATRICES`
-inside `circuitBuilder.ts` is literally the same `PAULI_X`, `HADAMARD`,
-etc. from `gates.ts`. The entire content here is about *software
-structure* rather than physics, which is a fair description of what
-most quantum programming work actually looks like day to day: less
-deriving new matrices, more organizing gate sequences correctly.
+This lesson introduces no new physics. `SINGLE_QUBIT_MATRICES` inside
+`circuitBuilder.ts` holds the same `PAULI_X`, `HADAMARD`, and the rest,
+imported from `gates.ts`. The content here is about *software structure*
+rather than physics — which is a fair description of most quantum
+programming work day to day: less deriving new matrices, more organizing
+gate sequences correctly.
 
 ## Worked Example
 
@@ -148,9 +163,9 @@ const state = runCircuit(circuit);
 
 This platform's test suite confirms `state.probabilities()` gives
 exactly `[0, 1]`. The circuit-as-data representation reproduces the
-matrix identity $HZH=X$ exactly, since underneath, `runCircuit` is doing
-nothing more than applying $H$, then $Z$, then $H$ in sequence, exactly
-as Quantum Gates & Circuits' direct approach would.
+matrix identity $HZH=X$ to full precision, because underneath,
+`runCircuit` does nothing more than apply $H$, then $Z$, then $H$ in
+sequence — the same three calls Quantum Gates & Circuits made directly.
 
 The instruction list above is still just data — here's what happens once
 `runCircuit` actually dispatches it, the real $|{\text{amplitude}}|^2$ at
@@ -172,10 +187,10 @@ used, so it works in terms of qubit wires rather than a bare
 `QuantumCircuit(1)` and always keeps at least two of them on the
 canvas. Build the same three-instruction list — $H$, $Z$, $H$ — on
 qubit 0 and leave qubit 1 untouched: since gates act only on the wires
-they're applied to, an idle second qubit has zero effect on qubit 0's
-evolution, so stepping through it still reproduces exactly the circuit
-above. Watch the state land on $|1\rangle$ after the final $H$ rather
-than reading it as a claim about someone else's code:
+they're applied to, an idle second qubit has no effect on qubit 0's
+evolution, so stepping through it reproduces the circuit above. Watch
+the state land on $|1\rangle$ after the final $H$ rather than reading it
+as a claim about someone else's code:
 
 <InteractiveSection title="Build HZH and confirm it matches X" description="Build H, Z, H on qubit 0 yourself, leaving qubit 1 idle. Step through each gate. Confirm q0 lands on |1⟩, exactly matching X|0⟩.">
   <LazyCircuitBuilder />
@@ -185,15 +200,15 @@ than reading it as a claim about someone else's code:
 
 <Callout type="warning">
 **Assuming `circuit.h(0)` immediately changes some quantum state.** It
-only appends an instruction to a list. Nothing about any quantum state
-exists until `runCircuit` is actually called.
+only appends an instruction to a list. No quantum state exists at all
+until `runCircuit` is called.
 </Callout>
 
 <Callout type="note">
-**Thinking this is a fundamentally different kind of quantum computing.**
-It's the identical physics (every instruction dispatches to Quantum
-Gates & Circuits' own functions). Only the software organization
-(data-then-execute, vs. immediate-execute) has changed.
+**Thinking this is a different kind of quantum computing.** It is the
+same physics: every instruction dispatches to Quantum Gates & Circuits'
+own functions. Only the software organization has changed —
+data-then-execute in place of immediate-execute.
 </Callout>
 
 ## Practice Questions

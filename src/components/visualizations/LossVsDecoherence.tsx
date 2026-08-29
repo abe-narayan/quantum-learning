@@ -94,26 +94,51 @@ export function LossVsDecoherence({
           role="img"
           aria-label={`${ariaLabel} Currently: the binary loss curve drops to zero at normalized time ${lossTime.toFixed(2)}.`}
         >
-          {/* axes */}
-          <line x1={PAD_LEFT} y1={HEIGHT - PAD_BOTTOM} x2={WIDTH - PAD_RIGHT} y2={HEIGHT - PAD_BOTTOM} className="stroke-border" strokeWidth={1} />
-          <line x1={PAD_LEFT} y1={PAD_TOP} x2={PAD_LEFT} y2={HEIGHT - PAD_BOTTOM} className="stroke-border" strokeWidth={1} />
-          <text x={WIDTH - PAD_RIGHT} y={HEIGHT - PAD_BOTTOM + 16} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          {/* Axes. The whole point of this figure is *where the brand curve meets zero*,
+              which is unreadable without seeing the y = 0 line, so both axes are
+              load-bearing. They were `stroke-border` — the panel-edge token, measured at
+              1.41:1 on `--surface-muted`, well under WCAG 2.1 SC 1.4.11's 3:1 for
+              meaningful graphical objects — which made the "drops straight to 0" claim
+              land on an invisible floor. `stroke-axis` is the chart channel. */}
+          <line x1={PAD_LEFT} y1={HEIGHT - PAD_BOTTOM} x2={WIDTH - PAD_RIGHT} y2={HEIGHT - PAD_BOTTOM} className="stroke-axis" strokeWidth={1} />
+          <line x1={PAD_LEFT} y1={PAD_TOP} x2={PAD_LEFT} y2={HEIGHT - PAD_BOTTOM} className="stroke-axis" strokeWidth={1} />
+          {/* 10 -> 14 -> 17 units. The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+              (320 less Container's `px-4` gutters), but this SVG renders inside
+              `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+              radius and fill and no padding at all — the `p-4` does. Subtract
+              2 x (16px padding + 1px border) = 34px.
+              So in this 480-unit viewBox the scale is 254/480 = 0.529, not the 0.6
+              the 14-unit pass used: 10 units painted at 5.29px and 14 at **7.41px**,
+              which was still under the floor it was trying to clear. 17 units gives
+              9.00px. The axis name and the 0/1 endpoints are exactly the marks a
+              reader must read to interpret the two curves. Fills stay on
+              `--muted-foreground` (~6.9:1); `--axis` is a 3:1 floor for strokes and
+              would *lower* text contrast. The "1" baseline moves PAD_TOP + 10 ->
+              PAD_TOP + 12 so the taller glyph still sits level with the y = 1
+              gridline it labels. */}
+          <text x={WIDTH - PAD_RIGHT} y={HEIGHT - PAD_BOTTOM + 18} textAnchor="end" className="fill-muted-foreground text-[17px]">
             time in transit →
           </text>
-          <text x={PAD_LEFT - 8} y={PAD_TOP + 8} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          <text x={PAD_LEFT - 8} y={PAD_TOP + 12} textAnchor="end" className="fill-muted-foreground text-[17px]">
             1
           </text>
-          <text x={PAD_LEFT - 8} y={HEIGHT - PAD_BOTTOM} textAnchor="end" className="fill-muted-foreground text-[10px]">
+          <text x={PAD_LEFT - 8} y={HEIGHT - PAD_BOTTOM} textAnchor="end" className="fill-muted-foreground text-[17px]">
             0
           </text>
 
-          {/* dashed marker at the sampled loss point */}
+          {/* Dashed marker at the sampled loss point. This is a reference line the prose
+              underneath explicitly sends the reader to look for ("dashed line, currently
+              t = ..."), so it is load-bearing, not decoration — the `/60` opacity that
+              used to sit here dropped a 1px dashed line to roughly half the contrast of
+              the solid `--warning` and made the thing the caption points at the faintest
+              mark in the frame. Full-strength `--warning`, matching the two data curves'
+              own weight. */}
           <line
             x1={xOf(lossTime)}
             y1={PAD_TOP}
             x2={xOf(lossTime)}
             y2={HEIGHT - PAD_BOTTOM}
-            className="stroke-warning/60"
+            className="stroke-warning"
             strokeWidth={1}
             strokeDasharray="3 3"
           />
@@ -137,13 +162,27 @@ export function LossVsDecoherence({
         <button
           type="button"
           onClick={() => setDrawSeed((s) => s + 1)}
-          className="rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted"
+          className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted"
         >
           Resample loss event
         </button>
       </div>
 
-      <p className="text-sm text-foreground">
+      {/* `aria-live="polite"`, the same treatment `BB84RoundTable` documents
+          for its own "New round" button. "Resample loss event" is this
+          figure's only control, and everything it changes was previously
+          announced nowhere: `lossTime` appears in the `<svg role="img">`
+          `aria-label` — which is a static element's accessible name, computed
+          once and never re-announced when it changes — and in the sentence
+          below, which is just text. Pressing the button produced complete
+          silence, on a figure whose whole argument is "press this repeatedly
+          and watch the drop point land somewhere different every time".
+          Attaching the live region to the visible node is safe here for
+          exactly BB84's reasons: it is mounted from first render (so its
+          initial content is not announced, only subsequent changes), and
+          nothing on a timer rewrites it — there is no rAF loop or autoplay in
+          this component — so it speaks once per press, paced by the reader. */}
+      <p aria-live="polite" className="text-sm text-foreground">
         The accent curve fades continuously, there&rsquo;s no single moment it
         &ldquo;happens.&rdquo; The brand curve stays exactly at 1 and then, at one
         random moment (dashed line, currently t ={" "}

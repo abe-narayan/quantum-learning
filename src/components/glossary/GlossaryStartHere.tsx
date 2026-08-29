@@ -77,7 +77,7 @@ export function GlossaryStartHere({ terms }: { terms: GlossaryEntry[] }) {
               // it is a preview, not a label. Measured across all 15 cards;
               // 12 exceeded 170 characters.
               aria-label={term.title}
-              className="group block border-l border-border pl-3 transition-colors hover:border-pillar-accent"
+              className="group block border-l border-border pl-3 transition-colors hover:border-pillar"
             >
               <div className="flex items-baseline gap-2">
                 <span aria-hidden="true" className="tech-value text-xs text-subtle-foreground">

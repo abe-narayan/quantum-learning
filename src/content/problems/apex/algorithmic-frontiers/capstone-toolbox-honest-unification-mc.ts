@@ -60,11 +60,15 @@ export const capstoneToolboxHonestUnificationMc: MultipleChoiceProblem = {
       { description: "It explicitly lists what remains hard: constructing an efficient block encoding for a new matrix, and finding a good polynomial approximation for a new target function." },
       { description: "It also shows the unification does not equalize costs: Grover-via-QSVT matches (not beats) Θ(√N), while QSVT-based Hamiltonian simulation beats first-order Trotter's derived scaling." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "QSVT unifies the constructions and sometimes improves their scaling, while finding block encodings and good polynomials stays open research work.",
   },
   explanation: {
     correctIdea: "QSVT is a genuine, powerful organizing/design framework, evaluated honestly: it explains and sometimes improves on older constructions, without making block-encoding or polynomial-approximation research obsolete.",
     whyCorrect: "This mirrors the capstone's explicit 'what remains genuinely open' section and its worked query-complexity comparison.",
-    whyWrong: ["Options b, c, and d each state an overclaim the lesson explicitly warns against."],
+    whyWrong: [
+      { optionId: "b", text: "Declares the older constructions incorrect. Nothing in them was wrong; QSVT re-derives them as instances of one framework." },
+      { optionId: "c", text: "Treats polynomial design as solved. A block encoding buys you circuit realizability once you have a feasible polynomial; it does not hand you the approximation." },
+      { optionId: "d", text: "Equalizes the costs. Grover-via-QSVT reproduces Θ(√N) while QSVT-based Hamiltonian simulation beats first-order Trotter: the construction unifies, the query complexities do not." },
+    ],
   },
 };

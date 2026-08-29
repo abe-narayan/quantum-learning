@@ -56,12 +56,16 @@ export const qmaSoundnessQuantifierMc: MultipleChoiceProblem = {
       { description: "QMA's definition requires: for x not in L, for EVERY p(n)-qubit state |psi>, the verifier accepts with probability <= 1/3." },
       { description: "This is a universal quantifier over the entire space of possible witness states, not just classical basis states or one 'intended' cheating strategy." },
     ],
-    finalAnswer: "(b)",
+    finalAnswer: "Every poly-qubit state Merlin could send, however entangled, is accepted with probability <= 1/3.",
   },
   explanation: {
     correctIdea: "QMA soundness is a universal statement over every possible quantum witness, mirroring NP's own soundness quantifier exactly.",
     whyCorrect:
       "Getting this quantifier backwards, or restricting its scope, doesn't just weaken the definition — it fails to define a meaningful soundness condition at all, exactly as the lesson's Common Mistakes section stresses.",
-    whyWrong: ["Options a, c, and d each either invert the quantifier or illegitimately restrict the space of witnesses soundness must hold against."],
+    whyWrong: [
+      { optionId: "a", text: "Inverts the quantifier. Saying some state is rejected is an existential claim, far too weak to rule out a cheating Merlin." },
+      { optionId: "c", text: "Restricts the space of witnesses to the one Merlin was supposed to send. Soundness has to hold against every state an adversarial Merlin might send." },
+      { optionId: "d", text: "Restricts the space of witnesses to computational basis states, which only re-derives NP's soundness. QMA quantifies over all quantum states, entangled superpositions included." },
+    ],
   },
 };

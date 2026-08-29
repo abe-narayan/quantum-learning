@@ -5,6 +5,40 @@ import { formatAmplitudeLatex } from "@/lib/quantum/format";
 const PROBABILITY_EPSILON = 1e-9;
 
 /**
+ * KaTeX's display wrapper, and the same wrapper carrying the keyboard-scroll
+ * tab stop. Byte-identical to the constants in `src/lib/mdx/rehypeKatexHtml.mjs`
+ * and `src/components/ui/KatexMath.tsx`; the string has to be duplicated rather
+ * than shared because `KatexMath` is a `"use client"` module and importing a
+ * helper out of it here would turn it into a client reference that this Server
+ * Component cannot call.
+ */
+const DISPLAY_OPEN = '<span class="katex-display">';
+const DISPLAY_OPEN_FOCUSABLE = '<span class="katex-display" tabindex="0">';
+
+/**
+ * The third of this codebase's three KaTeX paths — the build-time lesson path
+ * (`rehypeKatexHtml.mjs`), the runtime client path (`ui/KatexMath.tsx`), and
+ * this server-rendered one — brought into line on the same accessibility fix.
+ *
+ * `globals.css` §6 gives `.katex-display` `overflow-x: auto`, and only Firefox
+ * makes a scroll container focusable by default. Without this, a keyboard-only
+ * reader in Chromium or WebKit sees the left edge of a wide ket and cannot
+ * reach the rest of it — WCAG 2.1.1, and silent, because the page looks
+ * correct. The tab stop must sit on `.katex-display` itself and not on the
+ * `overflow-x-auto` div below it: that div's only child is this block-level
+ * slab, which fills the div's content box and takes the overflow on itself, so
+ * the div never has anything to scroll and arrow keys pressed on it would go
+ * to the document instead.
+ *
+ * No `role` and no `aria-label` on the math container, matching
+ * `rehypeKatexHtml.mjs`'s reasoning: KaTeX emits MathML for assistive tech and
+ * naming the container flattens the whole equation into that one name.
+ */
+function focusableDisplayHtml(html: string): string {
+  return html.startsWith(DISPLAY_OPEN) ? DISPLAY_OPEN_FOCUSABLE + html.slice(DISPLAY_OPEN.length) : html;
+}
+
+/**
  * Renders a computational-basis ket expression and (optionally) a bar per
  * basis state showing measurement probability. Takes a real `StateVector`
  * computed by the quantum engine — not hand-typed numbers — so the rendered
@@ -42,11 +76,13 @@ export function QuantumStateDisplay({
           .join(" + ")
       : "0";
 
-  const html = katex.renderToString(`|\\psi\\rangle = ${ketLatex}`, {
-    displayMode: true,
-    throwOnError: false,
-    strict: false,
-  });
+  const html = focusableDisplayHtml(
+    katex.renderToString(`|\\psi\\rangle = ${ketLatex}`, {
+      displayMode: true,
+      throwOnError: false,
+      strict: false,
+    })
+  );
 
   const probabilities = state.probabilities();
 
@@ -62,9 +98,20 @@ export function QuantumStateDisplay({
       {/* `.katex-display` already carries the equation-slab treatment from
           globals.css §6, so this wrapper deliberately adds no frame of its
           own — a slab inside a panel inside a panel is the kind of nested
-          bordering the design system exists to prevent. It only supplies the
-          horizontal scroll for math wider than the column. */}
-      <div className="overflow-x-auto px-4 py-1" dangerouslySetInnerHTML={{ __html: html }} />
+          bordering the design system exists to prevent.
+
+          It used to carry `overflow-x-auto` "for math wider than the column",
+          which was doing nothing: its only child is the block-level
+          `.katex-display`, which fills this content box and has its own
+          `overflow-x: auto`, so the inner element takes every pixel of the
+          overflow and this one has never had anything to scroll. Worse, a
+          box with `overflow-x: auto` and `overflow-y: visible` computes the
+          y axis to `auto` as well, so it was one tall fraction away from
+          silently clipping the ket vertically. Dropping it also retires the
+          scrollRegions backlog entry for this file: the real fix (the tab
+          stop) belongs on `.katex-display`, and `focusableDisplayHtml` above
+          now puts it there. */}
+      <div className="px-4 py-1" dangerouslySetInnerHTML={{ __html: html }} />
 
       {showProbabilities ? (
         <div className="border-t border-border px-4 py-3">

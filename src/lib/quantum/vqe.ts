@@ -8,9 +8,12 @@ import { eigenvaluesHermitian2x2 } from "./densityMatrix";
  * A single-qubit variational quantum eigensolver — deliberately the
  * smallest genuinely useful case, reusing existing gate and expectation
  * machinery rather than building a general multi-qubit ansatz/optimizer
- * framework. The single-qubit ansatz Ry(θ)Rz(φ)|0⟩ reaches every point on
- * the Bloch sphere, so it can represent the exact ground state of *any*
- * single-qubit Hamiltonian — this is not a toy that merely resembles VQE,
+ * framework. The single-qubit ansatz Rz(φ)Ry(θ)|0⟩ reaches every point on
+ * the Bloch sphere — in that order, and the order matters: Rz acts first on
+ * |0⟩, where it is only a global phase, so the reversed composition
+ * Ry(θ)Rz(φ)|0⟩ would be stuck on the X-Z great circle and could not
+ * represent a general state at all. As written it can represent the exact
+ * ground state of *any* single-qubit Hamiltonian — this is not a toy that merely resembles VQE,
  * it genuinely converges to the true ground state energy, checked directly
  * against the exact eigenvalue from `eigenvaluesHermitian2x2`.
  */

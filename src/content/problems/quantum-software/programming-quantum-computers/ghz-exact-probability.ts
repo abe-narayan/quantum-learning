@@ -20,27 +20,31 @@ export const ghzExactProbability: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "Running .h(0).cnot(0,1).cnot(1,2) from |000⟩, what is the EXACT probability of measuring |000⟩?",
+    prompt: "Running .h(0).cnot(0,1).cnot(1,2) from |000⟩, what is the exact probability of measuring |000⟩?",
     inputHint: "as a decimal",
   },
   answer: {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "The GHZ state is (|000⟩+|111⟩)/√2 — what's the probability of each term?",
+    incorrectFeedback: "The GHZ state is an equal superposition of just two terms. Square the amplitude of the all-zeros term; if you answered a smaller fraction, you may have spread the probability across all eight basis states.",
+    nearMisses: [
+      { value: 0.125, feedback: "1/8 spreads probability over all eight three-qubit outcomes. Six of them have zero amplitude in the GHZ state." },
+      { value: Math.SQRT1_2, tolerance: 0.005, feedback: "1/√2 is the amplitude. Squaring it gives the probability." },
+    ],
   },
   hints: [
     { text: "The GHZ state is an equal superposition of |000⟩ and |111⟩ only." },
     { text: "Each term has amplitude 1/√2." },
-    { text: "Probability = |1/√2|² = 0.5." },
+    { text: "Square the magnitude of the all-zeros amplitude. Only two terms share the total probability, and they share it equally." },
   ],
   solution: {
     steps: [{ description: "|000⟩'s amplitude is 1/√2, so P(|000⟩)=0.5 exactly." }],
     finalAnswer: "0.5",
   },
   explanation: {
-    correctIdea: "This is the EXACT result from runCircuit, distinct from the SAMPLED counts sampleMeasurements would produce with statistical noise around this exact value.",
-    whyCorrect: "Matches this platform's own test-suite-confirmed GHZ state probabilities.",
+    correctIdea: "This is the exact result from runCircuit, distinct from the sampled counts sampleMeasurements would produce with statistical noise around this exact value.",
+    whyCorrect: "Matches the test suite's confirmed GHZ state probabilities.",
     whyWrong: ["Answering anything other than exactly 0.5 confuses the exact simulation result with a sampled (noisy) result."],
   },
 };

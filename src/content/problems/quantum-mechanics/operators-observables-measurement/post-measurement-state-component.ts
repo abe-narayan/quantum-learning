@@ -22,6 +22,11 @@ export const postMeasurementStateComponent: NumericProblem = {
     value: 0.707107,
     tolerance: 0.001,
     incorrectFeedback: "First project (keep only the |0>,|1> components), then renormalize the resulting 2-component vector to unit length.",
+    nearMisses: [
+      { value: 1 / Math.sqrt(3), tolerance: 0.002, feedback: "That is the amplitude after projecting but before renormalizing. The projected vector has norm √(2/3), so dividing by it lifts the amplitude to 1/√2." },
+      { value: 0.5, feedback: "0.5 is the post-measurement probability of |0⟩. The question asks for the amplitude, which is its square root." },
+      { value: 1, feedback: "Amplitude 1 would mean the outcome left the system in |0⟩ alone. The N = 1 eigenspace is two-dimensional, so both |0⟩ and |1⟩ survive the projection." },
+    ],
   },
   hints: [
     { text: "P_1|psi> keeps only the |0> and |1> components of |psi>, both 1/sqrt(3)." },

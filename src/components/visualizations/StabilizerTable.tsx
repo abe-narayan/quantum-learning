@@ -76,9 +76,26 @@ export function StabilizerTable({
     .map((g) => g.label);
 
   return (
+    // `tabIndex={0}` on the scroll container. The stabilizer grid below is
+    // `auto repeat(numQubits, minmax(2.25rem, 1fr))` — 36px per qubit column
+    // plus the generator-label column — so the Steane code's seven qubits are
+    // ~290px and larger codes more, against a ~256px content box inside
+    // `panel-inset p-4` on a 320px phone. An `overflow-x-auto` div is
+    // focusable by default in no browser but Firefox, so a keyboard-only
+    // reader could read the first few Pauli columns of each generator and had
+    // no way to reach the rest of the pattern — which is the whole check the
+    // figure is for.
+    //
+    // The container does hold focusable elements (the qubit and error-type
+    // pickers), but they are NOT a substitute for this stop: those buttons sit
+    // in a `flex-wrap` row that wraps rather than overflows, so tabbing
+    // through them never scrolls the container, and the wide part — the grid —
+    // has no focusable content of its own at all. The extra stop is the only
+    // way to reach it, and it arrives already named by the `aria-label` above.
     <div
       role="group"
       aria-label={ariaLabel}
+      tabIndex={0}
       className="not-prose space-y-4 overflow-x-auto panel-inset p-4"
     >
       <div className="flex flex-wrap items-start gap-6">
@@ -96,10 +113,16 @@ export function StabilizerTable({
                   aria-pressed={active}
                   onClick={() => setSelectedQubit(q)}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    // `h-11 w-11` (44px), up from `h-8 w-8` (32px): this is
+                    // a row of up to n small round targets sitting right
+                    // next to each other, the worst case for a fingertip,
+                    // and 32px is under the WCAG 2.5.8 minimum. The border
+                    // is now unconditional so selecting a qubit doesn't
+                    // shrink its button by 2px and shuffle the row.
+                    "flex h-11 w-11 items-center justify-center rounded-full border text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     active
-                      ? "bg-brand text-brand-foreground"
-                      : "border border-border bg-surface text-muted-foreground hover:bg-surface-muted"
+                      ? "border-pillar bg-pillar text-brand-foreground"
+                      : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
                   )}
                 >
                   {q - qubitLabelOffset}
@@ -123,10 +146,15 @@ export function StabilizerTable({
                   aria-pressed={active}
                   onClick={() => setErrorType(type)}
                   className={cn(
-                    "rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    // `min-h-11` (44px) — the pill was ~28px tall, under the
+                    // WCAG 2.5.8 minimum — and the same unconditional border
+                    // and pillar-channel selected fill as the qubit picker
+                    // above and `PresetToggle`, so the three pill controls a
+                    // reader meets in this directory behave and look alike.
+                    "inline-flex min-h-11 items-center rounded-full border px-4 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     active
-                      ? "bg-brand text-brand-foreground"
-                      : "border border-border bg-surface text-muted-foreground hover:bg-surface-muted"
+                      ? "border-pillar bg-pillar text-brand-foreground"
+                      : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
                   )}
                 >
                   {type}
@@ -138,7 +166,7 @@ export function StabilizerTable({
       </div>
 
       <div
-        className="inline-grid gap-px overflow-hidden rounded-lg border border-border bg-border"
+        className="inline-grid gap-px overflow-hidden rounded-(--radius-tight) border border-border bg-border"
         style={{ gridTemplateColumns: `auto repeat(${numQubits}, minmax(2.25rem, 1fr))` }}
       >
         <div className="bg-surface px-2 py-2 text-xs font-semibold text-muted-foreground">g</div>

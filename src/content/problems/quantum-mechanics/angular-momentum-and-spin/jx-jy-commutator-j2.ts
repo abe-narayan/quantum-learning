@@ -23,26 +23,26 @@ export const jxJyCommutatorJ2: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "Using this platform's general angular momentum operators at j=2, compute the (0,0) entry difference between [Jx,Jy] and iJz. What should this difference be, if the commutation relation holds exactly?",
+    prompt: "Using the engine's general angular momentum operators at j=2, compute the (0,0) entry difference between [Jx,Jy] and iJz. What should this difference be, if the commutation relation holds exactly?",
     inputHint: "as a decimal",
   },
   answer: {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "If [Jx,Jy]=iJz holds exactly (as derived from first principles), this difference should be exactly 0.",
+    incorrectFeedback: "The check asks for the difference between two things the algebra says are equal. If you computed something nonzero, compare orderings: the commutator is JxJy minus JyJx, in that order, and the right side carries the factor of i.",
   },
   hints: [
     { text: "The commutation relation [Jx,Jy]=iħJz (ħ=1 here) was derived to hold for any j, not just orbital angular momentum." },
     { text: "If the derivation and the engine's implementation both agree, [Jx,Jy]-iJz should be the zero matrix." },
-    { text: "Every entry, including (0,0), should differ by 0." },
+    { text: "So if theory and implementation agree, the difference matrix has no surviving entries anywhere, and the top-left entry is no exception. Report its value." },
   ],
   solution: {
     steps: [{ description: "Since [Jx,Jy]=iJz holds exactly for any j (derived from the ladder-operator matrix elements), every matrix entry of the difference is exactly 0." }],
     finalAnswer: "0",
   },
   explanation: {
-    correctIdea: "This checks the abstract commutation relation against this platform's own concrete matrix implementation, not just the orbital (l) case derived by hand.",
+    correctIdea: "This checks the abstract commutation relation against the engine's own concrete matrix implementation, not just the orbital (l) case derived by hand.",
     whyCorrect: "Confirmed directly: the engine's independently-built matrices satisfy the algebra exactly, to floating-point precision.",
     whyWrong: ["Any nonzero answer would indicate either a genuine implementation bug or a misunderstanding of what an exact commutation relation guarantees."],
   },

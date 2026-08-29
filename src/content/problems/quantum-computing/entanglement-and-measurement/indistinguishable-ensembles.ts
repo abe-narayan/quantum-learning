@@ -21,20 +21,20 @@ export const indistinguishableEnsembles: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["tr(", "trace", "expectation value", "same ρ", "same density matrix"],
-      ["depends only on", "determined by ρ", "identical predictions", "no experiment"],
+      ["tr(", "trace", "expectation value", "expectation values", "same ρ", "same rho", "same density matrix", "identical density matrix", "born rule"],
+      ["depends only on", "depend only on", "only on ρ", "only on rho", "only on the density", "function of ρ", "function of rho", "function of the density", "determined by ρ", "determined by rho", "same statistics", "identical statistics", "same predictions", "identical predictions", "same probabilities", "no experiment", "cannot distinguish", "can't distinguish", "cannot be distinguished", "indistinguishable"],
     ],
-    incorrectFeedback: "Focus on what every measurable prediction (expectation value) actually depends on — is it ρ, or the ensemble story behind it?",
-    partialFeedback: "You're close — be explicit that every observable's prediction is a function of ρ alone, not of which ensemble produced it.",
+    incorrectFeedback: "Ask what every measurable prediction is computed from. Does the recipe that prepared the qubit appear anywhere in that computation?",
+    partialFeedback: "You're close. Say what single object every observable's prediction is computed from, and note that both recipes hand you that very object.",
   },
   hints: [
-    { text: "Every observable's expectation value is Tr(ρA) — a function of ρ alone." },
-    { text: "If two ensembles produce the same ρ, they produce the same Tr(ρA) for every A." },
-    { text: "A measurement is a way of estimating some Tr(ρA); if that's identical for both ensembles, no measurement can tell them apart." },
+    { text: "Write down the formula that turns a state and an observable into a measurable prediction. Which objects enter it?" },
+    { text: "The two preparation stories differ, but what mathematical object do they share?" },
+    { text: "If every quantity an experiment can estimate is computed from that shared object, what follows about telling the two stories apart?" },
   ],
   solution: {
     steps: [
-      { description: "Any observable's expectation value is $\\langle A\\rangle=\\text{Tr}(\\rho A)$ — a function of ρ alone." },
+      { description: "Any observable's expectation value is $\\langle A\\rangle=\\text{Tr}(\\rho A)$, a function of ρ alone." },
       { description: "Both ensembles produce the identical $\\rho=I/2$, so $\\text{Tr}(\\rho A)$ is identical for every observable $A$." },
       { description: "Since every possible measurement's statistics reduce to some Tr(ρA), no experiment can distinguish the two preparations." },
     ],

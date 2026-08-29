@@ -27,11 +27,15 @@ export const oxygen2pElectronCount: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "8 total, minus 2 (1s) minus 2 (2s), leaves the 2p count.",
+    nearMisses: [
+      { value: 6, feedback: "6 is the 2p subshell's full capacity, not oxygen's occupancy of it. Only 4 electrons are left once 1s and 2s are filled." },
+      { value: 2, feedback: "2 subtracts only one full subshell. Both 1s and 2s fill before 2p starts." },
+    ],
   },
   hints: [
     { text: "1s holds 2 electrons (full)." },
-    { text: "2s holds 2 more (full), using 4 of the 8 total so far." },
-    { text: "8-4=4 electrons remain for 2p." },
+    { text: "2s holds 2 more (full), which together with 1s uses half of oxygen's electrons." },
+    { text: "Subtract the already-placed electrons from the total of eight. Whatever remains goes into 2p." },
   ],
   solution: {
     steps: [

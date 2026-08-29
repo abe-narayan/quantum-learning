@@ -49,7 +49,7 @@ export const berryPhaseAt60 = berryPhaseNumeric(Math.PI / 3);
 export const lessonMeta = {
   title: "The Adiabatic Theorem and Berry Phase",
   description:
-    "A Hamiltonian that changes slowly enough keeps a system in its instantaneous eigenstate — proved here directly from the time-dependent Schrödinger equation. Applied to a spin-1/2 dragged around a cone by a slowly rotating field, the same derivation produces Berry's famous geometric phase, computed here as a real discretized loop integral and matched to −½ the solid angle traced.",
+    "A Hamiltonian that changes slowly enough keeps a system in its instantaneous eigenstate, proved here directly from the time-dependent Schrödinger equation. Applied to a spin-1/2 dragged around a cone by a slowly rotating field, the same derivation produces Berry's famous geometric phase, computed here as a real discretized loop integral and matched to −½ the solid angle traced.",
   course: "symmetry-scattering-and-semiclassical-methods",
   module: "the-adiabatic-theorem-and-berry-phase",
   order: 1,
@@ -74,16 +74,15 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="A memory with no clock in it">
-  Walk a control field slowly around a loop and a quantum system doesn't
-  just track along — it remembers the shape of the path it took, as a
-  real, measurable phase, even after returning exactly to where it
-  started.
+  Walk a control field slowly around a loop and bring it back to exactly
+  where it started. The system does not come back unchanged, and what it
+  keeps is a record of the loop's shape.
 </LessonHook>
 
 ## Motivation
 
 Holonomic and topological quantum computing build logic gates out of
-exactly the phase this lesson derives: a control field is walked slowly
+the phase this lesson derives: a control field is walked slowly
 around a loop in parameter space, and the qubit picks up a phase that
 depends only on the loop's shape, not on how fast or exactly how it was
 traversed. Gates built this way inherit that same insensitivity, which is
@@ -104,8 +103,8 @@ four lines of algebra.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/1/10/Michael_Berry%2C_Yerevan_-_Ashtarak%2C_Armenia%2C_FOP-2014%2C_03.09.2014_%28cropped%29.jpg"
-  alt="Photograph of physicist Michael Berry at the International Advanced School on Frontiers in Optics and Photonics, Armenia, 2014"
-  caption="Sir Michael Berry, who discovered in 1984 that a slowly-cycled quantum system picks up a real, measurable geometric phase depending only on the path traced in parameter space -- exactly the phase this lesson derives and computes for a spin-1/2 dragged around a cone."
+  alt="Michael Berry, cropped to head and shoulders, attending the International Advanced School on Frontiers in Optics and Photonics near Yerevan, Armenia, in September 2014"
+  caption="Sir Michael Berry, who discovered in 1984 that a slowly-cycled quantum system picks up a real, measurable geometric phase depending only on the path traced in parameter space, the phase this lesson derives and computes for a spin-1/2 dragged around a cone."
   credit="Vahram Mekhitarian (photo), Jakob Gottfried (crop) / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Michael_Berry,_Yerevan_-_Ashtarak,_Armenia,_FOP-2014,_03.09.2014_(cropped).jpg"
   license="CC BY-SA 4.0"
@@ -129,7 +128,7 @@ pulling out the ordinary **dynamical phase** $\theta_n$ explicitly, so
 $c_n(t)$ captures everything else. Substituting into
 $i\hbar\partial_t|\psi\rangle=H|\psi\rangle$ and using
 $H|n\rangle=E_n|n\rangle$, the $E_n$ terms cancel *exactly* against
-$\dot\theta_n=-E_n/\hbar$ (this is precisely why $\theta_n$ was defined
+$\dot\theta_n=-E_n/\hbar$ (this is why $\theta_n$ was defined
 that way), leaving:
 
 $$
@@ -188,7 +187,7 @@ $\gamma_n(t)=i\int_0^t\langle n(t')|\dot n(t')\rangle\,dt'=i\oint\langle
 n|\nabla_R n\rangle\cdot d\vec R$ (chain rule, $R$ the Hamiltonian's slow
 parameters) depends only on the **path** $R(t)$ traces through parameter
 space, not on how fast it's traversed. This path-dependence, not
-time-dependence, is exactly what makes $\gamma_n$ **geometric**: this is
+time-dependence, is what makes $\gamma_n$ **geometric**: this is
 **Berry's phase**.
 
 ### Berry phase for spin-1/2 in a rotating field
@@ -220,7 +219,7 @@ sphere of field directions:
     { label: "γ is unchanged — it depends only on the loop's shape, not its duration", value: "same" },
   ]}
   correctValue="same"
-  explanation="γ = i∮⟨n|∇_R n⟩·dR is a line integral over the path in parameter space, with no leftover dt anywhere in the integrand — the chain rule that produced it cancelled the time-parametrization out completely. Slow the loop down, speed it up, traverse it unevenly: γ doesn't move, which is exactly the sense in which it's geometric rather than dynamical (the dynamical phase θ_n, by contrast, does grow with how long the loop takes)."
+  explanation="γ = i∮⟨n|∇_R n⟩·dR is a line integral over the path in parameter space, with no leftover dt anywhere in the integrand; the chain rule that produced it cancelled the time-parametrization out completely. Slow the loop down, speed it up, traverse it unevenly: γ doesn't move. The dynamical phase θ_n, by contrast, does grow with how long the loop takes."
 />
 
 <InteractiveSection
@@ -261,15 +260,15 @@ arbitrary convention.
 
 ## Worked Example
 
-**Compute the Berry phase for $\theta=60°$ by hand from the solid-angle
+**Compute the <Term id="adiabatic-theorem-berry-phase">Berry phase</Term> for $\theta=60°$ by hand from the solid-angle
 formula, and compare to the computed loop integral.**
 
 $\Omega=2\pi(1-\cos60°)=2\pi(1-\tfrac12)=\pi$. So
 $\gamma=-\tfrac12\Omega=-\tfrac\pi2\approx-1.5708$, a clean, exactly
 checkable value. The platform's discretized loop integral at
-$\theta=60°$ gives $\gamma\approx-1.5708$ as well — matching to better
-than $10^{-4}$, an independent numerical confirmation of the closed-form
-geometric formula, not a restatement of it.
+$\theta=60°$ gives $\gamma\approx-1.5708$ as well, matching to better
+than $10^{-4}$. That is an independent numerical confirmation of the
+closed-form geometric formula, not a restatement of it.
 
 ## Common Mistakes
 
@@ -328,14 +327,11 @@ tiny gap needs a much slower sweep than one with a large gap, at the
 
 ## Further Exploration
 
-[Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states)
-leaves slow time-dependence behind for a different kind of "as classical
-as quantum mechanics gets": the harmonic oscillator states that most
-closely track a classical trajectory.
-
 <NextDiscovery>
-  Coherent and Squeezed States leaves slow time-dependence behind
-  for a different kind of "as classical as quantum mechanics gets": the
-  harmonic oscillator states that most closely track a classical
-  trajectory.
+  [Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states)
+  leaves slow time-dependence for a different route to the classical
+  limit: the oscillator states whose expectation values follow a
+  classical trajectory exactly, and which stay minimum-uncertainty while
+  doing it. Berry phase was geometry in parameter space; this is geometry
+  in phase space.
 </NextDiscovery>

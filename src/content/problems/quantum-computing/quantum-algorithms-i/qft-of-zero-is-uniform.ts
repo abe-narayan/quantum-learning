@@ -50,6 +50,10 @@ export const qftOfZeroIsUniform: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "j=0 is the QFT's own 'zero frequency' case, which spreads equally over every output.",
     whyCorrect: "Directly confirmed: every one of the 8 output probabilities equals exactly 1/8.",
-    whyWrong: ["This is a genuinely different-looking but consistent fact from H^⊗n|0...0⟩ producing the same state via a totally different circuit."],
+    whyWrong: [
+      { optionId: "b", text: "Treats the QFT as the identity. At j=0 the phases all become 1, and the sum over every k remains." },
+      { optionId: "c", text: "Singles out one output. Nothing in the formula picks a particular k when j=0." },
+      { optionId: "d", text: "Keeps only two terms. The sum runs over all N basis states, not the two with uniform labels." },
+    ],
   },
 };

@@ -38,12 +38,16 @@ export const fineStructureTwoEffects: MultipleChoiceProblem = {
     { text: "Neither requires more than one electron or an external field." },
   ],
   solution: {
-    steps: [{ description: "Fine structure = spin-orbit coupling (L·S) + relativistic kinetic correction, both intrinsic to a single electron in the Coulomb field." }],
-    finalAnswer: "(a) Spin-orbit coupling and a relativistic kinetic energy correction",
+    steps: [{ description: "Fine structure is the sum of spin-orbit coupling, the L·S term, and the leading relativistic correction to the kinetic energy. Both are intrinsic to a single electron moving in the Coulomb field." }],
+    finalAnswer: "Spin-orbit coupling and the leading relativistic kinetic energy correction.",
   },
   explanation: {
-    correctIdea: "Both pieces of fine structure are single-electron effects, present even for isolated hydrogen with no external fields.",
-    whyCorrect: "Matches the lesson's Conceptual Overview exactly.",
-    whyWrong: ["The Zeeman effect (external B-field) and electron-electron repulsion (multi-electron atoms) are real but distinct effects, not part of hydrogen's intrinsic fine structure."],
+    correctIdea: "Both pieces of fine structure are single-electron effects, present in isolated hydrogen with no external field and no second electron.",
+    whyCorrect: "Matches the lesson's Conceptual Overview.",
+    whyWrong: [
+      { optionId: "b", text: "Needs more than one electron. Hydrogen has one, so neither effect has anything to act on." },
+      { optionId: "c", text: "Needs an external field. Fine structure is there with the field switched off; the Zeeman effect is a separate, applied-field splitting." },
+      { optionId: "d", text: "Names two ingredients the non-relativistic treatment already includes, so neither is a correction to it." },
+    ],
   },
 };

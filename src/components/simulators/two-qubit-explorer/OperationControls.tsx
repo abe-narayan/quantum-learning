@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,35 @@ export function OperationControls({
   onPreset: (presetId: string) => void;
   activePresetId: string | null;
 }) {
+  // Roving tabindex for the guided-walkthrough radiogroup, ported verbatim
+  // from `shared/controls.tsx`'s PillGroup rather than reinvented, so the two
+  // radiogroups a visitor meets inside the same instrument behave identically
+  // under the keyboard. Without this the group put all six presets in the Tab
+  // order and answered no arrow key at all, which is the one thing a screen
+  // reader user is promised when a control announces itself as a radio.
+  const presetRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const selectedPresetIndex = GUIDED_PRESETS.findIndex((preset) => preset.id === activePresetId);
+
+  const handlePresetKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    // While a walkthrough animates, every option is `disabled` and selecting a
+    // new one is refused by `runPreset` anyway — moving focus-and-selection
+    // here would lie about what the panel is doing, so bail out entirely.
+    if (disabled) return;
+    const count = GUIDED_PRESETS.length;
+    if (count === 0) return;
+
+    let delta = 0;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") delta = 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") delta = -1;
+    else return;
+
+    event.preventDefault();
+    const current = selectedPresetIndex === -1 ? 0 : selectedPresetIndex;
+    const nextIndex = (current + delta + count) % count;
+    onPreset(GUIDED_PRESETS[nextIndex].id);
+    presetRefs.current[nextIndex]?.focus();
+  };
+
   return (
     <div className="space-y-8">
       <ControlSection id="presets" title="Guided walkthrough">
@@ -48,19 +78,33 @@ export function OperationControls({
           animation (see TwoQubitExplorer's `isRunning`/`cancelledRef`) that narrates and
           disables the whole panel step-by-step. PillGroup has no notion of a
           disabled/in-progress option, so it can't represent "this preset is currently
-          animating" or block re-selection while one runs.
+          animating" or block re-selection while one runs. The keyboard behaviour is
+          still PillGroup's, ported above — hand-rolling the styling is not a licence
+          to hand-roll the ARIA pattern.
         */}
         <div role="radiogroup" aria-label="Guided walkthrough" className="flex flex-col gap-2">
-          {GUIDED_PRESETS.map((preset) => (
+          {GUIDED_PRESETS.map((preset, i) => (
             <button
               key={preset.id}
+              ref={(el) => {
+                presetRefs.current[i] = el;
+              }}
               type="button"
               role="radio"
               aria-checked={activePresetId === preset.id}
+              // Only the selected option is tabbable; with nothing selected
+              // (the visitor has driven the gates by hand) the first option
+              // holds the group's single tab stop, per the ARIA APG pattern.
+              tabIndex={i === selectedPresetIndex || (selectedPresetIndex === -1 && i === 0) ? 0 : -1}
               disabled={disabled}
               onClick={() => onPreset(preset.id)}
+              onKeyDown={handlePresetKeyDown}
               className={cn(
-                "rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                // `min-h-11` rather than the previous bare `py-2` (36px total):
+                // these are the widest tap targets in the rail and sit stacked
+                // 8px apart, so a thumb that missed one used to land on its
+                // neighbour and start a different walkthrough.
+                "flex min-h-11 items-center rounded-(--radius-tight) border px-3 py-2 text-left text-sm transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar",
                 "disabled:pointer-events-none disabled:opacity-50",
                 activePresetId === preset.id

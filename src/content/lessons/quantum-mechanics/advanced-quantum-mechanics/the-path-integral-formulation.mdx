@@ -36,7 +36,7 @@ export const lessonMeta = {
   module: "the-path-integral-formulation",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 30,
+  estimatedMinutes: 35,
   prerequisites: ["quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition"],
   objectives: [
     "State the path integral's central idea: sum over ALL paths, each weighted by exp(-S/ħ) or exp(iS/ħ)",
@@ -46,29 +46,35 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  Ask a quantum particle how it got from A to B, and Feynman's answer is
-  every way imaginable, all at once — including paths that zigzag
-  wildly, double back, and wander off before returning.
+  Ask a quantum particle how it got from A to B and Feynman's answer is
+  every way imaginable, all at once: paths that zigzag, double back, and
+  wander off to the far side of the galaxy before returning in time.
 </LessonHook>
 
 ## Motivation
 
-Not just the straight
-line, or whatever trajectory Newton's laws would single out. Literally
-every conceivable path between the two points counts, each
-contributing its own share to the final <Term id="amplitude">amplitude</Term>. Every
-lesson before this one, the <Term id="schrodinger-equation">Schrödinger equation</Term>, operators,
-<Term id="eigenvalue-eigenvector">eigenstates</Term>, was built on Hamiltonian language: how does the
-wavefunction evolve from one moment to the next? The path integral
-drops that question and asks something stranger instead: what is the
-amplitude for every possible way the particle could get from here to
-there, summed together? Same physics, identical predictions, but a
-completely different picture of what is actually happening.
+Every lesson before this one used the same language. There is a state,
+there is a Hamiltonian, and the <Term id="schrodinger-equation">Schrödinger equation</Term> says how the state
+changes from one instant to the next. Operators and <Term id="eigenvalue-eigenvector">eigenstates</Term> all hang
+off that framing.
+
+Feynman's formulation asks a different question and never mentions a
+state evolving. Given that the particle was at $x_i$ and ended at $x_f$,
+what is the <Term id="amplitude">amplitude</Term> for the transition? The answer is a sum over every
+conceivable path connecting them, with the straight classical line
+carrying no special status: it contributes one term among infinitely
+many.
+
+The two formulations agree on every prediction. What differs is what each
+one makes obvious, and the classical limit is the clearest case: in the
+operator picture it takes work to see why macroscopic objects follow
+Newton's laws, and in the path integral it falls out of an interference
+argument you can sketch on a napkin.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/b/bf/Richard_P._Feynman_Los_Alamos_ID_badge_photo.jpg"
   alt="Richard Feynman's wartime identification badge photograph from Los Alamos National Laboratory, circa 1943-1947"
-  caption="Richard Feynman, who developed the path-integral (sum-over-histories) formulation this lesson introduces, photographed during his time at Los Alamos in the 1940s, not long before he worked out this reformulation of quantum mechanics."
+  caption="Richard Feynman's Los Alamos identification badge, taken in the 1940s. He developed the sum-over-histories formulation shortly afterwards, building on a remark of Dirac's about the role of the classical action in quantum mechanics that had sat largely unused for a decade."
   credit="Los Alamos National Laboratory"
   creditUrl="https://commons.wikimedia.org/wiki/File:Richard_P._Feynman_Los_Alamos_ID_badge_photo.jpg"
   license="Public domain (U.S. federal government work)"
@@ -85,10 +91,15 @@ different from their neighbors' point their hands in nearly random
 directions, so as a group they cancel each other out almost completely.
 Paths clustered near the one true classical trajectory, though, have
 nearly identical actions, so their hands point almost the same way and
-reinforce rather than cancel. That's the whole idea before any integral
-gets written down: probability comes from constructive interference
-among the paths near the classical one, and destructive interference
-washing out nearly everything else.
+reinforce rather than cancel.
+
+That is the whole idea before any integral is written down. Probability
+comes from constructive interference among paths near the classical one
+and destructive interference washing out everything else. Notice what
+this explains: the classical trajectory is not selected by a law that
+forbids the others, it is what survives when the others cancel. Shrink
+$\hbar$ and the cancellation becomes more brutal, which is why large
+objects appear to follow one path exactly.
 
 The panels below make that clock-hand picture concrete, though only
 illustratively: the left panel draws a batch of sample paths between two
@@ -124,9 +135,10 @@ $$
 K(x_f,t_f;x_i,t_i) = \int\mathcal D[x(t)]\;e^{iS[x(t)]/\hbar}
 $$
 
-This looks nothing like anything in the operator formalism, yet it
-provably gives identical physical predictions, a fact this course
-states rather than proves in full generality.
+Nothing in the operator formalism resembles this, and yet the two are
+provably equivalent. This course states that equivalence rather than
+proving it in general; the numerical check further down verifies a
+specific consequence of it instead.
 
 ### Why this lesson uses Euclidean (imaginary) time
 
@@ -139,9 +151,13 @@ $\tau=it$ (a standard technique called **Wick rotation**, used
 throughout statistical mechanics and quantum field theory, not a
 simplification invented for this platform), turns the weight into
 $e^{-S_E/\hbar}$, a positive, exponentially decaying real Gaussian.
-This integrates numerically to high precision without any special
-tricks, while preserving exactly the "sum over paths" structure this
-lesson is trying to teach.
+That integrates numerically to high precision with no special handling,
+while leaving the sum-over-paths structure intact. The price is that
+phases become weights: in Euclidean time paths are suppressed rather than
+cancelled, so the interference story from the Intuition section survives
+as an analogy rather than as arithmetic. The classical path still
+dominates, for the related reason that it minimizes $S_E$ and so carries
+the largest weight.
 
 ### The free-particle Euclidean propagator
 
@@ -166,26 +182,33 @@ $$
 is the **Chapman-Kolmogorov composition law**, a mathematical identity
 (equivalent to the Gaussian convolution theorem) that any correct
 path-sum formulation must satisfy. This platform's
-`discretizedTwoSlicePropagator` computes the right-hand side directly, as
-a Riemann sum over a fine $x_1$ grid, literally summing over every
-discretized two-segment path, and matches the exact left-hand side to a
-relative error of $\sim10^{-15}$ (machine precision) across every tested
-$(x_f,x_i,\tau)$ combination. The Worked Example below plots the actual
-quantity being summed over $x_1$: it shows concretely where that Riemann
-sum's weight is concentrated, rather than leaving "sum over every
-intermediate position" as an abstract phrase.
+`discretizedTwoSlicePropagator` computes the right-hand side as a Riemann
+sum over a fine $x_1$ grid, which is a sum over every discretized
+two-segment path, and it matches the exact left-hand side to a relative
+error around $10^{-15}$, machine precision, for every tested
+$(x_f,x_i,\tau)$.
+
+Two segments is the smallest nontrivial case of the real construction. A
+genuine path integral repeats the split $N$ times and takes $N\to\infty$,
+integrating over $N-1$ intermediate positions; the worked example below
+does the $N=2$ version and plots the integrand, so "sum over every
+intermediate position" becomes a curve rather than a phrase.
 
 ## Physical Interpretation
 
-The "sum over all paths" picture makes certain physics intuitive that's
-opaque in the operator picture, most dramatically, why the *classical*
-path (the one satisfying $\delta S=0$) dominates in the macroscopic
-limit: paths near the classical one interfere constructively (nearby
-actions are nearly equal), while wildly different paths interfere
-destructively against their neighbors. It is an informal route to
-understanding the classical limit, one that complements rather than
-replaces the operator-based reasoning used throughout this platform's
-other courses.
+The sum-over-paths picture makes one thing easy that the operator picture
+makes hard: why the classical path, the one satisfying $\delta S=0$,
+dominates for macroscopic objects. Paths near it have nearly equal
+actions, so their phases align and add. Paths far from it have actions
+that differ wildly between neighbours, so their phases scatter and
+cancel. Stationary action is not a separate principle here; it is the
+condition for a path to have neighbours that agree with it.
+
+The formulation also travels further than this course does. Path
+integrals are the standard language of quantum field theory, where
+Feynman diagrams are a bookkeeping scheme for terms in such a sum, and of
+statistical mechanics, where the Euclidean version below is not a
+computational trick but the partition function itself.
 
 ## Worked Example
 
@@ -214,9 +237,8 @@ $x_1$ ranges over every real number, given that $x_i=-1$ and $x_f=3$.
   explanation="The plot below peaks right at x₁ = 1, the straight-line midpoint between x_i = -1 and x_f = 3, and falls off fast on either side. Every x₁ is included in the sum, but the ones far from the classical path contribute almost nothing."
 />
 
-The integrand being summed over, plotted directly against $x_1$ (the
-real product of the two Gaussian propagators, not an illustrative
-sketch), shows exactly where that sum's weight actually comes from:
+Here is the integrand plotted against $x_1$, the product of the two
+Gaussian propagators as the engine computes it:
 
 <ParametricCurve
   frames={pathIntegrandFrames}
@@ -224,14 +246,16 @@ sketch), shows exactly where that sum's weight actually comes from:
   ariaLabel="The path-integral integrand K_E(x_f,x_1)K_E(x_1,x_i) as a function of the intermediate position x_1"
 />
 
-The integrand peaks right around $x_1=1$, the straight-line midpoint
-between $x_i=-1$ and $x_f=3$, the classical intermediate position, and
-falls off fast on either side. This is the concrete, computed version
-of the Physical Interpretation section's claim: nearby paths
-(intermediate positions close to the classical one) contribute the
-overwhelming share of the total sum, while distant ones contribute
-almost nothing, even though the sum runs over every $x_1$, not just the
-classical one.
+The peak sits at $x_1=1$, the straight-line midpoint between $x_i=-1$ and
+$x_f=3$, which is where the classical particle would be at half time. The
+curve falls away quickly on both sides.
+
+That is the computed version of the Physical Interpretation's claim.
+Every $x_1$ is in the sum, including $x_1=-8$, which corresponds to a
+particle that sprints backwards and then returns. Its contribution is not
+zero; it is small. The classical answer emerges from weighting, not from
+exclusion, and that distinction is the entire content of the
+formulation.
 
 ## Common Mistakes
 
@@ -284,10 +308,10 @@ $x_1$, not just the one lying on the classical straight-line trajectory.
 
 ## Further Exploration
 
-<ChallengePrompt prompt="The composition law was checked here by splitting τ exactly at the midpoint (τ/2 and τ/2). Does the identity still have to hold if you split unevenly instead — say at τ/3 and 2τ/3 — or is the equal split doing something special?">
-  The Chapman-Kolmogorov identity is stated for *any* intermediate time,
-  not just the midpoint — check whether the two-Gaussian-convolution
-  structure this lesson derived actually depends on splitting evenly.
+<ChallengePrompt prompt="The composition law was checked here by splitting τ at the midpoint. Does the identity still hold for an uneven split, say τ/3 and 2τ/3, or was the equal split doing something special? If it holds, where does the integrand's peak move to?">
+  Chapman-Kolmogorov is stated for *any* intermediate time. Check whether
+  the two-Gaussian convolution this lesson used depends on splitting
+  evenly, and then ask where a classical particle would be at time τ/3.
 </ChallengePrompt>
 
 <NextDiscovery>

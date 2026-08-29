@@ -90,17 +90,33 @@ export function UncertaintyEllipse({
     <div className="not-prose space-y-3 panel-inset p-4">
       <div className="overflow-x-auto">
         <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-          <g className="stroke-border" strokeWidth={1}>
+          {/* The axes. This figure's claim is that the ellipse's *extent
+              along each axis* is the pair of uncertainties, which is
+              unreadable if the axes aren't. Moved off `--border` - the
+              panel-edge token, 1.41:1 on `--surface-muted`, under the 3:1
+              WCAG 2.1 SC 1.4.11 floor - onto `--axis`, which clears 3:1 on
+              every panel depth in both themes. */}
+          <g className="stroke-axis" strokeWidth={1.25}>
             <line x1={axisXStart.x} y1={axisXStart.y} x2={axisXEnd.x} y2={axisXEnd.y} />
             <line x1={axisYStart.x} y1={axisYStart.y} x2={axisYEnd.x} y2={axisYEnd.y} />
           </g>
-          <text x={axisXEnd.x - 4} y={axisXEnd.y - 6} textAnchor="end" className="fill-muted-foreground text-[11px]">
+          {/* viewBox 360 rendered `w-full`. The scale is NOT 0.8:
+              The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+              (320 less Container's `px-4` gutters), but this SVG renders inside
+              `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+              radius and fill and no padding at all — the `p-4` does. Subtract
+              2 x (16px padding + 1px border) = 34px.
+              The real box is 254px, so the scale is 254/360 = 0.706 —
+              `text-[11px]` painted at 7.8px, not 8.8px, and 14 units gives
+              **9.88px**, not 11.2px. 14 still clears the ~9px floor, so the
+              size stands and only the arithmetic is corrected. */}
+          <text x={axisXEnd.x - 4} y={axisXEnd.y - 8} textAnchor="end" fontSize={14} className="fill-axis">
             {xLabel}
           </text>
-          <text x={axisYEnd.x + 6} y={axisYEnd.y + 4} textAnchor="start" className="fill-muted-foreground text-[11px]">
+          <text x={axisYEnd.x + 7} y={axisYEnd.y + 5} textAnchor="start" fontSize={14} className="fill-axis">
             {pLabel}
           </text>
-          <circle cx={origin.x} cy={origin.y} r={1.5} className="fill-muted-foreground" />
+          <circle cx={origin.x} cy={origin.y} r={2} className="fill-axis" />
           <ellipse
             cx={centerSvg.x}
             cy={centerSvg.y}
@@ -110,8 +126,12 @@ export function UncertaintyEllipse({
             strokeWidth={2}
           />
           <circle cx={centerSvg.x} cy={centerSvg.y} r={2.5} className="fill-foreground" />
+          {/* viewBox 360 rendered `w-full`: 0.706 scale against the real
+              254px box (see the axis-label note above), so 10 units painted
+              at 7.06px and 13 gives **9.17px** — still clear of the ~9px
+              floor, so the size stands. */}
           {resolvedCenterLabel !== null && (
-            <text x={centerSvg.x + 8} y={centerSvg.y - 8} className="fill-foreground text-[10px] font-medium">
+            <text x={centerSvg.x + 8} y={centerSvg.y - 8} fontSize={13} className="fill-foreground font-medium">
               {resolvedCenterLabel}
             </text>
           )}

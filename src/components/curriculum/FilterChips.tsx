@@ -72,7 +72,7 @@ export function FilterChips<T extends string>({
               onClick={() => onChange(option.id)}
               aria-pressed={isSelected}
               className={cn(
-                "inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 text-sm transition-colors duration-[--dur-fast]",
+                "inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 text-sm transition-colors duration-(--dur-fast)",
                 isSelected
                   ? "border-pillar bg-pillar-wash font-medium text-pillar-text"
                   : "border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground",

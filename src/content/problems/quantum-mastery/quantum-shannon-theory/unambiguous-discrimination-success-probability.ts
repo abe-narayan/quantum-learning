@@ -23,7 +23,11 @@ export const unambiguousDiscriminationSuccessProbability: NumericProblem = {
     value: 0.2,
     tolerance: 0.001,
     incorrectFeedback:
-      "The lesson derived P(correct) = 1 - s and P(inconclusive) = s for the optimal POVM. With s = 0.8, P(E1 | true state psi1) = 1 - 0.8 = 0.2, not s itself -- a common slip is reporting the inconclusive probability instead of the success probability.",
+      "The lesson derived P(correct) = 1 - s and P(inconclusive) = s for the optimal POVM. A common slip is reporting the inconclusive probability s itself instead of its complement. With s = 0.8, take the complement.",
+    nearMisses: [
+      { value: 0.8, feedback: "0.8 is the inconclusive probability, which equals the overlap s. The success probability is its complement." },
+      { value: 0.36, tolerance: 0.002, feedback: "That is 1 − s², using the squared overlap. The unambiguous-discrimination result is linear in the overlap, not in its square." },
+    ],
   },
   hints: [
     { text: "The lesson proved kappa = 1/(1+s) for E1 = kappa|psi2-perp><psi2-perp|, and that P(E1 | true state psi1) = kappa * sin^2(theta) simplifies to exactly 1 - s." },

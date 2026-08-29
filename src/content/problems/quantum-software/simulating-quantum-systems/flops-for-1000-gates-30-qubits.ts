@@ -23,13 +23,18 @@ export const flopsFor1000Gates30Qubits: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 1e9,
+    tolerance: 0.02,
+    toleranceType: "relative",
     incorrectFeedback: "Compute 1000 × 2^30.",
+    nearMisses: [
+      { value: 2 ** 30, tolerance: 0.02, feedback: "That is 2^30, the cost of a single gate. Every gate touches the whole state vector, so the total multiplies by the gate count." },
+      { value: 1000 * 30, tolerance: 0.02, feedback: "That treats the cost as linear in the qubit count. State-vector simulation touches 2^n amplitudes per gate, not n." },
+    ],
   },
   hints: [
-    { text: "2^30 ≈ 1.074 × 10⁹." },
-    { text: "1000 × 1.074×10⁹." },
-    { text: "≈1.074×10¹² operations." },
+    { text: "The cost per gate is one pass over the whole state vector, so it scales as 2^n rather than n." },
+    { text: "2^30 ≈ 1.074 × 10⁹ amplitudes." },
+    { text: "Multiply that by the gate count. Sanity check against the lesson's 35-qubit, 500-gate case: this circuit should come out substantially cheaper." },
   ],
   solution: {
     steps: [{ description: "1000 × 2^30 ≈ 1000 × 1.074×10⁹ ≈ 1.074×10¹² operations." }],

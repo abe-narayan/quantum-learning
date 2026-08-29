@@ -63,8 +63,9 @@ export const whichVariantStillGives00: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Work out what each alternative does to the intermediate $|+\\rangle\\otimes|+\\rangle$ state before the second $H\\otimes H$.",
   },
   hints: [
-    { text: "With no phase gate at all, $H\\otimes H$ followed immediately by $H\\otimes H$ again is just $(H^2)\\otimes(H^2) = I\\otimes I$." },
-    { text: "Applying $H$ twice in a row to any single-qubit state returns it exactly, since $H^2=I$." },
+    { text: "Work out what each alternative leaves the intermediate $|+\\rangle\\otimes|+\\rangle$ looking like before the second $H\\otimes H$ layer." },
+    { text: "A $Z$ turns $|+\\rangle$ into $|-\\rangle$, and $H|-\\rangle=|1\\rangle$, so each $Z$ moves one qubit's final outcome from 0 to 1." },
+    { text: "$H^2=I$, so ask which alternative leaves the two Hadamard layers with nothing in between to undo." },
   ],
   solution: {
     steps: [
@@ -75,6 +76,11 @@ export const whichVariantStillGives00: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "A phase gate is what causes the interference pattern to shift away from $|00\\rangle$; with no phase gate, the two Hadamard layers exactly undo each other.",
-    whyCorrect: "Any nonzero phase manipulation (on either qubit, or both) generally moves the concentrated outcome elsewhere; removing it entirely returns you to the trivial $H^2=I$ case.",
+    whyCorrect: "A $Z$ on either qubit moves that qubit's final outcome from 0 to 1; removing the phase step entirely leaves the two Hadamard layers to cancel via $H^2=I$.",
+    whyWrong: [
+      { optionId: "a", text: "Moves the $Z$ to the other qubit, which concentrates onto $|10\\rangle$ rather than $|00\\rangle$." },
+      { optionId: "b", text: "Phases both qubits, so both final outcomes flip and the state concentrates onto $|11\\rangle$." },
+      { optionId: "d", text: "Measures partway through, which destroys the superposition the interference depends on. The outcome becomes random rather than certain." },
+    ],
   },
 };

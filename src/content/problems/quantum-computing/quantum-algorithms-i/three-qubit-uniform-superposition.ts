@@ -28,6 +28,11 @@ export const threeQubitUniformSuperposition: NumericProblem = {
     value,
     tolerance: 0.005,
     incorrectFeedback: "H^⊗3|000⟩ is a uniform superposition over all 8 three-bit strings — each equally likely.",
+    nearMisses: [
+      { value: 1 / 3, tolerance: 0.005, feedback: "1/3 counts qubits rather than outcomes. Three qubits give 2³ = 8 distinct bit strings, and the superposition is uniform over all of them." },
+      { value: Math.SQRT1_2 / 2, tolerance: 0.005, feedback: "That is 1/√8, the amplitude. The probability is its square." },
+      { value: 0.5, feedback: "0.5 is the probability for a single qubit. Each additional qubit halves the share of any one full outcome." },
+    ],
   },
   hints: [
     { text: "H^⊗3|000⟩ = (1/√8)Σₓ|x⟩ — 8 equally-weighted basis states." },

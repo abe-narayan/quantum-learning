@@ -33,7 +33,7 @@ export const hThenCnotResult: MultipleChoiceProblem = {
       { id: "a", text: `$${ketLatex(bellState)}$` },
       { id: "b", text: "$(0.71)|01\\rangle + (0.71)|10\\rangle$" },
       { id: "c", text: `$${ketLatex(afterH)}$` },
-      { id: "d", text: "$|11\\rangle$" },
+      { id: "d", text: "$(1.00)|11\\rangle$" },
     ],
   },
   answer: {
@@ -68,8 +68,9 @@ export const hThenCnotResult: MultipleChoiceProblem = {
     correctIdea: "H puts qubit 0 into superposition first; CNOT then correlates qubit 1 with whichever branch qubit 0 is in.",
     whyCorrect: "Tracing each term through both gates individually reproduces exactly the Bell state |Φ+⟩.",
     whyWrong: [
-      "Stopping after H only (option c) forgets that CNOT still needs to be applied.",
-      "The |Ψ+⟩ pattern (option b) would result from starting at a different basis state, not |00⟩.",
+      { optionId: "b", text: "The |Ψ+⟩ pattern would come from a different starting basis state, not |00⟩." },
+      { optionId: "c", text: "This is the state right after H, before CNOT is applied. CNOT is what entangles the pair." },
+      { optionId: "d", text: "A single basis state has no superposition at all, but H already put qubit 0 into one." },
     ],
   },
 };

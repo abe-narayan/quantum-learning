@@ -27,12 +27,17 @@ export const constructiveInterferenceAmplitudeSum: NumericProblem = {
     type: "numeric",
     value: combinedProbability,
     tolerance: 0.01,
-    incorrectFeedback: "Add the amplitudes FIRST (1/√2 + 1/√2 = 2/√2 = √2), then square the sum — don't add the individual probabilities (1/2 + 1/2).",
+    incorrectFeedback: "Add the amplitudes before squaring; do not add the individual probabilities. If you answered one, you used the classical rule of summing probabilities. Squaring the summed amplitude gives something strictly larger.",
+    nearMisses: [
+      { value: 1, feedback: "1 is the sum of the two individual probabilities, the classical rule. Amplitudes are added first and squared afterwards, which is what produces interference." },
+      { value: Math.SQRT2, tolerance: 0.01, feedback: "√2 is the summed amplitude. The question asks for its squared magnitude." },
+      { value: 0.5, feedback: "0.5 is what one amplitude alone gives. The point of the comparison is what happens when both are present before the squaring." },
+    ],
   },
   hints: [
-    { text: "This is not the same as adding the two individual probabilities (1/2 + 1/2 = 1)." },
-    { text: "Add the amplitudes first: 1/√2 + 1/√2 = 2/√2 = √2." },
-    { text: "Now square that sum: (√2)² = 2." },
+    { text: "This question is testing the difference between two rules: adding probabilities and adding amplitudes. Decide which one the prompt asks for before computing anything." },
+    { text: "Add the two amplitudes first, while they are still amplitudes. Each equals one over root two, so work out what their sum is." },
+    { text: "Now square the summed amplitude. Compare the result with the sum of the two individual probabilities; coming out bigger is the signature of constructive interference." },
   ],
   solution: {
     steps: [
@@ -43,7 +48,7 @@ export const constructiveInterferenceAmplitudeSum: NumericProblem = {
   },
   explanation: {
     correctIdea: "Squaring a sum of amplitudes is not the same as summing the individual squared probabilities: $|\\alpha_1+\\alpha_2|^2 \\neq |\\alpha_1|^2+|\\alpha_2|^2$ in general.",
-    whyCorrect: "Here the combined value, 2, is strictly larger than 1/2 + 1/2 = 1 — the two amplitudes reinforced each other, constructive interference. (This number is only meaningful as an illustration of interference; a real normalized combined state would need renormalizing.)",
+    whyCorrect: "Here the combined value, 2, is strictly larger than 1/2 + 1/2 = 1: the two amplitudes reinforced each other, constructive interference. (This number is only meaningful as an illustration of interference; a real normalized combined state would need renormalizing.)",
     whyWrong: [
       "Adding the individual probabilities (1/2+1/2=1) is exactly the classical-probability rule, which quantum amplitudes do not obey when combined before squaring.",
     ],

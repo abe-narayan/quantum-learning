@@ -27,12 +27,12 @@ export const costLandscapeGrid = Array.from({ length: 15 }, (_, i) => {
 export const lessonMeta = {
   title: "Variational Algorithm Implementation",
   description:
-    "Closing the loop this entire pillar built toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) finds ⟨Z⟩'s minimum at exactly θ=π, value -1, matching exactGroundStateEnergy(Z) exactly, and extends to a two-parameter Hamiltonian, converging to within 0.04% of the true ground energy by grid search alone.",
+    "Closing the loop this pillar has been building toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) finds ⟨Z⟩'s minimum at θ=π, value -1, matching exactGroundStateEnergy(Z) to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
   course: "compilation-and-hybrid-algorithms",
   module: "variational-algorithm-implementation",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 25,
+  estimatedMinutes: 20,
   prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows"],
   objectives: [
     "Build a VQE ansatz using QuantumCircuit rather than Quantum Algorithms II's separate matrix-based approach",
@@ -47,9 +47,30 @@ Every piece needed for this final implementation already exists, scattered acros
 
 ## Motivation
 
-Built the "software" way
-(circuit-as-data), not Quantum Algorithms II's direct matrix approach,
-and checked against that course's own verified results.
+Quantum Algorithms II already built <Term id="vqe">VQE</Term> once, computing its ansatz
+state by direct matrix arithmetic. This closing lesson implements the
+same variational loop the "software" way instead: the circuit-as-data
+pattern this pillar has developed, built from this platform's own
+`QuantumCircuit`. Because both code paths compute the same physics,
+every result here can be cross-checked against
+`exactGroundStateEnergy`, the same verified answers Quantum
+Algorithms II already established.
+
+The Hamiltonians in this lesson are deliberately small — one and two
+parameters, ground energies known in closed form — because that is what
+makes the implementation checkable. The reason anyone builds this
+machinery is the case where no closed form exists: a molecular
+Hamiltonian whose ground-state energy is the thing you wanted and cannot
+get any other way.
+
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/6/60/FeMoco_cluster.svg"
+  alt="Structural diagram of the FeMo-cofactor, the iron-molybdenum-sulfur active-site cluster of the nitrogenase enzyme"
+  caption="The FeMo-cofactor of nitrogenase, the most-cited target in the quantum-chemistry resource-estimation literature. A variational algorithm aimed at a molecule like this runs the same loop this lesson builds — prepare an ansatz, measure an expectation value, hand it to a classical optimizer — with a Hamiltonian of thousands of terms in place of 0.6Z + 0.8X, and no exact answer to check against."
+  credit="Smokefoot / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:FeMoco_cluster.svg"
+  license="Public domain"
+/>
 
 ## Engineering Development
 
@@ -93,13 +114,12 @@ $\langle Z\rangle$ directly from the circuit's own output.
 
 A simple grid search over $\theta\in[0,2\pi]$ (the same
 "smallest correct optimizer" choice Quantum Algorithms II's `runVqe`
-already used) finds the minimum at exactly $\theta=\pi$, with
-$\langle Z\rangle=-1$, matching `exactGroundStateEnergy(PAULI_Z)=-1`
-EXACTLY, confirming the `QuantumCircuit`-based implementation reproduces
-Quantum Algorithms II's matrix-based result precisely, despite being
-built through a completely different (software-first) code path. This
-page's own grid search, run live over all 41 points, traces out the
-full cost landscape the optimizer is searching:
+already used) finds the minimum at $\theta=\pi$, with
+$\langle Z\rangle=-1$, matching `exactGroundStateEnergy(PAULI_Z)=-1` to
+full precision — the `QuantumCircuit` implementation reproduces Quantum
+Algorithms II's matrix-based result through an entirely separate
+(software-first) code path. This page's own grid search, run live over
+all 41 points, traces out the cost landscape the optimizer is searching:
 
 <ParametricCurve
   ariaLabel="Cost landscape: expectation value of Z vs theta, grid search over one full period"
@@ -121,10 +141,10 @@ full cost landscape the optimizer is searching:
   referenceLines={[{ y: -1, label: "exact ground energy" }]}
 />
 
-Watch the curve dip to $-1$ exactly at $\theta=\pi$, touching the
-dashed reference line precisely there and nowhere else in the full
-period, exactly what "grid search finds the exact minimum" means as a
-picture rather than a single reported number.
+Watch the curve dip to $-1$ at $\theta=\pi$, touching the dashed
+reference line there and nowhere else in the full period. That is what
+"grid search finds the exact minimum" looks like as a picture rather
+than a single reported number.
 
 ### Extending to a nontrivial Hamiltonian
 
@@ -134,10 +154,9 @@ $\sqrt{0.6^2+0.8^2}=1$), a two-parameter ansatz
 direct matrix application to the circuit's output amplitudes,
 grid-searched over both $\theta$ and $\phi$, converges to
 $\langle H\rangle\approx-0.9996$, within $0.04\%$ of the true $-1$
-ground energy, limited only by grid resolution (a finer grid would
-close the gap further, exactly as the Variational Method course already
-established for a completely different, continuous-wavefunction, trial
-family).
+ground energy, limited only by grid resolution — a finer grid closes the
+gap further, as the Variational Method course established for a
+different, continuous-wavefunction trial family.
 
 Unlike the single-parameter case, this cost landscape is
 two-dimensional: $\langle H\rangle$ is now a function of a $(\theta,\phi)$
@@ -154,18 +173,18 @@ color-mapped heatmap, with the grid's own minimum marked directly:
 The darkest-green cell is the grid search's winner: the lowest
 $\langle H\rangle$ this particular $15\times15$ grid found, sitting
 close to (but, unlike the $H=Z$ case, not exactly on) the true
-continuous minimum, exactly the residual gap described above made
-visible as a picture of the whole landscape rather than a single
-reported number.
+continuous minimum. That offset is the residual gap described above,
+seen as a picture of the whole landscape rather than a single reported
+number.
 
 ## Physical Interpretation
 
-This is the entire Quantum Software pillar's thesis made concrete: the
-SAME physics (<Term id="vqe">VQE</Term>, already fully built in Quantum Algorithms II) can be
-implemented via different SOFTWARE PATTERNS (direct matrix
-computation vs. circuit-as-data), and, when both are correct, they
-agree exactly. Software structure is a real engineering choice; it
-doesn't change the underlying physics being computed.
+This is the Quantum Software pillar's thesis made concrete: one physical
+algorithm (VQE, already built in Quantum Algorithms II) admits several
+software realizations — direct matrix computation, circuit-as-data — and
+when both are correct they agree to the last digit. Software structure
+is a real engineering choice, and it changes nothing about the physics
+underneath.
 
 ## Worked Example
 
@@ -177,8 +196,8 @@ Grid search over `circuit.ry(0,theta)`'s $\langle Z\rangle$ finds the
 minimum at $\theta=\pi$ (a grid point landed exactly on it), giving
 $-1$, matching `exactGroundStateEnergy(PAULI_Z)=-1` to the full
 precision tested. Exact agreement (not just "close") is expected here
-because $H=Z$'s ground state is EXACTLY $|1\rangle$, which the
-$R_y(\theta)$ ansatz family can reach exactly at $\theta=\pi$, unlike
+because $H=Z$'s ground state is $|1\rangle$ on the nose, and the
+$R_y(\theta)$ ansatz family reaches it at $\theta=\pi$, unlike
 the two-parameter $0.6Z+0.8X$ case, where the grid search's finite
 resolution leaves a small (but shrinkable) residual gap.
 

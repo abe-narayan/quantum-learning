@@ -113,9 +113,8 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="The most classical quantum state there is">
   Energy eigenstates are maximally non-classical: $\langle x\rangle$ and
-  $\langle p\rangle$ both sit at zero forever. Coherent states are the
-  opposite extreme — the states that most closely track a classical
-  trajectory, and exactly the states real laser light approximates.
+  $\langle p\rangle$ both sit at zero forever. One family of states does
+  the opposite, and it is the family real laser light produces.
 </LessonHook>
 
 ## Motivation
@@ -133,7 +132,7 @@ directly from $a,a^\dagger$, no new postulate needed.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Baffled_LIGO_Scientists.jpg"
   alt="Two LIGO researchers examining fiber-coupling equipment inside the Pre-Stabilized Laser enclosure at LIGO Hanford, during the site's squeezed-light commissioning and upgrade work"
-  caption="LIGO's gravitational-wave detectors inject real squeezed light, exactly the states derived in this lesson, to push measurement noise on one quadrature below what any coherent state (ordinary laser light) could achieve, at the cost of extra noise on the other, precisely the Delta x / Delta p trade-off proved here."
+  caption="LIGO's gravitational-wave detectors inject real squeezed light, the states derived in this lesson, to push measurement noise on one quadrature below what any coherent state (ordinary laser light) could achieve, at the cost of extra noise on the other: the Delta x / Delta p trade-off proved here."
   credit="Nutsinee Kijbunchoo / LIGO, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Baffled_LIGO_Scientists.jpg"
   license="CC BY 4.0"
@@ -172,7 +171,7 @@ basis The Quantum Harmonic Oscillator used):
 
 <InteractiveSection
   title="A real coherent state's Fock-basis distribution"
-  description="Bars are the actual computed |cₙ|² for α=1.5 (mean photon number |α|²=2.25), built from the closed-form coefficients above in a 30-level truncated basis. The distribution peaks near n=2, and its Poisson shape (not a bell curve centered exactly at the mean, slightly skewed) is a genuine, checkable feature of e^(-|α|²)|α|^(2n)/n!, not merely asserted."
+  description="Bars are the actual computed |cₙ|² for α=1.5 (mean photon number |α|²=2.25), built from the closed-form coefficients above in a 30-level truncated basis. The distribution peaks near n=2, and its Poisson shape (not a bell curve centered exactly at the mean, slightly skewed) is a checkable feature of e^(-|α|²)|α|^(2n)/n!."
 >
   <BarChart
     bars={fockBars}
@@ -207,7 +206,7 @@ $$
 Uncertainty, and $\Delta x=\Delta p=1/\sqrt2$: identical to the ground
 state $|0\rangle$'s own spread. This is the coherent state's defining
 feature: it's a *displaced* vacuum, same shape, shifted mean position and
-momentum, which is exactly why it tracks a classical trajectory (the
+momentum, which is why it tracks a classical trajectory (the
 "blob" doesn't spread or distort as $\langle x\rangle,\langle p\rangle$
 oscillate). Checked directly against the real engine's coherent-state
 amplitudes at $\alpha=1.5$: $\Delta x=\Delta p\approx0.7071$ (machine
@@ -220,7 +219,7 @@ Coherent states are not the *only* minimum-uncertainty states, just the
 ones with $\Delta x=\Delta p$. Define a new operator via a **Bogoliubov
 transformation**, $b=a\cosh r+a^\dagger\sinh r$ (real squeeze parameter
 $r$), and its eigenstates $b|\beta\rangle=\beta|\beta\rangle$: the
-**squeezed states**. $b$ satisfies the *same* commutation relation as
+<Term id="squeezed-states">**squeezed states**. $b$ satisfies</Term> the *same* commutation relation as
 $a$: $[b,b^\dagger]=\cosh^2r\,[a,a^\dagger]+\sinh^2r\,[a^\dagger,a]=(\cosh^2r-\sinh^2r)[a,a^\dagger]=1$,
 so everything the earlier coherent-state derivation used (eigenstates
 existing, normalizability, the Fock-like expansion argument) carries over
@@ -234,7 +233,7 @@ to $b,|\beta\rangle$ unchanged, just relabeled.
     { label: "It rises above 1/2 — squeezing costs you some minimality", value: "above" },
   ]}
   correctValue="same"
-  explanation="b obeys the identical commutator [b,b†]=1 that a does, so |β⟩ saturates the uncertainty bound exactly the same way |α⟩ does — it's minimum-uncertainty by construction, not by accident. The derivation below shows Δx and Δp individually as e^(∓r)/√2, and the exponentials cancel in the product no matter how large r gets."
+  explanation="b obeys the identical commutator [b,b†]=1 that a does, so |β⟩ saturates the uncertainty bound the same way |α⟩ does; it is minimum-uncertainty by construction, not by accident. The derivation below shows Δx and Δp individually as e^(∓r)/√2, and the exponentials cancel in the product no matter how large r gets."
 />
 
 Inverting the Bogoliubov transform, $a=b\cosh r-b^\dagger\sinh r$
@@ -279,7 +278,7 @@ the Heisenberg bound.
 
 ## Physical Interpretation
 
-"Squeezing" is exactly what the name suggests: at $r=0.5$, position spread
+"Squeezing" is what the name suggests: at $r=0.5$, position spread
 shrinks to about $61\%$ of the coherent-state value while momentum spread
 grows to about $165\%$, the ellipse of uncertainty (a visual
 picture, even though this lesson stays in the algebra) stretched along
@@ -366,12 +365,10 @@ contradictions.
 
 ## Further Exploration
 
-[Three-Dimensional Scattering and the S-Matrix](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix)
-leaves the harmonic oscillator behind for the very different
-machinery of unbound, scattering states in three dimensions.
-
 <NextDiscovery>
-  Three-Dimensional Scattering and the S-Matrix leaves the
-  harmonic oscillator behind for the very different machinery of
-  unbound, scattering states in three dimensions.
+  [Three-Dimensional Scattering and the S-Matrix](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix)
+  leaves the harmonic oscillator for unbound states in three dimensions,
+  where the spectrum is continuous and normalizability is no longer
+  available as a selection rule. The phase shift replaces the energy
+  eigenvalue as the thing a calculation is trying to produce.
 </NextDiscovery>

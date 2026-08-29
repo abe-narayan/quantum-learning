@@ -61,7 +61,7 @@ export const lessonMeta = {
   module: "noise-aware-compilation-and-resource-estimation",
   order: 4,
   difficulty: "master",
-  estimatedMinutes: 27,
+  estimatedMinutes: 45,
   prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/quantum-compilation-and-transpilation", "apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"],
   objectives: [
     "Explain qubit routing and SWAP overhead precisely: mapping a circuit's logical two-qubit gates onto a real device's limited connectivity graph, and computing the SWAP-gate overhead for a specific concrete circuit and device topology",
@@ -337,6 +337,39 @@ and noise-aware success probability — finally get chained together into
 one end-to-end resource estimate for a real algorithm, the same kind of
 synthesis Fault-Tolerance Frontiers' own capstone already modeled for
 the fault-tolerant side of the pipeline.
+
+<ResearchConnection
+  title="Noise-aware mapping as a compiler pass"
+  source="Murali, Baker, Javadi-Abhari, Chong & Martonosi, ASPLOS 2019 (arXiv:1901.11054)"
+  url="https://arxiv.org/abs/1901.11054"
+>
+  The paper that built this lesson's idea into a real compiler and
+  measured it on IBM hardware, reporting success-probability improvements
+  of the same order as the toy calculation above. Two things worth
+  extracting. First, the mapping problem it solves is intractable to
+  solve exactly at scale, so every production compiler uses heuristics
+  or a bounded-time solver, and two compilers can hand you different
+  circuits for the same program. Second, the calibration data the pass
+  depends on is stale by construction: it was measured at the last
+  calibration, and the device has drifted since.
+</ResearchConnection>
+
+<Callout type="warning">
+**The success-probability model above assumes errors multiply, and
+sometimes they do not.** $P=\prod(1-p_i)$ treats each gate as an
+independent coin flip, which is the right model for *stochastic*
+(depolarizing-like) error. Coherent error — a systematic
+over-rotation, a miscalibrated pulse — accumulates in *amplitude*
+instead, so $n$ repetitions of a small coherent error can degrade
+fidelity like $n^2 p$ rather than $np$, and the product formula
+understates the damage. It can also overstate it: coherent errors from
+successive gates sometimes cancel. Randomized compiling exists
+specifically to convert coherent error into stochastic error, at a small
+gate-count cost, precisely so that estimates like the one above become
+trustworthy. Quoting a product-model success probability for a circuit
+that has not been randomized is quoting a number whose error bars are
+unknown in both directions.
+</Callout>
 
 ## Common Mistakes
 

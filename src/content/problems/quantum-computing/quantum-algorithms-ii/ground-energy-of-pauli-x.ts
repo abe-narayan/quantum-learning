@@ -26,6 +26,10 @@ export const groundEnergyOfPauliX: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "X's eigenvalues are the two square roots of 1 — what are they?",
+    nearMisses: [
+      { value: 1, feedback: "+1 is X's other eigenvalue, the highest energy. The ground state is the minimum, so take the other one." },
+      { value: 0, feedback: "0 is ⟨X⟩ in the |0⟩ or |1⟩ state, not an eigenvalue of X. X² = I forces its eigenvalues to be ±1." },
+    ],
   },
   hints: [
     { text: "X's eigenstates are |+⟩ and |−⟩." },

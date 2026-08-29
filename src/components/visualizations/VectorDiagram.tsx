@@ -21,8 +21,14 @@ const LABEL_OFFSET = 12;
  * threshold, adapted from one axis to a shared point in the plane.
  */
 const LABEL_COLLISION_PX = 20;
-/** Rough px-per-character used only to decide how far to push a colliding label outward; doesn't need to be exact. */
-const LABEL_CHAR_WIDTH_PX = 6;
+/**
+ * Rough px-per-character used only to decide how far to push a colliding
+ * label outward; doesn't need to be exact. Raised from 6 alongside the label
+ * type size below (11 -> 13 units): the de-collision fan pushes each label
+ * out by roughly its own half-width, so leaving this at the old size's
+ * estimate would have under-pushed every colliding cluster by ~15% and let
+ * tip-to-tip labels touch again at the larger type. */
+const LABEL_CHAR_WIDTH_PX = 7.5;
 /** Extra gap (px) enforced beyond a colliding label's own estimated half-width. */
 const LABEL_CLUSTER_GAP_PX = 8;
 /** Angular fan (degrees) spread across a colliding cluster so labels separate even when their vectors point in nearly the same direction. */
@@ -182,8 +188,17 @@ export function VectorDiagram({
   return (
     <div className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} className="w-full" role="img" aria-label={ariaLabel}>
+        {/* The two axes are the only fixed frame in the figure: a vector
+            arrow means nothing without a visible origin and orientation to
+            read it against, and this component's callers use it for
+            projections and rotations where "which way is x" carries the
+            argument. Load-bearing, so `--axis` (clears 3:1 on every panel
+            depth) replaces `--border`, the panel-edge token that measured
+            1.41:1 on `--surface-muted` — under the 3:1 WCAG 2.1 SC 1.4.11
+            floor. `showGrid` keeps its existing name and meaning; despite it
+            there has never been a grid here, only these axes. */}
         {showGrid && (
-          <g className="stroke-border" strokeWidth={1}>
+          <g className="stroke-axis" strokeWidth={1.25}>
             <line x1={axisXStart.x} y1={axisXStart.y} x2={axisXEnd.x} y2={axisXEnd.y} />
             <line x1={axisYStart.x} y1={axisYStart.y} x2={axisYEnd.x} y2={axisYEnd.y} />
           </g>
@@ -206,7 +221,18 @@ export function VectorDiagram({
                 x={anchor.x}
                 y={anchor.y}
                 textAnchor="middle"
-                className={`text-[11px] font-medium ${FILL_CLASS[d.color]}`}
+                // viewBox 320 rendered `w-full`. The scale is 0.794, not
+                // the 0.9 this note used to claim: 288px is the page column,
+                // but the SVG sits inside `panel-inset p-4`, and
+                // `panel-inset` (globals.css) has no padding of its own — the
+                // `p-4` does — so the real box is 288 - 2 x (16px padding +
+                // 1px border) = 254px. 11 units therefore painted at 8.7px,
+                // under the ~9px floor rather than over it, and 13 gives
+                // **10.32px**, not 11.7px. These are the vectors' names - the
+                // only thing tying an arrow on screen to the algebra in the
+                // surrounding prose - so they are must-read, not annotation.
+                fontSize={13}
+                className={`font-medium ${FILL_CLASS[d.color]}`}
               >
                 {d.v.label}
               </text>

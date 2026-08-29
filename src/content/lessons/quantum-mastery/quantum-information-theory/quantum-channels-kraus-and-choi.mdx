@@ -6,6 +6,8 @@ import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { eigenvaluesHermitian2x2 } from "@/lib/quantum/densityMatrix";
 import { amplitudeDampingChannel, dephasingChannel, applyKrausChannel } from "@/lib/quantum/openSystems";
+import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
+import { blochStateFromAngles, densityMatrixToBlochVector } from "@/lib/quantum/bloch";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 
 export const practiceProblems = getProblemMetaForLesson(
@@ -33,7 +35,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mastery/quantum-information-theory/the-lindblad-master-equation",
-      note: "The Lindblad equation generates a continuous family of CP maps; every snapshot of it has a Choi matrix obeying exactly this lesson's positivity condition.",
+      note: "The Lindblad equation generates a continuous family of CP maps; every snapshot of it has a Choi matrix obeying this lesson's positivity condition.",
     },
   ],
 };
@@ -84,6 +86,44 @@ export const partialTraceOutput = (J) => {
 }
 export const tracedOutAD = partialTraceOutput(J_AD);
 export const tracedOutDP = partialTraceOutput(J_DP);
+
+export const blochCircleAngles = Array.from({ length: 181 }, (_, i) => (i / 180) * 2 * Math.PI);
+export const blochCircleVectors = (krausOps) =>
+  blochCircleAngles.map((theta) => {
+    const rho = pureStateDensityMatrix(blochStateFromAngles({ theta, phi: 0 }));
+    return densityMatrixToBlochVector(krausOps === null ? rho : applyKrausChannel(rho, krausOps));
+  });
+export const blochPlotCentre = 118;
+export const blochPlotRadius = 92;
+export const blochPathFor = (krausOps) =>
+  `${blochCircleVectors(krausOps)
+    .map((v, i) => {
+      const px = blochPlotCentre + blochPlotRadius * v.x;
+      const py = blochPlotCentre - blochPlotRadius * v.z;
+      return `${i === 0 ? "M" : "L"}${px.toFixed(2)},${py.toFixed(2)}`;
+    })
+    .join(" ")} Z`;
+export const blochPurePath = blochPathFor(null);
+export const contractionGammas = [0.3, 0.6, 0.9];
+export const contractionPaths = contractionGammas.map((g) => blochPathFor(amplitudeDampingChannel(g)));
+export const contractionCentreShift = contractionGammas.map(
+  (g) =>
+    densityMatrixToBlochVector(
+      applyKrausChannel(
+        pureStateDensityMatrix(blochStateFromAngles({ theta: Math.PI / 2, phi: 0 })),
+        amplitudeDampingChannel(g)
+      )
+    ).z
+);
+export const contractionWidth = contractionGammas.map(
+  (g) =>
+    densityMatrixToBlochVector(
+      applyKrausChannel(
+        pureStateDensityMatrix(blochStateFromAngles({ theta: Math.PI / 2, phi: 0 })),
+        amplitudeDampingChannel(g)
+      )
+    ).x
+);
 
 export const strengthSamples = Array.from({ length: 41 }, (_, i) => i / 40);
 
@@ -140,23 +180,54 @@ export const choiSpectrumFrames = [
 
 ## Motivation
 
-Open Quantum Systems & Kraus Operators stated the Kraus sum
-representation $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$ as *the*
-general form of a physically valid channel, without proving that every
-completely positive, trace-preserving map actually has one. This lesson
-supplies that proof, via a tool that turns an entire *map* (an operator
-on operators) into a single ordinary matrix that can be diagonalized with
-machinery this platform already has: the **Choi–Jamiolkowski
-isomorphism**.
+Open Quantum Systems & Kraus Operators stated the
+<Term id="kraus-operators-cptp-maps">Kraus sum representation</Term>
+$\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$ as *the* general form of a
+physically valid channel, without proving that every completely positive,
+trace-preserving map has one. This lesson supplies that proof, via a tool
+that turns an entire *map* (an operator on operators) into a single
+ordinary matrix that can be diagonalized with machinery this platform
+already has: the **Choi–Jamiołkowski isomorphism**.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/2/2e/D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
-  alt="A D-Wave Two 512-qubit superconducting quantum processor chip, mounted in its package and ready for cooling to near-absolute zero"
-  caption="A real physical qubit register like this one is never perfectly isolated: every uncontrolled coupling to its environment is exactly the kind of completely positive, trace-preserving map this lesson's Choi matrix machinery is built to characterize and validate."
-  credit="Steve Jurvetson / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:D-Wave_Two_512_qubit_Vesuvius_chip.jpg"
-  license="CC BY 2.0"
-/>
+Before the algebra, it is worth seeing what a CPTP map *does*, because the
+constraint has a shape. A channel maps the Bloch ball into itself, and
+"into itself" is the whole of complete positivity plus trace preservation
+made visible. The figure below takes the $x$–$z$ cross-section of the ball
+and pushes every point through `amplitudeDampingChannel` at three
+strengths, using this platform's own `applyKrausChannel` and
+`densityMatrixToBlochVector` to place each point.
+
+<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
+  <svg width={236} height={236} viewBox="0 0 236 236" className="mx-auto max-w-full" role="img" aria-label="The x-z cross-section of the Bloch ball under amplitude damping. The outer grey circle is the set of pure states at gamma equals zero. Inside it sit three progressively smaller ellipses, for gamma equals 0.3, 0.6 and 0.9, each one both narrower and shorter than the last and each shifted upward toward the north pole, which is the state ket zero. At gamma equals 0.9 the ellipse has nearly collapsed onto that north pole. No ellipse touches or crosses the outer circle, and none is centred on the origin: the channel contracts the ball and simultaneously drags it toward one fixed point.">
+    <line x1={118} y1={18} x2={118} y2={218} className="stroke-border" strokeWidth={1} />
+    <line x1={18} y1={118} x2={218} y2={118} className="stroke-border" strokeWidth={1} />
+    <path d={blochPurePath} className="fill-none stroke-muted-foreground" strokeWidth={1.75} strokeDasharray="5 4" />
+    <path d={contractionPaths[0]} className="fill-brand/10 stroke-brand" strokeWidth={2} />
+    <path d={contractionPaths[1]} className="fill-accent/10 stroke-accent" strokeWidth={2} />
+    <path d={contractionPaths[2]} className="fill-warning/10 stroke-warning" strokeWidth={2} />
+    <circle cx={118} cy={26} r={3} className="fill-foreground" />
+    <text x={124} y={22} className="fill-foreground text-[10px]">|0⟩ (fixed point)</text>
+    <text x={124} y={216} className="fill-muted-foreground text-[10px]">|1⟩</text>
+    <text x={26} y={112} className="fill-muted-foreground text-[10px]">⟨X⟩</text>
+  </svg>
+</div>
+
+Dashed: the pure states, $|\vec r|=1$. Solid, outer to inner:
+$\gamma=0.3,\,0.6,\,0.9$. Each image is an ellipse of half-width
+$\sqrt{1-\gamma}$ and half-height $1-\gamma$, centred at $z=\gamma$
+rather than at the origin.
+
+Two features of that picture carry the lesson. The ellipses stay
+*inside* the circle: the channel never produces a state outside the ball,
+which is what a positive, trace-preserving map has to do. And no ellipse
+is centred on the origin. Amplitude damping is **non-unital**: it moves
+$I/2$, dragging everything toward $|0\rangle$. At $\gamma={contractionGammas[1]}$
+the equator has contracted to half-width {contractionWidth[1].toFixed(4)}
+and lifted to $z={contractionCentreShift[1].toFixed(4)}$, both read off
+the real channel rather than the formula. Complete positivity is the
+statement that this containment survives even when the qubit being
+squeezed is entangled with a spectator the channel never touches, and
+that extra clause is what the Choi matrix is built to test.
 
 ## Mathematical Development
 
@@ -176,7 +247,7 @@ This is a
 strictly stronger requirement than positivity (there exist positive maps,
 like transposition, that are not completely positive), and it's the
 correct physical requirement: a subsystem's evolution must remain valid
-even when it's entangled with something else, exactly the situation this
+even when it's entangled with something else, the situation this
 platform's `partialTrace`-based reduced states are built to describe.
 
 ### The Choi matrix
@@ -184,7 +255,7 @@ platform's `partialTrace`-based reduced states are built to describe.
 <EquationReveal
   terms={[
     { id: "J", symbol: "J(ℰ)", gloss: "The Choi matrix — a single d²×d² matrix that encodes the entire channel ℰ." },
-    { id: "ij", symbol: "|i⟩⟨j|", gloss: "Every basis matrix, including non-positive-semi-definite ones (i≠j) — ℰ is still a well-defined linear map on them." },
+    { id: "ij", symbol: "|i⟩⟨j|", gloss: "Every basis matrix, including non-positive-semi-definite ones (i≠j); ℰ is still a well-defined linear map on them." },
     { id: "Eij", symbol: "ℰ(|i⟩⟨j|)", gloss: "The channel's output when fed that basis matrix." },
   ]}
 >
@@ -208,6 +279,30 @@ one half of a maximally entangled pair through $\mathcal E$ and leaving
 the other half alone.
 
 ### Complete positivity $\Longleftrightarrow$ $J(\mathcal E)\geq0$
+
+<TheoremBox title="Choi's theorem" provenance="derived">
+
+**Hypotheses.** $\mathcal E$ is a linear map on the $d\times d$ complex
+matrices, with $d$ **finite**. Nothing is assumed about positivity,
+trace, or the existence of any Kraus form.
+
+**Conclusion.** $\mathcal E$ is completely positive if and only if
+$J(\mathcal E)\geq0$, and in that case the eigendecomposition of
+$J(\mathcal E)$ *constructs* a Kraus family $\{K_k\}$ with
+$\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$. The number of nonzero
+eigenvalues is the minimal Kraus rank, so $r\leq d^2$ always.
+
+The finiteness of $d$ is load-bearing and is the reason this proof is
+short. In infinite dimensions the sum defining $J$ need not converge, the
+spectral decomposition of $J$ can have continuous parts, and the
+corresponding statement requires normality assumptions on $\mathcal E$
+and a different argument (Stinespring's, which the Shannon-theory course
+takes up). Every claim below is a finite-dimensional claim.
+
+Choi (1975); the equivalent state-channel correspondence is due to
+Jamiołkowski (1972).
+
+</TheoremBox>
 
 **Easy direction.** If $\mathcal E$ has a Kraus form
 $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$, first check
@@ -270,10 +365,11 @@ $\blacksquare$
 
 ## Worked Example
 
-**Build the Choi matrices for this platform's own amplitude-damping
-($\gamma=0.3$) and dephasing ($\lambda=0.3$) channels, verify complete
-positivity directly, and reconstruct amplitude damping's Kraus operators
-from nothing but $J$'s eigenvectors.**
+**Build the Choi matrices for this platform's own
+<Term id="amplitude-damping">amplitude-damping</Term> ($\gamma=0.3$) and
+<Term id="dephasing">dephasing</Term> ($\lambda=0.3$) channels, verify
+complete positivity directly, and reconstruct amplitude damping's Kraus
+operators from nothing but $J$'s eigenvectors.**
 
 <MatrixGridExplorer
   presets={[
@@ -288,13 +384,13 @@ block on the $\{(0,0),(1,1)\}$ indices plus one or two isolated diagonal
 entries. `eigenvaluesHermitian2x2`, the same closed-form solver used
 throughout this course, applied directly to each $2\times2$ block gives:
 
-$$
-\text{Amplitude damping: block eigenvalues } \{1.7,\ 0\}, \quad \text{isolated entry } 0.3 \qquad\Longrightarrow\quad \text{full spectrum } \{1.7,\ 0.3,\ 0,\ 0\}
-$$
+| Channel | Block eigenvalues | Isolated diagonal entries | Full Choi spectrum |
+|---|---|---|---|
+| Amplitude damping, $\gamma={gamma}$ | {muAD1.toFixed(4)}, {muAD2.toFixed(4)} | {isolatedAD.toFixed(4)}, 0 | {[muAD1, isolatedAD, muAD2, 0].map((v) => v.toFixed(4)).join(", ")} |
+| Dephasing, $\lambda={lambda}$ | {muDP1.toFixed(4)}, {muDP2.toFixed(4)} | {isolatedDP1.toFixed(4)}, {isolatedDP2.toFixed(4)} | {[muDP1, muDP2, isolatedDP1, isolatedDP2].map((v) => v.toFixed(4)).join(", ")} |
 
-$$
-\text{Dephasing: block eigenvalues } \{1.7,\ 0.3\}, \quad \text{isolated entries } 0,\ 0 \qquad\Longrightarrow\quad \text{full spectrum } \{1.7,\ 0.3,\ 0,\ 0\}
-$$
+Every entry above comes from `eigenvaluesHermitian2x2` applied to the
+Choi matrices built just above, not from a formula typed out by hand.
 
 Every eigenvalue is $\geq0$ for both channels (confirming complete
 positivity directly from the theorem above, not merely from already
@@ -306,13 +402,13 @@ $J_{DP}$ returns exactly $I$).
 ### How the spectrum moves as the channel strengthens
 
 <PredictBeforeReveal
-  question="At gamma=1, amplitude damping is total: every qubit decays to |0>, the same trivial, fully-known outcome regardless of input. Does the channel's Kraus rank drop back down to 1 there, the way it's exactly 1 at gamma=0?"
+  question="At gamma=1, amplitude damping is total: every qubit decays to |0⟩, the same trivial, fully-known outcome regardless of input. Does the channel's Kraus rank drop back down to 1 there, the way it's exactly 1 at gamma=0?"
   options={[
     { label: "Yes — total decay is just as trivial as no decay at all, so rank 1 again", value: "rank1" },
     { label: "No — it stays at rank 2, the same as every other gamma strictly between 0 and 1", value: "rank2" },
   ]}
   correctValue="rank2"
-  explanation="Rank 2 the whole way through, including gamma=1. 'Trivial outcome' and 'trivial channel' aren't the same thing: at gamma=1 the channel still needs two Kraus operators (K0 kills all population in |1>, K1 carries every |1> amplitude over to |0>) to correctly zero out coherences along with populations. Only gamma=0, literally no evolution at all, collapses back to a single K0=I."
+  explanation="Rank 2 the whole way through, including gamma=1. 'Trivial outcome' and 'trivial channel' aren't the same thing: at gamma=1 the channel still needs two Kraus operators (K0 kills all population in |1⟩, K1 carries every |1⟩ amplitude over to |0⟩) to correctly zero out coherences along with populations. Only gamma=0, literally no evolution at all, collapses back to a single K0=I."
 />
 
 The presets above freeze $\gamma=\lambda=0.3$, which hides a fact the
@@ -327,12 +423,12 @@ of nonzero values among $\{\mu_1,\mu_2,J(2,2),J(1,1){=}0\}$, that makes
 the channel rank $1$ (the trivial identity map, no Kraus operator
 besides $K_0=I$ needed) only exactly at $\gamma=0$, and rank $2$ for
 *every* $\gamma\in(0,1]$, all the way through total decay at
-$\gamma=1$ — the rank never drops back down at that endpoint. Dephasing
+$\gamma=1$. The rank never drops back down at that endpoint. Dephasing
 looks structurally different: its two isolated entries $J(1,1)$ and
 $J(2,2)$ stay pinned at exactly $0$ for every $\lambda$, so its rank is
 governed entirely by its *block*, whose own eigenvalues
 $\mu_1(\lambda)=2-\lambda$ and $\mu_2(\lambda)=\lambda$ are both
-nonzero throughout $(0,1)$ — dephasing never has a trivial isolated
+nonzero throughout $(0,1)$; dephasing never has a trivial isolated
 component to track, unlike amplitude damping.
 
 <ParametricCurve
@@ -367,20 +463,28 @@ term-by-term identity claimed in the proof above.
 ## Physical Interpretation
 
 <InsightBlock>
-  A channel and a bipartite quantum state carry exactly the same
-  information — related by "send half of a maximally entangled pair
-  through it." Checking whether a proposed channel is physically valid
-  reduces to checking whether one matrix is positive semi-definite.
+  Complete positivity is defined by a quantifier over every spectator
+  system of every dimension. The Choi matrix eliminates that quantifier.
+  One finite matrix, one eigenvalue check, and the infinite family of
+  conditions is discharged.
 </InsightBlock>
 
-The Choi–Jamiolkowski isomorphism says a channel and a bipartite quantum
-state carry exactly the same information, related by "send half of a
-maximally entangled pair through it." This is why checking a proposed
-channel's validity reduces to checking a single matrix's positive
-semi-definiteness (an ordinary, checkable linear-algebra condition, not
-a fact about *every* possible input state and *every* possible larger
-system it might be entangled with, which complete positivity's original
-definition would otherwise demand quantifying over).
+The <Term id="choi-jamiolkowski-isomorphism">Choi–Jamiołkowski isomorphism</Term>
+says a channel and a bipartite quantum state carry the same information,
+related by "send half of a maximally entangled pair through it." The
+practical consequence is the one worth dwelling on. Complete positivity's
+definition quantifies over *every* possible input state and *every*
+possible larger system the input might be entangled with, which is not a
+condition anyone can check by inspection. Choi's theorem replaces it with
+the positive semi-definiteness of a single $d^2\times d^2$ matrix: an
+eigenvalue computation, finite and mechanical.
+
+The geometric reading connects to the figure this lesson opened with. The
+Bloch ball is the state space of one qubit; the Choi matrix is a state on
+*two*. Asking whether a channel is completely positive is asking whether
+that two-qubit object is a legal state, and the reason the one-qubit
+picture is not enough is the same reason the transpose map passes
+the ball test and fails the Choi test.
 
 ## Common Mistakes
 
@@ -430,7 +534,7 @@ $\mathcal E$ to be a physically valid channel.
   turns a channel into a single ordinary matrix.
 - $\mathcal E$ is completely positive if and only if $J(\mathcal E)\geq0$,
   proved in both directions, with the hard direction's reshaping
-  argument reconstructing genuine Kraus operators from $J$'s
+  argument reconstructing explicit Kraus operators from $J$'s
   eigendecomposition.
 - $\mathcal E$ is trace-preserving if and only if
   $\text{Tr}_{\text{out}}(J(\mathcal E))=I$.

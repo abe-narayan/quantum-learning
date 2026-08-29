@@ -20,27 +20,27 @@ export const whyMeasurementWouldCollapseSuperposition: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["collapse", "collapses", "forces a definite"],
-      ["superposition", "amplitudes", "alpha", "beta"],
+      ["collapse", "forces a definite", "definite outcome", "definite state", "definite value", "projects", "picks one outcome", "snaps to"],
+      ["superposition", "amplitude", "coefficient", "alpha", "beta", "α", "β"],
     ],
-    incorrectFeedback: "Recall what measurement does to a state like α|0⟩+β|1⟩ — does it leave α,β intact afterward?",
-    partialFeedback: "Good — be explicit that this destroys exactly the α,β information the code is meant to preserve.",
+    incorrectFeedback: "Recall what the measurement postulate does to a general single-qubit state, and ask what survives of the two numbers that described it.",
+    partialFeedback: "Good. Be explicit that what gets destroyed is precisely the information the code exists to protect.",
   },
   hints: [
-    { text: "Measuring α|0⟩+β|1⟩ collapses it to |0⟩ or |1⟩, with probabilities |α|² and |β|²." },
-    { text: "After measurement, the specific values of α and β are gone — only the classical outcome remains." },
-    { text: "This is exactly the information error correction needs to preserve." },
+    { text: "Write down what the measurement postulate says happens to a general qubit state measured in the computational basis." },
+    { text: "After that event, can anyone recover the two numbers that described the state beforehand?" },
+    { text: "Which numbers was the error-correction scheme trying to protect in the first place?" },
   ],
   solution: {
     steps: [
       { description: "Measuring a superposition collapses it to one definite basis outcome, chosen randomly by the Born rule." },
-      { description: "The original amplitudes α, β are irretrievably lost in this process — not merely hidden, but gone." },
+      { description: "The original amplitudes α, β are irretrievably lost in this process: not merely hidden, but gone." },
     ],
     finalAnswer: "Measurement forces the qubit into one definite outcome, destroying the exact α,β values that were the actual information being protected.",
   },
   explanation: {
-    correctIdea: "Any error-checking strategy for quantum information must avoid direct measurement of the protected amplitudes — exactly why syndrome measurement is designed around this constraint.",
+    correctIdea: "Any error-checking strategy for quantum information must avoid direct measurement of the protected amplitudes. This is exactly why syndrome measurement is designed around that constraint.",
     whyCorrect: "This is precisely the obstacle syndrome extraction (measuring only parity, not individual qubit values) is built to avoid.",
-    whyWrong: ["Saying 'it just gives the wrong answer' misses the deeper point — the issue isn't inaccuracy, it's that the protected information is destroyed outright."],
+    whyWrong: ["Saying 'it just gives the wrong answer' misses the deeper point: the issue isn't inaccuracy, it's that the protected information is destroyed outright."],
   },
 };

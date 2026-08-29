@@ -10,22 +10,21 @@ export const practiceProblems = getProblemMetaForLesson(
 
 export const fineStructureAlpha = 1 / 137;
 export const fineStructureScaleEV = fineStructureAlpha * fineStructureAlpha * RYDBERG_EV;
-export const fineStructureFrames = [1, 2, 3, 4].map((n) => ({
-  paramLabel: `n = ${n}`,
-  bars: [
-    {
-      label: `|E${n}|`,
-      value: Math.abs(hydrogenEnergyLevel(n)),
-      caption: `${Math.abs(hydrogenEnergyLevel(n)).toFixed(3)} eV`,
-    },
-    {
-      label: "fine structure",
-      value: fineStructureScaleEV,
-      highlight: true,
-      caption: `${fineStructureScaleEV.toFixed(6)} eV`,
-    },
-  ],
-}));
+export const fineStructureFrames = [1, 2, 3, 4].map((n) => {
+  const fineStructureEV = fineStructureScaleEV / (n * n * n);
+  const levelEV = Math.abs(hydrogenEnergyLevel(n));
+  return {
+    paramLabel: `n = ${n}: |E${n}| = ${levelEV.toFixed(3)} eV, fine structure ≈ ${fineStructureEV.toFixed(6)} eV`,
+    bars: [
+      {
+        label: `n = ${n}`,
+        value: fineStructureEV / levelEV,
+        highlight: true,
+        caption: `${(fineStructureEV / levelEV).toExponential(2)}`,
+      },
+    ],
+  };
+});
 
 export const lessonMeta = {
   title: "Fine Structure (Introduction)",
@@ -50,10 +49,12 @@ Every energy value this course computed, Eₙ=−13.6 eV/n², independent of l a
 
 ## Motivation
 
-Specifically: the electron has spin, and at the $\sim0.1\%$ level,
-relativistic corrections matter. This closing lesson is honest about
-that gap rather than pretending it doesn't exist, and previews (without
-deriving) what the next level of approximation adds.
+The gap between the model and the real atom is small but real. The
+electron carries spin, which the Schrödinger treatment ignored, and it
+moves fast enough ($v/c\sim\alpha\approx1/137$) that relativistic
+corrections enter at the $\alpha^2$ level. This closing lesson is honest
+about that gap rather than pretending it doesn't exist, and previews
+(without deriving) what the next level of approximation adds.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Portrait_of_Arnold_Sommerfeld.jpg"
@@ -86,32 +87,36 @@ energies by an amount that depends on both $n$ and $l$.
 
 ### What breaks, specifically
 
-Both corrections scale as roughly $(\alpha)^2\times13.6\text{ eV}\approx10^{-4}\times13.6\text{ eV}$,
-where $\alpha\approx1/137$ is the fine-structure constant, small enough
+Both corrections scale as roughly $\alpha^2\times13.6\text{ eV}/n^3$
+(times an order-one factor that depends on $j$), where
+$\alpha\approx1/137$ is the fine-structure constant, so
+$\alpha^2\approx5.3\times10^{-5}$. That suppression is small enough
 that this course's $E_n=-13.6/n^2$ is an excellent approximation for most
-purposes, but large enough to be precisely measured spectroscopically
-(historically, this is exactly how fine structure was first discovered).
+purposes, but large enough to measure. Fine structure was discovered
+spectroscopically, as a splitting of lines the Bohr model predicted to be
+single.
 
 <PredictBeforeReveal
-  question="|Eₙ| shrinks like 1/n² as n grows, while the ~α²×13.6 eV fine-structure scale stays roughly fixed. As n increases from 1 to 4, does the fine-structure correction become a bigger or smaller fraction of |Eₙ|?"
+  question="|Eₙ| shrinks like 1/n² as n grows, while the fine-structure correction scales like α²×13.6 eV/n³. As n increases from 1 to 4, does the correction become a bigger or smaller fraction of |Eₙ|?"
   options={[
     { label: "Bigger fraction of |Eₙ| at higher n", value: "bigger" },
     { label: "Smaller fraction of |Eₙ| at higher n", value: "smaller" },
     { label: "Always the same fraction, regardless of n", value: "same" },
   ]}
-  correctValue="bigger"
-  explanation="|Eₙ| falls off fast (as 1/n²) while the fine-structure scale barely moves, so the correction eats a growing share of the level spacing at higher n, even though its absolute size stays roughly the same ~10⁻⁴ eV. Slide n in the chart below and compare the two caption numbers directly: the gap between the bars narrows in relative terms even as Eₙ itself shrinks."
+  correctValue="smaller"
+  explanation="The correction falls off as 1/n³, one power of n faster than |Eₙ| itself, so their ratio goes as α²/n. Fine structure matters most for the ground state and fades at higher n, both in absolute size and as a share of the level. The chart below plots exactly that ratio: it starts at α²≈5.3×10⁻⁵ for n=1 and falls by a factor of 4 by n=4."
 />
 
 <InteractiveSection
   title="Slide n, size up the fine-structure gap"
-  description="Slide through n and compare the exact Eₙ this course derived to the ~α²×13.6 eV fine-structure scale. Watch the caption numbers, not just the bar heights, to see just how large that gap really is."
+  description="Each bar is the α²×13.6 eV/n³ fine-structure scale divided by |Eₙ| itself. Plotting the ratio rather than the two energies side by side is the only way both survive on one axis: at n=1 the correction is roughly one part in twenty thousand of the level it sits on, far too small to see against a 13.6 eV bar. Slide n and watch the ratio fall as α²/n; the frame label above the chart carries both raw eV numbers."
+  mode="observe"
 >
   <BarChartExplorer
     frames={fineStructureFrames}
     sliderLabel="Principal quantum number n"
-    ariaLabel="Bar chart comparing the magnitude of hydrogen energy level E_n to the order-of-magnitude fine-structure correction scale, for n from 1 to 4"
-    maxValue={fineStructureScaleEV * 8}
+    ariaLabel="Bar chart of the fine-structure correction expressed as a fraction of the hydrogen level energy |E_n|, falling from about 5.3 times ten to the minus five at n equals 1 to about 1.3 times ten to the minus five at n equals 4"
+    maxValue={fineStructureAlpha * fineStructureAlpha}
   />
 </InteractiveSection>
 
@@ -127,20 +132,20 @@ $j$ get slightly different energies.
     { label: "j = 1/2", highlight: true },
   ]}
   ariaLabel="Schematic diagram showing the single non-relativistic n=2 hydrogen energy level fanning out into two closely spaced levels labeled j=3/2 and j=1/2 once fine structure is included"
-  caption="Schematic, not to scale: the fine-structure splitting is real but tiny (~10⁻⁴ of E_n), and its actual size is computed later in Quantum Mastery."
+  caption="Schematic, not to scale: the fine-structure splitting is real but tiny (parts in 10⁵ of |Eₙ|), and its actual size is computed later in Quantum Mastery."
 />
 
 ## Honest Scope Statement
 
 This course derived the leading-order, non-relativistic, spin-free
-hydrogen atom completely and correctly: energies, orbitals, and their
-degeneracies are all genuine, checkable results, not simplifications
-that hide wrong answers. Fine structure is a real, separate
-next-order correction this course does not derive; doing so requires
-either full relativistic quantum mechanics (the Dirac equation) or
+hydrogen atom completely and correctly. The energies, orbitals, and
+degeneracies are checkable results, not simplifications hiding wrong
+answers. Fine structure is a separate next-order correction that this
+course does not derive; doing so requires either full relativistic
+quantum mechanics (the Dirac equation) or
 <Term id="degenerate-perturbation-theory">degenerate perturbation theory</Term> applied to $\vec L\cdot\vec S$, both
-beyond this course's scope. What's presented here is the map of what's
-missing, not the missing calculation itself.
+beyond this course's scope. What is offered here is a map of what is
+missing, not the missing calculation.
 
 ## Common Mistakes
 
@@ -152,10 +157,11 @@ fine splitting that depends on $j$, not just $n$.
 </Callout>
 
 <Callout type="note">
-**Assuming fine structure is a large effect.** At $\sim10^{-4}$ relative
-size, it's a precision correction, not a qualitative change: this
-course's $E_n=-13.6/n^2$ remains an excellent approximation for
-essentially every purpose outside high-resolution spectroscopy.
+**Assuming fine structure is a large effect.** At a relative size of
+roughly $\alpha^2/n\lesssim5\times10^{-5}$, it's a precision correction,
+not a qualitative change: this course's $E_n=-13.6/n^2$ remains an
+excellent approximation for essentially every purpose outside
+high-resolution spectroscopy.
 </Callout>
 
 ## Practice Questions
@@ -175,21 +181,23 @@ essentially every purpose outside high-resolution spectroscopy.
 ## Summary
 
 - Fine structure combines spin-orbit coupling ($\vec L\cdot\vec S$) and
-  a relativistic kinetic correction, both scaling as $\sim\alpha^2E_n$.
+  a relativistic kinetic correction, both scaling as
+  $\sim\alpha^2\times13.6\text{ eV}/n^3$, so the correction shrinks with
+  $n$ faster than $|E_n|$ itself does.
 - It breaks this course's exact $l$-independence of $E_n$: real
   hydrogen's energy levels split slightly by total angular momentum $j$.
-- This course's results are the genuine, correct non-relativistic,
-  spin-free hydrogen atom, a real foundation, not a simplification that
-  needs to be unlearned, just one with a clearly stated next-order
-  correction beyond its scope.
+- This course's results are the correct non-relativistic, spin-free
+  hydrogen atom: a foundation to build on rather than a simplification
+  to unlearn, with one clearly stated next-order correction sitting
+  beyond its scope.
 
 ## Further Exploration
 
 <NextDiscovery>
 This closes **The Hydrogen Atom**. The next course, **Approximation
 Methods**, builds the general tools (perturbation theory, the
-variational principle) that a full fine-structure calculation would
-actually use, applied there to more tractable example systems.
+variational principle) that a full fine-structure calculation needs,
+applied there to more tractable example systems.
 
 The specific calculation this lesson names and withholds, degenerate
 perturbation theory applied to $\vec L\cdot\vec S$, is worked in full,

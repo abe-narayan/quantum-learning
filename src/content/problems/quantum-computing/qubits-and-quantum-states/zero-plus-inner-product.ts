@@ -29,6 +29,11 @@ export const zeroPlusInnerProduct: NumericProblem = {
     value: overlap,
     tolerance: 0.01,
     incorrectFeedback: "Expand |+⟩ into its |0⟩ and |1⟩ pieces first, then use orthonormality to see which term survives ⟨0| ... ⟩.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is |⟨0|+⟩|², the probability. The question asks for the inner product itself, before squaring." },
+      { value: 1, feedback: "1 is ⟨0|0⟩. |+⟩ is a superposition, so only part of it overlaps with |0⟩." },
+      { value: 0, feedback: "0 is ⟨0|1⟩. |+⟩ carries a nonzero |0⟩ component, so the overlap does not vanish." },
+    ],
   },
   hints: [
     { text: "⟨0| = (1, 0), acting on |+⟩'s column vector, is ordinary row-times-column matrix multiplication." },

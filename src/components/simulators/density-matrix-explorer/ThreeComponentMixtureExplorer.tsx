@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Readout } from "@/components/ui/Typography";
 import { blochStateFromAngles } from "@/lib/quantum/bloch";
 import { pureStateDensityMatrix, convexCombination, purity, vonNeumannEntropy, validateDensityMatrix } from "@/lib/quantum/densityMatrix";
@@ -11,6 +11,9 @@ import { DensityMatrixStatePanel } from "./DensityMatrixStatePanel";
 import { SimulatorInstrument } from "../shared/SimulatorInstrument";
 import { SimulatorFraming } from "../shared/Framing";
 import { ControlSection, SimulatorSlider, PillGroup } from "../shared/controls";
+
+/** How long the derived-weight readout must hold still before it is announced. See `announcedPPlus`. */
+const SETTLE_MS = 400;
 
 const ZERO_ANGLES = { theta: 0, phi: 0 };
 const ONE_ANGLES = { theta: Math.PI, phi: 0 };
@@ -55,6 +58,34 @@ export function ThreeComponentMixtureExplorer() {
 
   const clampedP1 = Math.min(p1, 1 - p0);
   const pPlus = 1 - p0 - clampedP1;
+  /** p₀ has claimed the entire probability budget, so p₁'s slider range has collapsed to a single point. */
+  const noWeightLeftForP1 = 1 - p0 <= 0;
+
+  /**
+   * The value the live region actually speaks, held one settle-delay behind
+   * `pPlus`.
+   *
+   * `pPlus` is derived from two sliders, so it changes on every `pointermove`
+   * of a drag — dozens of times per second. Announcing each one is not the
+   * classic timer-driven live-region spam (nothing here updates unless the
+   * reader is doing something), but it is chatty in a way that actively hurts:
+   * NVDA and VoiceOver queue polite updates rather than dropping them, so a
+   * one-second drag leaves a reader listening to twenty stale numbers before
+   * hearing the one they stopped on, and JAWS interrupts its own reading of
+   * the slider's `aria-valuetext` to do it.
+   *
+   * Debouncing to the end of the gesture makes it one announcement per drag —
+   * the number the reader actually chose. Keyboard scrubbing behaves the same
+   * way: hold an arrow key and you hear the result once, on release, instead
+   * of once per repeat. `SETTLE_MS` is long enough to span pointer-event
+   * cadence and key auto-repeat, short enough that it still reads as a
+   * response to the action rather than a later interruption.
+   */
+  const [announcedPPlus, setAnnouncedPPlus] = useState(pPlus);
+  useEffect(() => {
+    const id = window.setTimeout(() => setAnnouncedPPlus(pPlus), SETTLE_MS);
+    return () => window.clearTimeout(id);
+  }, [pPlus]);
 
   const rho = useMemo(
     () =>
@@ -142,6 +173,17 @@ export function ThreeComponentMixtureExplorer() {
                 max={1 - p0}
                 step={0.01}
                 formatValue={(v) => v.toFixed(2)}
+                // At p₀ = 1 (the "Pure |0⟩" preset does exactly this) the
+                // remaining weight is zero, so this slider's own range
+                // collapses to a single point: it looks live, moves nowhere,
+                // and says nothing about why. Disabling it and saying so is
+                // the honest reading of "there is no weight left to give."
+                disabled={noWeightLeftForP1}
+                hint={
+                  noWeightLeftForP1
+                    ? "p₀ has taken all of the weight, so there is none left to put on |1⟩. Lower p₀ to free some up."
+                    : undefined
+                }
                 onChange={(value) => {
                   setP1(value);
                   setActivePresetId(null);
@@ -150,7 +192,24 @@ export function ThreeComponentMixtureExplorer() {
               <div>
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="text-sm text-foreground">p₊ (|+⟩) — derived</span>
+                  {/* The visible readout is no longer the live region itself.
+                      It repaints on every pointermove of a drag, which is
+                      right for eyes and wrong for a speech queue; the
+                      announcement now comes from the settled `sr-only` region
+                      beside it, so the two can be paced independently. */}
                   <span className="font-mono text-sm text-foreground">{pPlus.toFixed(2)}</span>
+                  {/* The one number on this panel nothing else announces: it
+                      has no slider of its own, and the purity readout in the
+                      instrument header reports a different quantity. Without
+                      a live region a screen-reader user dragging p₀ or p₁
+                      never learns what the third weight became.
+                      Named in the text rather than relying on the adjacent
+                      visible label, because a live announcement arrives with
+                      no surrounding context — "0.25" alone says nothing about
+                      which of the three weights just moved. */}
+                  <span aria-live="polite" className="sr-only">
+                    p₊ (|+⟩) is {announcedPPlus.toFixed(2)}
+                  </span>
                 </div>
                 <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-muted">
                   <div

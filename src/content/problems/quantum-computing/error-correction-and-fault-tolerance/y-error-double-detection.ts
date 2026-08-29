@@ -20,11 +20,11 @@ export const yErrorDoubleDetection: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["y = ixz", "both x and z", "combination"],
-      ["inner code catches", "outer code catches", "independently"],
+      ["y = ixz", "y=ixz", "ixz", "both x and z", "x and z", "x and a z", "combination", "product of x and z", "simultaneously an x", "x part and", "x component"],
+      ["inner code", "outer code", "each mechanism", "each code", "both mechanisms", "own component", "own piece", "separately", "independently"],
     ],
-    incorrectFeedback: "Recall Y=iXZ — a Y error is simultaneously an X error and a Z error on the same qubit.",
-    partialFeedback: "Good — now explain why each of the two mechanisms responds to its own piece of this combination independently.",
+    incorrectFeedback: "Start from the decomposition of Y given in the first lesson. What two simpler errors does it bundle together, and which mechanism notices each one?",
+    partialFeedback: "Good. Now explain why neither mechanism needs to know what the other one saw.",
   },
   hints: [
     { text: "Y=iXZ means a Y error acts like both an X error and a Z error at once." },

@@ -26,27 +26,28 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Ask where an electron in a hydrogen atom actually is, and quantum mechanics won't hand you a single point — it hands you a function.
+Ask where an electron in a hydrogen atom is, and quantum mechanics will not hand you a point. It hands you a function.
 </LessonHook>
 
 ## Motivation
 
-That function is $\psi(x)$, and this lesson is about where it comes from
+The function quantum mechanics hands you is $\psi(x)$, the wavefunction,
+and this lesson is about where it comes from
 and what it means. A finite list of amplitudes is enough to describe a
 qubit, or three qubits, or any number of qubits: $\mathbb{C}^2$,
 $\mathbb{C}^8$, always some finite dimension with one number per <Term id="basis">basis</Term>
-state. Position refuses that treatment — a particle isn't confined to finitely many discrete
-spots, it can sit at *any* real number $x$, so no finite list of
-amplitudes can label a continuum of possibilities one at a time. The
-postulates from the last course (state, <Term id="observable">observable</Term>, measurement,
-dynamics) survive this move with their content untouched; only their
-*representation* changes, and pinning down exactly how is this lesson's
-entire job.
+state. Position refuses that treatment. A particle is not confined to
+finitely many discrete spots; it can sit at *any* real number $x$, so no
+finite list of amplitudes can label a continuum of possibilities one at a
+time. The postulates from the last course (state, <Term id="observable">observable</Term>,
+measurement, dynamics) survive this move with their content untouched.
+Only their *representation* changes, and pinning down how is this lesson's
+whole job.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/7/7f/A565_G_P_Thomson_Electron_Diffraction.jpg"
   alt="One of G. P. Thomson's original 1920s electron diffraction photographs, showing concentric rings produced by a beam of electrons passing through a thin metal foil"
-  caption="G. P. Thomson's 1920s electron diffraction experiments produced ring patterns from a beam of electrons — direct experimental evidence that matter has wave character, the physical fact psi(x) is built to describe."
+  caption="G. P. Thomson's 1920s electron diffraction experiments produced ring patterns from a beam of electrons: direct experimental evidence that matter has wave character, the physical fact psi(x) is built to describe."
   credit="Science Museum Group / G. P. Thomson"
   creditUrl="https://commons.wikimedia.org/wiki/File:A565_G_P_Thomson_Electron_Diffraction.jpg"
   license="CC BY 4.0"
@@ -56,8 +57,8 @@ entire job.
 
 Don't start from continuous $x$ directly. Start from what you already
 know. Chop space into a fine grid of positions $x_1, x_2, \ldots, x_N$
-spaced $\Delta x$ apart (this is *exactly* the grid this course's numerical
-simulator uses internally). A particle's state on this grid is an ordinary
+spaced $\Delta x$ apart (the same grid this course's numerical simulator
+uses internally). A particle's state on this grid is an ordinary
 finite-dimensional <Term id="quantum-state">state vector</Term>, $|\psi\rangle = \sum_i c_i|x_i\rangle$,
 with $\sum_i |c_i|^2 = 1$ by the <Term id="born-rule">Born rule</Term> you already know. Then ask what
 happens to this description as $\Delta x \to 0$.
@@ -78,9 +79,11 @@ $$
 c_i = \psi(x_i)\sqrt{\Delta x}
 $$
 
-for some function $\psi$. The $\sqrt{\Delta x}$ is exactly what's needed
-so that $|c_i|^2 = |\psi(x_i)|^2 \Delta x$ stays finite and proportional to
-the interval width as $\Delta x \to 0$. The normalization condition
+for some function $\psi$. The $\sqrt{\Delta x}$ is what makes
+$|c_i|^2 = |\psi(x_i)|^2 \Delta x$ stay finite and proportional to the
+interval width as $\Delta x \to 0$. Any other power fails: a constant
+$c_i$ leaves $\sum_i|c_i|^2$ growing without bound as $N$ increases, and
+$c_i \propto \Delta x$ sends the whole sum to zero. The normalization condition
 becomes
 
 $$
@@ -107,20 +110,20 @@ an unrelated approximation.
 
 <InteractiveSection
   title="Watch the discrete bars become the continuous curve"
-  description="Each bar's height is |psi(x_i)|^2 and its width is Delta x, so the bar's AREA is |c_i|^2 — the quantity the Born rule actually needs to sum to 1. Drag the slider to refine the grid: the blocky bars at low N thin and fuse into the smooth |psi(x)|^2 curve, while the running sum beneath the plot stays pinned near 1 the entire time."
+  description="Each bar's height is |psi(x_i)|^2 and its width is Delta x, so the bar's AREA is |c_i|^2, the quantity the Born rule needs to sum to 1. Drag the slider to refine the grid: the blocky bars at low N thin and fuse into the smooth |psi(x)|^2 curve, while the running sum beneath the plot stays pinned near 1 the entire time."
 >
   <DiscretizationLimit ariaLabel="Histogram of discrete cell probabilities over a Gaussian, converging to the continuous probability density as the number of grid cells N increases via a slider" />
 </InteractiveSection>
 
 <PredictBeforeReveal
-  question="c_i = psi(x_i) * sqrt(Delta x) has to hold so that |c_i|^2 = |psi(x_i)|^2 * Delta x stays finite as Delta x shrinks toward zero. If |c_i|^2 itself stays a sensible probability (between 0 and 1), what does that force |psi(x_i)|^2 to do as Delta x -> 0?"
+  question="|c_i|^2 = |psi(x_i)|^2 * Delta x is a probability, so it can never exceed 1. Is |psi(x_i)|^2 itself also capped at 1?"
   options={[
     { label: "It also stays between 0 and 1", value: "bounded" },
     { label: "It can grow arbitrarily large", value: "unbounded" },
     { label: "It has to go to zero", value: "zero" },
   ]}
   correctValue="unbounded"
-  explanation="|psi(x_i)|^2 = |c_i|^2 / Delta x, and dividing a bounded probability by a width shrinking to zero forces the density to blow up wherever the wavefunction is squeezed into a narrow region. That's not a pathology -- it's exactly why psi(x) is called an amplitude density rather than an amplitude, argued directly below."
+  explanation="No. |psi(x_i)|^2 = |c_i|^2 / Delta x is a probability per unit length, not a probability, and dividing by a length is exactly what removes the ceiling at 1. Squeeze a state into a region of width w and it carries probability of order 1 across that width, so its density there is of order 1/w, which grows without bound as w shrinks. That is not a pathology. It is the reason psi(x) is called an amplitude density rather than an amplitude, argued directly below."
 />
 
 ### Why $\psi(x)$ is a density, not an amplitude
@@ -144,9 +147,9 @@ Revisit the four postulates from the last course:
 - **Observable**: still a Hermitian operator (position and momentum
   operators are built explicitly in later lessons).
 - **Measurement**: still Born's rule, reinterpreted as a *density* for a
-  continuous outcome, exactly as derived above.
+  continuous outcome, as derived above.
 - **Dynamics**: still $i\hbar\,d|\psi\rangle/dt = H|\psi\rangle$; position
-  space just makes $H$ a differential operator instead of a matrix (a
+  space turns $H$ into a differential operator instead of a matrix (a
   later lesson).
 
 Nothing here is new physics. It's the same postulates, in a basis with a
@@ -156,10 +159,10 @@ continuum of labels instead of finitely many.
 
 A finite-dimensional qubit's amplitudes told you how much of $|0\rangle$,
 how much of $|1\rangle$. $\psi(x)$ tells you the analogous thing for
-every possible position simultaneously, a function's worth of amplitude
-information, which is exactly why continuous quantum mechanics needs
-calculus where finite-dimensional quantum computing needed only linear
-algebra.
+every possible position simultaneously: a function's worth of amplitude
+information rather than a list's. That is the reason continuous quantum
+mechanics needs calculus where finite-dimensional quantum computing needed
+only linear algebra.
 
 ## Worked Example
 
@@ -187,7 +190,7 @@ interval width, compares two different kinds of quantities.
 
 <InteractiveSection
   title="Narrow σ, watch height rise but area hold at 1"
-  description="Try the Free Gaussian Packet preset and narrow its width σ. The curve's height changes, but the area underneath it — the actual probability, exactly the density-versus-probability distinction above — always stays exactly 1."
+  description="Try the Free Gaussian Packet preset and narrow its width σ. The curve's height changes; the area underneath it does not. The height is the density and the area is the probability, which is the distinction argued above, visible in one slider."
 >
   <LazyWavefunctionExplorer />
 </InteractiveSection>

@@ -22,7 +22,7 @@ export const jointXFirstThenZZero = xBasisProbs[0] * zAfterPlus[0];
 export const lessonMeta = {
   title: "Sequential Measurements and Incompatibility",
   description:
-    "A fully worked, numeric measure-then-measure-then-measure-again sequence on a single qubit, showing exactly how an incompatible measurement destroys an earlier certainty.",
+    "A fully worked, numeric measure-then-measure-then-measure-again sequence on a single qubit, tracking step by step how an incompatible measurement destroys an earlier certainty.",
   course: "operators-observables-measurement",
   module: "sequential-measurements-and-incompatibility",
   order: 1,
@@ -37,7 +37,7 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Does the order you measure things in change what you find? For ordinary compatible quantities, no. For Z and X on a qubit, yes — and by a specific, checkable amount.
+Does the order you measure things in change what you find? For ordinary compatible quantities, no. For Z and X on a qubit, yes, and by a specific, checkable amount: a factor of two.
 </LessonHook>
 
 ## Motivation
@@ -51,7 +51,7 @@ numbers at every step.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Exp%C3%A9rience_%C3%A0_3_polarisants.jpg"
   alt="Three polarizing filters demonstrating that light blocked by two crossed polarizers is partly restored by inserting a third filter at 45 degrees between them"
-  caption="A classical analogue of this lesson's exact result: light is fully blocked by two crossed polarizers, but inserting a third, incompatible polarizer axis between them lets light back through -- the same 'measuring in between changes the outcome' structure as the Z-then-X-then-Z sequence derived below."
+  caption="A classical analogue of this lesson's result. Two crossed polarizers block light completely, and inserting a third at 45° between them lets light back through. Adding a filter increases transmission, which is the same 'measuring in between changes the outcome' structure as the Z-then-X-then-Z sequence derived below."
   credit="Camion / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Exp%C3%A9rience_%C3%A0_3_polarisants.jpg"
   license="CC BY-SA 4.0"
@@ -62,7 +62,7 @@ numbers at every step.
 If $Z$ and $X$ shared an eigenbasis, measuring one right after the other
 would never change anything. You'd already be sitting in an <Term id="eigenvalue-eigenvector">eigenstate</Term>
 of both. Since $[X,Z]\ne0$ (proven earlier this course), no such shared
-eigenstate exists in general, and this lesson shows exactly what breaks.
+eigenstate exists, and this lesson traces what breaks, step by step.
 
 ## Mathematical Development
 
@@ -94,11 +94,11 @@ P(Z{=}0) = |\langle0|+\rangle|^2 = \left|\frac1{\sqrt2}\right|^2 = \frac12, \qqu
 $$
 
 **The certainty from Step 1 is gone.** Before the $X$ measurement, $Z$
-was $100\%$ predictable. After it, $Z$'s outcome is completely random
-again. The $X$ measurement didn't just add new information, it
-*erased* the old certainty entirely.
+was $100\%$ predictable. After it, $Z$'s outcome is a coin flip. The $X$
+measurement did not only add new information; it *erased* the old
+certainty.
 
-### Does the order actually matter?
+### Does the order matter?
 
 Run the numbers the other way: measure $X$ first, then $Z$. Starting
 from $|0\rangle$, $P(X{=}{+}1)=\tfrac12$ (Step 2's calculation, unchanged
@@ -160,7 +160,7 @@ at once:
 />
 
 Both paths through the $X$ branch land on the same $50/50$ split at the
-final $Z$ measurement, exactly the "doesn't matter which $X$ outcome
+final $Z$ measurement, which is the "it doesn't matter which $X$ outcome
 occurred" fact proven below.
 
 <PredictBeforeReveal
@@ -172,10 +172,10 @@ occurred" fact proven below.
     { label: "It depends which X outcome occurred", value: "depends" },
   ]}
   correctValue="fifty-fifty"
-  explanation="Whichever X-outcome occurs, the qubit collapses to an X-eigenstate, an equal superposition in the Z-basis, so the third Z measurement comes back exactly 50/50, as derived above. It also doesn't depend on which X outcome occurred: both |+⟩ and |−⟩ give the identical 50/50 split. Try it live below: start at |0⟩, apply H, and measure repeatedly."
+  explanation="Whichever X-outcome occurs, the qubit collapses to an X-eigenstate, which is an equal superposition in the Z-basis, so the third Z measurement comes back exactly 50/50, as derived above. Which X outcome occurred makes no difference: |+⟩ and |−⟩ give the identical 50/50 split. Try it below: start at |0⟩, apply H, and measure repeatedly."
 />
 
-<InteractiveSection title="Run the sequence yourself" description="Start at |0⟩, apply H (the X-basis change), and measure a few times: watch the Z-outcome go from 100% predictable to a genuine coin flip, live, on the real state — the exact three-step sequence worked out above, not a scripted animation.">
+<InteractiveSection title="Run the sequence yourself" description="Start at |0⟩, apply H (the X-basis change), and measure a few times. Watch the Z-outcome go from 100% predictable to a coin flip, computed on the real state rather than replayed from a script: the three-step sequence worked out above.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -185,8 +185,8 @@ This is what "incompatible" means operationally, not just algebraically:
 measuring $X$ forces the state into an $X$-eigenstate, and an
 $X$-eigenstate is (by the last course's basis-change formulas) an
 *equal* superposition in the $Z$-basis, as far from a $Z$-eigenstate as
-a normalized state can get. The disturbance isn't a technological
-limitation or measurement noise; it's what the state genuinely becomes.
+a normalized state can get. The disturbance is not a technological
+limitation or measurement noise. It is what the state has become.
 
 ## Worked Example
 
@@ -206,7 +206,7 @@ equally far (in this precise sense) from either $Z$-eigenstate.
 
 <Callout type="warning">
 **Thinking the disturbance is somehow avoidable with a "gentler"
-measurement.** For genuinely incompatible observables, any measurement
+measurement.** For incompatible observables, any measurement
 that extracts $X$'s definite value necessarily leaves $Z$ maximally
 uncertain. This is a feature of the state, not an artifact of a
 particular measuring apparatus.
@@ -236,7 +236,7 @@ probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
 ## Summary
 
 - Measuring $Z$, then $X$, then $Z$ again on $|0\rangle$ takes a certain
-  outcome ($P(Z{=}0)=1$) to a completely uncertain one
+  outcome ($P(Z{=}0)=1$) to a maximally uncertain one
   ($P(Z{=}0)=\tfrac12$), a fully explicit, numeric demonstration of
   disturbance by an incompatible measurement.
 - The result doesn't depend on which $X$-outcome occurred. Both

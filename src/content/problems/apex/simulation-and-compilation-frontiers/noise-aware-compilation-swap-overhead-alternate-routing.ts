@@ -30,6 +30,21 @@ export const noiseAwareCompilationSwapOverheadAlternateRouting: NumericProblem =
     tolerance: 0,
     incorrectFeedback:
       "First find each pair's chain distance under the identity mapping (|i-j| in physical index), then apply 2(d-1) only to the pairs that aren't already adjacent (d=1 needs zero SWAPs), and sum.",
+    nearMisses: [
+      {
+        value: distances.reduce((sum, d) => sum + (d - 1), 0),
+        feedback:
+          "You counted d-1 SWAPs per pair rather than 2(d-1). The factor of two is the return trip: after the gate, the qubits have to be swapped back so the rest of the circuit still sees the original mapping.",
+      },
+      {
+        value: distances.reduce((sum, d) => sum + 2 * d, 0),
+        feedback: "Using 2d instead of 2(d-1) charges a SWAP for the final adjacency too, and it wrongly bills the three already-adjacent pairs.",
+      },
+      {
+        value: distances.filter((d) => d > 1).reduce((sum, d) => sum + 2 * d, 0),
+        feedback: "You skipped the adjacent pairs correctly but used 2d rather than 2(d-1). Bridging a distance-d gap takes d-1 hops, not d.",
+      },
+    ],
   },
   hints: [
     { text: "Three of the five pairs are already adjacent under the identity mapping: (q0,q1), (q1,q2), (q2,q3) all have distance 1, so they contribute 0 SWAPs each." },
@@ -51,7 +66,7 @@ export const noiseAwareCompilationSwapOverheadAlternateRouting: NumericProblem =
     whyCorrect:
       "This is the identical method the lesson applied, run on a different set of required interactions: (q0,q3) is the chain's worst-case pair (the two endpoints), so it dominates the total even though it's only one of five interactions.",
     whyWrong: [
-      "Applying 2(d-1) to every pair, including the three already-adjacent ones, overcounts: distance-1 pairs need zero SWAPs, not 2(1-1) misapplied as some positive number.",
+      "Counting d-1 SWAPs per pair instead of 2(d-1) halves the total to 3: the formula is doubled because each qubit walked toward its partner has to be walked back afterwards, or the mapping the rest of the circuit assumes is destroyed.",
       "Using d instead of d-1 in the formula (i.e. 2d) overstates the cost: bridging a gap of distance d only requires walking d-1 intermediate steps each way, not d.",
     ],
   },

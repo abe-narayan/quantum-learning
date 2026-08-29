@@ -25,7 +25,23 @@ export const capstoneLandscapeTimelinePredictionEvaluation: ConceptualProblem = 
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["track record", "historically", "repeatedly wrong", "poor track record", "overconfident predictions", "consistently wrong"],
+      {
+        phrases: [
+          "track record",
+          "historically",
+          "history of",
+          "past predictions",
+          "previous predictions",
+          "repeatedly wrong",
+          "been wrong",
+          "wrong before",
+          "poor track record",
+          "overconfident predictions",
+          "consistently wrong",
+        ],
+        missingFeedback:
+          "You have said what kind of claim a timeline is and what you would check. One piece is still missing: this field's own record of confident timeline predictions, in both the optimistic and the pessimistic direction, is poor, which is the empirical reason to discount the confident phrasing rather than only the logical one.",
+      },
       ["roadmap", "engineering target", "not a theorem", "not proven", "aspirational goal", "internal target", "not evidence"],
       ["resource estimate", "assumptions", "error rate assumptions", "qubit count needed", "what basis", "extrapolation", "magic state", "code distance"],
     ],

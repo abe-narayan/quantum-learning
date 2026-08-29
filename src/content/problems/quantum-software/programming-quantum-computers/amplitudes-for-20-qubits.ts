@@ -25,11 +25,15 @@ export const amplitudesFor20Qubits: NumericProblem = {
     value,
     tolerance: 1000,
     incorrectFeedback: "Compute 2^20.",
+    nearMisses: [
+      { value: 40, tolerance: 0.5, feedback: "40 is 2n. The state vector's length is 2^n, which grows exponentially rather than linearly in the qubit count." },
+      { value: 400, tolerance: 0.5, feedback: "400 is n². State-vector length is 2^n." },
+    ],
   },
   hints: [
     { text: "State-vector simulation needs 2^n amplitudes for n qubits." },
-    { text: "2^20 = 2^10 × 2^10 = 1024 × 1024." },
-    { text: "≈1,048,576." },
+    { text: "2^20 = 2^10 × 2^10, and 2^10 = 1024." },
+    { text: "Multiply 1024 by itself. Sanity check the scale: it should come out near a million, which is why 20 qubits is still comfortable for a laptop." },
   ],
   solution: {
     steps: [{ description: "2^20 = 1,048,576 amplitudes — about a million, still very manageable classically." }],

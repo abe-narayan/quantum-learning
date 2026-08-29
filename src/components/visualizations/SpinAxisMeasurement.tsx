@@ -103,19 +103,42 @@ export function SpinAxisMeasurement({
     <div className="not-prose space-y-4 panel-inset p-4 sm:p-5" aria-label={ariaLabel}>
       <div className="flex justify-center">
         <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Bloch circle. Input state at angle ${inputTheta.toFixed(2)} radians from |0⟩. Measurement axis at angle ${axisTheta.toFixed(2)} radians. ${narration}`} className="w-full max-w-[260px]">
-          <circle cx={CX} cy={CY} r={R} className="fill-none stroke-border" strokeWidth={1.5} />
-          <text x={CX} y={CY - R - 12} textAnchor="middle" className="fill-muted-foreground text-[9px] font-mono">|0⟩</text>
-          <text x={CX} y={CY + R + 20} textAnchor="middle" className="fill-muted-foreground text-[9px] font-mono">|1⟩</text>
+          {/* The Bloch circle is the plotted region: every vector here is
+              meaningful only as a direction on it, and the collapsed state
+              landing *on* it is the postulate being demonstrated.
+              Load-bearing, so `--axis` (≥3:1 on every panel depth) replaces
+              `--border`, the panel-edge token that measured 1.41:1 on
+              `--surface-muted` — under the 3:1 WCAG 2.1 SC 1.4.11 floor. */}
+          <circle cx={CX} cy={CY} r={R} className="fill-none stroke-axis" strokeWidth={1.5} />
+          {/* `w-full max-w-[260px]` on a 260-unit viewBox pins the scale at
+              1.0, so 9 authored units painted at a literal 9px — under the
+              10px floor with no scaling penalty to blame. 12 clears it.
+              These two kets are the poles the whole geometry is oriented
+              by. */}
+          <text x={CX} y={CY - R - 14} textAnchor="middle" fontSize={12} className="fill-axis font-mono">|0⟩</text>
+          <text x={CX} y={CY + R + 22} textAnchor="middle" fontSize={12} className="fill-axis font-mono">|1⟩</text>
 
           {/* The measurement axis: a full diameter through its two eigenstates. */}
           <line x1={plusSvg.px} y1={plusSvg.py} x2={minusSvg.px} y2={minusSvg.py} className="stroke-accent" strokeWidth={2} strokeDasharray="5 4" />
           <circle cx={plusSvg.px} cy={plusSvg.py} r={5} className="fill-accent" />
           <circle cx={minusSvg.px} cy={minusSvg.py} r={5} className="fill-accent" />
-          <text x={plusSvg.px + (plusSvg.px > CX ? 12 : -12)} y={plusSvg.py} textAnchor={plusSvg.px > CX ? "start" : "end"} className="fill-accent text-[10px] font-semibold">+n̂</text>
-          <text x={minusSvg.px + (minusSvg.px > CX ? 12 : -12)} y={minusSvg.py} textAnchor={minusSvg.px > CX ? "start" : "end"} className="fill-accent text-[10px] font-semibold">−n̂</text>
+          {/* Scale is 1.0 here (see the ket labels above), so 10 authored
+              units was a literal 10px — on the floor, not under it. 12 gives
+              these two eigenstate names the same weight as the poles they
+              are being compared against. */}
+          <text x={plusSvg.px + (plusSvg.px > CX ? 12 : -12)} y={plusSvg.py} textAnchor={plusSvg.px > CX ? "start" : "end"} fontSize={12} className="fill-accent font-semibold">+n̂</text>
+          <text x={minusSvg.px + (minusSvg.px > CX ? 12 : -12)} y={minusSvg.py} textAnchor={minusSvg.px > CX ? "start" : "end"} fontSize={12} className="fill-accent font-semibold">−n̂</text>
 
           {/* The state: fixed input, or the post-measurement collapsed eigenstate. */}
-          <line x1={origin.px} y1={origin.py} x2={inputSvg.px} y2={inputSvg.py} className={outcome === null ? "stroke-brand" : "stroke-border"} strokeWidth={outcome === null ? 2.5 : 1.5} strokeDasharray={outcome === null ? undefined : "3 3"} />
+          {/* Post-measurement the original input state stays on screen as a
+              dashed ghost, so the reader can see what collapsed to what.
+              That ghost is data, not chrome — the comparison IS the lesson —
+              so at `stroke-border` (1.41:1 on `--surface-muted`) it was being
+              asked to carry meaning at a contrast chosen for hairline panel
+              edges, and on the dark theme it simply disappeared. `--axis`
+              keeps it visibly subordinate to the brand-coloured live state
+              while staying above the 3:1 floor. */}
+          <line x1={origin.px} y1={origin.py} x2={inputSvg.px} y2={inputSvg.py} className={outcome === null ? "stroke-brand" : "stroke-axis"} strokeWidth={outcome === null ? 2.5 : 1.5} strokeDasharray={outcome === null ? undefined : "3 3"} />
           {outcome !== null && (
             <line x1={origin.px} y1={origin.py} x2={displayedSvg.px} y2={displayedSvg.py} className="stroke-brand" strokeWidth={2.5} />
           )}
@@ -139,7 +162,7 @@ export function SpinAxisMeasurement({
             setAxisTheta(Number(e.target.value));
           }}
           aria-label="Measurement axis angle theta, in radians from the Z axis"
-          className="mt-2 w-full accent-brand"
+          className="mt-2 h-11 w-full accent-brand"
         />
       </label>
 
@@ -156,21 +179,36 @@ export function SpinAxisMeasurement({
         <button
           type="button"
           onClick={handleMeasure}
-          className="rounded-md border border-brand bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="min-h-11 rounded-(--radius-tight) border border-brand bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Measure
         </button>
+        {/* `aria-disabled` rather than the native `disabled` attribute. This
+            button disables itself *as a direct result of being pressed*:
+            Reset clears `outcome` back to null, which is exactly the condition
+            that greys it out. A natively-disabled button stops being focusable
+            while it currently holds focus, so a keyboard reader who presses
+            Reset has focus dropped to <body> by their own click, and the next
+            Tab restarts from the top of the page instead of returning to
+            Measure beside it. `aria-disabled` announces the same "dimmed,
+            unavailable" state while keeping the element focusable, so focus
+            survives the press; the handler no-ops and
+            `aria-disabled:pointer-events-none` reproduces the
+            dead-to-the-mouse behaviour. */}
         <button
           type="button"
-          onClick={handleReset}
-          disabled={outcome === null}
-          className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          onClick={() => {
+            if (outcome === null) return;
+            handleReset();
+          }}
+          aria-disabled={outcome === null}
+          className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-muted aria-disabled:pointer-events-none aria-disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar"
         >
           Reset
         </button>
       </div>
 
-      <div aria-live="polite" className="rounded-xl border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {narration}
       </div>
     </div>

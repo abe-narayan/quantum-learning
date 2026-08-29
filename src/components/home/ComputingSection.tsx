@@ -35,11 +35,21 @@ export function ComputingSection() {
                   <SectionTitle id="computing-heading" className="mt-3">
                     Build the machines, then run the algorithms
                   </SectionTitle>
+                  {/* First occurrence of "Bloch sphere" on the page, so it is
+                      glossed in plain speech at first use — same first-use
+                      rule as MechanicsSection's Notation block — and the live
+                      explorer beside this text is the thing being described.
+                      "Classical shared randomness" was accurate but alien;
+                      "prearranged answers" is the same physical claim (no
+                      local hidden variables) said plainly. */}
                   <Lede className="mt-4 max-w-none">
-                    A single qubit&rsquo;s state on the Bloch sphere, then multi-qubit circuits wired
-                    together and entangled — a joint state, (|00⟩ + |11⟩)/√2, that cannot be split
-                    into a separate state for each qubit. Measuring one instantly fixes the other&rsquo;s
-                    outcome, in a way no classical shared randomness can reproduce.
+                    A single qubit&rsquo;s state lives on the Bloch sphere, the globe the live
+                    explorer here draws: north pole |0⟩, south pole |1⟩, every other point a
+                    superposition of both. Then come multi-qubit circuits, wired together and
+                    entangled into a joint state, (|00⟩ + |11⟩)/√2, that cannot be split into a
+                    separate state for each qubit. Measuring one instantly fixes the
+                    other&rsquo;s outcome, and no scheme of secretly prearranged answers can
+                    reproduce that.
                   </Lede>
                 </Reveal>
 

@@ -22,7 +22,7 @@ export const lessonMeta = {
   module: "tensor-networks-and-matrix-product-states",
   order: 1,
   difficulty: "master",
-  estimatedMinutes: 29,
+  estimatedMinutes: 55,
   prerequisites: ["quantum-software/simulating-quantum-systems/tensor-network-methods"],
   objectives: [
     "Construct the matrix product state (MPS) decomposition of an n-qubit state explicitly via repeated singular value decomposition (SVD), and define bond dimension precisely as the number of singular values kept at each cut",
@@ -258,6 +258,23 @@ checkable criterion for when a classical computer can and cannot keep up
 with a quantum one, is exactly the job of this course's next lesson,
 When Classical Simulation Works, and it reuses the bond-dimension and
 area-law machinery built here directly.
+
+<ResearchConnection
+  title="The theory, and the algorithm that uses it"
+  source="Vidal, Phys. Rev. Lett. 91, 147902 (2003) (arXiv:quant-ph/0301063); Schollwöck, Annals of Physics 326, 96 (2011) (arXiv:1008.3477)"
+  url="https://arxiv.org/abs/1008.3477"
+>
+  Vidal's paper is the direct statement of this lesson's claim as a
+  simulation result: a quantum circuit whose state stays at bounded
+  Schmidt rank across every cut can be simulated classically in
+  polynomial time, with the update cost per two-qubit gate scaling as
+  $\chi^3$. Schollwöck's review is the practitioner's reference, and the
+  reason to read it here is that it is candid about where the picture
+  breaks: bond dimension grows under time evolution even when the ground
+  state obeys an area law, so an MPS simulation of *dynamics* has a
+  time horizon rather than a size limit. Everything above describes
+  states; simulating evolution is a separate and harder question.
+</ResearchConnection>
 
 ## Worked Example
 

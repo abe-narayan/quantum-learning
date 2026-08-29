@@ -23,7 +23,7 @@ function ComponentPicker({
   isInert: boolean;
 }) {
   return (
-    <div className={cn("rounded-xl border border-border bg-surface p-3", isInert && "opacity-60")}>
+    <div className={cn("rounded-panel border border-border bg-surface p-3", isInert && "opacity-60")}>
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
       {isInert && (
         <p className="mt-1 text-[11px] text-muted-foreground">
@@ -32,14 +32,33 @@ function ComponentPicker({
       )}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {STATE_PRESETS.map((preset) => (
-          <Button key={preset.id} variant="secondary" size="sm" onClick={() => onChange(preset.angles)}>
+          <Button
+            key={preset.id}
+            variant="secondary"
+            size="sm"
+            // Two ComponentPickers render side by side with the identical set
+            // of ket buttons, so without the possibility name in the label a
+            // screen reader's button list was two indistinguishable copies of
+            // |0⟩, |1⟩, |+⟩, … and no way to tell which mixture component a
+            // given one would change.
+            aria-label={`Set ${title} to ${preset.ket}`}
+            onClick={() => onChange(preset.angles)}
+          >
             {preset.ket}
           </Button>
         ))}
       </div>
       <div className="mt-2 space-y-2">
         <SimulatorSlider
-          label="θ (tilt from |0⟩)"
+          // Same duplication problem as the ket buttons above: two θ sliders
+          // and two φ sliders, one pair per possibility. The `sr-only` half
+          // rides inside the same <label>, so the accessible name still
+          // contains the visible text.
+          label={
+            <>
+              θ (tilt from |0⟩)<span className="sr-only"> for {title}</span>
+            </>
+          }
           value={angles.theta}
           min={0}
           max={Math.PI}
@@ -49,7 +68,11 @@ function ComponentPicker({
           onChange={(theta) => onChange({ theta, phi: angles.phi })}
         />
         <SimulatorSlider
-          label="φ (spin around)"
+          label={
+            <>
+              φ (spin around)<span className="sr-only"> for {title}</span>
+            </>
+          }
           value={angles.phi}
           min={0}
           max={2 * Math.PI}

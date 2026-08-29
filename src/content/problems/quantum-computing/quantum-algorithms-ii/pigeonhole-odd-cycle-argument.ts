@@ -20,16 +20,16 @@ export const pigeonholeOddCycleArgument: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["alternate", "alternating colors", "go around", "return to start"],
-      ["odd", "can't return", "parity", "contradiction"],
+      ["alternat", "go around", "around the cycle", "return to start", "back to the start", "wraps around", "every other"],
+      ["odd number", "odd length", "odd cycle", "odd count", "odd n", "parity", "contradict", "mismatch", "two different colors", "both colors", "wrong color", "can't return", "cannot return", "inconsistent"],
     ],
-    incorrectFeedback: "Imagine coloring the cycle's vertices one at a time, alternating colors to cut every edge — what happens when you get back to the start on an odd cycle?",
-    partialFeedback: "Good — now be explicit about the parity contradiction this creates.",
+    incorrectFeedback: "Try to two-color the cycle so every edge is cut, working vertex by vertex, and pay attention to the moment the loop closes on itself.",
+    partialFeedback: "Good. Now be explicit about the clash at the final vertex and why the cycle's length is what causes it.",
   },
   hints: [
-    { text: "Cutting every edge of a cycle requires strictly alternating colors around it." },
-    { text: "After going around an odd number of vertices, alternating colors puts you back at the start with the wrong color." },
-    { text: "This is a direct contradiction — the starting vertex can't have two different colors." },
+    { text: "To cut an edge, what must be true of its two endpoint colors? Walk vertex by vertex around the cycle imposing that condition." },
+    { text: "Track which color you are forced to give vertex k. What determines it?" },
+    { text: "The walk eventually arrives back where it began. Compare the color demanded there with the color you gave that vertex at the start." },
   ],
   solution: {
     steps: [

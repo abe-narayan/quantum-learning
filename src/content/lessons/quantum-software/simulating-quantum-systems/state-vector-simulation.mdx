@@ -28,7 +28,7 @@ export const lessonMeta = {
   module: "state-vector-simulation",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 18,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-software/programming-quantum-computers/simulators-vs-real-hardware"],
   objectives: [
     "Identify state-vector simulation as the specific technique this platform's engine has used throughout, not a new algorithm",
@@ -49,9 +49,10 @@ You've been simulating quantum systems since this platform's very first lesson. 
 
 ## Motivation
 
-This course is called "Simulating Quantum Systems." This lesson pins
-down its specific guarantees and specific limits, and sets up the rest
-of this course's cost analysis.
+Every circuit this platform has ever executed was run by a state-vector
+simulator, the technique this course is named for. This opening lesson
+names that technique explicitly, pins down its specific guarantees and
+specific limits, and sets up the rest of this course's cost analysis.
 
 ## Engineering Development
 
@@ -64,14 +65,70 @@ Applying a gate updates these amplitudes directly via ordinary linear
 algebra (`applySingleQubitGate`, `applyCNOT`): exact matrix
 multiplication, not an approximation of any kind.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
-  alt="Portrait photograph of mathematician John von Neumann at Los Alamos National Laboratory"
-  caption="John von Neumann, who gave quantum mechanics its modern linear-algebra formulation (state vectors, operators, inner products) and, in the same decade, helped design the stored-program computer architecture almost every classical machine still uses today. State-vector simulation is what happens when one of his ideas runs on the other."
-  credit="Los Alamos National Laboratory"
-  creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
-  license="Public domain"
+Written out, the whole technique is four boxes wide, with the second one
+repeated once per gate. Nothing in it is quantum: it is an array of
+complex numbers, a matrix multiply, and a random draw at the end.
+
+<PipelineDiagram
+  ariaLabel="The state-vector simulation pipeline: allocate two-to-the-n amplitudes, apply the next gate's matrix to them, repeat for every gate, then square the amplitudes to get probabilities and draw shots from them"
+  steps={[
+    { label: "Allocate", detail: "2ⁿ complex amplitudes, all but one zero" },
+    { label: "Apply a gate", detail: "matrix multiply, in place", highlight: true },
+    { label: "Probabilities", detail: "|amplitude|² per basis state" },
+    { label: "Sample", detail: "draw shots from that distribution" },
+  ]}
 />
+
+The second box is where every cost in this course comes from: it touches
+every one of those $2^n$ amplitudes, and $2^n$ is the number that
+doubles with each qubit you add.
+
+### The amplitude array, watched through one gate
+
+"A list of $2^n$ complex amplitudes" is concrete enough to write out in
+full for a small register. A 3-qubit register is an array of exactly
+$2^3=8$ complex numbers, one slot per basis state. Freshly initialized
+in $\lvert 000\rangle$, the array is:
+
+| Slot | Basis state | Amplitude |
+| --- | --- | --- |
+| 0 | $\lvert 000\rangle$ | $1$ |
+| 1 | $\lvert 001\rangle$ | $0$ |
+| 2 | $\lvert 010\rangle$ | $0$ |
+| 3 | $\lvert 011\rangle$ | $0$ |
+| 4 | $\lvert 100\rangle$ | $0$ |
+| 5 | $\lvert 101\rangle$ | $0$ |
+| 6 | $\lvert 110\rangle$ | $0$ |
+| 7 | $\lvert 111\rangle$ | $0$ |
+
+Now apply a single Hadamard to the first qubit (qubit 0, the leftmost
+bit of each basis label, in this platform's convention). Mechanically,
+this is what `applySingleQubitGate` does: it walks the array and pairs
+every slot whose qubit-0 bit is $0$ with the slot four positions later,
+its qubit-0-flipped partner. Four pairs mix: slots $(0,4)$, $(1,5)$,
+$(2,6)$, and $(3,7)$. Each pair $(a_0, a_1)$ is replaced by
+$((a_0+a_1)/\sqrt{2},\ (a_0-a_1)/\sqrt{2})$, the Hadamard's own matrix
+acting inside that pair. Only the $(0,4)$ pair holds anything nonzero,
+so the array becomes:
+
+| Slot | Basis state | Mixes with slot | Amplitude after $H$ on qubit 0 |
+| --- | --- | --- | --- |
+| 0 | $\lvert 000\rangle$ | 4 | $1/\sqrt{2}$ |
+| 1 | $\lvert 001\rangle$ | 5 | $0$ |
+| 2 | $\lvert 010\rangle$ | 6 | $0$ |
+| 3 | $\lvert 011\rangle$ | 7 | $0$ |
+| 4 | $\lvert 100\rangle$ | 0 | $1/\sqrt{2}$ |
+| 5 | $\lvert 101\rangle$ | 1 | $0$ |
+| 6 | $\lvert 110\rangle$ | 2 | $0$ |
+| 7 | $\lvert 111\rangle$ | 3 | $0$ |
+
+Notice what it cost. One gate, on one qubit, touched every one of the
+8 amplitudes: all four pairs were read and rewritten, because nothing
+in the array announces in advance which slots happen to be zero. That
+is this course's entire cost story in miniature. A gate on a single
+qubit is an operation over the whole $2^n$-entry array, which is
+exactly why the next lesson's scaling analysis comes out exponential
+in the qubit count.
 
 ### What it guarantees
 
@@ -105,7 +162,7 @@ circuit.
   explanation="Sampling is a random process — sampleMeasurements is drawing finite outcomes from a probability distribution, not reading the distribution off directly. The count of 00-outcomes divided by shots converges toward 0.5 in probability, but landing on exactly 0.500 at some specific finite shot count would itself be a coincidence. The exact bar, by contrast, was never sampled at all: runCircuit computed 0.5 directly from the state vector's amplitudes, with no randomness involved."
 />
 
-<InteractiveSection title="Exact vs. sampled, side by side" description="Slide from 10 shots up to 5000. The exact bars are runCircuit's fixed output for this Bell circuit, computed once. The sampled bars are a fresh sampleMeasurements call at each shot count, this page's own live run, converging toward the exact bars as shots grow but never quite landing on them exactly.">
+<InteractiveSection title="What the array gives you vs. what hardware would give" description="The exact bars are what the amplitude array gives you: runCircuit computed this Bell circuit's two 1/√2 amplitudes once, and squaring them reads off 0.5 directly, no randomness involved. The sampled bars are what hardware would give: a fresh finite-shot draw at each shot count. Slide from 10 shots up to 5000 and ask, at each stop, how many shots it takes before the hardware-style answer becomes a trustworthy stand-in for the array's exact one.">
   <BarChartExplorer
     sliderLabel="Shots sampled"
     ariaLabel="Exact 50/50 state-vector probabilities versus sampled counts for a Bell circuit, at shot counts from 10 to 5000"

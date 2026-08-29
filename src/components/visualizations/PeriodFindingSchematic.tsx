@@ -41,12 +41,25 @@ export function PeriodFindingSchematic({
   const colX = (col: number) => LABEL_WIDTH + col * COLUMN_WIDTH + COLUMN_WIDTH / 2;
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
+    // `tabIndex={0}`, for the same reason as `StaticCircuitDiagram`, which
+    // this mirrors: `width` is computed from the register sizes and the
+    // `<svg>` is `min-w-full` (a floor, not a ceiling), so the schematic is
+    // routinely wider than the lesson column and this wrapper is what scrolls.
+    // `overflow-x-auto` is focusable by default only in Firefox, so a
+    // keyboard-only reader could see the counting register's Hadamards and had
+    // no way to reach the inverse QFT and the measurement at the right end —
+    // which is where the period actually gets read out. No `role`/`aria-label`
+    // on the wrapper: the `<svg>` already carries `role="img"` and the label.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={ariaLabel ?? "Schematic of the period-finding circuit's structure"} className="min-w-full">
         {/* Counting register wires */}
         {Array.from({ length: countingRows }, (_, q) => (
           <g key={`wire-${q}`}>
-            <line x1={LABEL_WIDTH} y1={rowY(q)} x2={width} y2={rowY(q)} className="stroke-border" strokeWidth={2} />
+            {/* Qubit wires - the structure the whole schematic exists to
+                show. Moved off `--border` (panel-edge token, 1.41:1 on
+                `--surface-muted`, under the 3:1 WCAG 2.1 SC 1.4.11 floor)
+                onto `--axis`, which clears 3:1 on every panel depth. */}
+            <line x1={LABEL_WIDTH} y1={rowY(q)} x2={width} y2={rowY(q)} className="stroke-axis" strokeWidth={2} />
             <text x={4} y={rowY(q) + 4} className="fill-muted-foreground text-xs font-mono">
               {`q${q}`}
             </text>
@@ -55,8 +68,8 @@ export function PeriodFindingSchematic({
 
         {/* Bundled target register wire (drawn as a double line to signal "register", not a single qubit) */}
         <g>
-          <line x1={LABEL_WIDTH} y1={rowY(targetRow) - 2} x2={width} y2={rowY(targetRow) - 2} className="stroke-border" strokeWidth={2} />
-          <line x1={LABEL_WIDTH} y1={rowY(targetRow) + 2} x2={width} y2={rowY(targetRow) + 2} className="stroke-border" strokeWidth={2} />
+          <line x1={LABEL_WIDTH} y1={rowY(targetRow) - 2} x2={width} y2={rowY(targetRow) - 2} className="stroke-axis" strokeWidth={2} />
+          <line x1={LABEL_WIDTH} y1={rowY(targetRow) + 2} x2={width} y2={rowY(targetRow) + 2} className="stroke-axis" strokeWidth={2} />
           <text x={4} y={rowY(targetRow) + 4} className="fill-muted-foreground text-xs font-mono">
             {"|1⟩"}
           </text>
@@ -82,7 +95,11 @@ export function PeriodFindingSchematic({
               <line x1={cx} y1={rowY(q)} x2={cx} y2={rowY(targetRow)} className="stroke-brand" strokeWidth={2} />
               <circle cx={cx} cy={rowY(q)} r={5} className="fill-brand" />
               <rect x={cx - 26} y={rowY(targetRow) - 18} width={52} height={36} rx={8} className="fill-surface stroke-brand" strokeWidth={1.5} />
-              <text x={cx} y={rowY(targetRow) - 24} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">
+              {/* Intrinsic width plus `min-w-full`, so this diagram renders at
+                  its natural 564 units and scrolls rather than shrinking - the
+                  viewBox scale is 1.0 and 10 authored units was a literal 10px,
+                  on the floor rather than under it. 12 clears it. */}
+              <text x={cx} y={rowY(targetRow) - 26} textAnchor="middle" fontSize={12} className="fill-axis font-mono">
                 {`k=${k}`}
               </text>
               <text x={cx} y={rowY(targetRow) + 4} textAnchor="middle" className="fill-foreground text-[11px] font-semibold">

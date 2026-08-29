@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, applyCNOT, applySwap } from "@/lib/quantum/gates";
 import { measure, measureQubit } from "@/lib/quantum/measurement";
+import { pureStateDensityMatrix, purity } from "@/lib/quantum/densityMatrix";
+import { reducedDensityMatrixQubit0, reducedDensityMatrixQubit1 } from "@/lib/quantum/partialTrace";
 import { StatePanel } from "./StatePanel";
 import { CorrelationView } from "./CorrelationView";
 import { OperationControls, type InitId } from "./OperationControls";
@@ -12,6 +14,7 @@ import { SINGLE_QUBIT_GATES, type SingleQubitGateId } from "./gateDefinitions";
 import { GUIDED_PRESETS } from "./presets";
 import { SimulatorInstrument } from "../shared/SimulatorInstrument";
 import { SimulatorFraming } from "../shared/Framing";
+import { Predict } from "../shared/Predict";
 
 const STEP_DELAY_MS = 700;
 
@@ -29,15 +32,73 @@ function gateNarration(gate: SingleQubitGateId, qubit: 0 | 1) {
   return `Applied ${gate} to qubit ${qubit}.`;
 }
 
-export function TwoQubitExplorer() {
-  const [state, setState] = useState<StateVector>(() => StateVector.zero(2));
-  const [narration, setNarration] = useState(
-    "Starting state: |00⟩ — both qubits definitely 0, and completely independent of each other. Run the “Create a Bell state” walkthrough in the controls to entangle them, then measure one qubit and watch what happens to the other."
+/** How mixed a reduced state is, in words a first-time reader can act on. */
+function purityDescription(p: number): string {
+  if (p > 0.999) return "pure — this qubit has a definite state of its own";
+  if (p < 0.501) return "maximally mixed — no state of its own at all";
+  return "partly mixed — some of its state lives in the correlation";
+}
+
+/**
+ * "Qubit 0 alone / Qubit 1 alone": the reduced state of each qubit with the
+ * other traced out, summarised by its purity Tr(ρ²). Computed with the same
+ * `reducedDensityMatrixQubit0/1` + `purity` engine functions
+ * `EntanglementCorrelation` uses — for a product state each purity is 1
+ * (each qubit is a complete description by itself); for a Bell state each is
+ * 0.5 (all the information is in the pair, none in either half).
+ */
+function ReducedStatesPanel({ state }: { state: StateVector }) {
+  const { purity0, purity1 } = useMemo(() => {
+    const rho = pureStateDensityMatrix(state);
+    return {
+      purity0: purity(reducedDensityMatrixQubit0(rho)),
+      purity1: purity(reducedDensityMatrixQubit1(rho)),
+    };
+  }, [state]);
+
+  return (
+    <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
+      <h3 className="text-sm font-semibold text-foreground">Each qubit alone</h3>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Ignore one qubit entirely — what is left of the other? Purity Tr(ρ²) = 1 means a complete
+        state of its own; 0.5 means maximally mixed, with everything in the correlation.
+      </p>
+      <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div>
+          <dt className="text-xs text-muted-foreground">Qubit 0 alone</dt>
+          <dd className="mt-0.5 text-sm text-foreground">
+            <span className="font-mono">{purity0.toFixed(3)}</span>
+            <span className="ml-2 text-xs text-muted-foreground">{purityDescription(purity0)}</span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Qubit 1 alone</dt>
+          <dd className="mt-0.5 text-sm text-foreground">
+            <span className="font-mono">{purity1.toFixed(3)}</span>
+            <span className="ml-2 text-xs text-muted-foreground">{purityDescription(purity1)}</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
   );
-  const [activePresetId, setActivePresetId] = useState<string | null>("start");
+}
+
+/** The Bell pair (|00⟩ + |11⟩)/√2 the instrument now opens on — built with the same engine calls the "bell" guided preset replays. */
+function initialBellState(): StateVector {
+  return applyCNOT(applySingleQubitGate(StateVector.zero(2), gateMatrix("H"), 0), 0, 1);
+}
+
+export function TwoQubitExplorer() {
+  const [state, setState] = useState<StateVector>(initialBellState);
+  const [narration, setNarration] = useState(
+    "Starting mid-experiment: H then CNOT already ran, so the pair sits in the Bell state (|00⟩ + |11⟩)/√2 — entangled. Neither qubit has a definite value, yet they always agree. Measure qubit 0 and watch qubit 1's fate lock in instantly. Reset returns to plain |00⟩."
+  );
+  const [activePresetId, setActivePresetId] = useState<string | null>("bell");
   const [lastMeasurement, setLastMeasurement] = useState<string | null>(null);
   const [targetQubit, setTargetQubit] = useState<0 | 1>(0);
   const [isRunning, setIsRunning] = useState(false);
+  /** Resolved outcome of the "measure qubit 0 of a Bell pair" prediction, set from the first real qubit-0 measurement. */
+  const [predictOutcomeId, setPredictOutcomeId] = useState<string | null>(null);
 
   const cancelledRef = useRef(false);
   useEffect(
@@ -122,8 +183,25 @@ export function TwoQubitExplorer() {
       setNarration(
         `Measured qubit ${qubit}: got ${result.outcome} (probability was ${Math.round(result.probability * 100)}%). The state has collapsed — this was an instantaneous event, not a smooth transition.`
       );
+      // Resolve only when the measured state really is the Bell preparation
+      // the question describes (freshly mounted, or after re-running the
+      // "bell" walkthrough) — measuring some other state the visitor built
+      // should not grade this prediction.
+      if (qubit === 0 && predictOutcomeId === null && activePresetId === "bell") {
+        // Resolve the "measure qubit 0 only" prediction from the real
+        // post-measurement state: read qubit 1's marginal off the collapsed
+        // state's Born-rule probabilities (qubit 1 is the low bit of the
+        // basis index) and see whether it is now certain, and of what.
+        const probabilities = result.collapsed.probabilities();
+        const pQubit1IsOne = probabilities.reduce((sum, p, index) => ((index & 1) === 1 ? sum + p : sum), 0);
+        const qubit1Fixed = pQubit1IsOne > 0.999 || pQubit1IsOne < 0.001;
+        const qubit1Value = pQubit1IsOne > 0.5 ? 1 : 0;
+        setPredictOutcomeId(
+          !qubit1Fixed ? "unchanged" : qubit1Value === result.outcome ? "fixed-match" : "fixed-opposite"
+        );
+      }
     },
-    [disabled, state]
+    [disabled, state, predictOutcomeId, activePresetId]
   );
 
   const measureBothAction = useCallback(() => {
@@ -201,7 +279,7 @@ export function TwoQubitExplorer() {
 
           <div
             aria-live="polite"
-            className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
+            className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
           >
             {narration}
             {lastMeasurement ? (
@@ -209,7 +287,18 @@ export function TwoQubitExplorer() {
             ) : null}
           </div>
 
+          <Predict
+            question="The pair starts in a Bell state. Measure qubit 0 only — what can you then say about qubit 1?"
+            options={[
+              { id: "unchanged", label: "Nothing new — it stays 50/50" },
+              { id: "fixed-match", label: "It is now certain, and matches qubit 0" },
+              { id: "fixed-opposite", label: "It is now certain, and opposite to qubit 0" },
+            ]}
+            outcomeId={predictOutcomeId}
+          />
+
           <StatePanel state={state} />
+          <ReducedStatesPanel state={state} />
           <CorrelationView state={state} />
 
           <SimulatorFraming

@@ -12,7 +12,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Quantum Circuit Notation",
   description:
-    "How to read and write multi-qubit circuit diagrams, and how they correspond exactly to the operator products from the last course.",
+    "How to read and write multi-qubit circuit diagrams, and how they correspond to the operator products from the last course.",
   course: "quantum-gates-and-circuits",
   module: "quantum-circuit-notation",
   order: 1,
@@ -35,18 +35,27 @@ Every multi-qubit operation so far has been described in prose and equations. Re
 
 ## Motivation
 
-Learning to read one fluently
-is a small, mechanical skill; getting the *ordering convention* backwards
-is the single most common way people misread a circuit, so this lesson
-spends real time on that specifically.
+Circuit diagrams are the working notation of the whole field: papers,
+textbooks, and every quantum SDK draw computations as wires and boxes
+rather than equations. Learning to read one fluently is a small, mechanical
+skill, and there is exactly one place it goes wrong. Getting the *ordering
+convention* backwards is the most common way people misread a circuit, so
+this lesson spends its time there.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
-  alt="Google's Sycamore superconducting quantum processor chip, mounted with its array of individually wired qubits"
-  caption="Every wire in a circuit diagram stands for one physical qubit like these on Google's Sycamore chip. The diagram is an abstraction; the wiring, control lines, and readout hardware underneath it are not."
-  credit="Google"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
-  license="CC BY 3.0"
+Here is a circuit using every symbol the notation has. By the end of the
+next section you should be able to say what each mark means and write down
+the operator it stands for.
+
+<StaticCircuitDiagram
+  numQubits={3}
+  instructions={[
+    { gate: "H", targets: [0] },
+    { gate: "CNOT", targets: [0, 1] },
+    { gate: "T", targets: [2] },
+    { gate: "CZ", targets: [1, 2] },
+    { gate: "MEASURE", targets: [0] },
+  ]}
+  ariaLabel="A three-qubit circuit showing every notational element: a gate box (H on qubit 0), a control dot joined to a target (CNOT from qubit 0 to qubit 1), a gate on an otherwise idle wire (T on qubit 2), a two-qubit controlled-Z between qubits 1 and 2, and a measurement meter on qubit 0. Wires with no symbol in a column are implicitly the identity."
 />
 
 ## Intuition
@@ -60,8 +69,8 @@ circuit is reading a story of the state evolving, one column at a time.
 
 ### The conventions
 
-- **Wires**, read top to bottom, are qubits 0, 1, 2, ..., matching this
-  platform's ordering convention exactly, so the topmost wire is always
+- **Wires**, read top to bottom, are qubits 0, 1, 2, ..., matching the
+  simulator's ordering convention, so the topmost wire is always
   qubit 0.
 - **Boxes** on a wire (labeled $H$, $X$, $S$, etc.) are <Term id="single-qubit-gates">single-qubit
   gates</Term>, identical to the ones from the last course.
@@ -78,7 +87,7 @@ circuit is reading a story of the state evolving, one column at a time.
 ### From diagram to operator expression
 
 A circuit is read left to right, but the corresponding operator product,
-exactly as established in the last course's circuit lesson, is written
+as established in the last course's circuit lesson, is written
 and multiplied **right to left**: the leftmost box in the diagram is the
 rightmost (first-applied) operator in the product. If qubit 0 gets an $H$
 while qubit 1 does nothing, that single column is the operator
@@ -90,14 +99,14 @@ $$
 \text{full circuit} = \text{CNOT} \cdot (H\otimes I)
 $$
 
-This is exactly the same right-to-left composition rule from the last
+This is the same right-to-left composition rule from the last
 course's capstone lesson: nothing new about *how* operators combine, only
 new about *reading a picture* instead of a written expression.
 
 ### Following a circuit step by step
 
-Here's what that circuit actually looks like, drawn the way every SDK
-and paper draws it: qubit 0's wire on top, time flowing left to right.
+Here is that circuit drawn the way every SDK and paper draws it: qubit 0's
+wire on top, time flowing left to right.
 
 <StaticCircuitDiagram
   numQubits={2}
@@ -122,7 +131,7 @@ leaves behind.
     { label: "It only affects qubit 0, since CNOT's control is qubit 0", value: "control-only" },
   ]}
   correctValue="entangles"
-  explanation="CNOT(0,1) checks qubit 0 (the control) in each term separately: the |00⟩ term has control 0, so it's untouched; the |10⟩ term has control 1, so its target (qubit 1) flips to 1, giving |11⟩. The result, (|00⟩+|11⟩)/√2, correlates the two qubits — measuring one now tells you the other, which is exactly what a product of single-qubit gates could never produce."
+  explanation="CNOT(0,1) checks qubit 0 (the control) in each term separately: the |00⟩ term has control 0, so it's untouched; the |10⟩ term has control 1, so its target (qubit 1) flips to 1, giving |11⟩. The result, (|00⟩+|11⟩)/√2, correlates the two qubits: measuring one now tells you the other, something no product of single-qubit gates could ever produce."
 />
 
 <QuantumStateDisplay state={afterH} label="After column 1: H on qubit 0" />
@@ -161,8 +170,8 @@ Column 1: $X$ on qubit 1 turns $|00\rangle$ into $|01\rangle$ (qubit 0
 untouched, qubit 1 flips). Column 2: $\text{CNOT}$ with control = qubit 1
 (which is now 1) flips the target, qubit 0: $|01\rangle \to |11\rangle$.
 Final state: $|11\rangle$, with certainty (no superposition was ever
-introduced, so this circuit is really just doing classical bit-flip logic
-here).
+introduced, so this circuit is doing classical bit-flip logic and nothing
+more).
 
 ## Common Mistakes
 
@@ -210,6 +219,6 @@ product, needed to keep the dimensions consistent.
 
 <NextDiscovery>
 [Controlled Gates and CNOT](/lessons/quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot) uses the dot-and-$\oplus$ notation
-introduced here, worked out completely: the matrix, the truth table, and
+introduced here, worked out in full: the matrix, the truth table, and
 why it's the standard building block for entangling circuits.
 </NextDiscovery>

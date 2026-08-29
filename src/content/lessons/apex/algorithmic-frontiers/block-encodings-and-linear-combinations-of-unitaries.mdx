@@ -113,7 +113,7 @@ export const lessonMeta = {
   module: "block-encodings-and-linear-combinations-of-unitaries",
   order: 1,
   difficulty: "master",
-  estimatedMinutes: 28,
+  estimatedMinutes: 65,
   prerequisites: ["quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization"],
   objectives: [
     "Define a block encoding of a matrix A: a unitary U such that A = (bra 0 on ancilla) U (ket 0 on ancilla), up to a normalization factor",
@@ -244,6 +244,34 @@ $$
 </DerivationSteps>
 
 This is not merely close to a block encoding: it is one, exactly, by the definition above, of $A/\|\alpha\|_1$. When $\|\alpha\|_1=1$ (as in the worked example below), $U$ block-encodes $A$ itself with no extra rescaling.
+
+<ResearchConnection
+  title="Where PREPARE–SELECT–PREPARE† comes from"
+  source="Childs & Wiebe, Quantum Information and Computation 12, 901 (2012) (arXiv:1202.5822)"
+  url="https://arxiv.org/abs/1202.5822"
+>
+  The paper that introduced the linear-combination-of-unitaries
+  construction, in its original setting: simulating $e^{-iHt}$ by summing
+  the terms of a Taylor or Chebyshev series, each of which is a unitary,
+  rather than by a product formula. Read it for the $\|\alpha\|_1$
+  normalization specifically. That factor is the whole cost of the
+  technique, and the paper is direct about it: the success probability
+  degrades as $1/\|\alpha\|_1^2$, so an $A$ whose decomposition has many
+  comparably-sized terms is expensive to block-encode even though the
+  construction always works.
+</ResearchConnection>
+
+<Callout type="warning">
+**The $\ell_1$ norm is where LCU's cost hides.** The construction above
+block-encodes $A/\|\alpha\|_1$, not $A$, and every downstream algorithm
+pays for that rescaling: a matrix written as a sum of $m$ Pauli terms
+with comparable coefficients has $\|\alpha\|_1$ growing with $m$, which
+shrinks the encoded block and therefore the success probability by the
+same factor. For a molecular Hamiltonian with $O(n^4)$ terms this is not
+a rounding error, and reducing $\|\alpha\|_1$ by finding a better
+decomposition (factorized, tensor-hypercontracted, or otherwise) is an
+active research problem in its own right, not a preprocessing detail.
+</Callout>
 
 ## Physical Interpretation
 

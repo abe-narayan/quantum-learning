@@ -19,7 +19,7 @@ export const amplitudeEstimationQpeFreeScalingMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "It achieves the same O(1/ε) Grover-iterate query scaling as QPE-based amplitude estimation, using a classically-scheduled sequence of Grover-iterate runs, direct measurements, and classical maximum-likelihood post-processing — no QFT or wide phase-register ancilla — at the cost of a modest constant-factor query overhead, trading a little proven query-optimality for a much shallower, more NISQ-friendly circuit.",
+        text: "It keeps the same O(1/ε) Grover-iterate query scaling, reaching it through a classically scheduled series of measured Grover runs plus maximum-likelihood post-processing, so it needs no QFT and no wide ancilla, at a modest constant-factor query overhead.",
       },
       {
         id: "b",
@@ -57,13 +57,17 @@ export const amplitudeEstimationQpeFreeScalingMc: MultipleChoiceProblem = {
       { description: "QPE-free (maximum-likelihood / iterative) amplitude estimation reuses the same Grover iterate and closed-form probability, but queries a classical, increasing schedule of iteration counts, each measured directly." },
       { description: "Combined via classical maximum likelihood, this still achieves O(1/ε) total queries — the same scaling as QPE-based amplitude estimation — while needing no QFT and no wide coherent ancilla register, at a modest constant-factor query overhead." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "The same O(1/ε) query scaling as QPE-based amplitude estimation, with no QFT and no wide coherent ancilla, at a modest constant-factor query overhead.",
   },
   explanation: {
     correctIdea:
       "QPE-free amplitude estimation is a genuine, non-consolation-prize result: same asymptotic query scaling, dramatically shallower circuit structure.",
     whyCorrect:
       "This is exactly the distinction the lesson derives and the mandated Callout insists on: 'QPE-free doesn't mean worse scaling, it means the same O(1/ε) scaling with a shallower circuit.'",
-    whyWrong: ["Options b, c, and d each either misdescribe the mechanism (b), understate the scaling (c), or overstate the remaining circuit cost (d)."],
+    whyWrong: [
+      { optionId: "b", text: "Misdescribes the mechanism. The QPE-free schedule never queries the Grover iterate in superposition over iteration counts; each round fixes m_k classically and measures immediately." },
+      { optionId: "c", text: "Understates the scaling. The query count stays O(1/ε), the same Heisenberg-limited exponent as QPE-based amplitude estimation, not classical Monte Carlo's O(1/ε²)." },
+      { optionId: "d", text: "Overstates the remaining circuit cost. Removing the controlled-iterate superposition and the QFT is what shortens the coherent depth; the classical post-processing is a consequence, not the only change." },
+    ],
   },
 };

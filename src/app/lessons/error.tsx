@@ -38,9 +38,16 @@ export default function LessonsError({
         simulators, not something you did. You can try again, or head back to the lesson library.
       </Lede>
 
+      {/* `/lessons`, not `/learn`. The label says "all lessons" and `/lessons`
+          is the page titled exactly that — the flat index of every written
+          lesson. `/learn` is the curriculum explorer: the recommended order,
+          grouped by track, which is a different page answering a different
+          question. Sending a reader whose lesson just crashed to an index
+          that does not contain the flat list they asked for is a second
+          small failure on top of the first. */}
       <div className="mt-10 flex flex-wrap gap-3">
         <Button onClick={() => retry()}>Try again</Button>
-        <Button href="/learn" variant="secondary">
+        <Button href="/lessons" variant="secondary">
           Back to all lessons
         </Button>
       </div>

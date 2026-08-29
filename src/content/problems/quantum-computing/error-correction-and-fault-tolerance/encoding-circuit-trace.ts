@@ -20,16 +20,16 @@ export const encodingCircuitTrace: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["110", "after cnot\\(0,1\\)", "first cnot"],
-      ["111", "after cnot\\(0,2\\)", "second cnot", "final"],
+      ["110", "1,1,0", "one one zero", "first cnot"],
+      ["111", "1,1,1", "one one one", "second cnot", "all three"],
     ],
-    incorrectFeedback: "Apply CNOT(0,1) to α|000⟩+β|100⟩ first, tracking which term's qubit 1 flips.",
-    partialFeedback: "Good — now apply the second CNOT to reach the final 3-qubit encoded state.",
+    incorrectFeedback: "Write the starting state as a sum of two terms, then let each gate act on one term at a time, tracking which target qubit flips.",
+    partialFeedback: "You have the state after the first gate. Now let the remaining gate act and write out what the β term becomes.",
   },
   hints: [
-    { text: "Initial state: α|000⟩+β|100⟩ (qubit 0 carries the logical value, qubits 1,2 start at 0)." },
-    { text: "CNOT(0,1): only the β term (qubit 0 = 1) has qubit 1 flipped, giving α|000⟩+β|110⟩." },
-    { text: "CNOT(0,2): similarly, only the β term has qubit 2 flipped, giving α|000⟩+β|111⟩." },
+    { text: "Write the initial three-qubit state as a sum of two terms. Which qubit is the control for both gates?" },
+    { text: "A CNOT flips its target only in the term where the control qubit reads 1. Which of your two terms is that?" },
+    { text: "Apply that reasoning twice, once per gate. Only one term changes each time." },
   ],
   solution: {
     steps: [
@@ -40,7 +40,7 @@ export const encodingCircuitTrace: ConceptualProblem = {
     finalAnswer: "Final state: α|000⟩+β|111⟩.",
   },
   explanation: {
-    correctIdea: "Each CNOT only acts on the term(s) where its control qubit is 1 — tracking this term by term gives the exact encoding.",
+    correctIdea: "Each CNOT only acts on the term(s) where its control qubit is 1. Tracking this term by term gives the exact encoding.",
     whyCorrect: "Matches encodeBitFlipCode's actual implementation and output exactly.",
     whyWrong: ["Applying CNOT to both terms uniformly ignores that CNOT's target only flips when the control is specifically 1, not always."],
   },

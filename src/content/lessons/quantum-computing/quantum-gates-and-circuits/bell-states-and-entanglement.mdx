@@ -14,7 +14,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Bell States and Entanglement",
   description:
-    "Deriving (|00⟩ + |11⟩)/√2 from H and CNOT, proving it can't be a product state, and showing precisely why it isn't ordinary classical correlation.",
+    "Deriving (|00⟩ + |11⟩)/√2 from H and CNOT, proving it can't be a product state, and finding the measurement that separates it from ordinary classical correlation.",
   course: "quantum-gates-and-circuits",
   module: "bell-states-and-entanglement",
   order: 1,
@@ -29,7 +29,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum",
-      note: "That lesson proves this platform's Bell state |Ψ⁻⟩ is not merely analogous to but literally identical to the total-spin-zero singlet of two combined spin-1/2 particles, verified as the same J²=0 eigenstate.",
+      note: "That lesson proves the Bell state |Ψ⁻⟩ is not merely analogous to but identical to the total-spin-zero singlet of two combined spin-1/2 particles, verified as the same J²=0 eigenstate.",
     },
   ],
 };
@@ -40,40 +40,43 @@ export const bellState = applyCNOT(afterH, 0, 1);
 export const afterHBoth = applySingleQubitGate(applySingleQubitGate(bellState, HADAMARD, 0), HADAMARD, 1);
 
 <LessonHook eyebrow="The most famous state in quantum computing">
-Two entangled qubits keep agreeing with each other even when you change how you measure them — a correlation no predetermined pair of classical coins could ever reproduce.
+Two entangled qubits keep agreeing with each other even when you change how you measure them. No predetermined pair of classical coins can do that.
 </LessonHook>
 
 ## Motivation
 
 The last lesson ended with a promise: put CNOT's control qubit into
-<Term id="superposition">superposition</Term> first, and something new happens. This lesson delivers on
-it. The result is the most famous state in quantum computing, and the
-question of what makes it different from ordinary correlated randomness
-is one every serious treatment of the subject has to answer precisely,
-not just gesture at.
+<Term id="superposition">superposition</Term> first, and something new happens. Two columns of circuit
+produce it.
+
+The state that comes out is easy to write down and easy to mistake for
+something ordinary. Two coins that always land the same way would give the
+same 50/50-and-always-matching statistics. The work of this lesson is
+finding the measurement that tells the two situations apart, and it takes
+one calculation you can do by hand.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Alain_Aspect_experiment_1981_diagram.svg"
   alt="Schematic diagram of Alain Aspect's 1981 entanglement experiment: a photon source S produces two correlated photons that pass through polarizers a and b to detectors D+ and D-, with results recorded at R"
-  caption="Alain Aspect's 1981 Orsay experiment: a source emits pairs of entangled photons to polarizers set at independently-chosen angles, showing correlations that survive a change of measurement basis exactly the way this lesson's H⊗H calculation does — the experimental result that earned Aspect a share of the 2022 Nobel Prize in Physics."
+  caption="The layout of Aspect's 1981 Orsay experiment: source S emits a pair of entangled photons toward polarizers a and b, each set to an independently chosen angle, with coincidences recorded at R."
   credit="Neolexx"
   creditUrl="https://commons.wikimedia.org/wiki/File:Alain_Aspect_experiment_1981_diagram.svg"
   license="CC BY 3.0"
 />
 
 <HistoricalMoment date="1981" place="Orsay, France">
-Alain Aspect's experiment sends pairs of entangled photons to polarizers set at independently-chosen angles, showing correlations that survive a change of measurement basis exactly the way this lesson's H⊗H calculation does — work that earned Aspect a share of the 2022 Nobel Prize in Physics.
+Alain Aspect's team measures entangled photon pairs and finds correlations that survive a change of measurement basis, just as this lesson's H⊗H calculation predicts. Four decades later, this series of experiments earned Aspect a share of the 2022 Nobel Prize in Physics.
 </HistoricalMoment>
 
 ## Intuition
 
 Imagine two coins prepared so that they always land the same way, but you
 don't know which way until you look: heads-heads or tails-tails, 50/50,
-decided the moment they were set up. That's *classical* correlation,
-shared but predetermined. A Bell pair looks identical if you only ever
-check one measurement, but as this lesson shows with an actual
-calculation, it keeps agreeing even when you check in a *different* way
-of measuring, which no predetermined classical coin pair can do.
+decided the moment they were set up. That's *classical* correlation:
+shared, but predetermined. A Bell pair is indistinguishable from this if
+you only ever measure one way. Change the measurement, though, and the
+Bell pair keeps agreeing while the coins stop. That is the calculation
+below.
 
 ## Mathematical Development
 
@@ -136,7 +139,7 @@ $$
 a_0b_0=\tfrac{1}{\sqrt2}, \qquad a_0b_1=0, \qquad a_1b_0=0, \qquad a_1b_1=\tfrac{1}{\sqrt2}
 $$
   </DerivationStep>
-  <DerivationStep annotation="a_0b_1=0 forces a_0=0 or b_1=0 — a product of complex numbers is zero only if one factor is.">
+  <DerivationStep annotation="a_0b_1=0 forces a_0=0 or b_1=0, since a product of complex numbers is zero only if one factor is.">
 If $a_0=0$: then $a_0b_0=0\neq\frac{1}{\sqrt2}$, contradiction.
   </DerivationStep>
   <DerivationStep annotation="Check the other branch of the same either/or.">
@@ -146,15 +149,16 @@ If $b_1=0$: then $a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction.
 
 No values of
 $a_0,a_1,b_0,b_1$ satisfy all four equations simultaneously, so
-$|\Phi^+\rangle$ is **not** a product state. This is a complete proof, not
-an assertion: <Term id="entanglement">entanglement</Term> isn't a label we attach to this state, it's a
-provable mathematical fact about it.
+$|\Phi^+\rangle$ is **not** a product state. Notice what the proof rules
+out: not one clever factorization you failed to find, but all of them at
+once. <Term id="entanglement">Entanglement</Term> is not a label attached to this state; it is a theorem
+about it.
 
 ### Is this different from classical correlation?
 
 Measuring each qubit of $|\Phi^+\rangle$ in the <Term id="computational-basis">computational basis</Term> gives
 0 or 1 with 50/50 probability individually, and the two outcomes always
-match, exactly what a pair of classically-correlated coins would give
+match, which is what a pair of classically-correlated coins would give
 too. So far, no difference. The gap shows up when you measure in a
 *different* basis. Apply $H$ to **both** qubits of $|\Phi^+\rangle$:
 
@@ -164,7 +168,7 @@ $$
 (H\otimes H)|\Phi^+\rangle = \frac{|00\rangle+|11\rangle}{\sqrt2} = |\Phi^+\rangle
 $$
 
-Applying $H$ to both qubits (which, recall, is exactly how you measure in
+Applying $H$ to both qubits (which, recall, is how you measure in
 the X-basis) reproduces the *same* perfectly-correlated pattern:
 $|00\rangle$ or $|11\rangle$ only, still 50/50, still perfectly matching.
 A classical hidden-variable model, two coins with some fixed, if hidden,
@@ -186,14 +190,13 @@ comparing notes over an ordinary (light-speed-limited) classical channel.
 
 ## Physical Interpretation
 
-Entanglement is real, provable structure in the state itself, not a
-statement about anyone's ignorance. Two entangled qubits behave as one
-system with no independently well-defined parts, and that fact is what
-every later lesson in this course (measurement, teleportation, and the
-no-cloning theorem) builds on directly.
+Entanglement is structure in the state itself, not a statement about
+anyone's ignorance. Two entangled qubits behave as one system with no
+independently well-defined parts, and that fact is what the rest of this
+course (measurement, teleportation, no-cloning) is built on.
 
 <InsightBlock>
-Entanglement is real, provable structure in the state itself, not a statement about anyone's ignorance.
+Entanglement is structure in the state itself, not a statement about anyone's ignorance. There is no fact about qubit 1 alone that the pair is keeping from you.
 </InsightBlock>
 
 <PredictBeforeReveal
@@ -205,10 +208,10 @@ Entanglement is real, provable structure in the state itself, not a statement ab
     { label: "100% of the time", value: "100" },
   ]}
   correctValue="100"
-  explanation="|Φ+⟩ = (|00⟩+|11⟩)/√2 has zero amplitude on |01⟩ and |10⟩, so measurement can only ever land on 00 or 11 — never a mismatch. Each outcome is 50/50 individually, but the two qubits agree 100% of the time. That's exactly what the Correlation table below shows for the Bell state (only the diagonal nonzero), in contrast to |++⟩, where all four outcomes are equally likely and the qubits agree only half the time."
+  explanation="|Φ+⟩ = (|00⟩+|11⟩)/√2 has zero amplitude on |01⟩ and |10⟩, so measurement can only ever land on 00 or 11, never a mismatch. Each outcome is 50/50 individually, but the two qubits agree 100% of the time. That is what the Correlation table below shows for the Bell state (only the diagonal nonzero), in contrast to |++⟩, where all four outcomes are equally likely and the qubits agree only half the time."
 />
 
-<InteractiveSection title="Watch the indicator flip" description='Try it yourself. Click Initialize → |++⟩ and check the entanglement indicator: a product state, as expected. Then click the Create a Bell state guided walkthrough and watch the indicator flip to "Entangled" the moment CNOT is applied. Open the Correlation table for both states: for |++⟩ the four outcomes are independent (25% each); for the Bell state, only the diagonal is nonzero, exactly the perfect correlation this lesson just derived.'>
+<InteractiveSection title="Watch the indicator flip" description='Try it yourself. Click Initialize → |++⟩ and check the entanglement indicator: a product state, as expected. Then click the Create a Bell state guided walkthrough and watch the indicator flip to "Entangled" the moment CNOT is applied. Open the Correlation table for both states: for |++⟩ the four outcomes are independent (25% each); for the Bell state, only the diagonal is nonzero: the perfect correlation this lesson just derived.'>
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
@@ -277,7 +280,7 @@ correlation.
 ## Further Exploration
 
 <NextDiscovery>
-[Multi-Qubit Measurement](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement) makes precise exactly what
+[Multi-Qubit Measurement](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement) makes precise what
 happens to the *rest* of an entangled state when you measure only part of
 it, the mechanism behind the perfect correlation you just derived.
 </NextDiscovery>

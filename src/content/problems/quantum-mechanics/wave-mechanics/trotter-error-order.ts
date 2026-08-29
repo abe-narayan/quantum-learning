@@ -22,6 +22,10 @@ export const trotterErrorOrder: NumericProblem = {
     value: 3,
     tolerance: 0.001,
     incorrectFeedback: "The symmetric split cancels the O(Delta t^2) term entirely, leaving the next order up as the leading error.",
+    nearMisses: [
+      { value: 2, feedback: "2 is the naive split's order. Symmetrizing the half-step, full-step, half-step arrangement is what cancels that term." },
+      { value: 1, feedback: "Order 1 would be worse than the naive split. Symmetrizing improves the accuracy, it does not degrade it." },
+    ],
   },
   hints: [{ text: "If the O(Delta t^2) term cancels by symmetry, what's the next power of Delta t in the Taylor expansion?" }],
   solution: {

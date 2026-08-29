@@ -24,6 +24,11 @@ export const dataProcessingMutualInformationAtLambda: NumericProblem = {
     tolerance: 0.002,
     incorrectFeedback:
       "First compute S(AB') as the binary entropy of p=lambda/2=0.3: -0.7*log2(0.7) - 0.3*log2(0.3). Then subtract that from 2.",
+    nearMisses: [
+      { value: 0.881291, tolerance: 0.003, feedback: "That is S(AB') itself. The mutual information subtracts it from S_A + S_B = 2 bits." },
+      { value: 2, feedback: "2 bits is the undephased Bell pair's mutual information. Dephasing at lambda = 0.6 has already cost some of it." },
+      { value: 1.278, tolerance: 0.005, feedback: "1.278 is the lesson's lambda = 0.4 entry. More dephasing means less mutual information." },
+    ],
   },
   hints: [
     { text: "At lambda=0.6, the outer block's eigenvalues are 1-lambda/2=0.7 and lambda/2=0.3 (the two zero eigenvalues from the empty middle block contribute nothing)." },
@@ -33,7 +38,7 @@ export const dataProcessingMutualInformationAtLambda: NumericProblem = {
   solution: {
     steps: [
       { description: "The dephased Bell state's joint spectrum is {1-lambda/2, lambda/2, 0, 0} = {0.7, 0.3, 0, 0} at lambda=0.6." },
-      { description: "$S(AB') = -0.7\\log_2(0.7) - 0.3\\log_2(0.3) \\approx 0.360265 + 0.521089$" },
+      { description: "$S(AB') = -0.7\\log_2(0.7) - 0.3\\log_2(0.3) \\approx 0.360201 + 0.521090$" },
       { description: "$S(AB') \\approx 0.881291$ bits, so $I(A:B') = S_A+S_B-S(AB') = 1+1-0.881291$" },
     ],
     finalAnswer: "I(A:B') ≈ 1.118709 bits.",

@@ -22,6 +22,11 @@ export const harmonicLevelSpacing: NumericProblem = {
     value: 2.5,
     tolerance: 0.01,
     incorrectFeedback: "Consecutive harmonic oscillator levels are always spaced by exactly hbar*omega, regardless of n.",
+    nearMisses: [
+      { value: 6.25, tolerance: 0.02, feedback: "6.25 is E₂ itself, ω(2 + 1/2). The question asks for the gap to E₁." },
+      { value: 1.25, feedback: "1.25 is ħω/2, the zero-point energy. The gap between consecutive levels is a full ħω." },
+      { value: 5, feedback: "5 is 2ħω, the gap across two steps of the ladder. E₂ and E₁ are adjacent." },
+    ],
   },
   hints: [{ text: "E_n = omega*(n+1/2) — subtract E_1 from E_2 and see what cancels." }],
   solution: {

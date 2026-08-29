@@ -3,10 +3,36 @@ import { StateVector } from "@/lib/quantum/state";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { BarChart } from "@/components/visualizations/BarChart";
+import { stateVectorAmplitudeCount, stateVectorMemoryBytes } from "@/lib/quantum/simulationCost";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-gates-and-circuits/tensor-products"
 );
+
+export const growthQubitCounts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+
+export const growthBars = growthQubitCounts.map((n) => {
+  const bytes = stateVectorMemoryBytes(n);
+  const readable =
+    bytes < 1e3
+      ? `${bytes} B`
+      : bytes < 1e6
+        ? `${(bytes / 1e3).toFixed(0)} kB`
+        : bytes < 1e9
+          ? `${(bytes / 1e6).toFixed(0)} MB`
+          : bytes < 1e12
+            ? `${(bytes / 1e9).toFixed(0)} GB`
+            : bytes < 1e15
+              ? `${(bytes / 1e12).toFixed(0)} TB`
+              : `${(bytes / 1e15).toFixed(0)} PB`;
+  return {
+    label: `${n}q`,
+    value: Math.log2(stateVectorAmplitudeCount(n)),
+    caption: readable,
+    highlight: n === 50,
+  };
+});
 
 export const lessonMeta = {
   title: "Tensor Products: Combining Qubits",
@@ -35,29 +61,19 @@ export const ketZeroOne = StateVector.zero(1).tensor(StateVector.basis(1, 1));
 export const ketOneZero = StateVector.basis(1, 1).tensor(StateVector.zero(1));
 
 <LessonHook eyebrow="Why this matters">
-Everything in the last course lived on one qubit's Bloch sphere. Real computation needs more than one qubit working together, but "more than one qubit" is not simply "do the single-qubit thing twice."
+Everything in the last course lived on one qubit's Bloch sphere. Real computation needs several qubits working together, and "several qubits" is not "the single-qubit thing, twice."
 </LessonHook>
 
 ## Motivation
 
-A classical
-2-bit register needs 2 bits to describe: which one of $\{00,01,10,11\}$ it's
-in. A quantum 2-qubit register needs to describe a *superposition* over
-all four of those possibilities simultaneously, which turns out to
-require exactly 4 complex <Term id="amplitude">amplitudes</Term>, not 2. This lesson derives where
-that "4" comes from, and it won't stop at 4: by the end, you'll see why
-$n$ qubits need $2^n$ amplitudes, the single fact that makes quantum
-computers exponentially hard to simulate classically, and (later courses)
-part of why they can be exponentially powerful.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
-  alt="NIST laboratory photograph of two trapped beryllium ions positioned above a gold ion-trap chip, surrounded by a copper enclosure"
-  caption="Two real trapped-ion qubits, held roughly 40 micrometers apart above a NIST ion-trap chip. Once coupled, this two-ion system is no longer '2 + 2' independent Bloch spheres — its state lives in exactly the 4-amplitude tensor-product space this lesson derives."
-  credit="NIST (photograph: Y. Colombe)"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
-  license="Public Domain (U.S. Government work)"
-/>
+A classical 2-bit register needs 2 bits to describe: which one of
+$\{00,01,10,11\}$ it is in. A quantum 2-qubit register has to describe a
+*superposition* over all four of those possibilities at once, which takes 4
+complex <Term id="amplitude">amplitudes</Term>, not 2. This lesson derives where that "4" comes from,
+and it does not stop at 4. By the end you will see why $n$ qubits need
+$2^n$ amplitudes, the one fact that makes quantum computers hard to
+simulate classically and (in later courses) part of why they can be
+powerful.
 
 ## Intuition
 
@@ -83,7 +99,7 @@ $$
 $$
 
 Every entry of the first vector multiplies every entry of the second.
-This is exactly what makes the result 4-dimensional from two
+That is what makes the result 4-dimensional from two
 2-dimensional inputs ($2\times2=4$), rather than 4-dimensional from
 "stacking" them ($2+2=4$ would give the wrong structure entirely; stacking
 loses the ability to represent correlations).
@@ -96,7 +112,7 @@ $$
 |0\rangle \otimes |1\rangle = \begin{pmatrix}1\\0\end{pmatrix}\otimes\begin{pmatrix}0\\1\end{pmatrix} = \begin{pmatrix}1\cdot0\\1\cdot1\\0\cdot0\\0\cdot1\end{pmatrix} = \begin{pmatrix}0\\1\\0\\0\end{pmatrix} = |01\rangle
 $$
 
-The result is exactly the <Term id="computational-basis">computational basis</Term> state whose label is the
+The result is the <Term id="computational-basis">computational basis</Term> state whose label is the
 two input labels written side by side. This is a useful shorthand you'll
 lean on constantly: $|i\rangle\otimes|j\rangle = |ij\rangle$, and you
 rarely need to write out the column-vector arithmetic by hand once you
@@ -110,7 +126,7 @@ trust this rule.
     { label: "They're the same up to normalization", value: "normalization" },
   ]}
   correctValue="different"
-  explanation="Computing both directly: |0⟩⊗|1⟩ = |01⟩ = (0,1,0,0) and |1⟩⊗|0⟩ = |10⟩ = (0,0,1,0). Neither the labels nor the underlying column vectors match — the tensor product is order-sensitive because it tracks which qubit each factor belongs to, exactly the way the classical strings '01' and '10' are different strings."
+  explanation="Computing both directly: |0⟩⊗|1⟩ = |01⟩ = (0,1,0,0) and |1⟩⊗|0⟩ = |10⟩ = (0,0,1,0). Neither the labels nor the underlying column vectors match. The tensor product is order-sensitive because it tracks which qubit each factor belongs to, the same way the classical strings '01' and '10' are different strings."
 />
 
 <QuantumStateDisplay state={ketZeroOne} label="|0⟩ ⊗ |1⟩" />
@@ -152,13 +168,30 @@ two qubits.
 ### Dimension growth and the qubit-ordering convention
 
 Tensoring $n$ single qubits together gives a $2^n$-dimensional state
-vector: each additional qubit *doubles* the dimension rather than adding
-a fixed amount to it. Three qubits need 8 amplitudes; ten qubits need
-1024; fifty qubits need more amplitudes than there are atoms on Earth to
-store classically. This exponential growth is the whole reason
-"simulating a quantum computer on a classical one" gets hard fast, and
-it's the raw resource multi-qubit algorithms will eventually try to
-exploit.
+vector: each additional qubit *doubles* the dimension rather than adding a
+fixed amount to it. Three qubits need 8 amplitudes, ten need 1024.
+
+Doubling is easy to say and hard to feel, so here is what it costs in
+memory. The bars plot $\log_2$ of the amplitude count at evenly spaced
+qubit counts (5, 10, 15, ..., 50), so a straight line means exponential
+growth, and the caption on each bar is the storage a double-precision
+state vector would need, computed by the same `stateVectorMemoryBytes`
+the platform's simulator-cost problems use.
+
+<BarChart
+  bars={growthBars}
+  maxValue={50}
+  ariaLabel="Log-base-2 of the state vector size at ten evenly spaced qubit counts, 5 through 50 in steps of 5, rising in equal increments so the bar tops form a straight line, with each bar captioned by the memory a double-precision state vector would need: 512 bytes at five qubits, 17 megabytes at twenty, 17 gigabytes at thirty, 18 terabytes at forty, and 18 petabytes at fifty."
+/>
+
+Each bar is exactly five units taller than the one before it, so the tops
+form a straight line: that is the point, since the cost is exponential in
+the qubit count, with no bend anywhere to grow out of. Thirty qubits fit
+in a large workstation's memory. Forty need a serious cluster. Fifty need
+about 18 petabytes, and nobody has found a general way around that. This is
+why "just simulate it classically" stops being an answer at a few dozen
+qubits. The same $2^n$ is the raw resource multi-qubit algorithms will
+later try to exploit.
 
 One convention needs to be fixed and used consistently everywhere from
 here on: **qubit 0 is the leftmost (most significant) label in a
@@ -197,8 +230,8 @@ $$
 Each coefficient has magnitude $\frac12$, so every one of the four
 outcomes is equally likely if measured. That makes sense, since $|+\rangle$
 and $|-\rangle$ are each individually 50/50 in the computational basis,
-and the qubits here are completely independent (no correlation has been
-introduced yet).
+and the qubits here are independent: nothing in this construction has
+correlated them.
 
 ## Common Mistakes
 
@@ -244,7 +277,7 @@ track which ket is qubit 0.
 
 <NextDiscovery>
 Up next, [Multi-Qubit State Vectors](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors) asks the sharper question
-this lesson set up: is every valid multi-qubit state actually *reachable*
+this lesson set up: is every valid multi-qubit state *reachable*
 as a tensor product of single-qubit states? The answer is no, and the
 states that aren't are the entangled ones.
 </NextDiscovery>

@@ -22,6 +22,10 @@ export const stationaryPhaseCalculation: NumericProblem = {
     value: -6,
     tolerance: 0.01,
     incorrectFeedback: "The phase angle is -E*t/hbar directly.",
+    nearMisses: [
+      { value: 6, feedback: "The sign is dropped. The exponent is −iEt/ħ, so a positive energy makes the phase angle run negative as time increases." },
+      { value: -1.5, feedback: "−1.5 is −E/t, dividing by the time where the exponent multiplies by it. The phase angle is the product −Et/ħ." },
+    ],
   },
   hints: [
     { text: "The phase factor is e^(i*theta) with theta = -E*t/hbar." },

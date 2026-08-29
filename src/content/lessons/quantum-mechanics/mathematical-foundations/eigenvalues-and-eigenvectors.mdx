@@ -2,10 +2,22 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
 import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
+import { Matrix } from "@/lib/quantum/matrix";
+import { Complex } from "@/lib/quantum/complex";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors"
 );
+
+export const eigenA = new Matrix([
+  [new Complex(2), new Complex(1)],
+  [new Complex(1), new Complex(2)]
+]);
+export const eigenP = new Matrix([
+  [new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)],
+  [new Complex(Math.SQRT1_2), new Complex(-Math.SQRT1_2)]
+]);
+export const eigenDiagonal = eigenP.dagger().mul(eigenA).mul(eigenP);
 
 export const eigenDemoA = (x, y) => ({ x: 2 * x + y, y: x + 2 * y });
 export const eigenSweepU = (angleDeg) => ({
@@ -38,8 +50,8 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  On a real quantum computer, the bit a measurement reports back isn't an
-  abstraction — it's literally which eigenvalue the readout hardware
+  On a real quantum computer, the bit a measurement reports back is not an
+  abstraction. It is a statement of which eigenvalue the readout hardware
   found.
 </LessonHook>
 
@@ -48,24 +60,15 @@ export const lessonMeta = {
 Most vectors, hit with an operator, come out pointing in some new
 direction. A special few come out pointing the *same* direction, only
 stretched or shrunk. Those are an operator's **<Term id="eigenvalue-eigenvector">eigenvectors</Term>**, and they
-matter enormously in physics: for the operators representing physical
-observables, eigenvectors turn out to be exactly the states with a
-definite, predictable value of that <Term id="observable">observable</Term>.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
-  alt="Google's Sycamore superconducting quantum processor chip, showing its grid of transmon qubits and coupling wiring"
-  caption="Google's Sycamore processor: on hardware like this, a qubit measurement is physically a readout process that projects the qubit onto the eigenbasis of whatever observable is being measured — the bit reported back is literally a report of which eigenvalue was found, exactly the equation Av=λv this lesson works out by hand."
-  credit="Google"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
-  license="CC BY 3.0"
-/>
+carry most of the physical content of the theory: for the operators
+representing physical observables, the eigenvectors are the states with a
+definite, predictable value of that <Term id="observable">observable</Term>, and nothing else is.
 
 ## Intuition
 
 Picture an operator as a transformation of the plane. Most directions get
-tilted somewhere else, but there's usually a couple of special axes that
-just get stretched along themselves. Those axes are the eigenvectors; the
+tilted somewhere else, but there are usually a couple of special axes that
+only get stretched along themselves. Those axes are the eigenvectors; the
 stretch factor along each is its eigenvalue.
 
 Using the matrix $A=\begin{pmatrix}2&1\\1&2\end{pmatrix}$ from this
@@ -91,16 +94,16 @@ treats as an axis of pure scaling, nothing else.
 <PredictBeforeReveal
   question="Sweep a unit vector u all the way around the circle (360°). At how many angles will Au land back on the same line as u (pointing the same way or the opposite way)?"
   options={[
-    { label: "0 — no angle works", value: "0" },
+    { label: "0, no angle works", value: "0" },
     { label: "1", value: "1" },
     { label: "2", value: "2" },
     { label: "4", value: "4" },
   ]}
   correctValue="4"
-  explanation="Four. A has two eigenvector lines, along (1,1) and (1,−1), and each line crosses the unit circle twice (once in each direction), for four angles total out of the full sweep — everywhere else, Au tilts off u's line. That matches this lesson's own Worked Example below, which finds eigenvalue 3 along (1,1) and eigenvalue 1 along (1,−1)."
+  explanation="Four. A has two eigenvector lines, along (1,1) and (1,−1), and each line crosses the unit circle twice (once in each direction), for four angles total out of the full sweep. Everywhere else, Au tilts off u's line. That matches this lesson's own Worked Example below, which finds eigenvalue 3 along (1,1) and eigenvalue 1 along (1,−1)."
 />
 
-<InteractiveSection title="Find the eigenvectors by eye" description="A unit vector u sweeps through every direction; Au (its image under A) is drawn alongside it. For most angles Au points somewhere else entirely. Find the two angles where Au snaps back onto the same line as u — those are A's eigenvector directions, and you can check your answer against this lesson's own worked example.">
+<InteractiveSection title="Find the eigenvectors by eye" description="A unit vector u sweeps through every direction; Au (its image under A) is drawn alongside it. For most angles Au points somewhere else entirely. Find the two angles where Au snaps back onto the same line as u. Those are A's eigenvector directions, and you can check your answer against this lesson's own worked example.">
   <VectorDiagramExplorer
     frames={Array.from({ length: 24 }, (_, i) => eigenSweepFrame(i * 15))}
     sliderLabel="Angle of u"
@@ -188,6 +191,28 @@ happens to be <Term id="orthonormal-basis">orthonormal</Term>. Not every operato
 diagonalize this way; the Hermitian Operators lesson shows that an
 important class always does.
 
+Concretely, for this lesson's $A=\begin{pmatrix}2&1\\1&2\end{pmatrix}$,
+build $P$ whose columns are the two normalized eigenvectors
+$\frac{1}{\sqrt2}(1,1)$ and $\frac{1}{\sqrt2}(1,-1)$. Then $P^\dagger AP$
+is what $A$ looks like to an observer using the eigenbasis as coordinates:
+
+<MatrixGrid
+  matrix={eigenA}
+  label="A in the standard basis"
+  compareTo={eigenDiagonal}
+  compareLabel="P†AP: A in its own eigenbasis"
+  highlightDiagonal
+  ariaLabel="Two two-by-two matrices side by side. On the left, A in the standard basis, with 2 on both diagonal entries and 1 in both off-diagonal entries. On the right, the same operator written in its eigenbasis: 3 and 1 on the diagonal and zeros off it."
+/>
+
+The off-diagonal $1$s are gone, and the numbers left on the diagonal are
+the eigenvalues $3$ and $1$ found in the Worked Example below. Nothing was
+done to the operator: only the coordinate system changed. Applying a
+diagonal matrix means multiplying each coordinate by its own number and
+never mixing coordinates, which is why finding an eigenbasis is usually
+the first move when an operator has to be applied repeatedly, exponentiated,
+or evolved in time.
+
 ## Physical Interpretation
 
 For an operator representing a physical observable, eigenvalues are the
@@ -201,9 +226,9 @@ This isn't only textbook language. On an actual superconducting or
 trapped-ion quantum computer, the kind IBM, Google, and IonQ operate, a
 measurement is physically a readout process that projects the qubit onto
 the eigenbasis of whatever observable is being measured, and the signal
-that comes back, the bit reported as $0$ or $1$, is literally a report of
-which eigenvalue was found. The eigenvalue equation on this page is the
-equation real readout hardware is built to resolve.
+that comes back, the bit reported as $0$ or $1$, is a label for which
+eigenvalue was found. The eigenvalue equation on this page is the equation
+real readout hardware is built to resolve.
 
 ## Worked Example
 
@@ -263,9 +288,8 @@ trace, you've made an arithmetic error somewhere.
 ## Further Exploration
 
 <ChallengePrompt prompt="A 2×2 matrix has determinant 10 and one eigenvalue is 5. What is the other eigenvalue, and what is the matrix's trace?">
-  Eigenvalues multiply to the determinant — the same trace/determinant
-  shortcut derived above, just its determinant half instead of its trace
-  half.
+  Eigenvalues multiply to the determinant: the same shortcut derived
+  above, using its determinant half rather than its trace half.
 </ChallengePrompt>
 
 <NextDiscovery>

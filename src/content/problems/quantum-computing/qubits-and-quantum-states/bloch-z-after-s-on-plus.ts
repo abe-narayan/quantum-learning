@@ -30,11 +30,15 @@ export const blochZAfterSOnPlus: NumericProblem = {
     value: blochZ,
     tolerance: 0.01,
     incorrectFeedback: "S rotates about the z-axis. Think about what that does to a point's latitude (its z-coordinate) versus its longitude.",
+    nearMisses: [
+      { value: 1, feedback: "z = 1 is the north pole, the state |0⟩. S cannot move a point off the equator, because it rotates around the very axis z is measured along." },
+      { value: Math.SQRT1_2, tolerance: 0.01, feedback: "1/√2 is an amplitude from the state vector, not a Bloch coordinate. z is |α|² − |β|², and here those two are equal." },
+    ],
   },
   hints: [
-    { text: "S rotates the Bloch vector by π/2 about the z-axis — the same axis z is measured along." },
+    { text: "S rotates the Bloch vector by π/2 about the z-axis, the same axis z is measured along." },
     { text: "A rotation about the z-axis moves a point's longitude (φ) but never its latitude (θ), so z = cos(θ) can't change either." },
-    { text: "|+⟩ starts on the equator, where z = 0." },
+    { text: "|+⟩ starts on the equator. Combine that with what a z-axis rotation preserves, and read off the final z value." },
   ],
   solution: {
     steps: [
@@ -46,9 +50,9 @@ export const blochZAfterSOnPlus: NumericProblem = {
   },
   explanation: {
     correctIdea: "Any rotation about the z-axis leaves the z-coordinate fixed, regardless of the rotation angle.",
-    whyCorrect: "S|+⟩ = |+i⟩, which is still on the equator (z=0), just at a different longitude — exactly the geometric picture from Quantum Gates.",
+    whyCorrect: "S|+⟩ = |+i⟩, which is still on the equator (z=0), just at a different longitude: the geometric picture from Quantum Gates.",
     whyWrong: [
-      "Computing the new amplitudes and mistakenly treating the imaginary coefficient itself as a z-coordinate — z comes from |α|²−|β|², not from reading off i directly.",
+      "Computing the new amplitudes and mistakenly treating the imaginary coefficient itself as a z-coordinate. z comes from |α|²−|β|², not from reading off i directly.",
       "Assuming any gate applied to a non-pole state must move it off the equator; only Rx- or Ry-type rotations do that here.",
     ],
   },

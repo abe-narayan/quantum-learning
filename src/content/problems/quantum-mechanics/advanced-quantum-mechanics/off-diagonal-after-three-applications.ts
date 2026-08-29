@@ -30,12 +30,17 @@ export const offDiagonalAfterThreeApplications: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "Compute 0.5 × 0.7³.",
+    incorrectFeedback: "The decay is multiplicative, not additive: each application multiplies the off-diagonal by 0.7. Apply that factor three times to the starting 0.5 rather than subtracting anything.",
+    nearMisses: [
+      { value: 0.343, tolerance: 0.002, feedback: "0.343 is 0.7³, the decay factor alone. It still has to multiply the starting off-diagonal magnitude of 0.5." },
+      { value: 0.35, tolerance: 0.002, feedback: "0.35 is the result after one application. Two more remain." },
+      { value: 0.5 - 3 * 0.3 * 0.5, tolerance: 0.002, feedback: "That subtracts a fixed slice each round. The channel scales the coherence by 0.7 each time, so the decay is geometric and never reaches zero in finitely many steps." },
+    ],
   },
   hints: [
-    { text: "Each application multiplies by 0.7." },
+    { text: "Each application multiplies the off-diagonal by the same factor, 0.7. Three applications compound geometrically." },
     { text: "0.5 × 0.7 × 0.7 × 0.7 = 0.5 × 0.343." },
-    { text: "= 0.1715." },
+    { text: "Multiply 0.343 by the starting magnitude 0.5." },
   ],
   solution: {
     steps: [{ description: "0.5 × 0.7³ = 0.5 × 0.343 = 0.1715." }],

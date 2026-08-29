@@ -31,11 +31,42 @@ export function QAOAExplorer() {
   const [presetId, setPresetId] = useState(DEFAULT_PRESET_ID);
   const [gamma, setGamma] = useState(DEFAULT_GAMMA);
   const [beta, setBeta] = useState(DEFAULT_BETA);
+  /**
+   * Whether the reader has swept γ or β on the current graph.
+   *
+   * The prediction below asks whether *any* (γ, β) reaches this graph's true
+   * max-cut — a fixed fact about the graph, which `bestAchievableRatio` knows
+   * from a grid search before the reader touches anything. Feeding that answer
+   * straight to `Predict` meant the panel graded the guess in the same instant
+   * it was made: a "predict first" control that answered itself, with no run
+   * in between and no reason to move a slider. Withholding the verdict until
+   * the reader has actually swept restores the loop the panel is named for.
+   */
+  const [hasSweptAngles, setHasSweptAngles] = useState(false);
+
+  function handlePresetChange(id: string) {
+    setPresetId(id);
+    // A new graph is a new question (`Predict` is remounted via `key`), so the
+    // sweep has to start over too — otherwise the second graph's answer would
+    // be revealed immediately on the strength of sweeping the first one.
+    setHasSweptAngles(false);
+  }
+
+  function handleGammaChange(v: number) {
+    setGamma(v);
+    setHasSweptAngles(true);
+  }
+
+  function handleBetaChange(v: number) {
+    setBeta(v);
+    setHasSweptAngles(true);
+  }
 
   function handleReset() {
     setPresetId(DEFAULT_PRESET_ID);
     setGamma(DEFAULT_GAMMA);
     setBeta(DEFAULT_BETA);
+    setHasSweptAngles(false);
   }
 
   const preset = QAOA_GRAPH_PRESETS.find((p) => p.id === presetId) ?? QAOA_GRAPH_PRESETS[0];
@@ -131,7 +162,7 @@ export function QAOAExplorer() {
 
         <div
           aria-live="polite"
-          className="rounded-xl border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
+          className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground"
         >
           The split shown above is the one this circuit is most likely to hand you — bitstring |
           {mostLikelyIndex.toString(2).padStart(preset.n, "0")}⟩, at {(mostLikelyProbability * 100).toFixed(1)}%.
@@ -139,14 +170,21 @@ export function QAOAExplorer() {
           you are at {(ratio * 100).toFixed(1)}% of optimal.
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+        {/* No `overflow-x-auto` here: the only child is a block-level
+            `.katex-display`, which fills this content box and carries its own
+            horizontal scroll (globals.css §6), so this box never had anything to
+            scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+            y axis to `auto` too, which would silently clip a tall equation. The tab
+            stop the slab needs now lives on `.katex-display` itself; see
+            `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+        <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
           <KatexMath
             tex={`\\langle \\text{cut}\\rangle(\\gamma=${gamma.toFixed(2)},\\,\\beta=${beta.toFixed(2)}) = ${expected.toFixed(4)}, \\quad \\text{true max} = ${trueMax}`}
             display
           />
         </div>
 
-        <div className="grid gap-3 rounded-xl border border-border bg-surface-muted/40 p-4 sm:grid-cols-2">
+        <div className="grid gap-3 rounded-panel border border-border bg-surface-muted/40 p-4 sm:grid-cols-2">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Expected cut ⟨C⟩</p>
             <p className="mt-1 font-mono text-lg text-pillar">{expected.toFixed(3)}</p>
@@ -159,12 +197,12 @@ export function QAOAExplorer() {
 
         <Predict
           key={preset.id}
-          question={`For ${preset.label}, is there any single (γ, β) at p=1 that reaches the graph's true max-cut exactly?`}
+          question={`For ${preset.label}, is there any single (γ, β) at p=1 that reaches the graph's true max-cut exactly? Guess, then sweep both sliders to check.`}
           options={[
             { id: "yes", label: "Yes — some (γ, β) reaches it" },
             { id: "no", label: "No — it plateaus below" },
           ]}
-          outcomeId={reachesOptimumExactly ? "yes" : "no"}
+          outcomeId={hasSweptAngles ? (reachesOptimumExactly ? "yes" : "no") : null}
         />
 
         <SimulatorFraming
@@ -185,11 +223,11 @@ export function QAOAExplorer() {
       controls={
         <QAOAControls
           presetId={preset.id}
-          onPresetChange={setPresetId}
+          onPresetChange={handlePresetChange}
           gamma={gamma}
-          onGammaChange={setGamma}
+          onGammaChange={handleGammaChange}
           beta={beta}
-          onBetaChange={setBeta}
+          onBetaChange={handleBetaChange}
           onReset={handleReset}
         />
       }

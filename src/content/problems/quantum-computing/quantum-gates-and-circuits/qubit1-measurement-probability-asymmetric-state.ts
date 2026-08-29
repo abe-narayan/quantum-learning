@@ -29,6 +29,11 @@ export const qubit1MeasurementProbabilityAsymmetricState: NumericProblem = {
     value: probabilityQubit1IsZero,
     tolerance: 0.01,
     incorrectFeedback: "Check qubit 1's bit (not qubit 0's) in each basis term, and sum |amplitude|² over only the terms where that bit is 0.",
+    nearMisses: [
+      { value: 0.75, feedback: "0.75 is P(qubit 1 = 1), the |01⟩ term's weight. The question asks for the outcome 0, carried by |00⟩ alone." },
+      { value: 1, feedback: "1 is P(qubit 0 = 0) from the lesson's worked example. Both terms have qubit 0 at 0; qubit 1 is the one that varies." },
+      { value: 0.5, feedback: "0.5 assumes the two outcomes are balanced. The amplitudes 1/2 and √3/2 are not equal, so their squares split 1/4 against 3/4." },
+    ],
   },
   hints: [
     { text: "Qubit 1 is the second (rightmost) label in each ket." },

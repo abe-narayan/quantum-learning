@@ -23,6 +23,11 @@ export const expectationValueFromProbabilities: NumericProblem = {
     value: -0.28,
     tolerance: 0.01,
     incorrectFeedback: "⟨A⟩ = Σ (eigenvalue) × (its probability) — weight each eigenvalue by its own probability and add.",
+    nearMisses: [
+      { value: 0, feedback: "0 is the unweighted average of the two eigenvalues. Weight each by its own probability: 0.36 against 0.64." },
+      { value: 0.28, feedback: "The sign is inverted. The larger probability sits on the −1 eigenvalue, so the average comes out negative." },
+      { value: 1, feedback: "The probabilities sum to 1, but the expectation value weights the eigenvalues by them: (+1)(0.36) + (−1)(0.64)." },
+    ],
   },
   hints: [
     { text: "⟨A⟩ = (+1)·P(+1) + (-1)·P(-1)." },

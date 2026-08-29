@@ -21,11 +21,11 @@ export const momentumEigenvalueCalculation: NumericProblem = {
     type: "numeric",
     value: 4,
     tolerance: 0.001,
-    incorrectFeedback: "Differentiate e^(4ix) once: d/dx e^(4ix) = 4i*e^(4ix). Then apply the -i prefactor from p-hat.",
+    incorrectFeedback: "Differentiating the exponential brings down i times the exponent's coefficient, and the -i prefactor then turns that into a real number. If your answer came out imaginary or negative, the two factors of i were not combined.",
   },
   hints: [
-    { text: "Differentiate phi(x)=e^(4ix) once with respect to x." },
-    { text: "Multiply the result by -i (the p-hat prefactor) and compare to p*phi(x)." },
+    { text: "An eigenvalue problem asks: after applying the operator, is the result the same function times a constant? Differentiate the given plane wave once and see what constant comes down." },
+    { text: "Multiply the derivative by the operator's -i prefactor, then compare against p times the original function. The two factors of i combine into a real constant." },
   ],
   solution: {
     steps: [

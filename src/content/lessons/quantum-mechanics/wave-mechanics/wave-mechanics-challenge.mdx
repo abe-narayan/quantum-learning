@@ -49,12 +49,12 @@ export const synthesisComparisonFrames = [
 export const lessonMeta = {
   title: "Wave Mechanics Challenge",
   description:
-    "A synthesis capstone connecting every idea in this course -- the wavefunction, momentum space, the position-space Schrodinger equation, and the solvable systems -- into a single coherent picture, alongside the finite-dimensional postulates from the last course.",
+    "A synthesis capstone connecting every idea in this course (the wavefunction, momentum space, the position-space Schrödinger equation, and the solvable systems) into a single coherent picture, alongside the finite-dimensional postulates from the last course.",
   course: "wave-mechanics",
   module: "wave-mechanics-challenge",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 26,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states"],
   objectives: [
     "Map every idea from this course onto its finite-dimensional counterpart from the last course",
@@ -64,12 +64,12 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-This course took the postulates from "From Classical to Quantum," proven there for finite-dimensional Hilbert spaces, and carried them across to continuous position, one lesson at a time. None of it required new physical postulates — only new mathematical machinery.
+This course took the postulates from "From Classical to Quantum," proven there for finite-dimensional Hilbert spaces, and carried them across to continuous position, one lesson at a time. No new physical postulate was needed anywhere, only new mathematical machinery.
 </LessonHook>
 
 ## Motivation
 
-Lesson by lesson: the wavefunction as a
+The crossing went lesson by lesson: the wavefunction as a
 continuum-limit <Term id="basis">basis</Term> expansion, momentum space as a Fourier-transform
 basis change, the Schrödinger equation as calculus substituted into
 already-proven dynamics, and three fully solved systems (the infinite
@@ -77,14 +77,11 @@ well, the <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term>, and
 machinery was needed to express the same four postulates in an
 infinite-dimensional setting.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/5/50/Paul_Dirac%2C_1933.jpg"
-  alt="Formal 1933 photographic portrait of physicist Paul Dirac"
-  caption="Paul Dirac, whose transformation theory showed in 1926 that Heisenberg's matrix mechanics and Schrödinger's wave mechanics were the same physics in different representations -- exactly the equivalence this capstone's recap table lays out row by row."
-  credit="Nobel Foundation"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Paul_Dirac,_1933.jpg"
-  license="Public domain"
-/>
+This is not a new observation. Dirac's transformation theory established in
+1926 that Heisenberg's matrix mechanics and Schrödinger's wave mechanics
+were the same physics written in two representations. The table below is
+that equivalence, laid out row by row for the two courses you have just
+worked through.
 
 ## Recap: Finite Dimensions to Continuous Position
 
@@ -101,22 +98,21 @@ infinite-dimensional setting.
 
 The last row is the one substantively new feature: finite-dimensional
 evolution (a $2\times2$ or truncated matrix exponential) could often be
-computed exactly. Continuous-position evolution generally cannot, which
-is exactly why this course needed to build a real numerical engine (the
-FFT, the split-operator method) rather than only proving formulas on
-paper.
+computed exactly. Continuous-position evolution generally cannot, and that
+gap is why this course had to build a real numerical engine (the FFT, the
+split-operator method) rather than only proving formulas on paper.
 
 ## Worked Synthesis Examples
 
 <PredictBeforeReveal
-  question="A particle sits in the infinite well's ground state -- an energy eigenstate -- and is left alone. What happens to <x> over time?"
+  question="A particle sits in the infinite well's ground state, which is an energy eigenstate, and is left alone. What happens to <x> over time?"
   options={[
     { label: "It oscillates back and forth", value: "oscillates" },
     { label: "It stays exactly constant", value: "constant" },
     { label: "It decays toward the well's center", value: "decays" },
   ]}
   correctValue="constant"
-  explanation="An energy eigenstate evolves by a pure phase (Schrodinger Equation in Position Space), so |psi(x,t)|^2 never changes, and neither does any expectation value built from it, including <x>. Worked Example 1 below reaches the same conclusion from Ehrenfest's theorem instead."
+  explanation="An energy eigenstate evolves by a pure phase (Schrödinger Equation in Position Space), so |psi(x,t)|^2 never changes, and neither does any expectation value built from it, including <x>. Worked Example 1 below reaches the same conclusion from Ehrenfest's theorem instead."
 />
 
 **1. A particle is in the infinite well's ground state. Using both this
@@ -140,7 +136,7 @@ well's ground state: which has a nonzero wavefunction outside its
 The harmonic oscillator's Gaussian ground state (Harmonic Oscillator in
 Position Space) has smooth exponential tails extending past the classical
 turning points, a direct consequence of the *smooth*, finite potential
-allowing exponentially decaying (not zero) solutions there, exactly the
+allowing exponentially decaying (not zero) solutions there. This is the
 Tunneling lesson's forbidden-region mechanism, applied to a bound state
 instead of a barrier. The infinite well's walls are (numerically,
 approximately) infinite, so its "forbidden region" decay constant
@@ -149,7 +145,7 @@ $V_0\to\infty$ limiting case of the same underlying physics.
 
 <InteractiveSection
   title="The tail the well can't have"
-  description="The well's half-width and the oscillator's classical turning point are both set to x = 2.5 here, so the two curves share the same confinement scale. That isolates exactly the difference Example 2 describes: past x = ±2.5, the well's ground state is clipped to exactly zero while the oscillator's Gaussian tail is still visibly nonzero.">
+  description="The well's half-width and the oscillator's classical turning point are both set to x = 2.5 here, so the two curves share the same confinement scale. That isolates the one difference Example 2 describes: past x = ±2.5, the well's ground state is clipped to exactly zero while the oscillator's Gaussian tail is still visibly nonzero.">
   <ParametricCurve
     frames={synthesisComparisonFrames}
     ariaLabel="Infinite well ground state and harmonic oscillator ground state wavefunctions plotted on the same axis, both scaled to a confinement region of half-width 2.5: the well's wavefunction is clipped to exactly zero beyond x=±2.5, while the oscillator's Gaussian tail remains visibly nonzero well past the same boundary"
@@ -164,10 +160,9 @@ $\psi(x,t) = \tfrac{1}{\sqrt2}\left(\psi_1(x)e^{-iE_1t/\hbar} +
 \psi_2(x)e^{-iE_2t/\hbar}\right)$. Computing $|\psi(x,t)|^2$ produces
 cross terms proportional to $\cos\!\big((E_2-E_1)t/\hbar\big)$ (from
 expanding $|a+b|^2=|a|^2+|b|^2+2\,\mathrm{Re}(a^*b)$ with the two
-time-dependent phases): a beat frequency set exactly by the energy gap,
-exactly what the Wavefunction Explorer's superposition preset animates. A
-single eigenstate has no second term to beat against, so no oscillation
-survives.
+time-dependent phases): a beat frequency set by the energy gap alone, and
+what the Wavefunction Explorer's superposition preset animates. A single
+eigenstate has no second term to beat against, so no oscillation survives.
 
 <InteractiveSection
   title="Watch two eigenstates beat against each other"
@@ -224,9 +219,11 @@ course derived is exact.
 ## Further Exploration
 
 <NextDiscovery>
-This completes **Wave Mechanics**. Three-dimensional systems, angular
-momentum, and spin, structure this course's 1D machinery doesn't yet
-cover at all, are the natural next steps deeper into the Quantum
-Mechanics pillar, building on the position-space Schrödinger equation,
-Fourier techniques, and bound-state intuition developed here.
+This completes **Wave Mechanics**. Everything here lived on a line. Real
+atoms do not: an electron bound to a nucleus moves in three dimensions,
+and the extra two bring structure this course's machinery says nothing
+about, starting with angular momentum and spin. Those are the natural next
+steps deeper into the Quantum Mechanics pillar, and they build directly on
+the position-space Schrödinger equation, the Fourier techniques, and the
+bound-state intuition developed here.
 </NextDiscovery>

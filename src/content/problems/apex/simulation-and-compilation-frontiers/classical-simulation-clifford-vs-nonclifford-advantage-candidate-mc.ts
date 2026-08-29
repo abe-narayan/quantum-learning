@@ -53,21 +53,21 @@ export const classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc: Multi
   ],
   solution: {
     steps: [
-      { description: "Circuit P: gate set is entirely Clifford, so criterion (a) (Gottesman-Knill) applies regardless of how much entanglement the circuit generates -- it is efficiently simulable no matter how deep or scrambling it is." },
-      { description: "Circuit Q: gate set includes non-Clifford rotations, so criterion (a) does not apply; and it generates volume-law entanglement, so criterion (b) (bounded bond dimension) does not apply either." },
+      { description: "Circuit P: gate set is entirely Clifford, so the gate-set criterion (Gottesman-Knill) applies regardless of how much entanglement the circuit generates -- it is efficiently simulable no matter how deep or scrambling it is." },
+      { description: "Circuit Q: gate set includes non-Clifford rotations, so the gate-set criterion does not apply; and it generates volume-law entanglement, so the bounded-bond-dimension criterion does not apply either." },
       { description: "Circuit Q is therefore the only one of the two that violates both known efficient classical-simulation criteria at once, making it the actual candidate worth pursuing for a quantum-advantage claim." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "Circuit Q, because it violates both efficient-simulation criteria at once while Circuit P stays a stabilizer circuit however entangled it gets.",
   },
   explanation: {
     correctIdea:
       "A real quantum-advantage candidate must defeat every known efficient classical-simulation method simultaneously, not just look complicated. Circuit P's entanglement is a red herring: Gottesman-Knill's guarantee never checked how entangled a stabilizer circuit's output is.",
     whyCorrect:
-      "Option (a) correctly applies both criteria independently to each circuit and identifies that Circuit P fails to escape Gottesman-Knill no matter how entangled it becomes, while Circuit Q escapes both known efficient methods at once -- precisely why real quantum-advantage experiments use random, non-Clifford, fast-entangling circuits rather than merely 'entangled' ones.",
+      "Applying both criteria independently to each circuit shows Circuit P failing to escape Gottesman-Knill no matter how entangled it becomes, while Circuit Q escapes both known efficient methods at once. That is why real quantum-advantage experiments use random, non-Clifford, fast-entangling circuits rather than merely 'entangled' ones.",
     whyWrong: [
-      "(b) treats entanglement as the sole determinant of simulability, exactly the Common Mistake this lesson warns against.",
-      "(c) ignores that Circuit P never leaves the efficiently-simulable stabilizer formalism, regardless of its entanglement.",
-      "(d) invents a 'more gate types is harder' rule with no basis in the actual theorem -- membership in the Clifford group, not gate-type variety, is what matters.",
+      { optionId: "b", text: "Treats entanglement as the sole determinant of simulability, the Common Mistake this lesson warns against." },
+      { optionId: "c", text: "Ignores that Circuit P never leaves the efficiently-simulable stabilizer formalism, regardless of its entanglement." },
+      { optionId: "d", text: "Invents a 'more gate types is harder' rule with no basis in the theorem. Membership in the Clifford group, not gate-type variety, is what matters." },
     ],
   },
 };

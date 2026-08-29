@@ -213,8 +213,8 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
               minHeight: NODE_HEIGHT,
             }}
             className={cn(
-              "absolute flex -translate-x-1/2 -translate-y-1/2 flex-col justify-center gap-1 rounded-[--radius-tight] border bg-surface px-3 py-2 text-left text-xs font-medium shadow-sm transition-[opacity,box-shadow,border-color] duration-[--dur-fast] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted",
-              isSelected ? "border-pillar-accent ring-2 ring-pillar-accent/40" : "border-border hover:border-pillar-accent/60",
+              "absolute flex -translate-x-1/2 -translate-y-1/2 flex-col justify-center gap-1 rounded-(--radius-tight) border bg-surface px-3 py-2 text-left text-xs font-medium shadow-sm transition-[opacity,box-shadow,border-color] duration-(--dur-fast) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted",
+              isSelected ? "border-pillar ring-2 ring-pillar/40" : "border-border hover:border-pillar/60",
               dimmed ? "opacity-30" : "opacity-100"
             )}
           >
@@ -227,12 +227,22 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
                   {step}
                 </span>
               ) : (
-                <span className="h-2 w-2 shrink-0 rounded-full bg-pillar-accent" aria-hidden="true" />
+                <span className="h-2 w-2 shrink-0 rounded-full bg-pillar" aria-hidden="true" />
               )}
               <span className="text-foreground">{node.title}</span>
               {isCompleted ? (
-                <span className="ml-auto shrink-0 text-pillar-text" aria-label="Completed" title="Completed">
-                  ✓
+                // The tick is decorative and the word is real text, rather
+                // than the reverse. `aria-label` on this bare `<span>` did
+                // nothing: no `role` means the implicit `generic` role, which
+                // ARIA prohibits naming, so screen readers dropped it and the
+                // node button announced only "✓" — a character AT reads
+                // inconsistently (some say "check mark", some skip it
+                // entirely) and which in no reading means "you have finished
+                // every lesson behind this concept". Matches the identical
+                // fix in ConceptListView and LessonCompletionMark.
+                <span className="ml-auto shrink-0 text-pillar-text" title="Completed">
+                  <span aria-hidden="true">✓</span>
+                  <span className="sr-only">Completed</span>
                 </span>
               ) : null}
             </span>
@@ -738,7 +748,7 @@ export function ConceptMapExplorer({
             <div
               role="group"
               aria-label="Map view"
-              className="flex shrink-0 items-center gap-1 rounded-[--radius-tight] border border-border-strong bg-surface p-0.5"
+              className="flex shrink-0 items-center gap-1 rounded-(--radius-tight) border border-border-strong bg-surface p-0.5"
             >
               {(
                 [
@@ -752,7 +762,7 @@ export function ConceptMapExplorer({
                   onClick={() => changeViewMode(mode)}
                   aria-pressed={viewMode === mode}
                   className={cn(
-                    "min-h-11 rounded-[--radius-tight] px-4 text-xs font-medium transition-colors duration-[--dur-fast]",
+                    "min-h-11 rounded-(--radius-tight) px-4 text-xs font-medium transition-colors duration-(--dur-fast)",
                     viewMode === mode
                       ? "bg-pillar-wash text-pillar-text shadow-[inset_0_0_0_1px_var(--pillar-edge)]"
                       : "text-muted-foreground hover:text-foreground"
@@ -769,14 +779,27 @@ export function ConceptMapExplorer({
               <button
                 type="button"
                 onClick={handleStartHere}
-                className="inline-flex min-h-11 items-center gap-2 rounded-[--radius-tight] border border-pillar-edge bg-pillar-wash px-4 text-sm font-medium text-pillar-text transition-colors duration-[--dur-fast] hover:border-pillar-accent"
+                className="inline-flex min-h-11 items-center gap-2 rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-4 text-sm font-medium text-pillar-text transition-colors duration-(--dur-fast) hover:border-pillar"
               >
                 Start at the beginning
                 <span aria-hidden="true">→</span>
               </button>
             ) : null}
 
-            <label className="inline-flex min-h-11 items-center gap-2 rounded-[--radius-tight] border border-border bg-surface px-3">
+            {/* `max-w-full` on the label and `min-w-0` on the select are what
+                keep this control inside the panel at 320px. A `<select>`
+                takes its automatic minimum size from its widest `<option>`,
+                and these options are concept titles — so with `max-w-[13rem]`
+                alone the label's minimum width was 24px of padding + the
+                wrapped caption + 208px of select ≈ 280px, against the 256px
+                the instrument's `px-4` leaves inside a 320px viewport. The
+                overflow was invisible rather than scrollable: the wrapping
+                `.instrument` is `overflow-hidden`, so the right edge of the
+                concept name was simply cut off with nothing to indicate it.
+                `min-w-0` restores the select's ability to shrink, and
+                `truncate` (already here) then does what it was written to
+                do. */}
+            <label className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-(--radius-tight) border border-border bg-surface px-3">
               <span className="text-xs text-muted-foreground">Show me the path to</span>
               <select
                 value={selectedId ?? ""}
@@ -786,7 +809,9 @@ export function ConceptMapExplorer({
                   if (id) handleSelect(id);
                   else setSelectedId(null);
                 }}
-                className="min-h-11 max-w-[13rem] truncate border-0 bg-transparent py-0 pr-1 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar-accent"
+                // `text-base` below `sm` (like AnswerInput): iOS Safari zooms
+                // the whole page on focusing any field under 16px.
+                className="min-h-11 min-w-0 max-w-[13rem] truncate border-0 bg-transparent py-0 pr-1 text-base font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar sm:text-sm"
               >
                 <option value="">a concept…</option>
                 {conceptsByTitle.map((node) => (
@@ -803,7 +828,7 @@ export function ConceptMapExplorer({
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             {PILLARS.map((pillar) => (
               <span key={pillar.slug} data-pillar={pillar.slug} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className="h-2 w-2 rounded-full bg-pillar-accent" aria-hidden="true" />
+                <span className="h-2 w-2 rounded-full bg-pillar" aria-hidden="true" />
                 {pillar.title}
               </span>
             ))}
@@ -816,7 +841,7 @@ export function ConceptMapExplorer({
                 onClick={() => setShowPath((current) => !current)}
                 aria-pressed={showPath}
                 className={cn(
-                  "min-h-11 rounded-full border px-4 py-1 text-xs font-medium transition-colors duration-[--dur-fast]",
+                  "min-h-11 rounded-full border px-4 py-1 text-xs font-medium transition-colors duration-(--dur-fast)",
                   showPath
                     ? "border-pillar-edge bg-pillar-wash text-pillar-text"
                     : "border-border text-muted-foreground hover:text-foreground"

@@ -27,13 +27,18 @@ doesn't get one.
 - **Next.js 16** (App Router, Turbopack, React 19 with the React Compiler
   enabled) — pure static site generation. No backend, no database, no auth,
   no API routes, no environment variables.
-- **MDX** (`@next/mdx`, `remark-gfm`, `remark-math`, `rehype-katex`) for
-  lesson content — prose and interactive components live in the same file.
+- **MDX** (`@next/mdx`, `remark-gfm`, `remark-math`, `rehype-slug`, and this
+  repo's own `rehypeKatexHtml.mjs`) for lesson content — prose and
+  interactive components live in the same file. `rehype-katex` was replaced
+  by `rehypeKatexHtml` for build-memory reasons and demoted to a
+  devDependency, where it survives as the parity oracle the replacement's
+  test compares against (see `docs/DEPLOYMENT.md`).
 - **TypeScript**, strict mode, throughout — including the quantum-mechanics
   engine itself (`src/lib/quantum/`), which is plain typed math with no
   external linear-algebra dependency.
 - **Tailwind CSS v4**.
-- **Vitest** for the test suite (`src/**/__tests__/`, 880+ tests) — mostly
+- **Vitest** for the test suite (`src/**/*.test.ts` and `scripts/**/*.test.ts`
+  — 97 files, 1,100+ declared cases as of 2026-08-29) — mostly
   correctness checks on the quantum engine and content-integrity checks
   (every lesson loads, every problem resolves to a real lesson, no duplicate
   slugs), plus design-system guards: every pillar's color channel agrees

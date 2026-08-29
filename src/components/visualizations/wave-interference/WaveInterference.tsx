@@ -12,6 +12,13 @@ const TWO_PI = 2 * Math.PI;
 const PLAY_INTERVAL_MS = 50;
 /** A full 0->2pi sweep takes about 6.5s — slow enough to watch fringes brighten and dim, not a blur. */
 const PHASE_STEP_PER_TICK = TWO_PI / 130;
+/**
+ * First-contact phase: phi = 2*pi/3, the exact phase the embedding lesson's
+ * worked example evaluates (I/4A^2 = 0.250), so the figure opens mid-phenomenon
+ * with partial interference on screen instead of the featureless fully-bright
+ * fringe at phi = 0. Reset still returns to the phi = 0 reference state.
+ */
+const INITIAL_PHASE = TWO_PI / 3;
 
 /**
  * Default third "Try this" bullet — written for
@@ -47,10 +54,12 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
   const prefersReducedMotion = usePrefersReducedMotion();
   const sliderId = useId();
 
-  const [phase, setPhase] = useState(0);
+  const [phase, setPhase] = useState(INITIAL_PHASE);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** Phase accumulated since Play was pressed — bounds the loop to one full sweep. */
+  const sweepRef = useRef(0);
 
   useEffect(() => {
     return () => {
@@ -61,12 +70,28 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
   useEffect(() => {
     if (!isPlaying || prefersReducedMotion) return;
     intervalRef.current = setInterval(() => {
+      // Auto-pause after one full 2*pi sweep (matching the steppers'
+      // auto-stop convention) rather than looping forever — a second lap adds
+      // nothing the first didn't show, and the visitor can always press Play
+      // again.
+      sweepRef.current += PHASE_STEP_PER_TICK;
+      if (sweepRef.current >= TWO_PI) {
+        setIsPlaying(false);
+        return;
+      }
       setPhase((p) => (p + PHASE_STEP_PER_TICK) % TWO_PI);
     }, PLAY_INTERVAL_MS);
     return () => {
       if (intervalRef.current !== null) clearInterval(intervalRef.current);
     };
   }, [isPlaying, prefersReducedMotion]);
+
+  const handlePlayToggle = () => {
+    setIsPlaying((p) => {
+      if (!p) sweepRef.current = 0;
+      return !p;
+    });
+  };
 
   const handlePhaseChange = (next: number) => {
     setIsPlaying(false);
@@ -98,7 +123,14 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
 
       <WaveInterferenceCanvas phase={phase} />
 
-      <div className="mt-4 overflow-x-auto panel-inset px-4 py-3">
+      {/* No `overflow-x-auto` here: the only child is a block-level
+          `.katex-display`, which fills this content box and carries its own
+          horizontal scroll (globals.css §6), so this box never had anything to
+          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          y axis to `auto` too, which would silently clip a tall equation. The tab
+          stop the slab needs now lives on `.katex-display` itself; see
+          `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+      <div className="mt-4 panel-inset px-4 py-3">
         <KatexMath
           tex={`I(\\varphi) = 4A^2\\cos^2(\\varphi/2) = ${raw.toFixed(3)} \\qquad \\frac{I}{4A^2} = \\cos^2(\\varphi/2) = \\frac{1+\\cos\\varphi}{2} = ${normalized.toFixed(3)}`}
           display
@@ -130,7 +162,21 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
             value={phase}
             onChange={(event) => handlePhaseChange(Number(event.target.value))}
             aria-label="Relative phase phi, in radians, from 0 to 2 pi"
-            className="mt-2 w-full accent-brand"
+            // Without `aria-valuetext` this slider announced a bare number —
+            // "2.09" — and nothing else, which is the one thing about this
+            // figure a screen-reader user cannot already work out. Everything
+            // the control exists to demonstrate (the central fringe swinging
+            // bright to dark on cos²(φ/2)) lives in the intensity readout, and
+            // that readout is painted into a canvas and a KaTeX block that
+            // never announce. Dragging from 0 to 2π therefore produced a
+            // hundred meaningless decimals and zero physics. The value text now
+            // carries the phase in units of π *and* the normalized intensity,
+            // so the rise-and-fall is audible on the control itself rather than
+            // only visible in the fringes. Every other slider on this bench
+            // (`FrameSlider`, `SimulatorSlider`, the steppers) already does
+            // this; this one was the outlier.
+            aria-valuetext={`phi = ${phaseOverPi.toFixed(2)} pi radians, central fringe intensity I over 4 A squared = ${normalized.toFixed(3)}`}
+            className="mt-2 h-11 w-full accent-brand"
           />
           <div className="mt-1 flex justify-between text-[10px] font-mono text-muted-foreground">
             <span>0</span>
@@ -145,17 +191,17 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
           {prefersReducedMotion ? (
             <Badge tone="neutral">Reduced motion — drag the slider above to scrub</Badge>
           ) : (
-            <Button variant="primary" size="sm" onClick={() => setIsPlaying((p) => !p)}>
+            <Button variant="primary" size="sm" className="min-h-11" onClick={handlePlayToggle}>
               {isPlaying ? "Pause" : "Play"}
             </Button>
           )}
-          <Button variant="ghost" size="sm" onClick={handleReset}>
+          <Button variant="ghost" size="sm" className="min-h-11" onClick={handleReset}>
             Reset
           </Button>
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl border border-accent/30 bg-accent/5 p-4">
+      <div className="mt-6 rounded-panel border border-accent/30 bg-accent/5 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">Try this</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-foreground">
           <li>

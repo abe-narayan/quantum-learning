@@ -3,10 +3,25 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyTwoQubitExplorer } from "@/components/simulators/two-qubit-explorer/LazyTwoQubitExplorer";
 import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
+import { angularMomentumX, angularMomentumY, angularMomentumZ } from "@/lib/quantum/angularMomentum";
+import { IDENTITY } from "@/lib/quantum/gates";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum"
 );
+
+export const totalComponent = (single) => single.tensor(IDENTITY).add(IDENTITY.tensor(single));
+
+export const totalJx = totalComponent(angularMomentumX(0.5));
+
+export const totalJy = totalComponent(angularMomentumY(0.5));
+
+export const totalJz = totalComponent(angularMomentumZ(0.5));
+
+export const totalJSquared = totalJx
+  .mul(totalJx)
+  .add(totalJy.mul(totalJy))
+  .add(totalJz.mul(totalJz));
 
 export const additionSpinLen = Math.sqrt(3) / 2;
 export const additionTripletLen = Math.sqrt(2);
@@ -55,7 +70,7 @@ export const lessonMeta = {
   module: "addition-of-angular-momentum",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 30,
+  estimatedMinutes: 35,
   prerequisites: ["quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment"],
   objectives: [
     "Construct the total angular momentum operator for two spin-1/2 particles from the individual spins",
@@ -65,7 +80,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement",
-      note: "The spin-0 singlet this lesson derives from atomic physics is not merely analogous to that lesson's Bell state |Ψ⁻⟩, it is the identical vector, verified here as the same J²=0 eigenstate.",
+      note: "Builds |Ψ⁻⟩ from a Hadamard and a CNOT. That construction and this lesson's spin-0 singlet produce the same vector, which this lesson verifies by checking it is a J²=0 eigenstate.",
     },
   ],
 };
@@ -78,12 +93,14 @@ export const lessonMeta = {
 
 ## Motivation
 
-Two spin-$\tfrac12$ particles, combined, don't have a single well-defined
-total spin: their combination can act as spin $0$ or spin $1$,
-depending on which specific combined state they're in. This lesson
-derives that decomposition explicitly, and turns up a state this
-platform already built in an entirely different course, for an entirely
-different reason.
+Two spin-$\tfrac12$ particles do not combine into one well-defined total
+spin. Depending on which combined state they occupy, the pair behaves as
+spin $1$ or as spin $0$, and "spin $0$" for a pair of spinning things is
+strange enough on its own to be worth the derivation.
+
+This lesson works out that decomposition, then finds that one of the four
+resulting states was already built on this platform, in a different
+course, for reasons that had nothing to do with atoms.
 
 Before deriving anything, guess: does combining two spin-$\tfrac12$
 particles always give total spin $1$ (the "obvious" $\tfrac12+\tfrac12$
@@ -98,7 +115,7 @@ are combined?
     { label: "No, the total spin is always 0", value: "always-0" },
   ]}
   correctValue="depends"
-  explanation="Spin doesn't add like ordinary numbers. Four independent combined states exist, and only some of them (the triplet) have total spin 1; one specific combination (the singlet) has total spin exactly 0. Which one you get depends entirely on which of the four states the two particles are actually in, derived explicitly below."
+  explanation="Spin does not add like ordinary numbers. The combined space is four-dimensional, and it splits into three states of total spin 1 (the triplet) plus one of total spin 0 (the singlet). Which you have depends on which of the four states the pair occupies, and the count 3+1=4 is the first hint that the answer had to be more than a single number."
 />
 
 ## Mathematical Development
@@ -109,9 +126,31 @@ For two spin-$\tfrac12$ particles, the total spin operators act on the
 combined $4$-dimensional space via
 $J_x=S_x^{(1)}\otimes I+I\otimes S_x^{(2)}$ (and similarly for $J_y,J_z$),
 each particle's own spin operator, tensored with the identity on the
-other particle, summed. This is a direct generalization of how single-
-particle operators extend to multi-particle systems, already used
-throughout Quantum Gates & Circuits for other operators.
+other particle, then summed. This is the standard way a single-particle
+operator extends to a multi-particle system, already used throughout
+Quantum Gates & Circuits.
+
+Here is why a change of basis is unavoidable. Below is $\vec J^{\,2}$
+written in the computational basis $|{\uparrow}{\uparrow}\rangle,
+|{\uparrow}{\downarrow}\rangle,|{\downarrow}{\uparrow}\rangle,
+|{\downarrow}{\downarrow}\rangle$, built from the operators just defined
+with $\hbar=1$:
+
+<MatrixGrid
+  matrix={totalJSquared}
+  label="J² in the computational basis (ħ = 1)"
+  highlightDiagonal
+  ariaLabel="A four by four matrix. The first and last diagonal entries are 2, the middle two diagonal entries are 1, and there are two off-diagonal entries of 1 connecting the second and third basis states. All other entries are zero."
+/>
+
+The outer states $|{\uparrow}{\uparrow}\rangle$ and
+$|{\downarrow}{\downarrow}\rangle$ sit on their own with eigenvalue $2$.
+The middle two do not: the off-diagonal $1$s couple
+$|{\uparrow}{\downarrow}\rangle$ to $|{\downarrow}{\uparrow}\rangle$, so
+neither has a definite total spin on its own. That $2\times2$ block
+$\begin{pmatrix}1&1\\1&1\end{pmatrix}$ has eigenvalues $2$ and $0$, and
+diagonalizing it means taking the sum and the difference. The four states
+listed next are what comes out.
 
 ### Four candidate combined states
 
@@ -129,10 +168,9 @@ $$
 
 ### Verified as exact eigenstates
 
-Applying $\vec J^{\,2}$ and $J_z$ (built exactly as above, from this
-platform's own $S_x,S_y,S_z$ for $j=\tfrac12$) to each of these four
-states directly confirms, to floating-point-exact precision (not
-approximately):
+Applying $\vec J^{\,2}$ and $J_z$, built as above from this platform's
+$S_x,S_y,S_z$ at $j=\tfrac12$, to each of the four states gives, to
+floating-point precision:
 
 | State | $\vec J^{\,2}$ eigenvalue | $J_z$ eigenvalue | Label |
 |---|---|---|---|
@@ -141,9 +179,14 @@ approximately):
 | $|1,-1\rangle$ | $2\hbar^2$ | $-\hbar$ | Triplet, $m=-1$ |
 | $|0,0\rangle$ | $0$ | $0$ | Singlet |
 
-$2\hbar^2=j(j+1)\hbar^2$ at $j=1$ (Lesson 2's formula); $0=j(j+1)\hbar^2$
-at $j=0$: both consistent, both checked directly, not assumed by
-symmetry.
+$2\hbar^2=j(j+1)\hbar^2$ at $j=1$, and $0=j(j+1)\hbar^2$ at $j=0$: both
+agree with Lesson 2's formula, and both were computed rather than
+inferred from symmetry.
+
+Count dimensions as a check. The combined space is $2\times2=4$
+dimensional, and the triplet ($2j+1=3$ states) plus the singlet ($1$
+state) accounts for all four. No state is left over and none is
+counted twice.
 
 ### The classical vector-model picture
 
@@ -154,8 +197,7 @@ resultant $\vec J=\vec S_1+\vec S_2$. For the triplet, $\vec J$ keeps a
 fixed length $\sqrt2\,\hbar$ ($\sqrt{j(j+1)}\hbar$ at $j=1$) while its
 vertical component runs through $+\hbar,0,-\hbar$ across the three
 $m$ values, matching the $J_z$ column above exactly. For the singlet
-the two vectors point opposite directions and cancel completely,
-matching $\vec J=0$:
+the two vectors point opposite ways and cancel, matching $\vec J=0$:
 
 <InteractiveSection
   title="Scrub through the four states"
@@ -167,34 +209,27 @@ matching $\vec J=0$:
   />
 </InteractiveSection>
 
-This picture is useful for intuition, but it's a cartoon: $\vec S_1$
-and $\vec S_2$ are operators, not classical arrows with a definite
-direction, so no measurement ever finds a spin literally pointing along
-the drawn arrow. What *is* exact is the length and $z$-projection each
-diagram frame encodes, both already verified directly from the
-operators in the table above.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Alain_Aspect_experiment_1981_diagram.svg"
-  alt="Diagram of Alain Aspect's 1981 Bell-test experiment: a source S emits a pair of correlated photons toward two polarization analyzers a and b, each feeding detectors D+ and D-, with coincidences recorded at R"
-  caption="The 1981 Aspect experiment, which measured exactly the kind of perfectly-correlated, individually-random outcomes this lesson derives for the spin-0 singlet, and confirmed they violate any theory built on a definite pre-existing direction for each particle."
-  credit="Wikimedia Commons / Neolexx"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Alain_Aspect_experiment_1981_diagram.svg"
-  license="CC BY 3.0"
-/>
+The picture earns its place for intuition and should not be trusted
+further than that. $\vec S_1$ and $\vec S_2$ are operators, not arrows
+with definite directions, and no measurement finds a spin pointing along
+the drawn line. What the diagram does encode correctly is each vector's
+length and $z$-projection, and those were verified from the operators in
+the table above.
 
 ### The singlet is a Bell state
 
 Compare $|0,0\rangle=\frac{1}{\sqrt2}(|{\uparrow}{\downarrow}\rangle-|{\downarrow}{\uparrow}\rangle)$
 directly to Quantum Gates & Circuits' Bell state
-$|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$: **identical**,
-term for term, once $|{\uparrow}\rangle\leftrightarrow|0\rangle$,
-$|{\downarrow}\rangle\leftrightarrow|1\rangle$. The maximally entangled
-Bell state built for quantum computing and the total-spin-zero singlet
-built for atomic physics are, mathematically, the exact same state, not
-an analogy: the identical vector, verified via the identical
-$\vec J^{\,2}=0$ <Term id="eigenvalue-eigenvector">eigenstate</Term> computation. (The triplet's $m=0$ state,
-$|1,0\rangle$, is likewise identical to $|\Psi^+\rangle$.)
+$|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$. Under
+$|{\uparrow}\rangle\leftrightarrow|0\rangle$ and
+$|{\downarrow}\rangle\leftrightarrow|1\rangle$ they agree term for term.
+
+These are the same vector. The maximally entangled Bell state was reached
+by asking what a Hadamard and a CNOT do to $|00\rangle$; the singlet was
+reached by asking which two-spin states have zero total angular momentum.
+The two questions have no obvious relationship, and they have one answer.
+(The triplet's $m=0$ state, $|1,0\rangle$, is $|\Psi^+\rangle$ in the same
+way.)
 
 Checking this yourself in the same explorer used to build Bell states in
 the first place makes the identity concrete rather than just asserted.
@@ -206,21 +241,28 @@ the same $|\Psi^-\rangle$ up to an unobservable <Term id="global-relative-phase"
 
 <InteractiveSection
   title="Prepare |Ψ⁻⟩ and find the singlet hiding inside"
-  description="Click the Bell preset, then target q1 and apply X followed by Z. Check the correlation table: this is the exact same vector as the spin-0 singlet above, not an analogy: the same amplitudes, the same perfect anti-correlation in every basis.">
+  description="Click the Bell preset, then target q1 and apply X followed by Z. Read the correlation table: the same amplitudes as the spin-0 singlet above, and the same perfect anti-correlation whichever basis you look in.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
 ## Physical Interpretation
 
-This is a deep connection, not a coincidence of notation: a
-system with total angular momentum exactly zero necessarily has *no
-preferred direction at all*: measuring either particle's spin along
-*any* axis gives a perfectly random result, but the two particles'
-outcomes are perfectly (anti-)correlated whichever axis is chosen. This
-is precisely the same "correlated in every basis" property Bell States
-and Entanglement proved for $|\Phi^+\rangle$ using Hadamards, here
-derived instead from the physical requirement that a spin-zero system
-carries no directional information whatsoever.
+The agreement is not a coincidence of notation, and there is a physical
+reason for it. A system with total angular momentum zero has no preferred
+direction available to it: rotate the whole state however you like and it
+comes back unchanged, since there is no vector in it to rotate.
+
+A state with no preferred direction cannot favour any outcome for a
+single-particle measurement along any axis, so each particle alone reads
+out at $50/50$. But the total must stay zero, so whatever one particle
+gives, the other must cancel. Perfectly random individually, perfectly
+anti-correlated jointly, in every basis.
+
+That is precisely the property Bell States and Entanglement established
+for $|\Phi^+\rangle$ by pushing Hadamards through a circuit. Here it
+follows from a symmetry statement instead: zero angular momentum means no
+directional information, and no directional information means no basis
+can be the special one.
 
 ## Worked Example
 
@@ -231,24 +273,36 @@ $J_z|1,0\rangle = \left(S_z^{(1)}\otimes I+I\otimes S_z^{(2)}\right)\frac{|{\upa
 On $|{\uparrow}{\downarrow}\rangle$: $S_z^{(1)}$ gives $+\tfrac\hbar2$,
 $S_z^{(2)}$ gives $-\tfrac\hbar2$, summing to $0$. On
 $|{\downarrow}{\uparrow}\rangle$: $-\tfrac\hbar2+\tfrac\hbar2=0$ as well.
-Both terms give eigenvalue $0$, so the whole superposition does too,
-matching the table exactly.
+Both terms are annihilated, so the superposition is too, and the table's
+$J_z=0$ entry is confirmed.
+
+Note that this calculation cannot distinguish $|1,0\rangle$ from
+$|0,0\rangle$: both have $J_z=0$, and the same argument applies to the
+minus combination verbatim. Separating them requires $\vec J^{\,2}$,
+which is precisely the operator whose off-diagonal block forced the two
+states to mix in the first place.
 
 ## Common Mistakes
 
 <Callout type="warning">
 **Assuming any two-spin-$\tfrac12$ state has a well-defined total spin.**
-Only the four states above (or their linear combinations *within* the
-same $j$) do: a generic superposition like $|{\uparrow}{\uparrow}\rangle+|{\downarrow}{\downarrow}\rangle$
-(unnormalized) is *not* automatically a $\vec J^{\,2}$ eigenstate unless
-it happens to match one of the four specific combinations derived here.
+Only the four states above, and their linear combinations *within* one
+$j$, do. The plainest counterexample is a bare product state:
+$|{\uparrow}{\downarrow}\rangle$ has a perfectly definite $J_z$ but is
+*not* a $\vec J^{\,2}$ eigenstate at all: the off-diagonal $1$s in the
+matrix above send it to
+$|{\uparrow}{\downarrow}\rangle+|{\downarrow}{\uparrow}\rangle$, which is
+not a multiple of what went in. Contrast
+$|{\uparrow}{\uparrow}\rangle+|{\downarrow}{\downarrow}\rangle$, which
+*is* one: it combines $|1,1\rangle$ and $|1,-1\rangle$, two members of the
+same $j=1$ multiplet, so it inherits their shared eigenvalue $2\hbar^2$
+while having no definite $m$.
 </Callout>
 
 <Callout type="note">
-**Treating the Bell-state/singlet connection as merely "similar" states.**
-They are the identical vector, under the identified basis correspondence,
-checked via the identical $\vec J^{\,2}=0$ eigenstate property, not an
-approximate resemblance.
+**Treating the Bell-state/singlet connection as a resemblance between two
+states.** Under the basis correspondence they are one vector with two
+names, and the $\vec J^{\,2}=0$ check above is performed on that vector.
 </Callout>
 
 ## Practice Questions
@@ -277,9 +331,9 @@ approximate resemblance.
 - Two spin-$\tfrac12$ particles combine into a spin-$1$ triplet (3 states)
   and a spin-$0$ singlet (1 state), verified as exact
   $\vec J^{\,2}$/$J_z$ eigenstates, not assumed by symmetry.
-- The singlet $|0,0\rangle$ is the identical vector to the Bell state
-  $|\Psi^-\rangle$; the triplet's $m=0$ state matches $|\Psi^+\rangle$,
-  a genuine mathematical identity, checked directly.
+- The singlet $|0,0\rangle$ *is* the Bell state $|\Psi^-\rangle$, and the
+  triplet's $m=0$ state is $|\Psi^+\rangle$: the same vectors, reached
+  from atomic physics and from circuit construction independently.
 - Total spin zero forces perfectly random single-particle outcomes along
   any measurement axis, with perfect correlation between the two
   particles, the physical content behind Bell-state entanglement,

@@ -34,10 +34,10 @@ export const lessonMeta = {
 
 The plane wave $e^{ipx/\hbar}$ from two lessons ago is the momentum
 operator's eigenfunction, but $\int|e^{ipx/\hbar}|^2dx = \int 1\,dx$
-diverges. A plane wave literally cannot be normalized: it isn't a valid
-physical state, only a useful mathematical building block. A real free
-particle needs a *superposition* of plane waves, which is exactly what a
-wave packet is.
+diverges. No rescaling repairs that, so a plane wave is not a physical
+state at all, only a useful mathematical building block. A real free
+particle is instead built as a *superposition* of plane waves, and that
+superposition is what a wave packet is.
 
 ## Intuition
 
@@ -70,17 +70,17 @@ $$
 $$
 
 Applying the inverse Fourier transform from two lessons ago gives the
-position-space wavefunction. A calculation whose result (the Gaussian
-transforms to a Gaussian, worked out explicitly in that lesson) is
+position-space wavefunction. That lesson already worked the transform out:
+a Gaussian transforms to a Gaussian, so the result is
 
 $$
 \psi(x,0) \propto e^{-x^2/(4\sigma^2)}\,e^{ik_0 x}, \qquad \sigma = \frac{1}{2\Delta k}
 $$
 
 an envelope localized near $x=0$ with width $\sigma$, modulated by a
-plane wave carrying the average momentum $p_0=\hbar k_0$. This is exactly
-`Wavefunction1D.gaussianPacket(grid, {center, width, momentum})`'s
-construction, generalized to an arbitrary center.
+plane wave carrying the average momentum $p_0=\hbar k_0$. This is the
+construction `Wavefunction1D.gaussianPacket(grid, {center, width,
+momentum})` implements, generalized to an arbitrary center.
 
 ### Group velocity
 
@@ -92,7 +92,7 @@ construction, generalized to an arbitrary center.
     { label: "The envelope doesn't move at all", value: "stationary" },
   ]}
   correctValue="group"
-  explanation="No — the envelope moves at the group velocity dω/dk, not the phase velocity ω/k of any individual plane wave in the superposition. For a free particle these actually differ by a factor of 2 (a Common Mistake flagged below), and it's the group velocity that matches the classical particle velocity p0/m."
+  explanation="No. The envelope moves at the group velocity dω/dk, not at the phase velocity ω/k of any individual plane wave in the superposition. For a free particle the two differ by a factor of 2 (a Common Mistake flagged below), and it is the group velocity that matches the classical particle velocity p0/m."
 />
 
 The envelope's peak moves at the **group velocity**, not the phase
@@ -104,30 +104,37 @@ $$
 v_g = \frac{d\omega}{dk}\bigg|_{k_0} = \frac{1}{\hbar}\frac{dE}{dk}\bigg|_{k_0} = \frac{\hbar k_0}{m} = \frac{p_0}{m}
 $$
 
-exactly the classical velocity $p_0/m$. This matches directly:
-$\langle x\rangle$'s rate of change under Schrödinger evolution equals
-$\langle p\rangle/m$ (Ehrenfest's theorem, a short calculation deferred to
-the Wave Packet Dynamics lesson, but numerically verified here already),
-so the packet's average position advances exactly like a free classical
-particle.
+which is the classical velocity $p_0/m$. The agreement is not a
+coincidence: $\langle x\rangle$'s rate of change under Schrödinger
+evolution equals $\langle p\rangle/m$ (Ehrenfest's theorem, a short
+calculation deferred to the Wave Packet Dynamics lesson but numerically
+verified here already), so the packet's average position advances the way
+a free classical particle would.
 
 ## Physical Interpretation
 
 A wave packet is the quantum object closest to "a particle with a
 definite position and momentum." It has *some* spread in both (bounded
 below by $\Delta x\Delta p\ge\hbar/2$, from the Momentum Space lesson),
-but for a macroscopic object that spread is utterly negligible, which is
-exactly why classical mechanics ever looked like a good approximation:
-Ehrenfest's theorem says a wave packet's average position obeys Newton's
-laws.
+but for a macroscopic object the spread is far below anything measurable.
+Take a $1$ g grain of sand localized to $\Delta x = 1\ \mu\mathrm{m}$.
+The bound gives $\Delta p \ge \hbar/(2\Delta x) \approx
+5.3\times10^{-29}\ \mathrm{kg\,m/s}$, so
+$\Delta v \gtrsim 5\times10^{-26}\ \mathrm{m/s}$. Left alone for the entire
+age of the universe, that velocity spread would blur the grain's position
+by about $20$ nm, a fiftieth of the micron you started with. That is why
+classical mechanics ever looked like the whole story.
+<Term id="ehrenfest-theorem">Ehrenfest's theorem</Term> says a wave packet's average position obeys
+Newton's laws, and for a grain of sand the average is all anyone can
+measure.
 
-<InteractiveSection title="Group velocity, live" description="The Wavefunction Explorer's Free Gaussian Packet preset builds exactly this state. Set momentum to a nonzero value and watch ⟨x⟩ in the state panel advance at a constant rate. Measure it against the formula v_g=p₀/m (natural units, m=1, so v_g=p₀ directly) by comparing the displayed ⟨p⟩ to the rate ⟨x⟩ changes at.">
+<InteractiveSection title="Group velocity, live" description="The Wavefunction Explorer's Free Gaussian Packet preset builds the state derived above. Set momentum to a nonzero value and watch ⟨x⟩ in the state panel advance at a constant rate. Measure it against the formula v_g=p₀/m (natural units, m=1, so v_g=p₀ directly) by comparing the displayed ⟨p⟩ to the rate ⟨x⟩ changes at.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
 
 <ExpectationTrace
   yLabel="⟨x⟩(t), for p0=2, m=1, x0=-15"
-  annotation="Solid: ⟨x(t)⟩ = x₀ + v_g t. Dashed: the pure v_g·t slope line (no offset). The two are parallel because both advance at exactly v_g = p₀/m = 2 -- the offset between them is just the starting position x₀ = -15."
+  annotation="Solid: ⟨x(t)⟩ = x₀ + v_g t. Dashed: the pure v_g·t slope line, with no offset. The two are parallel because both advance at v_g = p₀/m = 2, and the constant gap between them is the starting position x₀ = -15."
   ariaLabel="Plot of the wave packet's mean position advancing linearly in time, alongside a dashed pure-slope reference line with the same rate"
   series={[
     {
@@ -155,9 +162,9 @@ $$
 $$
 
 directly checkable against the simulator's live $\langle x\rangle$
-readout after playing that preset forward to $t=3$ (this exact check is
-also one of `timeEvolution.test.ts`'s engine tests, verified to match this
-formula numerically).
+readout after playing that preset forward to $t=3$. The same check runs as
+one of `timeEvolution.test.ts`'s engine tests, which asserts the numerical
+result against this formula.
 
 ## Common Mistakes
 
@@ -191,18 +198,18 @@ the classical particle velocity.
 ## Summary
 
 - A single plane wave isn't normalizable; a Gaussian superposition of
-  plane waves across a narrow momentum band builds a genuine, localized,
+  plane waves across a narrow momentum band builds a localized,
   normalizable wave packet.
 - The packet's envelope moves at the group velocity $v_g=dE/dp=p_0/m$,
   the classical velocity, recovered from purely quantum machinery.
-- This is exactly what `gaussianPacket` constructs, and exactly what the
+- That construction is what `gaussianPacket` builds and what the
   Wavefunction Explorer's Free Gaussian Packet preset animates.
 
 ## Further Exploration
 
 <ChallengePrompt prompt="For p0=4, m=2 (ħ=1), find both the group velocity and the phase velocity of the underlying plane wave, and confirm they differ by exactly the factor of 2 the Common Mistakes note states.">
-  $v_g=p_0/m$ as derived above; $v_{\rm phase}=\hbar k_0/(2m)=v_g/2$, from
-  the Common Mistakes note — compute both directly.
+  $v_g=p_0/m$ as derived above, and $v_{\rm phase}=\hbar k_0/(2m)=v_g/2$
+  from the Common Mistakes note. Compute both directly.
 </ChallengePrompt>
 
 <NextDiscovery>

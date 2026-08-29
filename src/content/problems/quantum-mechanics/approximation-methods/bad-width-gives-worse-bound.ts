@@ -41,17 +41,21 @@ export const badWidthGivesWorseBound: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Every normalized trial state gives a valid upper bound on E₀, regardless of how good or bad the parameter choice is — only the tightness of the bound changes.",
   },
   hints: [
-    { text: "The variational theorem applies to ANY normalized trial state, not just optimized ones." },
-    { text: "σ=3 gives a higher (worse, looser) bound; σ≈0.7 gives a much tighter one." },
-    { text: "Both are still valid upper bounds — neither violates ⟨H⟩≥E₀." },
+    { text: "State the theorem's hypothesis carefully: which trial states does ⟨H⟩ ≥ E₀ apply to?" },
+    { text: "Nothing in that hypothesis mentions optimization. Optimizing searches a family for the smallest ⟨H⟩; it is not a condition for the inequality." },
+    { text: "Compare both numbers against E₀ = 0.5 and ask whether either one violates the inequality." },
   ],
   solution: {
-    steps: [{ description: "Both σ=3 and the optimized σ give ⟨H⟩≥E₀=0.5, exactly as the theorem requires; only the tightness of the bound differs." }],
-    finalAnswer: "(a) Both are valid upper bounds; the poor choice just gives a looser one",
+    steps: [{ description: "The variational theorem says ⟨H⟩ ≥ E₀ for every normalized trial state. Both numbers sit above E₀ = 0.5, so both are valid upper bounds. Optimizing over σ finds the tightest bound this family can give; it does not decide which bounds are legitimate." }],
+    finalAnswer: "Both are valid upper bounds on E₀; the poorly chosen width gives a looser one.",
   },
   explanation: {
-    correctIdea: "This distinguishes 'valid' (the theorem always holds) from 'tight' (a property of how well the trial family, and the specific parameter choice, matches the true ground state).",
-    whyCorrect: "Matches the lesson's explicit Common Mistakes point about what a lower ⟨H⟩ does and doesn't indicate.",
-    whyWrong: ["Concluding the method 'fails' for bad parameters misunderstands that the theorem never promised a good bound — only a valid (upper-bound) one."],
+    correctIdea: "Validity and tightness are separate. The theorem promises validity for any normalized trial state, and tightness is what a good trial family and a good parameter choice buy you.",
+    whyCorrect: "Matches the lesson's Common Mistakes point about what a lower ⟨H⟩ does and does not indicate.",
+    whyWrong: [
+      { optionId: "b", text: "Treats disagreement with the exact answer as an error. An upper bound is expected to sit above E₀." },
+      { optionId: "c", text: "Adds a hypothesis the theorem does not have. It quantifies over every normalized trial state." },
+      { optionId: "d", text: "Calls a loose bound a failure. A loose but valid bound is the whole of what the theorem promises for a single trial choice." },
+    ],
   },
 };

@@ -84,6 +84,27 @@ function rand(seed: number): number {
   return x - Math.floor(x);
 }
 
+/**
+ * The loudest any single mark in any regime may be painted, at full
+ * `intensity`.
+ *
+ * This is a *measured* number, not a round one. The field is composited over
+ * `--background`, and `--pillar-accent` — the brightest colour any renderer
+ * reaches for — reaches body-text weight (4.5:1 against that ground) at
+ * roughly alpha 0.63. Every regime draws somewhere behind the reading column
+ * at some viewport, so a mark at or above that weight is a background
+ * competing with the prose in front of it, which is the single rule this
+ * whole feature is built around. 0.55 lands at ~3.4:1: unambiguously
+ * perceivable as a graphic, unambiguously quieter than text.
+ *
+ * The ceiling used to live only in `__tests__/regimes.test.ts`, set to 0.75 —
+ * loose enough that `drawState`'s state vector sat at 0.7 (5.09:1, brighter
+ * than anything else in the file) and passed. It is exported from the module
+ * it governs now so the number and the renderers it constrains are read
+ * together.
+ */
+export const REGIME_ALPHA_CEILING = 0.55;
+
 function withAlpha(ctx: CanvasRenderingContext2D, alpha: number, draw: () => void) {
   const previous = ctx.globalAlpha;
   ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
@@ -246,7 +267,19 @@ function drawState(frame: FieldFrame) {
     ctx.setLineDash([]);
   });
 
-  withAlpha(ctx, 0.7 * intensity, () => {
+  // 0.5, not the 0.7 this shipped with. `accent` at 0.7 over `--background`
+  // composites to 5.09:1 — above the 4.5:1 AA threshold, i.e. this line was
+  // drawn at literal body-text weight, and the sphere is centred at
+  // `0.72 * width` with a radius of `0.3 * min(width, height)`, so it sweeps
+  // straight through the reading column at every viewport (worse on a phone,
+  // where the column is the full width). A background mark as loud as the
+  // prose in front of it is the one thing this feature is not allowed to do.
+  // 0.5 composites to 3.08:1: still comfortably perceivable as a graphic, and
+  // the same value `drawWave` gives its own subject line (the Re(psi)
+  // carrier), so the loudest mark in a regime is one decision rather than six.
+  // `REGIME_ALPHA_CEILING` in ./regimes and the guard in
+  // __tests__/regimes.test.ts keep this from creeping back.
+  withAlpha(ctx, 0.5 * intensity, () => {
     ctx.strokeStyle = accent;
     ctx.lineWidth = 1.75;
     ctx.beginPath();
@@ -685,12 +718,26 @@ function drawJourney(frame: FieldFrame) {
   const from = JOURNEY_SEQUENCE[index];
   const to = JOURNEY_SEQUENCE[Math.min(segments, index + 1)];
 
+  // The crossfade is the one place a regime is rendered at something other
+  // than the caller's own intensity. It used to spread a fresh frame per
+  // side, which meant the homepage — the only page that uses `journey` —
+  // allocated two frame objects on top of the caller's on every single frame.
+  // Setting the one field that differs and putting it back is exactly
+  // equivalent: every renderer destructures `intensity` on entry and none
+  // writes to the frame, and `JOURNEY_SEQUENCE` is typed
+  // `Exclude<FieldRegime, "journey">`, so this cannot re-enter itself and
+  // find `intensity` already scaled. The restore at the end matters because
+  // QuantumField now reuses one frame object across paints.
+  const baseIntensity = frame.intensity;
   if (eased < 0.995) {
-    REGIME_RENDERERS[from]({ ...frame, intensity: frame.intensity * (1 - eased) });
+    frame.intensity = baseIntensity * (1 - eased);
+    REGIME_RENDERERS[from](frame);
   }
   if (eased > 0.005 && to !== from) {
-    REGIME_RENDERERS[to]({ ...frame, intensity: frame.intensity * eased });
+    frame.intensity = baseIntensity * eased;
+    REGIME_RENDERERS[to](frame);
   }
+  frame.intensity = baseIntensity;
 }
 
 /**

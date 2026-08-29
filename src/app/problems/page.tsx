@@ -64,7 +64,14 @@ export default async function ProblemsPage() {
           UX_REVIEW_2.md's "Genericness" paragraph both name: a filter strip
           straight into a card grid, with no reading column. Mirrors
           `/learn`'s own hero → wide-section split. */}
-      <Section width="reading" className="pt-4 sm:pt-8">
+      {/* `tight`, not `className="pt-4 sm:pt-8"`: `Section` writes its
+          vertical padding as an inline `style`, which always beats a class on
+          the same element, so that override compiled fine and applied to
+          nothing — the page opened with the full `--rhythm-section` (72px at
+          320px, 136px on a wide desktop) where 16px was asked for. `tight` is
+          the prop that actually reduces it. Same dead override as /learn's
+          hero, error.tsx and not-found.tsx. */}
+      <Section width="reading" tight>
         <Eyebrow>Problems</Eyebrow>
         <SectionTitle level={1} size="xl" className="mt-3">
           Practice what you&rsquo;ve learned

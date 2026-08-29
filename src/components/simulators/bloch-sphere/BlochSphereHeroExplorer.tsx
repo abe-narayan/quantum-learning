@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
-import { cn } from "@/lib/utils";
 import { StateVector } from "@/lib/quantum/state";
 import { applySingleQubitGate, rotationAboutAxis } from "@/lib/quantum/gates";
 import { measure } from "@/lib/quantum/measurement";
@@ -15,6 +14,29 @@ import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
 const ANIMATION_MS = 550;
 const HERO_GATE_IDS: readonly FixedGateId[] = ["H", "X", "Z"];
 const HERO_GATES = FIXED_GATES.filter((gate) => HERO_GATE_IDS.includes(gate.id));
+
+/**
+ * The state this hero opens on: |+⟩ = H|0⟩, the equal superposition.
+ *
+ * It used to open on |0⟩, and |0⟩ is the one point on this sphere that
+ * teaches nothing — the vector stands straight up at the north pole, which is
+ * indistinguishable at a glance from a classical bit reading 0, and the whole
+ * reason the Bloch sphere exists is to show the states a bit cannot reach.
+ * A homepage visitor who never presses a button therefore saw a picture that
+ * argued the opposite of the point. Opening on the equator means the very
+ * first frame is already a state with no classical counterpart, and the
+ * Measure button then has something to collapse. Reset still returns to |0⟩,
+ * which stays the reference state every lesson starts a circuit from.
+ *
+ * Built by running the real H gate on |0⟩ rather than hand-writing 1/√2
+ * amplitudes, so this is the same state the H button produces, from the same
+ * engine call, and cannot drift away from it.
+ */
+function initialSuperposition() {
+  const hadamard = FIXED_GATES.find((gate) => gate.id === "H");
+  if (!hadamard) throw new Error("Hero explorer expects an H gate in FIXED_GATES.");
+  return applySingleQubitGate(StateVector.zero(1), hadamard.matrix, 0);
+}
 
 function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
@@ -90,11 +112,11 @@ function slerp(a: BlochVector, b: BlochVector, t: number): BlochVector {
  * layout — not a decorative substitute for it.
  */
 export function BlochSphereHeroExplorer() {
-  const [state, setState] = useState(() => StateVector.zero(1));
-  const [renderPoint, setRenderPoint] = useState<BlochVector>({ x: 0, y: 0, z: 1 });
+  const [state, setState] = useState(initialSuperposition);
+  const [renderPoint, setRenderPoint] = useState<BlochVector>(() => stateToBlochVector(initialSuperposition()));
   const [isAnimating, setIsAnimating] = useState(false);
   const [narration, setNarration] = useState(
-    "This is a real qubit state — |0⟩. Apply H and watch it enter superposition."
+    "A real qubit, already in superposition: the arrow points at the equator, so |0⟩ and |1⟩ are equally likely. Press Measure to collapse it to one pole, or Reset to return to |0⟩."
   );
   const [lastMeasurement, setLastMeasurement] = useState<0 | 1 | null>(null);
 
@@ -188,8 +210,33 @@ export function BlochSphereHeroExplorer() {
     );
   }, [isAnimating, renderPoint, runAnimation, settleAt]);
 
+  // `min-h-11 min-w-11` (44px), not the previous `h-10 min-w-10` (40px): the
+  // single-letter gate buttons are the smallest targets on the homepage and
+  // sit in a wrapping row 8px apart, so at 40px they missed the touch-target
+  // floor in both axes at once. `min-h`/`min-w` rather than fixed `h`/`w` so
+  // "Measure" and "Reset" still size to their own text.
+  // `aria-disabled:` rather than `disabled:` here, paired with the switch from
+  // the native `disabled` attribute to `aria-disabled` on every button below.
+  // Every control in this row disables itself *as the direct result of being
+  // pressed*: applyGate / applyMeasurement / reset each set `isAnimating`
+  // true, which is exactly the condition that greyed the whole row out. A
+  // natively-disabled button stops being focusable while it currently holds
+  // focus, so a keyboard reader who pressed H had focus dropped to <body> by
+  // their own keystroke, spent the 600ms animation with no focus anywhere, and
+  // found their next Tab restarting from the top of the document. On the
+  // homepage hero that means you cannot apply two gates in a row from the
+  // keyboard without re-tabbing through the whole page between them — the
+  // single most-reached instrument on the site, unusable in sequence.
+  //
+  // `aria-disabled` announces the identical "dimmed, unavailable" state while
+  // keeping the element focusable, so focus stays on the button you pressed
+  // and is still there when the animation settles and the row goes live again.
+  // No handler guard needs adding: applyGate, applyMeasurement and reset all
+  // already open with `if (isAnimating) return;`, so a press that slips through
+  // is already a no-op. `aria-disabled:pointer-events-none` reproduces the
+  // dead-to-the-mouse behaviour `disabled` provided.
   const controlButtonClasses =
-    "inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-border bg-surface px-3 text-sm font-semibold text-foreground transition-colors hover:border-pillar/40 hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar disabled:pointer-events-none disabled:opacity-50";
+    "inline-flex min-h-11 min-w-11 items-center justify-center rounded-(--radius-tight) border border-border bg-surface px-3 text-sm font-semibold text-foreground transition-colors hover:border-pillar/40 hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar aria-disabled:pointer-events-none aria-disabled:opacity-50";
 
   return (
     <div className="relative mx-auto w-full max-w-sm">
@@ -202,7 +249,7 @@ export function BlochSphereHeroExplorer() {
         }}
       />
 
-      <div className="rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+      <div className="rounded-panel border border-border bg-surface p-6 shadow-sm sm:p-8">
         <BlochSphereCanvas blochPoint={renderPoint} className="mx-auto h-auto w-full max-w-xs" />
 
         <p aria-live="polite" className="mt-4 min-h-[2.5rem] text-center text-xs text-muted-foreground">
@@ -217,32 +264,43 @@ export function BlochSphereHeroExplorer() {
             <button
               key={gate.id}
               type="button"
-              disabled={isAnimating}
+              aria-disabled={isAnimating}
               onClick={() => applyGate(gate)}
               title={gate.explanation}
+              // A button whose entire content is the letter "H" announces as
+              // "H, button" — no indication it is a gate, or that pressing it
+              // does anything to the sphere. `title` alone does not fix that:
+              // it becomes the accessible *description*, which many screen
+              // readers skip. The visible letter stays as it is.
+              aria-label={`Apply the ${gate.label} gate`}
               className={controlButtonClasses}
             >
               {gate.label}
             </button>
           ))}
-          <button type="button" disabled={isAnimating} onClick={applyMeasurement} className={controlButtonClasses}>
+          <button type="button" aria-disabled={isAnimating} onClick={applyMeasurement} className={controlButtonClasses}>
             Measure
           </button>
-          <button type="button" disabled={isAnimating} onClick={reset} className={controlButtonClasses}>
+          <button type="button" aria-disabled={isAnimating} onClick={reset} className={controlButtonClasses}>
             Reset
           </button>
         </div>
 
+        {/* The rotate hint sits outside the link on purpose. It used to be the
+            link's second line, which made the link announce as "Bloch sphere
+            Drag to rotate the view Full explorer" — an instruction about the
+            canvas above welded onto the accessible name of a control that goes
+            somewhere else entirely. It now describes what it is about, and the
+            link's name is just its destination. */}
+        <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
+          Drag the sphere, or focus it and use the arrow keys, to rotate the view.
+        </p>
+
         <Link
           href="/simulators"
-          className={cn(
-            "mt-6 flex items-center justify-between gap-3 border-t border-border pt-4 transition-colors hover:border-pillar/40"
-          )}
+          className="mt-3 flex min-h-11 items-center justify-between gap-3 transition-colors hover:border-pillar/40"
         >
-          <div>
-            <p className="text-sm font-medium text-foreground">Bloch sphere</p>
-            <p className="text-xs text-muted-foreground">Drag to rotate the view</p>
-          </div>
+          <span className="text-sm font-medium text-foreground">Bloch sphere</span>
           <Badge tone="brand">Full explorer →</Badge>
         </Link>
       </div>

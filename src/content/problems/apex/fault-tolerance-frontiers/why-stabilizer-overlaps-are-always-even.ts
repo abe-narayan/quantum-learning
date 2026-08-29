@@ -24,7 +24,23 @@ export const whyStabilizerOverlapsAreAlwaysEven: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["closed loop", "closed cycle", "boundary loop", "cycle of edges", "enters and exits", "enter and exit"],
+      {
+        phrases: [
+          "closed loop",
+          "closed cycle",
+          "boundary loop",
+          "boundary is a loop",
+          "cycle of edges",
+          "enters and exits",
+          "enter and exit",
+          "enters and leaves",
+          "passes through",
+          "no loose end",
+          "cannot end at",
+        ],
+        missingFeedback:
+          "You have the parity conclusion, but not the reason it is forced. The face's edges form a closed loop, and a closed loop has no loose ends: at any vertex it touches, it must both arrive and depart, which is why the overlap can never be 1 or 3.",
+      },
       ["even", "0 or 2", "two", "pair"],
     ],
     incorrectFeedback:

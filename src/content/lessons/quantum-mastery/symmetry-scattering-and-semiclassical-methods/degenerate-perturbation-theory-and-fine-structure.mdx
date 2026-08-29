@@ -98,9 +98,9 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Finishing what the earlier lesson left open">
   Ordinary perturbation theory divides by zero the moment two states
-  share an energy — and hydrogen's degeneracy is the generic situation,
-  not an edge case. This lesson derives the fix, then actually finishes
-  the fine-structure calculation set aside earlier.
+  share an energy, and in hydrogen that is the normal case rather than
+  the exception. Here is the fix, and the fine-structure number the
+  earlier lesson could only bound.
 </LessonHook>
 
 ## Motivation
@@ -108,7 +108,7 @@ export const lessonMeta = {
 Fine Structure (Introduction) was honest about a gap: it named spin-orbit
 coupling as one of two effects splitting hydrogen's $l$-degeneracy, stated
 its rough size ($\sim\alpha^2\times13.6\text{ eV}$), and then explicitly
-declined to compute it, citing "degenerate perturbation theory... beyond
+declined to compute it, citing "<Term id="degenerate-perturbation-theory">degenerate perturbation theory</Term>... beyond
 this course's scope." Ordinary (non-degenerate) perturbation theory,
 Time-Independent Perturbation Theory's $E_n^{(2)}=\sum_{m\neq
 n}|H'_{mn}|^2/(E_n^{(0)}-E_m^{(0)})$, breaks down the moment $E_n^{(0)}$ is
@@ -122,7 +122,7 @@ the calculation the earlier lesson set aside.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d2/Seth_B._Nicholson_sits_at_his_spectroscope.jpg"
   alt="Astronomer Seth B. Nicholson seated at a large spectroscope at Mt. Wilson Observatory, 1929"
-  caption="Fine structure, the splitting this lesson computes exactly for hydrogen's 2p level, was first discovered as closely-spaced doublet lines in exactly this kind of high-resolution spectroscope, well before spin-orbit coupling existed as a theoretical explanation for what spectroscopists were already measuring."
+  caption="Fine structure, the splitting this lesson computes exactly for hydrogen's 2p level, was first discovered as closely-spaced doublet lines in this kind of high-resolution spectroscope, well before spin-orbit coupling existed as a theoretical explanation for what spectroscopists were already measuring."
   credit="Los Angeles Times, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Seth_B._Nicholson_sits_at_his_spectroscope.jpg"
   license="CC BY-SA 4.0"
@@ -171,7 +171,7 @@ degeneracy; its eigenvectors are the correct zeroth-order states, the
 specific combinations of $|\alpha\rangle$'s that $H'$ doesn't mix with
 each other at this order. Only in *this* basis does the ordinary
 non-degenerate machinery apply cleanly beyond first order. This is a
-genuine derivation, not a stated recipe: it uses nothing beyond
+derivation, not a stated recipe: it uses nothing beyond
 first-order perturbation expansion and $H_0$'s Hermiticity, both already
 established in Time-Independent Perturbation Theory and Hermitian
 Operators.
@@ -195,7 +195,7 @@ Take hydrogen's $2p$ subspace: $l=1$, $6$ states once spin is included
 ($m_L\in\{1,0,-1\}$, $m_S\in\{+\tfrac12,-\tfrac12\}$). Building $\vec
 L\cdot\vec S=L_xS_x+L_yS_y+L_zS_z$ directly from this platform's own
 $j=1$ and $j=\tfrac12$ operators (`angularMomentumX/Y/Z`, tensored
-together exactly as Addition of Angular Momentum tensored two spin-$\tfrac12$
+together the same way Addition of Angular Momentum tensored two spin-$\tfrac12$
 operators, just with unequal $j$'s now):
 
 <MatrixGridExplorer
@@ -205,8 +205,8 @@ operators, just with unequal $j$'s now):
 
 In the **uncoupled** $|m_L,m_S\rangle$ basis (the natural basis from
 Orbital Angular Momentum and Spin-1/2 Systems separately), $\vec
-L\cdot\vec S$ has genuine off-diagonal entries ($\tfrac1{\sqrt2}\approx0.707$,
-visible above): $H'$ mixes different $|m_L,m_S\rangle$ states, exactly the
+L\cdot\vec S$ has nonzero off-diagonal entries ($\tfrac1{\sqrt2}\approx0.707$,
+visible above): $H'$ mixes different $|m_L,m_S\rangle$ states, the
 situation the previous section's derivation addresses. Applying the
 coupled-basis transformation $U$ (columns = the $|j,m_j\rangle$ states,
 built from the specific $l{=}1\otimes s{=}\tfrac12$ Clebsch-Gordan
@@ -255,7 +255,7 @@ into the boxed formula for both $2p$ fine-structure levels:
     { label: "They stay exactly degenerate — spin-orbit coupling doesn't split them", value: "same" },
   ]}
   correctValue="32"
-  explanation="⟨L·S⟩=+1/2 for j=3/2 and −1 for j=1/2, so the j=3/2 quadruplet is pushed up and the j=1/2 doublet is pushed down, exactly what the diagram below shows numerically. The weighted average still comes out to zero (4×(+1/2)+2×(−1)=0), since spin-orbit coupling only splits the level, it can't shift the l=1 subspace's center of mass."
+  explanation="⟨L·S⟩=+1/2 for j=3/2 and −1 for j=1/2, so the j=3/2 quadruplet is pushed up and the j=1/2 doublet is pushed down, which is what the diagram below shows numerically. The weighted average still comes out to zero (4×(+1/2)+2×(−1)=0), since spin-orbit coupling only splits the level, it can't shift the l=1 subspace's center of mass."
 />
 
 <EnergyLevelDiagram
@@ -366,12 +366,11 @@ $H'_{SO}$ turns on.
 
 ## Further Exploration
 
-[Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem)
-derives in general the specific $l=1\otimes s=\tfrac12$ coupling
-coefficients this lesson borrowed to build $U$.
-
 <NextDiscovery>
-  Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem
-  derives in general the specific $l=1\otimes s=\tfrac12$ coupling
-  coefficients this lesson borrowed to build $U$.
+  [Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem)
+  derives the $l=1\otimes s=\tfrac12$ coupling coefficients this lesson
+  borrowed to build $U$, as one case of a general construction. It also
+  explains why the good basis here had to be the total-angular-momentum
+  one: that is the basis in which the perturbation is diagonal by
+  symmetry, before any matrix element is computed.
 </NextDiscovery>

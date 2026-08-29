@@ -15,7 +15,7 @@ export const lessonMeta = {
   module: "control-electronics",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 22,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/control-and-readout/cryogenic-systems"],
   objectives: [
     "Explain how a classical microwave pulse implements a single-qubit rotation via resonant driving",
@@ -36,10 +36,14 @@ Every <Term id="single-qubit-gates">gate</Term> this platform's Quantum Computin
 
 ## Motivation
 
-The control pulse can equally be a laser pulse rather than a microwave
-one, depending on the platform. This lesson makes that translation
-concrete, reusing machinery already built and verified: Approximation
-Methods' exact two-level <Term id="rabi-oscillation">Rabi model</Term>.
+Between an abstract circuit diagram and a physical qubit sits a rack of
+classical electronics whose job is to turn each gate symbol into a
+precisely-shaped control pulse, microwave for a superconducting circuit,
+laser for an ion or atom. This lesson makes that translation concrete,
+reusing machinery already built and verified: Approximation Methods'
+exact two-level <Term id="rabi-oscillation">Rabi model</Term>. It then
+asks the question the idealized model skips entirely: what shape should
+the pulse actually be?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Microwave_Apparatus_%286029992084%29.jpg"
@@ -62,6 +66,17 @@ identity connecting the abstract two-level Schrödinger equation to
 observable population transfer. Driving a real qubit with a microwave
 tone at its resonance frequency, for a controlled duration $t$, realizes
 exactly this dynamics.
+
+<Callout type="warning">
+**Watch the Rabi convention when reading datasheets and papers.**
+Throughout this pillar, $P_1(t)=\sin^2(\Omega t)$ and a $\pi$-pulse
+takes $t_\pi=\pi/(2\Omega)$. The more common convention in the
+literature defines $\Omega$ so that $P_1(t)=\sin^2(\Omega t/2)$ and
+$t_\pi=\pi/\Omega$. Same physics, but the two $\Omega$s differ by a
+factor of 2, so a Rabi frequency copied from a paper into this lesson's
+pulse-duration formulas produces gate times off by exactly that factor.
+Convert first.
+</Callout>
 
 <InteractiveSection title="Detune it, watch the ceiling drop" description={`Set the detuning slider below to zero and increase the coupling strength V (playing the role of Ω here): watch the population curve trace out P_1(t)=sin²(Vt) exactly, and the Bloch vector sweep smoothly from the north pole to the south pole and back at t_π=π/(2V). Then move detuning away from zero and watch the population curve stop reaching 1: this is what happens when a control pulse's frequency doesn't exactly match the qubit's resonance frequency.`}>
   <LazyRabiExplorer />
@@ -87,6 +102,42 @@ itself, since $\Omega$ is proportional to the microwave field strength).
 Real control electronics typically use whichever is more precisely
 controllable in a given setup. Both reach the identical target physics,
 $\Omega t=\theta/2$.
+
+### Why the pulse isn't square
+
+Everything so far has treated a pulse as a switch: drive at full
+strength for duration $t$, then stop instantly. Real control
+electronics almost never do this, and the reason is a Fourier fact. A
+pulse that turns on and off abruptly is short in time, so it is *wide*
+in frequency: a square envelope of duration $t$ has a sinc-shaped
+spectrum whose power spreads over a bandwidth of roughly $1/t$ around
+the carrier. Shrink the gate time toward nanoseconds and that spectral
+skirt spreads across tens of megahertz or more.
+
+For a transmon, that width lands somewhere dangerous. Superconducting
+Qubits built the whole platform on the junction's anharmonicity, the
+fact that the 1→2 gap sits *near* the 0→1 gap but not on it. Near is
+the operative word: the offset is small compared to the qubit frequency
+itself. A short square pulse's sinc skirt reaches that offset easily,
+so a drive nominally addressed to 0→1 also delivers real power at the
+1→2 transition and leaks population out of the qubit subspace entirely.
+This is the same failure Superconducting Qubits' prediction exercise
+flagged when it warned that pushing drive strength for faster gates
+eventually "starts exciting unwanted transitions": stronger and shorter
+driving means a wider spectrum, and the anharmonicity gap is the wall
+it hits.
+
+The fix is to shape the envelope. A smooth, Gaussian-style rise and
+fall has a spectrum that falls off far faster than a sinc, so nearly
+all the drive power stays concentrated at the 0→1 transition, at the
+modest cost of a slightly longer pulse for the same rotation angle.
+The standard refinement on top of this is **DRAG** (Derivative Removal
+by Adiabatic Gate), which adds a small corrective component
+proportional to the envelope's time derivative to cancel the residual
+1→2 leakage a plain Gaussian still leaves. The arbitrary waveform
+generators described below exist to synthesize these shaped envelopes,
+sample by sample; a box that could only switch a tone on and off would
+not be enough.
 
 ## Physical Interpretation
 
@@ -171,6 +222,10 @@ precisely, not one universally "correct" method.
 - Duration and amplitude are two equivalent control knobs reaching the
   same target rotation; real hardware picks whichever is more precisely
   controllable.
+- Real pulses are shaped, not square: a short square pulse's wide
+  sinc-shaped spectrum would drive the transmon's nearby 1→2 transition,
+  so hardware uses smooth Gaussian-style envelopes, with DRAG as the
+  standard leakage-canceling refinement.
 
 ## Further Exploration
 

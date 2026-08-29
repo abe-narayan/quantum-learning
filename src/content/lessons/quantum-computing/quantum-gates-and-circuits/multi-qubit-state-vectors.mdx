@@ -27,7 +27,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-software/simulating-quantum-systems/state-vector-simulation",
-      note: "This lesson's 2^n-amplitude state vector, examined explicitly as the exact technique every simulation on this platform has used since day one.",
+      note: "This lesson's 2^n-amplitude state vector, examined explicitly as the exact technique every simulation you've run on the site has used since day one.",
     },
   ],
 };
@@ -44,20 +44,25 @@ export const productExample = StateVector.zero(1).tensor(
 );
 
 <LessonHook eyebrow="Why this matters">
-The last lesson built multi-qubit states out of single-qubit ones, via ⊗. That raises an obvious question: does every valid multi-qubit state arise this way? The answer is no, and pinning down exactly why is one of the most important arguments in this course.
+The last lesson built multi-qubit states out of single-qubit ones, via ⊗. Does every valid multi-qubit state arise that way? The answer is no, and the states that don't are the ones this pillar is really about.
 </LessonHook>
 
 ## Motivation
 
-If it did, two qubits would really just be "two
-separate qubits" dressed up in bigger notation — nothing new would be
-possible that a pair of independent single-qubit systems couldn't already
-do.
+Suppose every two-qubit state could be built as $|a\rangle\otimes|b\rangle$
+from two single-qubit states. Then two qubits would be two separate qubits
+in bigger notation, and nothing would be possible that a pair of
+independent single-qubit systems could not already do. There would be no
+quantum computing worth the name.
+
+The counting argument below settles it in half a page, and the answer is
+that product states are a thin slice of the whole state space. Everything
+outside that slice, which is most of it, is entangled.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Quantum_Physics%3B_Paired_Atoms%3B_Untrapped_Atom_Pairs_%285941065432%29.jpg"
   alt="Laboratory image showing ultracold molecules splitting into entangled pairs of atoms flying apart in opposite directions, with a laser beam producing shadow images of the resulting cloud"
-  caption="An actual JILA/NIST measurement of ultracold molecules splitting into entangled atom pairs flying apart. A state like this has no separate description for 'this atom alone' — exactly the states this lesson shows can't be written as any single-particle product |a⟩⊗|b⟩."
+  caption="An actual JILA/NIST measurement of ultracold molecules splitting into entangled atom pairs flying apart. A state like this has no separate description for 'this atom alone': the kind of state this lesson shows can't be written as any single-particle product |a⟩⊗|b⟩."
   credit="Markus Greiner / JILA; NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Physics;_Paired_Atoms;_Untrapped_Atom_Pairs_(5941065432).jpg"
   license="Public Domain (U.S. Government work)"
@@ -69,9 +74,9 @@ Compare two ways of specifying a 2-qubit state. A **product state**
 $|a\rangle\otimes|b\rangle$ is fully determined by two points on two
 <Term id="bloch-sphere-term">Bloch spheres</Term>: that's it, nothing more to specify. A **general** 2-qubit
 state is specified by 4 independent complex amplitudes. If those two
-counts don't match, there must be states of the second kind that no
-choice of the first kind can reach. They don't match, and the gap between
-them is exactly what <Term id="entanglement">entanglement</Term> means.
+counts don't match, there must be states of the second kind that no choice
+of the first kind can reach. They don't match, and the gap between them is
+what <Term id="entanglement">entanglement</Term> means.
 
 ## Mathematical Development
 
@@ -90,7 +95,7 @@ $|b_1b_2\ldots b_n\rangle$.
 
 **Product states.** Each single-qubit factor contributes 2 real
 parameters (its own $\theta,\varphi$, after removing normalization and
-global phase exactly as in the single-qubit course). Two factors:
+global phase just as in the single-qubit course). Two factors:
 $2+2=4$ real parameters can specify *any* product state.
 
 **General 2-qubit states.** Four complex amplitudes are 8 real numbers.
@@ -99,7 +104,7 @@ Normalization removes 1. Overall <Term id="global-relative-phase">global phase</
 before) removes 1 more: $8-1-1=6$ real parameters.
 
 $6 > 4$. The general state space is strictly larger than the set of
-product states can reach. There is a genuine two-real-parameter's worth
+product states can reach. There is a full two-real-parameter's worth
 of states that no tensor product of single-qubit states can produce.
 Those are the **entangled** states.
 
@@ -117,10 +122,11 @@ $$
 
 From $a_0b_1=0$: either $a_0=0$ or $b_1=0$. If $a_0=0$, then
 $a_0b_0=0\neq\frac{1}{\sqrt2}$, a contradiction. If $b_1=0$, then
-$a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction. Either way, no
-choice of $a_0,a_1,b_0,b_1$ works: this state simply cannot be
-factored. A fully worked version of exactly this proof, for this exact
-state, is the centerpiece of the next lesson.
+$a_1b_1=0\neq\frac{1}{\sqrt2}$, also a contradiction. Either way, no choice
+of $a_0,a_1,b_0,b_1$ works. The state cannot be factored, and the argument
+covers every possible attempt at once rather than ruling out one guess at a
+time. A fully worked version of this proof, for this state, is the
+centerpiece of the next lesson.
 
 <PredictBeforeReveal
   question="Before running the coefficient-matching argument: does (|00⟩+|11⟩)/√2 factor as some |a⟩⊗|b⟩?"
@@ -130,7 +136,7 @@ state, is the centerpiece of the next lesson.
     { label: "No, no choice of |a⟩, |b⟩ works", value: "no" },
   ]}
   correctValue="no"
-  explanation="Matching coefficients against a0b0=1/√2, a0b1=0, a1b0=0, a1b1=1/√2 forces a contradiction no matter what you try: a0b1=0 needs a0=0 or b1=0, and either choice immediately zeroes out one of the two nonzero terms. There is no product state that reproduces this amplitude pattern — this is one of the states the parameter-counting argument above predicted must exist."
+  explanation="Matching coefficients against a0b0=1/√2, a0b1=0, a1b0=0, a1b1=1/√2 forces a contradiction no matter what you try: a0b1=0 needs a0=0 or b1=0, and either choice zeroes out one of the two nonzero terms. No product state reproduces this amplitude pattern. It is one of the states the parameter-counting argument above predicted had to exist."
 />
 
 <QuantumStateDisplay state={bellNumerator} label="Cannot be factored as |a⟩ ⊗ |b⟩" />
@@ -146,19 +152,19 @@ A product state means the two qubits are physically independent: you
 could describe qubit A's state completely on its own, hand it to someone
 else, and lose no information. An entangled state has no such
 description: asking "what is qubit A's state, by itself?" has no good
-answer, only the pair together has a well-defined state. This isn't a
-limitation of notation. It reflects a real difference in
-how the system behaves, with consequences (starting next lesson) for what
-happens when you measure just one of the two qubits.
+answer, and only the pair together has a well-defined state. This is not a
+limitation of the notation. It shows up as a difference in how the system
+behaves, starting next lesson with what happens when you measure one of
+the two qubits and leave the other alone.
 
 ## Interactive Experiment
 
 The factorability check above, matching coefficients and hunting for a
-contradiction, is exactly what the platform's real separability check
+contradiction, is what the simulator's real separability check
 computes for any 2-qubit state. Confirm both directions: a state that
 factors, and one that provably doesn't.
 
-<InteractiveSection title="Check factorability by computation, not just algebra" description="Initialize |++⟩ and read the state panel's Product state / Entangled indicator: Product state, since |+⟩⊗|+⟩ factors by construction. Then run the Create a Bell state guided walkthrough (H on qubit 0, then CNOT) and check the same indicator: Entangled, confirming by direct computation exactly what the coefficient-matching proof above showed algebraically for this state.">
+<InteractiveSection title="Check factorability by computation, not just algebra" description="Initialize |++⟩ and read the state panel's Product state / Entangled indicator: Product state, since |+⟩⊗|+⟩ factors by construction. Then run the Create a Bell state guided walkthrough (H on qubit 0, then CNOT) and check the same indicator: Entangled, confirming by direct computation what the coefficient-matching proof above showed algebraically for this state.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 

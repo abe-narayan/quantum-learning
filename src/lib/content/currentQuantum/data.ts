@@ -1,43 +1,49 @@
-import type { CurrentQuantumEntry } from "./types";
+import type { CurrentQuantumEntryBody } from "./types";
+import type { CurrentQuantumSlug } from "./metaRegistry";
 
 /**
- * Hand-maintained list of real quantum-computing/physics developments,
- * each tied back to a real QuantumLearn lesson. This is deliberately a flat
- * array of plain objects (like `GLOSSARY_TERMS` in `../glossary.ts`), not a
- * generated registry — there's no `npm run generate:*` step for this file.
- * To add an entry: verify the date/facts against the cited source, verify
- * `relatedLessonSlug` is a real file under `src/content/lessons/`, and
- * append an object below with a comment linking to where you got it.
+ * The prose half of the hand-maintained "Current Quantum" collection: for
+ * each entry slug, its summary, source citation, "why this matters" line,
+ * difficulty and optional figure — plus the editorial provenance comment
+ * recording where every fact came from.
  *
- * Entries were originally kept chronological (oldest first) purely for
- * human readability while editing. As multiple contributors have appended
- * entries over time, that ordering has drifted in places — new entries are
- * sometimes tacked on near the end rather than re-sorted into place by
- * date. Treat the array's literal order as approximate, not authoritative:
- * `getAllCurrentQuantumEntries()` always re-sorts entries newest-first by
- * comparing each `date` (see registry.ts), so display order on the site is
- * correct regardless of how this array is physically ordered. When adding
- * or fixing an entry, inserting it near its chronological neighbors is
- * still preferred for readability, but is not required for correctness.
+ * SERVER-ONLY. This module must never be reachable from a `"use client"`
+ * component; `src/lib/design/__tests__/clientBoundary.test.ts` enforces that
+ * from the source graph. The lightweight half every entry also has — slug,
+ * date, title, category, related lesson — lives in `metaRegistry.ts`, which
+ * *is* client-importable and carries the full explanation of why the two are
+ * separate files and what silently breaks if they are merged back. Read that
+ * before touching this one.
+ *
+ * There is no `npm run generate:*` step for this file and no generated twin:
+ * both halves are authored by hand, and no field appears in both, so there
+ * is nothing here that can drift out of sync with something else. What the
+ * two halves must agree on is the *set of slugs*, and that is enforced by
+ * the `Record<CurrentQuantumSlug, ...>` annotation below (a missing body is
+ * a compile error, an orphan body is an excess-property error) and re-checked
+ * at runtime by `__tests__/registry.test.ts`.
+ *
+ * TO ADD AN ENTRY: verify the date/facts against the cited source, verify
+ * the entry's `relatedLessonSlug` is a real file under `src/content/lessons/`,
+ * append the meta to `CURRENT_QUANTUM_META` in `metaRegistry.ts`, and append
+ * the body below with a comment linking to where you got it. Order here is
+ * for human readability only — display order comes from the meta's `date`
+ * (see `getAllCurrentQuantumMeta`), so an entry filed out of chronological
+ * order is untidy, never incorrect.
  */
-export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
+export const CURRENT_QUANTUM_BODIES: Record<CurrentQuantumSlug, CurrentQuantumEntryBody> = {
   // Source: P. W. Shor, "Polynomial-Time Algorithms for Prime Factorization
   // and Discrete Logarithms on a Quantum Computer," SIAM J. Comput. 26
   // (1997) 1484 (first presented at IEEE FOCS, Nov. 1994; preprint
   // arXiv:quant-ph/9508027). Date recorded as the 1994 conference result,
   // which is the historically cited "Shor's algorithm" moment.
-  {
-    slug: "shors-algorithm-1994",
-    date: "1994-11",
-    title: "Shor's Algorithm Shows Quantum Computers Could Break RSA",
+  "shors-algorithm-1994": {
     summary:
       "Mathematician Peter Shor showed that a quantum computer could factor large integers exponentially faster than any known classical method, by turning factoring into a period-finding problem solvable with the quantum Fourier transform. Because the security of RSA encryption rests on factoring being classically hard, this single theoretical result is what turned quantum computing from a physics curiosity into something governments and companies actively plan around — decades before a machine large enough to run it on cryptographically relevant numbers existed.",
-    category: "algorithms",
     source: {
       name: "arXiv (SIAM J. Comput. 26, 1997)",
       url: "https://arxiv.org/abs/quant-ph/9508027",
     },
-    relatedLessonSlug: "quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding",
     whyThisMatters:
       "This lesson derives the exact period-finding circuit Shor's algorithm depends on, the same construction that made this 1994 result a threat real enough to justify a new generation of cryptography.",
     difficulty: "advanced",
@@ -56,18 +62,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   },
   // Source: D. Bouwmeester et al., "Experimental quantum teleportation,"
   // Nature 390, 575-579 (11 Dec. 1997). https://www.nature.com/articles/37539
-  {
-    slug: "first-quantum-teleportation-1997",
-    date: "1997-12-11",
-    title: "First Experimental Demonstration of Quantum Teleportation",
+  "first-quantum-teleportation-1997": {
     summary:
       "A team led by Anton Zeilinger in Innsbruck, Austria used entangled photon pairs and a joint (Bell-state) measurement to transfer an unknown photon's polarization state onto a distant photon, without the state ever traveling through the space in between and without violating the no-cloning theorem. It was the first time the teleportation protocol — proposed theoretically in 1993 — had actually been carried out, confirming it works with real photons and real detectors, not just on paper.",
-    category: "historical experiment",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/37539",
     },
-    relatedLessonSlug: "quantum-computing/quantum-gates-and-circuits/quantum-teleportation",
     whyThisMatters:
       "This lesson derives the exact three-qubit protocol — entangle, Bell-measure, classically communicate, correct — that this 1997 experiment was the first to actually run with real photons.",
     difficulty: "intermediate",
@@ -75,18 +76,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: L. M. K. Vandersypen et al., "Experimental realization of Shor's
   // quantum factoring algorithm using nuclear magnetic resonance," Nature
   // 414, 883-887 (20 Dec. 2001). https://www.nature.com/articles/414883a
-  {
-    slug: "ibm-nmr-factors-15-2001",
-    date: "2001-12-20",
-    title: "IBM's NMR Quantum Computer Factors 15 Using Shor's Algorithm",
+  "ibm-nmr-factors-15-2001": {
     summary:
       "Researchers at IBM's Almaden lab, together with Stanford, built a 7-qubit quantum computer out of a custom molecule read out by nuclear magnetic resonance and used it to run Shor's algorithm end to end, correctly factoring 15 into 3 x 5. It was a tiny number that a child could factor by hand, but the point wasn't the arithmetic — it was the first time every step of a real quantum algorithm (superposition, entanglement, interference, measurement) had been executed together on physical hardware rather than just simulated.",
-    category: "hardware milestone",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/414883a",
     },
-    relatedLessonSlug: "quantum-computing/quantum-algorithms-ii/worked-example-factoring-15",
     whyThisMatters:
       "This lesson walks through factoring 15 with a=7 step by step (the exact instance IBM's 2001 experiment ran on real hardware), including the lesson's own honest note about what part of that pipeline actually needed a quantum computer.",
     difficulty: "advanced",
@@ -94,18 +90,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: J. Yin et al., "Satellite-based entanglement distribution over
   // 1200 kilometers," Science 356, 1140-1144 (15 June 2017).
   // https://www.science.org/doi/10.1126/science.aan3211
-  {
-    slug: "micius-satellite-entanglement-2017",
-    date: "2017-06-15",
-    title: "China's Micius Satellite Distributes Entanglement Over 1,200 km and Violates a Bell Inequality",
+  "micius-satellite-entanglement-2017": {
     summary:
       "The Micius satellite generated pairs of entangled photons in orbit and beamed one photon of each pair down to two ground stations in China separated by 1,200 km, far beyond what optical fiber loss allows. Measurements at the two stations violated a CHSH-type Bell inequality by several standard deviations, confirming the photons were still entangled after traveling through the atmosphere from space — a key proof that entanglement can survive real-world, long-distance channels needed for a future quantum internet.",
-    category: "quantum networking",
     source: {
       name: "Science",
       url: "https://www.science.org/doi/10.1126/science.aan3211",
     },
-    relatedLessonSlug: "quantum-computing/entanglement-and-measurement/the-chsh-inequality",
     whyThisMatters:
       "This lesson derives the S = 2√2 quantum CHSH value by hand for an ideal Bell state; Micius measured a real (noisier, but still classically-impossible) violation of that same inequality across 1,200 km of space.",
     difficulty: "advanced",
@@ -113,18 +104,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: F. Arute et al., "Quantum supremacy using a programmable
   // superconducting processor," Nature 574, 505-510 (23 Oct. 2019).
   // https://www.nature.com/articles/s41586-019-1666-5
-  {
-    slug: "google-sycamore-quantum-supremacy-2019",
-    date: "2019-10-23",
-    title: "Google's Sycamore Processor Claims \"Quantum Supremacy\"",
+  "google-sycamore-quantum-supremacy-2019": {
     summary:
       "Google's 53-qubit Sycamore chip sampled the output of a pseudo-random quantum circuit a million times in about 200 seconds, a task Google estimated would take the best classical supercomputer of the day roughly 10,000 years to reproduce (a figure IBM publicly disputed at the time, arguing a better classical algorithm could do it in days). That estimate did not hold for long: in 2022, Feng Pan, Keyang Chen, and Pan Zhang (Institute of Theoretical Physics, Chinese Academy of Sciences) published a tensor-network method that generated a million correlated bitstrings from the identical circuit in about 15 hours on a 512-GPU cluster, at a fidelity (~0.0037) comparable to Sycamore's own, and argued an exascale supercomputer could do the same task in seconds (Phys. Rev. Lett. 129, 090502). Google's underlying hardware result — that Sycamore does sample from the circuit's quantum distribution — was never shown to be wrong, but the '10,000 years, unreachable classically' framing was: this was the first widely reported claim of a task supposedly beyond brute-force classical simulation, and also an early, concrete lesson that a classical-hardness claim is only as good as the best classical algorithm known at the time it's made.",
-    category: "hardware milestone",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/s41586-019-1666-5",
     },
-    relatedLessonSlug: "quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage",
     whyThisMatters:
       "This capstone is explicit that 'quantum speedup' needs a precise, defensible comparison to a real classical algorithm — exactly the argument Google and IBM publicly disagreed about over Sycamore's claimed 10,000-year classical runtime, and exactly what the 2022 Pan-Chen-Zhang classical simulation later demonstrated concretely: the 'best classical algorithm' a quantum-advantage claim is measured against is a moving target, not a fixed constant.",
     difficulty: "advanced",
@@ -144,18 +130,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: The Nobel Prize in Physics 2022, press release, NobelPrize.org
   // (4 Oct. 2022).
   // https://www.nobelprize.org/prizes/physics/2022/press-release/
-  {
-    slug: "nobel-prize-2022-bell-tests",
-    date: "2022-10-04",
-    title: "Nobel Prize in Physics Awarded for Bell Inequality Experiments",
+  "nobel-prize-2022-bell-tests": {
     summary:
       "The 2022 Nobel Prize in Physics went jointly to John Clauser, Alain Aspect, and Anton Zeilinger for decades of experiments testing Bell's inequality with entangled photons. Clauser built the first practical test in the 1970s; Aspect closed a major loophole in the 1980s by switching measurement settings after the photons were already in flight; Zeilinger pushed the techniques further, enabling later work like entanglement swapping and teleportation. Together their experiments repeatedly confirmed that entangled particles show correlations no theory built on locality and pre-existing hidden values can explain, cementing entanglement as a real, exploitable physical resource rather than a philosophical puzzle.",
-    category: "historical experiment",
     source: {
       name: "NobelPrize.org",
       url: "https://www.nobelprize.org/prizes/physics/2022/press-release/",
     },
-    relatedLessonSlug: "quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables",
     whyThisMatters:
       "This lesson proves the |S| ≤ 2 bound that every local hidden-variable theory must obey; Clauser, Aspect, and Zeilinger are the three physicists whose experiments actually measured real entangled particles violating it.",
     difficulty: "intermediate",
@@ -177,18 +158,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: Y. Kim et al., "Evidence for the utility of quantum computing
   // before fault tolerance," Nature 618, 500-505 (14 June 2023).
   // https://www.nature.com/articles/s41586-023-06096-3
-  {
-    slug: "ibm-quantum-utility-2023",
-    date: "2023-06-14",
-    title: "IBM Demonstrates \"Quantum Utility\" Using Error Mitigation, Not Error Correction",
+  "ibm-quantum-utility-2023": {
     summary:
       "Using a 127-qubit Eagle processor, an IBM-led team simulated the dynamics of a 2D transverse-field Ising model at a circuit size IBM argued was too large to verify against the best classical tensor-network methods available in mid-2023. That framing didn't hold for long: within months, Joseph Tindall, Matt Fishman, Miles Stoudenmire, and Dries Sels published a tensor-network simulation (PRX Quantum 5, 010308, 2024; posted to arXiv in June 2023) that exploited the near-tree structure of IBM's heavy-hexagon qubit layout via belief-propagation contraction, and reported results that were 'significantly more accurate and precise' than IBM's own error-mitigated quantum results — not just feasible, but better. Several other independent groups published comparably efficient classical simulations of the same circuit around the same time. IBM's raw hardware data itself was never shown to be wrong, but the implicit claim that no classical method could match it collapsed almost immediately. The key trick on IBM's side was never full quantum error correction (which real hardware still can't do at this scale) but error mitigation — techniques like zero-noise extrapolation that run the same noisy circuit at different noise levels and extrapolate back to what a noiseless result would look like.",
-    category: "algorithms",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/s41586-023-06096-3",
     },
-    relatedLessonSlug: "quantum-software/compilation-and-hybrid-algorithms/quantum-error-mitigation",
     whyThisMatters:
       "This lesson derives zero-noise extrapolation's linear-in-noise-level formula from scratch — the exact technique IBM's 2023 paper leaned on to get a checkable answer out of noisy hardware without full error correction. The Tindall et al. rebuttal that followed within months is the sharpest real instance of the 'compared to what classical algorithm' problem: IBM's utility claim rested on the best classical method available in mid-2023, and a better one arrived before the year was out.",
     difficulty: "advanced",
@@ -217,18 +193,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // 2025 entries), which contradicted its own 2023 date. Moved here, next
   // to its correct chronological neighbors, since the array is short enough
   // that this placement stays easy to eyeball-verify by date.
-  {
-    slug: "ligo-squeezed-light-quantum-sensing-2023",
-    date: "2023-10-30",
-    title: "LIGO Uses Squeezed Light to Push Past the Ordinary Quantum Noise Limit",
+  "ligo-squeezed-light-quantum-sensing-2023": {
     summary:
       "Ahead of its fourth observing run, the LIGO gravitational-wave detectors were upgraded with a 300-meter filter cavity that produces 'frequency-dependent squeezed' light, injected into the interferometer to reduce quantum measurement noise across the entire detection band rather than just at high frequencies as in earlier squeezing setups. The result was a broadband sensitivity improvement of 15-18%, which increases LIGO's astrophysical detection rate for events like black hole and neutron star mergers by as much as 65% — a direct, deployed application of squeezed-state quantum optics that trades uncertainty in one observable for less uncertainty in the one the experiment actually measures.",
-    category: "sensing",
     source: {
       name: "Physical Review X",
       url: "https://doi.org/10.1103/PhysRevX.13.041021",
     },
-    relatedLessonSlug: "quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states",
     whyThisMatters:
       "This lesson derives exactly how a squeezed state trades a narrower Δx for a wider Δp while keeping their product at the Heisenberg minimum — the mechanism LIGO's 2023 upgrade uses in its interferometer to beat the ordinary quantum noise floor.",
     difficulty: "advanced",
@@ -250,18 +221,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: D. Bluvstein et al., "Logical quantum processor based on
   // reconfigurable atom arrays," Nature 626, 58-65 (6 Dec. 2023).
   // https://www.nature.com/articles/s41586-023-06927-3
-  {
-    slug: "harvard-quera-logical-qubits-2023",
-    date: "2023-12-06",
-    title: "48 Error-Corrected Logical Qubits Demonstrated on a Neutral-Atom Processor",
+  "harvard-quera-logical-qubits-2023": {
     summary:
       "A Harvard/QuEra/MIT collaboration used 280 individually-trapped neutral rubidium atoms, held and moved with optical tweezers, to encode 48 error-corrected logical qubits and run hundreds of logical gate operations across them — the largest logical-qubit processor demonstrated at the time. The result leaned on a distinctive feature of the neutral-atom platform: atoms can be physically shuttled between separate storage, entangling, and readout zones mid-circuit, which let the team implement error-correcting codes that would be far harder to wire up on a fixed, non-reconfigurable qubit grid.",
-    category: "error correction",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/s41586-023-06927-3",
     },
-    relatedLessonSlug: "quantum-hardware/physical-qubit-platforms/neutral-atoms",
     whyThisMatters:
       "This lesson explains how optical tweezers trap and rearrange neutral atoms into reconfigurable 2D/3D arrays — the exact hardware trick that let this 2023 experiment move atoms between zones to implement 48 logical qubits.",
     difficulty: "advanced",
@@ -269,18 +235,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: NIST, "NIST Releases First 3 Finalized Post-Quantum Encryption
   // Standards" (13 Aug. 2024).
   // https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards
-  {
-    slug: "nist-post-quantum-cryptography-standards-2024",
-    date: "2024-08-13",
-    title: "NIST Finalizes Its First Post-Quantum Cryptography Standards",
+  "nist-post-quantum-cryptography-standards-2024": {
     summary:
       "After an eight-year public competition, NIST published three finalized standards for cryptography designed to resist attacks from a future large-scale quantum computer: FIPS 203 (ML-KEM, for general encryption/key exchange), FIPS 204 (ML-DSA, for digital signatures), and FIPS 205 (SLH-DSA, a hash-based backup signature scheme). None of these algorithms rely on the integer-factoring or discrete-log problems that Shor's algorithm breaks; instead they're built on different hard problems (structured lattices, and for SLH-DSA, hash functions) believed to resist both classical and quantum attack.",
-    category: "cryptography",
     source: {
       name: "NIST",
       url: "https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards",
     },
-    relatedLessonSlug: "quantum-computing/quantum-algorithms-ii/shors-algorithm-factoring-via-period-finding",
     whyThisMatters:
       "This is the direct policy response to the threat this lesson derives mathematically: because Shor's algorithm breaks RSA's factoring assumption, NIST standardized replacement algorithms built on problems it doesn't touch.",
     difficulty: "intermediate",
@@ -305,18 +266,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // quantum chip" (9 Dec. 2024); underlying paper R. Acharya et al.,
   // "Quantum error correction below the surface code threshold," Nature
   // 638, 920-926 (2025). https://blog.google/technology/research/google-willow-quantum-chip/
-  {
-    slug: "google-willow-below-threshold-2024",
-    date: "2024-12-09",
-    title: "Google's Willow Chip Achieves Below-Threshold Error Correction",
+  "google-willow-below-threshold-2024": {
     summary:
       "Google's 105-qubit Willow processor ran surface-code memories at increasing code distances (3x3, 5x5, 7x7 grids of physical qubits per logical qubit) and showed the logical error rate roughly halving each time the grid got bigger, rather than growing worse — the long-sought 'below threshold' behavior where adding more physical qubits per logical qubit actually helps instead of hurts. The larger memory's logical qubit also outlived its best individual physical qubit, a 'beyond breakeven' result that is a necessary (though not by itself sufficient) condition for building a large, fault-tolerant quantum computer.",
-    category: "error correction",
     source: {
       name: "Google Quantum AI",
       url: "https://blog.google/technology/research/google-willow-quantum-chip/",
     },
-    relatedLessonSlug: "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction",
     whyThisMatters:
       "This lesson explains why real roadmaps build toward surface codes because their distance can grow just by making the 2D grid bigger — precisely the 3x3-to-7x7 scaling Willow used to demonstrate below-threshold behavior.",
     difficulty: "advanced",
@@ -324,18 +280,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: J. M. Thomas et al., "Quantum teleportation coexisting with
   // classical communications in optical fiber," Optica 11(12), 1700 (20
   // Dec. 2024). https://doi.org/10.1364/OPTICA.540362
-  {
-    slug: "northwestern-teleportation-over-internet-fiber-2024",
-    date: "2024-12-20",
-    title: "Quantum Teleportation Demonstrated Over Live Internet Fiber",
+  "northwestern-teleportation-over-internet-fiber-2024": {
     summary:
       "A Northwestern University team led by Prem Kumar teleported a photonic qubit's quantum state across a 30.2 km fiber that was simultaneously carrying 400 Gbps of ordinary internet traffic, by carefully separating the quantum photons' wavelength channel from the classical data channels sharing the same physical cable. It's the first demonstration that quantum teleportation doesn't require its own dedicated dark fiber — it can, with the right filtering, share existing telecom infrastructure with live data traffic, a practical prerequisite for any real-world quantum network.",
-    category: "quantum networking",
     source: {
       name: "Optica",
       url: "https://doi.org/10.1364/OPTICA.540362",
     },
-    relatedLessonSlug: "quantum-hardware/physical-qubit-platforms/photonic-qubits",
     whyThisMatters:
       "This lesson notes that a photonic qubit's defining property is that it travels rather than sitting still — exactly the property this 2024 experiment exploited to send a teleported qubit down a live, shared internet fiber.",
     difficulty: "intermediate",
@@ -344,18 +295,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // and Algorithm Breakthroughs on Path to Advantage and Fault Tolerance"
   // (12 Nov. 2025).
   // https://newsroom.ibm.com/2025-11-12-ibm-delivers-new-quantum-processors,-software,-and-algorithm-breakthroughs-on-path-to-advantage-and-fault-tolerance
-  {
-    slug: "ibm-nighthawk-loon-2025",
-    date: "2025-11-12",
-    title: "IBM Unveils Nighthawk and Loon on Its Path to Fault-Tolerant Quantum Computing",
+  "ibm-nighthawk-loon-2025": {
     summary:
       "IBM introduced two new superconducting processors with different jobs: Nighthawk, a 120-qubit chip built for running larger, more complex circuits en route to a 2026 quantum-advantage claim, and Loon, a testbed where each qubit connects to six neighbors (including vertically) rather than the usual four, a denser 3D-style connectivity aimed at implementing more efficient quantum low-density parity-check (qLDPC) error-correcting codes. IBM also reported decoding Loon's error syndromes on classical hardware in under 480 nanoseconds, fast enough to keep up with the error-correction cycle in real time.",
-    category: "hardware milestone",
     source: {
       name: "IBM Newsroom",
       url: "https://newsroom.ibm.com/2025-11-12-ibm-delivers-new-quantum-processors,-software,-and-algorithm-breakthroughs-on-path-to-advantage-and-fault-tolerance",
     },
-    relatedLessonSlug: "quantum-hardware/noise-decoherence-and-scaling/roadmaps-to-fault-tolerance",
     whyThisMatters:
       "This lesson's whole point is the physical-to-logical qubit overhead real roadmaps have to pay; Loon's six-way connectivity is IBM's specific hardware bet for shrinking that overhead with more efficient error-correcting codes.",
     difficulty: "advanced",
@@ -363,18 +309,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: IonQ, "IonQ Achieves Landmark Result, Setting New World Record
   // in Quantum Computing Performance" (21 Oct. 2025).
   // https://www.ionq.com/news/ionq-achieves-landmark-result-setting-new-world-record-in-quantum-computing
-  {
-    slug: "ionq-record-two-qubit-fidelity-2025",
-    date: "2025-10-21",
-    title: "IonQ Sets a New Trapped-Ion Two-Qubit Gate Fidelity Record: 99.99%",
+  "ionq-record-two-qubit-fidelity-2025": {
     summary:
       "IonQ announced a two-qubit gate fidelity of 99.99% using what it calls Electronic Qubit Control, surpassing the previous published trapped-ion record of 99.97% (set by Oxford Ionics, since acquired by IonQ, in 2024). Two-qubit gate fidelity matters more than almost any other single number for near-term quantum hardware: fault-tolerant error correction needs gate error rates well below the error-correcting code's threshold, so pushing fidelity from 99.9% to 99.99% represents roughly a 10x cut in the physical error a logical qubit has to correct for.",
-    category: "hardware milestone",
     source: {
       name: "IonQ",
       url: "https://www.ionq.com/news/ionq-achieves-landmark-result-setting-new-world-record-in-quantum-computing",
     },
-    relatedLessonSlug: "quantum-hardware/physical-qubit-platforms/trapped-ions",
     whyThisMatters:
       "This lesson explains why trapped ions' shared vibrational mode lets any pair of ions interact directly; two-qubit gate fidelity on exactly that mechanism is the number IonQ pushed to a record 99.99% in 2025.",
     difficulty: "intermediate",
@@ -398,18 +339,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: J. S. Bell, "On the Einstein Podolsky Rosen Paradox,"
   // Physics Physique Fizika 1, 195-200 (Nov. 1964).
   // https://link.aps.org/doi/10.1103/PhysicsPhysiqueFizika.1.195
-  {
-    slug: "bell-1964-epr-paradox-inequality",
-    date: "1964-11",
-    title: "John Bell Derives the Inequality That Makes Entanglement Testable",
+  "bell-1964-epr-paradox-inequality": {
     summary:
       "Responding to the 1935 Einstein-Podolsky-Rosen argument that quantum mechanics must be incomplete, physicist John Bell proved something the EPR paper's authors never attempted: a concrete, numerical inequality that any theory completing quantum mechanics with pre-existing 'hidden variables' (and no faster-than-light influence) would have to obey. Quantum mechanics itself predicts this inequality can be violated for an entangled pair. Bell's paper turned a decades-old philosophical disagreement about whether particles have definite properties before measurement into a question a real experiment could settle, which is exactly what happened starting with Clauser's apparatus in the 1970s.",
-    category: "historical experiment",
     source: {
       name: "Physics Physique Fizika",
       url: "https://link.aps.org/doi/10.1103/PhysicsPhysiqueFizika.1.195",
     },
-    relatedLessonSlug: "quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables",
     whyThisMatters:
       "This lesson's |S| ≤ 2 bound for any local hidden-variable theory is the direct mathematical descendant of the inequality Bell first derived in this 1964 paper, years before Clauser, Aspect, or Zeilinger could actually test it in a lab.",
     difficulty: "advanced",
@@ -432,18 +368,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // International Journal of Theoretical Physics 21 (6/7), 467-488
   // (1982); delivered as the keynote at MIT's Physics of Computation
   // Conference, May 1981. https://doi.org/10.1007/BF02650179
-  {
-    slug: "feynman-simulating-physics-with-computers-1981",
-    date: "1981-05",
-    title: "Feynman Proposes Using Quantum Systems to Simulate Quantum Physics",
+  "feynman-simulating-physics-with-computers-1981": {
     summary:
       "At a keynote talk at MIT, Richard Feynman pointed out that simulating quantum mechanics on an ordinary classical computer seems to require resources that grow exponentially with the number of particles involved, since a quantum state's description has exponentially many independent numbers. His proposed fix was direct: build a computer out of quantum-mechanical elements that obey quantum rules natively, so it could simulate other quantum systems without paying that exponential penalty. The idea took over a decade to formalize into concrete algorithms and decades more to run on real hardware, but this talk (published the following year) is the historical origin of quantum simulation as a research field.",
-    category: "historical experiment",
     source: {
       name: "International Journal of Theoretical Physics",
       url: "https://doi.org/10.1007/BF02650179",
     },
-    relatedLessonSlug: "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization",
     whyThisMatters:
       "This lesson turns Feynman's 1981 observation, that classical computers need exponential resources to simulate quantum systems while a quantum system could simulate another one directly, into the exact, quantitative Trotter error bound derived here.",
     difficulty: "master",
@@ -464,18 +395,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: A. Kandala et al., "Hardware-efficient variational quantum
   // eigensolver for small molecules and quantum magnets," Nature 549,
   // 242-246 (14 Sept. 2017). https://www.nature.com/articles/nature23879
-  {
-    slug: "ibm-vqe-beh2-kandala-2017",
-    date: "2017-09-14",
-    title: "IBM Runs VQE on Real Hardware to Find Molecular Ground-State Energies",
+  "ibm-vqe-beh2-kandala-2017": {
     summary:
       "An IBM-led team ran the variational quantum eigensolver on a six-qubit superconducting processor, optimizing a hardware-tailored ansatz circuit against a classical optimizer to find the ground-state energy of increasingly large molecules, up to BeH2 with more than one hundred Pauli terms in its Hamiltonian, the largest quantum chemistry calculation run on real quantum hardware at the time. The experiment mattered less for the specific molecule (still small enough for classical methods) than for showing the full hybrid quantum-classical loop, gradient-free optimization over a real noisy device, actually converges to a physically meaningful answer rather than getting stuck or drifting.",
-    category: "algorithms",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/nature23879",
     },
-    relatedLessonSlug: "quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example",
     whyThisMatters:
       "This lesson runs VQE's hybrid optimization loop to convergence on a one-qubit toy Hamiltonian; this 2017 experiment is the first time the identical loop structure was scaled onto real hardware and converged on the ground-state energy of an actual molecule.",
     difficulty: "advanced",
@@ -484,18 +410,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // "Hartree-Fock on a superconducting qubit quantum computer," Science
   // 369, 1084-1089 (28 Aug. 2020).
   // https://www.science.org/doi/10.1126/science.abb9811
-  {
-    slug: "google-hartree-fock-chemistry-2020",
-    date: "2020-08-28",
-    title: "Google Simulates a Chemical Reaction Mechanism on a Superconducting Processor",
+  "google-hartree-fock-chemistry-2020": {
     summary:
       "Google's quantum AI team used up to a dozen qubits and a parameterized ansatz circuit implementing Givens rotations to prepare Hartree-Fock wavefunctions, then modeled the isomerization mechanism of diazene (a real chemical reaction pathway) on a superconducting processor, combined with an error-mitigation scheme based on the physical constraint that the simulated electron count must stay fixed. It was, at the time, the largest chemical simulation run on quantum hardware, and a concrete demonstration that variational ansatz circuits can track a real reaction's energy landscape, not just a single fixed molecule's ground state.",
-    category: "algorithms",
     source: {
       name: "Science",
       url: "https://www.science.org/doi/10.1126/science.abb9811",
     },
-    relatedLessonSlug: "quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits",
     whyThisMatters:
       "This lesson defines an ansatz circuit and asks what 'expressive enough' means in the abstract; Google's 2020 experiment is a concrete answer, using a Givens-rotation ansatz expressive enough to track a real reaction's energy landscape across a dozen qubits.",
     difficulty: "advanced",
@@ -504,18 +425,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // space-to-ground quantum communication network over 4,600
   // kilometres," Nature 589, 214-219 (6 Jan. 2021).
   // https://www.nature.com/articles/s41586-020-03093-8
-  {
-    slug: "china-integrated-quantum-communication-network-2021",
-    date: "2021-01-06",
-    title: "China Links Fiber and Satellite QKD Into a 4,600 km Quantum Network",
+  "china-integrated-quantum-communication-network-2021": {
     summary:
       "A USTC-led team combined more than 700 km of trusted-node fiber QKD links across four Chinese cities with two ground-to-satellite links to the Micius satellite, forming a single integrated network that let over 150 users exchange BB84-based quantum keys across a total distance of 4,600 km. The satellite links also had their key generation rate raised roughly 40x over earlier work, to 47.8 kilobits per second. It was the first time fiber-based metropolitan QKD and satellite-based long-distance QKD had been operated together as one practical, multi-user network rather than as separate lab demonstrations.",
-    category: "quantum networking",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/s41586-020-03093-8",
     },
-    relatedLessonSlug: "quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution",
     whyThisMatters:
       "This lesson derives BB84's key exchange for a single Alice and Bob; China's 2021 network runs the identical protocol at the scale of a real multi-user infrastructure, stitching together fiber links and the Micius satellite link into one 4,600 km system.",
     difficulty: "intermediate",
@@ -524,18 +440,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Laboratory), "Waveguide-Coupled Rydberg Spectrum Analyzer from 0 to
   // 20 GHz," Phys. Rev. Applied 15, 014053 (27 Jan. 2021).
   // https://link.aps.org/doi/10.1103/PhysRevApplied.15.014053
-  {
-    slug: "army-rydberg-spectrum-analyzer-2021",
-    date: "2021-01-27",
-    title: "Army Researchers Build a Rydberg-Atom Sensor Spanning 0 to 20 GHz",
+  "army-rydberg-spectrum-analyzer-2021": {
     summary:
       "Researchers at the U.S. Army Research Laboratory coupled a vapor cell of Rydberg atoms to a microwave waveguide and used it as a spectrum analyzer that continuously covers frequencies from near zero up to 20 GHz, detecting real-world AM/FM radio, Bluetooth, and Wi-Fi signals, a far broader single-device bandwidth than a conventional antenna and receiver chain typically covers. The sensor works because an atom driven to a highly excited Rydberg state has an electron in a hugely expanded orbit, which makes its energy levels (and therefore its response to an external electric field) exceptionally sensitive across a wide range of frequencies, an SI-traceable measurement calibrated directly against atomic physics rather than an antenna's geometry.",
-    category: "sensing",
     source: {
       name: "Physical Review Applied",
       url: "https://link.aps.org/doi/10.1103/PhysRevApplied.15.014053",
     },
-    relatedLessonSlug: "quantum-hardware/physical-qubit-platforms/neutral-atoms",
     whyThisMatters:
       "This lesson explains Rydberg blockade as exciting an atom to a huge, strongly-interacting orbit to build a two-qubit gate; the Army's 2021 sensor exploits the exact same giant-orbit sensitivity in the opposite direction, as an ultra-broadband electric-field antenna instead of a gate.",
     difficulty: "intermediate",
@@ -543,18 +454,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: D. Gong et al., "Quantum walks on a programmable
   // two-dimensional 62-qubit superconducting processor," Science 372,
   // 948-952 (28 May 2021). https://doi.org/10.1126/science.abg7812
-  {
-    slug: "ustc-62-qubit-quantum-walk-2021",
-    date: "2021-05-28",
-    title: "A 62-Qubit Processor Runs Single- and Two-Particle Quantum Walks",
+  "ustc-62-qubit-quantum-walk-2021": {
     summary:
       "A USTC-led team fabricated an 8x8 grid of 62 superconducting qubits and used it to run genuine quantum walks: single- and two-particle 'walkers' spreading across the 2D lattice by quantum interference rather than classical random hopping, including a Mach-Zehnder-style interferometer where a walker coherently splits into two paths before recombining. The measured spreading matched the quadratically-faster-than-classical variance growth quantum walk theory predicts, on real hardware large enough that no straightforward classical simulation of the full 62-qubit dynamics was feasible to check it against directly.",
-    category: "algorithms",
     source: {
       name: "Science",
       url: "https://doi.org/10.1126/science.abg7812",
     },
-    relatedLessonSlug: "quantum-mastery/advanced-algorithms-and-complexity/quantum-walks",
     whyThisMatters:
       "This lesson computes the Hadamard walk's variance growing quadratically faster than the classical random walk's; USTC's 2021 experiment measured exactly that quantum-versus-classical spreading gap directly, on a real 62-qubit lattice too large to simulate classically.",
     difficulty: "master",
@@ -563,18 +469,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Quantum Networking and MIT), "Entanglement of nanophotonic quantum
   // memory nodes in a telecom network," Nature 629, 573-578 (15 May
   // 2024). https://www.nature.com/articles/s41586-024-07252-z
-  {
-    slug: "harvard-telecom-quantum-memory-network-2024",
-    date: "2024-05-15",
-    title: "Harvard Entangles Two Diamond Quantum Memories Over Telecom Fiber",
+  "harvard-telecom-quantum-memory-network-2024": {
     summary:
       "A Harvard-led team built two independent quantum network nodes, each a silicon-vacancy color center in a nanophotonic diamond cavity holding both an electron spin and a nuclear spin, connected by telecom-wavelength optical fiber (including a 35 km loop deployed through real Boston-area infrastructure). Using heralded spin-photon entangling operations and quantum frequency conversion to telecom wavelengths, they entangled the two remote nodes' electron spins and, using the more error-resistant nuclear spins with built-in error detection, kept that remote entanglement alive for up to a full second, long enough to be useful rather than a fleeting correlation.",
-    category: "quantum networking",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/s41586-024-07252-z",
     },
-    relatedLessonSlug: "quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement",
     whyThisMatters:
       "This lesson derives the Bell state (|00⟩+|11⟩)/√2 from a two-qubit circuit sitting on one chip; Harvard's 2024 experiment generated that same kind of entanglement between two physically separate matter-qubit memories over real telecom fiber, the building block a quantum repeater network needs.",
     difficulty: "intermediate",
@@ -584,18 +485,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Hz^-1/2 toward measurement of biomagnetic field," Phys. Rev. Applied
   // 21, 064010 (5 June 2024).
   // https://doi.org/10.1103/PhysRevApplied.21.064010
-  {
-    slug: "tokyo-tech-diamond-magnetometer-meg-2024",
-    date: "2024-06-05",
-    title: "A Diamond Quantum Magnetometer Reaches Sub-10-Picotesla Sensitivity",
+  "tokyo-tech-diamond-magnetometer-meg-2024": {
     summary:
       "A Tokyo Institute of Technology team built a diamond magnetometer using an ensemble of nitrogen-vacancy centers, negatively-charged defects whose electron spin can be optically read out, and pushed its DC magnetic field sensitivity below 10 picotesla per root-hertz using continuous-wave optically detected magnetic resonance. That sensitivity level puts it within reach of magnetoencephalography, mapping the brain's tiny magnetic fields, at room temperature with millimeter-scale spatial resolution, a genuine improvement over the centimeter-scale resolution of conventional (and far bulkier, cryogenically-cooled) MEG hardware.",
-    category: "sensing",
     source: {
       name: "Physical Review Applied",
       url: "https://doi.org/10.1103/PhysRevApplied.21.064010",
     },
-    relatedLessonSlug: "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence",
     whyThisMatters:
       "This lesson notes T1 and T2 weren't invented for qubits, they're the same spin-relaxation constants Bloch defined for MRI in 1946; this 2024 diamond magnetometer is a direct descendant of that same physics, where a longer coherence time directly buys higher magnetic-field sensitivity.",
     difficulty: "advanced",
@@ -605,18 +501,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // qubits on record with an error rate 800x better than physical
   // qubits" (3 Apr. 2024).
   // https://blogs.microsoft.com/blog/2024/04/03/advancing-science-microsoft-and-quantinuum-demonstrate-the-most-reliable-logical-qubits-on-record-with-an-error-rate-800x-better-than-physical-qubits/
-  {
-    slug: "quantinuum-microsoft-reliable-logical-qubits-2024",
-    date: "2024-04-03",
-    title: "Microsoft and Quantinuum Cut Logical Error Rates 800x Below Physical Ones",
+  "quantinuum-microsoft-reliable-logical-qubits-2024": {
     summary:
       "Using Microsoft's qubit-virtualization error-diagnostics software on Quantinuum's H2 trapped-ion processor, the two companies built four error-corrected logical qubits out of just 30 physical qubits and ran more than 14,000 individual circuit instances with zero uncorrected errors, a logical error rate they reported as roughly 800 times lower than the underlying physical qubits' error rate, the largest such gap reported at the time. The demonstration also included active syndrome extraction, repeatedly diagnosing and correcting errors mid-circuit without collapsing the encoded logical information, moving the hardware from Microsoft's 'Level 1: Foundational' to 'Level 2: Resilient' benchmark for fault-tolerant progress.",
-    category: "error correction",
     source: {
       name: "Microsoft Azure Quantum Blog",
       url: "https://blogs.microsoft.com/blog/2024/04/03/advancing-science-microsoft-and-quantinuum-demonstrate-the-most-reliable-logical-qubits-on-record-with-an-error-rate-800x-better-than-physical-qubits/",
     },
-    relatedLessonSlug: "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead",
     whyThisMatters:
       "This capstone cites literature figures of hundreds to thousands of physical qubits per logical qubit; Microsoft and Quantinuum's 2024 result cut that overhead dramatically, building four reliable logical qubits from only 30 physical ones on a real trapped-ion device.",
     difficulty: "advanced",
@@ -624,18 +515,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Source: AWS, "Amazon's new Ocelot chip brings us closer to building
   // a practical quantum computer" (27 Feb. 2025).
   // https://www.aboutamazon.com/news/aws/quantum-computing-aws-ocelot-chip
-  {
-    slug: "aws-ocelot-cat-qubits-2025",
-    date: "2025-02-27",
-    title: "AWS Unveils Ocelot, a Chip Built on Error-Biased \"Cat Qubits\"",
+  "aws-ocelot-cat-qubits-2025": {
     summary:
       "AWS introduced Ocelot, a nine-qubit chip built from superconducting 'cat qubits,' oscillators encoded so that the two logical states are far apart in phase space, which passively suppresses bit-flip errors exponentially well while leaving phase-flip errors mostly untouched. Because only one error type needs active correction, a simple repetition-style code layered on top can handle it with far fewer physical qubits than a general-purpose code needs, and AWS reported this approach could cut the physical-to-logical qubit overhead by up to 90% compared to conventional, unbiased approaches, while measuring logical error rates as low as 1.65% at code distance 5.",
-    category: "error correction",
     source: {
       name: "AWS (About Amazon)",
       url: "https://www.aboutamazon.com/news/aws/quantum-computing-aws-ocelot-chip",
     },
-    relatedLessonSlug: "quantum-computing/error-correction-and-fault-tolerance/why-quantum-errors-are-different",
     whyThisMatters:
       "This lesson shows that correcting X and Z errors separately is enough to handle any single-qubit error; Ocelot is built around deliberately making that asymmetric, passively suppressing X (bit-flip) errors in hardware so only the Z (phase-flip) half needs active, qubit-expensive correction.",
     difficulty: "advanced",
@@ -644,18 +530,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Oxford), "Distributed quantum computing across an optical network
   // link," Nature 638, 383-388 (5 Feb. 2025).
   // https://www.nature.com/articles/s41586-024-08404-x
-  {
-    slug: "oxford-distributed-quantum-computing-2025",
-    date: "2025-02-05",
-    title: "Oxford Teleports a Logic Gate Between Two Separate Quantum Processors",
+  "oxford-distributed-quantum-computing-2025": {
     summary:
       "An Oxford team connected two separate trapped-ion processing modules with a photonic fiber link, used it to generate entanglement between an ion in each module, and then teleported not just a qubit's state but an entire two-qubit logic gate across that link, running a small quantum algorithm that spanned both modules as though they were one connected machine. It's a direct answer to quantum computing's scaling problem: rather than building one ever-larger chip, link many smaller, more manufacturable modules together with photonic interconnects and let teleportation carry gates (not just data) across the network.",
-    category: "quantum networking",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/s41586-024-08404-x",
     },
-    relatedLessonSlug: "quantum-computing/quantum-gates-and-circuits/quantum-teleportation",
     whyThisMatters:
       "This lesson derives teleportation's entangle, Bell-measure, classically-communicate, correct protocol for moving a single qubit's state; Oxford's 2025 experiment runs the same structure to teleport an entire two-qubit gate between separate processors, linking them into one larger machine.",
     difficulty: "intermediate",
@@ -664,18 +545,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // Ridge National Laboratory, and UT Austin, "Certified randomness
   // using a trapped-ion quantum processor," Nature 640, 343-348 (10
   // Apr. 2025). https://www.nature.com/articles/s41586-025-08737-1
-  {
-    slug: "quantinuum-certified-randomness-2025",
-    date: "2025-04-10",
-    title: "Quantinuum Demonstrates Cryptographically Certified Quantum Randomness",
+  "quantinuum-certified-randomness-2025": {
     summary:
       "A team spanning Quantinuum, JPMorganChase, and three U.S. research institutions used a 56-qubit trapped-ion processor to run a protocol where a classical client sends deliberately hard-to-simulate random circuits to the quantum computer, which executes them and returns results a classical supercomputer (in this case, several combined, exceeding a quintillion floating-point operations per second) then verifies against. Because generating a convincing fake response would have required classically simulating circuits believed to be beyond any current supercomputer's reach, a successful, timely response effectively certifies the returned bits are random and were not predictable in advance, a real cryptographic protocol turned into a commercial product rather than a lab curiosity.",
-    category: "cryptography",
     source: {
       name: "Nature",
       url: "https://www.nature.com/articles/s41586-025-08737-1",
     },
-    relatedLessonSlug: "quantum-software/simulating-quantum-systems/computational-cost-and-scaling",
     whyThisMatters:
       "This lesson explains why quantum-advantage experiments deliberately target circuits beyond any classical simulator's reach; Quantinuum's 2025 protocol leans on that exact classical-hardness gap, turning 'a classical computer can't keep up' into a cryptographic certificate that a random number was quantum-generated rather than guessed in advance.",
     difficulty: "intermediate",
@@ -684,21 +560,18 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // 2025 as the Year of Fault Tolerance and Over $230M of New Capital to
   // Accelerate Industrial Deployment" (9 Dec. 2025); underlying paper
   // D. Bluvstein et al., "A fault-tolerant neutral-atom architecture for
-  // universal quantum computation," Nature 649, 39-46 (2026),
-  // arXiv:2506.20661.
+  // universal quantum computation," Nature 649, 39-46 (2026), published
+  // online 10 Nov. 2025, https://doi.org/10.1038/s41586-025-09848-5,
+  // arXiv:2506.20661. (Citation re-verified Aug. 2026 against the Nature
+  // article page and NIST's publication record for the paper.)
   // https://www.quera.com/press-releases/quera-computing-marks-record-2025-as-the-year-of-fault-tolerance-and-over-230m-of-new-capital-to-accelerate-industrial-deployment
-  {
-    slug: "harvard-quera-96-logical-qubits-2025",
-    date: "2025-12-09",
-    title: "Harvard/QuEra/MIT Team Doubles the Logical-Qubit Record to 96 on One Neutral-Atom Processor",
+  "harvard-quera-96-logical-qubits-2025": {
     summary:
       "Two years after their 48-logical-qubit demonstration, the same Harvard/QuEra/MIT collaboration (with Markus Greiner and Vladan Vuletic joining Mikhail Lukin's group) used up to 448 individually-trapped neutral rubidium atoms to run up to 96 error-corrected logical qubits simultaneously, encoded with both the [[7,1,3]] Steane code and a higher-rate [[16,6,4]] code. The result folded together, for the first time on one integrated architecture, physical entanglement, logical entanglement, logical 'magic state' generation for universal gates, and mid-circuit entropy removal via atom re-use — and directly measured 'below-threshold' behavior again, this time reporting roughly a 2.14x reduction in logical error rate in a four-round characterization circuit as the code scaled up, rather than the error rate growing worse.",
-    category: "error correction",
     source: {
       name: "QuEra Computing",
       url: "https://www.quera.com/press-releases/quera-computing-marks-record-2025-as-the-year-of-fault-tolerance-and-over-230m-of-new-capital-to-accelerate-industrial-deployment",
     },
-    relatedLessonSlug: "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead",
     whyThisMatters:
       "This capstone's whole point is that code distance only helps below a critical physical error rate, and that physical-to-logical qubit overhead is a real, citable number, not an abstraction; this 2025 result is a direct, newer data point on exactly that overhead curve, doubling the logical-qubit count this file's 2023 QuEra entry reported two years earlier while again demonstrating below-threshold scaling.",
     difficulty: "advanced",
@@ -707,18 +580,13 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
   // On-Chip Cryogenic Control of Gate-Model Qubits," press release (6 Jan.
   // 2026).
   // https://www.dwavequantum.com/company/newsroom/press-release/d-wave-demonstrates-first-scalable-on-chip-cryogenic-control-of-gate-model-qubits/
-  {
-    slug: "dwave-onchip-cryogenic-control-2026",
-    date: "2026-01-06",
-    title: "D-Wave Demonstrates On-Chip Cryogenic Control for Gate-Model Qubits",
+  "dwave-onchip-cryogenic-control-2026": {
     summary:
       "D-Wave built a multichip package that bump-bonds a high-coherence superconducting fluxonium qubit chip directly to a multilayer cryogenic control chip, using multiplexed digital-to-analog converters (with key fabrication steps done at NASA's Jet Propulsion Laboratory) to generate and route each qubit's control signals right next to the qubit itself, rather than piping a separate room-temperature wire down to every qubit through the dilution refrigerator. D-Wave says the same multiplexing scheme already controls tens of thousands of qubits and couplers in its commercial annealing processors with only about 200 bias wires, and that the same on-chip approach can cut gate-model wiring complexity by a similar factor without degrading qubit fidelity — attacking the 'wiring problem' that limits how many physical qubits a dilution refrigerator's fixed number of cryostat feedthroughs can practically support.",
-    category: "hardware milestone",
     source: {
       name: "D-Wave Quantum Inc.",
       url: "https://www.dwavequantum.com/company/newsroom/press-release/d-wave-demonstrates-first-scalable-on-chip-cryogenic-control-of-gate-model-qubits/",
     },
-    relatedLessonSlug: "quantum-hardware/control-and-readout/control-electronics",
     whyThisMatters:
       "This lesson explains that every gate is, physically, a classical control system generating a precisely-shaped pulse and sending it to the qubit; D-Wave's 2026 chip moves that pulse generation from room-temperature electronics onto a chip bonded right next to the qubits, the specific hardware bet aimed at the wiring bottleneck that lesson's control system faces at scale.",
     difficulty: "intermediate",
@@ -739,4 +607,51 @@ export const CURRENT_QUANTUM_ENTRIES: CurrentQuantumEntry[] = [
       license: "CC BY 2.0",
     },
   },
-];
+  // Source: S. Dasu et al. (Quantinuum), "Computing with many encoded
+  // logical qubits beyond break-even," arXiv:2602.22211 (submitted 25 Feb.
+  // 2026). https://arxiv.org/abs/2602.22211 — details verified against the
+  // arXiv abstract (48-94 logical qubits, iceberg codes, Helios hardware).
+  "quantinuum-helios-iceberg-logical-qubits-2026": {
+    summary:
+      "Quantinuum researchers used the company's 98-qubit Helios trapped-ion processor to run computations on between 48 and 94 logical qubits, reporting beyond-break-even performance: the encoded circuits outperformed their unencoded physical equivalents across benchmarks including GHZ-state preparation and quantum simulation of three-dimensional magnetic systems. The striking number is the overhead. Instead of the hundreds of physical qubits per logical qubit that surface-code estimates assume, the team used high-rate [[k+2, k, 2]] 'iceberg' error-detecting codes, which spend only two extra physical qubits regardless of how many logical qubits they protect, plus a two-level concatenated iceberg construction for full error correction. The trade is real: iceberg codes have distance 2 (detection) or 4 (correction), far weaker protection than a large surface code, so this is a bet that trapped-ion fidelities are already good enough that thin codes beat thick ones at today's machine sizes.",
+    source: {
+      name: "arXiv (Quantinuum)",
+      url: "https://arxiv.org/abs/2602.22211",
+    },
+    whyThisMatters:
+      "This capstone treats physical-to-logical overhead as the central budget line of fault tolerance; Quantinuum's iceberg-code result is a live data point at the opposite extreme of that trade-off, buying dozens of weakly-protected logical qubits for almost no overhead rather than a few strongly-protected ones for hundreds of physical qubits each.",
+    difficulty: "advanced",
+  },
+  // Source: "Improved quantum processor logical error rates via correction
+  // and detection," Nature 654 (issue 8118), published 10 June 2026,
+  // https://www.nature.com/articles/s41586-026-10628-y (Microsoft Quantum
+  // and Quantinuum). Figures cross-checked against Microsoft's companion
+  // blog post (quantum.microsoft.com, "Microsoft's application of error
+  // correction to trapped-ion qubits published in Nature").
+  "microsoft-quantinuum-carbon-tesseract-nature-2026": {
+    summary:
+      "Two years after their 2024 press-release claim of logical error rates 800x below physical ones, Microsoft and Quantinuum published the peer-reviewed version: running Microsoft's qubit-virtualization software on Quantinuum's trapped-ion hardware, with two codes tailored to the platform, a 12-qubit 'carbon' code encoding two logical qubits and a 16-qubit 'tesseract' color code encoding four. Across circuits of up to 12 logical qubits they measured logical error rates 11x to 800x below matched physical baselines, with the headline number coming from Bell-state preparation (roughly 0.8% physical error down to 0.001% logical, with post-selection), plus a 51x per-round improvement under repeated mid-circuit error correction. The same collaboration also demonstrated an end-to-end hybrid chemistry workflow, combining the logical qubits with classical HPC and AI models to estimate a catalytic intermediate's ground-state energy to chemical accuracy.",
+    source: {
+      name: "Nature",
+      url: "https://www.nature.com/articles/s41586-026-10628-y",
+    },
+    whyThisMatters:
+      "This lesson builds the syndrome-measure-then-recover cycle one step at a time; the repeated mid-circuit correction rounds in this 2026 paper are that exact cycle running on real trapped ions, now with peer-reviewed numbers for how much each round of it actually buys.",
+    difficulty: "advanced",
+  },
+  // Source: V. Sivak et al. (Google Quantum AI), "Reinforcement learning
+  // control of quantum error correction," Nature 655, 879-884 (8 July
+  // 2026). https://www.nature.com/articles/s41586-026-10759-2 — figures
+  // verified against the Nature article page.
+  "google-rl-control-error-correction-2026": {
+    summary:
+      "Google Quantum AI showed that the error-detection events a surface code already produces every cycle can be reused as a training signal: a reinforcement-learning agent watches them and continuously adjusts more than 1,000 physical control parameters on the Willow processor, so the machine recalibrates itself while computing instead of stopping for scheduled calibration. On top of Google's standard calibration the agent suppressed the logical error rate by a further 20%, reaching a record 7.72 x 10^-4 per round for a distance-7 surface code, and it made the system 2.4x more stable against deliberately injected control drift (3.5x when the decoder was steered as well). Simulations in the paper indicate the approach scales to distance-15 codes with around 40,000 parameters without the convergence rate degrading.",
+    source: {
+      name: "Nature",
+      url: "https://www.nature.com/articles/s41586-026-10759-2",
+    },
+    whyThisMatters:
+      "This lesson warns that treating calibration as a one-time setup step is a mistake because real hardware drifts and production systems recalibrate routinely; Google's 2026 result attacks that exact problem by letting the error-correction cycle itself retune the controls continuously, instead of pausing the machine to recalibrate.",
+    difficulty: "advanced",
+  },
+};

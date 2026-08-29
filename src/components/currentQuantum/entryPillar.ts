@@ -1,5 +1,5 @@
 import type { Pillar } from "@/lib/content/types";
-import type { CurrentQuantumEntry } from "@/lib/content/currentQuantum/registry";
+import type { CurrentQuantumEntry } from "@/lib/content/currentQuantum/types";
 import { PILLAR_ORDER } from "@/lib/design/pillars";
 
 const PILLAR_SET = new Set<string>(PILLAR_ORDER);

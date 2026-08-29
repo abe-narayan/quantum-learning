@@ -21,8 +21,36 @@ export const synthesisWellDepthAndBoundStateCount: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["more and more branches", "unboundedly many crossings", "number of bound states grows without bound"],
-      ["approaches the infinite well", "recovers the infinite ladder", "consistent with the infinite well's endless spectrum"],
+      [
+        "more and more branches",
+        "more branches",
+        "more crossings",
+        "additional crossings",
+        "unboundedly many crossings",
+        "number of bound states grows without bound",
+        "grows without bound",
+        "without limit",
+        "unbounded",
+        "arbitrarily many",
+        "more bound states",
+        "keeps growing",
+      ],
+      {
+        phrases: [
+          "approaches the infinite well",
+          "recovers the infinite ladder",
+          "infinite well",
+          "infinite square well",
+          "infinite ladder",
+          "endless spectrum",
+          "infinitely many levels",
+          "in the limit",
+          "recovers",
+          "matches the infinite",
+        ],
+        missingFeedback:
+          "You have the growth in bound-state count. Close the loop with the limiting case: V₀ → ∞ is the infinite square well, whose endless ladder of levels is exactly what an unbounded number of crossings has to reproduce.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that the number of bound states grows without bound as V0 grows (the quarter-circle sweeps past ever more tangent/cotangent branches), and that this is exactly consistent with the infinite well's endless ladder of states.",
   },

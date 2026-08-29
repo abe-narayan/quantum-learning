@@ -52,7 +52,11 @@ export function PeriodFindingControls({
           options={N_TOGGLE_OPTIONS}
           index={N_TOGGLE_OPTIONS.findIndex((o) => o.n === N)}
           onChange={(i) => onNChange(N_TOGGLE_OPTIONS[i].n)}
-          ariaLabel="N"
+          // "N" on its own is a letter, not a name: announced as "N, radio
+          // group" it says nothing about what choosing 15 over 21 does. The
+          // section heading beside it is a section boundary, not part of the
+          // group's accessible name.
+          ariaLabel="N — the number to factor"
         />
       </ControlSection>
 
@@ -65,7 +69,12 @@ export function PeriodFindingControls({
           value={a}
           aria-label="a — the base you repeatedly multiply by, mod N"
           onChange={(e) => onAChange(Number(e.target.value))}
-          className="min-h-11 w-full rounded-md border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className={
+            // text-base below sm keeps the effective font size at 16px on
+            // phones — iOS Safari auto-zooms the page on focusing any form
+            // control whose font is smaller than that.
+            "min-h-11 w-full rounded-(--radius-tight) border border-border bg-surface px-2 py-1.5 font-mono text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-sm"
+          }
         >
           {validBases.map((base) => (
             <option key={base} value={base}>
@@ -100,7 +109,7 @@ export function PeriodFindingControls({
           options={X_BITS_TOGGLE_OPTIONS}
           index={X_BITS_TOGGLE_OPTIONS.findIndex((o) => o.bits === xBits)}
           onChange={(i) => onXBitsChange(X_BITS_TOGGLE_OPTIONS[i].bits)}
-          ariaLabel="Counting qubits"
+          ariaLabel="t — how many counting qubits to measure with"
         />
         <SymbolGloss
           items={[

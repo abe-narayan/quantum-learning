@@ -49,6 +49,10 @@ export const oneStateDensityMatrixChoice: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "The outer product of |1⟩ with itself places a 1 in the (1,1) position and 0 elsewhere.",
     whyCorrect: "Direct matrix multiplication of the column and row vectors gives exactly this matrix.",
-    whyWrong: ["Option b is |0⟩'s density matrix, the opposite basis state."],
+    whyWrong: [
+      { optionId: "b", text: "The density matrix of |0⟩, with the 1 in the wrong corner." },
+      { optionId: "c", text: "Off-diagonal where |1⟩⟨1| is diagonal. Its trace is 0, so it is not a density matrix at all." },
+      { optionId: "d", text: "Not Hermitian, which every density matrix has to be." },
+    ],
   },
 };

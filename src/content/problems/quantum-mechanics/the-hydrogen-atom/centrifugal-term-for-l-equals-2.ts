@@ -25,11 +25,16 @@ export const centrifugalTermForLEquals2: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "Compute l(l+1) directly with l=2.",
+    nearMisses: [
+      { value: 4, feedback: "4 is l². The centrifugal coefficient is l(l+1), the same eigenvalue structure as L², which always exceeds l²." },
+      { value: 2, feedback: "2 is l itself. The coefficient multiplies the two factors l and l+1." },
+      { value: 5, feedback: "5 is 2l+1, the number of m states at l=2. The centrifugal coefficient is the L² eigenvalue l(l+1) instead." },
+    ],
   },
   hints: [
     { text: "Substitute l=2 into l(l+1)." },
-    { text: "2×3=6." },
-    { text: "The coefficient is 6, larger than l=1's coefficient of 2 — higher l means a stronger centrifugal barrier." },
+    { text: "With l=2, the two factors are 2 and 3." },
+    { text: "Multiply the two factors. As a check, the result should exceed l=1's coefficient of 2, since higher l means a stronger centrifugal barrier." },
   ],
   solution: {
     steps: [{ description: "l(l+1) = 2(3) = 6." }],

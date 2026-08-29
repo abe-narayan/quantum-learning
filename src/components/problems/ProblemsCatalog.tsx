@@ -480,7 +480,7 @@ export function ProblemsCatalog({
             <Button onClick={showFoundational}>Show the {foundationalCount} foundational problems</Button>
             <Link
               href={`/problems/${startingPoint.slug}`}
-              className="inline-flex min-h-11 items-center rounded-[--radius-tight] text-sm text-pillar-text underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+              className="inline-flex min-h-11 items-center rounded-(--radius-tight) text-sm text-pillar-text underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
             >
               Or open the first one: &ldquo;{startingPoint.title}&rdquo;
             </Link>
@@ -544,7 +544,7 @@ export function ProblemsCatalog({
                 key={filter.key}
                 type="button"
                 onClick={filter.clear}
-                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-pillar-edge bg-pillar-wash px-3.5 py-1 text-sm text-pillar-text transition-colors duration-[--dur-fast] hover:border-pillar focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-pillar-edge bg-pillar-wash px-3.5 py-1 text-sm text-pillar-text transition-colors duration-(--dur-fast) hover:border-pillar focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
               >
                 <span className="text-subtle-foreground">{filter.group}:</span>
                 {filter.label}
@@ -557,7 +557,7 @@ export function ProblemsCatalog({
             <button
               type="button"
               onClick={clearAll}
-              className="ml-auto inline-flex min-h-11 items-center rounded-[--radius-tight] px-1 text-sm text-muted-foreground underline underline-offset-4 transition-colors duration-[--dur-fast] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+              className="ml-auto inline-flex min-h-11 items-center rounded-(--radius-tight) px-1 text-sm text-muted-foreground underline underline-offset-4 transition-colors duration-(--dur-fast) hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
             >
               Show all {problems.length} problems
             </button>
@@ -571,12 +571,21 @@ export function ProblemsCatalog({
         The count line is a live region: a filter change repaints the whole
         list below silently otherwise, which is precisely the case where a
         screen-reader user is left not knowing whether anything happened.
+
+        `role="group"` is what makes the `aria-label` below mean anything. A
+        `<div>` with no role is `generic`, and ARIA prohibits naming a generic
+        element — so the label was dropped by every major screen reader, and
+        the one moment it exists for (focus landing here after "Show the
+        foundational problems") announced an unnamed container instead of
+        "Problem results". `group` rather than `region`: this is a two-line
+        count header, not a landmark anyone should find in a landmark list.
       */}
       <div
         ref={resultsRef}
         tabIndex={-1}
+        role="group"
         aria-label="Problem results"
-        className="mt-5 flex items-center justify-between gap-3 scroll-mt-24 focus:outline-none"
+        className="mt-5 flex items-center justify-between gap-3 scroll-mt-24 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
       >
         <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
           {filtered.length} problem{filtered.length === 1 ? "" : "s"}
@@ -652,7 +661,7 @@ export function ProblemsCatalog({
           combination that produced the emptiness and puts both escapes —
           drop everything, or fall back to the foundational set — in reach.
         */
-        <div className="mt-10 rounded-[--radius-panel] border border-dashed border-border p-8 text-center">
+        <div className="mt-10 rounded-panel border border-dashed border-border p-8 text-center">
           <p className="text-sm text-foreground">
             {activeFilters.length > 1
               ? `No problem is all of these at once: ${activeFilters.map((filter) => filter.label).join(" + ")}.`

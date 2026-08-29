@@ -27,12 +27,16 @@ export const czAmplitudeOnEleven: NumericProblem = {
     type: "numeric",
     value: amplitudeOn11,
     tolerance: 0.01,
-    incorrectFeedback: "CZ never changes which basis state you're in — only its sign. Recall what Z alone does to |1⟩.",
+    incorrectFeedback: "CZ never changes which basis state you're in, only its sign. Recall what Z alone does to |1⟩.",
+    nearMisses: [
+      { value: 1, feedback: "The sign is the whole effect here. Z flips the sign of |1⟩, and the target is 1, so the amplitude comes out negative." },
+      { value: 0, feedback: "No amplitude leaves |11⟩: CZ is diagonal, so it never moves probability between basis states. Only the sign changes." },
+    ],
   },
   hints: [
     { text: "The control (qubit 0) is 1 in |11⟩, so the U=Z part of the construction applies to the target." },
-    { text: "Z|1⟩ = -|1⟩ — Z leaves the basis state unchanged but flips its sign." },
-    { text: "So CZ|11⟩ is still |11⟩, just with amplitude -1 instead of +1." },
+    { text: "Z|1⟩ = -|1⟩: Z leaves the basis state unchanged but flips its sign." },
+    { text: "So CZ leaves the state on the same basis state, and only the sign in front changes. Read off the resulting amplitude, sign included." },
   ],
   solution: {
     steps: [
@@ -42,10 +46,10 @@ export const czAmplitudeOnEleven: NumericProblem = {
     finalAnswer: "$-1$",
   },
   explanation: {
-    correctIdea: "Unlike CNOT, CZ never changes which basis state a computational-basis input is in — it only ever multiplies by a sign.",
+    correctIdea: "Unlike CNOT, CZ never changes which basis state a computational-basis input is in. It only ever multiplies by a sign.",
     whyCorrect: "Z is diagonal (Z|0⟩=|0⟩, Z|1⟩=-|1⟩), so the controlled version can only ever attach a ±1 phase, never flip a bit.",
     whyWrong: [
-      "Expecting CZ to flip a bit the way CNOT does confuses the two gates — CZ's U=Z is diagonal, so no bit ever changes value under it.",
+      "Expecting CZ to flip a bit the way CNOT does confuses the two gates: CZ's U=Z is diagonal, so no bit ever changes value under it.",
       "Answering +1 forgets that Z specifically flips the sign of |1⟩ (not |0⟩), and both qubits are 1 here.",
     ],
   },

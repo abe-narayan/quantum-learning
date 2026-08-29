@@ -137,7 +137,7 @@ export function ApexOpenProblems({
                 <SectionTitle level={3} size="sm">
                   <Link
                     href={getCourseHref(course.slug, groundingLesson?.slug)}
-                    className="transition-colors duration-[--dur-fast] ease-[--ease-mech] hover:text-pillar-text focus-visible:text-pillar-text"
+                    className="transition-colors duration-(--dur-fast) ease-mech hover:text-pillar-text focus-visible:text-pillar-text"
                   >
                     {course.title}
                   </Link>
@@ -153,7 +153,7 @@ export function ApexOpenProblems({
                   <TechLabel as="p">Closest coverage</TechLabel>
                   <Link
                     href={groundingHref}
-                    className="mt-1 flex min-h-11 items-center text-foreground transition-colors duration-[--dur-fast] ease-[--ease-mech] hover:text-pillar-text focus-visible:text-pillar-text"
+                    className="mt-1 flex min-h-11 items-center text-foreground transition-colors duration-(--dur-fast) ease-mech hover:text-pillar-text focus-visible:text-pillar-text"
                   >
                     {groundingTitle} →
                   </Link>

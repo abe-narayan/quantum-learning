@@ -62,7 +62,7 @@ export const lessonMeta = {
   module: "quantum-error-mitigation",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 28,
+  estimatedMinutes: 35,
   prerequisites: ["quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows"],
   objectives: [
     "Distinguish error mitigation (a statistical correction of measured expectation values) from error correction (repairing the quantum state itself), and explain why they solve different problems",
@@ -73,7 +73,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
-      note: "The depolarizing channel this lesson's zero-noise extrapolation derivation uses is a Kraus channel in exactly that lesson's sense, and applyKrausChannel/applyChannelRepeatedly (built there, reused by Noise Simulation) is what this lesson's E(1), E(3) numbers were checked against.",
+      note: "The depolarizing channel this lesson's zero-noise extrapolation derivation uses is a Kraus channel in that lesson's sense, and applyKrausChannel/applyChannelRepeatedly (built there, reused by Noise Simulation) is what this lesson's E(1), E(3) numbers were checked against.",
     },
     {
       slug: "quantum-software/simulating-quantum-systems/noise-simulation",
@@ -112,7 +112,7 @@ works a second technique numerically end to end.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/ae/IBM_Q_System_One_%28Fraunhofer%29_installation.jpg"
   alt="IBM Research engineers installing and working on an IBM Quantum System One"
-  caption="IBM Research engineers working on an IBM Quantum System One in Ehningen, Germany. Techniques like zero-noise extrapolation exist precisely because every individual run on hardware like this is noisy; mitigation corrects the statistics computed afterward, not the physical run itself."
+  caption="IBM Research engineers working on an IBM Quantum System One in Ehningen, Germany. Techniques like zero-noise extrapolation exist because every individual run on hardware like this is noisy; mitigation corrects the statistics computed afterward, not the physical run itself."
   credit="IBM Research / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_System_One_(Fraunhofer)_installation.jpg"
   license="CC BY 2.0"
@@ -275,9 +275,9 @@ repetitions at controlled noise levels, or a one-time calibration matrix
 inversion) to pull a less-biased number out of many noisy ones. Neither
 technique changes what the quantum device physically does on any given
 run; both operate entirely on the classical side of the hybrid loop
-Hybrid Quantum-Classical Workflows already named, exactly the
+Hybrid Quantum-Classical Workflows already named. That is the
 "classical optimizer can partially compensate" sentence the NISQ
-capstone left unexplained.
+capstone left unexplained, cashed out.
 
 ## Worked Example: Correcting a measured distribution
 
@@ -365,8 +365,8 @@ exact answer."
    directly to $(1,0)^T$, no inversion needed.)
 4. Explain, in your own words, why "more circuit repetitions, no extra
    qubits" (mitigation) and "more physical qubits, exponential
-   suppression" (correction) are fundamentally different resource
-   trades, not two versions of the same idea.
+   suppression" (correction) are different resource trades, not two
+   versions of the same idea.
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -398,8 +398,8 @@ This closes **Quantum Software**, on the piece the NISQ capstone's "the
 classical loop can partially compensate for imperfect quantum
 execution" line left unnamed, and the feature Quantum SDKs Overview
 flagged this platform's own minimal `QuantumCircuit` pattern as missing.
-Variational Algorithm Implementation's grid-search VQE loop is exactly
-where a real deployment would plug zero-noise extrapolation in: run the
+Variational Algorithm Implementation's grid-search VQE loop is where a
+real deployment would plug zero-noise extrapolation in: run the
 ansatz circuit at several folded noise levels per optimizer iteration
 instead of once, and extrapolate before handing the cost function back
 to the classical optimizer.

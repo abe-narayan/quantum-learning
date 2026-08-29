@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 // transition list + pressed-state scale from Button.tsx, and the focus ring
 // convention established by the skip-link in src/app/layout.tsx.
 const INTERACTIVE_CLASSES =
-  "transition-[color,background-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "transition-[color,background-color,transform] active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 // A curriculum this size (six pillars, ~200+ lessons) earns a real site
 // index, not a row of links — this is deliberately the place a visitor who
@@ -38,7 +38,7 @@ export async function Footer() {
         <div className="max-w-xs">
           <Link
             href="/"
-            className={cn("inline-flex items-center rounded-[var(--radius-tight)]", INTERACTIVE_CLASSES)}
+            className={cn("inline-flex items-center rounded-(--radius-tight)", INTERACTIVE_CLASSES)}
           >
             <Wordmark markClassName="h-7 w-7" />
           </Link>

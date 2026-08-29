@@ -38,8 +38,9 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  Nine lessons of pure linear algebra, and not one prediction about a
-  real experiment yet. This lesson is where that changes.
+  Everything so far has been linear algebra: true, but not yet about
+  anything. Four postulates turn it into predictions a laboratory can
+  check.
 </LessonHook>
 
 ## Motivation
@@ -73,9 +74,10 @@ sentence is a lesson you've already done the work for.
 
 ### Postulate 1: states are unit vectors
 
-A quantum system's state is a vector $|\psi\rangle$ with $\|\psi\rangle\|=1$,
-in a complex <Term id="vector-space">vector space</Term> equipped with an inner product (a **Hilbert
-space**, the name for exactly the structure built across this course).
+A quantum system's state is a vector $|\psi\rangle$ with
+$\big\||\psi\rangle\big\|=1$, in a complex <Term id="vector-space">vector space</Term> equipped with an
+inner product (a **Hilbert space**, the name for the structure built
+across this course).
 Two states are the same if they differ only by an overall phase:
 $|\psi\rangle$ and $e^{i\alpha}|\psi\rangle$ represent the identical
 physical situation, for any real $\alpha$, a fact this lesson will
@@ -84,9 +86,9 @@ justify below rather than just assert.
 ### Postulate 2: observables are Hermitian operators
 
 A measurable physical quantity corresponds to a Hermitian operator $A$.
-Its possible outcomes are exactly its eigenvalues, guaranteed real by the
-Hermitian Operators lesson, exactly matching the physical requirement that
-measurement outcomes are real numbers.
+Its possible outcomes are its eigenvalues and nothing else, guaranteed
+real by the Hermitian Operators lesson, which is the physical requirement
+that measurement outcomes be real numbers.
 
 ### Postulate 3 (the Born rule): outcome probabilities
 
@@ -96,9 +98,9 @@ $|\psi\rangle$, the probability of measuring outcome $\lambda_i$ is:
 
 <EquationReveal
   terms={[
-    { id: "P", symbol: "P(λᵢ)", gloss: "The probability of measuring outcome λᵢ — a number between 0 and 1." },
-    { id: "e", symbol: "⟨eᵢ|ψ⟩", gloss: "The overlap between the state ψ and the eigenvector eᵢ for outcome λᵢ — how much of ψ 'points along' that outcome." },
-    { id: "mod", symbol: "| · |²", gloss: "Squared modulus — the step that turns a complex amplitude into a real, non-negative probability." },
+    { id: "P", symbol: "P(λᵢ)", gloss: "The probability of measuring outcome λᵢ: a number between 0 and 1." },
+    { id: "e", symbol: "⟨eᵢ|ψ⟩", gloss: "The overlap between the state ψ and the eigenvector eᵢ for outcome λᵢ, measuring how much of ψ 'points along' that outcome." },
+    { id: "mod", symbol: "| · |²", gloss: "Squared modulus, the step that turns a complex amplitude into a real, non-negative probability." },
   ]}
 >
 $$
@@ -119,7 +121,7 @@ $$
 \sum_i P(\lambda_i) = \sum_i |c_i|^2 = \sum_i \langle\psi|e_i\rangle\langle e_i|\psi\rangle
 $$
   </DerivationStep>
-  <DerivationStep annotation="Factor ⟨ψ| and |ψ⟩ out of the sum, leaving exactly the completeness relation in the middle.">
+  <DerivationStep annotation="Factor ⟨ψ| and |ψ⟩ out of the sum, leaving the completeness relation standing alone in the middle.">
 $$
 \sum_i \langle\psi|e_i\rangle\langle e_i|\psi\rangle = \langle\psi|\Big(\sum_i|e_i\rangle\langle e_i|\Big)|\psi\rangle
 $$
@@ -129,16 +131,18 @@ $$
 \langle\psi|\Big(\sum_i|e_i\rangle\langle e_i|\Big)|\psi\rangle = \langle\psi|I|\psi\rangle = \langle\psi|\psi\rangle
 $$
   </DerivationStep>
-  <DerivationStep annotation="Postulate 1 requires ‖ψ‖=1, i.e. ⟨ψ|ψ⟩=1 — total probability comes out exactly right.">
+  <DerivationStep annotation="Postulate 1 requires ‖ψ‖=1, i.e. ⟨ψ|ψ⟩=1, so the probabilities sum to 1 with nothing left over.">
 $$
 \langle\psi|\psi\rangle = 1
 $$
   </DerivationStep>
 </DerivationSteps>
 
-Normalization, orthonormal
-eigenbases, and the completeness relation all conspire to make this
-come out exactly right: a real consistency check, not a coincidence.
+Notice how much had to be in place for that to work: normalization from
+Postulate 1, an orthonormal eigenbasis from the Hermitian Operators
+lesson, and the completeness relation from Bra-Ket Formalism. Had any one
+of them failed, the Born rule would assign probabilities that do not sum
+to $1$, and the postulate would be dead on arrival.
 
 ### Expectation value, and why it matches $\langle\psi|A|\psi\rangle$
 
@@ -151,9 +155,9 @@ $$
 \langle A\rangle = \sum_i \lambda_i|\langle e_i|\psi\rangle|^2 = \sum_i\lambda_i\langle\psi|e_i\rangle\langle e_i|\psi\rangle = \langle\psi|\Big(\sum_i\lambda_i|e_i\rangle\langle e_i|\Big)|\psi\rangle = \langle\psi|A|\psi\rangle
 $$
 
-This recovers exactly the "sandwich" formula stated without proof back in
-the Hermitian Operators lesson, now derived as a consequence of the Born
-rule, closing the loop between that lesson and this one.
+That last expression is the "sandwich" formula stated without proof back
+in the Hermitian Operators lesson, now standing as a consequence of the
+Born rule rather than as a definition of its own.
 
 ### Why global phase is unobservable
 
@@ -164,8 +168,8 @@ $P(\lambda_i) = |e^{i\alpha}\langle e_i|\psi\rangle|^2 =
 |e^{i\alpha}|^2\,|\langle e_i|\psi\rangle|^2 = |\langle
 e_i|\psi\rangle|^2$, completely unchanged, because $|e^{i\alpha}|=1$
 (Complex Numbers lesson). Every prediction this framework makes depends
-only on $|\psi\rangle$ up to an overall phase, which is exactly Postulate
-1's claim, now justified rather than just stated.
+only on $|\psi\rangle$ up to an overall phase, which is Postulate 1's
+claim, now justified rather than stated.
 
 ### Measurement and collapse
 
@@ -212,7 +216,7 @@ ways of computing $\langle A\rangle$ agree.**
     { label: "Equally likely", value: "equal" },
   ]}
   correctValue="minus"
-  explanation="P(-1) = 0.8² = 0.64 beats P(+1) = 0.6² = 0.36, even though 0.8 isn't twice 0.6 — squaring the amplitude widens the gap between the two outcomes. This is exactly the trap the Born rule sets: eyeballing the raw overlaps gets the ranking right here, but never the actual probabilities."
+  explanation="P(-1) = 0.8² = 0.64 beats P(+1) = 0.6² = 0.36. Squaring the amplitudes widens the gap: the overlaps differ by a factor of 1.33, the probabilities by 1.78. Eyeballing the raw overlaps gets the ranking right here, but never the probabilities themselves."
 />
 
 $$
@@ -232,7 +236,7 @@ the two outcomes side by side and the gap between them is easy to see:
 
 The two bars sum to exactly 1, as normalization demands.
 
-<InteractiveSection title="Slide c₊, watch normalization hold" description="Drag c₊ from 0 to 1. c₋ is set automatically to keep the state normalized (c₊² + c₋² = 1), and the two bars always sum to exactly 1 no matter where you leave the slider — normalization isn't a special property of the 0.6/0.8 example above, it holds everywhere along this whole family of states.">
+<InteractiveSection title="Slide c₊, watch normalization hold" description="Drag c₊ from 0 to 1. c₋ is set automatically to keep the state normalized (c₊² + c₋² = 1), and the two bars always sum to exactly 1 no matter where you leave the slider. Normalization is not a special property of the 0.6/0.8 example above; it holds everywhere along this family of states.">
   <BarChartExplorer
     frames={Array.from({ length: 21 }, (_, i) => bornRuleFrame(i * 5))}
     sliderLabel="c₊ (as a percentage of its max value)"
@@ -247,8 +251,8 @@ $$
 
 Via the sandwich formula, with $A=\lambda_+|e_+\rangle\langle e_+| +
 \lambda_-|e_-\rangle\langle e_-|$ and $|\psi\rangle = 0.6|e_+\rangle +
-0.8|e_-\rangle$ (real coefficients, so this expansion is literally
-$c_+=\langle e_+|\psi\rangle=0.6$, $c_-=0.8$):
+0.8|e_-\rangle$ (real coefficients, so the expansion coefficients are the
+overlaps themselves: $c_+=\langle e_+|\psi\rangle=0.6$, $c_-=0.8$):
 
 $$
 \langle\psi|A|\psi\rangle = (0.6)^2(+1) + (0.8)^2(-1) = 0.36-0.64=-0.28
@@ -262,8 +266,8 @@ Both routes agree, as the general derivation above guarantees they must.
 **Using the amplitude directly instead of its squared modulus.**
 $P(\lambda_i)=|\langle e_i|\psi\rangle|^2$, not $\langle
 e_i|\psi\rangle$ itself. This has been the single most common error
-throughout the course; here is where it actually costs you a wrong
-probability.
+throughout the course, and this is the lesson where it starts producing
+wrong numbers rather than just wrong notation.
 </Callout>
 
 <Callout type="mistake">
@@ -308,8 +312,8 @@ superposition, not an overall phase on the whole state, is observable.
 
 <ChallengePrompt prompt="The worked example's observable A had eigenvalues ±1 and gave ⟨A⟩=-0.28. A different observable B has the same eigenvectors but eigenvalues ±2. What is ⟨B⟩ for the same state?">
   Recompute directly from $\langle B\rangle=\sum_i\lambda_iP(\lambda_i)$
-  using $B$'s eigenvalues — the probabilities $P(+1),P(-1)$ haven't
-  changed since $B$ shares $A$'s eigenvectors.
+  using $B$'s eigenvalues. The probabilities $P(+1),P(-1)$ have not
+  changed, since $B$ shares $A$'s eigenvectors.
 </ChallengePrompt>
 
 <NextDiscovery>

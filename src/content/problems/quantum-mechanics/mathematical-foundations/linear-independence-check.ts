@@ -47,6 +47,10 @@ export const linearIndependenceCheck: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "Independence over ℂ allows complex scalars, so a pair can look 'different' while still being dependent.",
     whyCorrect: "The standard basis vectors (1,0) and (0,1) genuinely point in unrelated directions — no complex scalar relates them.",
-    whyWrong: ["(i,0) and (1,0) are dependent precisely because complex scalars are allowed — this is the subtlety the lesson emphasizes."],
+    whyWrong: [
+      { optionId: "a", text: "The trap of the set: the two entries look unrelated, but (i,0) = i·(1,0), and over ℂ that scalar is allowed." },
+      { optionId: "c", text: "(2,2) = 2·(1,1), a real multiple, so the pair spans only a line." },
+      { optionId: "d", text: "The same vector twice, which is dependent for the simplest possible reason." },
+    ],
   },
 };

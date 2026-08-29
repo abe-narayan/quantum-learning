@@ -25,11 +25,15 @@ export const transitionProbabilityWeakCoupling: NumericProblem = {
     value,
     tolerance: 0.00002,
     incorrectFeedback: "Compute 4(0.01)²sin²(1.5)/1² directly.",
+    nearMisses: [
+      { value: 4 * 0.0001 * Math.sin(3), tolerance: 0.000005, feedback: "The sine's argument is ωt/2 = 1.5, not ωt = 3, and it is squared before multiplying." },
+      { value: 0.0001, tolerance: 0.000005, feedback: "|V|² alone is 10⁻⁴. The formula carries a factor of 4 in front." },
+    ],
   },
   hints: [
-    { text: "sin(1.5 rad) ≈ 0.9975." },
-    { text: "4(0.0001)(0.9975)²/1 ≈ 0.000398." },
-    { text: "This matches the lesson's worked-example table entry for V=0.01, t=3." },
+    { text: "The argument of the sine is ωt/2, which is 1.5 radians here, not 3." },
+    { text: "sin(1.5 rad) ≈ 0.9975, so sin² of it is very close to 1: the whole answer is set by the 4|V|²/ω² prefactor." },
+    { text: "Evaluate 4|V|²/ω² and scale it by that sin² factor. The result should match the lesson's worked-example table entry for V=0.01, t=3." },
   ],
   solution: {
     steps: [{ description: "P(3) = 4(0.01)²sin²(1.5)/1² ≈ 4(0.0001)(0.995) ≈ 0.000398." }],

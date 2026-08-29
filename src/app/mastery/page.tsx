@@ -139,7 +139,14 @@ export default async function MasteryPage() {
       {/* -------------------------------------------------------------
           Hero
           ------------------------------------------------------------- */}
-      <Section width="reading" className="pt-4 sm:pt-8">
+      {/* `tight`, not `className="pt-4 sm:pt-8"`: `Section` writes its
+          vertical padding as an inline `style`, which always beats a class on
+          the same element, so that override compiled fine and applied to
+          nothing — the page opened with the full `--rhythm-section` (72px at
+          320px, 136px on a wide desktop) where 16px was asked for. `tight` is
+          the prop that actually reduces it. Same dead override as /learn's
+          hero, error.tsx and not-found.tsx. */}
+      <Section width="reading" tight>
         {/* The h1 renders immediately rather than inside a Reveal — an
             above-the-fold page title must not depend on JS/observer timing
             to become visible, matching Hero and ApexHero on the other two
@@ -449,9 +456,12 @@ export default async function MasteryPage() {
                 </p>
               ) : null}
             </div>
+            {/* Button mechanics, not a pill: same tight radius, press scale
+                and pillar focus ring as `ui/Button.tsx`, with the pillar-edge
+                voice this hand-off moment already used. */}
             <Link
               href={pillarVisual("apex").route}
-              className="tech-label inline-flex shrink-0 items-center gap-2 rounded-full border border-pillar-edge px-4 py-2.5 text-pillar-text transition-colors hover:bg-pillar-wash"
+              className="tech-label inline-flex shrink-0 items-center gap-2 rounded-(--radius-tight) border border-pillar-edge px-4 py-2.5 text-pillar-text transition-[color,background-color,border-color,transform] duration-(--dur-fast) ease-instrument hover:bg-pillar-wash active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Continue to Apex →
             </Link>

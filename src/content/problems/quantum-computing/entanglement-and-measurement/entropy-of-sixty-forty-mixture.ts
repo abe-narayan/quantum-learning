@@ -31,6 +31,15 @@ export const entropyOfSixtyFortyMixture: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "Since ρ is already diagonal, its eigenvalues are just its diagonal entries — apply Shannon entropy directly to (0.6, 0.4).",
+    nearMisses: [
+      {
+        value: -0.6 * Math.log(0.6) - 0.4 * Math.log(0.4),
+        tolerance: 0.005,
+        feedback: "That is the same entropy in nats, from using the natural log. Bits need log base 2, so divide by ln 2.",
+      },
+      { value: 1, feedback: "1 bit is the maximum, reached only by a 50/50 split. A 0.6/0.4 split is slightly ordered, so its entropy sits a little below 1." },
+      { value: 0, feedback: "Zero entropy means a pure state, a single outcome with probability 1. Both outcomes here carry real weight." },
+    ],
   },
   hints: [
     { text: "ρ is already diagonal, so its eigenvalues are 0.6 and 0.4 directly." },

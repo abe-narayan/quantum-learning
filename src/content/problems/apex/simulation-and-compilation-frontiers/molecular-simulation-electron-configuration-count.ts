@@ -34,12 +34,28 @@ export const molecularSimulationElectronConfigurationCount: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0,
-    incorrectFeedback: `Count the number of ways to choose which ${numElectrons} of the ${numSpinOrbitals} spin-orbitals are occupied: this is the binomial coefficient C(${numSpinOrbitals}, ${numElectrons}).`,
+    incorrectFeedback: `Two ways this usually goes wrong. Counting ordered assignments (a permutation count) overcounts, because reordering the same occupied orbitals gives the same physical state. And counting every occupation pattern of all ${numSpinOrbitals} spin-orbitals ignores the fixed electron number. What you want is the number of ${numElectrons}-element subsets of the ${numSpinOrbitals} spin-orbitals.`,
+    nearMisses: [
+      {
+        value: 30240,
+        feedback:
+          "30240 = 10!/5! counts ordered selections. Two orderings of the same five occupied orbitals describe one state, so divide out the 5! orderings.",
+      },
+      {
+        value: 1024,
+        feedback:
+          "1024 = 2^10 counts every occupation pattern, including those with the wrong number of electrons. The question fixes the particle number at 5.",
+      },
+      {
+        value: 210,
+        feedback: "210 is C(10,4). One more orbital has to be occupied to reach 5 electrons.",
+      },
+    ],
   },
   hints: [
-    { text: "Each basis state of the fixed-particle-number sector is specified by exactly which orbitals are occupied, with the order of choosing not mattering — that makes this a combination count, not a permutation count." },
+    { text: "Each basis state of the fixed-particle-number sector is specified by which orbitals are occupied, and the order of choosing them does not matter. That makes this a combination count, not a permutation count." },
     { text: `The count is the binomial coefficient C(${numSpinOrbitals}, ${numElectrons}) = ${numSpinOrbitals}! / (${numElectrons}! · ${numSpinOrbitals - numElectrons}!).` },
-    { text: `Building it up multiplicatively: C(${numSpinOrbitals},1)=10, C(${numSpinOrbitals},2)=45, C(${numSpinOrbitals},3)=120, C(${numSpinOrbitals},4)=210, C(${numSpinOrbitals},5)=${value}.` },
+    { text: `Building it up multiplicatively: C(${numSpinOrbitals},1)=10, C(${numSpinOrbitals},2)=45, C(${numSpinOrbitals},3)=120, C(${numSpinOrbitals},4)=210. One more multiplicative step, a factor of (${numSpinOrbitals}-4)/${numElectrons}, gives the count you want.` },
   ],
   solution: {
     steps: [

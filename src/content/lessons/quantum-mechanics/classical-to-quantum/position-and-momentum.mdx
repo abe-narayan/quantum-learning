@@ -27,6 +27,10 @@ export const positionMomentumFrame = (dxTimes1e10) => ({
 
 export const positionMomentumFrames = Array.from({ length: 21 }, (_, i) => positionMomentumFrame(0.5 + i * 0.1));
 
+export const positionMomentumMax = Math.max(
+  ...positionMomentumFrames.flatMap((f) => f.bars.map((b) => b.value))
+);
+
 export const uncertaintyBoxFrames = positionMomentumFrames.map((f, i) => ({
   paramLabel: f.paramLabel,
   deltaX: 0.5 + i * 0.1,
@@ -41,7 +45,7 @@ export const lessonMeta = {
   module: "position-and-momentum",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 20,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"],
   objectives: [
     "State the canonical commutation relation [x,p] = iℏ",
@@ -52,48 +56,52 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   Squeeze a laser through a narrower slit and the light fans out wider,
-  not narrower. The same trade-off, made exact, is the single most famous
-  result in quantum mechanics.
+  not narrower. One substitution into a theorem this course already
+  proved turns that observation into $\Delta x\,\Delta p \ge \hbar/2$.
 </LessonHook>
 
 ## Motivation
 
-Squeeze a laser beam through a narrower and narrower slit, and something
-counterintuitive happens: the light doesn't come out narrower. Past a
-certain slit width, it fans out into the wide diffraction pattern below,
-wider than the slit itself. Pin the beam's position down more tightly at
-the slit, and its spread in momentum (direction of travel) grows to
-compensate.
+Narrow the slit and, past a certain width, the beam stops obeying you.
+Instead of a tighter line, it fans out into the pattern below, wider than
+the slit that made it. Confining the beam's position at the slit widens
+its spread in direction of travel, which is to say its momentum.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/2/21/Blue_laser_single_slit_diffraction_photo.jpg"
-  alt="Photograph of a single-slit diffraction pattern from a blue laser, a bright central band flanked by fainter side bands"
-  caption="Confining a laser beam's position to a narrow slit spreads its momentum (direction) into this diffraction pattern, the same position-momentum trade-off that [x,p]=iℏ makes precise for any quantum system."
+  alt="Blue laser light spread into a horizontal line of bands: one wide, intense band in the middle, then progressively fainter bands on either side, each separated from its neighbour by a dark gap"
+  caption="A blue laser through a single slit. The narrower the slit, the wider the fan: the central band's angular width is inversely proportional to the slit width, which is the position-momentum trade-off that [x,p]=iℏ turns into an exact bound for every quantum system."
   credit="Xyqorophibian / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Blue_laser_single_slit_diffraction_photo.jpg"
   license="CC BY-SA 4.0"
 />
 
-That trade-off, familiar from classical wave optics, is exact and
-universal in quantum mechanics for any pair of observables that fail to
-commute, and position and momentum are the pair the theory historically
-grew out of. Every <Term id="observable">observable</Term> in this course so far has lived on a
-finite-dimensional <Term id="hilbert-space">Hilbert space</Term>, where a handful of numbers specified a
-state completely. A real particle's position doesn't work that way: it
-can, in principle, take a continuum of values. This lesson previews what
-changes, and what doesn't, when position and momentum enter the picture,
-without building the full continuous machinery, which is the subject of
-the Wave Mechanics course.
+Classical wave optics predicts this too, so on its own the photograph
+proves nothing about quantum mechanics. What quantum mechanics adds is
+that the same trade-off holds for particles with mass, holds for pairs of
+observables that have nothing to do with waves, and comes with an exact
+number attached rather than an order-of-magnitude estimate.
+
+One thing does change. Every <Term id="observable">observable</Term> so far has lived on a
+finite-dimensional <Term id="hilbert-space">Hilbert space</Term>, where a handful of numbers pin down a
+state. Position takes a continuum of values, so the space is now
+infinite-dimensional. This lesson takes stock of what that breaks, which
+turns out to be less than expected: the full continuous machinery belongs
+to the Wave Mechanics course, and none of it is needed for the result
+below.
 
 ## Intuition
 
-Heisenberg's <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term>, stated for exactly the position-momentum
-pair, is the single most famous consequence of everything derived so far
-in this course. The postulates don't change at all for a continuous
-observable: states are still vectors, position and momentum are still
-Hermitian operators, measurement is still governed by the <Term id="born-rule">Born rule</Term>, only
-the *label* on the basis states becomes a continuous variable $x$ instead
-of a discrete index $i$.
+None of the four postulates needs amending for a continuous observable.
+States are still vectors, position and momentum are still Hermitian
+operators, measurement still runs through the <Term id="born-rule">Born rule</Term>. What changes is
+bookkeeping: the *label* on the basis states becomes a continuous
+variable $x$ rather than a discrete index $i$, so sums over outcomes turn
+into integrals and a few normalization statements need care.
+
+Because the postulates survive intact, so does every theorem proved from
+them. Heisenberg's <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term> is about to arrive as one line
+of substitution rather than as a new physical idea.
 
 ## Mathematical Development
 
@@ -137,11 +145,16 @@ $$
 $$
 
 (using $\langle i\hbar\rangle = i\hbar\langle\psi|\psi\rangle = i\hbar$
-for a normalized state, so $|\langle i\hbar\rangle|=\hbar$). This is the
-**Heisenberg uncertainty principle**, $\Delta x\,\Delta p\ge\hbar/2$, not
-a new postulate, but the general uncertainty relation from earlier in
-this course, evaluated for this one specific, historically first-studied
-pair of observables.
+for a normalized state, so $|\langle i\hbar\rangle|=\hbar$). That is the
+**Heisenberg uncertainty principle**, $\Delta x\,\Delta p\ge\hbar/2$.
+
+Notice how little work the last step did. Unlike every other uncertainty
+bound this course has computed, the right-hand side here does not depend
+on the state at all: $[\hat x,\hat p]$ is a number times the identity, so
+$\langle[\hat x,\hat p]\rangle$ comes out the same in every state. Every
+other pair, including $X$ and $Y$ from the earlier lesson, has a bound
+that weakens or vanishes for particular states. Position and momentum
+never let up.
 
 ### Connecting to the harmonic oscillator
 
@@ -170,23 +183,34 @@ $$
   </DerivationStep>
 </DerivationSteps>
 
-The canonical commutation relation for $\hat x,\hat p$ is a direct
-algebraic consequence of the harmonic oscillator's ladder algebra, not
-a separate fact, confirmed by the same commutator machinery built in
-the Expectation Values lesson.
+So $[\hat x,\hat p]=i\hbar$ and $[a,a^\dagger]=1$ are the same statement
+written in two variable sets. The ladder algebra of the last lesson was
+never an oscillator-specific trick; it was the canonical commutation
+relation in a change of coordinates, which is why ladder operators keep
+reappearing in systems that are not oscillators at all.
 
 ## Physical Interpretation
 
-Momentum plays a second role beyond "an observable": it generates
-translations in space, exactly the way the Hamiltonian generates
-translations in time (Time Evolution lesson), a deep structural
-parallel this course doesn't develop fully, but worth knowing exists.
-Historically, $[\hat x,\hat p]=i\hbar$ (via Heisenberg's matrix mechanics)
-and the Schrödinger equation (via wave mechanics) were discovered
-independently and only later shown to be the same theory. This course,
-by building the Schrödinger equation from unitarity and now connecting
-$[\hat x,\hat p]$ to the harmonic oscillator's algebra, has effectively
-retraced both routes from the same postulates.
+Momentum has a second job beyond being an observable. Compare the
+Time Evolution lesson's $U(t)=e^{-i\hat Ht/\hbar}$, which shifts a state
+forward in time, with
+
+$$
+T(a) = e^{-i\hat p a/\hbar}, \qquad T(a)|x\rangle = |x+a\rangle
+$$
+
+which shifts it through space. The two have the same form, and in each
+case the generator is the observable conjugate to the thing being
+shifted: energy for time, momentum for position. That pairing is the
+source of the commutation relation rather than a consequence of it, and
+Wave Mechanics develops the point properly.
+
+There is a historical footnote worth keeping. $[\hat x,\hat p]=i\hbar$
+came from Heisenberg's matrix mechanics and the Schrödinger equation came
+from wave mechanics; the two were built independently in 1925 and 1926,
+looked nothing alike, and were only afterwards shown to be one theory.
+This course reached both from the same four postulates, which is why the
+equivalence needed no argument here.
 
 ## Worked Example
 
@@ -200,10 +224,14 @@ $$
 
 Small in everyday units, but for an electron (mass $\approx
 9.1\times10^{-31}$ kg) this corresponds to a minimum velocity uncertainty
-of roughly $\Delta p/m \approx 5.8\times10^5$ m/s, not negligible at
-all on an atomic scale, which is exactly why quantum effects dominate
-atomic physics but are undetectable for everyday (much more massive)
-objects.
+of roughly $\Delta p/m \approx 5.8\times10^5$ m/s. That is about $0.2\%$
+of the speed of light, for an electron merely known to sit inside an
+atom.
+
+Run the same numbers for a $1$ gram bead localized to a micron and the
+velocity uncertainty lands near $10^{-25}$ m/s, which no experiment will
+ever resolve. The bound applies to both; only the mass in the denominator
+decides whether anyone notices.
 
 <PredictBeforeReveal
   question="If Δx is doubled (the position is known only half as precisely), what happens to the minimum Δp?"
@@ -213,24 +241,25 @@ objects.
     { label: "It's unaffected", value: "same" },
   ]}
   correctValue="halves"
-  explanation="Δp_min = ħ/(2Δx) is inversely proportional to Δx, so doubling Δx exactly halves the minimum momentum uncertainty — the product Δx·Δp_min stays pinned at ħ/2 no matter where the slider sits, which is the whole content of the bound."
+  explanation="Δp_min = ħ/(2Δx) is inversely proportional to Δx, so doubling Δx halves the minimum momentum uncertainty. The product Δx·Δp_min holds at ħ/2 wherever the slider sits, which is the entire content of the bound: it constrains the product and says nothing about either factor alone."
 />
 
 <InteractiveSection title="Slide Δx, watch the trade-off" description="Δp_min = ℏ/(2Δx) is recomputed live as Δx varies around an atomic radius; Δx = 1.0×10⁻¹⁰ m is marked, reproducing the worked example's Δp_min ≈ 5.3×10⁻²⁵ kg·m/s exactly. The second bar converts that same Δp_min to a minimum velocity uncertainty for an electron, the same conversion the worked example makes.">
   <BarChartExplorer
     frames={positionMomentumFrames}
     sliderLabel="Δx (×10⁻¹⁰ m)"
-    ariaLabel="Minimum momentum uncertainty and the corresponding minimum electron velocity uncertainty, recomputed live from the Heisenberg bound as position uncertainty Delta x varies around one atomic radius"
+    ariaLabel="Minimum momentum uncertainty and the corresponding minimum electron velocity uncertainty, recomputed live from the Heisenberg bound as position uncertainty Delta x varies around one atomic radius, on a fixed vertical scale so both bars are seen falling as Delta x grows"
+    maxValue={positionMomentumMax}
   />
 </InteractiveSection>
 
-<InteractiveSection title="The uncertainty box: squeeze one side, the other stretches" description="A box of width Δx and height Δp = ħ/(2Δx), centered at the origin of the (x, p) plane. Drag the same Δx as above and watch the box narrow horizontally while it stretches vertically — its area Δx·Δp never changes, because it's pinned at ħ/2 by construction, not by coincidence. Because Δx here is in units of ×10⁻¹⁰ m and Δp in ×10⁻²⁵ kg·m/s, the readout's raw product (≈5.3) carries an implied ×10⁻³⁵ kg·m²/s — restoring it recovers the actual ħ/2 ≈ 5.3×10⁻³⁵ kg·m²/s.">
+<InteractiveSection title="The uncertainty box: squeeze one side, the other stretches" description="A box of width Δx and height Δp = ħ/(2Δx), centered at the origin of the (x, p) plane. Drag the same Δx as above: the box narrows horizontally and stretches vertically, and its area holds still, because the area is Δx·Δp = ħ/2 by construction. Since Δx is in units of ×10⁻¹⁰ m and Δp in ×10⁻²⁵ kg·m/s, the readout's raw product (≈5.3) carries an implied ×10⁻³⁵ kg·m²/s; restoring it recovers ħ/2 ≈ 5.3×10⁻³⁵ kg·m²/s.">
   <PhaseSpacePanel
     mode="box"
     frames={uncertaintyBoxFrames}
     sliderLabel="Δx (×10⁻¹⁰ m)"
     ariaLabel="Rectangle in the x, p plane with width Delta x and height the minimum Delta p, shrinking in width and growing in height as Delta x decreases, with area held fixed at h-bar over 2"
-    productSuffix="(pinned — in these ×10⁻¹⁰ m / ×10⁻²⁵ kg·m/s units, this constant equals ħ/2 once the implied ×10⁻³⁵ kg·m²/s is restored)"
+    productSuffix="(constant: in these ×10⁻¹⁰ m / ×10⁻²⁵ kg·m/s units it equals ħ/2 once the implied ×10⁻³⁵ kg·m²/s is restored)"
   />
 </InteractiveSection>
 
@@ -239,8 +268,8 @@ objects.
 <Callout type="warning">
 **Treating $\hat p$ as an ordinary number rather than an operator.** Every
 manipulation above used $[\hat x,\hat p]$ as an operator commutator, the
-same object type as $[X,Y]$ for the Pauli matrices, the physics is
-identical in kind, just on an infinite-dimensional space.
+same kind of object as $[X,Y]$ for the Pauli matrices. Only the dimension
+of the space changed.
 </Callout>
 
 <Callout type="note">
@@ -279,10 +308,11 @@ no need for a separate argument specific to position and momentum.
 
 ## Further Exploration
 
-<ChallengePrompt prompt="For a particle confined to a proton-sized region (Δx ≈ 10⁻¹⁵ m, five orders of magnitude tighter than the worked example's atomic 10⁻¹⁰ m), what's the minimum Δp — and how many orders of magnitude larger is it than the worked example's result?">
-  Same formula, $\Delta p_{\min}=\hbar/(2\Delta x)$, just a different
-  $\Delta x$ — compare the exponents directly rather than only the
-  numbers.
+<ChallengePrompt prompt="Confine a particle to a proton-sized region, Δx ≈ 10⁻¹⁵ m, five orders of magnitude tighter than the worked example's atomic 10⁻¹⁰ m. What is the minimum Δp, and how many orders of magnitude larger is it than the worked example's answer?">
+  Same formula, $\Delta p_{\min}=\hbar/(2\Delta x)$, with a different
+  $\Delta x$. Compare the exponents rather than the mantissas, then ask
+  what kinetic energy that momentum implies for an electron and whether
+  a nucleus could hold onto it.
 </ChallengePrompt>
 
 <NextDiscovery>

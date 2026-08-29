@@ -44,25 +44,18 @@ The last lesson showed that measuring either qubit of a Bell state always matche
 
 ## Motivation
 
-Along the way, this lesson builds the tool, measuring *part* of a
-multi-qubit state, that quantum teleportation is built entirely out
-of, two lessons from now.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sycamore_Quantum_Chip.jpg/1280px-Sycamore_Quantum_Chip.jpg"
-  alt="Google's Sycamore superconducting quantum processor chip, mounted and displayed at the Deutsches Museum in Munich"
-  caption="A real multi-qubit superconducting processor (Google's Sycamore chip). Each qubit on hardware like this is read out individually through its own dispersive-measurement circuitry — physically the same 'measure one qubit, leave the rest alone' operation this lesson works out mathematically."
-  credit="Coldupnorth"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Sycamore_Quantum_Chip.jpg"
-  license="CC BY-SA 4.0"
-/>
+Deriving the Bell-state correlation from the measurement postulate builds a
+tool along the way: measuring *part* of a multi-qubit state. That operation
+is not a convenience of the mathematics. Real hardware reads out one qubit
+at a time, through that qubit's own readout line, and quantum teleportation
+two lessons from now is built out of nothing else.
 
 ## Intuition
 
 Measuring a single-qubit state <Term id="wavefunction-collapse">collapses</Term> it to a definite basis state,
 full stop. Measuring one qubit *within* a multi-qubit state has to do
 something more careful: the other qubits are still there, still possibly
-in superposition, and the measurement can't simply erase them. What it
+in superposition, and the measurement cannot erase them. What it
 does is throw away every possibility inconsistent with the outcome you
 got, and rescale what's left so it's still a valid, normalized state.
 
@@ -89,7 +82,7 @@ $$
 This is the general single-qubit computational-basis <Term id="born-rule">Born rule</Term> from the
 last course, applied one qubit at a time instead of to the whole
 register at once. The "collapse to a definite basis state" you already
-know is exactly the special case where the state being measured has only
+know is the special case where the state being measured has only
 one qubit to begin with.
 
 ### Applied to the Bell state
@@ -111,7 +104,7 @@ $\sqrt{1/2}$ gives amplitude exactly 1 on $|00\rangle$:
     { label: "Undefined until qubit 1 is also measured", value: "undefined" },
   ]}
   correctValue="zero"
-  explanation="Only the |00⟩ term survives outcome 0 — the |11⟩ term is zeroed out and the rest renormalized. There's nothing left in the state with qubit 1 equal to 1, so qubit 1 is exactly |0⟩, not merely likely to be |0⟩. No further measurement can change that."
+  explanation="Only the |00⟩ term survives outcome 0. The |11⟩ term is zeroed out and what remains is renormalized, so there is nothing left in the state with qubit 1 equal to 1. Qubit 1 is |0⟩ with certainty, not merely likely to be |0⟩, and no further measurement can change that. Notice nobody touched qubit 1."
 />
 
 <QuantumStateDisplay state={bellAfterZero} label="Bell state, after measuring qubit 0 → outcome 0" />
@@ -122,9 +115,8 @@ measurement, its value is **exactly determined**, with certainty. This is
 the full mechanism behind the correlation from the last lesson, not an
 approximation of it.
 
-The same two outcomes, drawn as the branching process they actually are:
-one 50/50 measurement, and qubit 1's fate fixed by which branch it lands
-in.
+The same two outcomes, drawn as the branching process they are: one 50/50
+measurement, with qubit 1's value fixed by which branch it lands in.
 
 <MeasurementTree
   root={{
@@ -146,11 +138,11 @@ superposition. Measure qubit 1:
 <QuantumStateDisplay state={plusZero} label="|+⟩ ⊗ |0⟩, before any measurement" />
 <QuantumStateDisplay state={plusZeroAfterMeasuringQubit1} label="After measuring qubit 1 (always outcome 0)" />
 
-Qubit 1's outcome is certain (it was already definite), and, crucially,
-qubit 0's superposition survives completely untouched. Measuring one
-qubit of a product state never disturbs the other; measuring one qubit of
-an entangled state generally does. <Term id="entanglement">Entanglement</Term> is precisely what makes
-that difference possible.
+Qubit 1's outcome is certain (it was already definite), and qubit 0's
+superposition survives untouched. That is the whole contrast: measuring one
+qubit of a product state never disturbs the other, while measuring one
+qubit of an entangled state generally does. <Term id="entanglement">Entanglement</Term> is what makes the
+difference possible.
 
 ## Physical Interpretation
 
@@ -161,7 +153,7 @@ collapsing part of an indivisible state collapses the whole description
 at once, which is why the untouched qubit's outcome becomes definite even
 though nothing was done to it directly.
 
-<InteractiveSection title="Collapse vs. no collapse" description="Try it yourself, using the exact Measure q0 / Measure q1 buttons this lesson's math describes. Run the Create a Bell state walkthrough, then measure q0: the state panel shows the collapse this lesson derived, exactly. Reset, prepare |++⟩ instead, and measure q1: notice q0's row in the state table still shows a 50/50 split afterward, the unentangled contrast from the previous section, live.">
+<InteractiveSection title="Collapse vs. no collapse" description="Use the Measure q0 / Measure q1 buttons this lesson's math describes. Run the Create a Bell state walkthrough, then measure q0: the state panel shows the collapse derived above. Reset, prepare |++⟩ instead, and measure q1: q0's row in the state table still shows a 50/50 split afterward, which is the unentangled contrast from the previous section, live.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
@@ -219,7 +211,7 @@ normalized quantum state.
 - Applied to a Bell state, this shows the partner qubit becomes exactly
   determined, not just statistically likely to match.
 - Applied to a product state, the untouched qubit's superposition survives
-  completely.
+  intact.
 
 ## Further Exploration
 

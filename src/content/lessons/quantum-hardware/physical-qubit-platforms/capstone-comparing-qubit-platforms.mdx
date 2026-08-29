@@ -5,7 +5,6 @@ import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { Question } from "@/components/narrative/Question";
 import { GraphDiagram } from "@/components/visualizations/GraphDiagram";
 import { HardwarePlatformSchematic } from "@/components/visualizations/HardwarePlatformSchematic";
-import { AnnotatedFigure } from "@/components/narrative/AnnotatedFigure";
 
 export const gateBudgetFrames = [
   {
@@ -13,7 +12,7 @@ export const gateBudgetFrames = [
     bars: [{ label: "Gate budget (10^n gates)", value: 3, caption: "~10³ gates" }],
   },
   {
-    paramLabel: "Trapped ion: ~10 μs gate, ~1 s coherence",
+    paramLabel: "Trapped ion: ~10 μs two-qubit gate, ~1 s coherence",
     bars: [{ label: "Gate budget (10^n gates)", value: 5, highlight: true, caption: "~10⁵ gates" }],
   },
 ];
@@ -32,10 +31,10 @@ export const coherenceTimeBars = coherenceSecondsByPlatform.map(({ label, second
 }));
 
 export const gateSecondsByPlatform = [
-  { label: "Super-conducting", seconds: 1e-8, caption: "~10 ns" },
-  { label: "Spin qubits", seconds: 1e-7, caption: "~100 ns" },
-  { label: "Neutral atoms", seconds: 1e-6, caption: "~1 μs" },
-  { label: "Trapped ions", seconds: 1e-5, caption: "~10 μs", highlight: true },
+  { label: "Super-conducting", seconds: 1e-8, caption: "~10 ns (1-qubit)" },
+  { label: "Spin qubits", seconds: 1e-7, caption: "~100 ns (1-qubit)" },
+  { label: "Neutral atoms", seconds: 1e-6, caption: "~1 μs (1-qubit)" },
+  { label: "Trapped ions", seconds: 1e-5, caption: "~10 μs (2-qubit)", highlight: true },
 ];
 export const gateTimeBars = gateSecondsByPlatform.map(({ label, seconds, caption, highlight }) => ({
   label,
@@ -51,15 +50,15 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Capstone: Comparing Qubit Platforms",
   description:
-    "No single platform wins on every axis: putting superconducting circuits, trapped ions, neutral atoms, photons, and spin qubits side by side on coherence time, gate speed, connectivity, and scalability makes the actual engineering tradeoff space visible at once.",
+    "No single platform wins on every axis: putting superconducting circuits, trapped ions, neutral atoms, photons, and spin qubits side by side on coherence time, gate speed, two-qubit gate fidelity, connectivity, and scalability makes the actual engineering tradeoff space visible at once.",
   course: "physical-qubit-platforms",
   module: "capstone-comparing-qubit-platforms",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 20,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-hardware/physical-qubit-platforms/spin-qubits"],
   objectives: [
-    "Compare all five platforms on the same four axes: coherence time, gate speed, connectivity, and scalability path",
+    "Compare all five platforms on the same five axes: coherence time, gate speed, two-qubit gate fidelity, connectivity, and scalability path",
     "Explain why no platform dominates on every axis simultaneously",
     "Identify which platform a given application's priorities (e.g. long computations vs. fast iteration) would favor",
   ],
@@ -76,39 +75,42 @@ obvious choice, in isolation. Read side by side, none of them do:
 superconducting circuits, trapped ions, <Term id="neutral-atoms">neutral atoms</Term>, photons, and <Term id="spin-qubits">spin
 qubits</Term> each trade something real for something else. This capstone adds
 no new physics. It puts all five in the same room, which is where the
-actual engineering decision-making happens in practice.
+engineering decision actually gets made.
 
-<AnnotatedFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/9/91/IBM_Quantum_System_One.jpg"
-  alt="IBM Quantum System One, a full quantum computing system, showing the golden dilution-refrigerator cryostat casing suspended in its glass-walled enclosure"
-  caption="What five chapters of qubit physics have left out until now: the classical machine built around the chip. This particular system houses superconducting transmons, but every platform in this table needs its own version of this same infrastructure, cryogenics or vacuum optics, wiring, and control electronics, which is exactly where the Control & Readout course picks up."
-  pins={[
-    { id: "shell", x: 50, y: 8, label: "The outer vacuum shell enclosing the whole cryostat." },
-    { id: "braid", x: 28, y: 33, label: "Copper braided thermal straps, anchoring each stage to the one above it." },
-    { id: "stages", x: 30, y: 50, label: "Gold-plated stages, each colder than the last — the cryogenics this lesson's table folds into one word." },
-    { id: "wiring", x: 75, y: 70, label: "Coiled signal wiring, carrying control and readout lines down toward the chip." },
-  ]}
-  credit="Onri Jay Benally / IBM"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
+<ExternalFigure
+  src="https://upload.wikimedia.org/wikipedia/commons/5/5e/QuEra_Aquila_Optical_Layout.jpg"
+  alt="The optical table and beam layout of QuEra's first-generation Aquila neutral-atom quantum computer"
+  caption="What five chapters of qubit physics have left out until now: the machine built around the qubits. This is the optical bench of a neutral-atom system — no cryostat anywhere in it, because a tweezer array needs vacuum and stabilized lasers instead. Every row of the table below carries its own version of this bill, and Control & Readout is where it comes due."
+  credit="QuEra Computing, Inc., via Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:QuEra_Aquila_Optical_Layout.jpg"
   license="CC BY 4.0"
 />
 
 ## The Tradeoff Space, Side by Side
 
-Same four axes, five platforms, one table: this is what an actual
-engineering decision between them rests on.
+Same five axes, five platforms, one table: this is what a decision
+between them rests on.
 
-| Platform | Coherence time | Gate speed | Connectivity | Scaling path |
-|---|---|---|---|---|
-| Superconducting | ~microseconds | ~nanoseconds (fast) | mostly nearest-neighbor | lithographic fabrication, many labs/companies actively scaling |
-| Trapped ions | ~seconds (long) | ~microseconds (slow) | all-to-all within a trap | chain length limited; modular/networked traps an active research direction |
-| Neutral atoms | ~seconds (long) | ~microseconds | flexible, reconfigurable geometry | hundreds of qubits already demonstrated; among the largest current counts |
-| Photonic | effectively no decoherence in flight; loss-limited instead | very fast per operation | naturally networked (light travels) | strong for communication/networking; two-qubit gates remain the hard problem |
-| Spin qubits | intermediate–long | ~nanoseconds | nearest-neighbor (dot-to-dot) | leverages existing semiconductor fabrication tooling |
+| Platform | Coherence time | Gate speed | Two-qubit gate fidelity | Connectivity | Scaling path |
+|---|---|---|---|---|---|
+| Superconducting | ~microseconds | ~nanoseconds (fast) | ~99.5-99.9% | mostly nearest-neighbor | lithographic fabrication, many labs/companies actively scaling |
+| Trapped ions | ~seconds (long) | ~microseconds (slow) | ~99.9% (best published at or above 99.9%) | all-to-all within a trap | chain length limited; modular/networked traps an active research direction |
+| Neutral atoms | ~seconds (long) | ~microseconds | ~99.5% | flexible, reconfigurable geometry | hundreds of qubits already demonstrated; among the largest current counts |
+| Photonic | effectively no decoherence in flight; loss-limited instead | very fast per operation | probabilistic fusion gates: succeed or fail heralded, a different regime from a fidelity spec | naturally networked (light travels) | strong for communication/networking; two-qubit gates remain the hard problem |
+| Spin qubits | intermediate–long | ~nanoseconds | ~99% | nearest-neighbor (dot-to-dot) | leverages existing semiconductor fabrication tooling |
 
 (These are representative orders of magnitude for illustrating the
-tradeoff space, not precise specifications of any particular device;
-real numbers vary by generation, vendor, and continue to improve.)
+tradeoff space, drawn from published results through the mid-2020s, not
+specifications of any particular device; real numbers vary by
+generation and vendor, and continue to improve. Read every figure here
+as carrying an implicit date, and go looking for the current one before
+quoting any of them in an argument that matters. The
+fidelity column especially rewards that caution: it moves fastest, and
+the gap between a platform's best published result and its typical
+device is often wide. The photonic entry isn't a dodge: a fusion gate
+either succeeds or heralds its own failure, so "what fraction succeed"
+and "how faithful the survivors are" are two separate questions, and
+compressing them into one percentage would misrepresent the platform.)
 
 The table's five rows are five physically distinct structures, not just
 five sets of numbers; each platform lesson's own schematic,
@@ -144,9 +146,9 @@ side by side, makes that concrete:
 </div>
 
 Five different physical mechanisms for the same underlying job (an
-isolated, controllable two-level system) is exactly why the table above
-has no row that wins on every column: each structure's own geometry is
-what produces its particular coherence/speed/connectivity tradeoff.
+isolated, controllable two-level system) is why the table above has no
+row that wins on every column: each structure's own geometry is what
+produces its particular coherence/speed/connectivity tradeoff.
 
 ### Coherence time, on an actual log scale
 
@@ -179,9 +181,20 @@ plotted is $-\log_{10}(\text{seconds})$), so the platforms that were tall
 on the coherence chart tend to be short here, and vice versa:
 
 <BarChart
-  ariaLabel="Single-qubit gate speed across four platforms, log scale with taller meaning faster: superconducting around 10 nanoseconds, spin qubits around 100 nanoseconds, neutral atoms around 1 microsecond, trapped ions around 10 microseconds"
+  ariaLabel="Gate speed across four platforms, log scale with taller meaning faster: single-qubit gate times for superconducting around 10 nanoseconds, spin qubits around 100 nanoseconds, and neutral atoms around 1 microsecond, plus the two-qubit entangling gate time for trapped ions around 10 microseconds"
   bars={gateTimeBars}
 />
+
+One caution about reading this chart: the bars don't all measure the
+same kind of gate, and the captions say which is which. The
+superconducting, spin-qubit, and neutral-atom bars are *single-qubit*
+gate times; the trapped-ion bar is the platform's *two-qubit* entangling
+gate, because that shared-motion step is the operation that actually
+sets the platform's pace (the Trapped Ions lesson noted a single-qubit
+ion gate, a direct laser drive with no shared motion involved, runs
+considerably faster). Plotting the ion's defining bottleneck rather than
+its best case is the honest comparison, but only with the mismatch
+labeled.
 
 Photonic is excluded here too, for a related but different reason: a
 passive polarization rotation has essentially no drive time at all, while
@@ -365,9 +378,10 @@ qualitative tradeoffs, not a snapshot to memorize as timeless fact.
 
 ## Summary
 
-- Comparing coherence time, gate speed, connectivity, and scalability
-  side by side shows every platform trading strength on one axis for
-  weakness on another; no platform dominates across the board.
+- Comparing coherence time, gate speed, two-qubit gate fidelity,
+  connectivity, and scalability side by side shows every platform
+  trading strength on one axis for weakness on another; no platform
+  dominates across the board.
 - This reflects genuine physical tradeoffs (isolation vs. coupling
   strength), not simply immature engineering that will resolve itself.
 - Application priorities (raw gate count vs. fast iteration vs.

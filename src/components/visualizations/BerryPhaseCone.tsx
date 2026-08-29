@@ -86,7 +86,14 @@ function WireCircle({ plane, dashed }: { plane: "xy" | "xz" | "yz"; dashed: bool
             y1={point.sy}
             x2={next.sx}
             y2={next.sy}
-            className="stroke-border"
+            // The three great circles are scaffolding: they sell the sphere as a 3D
+            // object, but nothing in the Berry-phase argument is read off them, and
+            // they must stay quieter than the cap and the loop they sit behind. That
+            // is exactly what `--axis-grid` is for — deliberately below the 3:1 floor,
+            // unlike `--axis`, which the sphere's silhouette below now uses. They were
+            // on `stroke-border` (the panel-edge token) purely because no chart channel
+            // existed; `--axis-grid` is the same intent with the right name.
+            className="stroke-axis-grid"
             strokeWidth={1}
             strokeDasharray={dashed || isBack ? "3 4" : undefined}
             opacity={depthOpacity(avgDepth)}
@@ -182,9 +189,32 @@ export function BerryPhaseCone({ ariaLabel }: { ariaLabel: string }) {
 
   return (
     <div className="not-prose space-y-3 panel-inset p-4">
-      <div className="overflow-x-auto">
+      {/* `tabIndex={0}` on the scroll container. The SVG below has an intrinsic
+          `width={VIEW_SIZE}` (320) and no `w-full`, so unlike this directory's
+          responsive figures it does not shrink — it renders at 320 real pixels
+          inside a ~256px content box on a 320px phone and this wrapper takes
+          the overflow. An `overflow-x-auto` div is focusable by default in no
+          browser but Firefox, so a keyboard-only or trackpad-less reader could
+          see the left two-thirds of the sphere and had no way to scroll to the
+          rest — WCAG 2.1.1.
+          Deliberately no `role`/`aria-label` here, for the reason
+          `rehypeKatexHtml.mjs` gives for display math: the `<svg>` inside is
+          already `role="img"` with the full composed label, and naming the
+          wrapper too would announce the figure twice. One bare tab stop is the
+          accepted trade. The global `:focus-visible` outline in globals.css
+          makes it visible; `panel-inset` sets no `overflow: hidden` that could
+          clip the ring. */}
+      <div tabIndex={0} className="overflow-x-auto">
         <svg width={VIEW_SIZE} height={VIEW_SIZE} viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`} role="img" aria-label={ariaLabel}>
-          <circle cx={CENTER.x} cy={CENTER.y} r={RADIUS} fill="none" className="stroke-border" strokeWidth={1.5} />
+          {/* The silhouette is load-bearing, not chrome: the entire claim the slider
+              demonstrates is "how much of the *whole sphere* the cap covers" — at
+              θ→180° the cap should read as almost all of it — and that comparison is
+              impossible without seeing where the sphere ends. It was `stroke-border`,
+              the panel-edge token at 1.41:1 on `--surface-muted`, so the reference
+              outline for a proportion argument was under WCAG 2.1 SC 1.4.11's 3:1.
+              `stroke-axis` is the chart channel; the wireframe stays subordinate on
+              `stroke-axis-grid`. */}
+          <circle cx={CENTER.x} cy={CENTER.y} r={RADIUS} fill="none" className="stroke-axis" strokeWidth={1.5} />
 
           <WireCircle plane="xy" dashed={false} />
           <WireCircle plane="xz" dashed />

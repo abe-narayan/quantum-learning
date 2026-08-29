@@ -69,9 +69,9 @@ see for real in the future Hydrogen Atom course).
 
 ## Intuition
 
-A **projection operator** does exactly what the name suggests: given any
-vector, it keeps the part lying in some subspace and discards the rest,
-the linear-algebra analogue of a shadow cast onto a wall. Every term
+A **projection operator** does what the name suggests: given any vector,
+it keeps the part lying in some subspace and discards the rest, the
+linear-algebra analogue of a shadow cast onto a wall. Every term
 $|e_i\rangle\langle e_i|$ in the spectral decomposition is a projector
 onto the one-dimensional subspace spanned by $|e_i\rangle$; this lesson's
 only real extension is allowing that subspace to be bigger than one
@@ -79,11 +79,11 @@ dimension.
 
 Drag $v$ around the plane below and watch its shadow $Pv$ fall onto a
 one-dimensional eigenspace (a line) versus a two-dimensional, degenerate
-eigenspace (the whole plane, where the shadow of $v$ is just $v$ itself).
-Either way, the dashed line dropping straight down from $v$ to $Pv$ is
-the "cast a shadow" step, and the small loop at $Pv$ is $P$ applied a
-second time landing on exactly the same point: idempotence, drawn rather
-than just proven.
+eigenspace (the whole plane, where the shadow of $v$ is $v$ itself, since
+nothing is left to discard). Either way, the dashed line dropping straight
+down from $v$ to $Pv$ is the "cast a shadow" step, and the small loop at
+$Pv$ is $P$ applied a second time, landing on the same point it started
+from. That loop is idempotence, drawn rather than proven.
 
 <ProjectionShadow ariaLabel="Drag a vector and see its shadow projected onto a one-dimensional or two-dimensional eigenspace" />
 
@@ -126,9 +126,9 @@ $$
 
 This is still idempotent (each term is individually idempotent, and
 cross terms vanish by orthogonality: $\langle e_{i,j}|e_{i,k}\rangle=0$
-for $j\ne k$), proven exactly the same way, just with an extra sum. This
-is precisely what this platform's `projectorOntoSubspace(vectors)`
-function builds, and `outerProduct(ket, bra)` computes each
+for $j\ne k$), proven the same way as before with one extra sum. This is
+what this platform's `projectorOntoSubspace(vectors)` function builds,
+with `outerProduct(ket, bra)` computing each
 $|e_{i,k}\rangle\langle e_{i,k}|$ term.
 
 ### The full spectral decomposition, correctly stated
@@ -151,12 +151,12 @@ eigenvectors span the whole space).
 <PredictBeforeReveal
   question="A measurement finds a system's energy is exactly Ei, and Ei happens to be a degenerate eigenvalue with a 2-dimensional eigenspace. Does that measurement pin down the system's exact state?"
   options={[
-    { label: "Yes — one eigenvalue always means one exact state", value: "yes" },
-    { label: "No — the state could be anywhere in the 2-dimensional eigenspace", value: "no" },
+    { label: "Yes, one eigenvalue always means one exact state", value: "yes" },
+    { label: "No, the state could be anywhere in the 2-dimensional eigenspace", value: "no" },
     { label: "Only if the two eigenvectors happen to be orthogonal", value: "orthogonal-only" },
   ]}
   correctValue="no"
-  explanation="No. Knowing the energy is Ei only tells you the state lives somewhere in that eigenvalue's eigenspace — for a degenerate Ei, that's a whole subspace, not a single ray. This is exactly why the projector Pi for a degenerate eigenvalue sums over every eigenvector in that eigenspace rather than picking out just one."
+  explanation="No. Knowing the energy is Ei tells you the state lives somewhere in that eigenvalue's eigenspace, and for a degenerate Ei that is a whole subspace rather than a single ray. This is why the projector Pi for a degenerate eigenvalue sums over every eigenvector in the eigenspace instead of picking one out."
 />
 
 Degeneracy means an eigenvalue alone doesn't fully identify a unique
@@ -168,7 +168,7 @@ next lesson builds the tool for resolving this: a second, compatible
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Pieter_Zeeman.jpg"
   alt="Portrait photograph of physicist Pieter Zeeman, circa 1920"
-  caption="Zeeman discovered that a magnetic field splits a single degenerate spectral line into several distinct ones -- a physical demonstration that the field has changed which observable's projectors describe the atom's energy levels, turning one high-rank P_i into several rank-1 projectors."
+  caption="Zeeman discovered that a magnetic field splits a single degenerate spectral line into several distinct ones. Degeneracy is not a permanent feature of a system: the field lifts it, turning one high-rank projector P_i into several rank-1 projectors, each with its own energy."
   credit="Nationaal Archief / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Pieter_Zeeman.jpg"
   license="CC BY-SA 3.0 NL"
@@ -192,8 +192,8 @@ $$
 N = 1\cdot P_1 + 2\cdot P_2 = \begin{pmatrix}1&0&0\\0&1&0\\0&0&2\end{pmatrix} \checkmark
 $$
 
-matching $N$ exactly, confirming both projectors and the decomposition
-directly.
+which is $N$ back again, confirming both projectors and the decomposition
+in one step.
 
 <InteractiveSection title="Check idempotence for both projectors" description="Switch between P₁ (built from platform's real projectorOntoSubspace on N's 2-dimensional degenerate eigenspace) and P₂ (the ordinary rank-1 case). Both satisfy P² = P, confirmed by direct computation rather than the general proof alone.">
   <MatrixGridExplorer
@@ -243,8 +243,8 @@ projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
 - The full spectral decomposition $A=\sum_i\lambda_iP_i$, summed over
   *distinct* eigenvalues, holds correctly whether or not any eigenvalue
   is degenerate.
-- `outerProduct` and `projectorOntoSubspace` (this platform's new engine
-  functions) build exactly these objects, tested against idempotence,
+- `outerProduct` and `projectorOntoSubspace` (this platform's engine
+  functions) build these objects, tested against idempotence,
   completeness, and the reconstruction of Pauli-$Z$ from its own
   projectors.
 
@@ -263,9 +263,9 @@ projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
   vanishing.
 
   For a fully rigorous treatment of this lesson's $A=\sum_i\lambda_iP_i$
-  formula — proving it as an exact special case of the general
-  projection-valued-measure spectral theorem, the version that also
-  correctly covers operators like $\hat x$ with a continuous spectrum —
-  see [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators)
+  formula, proving it as a special case of the general
+  projection-valued-measure spectral theorem (the version that also covers
+  operators like $\hat x$ with a continuous spectrum), see
+  [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators)
   in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
 </NextDiscovery>

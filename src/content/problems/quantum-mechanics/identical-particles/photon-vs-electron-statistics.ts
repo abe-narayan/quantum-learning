@@ -33,17 +33,21 @@ export const photonVsElectronStatistics: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Integer spin (like the photon's spin 1) means bosonic (symmetric); half-integer spin (like the electron's spin 1/2) means fermionic (antisymmetric).",
   },
   hints: [
-    { text: "Integer spin (0, 1, 2, ...) → bosons → symmetric wavefunctions." },
-    { text: "Half-integer spin (1/2, 3/2, ...) → fermions → antisymmetric wavefunctions." },
-    { text: "Photon spin=1 (integer); electron spin=1/2 (half-integer)." },
+    { text: "The spin-statistics connection sorts particles by one thing only: whether their spin is an integer or a half-integer." },
+    { text: "Sort the two particles into those categories first, using the spins the prompt gives you." },
+    { text: "Integer spin goes with symmetric wavefunctions, half-integer with antisymmetric. Now read off each particle." },
   ],
   solution: {
-    steps: [{ description: "Photons (spin 1, integer) are bosons, symmetric. Electrons (spin 1/2, half-integer) are fermions, antisymmetric." }],
-    finalAnswer: "(a) Photons: symmetric (bosons). Electrons: antisymmetric (fermions).",
+    steps: [{ description: "Photons have spin 1, an integer, so they are bosons and their joint wavefunction is symmetric under exchange. Electrons have spin 1/2, a half-integer, so they are fermions and their joint wavefunction is antisymmetric." }],
+    finalAnswer: "Photons are bosons with a symmetric wavefunction; electrons are fermions with an antisymmetric one.",
   },
   explanation: {
-    correctIdea: "This is a direct, memorizable application of the spin-statistics connection this course states as an experimental fact.",
-    whyCorrect: "Matches the standard, well-established assignment for these two specific particles.",
-    whyWrong: ["Electron exclusion (fermion behavior) is exactly why atomic shell structure exists (Multi-Electron Atoms) — if electrons were bosons, this entire course's shell-filling logic would collapse."],
+    correctIdea: "The spin-statistics connection keys entirely on integer versus half-integer spin, so the two spins given in the prompt settle the answer on their own.",
+    whyCorrect: "Matches the standard assignment for these two particles, and it is why electron exclusion produces atomic shell structure.",
+    whyWrong: [
+      { optionId: "b", text: "Runs the connection backwards. Integer spin is bosonic and half-integer is fermionic, not the reverse." },
+      { optionId: "c", text: "Sorts by elementary versus composite. Elementarity does not enter; spin does, and the two spins here differ." },
+      { optionId: "d", text: "Makes statistics contextual. It is fixed by the particle species, which is why electron exclusion holds in every atom." },
+    ],
   },
 };

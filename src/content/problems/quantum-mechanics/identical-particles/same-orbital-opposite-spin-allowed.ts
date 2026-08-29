@@ -34,16 +34,20 @@ export const sameOrbitalOppositeSpinAllowed: MultipleChoiceProblem = {
   },
   hints: [
     { text: "Exclusion is violated only when both the spatial orbital AND the spin are identical." },
-    { text: "Option (a) has the same orbital (1s) and the same spin (up) for both electrons." },
+    { text: "One configuration puts both electrons in 1s with both spins up: same orbital, same spin." },
     { text: "Every other option differs in either orbital or spin." },
   ],
   solution: {
-    steps: [{ description: "Only (a) has both electrons in the identical complete single-particle state (same orbital, same spin) — this is exactly the a=b case where antisymmetrize throws." }],
-    finalAnswer: "(a) Both electrons in 1s, both spin-up",
+    steps: [{ description: "Only the both-in-1s, both-spin-up configuration puts two electrons in the identical complete single-particle state (same orbital, same spin) — this is exactly the a=b case where antisymmetrize throws." }],
+    finalAnswer: "Both electrons in 1s, both spin-up",
   },
   explanation: {
     correctIdea: "This directly tests the 'complete single-particle state includes spin' point from the lesson's Common Mistakes section.",
     whyCorrect: "Matches the antisymmetrize(a,a) throw condition — here a is 'the (1s, spin-up) single-particle state' for both electrons.",
-    whyWrong: ["Options (b), (c), (d) all differ in at least one quantum number (spin or orbital), making them distinct single-particle states and therefore fully allowed."],
+    whyWrong: [
+      { optionId: "b", text: "Same spatial orbital, but opposite spins make these two different complete single-particle states, so this is allowed." },
+      { optionId: "c", text: "Different spatial orbitals (1s versus 2s) already make these different single-particle states, whatever the spins." },
+      { optionId: "d", text: "Different spatial orbitals again (2s versus 2p), so this is allowed too." },
+    ],
   },
 };

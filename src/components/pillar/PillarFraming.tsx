@@ -292,7 +292,7 @@ export function PillarLessonStrip({
           <li key={lesson.slug}>
             <Link
               href={`/lessons/${lesson.slug}`}
-              className="group flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border bg-surface-muted/40 px-3 py-2 transition-colors duration-[--dur-fast] ease-[--ease-mech] hover:border-pillar-edge hover:bg-surface-muted focus-visible:border-pillar-edge focus-visible:bg-surface-muted"
+              className="group flex min-h-11 items-center justify-between gap-3 rounded-(--radius-tight) border border-border bg-surface-muted/40 px-3 py-2 transition-colors duration-(--dur-fast) ease-mech hover:border-pillar-edge hover:bg-surface-muted focus-visible:border-pillar-edge focus-visible:bg-surface-muted"
             >
               <span className="min-w-0">
                 <span className="block truncate font-tech text-[0.65rem] uppercase tracking-[0.1em] text-subtle-foreground">

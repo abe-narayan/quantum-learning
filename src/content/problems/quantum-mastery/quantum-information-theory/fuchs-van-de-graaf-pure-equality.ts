@@ -22,7 +22,11 @@ export const fuchsVanDeGraafPureEquality: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["own purification", "already pure", "trivial purification", "itself"],
-      ["contractivity", "equality", "no partial trace needed", "b is trivial"],
+      {
+        phrases: ["contractivity", "contraction", "equality", "no partial trace needed", "nothing to trace out", "b is trivial", "no slack", "loses nothing", "tight"],
+        missingFeedback:
+          "You have noticed that a pure state purifies itself. Say what that does to the proof: the only inequality in it is the contraction under tracing out B, and with B one-dimensional there is nothing to trace out, so that step loses nothing and the bound closes.",
+      },
     ],
     incorrectFeedback:
       "If rho and sigma are already pure, their own Uhlmann-optimal purifications can be taken to be themselves (a trivial one-dimensional B system), so the contractivity step used to derive the upper bound involves no actual partial trace, and the pure-pure trace-distance identity applies directly with no loss.",

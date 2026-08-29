@@ -15,6 +15,14 @@ the concept map, Navbar Escape, `IconButton`, `getCourseHref`, `/courses/[slug]`
 beginner glossary entries, `<Term>` in 10 lessons). **Verify before you "fix" —
 re-reading the audit and re-doing a finished item wastes the wave.**
 
+**Status as of 2026-08-29 (later than this brief).** The `<Term>` rollout is
+long past "10 lessons": it now runs to **at least 559 calls across 191 of
+the 219 lessons** (still climbing while this wave runs), and the glossary
+stands at **258 terms**. Both audits carry dated
+resolution notes on the findings that have since landed. Re-derive any count
+in this file before relying on it — `grep -c '<Term' -r src/content/lessons`
+and `npx vitest run src/lib/content/__tests__/glossary.test.ts`.
+
 Baseline at wave start: `npm run typecheck` clean, `npx vitest run` = 929/929 pass.
 Do not regress either.
 

@@ -44,6 +44,10 @@ export const verifyX2Anticommutation: MultipleChoiceProblem = {
   explanation: {
     correctIdea: "This reproduces the decode table's qubit-2 entry, syndrome (0,1), from operator structure alone.",
     whyCorrect: "Matches Lesson 2's decode table exactly, now derived rather than just quoted.",
-    whyWrong: ["Any answer other than 'Z₁Z₂ only' misidentifies which stabilizer generator actually contains a same-qubit Z operator."],
+    whyWrong: [
+      { optionId: "b", text: "Names the stabilizer that has no operator on qubit 2 at all, so it commutes with X₂ trivially." },
+      { optionId: "c", text: "Would need both stabilizers to touch qubit 2, and only one of them does." },
+      { optionId: "d", text: "Would mean the error goes undetected. X and Z anticommute on a shared qubit, and Z₁Z₂ shares qubit 2." },
+    ],
   },
 };

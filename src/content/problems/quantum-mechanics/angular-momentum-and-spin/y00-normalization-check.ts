@@ -24,12 +24,16 @@ export const y00NormalizationCheck: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Every properly normalized wavefunction (or angular function) integrates its squared magnitude to exactly 1.",
+    incorrectFeedback: "Normalization is a definition, not a computation: a properly normalized angular function integrates its squared magnitude to a fixed value over the full sphere. If you integrated and got something else, the discrepancy is numerical error, not physics.",
+    nearMisses: [
+      { value: 4 * Math.PI, tolerance: 0.05, feedback: "4π is the total solid angle. It is what |Y₀⁰|² is divided by, since Y₀⁰ = 1/√(4π), so the integral comes back to 1." },
+      { value: 1 / (4 * Math.PI), tolerance: 0.005, feedback: "1/(4π) is |Y₀⁰|² itself, a constant over the sphere. Integrating that constant over 4π steradians recovers the normalization." },
+    ],
   },
   hints: [
-    { text: "Normalization means the total probability (or, here, angular probability density) integrates to 1." },
-    { text: "This holds for every valid Y_l^m, not just Y₀⁰ specifically." },
-    { text: "The answer is 1." },
+    { text: "This question asks what normalization means, not for an integral you must grind out. What must the squared magnitude of a properly normalized angular function integrate to over the full solid angle?" },
+    { text: "The normalization convention is the same for every valid Y_l^m; nothing about this particular harmonic changes it." },
+    { text: "State the defining value of a normalized probability integral. The numerical check should reproduce it, up to tiny grid error." },
   ],
   solution: {
     steps: [{ description: "By definition of normalization, ∫|Y₀⁰|² dΩ = 1." }],

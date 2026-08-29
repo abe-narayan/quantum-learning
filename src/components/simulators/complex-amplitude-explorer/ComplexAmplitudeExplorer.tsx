@@ -27,6 +27,8 @@ type Mode = "single" | "two-amplitude";
 const DEFAULT_RE = 0.5;
 const DEFAULT_IM = 0.5;
 const DEFAULT_ALPHA_MAGNITUDE = Math.SQRT1_2;
+/** Both phases start at 0, so the pair opens with no relative phase between them and δ is the reader's first move. */
+const DEFAULT_ALPHA_PHASE = 0;
 const DEFAULT_BETA_PHASE = 0;
 const RE_IM_BOUND = 1.5;
 const URL_SYNC_DEBOUNCE_MS = 400;
@@ -118,7 +120,7 @@ export function ComplexAmplitudeExplorer({
   const [im, setIm] = useState(() => initialSingle?.im ?? DEFAULT_IM);
 
   const [alphaMagnitude, setAlphaMagnitude] = useState(() => initialTwo?.alphaMagnitude ?? DEFAULT_ALPHA_MAGNITUDE);
-  const [alphaPhase, setAlphaPhase] = useState(() => initialTwo?.alphaPhase ?? 0);
+  const [alphaPhase, setAlphaPhase] = useState(() => initialTwo?.alphaPhase ?? DEFAULT_ALPHA_PHASE);
   const [betaPhase, setBetaPhase] = useState(() => initialTwo?.betaPhase ?? DEFAULT_BETA_PHASE);
   const [copied, setCopied] = useState(false);
 
@@ -200,9 +202,13 @@ export function ComplexAmplitudeExplorer({
       setRe(DEFAULT_RE);
       setIm(DEFAULT_IM);
     } else {
-      setAlphaMagnitude(Math.SQRT1_2);
-      setAlphaPhase(0);
-      setBetaPhase(0);
+      // The named defaults, not re-typed literals. These three lines used to
+      // spell out `Math.SQRT1_2` and two zeroes directly, so the constants
+      // that define the mount state and the code that restores it could drift
+      // apart silently and Reset would stop landing where the reader started.
+      setAlphaMagnitude(DEFAULT_ALPHA_MAGNITUDE);
+      setAlphaPhase(DEFAULT_ALPHA_PHASE);
+      setBetaPhase(DEFAULT_BETA_PHASE);
     }
   }
 
@@ -244,7 +250,7 @@ export function ComplexAmplitudeExplorer({
 
       <div
         aria-live="polite"
-        className="mt-3 rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+        className="mt-3 rounded-panel border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
       >
         {mode === "single"
           ? singleModeNarration

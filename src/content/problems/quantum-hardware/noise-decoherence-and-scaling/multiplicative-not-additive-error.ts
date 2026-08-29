@@ -19,18 +19,18 @@ export const multiplicativeNotAdditiveError: MultipleChoiceProblem = {
       { id: "a", text: "p^N (multiplicative)" },
       { id: "b", text: "1 - N(1-p) (additive/linear)" },
       { id: "c", text: "p (unchanged regardless of N)" },
-      { id: "d", text: "p/N" },
+      { id: "d", text: "1 - p^N (the chance the circuit does not run clean)" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This linear approximation can even go negative for large N (an impossible probability) — it's not the correct formula, though it can approximate p^N reasonably for SMALL N(1-p).",
-      c: "This would only be true for a single gate (N=1) — more gates strictly reduce overall success probability.",
-      d: "This isn't a valid probability formula at all — dividing fidelity by gate count has no probabilistic justification.",
+      b: "This is the first-order approximation to p^N, and it is a decent one while N(1-p) stays small. Pushed to large N it goes negative, which no probability can do.",
+      c: "This holds only at N=1. Each extra gate is another chance to fail, so overall success strictly falls as N grows.",
+      d: "This is the complement: the probability that at least one gate fails. The question asks for the probability they all succeed.",
     },
-    defaultIncorrectFeedback: "Independent sequential events combine multiplicatively: overall success requires EVERY gate to succeed, giving p×p×...×p (N times) = p^N.",
+    defaultIncorrectFeedback: "Independent sequential events combine multiplicatively: overall success requires every gate to succeed, giving p×p×...×p, N times, which is p^N.",
   },
   hints: [
     { text: "Overall success requires ALL N gates to succeed, not just one." },
@@ -39,11 +39,15 @@ export const multiplicativeNotAdditiveError: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "Independent sequential successes multiply: P(all N succeed) = p^N." }],
-    finalAnswer: "(a) p^N",
+    finalAnswer: "p^N, the product of the N independent per-gate success probabilities.",
   },
   explanation: {
-    correctIdea: "This is the specific mathematical structure behind the lesson's entire compounding-error table — confirming the reader understands WHY it's exponential decay, not just that it happens to be.",
+    correctIdea: "Success has to hold at every gate, and independent events that must all hold multiply. That product is what makes circuit fidelity decay exponentially in depth.",
     whyCorrect: "Standard probability theory for independent sequential events.",
-    whyWrong: ["The additive approximation (b) is a common simplification that breaks down badly for large N, exactly where this lesson's point matters most."],
+    whyWrong: [
+      { optionId: "b", text: "Uses the linear approximation to p^N. It tracks the truth while N(1-p) is small and breaks down at large N, which is where the lesson's point bites." },
+      { optionId: "c", text: "Ignores depth. Each additional gate multiplies in another factor of p." },
+      { optionId: "d", text: "Answers the complementary question, the chance of at least one failure, rather than the chance of none." },
+    ],
   },
 };

@@ -27,7 +27,7 @@ export function MatrixCellGrid({
   const cols = cells[0]?.length ?? 0;
   return (
     <div
-      className="inline-grid gap-px overflow-hidden rounded-lg border border-border bg-border"
+      className="inline-grid gap-px overflow-hidden rounded-(--radius-tight) border border-border bg-border"
       style={{ gridTemplateColumns: `repeat(${cols}, minmax(3.5rem, 1fr))` }}
     >
       {cells.map((row, r) =>
@@ -73,9 +73,37 @@ export function MatrixGrid({
   digits?: number;
 }) {
   return (
+    // `role="group"`, not `role="img"` — the policy this directory now applies
+    // everywhere (see TensorNetworkDiagram and PathPhasorSum for the same call
+    // made earlier). `img` makes every descendant presentational, and the
+    // descendants here are the matrix itself: 4 to 28 formatted complex
+    // entries plus the `label`/`compareLabel` captions that say which matrix
+    // is which. No caller's `ariaLabel` enumerates those numbers — they are
+    // sentences like "The Werner state used as this lesson's mixed-state
+    // worked example, p=0.7", and the block-encoding lesson's own label says
+    // the figure exists "to compare entry by entry", which is precisely what
+    // `role="img"` made impossible. The label is a *summary of* the grid, not
+    // a substitute for it, so the role was deleting the content and leaving
+    // the caption.
+    //
+    // `group` keeps that same label — a screen reader announces it on entry
+    // and on focus, so nothing `img` was delivering is lost — while leaving
+    // the entries in the accessibility tree for a reader who wants them.
+    //
+    // `tabIndex={0}`: this is an `overflow-x-auto` container that genuinely
+    // overflows. `MatrixCellGrid` lays out `repeat(cols, minmax(3.5rem, 1fr))`,
+    // so a 4-column matrix is 224px and the Hamming[7,4,3] generator matrix
+    // (css-codes-and-the-general-stabilizer-formalism.mdx) is 7 columns =
+    // 392px, both against a ~256px content box inside `panel-inset p-4` on a
+    // 320px phone. A scroll container is focusable by default only in Firefox,
+    // so without this a keyboard-only reader in Chromium/WebKit sees the first
+    // two or three columns of the matrix and has no way to reach the rest —
+    // WCAG 2.1.1. The global `:focus-visible` outline in globals.css makes the
+    // new stop visible; nothing here cancels it.
     <div
-      role="img"
+      role="group"
       aria-label={ariaLabel}
+      tabIndex={0}
       className="not-prose flex flex-wrap items-start gap-6 overflow-x-auto panel-inset p-4"
     >
       <div className="space-y-2">

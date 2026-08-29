@@ -71,7 +71,7 @@ export const lessonMeta = {
   module: "capstone-from-algorithm-to-qubit-count",
   order: 6,
   difficulty: "master",
-  estimatedMinutes: 26,
+  estimatedMinutes: 70,
   prerequisites: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation", "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"],
   objectives: [
     "Combine every ingredient of this course (classical-simulability boundary, T-count synthesis, routing/noise-aware compilation) with the Fault Tolerance Frontiers course's own resource-estimation methodology into one complete, end-to-end pipeline",
@@ -360,6 +360,24 @@ qubit counts for fault-tolerant algorithms are precisely known" has
 misread this lesson; a reader who takes away "the *method* for
 estimating them is solid, and the inputs to that method are where the
 real uncertainty and the real research lives" has read it correctly.
+
+<ResearchConnection
+  title="The method at full scale, and the assumption most likely to change it"
+  source="Gidney & Ekerå, Quantum 5, 433 (2021) (arXiv:1905.09749); Bravyi, Cross, Gambetta, Maslov, Rall & Yoder, Nature 627, 778 (2024) (arXiv:2308.07915)"
+  url="https://arxiv.org/abs/1905.09749"
+>
+  Gidney and Ekerå run this same four-stage pipeline on RSA-2048 and
+  arrive at roughly 20 million physical qubits for 8 hours, which is
+  where to look if you want to see Stages 1 through 4 executed at
+  professional depth rather than on a toy circuit. Bravyi et al. is the
+  concrete version of the qLDPC caveat above: a $[[144,12,12]]$ code
+  storing 12 logical qubits in 288 physical qubits at a threshold
+  comparable to the surface code's, which is roughly an order of
+  magnitude better in qubits per logical qubit than the surface-code
+  numbers Stage 4 assumes. The trade is connectivity — the code's checks
+  are not planar-local — so it is a claim about a different hardware
+  target, not a free improvement on this one.
+</ResearchConnection>
 
 This full pipeline, Stages 1 through 4 together, is the APEX pillar's
 practical answer to a question popular accounts of quantum computing

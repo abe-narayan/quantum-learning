@@ -14,7 +14,25 @@ import { useDeferredMount } from "@/components/motion/useDeferredMount";
  */
 function CheckpointSkeleton({ problemCount }: { problemCount: number }) {
   return (
-    <Instrument className="not-prose mt-8" label="Checkpoint: test yourself before moving on" as="div">
+    <Instrument
+      className="not-prose mt-8"
+      label="Checkpoint: test yourself before moving on"
+      // The loaded header carries an "X of N solved" pill beside the label,
+      // and `Instrument`'s header row is `flex-wrap`: at a phone width the
+      // label and that pill sit on two lines, so a skeleton with no readout
+      // at all was one line shorter and the swap moved the whole lesson
+      // under it. A blank pill of the same size holds the row open. Never
+      // the real text — it would be a count nobody has counted yet — and
+      // `aria-hidden`, because the accessible loading state is the sr-only
+      // line below, exactly as for the body blocks.
+      readout={
+        <span
+          aria-hidden="true"
+          className="block h-5 w-24 rounded-full bg-surface-muted motion-safe:animate-pulse"
+        />
+      }
+      as="div"
+    >
       <div role="status">
         <span className="sr-only">Loading checkpoint…</span>
         <div aria-hidden="true">
@@ -23,7 +41,7 @@ function CheckpointSkeleton({ problemCount }: { problemCount: number }) {
             {Array.from({ length: problemCount }, (_, index) => (
               <div
                 key={index}
-                className="h-11 rounded-[--radius-tight] border border-border bg-surface motion-safe:animate-pulse"
+                className="h-11 rounded-(--radius-tight) border border-border bg-surface motion-safe:animate-pulse"
                 style={{ animationDelay: `${index * 120}ms` }}
               />
             ))}
@@ -65,11 +83,15 @@ type LazyCourseCheckpointProps = {
  * and hydration, not that it waits for the user to scroll to it.
  *
  * This exists for every *other* lesson page as much as for the one that
- * renders it: `LessonLayout` statically imported `CourseCheckpoint`, whose
- * `ProblemView` subtree reaches KaTeX (~272KB min) through
- * `ScrollableMathText`/`KatexMath` — putting that whole chain in the eager
- * client graph of all 219 lesson pages, though it renders only on a
- * course's final lesson. Props pass through unchanged.
+ * renders it: `LessonLayout` statically imported `CourseCheckpoint`, which
+ * reaches KaTeX (~272KB min) through `ScrollableMathText` and
+ * `prerenderProblemMath` — putting that whole chain in the eager client
+ * graph of all 219 lesson pages, though it renders only on a course's final
+ * lesson. (The checkpoint is the one surface that still renders problem math
+ * in the browser: `/problems/[slug]` does it on the server, but a Client
+ * Component cannot render the Server Component that does — see
+ * `CourseCheckpoint`'s header. Behind this boundary that costs nothing
+ * eagerly.) Props pass through unchanged.
  *
  * (The props type is declared structurally rather than imported from
  * `./CourseCheckpoint` so that even a type-only top-level reference to that

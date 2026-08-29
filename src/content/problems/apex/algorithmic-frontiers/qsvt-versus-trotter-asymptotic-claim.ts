@@ -23,7 +23,11 @@ export const qsvtVersusTrotterAsymptoticClaim: ConceptualProblem = {
     requiredConceptGroups: [
       ["asymptotic", "big-o", "big o", "query complexity", "scaling"],
       ["constant factor", "overhead", "practical", "circuit depth", "fixed", "small problem", "doesn't mean"],
-      ["unify", "unifying", "framework", "special case", "explains why"],
+      {
+        phrases: ["unify", "unifying", "unification", "framework", "special case", "explains why", "same construction", "one construction"],
+        missingFeedback:
+          "You have the asymptotic-versus-practical distinction. The claim's second error is still missing: say what QSVT does establish about Trotterization and Grover. It recovers both as special cases of a single polynomial-transformation construction, which explains why they work rather than making them obsolete.",
+      },
     ],
     incorrectFeedback:
       "Focus on the difference between an asymptotic scaling statement (how error or cost grows as a limit is approached) and a claim about which method is better for a specific, fixed-size problem, and on what QSVT's role as a unifying framework actually means.",

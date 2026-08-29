@@ -26,11 +26,15 @@ export const totalCnotEquivalentOps: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "8 SWAPs × 3 CNOTs each, plus the 1 original CNOT.",
+    nearMisses: [
+      { value: 24, feedback: "24 counts the SWAPs' CNOT-equivalents only. The logical CNOT the circuit was there to perform still has to be added." },
+      { value: 9, feedback: "9 adds the SWAP count to the logical CNOT without expanding each SWAP into its 3 CNOTs." },
+    ],
   },
   hints: [
     { text: "8 SWAPs × 3 CNOTs/SWAP = 24 CNOT-equivalents from the SWAPs alone." },
     { text: "Plus the original logical CNOT itself: +1." },
-    { text: "24 + 1 = 25." },
+    { text: "Add the single original logical CNOT to the twenty-four CNOT-equivalents from the SWAPs." },
   ],
   solution: {
     steps: [{ description: "8×3 + 1 = 24 + 1 = 25 total CNOT-equivalent operations." }],

@@ -259,7 +259,7 @@ export function BlochSphereExplorer() {
 
           <div
             aria-live="polite"
-            className="mt-4 rounded-xl border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+            className="mt-4 rounded-panel border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
           >
             {narration}
             {lastMeasurement !== null ? (

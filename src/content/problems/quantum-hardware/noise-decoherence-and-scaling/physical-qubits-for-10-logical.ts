@@ -26,10 +26,14 @@ export const physicalQubitsFor10Logical: NumericProblem = {
     value,
     tolerance: 10,
     incorrectFeedback: "Multiply 1000 physical qubits per logical qubit by 10 logical qubits.",
+    nearMisses: [
+      { value: 1000, feedback: "1000 is the overhead for a single logical qubit. Ten of them cost ten times that." },
+      { value: 10, tolerance: 0.5, feedback: "10 is the logical qubit count. Each one is encoded across about a thousand physical qubits." },
+    ],
   },
   hints: [
-    { text: "1000 × 10." },
-    { text: "= 10,000." },
+    { text: "The overhead is quoted per logical qubit, so it multiplies the logical count rather than being shared across it." },
+    { text: "Multiply the two figures. Sanity check against the lesson's own example, which needed 50,000 physical qubits for 50 logical ones: yours should come out five times smaller." },
   ],
   solution: {
     steps: [{ description: "1000 × 10 = 10,000 physical qubits." }],

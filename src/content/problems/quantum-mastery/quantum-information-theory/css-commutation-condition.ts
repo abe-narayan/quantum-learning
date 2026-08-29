@@ -22,7 +22,11 @@ export const cssCommutationCondition: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["dot product", "g.h", "even", "mod 2", "overlap"],
-      ["dual", "c1 perp", "c2 subset", "contained"],
+      {
+        phrases: ["dual", "c1 perp", "c2 subset", "contained", "subset", "nested", "inside c1", "codeword of c1"],
+        missingFeedback:
+          "You have the commutation criterion. Now use the code structure: h lies in C₁'s dual, so h·c = 0 for every codeword c of C₁, and C₂ ⊆ C₁ is what guarantees each X-generator's g is one of those codewords.",
+      },
     ],
     incorrectFeedback:
       "X^g and Z^h commute exactly when g.h is even (0 mod 2). Since h is in C1's dual, h.c=0 for every codeword c of C1; if C2 is a subset of C1, every g in C2 is such a c, so g.h=0 automatically.",

@@ -27,7 +27,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
-      note: "A transmon qubit's energy levels are literally an anharmonic version of this oscillator.",
+      note: "A transmon qubit's energy levels are an anharmonic version of this oscillator.",
     },
   ],
 };
@@ -74,11 +74,11 @@ circuit, capacitor and junction together, on a chip:
 
 This nonlinearity makes the energy levels
 *unevenly* spaced (anharmonic), so a microwave pulse tuned to the
-0→1 gap no longer resonantly drives 1→2 as well. This is precisely
-what makes an artificial "atom" out of a circuit, isolating a clean
-two-level qubit ($|0\rangle,|1\rangle$) from what would otherwise be an
-infinite oscillator ladder. The two ladders side by side make the
-difference visible directly, not just in words:
+0→1 gap no longer resonantly drives 1→2 as well. That is what makes an
+artificial "atom" out of a circuit, isolating a clean two-level qubit
+($|0\rangle,|1\rangle$) from what would otherwise be an infinite
+oscillator ladder. The two ladders side by side make the difference
+visible directly, not just in words:
 
 <div className="not-prose grid gap-4 sm:grid-cols-2">
 
@@ -110,14 +110,16 @@ difference visible directly, not just in words:
 higher $n$, not a measured device's specific anharmonicity.) In the
 plain harmonic case, every gap is identical, so a drive resonant with
 0→1 is equally resonant with 1→2. In the transmon case, the 0→1 gap
-(highlighted) is measurably different from 1→2, which is exactly what
-lets a microwave pulse address only the qubit subspace.
+(highlighted) is measurably different from 1→2, which is what lets a
+microwave pulse address only the qubit subspace.
 
 ### Coherence time and gate speed
 
 Superconducting qubits' defining tradeoff is relatively short coherence
 times (typically microseconds, with energy relaxation $T_1$ and dephasing
-$T_2$ both in this range for current devices) but very fast gates
+$T_2$ both in this range; modern transmons commonly reach order 100 μs,
+and the 10 μs figure this pillar's worked comparisons use is a
+deliberately conservative round number) but very fast gates
 (<Term id="single-qubit-gates">single-qubit gates</Term> typically tens of nanoseconds). The *ratio* of gate
 time to coherence time, not either number alone, is what determines
 how many operations fit before decoherence dominates; the Noise,
@@ -125,19 +127,43 @@ Decoherence & Scaling course develops this tradeoff quantitatively.
 
 This is also the platform every major commercial player bet on first,
 specifically because it's a chip. IBM's public roadmap ran from the
-127-qubit Eagle processor through the 1,121-qubit Condor, then pivoted
-toward smaller, higher-fidelity "Heron" chips linked together into
-modular systems rather than chasing qubit count in isolation. Google's
-Willow chip reported in late 2024 that its <Term id="surface-codes">surface-code</Term> <Term id="logical-error-rate">logical error
-rate</Term> kept dropping as the code was scaled up, the first real evidence
-that error correction on this platform gets easier, not harder, with
-size. Neither result required inventing new physics; both are the same
-lithographic, wire-up-many-identical-circuits argument this section
-opened with, playing out at production scale.
+127-qubit Eagle processor (2021) through the 1,121-qubit Condor (2023),
+then pivoted toward smaller, higher-fidelity "Heron" chips linked
+together into modular systems rather than chasing qubit count in
+isolation. Google went the other way and scaled the <Term id="surface-codes">surface code</Term>
+instead of the register. Neither move required inventing new physics;
+both are the same lithographic, wire-up-many-identical-circuits argument
+this section opened with, playing out at production scale.
 
 <HistoricalMoment date="2024">
-Google's Willow chip reports that its surface-code logical error rate keeps dropping as the code is scaled up — the first real evidence that error correction on this platform gets easier, not harder, with size.
+Google's Willow chip reports that its surface-code <Term id="logical-error-rate">logical error rate</Term> keeps dropping as the code is scaled up — the first real evidence that error correction on this platform gets easier, not harder, with size.
 </HistoricalMoment>
+
+### What this platform is bad at
+
+Every one of those chips still has to be wired. A superconducting qubit
+is controlled through coaxial lines running from room-temperature
+electronics down through every stage of a dilution refrigerator to a
+chip held near 10 mK, and a typical design needs two or three of them
+per qubit (drive, readout, and often a flux bias). Cooling power,
+physical space in the fridge bore, and the heat each cable conducts
+downward are all finite, which is why "how many qubits" and "how many
+wires" have become close to the same engineering question (Scaling
+Challenges works the numbers).
+
+Two more weaknesses belong in any honest account of the platform:
+
+- **Fabrication spread.** Nominally identical junctions come out of the
+  fab with different critical currents, so nominally identical qubits
+  come out with different frequencies. Chips therefore need per-qubit
+  calibration (Calibration), and unlucky frequency collisions between
+  neighbors degrade specific gates on specific pairs.
+- **Two-level-system defects.** Amorphous oxides in and around the
+  junction host microscopic defects that couple to the qubit and drift
+  over hours. A qubit's $T_1$ is not a fixed device constant; it moves
+  from one calibration to the next, which is why coherence figures are
+  quoted as medians over a chip and a time window rather than as a
+  single number.
 
 ### Gate time from the Rabi model
 
@@ -153,6 +179,18 @@ reused directly for real hardware). A full population transfer
 $t=\pi/(2\Omega)$, a genuine, computable gate time from a given drive
 strength $\Omega$ (the Rabi frequency), not a hardcoded number.
 
+<Callout type="warning">
+**A convention to check before quoting numbers from papers.** This text
+consistently writes the resonant Rabi oscillation as
+$P_1(t)=\sin^2(\Omega t)$, giving $t_\pi=\pi/(2\Omega)$. Most labs and
+papers instead define the Rabi frequency so that
+$P_1(t)=\sin^2(\Omega t/2)$, giving $t_\pi=\pi/\Omega$. The physics is
+identical; the symbol $\Omega$ differs by a factor of 2 between the two
+conventions. Take a Rabi frequency quoted in a paper and plug it
+directly into this text's formulas without converting, and every gate
+time you compute will be wrong by that factor of 2.
+</Callout>
+
 <PredictBeforeReveal
   question="A lab doubles its microwave drive power, which doubles Ω. Using t_π = π/(2Ω), what happens to the π-pulse duration?"
   options={[
@@ -162,7 +200,7 @@ strength $\Omega$ (the Rabi frequency), not a hardcoded number.
     { label: "It quadruples", value: "quadruples" },
   ]}
   correctValue="halves"
-  explanation="t_π is inversely proportional to Ω, so doubling the drive strength halves the gate time. This is precisely why pushing more microwave power into the chip is one real lever for faster gates, right up until stronger driving starts exciting unwanted transitions or heating the fridge. Set V (playing Ω) below and watch the population reach 1 sooner as V grows."
+  explanation="t_π is inversely proportional to Ω, so doubling the drive strength halves the gate time. That is why pushing more microwave power into the chip is one real lever for faster gates — right up until stronger driving starts exciting the 1→2 transition the anharmonicity was supposed to protect, or heating the fridge. Set V (playing Ω) below and watch the population reach 1 sooner as V grows."
 />
 
 <InteractiveSection title="Drive the transmon's two-level subspace" description="Set detuning to zero and vary the coupling strength V, playing the role of this platform's microwave drive strength Ω: watch the population climb to 1 exactly at t_π=π/(2V), the same π-pulse formula this section just derived, and the Bloch vector sweep from the north pole to the south pole and back. Then move detuning away from zero and watch the population's ceiling drop below 1: this is what happens when the microwave tone isn't exactly resonant with the anharmonic 0-1 gap.">
@@ -224,10 +262,14 @@ not either number in isolation.
 - Gate time follows directly from the Rabi model already built and
   verified in Approximation Methods, reused here unchanged for a genuine
   hardware calculation.
+- The costs are real: roughly one microwave line per qubit down into a
+  ~10 mK fridge, per-qubit frequency spread from fabrication, and
+  drifting two-level-system defects that make $T_1$ a median rather than
+  a constant.
 
 ## Further Exploration
 
 <NextDiscovery>
-[Trapped Ions](/lessons/quantum-hardware/physical-qubit-platforms/trapped-ions) is a completely different physical platform, with
-the opposite speed/coherence tradeoff.
+[Trapped Ions](/lessons/quantum-hardware/physical-qubit-platforms/trapped-ions) is a different physical platform with the
+opposite speed/coherence tradeoff.
 </NextDiscovery>

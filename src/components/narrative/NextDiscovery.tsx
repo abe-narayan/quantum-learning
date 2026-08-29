@@ -26,7 +26,7 @@ export function NextDiscovery({ children, className }: { children: ReactNode; cl
   return (
     <div
       className={cn(
-        "not-prose my-10 rounded-[var(--radius-panel)] border border-pillar-edge bg-pillar-wash p-5 sm:p-6",
+        "not-prose my-10 rounded-panel border border-pillar-edge bg-pillar-wash p-5 sm:p-6",
         className
       )}
     >

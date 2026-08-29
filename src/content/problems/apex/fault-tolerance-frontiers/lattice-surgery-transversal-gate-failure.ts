@@ -49,15 +49,16 @@ export const latticeSurgeryTransversalGateFailure: MultipleChoiceProblem = {
           "A transversal gate requires every physical qubit of one code block to have a corresponding partner qubit in the other block. For two surface-code patches placed side by side on a chip, only the qubits directly on the touching boundary are physically adjacent; every interior qubit of one patch has no nearby partner in the other patch at all.",
       },
     ],
-    finalAnswer: "(a)",
+    finalAnswer:
+      "Away from the shared boundary, the two patches' physical qubits have no qubit-by-qubit correspondence and no physical adjacency, so most qubits in one patch have no partner in the other to act on.",
   },
   explanation: {
     correctIdea:
       "The lack of a qubit-by-qubit correspondence (and physical adjacency) between two separate 2D patches, not a general impossibility of transversal or two-qubit logical gates, is exactly why lattice surgery -- a boundary-only operation -- is needed instead.",
     whyWrong: [
-      "(b) confuses this specific two-patch case with transversal single-qubit logical operations within one patch, which do exist.",
-      "(c) is false: lattice surgery is precisely a real, fault-tolerant logical two-qubit gate mechanism for surface codes.",
-      "(d) misattributes a geometric/structural constraint to a hardware-technology mismatch.",
+      { optionId: "b", text: "Confuses this two-patch case with transversal logical operations inside one patch, which do exist." },
+      { optionId: "c", text: "States the opposite of the lesson: lattice surgery is a real fault-tolerant logical two-qubit gate for surface codes." },
+      { optionId: "d", text: "Misreads a geometric constraint as a hardware-technology mismatch. Both patches are the same technology; the problem is where the qubits sit." },
     ],
   },
 };

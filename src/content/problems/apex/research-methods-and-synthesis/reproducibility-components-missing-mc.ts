@@ -19,11 +19,11 @@ export const reproducibilityComponentsMissingMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "No single addition closes all the gaps: the missing pieces are independent of each other -- the exact gate sequence (which circuit), a calibration snapshot/date for the specific device used (since the same physical device's performance drifts day to day), the exact classical post-processing/error-mitigation pipeline applied to the raw measurements, and the shot count with a resulting confidence interval on the 90% figure. All four must be supplied; supplying only one leaves the other three gaps exactly as open as before.",
+        text: "Four independent pieces are missing, and no single addition closes the others: the exact gate sequence, a calibration snapshot for the device on the day it ran, the classical post-processing pipeline, and the shot count with a confidence interval on the 90% figure.",
       },
       {
         id: "b",
-        text: "Naming the specific device model fully resolves the reproducibility problem, since a device's specifications are fixed and don't change once fabricated.",
+        text: "Naming the specific device model closes the gap: a device's gate fidelities and coherence times are fixed once it is fabricated, so the model name pins the performance down.",
       },
       {
         id: "c",
@@ -57,17 +57,17 @@ export const reproducibilityComponentsMissingMc: MultipleChoiceProblem = {
       { description: "The claim as stated supplies none of them in checkable detail -- 'a 20-qubit superconducting device' names a class of hardware, not a calibrated instance; '90% overlap' has no shot count or confidence interval attached." },
       { description: "Supplying only one (e.g. just the shot count) would still leave the circuit, calibration, and post-processing pipeline completely unspecified, so no single addition suffices." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "All four components are missing and independent: exact circuit, calibrated hardware snapshot, post-processing pipeline, and shot count with a confidence interval.",
   },
   explanation: {
     correctIdea:
       "Reproducibility is a conjunction of four independent requirements, not a single score to raise -- a claim is only as reproducible as its weakest missing component.",
     whyCorrect:
-      "Option (a) correctly lists all four components this lesson identifies and correctly states that they are independent gaps requiring independent fixes.",
+      "Listing all four components this lesson identifies, and treating them as independent gaps requiring independent fixes, is what the 'Four Components' section asks a reader to do.",
     whyWrong: [
-      "(b) conflates naming a device class with specifying a calibrated instance of it, ignoring that performance drifts over time.",
-      "(c) elevates statistics to the only relevant factor, ignoring that the exact circuit and post-processing pipeline each independently change what the number means.",
-      "(d) mistakes a specific-sounding number for a reproducible claim, when none of the four components are actually specified.",
+      { optionId: "b", text: "Conflates naming a device class with specifying a calibrated instance of it, ignoring that performance drifts over time." },
+      { optionId: "c", text: "Elevates statistics to the only relevant factor. The circuit and the post-processing pipeline each change what the number means, independently of shot count." },
+      { optionId: "d", text: "Mistakes a specific-sounding number for a reproducible claim when none of the four components are specified." },
     ],
   },
 };

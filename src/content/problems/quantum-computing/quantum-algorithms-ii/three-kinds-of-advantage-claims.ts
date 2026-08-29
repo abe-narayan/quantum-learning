@@ -39,11 +39,15 @@ export const threeKindsOfAdvantageClaims: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "Grover's = provably optimal; Deutsch-Jozsa = promise-dependent exponential; QAOA = heuristic, no guarantee." }],
-    finalAnswer: "(a)",
+    finalAnswer: "Grover's = provably optimal; Deutsch-Jozsa = promise-dependent exponential; QAOA = heuristic, no guarantee.",
   },
   explanation: {
     correctIdea: "Recognizing these as three genuinely distinct categories, not interchangeable synonyms for 'quantum is faster,' is the central synthesis point across both algorithms courses.",
     whyCorrect: "This matches exactly the distinctions drawn in Quantum Algorithms I's capstone and reinforced in this course's own capstone.",
-    whyWrong: ["Options b, c, and d each collapse or scramble a distinction that took two full capstone lessons to establish carefully."],
+    whyWrong: [
+      { optionId: "b", text: "Collapses three different kinds of claim into one, erasing the distinction this course built across two lessons." },
+      { optionId: "c", text: "Reverses Grover's and Deutsch-Jozsa's guarantees, and calls QAOA promise-dependent when it is a heuristic with no proven guarantee." },
+      { optionId: "d", text: "Grover's and Deutsch-Jozsa both carry proven mathematical guarantees. Only QAOA lacks one." },
+    ],
   },
 };

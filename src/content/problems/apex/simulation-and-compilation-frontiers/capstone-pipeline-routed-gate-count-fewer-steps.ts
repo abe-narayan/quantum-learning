@@ -34,11 +34,30 @@ export const capstonePipelineRoutedGateCountFewerSteps: NumericProblem = {
     tolerance: 0.5,
     incorrectFeedback:
       "First scale both gate types by 15 steps (not 20): two-qubit gates = 50x15 = 750, T gates = 30x15 = 450. Then apply the 2.5x routing multiplier to the two-qubit count only: 750x2.5 = 1875. Add the untouched T-count: 1875 + 450.",
+    nearMisses: [
+      {
+        value: (rawTwoQubitGatesPerStep * 20 * swapOverheadMultiplier) + rawTGatesPerStep * 20,
+        feedback: "That is the capstone's own 20-step total. This question shortens the circuit to 15 Trotter steps, so both per-step counts scale by 15.",
+      },
+      {
+        value: (totalTwoQubitGates + totalTGates) * swapOverheadMultiplier,
+        feedback:
+          "You applied the routing multiplier to the whole circuit. T gates are single-qubit: they never need a SWAP to reach a neighbour, so routing leaves the T-count alone.",
+      },
+      {
+        value: totalTwoQubitGates + totalTGates,
+        feedback: "That is the raw gate count before Stage 3. The two-qubit gates still have to absorb the 2.5x SWAP overhead.",
+      },
+      {
+        value: routedTwoQubitGates,
+        feedback: "That is the routed two-qubit count alone. The question asks for the total, so the T-count still has to be added.",
+      },
+    ],
   },
   hints: [
     { text: "Stage 2 of the capstone scales each per-step count by the number of Trotter steps: two-qubit gates = 50 x steps, T gates = 30 x steps." },
     { text: "Stage 3 applies the 2.5x SWAP-overhead multiplier to the two-qubit gate count only -- never to the T-count, since T gates are single-qubit and need no routing." },
-    { text: "Routed total = (50 x 15 x 2.5) + (30 x 15) = 1875 + 450." },
+    { text: "Add the two stages' outputs: the routed two-qubit count and the untouched T-count. Sanity check the result against the capstone's own 20-step total of 3100, which this shortened circuit should come in below." },
   ],
   solution: {
     steps: [

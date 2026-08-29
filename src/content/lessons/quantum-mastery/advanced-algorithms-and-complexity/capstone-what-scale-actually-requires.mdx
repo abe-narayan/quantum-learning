@@ -73,7 +73,7 @@ export const capstoneClassicalN1024 = 2 ** 10;
 export const lessonMeta = {
   title: "Capstone: What Scale Actually Requires",
   description:
-    "Synthesizing BQP's oracle-relative separations, Trotterization's derived error bound, and barren plateaus' exponential trainability wall into one honest account of exactly what separates every toy result this platform verifies exactly from genuine at-scale quantum advantage, and what real research is doing about each wall.",
+    "Synthesizing BQP's oracle-relative separations, Trotterization's derived error bound, and barren plateaus' exponential trainability wall into one honest account of what separates every toy result this platform verifies exactly from at-scale quantum advantage, and what real research is doing about each wall.",
   course: "advanced-algorithms-and-complexity",
   module: "capstone-what-scale-actually-requires",
   order: 6,
@@ -88,7 +88,7 @@ export const lessonMeta = {
   ],
   objectives: [
     "Synthesize BQP's oracle-relative separations, Trotterization's error bound, and barren plateaus' variance scaling into one account of what scale requires",
-    "Explain precisely why every exactly-verified toy result on this platform sits on the near side of all three walls",
+    "Explain why every exactly-verified toy result on this platform sits on the near side of all three walls",
     "State, honestly and without exaggeration in either direction, what real research is doing about each wall",
   ],
 };
@@ -109,18 +109,17 @@ hand-waved. And none of it, by itself, proves anything about whether the
 same algorithms deliver a real advantage at the scale where it would
 actually matter: millions of gates, hundreds of qubits, cryptographically
 or scientifically relevant problem sizes. This capstone brings together
-three separate, real, derived results from this course to say precisely
-why, and precisely what would have to be true for that gap to close.
-Three walls, one honest map of exactly where each one sits.
+three separate, real, derived results from this course to say why, and
+what would have to be true for that gap to close. Three walls, one
+honest map of where each one sits.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sycamore_Quantum_Chip.jpg/1280px-Sycamore_Quantum_Chip.jpg"
-  alt="Google's Sycamore superconducting quantum processor chip"
-  caption="Sycamore's 53 qubits are already large enough to be practically unsimulable classically, yet still tiny next to the qubit counts this capstone's three derived walls (oracle separations, simulation cost, and vanishing trainability) show are needed before toy-scale results like this course's become genuine, structured quantum advantage."
-  credit="Coldupnorth / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Sycamore_Quantum_Chip.jpg"
-  license="CC BY-SA 4.0"
-/>
+The scale gap is worth stating in numbers before the walls are derived.
+Sycamore's 53 qubits were already beyond practical classical simulation
+of the specific sampling task it ran, which is a real result. It is also
+two to three orders of magnitude short of what the three walls below say
+a *structured, useful* advantage costs. Both facts are true at once, and
+holding them together is most of what separates a careful reading of the
+field from an enthusiastic one.
 
 ## Mathematical Development
 
@@ -128,19 +127,19 @@ Three walls, one honest map of exactly where each one sits.
 
 Module 1 proved that Deutsch-Jozsa's and Simon's algorithms' exponential
 speedups are relative to a black-box oracle, subject to the
-Baker-Gill-Solovay relativization barrier: genuine, rigorous facts
+Baker-Gill-Solovay relativization barrier: rigorous facts
 about query complexity that say nothing unconditional about
 $\mathsf{BPP}$ vs. $\mathsf{BQP}$ for real, structured problems. Grover's
 $\Theta(\sqrt N)$ optimality is a real theorem, but specifically for
 *unstructured* black-box search: it says nothing about whether
 structured problems (factoring, chemistry, optimization) admit a better
-quantum algorithm, which is exactly why Shor's algorithm (exploiting
+quantum algorithm, which is why Shor's algorithm (exploiting
 real number-theoretic structure) can and does beat what BBBV's bound
 would suggest is possible for generic search.
 
 ### Wall 2: simulation cost is real, derived, and grows with the problem
 
-Module 2 derived a genuine total-error bound for first-order
+Module 2 derived a total-error bound for first-order
 Trotterization, $\frac{t^2}{2n}\|[A,B]\|$, and Module 4 derived the
 exact QFT's $O(t^2)$ gate count (with a provable $O(t\log(t/\epsilon))$
 approximate alternative). These aren't pessimistic guesses: they're
@@ -150,7 +149,7 @@ establish is that simulating a real physical system, or estimating a
 real phase to useful precision, costs a *quantifiable*, *scaling*
 resource, not a fixed constant: more Hamiltonian terms, tighter target
 accuracy, or larger registers all directly and predictably increase the
-gate count required, exactly as the derived formulas say.
+gate count required, as the derived formulas say.
 
 ### Wall 3: even with enough qubits, training may not work
 
@@ -169,7 +168,7 @@ concentration of measure to bite.
   ariaLabel="Recap: measured gradient variance for a real multi-qubit variational ansatz at n=2 through 6 qubits, from this course's barren plateaus lesson, the sharpest single number in the course for what scale costs"
 />
 
-This is the same real computation from the barren plateaus lesson,
+This is the same computation from the <Term id="barren-plateaus">barren plateaus</Term> lesson,
 reproduced here because it's arguably the sharpest single number in the
 whole course: a factor of roughly $17\times$ shrinkage in just four
 additional qubits, entirely real, entirely derived from this platform's
@@ -179,13 +178,13 @@ actual gate and expectation-value engine.
 
 Grover's algorithm on $N=16$ needs `optimalGroverIterations(4)` $=3$
 iterations; on $N=1024$, $25$ iterations, both tiny, both nowhere near
-where BBBV's bound becomes a genuine obstacle to anything, since nobody
+where BBBV's bound becomes an obstacle to anything, since nobody
 is proposing to break real cryptography with $16$-item search. VQE's
 $1$-qubit toy example sits so far from barren-plateau territory that its
 cost landscape has essentially no flat regions at all. Shor's factoring
 $15$ needs a period-finding register barely large enough to demonstrate
 the mechanism. **None of this is a trick or a hidden shortcut**: every
-one of these results is exactly what it claims to be. It's simply that
+one of these results is exactly what it claims to be. The point is that
 "exactly correct at small scale" and "advantageous at large scale" are
 different claims, and this course has now derived, rather than merely
 asserted, exactly where the gap between them comes from.
@@ -209,7 +208,7 @@ asserted, exactly where the gap between them comes from.
 Both bar pairs are real numbers from this course's own Grover engine
 (`optimalGroverIterations`), not illustrative round figures: classical
 brute force grows linearly with $N$ while Grover's $\Theta(\sqrt N)$
-optimum barely grows at all across the same range, exactly the gap Wall
+optimum barely grows at all across the same range, the gap Wall
 1 says is real, provable, and still nowhere near unconditional advantage
 on a structured problem.
 
@@ -226,10 +225,10 @@ All three walls share a common shape: each is a *quantitative*,
 impossibility. A proof of impossibility would say "this can never work."
 What this course actually derived says something more precise and more
 useful: "this costs exactly this much, scales exactly this way, and
-degrades for exactly this reason", which is precisely the kind of
+degrades for exactly this reason", which is the kind of
 statement that real research can and does push against, by finding
 smarter algorithms, better error bounds, and better-designed ansätze,
-rather than by hoping the walls simply aren't there.
+rather than by hoping the walls aren't there.
 
 <PredictBeforeReveal
   question="VQE's 1-qubit toy example converged perfectly. Scale the same ansatz pattern up naively. Which of this course's three walls would you hit first: running out of qubits to simulate the circuit, running out of gate budget for time evolution, or losing a trainable gradient?"
@@ -239,7 +238,7 @@ rather than by hoping the walls simply aren't there.
     { label: "Losing a trainable gradient — barren plateaus bite at modest qubit counts", value: "gradient" },
   ]}
   correctValue="gradient"
-  explanation="Module 5's own numbers make this concrete: gradient variance already drops by roughly 17× just going from n=2 to n=6 qubits — sizes small enough that classical simulation and Trotter gate counts are both trivial. Wall 3 is the one that shows up earliest as qubit count grows, well before Wall 1's structural limits or Wall 2's raw resource costs become the binding constraint, which is exactly why 'just add more qubits to a working small ansatz' is not, by itself, a viable scaling strategy."
+  explanation="Module 5's own numbers make this concrete: gradient variance already drops by roughly 17× just going from n=2 to n=6 qubits — sizes small enough that classical simulation and Trotter gate counts are both trivial. Wall 3 is the one that shows up earliest as qubit count grows, well before Wall 1's structural limits or Wall 2's raw resource costs become the binding constraint, which is why 'just add more qubits to a working small ansatz' is not, by itself, a viable scaling strategy."
 />
 
 ## Worked Example
@@ -253,7 +252,7 @@ answer already in this platform: it doesn't try to beat BBBV's generic
 bound, it sidesteps the black-box model entirely by exploiting modular
 arithmetic's real structure (period-finding via the QFT, Module 1's
 "structured problems are fair game" point made concrete). Every serious
-quantum algorithm search for new speedups looks for exactly this kind of
+quantum algorithm search for new speedups looks for this kind of
 exploitable structure, not a way around unstructured-search's proven
 limit.
 
@@ -281,7 +280,7 @@ Every wall derived in this course is a *resource* or *trainability*
 scaling law, not a no-go theorem. Shor's algorithm is a real,
 unconditional (conditional only on standard cryptographic hardness
 assumptions about factoring's classical difficulty) quantum speedup for
-a genuinely structured problem, proof that at least one of these walls
+a structured problem, proof that at least one of these walls
 is not, in fact, an absolute barrier.
 </Callout>
 
@@ -324,27 +323,22 @@ not a lesser one.
   deep, expressive ansätze against global cost functions (Module 5).
 - Every toy result this platform built sits comfortably on the near side
   of all three walls, not because of a hidden shortcut, but because the
-  problem sizes involved are genuinely small.
+  problem sizes involved are small.
 - None of the three walls is a proof of impossibility; each is a
   quantitative scaling law with a real, active, technical research
-  program pushing against it, exactly the kind of honest, specific
+  program pushing against it, the kind of honest, specific
   optimism this course's own derivations, not slogans, can back up.
 
 ## Further Exploration
 
-This completes **Quantum Algorithms, Complexity & Simulation at Scale**,
-and with it the algorithms thread of the **Quantum Mastery** pillar.
-From here, [Rigorous Quantum Information
-Theory](/lessons/quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification)
-and [Hilbert Space & Spectral
-Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness)
-extend this same standard, real derivations, real verified numbers,
-honest scope, into the mathematical foundations underneath everything
-this course assumed.
-
 <NextDiscovery>
-  Rigorous Quantum Information Theory and Hilbert Space & Spectral
-  Theory extend this same standard (real derivations, real verified
-  numbers, honest scope) into the mathematical foundations underneath
-  everything this course assumed.
+  This completes **Quantum Algorithms, Complexity & Simulation at
+  Scale**, and with it the algorithms thread of the **Quantum Mastery**
+  pillar. [Rigorous Quantum Information
+  Theory](/lessons/quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification)
+  and [Hilbert Space & Spectral
+  Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness)
+  hold the same standard (derivations rather than assertions, computed
+  rather than quoted numbers, explicit scope) and turn it on the
+  mathematical foundations this course assumed throughout.
 </NextDiscovery>

@@ -22,6 +22,11 @@ export const dispersionFormulaCalculation: NumericProblem = {
     value: 2.236068,
     tolerance: 0.001,
     incorrectFeedback: "sigma(t)^2 = sigma_0^2 + (t/(2*sigma_0))^2. Substitute sigma_0=1, t=4, then take the square root at the end.",
+    nearMisses: [
+      { value: 5, tolerance: 0.005, feedback: "5 is σ(4)², the sum before the square root." },
+      { value: 2, feedback: "2 is the spreading term t/(2σ₀) on its own. The widths add in quadrature with the initial σ₀, so the total exceeds 2." },
+      { value: 3, feedback: "3 adds σ₀ and the spreading term directly. They combine in quadrature, not linearly." },
+    ],
   },
   hints: [
     { text: "sigma(t)^2 = sigma_0^2 + (t/(2*sigma_0))^2 in natural units." },

@@ -142,7 +142,14 @@ function useTocEntries(containerId: string) {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (entries.length === 0) return undefined;
+    // `< MIN_HEADINGS`, not `=== 0`: below that threshold both consumers
+    // render nothing (the desktop rail collapses to an empty `<nav>`, the
+    // mobile toggle returns `null`), so an observer created here had no
+    // reader for its answer. It still attached an IntersectionObserver to
+    // every `h2` on the page and ran the browser's intersection bookkeeping
+    // through the whole scroll of the lesson, on every short lesson in the
+    // corpus, to update state nothing renders.
+    if (entries.length < MIN_HEADINGS) return undefined;
     const headingEls = entries
       .map((entry) => document.getElementById(entry.id))
       .filter((el): el is HTMLElement => Boolean(el));
@@ -197,7 +204,7 @@ export function TableOfContentsDesktop({ containerId }: { containerId: string })
                 className={cn(
                   "-ml-px flex items-baseline gap-2 border-l-2 py-1.5 pl-3 transition-colors",
                   isActive
-                    ? "border-pillar-accent font-medium text-pillar-text"
+                    ? "border-pillar font-medium text-pillar-text"
                     : isPast
                       ? "border-pillar-dim/60 text-muted-foreground hover:text-foreground"
                       : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
@@ -273,7 +280,12 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
   return (
     <div
       ref={containerRef}
-      className="mt-8 max-w-3xl lg:hidden"
+      // `max-w-[46rem]`, the lesson page's reading measure, not `max-w-3xl`
+      // (48rem): this sits directly between the pre-content stack and the
+      // prose column, both of which are 46rem, so the extra 32px put the
+      // contents toggle's right edge outside both of its neighbours at every
+      // viewport between `sm` and `lg`. See LessonMetaStrip.tsx.
+      className="mt-8 max-w-[46rem] lg:hidden"
       onBlur={(event) => {
         if (!containerRef.current?.contains(event.relatedTarget as Node | null)) {
           setIsOpen(false);
@@ -300,7 +312,7 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
         // printing on every lesson. An attribute that exists for styling
         // should not be one whose presence depends on runtime state.
         data-toc-toggle=""
-        className="flex w-full min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted/60 px-4 py-3 text-left text-sm transition-colors hover:bg-surface-muted"
+        className="flex w-full min-h-11 items-center justify-between gap-3 rounded-panel border border-border bg-surface-muted/60 px-4 py-3 text-left text-sm transition-colors hover:bg-surface-muted"
       >
         <span className="flex min-w-0 flex-col">
           <span className="tech-label text-subtle-foreground">
@@ -323,7 +335,7 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
       {isOpen ? (
         <ul
           id="lesson-toc-mobile-panel"
-          className="mt-2 space-y-0.5 rounded-xl border border-border bg-surface p-2 text-sm"
+          className="mt-2 space-y-0.5 rounded-panel border border-border bg-surface p-2 text-sm"
         >
           {entries.map((entry, index) => (
             <li key={entry.id}>
@@ -332,7 +344,7 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
                 onClick={() => setIsOpen(false)}
                 aria-current={activeId === entry.id ? "location" : undefined}
                 className={cn(
-                  "flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 transition-colors",
+                  "flex min-h-11 items-center gap-3 rounded-(--radius-tight) px-3 py-2 transition-colors",
                   activeId === entry.id
                     ? "bg-pillar-wash font-medium text-pillar-text"
                     : "text-muted-foreground hover:text-foreground"

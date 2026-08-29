@@ -24,11 +24,13 @@ import { Wavefunction1D } from "./wavefunction";
  *
  * Implementation note: the two FFT calls here deliberately use the *raw*
  * fft()/ifft() pair (not the dx/sqrt(2*pi)-normalized `positionToMomentum`)
- * — the physical normalization constant is a fixed scalar that cancels
- * exactly across a transform-multiply-inverse-transform round trip (worked
- * out in the module comment of fourier.ts's physics wrappers), so applying
- * the kinetic phase to the raw FFT output and taking the raw IFFT gives an
- * answer bit-identical to doing the fully-normalized round trip, for less
+ * — everything those wrappers add (the dx/sqrt(2*pi) scalar and the
+ * centered-grid (-1)^m signs alike) is applied per momentum bin and then
+ * undone in the same bin on the way back, and the kinetic factor in between
+ * is itself diagonal in those bins, so all of it cancels exactly across a
+ * transform-multiply-inverse-transform round trip. Applying the kinetic
+ * phase to the raw FFT output and taking the raw IFFT therefore gives an
+ * answer identical to doing the fully-normalized round trip, for less
  * arithmetic.
  */
 export class SplitOperatorEvolver {

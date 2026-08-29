@@ -35,12 +35,20 @@ export default function GlobalError({
       <head>
         <title>Something went wrong · QuantumLearn</title>
         {/* Same no-flash theme script as the root layout, so an explicit
-            light/dark choice still applies even when the layout itself is
-            what crashed. */}
+            theme choice still applies even when the layout itself is what
+            crashed. `"system"` has to be in the accepted list alongside
+            `"light"`/`"dark"` — it was missing, and it is not a no-op: the
+            site is dark-first, so globals.css gates its
+            `prefers-color-scheme: light` block on `:root[data-theme="system"]`
+            precisely so an *undecided* visitor is not flipped to light by
+            their OS. Without the attribute, a reader who explicitly chose
+            "follow my system" and is on a light OS is indistinguishable from
+            an undecided one and got a dark crash page. Keep this list in sync
+            with src/app/layout.tsx and ThemeToggle.tsx. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              '(function(){try{var t=localStorage.getItem("quantumlearn:theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
+              '(function(){try{var t=localStorage.getItem("quantumlearn:theme");if(t==="light"||t==="dark"||t==="system")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
           }}
         />
       </head>
@@ -64,13 +72,19 @@ export default function GlobalError({
             <button
               type="button"
               onClick={() => retry()}
-              className="inline-flex items-center justify-center rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-foreground transition-opacity hover:opacity-90"
+              // Shape hand-rolled rather than imported from Button.tsx (this
+              // page must not depend on anything that could be part of what
+              // crashed), but it uses the same `--radius-tight` that
+              // Button.tsx switched to: a full pill "reads as a soft SaaS
+              // chip — the exact generic look the instrument language
+              // avoids", and this page is still the site.
+              className="inline-flex min-h-11 items-center justify-center rounded-(--radius-tight) bg-brand px-4 py-2 text-sm font-medium text-brand-foreground transition-opacity hover:opacity-90"
             >
               Try again
             </button>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-muted"
+              className="inline-flex min-h-11 items-center justify-center rounded-(--radius-tight) border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-muted"
             >
               Back to home
             </Link>

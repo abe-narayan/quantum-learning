@@ -26,24 +26,25 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   Hydrogen, a spherical well, and a 3D harmonic oscillator share nothing
-  as potentials — yet their angular wavefunctions are built from exactly
-  the same handful of functions. That's not a coincidence.
+  as potentials. Their angular wavefunctions are nevertheless built from
+  the same handful of functions, and one commutator explains why.
 </LessonHook>
 
 ## Motivation
 
 Hydrogen, the finite spherical well, and the 3D <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term> look
 nothing alike as potentials, yet every one of them factors into a radial
-piece times an angular piece, and the angular piece is always built from
-exactly the same handful of functions, $Y_l^m$, no matter which of the
-three $V(r)$ actually is. That's a strange thing for three unrelated
-potentials to have in common, unless there's a shared reason it has to be
-true. There is, and it has almost nothing to do with hydrogen
-specifically: it's about rotations. Angular Momentum & Spin's capstone
-previewed the punchline, that hydrogen's wavefunction separates into
-$R(r)Y_l^m(\theta,\varphi)$ with the angular part already fully solved.
-This lesson proves *why* that separation is valid at all: the answer is a
-commutator, not a coincidence.
+piece times an angular piece, and the angular piece is always one of the
+same functions $Y_l^m$, whichever $V(r)$ you picked. Three unrelated
+potentials do not agree by accident, so there should be a reason, and the
+reason turns out to have nothing to do with hydrogen. It is about
+rotations.
+
+Angular Momentum & Spin's capstone gave the punchline, that hydrogen's
+wavefunction separates as $R(r)Y_l^m(\theta,\varphi)$ with the angular
+part already solved. What that lesson did not establish is why the
+separation is legitimate. This one does, and the whole argument fits in
+a commutator.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/e5/Noether.jpg"
@@ -77,17 +78,18 @@ has to commute with $H$. Nothing more exotic than that is needed.
 
 A potential is **central** if it depends only on the distance from the
 origin, $V(r)$, never on direction. Hydrogen's electron-proton Coulomb
-attraction, $V(r)=-\dfrac{e^2}{4\pi\epsilon_0 r}$, is exactly this form:
-it only knows how far the electron is from the nucleus, not which way.
+attraction, $V(r)=-\dfrac{e^2}{4\pi\epsilon_0 r}$, has this form: it knows
+how far the electron is from the nucleus and nothing about which way.
 
 ### Why H commutes with L² and Lz
 
 The Hamiltonian is $H=\dfrac{p^2}{2m}+V(r)$. $L_z=xp_y-yp_x$ (Angular
 Momentum & Spin, Lesson 1) is built entirely from position and momentum
-components; crucially, $V(r)$ (depending only on the radial distance
-$r=\sqrt{x^2+y^2+z^2}$) commutes with $L_z$, because rotating about the
-$z$-axis doesn't change $r$ at all (a rotation preserves distance from
-the origin by definition), and $L_z$ *generates* exactly that rotation.
+components. The load-bearing step is that $V(r)$, depending only on the
+radial distance $r=\sqrt{x^2+y^2+z^2}$, commutes with $L_z$: rotating
+about the $z$-axis leaves $r$ untouched, since a rotation preserves
+distance from the origin by definition, and $L_z$ is the generator of
+that rotation.
 
 The kinetic term $p^2/2m$ commutes with $L_z$ too, for the same kind of
 reason: $L_z$ generates rotations, and rotations don't change how "spread
@@ -101,33 +103,32 @@ Operators, Observables & Measurement proved that commuting <Term id="hermitian-o
 operators share a common eigenbasis. Since $H$, $\vec L^{\,2}$, and $L_z$
 all mutually commute, energy <Term id="eigenvalue-eigenvector">eigenstates</Term> can be *chosen* to simultaneously
 satisfy $\vec L^{\,2}\psi=l(l+1)\hbar^2\psi$ and $L_z\psi=m\hbar\psi$,
-which means the angular part of any such $\psi$ is forced to be exactly
-one of Angular Momentum & Spin's $Y_l^m(\theta,\varphi)$ functions,
-already fully derived and verified there, with zero new angular
-calculation needed here. This is exactly why the shapes below are the
-*only* angular shapes any central potential's energy eigenstates can
-ever take, regardless of $V(r)$'s specific radial form:
+which means the angular part of any such $\psi$ has to be one of Angular
+Momentum & Spin's $Y_l^m(\theta,\varphi)$ functions, already derived and
+verified there, with no new angular calculation needed here. That is why
+the shapes below are the *only* angular shapes any central potential's
+energy eigenstates can take, regardless of $V(r)$'s radial form:
 
 <PredictBeforeReveal
   question="Swap hydrogen's Coulomb potential for a 3D harmonic oscillator's V(r)=½mω²r², keeping the same (l, m). Does the angular shape |Y_l^m|² plotted below change?"
   options={[
-    { label: "Yes — a different V(r) gives a different angular shape", value: "changes" },
-    { label: "No — the angular shape depends only on (l, m), never on V(r)", value: "same" },
+    { label: "Yes, a different V(r) gives a different angular shape", value: "changes" },
+    { label: "No, the angular shape depends only on (l, m), never on V(r)", value: "same" },
     { label: "Only the l=0 shape stays the same; l>0 shapes change", value: "l0-only" },
   ]}
   correctValue="same"
-  explanation="The commutators proved above, [H,L²]=[H,Lz]=0, never used the specific form of V(r), only that it depends on r alone. Swap in any other central potential and the same argument goes through unchanged, so the angular factor is still forced to be exactly one of these Y_l^m shapes. Only the radial factor R(r), not plotted here, would differ between hydrogen and an oscillator."
+  explanation="The commutators proved above, [H,L²]=[H,Lz]=0, never used the specific form of V(r), only that it depends on r alone. Swap in any other central potential and the same argument goes through unchanged, so the angular factor is still one of these Y_l^m shapes. Only the radial factor R(r), not plotted here, differs between hydrogen and an oscillator."
 />
 
 <OrbitalShapePlot ariaLabel="Angular shape |Y_l^m|^2 for each (l, m), the only angular forms any central potential's eigenstates can take" />
 
 ## Physical Interpretation
 
-This isn't special to hydrogen: *any* central potential (a 3D harmonic
-oscillator, a finite spherical well, hydrogen) separates the same way,
-for the same reason: rotational symmetry of $V(r)$ guarantees $H$
-commutes with the generators of rotation. Hydrogen is simply the specific
-$V(r)=-e^2/4\pi\epsilon_0r$ case this course solves completely.
+None of this is special to hydrogen. *Any* central potential, a 3D
+harmonic oscillator or a finite spherical well included, separates the
+same way and for the same reason: rotational symmetry of $V(r)$ guarantees
+$H$ commutes with the generators of rotation. Hydrogen is the one case
+this course solves in full, at $V(r)=-e^2/4\pi\epsilon_0r$.
 
 ## Worked Example
 
@@ -156,8 +157,8 @@ not commute with $L_z$ or $\vec L^{\,2}$ for such a potential.
 <Callout type="note">
 **Thinking $[H,L_z]=0$ means $H$ and $L_z$ are the same operator, or that
 energy determines $m$.** It means they *can* be simultaneously
-diagonalized: energy eigenstates are highly degenerate in $m$ precisely
-because $H$ doesn't depend on $m$ at all (only on $n$, and, before fine
+diagonalized: energy eigenstates are highly degenerate in $m$ because
+$H$ doesn't depend on $m$ at all (only on $n$, and, before fine
 structure, not even on $l$) for the Coulomb potential specifically.
 </Callout>
 
@@ -179,19 +180,19 @@ structure, not even on $l$) for the Coulomb potential specifically.
 ## Summary
 
 - A central potential $V(r)$ depends only on distance from the origin,
-  never direction; hydrogen's Coulomb potential is exactly this form.
+  never direction; hydrogen's Coulomb potential is one.
 - $[H,L_z]=[H,\vec L^{\,2}]=0$ for any central potential, since rotations
   preserve $r$ and hence preserve $V(r)$ and the rotationally-symmetric
   kinetic term.
 - This lets energy eigenstates be chosen as simultaneous $H$, $\vec
-  L^{\,2}$, $L_z$ eigenstates, forcing the angular part to be exactly
-  one of Angular Momentum & Spin's already-derived $Y_l^m$ functions.
+  L^{\,2}$, $L_z$ eigenstates, forcing the angular part to be one of
+  Angular Momentum & Spin's already-derived $Y_l^m$ functions.
 
 ## Further Exploration
 
 <ChallengePrompt prompt="The Mathematical Development section proves [H,Lz]=0 using rotations about the z-axis specifically. Does the same argument show [H,Lx]=0 and [H,Ly]=0 too, or is z somehow special?">
-  Retrace the rotation argument with the rotation axis relabeled — does
-  anything in it actually depend on which axis was chosen?
+  Retrace the rotation argument with the rotation axis relabeled. Does
+  any step of it depend on which axis was chosen?
 </ChallengePrompt>
 
 <NextDiscovery>

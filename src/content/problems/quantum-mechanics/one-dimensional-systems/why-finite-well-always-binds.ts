@@ -21,8 +21,25 @@ export const whyFiniteWellAlwaysBinds: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["starts at the origin", "both curves pass through k=0", "tangent curve begins at zero too"],
-      ["always crosses", "must intersect", "no matter how small the quarter-circle"],
+      [
+        "starts at the origin",
+        "at the origin",
+        "the origin",
+        "both curves pass through k=0",
+        "k=0",
+        "k = 0",
+        "at zero",
+        "through zero",
+        "start at zero",
+        "both start",
+        "both begin",
+        "tangent curve begins at zero too",
+      ],
+      {
+        phrases: ["always crosses", "must cross", "must intersect", "always intersect", "no matter how small the quarter-circle", "by continuity", "guaranteed", "at least one crossing", "diverges"],
+        missingFeedback:
+          "You have set up the two curves at k = 0. The conclusion still needs stating: k·tan(ka) starts below the quarter-circle and diverges to infinity before its first branch ends, so by continuity the two must cross, however shallow the well.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that the tangent curve (k*tan(ka)) starts at 0 exactly where k=0, just like the quarter-circle's kappa axis, and that this guarantees a crossing exists for the first branch regardless of how small the quarter-circle's radius is.",
   },

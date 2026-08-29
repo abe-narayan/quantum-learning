@@ -24,11 +24,15 @@ export const maxT2ForGivenT1: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 1,
-    incorrectFeedback: "T2_max = 2 × T1 = 2 × 80.",
+    incorrectFeedback: "The maximum comes from saturating the bound: double T1. If you answered T1 itself, you dropped the factor of two that separates energy relaxation from pure dephasing.",
+    nearMisses: [
+      { value: 80, feedback: "80 μs is T₁ itself. The bound permits T₂ to reach twice that, when pure dephasing is entirely absent." },
+      { value: 40, feedback: "40 μs halves T₁. The bound runs the other way: T₂ ≤ 2T₁, so the extreme case is above T₁, not below." },
+    ],
   },
   hints: [
-    { text: "The bound is T2 ≤ 2T1." },
-    { text: "2 × 80 = 160." },
+    { text: "The bound is T2 ≤ 2T1, and the question asks for the extreme case, where the bound is saturated with equality." },
+    { text: "Double the given T1." },
   ],
   solution: {
     steps: [{ description: "T2_max = 2 × 80μs = 160μs." }],

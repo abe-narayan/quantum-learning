@@ -7,6 +7,8 @@ import {
   getProblemMetaForLesson,
   getProblemMetaForCourse,
 } from "../metaRegistry";
+import { getProblemsForLesson } from "../registry";
+import { compareProblemDifficulty } from "../types";
 
 /**
  * THE drift guard for the meta-only registry.
@@ -47,14 +49,30 @@ describe("metaRegistry lookups", () => {
     expect(getProblemMeta("definitely-not-a-problem-slug")).toBeUndefined();
   });
 
-  it("getProblemMetaForLesson matches the full registry's per-lesson filter", () => {
+  it("getProblemMetaForLesson matches the full registry's per-lesson filter, difficulty-sorted", () => {
     const lessons = new Set(
       PROBLEM_METAS.map((meta) => meta.lesson).filter((l): l is string => Boolean(l))
     );
     expect(lessons.size).toBeGreaterThan(0);
     for (const lesson of lessons) {
       expect(getProblemMetaForLesson(lesson)).toEqual(
-        PROBLEMS.filter((p) => p.meta.lesson === lesson).map((p) => p.meta)
+        PROBLEMS.filter((p) => p.meta.lesson === lesson)
+          .map((p) => p.meta)
+          .sort((a, b) => compareProblemDifficulty(a.difficulty, b.difficulty))
+      );
+    }
+  });
+
+  it("getProblemMetaForLesson and getProblemsForLesson agree on order for every lesson", () => {
+    // The lesson page renders the meta list; the problem pages render the
+    // full list. If their orders diverged, the practice ramp a student sees
+    // on the lesson would not match the corpus the sort was designed for.
+    const lessons = new Set(
+      PROBLEM_METAS.map((meta) => meta.lesson).filter((l): l is string => Boolean(l))
+    );
+    for (const lesson of lessons) {
+      expect(getProblemMetaForLesson(lesson).map((meta) => meta.slug)).toEqual(
+        getProblemsForLesson(lesson).map((p) => p.meta.slug)
       );
     }
   });

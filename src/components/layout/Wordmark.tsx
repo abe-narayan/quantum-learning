@@ -12,7 +12,7 @@ export function LogoMark({ className }: { className?: string }) {
     <span
       aria-hidden="true"
       className={cn(
-        "flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-tight)] border border-border-strong bg-surface-muted text-brand",
+        "flex h-8 w-8 shrink-0 items-center justify-center rounded-(--radius-tight) border border-border-strong bg-surface-muted text-brand",
         className
       )}
     >
@@ -26,12 +26,29 @@ export function LogoMark({ className }: { className?: string }) {
   );
 }
 
-/** Mark + wordmark, as used in the navbar and footer brand columns. */
-export function Wordmark({ className, markClassName }: { className?: string; markClassName?: string }) {
+/** Mark + wordmark, as used in the navbar and footer brand columns.
+ *
+ *  `labelClassName` exists so the navbar can drop the word on the narrowest
+ *  phones while the footer — which has a whole column to itself and no
+ *  competing controls — always keeps it. The name is never *truncated*: a
+ *  half-rendered "Quantu…" beside the mark reads as a rendering fault, so the
+ *  only two states are the full word and the mark alone. See the call site in
+ *  Navbar.tsx for the width arithmetic that forces the choice. */
+export function Wordmark({
+  className,
+  markClassName,
+  labelClassName,
+}: {
+  className?: string;
+  markClassName?: string;
+  labelClassName?: string;
+}) {
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <LogoMark className={markClassName} />
-      <span className="text-base font-semibold tracking-tight text-foreground">QuantumLearn</span>
+      <span className={cn("text-base font-semibold tracking-tight text-foreground", labelClassName)}>
+        QuantumLearn
+      </span>
     </span>
   );
 }

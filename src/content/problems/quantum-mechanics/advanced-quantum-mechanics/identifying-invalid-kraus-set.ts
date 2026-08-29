@@ -38,12 +38,16 @@ export const identifyingInvalidKrausSet: MultipleChoiceProblem = {
     { text: "2I is NOT unitary: (2I)†(2I)=4I≠I." },
   ],
   solution: {
-    steps: [{ description: "(2I)†(2I)=4I²=4I≠I, so K₀=2I fails trace-preservation, while I, X, H are all genuinely unitary and pass." }],
-    finalAnswer: "(a) K₀ = 2·I",
+    steps: [{ description: "(2I)†(2I) = 4I ≠ I, so K₀ = 2I fails the trace-preservation condition. I, X and H are unitary, so each satisfies K₀†K₀ = I and passes." }],
+    finalAnswer: "K₀ = 2·I, since (2I)†(2I) = 4I rather than I.",
   },
   explanation: {
-    correctIdea: "This directly extends the lesson's own 'K scaled by 2' counter-example, applied to a slightly larger set of familiar operators.",
-    whyCorrect: "4I≠I is a straightforward direct computation.",
-    whyWrong: ["I, X, and H are all standard unitary gates already used throughout this platform's Quantum Computing courses — each automatically satisfies the trace-preservation condition as a single-operator channel."],
+    correctIdea: "For a single-operator Kraus set, trace preservation reduces to K₀†K₀ = I, which is the definition of unitarity. Scaling any unitary by a factor other than a phase breaks it.",
+    whyCorrect: "4I ≠ I is a direct computation.",
+    whyWrong: [
+      { optionId: "b", text: "The identity satisfies I†I = I, so it is the trivial do-nothing channel." },
+      { optionId: "c", text: "X is unitary, so X†X = I and the channel is a valid bit flip." },
+      { optionId: "d", text: "H is unitary, so H†H = I and the channel is a valid basis change." },
+    ],
   },
 };

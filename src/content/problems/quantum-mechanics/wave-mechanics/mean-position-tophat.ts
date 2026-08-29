@@ -22,6 +22,10 @@ export const meanPositionTophat: NumericProblem = {
     value: 5,
     tolerance: 0.01,
     incorrectFeedback: "<x> = integral of x*|psi(x)|^2 dx. For a uniform density on an interval, this is just the interval's midpoint.",
+    nearMisses: [
+      { value: 6, feedback: "6 is the interval's width. The mean is its centre, halfway between the two endpoints." },
+      { value: 3, feedback: "3 is half the width. The interval starts at 2, not at 0, so the midpoint is shifted." },
+    ],
   },
   hints: [
     { text: "The density |psi(x)|^2 is constant (uniform) across [2,8]." },

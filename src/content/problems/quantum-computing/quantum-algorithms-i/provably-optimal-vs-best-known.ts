@@ -39,11 +39,15 @@ export const provablyOptimalVsBestKnown: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "Grover's Ω(√N) bound is a proven fact about unstructured search generally; Deutsch-Jozsa's speedup is specific to its promise problem." }],
-    finalAnswer: "(a)",
+    finalAnswer: "Grover's Ω(√N) lower bound is proven against any quantum algorithm; Deutsch-Jozsa's separation is tied to its engineered promise.",
   },
   explanation: {
     correctIdea: "Optimality (proven best possible) and separation (a specific algorithm beating a specific classical bound) are different strengths of claim.",
     whyCorrect: "This distinction is exactly what the capstone lesson's 'why Grover's speedup is optimal' section establishes.",
-    whyWrong: ["Options b, c, and d each mischaracterize which result carries which kind of guarantee."],
+    whyWrong: [
+      { optionId: "b", text: "Reverses the two results. Grover's bound is the one proven optimal." },
+      { optionId: "c", text: "Deutsch-Jozsa's exponential gap is real but specific to its promise structure, not a proven lower bound over a broader problem class." },
+      { optionId: "d", text: "Both results are mathematical theorems, not experimental observations." },
+    ],
   },
 };

@@ -22,6 +22,11 @@ export const probabilityInSubregion: NumericProblem = {
     value: 0.3,
     tolerance: 0.001,
     incorrectFeedback: "P(a<=x<=b) = integral from a to b of |psi(x)|^2 dx. Here |psi(x)|^2 = 1/10 is constant, so the probability is just (b-a)/10.",
+    nearMisses: [
+      { value: 3, feedback: "3 is the subregion's width. It still has to be weighted by the density 1/10." },
+      { value: 0.5, feedback: "0.5 uses the endpoint 5 rather than the width 5 − 2. The integral runs from 2, not from 0." },
+      { value: 0.2, feedback: "0.2 is 2/10, weighting the lower endpoint rather than the width. The region runs from 2 to 5, so the width is 5 − 2 = 3." },
+    ],
   },
   hints: [
     { text: "The probability density here is uniform: |psi(x)|^2 = 1/10 everywhere inside [0,10]." },

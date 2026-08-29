@@ -19,11 +19,11 @@ export const evaluatingAWorstCaseNpCompleteClaimMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "If genuinely true as stated (worst-case, fully general NP-complete instances, a real correctness proof, exponential advantage over every classical algorithm), this would be direct evidence toward NP ⊆ BQP — a famous, currently open question that is widely believed to be false — and would be a landmark result. Exactly because the implication is so large and decades of attempts by the whole field have failed, the claim demands very careful scrutiny of the instance class, the proof, and whether 'faster than every known classical algorithm' secretly means only the algorithms actually tried.",
+        text: "If true as stated, this would be direct evidence toward NP ⊆ BQP, an open question widely believed false. That is precisely why the claim needs scrutiny of the instance class, the proof, and what 'every known classical algorithm' covers.",
       },
       {
         id: "b",
-        text: "This is unremarkable: NP ⊆ BQP was already proven by Shor's algorithm, so a new demonstration on another NP-complete problem is simply expected and not newsworthy.",
+        text: "This is unremarkable: Shor's algorithm already put an NP-complete problem in BQP, so NP ⊆ BQP is settled and another demonstration adds nothing new.",
       },
       {
         id: "c",
@@ -57,17 +57,17 @@ export const evaluatingAWorstCaseNpCompleteClaimMc: MultipleChoiceProblem = {
       { description: "NP ⊆ BQP is open and widely believed false (on BBBV/Grover-style black-box evidence), so a genuine result of this shape would be a landmark, field-shaking result." },
       { description: "Because the implication is enormous and the field has failed to find such an algorithm for decades, the claim -- not proven impossible, but astronomically unlikely on current evidence -- calls for very careful scrutiny of exactly what was proven, rather than either dismissal or uncritical acceptance." },
     ],
-    finalAnswer: "(a)",
+    finalAnswer: "It would be direct evidence toward NP ⊆ BQP, an open and widely disbelieved question, so the claim warrants scrutiny proportional to that implication.",
   },
   explanation: {
     correctIdea:
       "Precise complexity-theoretic language turns a vague 'quantum advantage' claim into something checkable: this specific claim, if true as stated, would resolve an open, widely-disbelieved question, which is exactly why it warrants intense scrutiny rather than a flat yes-or-no reaction.",
     whyCorrect:
-      "Option (a) correctly identifies which open question is at stake (NP ⊆ BQP), correctly states the current belief (widely disbelieved but not proven false), and correctly prescribes scrutiny proportional to the claim's implications -- exactly the habit this lesson's 'why this matters' section names as the payoff of precise complexity theory.",
+      "Naming the open question at stake (NP ⊆ BQP), stating the current belief (widely disbelieved but not proven false), and prescribing scrutiny proportional to the claim's implications is the habit this lesson's 'why this matters' section names as the payoff of precise complexity theory.",
     whyWrong: [
-      "(b) misattributes NP ⊆ BQP to Shor's algorithm, which only places factoring (not known to be NP-complete) in BQP.",
-      "(c) both misstates BQP ⊆ NP as proven (it's open) and draws an absurd conclusion from it (P ⊆ NP and P ⊆ BQP already guarantee some overlap regardless).",
-      "(d) misapplies BBBV's black-box query lower bound as if it were an unconditional, structure-independent theorem, which the prerequisite lesson's relativization discussion specifically warns against.",
+      { optionId: "b", text: "Misattributes NP ⊆ BQP to Shor's algorithm, which only places factoring (not known to be NP-complete) in BQP." },
+      { optionId: "c", text: "Misstates BQP ⊆ NP as proven when it is open, then draws an absurd conclusion from it: P ⊆ NP and P ⊆ BQP already guarantee some overlap regardless." },
+      { optionId: "d", text: "Applies BBBV's black-box query lower bound as if it were an unconditional, structure-independent theorem, which the prerequisite lesson's relativization discussion warns against." },
     ],
   },
 };

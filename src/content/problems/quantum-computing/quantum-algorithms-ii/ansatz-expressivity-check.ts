@@ -39,11 +39,15 @@ export const ansatzExpressivityCheck: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "θ,φ parameterize the Bloch sphere directly, and every pure single-qubit state is some point on it — so the ansatz can reach any of them." }],
-    finalAnswer: "(a)",
+    finalAnswer: "θ and φ parameterize the whole Bloch sphere, and every pure single-qubit state is a point on it.",
   },
   explanation: {
     correctIdea: "Expressivity of an ansatz means 'can it reach the state you need' — for one qubit, two real parameters are exactly enough.",
     whyCorrect: "This is exactly why the lesson's VQE tests can guarantee convergence to the true E₀, not merely an approximation.",
-    whyWrong: ["Options b, c, and d each misstate either the actual gate algebra or the actual claim being made about expressivity."],
+    whyWrong: [
+      { optionId: "b", text: "Ry and Rz do not commute in general, so the order still matters for which state a given (θ, φ) produces." },
+      { optionId: "c", text: "Different Hamiltonians generally have different ground states. The ansatz's job is to reach whichever one is needed." },
+      { optionId: "d", text: "The expressivity here is exact, not approximate: θ and φ are the Bloch sphere's own polar and azimuthal angles." },
+    ],
   },
 };

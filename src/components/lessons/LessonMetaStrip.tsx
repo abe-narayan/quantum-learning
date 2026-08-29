@@ -8,6 +8,16 @@ import { cn } from "@/lib/utils";
 type RelatedEntry = { lesson: LessonMetaWithSlug; note: string };
 
 /**
+ * A prerequisite, optionally carrying the author's note about *what* it gives
+ * this lesson. The note is the same `related[].note` the "Related elsewhere"
+ * list renders: 42 of the corpus's 125 `related` entries name a lesson that
+ * is already a prerequisite, so `LessonLayout` folds those notes onto the
+ * prerequisite rather than printing the same lesson twice in this one panel.
+ * See the merge rationale in LessonLayout.tsx.
+ */
+type PrerequisiteEntry = { lesson: LessonMetaWithSlug; note?: string };
+
+/**
  * Everything the old LessonLayout stacked as up to three separate
  * bordered `<div>`s (prerequisites / resurfaces-in / related elsewhere)
  * collapsed into one instrument strip. Nothing is dropped — every link and
@@ -27,6 +37,13 @@ type RelatedEntry = { lesson: LessonMetaWithSlug; note: string };
  * `currentCourseSlug` is only used to decide whether a prerequisite's
  * course name needs to be printed (a same-course prerequisite doesn't need
  * its course repeated back to the reader).
+ *
+ * "Requires" and "Related elsewhere" no longer overlap. A third of the
+ * corpus's `related[]` entries name a lesson that is already a prerequisite,
+ * which used to print that lesson twice inside this one panel — bare under
+ * "Requires", then again with its note under a heading ("elsewhere") that
+ * was false for it. `LessonLayout` now folds those notes onto the matching
+ * prerequisite instead; see the reasoning there.
  */
 export function LessonMetaStrip({
   currentCourseSlug,
@@ -35,7 +52,7 @@ export function LessonMetaStrip({
   relatedElsewhere,
 }: {
   currentCourseSlug: string;
-  prerequisites: LessonMetaWithSlug[];
+  prerequisites: PrerequisiteEntry[];
   resurfacesIn: LessonMetaWithSlug[];
   relatedElsewhere: RelatedEntry[];
 }) {
@@ -45,7 +62,14 @@ export function LessonMetaStrip({
 
   if (!hasPrereqs && !hasResurfaces && !hasRelated) return null;
 
-  const columnCount = [hasPrereqs, hasResurfaces].filter(Boolean).length;
+  // A prerequisite that carries a note is a sentence, not a chip. Two
+  // sentence-bearing lists side by side in half of a 46rem panel wrap to
+  // three or four lines each and stop reading as a list at all, so the
+  // moment any note is present the panel drops to a single column and lets
+  // both lists have the full measure. Without notes (the majority of
+  // lessons) the two-column pairing is unchanged.
+  const anyPrereqNote = prerequisites.some((entry) => Boolean(entry.note));
+  const columnCount = anyPrereqNote ? 1 : [hasPrereqs, hasResurfaces].filter(Boolean).length;
 
   const summary = [
     hasPrereqs
@@ -58,10 +82,18 @@ export function LessonMetaStrip({
     .join(" · ");
 
   return (
-    <details className="group mt-10 max-w-3xl">
+    // `max-w-[46rem]`, not `max-w-3xl`. 3xl is 48rem — 32px wider than the
+    // reading column every other block on a lesson page is measured to
+    // (docs/DESIGN_SYSTEM.md §"the reading column is ~46rem", and
+    // LessonLayout's prose, pre-content stack, FadeRule and complete-toggle
+    // all use it). The below-body stack therefore stepped in and out by 32px
+    // down its right edge — Lineage 48rem, rule 46rem, Status 46rem, What's
+    // next 48rem — on all 219 lesson pages. Nothing looked broken enough to
+    // name, which is exactly why it survived three passes.
+    <details className="group mt-10 max-w-[46rem]">
       <summary
         className={cn(
-          "flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg",
+          "flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-(--radius-tight)",
           "border border-border bg-surface-muted/40 px-4 py-3 transition-colors hover:bg-surface-muted",
           "[&::-webkit-details-marker]:hidden"
         )}
@@ -86,25 +118,48 @@ export function LessonMetaStrip({
       <Instrument
         className="mt-3"
         bodyClassName={cn("grid gap-x-8 gap-y-5", columnCount > 1 && "sm:grid-cols-2")}
-        footnote="Prerequisites and resurfacing are derived automatically from the curriculum graph."
+        // Honest about provenance now that the two are mixed in one list: the
+        // links come from the curriculum graph, the sentences after them are
+        // written by the lesson's author. A reader who sees a note attached to
+        // one prerequisite and none on the next should know that is an
+        // authoring choice, not a gap in the data.
+        footnote="Prerequisite and resurfacing links come from the curriculum graph. Notes are written by the lesson author."
       >
         {hasPrereqs ? (
+          // A real `<ul>`, not the comma-run this used to be. Two reasons, and
+          // the first is the one that forced it: a prerequisite can now carry
+          // the author's note explaining what it gives this lesson (see the
+          // merge in LessonLayout), and a run of "A — long sentence, B — long
+          // sentence" separated only by commas has no scannable boundary
+          // between entries. The second is free: a list announces as "list, 3
+          // items" with item boundaries, which the run never did. "Resurfaces
+          // in" below stays a run on purpose — it carries no notes, is often
+          // long, and reads as an index rather than as a set of things to go
+          // and do.
           <div>
             <TechLabel>Requires</TechLabel>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {prerequisites.map((lesson, i) => {
-                const prereqCourse = lesson.course !== currentCourseSlug ? getCourse(lesson.course) : undefined;
+            <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-muted-foreground">
+              {prerequisites.map(({ lesson, note }) => {
+                const prereqCourse =
+                  lesson.course !== currentCourseSlug ? getCourse(lesson.course) : undefined;
                 return (
-                  <span key={lesson.slug}>
-                    {i > 0 ? ", " : ""}
+                  <li key={lesson.slug}>
                     <Link href={`/lessons/${lesson.slug}`} className="text-pillar-text hover:underline">
                       {lesson.title}
                     </Link>
-                    {prereqCourse ? <span className="text-subtle-foreground"> ({prereqCourse.title})</span> : null}
-                  </span>
+                    {prereqCourse ? (
+                      <span className="text-subtle-foreground"> ({prereqCourse.title})</span>
+                    ) : null}
+                    {note ? (
+                      <>
+                        {" — "}
+                        {note}
+                      </>
+                    ) : null}
+                  </li>
                 );
               })}
-            </p>
+            </ul>
           </div>
         ) : null}
 

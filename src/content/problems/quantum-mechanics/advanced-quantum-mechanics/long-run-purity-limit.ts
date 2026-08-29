@@ -30,20 +30,25 @@ export const longRunPurityLimit: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "The off-diagonal coherence decays toward 0, leaving a diagonal (50/50) state — what is the purity of the maximally mixed single-qubit state?",
+    incorrectFeedback: "Repeated dephasing destroys the coherence but preserves the populations, leaving the maximally mixed diagonal state. Compute Tr(ρ²) for that state: square each of its two equal eigenvalues and add.",
+    nearMisses: [
+      { value: 1, feedback: "Purity 1 means the state stayed pure. Dephasing removes coherence, so the limit is mixed, not pure." },
+      { value: 0, feedback: "Purity has a floor of 1/d, which is 1/2 for a qubit. No density matrix reaches 0." },
+      { value: 0.25, feedback: "0.25 is one squared eigenvalue. Purity sums the squares of all of them, and there are two equal populations here." },
+    ],
   },
   hints: [
-    { text: "The off-diagonal terms decay toward 0 as applications increase." },
-    { text: "A diagonal state with P(0)=P(1)=0.5 is the maximally mixed single-qubit state." },
-    { text: "The maximally mixed state's purity is Tr(ρ²)=0.5² +0.5²=0.5." },
+    { text: "Each dephasing application shrinks the off-diagonal coherence, so ask what the density matrix looks like once the coherence is entirely gone." },
+    { text: "What survives is an even diagonal: equal populations in both basis states. That is the maximally mixed single-qubit state." },
+    { text: "Purity is Tr(ρ²), the sum of squared eigenvalues. Square the two equal populations and add them." },
   ],
   solution: {
-    steps: [{ description: "As applications grow, the off-diagonal vanishes, leaving diag(0.5,0.5) — the maximally mixed state, with purity 0.5² +0.5² = 0.5." }],
+    steps: [{ description: "As applications grow, the off-diagonal vanishes, leaving diag(0.5,0.5), the maximally mixed state, with purity 0.5² +0.5² = 0.5." }],
     finalAnswer: "0.5",
   },
   explanation: {
     correctIdea: "This matches the lesson's table exactly, and connects the long-run limit to the general definition of purity for a maximally mixed state.",
     whyCorrect: "Matches applyChannelRepeatedly's purity output at large n, converging to exactly 0.5.",
-    whyWrong: ["Answering 0 or 1 confuses purity's scale — 1 is a pure state, 0.5 is single-qubit maximally mixed, and 0 is not achievable for any valid density matrix."],
+    whyWrong: ["Answering 0 or 1 confuses purity's scale: 1 is a pure state, 0.5 is single-qubit maximally mixed, and 0 is not achievable for any valid density matrix."],
   },
 };

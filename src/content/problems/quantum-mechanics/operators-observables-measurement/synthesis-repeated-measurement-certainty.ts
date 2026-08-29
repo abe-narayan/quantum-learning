@@ -22,6 +22,9 @@ export const synthesisRepeatedMeasurementCertainty: NumericProblem = {
     value: 1,
     tolerance: 0.001,
     incorrectFeedback: "The post-measurement state already lies entirely within the a_i eigenspace. Use idempotence (P_i^2 = P_i) to see what a second measurement of P_i must give.",
+    nearMisses: [
+      { value: 0.5, feedback: "A half would describe a measurement of an incompatible observable. Repeating the same measurement projects a state that is already inside the eigenspace, so nothing changes." },
+    ],
   },
   hints: [
     { text: "The state after the first measurement is P_i|psi>/||P_i|psi>|| — already entirely inside the a_i eigenspace." },

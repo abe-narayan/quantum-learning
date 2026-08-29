@@ -48,19 +48,15 @@ Does adding more error correction always help a noisy quantum computer?
 
 ## Motivation
 
-The **<Term id="quantum-threshold-theorem">threshold theorem</Term>** answers precisely, and understanding why
-closes the loop back to Quantum Algorithms II's Shor's-algorithm
-capstone, which flagged fault-tolerant hardware as the missing
-ingredient for factoring at cryptographic scale.
+Every code in this course has been described as though correcting errors
+were free. It is not. Each code spends physical qubits, and each of those
+qubits is itself capable of failing, which raises a question the course has
+so far dodged: can adding error correction ever make things worse?
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Full_wafer_of_Intel_quantum_computers.jpg"
-  alt="A full silicon wafer containing dozens of Intel quantum processor chips, before dicing"
-  caption="A full wafer of Intel quantum processor chips: a physical sense of scale for this lesson's resource-overhead numbers, hundreds to low thousands of physical qubits per single logical qubit, cited from the literature."
-  credit="Steve Jurvetson, via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Full_wafer_of_Intel_quantum_computers.jpg"
-  license="CC BY 2.0"
-/>
+It can, and the **<Term id="quantum-threshold-theorem">threshold theorem</Term>** says precisely when. Answering it
+also closes the loop back to Quantum Algorithms II's capstone, which named
+fault-tolerant hardware as the missing ingredient for factoring at
+cryptographic scale without saying what that would cost.
 
 ## Mathematical Development
 
@@ -108,10 +104,10 @@ number. Before sweeping it, make a call:
     { label: "It oscillates unpredictably with d", value: "oscillates" },
   ]}
   correctValue="rises"
-  explanation="Above the crossover, each additional physical qubit is more likely than not to be wrong, so a majority vote among more of them is more likely, not less, to land on the wrong answer. The failure probability climbs with d instead of falling. This is the same logic Common Mistakes below applies to real error correction: past threshold, adding more error-correction machinery introduces more error than it removes. Sweep the slider below to see the curve's slope flip sign exactly at p = 0.5."
+  explanation="Above the crossover each additional physical qubit is more likely than not to be wrong, so a majority vote among more of them is more likely to land on the wrong answer, not less. Failure probability climbs with d instead of falling. Real error correction behaves the same way: past threshold, added error-correction machinery introduces more error than it removes. Sweep the slider below and watch the curve's slope flip sign at p = 0.5. This is why hardware groups chase gate fidelity before they chase qubit count."
 />
 
-<InteractiveSection title="Above and below threshold, opposite trends" description="Drag the slider to sweep the toy physical error rate p from 0.1 to 0.9. Below this toy model's own p=0.5 crossover, failure probability drops as distance grows, more redundancy helps. Above it, failure probability grows instead, exactly the 'more error correction makes it worse' case Common Mistakes warns about below. The curve's slope flips sign exactly at p = 0.5.">
+<InteractiveSection title="Above and below threshold, opposite trends" description="Drag the slider to sweep the toy physical error rate p from 0.1 to 0.9. Below this model's p=0.5 crossover, failure probability drops as distance grows and more redundancy helps. Above it, failure probability grows instead, which is the 'more error correction makes it worse' case Common Mistakes warns about. The curve's slope flips sign at p = 0.5.">
   <ParametricCurve
     frames={toyThresholdFrames}
     sliderLabel="p"
@@ -128,7 +124,7 @@ simulation in the research literature, not something derivable from the
 qualitative combinatorial argument above alone. Commonly cited figures
 for surface codes are in the rough neighborhood of $p_{\text{th}}\sim
 0.5$–$1\%$ per gate, cited here as a widely-referenced approximate
-figure from the literature, explicitly **not** a number this platform's
+figure from the literature, explicitly **not** a number the course's
 own (much smaller, 3-qubit) codes derive or verify.
 
 ### Resource overhead, honestly scoped
@@ -139,21 +135,23 @@ Quantum Algorithms II) is estimated, in published research, to need on
 the order of **hundreds to low thousands of physical qubits per logical
 qubit**, depending heavily on the target error rate, the exact code, and
 the specific algorithm's circuit depth. This is, again, a cited
-range from the literature; this platform's own $[[3,1,3]]$ and
-$[[9,1,3]]$ codes are far too small to derive such a figure, and no
+range from the literature; the course's own 3-qubit codes and the
+$[[9,1,3]]$ Shor code are far too small to derive such a figure, and no
 claim is made that they could.
 
 ## Physical Interpretation
 
-This closes the exact gap Quantum Algorithms II's capstone identified:
-Shor's algorithm needs one long circuit to succeed essentially in a
-single shot, at cryptographically relevant scale, achievable only with
-physical error rates safely below threshold and a code with <Term id="code-distance">distance</Term>
-large enough to suppress the residual logical error rate over the whole
-circuit's duration. VQE and QAOA, by contrast, tolerate a much higher
-effective error rate precisely because their hybrid structure doesn't
-need any single circuit execution to be perfect, the same distinction
-that lesson drew, now explained by *why* fault tolerance is expensive.
+This closes the gap Quantum Algorithms II's capstone left open. Shor's
+algorithm needs one long circuit to succeed in a single shot at
+cryptographically relevant scale, which requires physical error rates
+safely below threshold and a code with <Term id="code-distance">distance</Term> large enough to suppress
+the residual logical error rate across the whole circuit's duration.
+
+VQE and QAOA tolerate a far higher effective error rate because their
+hybrid structure needs no single circuit execution to be perfect. That is
+the same distinction the earlier capstone drew, now with the reason
+attached: fault tolerance is expensive, and only one of the two families
+has to pay for it.
 
 ## Worked Example
 

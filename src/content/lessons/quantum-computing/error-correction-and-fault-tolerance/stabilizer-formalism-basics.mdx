@@ -16,7 +16,7 @@ export const generatorEntries = Object.entries(generatorPatterns).map((entry) =>
 export const lessonMeta = {
   title: "Stabilizer Formalism Basics",
   description:
-    "The bit-flip code's syndrome measurements, renamed and generalized: Z0Z1 and Z1Z2 are exactly the code's stabilizer generators, and a syndrome bit flipping from 0 to 1 is exactly the statement that an error anticommutes with that generator.",
+    "The bit-flip code's syndrome measurements, renamed and generalized: Z0Z1 and Z1Z2 are the code's stabilizer generators, and a syndrome bit flipping from 0 to 1 is the statement that an error anticommutes with that generator.",
   course: "error-correction-and-fault-tolerance",
   module: "stabilizer-formalism-basics",
   order: 1,
@@ -37,22 +37,20 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-The last three lessons built two specific codes from scratch, gate by gate. The stabilizer formalism is the general language every real quantum error-correcting code is described in — and this lesson's whole point is that it isn't new.
+The last three lessons built two codes from scratch, gate by gate. The stabilizer formalism is the language every real code is written in, and the point of this lesson is that you have been using it already without the name.
 </LessonHook>
 
 ## Motivation
 
-The two syndrome measurements already built for the bit-flip code
-*are* stabilizer measurements — just not named that way yet.
+Three-qubit codes can be described with a truth table. Real codes cannot:
+the surface code two lessons from now has hundreds of parity checks, and
+nobody writes those down as a lookup table.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/6/64/4_Qubit_Chip%2C_10.1103.PhysRevX.5.021027_%28A._Wallraff%2C_2015%29.png"
-  alt="A real 4-qubit superconducting chip with coplanar waveguide resonators and control lines, from a 2015 ETH Zurich experiment"
-  caption="A real 4-qubit superconducting processor (ETH Zurich, Wallraff group): the kind of physical device whose parity measurements this lesson recasts as measuring stabilizer generators' ±1 eigenvalues."
-  credit="Y. Salathé et al., Physical Review X 5, 021027 (2015), via Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:4_Qubit_Chip,_10.1103.PhysRevX.5.021027_(A._Wallraff,_2015).png"
-  license="CC BY-SA 3.0"
-/>
+What replaces the table is an algebra. The two syndrome measurements
+already built for the bit-flip code *are* stabilizer measurements, and the
+decode table you read off a diagram is derivable instead from which
+operators anticommute with which. Once you can compute the syndrome from
+the algebra, the size of the code stops mattering.
 
 ## Mathematical Development
 
@@ -78,11 +76,11 @@ $Z_0Z_1|000\rangle=(+1)(+1)|000\rangle=+|000\rangle$; $Z|1\rangle=-|1\rangle$,
 so $Z_0Z_1|111\rangle=(-1)(-1)|111\rangle=+|111\rangle$. Both basis terms
 are $+1$ eigenstates, so their superposition is too (both terms scale by
 the identical $+1$). The same check applies to $Z_1Z_2$. **These two
-operators are exactly the parities `runBitFlipCorrectionCycle`'s ancillas
-extract.** Measuring $Z_0Z_1$ via an ancilla-CNOT-measurement circuit is
-precisely computing "does qubit 0 agree with qubit 1," the same
-computation, now identified as measuring a stabilizer's eigenvalue rather
-than described as an ad-hoc parity check.
+operators are the parities `runBitFlipCorrectionCycle`'s ancillas
+extract.** Measuring $Z_0Z_1$ through an ancilla-CNOT-measurement circuit
+computes "does qubit 0 agree with qubit 1." Same computation, now named as
+measuring a stabilizer's eigenvalue rather than described as an ad-hoc
+parity check.
 
 ### Syndromes are eigenvalue flips
 
@@ -104,12 +102,15 @@ from (anti)commutation rather than read off a truth table.
 
 ## Physical Interpretation
 
-The stabilizer formalism doesn't add new physics to what Lessons 2 and 3
-already built. It gives the *same* syndrome-measurement idea a
-compact algebraic language (which Pauli operators stabilize the code,
-which errors anticommute with which stabilizers) that scales to far more
-complex codes than a 3-qubit truth table could describe by hand,
-including the <Term id="surface-codes">surface codes</Term> covered conceptually two lessons from now.
+The stabilizer formalism adds no physics to what Lessons 2 and 3 built. It
+gives the same syndrome-measurement idea an algebraic language: which Pauli
+operators stabilize the code, and which errors anticommute with which
+stabilizers.
+
+The payoff is scale. A truth table's size grows with the number of possible
+errors; an anticommutation rule's does not. That is what makes codes with
+hundreds of checks, like the <Term id="surface-codes">surface codes</Term> two lessons from now, describable
+at all.
 
 ## Worked Example
 
@@ -119,10 +120,10 @@ the decode table's $(1,1)\to$ qubit 1 entry.**
 $X_1$ acts nontrivially only on qubit 1, so it anticommutes with any
 stabilizer containing a $Z$ on qubit 1 and commutes with any that
 doesn't touch qubit 1 at all. Both $Z_0Z_1$ (has $Z$ on qubit 1) and
-$Z_1Z_2$ (also has $Z$ on qubit 1) contain a $Z$ on qubit 1, so $X_1$
-anticommutes with *both*, flipping both syndrome bits to $1$:
-$(1,1)$, exactly matching the decode table's qubit-1 entry from Lesson
-2, now derived from the operators' structure rather than just quoted.
+$Z_1Z_2$ (also has $Z$ on qubit 1) contain a $Z$ there, so $X_1$
+anticommutes with *both* and flips both syndrome bits to $1$. Syndrome
+$(1,1)$, matching Lesson 2's qubit-1 decode entry, this time derived from
+the operators' structure rather than quoted from a table.
 
 The grid below runs the same anticommutation check generally: $g_1=Z_0Z_1$
 and $g_2=Z_1Z_2$ as Pauli strings, labeled with this lesson's own
@@ -140,7 +141,7 @@ checking it.
     { label: "Neither, X_2 is undetectable by this code", value: "neither" },
   ]}
   correctValue="g2"
-  explanation="An operator anticommutes with a stabilizer only through the qubits they share support on. X_2 touches qubit 2; g1 = Z0Z1 never touches qubit 2 at all, so they commute trivially. g2 = Z1Z2 does have a Z on qubit 2, and same-qubit X and Z anticommute, so g2 flips. Syndrome (0,1), exactly Lesson 2's qubit-2 decode entry. Check it in the table below."
+  explanation="An operator anticommutes with a stabilizer only through the qubits they both act on. X_2 touches qubit 2; g1 = Z0Z1 never touches qubit 2, so they commute trivially. g2 = Z1Z2 has a Z on qubit 2, and X and Z on the same qubit anticommute, so g2 flips. Syndrome (0,1), which is Lesson 2's qubit-2 decode entry. Notice that you did not need to know what the code was protecting, or what α and β were, to work that out."
 />
 
 <StabilizerTable generators={generatorEntries} ariaLabel="Interactive table of the bit-flip code's two stabilizer generators g1 (Z0Z1) and g2 (Z1Z2) across qubits 0 through 2, with a qubit and X/Z error-type selector that highlights which generators anticommute with the chosen single-qubit error" defaultQubit={2} qubitLabelOffset={1} />

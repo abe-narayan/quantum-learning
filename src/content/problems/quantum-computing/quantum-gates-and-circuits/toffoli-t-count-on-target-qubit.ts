@@ -53,7 +53,12 @@ export const toffoliTCountOnTargetQubit: NumericProblem = {
     value: tCountOnQubit2,
     tolerance: 0.5,
     incorrectFeedback:
-      "Go instruction by instruction through the 15-gate circuit and mark every T or P(-π/4) gate whose target is qubit 2 — the first two T-type gates and the fifth and sixth both land on qubit 2.",
+      "Go instruction by instruction through the circuit and mark every T-type gate (T or T-dagger) whose target line is the target qubit, then count the marks. A miscount usually comes from missing the T-dagger gates, which count too.",
+    nearMisses: [
+      { value: totalTCount, feedback: "7 is the circuit's total T-count across all three qubits. The question asks only for the share landing on the target line." },
+      { value: 3, feedback: "3 is what an even split across three qubits would give. This construction is not even: the target carries more than the two controls combined." },
+      { value: 2, feedback: "2 is qubit 1's share. Count the T-type gates whose line is qubit 2, remembering that the T-dagger gates (drawn as P(-π/4)) count as well." },
+    ],
   },
   hints: [
     { text: "List the 7 T-type gates in circuit order and note which qubit each one targets: qubit 2 gets hit three times in a row early on (interleaved with CNOTs to qubits 0 and 1), then once more right before the circuit's second Hadamard." },

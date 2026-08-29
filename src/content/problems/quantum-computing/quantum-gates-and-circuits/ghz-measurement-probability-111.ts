@@ -31,6 +31,10 @@ export const ghzMeasurementProbability111: NumericProblem = {
     value: probabilityOf111,
     tolerance: 0.01,
     incorrectFeedback: "Apply the Born rule directly to the $|111\\rangle$ term's amplitude in the GHZ state.",
+    nearMisses: [
+      { value: 0.125, feedback: "1/8 spreads probability over all eight three-qubit outcomes. Six of them have zero amplitude in the GHZ state, so only two share the total." },
+      { value: Math.SQRT1_2, tolerance: 0.01, feedback: "1/√2 is the amplitude on |111⟩. Squaring it gives the probability." },
+    ],
   },
   hints: [
     { text: "The GHZ state has exactly two nonzero terms: $|000\\rangle$ and $|111\\rangle$, each with amplitude $\\frac{1}{\\sqrt2}$." },

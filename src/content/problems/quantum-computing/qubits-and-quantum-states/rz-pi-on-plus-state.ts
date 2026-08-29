@@ -63,8 +63,9 @@ export const rzPiOnPlusState: MultipleChoiceProblem = {
     correctIdea: "Rz's entire effect is φ → φ + θ; tracking φ alone is enough to identify the resulting named state on the equator.",
     whyCorrect: "Starting at φ=0 and adding π lands exactly at φ=π, which is |−⟩'s defining longitude.",
     whyWrong: [
-      "Applying only half the requested rotation angle (a common slip, since π/2 is a more familiar special case from the worked example) gives |+i⟩ instead.",
-      "Forgetting that Rz can never move a state off the equator once it started there.",
+      { optionId: "b", text: "Applies half the requested angle. Rz(π/2) is the lesson's worked example, and it lands here instead." },
+      { optionId: "c", text: "Moves the state off the equator, which Rz cannot do: it changes φ and leaves θ alone." },
+      { optionId: "d", text: "Adds 3π/2 to φ rather than π, going three quarters of the way round instead of half." },
     ],
   },
 };

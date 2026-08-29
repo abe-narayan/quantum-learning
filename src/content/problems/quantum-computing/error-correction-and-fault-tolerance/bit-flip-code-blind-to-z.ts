@@ -29,15 +29,18 @@ export const bitFlipCodeBlindToZ: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.5,
-    incorrectFeedback: "Z only changes relative phase, never which computational-basis term has amplitude — does the syndrome (a parity check on basis values) notice this at all?",
+    incorrectFeedback: "Z changes only the relative phase, never which computational-basis term carries amplitude. Ask whether a parity check on basis values can register a pure phase change at all; the syndrome bits you sum should reflect that.",
   },
   hints: [
-    { text: "Z leaves |0⟩ and |1⟩'s computational-basis identity unchanged — only a phase changes." },
-    { text: "The syndrome checks are parity checks on qubit values, not phases." },
-    { text: "A Z error should be completely invisible to this syndrome." },
+    { text: "Start by asking what a Z error does to a computational-basis ket: it can flip the sign in front, but it never changes which basis state the qubit occupies." },
+    { text: "The bit-flip code's syndrome bits are parity checks on basis values. Parity checks see only which basis state each qubit is in, never the phase." },
+    { text: "So decide whether this error changes anything the parity checks can see. Your answer is the sum of the two syndrome bits that follow." },
   ],
   solution: {
-    steps: [{ description: "Z doesn't change which basis state a qubit is in, only its phase — so both syndrome bits stay 0." }],
+    steps: [
+      { description: "Z doesn't change which basis state a qubit is in, only its phase." },
+      { description: "The parity checks therefore see nothing: both syndrome bits stay 0, and their sum is 0." },
+    ],
     finalAnswer: "0",
   },
   explanation: {

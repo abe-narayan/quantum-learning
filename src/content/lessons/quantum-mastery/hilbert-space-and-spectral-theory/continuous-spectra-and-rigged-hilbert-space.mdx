@@ -20,6 +20,23 @@ export const sincFrames = sincLValues.map((L) => ({
   ],
 }));
 
+export const dirichletArea = (L) => {
+  const a = -6;
+  const b = 6;
+  const n = 24000;
+  const h = (b - a) / n;
+  let sum = dirichletKernel(a, L) + dirichletKernel(b, L);
+  for (let i = 1; i < n; i += 1) {
+    sum += dirichletKernel(a + i * h, L) * (i % 2 === 0 ? 2 : 4);
+  }
+  return (sum * h) / 3;
+};
+
+export const sincAreas = sincLValues.map((L) => dirichletArea(L));
+export const sincPeaks = sincLValues.map((L) => L / Math.PI);
+export const maxAreaDeviationPercent =
+  Math.max(...sincAreas.map((area) => Math.abs(area - 1))) * 100;
+
 export const lessonMeta = {
   title: "Continuous Spectra and Rigged Hilbert Space",
   description:
@@ -36,7 +53,7 @@ export const lessonMeta = {
   objectives: [
     "Derive directly that the momentum eigenfunction φ_p(x)=e^{ipx/ħ} has infinite L² norm, hence is not a Hilbert-space vector",
     "Build the Gelfand triple Φ ⊂ H ⊂ Φ′ and state precisely what kind of object |p⟩ actually is",
-    "Verify ⟨p|p′⟩=δ(p−p′) as a genuine delta-sequence limit, not an asserted identity",
+    "Verify ⟨p|p′⟩=δ(p−p′) as a delta-sequence limit, not an asserted identity",
   ],
   related: [
     {
@@ -47,7 +64,7 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="A state that isn't a vector">
-  $|p\rangle$ is not, and cannot be, an element of $L^2(\mathbb R)$ —
+  $|p\rangle$ is not, and cannot be, an element of $L^2(\mathbb R)$:
   its overlap with itself is formally $\delta(0)$, and $\delta(0)$ is
   not a number. This lesson builds the structure in which $|p\rangle$ is
   a fully legitimate object anyway, of a different kind entirely.
@@ -60,7 +77,7 @@ as "the momentum eigenstate," expanded arbitrary states in it, and
 relied on completeness, $\int|p\rangle\langle p|\,dp=I$, without a second
 thought, and every physical prediction that came out of it was correct.
 This lesson doesn't patch over the resulting mathematical crack; it
-builds the precise structure, the **rigged Hilbert space**, and shows
+builds <Term id="rigged-hilbert-space">the precise structure, the **rigged Hilbert space**</Term>, and shows
 exactly what breaks (and why) if you try to force $|p\rangle$ into
 $\mathcal H$ itself.
 
@@ -93,7 +110,7 @@ normalizable wave packet from the Worked Example in $\mathcal H$, and
 the plane wave $|p\rangle$ (together with $\delta(p-p')$ itself)
 outermost in $\Phi'$, too rough to ever join $\mathcal H$.
 
-<div className="not-prose overflow-x-auto rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
   <svg width={620} height={340} viewBox="0 0 620 340" className="w-full" role="img" aria-label="Three concentric regions showing the Gelfand triple. Outermost: Phi-prime, the space of distributions, containing the plane wave phi sub p of x equals e to the i p x over h-bar, that is the momentum eigenstate ket p, together with the delta function delta of p minus p-prime. Middle: the Hilbert space H equals L-two of the reals, containing the normalizable wave packet psi of x equals the integral of c of p times phi sub p of x d p, which has finite norm even though no single phi sub p does. Innermost: Phi, the Schwartz space of smooth, rapidly-decaying test functions.">
     <text x={170} y={22} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">
       The Gelfand triple: three nested spaces
@@ -150,11 +167,52 @@ vanishing-at-infinity issue Hilbert Spaces and Self-Adjointness dealt
 with: $\phi_p$ doesn't even decay, let alone vanish; $|\phi_p|^2$ is a
 nonzero constant everywhere on the line.
 
-### $\langle p|p'\rangle=\delta(p-p')$, derived as a genuine limit
+So $\hat p$ has no eigenvectors, and yet the previous lesson's PVM
+assigns it a spectrum filling all of $\mathbb R$. Both statements are
+true, which means "spectrum" cannot mean "set of eigenvalues" here. It
+is worth having the actual definition before going further.
+
+<DefinitionBox title="Spectrum, and its three parts">
+
+For a closed operator $A$, the **resolvent set** $\rho(A)$ is the set of
+$\lambda\in\mathbb C$ for which $A-\lambda$ has a bounded inverse defined
+on all of $\mathcal H$. The **spectrum** is what is left,
+$\sigma(A)=\mathbb C\setminus\rho(A)$, and it splits by *how* the inverse
+fails:
+
+- **Point spectrum** $\sigma_p$: $A-\lambda$ is not injective. There is an
+  eigenvector in $\mathcal H$. This is the only case finite
+  dimensions ever produces.
+- **Continuous spectrum** $\sigma_c$: $A-\lambda$ is injective with dense
+  range, but the inverse is unbounded. No eigenvector exists in
+  $\mathcal H$, yet one can find unit vectors $\psi_n\in D(A)$ with
+  $\|(A-\lambda)\psi_n\|\to0$ — approximate eigenvectors, arbitrarily
+  close to being eigenvectors, converging to nothing in $\mathcal H$.
+- **Residual spectrum** $\sigma_r$: $A-\lambda$ is injective but its range
+  is not dense. For a self-adjoint $A$ this set is **empty**, which is
+  one of the quieter dividends of self-adjointness.
+
+</DefinitionBox>
+
+For a matrix, $\sigma(A)=\sigma_p(A)$ and nothing else can happen: a
+non-injective $A-\lambda$ on a finite-dimensional space is exactly a
+non-invertible one. The momentum operator is the standard counterexample
+in infinite dimensions. Its spectrum is all of $\mathbb R$ and its point
+spectrum is empty, so *every* spectral value of $\hat p$ is a continuous
+one. The approximate eigenvectors are concrete: fix a smooth bump
+$\chi$ supported on $[-1,1]$, and set
+$\psi_L(x)=\chi(x/L)e^{ipx/\hbar}/\|\chi(\cdot/L)\|$. Then
+$(\hat p-p)\psi_L=-i\hbar\,\chi'(x/L)e^{ipx/\hbar}/(L\|\chi(\cdot/L)\|)$,
+whose norm is $O(1/L)\to0$, while $\psi_L$ itself spreads out and
+converges to no $L^2$ function at all. Every $\psi_L$ is a legitimate
+state; their limit is not. The rest of this lesson builds the space where
+that limit does have a home.
+
+### $\langle p|p'\rangle=\delta(p-p')$, derived as a limit
 
 The standard identity $\langle p|p'\rangle=\delta(p-p')$ (using
 normalization $\phi_p(x)=e^{ipx/\hbar}/\sqrt{2\pi\hbar}$) isn't an
-assertion; it's the limit of a genuine, hand-computable sequence.
+assertion; it's the limit of a hand-computable sequence.
 Truncate the overlap integral to a finite box $[-L,L]$ (natural units
 $\hbar=1$):
 
@@ -164,7 +222,7 @@ $$
 
 a fully elementary antiderivative computation. $D_L(q)\equiv\sin(qL)/(\pi
 q)$ (with $D_L(0)=L/\pi$, the removable-singularity value) is the
-**Dirichlet kernel**, and it is a genuine delta-sequence: $\int_{-\infty}^\infty
+**Dirichlet kernel**, and it is a delta-sequence: $\int_{-\infty}^\infty
 D_L(q)\,dq=1$ for *every* $L$ (a standard, exact identity, cited here),
 while its peak height $L/\pi$ grows and its main lobe's width shrinks
 like $1/L$ as $L\to\infty$, concentrating all its area into an
@@ -178,7 +236,7 @@ ever-narrower spike at $q=0$:
     { label: "It stays exactly 1 for every L", value: "constant" },
   ]}
   correctValue="constant"
-  explanation="The area is exactly 1 for every L, not approximately — the worked example below derives this directly by substitution. Only the kernel's shape changes as L grows; its total area never does. That fixed-area, ever-narrowing behavior is precisely what 'D_L → δ as L → ∞' means."
+  explanation="The area is exactly 1 for every L, not approximately. The worked example below derives this directly by substitution. Only the kernel's shape changes as L grows; its total area never does."
 />
 
 <ParametricCurve
@@ -187,13 +245,17 @@ ever-narrower spike at $q=0$:
   ariaLabel="The Dirichlet kernel sin(qL) over pi q, sharpening into a delta function as the truncation half-width L grows"
 />
 
-This platform's own numerical integration of $D_L(q)$ over the range
-plotted above confirms $\int D_L\,dq\approx1$ to within $0.4\%$ at every
-one of $L=5,20,80$ shown above, while the peak height visibly grows as
-$L/\pi\approx1.6,6.4,25.5$ respectively: the concrete, checked
-delta-sequence convergence $D_L\to\delta$ as $L\to\infty$, exactly what
-makes $\langle p|p'\rangle=\delta(p-p')$ a genuine (if formal) limit
-statement, not a hand-wave.
+Simpson quadrature of $D_L(q)$ across the plotted range, computed at
+module scope rather than quoted, gives areas
+{sincAreas.map((area) => area.toFixed(4)).join(", ")} at
+$L=5,20,80$: within {maxAreaDeviationPercent.toFixed(2)}% of $1$ in the
+worst case, with the residual coming from truncating at $|q|=6$ rather
+than integrating the whole line. Over the same three values the peak
+height climbs as
+$L/\pi={sincPeaks.map((peak) => peak.toFixed(2)).join(", ")}$. Fixed
+area, rising peak, narrowing lobe: that is what $D_L\to\delta$ means, and
+it is what makes $\langle p|p'\rangle=\delta(p-p')$ a limit statement
+rather than a hand-wave.
 
 ### The Schwartz space $\Phi$
 
@@ -205,7 +267,7 @@ Fourier analysis): it's dense in $L^2(\mathbb R)$ (so nothing physical is
 lost by restricting to it), and it's invariant under both the Fourier
 transform and multiplication/differentiation by polynomials, meaning
 $\hat x,\hat p$, and every polynomial combination of them, map $\mathcal
-S$ back into $\mathcal S$. That closure property is exactly what a
+S$ back into $\mathcal S$. That closure property is what a
 "space of test functions" needs to be useful.
 
 ### The dual space $\Phi'$ and the Gelfand triple
@@ -230,23 +292,44 @@ $\psi\in\Phi$, a perfectly well-defined, finite number for every nice
 $\psi$ (the defining integral converges because $\psi$ is Schwartz,
 decaying faster than $\phi_p$'s constant magnitude needs), even though
 $\langle p|p\rangle$ itself (pairing $|p\rangle$ against itself, which
-isn't in $\Phi$) is not defined this way at all. This is precisely how
+isn't in $\Phi$) is not defined this way at all. This is how
 $|p\rangle$ can be used constantly and rigorously against physical
 states $\psi$, while never being a vector of $\mathcal H$ itself.
 
 ### The Gelfand–Maurin theorem
 
-**Theorem (cited, not proved here; a substantial 20th-century result
-building directly on von Neumann's spectral theorem).** For any
-self-adjoint operator $A$ on $\mathcal H$ with $\Phi\subset D(A)$
-invariant under $A$, there exists a complete set of generalized
-eigenvectors in $\Phi'$ with eigenvalues filling exactly $A$'s spectrum,
+<TheoremBox title="Gelfand–Maurin (nuclear spectral theorem)" provenance="cited">
+
+**Hypotheses.** $\mathcal H$ is a separable Hilbert space; $A$ is
+self-adjoint on it; $\Phi\subset D(A)$ is a **nuclear** space, dense in
+$\mathcal H$, invariant under $A$ ($A\Phi\subseteq\Phi$), and continuously
+embedded. The Schwartz space $\mathcal S(\mathbb R)$ satisfies all of
+these for $\hat x$ and $\hat p$, which is why it was the right choice of
+$\Phi$ above.
+
+**Conclusion.** $A$ has a complete set of generalized eigenvectors
+$\{|\lambda\rangle\}\subset\Phi'$ with $\lambda$ ranging over $\sigma(A)$,
 and every $\psi\in\Phi$ decomposes as
-$\psi=\int d\lambda\,\langle\lambda|\psi\rangle|\lambda\rangle$, an
-equality that holds in the $\Phi,\Phi'$ pairing sense (both sides,
-paired against any test function, agree), not as an ordinary
-$\mathcal H$-norm-convergent sum. This is the fully rigorous version of
-"$\int|p\rangle\langle p|\,dp=I$."
+
+$$
+\psi = \int_{\sigma(A)} d\mu(\lambda)\,\langle\lambda|\psi\rangle\,|\lambda\rangle
+$$
+
+against a spectral measure $\mu$. The equality holds in the
+$\Phi,\Phi'$ pairing sense: both sides, tested against any
+$\varphi\in\Phi$, agree. It is *not* a norm-convergent expansion in
+$\mathcal H$, and it does not assert that any $|\lambda\rangle$ is a
+vector.
+
+Nuclearity is the hypothesis doing the real work, and it is the one
+usually skipped. Without it the generalized eigenvectors need not exist.
+Gelfand–Vilenkin, *Generalized Functions* IV; Maurin (1968).
+
+</TheoremBox>
+
+This is the rigorous content of "$\int|p\rangle\langle p|\,dp=I$": not a
+completeness relation in $\mathcal H$, but a decomposition valid whenever
+both sides are paired against a test function.
 
 ## Physical Interpretation
 
@@ -256,10 +339,10 @@ $\langle p|p\rangle=1$ (finite), but the honest computation above gives
 $\delta(0)$, undefined/infinite. There is no consistent way to patch
 this within $\mathcal H$ itself: the resolution has to be the different
 kind of object built here, not a rescaled or regularized version of the
-same kind of object. Physically this is exactly right: no real
+same kind of object. Physically this is right: no real
 measurement apparatus resolves momentum to infinite precision. What gets
 measured is always a wave packet, built by integrating $|p\rangle$
-against a genuine, nice (Schwartz, or at least $L^2$) weighting function,
+against a nice (Schwartz, or at least $L^2$) weighting function,
 landing back in $\mathcal H$ every time. $|p\rangle$ itself is the
 idealized limit those packets approach, never a state any real
 experiment prepares.
@@ -277,9 +360,9 @@ using the substitution $u=qL$ (so $dq=du/L$, and the $L$'s cancel
 exactly, independent of $L$) and the standard Dirichlet integral
 $\int_{-\infty}^\infty\mathrm{sinc}(u)\,du=\pi$ (cited, a classical
 result usually proved by contour integration, outside this course's
-scope). This is exactly why the numerical check above found
-$\approx1$ at every tested $L$: it's not converging *to* $1$ as $L$
-grows, it's *exactly* $1$ for every finite $L$ already; only the
+scope). This is why the numerical check above found
+$\approx1$ at every tested $L$: it is not converging *to* $1$ as $L$
+grows, but is *exactly* $1$ for every finite $L$ already. Only the
 kernel's *shape* (narrowing, sharpening) changes with $L$, not its total
 area, which is the precise mathematical content of "$D_L\to\delta$."
 
@@ -314,7 +397,7 @@ finite- or even infinite-dimensional Hilbert-space identity by itself.
    properties necessary for $\Phi$ to be a sensible "test function"
    space for a theory that uses both $\hat x$ and $\hat p$?
 3. A physically prepared wave packet $\psi(x)=\int c(p)\phi_p(x)\,dp$
-   with $c(p)$ a smooth, compactly-supported function is a genuine
+   with $c(p)$ a smooth, compactly-supported function is an honest
    $L^2(\mathbb R)$ vector, even though each individual $\phi_p$ isn't.
    Explain, in terms of the Dirichlet-kernel worked example, why
    integrating over many $|p\rangle$'s can land back in $\mathcal H$ even
@@ -327,12 +410,12 @@ finite- or even infinite-dimensional Hilbert-space identity by itself.
 - $\phi_p(x)=e^{ipx/\hbar}$ has $\int|\phi_p|^2dx=\infty$: a one-line
   derivation that $|p\rangle\notin L^2(\mathbb R)$.
 - $\langle p|p'\rangle=\delta(p-p')$ is the $L\to\infty$ limit of the
-  truncated overlap $D_L(p-p')=\sin((p-p')L)/(\pi(p-p'))$, a genuine
+  truncated overlap $D_L(p-p')=\sin((p-p')L)/(\pi(p-p'))$, a
   delta-sequence: total area exactly $1$ for every $L$, sharpening
   toward a spike as $L$ grows.
 - The Gelfand triple $\Phi\subset\mathcal H\subset\Phi'$ (Schwartz
   functions inside $L^2$ inside distributions) is where $|p\rangle$
-  genuinely lives, a well-defined linear functional on $\Phi$, never a
+  lives, a well-defined linear functional on $\Phi$, never a
   vector of $\mathcal H$ itself.
 - The Gelfand–Maurin theorem (cited) makes
   $\int|p\rangle\langle p|\,dp=I$ fully rigorous, as a $\Phi,\Phi'$
@@ -340,14 +423,10 @@ finite- or even infinite-dimensional Hilbert-space identity by itself.
 
 ## Further Exploration
 
-[Green's Functions and Resolvents](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents)
-puts the position operator's continuous spectrum to direct
-computational use: encoding every bound state and scattering state of a
-Hamiltonian in a single analytic object, the resolvent $(E-H)^{-1}$.
-
 <NextDiscovery>
-  Green's Functions and Resolvents puts the continuous spectrum to
-  direct computational use: encoding every bound state and scattering
-  state of a Hamiltonian in a single analytic object, the resolvent
-  $(E-H)^{-1}$.
+  [Green's Functions and Resolvents](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents)
+  puts the split just defined to computational use. The resolvent
+  $(E-H)^{-1}$ has poles exactly on the point spectrum and a branch cut
+  exactly along the continuous spectrum, so a single analytic function of
+  complex energy carries both parts of $\sigma(H)$ at once.
 </NextDiscovery>

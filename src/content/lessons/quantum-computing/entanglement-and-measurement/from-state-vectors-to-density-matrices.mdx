@@ -13,7 +13,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "From State Vectors to Density Matrices",
   description:
-    "The operator ρ=|ψ⟩⟨ψ| that carries exactly the same information as a state vector, derived, not just defined, and cross-checked against every expectation value this platform has computed so far.",
+    "The operator ρ=|ψ⟩⟨ψ| that carries the same information as a state vector, derived rather than defined, and cross-checked against every expectation value this platform has computed so far.",
   course: "entanglement-and-measurement",
   module: "from-state-vectors-to-density-matrices",
   order: 1,
@@ -31,21 +31,22 @@ export const zeroState = StateVector.zero(1);
 export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
 
 <LessonHook eyebrow="Why this matters">
-For an entangled pair like the Bell state, "what is qubit 0's state, on its own?" has no good answer — there is no single-qubit ket that describes it. That's not a gap in notation to patch over; it's a sign the state vector is the wrong tool for the job.
+For an entangled pair like the Bell state, "what is qubit 0's state, on its own?" has no good answer. No single-qubit ket describes it. That is not a gap in the notation to be patched; it means the state vector is the wrong object for the job.
 </LessonHook>
 
 ## Motivation
 
-Multi-Qubit State Vectors ended on an unanswered question, and this
-course exists to build the right tool for answering it.
+Multi-Qubit State Vectors left a question open. Hand someone half of a
+Bell pair and ask them to write down the state of the qubit they are
+holding, and they cannot. Every ket $\alpha|0\rangle+\beta|1\rangle$ makes
+predictions their qubit does not obey.
 
-The fix starts here, with a state vector's whole physical content
-repackaged into a different mathematical object: not a list of
-amplitudes, but an operator. Every prediction a state vector makes
-(every probability, every expectation value) survives the repackaging
-exactly. Nothing is lost yet. What's gained shows up over the next few
-lessons: this new object turns out to describe things $|\psi\rangle$
-simply cannot.
+That is not a failure of imagination. This course builds the object that
+answers the question, and this lesson is the first step: a state vector's
+whole physical content, repackaged as an operator instead of a list of
+amplitudes. Every prediction survives the repackaging, so nothing is
+gained yet. What is gained arrives over the next few lessons, when the new
+object turns out to describe situations no ket can.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
@@ -100,7 +101,7 @@ concrete before the algebra below generalizes it:
     { label: "Depends on the phase, not just the angle", value: "phase" },
   ]}
   correctValue="surface"
-  explanation="Every pure state has Tr(ρ²)=1, the maximum possible purity, which corresponds geometrically to sitting exactly on the sphere's surface — no matter which pure state you pick. It's only once you start mixing states with weight strictly between 0 and 1 (next lesson) that the point pulls inward, off the surface."
+  explanation="Every pure state has Tr(ρ²)=1, the maximum purity, and that corresponds geometrically to sitting on the sphere's surface, whichever pure state you pick. The point only pulls inward once you mix states with weight strictly between 0 and 1, which is next lesson's subject."
 />
 
 <InteractiveSection title="Build ρ=|ψ⟩⟨ψ| from a single point" description="Set the mixing weight to 1 so only one component contributes: that's exactly ρ=|ψ⟩⟨ψ⟩ for whichever single Bloch point you pick, not a mixture yet. Try |0⟩, then |+⟩, then an arbitrary angle, and watch ρ change with it. The point stays exactly on the sphere's surface every time, matching Tr(ρ²)=1.">
@@ -164,13 +165,14 @@ regression test (`densityMatrix.test.ts`), not just checked once here.
 ## Physical Interpretation
 
 $\rho=|\psi\rangle\langle\psi|$ is not a new theory of quantum states.
-It's the *same* state vector, viewed as an operator instead of a list of
-numbers. Every prediction (probabilities, expectation values) computed
-from $\rho$ agrees exactly with the one computed from $|\psi\rangle$
-directly. What changes is what the object *can express*: an operator
-can be built in ways a normalized vector cannot (added together,
-weighted by probabilities, restricted to part of a larger system), and
-those constructions are exactly what the rest of this course is about.
+It is the *same* state vector, viewed as an operator instead of a list of
+numbers. Every probability and every expectation value computed from
+$\rho$ agrees with the one computed from $|\psi\rangle$ directly.
+
+What changes is what the object *can express*. Operators can be built in
+ways normalized vectors cannot: added together, weighted by probabilities,
+restricted to part of a larger system. Those three constructions are the
+rest of this course.
 
 ## Worked Example
 
@@ -197,9 +199,9 @@ are entirely different objects.
 
 <Callout type="mistake">
 **Thinking density matrices are only for "mixed" or uncertain states.**
-Every pure state has a perfectly well-defined density matrix; $\rho$
-isn't a hedge against not knowing $|\psi\rangle$. The distinction between
-pure and genuinely mixed states is the subject of the next lesson.
+Every pure state has a well-defined density matrix. $\rho$ is not a hedge
+against not knowing $|\psi\rangle$. The distinction between pure and mixed
+states is the subject of the next lesson.
 </Callout>
 
 ## Practice Questions
@@ -228,8 +230,8 @@ pure and genuinely mixed states is the subject of the next lesson.
 - $\langle A\rangle=\text{Tr}(\rho A)$ is the same expectation-value
   formula as $\langle\psi|A|\psi\rangle$, re-derived using the cyclic
   property of trace, not a new postulate.
-- Global phase, which was always physically invisible, vanishes
-  completely from the density-matrix description.
+- Global phase, which was always physically invisible, does not appear in
+  the density-matrix description at all.
 
 ## Further Exploration
 

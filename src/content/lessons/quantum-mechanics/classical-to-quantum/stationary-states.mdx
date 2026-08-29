@@ -15,7 +15,7 @@ export const lessonMeta = {
   module: "stationary-states",
   order: 1,
   difficulty: "intermediate",
-  estimatedMinutes: 20,
+  estimatedMinutes: 25,
   prerequisites: ["quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"],
   objectives: [
     "Prove that an energy eigenstate evolves only by an overall phase",
@@ -25,13 +25,18 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-A superposition of energy eigenstates precesses — its measurement statistics visibly change over time. A state that starts as a single energy eigenstate never precesses at all, in a precise sense worth deriving rather than assuming.
+A superposition of energy eigenstates precesses: its measurement statistics visibly change over time. A state that starts as a single energy eigenstate never does, and the reason is worth deriving rather than assuming.
 </LessonHook>
 
 ## Motivation
 
-The last lesson's worked example showed the first case directly. This
-lesson proves the complementary fact.
+The last lesson's worked example showed a superposition's statistics
+precessing in real time. This lesson proves the complementary fact: a
+state that begins in a single energy eigenstate keeps identical
+measurement statistics forever. Both results come out of the same
+formula, $U(t)=e^{-iHt/\hbar}$, and comparing them is what reveals which
+feature of a state actually drives the motion. It turns out not to be
+energy, but energy *differences*.
 
 ## Intuition
 
@@ -56,8 +61,8 @@ notes, which is what determines the chord's character, does change.
 ### Energy eigenstates evolve by a single phase
 
 Let $|n\rangle$ satisfy $H|n\rangle = E_n|n\rangle$. The evolution
-operator is defined by its <Term id="taylor-series">Taylor series</Term>, exactly like $e^{i\theta}$ was
-built from the Taylor series in the Complex Numbers lesson:
+operator is defined by its <Term id="taylor-series">Taylor series</Term>, the same way $e^{i\theta}$ was
+built in the Complex Numbers lesson:
 
 $$
 U(t)|n\rangle = e^{-iHt/\hbar}|n\rangle = \sum_{k=0}^\infty \frac{1}{k!}\left(\frac{-iHt}{\hbar}\right)^k|n\rangle = \sum_{k=0}^\infty \frac{1}{k!}\left(\frac{-iE_nt}{\hbar}\right)^k|n\rangle = e^{-iE_nt/\hbar}|n\rangle
@@ -88,12 +93,12 @@ $$
 
 using $|e^{-iE_nt/\hbar}|=1$ (Complex Numbers lesson), completely
 independent of $t$. This is why $|n\rangle$ is called a **stationary
-state**: not because the state *vector* is unchanging (it visibly isn't,
-it accrues phase continuously) but because every physically measurable
-prediction built from it is exactly constant in time.
+state**: not because the state *vector* stops changing (it does not; it
+accrues phase continuously) but because every measurable prediction built
+from it is constant in time.
 
-On the Bloch sphere, "accrues phase but stays stationary" versus "genuinely
-precesses" is a difference you can watch, not just derive:
+On the Bloch sphere, "accrues phase but stays put" and "actually
+precesses" are a difference you can watch rather than only derive:
 
 <PredictBeforeReveal
   question="Prepare |0⟩ (a Z-eigenstate) and repeatedly apply a Z-axis rotation gate. Does the point on the Bloch sphere move?"
@@ -103,7 +108,7 @@ precesses" is a difference you can watch, not just derive:
     { label: "It spirals toward the equator", value: "spirals" },
   ]}
   correctValue="fixed"
-  explanation="|0⟩ is an eigenstate of H (up to the choice of Hamiltonian axis), so it only accrues an overall phase, e^{-iE_nt/ħ}, which is invisible on the Bloch sphere entirely — the point sits at the pole no matter how many rotations are applied. |+⟩, tried next, is a superposition of two different Z-eigenstates, so its relative phase is physical and the point genuinely sweeps."
+  explanation="|0⟩ is an eigenstate of H (for a Z-axis Hamiltonian), so it picks up only an overall phase e^{-iE_nt/ħ}, and the Bloch sphere does not display overall phase at all. The point sits at the pole no matter how many rotations you apply. |+⟩, tried next, is a superposition of two different Z-eigenstates; its relative phase is physical, and the point sweeps."
 />
 
 <InteractiveSection
@@ -112,10 +117,41 @@ precesses" is a difference you can watch, not just derive:
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-### Energy is exactly conserved, for any state
+### What a superposition does instead
 
-Here's a stronger, more general fact: $\langle H\rangle$ itself is
-exactly conserved for *any* state, not only eigenstates of $H$. Since
+The eigenstate result also settles the general case, because $U(t)$ acts
+on each eigenstate independently. Take $|\psi(0)\rangle = c_1|1\rangle +
+c_2|2\rangle$ with $H|n\rangle = E_n|n\rangle$:
+
+$$
+|\psi(t)\rangle = c_1 e^{-iE_1t/\hbar}|1\rangle + c_2 e^{-iE_2t/\hbar}|2\rangle
+$$
+
+Pull the first phase out in front of the whole expression:
+
+$$
+|\psi(t)\rangle = e^{-iE_1t/\hbar}\left(c_1|1\rangle + c_2 e^{-i(E_2-E_1)t/\hbar}|2\rangle\right)
+$$
+
+The prefactor is a global phase and drops out of every prediction. What
+survives is the *relative* phase between the two components, turning at
+angular frequency $\omega_{21}=(E_2-E_1)/\hbar$. So a superposition is
+non-stationary if and only if it spans two distinct energies, and the
+speed of its oscillation is fixed by the gap between them, never by the
+energies themselves. Shifting the zero of energy by adding a constant to
+$H$ changes $E_1$ and $E_2$ equally, leaves $\omega_{21}$ alone, and
+therefore changes nothing observable, which is the reason a Hamiltonian's
+overall offset is always physically irrelevant.
+
+That frequency has a name outside this course: $\hbar\omega_{21} =
+E_2-E_1$ is the Bohr condition, and it is why an atom dropping between
+two levels emits light at one sharp frequency rather than a smear.
+
+### Energy is conserved, for any state
+
+Stationarity is about all observables in one special state. Here is the
+complementary statement: one special observable, $\langle H\rangle$, is
+conserved in *every* state. Since
 $U(t)=e^{-iHt/\hbar}$ is built purely out of $H$ (as a power series in
 $H$), it commutes with $H$: $U(t)H = HU(t)$, so $U^\dagger(t)HU(t)=H$
 exactly (using $U^\dagger(t)=U(-t)$, easily checked from the series).
@@ -125,21 +161,25 @@ $$
 \langle H\rangle_t = \langle\psi(t)|H|\psi(t)\rangle = \langle\psi(0)|U^\dagger(t)HU(t)|\psi(0)\rangle = \langle\psi(0)|H|\psi(0)\rangle = \langle H\rangle_0
 $$
 
-Total energy's expectation value never changes under Schrödinger
-evolution, the quantum version of energy conservation, and it holds
-generally, not just for the special case of an eigenstate.
+The expectation value of total energy never changes under Schrödinger
+evolution. This is the quantum form of energy conservation, and the
+argument used only that $U(t)$ is built from $H$, so it covers every
+state rather than the eigenstates alone.
 
 ## Physical Interpretation
 
 "Stationary state" is standard language throughout chemistry and atomic
 physics: an electron in a definite energy eigenstate of an atom (an
-"orbital") has a probability distribution over position that is
-truly static in time, even though nothing about the underlying state
-vector has literally stopped changing. A superposition of two different
-orbitals, by contrast, has a probability distribution that visibly
-oscillates, the physical origin of phenomena like atomic transitions and
-Rabi oscillations, both built from exactly the precession picture the
-last lesson derived.
+"orbital") has a probability cloud that does not move, even though the
+underlying state vector never stops accruing phase. This is why textbook
+orbital pictures can be drawn as still images at all.
+
+A superposition of two orbitals is a different object. Its charge
+distribution sloshes back and forth at $\omega_{21}=(E_2-E_1)/\hbar$, and
+an oscillating charge distribution radiates. That is the mechanism behind
+atomic transitions and Rabi oscillations alike, and it is why an atom
+sitting in a single eigenstate is stable: with nothing oscillating, there
+is nothing to radiate.
 
 ## Worked Example
 
@@ -148,11 +188,17 @@ $|\psi(0)\rangle=|0\rangle$ (an eigenstate, with $H|0\rangle =
 \tfrac{\hbar\omega}{2}|0\rangle$).**
 
 By the formula above, $|\psi(t)\rangle = e^{-i(\hbar\omega/2)t/\hbar}|0\rangle
-= e^{-i\omega t/2}|0\rangle$, matching the rotation-formula computation
-from the last lesson's practice question 1 exactly. The probability of
-measuring $|0\rangle$ again is $|e^{-i\omega t/2}|^2\cdot|\langle0|0\rangle|^2
-= 1\cdot1 = 1$ for every $t$: certain, and constant, confirming
-stationarity concretely rather than only abstractly.
+= e^{-i\omega t/2}|0\rangle$, which is what the rotation formula gave in
+the last lesson's practice question 1. The probability of measuring
+$|0\rangle$ again is $|e^{-i\omega t/2}|^2\cdot|\langle0|0\rangle|^2 =
+1\cdot1 = 1$ for every $t$.
+
+Now contrast $|\psi(0)\rangle=|+\rangle$ under the same $H$. Here
+$E_0=+\hbar\omega/2$ and $E_1=-\hbar\omega/2$, so the gap is
+$E_1-E_0=-\hbar\omega$ and the relative phase turns at $\omega$. That
+reproduces the $\cos^2(\omega t/2)$ revival curve from the previous
+lesson without redoing the algebra: one energy gap, one oscillation
+frequency.
 
 ## Common Mistakes
 
@@ -166,8 +212,12 @@ absent.
 
 <Callout type="warning">
 **Assuming energy conservation only holds for eigenstates of $H$.** The
-derivation above shows $\langle H\rangle$ is exactly conserved for *any*
-initial state, a strictly more general fact than stationarity itself.
+derivation above shows $\langle H\rangle$ is conserved for *any* initial
+state. Note also what it does not say. The individual probabilities of
+measuring each energy are frozen too, for the same reason; but the
+probabilities of measuring *other* observables are free to oscillate, and
+in a superposition of two energies generally do. A frozen
+$\langle H\rangle$ is not a frozen system.
 </Callout>
 
 ## Practice Questions
@@ -188,13 +238,20 @@ initial state, a strictly more general fact than stationarity itself.
 - An energy eigenstate evolves as $|\psi(t)\rangle=e^{-iE_nt/\hbar}|n\rangle$,
   the same vector, times an overall phase.
 - Because <Term id="global-relative-phase">global phase</Term> is unobservable, every measurement probability for
-  such a state is exactly constant in time, the definition of
-  "stationary."
-- $\langle H\rangle$ is exactly conserved for *any* state, derived from
-  $U(t)$ commuting with $H$, a stronger, more general statement than
-  stationarity of eigenstates alone.
+  such a state is constant in time. That is what "stationary" means.
+- A superposition of two eigenstates oscillates at
+  $\omega_{21}=(E_2-E_1)/\hbar$: energy *gaps* set every quantum
+  frequency, and the zero point of energy never matters.
+- $\langle H\rangle$ is conserved for *any* state, which follows from
+  $U(t)$ commuting with $H$.
 
 ## Further Exploration
+
+<ChallengePrompt prompt="Add a constant to the Hamiltonian: H' = (ħω/2)Z + 5ħω·I, so every energy shifts up by 5ħω. Recompute |ψ(t)⟩ for |ψ(0)⟩ = |+⟩ and find P(+, t).">
+  Every eigenvalue moves, so both phase factors change. Pull out the
+  common factor as the derivation above does, and see whether anything
+  measurable survives the shift.
+</ChallengePrompt>
 
 <NextDiscovery>
 [The Quantum Harmonic Oscillator](/lessons/quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator) applies everything so

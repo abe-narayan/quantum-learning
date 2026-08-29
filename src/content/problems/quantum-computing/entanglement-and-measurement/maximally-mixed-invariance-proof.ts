@@ -20,20 +20,20 @@ export const maximallyMixedInvarianceProof: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["factor", "1/2 out", "scalar", "uu†", "uu^\\dagger"],
-      ["identity", "= i", "unitary"],
+      ["factor", "1/2 out", "half out", "scalar", "constant", "uu†", "uu^dagger", "uu dagger", "u u†", "pull out", "pulls out", "pulled out"],
+      ["identity", "= i", "=i", "equals i", "unitar"],
     ],
-    incorrectFeedback: "Pull the scalar 1/2 out of U(I/2)U† first, then simplify what's left using the definition of unitary.",
-    partialFeedback: "Good — now be explicit that UIU†=UU† and that this equals I by the definition of unitarity.",
+    incorrectFeedback: "Two moves finish this proof: first deal with the number 1/2 sitting inside the product, then ask what the defining property of U says about what remains.",
+    partialFeedback: "You have one of the two moves. The other is either moving the number 1/2 aside or using the defining property of U on the product that remains. State both.",
   },
   hints: [
-    { text: "U(I/2)U† = (1/2) U I U† — the scalar 1/2 factors out freely." },
-    { text: "UIU† = UU† since multiplying by the identity does nothing." },
-    { text: "UU† = I by the very definition of a unitary matrix." },
+    { text: "The 1/2 is just a number sitting inside a matrix product. What are you allowed to do with it?" },
+    { text: "Once the number is moved out front, what product of matrices remains? Simplify U times I first." },
+    { text: "What does the defining property of U say about the product of U with its own conjugate transpose?" },
   ],
   solution: {
     steps: [
-      { description: "$U(I/2)U^\\dagger = \\tfrac12 UIU^\\dagger$ — the scalar factors out of matrix multiplication." },
+      { description: "$U(I/2)U^\\dagger = \\tfrac12 UIU^\\dagger$: the scalar factors out of matrix multiplication." },
       { description: "$UIU^\\dagger = UU^\\dagger$, since multiplying by the identity matrix changes nothing." },
       { description: "$UU^\\dagger = I$ by the defining property of a unitary matrix, so the whole expression is $\\tfrac12I=I/2$." },
     ],

@@ -61,8 +61,8 @@ export const classifyIScaledPair: MultipleChoiceProblem = {
     correctIdea: "Global phase means multiplying the ENTIRE state by one common factor — both coefficients here got multiplied by the same i.",
     whyCorrect: "Since both terms scale by the identical factor, this is exactly the pattern the lesson defines as global phase, unobservable in any basis.",
     whyWrong: [
-      "Mistaking it for relative phase, which requires only one of the two coefficients to pick up a phase, not both equally.",
-      "Assuming a factor of i (rather than a real number like −1) can't be a global phase — any unit-modulus complex number, including i, works as a global phase factor.",
+      { optionId: "b", text: "A relative phase touches one coefficient and leaves the other alone. Here both picked up the same factor, which is what makes it global." },
+      { optionId: "c", text: "Reads i as too exotic to be a global phase. Any unit-modulus factor qualifies, i included, and here the relationship is the simple one |ψ₄⟩ = i|ψ₁⟩." },
     ],
   },
 };

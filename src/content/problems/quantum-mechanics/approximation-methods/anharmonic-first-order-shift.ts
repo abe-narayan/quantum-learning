@@ -31,12 +31,17 @@ export const anharmonicFirstOrderShift: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.0005,
-    incorrectFeedback: "Compute 3λ/4 with λ=0.02.",
+    incorrectFeedback: "The Gaussian moment matters here: ⟨0|x⁴|0⟩ is 3/4, not the 1/2 that belongs to x². Multiply that moment by λ.",
+    nearMisses: [
+      { value: lambda * 0.5, tolerance: 0.0002, feedback: "That uses ⟨0|x²|0⟩ = 1/2. The perturbation is x⁴, whose ground-state moment is 3⟨x²⟩² = 3/4." },
+      { value: 0.75, tolerance: 0.002, feedback: "0.75 is the moment ⟨0|x⁴|0⟩ on its own. The energy shift multiplies it by the coupling λ." },
+      { value: 0.0075, tolerance: 0.0002, feedback: "0.0075 is the worked example's answer at λ = 0.01. A first-order shift is linear in λ, so doubling the coupling doubles the shift." },
+    ],
   },
   hints: [
     { text: "⟨0|x⁴|0⟩=3/4 exactly for the harmonic oscillator ground state." },
     { text: "E₀^(1)=λ×(3/4)." },
-    { text: "0.02×0.75=0.015." },
+    { text: "Multiply 0.02 by 0.75." },
   ],
   solution: {
     steps: [{ description: "E₀^(1) = λ⟨0|x⁴|0⟩ = 0.02×0.75 = 0.015." }],

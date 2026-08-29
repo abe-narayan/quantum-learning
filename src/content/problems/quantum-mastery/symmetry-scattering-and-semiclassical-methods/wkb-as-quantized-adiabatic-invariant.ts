@@ -23,7 +23,7 @@ export const wkbAsQuantizedAdiabaticInvariant: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["quantized", "discrete values", "integer", "n"],
+      ["quantized", "quantization", "discrete values", "discrete set", "discrete ladder", "integer", "quantum number"],
       ["ħ", "hbar", "planck"],
       ["classical", "adiabatic invariant", "stays constant", "conserved"],
     ],

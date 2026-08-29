@@ -48,9 +48,9 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-  Two quantum states being "perpendicular" isn't decoration borrowed from
-  geometry — it's exactly the condition for a single measurement to tell
-  them apart with certainty.
+  Two quantum states being "perpendicular" is not decoration borrowed from
+  geometry. It is the condition, necessary and sufficient, for a single
+  measurement to tell them apart with certainty.
 </LessonHook>
 
 ## Motivation
@@ -76,9 +76,9 @@ supplies length and angle is called an **<Term id="inner-product">inner product<
 
 For ordinary real vectors, the dot product $u\cdot v = \sum u_iv_i$ already
 does this job: $u\cdot u$ gives squared length, and $u\cdot v=0$ means
-perpendicular. The complex case needs one modification, conjugation,
-and once you see why, the whole structure falls out naturally rather than
-looking like an arbitrary rule.
+perpendicular. The complex case needs one modification, conjugation, and
+the reason for it is concrete: without conjugation, squared lengths can
+come out negative. Everything else follows from repairing that.
 
 ## Mathematical Development
 
@@ -88,8 +88,8 @@ Try defining an inner product on $\mathbb{C}^n$ the naive way, without
 conjugating: $\langle v,v\rangle \overset{?}{=} \sum v_i^2$. Take
 $v=(i,0)$: $\sum v_i^2 = i^2 = -1$, negative. A notion of "squared
 length" that can be negative is useless. Conjugating one side fixes this
-immediately, because $v_i^*v_i=|v_i|^2\ge0$ always (this is exactly the
-$zz^*\ge0$ fact from the Complex Numbers lesson).
+immediately, because $v_i^*v_i=|v_i|^2\ge0$ always (the $zz^*\ge0$ fact
+from the Complex Numbers lesson, applied one coordinate at a time).
 
 ### The axioms
 
@@ -147,7 +147,7 @@ $$
   question="Can |⟨u,v⟩| ever come out larger than ‖u‖‖v‖, for some choice of u and v?"
   options={[
     { label: "Yes, for some complex vectors", value: "yes" },
-    { label: "No — it never exceeds ‖u‖‖v‖", value: "no" },
+    { label: "No, it never exceeds ‖u‖‖v‖", value: "no" },
     { label: "Only when u and v are linearly dependent", value: "dependent" },
   ]}
   correctValue="no"
@@ -172,7 +172,7 @@ $$
 0 \le \langle w,w\rangle
 $$
   </DerivationStep>
-  <DerivationStep annotation="Expand using ⟨v,u⟩=⟨u,v⟩* and that ⟨v,v⟩ is real. All three of the last terms reduce to the same quantity — two subtract, one adds, leaving exactly one copy.">
+  <DerivationStep annotation="Expand using ⟨v,u⟩=⟨u,v⟩* and that ⟨v,v⟩ is real. All three of the last terms reduce to the same quantity: two subtract, one adds, leaving a single copy.">
 $$
 0 \le \langle w,w\rangle = \langle u,u\rangle - c\langle u,v\rangle - c^*\langle v,u\rangle + c^*c\langle v,v\rangle = \langle u,u\rangle - \frac{|\langle v,u\rangle|^2}{\langle v,v\rangle}
 $$
@@ -182,7 +182,7 @@ $$
 |\langle v,u\rangle|^2 \le \langle u,u\rangle\langle v,v\rangle = \|u\|^2\|v\|^2
 $$
   </DerivationStep>
-  <DerivationStep annotation="Take square roots. |⟨v,u⟩| = |⟨u,v⟩| since conjugating doesn't change modulus — this is Cauchy-Schwarz.">
+  <DerivationStep annotation="Take square roots. |⟨v,u⟩| = |⟨u,v⟩| since conjugating doesn't change modulus, and what remains is Cauchy-Schwarz.">
 $$
 |\langle u,v\rangle| \le \|u\|\,\|v\|
 $$
@@ -196,8 +196,8 @@ just $|\cos\theta|\le1$. Complex vectors don't have a literal angle in the
 same sense, but the ratio $|\langle u,v\rangle|/(\|u\|\|v\|)\in[0,1]$
 still measures how much $u$ and $v$ "overlap," the same word used for
 $\langle\phi|\psi\rangle$ once bra-ket notation is introduced. The vector
-$w=u-cv$ built during the Cauchy-Schwarz proof is exactly the first step
-of **Gram-Schmidt orthogonalization**: subtracting off the component along
+$w=u-cv$ built during the Cauchy-Schwarz proof is the first step of
+**Gram-Schmidt orthogonalization**: subtracting off the component along
 $v$ leaves a piece orthogonal to it, which is how an arbitrary basis gets
 converted into an orthonormal one, one vector at a time.
 
@@ -207,7 +207,7 @@ $w=u-cv=(2,-1)$. Drawing $w$ starting at $cv$'s tip and ending at $u$'s
 tip shows the whole construction at once: $cv$ is $u$'s shadow along $v$,
 and $w$ is what's left over, sitting at a right angle to $v$.
 
-<InteractiveSection title="Watch w stay perpendicular to v" description="v is fixed. Drag the slider to spin u all the way around. cv (u's shadow along v) and w = u - cv update live — confirm w stays at a right angle to v for every angle, exactly as the Cauchy-Schwarz derivation guarantees.">
+<InteractiveSection title="Watch w stay perpendicular to v" description="v is fixed. Drag the slider to spin u all the way around. cv (u's shadow along v) and w = u - cv update live. Confirm that w stays at a right angle to v at every angle, as the Cauchy-Schwarz derivation guarantees.">
   <VectorDiagramExplorer
     frames={Array.from({ length: 36 }, (_, i) => csDemoFrame(i * 10))}
     sliderLabel="Angle of u"
@@ -217,12 +217,36 @@ and $w$ is what's left over, sitting at a right angle to $v$.
 
 ## Physical Interpretation
 
-Two quantum states with $\langle\phi|\psi\rangle=0$ are exactly the states
-a single measurement can tell apart with certainty: a geometric condition
-on vectors doubling as a statement about what's experimentally
-distinguishable. $\|\psi\|=1$ will turn out to be exactly the
-normalization condition that makes total measurement probability equal
-$1$, developed fully in the Probability and Quantum States lesson.
+Two quantum states with $\langle\phi|\psi\rangle=0$ are the states, and
+the only states, that a single measurement can tell apart with certainty.
+A geometric condition on vectors doubles as a statement about what is
+experimentally distinguishable. $\|\psi\|=1$ is the normalization
+condition that makes total measurement probability equal $1$, developed
+fully in the Probability and Quantum States lesson.
+
+The non-orthogonal case is where the inner product earns its keep, because
+the overlap is not merely a yes-or-no verdict: its size sets a quantitative
+limit. Take $|0\rangle$ and $|+\rangle = (|0\rangle+|1\rangle)/\sqrt2$,
+with overlap $\langle 0|+\rangle = 1/\sqrt2 \approx 0.707$. Suppose someone
+hands you one of the two at random and you measure in the
+$\{|0\rangle,|1\rangle\}$ basis. Outcome $1$ can only have come from
+$|+\rangle$, so it settles the question. Outcome $0$ is inconclusive, and
+the best response to it is to answer $|0\rangle$ every time rather than
+flip a coin, since $|0\rangle$ is the likelier preparation to have
+produced it. That policy is right whenever the state really was
+$|0\rangle$, and right on half of the $|+\rangle$ preparations (the half
+that happened to give outcome $1$), so your success rate is
+$\tfrac12(1) + \tfrac12(\tfrac12) = 0.75$. A better-chosen measurement
+does better still, and the ceiling for any measurement at all is
+
+$$
+P_{\text{success}} = \tfrac{1}{2}\left(1 + \sqrt{1 - |\langle\phi|\psi\rangle|^2}\right) = \tfrac{1}{2}\left(1 + \sqrt{1 - \tfrac12}\right) \approx 0.854
+$$
+
+Orthogonal states put $|\langle\phi|\psi\rangle| = 0$ into that formula and
+recover $P_{\text{success}} = 1$; identical states put in $1$ and give
+$0.5$, which is a coin flip. The single number $|\langle\phi|\psi\rangle|$
+interpolates between the two.
 
 ## Worked Example
 
@@ -234,8 +258,8 @@ $$
 $$
 
 They're orthogonal. (Quick sanity check on why this is unsurprising: $v$
-is $i$ times the vector $(1,-i)$, and $(1,-i)$ turns out to be exactly
-orthogonal to $(1,i)$ under this inner product. An overall phase factor
+is $i$ times the vector $(1,-i)$, and $(1,-i)$ is orthogonal to $(1,i)$
+under this inner product. An overall phase factor
 like this $i$ never changes orthogonality, since $|\langle u, cv\rangle| =
 |c|\,|\langle u,v\rangle|$ for any scalar $c$.)
 
@@ -287,12 +311,12 @@ for the opposite convention when reading other sources.
 ## Further Exploration
 
 <ChallengePrompt prompt="The explanation above says Cauchy–Schwarz becomes an equality exactly when u and v are parallel. For v=(1,1), pick a nonzero u that makes it an equality, and verify |⟨u,v⟩|=‖u‖‖v‖ directly.">
-  Try $u$ as any scalar multiple of $v$ itself — then just plug both
-  sides into the inequality and check they come out equal.
+  Try $u$ as any scalar multiple of $v$ itself, then plug both sides into
+  the inequality and check that they come out equal.
 </ChallengePrompt>
 
 <NextDiscovery>
-  [The Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism) gives this exact inner-product
+  [The Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism) gives this inner-product
   structure a compact, standard notation: bras, kets, outer products, and
   the completeness relation, used throughout the rest of quantum mechanics.
 </NextDiscovery>

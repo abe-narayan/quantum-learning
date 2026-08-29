@@ -25,13 +25,32 @@ export const linearSystemsPolynomialDegreeForTargetEpsilon: NumericProblem = {
   answer: {
     type: "numeric",
     value,
-    tolerance: 2,
+    tolerance: 0,
     incorrectFeedback: "Compute κ·ln(1/ε) with κ=2 and ε=0.001, then round up to the nearest integer, since a polynomial degree can't be fractional.",
+    nearMisses: [
+      {
+        value: kappa * Math.log(1 / epsilon),
+        tolerance: 0.05,
+        feedback: "That is the raw estimate before rounding. A polynomial degree is a whole number, and rounding down would miss the target accuracy, so round up.",
+      },
+      {
+        value: Math.floor(kappa * Math.log(1 / epsilon)),
+        feedback: "You rounded down. A degree below the estimate does not reach accuracy ε, so the rounding has to go up.",
+      },
+      {
+        value: Math.ceil(kappa * Math.log2(1 / epsilon)),
+        feedback: "That uses log base 2. The lesson's estimate is stated with the natural log, ln(1/ε).",
+      },
+      {
+        value: Math.ceil(kappa * Math.log10(1 / epsilon)),
+        feedback: "That uses log base 10. The lesson's estimate is stated with the natural log, ln(1/ε).",
+      },
+    ],
   },
   hints: [
     { text: "The lesson states the degree scales as O(κ log(1/ε)); take the estimate degree ≈ κ·ln(1/ε)." },
     { text: "ln(1/0.001) = ln(1000) ≈ 6.9078." },
-    { text: "2 × 6.9078 ≈ 13.82 — round up, since a polynomial degree must be a whole number and must not undershoot the target accuracy." },
+    { text: "Multiply by κ, then round up: a polynomial degree must be a whole number, and rounding down would undershoot the target accuracy." },
   ],
   solution: {
     steps: [
@@ -42,7 +61,7 @@ export const linearSystemsPolynomialDegreeForTargetEpsilon: NumericProblem = {
     finalAnswer: `degree ≈ ${value}`,
   },
   explanation: {
-    correctIdea: "The polynomial degree needed to approximate 1/x on a κ-dependent truncated interval scales with both κ and the target accuracy — a concrete, computable resource cost, not just a qualitative claim.",
+    correctIdea: "The polynomial degree needed to approximate 1/x on a κ-dependent truncated interval scales with both κ and the target accuracy: a concrete, computable resource cost, not just a qualitative claim.",
     whyCorrect: "This is exactly the quantitative dependence the lesson's regularization discussion establishes: κ sets how close to the unbounded singularity at x=0 the approximation must remain valid.",
     whyWrong: ["Using log base 10 or log base 2 instead of the natural log, or forgetting to round up, both give a degree that doesn't actually match the lesson's stated ln(1/ε) scaling."],
   },

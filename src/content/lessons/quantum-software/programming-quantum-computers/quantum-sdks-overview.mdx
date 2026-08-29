@@ -20,7 +20,7 @@ export const lessonMeta = {
   module: "quantum-sdks-overview",
   order: 1,
   difficulty: "foundational",
-  estimatedMinutes: 18,
+  estimatedMinutes: 20,
   prerequisites: ["quantum-software/programming-quantum-computers/circuit-representation-in-code"],
   objectives: [
     "Name three major real-world quantum SDKs and one distinguishing characteristic of each",
@@ -44,12 +44,12 @@ platform's own `QuantumCircuit` already demonstrates in miniature),
 not memorizing any one's specific syntax.
 
 <ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
-  alt="Google's Sycamore quantum processor chip, shown in a still from Google's own video"
-  caption="Google's Sycamore quantum processor, the chip family Cirq was built to target. Every SDK covered here (Qiskit, Cirq, PennyLane) ultimately builds toward a specific real device like this, or a simulator standing in for one."
-  credit="Google / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
-  license="CC BY 3.0"
+  src="https://upload.wikimedia.org/wikipedia/commons/c/c0/IQM_Quantum_Computers_Design.jpg"
+  alt="An IQM superconducting quantum computer, one vendor's system among several an SDK can target"
+  caption="An IQM system — a vendor neither Qiskit nor Cirq was originally written for. That is the point of the shared structure this lesson surveys: an SDK's job is to be aimable at whichever backend you have access to, so a circuit is not rewritten every time the machine underneath it changes."
+  credit="Ragsxl / Wikimedia Commons"
+  creditUrl="https://commons.wikimedia.org/wiki/File:IQM_Quantum_Computers_Design.jpg"
+  license="CC BY-SA 4.0"
 />
 
 ## Engineering Development
@@ -98,9 +98,9 @@ the exact same three boxes:
 ### How this looks in real Qiskit
 
 This platform's `QuantumCircuit` is deliberately minimal, so it's worth
-seeing, once, what the SAME Bell-state circuit built above
-(`h(0).cnot(0,1)`) actually looks like in a real SDK. Here it is in
-Qiskit, IBM's SDK, using only the small, stable core of its API
+seeing what the SAME Bell-state circuit built above (`h(0).cnot(0,1)`)
+actually looks like in each of the three SDKs this lesson surveys.
+First, Qiskit, IBM's SDK, using only the small, stable core of its API
 (circuit construction and gates, not a specific execution/backend
 call, which has changed across Qiskit versions):
 
@@ -122,6 +122,61 @@ long-stable, core parts of Qiskit's `QuantumCircuit` API; only the
 "backend" step (choosing a simulator or real device, and what to call
 to execute it) changes meaningfully across SDK versions, which is
 exactly the abstraction the next section names.
+
+### The same circuit in Cirq
+
+Here is the identical Bell circuit in Cirq, Google's SDK. The surface
+changes: qubits become explicit objects, and the circuit is built from
+a list of operations rather than method chaining. The three boxes do
+not change at all:
+
+```python
+# Real Cirq syntax, shown as a static comparison only.
+# It is not run by this platform's own simulator above.
+import cirq
+
+# BUILD: two named qubit objects, then the circuit as a data structure.
+q0, q1 = cirq.LineQubit.range(2)
+circuit = cirq.Circuit([cirq.H(q0), cirq.CNOT(q0, q1), cirq.measure(q0, q1)])
+
+# BACKEND + RESULTS: cirq.Simulator() is the backend choice; .run()
+# executes the circuit and hands back per-shot measurement records.
+result = cirq.Simulator().run(circuit, repetitions=1000)
+```
+
+### The same circuit in PennyLane
+
+PennyLane rearranges the furniture more aggressively: the backend (a
+"device") is chosen *before* the circuit, and the circuit itself is an
+ordinary Python function wearing a decorator. Squint past that and the
+same three boxes are still all present:
+
+```python
+# Real PennyLane syntax, shown as a static comparison only.
+import pennylane as qml
+
+# BACKEND: chosen up front, before any circuit exists.
+dev = qml.device("default.qubit", wires=2)
+
+# BUILD: the circuit is a decorated function bound to that device.
+@qml.qnode(dev)
+def bell():
+    qml.Hadamard(0)
+    qml.CNOT(wires=[0, 1])
+    # RESULTS: the return statement declares what to read back.
+    return qml.probs(wires=[0, 1])
+
+probs = bell()  # calling the function executes it on the device
+```
+
+Line the three snippets up and the "different skins over the same
+three boxes" claim stops being an assertion and becomes visible. Every
+one contains a Hadamard, a CNOT, and a readout; every one names a
+backend; every one hands back results. Qiskit and Cirq build a circuit
+object first and pass it to a backend afterward, while PennyLane binds
+the backend up front and makes the circuit callable, but those are
+ergonomic reshufflings of the same pipeline, not different
+capabilities.
 
 ### What a backend abstracts over
 

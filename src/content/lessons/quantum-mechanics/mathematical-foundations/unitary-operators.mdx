@@ -6,6 +6,7 @@ import { Complex } from "@/lib/quantum/complex";
 import { matrixToCells } from "@/components/visualizations/MatrixGrid";
 import { MatrixGridExplorer } from "@/components/visualizations/MatrixGridExplorer";
 import { VectorDiagramExplorerPair } from "@/components/visualizations/VectorDiagramExplorerPair";
+import { VectorDiagram } from "@/components/visualizations/VectorDiagram";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/mathematical-foundations/unitary-operators"
@@ -45,6 +46,9 @@ export const rotationSweepFrame = (matrix, imageLabel, imageColor, angleDeg) => 
   };
 };
 
+export const hadamardE1 = applyRealMatrix(HADAMARD, 1, 0);
+export const hadamardE2 = applyRealMatrix(HADAMARD, 0, 1);
+
 export const lessonMeta = {
   title: "Unitary Operators",
   description:
@@ -76,22 +80,13 @@ export const lessonMeta = {
 
 ## Motivation
 
-A <Term id="quantum-state">quantum state</Term>'s norm is tied to total probability, the Probability and
-Quantum States lesson makes this precise, but the short version is that a
+A <Term id="quantum-state">quantum state</Term>'s norm is tied to total probability. The Probability and
+Quantum States lesson makes that precise; the short version is that a
 <Term id="normalization">normalized</Term> state must *stay* normalized as it evolves or gets transformed,
 or probability would leak away or overshoot $100\%$. The operators
 guaranteed to preserve norms are called **<Term id="unitary-operator">unitary</Term>**, and every quantum
 gate, every basis change, and every step of time evolution in quantum
 mechanics is one.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Microwave_Apparatus_%286029992084%29.jpg"
-  alt="A pair of trapped ions inside a glass vacuum chamber, illuminated by a green LED for visibility, being manipulated by microwave fields as part of a NIST quantum computing experiment"
-  caption="Real trapped-ion hardware like this is exactly what randomized benchmarking runs on: applying long sequences of microwave-driven gates and tracking how the outcome statistics decay measures precisely how closely an implemented gate satisfies U†U=I, the unitarity condition this lesson derives from the adjoint definition."
-  credit="Y. Colombe / NIST"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Microwave_Apparatus_(6029992084).jpg"
-  license="Public Domain (U.S. Government work)"
-/>
 
 ## Intuition
 
@@ -105,7 +100,7 @@ length.
 
 <InteractiveSection
   title="Unitary vs. non-unitary: watch the arrow's length"
-  description="A unit vector u sweeps through every angle, driven by one shared slider. Left: Hu, u's image under the Hadamard matrix (this lesson's own worked example below), rotates right along with u but never changes length. Right: the same sweep through the non-unitary matrix diag(2,1) for contrast — its image visibly stretches and shrinks as it rotates, exactly the rescaling a unitary operator is forbidden from doing. Both panels move together so you can compare them at the same angle.">
+  description="A unit vector u sweeps through every angle, driven by one shared slider. Left: Hu, u's image under the Hadamard matrix (this lesson's own worked example below), rotates right along with u but never changes length. Right: the same sweep through the non-unitary matrix diag(2,1) for contrast. Its image visibly stretches and shrinks as it rotates, which is the rescaling a unitary operator is forbidden from doing. Both panels move together so you can compare them at the same angle.">
   <VectorDiagramExplorerPair
     sliderLabel="Angle of u"
     panels={[
@@ -146,7 +141,7 @@ $$
 $$
 
 <Callout type="note">
-This is precisely why every gate you've met, if you've studied the
+This is why every gate you've met, if you've studied the
 Quantum Computing track ($X$, $H$, $S$, $\mathrm{CNOT}$, all of them), is
 unitary: a gate must take a normalized state to another normalized state,
 and this theorem is the reason that requirement is equivalent to
@@ -170,16 +165,35 @@ there is a unitary $U$ with $U|e_i\rangle=|f_i\rangle$ for every $i$:
 define $U$ this way on the basis and extend linearly. It preserves inner
 products because both bases are orthonormal:
 $\langle Ue_i|Ue_j\rangle=\langle f_i|f_j\rangle=\delta_{ij}=\langle
-e_i|e_j\rangle$, matching the definition of a unitary map exactly. This
-is the operator-level version of the "change of basis" idea from the
-Vector Spaces lesson: moving between two orthonormal bases is always a
-unitary transformation.
+e_i|e_j\rangle$, which is the definition of a unitary map. This is the
+operator-level version of the "change of basis" idea from the Vector
+Spaces lesson: moving between two orthonormal bases is always a unitary
+transformation.
+
+The Hadamard matrix is the smallest concrete case. Feed it the standard
+basis and it returns the Hadamard basis:
+
+<VectorDiagram
+  vectors={[
+    { label: "e₁", x: 1, y: 0, color: "muted", dashed: true },
+    { label: "e₂", x: 0, y: 1, color: "muted", dashed: true },
+    { label: "He₁ = |+⟩", x: hadamardE1.x, y: hadamardE1.y, color: "brand" },
+    { label: "He₂ = |−⟩", x: hadamardE2.x, y: hadamardE2.y, color: "accent" }
+  ]}
+  ariaLabel="The two standard basis vectors drawn along the axes as dashed arrows, and their images under the Hadamard matrix drawn as solid arrows at plus and minus forty-five degrees. All four arrows have the same length, and the two images meet at a right angle just as the originals do."
+/>
+
+The right angle between $e_1$ and $e_2$ survives, and so does the length
+of each arrow. Both facts are the same theorem: $\langle Ue_1|Ue_2\rangle
+= \langle e_1|e_2\rangle = 0$ preserves the angle, and $\|Ue_i\|=\|e_i\|$
+preserves the length. What the Hadamard did was rotate and reflect the
+frame, not deform it.
 
 ### Columns form an orthonormal basis
 
 $U^\dagger U = I$ says something concrete entry-by-entry: the $(i,j)$
-entry of $U^\dagger U$ is exactly the inner product of $U$'s $i$-th column
-with $U$'s $j$-th column. So $U^\dagger U=I$ is equivalent to: **the
+entry of $U^\dagger U$ is the inner product of $U$'s $i$-th column with
+$U$'s $j$-th column. So $U^\dagger U=I$ is equivalent to: **the
 columns of $U$ form an orthonormal set.** This is often the fastest way to
 check unitarity by eye.
 
@@ -187,9 +201,9 @@ check unitarity by eye.
 
 Time evolution in quantum mechanics is generated by a unitary operator,
 covered in full once the Wave Mechanics course reaches the Schrödinger
-equation, which is exactly why a normalized state stays normalized
-forever as it evolves: unitarity *is* conservation of total probability,
-restated in operator language.
+equation. That is why a normalized state stays normalized forever as it
+evolves: unitarity *is* conservation of total probability, restated in
+operator language.
 
 This is also, concretely, what a real device's gate-calibration numbers
 are measuring. Randomized benchmarking, run routinely on IBM, Google, and
@@ -197,8 +211,8 @@ IonQ hardware, applies long sequences of gates and tracks how the outcome
 statistics decay with sequence length, which amounts to a direct measure
 of how closely an implemented gate satisfies $U^\dagger U=I$. Leakage out
 of the two-level computational subspace and decoherence during the gate
-both show up as a measurable departure from unitarity, which is exactly
-the quantity a reported gate fidelity is quantifying.
+both show up as a measurable departure from unitarity, and that departure
+is what a reported gate fidelity puts a number on.
 
 ## Worked Example
 
@@ -209,12 +223,12 @@ from the last lesson (shown there to be non-Hermitian).**
 <PredictBeforeReveal
   question="S is not Hermitian (shown last lesson). Does that mean S also fails to be unitary?"
   options={[
-    { label: "Yes — non-Hermitian implies non-unitary", value: "non-unitary" },
-    { label: "No — S can still be unitary", value: "unitary" },
+    { label: "Yes, non-Hermitian implies non-unitary", value: "non-unitary" },
+    { label: "No, S can still be unitary", value: "unitary" },
     { label: "Can't tell without computing S†S", value: "unsure" },
   ]}
   correctValue="unitary"
-  explanation="S is unitary despite not being Hermitian — the two properties are independent, and the computation below confirms S†S = I directly. A matrix can fail one condition and satisfy the other; there's no implication either way."
+  explanation="S is unitary despite not being Hermitian. The two properties are independent, and the computation below confirms S†S = I directly. A matrix can fail one condition and satisfy the other; there's no implication either way."
 />
 
 $H$ is real and symmetric, so $H^\dagger=H$. Compute $H^2$:
@@ -281,8 +295,8 @@ plain transpose.
 ## Further Exploration
 
 <ChallengePrompt prompt="Verify directly, not via the eigenvalue-modulus theorem, that the 2D rotation matrix R(θ)=[[cosθ,−sinθ],[sinθ,cosθ]] is unitary for any θ, by checking its columns are orthonormal.">
-  Same orthonormal-columns test as practice question 3 — but this time
-  work with $\cos\theta$ and $\sin\theta$ symbolically, using
+  Same orthonormal-columns test as practice question 3, but this time work
+  with $\cos\theta$ and $\sin\theta$ symbolically, using
   $\cos^2\theta+\sin^2\theta=1$.
 </ChallengePrompt>
 

@@ -14,7 +14,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Purity, von Neumann Entropy, and Information",
   description:
-    "The standard measure of mixedness, von Neumann entropy, built from a density matrix's actual eigenvalues via an exact closed-form solver for the 2×2 case, and shown to reduce exactly to classical Shannon entropy when ρ happens to be diagonal.",
+    "The standard measure of mixedness, von Neumann entropy, built from a density matrix's eigenvalues via a closed-form 2×2 solver, and shown to reduce to classical Shannon entropy when ρ is diagonal.",
   course: "entanglement-and-measurement",
   module: "purity-entropy-and-information",
   order: 1,
@@ -29,17 +29,22 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Purity, Tr(ρ²), has done real work in the last two lessons: detecting mixedness, and tying directly to entanglement. But it isn't the measure physicists actually reach for first.
+Purity, Tr(ρ²), has done real work in the last two lessons: it detects mixedness and ties directly to entanglement. It is still not the measure physicists reach for first.
 </LessonHook>
 
 ## Motivation
 
-That tie to entanglement holds specifically for 2-qubit pure states.
-The standard measure physicists reach for first is **<Term id="von-neumann-entropy-purity">von Neumann
-entropy</Term>**, and this lesson
-builds it properly: not as a new formula to accept, but as the direct
-quantum generalization of an idea this platform already uses, Shannon
-entropy of a classical probability distribution.
+Purity's tie to entanglement holds for 2-qubit pure states, and its scale
+is arbitrary: 1 down to 1/d, with no interpretation attached to the
+number itself. The measure physicists reach for instead is
+**<Term id="von-neumann-entropy-purity">von Neumann entropy</Term>**, which is measured in bits and means what
+bits usually mean.
+
+This lesson builds it as the quantum generalization of a classical idea
+you may already know, the Shannon entropy of a probability distribution,
+rather than as a new formula to accept. There is one trap along the way,
+and it catches people who assume the diagonal of $\rho$ is the
+distribution to plug in.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/9/99/ClaudeShannon_MFO3807.jpg"
@@ -55,7 +60,8 @@ entropy of a classical probability distribution.
 ### Eigenvalues of a density matrix
 
 A <Term id="hermitian-operator">Hermitian</Term> matrix has real eigenvalues and an orthonormal eigenbasis,
-a fact this platform has used since Operators, Observables & Measurement.
+a fact proved back in Hermitian Operators (Mathematical Foundations) and
+in constant use since.
 For a $2\times2$ Hermitian matrix
 $\rho=\begin{pmatrix}a&z\\z^*&d\end{pmatrix}$, the characteristic
 polynomial $\lambda^2-(a+d)\lambda+(ad-|z|^2)=0$ has the closed-form
@@ -65,18 +71,17 @@ $$
 \lambda_{\pm} = \frac{a+d}{2} \pm \sqrt{\left(\frac{a-d}{2}\right)^2+|z|^2}
 $$
 
-This is the ordinary quadratic formula, nothing more exotic, and it's
-exactly what `eigenvaluesHermitian2x2` computes. Scope matters here:
-this is a closed-form solver for the $2\times2$ case specifically, not a
-general eigensolver. Finding eigenvalues of an arbitrary $N\times N$
-Hermitian matrix requires genuinely different (generally iterative)
-numerical methods, which this platform does not implement. Every density matrix this course actually needs (single-qubit
-reduced states) is exactly $2\times2$, so the closed form is complete
-for this course's scope.
+That is the ordinary quadratic formula and nothing more exotic, and it is
+what `eigenvaluesHermitian2x2` computes. Scope matters here: this is a
+closed-form solver for the $2\times2$ case, not a general eigensolver.
+Eigenvalues of an arbitrary $N\times N$ Hermitian matrix need iterative
+numerical methods this engine does not implement. Every density matrix
+this course needs (single-qubit reduced states) is $2\times2$, so the
+closed form covers it.
 
 For a valid density matrix, both eigenvalues are guaranteed
 nonnegative (positivity) and sum to 1 (trace), so $\lambda_+,\lambda_-$
-form a genuine probability distribution over exactly two outcomes.
+form a true probability distribution over two outcomes.
 
 ### Von Neumann entropy
 
@@ -94,23 +99,24 @@ eigenvalue contributes nothing rather than producing an undefined term.
 `vonNeumannEntropy`'s implementation handles this directly rather than
 letting it silently become `NaN`.
 
-### This is exactly Shannon entropy, generalized
+### This is Shannon entropy, generalized
 
 If $\rho$ happens to already be diagonal, $\rho=\text{diag}(p_1,\dots,p_d)$
-for a genuine classical probability distribution $p_i$, then the
+for a classical probability distribution $p_i$, then the
 <Term id="eigenvalue-eigenvector">eigenvalues</Term> *are* the $p_i$, and
 
 $$
 S(\rho) = -\sum_i p_i \log_2 p_i = H(p)
 $$
 
-exactly Shannon's classical entropy of the distribution $p$. Von Neumann
-entropy is not a quantum analogue built by loose resemblance: for a
-diagonal $\rho$, it is literally, term for term, the same formula. What
-makes it quantum is that $\rho$ need not be diagonal at all, and the
-eigenvalues (not the diagonal entries) are what the formula actually
-needs, which is exactly where the subtlety in the next section comes
-from.
+which is Shannon's classical entropy of the distribution $p$. Von Neumann
+entropy is not a quantum analogue built by resemblance. For a diagonal
+$\rho$ it is the same formula, term for term.
+
+What makes it quantum is that $\rho$ need not be diagonal, and that the
+eigenvalues rather than the diagonal entries are what the formula needs.
+That distinction is invisible for classical distributions and is where the
+next section's trap lives.
 
 ### Two limits, verified
 
@@ -154,7 +160,7 @@ else in this lesson, not a re-derived formula) at each point:
       ]
     }
   ]}
-  referenceLines={[{ y: 1, label: "p=0.5 — maximally mixed: purity 0.5, entropy 1 bit" }]}
+  referenceLines={[{ y: 1, label: "p=0.5, maximally mixed: purity 0.5, entropy 1 bit" }]}
   ariaLabel="Purity and von Neumann entropy plotted as functions of p for the diagonal family diag(p, 1-p) from p=0 to p=1: purity traces a U shape from 1 down to 0.5 at p=0.5 and back to 1, while entropy traces the mirrored inverted peak from 0 up to 1 bit at p=0.5 and back to 0"
 />
 
@@ -176,23 +182,23 @@ entries, different off-diagonal term.
 <PredictBeforeReveal
   question="ρ₁=diag(0.9,0.1) and ρ₂ (same diagonal, off-diagonal entries ±0.3) have identical P(0)=0.9, P(1)=0.1 in the computational basis. Do they have the same von Neumann entropy?"
   options={[
-    { label: "Yes — entropy only depends on the diagonal", value: "same" },
-    { label: "No — ρ₂'s off-diagonal term changes its eigenvalues", value: "different" },
+    { label: "Yes: entropy depends only on the diagonal", value: "same" },
+    { label: "No: ρ₂'s off-diagonal term changes its eigenvalues", value: "different" },
   ]}
   correctValue="different"
-  explanation="ρ₂'s eigenvalues, from the quadratic formula with a=0.9, d=0.1, z=0.3, come out to exactly 1 and 0: ρ₂ is secretly a pure state, so S(ρ₂)=0, while S(ρ₁)≈0.469 bits — worked out in full just below. Identical diagonals, completely different entropy: entropy is a property of the eigenvalues, never a shortcut through the diagonal."
+  explanation="ρ₂'s eigenvalues, from the quadratic formula with a=0.9, d=0.1, z=0.3, come out to 1 and 0. ρ₂ is a pure state in disguise, so S(ρ₂)=0, while S(ρ₁)≈0.469 bits, worked out below. Identical diagonals, opposite entropies. Entropy is a property of the eigenvalues, and the diagonal is not a shortcut to it."
 />
 
 $\rho_1$'s eigenvalues are just its
 diagonal entries, $0.9$ and $0.1$, giving $S(\rho_1)\approx0.469$ bits.
 But $\rho_2$'s eigenvalues (via the quadratic formula, with
-$a=0.9,d=0.1,z=0.3$) come out to exactly $1$ and $0$: $\rho_2$ is
-secretly a *pure* state, despite its diagonal looking identical to
-$\rho_1$'s, and $S(\rho_2)=0$. Both values were computed directly from
-the engine, not asserted. Reading entropy off the diagonal alone would
-have silently given the wrong answer for $\rho_2$: entropy is a
-property of the full matrix (via its eigenvalues), never a shortcut
-through the diagonal.
+$a=0.9,d=0.1,z=0.3$) come out to $1$ and $0$. So $\rho_2$ is a *pure*
+state wearing $\rho_1$'s diagonal, and $S(\rho_2)=0$. Both values come
+from the engine rather than from assertion.
+
+Reading entropy off the diagonal would have given the wrong answer for
+$\rho_2$, and given it silently, with no sign anything had gone wrong.
+Entropy is a property of the whole matrix through its eigenvalues.
 
 <InteractiveSection title="Same diagonal, opposite entropy" description="Build ρ₁ first: mix |0⟩ and |1⟩ with weight 0.9. Read the entropy (≈0.469 bits). Now switch to weight 1 on a single Bloch point at θ≈36.9° (φ=0) instead: cos²(θ/2)=0.9 makes its diagonal entries identical to ρ₁'s, but the point now sits on the sphere's surface, not inside it, and entropy drops straight to 0. Same diagonal, opposite entropy.">
   <LazyDensityMatrixExplorer />
@@ -200,14 +206,15 @@ through the diagonal.
 
 ## Physical Interpretation
 
-Entropy quantifies, in bits, how much genuine uncertainty remains about
-which "definite state" a system is really in, zero for a pure state
-(the system is definitely, unambiguously, in one specific quantum state)
-and rising toward its maximum as the mixture spreads evenly across more
-distinguishable possibilities. Because it's built from eigenvalues, it
-is unchanged by which basis you happen to describe $\rho$ in: a
-basis-independent, physically meaningful number, exactly the property a
-good measure of "how mixed is this, really" should have.
+Entropy quantifies, in bits, how much uncertainty remains about which
+definite state a system is in. Zero for a pure state, where the system is
+unambiguously in one specific quantum state, rising toward its maximum as
+the mixture spreads evenly across more distinguishable possibilities.
+
+Because it is built from eigenvalues, it does not change when you
+re-describe $\rho$ in another basis. That basis independence is the
+property any honest measure of mixedness needs, and it is what purity's
+raw number lacks an interpretation for.
 
 ## Worked Example
 
@@ -232,10 +239,10 @@ can differ substantially from its diagonal entries.
 </Callout>
 
 <Callout type="note">
-**Confusing $S(\rho)=0$ with "nothing is known."** It's the opposite:
-$S(\rho)=0$ means the state is known *completely* (a specific pure
-state): entropy measures residual uncertainty, so zero entropy is
-maximal knowledge, not minimal.
+**Confusing $S(\rho)=0$ with "nothing is known."** It is the opposite.
+$S(\rho)=0$ means the state is known in full: one specific pure state.
+Entropy measures residual uncertainty, so zero entropy is maximal
+knowledge.
 </Callout>
 
 ## Practice Questions
@@ -268,8 +275,8 @@ maximal knowledge, not minimal.
   exactly to classical Shannon entropy when $\rho$ is diagonal.
 - $S=0$ for every pure state; $S=1$ bit for the maximally mixed qubit:
   the two extremes, both derived and verified against the engine.
-- Entropy must be computed from eigenvalues, not diagonal entries: two
-  matrices with identical diagonals can have entirely different entropy.
+- Entropy must be computed from eigenvalues, not diagonal entries. Two
+  matrices with identical diagonals can have opposite entropies.
 
 ## Further Exploration
 

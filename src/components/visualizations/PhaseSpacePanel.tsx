@@ -41,7 +41,12 @@ function PhaseSpaceAxes({ maxX, maxP, toSvg }: { maxX: number; maxP: number; toS
 
   return (
     <>
-      <g className="stroke-border/50" strokeWidth={1}>
+      {/* Background ruling: `--axis-grid` is the token built for exactly
+          this - deliberately below the 3:1 floor so the plotted ellipse/box
+          stays the loudest thing in the frame. It replaces a half-alpha
+          panel edge, which was quiet by accident rather than by design and
+          gave no guarantee about which side of the data it landed on. */}
+      <g className="stroke-axis-grid" strokeWidth={1}>
         {xTicks.map((v, i) => {
           const top = toSvg(v, maxP);
           const bottom = toSvg(v, -maxP);
@@ -53,17 +58,34 @@ function PhaseSpaceAxes({ maxX, maxP, toSvg }: { maxX: number; maxP: number; toS
           return <line key={`gp${i}`} x1={left.x} y1={left.y} x2={right.x} y2={right.y} />;
         })}
       </g>
-      <g className="stroke-border" strokeWidth={1}>
+      {/* The x and p axes. A phase-space figure is unreadable without
+          them - the whole claim is *where* the state sits relative to the
+          origin - so they are load-bearing and move off `--border` (the
+          panel-edge token, 1.41:1 on `--surface-muted`, under the 3:1 WCAG
+          2.1 SC 1.4.11 floor) onto `--axis`. */}
+      <g className="stroke-axis" strokeWidth={1.25}>
         <line x1={xAxisStart.x} y1={xAxisStart.y} x2={xAxisEnd.x} y2={xAxisEnd.y} />
         <line x1={pAxisStart.x} y1={pAxisStart.y} x2={pAxisEnd.x} y2={pAxisEnd.y} />
       </g>
-      <text x={xAxisEnd.x - 4} y={xAxisEnd.y - 6} textAnchor="end" className="fill-muted-foreground text-[11px]">
+      {/* viewBox is 360 wide and renders `w-full`. The scale is NOT the 0.8
+          this note used to claim: The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+          (320 less Container's `px-4` gutters), but this SVG renders inside
+          `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+          radius and fill and no padding at all — the `p-4` does. Subtract
+          2 x (16px padding + 1px border) = 34px.
+          The real box is 254px, so the scale is 254/360 = 0.706 and every
+          effective size quoted here was ~13% optimistic — `text-[11px]`
+          painted at 7.8px, not 8.8px. 14 units still clears the floor at
+          9.88px, so the size stands and only the arithmetic is corrected.
+          These are the only two characters telling the reader which axis is
+          position and which is momentum. */}
+      <text x={xAxisEnd.x - 4} y={xAxisEnd.y - 8} textAnchor="end" fontSize={14} className="fill-axis">
         x
       </text>
-      <text x={pAxisEnd.x + 6} y={pAxisEnd.y + 4} textAnchor="start" className="fill-muted-foreground text-[11px]">
+      <text x={pAxisEnd.x + 7} y={pAxisEnd.y + 5} textAnchor="start" fontSize={14} className="fill-axis">
         p
       </text>
-      <circle cx={origin.x} cy={origin.y} r={1.5} className="fill-muted-foreground" />
+      <circle cx={origin.x} cy={origin.y} r={2} className="fill-axis" />
     </>
   );
 }
@@ -123,7 +145,14 @@ function PhaseSpaceEllipsePanel({
             className="fill-brand/10 stroke-brand"
             strokeWidth={2}
           />
-          <text x={center.x + a * scale + 4} y={center.y - 4} className="fill-brand text-[10px] font-medium">
+          {/* viewBox 360 rendered `w-full`. The real box is 254px, not 288px
+              (see the axis-label note above for why), so the scale is 0.706:
+              10 units painted at 7.06px and 13 gives **9.17px** effective —
+              still over the ~9px floor, so the size stands and only the
+              arithmetic is corrected. This label names the contour the whole
+              panel is about, and the one below names the moving state
+              point. */}
+          <text x={center.x + a * scale + 4} y={center.y - 4} fontSize={13} className="fill-brand font-medium">
             E = {energy}
           </text>
           <line
@@ -136,7 +165,7 @@ function PhaseSpaceEllipsePanel({
             strokeDasharray="3 3"
           />
           <circle cx={point.x} cy={point.y} r={4} className={onCurve ? "fill-accent stroke-accent" : "fill-foreground stroke-none"} />
-          <text x={point.x + 8} y={point.y - 8} className="fill-foreground text-[10px] font-medium">
+          <text x={point.x + 8} y={point.y - 8} fontSize={13} className="fill-foreground font-medium">
             (x, p)
           </text>
         </svg>

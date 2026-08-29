@@ -24,6 +24,11 @@ export const holevoChiBb84AtP: NumericProblem = {
     tolerance: 0.001,
     incorrectFeedback:
       "chi(p) = S(average state) - (1/2)*S(rho_0(p)) - (1/2)*S(rho_+(p)) = 0.75494 - 0.5*(0.46900) - 0.5*(0.46900) = 0.75494 - 0.46900.",
+    nearMisses: [
+      { value: 0.75494, tolerance: 0.002, feedback: "That is S of the average state alone. Part of it is each individual output's own noise-induced mixedness, which the Holevo quantity subtracts off." },
+      { value: 0.469, tolerance: 0.002, feedback: "That is the average individual output entropy. It is the quantity being subtracted, not the result." },
+      { value: 0.531, tolerance: 0.003, feedback: "0.531 is 1 − 0.469, which would be the answer if the average state were maximally mixed. It is not: the two output Bloch vectors are non-orthogonal, so S(avg) falls short of 1 bit." },
+    ],
   },
   hints: [
     { text: "The Holevo quantity is chi = S(sum_i p_i rho_i) - sum_i p_i S(rho_i), the entropy of the average state minus the (probability-weighted) average of the individual entropies." },

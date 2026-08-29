@@ -28,11 +28,16 @@ export const nEquals3OrbitalCount: NumericProblem = {
     value,
     tolerance: 0.5,
     incorrectFeedback: "Sum 2l+1 for l=0 (3s), l=1 (3p), l=2 (3d) and add them up.",
+    nearMisses: [
+      { value: 3, feedback: "3 counts the subshells s, p and d. Each holds 2l+1 orbitals, so the total runs higher." },
+      { value: 5, feedback: "5 counts the 3d orbitals alone. The 3s and 3p orbitals share the same n=3 energy." },
+      { value: 18, feedback: "18 doubles the orbital count for spin. The question asks for orbitals, not electron capacity." },
+    ],
   },
   hints: [
     { text: "3s: l=0 gives 1 orbital. 3p: l=1 gives 3 orbitals. 3d: l=2 gives 5 orbitals." },
-    { text: "1+3+5=9." },
-    { text: "This matches n²=3²=9." },
+    { text: "Add the three odd contributions: 1, 3, and 5." },
+    { text: "The total should match the n² rule at n=3. Verify your sum against it." },
   ],
   solution: {
     steps: [

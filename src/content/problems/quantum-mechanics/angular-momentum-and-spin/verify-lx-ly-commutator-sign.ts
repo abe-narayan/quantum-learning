@@ -33,17 +33,21 @@ export const verifyLxLyCommutatorSign: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Recall the general commutator identity [A,B]=−[B,A].",
   },
   hints: [
-    { text: "Every commutator satisfies [A,B]=−[B,A]." },
-    { text: "Apply this with A=Lx, B=Ly." },
-    { text: "[Ly,Lx]=−[Lx,Ly]=−iħLz." },
+    { text: "Write out the definition: [A,B] = AB − BA." },
+    { text: "Now write [B,A] = BA − AB and compare the two expressions term by term." },
+    { text: "Swapping the two operators negates the whole commutator, so apply that to the value you were given." },
   ],
   solution: {
-    steps: [{ description: "[Ly,Lx]=−[Lx,Ly]=−iħLz, using the general antisymmetry of any commutator." }],
-    finalAnswer: "−iħLz",
+    steps: [{ description: "[Ly,Lx] = LyLx − LxLy = −(LxLy − LyLx) = −[Lx,Ly] = −iħLz. The antisymmetry is immediate from the definition, so nothing about Lx and Ly in particular is needed." }],
+    finalAnswer: "−iħLz, since swapping the two arguments of a commutator negates it.",
   },
   explanation: {
-    correctIdea: "Commutator antisymmetry is a completely general algebraic fact, independent of what Lx,Ly specifically are.",
-    whyCorrect: "Matches the direct definition [A,B]=AB−BA, which flips sign under swapping A and B.",
-    whyWrong: ["Any answer other than −iħLz misapplies or ignores the basic antisymmetry property of commutators."],
+    correctIdea: "Commutator antisymmetry is an algebraic fact about the definition AB − BA, independent of what the two operators are.",
+    whyCorrect: "Matches the definition [A,B] = AB − BA, which changes sign under swapping A and B.",
+    whyWrong: [
+      { optionId: "b", text: "Leaves the sign alone, treating the commutator as symmetric in its arguments. It never is." },
+      { optionId: "c", text: "Changes which operator appears on the right-hand side. Swapping the arguments changes the sign, not the result operator." },
+      { optionId: "d", text: "Says the two commute, which is the claim this whole lesson exists to deny." },
+    ],
   },
 };

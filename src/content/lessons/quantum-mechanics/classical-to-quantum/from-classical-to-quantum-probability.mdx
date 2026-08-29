@@ -27,8 +27,9 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="Why this matters">
   Open a second slit and, at some spots on the screen, particles stop
-  arriving entirely — even though either slit alone would have put them
-  there. No story about a hidden definite path survives that.
+  arriving. Either slit alone would have put them there; opening both
+  sends the count to zero. No story about a hidden definite path
+  survives that.
 </LessonHook>
 
 ## Motivation
@@ -40,7 +41,7 @@ claim for an experiment simple enough to set up with a laser pointer and
 two closely-spaced slits cut in foil. This lesson works through the
 actual numbers behind that claim.
 
-The last lesson defined classical probability precisely: it always
+The last lesson pinned down what classical probability is: it always
 describes ignorance about one underlying definite fact. The double-slit
 pattern is the concrete case where that definition breaks down, not
 through any subtlety in how the ignorance gets described, but in the raw
@@ -48,8 +49,8 @@ measured numbers themselves.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Double_slit_interference.png"
-  alt="Photograph of a double-slit interference pattern of sunlight, showing alternating bright and dark fringes"
-  caption="An actual double-slit interference pattern, produced here by sunlight passing through two slits about 1 cm long and 0.5 mm apart. The bright and dark fringes are exactly the pattern no hidden-definite-path story can reproduce."
+  alt="A row of alternating bright and dark vertical bands cast by sunlight, brightest at the centre of the row and fading toward both edges, with the dark gaps between bands as wide as the bright ones"
+  caption="A real double-slit interference pattern, produced here by sunlight passing through two slits about 1 cm long and 0.5 mm apart. The dark bands are the ones no hidden-definite-path story can account for: light reaches them through either slit alone, and stops when both are open."
   credit="Aleksandr Berdnikov / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Double_slit_interference.png"
   license="CC BY-SA 4.0"
@@ -104,9 +105,10 @@ $$
 |\psi_1+\psi_2|^2 = (\psi_1+\psi_2)^*(\psi_1+\psi_2) = |\psi_1|^2+|\psi_2|^2+\underbrace{\psi_1^*\psi_2+\psi_2^*\psi_1}_{\text{cross terms}}
 $$
 
-The cross terms are the entire story: they vanish for real, same-sign
-numbers added the "classical" way, but not for complex amplitudes with a
-<Term id="global-relative-phase">relative phase</Term>. Where the cross terms are positive, the pattern brightens
+The cross terms are the entire story: the classical addition rule has no
+such term at all, while $\lvert\psi_1+\psi_2\rvert^2$ always carries one,
+and its size and sign are set by the <Term id="global-relative-phase">relative phase</Term> between the two
+amplitudes. Where the cross terms are positive, the pattern brightens
 past the classical prediction (**constructive interference**); where
 they're negative, it dims, potentially to zero even though both
 individual probabilities are positive (**destructive interference**).
@@ -127,10 +129,11 @@ The classical prediction never changes; it only depends on the
 individual magnitudes, which are fixed at $0.5$ each. The quantum
 prediction swings from **double** the classical value (perfectly
 constructive) to **zero** (perfectly destructive), purely as a function of
-relative phase. This is exactly the fringe pattern: as position $x$ on the
-screen changes, the relative phase between the two paths changes (their
-path lengths to the two slits differ), sweeping through exactly this
-range.
+relative phase. That swing is the fringe pattern. Moving across the
+screen changes $x$, which changes the difference in path length from the
+two slits, which changes $\theta$; the table's three rows are three
+points on that sweep, and the bright and dark bands are where it tops out
+and bottoms out.
 
 <PredictBeforeReveal
   question="At θ = π/2 (a quarter-cycle relative phase, neither in nor out of phase), how should the quantum prediction |ψ1+ψ2|² compare to the classical prediction |ψ1|²+|ψ2|²?"
@@ -140,7 +143,7 @@ range.
     { label: "They're exactly equal", value: "equal" },
   ]}
   correctValue="equal"
-  explanation="The cross terms ψ1*ψ2+ψ2*ψ1 vanish exactly at a quarter-cycle relative phase, so the quantum and classical predictions coincide there — the θ = π/2 row in the table above, 0.5 either way. That's the one special angle where interference has no net effect on the total, not because it's absent, but because its two contributions cancel."
+  explanation="The cross terms ψ1*ψ2+ψ2*ψ1 vanish at a quarter-cycle relative phase, so the two predictions coincide: that is the θ = π/2 row in the table above, 0.5 either way. It is the one angle where interference has no net effect on the total, not because it is absent but because its two contributions cancel each other."
 />
 
 <InteractiveSection
@@ -171,15 +174,31 @@ description of the same physics. It's required by the actual numbers.
 
 ## Physical Interpretation
 
-This has actually been performed, not just imagined, with electrons,
-neutrons, atoms, and molecules of hundreds of atoms, one particle at a
-time, and the interference pattern always builds up exactly as the
-amplitude rule predicts. A related, equally important fact: if you add a
-detector that determines which slit each particle actually used, the
-interference pattern disappears, and the classical addition rule is
-restored. Extracting which-path information genuinely changes the
-physical outcome, a deep fact about measurement this course will return
-to, not a limitation of the detector.
+The experiment has been run, not merely imagined, with electrons,
+neutrons, whole atoms, and molecules built from hundreds of atoms, fired
+one particle at a time. The fringes build up dot by dot, and each dot
+lands where the amplitude rule says it should.
+
+Now push on the setup. Nothing in the argument above required you to stay
+ignorant of which slit the particle used; the classical rule assumed only
+that some definite fact existed, known or not. So put a detector at the
+slits and find out which one it was.
+
+<PredictBeforeReveal
+  question="You add a detector at the slits that records which one each particle passes through, changing nothing else about the apparatus. What happens to the fringes on the screen?"
+  options={[
+    { label: "Nothing; you have only added a passive record of a fact that was already true", value: "same" },
+    { label: "They blur but survive, degraded by the detector's noise", value: "blurred" },
+    { label: "They vanish, and the two single-slit patterns just add", value: "vanish" },
+  ]}
+  correctValue="vanish"
+  explanation="The screen goes classical: P = P1 + P2, the rule the fringes had been violating. This is not the detector being clumsy. Any apparatus that makes the which-path fact available, however gentle, erases the interference, and discarding the record before it can be read brings the fringes back. Which-path information and interference cannot coexist."
+/>
+
+So which-path information is not free bookkeeping laid over an unchanged
+process. Learning the path changes what the screen shows. That is a claim
+about what measurement is, not about how good detectors are, and the
+lessons on the postulates return to it.
 
 ## Worked Example
 
@@ -249,7 +268,7 @@ variable might be.
 ## Further Exploration
 
 <ChallengePrompt prompt="Every example above uses equal-magnitude amplitudes. For ψ1=0.6 and ψ2=0.3 (different magnitudes this time) at θ=π (opposite phase), does the combined probability still drop all the way to zero?">
-  Redo the same $|\psi_1+\psi_2|^2$ calculation — does perfect
+  Redo the same $|\psi_1+\psi_2|^2$ calculation. Does perfect
   cancellation require the two magnitudes to match, or does any
   opposite-phase pair cancel completely?
 </ChallengePrompt>

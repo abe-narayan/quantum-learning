@@ -29,6 +29,18 @@ export const queryComplexityAdversaryBoundN64: NumericProblem = {
     tolerance: 0,
     incorrectFeedback:
       "First compute ||Gamma||: Gamma is a 1x64 row vector of all ones, so its spectral (= Euclidean) norm is sqrt(64). Then compute max_i ||Gamma ∘ D_i||: each D_i picks out exactly one entry of Gamma, so Gamma ∘ D_i has a single 1 and spectral norm 1 for every i. Divide the two.",
+    nearMisses: [
+      {
+        value: N,
+        feedback:
+          "64 is the sum of Gamma's entries, not its spectral norm. For a row vector the spectral norm is the Euclidean norm, sqrt(sum of squares) = sqrt(64).",
+      },
+      {
+        value: Math.sqrt(N) / 2,
+        feedback:
+          "The denominator max_i ||Gamma o D_i|| is 1, not 2: each D_i leaves a single entry equal to 1, whose spectral norm is 1 no matter how large N is.",
+      },
+    ],
   },
   hints: [
     { text: "Gamma is a 1x64 all-ones matrix, since the single NO instance (all-zero) is related to every one of the 64 YES instances (each with a different single marked position)." },

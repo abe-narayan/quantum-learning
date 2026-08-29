@@ -39,11 +39,15 @@ export const surfaceCodeDistanceScaling: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "Surface codes scale by repeating an identical local pattern on a bigger grid; Shor-style codes need a new, larger hand-designed construction for higher distance." }],
-    finalAnswer: "(a)",
+    finalAnswer: "The surface code needs only a bigger grid of the same stabilizer pattern; Shor-style codes need a new hand-designed construction.",
   },
   explanation: {
     correctIdea: "This scaling difference, not raw qubit count at any one distance, is the surface code's real structural advantage.",
     whyCorrect: "Matches the lesson's explicit distinction directly.",
-    whyWrong: ["Options b, c, and d each misstate the actual difference in how each code family scales to higher distance."],
+    whyWrong: [
+      { optionId: "b", text: "Misses the surface code's structural advantage: a bigger grid reuses the identical local stabilizer pattern." },
+      { optionId: "c", text: "Credits the Shor-code family with a 'bigger version' it does not have. Higher distance there needs new code design." },
+      { optionId: "d", text: "Caps both families at distance 3. Both reach arbitrarily higher distance, by different routes." },
+    ],
   },
 };

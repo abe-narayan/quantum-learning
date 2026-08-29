@@ -34,7 +34,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mastery/quantum-information-theory/trace-distance-and-fidelity",
-      note: "Uhlmann's fidelity theorem is proved by optimizing over exactly the purifications this lesson constructs.",
+      note: "That lesson is where the purifications built here start doing work: Uhlmann's theorem characterises fidelity as a maximum of overlaps over all purifications of two states, so the 'every purification differs from every other by a unitary on B' freedom proved here is precisely the set that maximisation ranges over. Without that classification the maximum would be over an unspecified collection.",
     },
   ],
 };
@@ -142,7 +142,8 @@ export const panelVectors = (v1, v1Label, v2, v2Label) => {
 
 <LessonHook eyebrow="What this lesson finally proves">
   A pure bipartite state's two reduced density matrices always share the
-  same nonzero eigenvalues — a fact the earlier course simply asserted.
+  same nonzero eigenvalues — a fact the earlier course asserted without
+  proof.
   Here it falls out, in three lines, of nothing more than the singular
   value decomposition.
 </LessonHook>
@@ -189,9 +190,9 @@ $$
 |\psi\rangle_{AB} = \sum_{i=0}^{d_A-1}\sum_{j=0}^{d_B-1} M_{ij}\,|i\rangle_A|j\rangle_B
 $$
 
-for some $d_A\times d_B$ complex matrix $M$, simply by reading off the
+for some $d_A\times d_B$ complex matrix $M$, by reading off the
 coefficient of each $|i\rangle_A|j\rangle_B$ basis term. This is nothing
-new: `testSeparability` already builds exactly this matrix for the
+new: `testSeparability` already builds this matrix for the
 2-qubit case ($M=\begin{pmatrix}a&b\\c&d\end{pmatrix}$ for
 $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$) to test
 separability via $\det M$. Normalization of $|\psi\rangle$ is exactly the
@@ -207,7 +208,7 @@ elsewhere. This is a standard linear-algebra fact (proved by
 diagonalizing the Hermitian, positive-semidefinite matrix $M^\dagger M$
 to get $V$ and the $\sigma_i^2$, then defining $U$'s columns from
 $Mv_i/\sigma_i$ for $\sigma_i\neq0$, extended to a full orthonormal basis
-otherwise); it is assumed here as prior linear algebra, exactly the same
+otherwise); it is assumed here as prior linear algebra, the same
 way this course's corpus assumes the spectral theorem for Hermitian
 matrices without re-proving it in every lesson that uses it.
 
@@ -227,7 +228,7 @@ gives the Schmidt decomposition in two steps:
   </DerivationStep>
 </DerivationSteps>
 
-This gives exactly the **Schmidt decomposition**:
+This gives the **Schmidt decomposition**:
 
 <TheoremBox title="Schmidt decomposition" provenance="derived">
 
@@ -301,12 +302,12 @@ coefficients."
 with $d=\sqrt{1-0.6^2-0.3^2-0.2^2}\approx0.714143$ (chosen to normalize).
 Find its Schmidt decomposition explicitly.**
 
-<QuantumStateDisplay state={psi} label="The worked-example state |psi>" />
+<QuantumStateDisplay state={psi} label="The worked-example state |ψ⟩" />
 
 $\rho_A=MM^\dagger$, computed by `reducedDensityMatrixQubit0`, comes out
 to $\begin{pmatrix}0.45&0.334243\\0.334243&0.55\end{pmatrix}$ (shown
 above). Its eigenvalues, via `eigenvaluesHermitian2x2` (the platform's
-own closed-form $2\times2$ solver, exactly the tool
+own closed-form $2\times2$ solver, the same tool
 "Entanglement Entropy for Pure Bipartite States" already trusted for the
 same matrix, now justified as actually computing Schmidt coefficients):
 
@@ -336,7 +337,7 @@ vectors and $\lambda_k=\cos^2\theta,\sin^2\theta$).
 
 Every mixed state $\rho_A$ on system $A$ is the reduced state
 of some pure state $|\psi\rangle_{AB}$ on a larger system $AB$, a
-**purification** of $\rho_A$.
+<Term id="quantum-state-purification">**purification** of $\rho_A$</Term>.
 
 </TheoremBox>
 
@@ -385,11 +386,10 @@ optimizes over.
 ## Physical Interpretation
 
 <InsightBlock>
-  A bipartite pure state, however complicated its raw amplitudes look, is
-  secretly built from at most $\min(d_A,d_B)$ perfectly correlated pairs
-  of basis vectors — and any mixed state's uncertainty can always be
-  reinterpreted as entanglement with some larger, currently-inaccessible
-  system.
+  The Schmidt rank is the honest measure of how complicated a bipartite
+  pure state is. A state with $d_Ad_B$ amplitudes and Schmidt rank 1 is a
+  product state wearing a disguise, and no amount of algebra on those
+  amplitudes will show that as clearly as one rotation does.
 </InsightBlock>
 
 The Schmidt decomposition says a bipartite pure state, however
@@ -401,7 +401,7 @@ the reverse move is always available: any uncertainty a mixed state
 $\rho_A$ carries can always be reinterpreted as entanglement with some
 larger, currently-inaccessible system $B$; mixedness is never
 fundamentally different from "the rest of a pure state I can't see,"
-which is exactly the physical content behind statements like "decoherence
+which is the physical content behind statements like "decoherence
 entangles a system with its environment" from Advanced Topics in Quantum
 Mechanics.
 
@@ -415,16 +415,16 @@ so the pairing this section claims (measure $A$ along $u_k$, $B$ collapses
 to the matching $w_k$) is something to look at, not just read.
 
 <PredictBeforeReveal
-  question="The Bell state's two Schmidt coefficients come out exactly equal (lambda1 = lambda2 = 0.5). Given that, are its Schmidt vectors u1, u2 pinned to one specific basis, the same way the worked example's genuinely unequal coefficients pin down a specific rotation?"
+  question="The Bell state's two Schmidt coefficients come out exactly equal (lambda1 = lambda2 = 0.5). Given that, are its Schmidt vectors u1, u2 pinned to one specific basis, the same way the worked example's unequal coefficients pin down a specific rotation?"
   options={[
     { label: "Yes — every pure state has one and only one Schmidt basis", value: "unique" },
     { label: "No — with equal coefficients, any orthonormal basis works equally well", value: "not-unique" },
   ]}
   correctValue="not-unique"
-  explanation="Equal Schmidt coefficients mean rho_A is proportional to the identity, and every orthonormal basis diagonalizes the identity equally well — there's no preferred direction to find. This is exactly the same non-uniqueness ordinary degenerate eigenvectors have, and it's why the Bell-state panel below looks unrotated: the computational basis is just as valid a Schmidt basis as any other for this particular state, not because the state is somehow less entangled."
+  explanation="Equal Schmidt coefficients mean rho_A is proportional to the identity, and every orthonormal basis diagonalizes the identity equally well. There is no preferred direction to find. This is the ordinary non-uniqueness of degenerate eigenvectors, and it is why the Bell-state panel below looks unrotated: the computational basis is just as valid a Schmidt basis as any other for this particular state, not because the state is somehow less entangled."
 />
 
-<div className="not-prose space-y-6 rounded-xl border border-border bg-surface-muted/40 p-4">
+<div className="not-prose space-y-6 rounded-panel border border-border bg-surface-muted/40 p-4">
 
 <div>
 <p className="mb-3 text-sm text-muted-foreground">
@@ -438,7 +438,7 @@ $|0\rangle,|1\rangle$: no rotation at all.
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem A</p>
 <VectorDiagram
   vectors={panelVectors(productPreset.u1, "u1", productPreset.u2, "u2")}
-  ariaLabel="Subsystem A's Schmidt vectors u1 and u2 for the product state |0>|0>, landing exactly on the computational basis vectors |0> and |1> with no rotation"
+  ariaLabel="Subsystem A's Schmidt vectors u1 and u2 for the product state with both qubits in state zero, landing exactly on the computational basis vectors, state zero and state one, with no rotation"
   showGrid={false}
 />
 </div>
@@ -446,7 +446,7 @@ $|0\rangle,|1\rangle$: no rotation at all.
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem B</p>
 <VectorDiagram
   vectors={panelVectors(productPreset.w1, "w1", productPreset.w2, "w2")}
-  ariaLabel="Subsystem B's Schmidt vectors w1 and w2 for the product state |0>|0>, landing exactly on the computational basis vectors |0> and |1> with no rotation"
+  ariaLabel="Subsystem B's Schmidt vectors w1 and w2 for the product state with both qubits in state zero, landing exactly on the computational basis vectors, state zero and state one, with no rotation"
   showGrid={false}
 />
 </div>
@@ -459,7 +459,7 @@ Maximally entangled: $\lambda_1$ = {bellPreset.lambda1.toFixed(3)},
 $\lambda_2$ = {bellPreset.lambda2.toFixed(3)}, exactly equal. Because the two
 Schmidt coefficients are degenerate, $\rho_A$ is proportional to the
 identity and *any* orthonormal basis is a valid Schmidt basis (see
-Common Mistakes below) — the computational basis shown here works as
+Common Mistakes below). The computational basis shown here works as
 well as any other, so this panel looks axis-aligned even though the
 state is more entangled than the worked example.
 </p>
@@ -486,9 +486,9 @@ state is more entangled than the worked example.
 <div>
 <p className="mb-3 text-sm text-muted-foreground">
 The lesson's own worked example: $\lambda_1$ = {workedPreset.lambda1.toFixed(3)},
-$\lambda_2$ = {workedPreset.lambda2.toFixed(3)}, genuinely unequal. Here
+$\lambda_2$ = {workedPreset.lambda2.toFixed(3)}, clearly unequal. Here
 $u_1,u_2$ (A) and $w_1,w_2$ (B) are rotated well away from
-$|0\rangle,|1\rangle$ — this is what "measure $A$ along $u_k$" actually
+$|0\rangle,|1\rangle$. This is what "measure $A$ along $u_k$"
 means geometrically, and why it is not the same instruction as
 "measure $A$ in the computational basis."
 </p>
@@ -497,7 +497,7 @@ means geometrically, and why it is not the same instruction as
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem A</p>
 <VectorDiagram
   vectors={panelVectors(workedPreset.u1, "u1", workedPreset.u2, "u2")}
-  ariaLabel="Subsystem A's Schmidt vectors u1 and u2 for the worked-example state, clearly rotated away from the computational basis |0> and |1>"
+  ariaLabel="Subsystem A's Schmidt vectors u1 and u2 for the worked-example state, clearly rotated away from the computational basis states zero and one"
   showGrid={false}
 />
 </div>
@@ -505,7 +505,7 @@ means geometrically, and why it is not the same instruction as
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem B</p>
 <VectorDiagram
   vectors={panelVectors(workedPreset.w1, "w1", workedPreset.w2, "w2")}
-  ariaLabel="Subsystem B's Schmidt vectors w1 and w2 for the worked-example state, clearly rotated away from the computational basis |0> and |1>, paired index-for-index with subsystem A's u1 and u2"
+  ariaLabel="Subsystem B's Schmidt vectors w1 and w2 for the worked-example state, clearly rotated away from the computational basis states zero and one, paired index-for-index with subsystem A's u1 and u2"
   showGrid={false}
 />
 </div>
@@ -532,8 +532,8 @@ though every individual number involved looks plausible on its own.
 <Callout type="warning">
 **Assuming the Schmidt basis is unique.** When two Schmidt coefficients
 are equal ($\lambda_j=\lambda_k$), any unitary rotation within that
-degenerate eigenspace produces an equally valid Schmidt basis, exactly
-the same non-uniqueness ordinary degenerate eigenvectors have. The
+degenerate eigenspace produces an equally valid Schmidt basis, the
+same non-uniqueness ordinary degenerate eigenvectors have. The
 coefficients $\{\lambda_k\}$ themselves (and quantities built only from
 them, like entanglement entropy) are the well-defined, basis-independent
 content; the individual vectors $|u_k\rangle,|w_k\rangle$ are not unique

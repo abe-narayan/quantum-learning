@@ -21,7 +21,21 @@ export const superpositionVsMixture: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["different basis", "x basis", "x-basis", "measure in x", "another basis"],
+      [
+        "different basis",
+        "x basis",
+        "x-basis",
+        "x axis",
+        "x-axis",
+        "measure in x",
+        "measure x",
+        "measuring x",
+        "another basis",
+        "hadamard basis",
+        "plus minus basis",
+        "different measurement",
+        "rotated basis",
+      ],
       ["distinguish", "differ", "different result", "different prediction"],
     ],
     incorrectFeedback: "Think about measuring in a basis other than the computational basis — what does each state predict there?",

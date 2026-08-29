@@ -23,6 +23,11 @@ export const classicalOscillatorEnergy: NumericProblem = {
     value: 13,
     tolerance: 0.01,
     incorrectFeedback: "Compute p²/(2m) and V(x) = x² separately, then add them.",
+    nearMisses: [
+      { value: 25, feedback: "25 is p² + x², with the kinetic term never divided by 2m. With m = 2 the kinetic energy is 16/4 = 4." },
+      { value: 17, feedback: "17 divides p² by m but not by 2m. The kinetic term is p²/(2m)." },
+      { value: 4, feedback: "4 is the kinetic energy alone. The total also includes V(x) = x²." },
+    ],
   },
   hints: [
     { text: "Kinetic energy is p²/(2m); here p=4, m=2." },

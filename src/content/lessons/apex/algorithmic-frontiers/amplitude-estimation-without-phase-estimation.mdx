@@ -34,7 +34,7 @@ export const lessonMeta = {
   module: "amplitude-estimation-without-phase-estimation",
   order: 4,
   difficulty: "master",
-  estimatedMinutes: 26,
+  estimatedMinutes: 50,
   prerequisites: [
     "quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth",
     "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
@@ -161,12 +161,27 @@ $$
 $$
 
 so $\epsilon=O(1/M)$, i.e. $M=O(1/\epsilon)$ Grover-iterate applications
-suffice — the celebrated **quadratic speedup for estimation**,
+suffice: the **quadratic speedup for estimation**,
 Heisenberg-limited $O(1/\epsilon)$ in place of classical Monte Carlo's
 $O(1/\epsilon^2)$. The cost: those $M=2^t$ applications of $Q$ are
 queried *in superposition*, so the entire circuit (every controlled-$Q$
 application plus the final inverse QFT on $t=O(\log(1/\epsilon))$ qubits)
 must run coherently before a single measurement is taken.
+
+<ResearchConnection
+  title="The original amplitude estimation algorithm"
+  source="Brassard, Høyer, Mosca & Tapp, AMS Contemporary Mathematics 305, 53 (2002) (arXiv:quant-ph/0005055)"
+  url="https://arxiv.org/abs/quant-ph/0005055"
+>
+  The paper that generalized Grover's algorithm from search to
+  estimation and proved the bound quoted above. It is worth reading for
+  its scope rather than its result: the same construction is developed
+  for amplitude *amplification* with an arbitrary state-preparation
+  unitary, for exact search when the number of solutions is known, and
+  for counting, all from one rotation-by-$2\theta$ analysis. The
+  unification the Algorithmic Frontiers capstone attributes to QSVT is
+  visible here in embryo, restricted to one polynomial family.
+</ResearchConnection>
 
 ### QPE-free amplitude estimation: the same iterate, a classical schedule
 

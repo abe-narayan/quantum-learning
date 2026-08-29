@@ -61,8 +61,9 @@ export const cnotDoesNotCloneSuperposition: MultipleChoiceProblem = {
     correctIdea: "A device correctly copying $|0\\rangle$ and $|1\\rangle$ individually is, by linearity alone, forced to fail at cloning any superposition of them.",
     whyCorrect: "This is literally the no-cloning proof's own contradiction step, run on the specific gate CNOT instead of an abstract unitary U.",
     whyWrong: [
-      "CNOT is unitary and does act on two qubits — neither of those properties is what exempts (or fails to exempt) it from the theorem.",
-      "The theorem's force is entirely in what linearity requires for superposition inputs, not in any special status of $|0\\rangle$ versus $|1\\rangle$.",
+      { optionId: "a", text: "CNOT is unitary, and it is used as such throughout this course. The theorem applies to it." },
+      { optionId: "b", text: "Singles out |0⟩. The theorem's force is in what linearity demands for superposition inputs, with no special status for either basis state." },
+      { optionId: "d", text: "Counts the device's qubits rather than what it is asked to copy. The theorem is about copying an unknown state onto a blank qubit, whatever hardware does the copying." },
     ],
   },
 };

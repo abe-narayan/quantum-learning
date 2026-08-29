@@ -29,6 +29,10 @@ export const p0AfterHSHOnZero: NumericProblem = {
     value: pZero,
     tolerance: 0.01,
     incorrectFeedback: "Track the state through all three gates one at a time: |0⟩ → (after H) → (after S) → (after H), then apply the Born rule to the final state.",
+    nearMisses: [
+      { value: 1, feedback: "P(0) = 1 is what HH|0⟩ gives, with nothing between the Hadamards. The S gate in the middle changes the relative phase, and the outcome with it." },
+      { value: 0, feedback: "Nothing here forces destructive interference on |0⟩: the final amplitude is (1+i)/2, which has magnitude 1/√2, not 0." },
+    ],
   },
   hints: [
     { text: "Apply the gates one at a time, in the order given: H first, then S, then H again." },

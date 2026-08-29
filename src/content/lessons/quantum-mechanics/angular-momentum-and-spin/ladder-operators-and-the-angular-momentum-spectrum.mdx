@@ -34,6 +34,10 @@ export const ladderFrames = ladderJValues.map((j) => ({
   bars: ladderRaiseBarsForJ(j)
 }));
 
+export const ladderMaxNorm = Math.max(
+  ...ladderFrames.flatMap((f) => f.bars.map((b) => b.value))
+);
+
 export const lessonMeta = {
   title: "Ladder Operators and the Angular Momentum Spectrum",
   description:
@@ -42,7 +46,7 @@ export const lessonMeta = {
   module: "ladder-operators-and-the-angular-momentum-spectrum",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 35,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-mechanics/angular-momentum-and-spin/angular-momentum-commutation-relations"],
   objectives: [
     "Derive [Jz,J±]=±ħJ± and explain why this makes J± raise/lower Jz's eigenvalue by ħ",
@@ -52,19 +56,27 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-The <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term>'s entire energy spectrum was derived from ladder operators and a single commutation relation — no calculus, no wavefunctions. Angular momentum's spectrum comes from exactly the same strategy.
+The <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term>'s entire energy spectrum came from ladder operators and one commutation relation, with no calculus and no wavefunctions. Angular momentum yields to the same strategy, and answers a question the oscillator never raised: why half-integers are allowed at all.
 </LessonHook>
 
 ## Motivation
 
-From Classical to Quantum, that used the ladder operators $a,a^\dagger$
-and the single relation $[a,a^\dagger]=1$. Here, the ladder operators
-are built from $L_x,L_y$ (or the general $J_x,J_y$) instead.
+The oscillator's spectrum fell out, back in From Classical to Quantum,
+from the ladder operators $a,a^\dagger$ and the single relation
+$[a,a^\dagger]=1$. Here the ladder operators are built from $J_x$ and
+$J_y$ instead.
+
+The two cases differ in one respect that turns out to matter. The
+oscillator's ladder had a floor and no ceiling, so its spectrum ran
+$0,1,2,\dots$ upward forever. Angular momentum's ladder is bounded at
+*both* ends, and being trapped between two walls while stepping in fixed
+units is a much stronger constraint. It is what produces the
+half-integers.
 
 <ExternalFigure
   src="https://www.nist.gov/sites/default/files/images/2019/07/10/19pml016_leibrandt_alclockuncertainty_hr.png"
   alt="Illustration of NIST's quantum-logic optical atomic clock: a single trapped aluminum ion (blue) whose clock transition is read out via a companion magnesium ion (yellow), held in a gold ion-trap chip"
-  caption="A single trapped ion, held on one specific rung of its own angular-momentum ladder. Every optical atomic clock, including this one, works by locking a laser to the exact energy gap between two such rungs, the same m-to-m spacing this lesson derives from pure algebra."
+  caption="NIST's quantum-logic optical clock: one aluminum ion, read out through a companion magnesium ion. Every internal state of that ion is labeled by the (j, m) pair this lesson derives, and the shifts between neighbouring m sublevels in a stray magnetic field are among the systematic errors a clock at this accuracy has to measure and subtract."
   credit="NIST / JILA (S. Burrows)"
   creditUrl="https://www.nist.gov/programs-projects/trapped-ion-optical-clocks"
   license="Public domain (U.S. government work)"
@@ -88,10 +100,17 @@ $$
 J_z(J_\pm|j,m\rangle) = (J_\pm J_z + [J_z,J_\pm])|j,m\rangle = J_\pm(m\hbar)|j,m\rangle \pm\hbar J_\pm|j,m\rangle = (m\pm1)\hbar\,(J_\pm|j,m\rangle)
 $$
 
-So $J_\pm|j,m\rangle$ is itself a $J_z$ eigenstate, with eigenvalue
-raised (or lowered) by exactly $\hbar$, precisely the harmonic
-oscillator's $a^\dagger|n\rangle\propto|n+1\rangle$ argument, with $J_z$'s
-spectrum playing the role $\hat N$'s did there.
+So $J_\pm|j,m\rangle$ is itself a $J_z$ eigenstate, with eigenvalue raised
+or lowered by exactly $\hbar$. This is the harmonic oscillator's
+$a^\dagger|n\rangle\propto|n+1\rangle$ argument with $J_z$ in the role
+$\hat N$ played there.
+
+One more operator earns its keep before the main argument. $\vec J^{\,2}
+= J_x^2+J_y^2+J_z^2$ commutes with all three components (check it on
+$J_z$: the $J_x^2$ and $J_y^2$ terms produce cancelling contributions),
+so it commutes with $J_\pm$ too. Climbing the ladder therefore never
+changes $\vec J^{\,2}$'s eigenvalue: the whole ladder sits at one fixed
+total, which is why a single label $j$ can name all of it.
 
 ### Boundedness forces a top and bottom rung
 
@@ -104,14 +123,39 @@ $$
 j(j+1)\hbar^2 - m^2\hbar^2 \geq 0 \implies m^2 \leq j(j+1)
 $$
 
-$m$ is bounded above and below. Since $J_+$ keeps raising $m$ by 1
-indefinitely unless it eventually annihilates the state, there must be a
-**top rung** $m=j$ where $J_+|j,j\rangle=0$, and by the same logic a
-**bottom rung** $m=-j$ where $J_-|j,-j\rangle=0$; otherwise $m$ would
-exceed its bound. Both terminations are needed simultaneously, and since
-$J_+$ raises $m$ in steps of exactly $1$ (in units of $\hbar$), the
-distance from the bottom rung to the top, $j-(-j)=2j$, must be a
-**non-negative integer**.
+$m$ is bounded above and below. Since $J_+$ raises $m$ by $1$ every time
+it is applied, the only way to respect that bound is for the climb to
+stop: some **top rung** $m_{\max}$ must satisfy $J_+|m_{\max}\rangle=0$,
+and by the mirror argument some **bottom rung** $m_{\min}$ must satisfy
+$J_-|m_{\min}\rangle=0$.
+
+### Why the top rung is at exactly $m=j$
+
+So far $j$ was only a way of writing $\vec J^{\,2}$'s eigenvalue. The
+following identity is what ties it to the ladder's actual endpoints.
+Expand $J_-J_+$ using $J_\pm = J_x \pm iJ_y$ and $[J_x,J_y]=i\hbar J_z$:
+
+$$
+J_-J_+ = J_x^2+J_y^2 + i[J_x,J_y] = \vec J^{\,2} - J_z^2 - \hbar J_z
+$$
+
+Apply both sides to the top rung, where the left side gives zero:
+
+$$
+0 = \left(\vec J^{\,2} - m_{\max}^2\hbar^2 - m_{\max}\hbar^2\right)|m_{\max}\rangle
+$$
+
+so $\vec J^{\,2}$'s eigenvalue is $m_{\max}(m_{\max}+1)\hbar^2$. Comparing
+with the label $j(j+1)\hbar^2$ identifies $j=m_{\max}$: the convention was
+chosen precisely so that $j$ names the highest rung. Running the same
+argument with $J_+J_- = \vec J^{\,2}-J_z^2+\hbar J_z$ on the bottom rung
+gives $m_{\min}(m_{\min}-1)=j(j+1)$. That quadratic has two roots,
+$m_{\min}=-j$ and $m_{\min}=j+1$; the second is discarded because the
+bottom rung cannot sit above the top rung $m_{\max}=j$, leaving
+$m_{\min}=-j$.
+
+The ladder therefore runs from $-j$ to $+j$ in steps of $1$, so the total
+climb $2j$ is a **non-negative integer**.
 
 <PredictBeforeReveal
   question="The top rung sits at m = j and the bottom rung at m = -j, with every step in between exactly 1 apart. What does that force j itself to be?"
@@ -128,37 +172,45 @@ $$
 \boxed{j = 0,\ \tfrac12,\ 1,\ \tfrac32,\ 2,\ \dots}
 $$
 
-exactly the half-integer-or-integer spectrum angular momentum is famous
-for, derived here from pure algebra, not assumed.
+This is the integer-or-half-integer spectrum angular momentum is known
+for, and it arrived without a single wavefunction. Note what did the
+work: the ladder steps by $1$ and is pinned at both ends, so $2j$ counts
+the rungs and has to be a whole number. Nothing forbids $2j$ from being
+odd, which is the entire origin of half-integer spin.
 
 ### Verified directly
 
-`angularMomentumRaising(j)` acting on the top state ($m=j$, index 0 in
-this platform's basis convention) gives exactly the zero vector, for
-every $j$ tested; `angularMomentumLowering(j)` similarly annihilates the
-bottom state. Both are checked directly, confirming the boundedness
-argument produces exactly the matrices this platform's engine
-independently builds from the raw matrix-element formula.
+The platform builds `angularMomentumRaising(j)` from the standard matrix-
+element formula, with no reference to the argument above. Applied to the
+top state ($m=j$, index 0 in this basis convention) it returns the zero
+vector for every $j$ tested, and `angularMomentumLowering(j)` does the
+same at the bottom. Two independent routes, one answer.
 
 <InteractiveSection
-  title="Watch J+ vanish exactly at the top rung"
-  description="Pick a j value. Each bar is the actual norm of J+ applied directly to that |j,m⟩ basis state, read off the real raising-operator matrix, not simulated. Every bar but the top one is nonzero (J+ successfully raises m by 1); the top-rung bar, m = j, is exactly zero, J+ annihilates it, precisely the boundedness argument above, made numeric."
+  title="Watch J+ vanish at the top rung"
+  description="Pick a j value. Each bar is the norm of J+ applied to that |j,m⟩ basis state, read off the real raising-operator matrix. Every bar but one is nonzero, meaning J+ raised m successfully; the top-rung bar at m = j reads zero, because there is nothing above it to raise into. Notice also that the bars are not equal. The norm √(j(j+1)−m(m+1)) is largest for the rungs near the middle of the ladder and falls off toward both ends — symmetrically about m = −½ rather than about m = 0, so it vanishes at the top rung but not at the bottom one: at j=2 the bars read 0, 2, √6, √6, 2 going down from m=2. So the ladder does not merely stop at the top, it runs out of strength on the approach. The vertical scale is held fixed across j, so the bars also grow as j does."
 >
   <BarChartExplorer
     frames={ladderFrames}
     sliderLabel="Total angular momentum j"
-    ariaLabel="Norm of J-plus applied to each basis state |j,m>, for m from the top rung down to the bottom rung, at several values of j"
+    ariaLabel="Norm of J-plus applied to each basis state |j,m>, for m from the top rung down to the bottom rung, at several values of j, drawn on one fixed vertical scale shared by every j"
+    maxValue={ladderMaxNorm}
   />
 </InteractiveSection>
 
 ## Physical Interpretation
 
-Nothing about *space* or *rotation* entered this derivation. It's pure
-consequence of the commutation algebra $[J_i,J_j]=i\hbar\epsilon_{ijk}J_k$.
-This is exactly why the same math applies unchanged to spin (which has
-no classical rotational picture at all): spin-1/2's $j=\tfrac12$ is the
-*smallest nontrivial solution* this algebra allows, not a separate
-assumption bolted on afterward.
+Nothing about space or rotation entered this derivation. It followed from
+the commutation algebra $[J_i,J_j]=i\hbar\epsilon_{ijk}J_k$ and nothing
+else, which is why it applies unchanged to spin, a quantity with no
+classical rotational picture behind it at all. Spin-$\tfrac12$ is not an
+extra postulate bolted on: $j=\tfrac12$ is the smallest nontrivial
+solution the algebra already had.
+
+The next lesson supplies the other half of the story. Orbital angular
+momentum, which does come from motion through space, turns out to admit
+only the *integer* solutions, and the half-integers are left over for
+something that is not motion.
 
 ## Worked Example
 
@@ -166,13 +218,16 @@ assumption bolted on afterward.
 exactly $2j+1=3$ of them.**
 
 Starting at the top rung $m=j=1$ and stepping down by $1$ until reaching
-the bottom rung $m=-j=-1$: $m=1,0,-1$, exactly $3=2(1)+1$ values,
-matching `angularMomentumZ(1)`'s $3\times3$ matrix having exactly 3
-diagonal entries, $1,0,-1$.
+the bottom rung $m=-j=-1$ gives $m=1,0,-1$: three values, matching
+$2j+1=3$. The platform's `angularMomentumZ(1)` is a $3\times3$ matrix
+with exactly those three numbers on its diagonal.
 
-The ladder structure is easiest to see as an actual ladder: each rung is
-one $m$ value, evenly spaced by exactly $\hbar$, with $J_+$ climbing up
-and $J_-$ climbing down until each hits the corresponding end.
+Total angular momentum for this state is $\sqrt{j(j+1)}\,\hbar =
+\sqrt2\,\hbar \approx 1.41\hbar$, while the largest projection available
+is $1\hbar$. The vector can never lie along $z$, however you prepare it.
+
+Drawn as a ladder, each rung is one $m$ value, spaced by $\hbar$, with
+$J_+$ climbing and $J_-$ descending until each runs out of rungs:
 
 <EnergyLevelDiagram
   levels={[

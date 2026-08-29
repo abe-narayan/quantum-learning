@@ -21,11 +21,11 @@ export const whyTraceOutEverythingIsMeaningless: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["no qubits", "zero qubits", "nothing left", "no subsystem", "empty"],
-      ["no observable", "no local observable", "doesn't apply", "not defined"],
+      ["no qubits", "zero qubits", "nothing left", "nothing remains", "no subsystem", "no remaining", "no kept", "is empty", "empty system", "empty set", "left empty", "all qubits gone"],
+      ["no observable", "no local observable", "nothing to measure", "nothing to act on", "no operator", "doesn't apply", "does not apply", "not defined", "undefined", "not well-defined", "not well defined", "meaningless", "not meaningful", "no requirement", "cannot be defined", "can't be defined"],
     ],
     incorrectFeedback: "Think about what the defining requirement Tr[(A⊗I)ρ]=Tr(Aρ_A) would even mean if there's no subsystem A left to have an observable on.",
-    partialFeedback: "You're close — be explicit about there being no remaining subsystem for any local observable A to act on.",
+    partialFeedback: "You're close. Be explicit about what the observable A in the defining requirement would have to live on, and why that thing is gone.",
   },
   hints: [
     { text: "The defining requirement talks about a local observable A acting on 'the kept qubits.'" },

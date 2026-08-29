@@ -23,6 +23,11 @@ export const capacityEntanglementBreakingThreshold: NumericProblem = {
     value: 0.6667,
     tolerance: 0.001,
     incorrectFeedback: "Solve 3p/4 = 1/2 for p: p = (1/2)*(4/3) = 2/3.",
+    nearMisses: [
+      { value: 2, feedback: "2 comes from setting the symmetric eigenvalue 1/2 − p/4 to zero. That root lies outside the physical range, so it never binds; only the singlet direction does." },
+      { value: 0.2524, tolerance: 0.002, feedback: "0.2524 is where the hashing lower bound stops certifying a positive capacity. That is a failure to certify, not a proof of zero capacity; the rigorous zero arrives later, at the entanglement-breaking point." },
+      { value: 0.5, feedback: "At p = 0.5 the singlet eigenvalue is still negative, so the state is still entangled and the channel still carries quantum information." },
+    ],
   },
   hints: [
     { text: "The Peres-Horodecki criterion says a two-qubit state is entangled exactly when its partial transpose has a negative eigenvalue." },

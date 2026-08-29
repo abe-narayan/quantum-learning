@@ -71,7 +71,7 @@ export const barrierWaveFrames = barrierWaveWidths.map((L) => ({
 export const lessonMeta = {
   title: "Resonant Transmission Through a Barrier",
   description:
-    "Extending the step-potential result to a full barrier reveals something the step alone couldn't: special energies where the barrier becomes perfectly transparent, exactly analogous to anti-reflective optical coatings.",
+    "Extending the step-potential result to a full barrier reveals something the step alone couldn't: special energies where the barrier becomes perfectly transparent, on the same interference mechanism as anti-reflective optical coatings.",
   course: "one-dimensional-systems",
   module: "resonant-transmission-through-a-barrier",
   order: 1,
@@ -100,13 +100,13 @@ Tunneling and the Finite Barrier covered $E<V_0$: a barrier taller than
 the particle's energy, crossed only by the exponentially-suppressed
 <Term id="quantum-tunneling">tunneling mechanism</Term>. This lesson covers the complementary regime,
 $E>V_0$: the particle has enough energy to classically cross the
-barrier, so *something* transmits, and classically all of it should,
-every time, with no obstacle at all worth mentioning. Quantum mechanics
+barrier, so *something* transmits. Classically all of it does, every
+time, and the barrier is no obstacle worth mentioning. Quantum mechanics
 disagrees on both counts. At most energies the barrier reflects part of
-the beam even though the particle "should" sail over it — and then, at
-a specific, predictable sequence of energies, the reflection vanishes
-*completely*. $T=1$, exactly, not approximately. A barrier that is, by
-every classical measure, a solid obstruction becomes perfectly
+the beam even though the particle "should" sail over it. Then, at a
+specific and predictable sequence of energies, the reflection vanishes
+*completely*: $T=1$, exactly, not approximately. A barrier that is by
+every classical measure a solid obstruction becomes perfectly
 transparent.
 
 <ExternalFigure
@@ -125,10 +125,10 @@ step-potential problem, just with a third region (transmitted wave)
 past a *second* boundary. The difference that matters: inside the
 barrier the <Term id="wavefunction">wavefunction</Term> still **oscillates** (not decays, since
 $E>V_0$ there means $k$ is real inside too), unlike the tunneling
-case's exponential decay. Two boundaries means two reflected waves —
-one from entering the barrier, one from leaving it — can interfere with
-each other, and interference, constructive or destructive, is exactly
-what produces resonances.
+case's exponential decay. Two boundaries also means two reflected waves,
+one from entering the barrier and one from leaving it, and those two can
+interfere with each other. Where they cancel, nothing reflects. That
+cancellation is the resonance.
 
 ## Mathematical Development
 
@@ -147,9 +147,9 @@ $$
 \boxed{\;T = \left[1 + \frac{V_0^2\sin^2(k_2L)}{4E(E-V_0)}\right]^{-1}\;}
 $$
 
-This platform's `barrierScatteringTransmission` function implements
-exactly this formula, tested against the $V_0\to0$ limit ($T\to1$, no
-barrier) and the resonance condition below.
+This platform's `barrierScatteringTransmission` function implements that
+formula, tested against the $V_0\to0$ limit ($T\to1$, no barrier) and
+against the resonance condition below.
 
 ### The resonance condition
 
@@ -160,8 +160,8 @@ k_2L = n\pi, \qquad n=1,2,3,\ldots
 $$
 
 At these special energies, the barrier is **perfectly transparent**:
-every incident particle transmits, none reflects, despite the barrier
-being, in every other sense, a genuine obstacle.
+every incident particle transmits and none reflects, despite the barrier
+being, in every other sense, a real obstacle.
 
 <PredictBeforeReveal
   question="Fix E=5 and V0=2, then slowly widen the barrier L from near 0. What does the transmission probability T(L) do?"
@@ -172,7 +172,7 @@ being, in every other sense, a genuine obstacle.
     { label: "T stays essentially constant near 1 for any width", value: "constant" },
   ]}
   correctValue="resonant"
-  explanation="T = [1 + V0²sin²(k2L)/(4E(E−V0))]⁻¹ hits exactly 1 whenever sin(k2L)=0, i.e. k2L = nπ — a periodic, exact return to perfect transmission, not a decaying oscillation. The curve below plots exactly this and touches T=1 at each of those widths."
+  explanation="T = [1 + V0²sin²(k2L)/(4E(E−V0))]⁻¹ hits exactly 1 whenever sin(k2L)=0, i.e. k2L = nπ. That is a periodic, exact return to perfect transmission, not a decaying oscillation. The curve below plots the formula and touches T=1 at each of those widths."
 />
 
 Sweeping barrier width
@@ -188,11 +188,11 @@ hitting exactly $T=1$, directly visible:
 />
 
 Every peak touches exactly $1$, never overshooting, and the peaks repeat
-with spacing $\pi/k_2$ in $L$, exactly the periodicity $\sin^2(k_2L)=0$
+with spacing $\pi/k_2$ in $L$, the periodicity $\sin^2(k_2L)=0$
 predicts.
 
-That $T(L)$ curve is the aggregate outcome; the mechanism behind each
-peak is the standing wave $|\psi(x)|^2$ actually forms, oscillating for
+That $T(L)$ curve is the aggregate outcome. The mechanism behind each
+peak is the standing wave $|\psi(x)|^2$ forms: oscillating for
 $x<0$ from the incident and reflected waves interfering, oscillating
 again *inside* the barrier from its own two boundary-matched
 components, and flat past $x=L$ where only the transmitted wave
@@ -206,7 +206,7 @@ survives:
 
 Watch the interior pattern as the slider crosses
 $L=\pi/k_2\approx1.283$ (the first resonance from the Worked Example
-below) and $L=2\pi/k_2\approx2.565$ (the second): at those exact
+below) and $L=2\pi/k_2\approx2.565$ (the second). At those two
 widths, the oscillation inside the barrier fits precisely one and two
 half-wavelengths, respectively, between $x=0$ and $x=L$, and the
 outside-the-barrier ripple for $x<0$ visibly flattens, the spatial
@@ -215,17 +215,17 @@ doesn't close up evenly at $x=L$, and some ripple persists for $x<0$.
 
 ## Physical Interpretation
 
-This is the exact quantum-mechanical analogue of an anti-reflective
-optical coating: a thin film reflects light at both of its surfaces, and
-at specific wavelengths those two reflections destructively interfere,
-cancelling the net reflection entirely. Here, the two boundaries of the
-barrier play the role of the film's two surfaces, and the resonance
-condition $k_2L=n\pi$ is exactly the same "round-trip phase is a
-multiple of $2\pi$" condition that governs optical thin-film
-interference: the same physics as light, showing up because both are
-governed by a wave equation with boundary matching.
+This is the quantum-mechanical counterpart of an anti-reflective optical
+coating. A thin film reflects light at both of its surfaces, and at
+specific wavelengths those two reflections destructively interfere,
+cancelling the net reflection. Here the two boundaries of the barrier
+play the role of the film's two surfaces, and the resonance condition
+$k_2L=n\pi$ is the same "round-trip phase is a multiple of $2\pi$"
+condition that governs optical thin-film interference. Light and matter
+agree here because both obey a wave equation matched across a boundary,
+and neither derivation ever asked what kind of wave it was.
 
-This isn't just a textbook curiosity. Resonant tunneling diodes (RTDs)
+The effect is engineered on purpose. Resonant tunneling diodes (RTDs)
 use a thin quantum well sandwiched between two barriers, engineered so
 a transmission resonance sits at a specific electron energy. Applying a
 voltage shifts that resonance relative to the incoming electrons: as
@@ -249,8 +249,8 @@ $$
 
 First resonance ($n=1$): $L=\pi/k_2\approx1.2825$. Substituting into the
 transmission formula, $\sin(k_2L)=\sin(\pi)=0$ exactly, so the
-$\sin^2$ term vanishes and $T=1/[1+0]=1$, confirmed directly, and
-matched by this platform's own test suite for `barrierScatteringTransmission`.
+$\sin^2$ term vanishes and $T=1/[1+0]=1$, which this platform's test
+suite for `barrierScatteringTransmission` asserts independently.
 For comparison, at a *non*-resonant width like $L=1$: $k_2L\approx2.449$
 (not a multiple of $\pi$), giving $T\approx0.9736$, still high (a
 narrow barrier relative to the wavelength), but not exactly 1.
@@ -295,15 +295,15 @@ coincidence.
 - $T=1$ exactly whenever $k_2L=n\pi$: perfect transmission at discrete
   resonant energies, directly analogous to anti-reflective optical
   coatings.
-- This is the genuine complement to Wave Mechanics' tunneling treatment:
-  together, the two regimes ($E<V_0$ and $E>V_0$) fully describe
-  scattering off a rectangular barrier at any energy.
+- This regime is the complement to Wave Mechanics' tunneling treatment.
+  Together, $E<V_0$ and $E>V_0$ describe scattering off a rectangular
+  barrier at every energy.
 
 ## Further Exploration
 
 <ChallengePrompt prompt="The resonance condition gives a whole family of widths L_n = nπ/k2. Does the spacing between consecutive resonant widths, L_(n+1) − L_n, grow, shrink, or stay constant as n increases?">
-  Write $L_{n+1}-L_n$ directly from the boxed condition $k_2L=n\pi$ — no
-  new derivation needed, just algebra on the formula already derived.
+  Write $L_{n+1}-L_n$ directly from the boxed condition $k_2L=n\pi$. No
+  new derivation is needed, only algebra on the formula already there.
 </ChallengePrompt>
 
 <NextDiscovery>

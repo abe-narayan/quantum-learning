@@ -38,6 +38,14 @@ export const phaseInvarianceOfEntanglementMeasures: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "Concurrence uses |ad-bc|, and a phase on d only changes its phase, not its magnitude — compare to an ordinary Bell state.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is |ad−bc|. Concurrence doubles it: C = 2|ad−bc|." },
+      {
+        value: Math.cos(Math.PI / 6),
+        tolerance: 0.01,
+        feedback: "You let the phase into the magnitude. |e^{iπ/6}| = 1, so the phase leaves |ad| untouched and the concurrence matches an ordinary Bell state's.",
+      },
+    ],
   },
   hints: [
     { text: "a=√0.5, d=√0.5·e^(iπ/6), b=c=0." },

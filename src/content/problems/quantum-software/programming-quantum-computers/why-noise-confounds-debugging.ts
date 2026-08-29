@@ -20,7 +20,22 @@ export const whyNoiseConfoundsDebugging: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["two possible causes", "logic bug OR hardware", "can't tell which"],
+      [
+        "two possible causes",
+        "two explanations",
+        "two causes",
+        "logic bug OR hardware",
+        "bug or noise",
+        "code or noise",
+        "or hardware",
+        "or noise",
+        "can't tell which",
+        "cannot tell",
+        "can't tell",
+        "ambiguous",
+        "which one",
+        "either",
+      ],
       ["simulator", "isolates", "zero physical error", "eliminates one cause"],
     ],
     incorrectFeedback: "Address the specific ambiguity real hardware introduces (two possible causes for a wrong result) and how a simulator eliminates one of them.",

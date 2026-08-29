@@ -22,7 +22,26 @@ export const synthesisNotAStrictGeneralization: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["energy-time", "energy time uncertainty"],
-      ["no earlier special case", "not previously stated in any form", "genuinely new starting point"],
+      {
+        phrases: [
+          "no earlier special case",
+          "not a special case",
+          "no special case",
+          "not previously stated in any form",
+          "not previously stated",
+          "genuinely new starting point",
+          "new starting point",
+          "new postulate",
+          "new statement",
+          "not a generalization",
+          "separate claim",
+          "independent claim",
+          "additional assumption",
+          "not derived",
+        ],
+        missingFeedback:
+          "You have named the relation. The point of the question is its status: nothing earlier in the course is a special case of it, so it is a new statement in its own right rather than a generalization of something already established.",
+      },
     ],
     incorrectFeedback: "Name both pieces: which lesson (the energy-time uncertainty relation), and why it's different (there was no earlier, special-cased version of it anywhere on the platform to generalize from — unlike every other result in this course).",
   },

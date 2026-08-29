@@ -47,11 +47,15 @@ export const phaseFlipCodeCorrectsZError: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [{ description: "The recovered state matches the original exactly, confirmed to floating-point precision by direct computation." }],
-    finalAnswer: "(a) — matches exactly.",
+    finalAnswer: "It matches exactly, to floating-point precision.",
   },
   explanation: {
     correctIdea: "The H-conjugation is exact, so the phase-flip code inherits the bit-flip code's exact correction guarantee for its own error type.",
     whyCorrect: `Confirmed directly: the maximum amplitude difference is ${maxDiff.toExponential(2)}, essentially floating-point noise.`,
-    whyWrong: ["Options b, c, and d each misstate either the precision of the correction or which error type/qubit this code handles."],
+    whyWrong: [
+      { optionId: "b", text: "Understates the precision. The H-conjugation and the underlying bit-flip correction are both exact, so no residual error is left behind." },
+      { optionId: "c", text: "Backwards on error type. The phase-flip code is built to correct Z errors; the bit-flip code is the one blind to them." },
+      { optionId: "d", text: "Singles out qubit 2. The code corrects a Z error on any of the three qubits equally, as this problem's own computation shows." },
+    ],
   },
 };

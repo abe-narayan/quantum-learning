@@ -45,7 +45,7 @@ Something has quietly changed over the last ten lessons: a problem that mixes tr
 
 ## Motivation
 
-That's the
+A mixed problem reading as one problem is the
 real payoff of building complex numbers, vector spaces, inner products,
 <Term id="dirac-notation">bra-ket notation</Term>, operators, eigenvalues, Hermiticity, unitarity, and
 tensor products one at a time, then connecting all of it to physical
@@ -94,19 +94,19 @@ necessarily unitary?**
     { label: "Can't tell without a specific M", value: "unsure" },
   ]}
   correctValue="yes"
-  explanation="Yes, necessarily — and the two-line argument below needs only two earlier facts: real+symmetric gives Hermitian (M† = M), and Hermitian plus M² = I gives M†M = M² = I, the unitarity condition. Neither the Hermitian Operators lesson nor the Unitary Operators lesson states this combined fact on its own; it only appears once you put both to work on the same matrix."
+  explanation="Yes, necessarily. The two-line argument below needs only two earlier facts: real plus symmetric gives Hermitian (M† = M), and Hermitian plus M² = I gives M†M = M² = I, the unitarity condition. Neither the Hermitian Operators lesson nor the Unitary Operators lesson states this combined fact on its own; it appears only once you put both to work on the same matrix."
 />
 
 Real and symmetric means $M^\dagger = M^T = M$ (conjugation does nothing
 to a real matrix), so $M$ is Hermitian. Check $M^\dagger M$: since
 $M^\dagger=M$, $M^\dagger M = M^2 = I$ directly from the given condition.
-So $M^\dagger M=I$, which is exactly the unitarity condition. **Yes**,
+So $M^\dagger M=I$, which is the unitarity condition. **Yes**,
 necessarily. (Pauli-$X$ is the standard example: real, symmetric, and
 $X^2=I$.) This combines the Hermitian Operators lesson's adjoint
 definition with the Unitary Operators lesson's defining condition;
 neither lesson alone states this fact.
 
-<InteractiveSection title="Check M = M† = M⁻¹ across three operators" description="All three of these are both Hermitian (M = M†) and their own inverse (M² = I), the exact combination the synthesis argument above needs. Switch between them and confirm both properties hold for each.">
+<InteractiveSection title="Check M = M† = M⁻¹ across three operators" description="All three of these are Hermitian (M = M†) and are their own inverse (M² = I), the combination the synthesis argument above turns on. Switch between them and confirm both properties hold for each.">
   <MatrixGridExplorer
     presets={involutionPresets}
     ariaLabel="Choose an operator to check simultaneously that it equals its own conjugate transpose and that squaring it gives the identity matrix"
@@ -125,6 +125,17 @@ any further calculation.
 
 **3. Two qubits are each individually <Term id="normalization">normalized</Term>. Is their combined
 two-qubit state via the <Term id="tensor-product">tensor product</Term> automatically normalized too?**
+
+<PredictBeforeReveal
+  question="Two normalized single-qubit states are combined with ⊗. Does the four-component result need renormalizing?"
+  options={[
+    { label: "No, it is already normalized", value: "no" },
+    { label: "Yes, divide by √2", value: "sqrt2" },
+    { label: "Yes, but the factor depends on u and v", value: "depends" },
+  ]}
+  correctValue="no"
+  explanation="Already normalized, with no factor to divide out. The tensor product multiplies inner products, so ⟨u⊗v, u⊗v⟩ = ⟨u,u⟩⟨v,v⟩ = 1·1 = 1. The instinct to divide by √2 comes from adding states, where cross terms do change the norm. Combining with ⊗ is a different operation, and it leaves the norm alone."
+/>
 
 Let $|u\rangle,|v\rangle$ each have norm $1$. Using the tensor-product
 inner-product rule from the Tensor Products lesson,
@@ -166,9 +177,10 @@ notation; always check a source's convention before mixing formulas.
    guaranteed orthogonal to each other? Contrast with the eigenvector for
    eigenvalue $4$.
 3. Two systems have dimensions $2$ and $3$. What is the dimension of their
-   combined state space, and what is the largest possible number of
-   linearly independent product states you could list (compare this to
-   the full dimension, and connect the gap to entanglement)?
+   combined state space, and how many free parameters does a simple tensor
+   $u\otimes v$ carry (the $n+m-1$ count from the Tensor Products lesson)?
+   Compare the two numbers, and say what the gap between them means for
+   how common entanglement is.
 4. A state $|\psi\rangle$ is measured with a Hermitian observable whose
    spectral decomposition is $A = 2|e_1\rangle\langle e_1| +
    5|e_2\rangle\langle e_2|$. If $\langle A\rangle = 3.5$ and there are
@@ -183,6 +195,26 @@ notation; always check a source's convention before mixing formulas.
    after it in this course? Defend your choice in two or three sentences.
 
 <PracticeLinks problems={practiceProblems} />
+
+<Callout type="note">
+**One honest note about what comes next.** This course kept its promise:
+everything in it was built from algebra, trigonometry and the three power
+series stated in Lesson 2, with no calculus assumed anywhere. That
+promise covers *this* course only. From **From Classical to Quantum**
+onward, single-variable calculus is assumed rather than taught, and there
+is no calculus lesson elsewhere in this curriculum to send you to. What
+is actually used is narrow and standard: derivatives $\frac{d}{dt}$ and
+$\frac{d}{dx}$ (and partial derivatives once wavefunctions of $x$ and $t$
+appear), definite integrals as the continuous version of the sums used
+here, the exponential's defining property that
+$\frac{d}{dt}e^{\lambda t}=\lambda e^{\lambda t}$, and first-order Taylor
+expansion with big-$O$ remainder ($f(\varepsilon)=f(0)+f'(0)\varepsilon+O(\varepsilon^2)$).
+The first lesson that needs any of it is **Time Evolution and the
+Schrödinger Equation**, which uses the last two. If those are unfamiliar,
+any introductory single-variable calculus text covers all of them well
+before its midpoint, and none of the material below the Quantum
+Mechanics pillar's Wave Mechanics course needs more than that.
+</Callout>
 
 ## Summary
 

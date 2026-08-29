@@ -25,18 +25,26 @@ concept-dependency map) and `/glossary` (an alphabetical term reference
 linked back into lessons) are both real, shipped pages not covered anywhere
 else in this document.
 
-**`/lessons` no longer has its own UI.** `src/app/lessons/page.tsx` is now a
-5-line `permanentRedirect("/learn")` stub. The flat, catalog-style lesson
-detail route (`/lessons/<pillar-slug>/<course-slug>/<lesson-slug>`) still
-exists and is what lesson links resolve to — only the `/lessons` *index*
-page was collapsed into `/learn`, once having both stopped pulling their
-weight as two separate entry points into the same `CourseList` view. Learn
-(`/learn`) is now the single guided entry point — all six pillars (Quantum
-Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, Quantum
-Mastery, and Apex) presented with framing, so a new visitor understands the
-shape of the whole curriculum and where to start — backed by the one
-curriculum registry (`src/lib/content/curriculum.ts`), so there remains
-exactly one source of truth for "what courses exist."
+**`/lessons` and `/learn` are two different jobs, and briefly were one.**
+`/lessons` was collapsed into a `permanentRedirect("/learn")` stub at one
+point; it has since been rebuilt (`src/app/lessons/page.tsx` +
+`components/curriculum/LessonIndex.tsx`) as the complete, grouped,
+filterable index of every authored lesson. The redirect made `/learn` carry
+two incompatible jobs at once — *"here is the order you should read this
+in"* and *"here is everything, find your own way"* — and the second is the
+one a reader needs precisely when the six-pillar progression has stopped
+helping them. So: **`/learn` is the guided entry point** (all six pillars —
+Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software,
+Quantum Mastery, Apex — presented with framing, so a new visitor sees the
+shape of the whole curriculum and where to start), and **`/lessons` is the
+flat findable index.** Both are backed by the one curriculum registry
+(`src/lib/content/curriculum.ts`), so there remains exactly one source of
+truth for "what courses exist."
+
+**`/courses/<slug>`** is the third member of that family, one page per
+course (32 of them), generated from `COURSES` with `dynamicParams = false`.
+`sitemap.ts` maps the *same* array, so the sitemap and the generated pages
+cannot drift apart — one array feeds both.
 
 **Hardware** and **Software** are full pillars in the curriculum registry
 (on equal footing with Mechanics and Computing), and also get their own
@@ -103,10 +111,35 @@ Griffiths-style course), reorganized into courses sized so each has a clear
 prerequisite chain and a coherent set of ~4-5 modules.
 
 **Quantum Computing** — 6 courses, deliberately able to **start in
-parallel** with Quantum Mechanics: `Qubits & Quantum States` only requires
-`Mathematical Foundations` (linear algebra + probability), not the full QM
-sequence. This matches how quantum computing is actually taught — you don't
-need the Schrödinger equation to understand a Bloch sphere.
+parallel** with Quantum Mechanics. This matches how quantum computing is
+actually taught — you don't need the Schrödinger equation to understand a
+Bloch sphere.
+
+**The curriculum has two roots, not one (2026-08).** `Qubits & Quantum
+States` used to declare `Mathematical Foundations` as its prerequisite. It
+no longer declares anything: not one of its lessons requires a Mathematical
+Foundations lesson, because the course re-teaches complex numbers and Dirac
+notation from scratch, which is the entire reason it exists. Declaring the
+edge anyway printed "Requires Mathematical Foundations" on a card whose
+`foundational` badge simultaneously reads "no prior background needed", and
+it contradicted `/learn`'s own fork, whose whole premise is that this is the
+route needing nothing first.
+
+So `COURSES.filter(c => c.prerequisites.length === 0)` returns **two**
+courses — `mathematical-foundations` and `qubits-and-quantum-states` — and
+they are a real choice rather than an ordering: **intuition-first** starts at
+Qubits & Quantum States, **rigour-first** starts at Mathematical
+Foundations. Anything in this repo or its docs claiming a single entry
+point, or that every course traces back to Mathematical Foundations, is
+describing the old graph.
+
+`/learn` (`src/app/learn/page.tsx`) derives which card is which by
+**excluding the intuition lesson's course from the root set**, not by taking
+`rootCourses[0]` — declaration order in `curriculum.ts` is not load-bearing
+and must not become so. The same page counts how much of the curriculum
+actually hangs off the rigorous root by walking the prerequisite closure,
+rather than asserting "everything", which was a true statement about a
+one-root graph and became false the moment there were two.
 
 `Qubits & Quantum States → Quantum Gates & Circuits → Entanglement, Mixed
 States & Bell Tests → Quantum Algorithms I: Foundations → Quantum
@@ -133,8 +166,11 @@ written by whoever authors that lesson).
 
 **Prerequisites are a graph, not a list position** — `Course.prerequisites`
 is an array of course slugs, so a course can require multiple prior courses,
-and courses from different pillars can reference each other (as
-`quantum-computing/qubits-and-quantum-states` does). This is what will
+and courses from different pillars can reference each other (Quantum
+Software's `simulating-quantum-systems` requires Quantum Mechanics'
+`advanced-quantum-mechanics`; Quantum Hardware's
+`physical-qubit-platforms` requires Quantum Computing's
+`qubits-and-quantum-states`). This is what will
 eventually power "you're missing a prerequisite" warnings without any
 rewrite. Quantum Mastery is where this graph structure stops being a
 convenience and becomes load-bearing: courses like
@@ -342,9 +378,59 @@ src/content/lessons/<pillar-slug>/<course-slug>/<lesson-slug>.mdx
 **`LessonMeta` shape** (`src/lib/content/types.ts`) — covers exactly the
 fields requested: `title`, `description`, `course`, `module`, `order`,
 `difficulty`, `estimatedMinutes`, `prerequisites` (lesson slugs), and
-`objectives`. `slug` is *not* part of the exported object — it's derived
-from the file's path by the loader, so there's no way for a lesson's
-metadata and its actual URL to disagree.
+`objectives`, plus an optional `related` (`{ slug, note }[]`) for
+"see also" cross-links, whose slugs `linkIntegrity.test.ts` resolves.
+`slug` is *not* part of the exported object — it's derived from the file's
+path by the loader, so there's no way for a lesson's metadata and its actual
+URL to disagree.
+
+### How long a lesson says it takes (recalibrated 2026-08)
+
+Two numbers are printed side by side on almost every card in the app:
+`Course.estimatedHours` in a course's stats block, and
+`lesson.estimatedMinutes` on every module row of that same card. Both used
+to be hand-authored, and they disagreed by between **1.1× and 4.1×** with no
+consistent factor — Quantum Shannon Theory advertised 11h above six rows
+totalling 160 minutes. That is not a rounding difference a reader can
+charitably explain away, and once noticed it discredits every other number
+on the page.
+
+**`estimatedHours` is now derived, not authored.** It is the sum of the
+course's lessons' `estimatedMinutes`, rounded to the nearest half hour, and
+`src/lib/content/__tests__/curriculumCoverage.test.ts` pins it: adding a
+lesson or retiming one now fails there *with the number to write down*
+rather than silently widening the gap. (Courses with no authored lessons yet
+are skipped — there is nothing to derive from.)
+
+**`estimatedMinutes` is fitted, not guessed.** The rule used for the
+recalibration is
+
+```
+minutes  =  words / rate(difficulty)  +  Σ(feature prices)
+```
+
+with reading rates of **72 / 66 / 58 / 50 words per minute** for
+`foundational` / `intermediate` / `advanced` / `master`. The ramp is the
+point: the same paragraph of prose costs a reader more per word when it is
+carrying a derivation they have not seen before, so a flat rate
+systematically under-times exactly the lessons that are hardest. The feature
+term prices the things a reader *does* rather than reads — working a
+`PredictBeforeReveal`, stepping a `DerivationSteps`, actually driving an
+embedded simulator — none of which contribute words but all of which
+contribute minutes.
+
+Write this down when you retime a lesson: it is precisely the kind of rule
+that gets silently re-guessed, and a second person guessing differently
+re-opens the 4× gap the derivation just closed. Note also what is *not*
+enforced — no test checks a lesson's own minutes against the rule (only the
+course roll-up is pinned), so the coefficients live here and nowhere else.
+
+Effect on the site total: from ~277h of hand-authored figures to **116h**
+(6,963 minutes across 219 lessons, measured 2026-08-29; the 32 courses'
+derived `estimatedHours` sum to 117h, the difference being half-hour
+rounding). This number is still moving as individual pillars are
+recalibrated — treat it as a reading of the day it was taken, not a
+constant.
 
 **Loading (`src/lib/content/lessons.ts`)** — server-only:
 
@@ -406,17 +492,52 @@ that needs restructuring as content grows.
 **Global MDX styling:** `@tailwindcss/typography`'s `prose` classes handle
 lesson body typography (headings, lists, code, math spacing) without
 hand-styling every element per lesson. `src/mdx-components.tsx` (the
-required Next.js file for App Router MDX) currently exposes one custom
-shortcode, `<Callout type="note" | "warning" | "mistake">`, matching the
-"common mistakes" section of the required 10-part lesson structure — usable
-in any `.mdx` file with no per-file import.
+required Next.js file for App Router MDX) exposes 26 entries as of
+2026-08-29 — a `table` wrapper, `KatexHtml`, and the narrative/visualization
+shortcodes (`Callout`, `Term`, `DefinitionBox`, `DerivationSteps`,
+`MatrixGrid`, …) — usable in any `.mdx` file with no per-file import.
 
-**Math rendering:** `remark-math` + `rehype-katex` + `katex`. KaTeX was
-chosen over MathJax because it renders to static HTML/CSS at *build time*
-(via the rehype pipeline) — a lesson page needs zero client-side JS to
-display correct, accessible math, which matters a lot once there are
-hundreds of math-heavy pages. `remark-gfm` is also enabled for tables
-(needed for things like quantum-number tables, gate truth tables).
+That mapping is **deliberately small, and its size is a policy rather than
+an accident**: every component mapped here is eagerly imported into all 219
+compiled lesson modules' graphs, so for the many `"use client"` ones among
+them, every lesson page's client bundle carries the whole mapped set and
+every static-generation worker pays its build-memory cost — whether the
+lesson uses it or not. The bar is "used broadly across the corpus" (roughly
+≥10 lessons, or universal like the table wrapper); a narrowly-used component
+is imported explicitly by the few lessons that need it. Enforcing that
+strictly is safe because a JSX tag that is neither mapped nor imported fails
+loudly: `loadLesson` deliberately does *not* catch import/evaluation errors
+for a known slug, so an undefined component throws at render instead of
+silently 404ing. `src/lib/design/__tests__/mdxMapping.test.ts` guards the
+policy. `KatexHtml` is the one entry no lesson author ever writes — the math
+plugin injects one per equation, so unmapping it breaks every math-bearing
+lesson.
+
+**Math rendering:** `remark-math` + **this repo's own
+`src/lib/mdx/rehypeKatexHtml.mjs`** + `katex`. KaTeX was chosen over MathJax
+because it renders to static HTML/CSS at *build time* (via the rehype
+pipeline) — a lesson page needs zero client-side JS to display correct,
+accessible math, which matters a lot once there are hundreds of math-heavy
+pages. `remark-gfm` is also enabled for tables (needed for things like
+quantum-number tables, gate truth tables).
+
+The pipeline no longer uses `rehype-katex` itself. It emitted each equation
+as a hast element *tree*, and with ~17,500 equations across the corpus that
+turned 3.4MB of MDX source into ~82MB of compiled JS and OOM'd Vercel's 8GB
+build container; `rehypeKatexHtml` renders the same KaTeX with the same
+options and error semantics but emits one `<KatexHtml html="…"/>` string
+node per equation — ~50× fewer AST nodes. It also injects the
+`.katex-display` `tabindex="0"` that a separate `rehypeScrollableMath`
+plugin used to add (equations stopped existing as hast for a later plugin to
+tag, so the two had to merge). Full numbers in
+[`docs/DEPLOYMENT.md`](DEPLOYMENT.md).
+
+`rehype-katex` is therefore a **devDependency, not a dependency**, and it is
+not dead: `src/lib/mdx/__tests__/rehypeKatexHtml.test.ts` imports it as a
+parity oracle, compiling the same source through both pipelines and
+asserting the equation structure matches. An earlier audit recommended
+deleting the package; that recommendation was wrong, and removing it breaks
+the only test that can tell you the replacement still renders the same math.
 
 ---
 
@@ -538,12 +659,16 @@ kept (see §9's testing recommendation for the durable version of this).
 holds `BlochSphereExplorer` (the real interactive simulator, which reads and
 writes `StateVector`s via `lib/quantum/` and renders the corresponding
 point on the sphere) alongside `BlochSphereHeroExplorer`, a trimmed-down
-variant embedding the same real math for the homepage hero. (An earlier,
+variant embedding the same real math for a section hero. (An earlier,
 purely decorative `BlochSpherePreview` — a static SVG with no `lib/quantum/`
 dependency — was replaced by `BlochSphereHeroExplorer` in a later polish
-pass once it became clear a homepage that opens on a labeled "static
+pass once it became clear a page that opens on a labeled "static
 illustration" undercuts the whole "real interactive experiments" pitch; see
-the Session 13 entry below.) Neither the gate math nor the circuit state is
+the Session 13 entry below.) The pattern generalized: the *site* hero is now
+`WavefunctionHeroExplorer` (`components/home/Hero.tsx` →
+`LazyWavefunctionHeroExplorer`), and `BlochSphereHeroExplorer` moved down to
+where it belongs topically — the Computing pillar page and the homepage's
+Computing section. Neither the gate math nor the circuit state is
 ever mixed into a rendering file. The convention going forward:
 `src/components/simulators/<name>/` for rendering,
 `src/lib/quantum/` for math, never mixed in one file.
@@ -954,8 +1079,13 @@ scope limit.
 ## 7. UI System
 
 Reused/extended, not rebuilt — everything here composes the primitives from
-the previous session (`Button`, `Badge`, `Card`, `Container`, `PageHeader`)
-plus a few new, purpose-built pieces:
+the previous session (`Button`, `Badge`, `Card`, `Container`) plus a few
+new, purpose-built pieces. (`PageHeader` was a sixth primitive here and has
+since been **deleted**: every page now opens on
+`Eyebrow`/`SectionTitle`/`Lede` directly — see `ui/Typography.tsx`,
+`ui/Section.tsx`, and the resolution note on UX_REVIEW_2's P2-new-1.
+`ui/Panel.tsx` and `ui/IconButton.tsx` joined the set later; see
+DESIGN_SYSTEM.md §4 for the surface vocabulary.)
 
 - **`components/curriculum/CourseList`** — the single component that
   renders "a pillar's courses and their modules, with per-module
@@ -971,16 +1101,19 @@ plus a few new, purpose-built pieces:
   and a previous/next footer nav. Every future lesson gets all of this for
   free just by having correct `lessonMeta` and being registered as a module
   in `curriculum.ts`.
-- **`components/mdx/Callout`** — the one content-authoring primitive
-  content needs today (see §5).
+- **`components/mdx/Callout`** — the first content-authoring primitive, and
+  for a while the only one. The global mapping has since grown to 26 entries
+  (see §5), but the bar it grew under is unchanged: broadly used, or
+  universal.
 - **`components/quantum/QuantumStateDisplay`** — added for Quantum Gates &
   Circuits. Renders a computational-basis ket expression plus a
   probability bar per basis state, from a real `StateVector` a lesson
   computed via the actual engine (not hand-typed numbers) — so the
   rendered math can never drift from what the engine computes. It's a
   **pure Server Component**: `katex.renderToString` runs at build time
-  (the same call `rehype-katex` itself makes internally), so this ships
-  zero client-side JavaScript. Lessons compose several of these in a row
+  (the same call `rehypeKatexHtml.mjs` makes for lesson math and
+  `renderProblemMath.ts` makes for problem math), so this ships zero
+  client-side JavaScript. Lessons compose several of these in a row
   to narrate a gate-by-gate sequence (a Bell-state or teleportation
   derivation) without needing a dedicated "stepper" component — deliberately
   choosing repetition of one small component over building a bigger one.
@@ -998,6 +1131,13 @@ listed here as future work, was designed and built this session — see §7b.
 ---
 
 ## 7b. Problems System Architecture
+
+> **Note on cross-references.** Comments throughout `src/lib/problems/`
+> point at "docs/ARCHITECTURE.md §10" for the problems system — that is
+> **this** section. The document was renumbered and the code comments were
+> not; treat `§10` in `registry.ts`, `types.ts` and
+> `validators/conceptual.ts` as meaning §7b until those comments are
+> updated.
 
 The problems system is the platform's first real content type that isn't
 prose-plus-math (a lesson) or a hand-built interactive widget (a
@@ -1044,17 +1184,77 @@ authored problem, since validator dispatch relies on it.
 per problem type — `validateMultipleChoice`, `validateNumeric`,
 `validateConceptual` — dispatched by `validateAnswer(problem, rawAnswer)`.
 Every submission reaches a validator as a plain `string`; no submission is
-ever evaluated as code. Numeric answers are parsed with `Number(...)` and
-compared with configurable absolute or relative tolerance (never a bare
-`===`). Conceptual answers use case-insensitive substring matching against
-author-supplied keyword groups — deliberately simple and fully
-deterministic, not natural-language understanding; a correct answer
-phrased with none of the listed synonyms will be marked incomplete, and
-this is a documented Phase 1 limitation, not a stand-in for `eval`. The
-abstraction (`Problem -> ValidationResult`) is what makes adding a fourth
-validator later (symbolic, quantum-state-vector-with-global-phase,
-circuit-structure) a matter of adding one file and one `case`, not
-touching the UI.
+ever evaluated as code. The abstraction (`Problem -> ValidationResult`) is
+what makes adding a fourth validator later (symbolic,
+quantum-state-vector-with-global-phase, circuit-structure) a matter of
+adding one file and one `case`, not touching the UI.
+
+*Numeric.* Parsed with `Number(...)` and compared with configurable
+absolute or relative tolerance (never a bare `===`). When the submission
+is wrong, the optional `nearMisses` array on `NumericAnswer` is scanned in
+order and the first window that contains the value supplies its own
+`feedback` instead of the generic `incorrectFeedback` — which is how a
+sign flip, a forgotten square, or a probability given where an amplitude
+was asked for gets named rather than merely rejected. Each near miss may
+carry its own `tolerance` (defaulting to the answer's). The scan runs
+**only after** the correct-answer test has already failed, so a near miss
+can never shadow the real answer even where the two windows overlap.
+
+*Conceptual — the three-tier matcher.* Originally a single
+case-insensitive substring test against author-supplied keyword groups.
+That was too brittle in practice: a trailing period, an apostrophe, or an
+interposed "are" defeated an answer that was plainly right. The matcher is
+now three checks, each strictly more lenient than the last, tried in order
+until one passes:
+
+1. **Legacy substring** — the lowercased phrase inside the lowercased
+   submission. This is the *original* matcher, kept verbatim and first, so
+   everything the old behaviour accepted is still accepted by
+   construction.
+2. **Normalized substring** — both sides lowercased, stripped to
+   `[a-z0-9 ]`, whitespace collapsed. Stray punctuation ("observed." vs
+   "observed", "can't" vs "cant") stops blocking a match.
+3. **In-order token subsequence with light stemming** — the phrase's
+   tokens must appear *in order* in the submission, not necessarily
+   adjacently, where a submission token matches if it starts with the
+   phrase token or their stems do (trailing `es`/`s` stripped, never
+   `ss`). This is what lets "inner products are preserved" satisfy the
+   phrase `"inner product preserv"`.
+
+Everything stays deliberately deterministic and safe — still not natural-
+language understanding, still never `eval`. The Phase 1 limitation is
+unchanged in kind, only narrowed: a student can game it with the right
+keywords in the wrong context, and an answer using none of the listed
+synonyms is still marked incomplete.
+
+*Conceptual — `ConceptGroup` and targeted missing-idea feedback.* A
+submission is fully correct only if it matches at least one phrase from
+*every* required group (AND across groups, OR within a group). A group was
+originally a bare `string[]`; that form is unchanged and fully supported.
+The alternative object form — `{ phrases, missingFeedback? }` — adds one
+thing: when a group is the **only** one the submission failed to cover,
+its `missingFeedback` is shown instead of the generic partial/incorrect
+message, so the student hears *which idea* is missing rather than "you're
+partly there". With more than one group unmatched the generic path still
+runs, because naming several missing ideas at once is just the solution.
+`conceptGroupPhrases(group)` is the accessor that flattens either form.
+
+*Difficulty ordering.* `PROBLEM_DIFFICULTY_RANK` and
+`compareProblemDifficulty(a, b)` live in `types.ts` — next to the
+vocabulary they rank, and in a module that imports none of the problem or
+quantum graph, so `metaRegistry.ts` can sort identically without pulling
+in the full corpus. Both `getProblemsForLesson` (registry) and
+`getProblemMetaForLesson` (meta registry) sort a lesson's practice list
+easiest-to-hardest with it, using a *stable* sort so authored
+content-path order breaks ties within a rung. File-path order ramped
+arbitrarily and a lesson could open on its hardest problem; a student
+working a list top to bottom deserves a monotone ramp. The two functions
+must never disagree — lesson pages render the meta-only twin while problem
+pages use the full one — and `metaRegistry.test.ts` pins them together.
+`getCourseCheckpointProblems` is **deliberately not** difficulty-sorted:
+it samples evenly over content-path order so a checkpoint spans the
+course's *material* rather than its difficulty rungs, and so the five
+problems a returning student already saw do not silently change.
 
 **Progress persistence** (`lib/problems/progress/`) is a `ProgressStore`
 interface — `getProblemProgress`, `recordAttempt`, `revealHint`,
@@ -1063,9 +1263,10 @@ interface — `getProblemProgress`, `recordAttempt`, `revealHint`,
 during SSR, where `window` doesn't exist). No component calls
 `localStorage` directly. `useProblemProgress(slug)` — built on
 `useSyncExternalStore`, not a `useEffect`-plus-`setState` hydration dance
-— is the one hook `ProblemView` uses to both read and mutate progress;
-swapping in an authenticated, server-backed store later means writing one
-new class against the same interface, not touching `ProblemView`. (This
+— is the one hook `ProblemViewClient` uses to both read and mutate
+progress; swapping in an authenticated, server-backed store later means
+writing one new class against the same interface, not touching the view.
+(This
 mattered in practice, not just in theory: an earlier version read
 progress via `useEffect` + `setState` on mount, and a separate bug in the
 localStorage read path — returning a freshly-parsed object on every call
@@ -1073,18 +1274,105 @@ instead of a cached one — combined with `useSyncExternalStore`'s
 stable-snapshot requirement to produce a genuine infinite render loop,
 caught by browser-testing the feature rather than by type-checking or unit
 tests. See the Session 6 changelog entry and
-`progress/__tests__/progressStore.test.ts`.)
+`src/lib/problems/__tests__/progressStore.test.ts`.)
 
 **UI components** (`components/problems/`) split along the same lines as
 §6b's simulator layering: `ProblemLayout` (server — breadcrumb, badges,
-title, prompt, prerequisites, related-lesson link) wraps `ProblemView`
-(client — the only part that needs state), which composes `AnswerInput`
-(dispatches by question type), `Feedback`, `HintPanel`, and
-`SolutionPanel`. The catalog (`/problems`) is `ProblemsCatalog` (client,
-owns filter state) rendering `ProblemFilters` and `ProblemCard`.
+title, prompt, prerequisites, related-lesson link) wraps `ProblemView`,
+which wraps `ProblemViewClient` — the actual `"use client"` boundary, and
+the only part that needs state. It composes `AnswerInput` (dispatches by
+question type), `Feedback`, `HintPanel`, and `SolutionPanel`. The catalog
+(`/problems`) is `ProblemsCatalog` (client, owns filter state) rendering
+the shared `curriculum/FilterChips` control and `ProblemCard`.
 `PracticeLinks` is the lesson-embed primitive — deliberately smaller and
 plainer than a full `ProblemCard`, so a lesson's practice section reads as
 part of the lesson rather than an inserted widget.
+
+**Where a problem's math stops being LaTeX (2026-08).** `ProblemView` used
+to *be* the client boundary, and that quietly cost every problem page the
+KaTeX runtime. `AnswerInput`, `HintPanel` and `SolutionPanel` render
+authored strings through `ScrollableMathText` → `MathText` → `katex`, and
+not one of those five files declares `"use client"` itself — they were
+dragged over the boundary by their importer. Everything statically
+reachable below a client boundary is downloaded eagerly, so 268KB raw /
+74.1KB gzip of `katex.min.js` sat in the *eager* bundle of all 547 problem
+pages, and the two existing katex guards never saw it because both pin
+`mdx-components.tsx` and `LessonLayout.tsx` by name.
+
+The fix is the one the lesson corpus already uses (`rehypeKatexHtml.mjs`
+renders MDX equations to HTML strings at compile time — see
+[`docs/DEPLOYMENT.md`](DEPLOYMENT.md)), transposed onto data that never
+passes through MDX:
+
+- `ProblemView` is now a **Server Component** whose entire job is to call
+  `prerenderProblemMath(problem)` and hand the result to
+  `ProblemViewClient`. Its props are unchanged, so the route is unchanged.
+- `renderProblemMath.ts` is the one place problem math meets `katex`. It
+  renders with `{ throwOnError: false, strict: false }` — byte-identical to
+  what `MathText`/`KatexMath` passed — so malformed TeX still degrades to
+  KaTeX's own `.katex-error` markup instead of failing a build with no
+  source position to report against. (`rehypeKatexHtml` deliberately
+  differs: it *has* a vfile and an authored position, so it can raise a
+  build-time warning first.)
+- `mathRuns.ts` holds the contract — the segment split (`splitMathSegments`,
+  `WIDE_MATH_CHARS`) and the rendered-run types — and holds **no** reference
+  to `katex`, so a client component importing it cannot re-open the chain
+  even through a type-only import.
+- `RenderedMathText.tsx` is the client half: it injects strings and nothing
+  else. `ScrollableMathText` now delegates its own output to
+  `RenderedScrollableMathText`, so there is exactly one implementation of
+  the markup and the two entry points cannot diverge.
+- `CourseCheckpoint` deliberately does *not* go through `ProblemView`: it is
+  a client component and cannot render a Server Component, so it calls
+  `prerenderProblemMath` itself and renders `ProblemViewClient` directly.
+  That keeps `katex` inside the checkpoint's own `LazyCourseCheckpoint`
+  chunk, where it already was and off every lesson page's eager graph.
+
+Measured: the route's eager client graph went **86.6 KB → 13.8 KB gzip**,
+removing 74 KB of KaTeX from every one of the 547 problem pages, at a cost
+of ~568 bytes gzip of prerendered HTML per page in the flight payload
+(median 163B, max 2.8KB). Rendering the gated hints and solution up front
+leaks nothing new: `ProblemView` was always handed the whole `Problem` —
+answer, hints, worked solution — as a client-component prop, so the flight
+payload has carried the authored text the whole time. What is gated is the
+*reveal*, in `SolutionPanel`, and that is unchanged.
+`components/problems/__tests__/renderedMath.test.ts` pins the rendered
+markup equal to `MathText`'s across the whole problem corpus, and
+`clientBoundary.test.ts`'s `KATEX_IN_EAGER_CLIENT_GRAPH` map is now empty
+and asserted to stay that way.
+
+**Multiple-choice display order is a seeded shuffle**
+(`components/problems/optionOrder.ts`). The authored option order put the
+correct answer first in the large majority of problems — an exploit a
+student notices after two or three problems. `seededShuffle(items,
+seedKey)` is Fisher-Yates over a `mulberry32` PRNG seeded by an FNV-1a
+hash of the problem slug, so the order is a **pure function of the
+problem**: no `Math.random`, no per-visit state. That matters twice —
+server render and client hydration agree byte-for-byte, and a student sees
+the same order on every visit, which keeps a problem feeling stable rather
+than slot-machine-like. Validation is untouched: submissions carry the
+option **id**, and `correctOptionId`/`optionFeedback` are keyed by id,
+never by position.
+
+`displayLetters(options, seedKey)` is the *only* function permitted to
+turn a position into a letter (A, B, C, … then AA, AB — spreadsheet-style,
+because a bare `String.fromCharCode(65 + index)` starts emitting `[`, `\`,
+`]` at the 27th option). Both `AnswerInput` and `SolutionPanel` read from
+it, seeded on `problem.meta.slug`. Two copies of `65 + index` are two
+copies that can disagree, and the disagreement is invisible in review and
+silent at runtime: the student reads an explanation about a letter sitting
+beside a different answer.
+
+Which gives the authoring rule: **solution and explanation prose must
+never name an option by letter.** "Option b confuses V02 with a different
+qubit" was correct only in the authored order and wrong for most readers
+once the shuffle landed. Describe the option by its content where that
+reads naturally; where an entry genuinely must point at one specific
+choice, use the object form of `WhyWrongEntry` —
+`{ optionId, text }` — and the renderer substitutes the letter that option
+actually carries in *this* reader's order.
+`src/lib/problems/__tests__/optionLetterReferences.test.ts` fails on any
+hardcoded letter reference that comes back.
 
 **Quiz** (`Quiz` type in `lib/problems/types.ts`, plus `getAllQuizzes` /
 `getQuiz` in the registry) is architecture only this phase — the data

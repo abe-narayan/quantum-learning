@@ -162,17 +162,41 @@ export function PathPhasorSum({
 
   return (
     <div className={cn("not-prose space-y-4 panel-inset p-4", className)}>
-      <div className="grid gap-4 sm:grid-cols-2" role="img" aria-label={ariaLabel}>
+      {/* `role="group"`, not `role="img"`. `img` makes every descendant
+          presentational, and this wrapper is not a picture — it is two
+          `aria-hidden` SVGs *plus four text nodes that are the only prose
+          explanation of them*: the two panel captions, the sentence saying
+          hue encodes phase (added precisely because "a reader could see a
+          rainbow and have no way to know it encoded the one quantity the
+          figure is about"), and the live "Total amplitude: N% of maximum"
+          readout that changes every time the slider moves. All four were
+          being erased from the accessibility tree by the role on this div, so
+          the hue gloss in particular was written for a reader who could never
+          receive it, and the one number the slider produces was announced
+          nowhere.
+
+          `group` carries the same `aria-label` — the full summary is still
+          spoken on entry — but leaves its children readable, so the captions
+          and the amplitude readout come back. The SVGs stay `aria-hidden`, so
+          nothing is announced twice. */}
+      <div className="grid gap-4 sm:grid-cols-2" role="group" aria-label={ariaLabel}>
         <div>
           <p className="mb-1 text-center text-xs font-medium text-muted-foreground">Sample paths (colored by phase)</p>
           <svg viewBox={`0 0 ${LEFT_WIDTH} ${PANEL_HEIGHT}`} className="mx-auto w-full max-w-sm" aria-hidden="true">
+            {/* The straight classical line between the two endpoints — the
+                zero-action reference every other path's phase is measured
+                against. Load-bearing, so `--axis` (clears 3:1 on every panel
+                depth) rather than `--border`, which is the panel-edge token
+                and measured 1.41:1 on `--surface-muted`: on the dark theme
+                the reference this figure's whole argument is relative to was
+                effectively invisible. */}
             <line
               x1={tOf(0)}
               y1={xOf(X_START)}
               x2={tOf(1)}
               y2={xOf(X_END)}
-              className="stroke-border"
-              strokeWidth={1}
+              className="stroke-axis"
+              strokeWidth={1.25}
               strokeDasharray="3 3"
             />
             {coloredPaths.map((p) => (
@@ -187,21 +211,49 @@ export function PathPhasorSum({
             ))}
             <circle cx={tOf(0)} cy={xOf(X_START)} r={4} className="fill-foreground" />
             <circle cx={tOf(1)} cy={xOf(X_END)} r={4} className="fill-foreground" />
-            <text x={tOf(0)} y={xOf(X_START) + 18} textAnchor="middle" className="fill-muted-foreground text-[9px] font-mono">
+            {/* viewBox 340 rendered `w-full max-w-sm`; at 320px the
+                `sm:grid-cols-2` wrapper is still one column, so this panel
+                gets the whole content width — but that width is 254px, not
+                the 288px this note used to claim. 288 is the page column;
+                the SVG sits inside `panel-inset p-4`, and `panel-inset`
+                (globals.css) supplies border, radius and fill and no padding
+                — the `p-4` does — so subtract 2 x (16px padding + 1px
+                border) = 34px. The scale is therefore 254/340 = 0.747, and
+                `text-[9px]` painted at 6.7px rather than 7.6px. 13 units
+                lands at **9.71px**, not 11.0px: still over the ~9px floor,
+                so the size stands and only the arithmetic is corrected.
+                These two words are the only thing establishing that every
+                path shares a fixed pair of endpoints, which is the premise
+                of the entire figure. */}
+            <text x={tOf(0)} y={xOf(X_START) + 20} textAnchor="middle" fontSize={13} className="fill-axis font-mono">
               start
             </text>
-            <text x={tOf(1)} y={xOf(X_END) - 10} textAnchor="middle" className="fill-muted-foreground text-[9px] font-mono">
+            <text x={tOf(1)} y={xOf(X_END) - 12} textAnchor="middle" fontSize={13} className="fill-axis font-mono">
               end
             </text>
           </svg>
+          {/* The paths are coloured by phase and nothing said what the
+              colours meant — a reader could see a rainbow and have no way to
+              know it encoded the one quantity the figure is about. */}
+          <p className="mt-1 text-center text-[11px] text-muted-foreground">
+            Hue = that path&rsquo;s phase angle; one full trip around the colour wheel is 2π of phase.
+          </p>
         </div>
 
         <div>
           <p className="mb-1 text-center text-xs font-medium text-muted-foreground">Phasors summed tip-to-tail</p>
           <svg viewBox={`0 0 ${RIGHT_WIDTH} ${PANEL_HEIGHT}`} className="mx-auto w-full max-w-xs" aria-hidden="true">
-            <circle cx={cx} cy={cy} r={R} fill="none" className="stroke-border/60" strokeWidth={1} strokeDasharray="2 3" />
-            <line x1={cx - R - 6} y1={cy} x2={cx + R + 6} y2={cy} className="stroke-border/50" strokeWidth={1} />
-            <line x1={cx} y1={cy - R - 6} x2={cx} y2={cy + R + 6} className="stroke-border/50" strokeWidth={1} />
+            {/* The unit circle is the scale bar for this panel: the resultant
+                arrow's length is only meaningful as a fraction of it ("100%
+                of maximum" is the arrow reaching the rim), so it has to be
+                perceivable — `--axis`, not the near-invisible `--border`.
+                The Re/Im cross-hairs stay subordinate but move to
+                `--axis-grid`, the token that is *designed* to sit below the
+                3:1 floor, rather than a half-alpha panel edge that landed
+                there by accident. */}
+            <circle cx={cx} cy={cy} r={R} fill="none" className="stroke-axis" strokeWidth={1.25} strokeDasharray="2 3" />
+            <line x1={cx - R - 6} y1={cy} x2={cx + R + 6} y2={cy} className="stroke-axis-grid" strokeWidth={1} />
+            <line x1={cx} y1={cy - R - 6} x2={cx} y2={cy + R + 6} className="stroke-axis-grid" strokeWidth={1} />
 
             {coloredPaths.map((p, i) => (
               <line
@@ -250,7 +302,12 @@ export function PathPhasorSum({
           step={HBAR_STEP}
           value={hbarEff}
           onChange={(e) => setHbarEff(Number(e.target.value))}
-          className="mt-2 w-full accent-brand"
+          // `h-11` (44px): a range input centres its track inside whatever
+          // height it is given, so this buys the full touch target without
+          // changing how the control looks — the same fix
+          // `simulators/shared/controls.tsx`'s `SimulatorSlider` already
+          // carries. Without it the hit area was the browser default ~16px.
+          className="mt-2 h-11 w-full accent-brand"
           aria-label="Effective h-bar, the phase-sensitivity slider"
           aria-valuetext={`h-bar effective ${hbarEff.toFixed(2)}, resultant amplitude ${amplitudePct} percent of maximum`}
         />

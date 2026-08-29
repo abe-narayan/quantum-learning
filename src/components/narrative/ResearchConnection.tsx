@@ -42,7 +42,7 @@ export function ResearchConnection({
   return (
     <div
       className={cn(
-        "not-prose my-8 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-surface",
+        "not-prose my-8 overflow-hidden rounded-panel border border-border bg-surface",
         className
       )}
     >

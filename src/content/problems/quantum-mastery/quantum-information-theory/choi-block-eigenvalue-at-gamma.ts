@@ -22,12 +22,17 @@ export const choiBlockEigenvalueAtGamma: NumericProblem = {
     type: "numeric",
     value: 1.4,
     tolerance: 0.001,
-    incorrectFeedback: "The nonzero eigenvalue is exactly 2-gamma (since the determinant is identically zero, the eigenvalues are trace and 0). At gamma=0.6, that's 2-0.6.",
+    incorrectFeedback: "With the determinant identically zero, the eigenvalues are the trace and zero, so the nonzero one is 2-gamma. If you solved a quadratic and got something else, recheck the determinant: the square root squares back exactly, so it vanishes for every gamma.",
+    nearMisses: [
+      { value: 0.6, feedback: "0.6 is gamma itself. The nonzero eigenvalue is the block's trace, 1 + (1 − gamma)." },
+      { value: 0.4, feedback: "0.4 is 1 − gamma, the block's lower-right entry. The trace adds the upper-left entry of 1 to it." },
+      { value: 2, feedback: "2 is the trace at gamma = 0. Damping reduces it linearly to 2 − gamma." },
+    ],
   },
   hints: [
     { text: "Since det=0 identically, the two eigenvalues are {trace, 0}." },
     { text: "The block's trace is 1+(1-gamma) = 2-gamma." },
-    { text: "At gamma=0.6, 2-gamma = 1.4." },
+    { text: "Evaluate 2-gamma at the given gamma." },
   ],
   solution: {
     steps: [

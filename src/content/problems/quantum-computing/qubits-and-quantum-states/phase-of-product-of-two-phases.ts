@@ -55,8 +55,9 @@ export const phaseOfProductOfTwoPhases: MultipleChoiceProblem = {
     correctIdea: "Multiplying complex numbers in polar form multiplies their magnitudes and adds their phases — this is a direct consequence of the exponent rule $e^{a}e^{b}=e^{a+b}$.",
     whyCorrect: `Directly verified: z₁ = e^{iπ/6}, z₂ = e^{iπ/3}, and their product's computed phase is ${productPhase.toFixed(4)} ≈ π/2 (${(Math.PI / 2).toFixed(4)}).`,
     whyWrong: [
-      "Multiplying the phase values together confuses the rule for magnitudes (which do multiply) with the rule for phases (which add).",
-      "Leaving the phase unchanged ignores z₂'s contribution entirely.",
+      { optionId: "b", text: "Multiplies the phases, applying the magnitude rule to the wrong quantity. Magnitudes multiply; phases add." },
+      { optionId: "c", text: "Leaves z₁'s phase where it was, dropping z₂'s contribution entirely." },
+      { optionId: "d", text: "Adds the two but slips on the arithmetic. π/6 + π/3 shares a denominator of 6, not 9." },
     ],
   },
 };

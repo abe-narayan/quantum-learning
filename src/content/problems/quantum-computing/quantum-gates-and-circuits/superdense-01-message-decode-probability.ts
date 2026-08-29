@@ -30,12 +30,20 @@ export const superdense01MessageDecodeProbability: NumericProblem = {
     value: probabilityOf01,
     tolerance: 0.01,
     incorrectFeedback:
-      "Run the same three steps as the lesson's $11$-row worked example, but with $X$ alone (not $Z$ then $X$): Bell pair, apply $X$ to qubit 0, then Bob's decode circuit.",
+      "Run the same three steps as the lesson's worked example row, but with $X$ alone rather than $Z$ then $X$: prepare the Bell pair, encode, then decode. If your probability came out at a half, check the gate order in the decode circuit.",
+    nearMisses: [
+      {
+        value: 0.5,
+        feedback:
+          "A half means the decode left an unresolved superposition, usually from running H before the CNOT. Bob's circuit is the exact inverse of the preparation circuit, so its gates come in the reverse order: CNOT first, then H.",
+      },
+      { value: 0.25, feedback: "0.25 spreads weight over all four outcomes. Decoding maps each Bell state onto one basis state, so a correct run leaves nothing on the other three." },
+    ],
   },
   hints: [
-    { text: "Apply $X$ to qubit 0 of $|\\Phi^+\\rangle=\\frac{1}{\\sqrt2}(|00\\rangle+|11\\rangle)$: this gives $\\frac{1}{\\sqrt2}(|10\\rangle+|01\\rangle)=|\\Psi^+\\rangle$." },
-    { text: "Bob's decode circuit is $\\text{CNOT}(0,1)$ then $H$ on qubit 0 — the exact inverse of the circuit that built the Bell pair." },
-    { text: "This should recover $|01\\rangle$ with certainty, exactly like the lesson's $11$-row worked example recovered $|11\\rangle$." },
+    { text: "Trace the state through Alice's step first. Applying $X$ to one half of a Bell pair turns it into a different Bell state; write out which one before Bob does anything." },
+    { text: "Bob's decode circuit, CNOT then $H$ on the first qubit, is the exact inverse of the circuit that built the Bell pair. It therefore maps each of the four Bell states to a distinct computational basis state." },
+    { text: "Work out which basis state $|\\Psi^+\\rangle$ decodes to, and ask whether any amplitude is left over on the other outcomes. The probability follows." },
   ],
   solution: {
     steps: [
@@ -43,11 +51,11 @@ export const superdense01MessageDecodeProbability: NumericProblem = {
       { description: "Alice applies $X$ to qubit 0 (encoding message $01$).", latex: "X\\otimes I\\,|\\Phi^+\\rangle = \\frac{1}{\\sqrt2}(|10\\rangle+|01\\rangle) = |\\Psi^+\\rangle" },
       { description: "Bob applies $\\text{CNOT}(0,1)$ then $H$ on qubit 0.", latex: `P(01) = ${probabilityOf01.toFixed(2)}` },
     ],
-    finalAnswer: `$P(01) = ${probabilityOf01.toFixed(2)}$ — Bob recovers message $01$ with certainty.`,
+    finalAnswer: `$P(01) = ${probabilityOf01.toFixed(2)}$: Bob recovers message $01$ with certainty.`,
   },
   explanation: {
     correctIdea: "Bob's decode circuit exactly inverts the Bell-pair-preparation circuit, so every one of Alice's four possible messages decodes to the matching computational basis state with certainty.",
     whyCorrect: "This independently confirms, via the real engine rather than the lesson's own displayed numbers, the $01$ row of the message table.",
-    whyWrong: ["A probability less than 1 would indicate a circuit-order or gate mistake — this protocol recovers every message with exact certainty, not merely high probability."],
+    whyWrong: ["A probability less than 1 would indicate a circuit-order or gate mistake: this protocol recovers every message with exact certainty, not merely high probability."],
   },
 };

@@ -27,6 +27,24 @@ export const classicalSimulationBellPairBondDimension: NumericProblem = {
     tolerance: 0.5,
     incorrectFeedback:
       "Each of the 5 independent Bell pairs contributes exactly 1 ebit of entanglement entropy across the cut (the same argument the lesson verified exactly for 3 pairs, reaching 3 ebits). With 5 independent pairs the total entropy is 5 ebits, and bond dimension is χ=2^(entropy in ebits), not the entropy itself and not the qubit count.",
+    nearMisses: [
+      {
+        value: numberOfPairs,
+        feedback: "5 is the entropy in ebits. Bond dimension is the Schmidt rank, 2 raised to that entropy, not the entropy itself.",
+      },
+      {
+        value: 10,
+        feedback: "10 is the qubit count. Bond dimension is set by the entropy across one cut, which here is 5 ebits.",
+      },
+      {
+        value: 1024,
+        feedback: "1024 = 2^10 is the full Hilbert-space dimension of all ten qubits. The bond dimension is capped by one side of the cut, five qubits, so 2^5.",
+      },
+      {
+        value: 8,
+        feedback: "8 is the lesson's own 3-pair answer. This circuit has 5 crossing pairs, so the exponent moves from 3 to 5.",
+      },
+    ],
   },
   hints: [
     { text: "This is the lesson's worked example (3 crossing Bell pairs, entropy reaching the maximum 3 ebits/χ=8 for that 3-vs-3 cut) scaled up from 3 pairs to 5 pairs." },

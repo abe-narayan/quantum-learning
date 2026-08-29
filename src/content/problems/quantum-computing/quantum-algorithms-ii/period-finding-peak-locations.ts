@@ -27,12 +27,17 @@ export const periodFindingPeakLocations: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.5,
-    incorrectFeedback: "First compute r (4^1, 4^2, ... mod 15 until you return to 1), then note the peak count equals r exactly — but only because 2^t is here evenly divisible by r.",
+    incorrectFeedback: "Two places to slip here. Either the order is off (list successive powers of 4 mod 15 by hand until one of them returns to 1; it happens sooner than you might expect), or you counted something other than the peaks, such as the peak spacing 64/r.",
+    nearMisses: [
+      { value: 32, feedback: "32 is the spacing between peaks, 2^t/r. The question asks how many peaks there are, which is r itself here." },
+      { value: 4, feedback: "4 is the base a, not the order. The order is the first exponent with 4^r ≡ 1 mod 15, and 4² = 16 ≡ 1 already." },
+      { value: 64, feedback: "64 is the number of possible outcomes with t=6 counting qubits. Only a handful of them carry probability." },
+    ],
   },
   hints: [
-    { text: "4¹=4, 4²=16 mod 15=1 — so r=2." },
-    { text: "With r=2 and 2^t=64, 64/r=32 is an exact integer — a clean case." },
-    { text: "The number of peaks equals r exactly whenever 2^t/r is a whole number." },
+    { text: "This problem stacks two questions. What does the order r of a mod N mean, and what rule connects r to the number of peaks in the measurement distribution?" },
+    { text: "Find r by listing successive powers of 4 mod 15 until you reach 1. Then recall the clean-division rule: when the total number of outcomes is a multiple of r, the distribution puts one sharp peak at every multiple of (outcomes)/r." },
+    { text: "With t=6 counting qubits there are 64 outcomes. Check whether 64 is divisible by the r you found. If it is, the peak count equals the order itself." },
   ],
   solution: {
     steps: [
@@ -42,8 +47,8 @@ export const periodFindingPeakLocations: NumericProblem = {
     finalAnswer: "2 peaks",
   },
   explanation: {
-    correctIdea: "The 'exactly r peaks' rule holds cleanly only when 2^t is evenly divisible by r — this example was chosen specifically because it is.",
-    whyCorrect: "Directly confirmed by the engine: exactly two outcomes (0 and 32) carry nonzero probability, each exactly 0.5.",
-    whyWrong: ["Using an order that doesn't evenly divide 2^t (try a=2, N=21, r=6, with t=6) gives a smeared distribution across roughly 2r nearby outcomes instead of r sharp peaks — a real subtlety, not this problem's chosen case."],
+    correctIdea: "The 'exactly r peaks' rule holds cleanly only when 2^t is evenly divisible by r. This example was chosen specifically because it is.",
+    whyCorrect: "Directly confirmed by the engine: exactly two outcomes (0 and 32) carry nonzero probability, each 0.5.",
+    whyWrong: ["Using an order that doesn't evenly divide 2^t (try a=2, N=21, r=6, with t=6) gives a smeared distribution across roughly 2r nearby outcomes instead of r sharp peaks. That subtlety is real, just not this problem's chosen case."],
   },
 };

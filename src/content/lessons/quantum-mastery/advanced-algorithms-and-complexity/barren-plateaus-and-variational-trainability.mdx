@@ -178,22 +178,13 @@ export const lessonMeta = {
 
 ## Motivation
 
-VQE's worked toy example converged beautifully: 80 pattern-search
-iterations, monotonic descent, agreement with the exact answer to
-$10^{-12}$. That example used exactly one qubit. This lesson asks the
+VQE's worked toy example converged without incident: 80 pattern-search
+iterations, monotonic descent throughout, agreement with the exact answer
+to $10^{-12}$. That example used exactly one qubit. This lesson asks the
 question the toy example was too small to expose: what happens to that
 same training process as the ansatz scales up to real problem sizes?
 The answer is one of the most important, and most numerically verifiable,
 results in variational quantum computing.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/IBM_Q_system_%28Fraunhofer_2%29.jpg/1280px-IBM_Q_system_%28Fraunhofer_2%29.jpg"
-  alt="An IBM Quantum System One installation at a Fraunhofer facility in Ehningen, Germany"
-  caption="Variational algorithms like VQE are precisely the hybrid quantum-classical routines designed to run on near-term hardware like this. This lesson derives why training the ansatz gets exponentially harder, not easier, as more of a machine's qubits are put to use — the barren plateau problem such hardware runs directly into at scale."
-  credit="IBM Research (photo: Holger Muench) / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Q_system_(Fraunhofer_2).jpg"
-  license="CC BY 2.0"
-/>
 
 ## Mathematical Development
 
@@ -219,7 +210,7 @@ $$
 $$
 
 an **exact** gradient formula (not a finite-difference approximation)
-using only two extra circuit evaluations, exactly the tool this lesson's
+using only two extra circuit evaluations, the tool this lesson's
 numerics use below.
 
 ### The gradient's mean is exactly zero
@@ -235,7 +226,7 @@ $$
 
 **exactly zero**, by the law of total expectation and the elementary
 fact that $\sin$ and $\cos$ each integrate to zero over a full period,
-for *any* joint distribution of the other parameters, no genuinely deep
+for *any* joint distribution of the other parameters, no deep
 theory required. This is the fully rigorous, elementary half of the
 barren plateau story: on average, the gradient doesn't point anywhere.
 
@@ -249,13 +240,13 @@ deviation) shrinks toward zero as the number of qubits grows, so
 gradient-based optimization has nothing to work with even locally. The
 mechanism (McClean, Boixo, Smelyanskiy, Babbush & Neven 2018, cited
 here rather than fully re-derived; the complete argument uses
-Weingarten calculus over the Haar measure, genuinely graduate-level
+Weingarten calculus over the Haar measure, which is substantial
 technical machinery) is **concentration of measure**: a sufficiently
 deep, sufficiently expressive parametrized circuit behaves, statistically,
 like a Haar-random unitary applied to the initial state. For a
 Haar-random pure state $|\psi\rangle$ in a $2^n$-dimensional Hilbert
 space and a fixed traceless observable $H$ (a global Pauli string like
-$Z^{\otimes n}$ is exactly this kind of observable), Lévy's lemma (a
+$Z^{\otimes n}$ is this kind of observable), Lévy's lemma (a
 standard concentration-of-measure theorem for Lipschitz functions on a
 high-dimensional sphere, itself a citable, standard result) gives
 
@@ -265,7 +256,7 @@ $$
 
 and because the parameter-shift gradient is itself a difference of two
 such expectation values at nearby parameter points, its variance
-inherits the same $O(2^{-n})$ scaling. **This is the barren plateau**:
+inherits the same $O(2^{-n})$ scaling. **<Term id="barren-plateaus">This is the barren plateau</Term>**:
 not merely that the average gradient is zero (derived exactly above, and
 true even for well-behaved landscapes), but that its *typical
 fluctuation size* collapses exponentially, so a random or naively-chosen
@@ -279,12 +270,12 @@ The single-qubit VQE toy example converged so easily precisely because
 $2^1=2$ is nowhere near large enough for concentration of measure to
 bite: the whole point of that lesson's ansatz being "fully expressive"
 (reaching every point on the Bloch sphere) meant the cost landscape had
-genuine, findable structure everywhere. Concentration of measure is a
+findable structure everywhere. Concentration of measure is a
 *high-dimensional* phenomenon: it's the same reason a random point on a
 high-dimensional sphere is, with overwhelming probability, very close
 to the equator, no matter which "pole" you call zero. A random
 parameter setting on a large, expressive enough variational circuit is,
-in exactly this sense, always "near the equator" of the cost landscape,
+in this sense, always "near the equator" of the cost landscape,
 nowhere near a useful gradient, for purely geometric reasons that have
 nothing to do with how good the classical optimizer is.
 
@@ -315,13 +306,13 @@ code already follows), and compute the sample variance at each $n$.**
 
 Every mean gradient is small relative to its own variance's square root
 (the standard deviation), consistent with the exactly-zero-mean result
-derived above (the small nonzero sample means are exactly the
-statistical noise expected from averaging $300$ finite samples, not a
+derived above (the small nonzero sample means are the statistical
+noise expected from averaging $300$ finite samples, not a
 violation of the exact identity). The variance itself drops by roughly
 half at each additional qubit ($0.130\to0.069\to0.027\to0.017\to0.0076$,
 ratios of $0.53,0.39,0.62,0.45$, noisy from finite sampling, but
 consistently well below $1$, and consistent with the cited $O(2^{-n})$
-scaling, not with any slower decay), a genuine factor of roughly
+scaling, not with any slower decay), a factor of roughly
 $17\times$ shrinkage from $n=2$ to $n=6$, measured directly, not merely
 asserted.
 
@@ -334,7 +325,7 @@ asserted.
 
 The variance numbers above summarize the plateau; this renders the object
 itself. Fix every parameter except the one being differentiated at a random
-draw, then sweep that one parameter $\theta$ over a full period — this
+draw, then sweep that one parameter $\theta$ over a full period. This
 traces out exactly the $C(\theta)=a+b\cos\theta+c\sin\theta$ curve derived
 above, computed with this lesson's own `scaledAnsatz`/`scaledCost` engine,
 not a stylized cartoon of it. Scrub $n$ from $2$ to $6$ below and watch
@@ -380,10 +371,8 @@ procedure (computed directly by this lesson's own `landscapeGridForN`,
 not a separate hand-picked example) covers a range of only $0.221$ —
 about $5.6\times$ narrower — and the grid looks almost uniformly
 colored: not because the search did anything different, but because
-there's less terrain left to find. This is the same $O(2^{-n})$
-collapse the variance numbers and the 1D curves above already showed,
-now visible as an actual loss of contrast in a picture, exactly what
-"nowhere for a gradient-based optimizer to go" looks like.
+there's less terrain left to find. A gradient-based optimizer dropped
+anywhere on that second grid has nothing to descend.
 
 <PredictBeforeReveal
   question="This lesson's own ansatz pattern (4n layers, entangling ring, global Z⊗n cost) shows gradient variance dropping by roughly half per extra qubit, from n=3 (6.909×10⁻²) to n=6 (7.557×10⁻³). Over those 3 extra qubits, how much did the variance actually shrink?"
@@ -393,7 +382,7 @@ now visible as an actual loss of contrast in a picture, exactly what
     { label: "Only a few percent — barren plateaus need many more qubits to bite", value: "percent" },
   ]}
   correctValue="order"
-  explanation="6.909×10⁻² / 7.557×10⁻³ ≈ 9.1×, close to the roughly-halving-per-qubit trend compounded over 3 qubits (2³=8, in the right ballpark given the noisy, finite-sample ratios reported above). The exact factor matters less than the shrinkage compounding multiplicatively per qubit, so a trend that looks mild going from n=3 to n=4 becomes crippling by n=20 or n=50, exactly the extrapolation Practice Question 3 below asks you to make explicit."
+  explanation="6.909×10⁻² / 7.557×10⁻³ ≈ 9.1×, close to the roughly-halving-per-qubit trend compounded over 3 qubits (2³=8, in the right ballpark given the noisy, finite-sample ratios reported above). The exact factor matters less than the shrinkage compounding multiplicatively per qubit, so a trend that looks mild going from n=3 to n=4 becomes crippling by n=20 or n=50, the extrapolation Practice Question 3 below asks you to make explicit."
 />
 
 ## Common Mistakes
@@ -407,7 +396,7 @@ decreasing, a real, reproducible finding, not a mistake to hide. The
 concentration-of-measure argument requires the circuit to be
 "sufficiently random," which in practice means sufficiently *deep*; a
 shallow ansatz hasn't yet scrambled enough to approximate a Haar-random
-unitary, so the asymptotic trend can be genuinely non-monotonic at small
+unitary, so the asymptotic trend can be non-monotonic at small
 $n$ and shallow depth, only becoming clean once the depth scales
 appropriately with $n$, as it does in the deeper ($4n$-layer) numbers
 used above.
@@ -421,7 +410,7 @@ cost function like $Z^{\otimes n}$. Shallower, problem-tailored ansätze
 (not generic random circuits) and *local* cost functions (built from
 few-qubit terms rather than an all-qubit observable) are active,
 partially effective mitigation strategies in real research; the
-phenomenon derived here is a genuine obstacle for the generic case, not
+phenomenon derived here is an obstacle for the generic case, not
 a no-go theorem for every possible variational circuit design.
 </Callout>
 
@@ -464,23 +453,17 @@ a no-go theorem for every possible variational circuit design.
   qubits (using this platform's real gate and expectation-value engine,
   a deterministic seeded random generator, and the exact parameter-shift
   formula derived above) shows measured gradient variance shrinking by
-  roughly half at each additional qubit, a genuine $\sim17\times$ drop
+  roughly half at each additional qubit, a $\sim17\times$ drop
   from $n=2$ to $n=6$, and, honestly reported, the trend is only clean
-  once the ansatz is deep enough, exactly as the "sufficiently random"
+  once the ansatz is deep enough, as the "sufficiently random"
   precondition predicts.
 
 ## Further Exploration
 
-Next, the capstone: [What Scale Actually Requires](/lessons/quantum-mastery/advanced-algorithms-and-complexity/capstone-what-scale-actually-requires),
-synthesizing this lesson's exponential trainability wall together with
-BQP's oracle-relative separations and Trotterization's error bounds into
-one account of what genuinely separates this platform's toy-scale
-results from real quantum advantage.
-
 <NextDiscovery>
-  The capstone synthesizes this lesson's exponential trainability
-  wall together with BQP's oracle-relative separations and
-  Trotterization's error bounds into one account of what genuinely
-  separates this platform's toy-scale results from real quantum
-  advantage.
+  The capstone, [What Scale Actually Requires](/lessons/quantum-mastery/advanced-algorithms-and-complexity/capstone-what-scale-actually-requires),
+  puts this lesson's trainability wall beside BQP's oracle-relative
+  separations and Trotterization's error bounds, and asks what all three
+  together say about the distance between this platform's toy-scale
+  results and quantum advantage on real hardware.
 </NextDiscovery>

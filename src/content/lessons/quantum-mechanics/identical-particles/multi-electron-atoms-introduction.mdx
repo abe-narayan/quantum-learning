@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { EnergyLevelDiagram } from "@/components/visualizations/EnergyLevelDiagram";
+import { ToggleView } from "@/components/mdx/ToggleView";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mechanics/identical-particles/multi-electron-atoms-introduction"
@@ -49,7 +50,7 @@ export const lessonMeta = {
   module: "multi-electron-atoms-introduction",
   order: 1,
   difficulty: "advanced",
-  estimatedMinutes: 20,
+  estimatedMinutes: 30,
   prerequisites: ["quantum-mechanics/identical-particles/the-pauli-exclusion-principle"],
   objectives: [
     "Derive the 2n² maximum shell capacity by combining hydrogen's n² orbital count with exclusion's spin-up/spin-down limit per orbital",
@@ -59,22 +60,30 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-Why does the periodic table have the shape it does — two elements in the first row, eight in the next two, then a jump to eighteen? Nothing about this lesson needs new physics to answer that.
+Why does the periodic table have the shape it does: two elements in the first row, eight in each of the next two, then a jump to eighteen? Those numbers are already sitting in results this pillar has derived. No new physics is needed to read them off.
 </LessonHook>
 
 ## Motivation
 
-Hydrogen Energy Levels
-already found $n^2$ degenerate orbitals for shell $n$; the previous
-lesson already found that each single-particle state, spatial orbital
-*and* spin, can hold at most one electron. Multiply those two
-already-established facts together and the shell structure of the whole
-periodic table falls out.
+Two results from earlier in this pillar are about to be multiplied
+together. Hydrogen Energy Levels counted $n^2$ degenerate spatial
+orbitals in shell $n$. The previous lesson showed that each complete
+single-particle state, spatial orbital *and* spin together, admits at
+most one electron.
+
+Neither result mentions chemistry. Their product is $2n^2$, and it gives
+$2, 8, 18, 32$: the row lengths of the periodic table, obtained from a
+degeneracy count and a sign flip under exchange.
+
+This lesson does that multiplication carefully, then is equally careful
+about what it does not deliver. Capacities come out exactly right;
+filling *order* does not, and the reason why is more interesting than the
+formula.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Glowing_noble_gases.jpg"
   alt="Five glass discharge tubes glowing with the characteristic colors of ionized helium, neon, argon, krypton, and xenon"
-  caption="Helium, neon, argon, krypton, and xenon (left to right), each glowing its own characteristic color when ionized. Every one of these elements has a completely filled outer shell in exactly the 2n² sense this lesson derives, which is also why they are chemically inert: neon's practice question below is the second tube from the left."
+  caption="Helium, neon, argon, krypton and xenon, left to right, each glowing its own colour in a discharge tube. Every one has its outermost occupied subshell completely full, which leaves no partly-filled orbital to bond through and is why the group is chemically inert. Neon, the subject of practice question 2, is second from the left."
   credit="Alchemist-hp (composite); individual gas photographs by Jurii"
   creditUrl="https://commons.wikimedia.org/wiki/File:Glowing_noble_gases.jpg"
   license="CC BY 3.0"
@@ -94,24 +103,29 @@ $$
 2n^2 \text{ electrons}
 $$
 
-$n=1$: $2(1)^2=2$ electrons (fills 1s). $n=2$: $2(2)^2=8$ electrons
-(fills 2s and 2p together). $n=3$: $2(3)^2=18$, though in real multi-electron
-atoms the filling order gets more complicated starting around here (a
-real complication this introduction names but doesn't resolve; see
-below).
+Within a shell, chemists split the $n^2$ orbitals by $l$ into
+**subshells** labeled s, p, d ($l=0,1,2$), each holding $2(2l+1)$
+electrons; the shell totals below are just those pieces added up.
+$n=1$: $2(1)^2=2$ electrons, filling 1s. $n=2$: $2(2)^2=8$, filling 2s
+and 2p together. $n=3$: $2(3)^2=18$, and this is where filling order
+starts to depart from shell order in real atoms, for reasons taken up
+below.
 
-The factor of 2 is most of chemistry's answer to "why do noble gases
-exist." An atom with every orbital up to some shell completely full,
-helium at 2, neon at 10 ($2+8$), has no partially-occupied orbital left
-to share or steal an electron through, which is exactly why those
-elements sit inertly at the ends of their rows while carbon, with 2p
-only two-sixths full, is eager to bond in four different directions at
-once. It's also why reactivity is periodic rather than a one-off
-property of each element: the same "one orbital short of closing" or
-"one orbital past closing" pattern recurs every time a shell's $2n^2$
-slots fill up again.
+Finite capacity is most of chemistry's answer to why noble gases exist.
+An atom whose outermost occupied subshell is completely full, helium at
+$2$, neon at $10$, has no partly-occupied orbital through which to share
+or accept an electron, so it sits inertly at the end of its row. Carbon,
+with 2p only two-sixths full, has four vacancies and bonds in four
+directions.
 
-### What's exactly hydrogen-like, and what isn't
+It is also why reactivity is *periodic* rather than a separate fact about
+each element. The pattern of "one short of closing" and "one past
+closing" repeats every time a set of slots fills up, so elements at the
+same position in successive rows behave alike. Mendeleev arranged the
+table by that repetition sixty years before anyone could explain it, and
+the explanation, when it came, was the two lines of this section.
+
+### What's hydrogen-like here, and what isn't
 
 The orbital *shapes* and *degeneracy counts* used above come directly
 from Hydrogen Energy Levels and Orbitals & Quantum Numbers, carried over
@@ -123,29 +137,33 @@ the nucleus's attraction. This repulsion is not spherically symmetric
 in the same simple $1/r$ way, and, critically, it does depend on $l$
 (a $2s$ electron, closer to the nucleus, feels the nuclear attraction
 more directly than a $2p$ electron of the same $n$, which is
-"screened" more by inner electrons). This is exactly why real multi-electron
+"screened" more by inner electrons). This is why the real
 filling order is 1s, 2s, 2p, 3s, 3p, 4s, 3d, ... rather than simply
 increasing $n$.
 
 ## Physical Interpretation
 
-This course does not attempt to solve the true multi-electron
-Hamiltonian (which has no exact closed-form solution even for helium,
-the two-electron case: a hard many-body problem in its own right, active
-research territory for larger atoms). What this introduction provides is
-the *qualitative* structure, shell capacities and the shape of the
-filling logic, using hydrogen's exact orbitals as an approximate
-single-particle <Term id="basis">basis</Term>, which is both an honest, standard approximation
-and as far as this course's scope goes.
+This course does not solve the true multi-electron Hamiltonian, and
+neither does anyone else in closed form. Helium, with two electrons, is
+already beyond exact solution, and estimating ground-state energies for
+larger atoms remains active research; it is one of the main targets
+quantum computing hopes to address.
+
+What this introduction supplies is the structure: shell capacities, and
+the logic of filling, with hydrogen's orbitals borrowed as an approximate
+single-particle <Term id="basis">basis</Term>. That borrowing is the standard first move in
+atomic physics, and it is worth being clear that it is an approximation
+rather than a derivation, because the next section is about exactly where
+it starts to fail.
 
 <PredictBeforeReveal
   question="Carbon has 6 electrons. Filling 1s and 2s to capacity (2 + 2 = 4) leaves 2 electrons for 2p, whose capacity is 6. Does 2p end up full, and does carbon have a closed outer shell like a noble gas?"
   options={[
-    { label: "Yes — 2p fills completely, carbon is inert", value: "full" },
-    { label: "No — 2p ends up only 2 of 6 full, carbon's shell stays open", value: "partial" },
+    { label: "Yes: 2p fills completely, carbon is inert", value: "full" },
+    { label: "No: 2p ends up only 2 of 6 full, carbon's shell stays open", value: "partial" },
   ]}
   correctValue="partial"
-  explanation="Only 2 of 2p's 6 slots get filled: capacity isn't the same as occupancy. Carbon's outer shell is wide open, which is exactly why it's chemically versatile (four bonds) rather than inert like the noble gases in the figure above, whose outer shells really are full."
+  explanation="Only 2 of 2p's 6 slots are filled: capacity is not occupancy. Carbon's outer subshell is wide open, which is what makes it chemically versatile rather than inert like the noble gases pictured above. The exclusion principle sets the ceiling; how many electrons an atom brings decides how far below it they stop."
 />
 
 ## Worked Example
@@ -153,13 +171,21 @@ and as far as this course's scope goes.
 **Using the shell-filling picture, write the electron configuration for
 carbon (6 electrons).**
 
-Fill lowest shells first: 1s holds 2 (fills, using its full $2(1)^2=2$
-capacity). Remaining 4 electrons go into $n=2$: 2s holds 2 more (full,
-$2(0+1)^2$... more precisely 2s alone holds 2, its own sub-shell
-capacity), leaving 2 electrons for 2p. Configuration:
-$1s^2\,2s^2\,2p^2$, matching carbon's known configuration, built here
-entirely from the $n^2$-orbital-count-times-2-for-spin logic, no
-periodic table lookup required.
+Work subshell by subshell, using the capacity $2(2l+1)$ for a subshell of
+angular momentum $l$.
+
+1s ($l=0$) holds $2(1)=2$ electrons and fills, leaving 4. 2s ($l=0$)
+holds $2$ and fills, leaving 2. 2p ($l=1$) has capacity $2(3)=6$ and
+receives the last 2, so it stops one-third full. The configuration is
+
+$$
+1s^2\,2s^2\,2p^2
+$$
+
+which is carbon's, arrived at from the orbital count and the factor of
+two for spin, with no periodic table consulted. Note that the subshell
+capacities $2, 2, 6$ sum to the shell capacities the section above
+derived: $2$ for $n=1$ and $2+6=8$ for $n=2$.
 
 <BarChart
   bars={[
@@ -171,12 +197,12 @@ periodic table lookup required.
   ariaLabel="Carbon's electron configuration: 1s2 2s2 2p2, with 2p only partially filled"
 />
 
-1s and 2s are both filled to capacity; 2p (capacity 6, three orbitals
-times 2 for spin) holds only 2 of its 6 available slots, exactly why
-carbon's outer shell isn't closed and it forms 4 bonds rather than being
-chemically inert.
+1s and 2s are filled to capacity. 2p, with capacity 6 from three orbitals
+times two spins, holds 2. Those four vacancies are why carbon forms four
+bonds rather than sitting inert, and why the chemistry of every living
+thing is built on it.
 
-<InteractiveSection title="Fill the shells for any element" description="Slide through electron counts and watch the shells fill in order. Land on 10 to check this lesson's own practice question 2 (neon), and notice 3s only starts filling once 2p is completely full at 10. Keep sliding past 18 (argon) to 20 (calcium) and 21 (scandium): 4s fills completely before 3d gets a single electron, the exact anomaly named in Common Mistakes below, happening live rather than just being asserted.">
+<InteractiveSection title="Fill the shells for any element" description="Slide through electron counts and watch the shells fill in order. Land on 10 to check this lesson's own practice question 2 (neon), and notice 3s only starts filling once 2p is completely full at 10. Keep sliding past 18 (argon) to 20 (calcium) and 21 (scandium): 4s fills completely before 3d gets a single electron, the anomaly named in Common Mistakes below, happening live rather than just being asserted.">
   <BarChartExplorer
     frames={Array.from({ length: 21 }, (_, i) => shellFillFrame(i + 1))}
     sliderLabel="Electron count"
@@ -189,42 +215,30 @@ chemically inert.
 
 The bar chart above shows *that* 4s fills before 3d; this diagram shows
 *why*, using the same screening argument from Mathematical Development.
-In a pure hydrogen-like potential, energy depends only on $n$, so 3s,
-3p, and 3d are exactly degenerate and 4s sits strictly above all three.
-Toggle to "Real multi-electron atom" to see screening split that
-degeneracy apart and drop 4s below 3d, letting the higher-$n$ 4s state
-fill first even though $n=4>3$.
+In a pure $1/r$ potential, energy depends only on $n$, so 3s, 3p and 3d
+are degenerate and 4s sits above all three. Toggle to "Real
+multi-electron atom" and screening splits that degeneracy: a 3s electron
+spends more time near the nucleus, sees less shielding from the inner
+electrons, and drops; 3d, which is held away from the nucleus by its own
+angular momentum barrier, is shielded most and drops least. The ordering
+rearranges far enough that 4s ends up below 3d and fills first, despite
+the larger $n$.
 
-<div className="not-prose flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface-muted/40 p-4">
-  <input type="radio" id="mea-n3-preset-hlike" name="mea-n3-preset" defaultChecked className="peer/hlike sr-only" />
-  <label
-    htmlFor="mea-n3-preset-hlike"
-    className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/hlike:border-transparent peer-checked/hlike:bg-brand peer-checked/hlike:text-brand-foreground peer-focus-visible/hlike:outline-none peer-focus-visible/hlike:ring-2 peer-focus-visible/hlike:ring-brand peer-focus-visible/hlike:ring-offset-2 peer-focus-visible/hlike:ring-offset-background"
-  >
-    Hydrogen-like (l-degenerate)
-  </label>
-  <input type="radio" id="mea-n3-preset-real" name="mea-n3-preset" className="peer/real sr-only" />
-  <label
-    htmlFor="mea-n3-preset-real"
-    className="cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted peer-checked/real:border-transparent peer-checked/real:bg-brand peer-checked/real:text-brand-foreground peer-focus-visible/real:outline-none peer-focus-visible/real:ring-2 peer-focus-visible/real:ring-brand peer-focus-visible/real:ring-offset-2 peer-focus-visible/real:ring-offset-background"
-  >
-    Real multi-electron atom
-  </label>
-  <div className="hidden w-full peer-checked/hlike:block">
-    <EnergyLevelDiagram
-      levels={hydrogenLikeLevels}
-      unit="arb. units"
-      ariaLabel="Hydrogen-like n=3 and n=4 levels: 3s, 3p, and 3d exactly degenerate, with 4s strictly above all three"
-    />
-  </div>
-  <div className="hidden w-full peer-checked/real:block">
-    <EnergyLevelDiagram
-      levels={realAtomLevels}
-      unit="arb. units"
-      ariaLabel="Real multi-electron atom: 3s below 3p below 4s below 3d, screening having pushed 4s under 3d, both 4s and 3d highlighted"
-    />
-  </div>
-</div>
+<ToggleView
+  options={["Hydrogen-like (l-degenerate)", "Real multi-electron atom"]}
+  ariaLabel="Choose which n=3 and n=4 energy-level picture to display"
+>
+  <EnergyLevelDiagram
+    levels={hydrogenLikeLevels}
+    unit="arb. units"
+    ariaLabel="Hydrogen-like n=3 and n=4 levels: 3s, 3p, and 3d exactly degenerate, with 4s strictly above all three"
+  />
+  <EnergyLevelDiagram
+    levels={realAtomLevels}
+    unit="arb. units"
+    ariaLabel="Real multi-electron atom: 3s below 3p below 4s below 3d, screening having pushed 4s under 3d, both 4s and 3d highlighted"
+  />
+</ToggleView>
 
 ## Common Mistakes
 
@@ -253,7 +267,7 @@ limitation stated explicitly rather than glossed over.
 2. Write the electron configuration for neon (10 electrons), following
    the worked example's method.
 3. Why can't the shell-filling picture developed here be used to compute
-   an EXACT ground-state energy for a multi-electron atom, even though it
+   an *exact* ground-state energy for a multi-electron atom, even though it
    correctly predicts electron configurations?
 4. Name the one physical effect, absent from the pure hydrogen
    treatment, that's responsible for the 4s-before-3d filling anomaly.

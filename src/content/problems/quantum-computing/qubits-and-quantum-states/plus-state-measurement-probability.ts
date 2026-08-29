@@ -28,6 +28,10 @@ export const plusStateMeasurementProbability: NumericProblem = {
     value: probabilityOfOne,
     tolerance: 0.01,
     incorrectFeedback: "Not quite. Remember that probabilities come from |amplitude|², not the amplitude itself.",
+    nearMisses: [
+      { value: Math.SQRT1_2, tolerance: 0.01, feedback: "0.707 is the amplitude 1/√2 itself. The Born rule squares it, and squaring 1/√2 gives 1/2." },
+      { value: 1, feedback: "Certainty would mean the state is |1⟩. Here half the amplitude sits on |0⟩, so the outcome is genuinely uncertain." },
+    ],
   },
   hints: [
     { text: "Start by identifying the amplitude on the |1⟩ term." },

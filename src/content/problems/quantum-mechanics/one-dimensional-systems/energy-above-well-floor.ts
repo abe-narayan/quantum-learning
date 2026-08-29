@@ -22,6 +22,10 @@ export const energyAboveWellFloor: NumericProblem = {
     value: 0.703607,
     tolerance: 0.001,
     incorrectFeedback: "Just add V0 to E directly: (-4.2964) + 5.",
+    nearMisses: [
+      { value: -4.2964, tolerance: 0.001, feedback: "That is E measured from the top of the well, where V = 0 outside. Adding V₀ re-references it to the well's floor." },
+      { value: 9.2964, tolerance: 0.001, feedback: "The sign slipped: E is negative, so E + V₀ is smaller than V₀, not larger." },
+    ],
   },
   hints: [{ text: "E + V0 directly, using the lesson's own numbers." }],
   solution: {

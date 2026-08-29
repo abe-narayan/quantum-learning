@@ -31,6 +31,31 @@ export const greenCurveFrames = [
   },
 ];
 
+export const greenTestEnergy = 3;
+export const greenTestX = 0.3;
+export const greenTestXPrime = -0.2;
+export const greenClosedForm = wellGreenFunction(
+  greenTestEnergy,
+  greenTestXPrime,
+  greenTestX,
+  wellHalfWidth
+);
+export const wellEigenfunction = (n, x, a) =>
+  Math.abs(x) > a ? 0 : Math.sqrt(1 / a) * Math.sin((n * Math.PI * (x + a)) / (2 * a));
+export const greenSpectralTermCount = 200;
+export const greenSpectralSum = Array(greenSpectralTermCount)
+  .fill(0)
+  .reduce((acc, _unused, i) => {
+    const n = i + 1;
+    const energy = infiniteSquareWellEnergyLevel(n, 2 * wellHalfWidth);
+    const numerator =
+      wellEigenfunction(n, greenTestX, wellHalfWidth) *
+      wellEigenfunction(n, greenTestXPrime, wellHalfWidth);
+    return acc + numerator / (greenTestEnergy - energy);
+  }, 0);
+export const greenRelativeGap =
+  Math.abs(greenClosedForm - greenSpectralSum) / Math.abs(greenClosedForm);
+
 export const lorentzianKernel = (x, eps) => eps / (x * x + eps * eps);
 export const lorentzXValues = Array(241).fill(0).map((_, i) => -4 + (i / 240) * 8);
 export const lorentzEpsValues = [1, 0.3, 0.1, 0.03];
@@ -61,7 +86,7 @@ export const lessonMeta = {
   objectives: [
     "Derive the resolvent R(E)=(E−H)⁻¹=Σₙ Pₙ/(E−Eₙ) directly from the spectral theorem and identify its poles as bound-state energies",
     "Derive the free-particle and infinite-square-well Green's functions in closed form from a jump condition, and verify the well's poles reproduce the exact known energy levels",
-    "Derive the Sokhotski–Plemelji imaginary-part identity and connect it to why the continuous spectrum shows up as a branch cut rather than isolated poles",
+    "Derive the Sokhotski–Plemelj imaginary-part identity and connect it to why the continuous spectrum shows up as a branch cut rather than isolated poles",
   ],
   related: [
     {
@@ -84,7 +109,8 @@ Solving the Finite Well Numerically needed bisection because
 $k\tan(ka)=\kappa$ has no closed-form solution. That's true for a
 single well, but it hides something more useful: every bound-state
 energy of *any* Hamiltonian, solvable or not, is simultaneously encoded
-in one analytic function of a complex variable $E$, its **resolvent**.
+in one analytic function of a complex variable $E$, its
+<Term id="greens-functions-resolvents">resolvent</Term>.
 Bound states show up as poles, scattering states as a branch cut: one
 object, derived once here, replacing "solve this specific transcendental
 equation" with "find where this specific function blows up."
@@ -92,7 +118,7 @@ equation" with "find where this specific function blows up."
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Green%27s_Mill_-_geograph.org.uk_-_3972145.jpg"
   alt="Green's Mill, the restored windmill in Sneinton, Nottingham"
-  caption="George Green ran this working windmill and taught himself, almost entirely alone, the mathematics behind the Green's functions and resolvents this lesson derives, before ever attending university. No authenticated portrait of Green himself survives; this mill is the closest genuine physical trace of him."
+  caption="George Green ran this working windmill and taught himself, almost entirely alone, the mathematics behind the Green's functions and resolvents this lesson derives, before ever attending university. No authenticated portrait of Green himself survives; this mill is the closest surviving physical trace of him."
   credit="John M / Geograph Britain and Ireland, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Green's_Mill_-_geograph.org.uk_-_3972145.jpg"
   license="CC BY-SA 2.0"
@@ -105,8 +131,10 @@ $1/(\omega^2-\omega_0^2)$: it diverges exactly at resonance,
 $\omega=\omega_0$. The resolvent $R(E)=(E-H)^{-1}$ is the exact quantum
 analogue of that response function, with $H$'s eigenvalues playing the
 role of resonant frequencies: $R(E)$ "blows up" precisely when $E$ hits
-an eigenvalue of $H$, for exactly the same algebraic reason a
-denominator vanishes at resonance.
+the spectrum of $H$, for the same algebraic reason a denominator vanishes
+at resonance. The analogy has a limit worth flagging early: for a
+discrete eigenvalue the blow-up is a pole, and for a continuous spectral
+value it is not, which is what the branch-cut section below is about.
 
 ## Mathematical Development
 
@@ -121,9 +149,12 @@ $$
 (E-H)\sum_n\frac{P_n}{E-E_n}=\sum_n(E-E_n)\frac{P_n}{E-E_n}=\sum_nP_n=I
 $$
 
-(using $HP_n=E_nP_n$ and completeness $\sum_nP_n=I$), a genuine, direct
-verification that this formula really is the inverse, not just a
-plausible guess.
+(using $HP_n=E_nP_n$ and completeness $\sum_nP_n=I$), which verifies that
+the formula is the inverse rather than a plausible guess. One hypothesis
+rides along silently: $E$ must lie in the resolvent set. For $E$ on the
+spectrum a denominator vanishes and $R(E)$ fails to be a bounded
+operator, which is why the resolvent set is defined by boundedness of the
+inverse rather than by invertibility alone.
 
 ### Poles $\leftrightarrow$ bound states
 
@@ -134,7 +165,7 @@ are the bound-state energies": not an analogy, but a direct algebraic
 consequence of the spectral decomposition, readable off the formula
 above by inspection.
 
-### Branch cuts $\leftrightarrow$ continuous spectrum, via Sokhotski–Plemelji
+### Branch cuts $\leftrightarrow$ continuous spectrum, via Sokhotski–Plemelj
 
 For a continuous spectrum, the sum becomes the spectral-theorem integral
 $R(E)=\int dE'\,dE(E')/(E-E')$ (schematically, using the PVM from two
@@ -160,7 +191,7 @@ $$
 **exactly $\pi$, for every $\varepsilon>0$**, while the function itself
 concentrates ever more sharply at $x=0$ as $\varepsilon\to0$ (its peak
 height $1/\varepsilon\to\infty$, its width $\sim\varepsilon\to0$),
-exactly the same delta-sequence structure as the last lesson's Dirichlet
+the same delta-sequence structure as the last lesson's Dirichlet
 kernel, now for a Lorentzian instead of a sinc:
 
 <PredictBeforeReveal
@@ -171,7 +202,7 @@ kernel, now for a Lorentzian instead of a sinc:
     { label: "It stays exactly π for every ε>0", value: "fixed" },
   ]}
   correctValue="fixed"
-  explanation="The antiderivative computation above gives exactly π for every ε>0 — not a limiting value, an exact one at each finite ε. Only the curve's shape sharpens as ε→0; the fixed area is what turns ε/(x²+ε²) into πδ(x), the same delta-sequence mechanism as the Dirichlet kernel one lesson ago, now driving the Sokhotski–Plemelji relation."
+  explanation="The antiderivative computation above gives exactly π for every ε>0 — not a limiting value, an exact one at each finite ε. Only the curve's shape sharpens as ε→0; the fixed area is what turns ε/(x²+ε²) into πδ(x), the same delta-sequence mechanism as the Dirichlet kernel one lesson ago, now driving the Sokhotski–Plemelj relation."
 />
 
 <ParametricCurve
@@ -180,28 +211,40 @@ kernel, now for a Lorentzian instead of a sinc:
   ariaLabel="The Lorentzian epsilon over x squared plus epsilon squared, sharpening into a delta spike at x=0 as epsilon shrinks from 1 to 0.03"
 />
 
-Exactly this delta-sequence behavior is visible directly: as $\varepsilon$
-shrinks from $1$ down to $0.03$, the curve's peak at $x=0$ grows toward
-$1/\varepsilon$ while its width collapses toward $x=0$, even though the
-total area underneath stays fixed at exactly $\pi$ for every one of
-these $\varepsilon$ values (the exact antiderivative computation just
-above, not a numerical approximation that merely gets close). So
-$\varepsilon/(x^2+\varepsilon^2)\to\pi\delta(x)$, giving the
-**Sokhotski–Plemelji relation**:
+The plotted curve shows this happening: as $\varepsilon$ shrinks from $1$
+down to $0.03$, the peak at $x=0$ climbs toward $1/\varepsilon$ and the
+width collapses, while the area underneath never moves off $\pi$. So
+$\varepsilon/(x^2+\varepsilon^2)\to\pi\delta(x)$.
+
+<TheoremBox title="Sokhotski–Plemelj relation" provenance="derived">
+
+For every test function $\varphi\in\mathcal S(\mathbb R)$,
 
 $$
-\lim_{\varepsilon\to0^+}\frac{1}{x-i\varepsilon}=\mathcal P\!\left(\frac1x\right)+i\pi\delta(x)
+\lim_{\varepsilon\to0^+}\int\frac{\varphi(x)}{x-i\varepsilon}\,dx = \mathcal P\!\int\frac{\varphi(x)}{x}\,dx + i\pi\varphi(0),
 $$
 
-(the real-part statement, that the principal value $\mathcal P(1/x)$
-is the correct real limit, is cited, a standard but separate
-distributional argument). The resolvent's imaginary part, right at the
-continuous spectrum, is therefore proportional to a genuine density of
-states (a $\delta$-function's worth of weight at every point of the
-continuum), which is precisely why the continuous spectrum reads as a
-branch cut on the real axis rather than a single isolated pole: the
-function's value actually differs depending on which side of the cut
-you approach from.
+written compactly as
+$\lim_{\varepsilon\to0^+}(x-i\varepsilon)^{-1}=\mathcal P(1/x)+i\pi\delta(x)$.
+
+The **sense of the limit** is the part worth pinning down: this is an
+equality of *distributions*, in the $\Phi,\Phi'$ pairing of the previous
+lesson, not a pointwise limit of functions. Pointwise, the left side has
+no limit at $x=0$ at all. The imaginary half is derived above from an
+integral that equals $\pi$ at every finite $\varepsilon$; the principal-value
+real half is cited (a separate distributional argument, standard in any
+treatment of tempered distributions).
+
+</TheoremBox>
+
+The consequence for the resolvent: its imaginary part, evaluated right on
+the continuous spectrum, is $\pi$ times a density of states, since the
+$\delta$ contributes weight at every point of the continuum rather than
+at isolated points. That is why the continuous spectrum reads as a branch
+cut on the real axis rather than a set of poles. The limiting value
+differs depending on which side of the axis you approach from, and a
+function with two different boundary values across a line has a cut
+there, by definition.
 
 ### The free-particle Green's function, derived from a jump condition
 
@@ -242,8 +285,8 @@ $E=n^2\pi^2/(8a^2)$**: compare directly to the infinite well's already-known
 closed-form spectrum, `infiniteSquareWellEnergyLevel(n, 2a)` $=n^2\pi^2/(2(2a)^2)=n^2\pi^2/(8a^2)$
 **exactly the same formula**, an independent derivation reproducing a
 result this platform already had, not a new assumption. For $a=1$,
-computed directly by the platform's engine: $E_1\approx1.2337$,
-$E_2\approx4.9348$.
+computed by `infiniteSquareWellEnergyLevel`: $E_1={wellE1.toFixed(4)}$,
+$E_2={wellE2.toFixed(4)}$.
 
 <ParametricCurve
   frames={greenCurveFrames}
@@ -272,25 +315,27 @@ question.
 
 ## Worked Example
 
-**Verify the infinite-well closed form against the independent
-eigenfunction-expansion formula $G(x,x';E)=\sum_n\psi_n(x)\psi_n(x')/(E-E_n)$,
-built from this platform's actual `infiniteSquareWellEigenstate`
-functions, not the closed form just derived.**
+**Check the closed form against the eigenfunction expansion
+$G(x,x';E)=\sum_n\psi_n(x)\psi_n(x')/(E-E_n)$, which is derived from the
+spectral theorem rather than from the jump condition, and so is an
+independent route to the same object.**
 
-For $a=1$, $E=3$ (strictly between $E_1\approx1.2337$ and
-$E_2\approx4.9348$, so no pole is nearby), $x=0.3$, $x'=-0.2$: the
-closed form derived above gives $G_{\text{well}}\approx0.76096$.
-Summing the independent eigenfunction-expansion formula directly, using
-this platform's real, normalized `infiniteSquareWellEigenstate`
-wavefunctions and `infiniteSquareWellEnergyLevel` energies (not the
-closed-form boxed formula) over the first $200$ terms, gives
-$\approx0.76096$, agreement to about $5$-$6$ significant figures using
-only $200$ of the infinitely many terms in a series that converges like
-$1/n^2$ (so the remaining terms shrink the gap further); two unrelated
-derivations of the same object (one a boundary-value ODE solve, one a
-spectral sum over independently-known eigenfunctions) landing on the
-same number, exactly the kind of cross-check this platform's engine
-tests already perform elsewhere.
+Take $a=1$, $E={greenTestEnergy}$ (strictly between
+$E_1\approx{wellE1.toFixed(4)}$ and $E_2\approx{wellE2.toFixed(4)}$, so
+no pole is nearby), $x={greenTestX}$, $x'={greenTestXPrime}$. The boxed
+closed form gives $G_{\text{well}}={greenClosedForm.toFixed(5)}$. The
+spectral sum, run at module scope over the first
+{greenSpectralTermCount} terms with energies from this platform's
+`infiniteSquareWellEnergyLevel` and the well's normalized
+eigenfunctions, gives {greenSpectralSum.toFixed(5)}: a relative gap of
+{(greenRelativeGap * 100).toFixed(3)}%.
+
+The residual is the truncation, not an error in either derivation. The
+terms fall off like $1/n^2$, so a $200$-term partial sum still carries a
+tail of that order, and the two numbers converge as more terms are kept.
+What matters is that a boundary-value ODE solve and a spectral sum over
+independently-known eigenfunctions, sharing no step of their derivations,
+land on the same value.
 
 ## Common Mistakes
 
@@ -299,7 +344,7 @@ tests already perform elsewhere.
 same way it does for bound states.** It doesn't: the continuous
 spectrum shows up as a *branch cut* (a discontinuity in the limiting
 value approached from above vs. below the real axis, via
-Sokhotski–Plemelji), never as an isolated pole. Only actual point
+Sokhotski–Plemelj), never as an isolated pole. Only actual point
 eigenvalues, isolated from the rest of the spectrum, produce poles.
 </Callout>
 
@@ -322,7 +367,7 @@ points) but never *where* the poles are.
 3. Explain in one or two sentences why $\mathrm{Im}[1/(x-i\varepsilon)]=
    \varepsilon/(x^2+\varepsilon^2)$ integrating to exactly $\pi$ for
    *every* $\varepsilon>0$ (not just in some limit) is what makes it a
-   genuine delta-sequence, not merely "approximately" one.
+   delta-sequence, not merely "approximately" one.
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -332,7 +377,7 @@ points) but never *where* the poles are.
   spectral theorem; its poles are exactly the discrete eigenvalues, with
   residue equal to that eigenvalue's projector.
 - The continuous spectrum shows up as a branch cut, via the
-  Sokhotski–Plemelji identity $\lim_{\varepsilon\to0^+}1/(x-i\varepsilon)=
+  Sokhotski–Plemelj identity $\lim_{\varepsilon\to0^+}1/(x-i\varepsilon)=
   \mathcal P(1/x)+i\pi\delta(x)$, whose imaginary part is derived here in
   full from an exact, $\varepsilon$-independent integral.
 - $G_0(x,x';E)=-\frac{i}{k}e^{ik|x-x'|}$ (free particle) and
@@ -345,17 +390,11 @@ points) but never *where* the poles are.
 
 ## Further Exploration
 
-[Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
-names the general structure both the infinite well's $-y''=\lambda
-y$ and the hydrogen radial equation share, proving once and for all why
-every such "boundary-matching" eigenvalue problem this platform has
-solved comes with guaranteed real eigenvalues and a complete,
-orthogonal eigenbasis.
-
 <NextDiscovery>
-  Sturm-Liouville Theory names the general structure the infinite
-  well and the hydrogen radial equation share, proving once and for all
-  why every such "boundary-matching" eigenvalue problem this platform
-  has solved comes with guaranteed real eigenvalues and a complete,
-  orthogonal eigenbasis.
+  [Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
+  names the structure the infinite well's $-y''=\lambda y$ and the
+  hydrogen radial equation share, and proves why every
+  "boundary-matching" eigenvalue problem of that shape arrives with real
+  eigenvalues and a complete orthogonal eigenbasis, rather than having to
+  be checked case by case.
 </NextDiscovery>

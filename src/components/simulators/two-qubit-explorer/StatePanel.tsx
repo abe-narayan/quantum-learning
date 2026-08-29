@@ -28,7 +28,14 @@ export function StatePanel({ state }: { state: StateVector }) {
         </Badge>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border bg-surface-muted/60 px-4 py-3">
+      {/* No `overflow-x-auto` here: the only child is a block-level
+          `.katex-display`, which fills this content box and carries its own
+          horizontal scroll (globals.css §6), so this box never had anything to
+          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          y axis to `auto` too, which would silently clip a tall equation. The tab
+          stop the slab needs now lives on `.katex-display` itself; see
+          `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
+      <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
         <KatexMath tex={`|\\psi\\rangle = ${ketLatex}`} display />
       </div>
 
@@ -38,7 +45,27 @@ export function StatePanel({ state }: { state: StateVector }) {
           : "This state cannot be written as any single-qubit state ⊗ single-qubit state — the qubits are entangled."}
       </p>
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      {/* `tabIndex={0}` + `role="group"` on the table's scroll container, the
+          same remedy `BB84RoundTable` and `mdx-components.tsx`'s `Table`
+          wrapper apply. `w-full` on a table is not a promise that it fits: the
+          three columns have real min-content widths — a `|11⟩` ket, a
+          formatted complex amplitude like `0.354 + 0.354i`, and a probability
+          cell holding a `w-16` meter beside a `w-10` percentage — which floor
+          this table near 300px, against a ~256px content box on a 320px phone.
+          An `overflow-x-auto` div is focusable by default in no browser except
+          Firefox, so a keyboard-only reader could see the basis labels and had
+          no way to scroll to the amplitudes and probabilities beside them,
+          which is the whole panel.
+          `group` rather than `region`: this table is a readout inside a
+          simulator instrument, not top-level page content, and a landmark per
+          simulator would clutter the page's landmark list for no navigational
+          gain. */}
+      <div
+        role="group"
+        aria-label="State vector amplitudes and probabilities, scrollable horizontally"
+        tabIndex={0}
+        className="overflow-x-auto rounded-panel border border-border"
+      >
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-surface-muted/60 text-xs uppercase tracking-wide text-muted-foreground">

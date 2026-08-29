@@ -22,7 +22,11 @@ export const synthesisZeroEnergyUncertaintyConsequence: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["same outcome", "identical result", "unchanged"],
-      ["state doesn't evolve", "stationary", "delta t_A is infinite"],
+      {
+        phrases: ["state doesn't evolve", "does not evolve", "stationary", "delta t_A is infinite", "infinite", "never changes", "doesn't change", "frozen", "no evolution"],
+        missingFeedback:
+          "You have the outcome. Say why the time gap does not matter: ΔE = 0 sends Δt_A to infinity for every observable, so the state is stationary and nothing has changed between the two measurements however long you wait.",
+      },
     ],
     incorrectFeedback: "Name both pieces: that the second measurement gives exactly the same outcome as the first, and why — because Delta E=0 means the state is stationary (Delta t_A = infinity for every observable), so nothing changes between the two measurements regardless of the time interval.",
   },

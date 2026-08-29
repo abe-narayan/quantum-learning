@@ -38,12 +38,16 @@ export const channelsReusedInHardwarePillar: MultipleChoiceProblem = {
     { text: "These map directly onto T1 and T2 decay times." },
   ],
   solution: {
-    steps: [{ description: "amplitudeDampingChannel (T1-style decay) and dephasingChannel (T2-style decay) are the two functions the capstone explicitly flags for direct reuse." }],
-    finalAnswer: "(a) amplitudeDampingChannel and dephasingChannel",
+    steps: [{ description: "amplitudeDampingChannel models T1-style energy relaxation and dephasingChannel models T2-style phase loss. Those are the two quantities a hardware noise course works in, so those are the two functions the capstone flags for direct reuse." }],
+    finalAnswer: "amplitudeDampingChannel and dephasingChannel, the T1 and T2 decay models.",
   },
   explanation: {
-    correctIdea: "This tests whether the reader tracked the capstone's explicit 'Where This Goes Next' section, not just the course's internal content.",
-    whyCorrect: "Matches the capstone lesson's explicit statement.",
-    whyWrong: ["The other options are real functions from other courses, but none were flagged as directly reused for hardware noise modeling specifically."],
+    correctIdea: "The two Kraus channels are written against T1 and T2, the same two numbers a hardware noise course is built around, which is what makes them portable across pillars.",
+    whyCorrect: "Matches the capstone lesson's 'Where This Goes Next' section.",
+    whyWrong: [
+      { optionId: "b", text: "Names the path-integral functions. They carry the course's conceptual weight and model no decoherence." },
+      { optionId: "c", text: "Names the exchange-symmetry functions from Identical Particles, which have no noise content." },
+      { optionId: "d", text: "Names Approximation Methods' perturbation corrections, which compute energy shifts rather than decay." },
+    ],
   },
 };

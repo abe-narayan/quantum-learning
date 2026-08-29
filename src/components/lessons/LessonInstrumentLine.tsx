@@ -59,7 +59,13 @@ export function LessonInstrumentLine({
         className
       )}
     >
-      <DifficultyMark difficulty={difficulty} />
+      {/* `withHint` on foundational only: "Foundational" is the one rung a
+          first-time reader has to be able to decode on the spot ("can I
+          start here without background?"), and the answer previously lived
+          in a title= tooltip no touch device ever shows. The other rungs
+          keep the tooltip: their readers are already navigating the
+          curriculum and the header row stays one line. */}
+      <DifficultyMark difficulty={difficulty} withHint={difficulty === "foundational"} />
 
       <dl className="flex flex-wrap items-center gap-x-5 gap-y-2.5">
         {hasPosition ? (

@@ -131,7 +131,7 @@ export function PillarLessonStrip({
           <li key={row.lesson.slug} data-pillar={row.pillar}>
             <Link
               href={`/lessons/${row.lesson.slug}`}
-              className="group flex min-h-11 items-center gap-3 rounded-[--radius-tight] px-2.5 py-2 transition-colors duration-[--dur-fast] ease-[--ease-mech] hover:bg-surface-muted focus-visible:bg-surface-muted"
+              className="group flex min-h-11 items-center gap-3 rounded-(--radius-tight) px-2.5 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
             >
               <span
                 aria-hidden="true"

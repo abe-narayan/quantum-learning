@@ -95,7 +95,13 @@ export function ProjectionShadow({
               className="fill-accent/10"
             />
           )}
-          <g className="stroke-border" strokeWidth={1}>
+          {/* The x/y axes. In "line" mode the x-axis IS the eigenspace being
+              projected onto — the reader has to see where it is to see that
+              Pv lands on it — so this is as load-bearing as a mark gets.
+              Moved off `--border` (panel-edge token, 1.41:1 on
+              `--surface-muted`) to `--axis`, which clears the 3:1 WCAG 1.4.11
+              floor on every panel depth in both themes. */}
+          <g className="stroke-axis" strokeWidth={1.25}>
             <line x1={axisStartX.x} y1={axisStartX.y} x2={axisEndX.x} y2={axisEndX.y} />
             <line x1={axisStartY.x} y1={axisStartY.y} x2={axisEndY.x} y2={axisEndY.y} />
           </g>
@@ -132,7 +138,19 @@ export function ProjectionShadow({
             className="stroke-accent"
             markerEnd={`url(#${idBase}-loop-arrow)`}
           />
-          <text x={pvSvg.x + 18} y={pvSvg.y - 24} className="fill-accent text-[10px] font-medium">
+          {/* viewBox 320 rendered `w-full`. The ratio is 0.794, not the 0.9
+              this note claimed: The box is 254px, not 288px: 288 is the *page column* on a 320px phone
+              (320 less Container's `px-4` gutters), but this SVG renders inside
+              `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
+              radius and fill and no padding at all — the `p-4` does. Subtract
+              2 x (16px padding + 1px border) = 34px.
+              Still the gentlest ratio in this directory, but 10 and 11 units
+              were at 7.9px and 8.7px — under the ~9px floor, not over it, so
+              the raise was needed for a stronger reason than the old note
+              gave. 12 and 13 units lift the three labels that carry the
+              argument (v, Pv, and the idempotence annotation) to **9.53px and
+              10.32px**, which does clear it. */}
+          <text x={pvSvg.x + 18} y={pvSvg.y - 24} fontSize={12} className="fill-accent font-medium">
             P(Pv) = Pv
           </text>
 
@@ -149,7 +167,8 @@ export function ProjectionShadow({
             x={vSvg.x + (vSvg.x - origin.x >= 0 ? 12 : -12)}
             y={vSvg.y - (vSvg.y - origin.y <= 0 ? 8 : -14)}
             textAnchor="middle"
-            className="fill-brand text-[11px] font-medium"
+            fontSize={13}
+            className="fill-brand font-medium"
           >
             v
           </text>
@@ -176,7 +195,7 @@ export function ProjectionShadow({
               className="stroke-accent"
             />
           )}
-          <text x={pvSvg.x} y={pvSvg.y + 16} textAnchor="middle" className="fill-accent text-[11px] font-medium">
+          <text x={pvSvg.x} y={pvSvg.y + 18} textAnchor="middle" fontSize={13} className="fill-accent font-medium">
             {coincide ? "Pv = v" : "Pv"}
           </text>
 
@@ -208,7 +227,11 @@ export function ProjectionShadow({
           step={1}
           value={angleDeg}
           onChange={(e) => setAngleDeg(Number(e.target.value))}
-          className="mt-2 w-full accent-brand"
+          // `h-11` (44px) for the touch target: a range input centres its
+          // track in whatever height it's given, so the control looks
+          // identical and only the hit area grows — previously the browser
+          // default ~16px, less than half the 44px minimum.
+          className="mt-2 h-11 w-full accent-brand"
           aria-label="Rotate the input vector v"
           aria-valuetext={`θ = ${angleDeg} degrees`}
         />

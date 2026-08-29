@@ -22,7 +22,11 @@ export const whyNoClosedFormFiniteWell: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       ["transcendental", "trig function tangled with", "no algebraic isolation"],
-      ["infinite well", "outside region forbidden entirely", "no kappa side"],
+      {
+        phrases: ["infinite well", "outside region forbidden entirely", "no kappa side", "no kappa", "forbidden", "walls are infinite", "vanishes at the wall", "sin(kl)"],
+        missingFeedback:
+          "You have said why the finite well's equation resists algebra. The comparison is still open: the infinite well's walls forbid the outside region entirely, so no κ term ever appears and the condition collapses to sin(kL)=0, which does solve in closed form.",
+      },
     ],
     incorrectFeedback: "Name both pieces: what makes the finite-well equation transcendental (a trig function and a square root of the same unknown, tangled together), and why the infinite well avoided this (its outside region was forbidden entirely, removing the kappa side of the equation).",
   },

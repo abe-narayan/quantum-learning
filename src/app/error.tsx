@@ -28,7 +28,11 @@ export default function Error({
   }, [error]);
 
   return (
-    <Section width="reading" className="pt-4 sm:pt-8">
+    // `tight`, not `className="pt-4 sm:pt-8"` — same dead override as
+    // not-found.tsx and /learn's hero: `Section` writes its vertical padding
+    // as an inline `style`, which no class on the same element can beat, so
+    // the requested 16px was silently the full `--rhythm-section` instead.
+    <Section width="reading" tight>
       <Eyebrow>System fault</Eyebrow>
       <SectionTitle level={1} size="xl" className="mt-4">
         This calculation collapsed

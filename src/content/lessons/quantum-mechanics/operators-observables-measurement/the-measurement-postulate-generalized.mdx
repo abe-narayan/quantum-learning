@@ -61,7 +61,7 @@ export const collapseVectors = [
 export const lessonMeta = {
   title: "The Measurement Postulate, Generalized",
   description:
-    "Restating Born's rule with projectors instead of raw coefficients -- correct whether or not the measured eigenvalue is degenerate, and reducing exactly to the familiar |c_i|^2 form when it isn't.",
+    "Restating Born's rule with projectors instead of raw coefficients: correct whether or not the measured eigenvalue is degenerate, and reducing exactly to the familiar |c_i|^2 form when it isn't.",
   course: "operators-observables-measurement",
   module: "the-measurement-postulate-generalized",
   order: 1,
@@ -74,7 +74,7 @@ export const lessonMeta = {
   objectives: [
     "State the measurement postulate using projectors and show it reduces to |c_i|^2 in the nondegenerate case",
     "Compute a measurement probability and the post-measurement collapsed state for a degenerate eigenvalue",
-    "Explain why collapse is described by the projector, not by simply picking one eigenvector arbitrarily",
+    "Explain why collapse is described by the projector rather than by picking one eigenvector out of the degenerate subspace",
   ],
   related: [
     {
@@ -85,25 +85,18 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Why this matters">
-The earlier measurement postulate, P(aᵢ)=|cᵢ|², is exactly right when aᵢ is nondegenerate — but it doesn't even typecheck when several eigenvectors share the same eigenvalue.
+The earlier measurement postulate, P(aᵢ)=|cᵢ|², is exactly right when aᵢ is nondegenerate. When several eigenvectors share an eigenvalue, it does not even typecheck.
 </LessonHook>
 
 ## Motivation
 
 From Classical to Quantum's measurement postulate defined
-$c_i=\langle a_i|\psi\rangle$ for a
-*single* eigenvector $|a_i\rangle$ — there's no single $|a_i\rangle$ to take
-a coefficient of once several eigenvectors
-share an eigenvalue. This lesson fixes that using last lesson's projectors.
-
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/d/d6/JohnvonNeumann-LosAlamos.jpg"
-  alt="Black-and-white portrait photograph of mathematician John von Neumann at Los Alamos National Laboratory"
-  caption="John von Neumann's 1932 Mathematical Foundations of Quantum Mechanics first formalized measurement as projection onto an eigenspace followed by renormalization -- precisely the collapse rule, correct for degenerate eigenvalues, that this lesson derives."
-  credit="Los Alamos National Laboratory / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
-  license="Public domain"
-/>
+$c_i=\langle a_i|\psi\rangle$ for a *single* eigenvector $|a_i\rangle$.
+Once several eigenvectors share an eigenvalue there is no single
+$|a_i\rangle$ to take a coefficient of, and the formula has nothing to
+compute. This lesson repairs it using last lesson's projectors, arriving
+at the form von Neumann gave in 1932: project onto the eigenspace, then
+renormalize.
 
 ## Intuition
 
@@ -130,9 +123,9 @@ $$
 |\psi\rangle \;\longrightarrow\; \frac{P_i|\psi\rangle}{\|P_i|\psi\rangle\|}
 $$
 
-Literally: apply the projector (keeping only the component of
-$|\psi\rangle$ lying in that eigenspace), then renormalize. This is
-exactly `state.applyMatrix(P_i).normalize()` using operations this
+Two steps, in order: apply the projector (keeping only the component of
+$|\psi\rangle$ lying in that eigenspace), then renormalize. In code that
+is `state.applyMatrix(P_i).normalize()`, built from operations this
 platform's `StateVector` already had.
 
 ### Reducing to the familiar case
@@ -144,9 +137,9 @@ P(a_i) = \langle\psi|a_i\rangle\langle a_i|\psi\rangle = \langle a_i|\psi\rangle
 $$
 
 using $\langle\psi|a_i\rangle=\langle a_i|\psi\rangle^*$ (conjugate
-symmetry of the inner product), exactly recovering the earlier formula.
-The generalized rule is the same postulate as before, correctly
-accounting for degeneracy, not a different one.
+symmetry of the inner product), which recovers the earlier formula
+unchanged. The generalized rule is the same postulate as before,
+correctly accounting for degeneracy, not a different one.
 
 ### Degenerate case: probabilities add
 
@@ -159,26 +152,36 @@ P(a_i) = \sum_{k=1}^d |\langle e_{i,k}|\psi\rangle|^2
 $$
 
 the sum of the individual squared-coefficient probabilities across
-every eigenvector *sharing* that eigenvalue. This matches ordinary
-probability theory exactly: "probability the outcome is $a_i$" is the sum
+every eigenvector *sharing* that eigenvalue. This is the ordinary rule
+from probability theory: "probability the outcome is $a_i$" is the sum
 over every way the system could produce that outcome.
 
 ## Physical Interpretation
 
 Collapse to $P_i|\psi\rangle/\|P_i|\psi\rangle\|$ (rather than, say,
 picking one specific eigenvector out of the degenerate subspace) is the
-physically correct rule: a measurement that only resolves "the eigenvalue
+physically correct rule. A measurement that only resolves "the eigenvalue
 is $a_i$" gives you no information about *where* in that eigenspace the
-state actually was, and, critically, doesn't destroy whatever
-information *was* there. Projecting keeps exactly the part of
-$|\psi\rangle$ consistent with the observed outcome, nothing more,
-nothing less.
+state was, and it must not destroy the information that was there.
+Projecting keeps the part of $|\psi\rangle$ consistent with the observed
+outcome, and discards only the part the outcome ruled out.
 
 ## Worked Example
 
 **For $N=\mathrm{diag}(1,1,2)$ and $|\psi\rangle=\tfrac{1}{\sqrt3}
 (|0\rangle+|1\rangle+|2\rangle)$, find $P(N=1)$ and the post-measurement
 state.**
+
+<PredictBeforeReveal
+  question="Commit to a value before the calculation: the outcome N = 1 belongs to a two-dimensional eigenspace spanned by |0⟩ and |1⟩, and |ψ⟩ weights all three basis states equally. What is P(N = 1)?"
+  options={[
+    { label: "1/3, one outcome out of three equally weighted states", value: "third" },
+    { label: "1/2, two outcomes are possible so they split evenly", value: "half" },
+    { label: "2/3, the eigenspace collects the weight of both |0⟩ and |1⟩", value: "twothirds" },
+  ]}
+  correctValue="twothirds"
+  explanation="The projector P₁ = |0⟩⟨0| + |1⟩⟨1| collects every amplitude in the eigenspace, so P(N=1) = |1/√3|² + |1/√3|² = 2/3. A degenerate outcome is not one branch among equals: it owns as much probability as its eigenspace holds. The calculation below confirms it, and P(N=2) = 1/3 makes the total come out to 1."
+/>
 
 $$
 P(N{=}1) = \langle\psi|P_1|\psi\rangle = \left|\frac{1}{\sqrt3}\right|^2 + \left|\frac{1}{\sqrt3}\right|^2 = \frac13+\frac13 = \frac23
@@ -195,8 +198,8 @@ $$
 (A quick check: $P(N{=}2)=|1/\sqrt3|^2=\tfrac13$, and $\tfrac23+\tfrac13=1$,
 probabilities sum to 1, as they must.)
 
-Laid out as a branching tree, the single measurement of $N$ has exactly
-two possible outcomes, each carrying its own collapsed state:
+Laid out as a branching tree, the single measurement of $N$ has two
+possible outcomes, each carrying its own collapsed state:
 
 <MeasurementTree
   root={{
@@ -217,38 +220,40 @@ two possible outcomes, each carrying its own collapsed state:
 
 Both branches' probabilities are computed the same way, $\|P_i|\psi\rangle\|^2$,
 whether the branch's own eigenspace is degenerate (N=1, two-dimensional)
-or not (N=2, one-dimensional) — the generalized rule doesn't need a
-special case for either.
+or not (N=2, one-dimensional). The generalized rule needs no special case
+for either.
 
-The bar chart below shows the *probabilities* that collapse produces,
-but not collapse itself: projecting and renormalizing are two distinct
-geometric steps, visible if instead of tracking all three components of
-$|\psi\rangle$ we track only how much of it lies in each eigenspace --
-$\|P_1|\psi\rangle\|$ against $\|P_2|\psi\rangle\|$, computed by this
-platform's own `projectorOntoSubspace` and `Matrix.apply`, not derived
-by hand. Since $N$'s two eigenspaces are orthogonal complements
-spanning the whole space, that pair is always a point on the unit
-circle.
+The bar chart below shows the *probabilities* that collapse produces, but
+not collapse itself. Projecting and renormalizing are two distinct
+geometric steps, and they become visible if, instead of tracking all three
+components of $|\psi\rangle$, we track only how much of it lies in each
+eigenspace: $\|P_1|\psi\rangle\|$ against $\|P_2|\psi\rangle\|$, computed
+by this platform's own `projectorOntoSubspace` and `Matrix.apply` rather
+than written in by hand. Since $N$'s two eigenspaces are orthogonal
+complements spanning the whole space, that pair is always a point on the
+unit circle.
 
 <VectorDiagram
   vectors={collapseVectors}
-  ariaLabel="Vector diagram whose horizontal axis is the amplitude in the N equals 1 eigenspace and whose vertical axis is the amplitude in the N equals 2 eigenspace. Psi starts as a unit vector at coordinates root two thirds, root one third, about 0.816, 0.577. Projecting onto the N equals 1 eigenspace, labeled P sub 1 ket psi and drawn dashed, drops straight down onto the horizontal axis at 0.816, 0 -- the horizontal coordinate is unchanged, only the vertical one is deleted. Renormalizing then stretches that shortened vector back out to the unit circle, landing exactly on the horizontal axis at 1, 0, the post-measurement state psi prime."
+  ariaLabel="Vector diagram whose horizontal axis is the amplitude in the N equals 1 eigenspace and whose vertical axis is the amplitude in the N equals 2 eigenspace. Psi starts as a unit vector at coordinates root two thirds, root one third, about 0.816, 0.577. Projecting onto the N equals 1 eigenspace, labeled P sub 1 ket psi and drawn dashed, drops straight down onto the horizontal axis at 0.816, 0, leaving the horizontal coordinate unchanged and deleting only the vertical one. Renormalizing then stretches that shortened vector back out to the unit circle, landing exactly on the horizontal axis at 1, 0, the post-measurement state psi prime."
 />
 
-Notice what each step actually did. Projecting left the horizontal
-(eigenspace-1) coordinate exactly alone -- $P_1|\psi\rangle$ sits at
-$x=\sqrt{2/3}$, precisely $|\psi\rangle$'s own eigenspace-1 amplitude
--- and only deleted the vertical (eigenspace-2) coordinate, which is
-why $P_1|\psi\rangle$ is *shorter* than $|\psi\rangle$: some of the
-vector's length belonged to an outcome that didn't happen. Only the
-second step, dividing by $\|P_1|\psi\rangle\|$, changes the horizontal
-coordinate itself, stretching the vector back out to unit length. These
-axes aren't the basis kets $|0\rangle,|1\rangle$ -- each tracks the
-*total* amplitude within one whole eigenspace, so this view deliberately
-hides $|\psi'\rangle$'s remaining internal superposition across
-$|0\rangle$ and $|1\rangle$ (the very thing the next Common Mistake
-callout warns against flattening away) while making the
-project-then-renormalize mechanism itself unmistakable.
+Follow what each step did. Projecting left the horizontal (eigenspace-1)
+coordinate untouched: $P_1|\psi\rangle$ sits at $x=\sqrt{2/3}$, which is
+$|\psi\rangle$'s own eigenspace-1 amplitude. It deleted only the vertical
+(eigenspace-2) coordinate, which is why $P_1|\psi\rangle$ is *shorter*
+than $|\psi\rangle$. Some of the vector's length belonged to an outcome
+that did not happen. Only the second step, dividing by
+$\|P_1|\psi\rangle\|$, changes the horizontal coordinate itself,
+stretching the vector back out to unit length.
+
+One caveat about reading this diagram: its axes are not the basis kets
+$|0\rangle,|1\rangle$. Each axis tracks the *total* amplitude within one
+whole eigenspace, so the picture deliberately hides $|\psi'\rangle$'s
+remaining internal superposition across $|0\rangle$ and $|1\rangle$, which
+is the thing the next Common Mistake warns against flattening away. What
+it buys in exchange is that the project-then-renormalize mechanism becomes
+two visible moves rather than one algebraic formula.
 
 <InteractiveSection title="Sweep the state, watch both probabilities move" description="A one-parameter family of normalized states, parameterized by φ, sweeping continuously between an eigenstate of N=1 and an eigenstate of N=2. The two bars always sum to exactly 1. Find the φ that reproduces the worked example's 2/3, 1/3 split.">
   <BarChartExplorer
@@ -297,13 +302,13 @@ outcomes). Dividing by $\|P_i|\psi\rangle\|$ is not optional.
   generalization, not a different rule.
 - In the degenerate case, the probability is the sum of $|c|^2$ over
   every eigenvector sharing that eigenvalue, and the post-measurement
-  state can remain a genuine superposition within the degenerate
-  subspace.
+  state can remain a superposition within the degenerate subspace.
 
 ## Further Exploration
 
 <NextDiscovery>
 [Sequential Measurements and Incompatibility](/lessons/quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility) makes
-"measuring one observable disturbs another" completely concrete with a
-worked numeric example using operators you already know well.
+"measuring one observable disturbs another" concrete, with a worked
+numeric example using operators you already know well: measure spin along
+$z$, then $x$, then $z$ again, and the first answer does not survive.
 </NextDiscovery>

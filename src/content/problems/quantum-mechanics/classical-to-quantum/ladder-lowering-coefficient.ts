@@ -22,6 +22,11 @@ export const ladderLoweringCoefficient: NumericProblem = {
     value: 2,
     tolerance: 0.01,
     incorrectFeedback: "The coefficient is √n with n=4, not n-1.",
+    nearMisses: [
+      { value: Math.sqrt(3), tolerance: 0.01, feedback: "√3 uses the level you land on. The lowering coefficient is √n, taken from the level you start on." },
+      { value: 4, feedback: "4 is n itself. The coefficient is its square root." },
+      { value: Math.sqrt(5), tolerance: 0.01, feedback: "√5 is the raising coefficient √(n+1) for a†|4⟩. Lowering uses √n." },
+    ],
   },
   hints: [
     { text: "The lowering rule gives a|n⟩ = √n |n-1⟩." },
